@@ -30,6 +30,7 @@ include(":ontrack-ui")
 include(":ontrack-ui-graphql")
 include(":ontrack-ui-support")
 include(":ontrack-web")
+include(":ontrack-web-core")
 include(":ontrack-acceptance")
 include(":ontrack-docs")
 

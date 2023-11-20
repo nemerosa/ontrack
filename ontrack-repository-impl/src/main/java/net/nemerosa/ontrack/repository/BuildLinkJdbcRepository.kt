@@ -2,11 +2,8 @@ package net.nemerosa.ontrack.repository
 
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.BuildLink
-import net.nemerosa.ontrack.model.structure.ID.Companion.of
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.springframework.stereotype.Repository
-import java.sql.ResultSet
-import java.util.function.BiConsumer
 import javax.sql.DataSource
 
 @Repository
@@ -46,6 +43,17 @@ class BuildLinkJdbcRepository(
             )
         )
     }
+
+    override fun getCountQualifiedBuildsUsedBy(build: Build): Int =
+        namedParameterJdbcTemplate!!.queryForObject(
+            """
+                SELECT COUNT(BL.ID)
+                FROM BUILD_LINKS BL
+                WHERE BL.BUILDID = :buildId
+            """,
+            mapOf("buildId" to build.id()),
+            Int::class.java
+        ) ?: 0
 
     override fun getQualifiedBuildsUsedBy(build: Build): List<BuildLink> {
         return namedParameterJdbcTemplate!!.query(

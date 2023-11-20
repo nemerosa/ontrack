@@ -157,15 +157,32 @@ interface StructureService {
     fun getBuildsUsedBy(build: Build, offset: Int = 0, size: Int = 10, filter: (Build) -> Boolean = { true }): PaginatedList<Build>
 
     /**
+     * Gets the total number of downstream links
+     *
+     * @param build  Source build
+     * @return Number of downstream links
+     */
+    fun getCountQualifiedBuildsUsedBy(
+        build: Build,
+    ): Int
+
+    /**
      * Gets the builds used by the given one.
      *
      * @param build  Source build
      * @param offset Offset for pagination
      * @param size   Page size for pagination
+     * @param depth  If greater than 0, looks for children up to this depth
      * @param filter Optional filter on the builds
      * @return List of qualified build links which are used by the given one
      */
-    fun getQualifiedBuildsUsedBy(build: Build, offset: Int = 0, size: Int = 10, filter: (Build) -> Boolean = { true }): PaginatedList<BuildLink>
+    fun getQualifiedBuildsUsedBy(
+        build: Build,
+        offset: Int = 0,
+        size: Int = 10,
+        depth: Int = 0,
+        filter: (Build) -> Boolean = { true },
+    ): PaginatedList<BuildLink>
 
     /**
      * Gets the builds which use the given one.
@@ -374,17 +391,25 @@ interface StructureService {
      * @param offset       Offset in the list
      * @param count        Maximum number of elements to return
      * @param sortingMode  How to sort the runs ([ValidationRunSortingMode.ID] by default)
+     * @param statuses List of statuses to filter upon
      * @return List of validation runs
      */
-    fun getValidationRunsForBuild(buildId: ID, offset: Int, count: Int, sortingMode: ValidationRunSortingMode = ValidationRunSortingMode.ID): List<ValidationRun>
+    fun getValidationRunsForBuild(
+        buildId: ID,
+        offset: Int,
+        count: Int,
+        sortingMode: ValidationRunSortingMode = ValidationRunSortingMode.ID,
+        statuses: List<String>? = null,
+    ): List<ValidationRun>
 
     /**
      * Gets the number of validation runs for a build.
      *
      * @param buildId ID of the build
+     * @param statuses List of statuses to filter upon
      * @return Number of validation runs
      */
-    fun getValidationRunsCountForBuild(buildId: ID): Int
+    fun getValidationRunsCountForBuild(buildId: ID, statuses: List<String>? = null): Int
 
     /**
      * Gets the list of validation runs for a build and a validation stamp.
@@ -395,7 +420,14 @@ interface StructureService {
      * @param count             Maximum number of elemnts to return
      * @return List of validation runs
      */
-    fun getValidationRunsForBuildAndValidationStamp(buildId: ID, validationStampId: ID, offset: Int, count: Int): List<ValidationRun>
+    fun getValidationRunsForBuildAndValidationStamp(
+        buildId: ID,
+        validationStampId: ID,
+        offset: Int,
+        count: Int,
+        sortingMode: ValidationRunSortingMode? = ValidationRunSortingMode.ID,
+        statuses: List<String>? = null,
+    ): List<ValidationRun>
 
     /**
      * Gets the list of validation runs for a build and a validation stamp.
@@ -406,7 +438,14 @@ interface StructureService {
      * @param count             Maximum number of elemnts to return
      * @return List of validation runs
      */
-    fun getValidationRunsForBuildAndValidationStamp(build: Build, validationStamp: ValidationStamp, offset: Int, count: Int): List<ValidationRun>
+    fun getValidationRunsForBuildAndValidationStamp(
+        build: Build,
+        validationStamp: ValidationStamp,
+        offset: Int,
+        count: Int,
+        sortingMode: ValidationRunSortingMode? = ValidationRunSortingMode.ID,
+        statuses: List<String>? = null,
+    ): List<ValidationRun>
 
     /**
      * Gets the list of validation runs for a build and a validation stamp, and a list of accepted statuses
@@ -527,7 +566,11 @@ interface StructureService {
      * @param validationStampId ID of the validation stamp
      * @return Number of validation runs for the validation stamp
      */
-    fun getValidationRunsCountForBuildAndValidationStamp(buildId: ID, validationStampId: ID): Int
+    fun getValidationRunsCountForBuildAndValidationStamp(
+        buildId: ID,
+        validationStampId: ID,
+        statuses: List<String>? = null,
+    ): Int
 
     /**
      * Gets the total number of validation runs for a validation stamp
@@ -556,5 +599,12 @@ interface StructureService {
     fun findBranchByName(project: String, branch: String): Optional<Branch>
 
     fun entityLoader(): BiFunction<ProjectEntityType, ID, ProjectEntity>
+
+    /**
+     * Gets the list of the most active projects
+     *
+     * @param count Maximum number of projects to return
+     */
+    fun lastActiveProjects(count: Int): List<Project>
 
 }

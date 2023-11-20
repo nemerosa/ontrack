@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
-@Profile(RunProfile.ACC, RunProfile.UNIT_TEST)
+@Profile(value = [RunProfile.DEV, RunProfile.ACC, RunProfile.UNIT_TEST])
 @RestController
 @RequestMapping("/extension/scm/mock")
 class MockSCMController(

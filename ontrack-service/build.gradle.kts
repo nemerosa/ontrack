@@ -23,6 +23,7 @@ dependencies {
     runtimeOnly("org.hibernate.validator:hibernate-validator")
 
     testImplementation(project(":ontrack-it-utils"))
+    testImplementation(project(path = ":ontrack-model", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
 
     testRuntimeOnly(project(":ontrack-repository-impl"))

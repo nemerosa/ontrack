@@ -192,7 +192,9 @@ public class AutoPromotionEventListener implements EventListener {
                 build.getId(),
                 validationStamp.getId(),
                 0,
-                1
+                1,
+                null,
+                null
         );
         if (runs.isEmpty()) {
             return false;

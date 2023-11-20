@@ -21,6 +21,6 @@ class GQLTypeBuildFilterForm : GQLType {
             .classField(BuildFilterForm::type)
             .stringField(BuildFilterForm::typeName)
             .booleanField(BuildFilterForm::isPredefined)
-            .jsonField(BuildFilterForm::form)
+            .jsonField(BuildFilterForm::form, deprecation = "Form is only used for the Ontrack legacy UI")
             .build()
 }

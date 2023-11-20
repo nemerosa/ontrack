@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.common.Document
-import net.nemerosa.ontrack.common.UserException
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.api.BuildValidationExtension
 import net.nemerosa.ontrack.extension.api.ExtensionManager
@@ -25,10 +24,10 @@ import net.nemerosa.ontrack.repository.*
 import net.nemerosa.ontrack.service.ImageHelper.checkImage
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.Validate
+import org.jetbrains.annotations.Nullable
 import org.slf4j.LoggerFactory
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import java.util.*
 import java.util.function.BiFunction
@@ -42,6 +41,7 @@ class StructureServiceImpl(
     private val validationRunStatusService: ValidationRunStatusService,
     private val validationDataTypeService: ValidationDataTypeService,
     private val structureRepository: StructureRepository,
+    private val projectRepository: ProjectRepository,
     private val branchRepository: BranchRepository,
     private val buildLinkRepository: BuildLinkRepository,
     private val extensionManager: ExtensionManager,
@@ -436,18 +436,53 @@ class StructureServiceImpl(
         return PaginatedList.create(list.filter(filter), offset, size)
     }
 
+    override fun getCountQualifiedBuildsUsedBy(build: Build): Int {
+        securityService.checkProjectFunction(build, ProjectView::class.java)
+        return buildLinkRepository.getCountQualifiedBuildsUsedBy(build)
+    }
+
     override fun getQualifiedBuildsUsedBy(
         build: Build,
         offset: Int,
         size: Int,
+        depth: Int,
         filter: (Build) -> Boolean
     ): PaginatedList<BuildLink> {
         securityService.checkProjectFunction(build, ProjectView::class.java)
-        // Gets the complete list, filtered by ACL
-        val list = buildLinkRepository.getQualifiedBuildsUsedBy(build)
-            .filter { b -> securityService.isProjectFunctionGranted(b.build, ProjectView::class.java) }
+        // First level dependency (depth == 0)
+        val list = internalQualifiedBuildsUsedBy(
+            build = build,
+            depth = depth
+        )
+            // Filtering using ACL
+            .filter { b ->
+                securityService.isProjectFunctionGranted(b.build, ProjectView::class.java)
+            }
         // OK
         return PaginatedList.create(list.filter { filter(it.build) }, offset, size)
+    }
+
+    private fun internalQualifiedBuildsUsedBy(
+        build: Build,
+        depth: Int,
+    ): List<BuildLink> {
+        // First level dependency (depth == 0)
+        val list = buildLinkRepository.getQualifiedBuildsUsedBy(build)
+        // Recursivity
+        return if (depth > 0) {
+            list.flatMap { link ->
+                // The top lebel build itself
+                listOf(link) +
+                        // ... and its children (without any filter)
+                        internalQualifiedBuildsUsedBy(
+                            build = link.build,
+                            depth = depth - 1, // One level less
+                        )
+            }
+        } else {
+            list
+        }
+
     }
 
     @Deprecated("Only qualified build links should be used")
@@ -1335,7 +1370,8 @@ class StructureServiceImpl(
         buildId: ID,
         offset: Int,
         count: Int,
-        sortingMode: ValidationRunSortingMode
+        sortingMode: ValidationRunSortingMode,
+        statuses: List<String>?,
     ): List<ValidationRun> {
         val build = getBuild(buildId)
         securityService.checkProjectFunction(build.branch.project.id(), ProjectView::class.java)
@@ -1343,39 +1379,49 @@ class StructureServiceImpl(
             build,
             offset,
             count,
-            sortingMode
+            sortingMode,
+            statuses,
         ) { validationRunStatusService.getValidationRunStatus(it) }
     }
 
-    override fun getValidationRunsCountForBuild(buildId: ID): Int {
+    override fun getValidationRunsCountForBuild(
+        buildId: ID,
+        statuses: List<String>?,
+    ): Int {
         val build = getBuild(buildId)
         securityService.checkProjectFunction(build.branch.project.id(), ProjectView::class.java)
-        return structureRepository.getValidationRunsCountForBuild(build)
+        return structureRepository.getValidationRunsCountForBuild(build, statuses)
     }
 
     override fun getValidationRunsForBuildAndValidationStamp(
         buildId: ID,
         validationStampId: ID,
         offset: Int,
-        count: Int
+        count: Int,
+        sortingMode: ValidationRunSortingMode?,
+        statuses: List<String>?,
     ): List<ValidationRun> {
         val build = getBuild(buildId)
         val validationStamp = getValidationStamp(validationStampId)
-        return getValidationRunsForBuildAndValidationStamp(build, validationStamp, offset, count)
+        return getValidationRunsForBuildAndValidationStamp(build, validationStamp, offset, count, sortingMode, statuses)
     }
 
     override fun getValidationRunsForBuildAndValidationStamp(
         build: Build,
         validationStamp: ValidationStamp,
         offset: Int,
-        count: Int
+        count: Int,
+        sortingMode: ValidationRunSortingMode?,
+        statuses: List<String>?,
     ): List<ValidationRun> {
         securityService.checkProjectFunction(build, ProjectView::class.java)
         return structureRepository.getValidationRunsForBuildAndValidationStamp(
             build,
             validationStamp,
             offset,
-            count
+            count,
+            sortingMode,
+            statuses,
         ) { validationRunStatusService.getValidationRunStatus(it) }
     }
 
@@ -1575,8 +1621,16 @@ class StructureServiceImpl(
         return getValidationRun(run.id)
     }
 
-    override fun getValidationRunsCountForBuildAndValidationStamp(buildId: ID, validationStampId: ID): Int {
-        return structureRepository.getValidationRunsCountForBuildAndValidationStamp(buildId, validationStampId)
+    override fun getValidationRunsCountForBuildAndValidationStamp(
+        buildId: ID,
+        validationStampId: ID,
+        statuses: List<String>?,
+    ): Int {
+        return structureRepository.getValidationRunsCountForBuildAndValidationStamp(
+            buildId,
+            validationStampId,
+            statuses,
+        )
     }
 
     override fun getValidationRunsCountForValidationStamp(validationStampId: ID): Int {
@@ -1631,4 +1685,9 @@ class StructureServiceImpl(
             projectEntityType.getEntityFn(this@StructureServiceImpl).apply(id)
         }
     }
+
+    override fun lastActiveProjects(count: Int): List<Project> =
+        projectRepository.lastActiveProjects()
+            .filter { securityService.isProjectFunctionGranted<ProjectView>(it) }
+            .take(count)
 }

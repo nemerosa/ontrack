@@ -14,6 +14,9 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+/**
+ * @deprecated Use dedicated repositories at entity level
+ */
 public interface StructureRepository {
 
     // Projects
@@ -24,6 +27,7 @@ public interface StructureRepository {
 
     /**
      * Looks for a project using its ID.
+     *
      * @param projectId ID of the project
      * @return Project or <code>null</code> if not found
      */
@@ -52,6 +56,7 @@ public interface StructureRepository {
 
     /**
      * Looks for a branch using its ID.
+     *
      * @param branchId ID of the project
      * @return Branch or `null` if not found
      */
@@ -79,6 +84,7 @@ public interface StructureRepository {
 
     /**
      * Looks for a build using its ID.
+     *
      * @param buildId ID of the build
      * @return Build or `null` if not found
      */
@@ -136,7 +142,6 @@ public interface StructureRepository {
      *
      * @param build Source build
      * @return List of builds used by the given one
-     *
      * @deprecated Use {@link BuildLinkRepository#getQualifiedBuildsUsedBy(Build)} instead.
      */
     List<Build> getBuildsUsedBy(Build build);
@@ -146,7 +151,6 @@ public interface StructureRepository {
      *
      * @param build Source build
      * @return List of builds which use the given one
-     *
      * @deprecated Use {@link BuildLinkRepository#getQualifiedBuildsUsing(Build)} instead.
      */
     List<Build> getBuildsUsing(Build build);
@@ -161,6 +165,7 @@ public interface StructureRepository {
 
     /**
      * Looks for a promotion level using its ID.
+     *
      * @param promotionLevelId ID of the promotion level
      * @return Promotion level or `null` if not found
      */
@@ -189,6 +194,7 @@ public interface StructureRepository {
 
     /**
      * Looks for a promotion run using its ID.
+     *
      * @param promotionRunId ID of the promotion run
      * @return Promotion run or `null` if not found
      */
@@ -235,6 +241,7 @@ public interface StructureRepository {
 
     /**
      * Looks for a validation stamp using its ID.
+     *
      * @param validationStampId ID of the validation stamp
      * @return Validation stamp or `null` if not found
      */
@@ -263,8 +270,9 @@ public interface StructureRepository {
 
     /**
      * Looping over ALL validation runs.
+     *
      * @param validationRunStatusService Run status mapping function (provided by caller)
-     * @param processing Processing code
+     * @param processing                 Processing code
      */
     void forEachValidationRun(Function<String, ValidationRunStatusID> validationRunStatusService, Consumer<ValidationRun> processing);
 
@@ -291,7 +299,10 @@ public interface StructureRepository {
      * @param sortingMode                How to sort the runs (null is {@link ValidationRunSortingMode#ID} by default)
      * @return List of validation runs
      */
-    List<ValidationRun> getValidationRunsForBuild(Build build, int offset, int count, @Nullable ValidationRunSortingMode sortingMode, Function<String, ValidationRunStatusID> validationRunStatusService);
+    List<ValidationRun> getValidationRunsForBuild(Build build, int offset, int count,
+                                                  @Nullable ValidationRunSortingMode sortingMode,
+                                                  @Nullable List<String> statuses,
+                                                  Function<String, ValidationRunStatusID> validationRunStatusService);
 
     /**
      * Gets the number of validation runs for a build.
@@ -299,9 +310,17 @@ public interface StructureRepository {
      * @param build Build to get the validation runs for
      * @return Number of validation runs
      */
-    int getValidationRunsCountForBuild(Build build);
+    int getValidationRunsCountForBuild(Build build, @Nullable List<String> statuses);
 
-    List<ValidationRun> getValidationRunsForBuildAndValidationStamp(Build build, ValidationStamp validationStamp, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService);
+    List<ValidationRun> getValidationRunsForBuildAndValidationStamp(
+            Build build,
+            ValidationStamp validationStamp,
+            int offset,
+            int count,
+            @Nullable ValidationRunSortingMode sortingMode,
+            @Nullable List<String> statuses,
+            Function<String, ValidationRunStatusID> validationRunStatusService
+    );
 
     List<ValidationRun> getValidationRunsForBuildAndValidationStampAndStatus(Build build, ValidationStamp validationStamp, List<ValidationRunStatusID> statuses, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService);
 
@@ -328,7 +347,11 @@ public interface StructureRepository {
      * @param validationStampId ID of the validation stamp
      * @return Number of validation runs for the validation stamp
      */
-    int getValidationRunsCountForBuildAndValidationStamp(ID buildId, ID validationStampId);
+    int getValidationRunsCountForBuildAndValidationStamp(
+            ID buildId,
+            ID validationStampId,
+            @Nullable List<String> statuses
+    );
 
     /**
      * Gets the total number of validation runs for a validation stamp

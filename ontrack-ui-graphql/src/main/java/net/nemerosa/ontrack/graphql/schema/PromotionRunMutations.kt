@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.graphql.schema
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.exceptions.BranchNotFoundException
@@ -11,6 +10,8 @@ import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.PromotionRun
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
+import java.time.LocalDateTime
+import kotlin.jvm.optionals.getOrNull
 
 @Component
 class PromotionRunMutations(
@@ -42,6 +43,12 @@ class PromotionRunMutations(
         ) { input ->
             val build = structureService.getBuild(ID.of(input.buildId))
             promote(build, input)
+        },
+        unitMutation<DeletePromotionRunInput>(
+            name = "deletePromotionRun",
+            description = "Deletes an existing promotion run",
+        ) { input ->
+            structureService.deletePromotionRun(ID.of(input.promotionRunId))
         }
     )
 
@@ -58,11 +65,18 @@ class PromotionRunMutations(
             promotionLevelId = null,
             promotionLevelName = input.promotion,
         )
+        val signature = securityService.currentSignature.run {
+            if (input.dateTime != null) {
+                withTime(input.dateTime)
+            } else {
+                this
+            }
+        }
         return structureService.newPromotionRun(
             PromotionRun.of(
                 build = build,
                 promotionLevel = promotionLevel,
-                signature = securityService.currentSignature,
+                signature = signature,
                 description = input.description,
             )
         )
@@ -76,6 +90,7 @@ class PromotionRunMutations(
 }
 
 interface PromotionRunInput {
+    val dateTime: LocalDateTime?
     val promotion: String
     val description: String?
 }
@@ -89,6 +104,8 @@ class CreatePromotionRunInput(
     val build: String,
     @APIDescription("Promotion name")
     override val promotion: String,
+    @APIDescription("Promotion date/time")
+    override val dateTime: LocalDateTime?,
     @APIDescription("Promotion description")
     override val description: String?,
 ) : PromotionRunInput
@@ -98,6 +115,13 @@ class CreatePromotionRunByIdInput(
     val buildId: Int,
     @APIDescription("Promotion name")
     override val promotion: String,
+    @APIDescription("Promotion date/time")
+    override val dateTime: LocalDateTime?,
     @APIDescription("Promotion description")
     override val description: String?,
 ) : PromotionRunInput
+
+class DeletePromotionRunInput(
+    @APIDescription("Promotion run ID")
+    val promotionRunId: Int,
+)

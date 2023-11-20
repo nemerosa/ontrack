@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.model.security
 
+import net.nemerosa.ontrack.model.dashboards.DashboardEdition
+import net.nemerosa.ontrack.model.dashboards.DashboardSharing
 import net.nemerosa.ontrack.model.labels.LabelManagement
 import net.nemerosa.ontrack.model.labels.ProjectLabelManagement
 import java.util.*
@@ -92,7 +94,9 @@ interface RolesService {
                 AccountGroupManagement::class.java,
                 ProjectList::class.java,
                 LabelManagement::class.java,
-                ValidationStampBulkUpdate::class.java
+                ValidationStampBulkUpdate::class.java,
+                DashboardEdition::class.java,
+                DashboardSharing::class.java,
         )
 
         /**

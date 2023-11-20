@@ -8,12 +8,22 @@ import java.net.URI
 /**
  * List of build links, plus an indicator (link to the build page)
  * showing if there is extra links.
+ *
+ * @property buildId ID of the parent link
+ * @property linksCount Number of downstream links
+ * @property decorations Individual downstream links
+ * @property extraLink Link to the build page
  */
 class BuildLinkDecorationList(
-        val decorations: List<BuildLinkDecoration>,
-        val extraLink: URI?
+        val buildId: Int, // Needed for NextUI
+        val linksCount: Int, // Needed for NextUI
+        @Deprecated("Not needed for NextUI")
+        val decorations: List<BuildLinkDecoration>, // No longer used by NextUI
+        @Deprecated("Not needed for NextUI")
+        val extraLink: URI?,  // No longer used by NextUI
 )
 
+@Deprecated("Not needed for NextUI")
 class BuildLinkDecoration(
         val project: String,
         val build: String,

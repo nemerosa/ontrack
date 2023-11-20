@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.graphql.schema
 
 import graphql.Scalars
 import graphql.schema.*
+import net.nemerosa.ontrack.graphql.schema.authorizations.GQLInterfaceAuthorizableService
 import net.nemerosa.ontrack.graphql.support.disabledField
 import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
@@ -25,6 +26,8 @@ class GQLTypeBranch(
     private val projectEntityInterface: GQLProjectEntityInterface,
     freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>,
     private val gqlPaginatedListFactory: GQLPaginatedListFactory,
+    private val branchFavouriteService: BranchFavouriteService,
+    private val gqlInterfaceAuthorizableService: GQLInterfaceAuthorizableService,
 ) : AbstractGQLProjectEntity<Branch>(
     Branch::class.java,
     ProjectEntityType.BRANCH,
@@ -46,7 +49,22 @@ class GQLTypeBranch(
                 .description("Reference to project")
                 .type(GraphQLTypeReference(GQLTypeProject.PROJECT))
                 .build()
-        ) // Promotion levels
+        )
+        // Authorizations
+        .apply {
+            gqlInterfaceAuthorizableService.apply(this, Branch::class)
+        }
+        // Is this branch a favourite?
+        .field {
+            it.name("favourite")
+                .description("Is this branch a favourite of the current user?")
+                .type(Scalars.GraphQLBoolean)
+                .dataFetcher { env ->
+                    val branch: Branch = env.getSource()
+                    branchFavouriteService.isBranchFavourite(branch)
+                }
+        }
+        // Promotion levels
         .field(
             GraphQLFieldDefinition.newFieldDefinition()
                 .name("promotionLevels")

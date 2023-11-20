@@ -26,6 +26,9 @@ class ProjectLabelManagementServiceImpl(
                     }
                     .map { labelManagementService.getLabel(it.id) }
 
+    override fun hasProjectLabel(project: Project, label: Label): Boolean =
+        projectLabelRepository.hasProjectLabel(project.id(), label.id)
+
     override fun getProjectsForLabel(label: Label): List<ID> =
             projectLabelRepository.getProjectsForLabel(label.id)
                     .filter { securityService.isProjectFunctionGranted(it, ProjectView::class.java) }

@@ -1,8 +1,10 @@
 package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.forRecursiveLinks
 import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException
 import net.nemerosa.ontrack.model.exceptions.ProjectNotFoundException
+import net.nemerosa.ontrack.model.labels.Label
 import net.nemerosa.ontrack.model.security.BuildConfig
 import net.nemerosa.ontrack.model.security.BuildCreate
 import net.nemerosa.ontrack.model.security.BuildEdit
@@ -10,6 +12,7 @@ import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -113,22 +116,22 @@ class BuildLinkIT : AbstractDSLTestSupport() {
         }
         asUser().withProjectFunction(source, BuildConfig::class.java).withView(target1).withView(target2)
             .withView(target3).call {
-            // Adds the link using a form
-            structureService.editBuildLinks(
-                source,
-                BuildLinkForm(
-                    false,
-                    BuildLinkFormItem(target1.project.name, target1.name, ""), // Existing
-                    BuildLinkFormItem(target2.project.name, target2.name, ""), // Existing
-                    BuildLinkFormItem(target3.project.name, target3.name, "") // New
+                // Adds the link using a form
+                structureService.editBuildLinks(
+                    source,
+                    BuildLinkForm(
+                        false,
+                        BuildLinkFormItem(target1.project.name, target1.name, ""), // Existing
+                        BuildLinkFormItem(target2.project.name, target2.name, ""), // Existing
+                        BuildLinkFormItem(target3.project.name, target3.name, "") // New
+                    )
                 )
-            )
-            // Checks all builds are still linked
-            assertEquals(
-                setOf(target1.id, target2.id, target3.id),
-                structureService.getQualifiedBuildsUsedBy(source).pageItems.map { it.build.id }.toSet()
-            )
-        }
+                // Checks all builds are still linked
+                assertEquals(
+                    setOf(target1.id, target2.id, target3.id),
+                    structureService.getQualifiedBuildsUsedBy(source).pageItems.map { it.build.id }.toSet()
+                )
+            }
     }
 
     @Test
@@ -145,22 +148,22 @@ class BuildLinkIT : AbstractDSLTestSupport() {
         }
         asUser().withProjectFunction(source, BuildConfig::class.java).withView(target1).withView(target2)
             .withView(target3).call {
-            // Adds the link using a form
-            structureService.editBuildLinks(
-                source,
-                BuildLinkForm(
-                    false,
-                    BuildLinkFormItem(target1.project.name, target1.name, ""), // Existing
-                    // BuildLinkFormItem(target2.project.name, target2.name, ""), // Removing
-                    BuildLinkFormItem(target3.project.name, target3.name, "") // New
+                // Adds the link using a form
+                structureService.editBuildLinks(
+                    source,
+                    BuildLinkForm(
+                        false,
+                        BuildLinkFormItem(target1.project.name, target1.name, ""), // Existing
+                        // BuildLinkFormItem(target2.project.name, target2.name, ""), // Removing
+                        BuildLinkFormItem(target3.project.name, target3.name, "") // New
+                    )
                 )
-            )
-            // Checks all builds are still linked
-            assertEquals(
-                setOf(target1.id, target3.id),
-                structureService.getQualifiedBuildsUsedBy(source).pageItems.map { it.build.id }.toSet()
-            )
-        }
+                // Checks all builds are still linked
+                assertEquals(
+                    setOf(target1.id, target3.id),
+                    structureService.getQualifiedBuildsUsedBy(source).pageItems.map { it.build.id }.toSet()
+                )
+            }
     }
 
     @Test
@@ -177,20 +180,20 @@ class BuildLinkIT : AbstractDSLTestSupport() {
         }
         asUser().withProjectFunction(source, BuildConfig::class.java).withView(target1).withView(target2)
             .withView(target3).call {
-            // Adds the link using a form
-            structureService.editBuildLinks(
-                source,
-                BuildLinkForm(
-                    true,
-                    BuildLinkFormItem(target3.project.name, target3.name, "") // New
+                // Adds the link using a form
+                structureService.editBuildLinks(
+                    source,
+                    BuildLinkForm(
+                        true,
+                        BuildLinkFormItem(target3.project.name, target3.name, "") // New
+                    )
                 )
-            )
-            // Checks all builds are still linked
-            assertEquals(
-                setOf(target1.id, target2.id, target3.id),
-                structureService.getQualifiedBuildsUsedBy(source).pageItems.map { it.build.id }.toSet()
-            )
-        }
+                // Checks all builds are still linked
+                assertEquals(
+                    setOf(target1.id, target2.id, target3.id),
+                    structureService.getQualifiedBuildsUsedBy(source).pageItems.map { it.build.id }.toSet()
+                )
+            }
     }
 
     @Test
@@ -219,12 +222,12 @@ class BuildLinkIT : AbstractDSLTestSupport() {
             }
             asUser().withProjectFunction(source, BuildConfig::class.java).withView(target1).withView(target2)
                 .withView(target3).call {
-                // Checks all builds are still linked
-                assertEquals(
-                    setOf(target1.id, target2.id, target3.id),
-                    structureService.getQualifiedBuildsUsedBy(source).pageItems.map { it.build.id }.toSet()
-                )
-            }
+                    // Checks all builds are still linked
+                    assertEquals(
+                        setOf(target1.id, target2.id, target3.id),
+                        structureService.getQualifiedBuildsUsedBy(source).pageItems.map { it.build.id }.toSet()
+                    )
+                }
         }
     }
 
@@ -254,12 +257,12 @@ class BuildLinkIT : AbstractDSLTestSupport() {
             }
             asUser().withProjectFunction(source, BuildConfig::class.java).withView(target1).withView(target2)
                 .withView(target3).call {
-                // Checks all builds are still linked
-                assertEquals(
-                    setOf(target2.id, target3.id),
-                    structureService.getQualifiedBuildsUsedBy(source).pageItems.map { it.build.id }.toSet()
-                )
-            }
+                    // Checks all builds are still linked
+                    assertEquals(
+                        setOf(target2.id, target3.id),
+                        structureService.getQualifiedBuildsUsedBy(source).pageItems.map { it.build.id }.toSet()
+                    )
+                }
         }
     }
 
@@ -287,12 +290,12 @@ class BuildLinkIT : AbstractDSLTestSupport() {
         }
         asUser().withProjectFunction(source, BuildConfig::class.java).withView(target1).withView(target2)
             .withView(target3).call {
-            // Checks all builds are still linked
-            assertEquals(
-                setOf(target1.id, target2.id, target3.id),
-                structureService.getQualifiedBuildsUsedBy(source).pageItems.map { it.build.id }.toSet()
-            )
-        }
+                // Checks all builds are still linked
+                assertEquals(
+                    setOf(target1.id, target2.id, target3.id),
+                    structureService.getQualifiedBuildsUsedBy(source).pageItems.map { it.build.id }.toSet()
+                )
+            }
     }
 
     @Test
@@ -500,7 +503,14 @@ class BuildLinkIT : AbstractDSLTestSupport() {
             assertTrue(structureService.isLinkedTo(b1, t3.project.name, buildPattern = t3.name, qualifier = "dep3"))
             assertTrue(structureService.isLinkedTo(b1, t3.project.name, "", qualifier = "dep3"))
             assertFalse(structureService.isLinkedTo(b1, t3.project.name, "", qualifier = BuildLink.DEFAULT))
-            assertFalse(structureService.isLinkedTo(b1, t3.project.name, buildPattern = t3.name, qualifier = BuildLink.DEFAULT))
+            assertFalse(
+                structureService.isLinkedTo(
+                    b1,
+                    t3.project.name,
+                    buildPattern = t3.name,
+                    qualifier = BuildLink.DEFAULT
+                )
+            )
 
             assertTrue(structureService.isLinkedFrom(t2, b1.project.name, ""))
             assertTrue(structureService.isLinkedFrom(t2, b1.project.name, b1.name))
@@ -667,6 +677,100 @@ class BuildLinkIT : AbstractDSLTestSupport() {
         assertProjectLinkedToFilter(source, target, "${target.project.name}:2.0*", listOf(b1))
         // Standard filter on project and exact build
         assertProjectLinkedToFilter(source, target, "${target.project.name}:2.0.0", listOf(b1))
+    }
+
+    @Test
+    fun `Getting first level builds by default`() {
+        forRecursiveLinks { _, p, builds ->
+            val links = structureService.getQualifiedBuildsUsedBy(p)
+            assertEquals(
+                listOf(
+                    builds["q2"],
+                    builds["q1"],
+                ),
+                links.pageItems.map { it.build }
+            )
+        }
+    }
+
+    @Test
+    fun `Filtering builds on project labels`() {
+        forRecursiveLinks { label, p, builds ->
+            val links = structureService.getQualifiedBuildsUsedBy(
+                build = p
+            ) { candidate ->
+                projectLabelManagementService.hasProjectLabel(candidate.project, label)
+            }
+            assertEquals(
+                listOf(
+                    builds["q1"],
+                ),
+                links.pageItems.map { it.build }
+            )
+        }
+    }
+
+    @Test
+    fun `Getting recursive links with max depth`() {
+        forRecursiveLinks { _, p, builds ->
+            val links = structureService.getQualifiedBuildsUsedBy(
+                build = p,
+                depth = 1, // We don't expect s layer
+            )
+            assertEquals(
+                listOf(
+                    builds["q2"],
+                    builds["r5"],
+                    builds["r4"],
+                    builds["r3"],
+                    builds["q1"],
+                    builds["r2"],
+                    builds["r1"],
+                ),
+                links.pageItems.map { it.build }
+            )
+        }
+    }
+
+    @Test
+    fun `Getting recursive links with max depth and label filtering`() {
+        forRecursiveLinks { label, p, builds ->
+            val links = structureService.getQualifiedBuildsUsedBy(
+                build = p,
+                depth = 1, // We don't expect s layer
+            ) { candidate ->
+                projectLabelManagementService.hasProjectLabel(candidate.project, label)
+            }
+            assertEquals(
+                listOf(
+                    builds["r4"],
+                    builds["q1"],
+                    builds["r1"],
+                ),
+                links.pageItems.map { it.build }
+            )
+        }
+    }
+
+    @Test
+    fun `Getting recursive links with deep depth and label filtering`() {
+        forRecursiveLinks { label, p, builds ->
+            val links = structureService.getQualifiedBuildsUsedBy(
+                build = p,
+                depth = 10,
+            ) { candidate ->
+                projectLabelManagementService.hasProjectLabel(candidate.project, label)
+            }
+            assertEquals(
+                listOf(
+                    builds["r4"],
+                    builds["q1"],
+                    builds["s2"],
+                    builds["r1"],
+                ),
+                links.pageItems.map { it.build }
+            )
+        }
     }
 
     private fun assertProjectLinkedToFilter(source: Branch, target: Branch, pattern: String, expected: List<Build>) {

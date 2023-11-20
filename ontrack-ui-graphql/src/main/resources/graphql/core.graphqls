@@ -7,3 +7,168 @@ type Mutation {
     """Basic test service"""
     ping: String
 }
+
+# =================================================================================
+# Payload errors (duplicate from the programmatic ones)
+# =================================================================================
+
+"Representation of an error."
+type PayloadUserError {
+    "Programmatic code to be used by client. Usually the FQCN of the corresponding exception."
+    exception: String!
+    "Additional information about the location of this error."
+    location: String
+    "The error message"
+    message: String!
+}
+
+"Interface implemented by all mutation payloads"
+interface PayloadInterface {
+    "List of errors"
+    errors: [PayloadUserError]
+}
+
+# =================================================================================
+# Scalars
+# =================================================================================
+
+scalar JSON
+
+# =================================================================================
+# ACL
+# =================================================================================
+
+"""A named authorization"""
+type Authorization {
+    """Name of the authorization scope"""
+    name: String!
+    """Action to authorize"""
+    action: String!
+    """Authorized?"""
+    authorized: Boolean!
+}
+
+extend type Query {
+    """Getting a list of authorizations for the authenticated user"""
+    authorizations: [Authorization!]!
+}
+
+# =================================================================================
+# Dashboards
+# =================================================================================
+
+type WidgetInstance {
+    uuid: String!
+    key: String!
+    config: JSON!
+}
+
+type Widget {
+    key: String!
+    name: String!
+    description: String!
+    defaultConfig: JSON!
+}
+
+enum DashboardContextUserScope {
+    PRIVATE
+    SHARED
+    BUILT_IN
+}
+
+type DashboardAuthorizations {
+    edit: Boolean!
+    share: Boolean!
+    delete: Boolean!
+}
+
+type Dashboard {
+    uuid: String!
+    name: String!
+    userScope: DashboardContextUserScope!
+    layoutKey: String!
+    widgets: [WidgetInstance!]!
+    authorizations: DashboardAuthorizations!
+}
+
+type DashboardLayout {
+    key: String!
+    name: String!
+    description: String!
+}
+
+extend type Query {
+    """Gets the current dashboard"""
+    userDashboard: Dashboard!
+    """Gets the list of private & shared dashboards"""
+    userDashboards: [Dashboard!]!
+    """List of available layouts"""
+    dashboardLayouts: [DashboardLayout!]!
+    """List of available widgets"""
+    dashboardWidgets: [Widget!]!
+}
+
+extend type Mutation {
+    """Saves a dashboard"""
+    saveDashboard(input: SaveDashboardInput!): SaveDashboardPayload
+    """Shares a dashboard"""
+    shareDashboard(input: ShareDashboardInput!): ShareDashboardPayload
+    """Deletes a dashboard"""
+    deleteDashboard(input: DeleteDashboardInput!): DeletionPayload
+    """Selects a dashboard"""
+    selectDashboard(input: SelectDashboardInput!): SelectDashboardPayload
+}
+
+input WidgetInstanceInput {
+    uuid: String
+    key: String!
+    config: JSON!
+}
+
+input SaveDashboardInput {
+    uuid: String
+    name: String!
+    userScope: DashboardContextUserScope!
+    layoutKey: String!
+    widgets: [WidgetInstanceInput!]!
+    select: Boolean! = true
+}
+
+type SaveDashboardPayload implements PayloadInterface {
+    "List of errors"
+    errors: [PayloadUserError]
+    """Saved dashboard"""
+    dashboard: Dashboard
+}
+
+input ShareDashboardInput {
+    """UUID of the dashboard to share"""
+    uuid: String!
+}
+
+input DeleteDashboardInput {
+    """UUID of the dashboard to delete"""
+    uuid: String!
+}
+
+input SelectDashboardInput {
+    """UUID of the dashboard to select"""
+    uuid: String!
+}
+
+type ShareDashboardPayload implements PayloadInterface {
+    "List of errors"
+    errors: [PayloadUserError]
+    """Shared dashboard"""
+    dashboard: Dashboard
+}
+
+type DeletionPayload implements PayloadInterface {
+    "List of errors"
+    errors: [PayloadUserError]
+}
+
+type SelectDashboardPayload implements PayloadInterface {
+    "List of errors"
+    errors: [PayloadUserError]
+}

@@ -6,11 +6,14 @@ import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.getPropertyDescription
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
+import net.nemerosa.ontrack.model.structure.PropertyService
 import org.springframework.stereotype.Component
 
 @Component
 class GQLTypeProjectEntityInformation(
     private val gqlProjectEntityInterface: GQLProjectEntityInterface,
+    private val gqlTypeProperty: GQLTypeProperty,
+    private val propertyService: PropertyService,
 ) : GQLType {
 
     data class Data(
@@ -40,6 +43,24 @@ class GQLTypeProjectEntityInformation(
                 .description(getPropertyDescription(Data::entity))
                 .type(gqlProjectEntityInterface.typeRef.toNotNull())
         }
+        .field {
+            it.name("properties")
+                .description("List of properties for this entity")
+                .type(listType(gqlTypeProperty.typeRef))
+                .argument(booleanArgument(ARG_HAS_VALUE, "Keeps only properties which have a value"))
+                .dataFetcher { env ->
+                    val data: Data = env.getSource()
+                    val hasValue: Boolean = env.getArgument<Boolean?>("hasValue") ?: false
+                    propertyService.getProperties(data.entity)
+                        .filter { property ->
+                            !hasValue || !property.isEmpty
+                        }
+                }
+        }
         .build()
+
+    companion object {
+        const val ARG_HAS_VALUE = "hasValue"
+    }
 
 }

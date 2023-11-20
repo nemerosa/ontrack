@@ -6,6 +6,7 @@ import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
 import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLObjectType.newObject
+import net.nemerosa.ontrack.graphql.schema.authorizations.GQLInterfaceAuthorizableService
 import net.nemerosa.ontrack.graphql.support.descriptionField
 import net.nemerosa.ontrack.model.structure.ValidationRun
 import net.nemerosa.ontrack.model.structure.ValidationRunStatus
@@ -17,13 +18,12 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @Component
-class GQLTypeValidationRunStatus
-@Autowired
-constructor(
+class GQLTypeValidationRunStatus(
     private val fieldContributors: List<GQLFieldContributor>,
     private val validationRunStatusID: GQLTypeValidationRunStatusID,
     private val creation: GQLTypeCreation,
-    private val freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>
+    private val freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>,
+    private val gqlInterfaceAuthorizableService: GQLInterfaceAuthorizableService,
 ) : GQLType {
 
     override fun getTypeName() = VALIDATION_RUN_STATUS
@@ -70,6 +70,12 @@ constructor(
             }
             // Links
             .fields(ValidationRunStatus::class.java.graphQLFieldContributions(fieldContributors))
+            // Authorizations
+            .apply {
+                gqlInterfaceAuthorizableService.apply(this, ValidationRunStatus::class) { data: Data ->
+                    data.delegate
+                }
+            }
             // OK
             .build()
 

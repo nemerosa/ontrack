@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.model.links.BranchLinksNode
 /**
  * Extension to enrich edge decorations in build graph.
  */
+@Deprecated("Will be removed in V5")
 interface BranchLinksDecorationExtension : Extension {
 
     /**

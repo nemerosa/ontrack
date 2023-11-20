@@ -35,6 +35,10 @@ angular.module('ot.directive.userMenu', [
                     $scope.closeMenu()();
                 };
 
+                $scope.nextUI = () => {
+                    location.href = '/ui';
+                };
+
                 $scope.logout = function () {
                     ot.call($http.post("logout", {})).then(() => {
                         location.href = '/login?logout';

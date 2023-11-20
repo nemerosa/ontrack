@@ -1,0 +1,102 @@
+/**
+ * For any component which must span 100% of the horizontal space
+ */
+.ot-line {
+    width: 100%;
+}
+
+/**
+ * Change the transparency of an item on hover
+ */
+
+.ot-hover-transparent-10 {
+    opacity: 10%;
+}
+
+.ot-hover-transparent-10:hover {
+    opacity: 100%;
+}
+
+/**
+ * Displaying a pointer cursor
+ */
+.ot-action {
+    cursor: pointer;
+}
+
+/**
+ * Commands
+ */
+.ot-command {
+    cursor: pointer;
+    opacity: 30%;
+}
+
+.ot-command:hover {
+    cursor: pointer;
+    opacity: 100%;
+}
+
+/**
+ * Information section
+ */
+
+.ot-info {
+    width: 100%;
+    border-left: solid 3px lightgray;
+    padding-left: 6px;
+}
+
+/**
+ * Well (inspired by Bootstrap)
+ */
+
+.ot-well {
+    width: 100%;
+    background-color: rgb(230, 230, 230);
+    border: solid 1px darkgrey;
+    padding: 6px;
+    border-radius: 6px;
+}
+
+/**
+ * Small inline box
+ */
+
+.ot-box {
+    width: 1em;
+    height: 1em;
+    display: inline-block;
+}
+
+/**
+ * Group of validations
+ */
+
+.ot-validation-group {
+    border: solid 1px rgb(128, 128, 128);
+    border-radius: 4px;
+    padding: 4px;
+}
+
+/**
+ * Element highlighted for VSF edition
+ */
+
+button.ot-validation-stamp-filter-edition {
+    background-color: lightyellow;
+}
+
+.ot-validation-stamp-filter-edition table th.ot-validation-stamp {
+    background-color: lightyellow;
+}
+
+/**
+ * Dependency link
+ */
+
+.ot-dependency {
+    border: solid 1px rgb(128, 128, 128);
+    border-radius: 4px;
+    padding: 4px;
+}

@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
 @Component
-@Profile(RunProfile.ACC, RunProfile.UNIT_TEST)
+@Profile(value = [RunProfile.DEV, RunProfile.ACC, RunProfile.UNIT_TEST])
 class MockSCMExtension(
     extensionFeature: SCMExtensionFeature,
     private val propertyService: PropertyService,

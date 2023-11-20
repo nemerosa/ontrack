@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service.security
 
+import net.nemerosa.ontrack.model.dashboards.DashboardEdition
 import net.nemerosa.ontrack.model.labels.LabelManagement
 import net.nemerosa.ontrack.model.labels.ProjectLabelManagement
 import net.nemerosa.ontrack.model.security.*
@@ -212,7 +213,7 @@ class RolesServiceImpl(
 
         // Creator
         registerGlobalRole(Roles.GLOBAL_CREATOR, "Creator",
-                "A creator is allowed to create new projects and to configure it. Once done, its rights on the " + "project are revoked immediately.",
+                "A creator is allowed to create new projects and to configure it. Once done, its rights on the project are revoked immediately.",
                 listOf(
                         ProjectCreation::class.java,
                         LabelManagement::class.java
@@ -283,7 +284,8 @@ class RolesServiceImpl(
         // Participant in all projects
         registerGlobalRole(Roles.GLOBAL_PARTICIPANT, "Participant",
                 "This role grants a read-only access to all projects and the right to comment on validation runs.",
-                RolesService.readOnlyGlobalFunctions,
+                RolesService.readOnlyGlobalFunctions
+                        + DashboardEdition::class.java,
                 RolesService.readOnlyProjectFunctions
                         + ValidationRunStatusChange::class.java
                         + ValidationRunStatusCommentEditOwn::class.java

@@ -47,6 +47,13 @@ class GQLRootQueryBranches(
                                 .type(GraphQLString)
                                 .build()
                 )
+                .argument(
+                        newArgument()
+                                .name("token")
+                                .description("Fragment to match against the branch name")
+                                .type(GraphQLString)
+                                .build()
+                )
                 .argument {
                     it.name(GRAPHQL_BRANCHES_FAVORITE_ARG)
                             .description("Keeps only branches listed as favourute")
@@ -60,7 +67,8 @@ class GQLRootQueryBranches(
     private fun branchFetcher(): DataFetcher<List<Branch>> = DataFetcher { environment ->
         val id: Int? = environment.getArgument("id")
         val projectName: String? = environment.getArgument("project")
-        val name: String? = environment.getArgument("name")
+        var name: String? = environment.getArgument("name")
+        val token: String? = environment.getArgument("token")
         val favourite: Boolean? = environment.getArgument(GRAPHQL_BRANCHES_FAVORITE_ARG)
         val propertyFilterArg: Any? = environment.getArgument(GQLInputPropertyFilter.ARGUMENT_NAME)
 
@@ -69,6 +77,11 @@ class GQLRootQueryBranches(
             { true }
         } else {
             { project -> project.name == projectName }
+        }
+
+        // Token to regex
+        if (name == null && !token.isNullOrBlank()) {
+            name = ".*$token.*"
         }
 
         // Branch name filter

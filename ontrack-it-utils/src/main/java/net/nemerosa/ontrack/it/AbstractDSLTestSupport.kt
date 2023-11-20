@@ -300,19 +300,19 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
      * Creates a validation run on a build, possibly with some data and a status.
      */
     fun <T> Build.validateWithData(
-        validationStamp: ValidationStamp,
-        validationRunStatusID: ValidationRunStatusID? = null,
-        validationDataTypeId: String? = null,
-        validationRunData: T? = null,
-        description: String? = null,
-        signature: Signature? = null,
+            validationStamp: ValidationStamp,
+            validationRunStatusID: ValidationRunStatusID? = null,
+            validationDataTypeId: String? = null,
+            validationRunData: T? = null,
+            description: String? = null,
+            signature: Signature? = null,
     ) = validateWithData(
-        validationStampName = validationStamp.name,
-        validationRunStatusID = validationRunStatusID,
-        validationDataTypeId = validationDataTypeId,
-        validationRunData = validationRunData,
-        description = description,
-        signature = signature,
+            validationStampName = validationStamp.name,
+            validationRunStatusID = validationRunStatusID,
+            validationDataTypeId = validationDataTypeId,
+            validationRunData = validationRunData,
+            description = description,
+            signature = signature,
     )
 
     /**
@@ -361,7 +361,7 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         }
     }
 
-    fun Build.linkTo(project: Project, buildName: String) {
+    fun Build.linkTo(project: Project, buildName: String, qualifier: String = "") {
         val build = structureService.buildSearch(
             project.id,
             BuildSearchForm(
@@ -369,13 +369,22 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
                 buildName = buildName,
             )
         ).firstOrNull() ?: throw BuildNotFoundException(project.name, buildName)
-        linkTo(build)
+        linkTo(build, qualifier)
+    }
+
+    fun Build.linkTo(build: Build, qualifier: String = "") {
+        structureService.createBuildLink(
+            this,
+            build,
+            qualifier,
+        )
     }
 
     infix fun Build.linkTo(build: Build) {
-        structureService.addBuildLink(
+        structureService.createBuildLink(
             this,
-            build
+            build,
+            ""
         )
     }
 

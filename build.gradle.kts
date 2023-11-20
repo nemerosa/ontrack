@@ -119,7 +119,8 @@ val postIntegrationTest by tasks.registering {
  */
 
 val javaProjects = subprojects.filter {
-    it.path != ":ontrack-web"
+    it.path != ":ontrack-web" &&
+            it.path != ":ontrack-web-core"
 }
 
 val exportedProjects = javaProjects.filter {

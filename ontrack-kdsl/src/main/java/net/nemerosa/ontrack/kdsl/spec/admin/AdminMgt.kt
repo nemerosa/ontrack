@@ -22,4 +22,11 @@ class AdminMgt(connector: Connector) : Connected(connector) {
             .parse<LogEntries>()
             .resources
 
+    /**
+     * Mgt. of predefined promotion levels
+     */
+    val predefinedPromotionLevels: PredefinedPromotionLevelsMgt by lazy {
+        PredefinedPromotionLevelsMgt(connector)
+    }
+
 }

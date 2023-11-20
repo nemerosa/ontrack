@@ -55,26 +55,18 @@ class ValidationStampFilterServiceImpl(
     }
 
     override fun newValidationStampFilter(filter: ValidationStampFilter): ValidationStampFilter {
-        checkUpdateAuthorisations(filter)
+        securityService.checkUpdateAuthorisations(filter)
         return repository.newValidationStampFilter(filter)
     }
 
     override fun saveValidationStampFilter(filter: ValidationStampFilter) {
-        checkUpdateAuthorisations(filter)
+        securityService.checkUpdateAuthorisations(filter)
         repository.saveValidationStampFilter(filter)
     }
 
     override fun deleteValidationStampFilter(filter: ValidationStampFilter): Ack {
-        checkUpdateAuthorisations(filter)
+        securityService.checkUpdateAuthorisations(filter)
         return repository.deleteValidationStampFilter(filter.id)
-    }
-
-    private fun checkUpdateAuthorisations(filter: ValidationStampFilter) {
-        filter.project?.let {
-            securityService.checkProjectFunction(it, ValidationStampFilterMgt::class.java)
-        } ?: filter.branch?.let {
-            securityService.checkProjectFunction(it, ValidationStampFilterCreate::class.java)
-        } ?: securityService.checkGlobalFunction(GlobalSettings::class.java)
     }
 
     override fun shareValidationStampFilter(filter: ValidationStampFilter, project: Project): ValidationStampFilter {

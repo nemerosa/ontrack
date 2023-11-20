@@ -18,7 +18,9 @@ import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -1001,11 +1003,31 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
-    public List<ValidationRun> getValidationRunsForBuild(Build build, int offset, int count, @Nullable ValidationRunSortingMode sortingMode, Function<String, ValidationRunStatusID> validationRunStatusService) {
+    public List<ValidationRun> getValidationRunsForBuild(
+            Build build,
+            int offset,
+            int count,
+            @Nullable ValidationRunSortingMode sortingMode,
+            @Nullable List<String> statuses,
+            Function<String, ValidationRunStatusID> validationRunStatusService
+    ) {
         ValidationRunSortingMode actualSortingMode = sortingMode != null ? sortingMode : ValidationRunSortingMode.ID;
         String sql = "SELECT VR.*, VDR.DATA_TYPE_ID, VDR.DATA " +
                 "FROM VALIDATION_RUNS VR " +
                 "LEFT JOIN VALIDATION_RUN_DATA VDR ON VDR.VALIDATION_RUN = VR.ID ";
+
+        String criterias = "";
+        Map<String,Object> params  = new HashMap<>();
+        params.put("buildId", build.id());
+        params.put("offset", offset);
+        params.put("limit", count);
+
+        if (statuses != null && !statuses.isEmpty()) {
+            sql += "INNER JOIN VALIDATION_RUN_STATUSES VRS ON VRS.ID = (SELECT ID FROM VALIDATION_RUN_STATUSES WHERE VALIDATIONRUNID = VR.ID ORDER BY ID DESC LIMIT 1) ";
+            criterias += "AND VRS.VALIDATIONRUNSTATUSID IN (:statuses) ";
+            params.put("statuses", statuses);
+        }
+
         String order = "";
         switch (actualSortingMode) {
             case ID:
@@ -1015,15 +1037,19 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
                 sql += "LEFT JOIN RUN_INFO RI ON RI.VALIDATION_RUN = VR.ID ";
                 order = "ORDER BY RI.RUN_TIME DESC, VR.ID DESC ";
                 break;
+            case NAME:
+                sql += "INNER JOIN VALIDATION_STAMPS VS ON VR.VALIDATIONSTAMPID = VS.ID ";
+                order = "ORDER BY VS.NAME ASC ";
+                break;
         }
+
         return getNamedParameterJdbcTemplate().query(
                 sql +
                         "WHERE VR.BUILDID = :buildId " +
+                        criterias +
                         order +
                         "LIMIT :limit OFFSET :offset",
-                params("buildId", build.id())
-                        .addValue("offset", offset)
-                        .addValue("limit", count),
+                params,
                 (rs, rowNum) -> toValidationRun(
                         rs,
                         id -> build,
@@ -1034,27 +1060,81 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
-    public int getValidationRunsCountForBuild(Build build) {
+    public int getValidationRunsCountForBuild(
+            Build build,
+            @Nullable List<String> statuses
+    ) {
+        String sql = "SELECT COUNT(VR.ID) FROM VALIDATION_RUNS VR ";
+        String criterias = "WHERE VR.BUILDID = :buildId ";
+
+        Map<String,Object> params  = new HashMap<>();
+        params.put("buildId", build.id());
+
+        if (statuses != null && !statuses.isEmpty()) {
+            sql += "INNER JOIN VALIDATION_RUN_STATUSES VRS ON VRS.ID = (SELECT ID FROM VALIDATION_RUN_STATUSES WHERE VALIDATIONRUNID = VR.ID ORDER BY ID DESC LIMIT 1) ";
+            criterias += "AND VRS.VALIDATIONRUNSTATUSID IN (:statuses) ";
+            params.put("statuses", statuses);
+        }
+
         return getNamedParameterJdbcTemplate().queryForObject(
-                "SELECT COUNT(ID) FROM VALIDATION_RUNS WHERE BUILDID = :buildId",
-                params("buildId", build.id()),
+                sql + criterias,
+                params,
                 Integer.class
         );
     }
 
     @Override
-    public List<ValidationRun> getValidationRunsForBuildAndValidationStamp(Build build, ValidationStamp validationStamp, int offset, int count, Function<String, ValidationRunStatusID> validationRunStatusService) {
+    public List<ValidationRun> getValidationRunsForBuildAndValidationStamp(
+            Build build,
+            ValidationStamp validationStamp,
+            int offset,
+            int count,
+            @Nullable ValidationRunSortingMode sortingMode,
+            @Nullable List<String> statuses,
+            Function<String, ValidationRunStatusID> validationRunStatusService
+    ) {
+
+        String sql = "SELECT VR.*, VDR.DATA_TYPE_ID, VDR.DATA " +
+                "FROM VALIDATION_RUNS VR " +
+                "LEFT JOIN VALIDATION_RUN_DATA VDR ON VDR.VALIDATION_RUN = VR.ID ";
+
+        String criterias = "WHERE VR.BUILDID = :buildId " +
+                "AND VR.VALIDATIONSTAMPID = :validationStampId ";
+
+        Map<String,Object> params  = new HashMap<>();
+        params.put("buildId", build.id());
+        params.put("validationStampId", validationStamp.id());
+        params.put("offset", offset);
+        params.put("limit", count);
+
+        if (statuses != null && !statuses.isEmpty()) {
+            sql += "INNER JOIN VALIDATION_RUN_STATUSES VRS ON VRS.ID = (SELECT ID FROM VALIDATION_RUN_STATUSES WHERE VALIDATIONRUNID = VR.ID ORDER BY ID DESC LIMIT 1) ";
+            criterias += "AND VRS.VALIDATIONRUNSTATUSID IN (:statuses) ";
+            params.put("statuses", statuses);
+        }
+
+        String order = "";
+        ValidationRunSortingMode actualSortingMode = sortingMode != null ? sortingMode : ValidationRunSortingMode.ID;
+        switch (actualSortingMode) {
+            case ID:
+                order = "ORDER BY VR.ID DESC ";
+                break;
+            case RUN_TIME:
+                sql += "LEFT JOIN RUN_INFO RI ON RI.VALIDATION_RUN = VR.ID ";
+                order = "ORDER BY RI.RUN_TIME DESC, VR.ID DESC ";
+                break;
+            case NAME:
+                sql += "INNER JOIN VALIDATION_STAMPS VS ON VR.VALIDATIONSTAMPID = VS.ID ";
+                order = "ORDER BY VS.NAME ASC ";
+                break;
+        }
+
         return getNamedParameterJdbcTemplate().query(
-                "SELECT VR.*, VDR.DATA_TYPE_ID, VDR.DATA " +
-                        "FROM VALIDATION_RUNS VR " +
-                        "LEFT JOIN VALIDATION_RUN_DATA VDR ON VDR.VALIDATION_RUN = VR.ID " +
-                        "WHERE VR.BUILDID = :buildId " +
-                        "AND VR.VALIDATIONSTAMPID = :validationStampId " +
-                        "ORDER BY VR.ID DESC " +
+                sql +
+                        criterias +
+                        order +
                         "LIMIT :limit OFFSET :offset",
-                params("buildId", build.id()).addValue("validationStampId", validationStamp.id())
-                        .addValue("limit", count)
-                        .addValue("offset", offset),
+                params,
                 (rs, rowNum) -> toValidationRun(
                         rs,
                         id -> build,
@@ -1090,10 +1170,27 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     }
 
     @Override
-    public int getValidationRunsCountForBuildAndValidationStamp(ID buildId, ID validationStampId) {
+    public int getValidationRunsCountForBuildAndValidationStamp(
+            ID buildId,
+            ID validationStampId,
+            List<String> statuses
+    ) {
+        String sql = "SELECT COUNT(VR.ID) FROM VALIDATION_RUNS VR ";
+        String criterias = "WHERE VR.BUILDID = :buildId AND VR.VALIDATIONSTAMPID = :validationStampId ";
+
+        Map<String,Object> params  = new HashMap<>();
+        params.put("buildId", buildId.get());
+        params.put("validationStampId", validationStampId.get());
+
+        if (statuses != null && !statuses.isEmpty()) {
+            sql += "INNER JOIN VALIDATION_RUN_STATUSES VRS ON VRS.ID = (SELECT ID FROM VALIDATION_RUN_STATUSES WHERE VALIDATIONRUNID = VR.ID ORDER BY ID DESC LIMIT 1) ";
+            criterias += "AND VRS.VALIDATIONRUNSTATUSID IN (:statuses) ";
+            params.put("statuses", statuses);
+        }
+
         return getNamedParameterJdbcTemplate().queryForObject(
-                "SELECT COUNT(ID) FROM VALIDATION_RUNS WHERE BUILDID = :buildId AND VALIDATIONSTAMPID = :validationStampId",
-                params("buildId", buildId.getValue()).addValue("validationStampId", validationStampId.getValue()),
+                sql + criterias,
+                params,
                 Integer.class
         );
     }

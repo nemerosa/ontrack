@@ -1,9 +1,7 @@
 package net.nemerosa.ontrack.graphql.schema
 
-import graphql.schema.GraphQLObjectType
-import net.nemerosa.ontrack.graphql.support.GraphQLBeanConverter
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
-import net.nemerosa.ontrack.model.annotations.getAPITypeName
+import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.preferences.Preferences
 import net.nemerosa.ontrack.model.preferences.PreferencesService
 import net.nemerosa.ontrack.model.security.SecurityService
@@ -37,6 +35,8 @@ class PreferencesMutations(
             val new = Preferences(
                 branchViewVsNames = input.branchViewVsNames ?: current.branchViewVsNames,
                 branchViewVsGroups = input.branchViewVsGroups ?: current.branchViewVsGroups,
+                dashboardUuid = input.dashboardUuid ?: current.dashboardUuid,
+                selectedBranchViewKey = input.selectedBranchViewKey ?: current.selectedBranchViewKey,
             )
             // Saves the preferences...
             preferencesService.setPreferences(account, new)
@@ -48,21 +48,11 @@ class PreferencesMutations(
 
 }
 
-@Component
-class GQLTypePreferences : GQLType {
-
-    override fun getTypeName(): String = Preferences::class.java.simpleName
-
-    override fun createType(cache: GQLTypeCache): GraphQLObjectType =
-        GraphQLObjectType.newObject()
-            .name(typeName)
-            .description(getAPITypeName(Preferences::class))
-            .fields(GraphQLBeanConverter.asObjectFields(Preferences::class, cache))
-            .build()
-
-}
-
 data class SetPreferencesInput(
     val branchViewVsNames: Boolean? = null,
     val branchViewVsGroups: Boolean? = null,
+    @APIDescription("Dashboard selected by default")
+    var dashboardUuid: String? = null,
+    @APIDescription("Selected branch view")
+    var selectedBranchViewKey: String? = null,
 )

@@ -88,6 +88,8 @@ class Build(
 
     /**
      * Links this build to other builds using their project names and their names.
+     *
+     * The project name may contain a "@qualifier".
      */
     fun linksTo(links: Map<String, String>) {
         graphqlConnector.mutate(
@@ -95,10 +97,20 @@ class Build(
                 branch.project.name,
                 name,
                 links.map { (project, name) ->
-                    LinksBuildInputItem.builder()
-                        .project(project)
-                        .build(name)
-                        .build()
+                    if (project.contains("@")) {
+                        val projectName = project.substringBefore("@")
+                        val qualifier = project.substringAfter("@")
+                        LinksBuildInputItem.builder()
+                            .project(projectName)
+                            .qualifier(qualifier)
+                            .build(name)
+                            .build()
+                    } else {
+                        LinksBuildInputItem.builder()
+                            .project(project)
+                            .build(name)
+                            .build()
+                    }
                 }
             )
         ) {

@@ -4,15 +4,21 @@ import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.ConnectorResponse
 import net.nemerosa.ontrack.kdsl.connector.ConnectorResponseBody
 import org.springframework.boot.web.client.RestTemplateBuilder
+import org.springframework.core.io.ByteArrayResource
+import org.springframework.http.HttpEntity
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.util.LinkedMultiValueMap
+import org.springframework.util.MultiValueMap
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.getForEntity
 import org.springframework.web.client.postForEntity
 import java.nio.charset.Charset
 
+
 class DefaultConnector(
-        override val url: String,
-        private val defaultHeaders: Map<String, String> = emptyMap(),
+    override val url: String,
+    private val defaultHeaders: Map<String, String> = emptyMap(),
 ) : Connector {
 
     companion object {
@@ -23,22 +29,22 @@ class DefaultConnector(
         get() = defaultHeaders[X_ONTRACK_TOKEN]
 
     override fun get(
-            path: String,
-            headers: Map<String, String>,
-            noAuth: Boolean,
+        path: String,
+        headers: Map<String, String>,
+        noAuth: Boolean,
     ): ConnectorResponse {
         val response = restTemplate(headers, noAuth).getForEntity<ByteArray>(path)
         return RestTemplateConnectorResponse(response)
     }
 
     class RestTemplateConnectorResponse(
-            private val response: ResponseEntity<ByteArray>,
+        private val response: ResponseEntity<ByteArray>,
     ) : ConnectorResponse {
         override val statusCode: Int
             get() = response.statusCodeValue
         override val body: ConnectorResponseBody = object : ConnectorResponseBody {
             override fun asText(charset: Charset): String =
-                    response.body?.toString(charset) ?: ""
+                response.body?.toString(charset) ?: ""
         }
     }
 
@@ -55,9 +61,26 @@ class DefaultConnector(
         restTemplate(headers).delete(path)
     }
 
+    override fun uploadFile(path: String, headers: Map<String, String>, file: Pair<String, ByteArray>) {
+        val actualHeaders = headers.toMutableMap()
+        actualHeaders["Content-Type"] = MediaType.MULTIPART_FORM_DATA.toString()
+
+        val body: MultiValueMap<String, Any> = LinkedMultiValueMap()
+        val (fileName, fileBytes) = file
+        body.add(fileName, ByteArrayResource(fileBytes))
+
+        val requestEntity: HttpEntity<MultiValueMap<String, Any>> = HttpEntity(body)
+
+        restTemplate(actualHeaders).postForEntity(
+            path,
+            requestEntity,
+            String::class.java
+        )
+    }
+
     private fun restTemplate(
-            headers: Map<String, String>,
-            noAuth: Boolean = false,
+        headers: Map<String, String>,
+        noAuth: Boolean = false,
     ): RestTemplate {
         var builder = RestTemplateBuilder().rootUri(url)
         defaultHeaders.forEach { (name, value) ->

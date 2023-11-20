@@ -1,18 +1,136 @@
 package net.nemerosa.ontrack.service.links
 
 import net.nemerosa.ontrack.extension.api.support.TestMetricsExportExtension
-import net.nemerosa.ontrack.it.links.AbstractBranchLinksTestJUnit4Support
+import net.nemerosa.ontrack.it.links.AbstractBranchLinksTestSupport
 import net.nemerosa.ontrack.model.links.BranchLinksDirection
-import org.junit.Test
+import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.BranchLink
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class BranchLinksServiceIT : AbstractBranchLinksTestJUnit4Support() {
+class BranchLinksServiceIT : AbstractBranchLinksTestSupport() {
 
     @Autowired
     private lateinit var testMetricsExportExtension: TestMetricsExportExtension
+
+    /**
+     * Given the following dependencies:
+     *
+     * ```
+     * source/main
+     *    6
+     *          preview -> target/preview/3
+     *          default -> target/main/6
+     *          default -> other/main/3
+     *    5
+     *    4
+     *          preview -> target/preview/3
+     *          default -> target/main/5
+     *          default -> other/main/2
+     *    3
+     *          preview -> target/preview/2
+     *          default -> target/main/5
+     *          default -> other/main/2
+     *    2
+     *          preview -> target/preview/2
+     *          default -> target/preview/1
+     *          default -> other/main/2
+     *    1
+     * ```
+     *
+     * we should have the following links:
+     *
+     * * preview x target/preview
+     * * default x target/main
+     * * default x other/main
+     */
+    @Test
+    fun `Direct branch downstream links`() {
+        asAdmin {
+            // Other
+            lateinit var otherMain: Branch
+            val other = project {
+                otherMain = branch("other-main") {
+                    build("other-1")
+                    build("other-2")
+                    build("other-3")
+                }
+            }
+            // Target
+            lateinit var targetMain: Branch
+            lateinit var targetPreview: Branch
+            val target = project {
+                targetPreview = branch("target-preview") {
+                    build("preview-1")
+                    build("preview-2")
+                    build("preview-3")
+                }
+                targetMain = branch("target-main") {
+                    build("main-1")
+                    build("main-2")
+                    build("main-3")
+                    build("main-4")
+                    build("main-5")
+                    build("main-6")
+                }
+            }
+            // Source
+            project {
+                branch {
+                    build("1") {
+                        // No dependencies
+                    }
+                    build("2") {
+                        linkTo(target, "preview-2", "preview")
+                        linkTo(target, "preview-1", "")
+                        linkTo(other, "other-2", "")
+                    }
+                    build("3") {
+                        linkTo(target, "preview-2", "preview")
+                        linkTo(target, "main-5", "")
+                        linkTo(other, "other-2", "")
+                    }
+                    build("4") {
+                        linkTo(target, "preview-3", "preview")
+                        linkTo(target, "main-5", "")
+                        linkTo(other, "other-2", "")
+                    }
+                    build("5") {
+                        // No dependencies
+                    }
+                    build("6") {
+                        linkTo(target, "preview-3", "preview")
+                        linkTo(target, "main-6", "")
+                        linkTo(other, "other-3", "")
+                    }
+
+                    // Gets the downstream branch links
+                    val links = branchLinksService.getDownstreamDependencies(this, 5)
+
+                    assertEquals(
+                        listOf(
+                            "preview" to targetPreview,
+                            "" to targetMain,
+                            "" to otherMain,
+                        ).sortedWith(
+                            compareBy(
+                                { it.second.project.name },
+                                { it.first },
+                            )
+                        ).map { (qualifier, branch) ->
+                              qualifier to branch.name
+                        },
+                        links.map {
+                            it.qualifier to it.branch.name
+                        }
+                    )
+                }
+            }
+        }
+    }
 
     @Test
     fun `No build links makes for one single node for the abstract graph`() {

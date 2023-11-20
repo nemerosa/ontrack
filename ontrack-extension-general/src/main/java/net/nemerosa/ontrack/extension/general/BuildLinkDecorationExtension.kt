@@ -24,6 +24,10 @@ class BuildLinkDecorationExtension(
     override fun getDecorations(entity: ProjectEntity): List<Decoration<BuildLinkDecorationList>> {
         // Gets the main build links of the source project
         val labels = mainBuildLinksService.getMainBuildLinksConfig(entity.project).labels
+
+        // Gets the number of links
+        val linksCount = structureService.getCountQualifiedBuildsUsedBy(entity as Build)
+
         // Gets the main links from this build
         var extraLinks = false
         val mainLinks = structureService.getQualifiedBuildsUsedBy(entity as Build, 0, Int.MAX_VALUE) { target ->
@@ -48,13 +52,15 @@ class BuildLinkDecorationExtension(
             val decorations = mainLinks.map { getDecoration(it) }
             // Global decoration
             return listOf(
-                    Decoration.of(
-                            this,
-                            BuildLinkDecorationList(
-                                    decorations,
-                                    extraLink
-                            )
+                Decoration.of(
+                    this,
+                    BuildLinkDecorationList(
+                        buildId = entity.id(),
+                        linksCount = linksCount,
+                        decorations = decorations,
+                        extraLink = extraLink,
                     )
+                )
             )
         }
     }
