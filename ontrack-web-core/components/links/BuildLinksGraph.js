@@ -44,6 +44,7 @@ function BuildLinksFlow({build}) {
             branch {
                 id
                 name
+                displayName
                 project {
                     id
                     name

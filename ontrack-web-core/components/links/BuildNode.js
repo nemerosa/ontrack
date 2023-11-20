@@ -5,6 +5,7 @@ import BuildLink from "@components/builds/BuildLink";
 import PromotionRun from "@components/promotionRuns/PromotionRun";
 import Timestamp from "@components/common/Timestamp";
 import BuildPromotions from "@components/links/BuildPromotions";
+import BranchDisplayNameLink from "@components/links/BranchDisplayNameLink";
 
 export default function BuildNode({data}) {
 
@@ -26,9 +27,9 @@ export default function BuildNode({data}) {
                     <Typography.Text ellipsis={true}>
                         {build && projectLink(build.branch.project)}
                     </Typography.Text>
-                    <Typography.Text ellipsis={true} italic>
-                        {build && branchLink(build.branch)}
-                    </Typography.Text>
+                    {
+                        build && <BranchDisplayNameLink branch={build.branch}/>
+                    }
                     <Typography.Text strong>
                         {build && <BuildLink build={build}></BuildLink>}
                     </Typography.Text>

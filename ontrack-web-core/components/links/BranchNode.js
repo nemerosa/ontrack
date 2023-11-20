@@ -3,10 +3,10 @@ import {Card, Space, Tooltip, Typography} from "antd";
 import {branchLink, branchUri, projectLink} from "@components/common/Links";
 import {FaArrowCircleLeft, FaLink} from "react-icons/fa";
 import Timestamp from "@components/common/Timestamp";
-import PromotionRun from "@components/promotionRuns/PromotionRun";
 import Link from "next/link";
 import BuildRef from "@components/links/BuildRef";
 import BuildPromotions from "@components/links/BuildPromotions";
+import BranchDisplayNameLink from "@components/links/BranchDisplayNameLink";
 
 function NodeSection({icon, title, children}) {
     return (
@@ -60,24 +60,10 @@ export default function BranchNode({data}) {
                     <Typography.Text ellipsis={true}>
                         {branch && projectLink(branch.project)}
                     </Typography.Text>
-                    {
-                        branch && branch.displayName && branch.displayName !== branch.name &&
-                        <Tooltip title={branch.name}>
-                            <Typography.Text italic ellipsis>
-                                {branchLink(branch, branch.displayName)}
-                                &nbsp;
-                                {linkToBranchLinks}
-                            </Typography.Text>
-                        </Tooltip>
-                    }
-                    {
-                        branch && (!branch.displayName || branch.displayName === branch.name) &&
-                        <Typography.Text italic ellipsis>
-                            {branchLink(branch, branch.name)}
-                            &nbsp;
-                            {linkToBranchLinks}
-                        </Typography.Text>
-                    }
+                    <BranchDisplayNameLink branch={branch}>
+                        &nbsp;
+                        {linkToBranchLinks}
+                    </BranchDisplayNameLink>
                     {
                         latestBuild &&
                         <NodeSection
