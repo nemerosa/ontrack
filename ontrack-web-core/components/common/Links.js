@@ -13,6 +13,11 @@ export function legacyUri() {
     return `${config.url}/`
 }
 
+export function graphiQLUri() {
+    const config = clientConfig()
+    return `${config.url}/graphiql.html`
+}
+
 export function homeUri() {
     return `${uiConfig.prefix}/`
 }

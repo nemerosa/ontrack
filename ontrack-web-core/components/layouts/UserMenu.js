@@ -2,10 +2,11 @@ import {Drawer, Menu} from "antd";
 import {useContext, useEffect, useState} from "react";
 import {UserContext} from "@components/providers/UserProvider";
 import {logout} from "@client/login";
-import {legacyUri} from "@components/common/Links";
+import {graphiQLUri, legacyUri} from "@components/common/Links";
 import {useRouter} from "next/router";
-import {FaDoorOpen, FaExpandArrowsAlt, FaSignOutAlt} from "react-icons/fa";
+import {FaCode, FaDoorOpen, FaExpandArrowsAlt, FaSignOutAlt} from "react-icons/fa";
 import {MainLayoutContext} from "@components/layouts/MainLayout";
+import Link from "next/link";
 
 export function useUserMenu() {
     const [open, setOpen] = useState(false);
@@ -121,6 +122,17 @@ export default function UserMenu({userMenu}) {
         //     //     type: 'divider',
         //     // })
         // }
+        // GraphiQL
+        menu.push({
+            key: 'graphiql',
+            label: <Link href={graphiQLUri()}>GraphiQL</Link>,
+            title: "GraphQL IDE",
+            icon: <FaCode/>,
+        })
+        // Separator
+        menu.push({
+            type: 'divider',
+        })
         // Adding predefined "Legacy UI"
         menu.push({
             key: 'legacy',
