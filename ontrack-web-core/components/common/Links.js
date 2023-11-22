@@ -3,7 +3,6 @@ import clientConfig from "@client/clientConfig";
 import {Space} from "antd";
 import Image from "next/image";
 import LegacyLink from "@components/common/LegacyLink";
-import {ValidationStampImage} from "@components/validationStamps/ValidationStampImage";
 
 const uiConfig = {
     prefix: '',
@@ -16,6 +15,10 @@ export function legacyUri() {
 
 export function homeUri() {
     return `${uiConfig.prefix}/`
+}
+
+export function homeHref(path) {
+    return `${homeUri()}${path}`
 }
 
 export function homeLink(text) {
@@ -62,7 +65,7 @@ export function buildLink(build, text) {
 }
 
 export function promotionLevelUri(promotionLevel) {
-    return `${legacyUri()}#/promotionLevel/1532`
+    return `${legacyUri()}#/promotionLevel/${promotionLevel.id}`
     // TODO LEGACY return `${uiConfig.prefix}/promotionLevel/${promotionLevel.id}`
 }
 
