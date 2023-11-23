@@ -92,6 +92,7 @@ class WebSecurityConfig(
     fun webSecurity(
         http: HttpSecurity,
         uiSecurityExtensions: List<UISecurityExtension>,
+        tokensService: TokensService,
     ): SecurityFilterChain {
         http {
             // Enabling JS Cookies for CSRF protection (for AngularJS)
@@ -110,13 +111,13 @@ class WebSecurityConfig(
             }
             // UI extensions
             uiSecurityExtensions.forEach { extension ->
-                extension.configure(this, LoginSuccessHandler())
+                extension.configure(this, LoginSuccessHandler(tokensService))
             }
             // Using a form login
             formLogin {
                 loginPage = "/login"
                 permitAll()
-                authenticationSuccessHandler = LoginSuccessHandler()
+                authenticationSuccessHandler = LoginSuccessHandler(tokensService)
             }
             // Logout setup
             logout {
