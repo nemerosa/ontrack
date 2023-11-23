@@ -2,7 +2,8 @@ import {NextResponse} from "next/server";
 
 export default function middleware(request) {
     if (request.nextUrl.pathname.startsWith('/auth')) {
-        console.log({request})
+        const token = request.nextUrl.searchParams.get('token')
+        const href = request.nextUrl.searchParams.get('href')
         return Response.json(
             {success: false, message: 'Authentication failed'},
             {status: 403}
