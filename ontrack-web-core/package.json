@@ -11,6 +11,7 @@
   "dependencies": {
     "ace-builds": "^1.24.2",
     "antd": "^5.8.6",
+    "cookies-next": "^4.1.0",
     "dayjs": "^1.11.7",
     "elkjs": "^0.8.2",
     "eslint": "8.38.0",

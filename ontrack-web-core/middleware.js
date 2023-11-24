@@ -1,6 +1,19 @@
 import {NextResponse} from "next/server";
 import {cookieName} from "@/connectionConstants";
 
+export const config = {
+    matcher: [
+        /*
+         * Match all request paths except for the ones starting with:
+         * - _next/static (static files)
+         * - _next/image (image optimization files)
+         * - favicon.ico (favicon file)
+         * - ontrack_ (logo)
+         */
+        '/((?!api|_next/static|_next/image|favicon.ico|ontrack_).*)',
+    ],
+}
+
 export default function middleware(request) {
 
     if (!request.nextUrl.pathname.startsWith('/_next')) {
@@ -25,7 +38,7 @@ export default function middleware(request) {
                 name: cookieName,
                 value: token,
                 path: '/',
-                expires: Date.now() + cookieMs,
+                expires: new Date(Date.now() + cookieMs),
             })
             // OK
             return response
