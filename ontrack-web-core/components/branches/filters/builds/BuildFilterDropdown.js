@@ -1,13 +1,15 @@
 import {useEffect, useState} from "react";
 import {Button, Dropdown, Space, Typography} from "antd";
 import {FaCaretDown, FaEraser, FaFilter, FaLink, FaPencilAlt, FaShare, FaTrashAlt, FaUsers} from "react-icons/fa";
-import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
 import SelectableMenuItem from "@components/common/SelectableMenuItem";
 import BuildFilterDialog, {useBuildFilterDialog} from "@components/branches/filters/builds/BuildFilterDialog";
 import {isAuthorized} from "@components/common/authorizations";
+import {useConnection} from "@components/providers/ConnectionContextProvider";
 
 export default function BuildFilterDropdown({branch, selectedBuildFilter, onSelectedBuildFilter, onPermalink}) {
+
+    const connection = useConnection()
 
     const [items, setItems] = useState([])
     const [forms, setForms] = useState([])
@@ -52,7 +54,7 @@ export default function BuildFilterDropdown({branch, selectedBuildFilter, onSele
                     setResources([...resources, editedFilterResource])
                 }
                 // Saving the filter
-                graphQLCall(
+                connection.graphQLCall(
                     gql`
                         mutation SaveBuildFilter(
                             $branchId: Int!,

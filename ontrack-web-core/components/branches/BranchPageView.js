@@ -12,12 +12,11 @@ import BranchInfoViewDrawer from "@components/branches/BranchInfoViewDrawer";
 import {Skeleton, Space} from "antd";
 import BranchFavourite from "@components/branches/BranchFavourite";
 import {gqlInformationFragment, gqlPropertiesFragment} from "@components/services/fragments";
-import BranchViewSelector from "@components/branches/BranchViewSelector";
 import {getBranchViews} from "@components/branches/views/branchViews";
 import {usePreferences} from "@components/providers/PreferencesProvider";
 import {useRouter} from "next/router";
 import JumpToBranch from "@components/branches/JumpToBranch";
-import {FaLink, FaTimes} from "react-icons/fa";
+import {FaLink} from "react-icons/fa";
 
 export default function BranchPageView({id}) {
     const [loadingBranch, setLoadingBranch] = useState(true)
