@@ -1,29 +1,37 @@
 import {NextResponse} from "next/server";
+import {cookieName} from "@/connectionConstants";
 
 export default function middleware(request) {
 
-    const cookieName = 'ontrack'
-    const cookieMs = 30 * 60 * 1000 // 30 minutes
-    const cookie = request.cookies.get(cookieName)
+    if (!request.nextUrl.pathname.startsWith('/_next')) {
+        const cookieMs = 30 * 60 * 1000 // 30 minutes
+        const cookie = request.cookies.get(cookieName)
 
-    if (cookie) {
-        // Already authenticated, going forward
-    } else if (request.nextUrl.pathname.startsWith('/auth')) {
-        const token = request.nextUrl.searchParams.get('token')
-        const href = request.nextUrl.searchParams.get('href')
-        // Preparing the response
-        const response = NextResponse.redirect(href ?? 'http://localhost:3000')
-        // Setting the cookie
-        response.cookies.set(cookieName, token)
-        response.cookies.set({
-            name: cookieName,
-            value: token,
-            path: '/',
-            expires: Date.now() + cookieMs,
-        })
-        // OK
-        return response
-    } else {
-        return NextResponse.redirect(new URL(`http://localhost:8080/login?targetUrl=test&token=true&tokenCallback=http://localhost:3000/auth&tokenCallbackHref=${request.url}`))
+        if (cookie) {
+            console.log(`[connection][middleware][${request.nextUrl.pathname}] Cookie set`)
+            // Already authenticated, going forward
+        } else if (request.nextUrl.pathname.startsWith('/auth')) {
+            const token = request.nextUrl.searchParams.get('token')
+            const href = request.nextUrl.searchParams.get('href')
+            console.log(`[connection][middleware][${request.nextUrl.pathname}] Auth request, setting the cookie and redirecting`, {
+                token,
+                href
+            })
+            // Preparing the response
+            const response = NextResponse.redirect(href ?? 'http://localhost:3000')
+            // Setting the cookie
+            response.cookies.set(cookieName, token)
+            response.cookies.set({
+                name: cookieName,
+                value: token,
+                path: '/',
+                expires: Date.now() + cookieMs,
+            })
+            // OK
+            return response
+        } else {
+            console.log(`[connection][middleware][${request.nextUrl.pathname}] Redirecting to login page`)
+            return NextResponse.redirect(new URL(`http://localhost:8080/login?targetUrl=test&token=true&tokenCallback=http://localhost:3000/auth&tokenCallbackHref=${request.url}`))
+        }
     }
 }
