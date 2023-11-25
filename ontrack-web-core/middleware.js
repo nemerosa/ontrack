@@ -1,5 +1,5 @@
 import {NextResponse} from "next/server";
-import {cookieName, isConnectionLoggingEnabled, ontrackUiUrl, ontrackUrl} from "@/connection";
+import {cookieName, cookieOptions, isConnectionLoggingEnabled, ontrackUiUrl, ontrackUrl} from "@/connection";
 
 export const config = {
     matcher: [
@@ -20,7 +20,6 @@ export default function middleware(request) {
 
     if (!path.startsWith('/_next') && !path.startsWith("/ontrack")) {
         const logging = isConnectionLoggingEnabled()
-        const cookieMs = 30 * 60 * 1000 // 30 minutes
         const cookie = request.cookies.get(cookieName)
 
         if (cookie) {
@@ -40,10 +39,9 @@ export default function middleware(request) {
                 // Setting the cookie
                 response.cookies.set(cookieName, token)
                 response.cookies.set({
+                    ...cookieOptions(),
                     name: cookieName,
                     value: token,
-                    path: '/',
-                    expires: new Date(Date.now() + cookieMs),
                 })
                 // OK
                 return response

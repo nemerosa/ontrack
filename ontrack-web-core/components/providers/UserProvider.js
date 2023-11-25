@@ -1,23 +1,23 @@
 import {createContext, useEffect, useState} from "react";
-import restCall from "@client/restCall";
 import {gql} from "graphql-request";
-import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import {useGraphQLClient, useRestClient} from "@components/providers/ConnectionContextProvider";
 
 export const UserContext = createContext({user: {}});
 
 const UserContextProvider = ({children}) => {
 
-    const client = useGraphQLClient()
+    const gqlClient = useGraphQLClient()
+    const restClient = useRestClient()
 
-    const [user, setUser] = useState({authorizations:{}});
+    const [user, setUser] = useState({authorizations: {}});
 
     let tmpUser = {}
 
     useEffect(() => {
-        if (client) {
-            restCall("/rest/user").then(data => {
+        if (restClient && gqlClient) {
+            restClient.get("/rest/user").then(data => {
                 tmpUser = data
-                return client.request(
+                return gqlClient.request(
                     gql`
                         query UserAuthorizations {
                             authorizations {
@@ -44,7 +44,7 @@ const UserContextProvider = ({children}) => {
                 setUser(tmpUser)
             })
         }
-    }, [client])
+    }, [gqlClient, restClient])
 
     return <UserContext.Provider value={user}>{children}</UserContext.Provider>
 };

@@ -7,6 +7,7 @@ import {useRouter} from "next/router";
 import {FaCode, FaDoorOpen, FaExpandArrowsAlt, FaSignOutAlt} from "react-icons/fa";
 import {MainLayoutContext} from "@components/layouts/MainLayout";
 import Link from "next/link";
+import {useLogout} from "@components/providers/ConnectionContextProvider";
 
 export function useUserMenu() {
     const [open, setOpen] = useState(false);
@@ -18,6 +19,8 @@ export function useUserMenu() {
 }
 
 export default function UserMenu({userMenu}) {
+
+    const logout = useLogout()
 
     const router = useRouter()
     const {toggleExpansion} = useContext(MainLayoutContext)
@@ -160,7 +163,7 @@ export default function UserMenu({userMenu}) {
             label: "Sign out",
             icon: <FaSignOutAlt/>,
             onClick: () => {
-                logout()
+                if (logout) logout.call()
             },
         })
         // Registers the menu

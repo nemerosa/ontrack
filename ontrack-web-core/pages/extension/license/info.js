@@ -1,17 +1,21 @@
 import {useEffect, useState} from "react";
-import restCall from "@client/restCall";
 import {Alert} from "antd";
 import StandardPage from "@components/layouts/StandardPage";
+import {useRestClient} from "@components/providers/ConnectionContextProvider";
 
 export default function ExtensionLicenseInfoPage() {
+
+    const client = useRestClient()
 
     const [license, setLicense] = useState({})
 
     useEffect(() => {
-        restCall('/extension/license').then(data => {
-            setLicense(data.license)
-        })
-    }, [])
+        if (client) {
+            client.get('/extension/license').then(data => {
+                setLicense(data.license)
+            })
+        }
+    }, [client])
 
     return (
         <StandardPage

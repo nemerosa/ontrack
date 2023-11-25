@@ -1,7 +1,7 @@
 import {createContext, useContext, useEffect, useState} from "react";
 import {useRouter} from "next/router";
-import {cookieName, isConnectionLoggingEnabled, ontrackUrl} from "@/connection";
-import {getCookie} from "cookies-next";
+import {cookieName, cookieOptions, isConnectionLoggingEnabled, ontrackUrl} from "@/connection";
+import {deleteCookie, getCookie} from "cookies-next";
 import {GraphQLClient} from "graphql-request";
 
 function createConnectionConfig(token) {
@@ -45,6 +45,47 @@ export const useGraphQLClient = () => {
         }
     }, [connection.config])
     return client
+}
+
+export const useRestClient = () => {
+    const connection = useConnection()
+    const [client, setClient] = useState()
+    useEffect(() => {
+        if (connection.config) {
+            const config = connection.config
+            setClient({
+                get: async (uri) => {
+                    const response = await fetch(
+                        `${config.url}${uri}`,
+                        {
+                            headers: config.headers,
+                        }
+                    )
+                    return response.json()
+                },
+            })
+        }
+    }, [connection.config]);
+    return client
+}
+
+export const useLogout = () => {
+    const connection = useConnection()
+    const [logout, setLogout] = useState()
+    useEffect(() => {
+        if (connection.config) {
+            const config = connection.config
+            setLogout({
+                call: async () => {
+                    // Removing the cookie
+                    deleteCookie(cookieName, cookieOptions())
+                    // Redirecting to the login page
+                    location.href = `${config.url}/login?logout`
+                },
+            })
+        }
+    }, [connection.config]);
+    return logout
 }
 
 export const ConnectionContext = createContext({})

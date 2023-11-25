@@ -5,6 +5,22 @@
 export const cookieName = 'ontrack'
 
 /**
+ * Default validity (in ms) for the cookie
+ * @type {number}
+ */
+const cookieMs = 30 * 60 * 1000 // 30 minutes
+
+/**
+ * Default options for the session cookie
+ */
+export const cookieOptions = () => {
+    return {
+        path: '/',
+        expires: new Date(Date.now() + cookieMs),
+    }
+}
+
+/**
  * URL of the Ontrack backend if not specified.
  * @type {string}
  */
