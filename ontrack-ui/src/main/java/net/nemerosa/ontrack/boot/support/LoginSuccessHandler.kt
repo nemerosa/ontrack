@@ -96,6 +96,7 @@ class LoginSuccessHandler(
         // Base URL
         var targetUrl = savedRequest
             ?.redirectUrl
+            ?.takeIf { !it.contains("/login") }
             ?: super.determineTargetUrl(request, response)
 
         // Hash part
