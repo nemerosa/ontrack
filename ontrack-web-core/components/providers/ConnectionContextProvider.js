@@ -1,6 +1,6 @@
 import {createContext, useContext, useEffect, useState} from "react";
 import {useRouter} from "next/router";
-import {cookieName, cookieOptions, isConnectionLoggingEnabled, ontrackUrl} from "@/connection";
+import {cookieName, cookieOptions, isConnectionLoggingEnabled, ontrackUiUrl, ontrackUrl} from "@/connection";
 import {deleteCookie, getCookie} from "cookies-next";
 import {GraphQLClient} from "graphql-request";
 
@@ -80,7 +80,7 @@ export const useLogout = () => {
                     // Removing the cookie
                     deleteCookie(cookieName, cookieOptions())
                     // Redirecting to the login page
-                    location.href = `${config.url}/login?logout`
+                    location.href = `${config.url}/login?logout&targetUrl=${ontrackUiUrl()}`
                 },
             })
         }
