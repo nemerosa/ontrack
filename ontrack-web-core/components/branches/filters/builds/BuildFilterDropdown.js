@@ -5,13 +5,15 @@ import {gql} from "graphql-request";
 import SelectableMenuItem from "@components/common/SelectableMenuItem";
 import BuildFilterDialog, {useBuildFilterDialog} from "@components/branches/filters/builds/BuildFilterDialog";
 import {isAuthorized} from "@components/common/authorizations";
-import graphQLCall from "@client/graphQLCall";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 
 export default function BuildFilterDropdown({branch, selectedBuildFilter, onSelectedBuildFilter, onPermalink}) {
 
     const [items, setItems] = useState([])
     const [forms, setForms] = useState([])
     const [resources, setResources] = useState([])
+
+    const client = useGraphQLClient()
 
     const onSelectResourceFilter = (resource) => {
         if (onSelectedBuildFilter) onSelectedBuildFilter(resource)
@@ -52,7 +54,7 @@ export default function BuildFilterDropdown({branch, selectedBuildFilter, onSele
                     setResources([...resources, editedFilterResource])
                 }
                 // Saving the filter
-                graphQLCall(
+                client.request(
                     gql`
                         mutation SaveBuildFilter(
                             $branchId: Int!,
@@ -110,7 +112,7 @@ export default function BuildFilterDropdown({branch, selectedBuildFilter, onSele
 
     const onShareFilter = (resource) => {
         return () => {
-            graphQLCall(
+            client.request(
                 gql`
                     mutation ShareBuildFilter(
                         $branchId: Int!,
@@ -156,7 +158,7 @@ export default function BuildFilterDropdown({branch, selectedBuildFilter, onSele
             // Drop the filter
             onDropFilter()
             // Deleting the filter in the background
-            graphQLCall(
+            client.request(
                 gql`
                     mutation DeleteBuildFilter(
                         $branchId: Int!,
@@ -322,8 +324,8 @@ export default function BuildFilterDropdown({branch, selectedBuildFilter, onSele
     }
 
     useEffect(() => {
-        if (branch) {
-            graphQLCall(
+        if (branch && client) {
+            client.request(
                 gql`
                     query BuildFilters(
                         $branchId: Int!,
@@ -350,7 +352,7 @@ export default function BuildFilterDropdown({branch, selectedBuildFilter, onSele
                 setResources(branch.buildFilterResources)
             })
         }
-    }, [branch]);
+    }, [branch, client]);
 
     useEffect(() => {
         if (forms || resources) {

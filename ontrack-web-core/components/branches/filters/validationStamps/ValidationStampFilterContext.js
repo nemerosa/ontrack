@@ -1,5 +1,4 @@
 import {createContext, useCallback, useEffect, useState} from "react";
-import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
 import {
     gqlValidationStampFilterFragment
@@ -14,6 +13,7 @@ import EditValidationStampFilterDialog
     useEditValidationStampFilterDialog
 } from "@components/branches/filters/validationStamps/EditValidationStampFilterDialog";
 import {usePreferences} from "@components/providers/PreferencesProvider";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 
 // noinspection JSUnusedLocalSymbols
 export const ValidationStampFilterContext = createContext({
@@ -50,40 +50,44 @@ export const ValidationStampFilterContext = createContext({
 
 export default function ValidationStampFilterContextProvider({branch, children}) {
 
+    const client = useGraphQLClient()
+
     const [validationStampNames, setValidationStampNames] = useState([])
     const [filters, setFilters] = useState([])
     useEffect(() => {
-        graphQLCall(
-            gql`
-                query GetValidationStampFilters(
-                    $branchId: Int!,
-                ) {
-                    branch(id: $branchId) {
-                        validationStampFilters(all: true) {
-                            ...validationStampFilterContent
-                        }
-                        validationStamps {
-                            name
+        if (client && branch) {
+            client.request(
+                gql`
+                    query GetValidationStampFilters(
+                        $branchId: Int!,
+                    ) {
+                        branch(id: $branchId) {
+                            validationStampFilters(all: true) {
+                                ...validationStampFilterContent
+                            }
+                            validationStamps {
+                                name
+                            }
                         }
                     }
-                }
 
-                ${gqlValidationStampFilterFragment}
-            `, {
-                branchId: branch.id,
-            }
-        ).then(data => {
-            setFilters(data.branch.validationStampFilters)
-            // Validation stamp names
-            setValidationStampNames(data.branch.validationStamps.map(it => it.name))
-            // Selection of the initial filter
-            // TODO Checks also the permalink
-            const initialFilter = getLocallySelectedValidationFilter(branch.id)
-            if (initialFilter) {
-                setSelectedFilter(initialFilter)
-            }
-        })
-    }, [branch])
+                    ${gqlValidationStampFilterFragment}
+                `, {
+                    branchId: branch.id,
+                }
+            ).then(data => {
+                setFilters(data.branch.validationStampFilters)
+                // Validation stamp names
+                setValidationStampNames(data.branch.validationStamps.map(it => it.name))
+                // Selection of the initial filter
+                // TODO Checks also the permalink
+                const initialFilter = getLocallySelectedValidationFilter(branch.id)
+                if (initialFilter) {
+                    setSelectedFilter(initialFilter)
+                }
+            })
+        }
+    }, [client, branch])
 
     const [selectedFilter, setSelectedFilter] = useState()
 
@@ -94,7 +98,7 @@ export default function ValidationStampFilterContextProvider({branch, children})
     }
 
     const updateFilter = (vsNames) => {
-        graphQLCall(
+        client.request(
             gql`
                 mutation UpdateValidationStampFilter(
                     $id: Int!,
@@ -159,7 +163,7 @@ export default function ValidationStampFilterContextProvider({branch, children})
     const newValidationStampFilterDialog = useNewValidationStampFilterDialog({
         onSuccess: (values) => {
             // Creates the filter
-            graphQLCall(
+            client.request(
                 gql`
                     mutation CreateValidationStampFilter(
                         $name: String!
@@ -194,7 +198,7 @@ export default function ValidationStampFilterContextProvider({branch, children})
 
     const editValidationStampFilterDialog = useEditValidationStampFilterDialog({
         onSuccess: (values, {filter}) => {
-            graphQLCall(
+            client.request(
                 gql`
                     mutation UpdateValidationStampFilter(
                         $id: Int!,

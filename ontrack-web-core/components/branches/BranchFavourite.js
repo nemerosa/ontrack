@@ -1,8 +1,8 @@
 import {useContext, useEffect, useState} from "react";
 import {EventsContext} from "@components/common/EventsContext";
-import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
 import Favourite from "@components/common/Favourite";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 
 export default function BranchFavourite({branch}) {
 
@@ -13,9 +13,11 @@ export default function BranchFavourite({branch}) {
         setFavourite(branch.favourite)
     }, [branch])
 
+    const client = useGraphQLClient()
+
     const toggleFavourite = async () => {
         if (favourite) {
-            return graphQLCall(
+            return client.request(
                 gql`
                     mutation UnsetFavourite(
                         $branchId: Int!,
@@ -34,7 +36,7 @@ export default function BranchFavourite({branch}) {
                 eventsContext.fireEvent("branch.favourite", {id: branch.id, value: false})
             })
         } else {
-            return graphQLCall(
+            return client.request(
                 gql`
                     mutation SetFavourite(
                         $branchId: Int!,

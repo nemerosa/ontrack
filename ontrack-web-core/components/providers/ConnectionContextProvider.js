@@ -2,6 +2,7 @@ import {createContext, useContext, useEffect, useState} from "react";
 import {useRouter} from "next/router";
 import {cookieName} from "@/connectionConstants";
 import {getCookie} from "cookies-next";
+import {GraphQLClient} from "graphql-request";
 
 function createConnectionConfig(token) {
     const connectionConfig = {}
@@ -27,24 +28,21 @@ function createConnectionConfig(token) {
 
 export const useConnection = () => useContext(ConnectionContext)
 
-export const useGraphQL = (query, variables) => {
+export const useGraphQLClient = () => {
     const connection = useConnection()
-
-    const [loading, setLoading] = useState(true)
-    const [data, setData] = useState()
-
-    connection.graphQLCall(query, variables)
-        .then(data => {
-            setData(data)
-        })
-        .finally(() => {
-            setLoading(false)
-        })
-
-    return {
-        loading,
-        data,
-    }
+    const [client, setClient] = useState()
+    useEffect(() => {
+        if (connection.config) {
+            const config = connection.config
+            setClient(
+                new GraphQLClient(
+                    `${config.url}/graphql`, {
+                        headers: config.headers,
+                    })
+            )
+        }
+    }, [connection.config])
+    return client
 }
 
 export const ConnectionContext = createContext({})
