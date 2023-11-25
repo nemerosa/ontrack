@@ -5,11 +5,9 @@ import {gql} from "graphql-request";
 import SelectableMenuItem from "@components/common/SelectableMenuItem";
 import BuildFilterDialog, {useBuildFilterDialog} from "@components/branches/filters/builds/BuildFilterDialog";
 import {isAuthorized} from "@components/common/authorizations";
-import {useConnection} from "@components/providers/ConnectionContextProvider";
+import graphQLCall from "@client/graphQLCall";
 
 export default function BuildFilterDropdown({branch, selectedBuildFilter, onSelectedBuildFilter, onPermalink}) {
-
-    const connection = useConnection()
 
     const [items, setItems] = useState([])
     const [forms, setForms] = useState([])
@@ -54,7 +52,7 @@ export default function BuildFilterDropdown({branch, selectedBuildFilter, onSele
                     setResources([...resources, editedFilterResource])
                 }
                 // Saving the filter
-                connection.graphQLCall(
+                graphQLCall(
                     gql`
                         mutation SaveBuildFilter(
                             $branchId: Int!,

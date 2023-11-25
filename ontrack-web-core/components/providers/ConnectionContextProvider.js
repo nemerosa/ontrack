@@ -1,8 +1,7 @@
-import {createContext, useContext, useEffect, useRef, useState} from "react";
+import {createContext, useContext, useEffect, useState} from "react";
 import {useRouter} from "next/router";
 import {cookieName} from "@/connectionConstants";
 import {getCookie} from "cookies-next";
-import {GraphQLClient} from "graphql-request";
 
 function createConnectionConfig(token) {
     const connectionConfig = {}
@@ -28,87 +27,53 @@ function createConnectionConfig(token) {
 
 export const useConnection = () => useContext(ConnectionContext)
 
-export const useGraphQL = (query, variables, callback, onCompleted) => {
+export const useGraphQL = (query, variables) => {
     const connection = useConnection()
+
+    const [loading, setLoading] = useState(true)
+    const [data, setData] = useState()
+
     connection.graphQLCall(query, variables)
         .then(data => {
-            if (callback) {
-                return callback(data);
-            }
+            setData(data)
         })
         .finally(() => {
-            if (onCompleted) {
-                onCompleted()
-            }
+            setLoading(false)
         })
+
+    return {
+        loading,
+        data,
+    }
 }
 
-export const ConnectionContext = createContext({
-    token: '',
-    config: {
-        url: '',
-        headers: {},
-    },
-    client: null,
-    graphQLCall: () => {
-    },
-    restCall: () => {
-    },
-    logout: () => {
-    },
-})
+export const ConnectionContext = createContext({})
 
 export default function ConnectionContextProvider({children}) {
 
     const router = useRouter()
 
-    const context = useRef({
-        token: '',
-        config: {
-            url: '',
-            headers: {},
-        },
-        client: undefined,
-    })
+    const [context, setContext] = useState({})
 
     useEffect(() => {
         console.log("[connection][provider] Route changed, checking cookie")
         const cookie = getCookie(cookieName)
         if (cookie) {
-            if (cookie.value && cookie.value !== context.token) {
-                const token = cookie.value
+            console.log("[connection][provider] Cookie present, checking token")
+            if (cookie && cookie !== context.token) {
                 console.log("[connection][provider] Cookie changed, updating context")
-                const config = createConnectionConfig(token)
-                const client = new GraphQLClient(
-                    `${config.url}/graphql`, {
-                        headers: config.headers,
-                    })
-                context.current = {
-                    token,
+                const config = createConnectionConfig(cookie)
+                setContext({
+                    token: cookie,
                     config,
-                    client,
-                    graphQLCall: async (query, variables) => client.request(query, variables),
-                    restCall: async (uri) => {
-                        const response = await fetch(
-                            `${config.url}${uri}`,
-                            {
-                                headers: config.headers,
-                            }
-                        )
-                        return response.json()
-                    },
-                    logout: async () => {
-                        await fetch(`${config.url}/logout`, {method: 'POST'})
-                        location.href = `${config.url}/login?logout`
-                    },
-                }
+                })
             }
         }
     }, [router.asPath])
 
     return (
         <>
-            <ConnectionContext.Provider value={context.current}>
+            <ConnectionContext.Provider value={context}>
                 {children}
             </ConnectionContext.Provider>
         </>

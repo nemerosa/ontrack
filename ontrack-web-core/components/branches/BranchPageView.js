@@ -1,5 +1,4 @@
 import {useEffect, useState} from "react";
-import graphQLCall from "@client/graphQLCall";
 import {CloseCommand, Command, LegacyLinkCommand} from "@components/common/Commands";
 import {branchLegacyUri, branchUri, projectUri} from "@components/common/Links";
 import Head from "next/head";
@@ -7,16 +6,17 @@ import {branchTitle} from "@components/common/Titles";
 import MainPage from "@components/layouts/MainPage";
 import {branchBreadcrumbs} from "@components/common/Breadcrumbs";
 import LoadingContainer from "@components/common/LoadingContainer";
-import {gql} from "graphql-request";
 import BranchInfoViewDrawer from "@components/branches/BranchInfoViewDrawer";
 import {Skeleton, Space} from "antd";
 import BranchFavourite from "@components/branches/BranchFavourite";
-import {gqlInformationFragment, gqlPropertiesFragment} from "@components/services/fragments";
 import {getBranchViews} from "@components/branches/views/branchViews";
 import {usePreferences} from "@components/providers/PreferencesProvider";
 import {useRouter} from "next/router";
 import JumpToBranch from "@components/branches/JumpToBranch";
 import {FaLink} from "react-icons/fa";
+import {useConnection, useGraphQL} from "@components/providers/ConnectionContextProvider";
+import {gqlGetBranch} from "@components/services/branches";
+import {GraphQLClient} from "graphql-request";
 
 export default function BranchPageView({id}) {
     const [loadingBranch, setLoadingBranch] = useState(true)
@@ -65,42 +65,23 @@ export default function BranchPageView({id}) {
         setSelectedBranchView(branchView)
     }, [branch, branchViews]);
 
+    const connection = useConnection()
+
     useEffect(() => {
-        if (id) {
-            setLoadingBranch(true)
-            graphQLCall(
-                gql`
-                    query GetBranch($id: Int!) {
-                        branches(id: $id) {
-                            id
-                            name
-                            project {
-                                id
-                                name
-                            }
-                            authorizations {
-                                name
-                                action
-                                authorized
-                            }
-                            properties {
-                                ...propertiesFragment
-                            }
-                            information {
-                                ...informationFragment
-                            }
-                        }
-                    }
-                    ${gqlPropertiesFragment}
-                    ${gqlInformationFragment}
-                `,
+        if (id && connection?.config) {
+            const config = connection.config
+            const client = new GraphQLClient(
+                `${config.url}/graphql`, {
+                    headers: config.headers,
+                })
+            client.request(
+                gqlGetBranch,
                 {id}
             ).then(data => {
                 let branch = data.branches[0];
                 setBranch(branch)
                 let loadedBranchViews = getBranchViews(branch);
                 setBranchViews(loadedBranchViews)
-                setLoadingBranch(false)
                 setCommands([
                     // TODO Since only one view for now (classic), not allowing to change views
                     // <BranchViewSelector
@@ -124,9 +105,103 @@ export default function BranchPageView({id}) {
                     />,
                     <CloseCommand key="close" href={projectUri(branch.project)}/>,
                 ])
+            }).finally(() => {
+                setLoadingBranch(false)
             })
         }
-    }, [id])
+    }, [connection, id]);
+
+    // const {loading, data} = useGraphQL(
+    //     gql`
+    //         query GetBranch($id: Int!) {
+    //             branches(id: $id) {
+    //                 id
+    //                 name
+    //                 project {
+    //                     id
+    //                     name
+    //                 }
+    //                 authorizations {
+    //                     name
+    //                     action
+    //                     authorized
+    //                 }
+    //                 properties {
+    //                     ...propertiesFragment
+    //                 }
+    //                 information {
+    //                     ...informationFragment
+    //                 }
+    //             }
+    //         }
+    //         ${gqlPropertiesFragment}
+    //         ${gqlInformationFragment}
+    //     `,
+    //     {id}
+    // )
+
+    // useEffect(() => {
+    //     if (id) {
+    //         setLoadingBranch(true)
+    //         graphQLCall(
+    //             gql`
+    //                 query GetBranch($id: Int!) {
+    //                     branches(id: $id) {
+    //                         id
+    //                         name
+    //                         project {
+    //                             id
+    //                             name
+    //                         }
+    //                         authorizations {
+    //                             name
+    //                             action
+    //                             authorized
+    //                         }
+    //                         properties {
+    //                             ...propertiesFragment
+    //                         }
+    //                         information {
+    //                             ...informationFragment
+    //                         }
+    //                     }
+    //                 }
+    //                 ${gqlPropertiesFragment}
+    //                 ${gqlInformationFragment}
+    //             `,
+    //             {id}
+    //         ).then(data => {
+    //             let branch = data.branches[0];
+    //             setBranch(branch)
+    //             let loadedBranchViews = getBranchViews(branch);
+    //             setBranchViews(loadedBranchViews)
+    //             setLoadingBranch(false)
+    //             setCommands([
+    //                 // TODO Since only one view for now (classic), not allowing to change views
+    //                 // <BranchViewSelector
+    //                 //     branchViews={loadedBranchViews}
+    //                 //     initialSelectedViewKey={initialSelectedViewKey}
+    //                 //     onBranchViewSelected={onBranchViewSelected}
+    //                 // />,
+    //                 <JumpToBranch key="branch" projectName={branch.project.name}/>,
+    //                 <Command
+    //                     key="links"
+    //                     icon={<FaLink/>}
+    //                     href={`${branchUri(branch)}/links`}
+    //                     text="Links"
+    //                     title="Displays downstream and upstream dependencies"
+    //                 />,
+    //                 <LegacyLinkCommand
+    //                     key="legacy"
+    //                     href={branchLegacyUri(branch)}
+    //                     text="Legacy branch"
+    //                     title="Goes to the legacy branch page"
+    //                 />,
+    //                 <CloseCommand key="close" href={projectUri(branch.project)}/>,
+    //             ])
+    //         })
+    //     }
+    // }, [id])
 
     return (
         <>
