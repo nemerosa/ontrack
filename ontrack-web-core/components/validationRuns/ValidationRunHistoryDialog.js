@@ -1,6 +1,5 @@
 import {useEffect, useState} from "react";
 import {List, Modal, Space, Typography} from "antd";
-import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
 import LoadingContainer from "@components/common/LoadingContainer";
 import BuildLink from "@components/builds/BuildLink";
@@ -16,6 +15,7 @@ import {isAuthorized} from "@components/common/authorizations";
 import ValidationDataType from "@components/framework/validation-data-type/ValidationDataType";
 import InfoBox from "@components/common/InfoBox";
 import ValidationRunData from "@components/framework/validation-run-data/ValidationRunData";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 
 export function useValidationRunHistoryDialog() {
     const [open, setOpen] = useState(false)
@@ -40,16 +40,19 @@ export function useValidationRunHistoryDialog() {
 
 export default function ValidationRunHistoryDialog({dialog, onChange}) {
 
+    const client = useGraphQLClient()
+
     const [loading, setLoading] = useState(true)
     const [build, setBuild] = useState()
     const [validationStamp, setValidationStamp] = useState()
     const [pageInfo, setPageInfo] = useState()
     const [runs, setRuns] = useState([])
     const [runsReload, setRunsReload] = useState(0)
+
     useEffect(() => {
-        if (dialog.open && dialog.run?.id) {
+        if (client && dialog.open && dialog.run?.id) {
             setLoading(true)
-            graphQLCall(
+            client.request(
                 gql`
                     query GetValidationRun($runId: Int!) {
                         validationRuns(id: $runId) {
@@ -69,7 +72,7 @@ export default function ValidationRunHistoryDialog({dialog, onChange}) {
             ).then(data => {
                 const buildId = data.validationRuns[0].build.id
                 const validationStampName = data.validationRuns[0].validationStamp.name
-                return graphQLCall(
+                return client.request(
                     gql`
                         query GetValidationHistory(
                             $buildId: Int!,
@@ -172,7 +175,7 @@ export default function ValidationRunHistoryDialog({dialog, onChange}) {
                 setLoading(false)
             })
         }
-    }, [dialog.open, dialog.run, runsReload]);
+    }, [client, dialog.open, dialog.run, runsReload]);
 
     const onOk = async () => {
         dialog.close()
@@ -203,7 +206,7 @@ export default function ValidationRunHistoryDialog({dialog, onChange}) {
     const replaceStatusCommentInRuns = (runs, vrsId, description, annotatedDescription) => runs.map(run => replaceStatusCommentInRun(run, vrsId, description, annotatedDescription))
 
     const editStatusComment = async (vrs, text) => {
-        const data = await graphQLCall(
+        const data = await client.request(
             gql`
                 mutation ChangeStatusComment(
                     $validationRunStatusId: Int!,

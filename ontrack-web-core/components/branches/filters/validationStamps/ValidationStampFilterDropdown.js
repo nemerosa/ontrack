@@ -2,7 +2,6 @@ import {Button, Dropdown, Space, Typography} from "antd";
 import {FaCaretDown, FaCheckDouble, FaEdit, FaEraser, FaEyeSlash, FaFilter, FaPlus} from "react-icons/fa";
 import {useContext, useEffect, useState} from "react";
 import CheckableMenuItem from "@components/common/CheckableMenuItem";
-import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
 import SelectableMenuItem from "@components/common/SelectableMenuItem";
 import {getLocallySelectedValidationFilter, setLocallySelectedValidationStampFilter} from "@components/storage/local";

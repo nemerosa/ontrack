@@ -1,10 +1,12 @@
 import MultipleSelectSearch from "@components/common/MultipleSelectSearch";
-import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 
 export default function SelectMultipleValidationStampNames({value, onChange}) {
+
+    const client = useGraphQLClient()
     const fetchValidationNames = async (token) => {
-        return graphQLCall(
+        return client.request(
             gql`
                 query ValidationStampNames($token: String!) {
                     validationStampNames(token: $token)

@@ -3,26 +3,30 @@ import SelectPromotionLevel from "@components/promotionLevels/SelectPromotionLev
 import SelectValidationStamp from "@components/validationStamps/SelectValidationStamp";
 import SelectValidationRunStatus from "@components/validationRuns/SelectValidationRunStatus";
 import {useEffect, useState} from "react";
-import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 
 export default function StandardBuildFilterProvider({branch, buildFilterForm}) {
 
+    const client = useGraphQLClient()
+
     const [properties, setProperties] = useState([])
     useEffect(() => {
-        graphQLCall(
-            gql`
-                query GetBranchProperties {
-                    properties(projectEntityType: BUILD) {
-                        value: typeName
-                        label: name
+        if (client) {
+            client.request(
+                gql`
+                    query GetBranchProperties {
+                        properties(projectEntityType: BUILD) {
+                            value: typeName
+                            label: name
+                        }
                     }
-                }
-            `
-        ).then(data => {
-            setProperties(data.properties)
-        })
-    }, []);
+                `
+            ).then(data => {
+                setProperties(data.properties)
+            })
+        }
+    }, [client]);
 
     const tabs = [
         {

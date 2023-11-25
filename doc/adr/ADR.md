@@ -10,3 +10,4 @@ Ontrack Next UI Architecture Decisions Records
 * [ADR-NXUI-0005-entity-ui-permissions](ADR-NXUI-0005-entity-ui-permissions.md) - how are UI permissions accessed at entity level
 * [ADR-NXUI-0006-ui-ref-data](ADR-NXUI-0006-ui-ref-data.md) - how to make reference data accessible at UI level
 * [ADR-NXUI-0007-ui-local-preferences](ADR-NXUI-0007-ui-local-preferences.md) - how to get and set local preferences in the UI
+* [ADR-NXUI-0008-ui-graphql-call](ADR-NXUI-0008-ui-graphql-call.md) - how to get and set local preferences in the UI

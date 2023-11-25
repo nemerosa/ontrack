@@ -1,13 +1,14 @@
 import {applyNodeChanges, Background, Controls, MarkerType, ReactFlow, ReactFlowProvider} from "reactflow";
 import {useCallback, useEffect, useMemo, useState} from "react";
-import ELK from 'elkjs';
-import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
 import BranchNode from "@components/links/BranchNode";
 import BranchLinkNode from "@components/links/BranchLinkNode";
 import {autoLayout} from "@components/links/GraphUtils";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 
 function BranchLinksFlow({branch}) {
+
+    const client = useGraphQLClient()
 
     const maxDownstreamDepth = 5
     const maxUpstreamDepth = 5
@@ -293,43 +294,45 @@ function BranchLinksFlow({branch}) {
     }
 
     useEffect(() => {
-        graphQLCall(
-            branchQuery,
-            {branchId: branch.id}
-        ).then(data => {
+        if (client && branch) {
+            client.request(
+                branchQuery,
+                {branchId: branch.id}
+            ).then(data => {
 
-            // Root branch
-            const rootBranch = data.branch
+                // Root branch
+                const rootBranch = data.branch
 
-            // Nodes & edges to build
-            const nodes = []
-            const edges = []
+                // Nodes & edges to build
+                const nodes = []
+                const edges = []
 
-            // Cache for the nodes & edges
-            const nodesCache = {}
-            const edgesCache = {}
+                // Cache for the nodes & edges
+                const nodesCache = {}
+                const edgesCache = {}
 
-            // Root node
-            const rootNode = branchToNode(rootBranch)
-            rootNode.data.selected = true
-            nodes.push(rootNode)
-            nodesCache[rootNode.id] = rootNode
+                // Root node
+                const rootNode = branchToNode(rootBranch)
+                rootNode.data.selected = true
+                nodes.push(rootNode)
+                nodesCache[rootNode.id] = rootNode
 
-            collectDownstreamNodes(rootNode, nodes, edges, nodesCache, edgesCache)
-            collectUpstreamNodes(rootNode, nodes, edges, nodesCache, edgesCache)
+                collectDownstreamNodes(rootNode, nodes, edges, nodesCache, edgesCache)
+                collectUpstreamNodes(rootNode, nodes, edges, nodesCache, edgesCache)
 
-            // Layout for the graph
+                // Layout for the graph
 
-            autoLayout({
-                nodes,
-                edges,
-                nodeWidth: 220,
-                nodeHeight: (node) => node.type === 'branch' ? 220 : 100,
-                setNodes,
-                setEdges,
+                autoLayout({
+                    nodes,
+                    edges,
+                    nodeWidth: 220,
+                    nodeHeight: (node) => node.type === 'branch' ? 220 : 100,
+                    setNodes,
+                    setEdges,
+                })
             })
-        })
-    }, [branch]);
+        }
+    }, [client, branch]);
 
     const onNodesChange = useCallback(
         (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),

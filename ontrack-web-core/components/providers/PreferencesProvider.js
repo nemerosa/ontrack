@@ -1,6 +1,6 @@
 import {createContext, useContext, useEffect, useState} from "react";
-import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 
 export const PreferencesContext = createContext({
     branchViewVsGroups: null,
@@ -13,27 +13,31 @@ export const PreferencesContext = createContext({
 
 export default function PreferencesContextProvider({children}) {
 
+    const client = useGraphQLClient()
+
     const [preferencesRecord, setPreferencesRecord] = useState({})
 
     useEffect(() => {
-        graphQLCall(
-            gql`
-                query GetPreferences {
-                    preferences {
-                        branchViewVsGroups
-                        branchViewVsNames
-                        dashboardUuid
-                        selectedBranchViewKey
+        if (client) {
+            client.request(
+                gql`
+                    query GetPreferences {
+                        preferences {
+                            branchViewVsGroups
+                            branchViewVsNames
+                            dashboardUuid
+                            selectedBranchViewKey
+                        }
                     }
-                }
-            `
-        ).then(data => {
-            setPreferencesRecord(data.preferences)
-        })
-    }, []);
+                `
+            ).then(data => {
+                setPreferencesRecord(data.preferences)
+            })
+        }
+    }, [client]);
 
     const setPreferences = (values) => {
-        graphQLCall(
+        client.request(
             gql`
                 mutation SetPreferences($input: SetPreferencesInput!) {
                     setPreferences(input: $input) {

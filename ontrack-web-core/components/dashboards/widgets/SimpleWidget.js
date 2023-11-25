@@ -1,6 +1,6 @@
-import graphQLCall from "@client/graphQLCall";
 import Widget from "@components/dashboards/widgets/Widget";
 import {useEffect, useState} from "react";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 
 export default function SimpleWidget({
                                          title, query, queryDeps = [], variables, canQuery,
@@ -10,13 +10,16 @@ export default function SimpleWidget({
                                          padding,
                                          children
                                      }) {
+
+    const client = useGraphQLClient()
+
     const [loading, setLoading] = useState(true)
     const [commands, setCommands] = useState([])
 
     useEffect(() => {
-        if (variables && (!canQuery || canQuery())) {
+        if (client && variables && (!canQuery || canQuery())) {
             setLoading(true)
-            graphQLCall(
+            client.request(
                 query,
                 variables
             ).then(data => {
@@ -28,7 +31,7 @@ export default function SimpleWidget({
                 setLoading(false)
             })
         }
-    }, queryDeps)
+    }, [client, ...queryDeps])
 
     return (
         <Widget

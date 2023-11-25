@@ -1,6 +1,4 @@
 import {createContext} from "react";
-import graphQLCall, {getUserErrors} from "@client/graphQLCall";
-import {gql} from "graphql-request";
 
 export const WidgetContext = createContext(null)
 export const WidgetDispatchContext = createContext(null)

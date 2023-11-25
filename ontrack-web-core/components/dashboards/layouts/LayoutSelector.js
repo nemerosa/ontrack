@@ -1,26 +1,30 @@
 import {useEffect, useState} from "react";
-import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
 import {Col, Row} from "antd";
 import SelectableLayout from "@components/dashboards/layouts/SelectableLayout";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 
 export default function LayoutSelector({selectedLayoutKey, onLayoutKeySelected}) {
+
+    const client = useGraphQLClient()
 
     const [layouts, setLayouts] = useState([])
 
     useEffect(() => {
-        graphQLCall(gql`
-            query DashboardLayouts {
-                dashboardLayouts {
-                    key
-                    name
-                    description
+        if (client) {
+            client.request(gql`
+                query DashboardLayouts {
+                    dashboardLayouts {
+                        key
+                        name
+                        description
+                    }
                 }
-            }
-        `).then(data => {
-            setLayouts(data.dashboardLayouts)
-        })
-    }, [])
+            `).then(data => {
+                setLayouts(data.dashboardLayouts)
+            })
+        }
+    }, [client])
 
     return (
         <>

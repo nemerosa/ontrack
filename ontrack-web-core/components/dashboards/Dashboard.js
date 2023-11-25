@@ -2,15 +2,17 @@ import {lazy, Suspense, useContext, useEffect, useState} from "react";
 import {Alert, Button, Col, Row, Skeleton, Space, Tabs, Typography} from "antd";
 import LayoutContextProvider from "@components/dashboards/layouts/LayoutContext";
 import {DashboardContext, DashboardDispatchContext} from "@components/dashboards/DashboardContext";
-import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
 import SelectableWidget from "@components/dashboards/widgets/SelectableWidget";
 import LayoutSelector from "@components/dashboards/layouts/LayoutSelector";
 import WidgetExpansionContextProvider from "@components/dashboards/layouts/WidgetExpansionContext";
 import LayoutContainer from "@components/dashboards/layouts/LayoutContainer";
 import {FaCog, FaWindowRestore} from "react-icons/fa";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 
 export default function Dashboard() {
+
+    const client = useGraphQLClient()
 
     const {selectedDashboard} = useContext(DashboardContext)
     const selectedDashboardDispatch = useContext(DashboardDispatchContext)
@@ -42,19 +44,21 @@ export default function Dashboard() {
 
     const [availableWidgets, setAvailableWidgets] = useState([])
     useEffect(() => {
-        graphQLCall(gql`
-            query DashboardWidgets {
-                dashboardWidgets {
-                    key
-                    name
-                    description
-                    defaultConfig
+        if (client) {
+            client.request(gql`
+                query DashboardWidgets {
+                    dashboardWidgets {
+                        key
+                        name
+                        description
+                        defaultConfig
+                    }
                 }
-            }
-        `).then(data => {
-            setAvailableWidgets(data.dashboardWidgets)
-        })
-    }, [])
+            `).then(data => {
+                setAvailableWidgets(data.dashboardWidgets)
+            })
+        }
+    }, [client])
 
     const onLayoutKeySelected = (key) => {
         selectedDashboardDispatch({

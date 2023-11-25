@@ -1,5 +1,4 @@
 import {useEffect, useState} from "react";
-import graphQLCall from "@client/graphQLCall";
 import {gqlBuilds} from "@components/branches/branchQueries";
 import {Space} from "antd";
 import BranchBuilds from "@components/branches/BranchBuilds";
@@ -9,11 +8,15 @@ import {getLocallySelectedBuildFilter, setLocallySelectedBuildFilter,} from "@co
 import {useRouter} from "next/router";
 import ValidationStampFilterContextProvider
     from "@components/branches/filters/validationStamps/ValidationStampFilterContext";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 
 export default function ClassicBranchView({branch}) {
 
     // Router (used for permalinks)
     const router = useRouter()
+
+    // GraphQL client
+    const client = useGraphQLClient()
 
     // Pagination status
     const [pagination, setPagination] = useState({
@@ -65,9 +68,9 @@ export default function ClassicBranchView({branch}) {
     // Loading the builds
     const [loadingBuilds, setLoadingBuilds] = useState(true)
     useEffect(() => {
-        if (branch) {
+        if (client && branch) {
             setLoadingBuilds(true)
-            graphQLCall(gqlBuilds, {
+            client.request(gqlBuilds, {
                 branchId: branch.id,
                 offset: pagination.offset,
                 size: pagination.size,
@@ -88,7 +91,7 @@ export default function ClassicBranchView({branch}) {
                 setLoadingBuilds(false)
             })
         }
-    }, [branch, pagination, buildsReloads, selectedBuildFilter])
+    }, [client, branch, pagination, buildsReloads, selectedBuildFilter])
 
     // Loading more builds
     const onLoadMoreBuilds = () => {
@@ -109,9 +112,9 @@ export default function ClassicBranchView({branch}) {
     const [validationStamps, setValidationStamps] = useState([])
     const [loadingValidationStamps, setLoadingValidationStamps] = useState(true)
     useEffect(() => {
-        if (branch) {
+        if (client && branch) {
             setLoadingValidationStamps(true)
-            graphQLCall(
+            client.request(
                 gql`
                     query GetValidationStamps($branchId: Int!) {
                         branches(id: $branchId) {
@@ -131,7 +134,7 @@ export default function ClassicBranchView({branch}) {
                 setLoadingValidationStamps(false)
             })
         }
-    }, [branch]);
+    }, [client, branch]);
 
     return (
         <>

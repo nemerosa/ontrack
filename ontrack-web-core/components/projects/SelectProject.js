@@ -1,13 +1,16 @@
 import {useState} from "react";
 import {Select} from "antd";
-import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 
 export default function SelectProject({
                                           value, onChange,
                                           placeholder = "Type the name of the project",
                                           idAsValue = false,
                                       }) {
+
+    const client = useGraphQLClient()
+
     const [projects, setProjects] = useState([])
     const [searching, setSearching] = useState(false)
 
@@ -19,7 +22,7 @@ export default function SelectProject({
         if (token && token.length > 2) {
             if (!searching) {
                 setSearching(true)
-                graphQLCall(
+                client.request(
                     gql`
                         query SearchProjects($token: String!) {
                             projects(pattern: $token) {

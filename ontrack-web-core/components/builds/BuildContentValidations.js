@@ -1,6 +1,5 @@
 import PageSection from "@components/common/PageSection";
 import React, {useEffect, useState} from "react";
-import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
 import {Button, Popover, Space, Table, Typography} from "antd";
 import ValidationStamp from "@components/validationStamps/ValidationStamp";
@@ -14,8 +13,11 @@ import ValidationRunData from "@components/framework/validation-run-data/Validat
 import ValidationRunSortingMode from "@components/validationRuns/ValidationRunSortingMode";
 import BuildValidateAction from "@components/builds/BuildValidateAction";
 import {isAuthorized} from "@components/common/authorizations";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 
 export default function BuildContentValidations({build}) {
+
+    const client = useGraphQLClient()
 
     const [loading, setLoading] = useState(true)
     const [validationRuns, setValidationRuns] = useState([])
@@ -79,120 +81,124 @@ export default function BuildContentValidations({build}) {
     const [statuses, setStatuses] = useState([])
     const [validationStamps, setValidationStamps] = useState([])
     useEffect(() => {
-        graphQLCall(
-            gql`
-                query ValidationRunFilters($branchId: Int!) {
-                    validationRunStatusIDList {
-                        value: id
-                        text: name
-                    }
-                    branches(id: $branchId) {
-                        validationStamps {
-                            value: name
+        if (client) {
+            client.request(
+                gql`
+                    query ValidationRunFilters($branchId: Int!) {
+                        validationRunStatusIDList {
+                            value: id
                             text: name
                         }
+                        branches(id: $branchId) {
+                            validationStamps {
+                                value: name
+                                text: name
+                            }
+                        }
                     }
-                }
-            `, {branchId: build.branch.id}
-        ).then(data => {
-            setStatuses(data.validationRunStatusIDList.sort(sortingByText))
-            setValidationStamps(data.branches[0].validationStamps.sort(sortingByText))
-        })
-    }, []);
+                `, {branchId: build.branch.id}
+            ).then(data => {
+                setStatuses(data.validationRunStatusIDList.sort(sortingByText))
+                setValidationStamps(data.branches[0].validationStamps.sort(sortingByText))
+            })
+        }
+    }, [client]);
 
     useEffect(() => {
-        setLoading(true)
-        graphQLCall(
-            gql`
-                query BuildValidations(
-                    $buildId: Int!,
-                    $offset: Int!,
-                    $size: Int!,
-                    $sortingMode: ValidationRunSortingMode!,
-                    $statuses: [String],
-                    $validationStamp: String,
-                ) {
-                    build(id: $buildId) {
-                        validationRunsPaginated(
-                            sortingMode: $sortingMode,
-                            offset: $offset,
-                            size: $size,
-                            statuses: $statuses,
-                            validationStamp: $validationStamp
-                        ) {
-                            pageInfo {
-                                pageIndex
-                                totalSize
-                                currentSize
-                                previousPage {
-                                    offset
-                                    size
-                                }
-                                nextPage {
-                                    offset
-                                    size
-                                }
-                            }
-                            pageItems {
-                                id
-                                key: id
-                                runOrder
-                                runInfo {
-                                    runTime
-                                }
-                                lastStatus {
-                                    creation {
-                                        time
-                                        user
+        if (client) {
+            setLoading(true)
+            client.request(
+                gql`
+                    query BuildValidations(
+                        $buildId: Int!,
+                        $offset: Int!,
+                        $size: Int!,
+                        $sortingMode: ValidationRunSortingMode!,
+                        $statuses: [String],
+                        $validationStamp: String,
+                    ) {
+                        build(id: $buildId) {
+                            validationRunsPaginated(
+                                sortingMode: $sortingMode,
+                                offset: $offset,
+                                size: $size,
+                                statuses: $statuses,
+                                validationStamp: $validationStamp
+                            ) {
+                                pageInfo {
+                                    pageIndex
+                                    totalSize
+                                    currentSize
+                                    previousPage {
+                                        offset
+                                        size
                                     }
-                                    description
-                                    annotatedDescription
-                                    statusID {
+                                    nextPage {
+                                        offset
+                                        size
+                                    }
+                                }
+                                pageItems {
+                                    id
+                                    key: id
+                                    runOrder
+                                    runInfo {
+                                        runTime
+                                    }
+                                    lastStatus {
+                                        creation {
+                                            time
+                                            user
+                                        }
+                                        description
+                                        annotatedDescription
+                                        statusID {
+                                            id
+                                            name
+                                        }
+                                    }
+                                    validationStamp {
                                         id
                                         name
+                                        image
+                                        description
+                                        annotatedDescription
                                     }
-                                }
-                                validationStamp {
-                                    id
-                                    name
-                                    image
-                                    description
-                                    annotatedDescription
-                                }
-                                data {
-                                    descriptor {
-                                        feature {
+                                    data {
+                                        descriptor {
+                                            feature {
+                                                id
+                                            }
                                             id
                                         }
-                                        id
+                                        data
                                     }
-                                    data
                                 }
                             }
                         }
                     }
+                `, {
+                    buildId: build.id,
+                    offset: pageRequest.offset,
+                    size: pageRequest.size,
+                    statuses: filteredInfo.status,
+                    validationStamp: filteredInfo.validation ? filteredInfo.validation[0] : null,
+                    sortingMode: sortingMode,
                 }
-            `, {
-                buildId: build.id,
-                offset: pageRequest.offset,
-                size: pageRequest.size,
-                statuses: filteredInfo.status,
-                validationStamp: filteredInfo.validation ? filteredInfo.validation[0] : null,
-                sortingMode: sortingMode,
-            }
-        ).then(data => {
-            setValidationRuns(data.build.validationRunsPaginated.pageItems)
-            const pageInfo = data.build.validationRunsPaginated.pageInfo;
-            setPagination({
-                ...pagination,
-                current: pageInfo.pageIndex + 1,
-                pageSize: pageRequest.size,
-                total: pageInfo.totalSize,
+            ).then(data => {
+                setValidationRuns(data.build.validationRunsPaginated.pageItems)
+                const pageInfo = data.build.validationRunsPaginated.pageInfo;
+                setPagination({
+                    ...pagination,
+                    current: pageInfo.pageIndex + 1,
+                    pageSize: pageRequest.size,
+                    total: pageInfo.totalSize,
+                })
+            }).finally(() => {
+                setLoading(false)
             })
-        }).finally(() => {
-            setLoading(false)
-        })
-    }, [build, pageRequest, filteredInfo, sortingMode, reloadCount]);
+        }
+    }, [client, build, pageRequest, filteredInfo, sortingMode, reloadCount]);
 
     // Definition of the columns
 

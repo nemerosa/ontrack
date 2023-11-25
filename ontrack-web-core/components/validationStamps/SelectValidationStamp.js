@@ -1,8 +1,8 @@
 import {Select, Space, Typography} from "antd";
 import {useEffect, useState} from "react";
-import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
 import ValidationStampImage from "@components/validationStamps/ValidationStampImage";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 
 export default function SelectValidationStamp({
                                                   branch, value, onChange, onValidationStampSelected,
@@ -11,12 +11,14 @@ export default function SelectValidationStamp({
                                                   multiple = false,
                                               }) {
 
+    const client = useGraphQLClient()
+
     const [validationStamps, setValidationStamps] = useState([])
     const [options, setOptions] = useState([])
 
     useEffect(() => {
-        if (branch) {
-            graphQLCall(
+        if (client && branch) {
+            client.request(
                 gql`
                     query GetValidationStamps($branchId: Int!) {
                         branches(id: $branchId) {
@@ -50,7 +52,7 @@ export default function SelectValidationStamp({
                 }))
             })
         }
-    }, [branch]);
+    }, [client, branch]);
 
     const onLocalChange = (value) => {
         if (onChange) onChange(value)

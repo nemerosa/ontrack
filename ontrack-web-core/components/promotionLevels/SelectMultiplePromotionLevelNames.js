@@ -1,10 +1,13 @@
 import MultipleSelectSearch from "@components/common/MultipleSelectSearch";
-import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 
 export default function SelectMultiplePromotionLevelNames({value, onChange}) {
+
+    const client = useGraphQLClient()
+
     const fetchPromotionNames = async (token) => {
-        return graphQLCall(
+        return client.request(
             gql`
                 query PromotionLevelNames($token: String!) {
                     promotionLevelNames(token: $token)

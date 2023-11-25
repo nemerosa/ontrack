@@ -1,10 +1,12 @@
 import {useContext, useEffect, useState} from "react";
 import {EventsContext} from "@components/common/EventsContext";
-import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
 import Favourite from "@components/common/Favourite";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 
 export default function ProjectFavourite({project}) {
+
+    const client = useGraphQLClient()
 
     const eventsContext = useContext(EventsContext)
     const [favourite, setFavourite] = useState(project.favourite)
@@ -15,7 +17,7 @@ export default function ProjectFavourite({project}) {
 
     const toggleFavourite = async () => {
         if (favourite) {
-            return graphQLCall(
+            return client.request(
                 gql`
                     mutation UnsetFavourite(
                         $projectId: Int!,
@@ -34,7 +36,7 @@ export default function ProjectFavourite({project}) {
                 eventsContext.fireEvent("project.favourite", {id: project.id, value: false})
             })
         } else {
-            return graphQLCall(
+            return client.request(
                 gql`
                     mutation SetFavourite(
                         $projectId: Int!,

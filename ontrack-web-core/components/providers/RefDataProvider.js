@@ -1,6 +1,6 @@
 import {createContext, useContext, useEffect, useState} from "react";
-import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 
 const refDataSignature = {
     /**
@@ -31,6 +31,8 @@ export const useRefData = () => useContext(RefDataContext)
 
 export default function RefDataContextProvider({children}) {
 
+    const client = useGraphQLClient()
+
     const [refData, setRefData] = useState(refDataSignature)
 
     const validationRunStatuses = (list) => {
@@ -60,24 +62,26 @@ export default function RefDataContextProvider({children}) {
     }
 
     useEffect(() => {
-        graphQLCall(
-            gql`
-                query RefData {
-                    validationRunStatusIDList {
-                        id
-                        name
-                        root
-                        passed
-                        followingStatuses
+        if (client) {
+            client.request(
+                gql`
+                    query RefData {
+                        validationRunStatusIDList {
+                            id
+                            name
+                            root
+                            passed
+                            followingStatuses
+                        }
                     }
-                }
-            `
-        ).then(data => {
-            setRefData({
-                validationRunStatuses: validationRunStatuses(data.validationRunStatusIDList),
+                `
+            ).then(data => {
+                setRefData({
+                    validationRunStatuses: validationRunStatuses(data.validationRunStatusIDList),
+                })
             })
-        })
-    }, []);
+        }
+    }, [client]);
 
     return <RefDataContext.Provider value={refData}>{children}</RefDataContext.Provider>
 

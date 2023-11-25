@@ -1,12 +1,14 @@
 import {applyNodeChanges, Background, Controls, ReactFlow, ReactFlowProvider} from "reactflow";
 import {gql} from "graphql-request";
 import {useCallback, useEffect, useMemo, useState} from "react";
-import graphQLCall from "@client/graphQLCall";
 import BuildNode from "@components/links/BuildNode";
 import BuildGroupNode from "@components/links/BuildGroupNode";
 import {autoLayout} from "@components/links/GraphUtils";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 
 function BuildLinksFlow({build}) {
+
+    const client = useGraphQLClient()
 
     const maxDownstreamDepth = 5
     const maxUpstreamDepth = 5
@@ -274,52 +276,54 @@ function BuildLinksFlow({build}) {
     }
 
     useEffect(() => {
-        graphQLCall(
-            buildQuery,
-            {buildId: build.id}
-        ).then(data => {
-            // Nodes & edges to build
-            const nodes = []
-            const edges = []
+        if (client) {
+            client.request(
+                buildQuery,
+                {buildId: build.id}
+            ).then(data => {
+                // Nodes & edges to build
+                const nodes = []
+                const edges = []
 
-            // Cache for the nodes & edges
-            const nodesCache = {}
-            const edgesCache = {}
+                // Cache for the nodes & edges
+                const nodesCache = {}
+                const edgesCache = {}
 
-            // Building all downstream nodes recursively
-            const rootNodeId = collectDownstreamNodes(
-                data.build,
-                nodes,
-                edges,
-                nodesCache,
-                edgesCache,
-            )
+                // Building all downstream nodes recursively
+                const rootNodeId = collectDownstreamNodes(
+                    data.build,
+                    nodes,
+                    edges,
+                    nodesCache,
+                    edgesCache,
+                )
 
-            // Selecting the root node
-            nodesCache[rootNodeId].data.selected = true
+                // Selecting the root node
+                nodesCache[rootNodeId].data.selected = true
 
-            // Building all upstream nodes recursively
-            collectUpstreamNodes(
-                rootNodeId,
-                data.build,
-                nodes,
-                edges,
-                nodesCache,
-                edgesCache,
-            )
+                // Building all upstream nodes recursively
+                collectUpstreamNodes(
+                    rootNodeId,
+                    data.build,
+                    nodes,
+                    edges,
+                    nodesCache,
+                    edgesCache,
+                )
 
-            // Layout for the graph
+                // Layout for the graph
 
-            autoLayout({
-                nodes,
-                edges,
-                nodeWidth: (node) => node.type === 'group' ? 200 : 180,
-                nodeHeight: (node) => node.type === 'group' ? 300 : 120,
-                setNodes,
-                setEdges,
+                autoLayout({
+                    nodes,
+                    edges,
+                    nodeWidth: (node) => node.type === 'group' ? 200 : 180,
+                    nodeHeight: (node) => node.type === 'group' ? 300 : 120,
+                    setNodes,
+                    setEdges,
+                })
             })
-        })
-    }, [build])
+        }
+    }, [client, build])
 
     const onNodesChange = useCallback(
         (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),

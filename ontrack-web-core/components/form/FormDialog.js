@@ -1,7 +1,8 @@
 import {Form, Modal} from "antd";
 import {useState} from "react";
-import graphQLCall, {getUserErrors} from "@client/graphQLCall";
 import FormErrors from "@components/form/FormErrors";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import {getUserErrors} from "@components/services/graphql-utils";
 
 export function useFormDialog(config) {
     const [open, setOpen] = useState(false)
@@ -25,6 +26,8 @@ export function useFormDialog(config) {
 
 export default function FormDialog({dialog, onValuesChange, children}) {
 
+    const client = useGraphQLClient()
+
     const form = dialog.form
     const [formErrors, setFormErrors] = useState([]);
     const [loading, setLoading] = useState(false)
@@ -43,7 +46,7 @@ export default function FormDialog({dialog, onValuesChange, children}) {
             let result
             let errors = undefined
             if (dialog.query) {
-                const data = await graphQLCall(
+                const data = await client.request(
                     dialog.query,
                     values
                 )

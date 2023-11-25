@@ -1,16 +1,18 @@
 import {Popconfirm, Popover, Spin} from "antd";
 import {FaTrashAlt} from "react-icons/fa";
 import {useState} from "react";
-import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 
 export default function PromotionRunDeleteAction({promotionRun, onDeletion}) {
+
+    const client = useGraphQLClient()
 
     const [deleting, setDeleting] = useState(false)
 
     const onDelete = () => {
         setDeleting(true)
-        graphQLCall(
+        client.request(
             gql`
                 mutation DeletePromotionRun(
                     $promotionRunId: Int!,

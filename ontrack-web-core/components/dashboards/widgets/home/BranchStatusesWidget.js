@@ -1,7 +1,6 @@
 import BranchStatusesWidgetForm from "@components/dashboards/widgets/home/BranchStatusesWidgetForm";
 import Widget from "@components/dashboards/widgets/Widget";
 import {useEffect, useState} from "react";
-import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
 import {Space, Table, Typography} from "antd";
 import {FaBan} from "react-icons/fa";
@@ -12,8 +11,11 @@ import PredefinedPromotionLevelImage from "@components/promotionLevels/Predefine
 import PredefinedValidationStampImage from "@components/validationStamps/PredefinedValidationStampImage";
 import Link from "next/link";
 import {toMilliSeconds} from "@components/common/SelectInterval";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 
 export default function BranchStatusesWidget({promotions, validations, refreshInterval, branches, title}) {
+
+    const client = useGraphQLClient()
 
     const [loading, setLoading] = useState(true)
 
@@ -63,157 +65,158 @@ export default function BranchStatusesWidget({promotions, validations, refreshIn
     }
 
     useEffect(() => {
-        setLoading(true)
-
-        const branchLoadings = branches.map(({project, branch}) =>
-            graphQLCall(
-                gql`
-                    query BranchStatus(
-                        $project: String!,
-                        $branch: String!,
-                        $promotions: [String!]!,
-                        $validations: [String!]!,
-                    ) {
-                        projects(name: $project) {
-                            id
-                            name
-                            branches(name: $branch) {
+        if (client) {
+            setLoading(true)
+            const branchLoadings = branches.map(({project, branch}) =>
+                client.request(
+                    gql`
+                        query BranchStatus(
+                            $project: String!,
+                            $branch: String!,
+                            $promotions: [String!]!,
+                            $validations: [String!]!,
+                        ) {
+                            projects(name: $project) {
                                 id
                                 name
-                                promotionStatuses(names: $promotions) {
-                                    promotionLevel {
-                                        id
-                                        name
-                                    }
-                                    creation {
-                                        time
-                                    }
-                                    build {
-                                        id
-                                        name
-                                        releaseProperty {
-                                            value
-                                        }
-                                    }
-                                }
-                                validationStatuses(names: $validations) {
-                                    validationStamp {
-                                        id
-                                        name
-                                    }
-                                    lastStatus {
-                                        creation {
-                                            time
-                                        }
-                                        statusID {
+                                branches(name: $branch) {
+                                    id
+                                    name
+                                    promotionStatuses(names: $promotions) {
+                                        promotionLevel {
                                             id
                                             name
                                         }
+                                        creation {
+                                            time
+                                        }
+                                        build {
+                                            id
+                                            name
+                                            releaseProperty {
+                                                value
+                                            }
+                                        }
                                     }
-                                    build {
-                                        id
-                                        name
-                                        releaseProperty {
-                                            value
+                                    validationStatuses(names: $validations) {
+                                        validationStamp {
+                                            id
+                                            name
+                                        }
+                                        lastStatus {
+                                            creation {
+                                                time
+                                            }
+                                            statusID {
+                                                id
+                                                name
+                                            }
+                                        }
+                                        build {
+                                            id
+                                            name
+                                            releaseProperty {
+                                                value
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
-                `,
-                {project, branch, promotions, validations}
+                    `,
+                    {project, branch, promotions, validations}
+                )
             )
-        )
 
-        Promise.all(branchLoadings).then(datas => {
+            Promise.all(branchLoadings).then(datas => {
 
-            setDataSource(datas.map(data => {
-                const branch = getBranch(data)
-                return branch ? branch : ({})
-            }))
+                setDataSource(datas.map(data => {
+                    const branch = getBranch(data)
+                    return branch ? branch : ({})
+                }))
 
-            // List of columns to set
-            const columnsList = []
-            // Branch column
-            columnsList.push({
-                key: 'branch',
-                title: "Branch",
-                render: (_, branch) => {
-                    return <Space>
-                        {projectLink(branch.project)}
-                        <span>/</span>
-                        {branchLink(branch)}
-                    </Space>
+                // List of columns to set
+                const columnsList = []
+                // Branch column
+                columnsList.push({
+                    key: 'branch',
+                    title: "Branch",
+                    render: (_, branch) => {
+                        return <Space>
+                            {projectLink(branch.project)}
+                            <span>/</span>
+                            {branchLink(branch)}
+                        </Space>
+                    }
+                })
+                // Column per promotion
+                if (promotions) {
+                    promotions.forEach(promotionName => {
+                        columnsList.push({
+                            key: promotionName,
+                            title: <PredefinedPromotionLevelImage name={promotionName}/>,
+                            render: (_, branch) => {
+                                if (branch.promotionStatuses) {
+                                    const run = branch.promotionStatuses.find(it => it.promotionLevel.name === promotionName)
+                                    if (run) {
+                                        return <Space direction="vertical">
+                                            {
+                                                <Space size={8}>
+                                                    {buildLink(run.build)}
+                                                    <Link href={promotionLevelUri(run.promotionLevel)}>
+                                                        <Typography.Text type="secondary">[history]</Typography.Text>
+                                                    </Link>
+                                                </Space>
+                                            }
+                                            <Timestamp value={run.creation.time}/>
+                                        </Space>
+                                    }
+                                }
+                                return <FaBan/>
+                            }
+                        })
+                    })
                 }
-            })
-            // Column per promotion
-            if (promotions) {
-                promotions.forEach(promotionName => {
-                    columnsList.push({
-                        key: promotionName,
-                        title: <PredefinedPromotionLevelImage name={promotionName}/>,
-                        render: (_, branch) => {
-                            if (branch.promotionStatuses) {
-                                const run = branch.promotionStatuses.find(it => it.promotionLevel.name === promotionName)
-                                if (run) {
-                                    return <Space direction="vertical">
-                                        {
-                                            <Space size={8}>
-                                                {buildLink(run.build)}
-                                                <Link href={promotionLevelUri(run.promotionLevel)}>
-                                                    <Typography.Text type="secondary">[history]</Typography.Text>
-                                                </Link>
-                                            </Space>
-                                        }
-                                        <Timestamp value={run.creation.time}/>
-                                    </Space>
+                // Column per validation
+                if (validations) {
+                    validations.forEach(validationName => {
+                        columnsList.push({
+                            key: validationName,
+                            title: <PredefinedValidationStampImage name={validationName}/>,
+                            render: (_, branch) => {
+                                if (branch.validationStatuses) {
+                                    const run = branch.validationStatuses.find(it => it.validationStamp.name === validationName)
+                                    if (run) {
+                                        return <Space direction="vertical">
+                                            {
+                                                <Space size={8}>
+                                                    <ValidationRunStatus
+                                                        status={run.lastStatus}
+                                                        tooltip={true}
+                                                        text={buildLink(run.build)}
+                                                    />
+                                                    <Link href={validationStampUri(run.validationStamp)}>
+                                                        <Typography.Text type="secondary">[history]</Typography.Text>
+                                                    </Link>
+                                                </Space>
+                                            }
+                                            <Timestamp value={run.lastStatus.creation.time}/>
+                                        </Space>
+                                    }
                                 }
+                                return <FaBan/>
                             }
-                            return <FaBan/>
-                        }
+                        })
                     })
-                })
-            }
-            // Column per validation
-            if (validations) {
-                validations.forEach(validationName => {
-                    columnsList.push({
-                        key: validationName,
-                        title: <PredefinedValidationStampImage name={validationName}/>,
-                        render: (_, branch) => {
-                            if (branch.validationStatuses) {
-                                const run = branch.validationStatuses.find(it => it.validationStamp.name === validationName)
-                                if (run) {
-                                    return <Space direction="vertical">
-                                        {
-                                            <Space size={8}>
-                                                <ValidationRunStatus
-                                                    status={run.lastStatus}
-                                                    tooltip={true}
-                                                    text={buildLink(run.build)}
-                                                />
-                                                <Link href={validationStampUri(run.validationStamp)}>
-                                                    <Typography.Text type="secondary">[history]</Typography.Text>
-                                                </Link>
-                                            </Space>
-                                        }
-                                        <Timestamp value={run.lastStatus.creation.time}/>
-                                    </Space>
-                                }
-                            }
-                            return <FaBan/>
-                        }
-                    })
-                })
-            }
-            // Ok for the columns
-            setColumns(columnsList)
+                }
+                // Ok for the columns
+                setColumns(columnsList)
 
-        }).finally(() => {
-            setLoading(false)
-        })
-    }, [promotions, validations, branches, refreshCount])
+            }).finally(() => {
+                setLoading(false)
+            })
+        }
+    }, [client, promotions, validations, branches, refreshCount])
 
     return (
         <>

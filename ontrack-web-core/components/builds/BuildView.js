@@ -4,26 +4,28 @@ import MainPage from "@components/layouts/MainPage";
 import {buildBreadcrumbs} from "@components/common/Breadcrumbs";
 import LoadingContainer from "@components/common/LoadingContainer";
 import {useEffect, useState} from "react";
-import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
 import {CloseCommand, LegacyLinkCommand} from "@components/common/Commands";
-import {branchLegacyUri, branchUri, buildLegacyUri} from "@components/common/Links";
+import {branchUri, buildLegacyUri} from "@components/common/Links";
 import {gqlDecorationFragment, gqlInformationFragment, gqlPropertiesFragment} from "@components/services/fragments";
 import BuildContent from "@components/builds/BuildContent";
 import {Space} from "antd";
 import Decorations from "@components/framework/decorations/Decorations";
 import BuildInfoViewDrawer from "@components/builds/BuildInfoViewDrawer";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 
 export default function BuildView({id}) {
+
+    const client = useGraphQLClient()
 
     const [loadingBuild, setLoadingBuild] = useState(true)
     const [build, setBuild] = useState({branch: {project: {}}})
     const [commands, setCommands] = useState([])
 
     useEffect(() => {
-        if (id) {
+        if (client && id) {
             setLoadingBuild(true)
-            graphQLCall(
+            client.request(
                 gql`
                     query GetBuild($id: Int!) {
                         build(id: $id) {
@@ -72,7 +74,7 @@ export default function BuildView({id}) {
                 ])
             })
         }
-    }, [id])
+    }, [client, id])
 
     return (
         <>

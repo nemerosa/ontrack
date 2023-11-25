@@ -4,8 +4,8 @@ import {FaComment, FaPlus} from "react-icons/fa";
 import SelectValidationRunStatus from "@components/validationRuns/SelectValidationRunStatus";
 import Rows from "@components/common/Rows";
 import {useState} from "react";
-import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 
 /**
  * @param run Validation run to update
@@ -13,12 +13,14 @@ import {gql} from "graphql-request";
  */
 export default function ValidationRunStatusChange({run, onStatusChanged}) {
 
+    const client = useGraphQLClient()
+
     const [nextStatusId, setNextStatusId] = useState('')
     const [description, setDescription] = useState('')
 
     const changeStatus = async () => {
         if (nextStatusId) {
-            await graphQLCall(
+            await client.request(
                 gql`
                     mutation ChangeValidationRunStatus(
                         $runId: Int!,

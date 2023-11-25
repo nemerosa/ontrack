@@ -1,6 +1,5 @@
 import MainPage from "@components/layouts/MainPage";
 import {useEffect, useState} from "react";
-import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
 import Head from "next/head";
 import {projectTitle} from "@components/common/Titles";
@@ -17,8 +16,11 @@ import JumpToBranch from "@components/branches/JumpToBranch";
 import ProjectFavourite from "@components/projects/ProjectFavourite";
 import {useDashboardEventForRefresh} from "@components/common/EventsContext";
 import ProjectInfoViewDrawer from "@components/projects/ProjectInfoViewDrawer";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 
 export default function ProjectView({id}) {
+
+    const client = useGraphQLClient()
 
     const [loadingProject, setLoadingProject] = useState(true)
 
@@ -29,9 +31,9 @@ export default function ProjectView({id}) {
     const favouriteRefreshCount = useDashboardEventForRefresh("branch.favourite")
 
     useEffect(() => {
-        if (id) {
+        if (id && client) {
             setLoadingProject(true)
-            graphQLCall(
+            client.request(
                 gql`
                     query GetProject($id: Int!) {
                         projects(id: $id) {
@@ -99,7 +101,7 @@ export default function ProjectView({id}) {
                 setLoadingProject(false)
             })
         }
-    }, [id, favouriteRefreshCount])
+    }, [client, id, favouriteRefreshCount])
 
     const commands = [
         <JumpToBranch key="branch" projectName={project.name}/>,

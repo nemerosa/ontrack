@@ -1,5 +1,4 @@
 import {useEffect, useState} from "react";
-import graphQLCall from "@client/graphQLCall";
 import {CloseCommand} from "@components/common/Commands";
 import {branchUri} from "@components/common/Links";
 import Head from "next/head";
@@ -9,18 +8,21 @@ import {downToBranchBreeadcrumbs} from "@components/common/Breadcrumbs";
 import LoadingContainer from "@components/common/LoadingContainer";
 import {gql} from "graphql-request";
 import PageSection from "@components/common/PageSection";
-import BuildLinksGraph from "@components/links/BuildLinksGraph";
 import BranchLinksGraph from "@components/links/BranchLinksGraph";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 
 export default function BranchLinksView({id}) {
+
+    const client = useGraphQLClient()
+
     const [loadingBranch, setLoadingBranch] = useState(true)
     const [branch, setBranch] = useState({project: {}})
     const [commands, setCommands] = useState([])
 
     useEffect(() => {
-        if (id) {
+        if (id && client) {
             setLoadingBranch(true)
-            graphQLCall(
+            client.request(
                 gql`
                     query GetBranch($id: Int!) {
                         branches(id: $id) {
@@ -44,7 +46,7 @@ export default function BranchLinksView({id}) {
                 setLoadingBranch(false)
             })
         }
-    }, [id])
+    }, [id, client])
 
     return (
         <>

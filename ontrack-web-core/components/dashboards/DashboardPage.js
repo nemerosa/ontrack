@@ -3,7 +3,6 @@ import Dashboard from "@components/dashboards/Dashboard";
 import DashboardCommandMenu from "@components/dashboards/commands/DashboardCommandMenu";
 import {DashboardContext, DashboardDispatchContext} from "@components/dashboards/DashboardContext";
 import {useEffect, useReducer, useState} from "react";
-import graphQLCall from "@client/graphQLCall";
 import {gql} from "graphql-request";
 import SaveDashboardDialog, {useSaveDashboardDialog} from "@components/dashboards/commands/SaveDashboardDialog";
 import {
@@ -17,13 +16,16 @@ import JumpToProject from "@components/projects/JumpToProject";
 import {v4} from "uuid";
 import {legacyUri} from "@components/common/Links";
 import {LegacyLinkCommand} from "@components/common/Commands";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 
 export default function DashboardPage({
                                           title,
                                       }) {
 
+    const client = useGraphQLClient()
+
     const reloadDashboards = (newSelection) => {
-        graphQLCall(gql`
+        client.request(gql`
             query ReloadDashboards {
                 userDashboards {
                     uuid
@@ -78,7 +80,7 @@ export default function DashboardPage({
                 return selectedDashboard
             }
             case 'share': {
-                graphQLCall(shareDashboardQuery, {
+                client.request(shareDashboardQuery, {
                     uuid: selectedDashboard.uuid,
                 }).then(data => {
                     reloadDashboards(data.shareDashboard.dashboard)
@@ -92,10 +94,10 @@ export default function DashboardPage({
                     okText: "Delete",
                     okType: "danger",
                     onOk: () => {
-                        return graphQLCall(deleteDashboardQuery, {
+                        return client.request(deleteDashboardQuery, {
                             uuid: selectedDashboard.uuid,
                         }).then(() => {
-                            return graphQLCall(loadDashboardsQuery)
+                            return client.request(loadDashboardsQuery)
                         }).then(data => {
                             setDashboards(data.userDashboards)
                             selectedDashboardDispatch({
@@ -157,7 +159,7 @@ export default function DashboardPage({
             }
             case 'saveEdition': {
                 if (selectedDashboard.uuid) {
-                    graphQLCall(saveDashboardQuery, {
+                    client.request(saveDashboardQuery, {
                         uuid: selectedDashboard.uuid,
                         name: selectedDashboard.name,
                         userScope: selectedDashboard.userScope,
@@ -209,16 +211,18 @@ export default function DashboardPage({
     const [selectedDashboard, selectedDashboardDispatch] = useReducer(selectedDashboardReducer, undefined)
 
     useEffect(() => {
-        graphQLCall(
-            loadDashboardsQuery
-        ).then(data => {
-            setDashboards(data.userDashboards)
-            selectedDashboardDispatch({
-                type: 'init',
-                selectedDashboard: data.userDashboard,
+        if (client) {
+            client.request(
+                loadDashboardsQuery
+            ).then(data => {
+                setDashboards(data.userDashboards)
+                selectedDashboardDispatch({
+                    type: 'init',
+                    selectedDashboard: data.userDashboard,
+                })
             })
-        })
-    }, [])
+        }
+    }, [client])
 
     const commands = [
         <JumpToProject key="project"/>,

@@ -36,9 +36,11 @@ export const useGraphQLClient = () => {
             const config = connection.config
             setClient(
                 new GraphQLClient(
-                    `${config.url}/graphql`, {
+                    `${config.url}/graphql`,
+                    {
                         headers: config.headers,
-                    })
+                    }
+                )
             )
         }
     }, [connection.config])
