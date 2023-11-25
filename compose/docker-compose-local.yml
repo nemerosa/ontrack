@@ -28,6 +28,20 @@ services:
       - "8080:8080"
       - "8800:8800"
 
+  # Ontrack UI
+  ui:
+    image: "nemerosa/ontrack-ui:latest"
+    restart: always
+    environment:
+      # External URLs!
+      NEXT_PUBLIC_ONTRACK_URL: http://localhost:8080
+      NEXT_PUBLIC_ONTRACK_UI_URL: http://localhost:3000
+    depends_on:
+      ontrack:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+
   # Postgresql database
   postgres:
     image: postgres:15

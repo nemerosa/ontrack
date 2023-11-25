@@ -108,30 +108,17 @@ val copyWebResources by tasks.registering {
 }
 
 /**
- * Copying the generated code from web-core
- */
-
-val copyWebCoreResources by tasks.registering(Copy::class) {
-    dependsOn(":ontrack-web-core:build")
-    from(project(":ontrack-web-core").file("out"))
-    into("src/main/resources/static/ui/")
-    mustRunAfter(copyWebResources)
-}
-
-/**
  * Dependencies
  */
 
 tasks.named<Jar>("jar") {
     enabled = true
     dependsOn(copyWebResources)
-    dependsOn(copyWebCoreResources)
     dependsOn("bootBuildInfo")
 }
 
 tasks.named<ProcessResources>("processResources") {
     dependsOn(copyWebResources)
-    dependsOn(copyWebCoreResources)
     dependsOn("bootBuildInfo")
 }
 
