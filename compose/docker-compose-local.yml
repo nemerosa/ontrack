@@ -7,7 +7,7 @@ services:
     image: "nemerosa/ontrack:latest"
     restart: always
     environment:
-      PROFILE: prod
+      PROFILE: prod,cors
       JAVA_OPTIONS: "${JAVA_OPTIONS:--Xms1024m -Xmx1024m}"
       # Database
       SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres/ontrack"

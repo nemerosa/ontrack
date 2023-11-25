@@ -441,7 +441,7 @@ val osPackages by tasks.registering {
 val dockerPrepareEnv by tasks.registering(Copy::class) {
     dependsOn(":ontrack-ui:bootJar")
     from("ontrack-ui/build/libs")
-    include("*-app.jar")
+    include("ontrack-ui-${version}-app.jar")
     into(project.file("docker"))
     rename(".*", "ontrack.jar")
 }

@@ -23,4 +23,9 @@ object RunProfile {
      * Production mode
      */
     const val PROD = "prod"
+
+    /**
+     * Accessory profile to run with CORS enabled
+     */
+    const val CORS = "cors"
 }

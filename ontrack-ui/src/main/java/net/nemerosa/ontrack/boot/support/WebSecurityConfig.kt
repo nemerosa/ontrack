@@ -70,8 +70,11 @@ class WebSecurityConfig(
                 authorize("/hook/secured/**", permitAll)
                 authorize(anyRequest, authenticated)
             }
-            // CORS only for development
-            if (envService.isProfileEnabled(RunProfile.DEV) || envService.isProfileEnabled(RunProfile.ACC)) {
+            // CORS only for development, acceptance tests or if explicitly enabled
+            if (envService.isProfileEnabled(RunProfile.DEV) ||
+                envService.isProfileEnabled(RunProfile.ACC) ||
+                envService.isProfileEnabled(RunProfile.CORS)
+            ) {
                 cors {}
             }
             // Requires BASIC authentication
