@@ -1,6 +1,17 @@
 Ontrack Web Core (Next UI)
 ==========================
 
+## Configuration
+
+### Environment variables
+
+| Variable          | Default value           | Description                                                                                                                                             |
+|-------------------|-------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
+| NEXT_PUBLIC_LOCAL | `false`                 | By passing the default authentication process, to directly using `admin` / `admin` as credentials when connecting to the backend. Used for development. |
+| ONTRACK_URL       | `http://localhost:8080` | URL of the backend (from a user point of view)                                                                                                          |
+| ONTRACK_UI_URL    | `http://localhost:3000` | URL of the frontend (from a user point of view)                                                                                                         |
+
+
 ## Architecture Decisions Records
 
 See [ADR](ADR.md).
