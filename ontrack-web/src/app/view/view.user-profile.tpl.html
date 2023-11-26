@@ -137,19 +137,19 @@
                         </div>
                     </td>
                     <td>
-                        <p class="form-control-static" ng-if="token.token.validUntil">
-                            {{ token.token.validUntil | date:'fullDate'}}
-                            {{ token.token.validUntil | date:'mediumTime'}}
-                            <span ng-if="token.token.valid">
+                        <p class="form-control-static" ng-if="token.validUntil">
+                            {{ token.validUntil | date:'fullDate'}}
+                            {{ token.validUntil | date:'mediumTime'}}
+                            <span ng-if="token.valid">
                                 <span class="fa fa-check text-success"></span>
                                 Valid
                             </span>
-                            <span ng-if="!token.token.valid">
+                            <span ng-if="!token.valid">
                                 <span class="fa fa-times text-danger"></span>
                                 Expired
                             </span>
                         </p>
-                        <p class="form-control-static" ng-if="!token.token.validUntil">
+                        <p class="form-control-static" ng-if="!token.validUntil">
                             <span class="fa fa-check text-success"></span>
                             <i>Does not expire</i>
                         </p>
