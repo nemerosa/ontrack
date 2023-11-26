@@ -7,6 +7,12 @@ import org.openqa.selenium.support.FindBy
 
 class UserProfilePage extends AbstractHeaderPage {
 
+    @FindBy(id = "ot-user-profile-generate-token-name")
+    protected WebElement tokenGenerateName
+
+    @FindBy(id = "ot-user-profile-generate-token-button")
+    protected WebElement tokenGenerateButton
+
     @FindBy(id = 'token')
     protected WebElement token
 
@@ -22,26 +28,26 @@ class UserProfilePage extends AbstractHeaderPage {
     @Override
     void waitFor() {
         super.waitFor()
-        browser.waitUntil("Token generation button") { browser.findElement(By.id("token-generate")).displayed }
-    }
-
-    /**
-     * Gets the token value
-     */
-    String getTokenValue() {
-        return token.getAttribute("value")
+        browser.waitUntil("Token generation name") { tokenGenerateName.displayed }
     }
 
     /**
      * Generates and copies a token
      */
-    String generateToken() {
-        def tokenGenerate = browser.findElement(By.id("token-generate"))
-        tokenGenerate.click()
+    String generateToken(String name) {
+        tokenGenerateName.sendKeys(name)
+        tokenGenerateButton.click()
+        def tokenValue = browser.findElement(By.xpath("//table[@id='ot-user-profile-token-list']//tr[@id='token-${name}']//input"))
         browser.waitUntil("Token generation") {
+            if (tokenValue.displayed) {
+                def text = tokenValue.getAttribute("value")
+                text != null && text != ""
+            } else {
+                false
+            }
             def text = getTokenValue()
             text != null && text != ""
         }
-        return tokenValue
+        return tokenValue.getAttribute("value")
     }
 }

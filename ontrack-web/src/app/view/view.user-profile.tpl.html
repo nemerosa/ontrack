@@ -30,7 +30,8 @@
                 </div>
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
-                        <button id="password-submit" type="submit" class="btn btn-primary" ng-disabled="passwordForm.changing">
+                        <button id="password-submit" type="submit" class="btn btn-primary"
+                                ng-disabled="passwordForm.changing">
                             <ot-loading ng-show="passwordForm.changing"></ot-loading>
                             Submit
                         </button>
@@ -64,53 +65,78 @@
     <!-- Token management -->
     <div ng-if="localUser._token" class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title">API token</h3>
+            <h3 class="panel-title">API tokens</h3>
         </div>
         <div class="panel-body">
-            <form class="form-horizontal">
-                <div class="form-group">
-                    <label for="token" class="col-sm-2 control-label">Token</label>
-                    <div class="col-sm-8">
-                        <div class="input-group">
-                            <input id="token" class="form-control" ng-model="token.token.value" type="text" readonly>
-                            <span class="input-group-btn">
-                            <button class="btn btn-default"
-                                    id="token-copy"
+            <div class="alert alert-info" ng-if="!tokens || tokens.length == 0">
+                No API token has been generated yet.
+            </div>
+            <div>
+                <form class="form-inline">
+                    <input
+                            id="ot-user-profile-generate-token-name"
+                            class="form-control"
+                            placeholder="Token name"
+                            ng-model="token.name"
+                            type="text"
+                    />
+                    <button class="btn btn-warning form-control"
+                            id="ot-user-profile-generate-token-button"
+                            ng-click="generateToken()"
+                            title="Generates a new token"
+                            ng-disabled="!token.name"
+                    >
+                        <i class="fa fa-cog"></i>
+                        Generate token
+                    </button>
+                </form>
+            </div>
+            <table id="ot-user-profile-token-list" class="table table-hover table-bordered" style="margin-top: 1em;"
+                   ng-if="tokens && tokens.length > 0">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Scope</th>
+                    <th>Creation</th>
+                    <th>Valid until</th>
+                    <th>&nbsp;</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="token in tokens" id="token-{{ token.name }}">
+                    <td class="ot-user-profile-token-name">
+                        {{ token.name }}
+                    </td>
+                    <td>
+                        {{ token.scope }}
+                    </td>
+                    <td>
+                        {{ token.creation | date:'fullDate'}}
+                        {{ token.creation | date:'mediumTime'}}
+                        <form class="form-inline" ng-if="token.value">
+                            <input
+                                    class="form-control ot-user-profile-token-value"
+                                    ng-model="token.value"
+                                    type="text"
+                                    readonly
+                                    style="width: 32em;"
+                            />
+                            <button class="btn btn-default ot-user-profile-token-copy"
                                     title="Copy API token"
-                                    ng-click="copyToken()"
-                                    ng-disabled="!token.token.value">
+                                    ng-click="copyToken(token)"
+                            >
                                 <i class="fa fa-copy"></i>
                             </button>
-                            <button class="btn btn-warning"
-                                    id="token-generate"
-                                    ng-if="localUser._changeToken"
-                                    ng-click="changeToken()"
-                                    title="Regenerate token">
-                                <i class="fa fa-cog"></i>
-                            </button>
-                            <button class="btn btn-danger"
-                                    id="token-revoke"
-                                    ng-if="localUser._revokeToken"
-                                    ng-click="revokeToken()"
-                                    title="Revoke token">
-                                <i class="fa fa-trash"></i>
-                            </button>
-                        </span>
+                            <span class="ot-user-profile-token-copied" ng-show="token.copied">
+                                <span class="fa fa-check text-success"></span>
+                                Copied
+                            </span>
+                        </form>
+                        <div class="text-danger" ng-show="token.value">
+                            The token value is only shown once.
                         </div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-2 control-label">Created on</label>
-                    <div class="col-sm-10">
-                        <p class="form-control-static">
-                            {{ token.token.creation | date:'fullDate'}}
-                            {{ token.token.creation | date:'mediumTime'}}
-                        </p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-2 control-label">Valid until</label>
-                    <div class="col-sm-10">
+                    </td>
+                    <td>
                         <p class="form-control-static" ng-if="token.token.validUntil">
                             {{ token.token.validUntil | date:'fullDate'}}
                             {{ token.token.validUntil | date:'mediumTime'}}
@@ -127,9 +153,19 @@
                             <span class="fa fa-check text-success"></span>
                             <i>Does not expire</i>
                         </p>
-                    </div>
-                </div>
-            </form>
+                    </td>
+                    <td>
+                        <div class="input-group-btn">
+                            <button class="btn btn-danger ot-user-profile-token-revoke"
+                                    ng-click="revokeToken(token)"
+                                    title="Revoke token">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 

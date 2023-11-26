@@ -7,47 +7,59 @@ import java.time.LocalDateTime
 /**
  * Representation of a user token
  *
+ * @param name Token name
  * @param value Token value
  * @param creation Creation timestamp
+ * @param scope Scope of this token
  * @param validUntil Indicates until when the token is valid - `null` if forever valid
  */
 data class Token(
-        val value: String,
-        val creation: LocalDateTime,
-        val validUntil: LocalDateTime?
+    val name: String,
+    val value: String,
+    val creation: LocalDateTime,
+    val scope: TokenScope,
+    val validUntil: LocalDateTime?
 ) {
 
     /**
      * Returns an obfuscated version of this token.
      */
-    fun obfuscate() = Token("", creation, validUntil)
+    fun obfuscate() = Token(name, "", creation, scope, validUntil)
 
     /**
      * Returns a new token with same [value] and [creation]
      * but with [validUntil] computed from [creation] according
      * to the given [validity] period. If the [validity] is `null`, [zero][Duration.isZero] or [negative][Duration.isNegative],
      * the validity end date is set to `null`, meaning that the token never expires.
+     *
+     * If the scope of the token is transient, the validity period cannot be changed.
      */
     fun validFor(validity: Duration?): Token =
-            if (validity == null || validity.isZero || validity.isNegative) {
-                Token(
-                        value,
-                        creation,
-                        null
-                )
-            } else {
-                Token(
-                        value,
-                        creation,
-                        creation + validity
-                )
-            }
+        if (scope.transient) {
+            this
+        } else if (validity == null || validity.isZero || validity.isNegative) {
+            Token(
+                name,
+                value,
+                creation,
+                scope,
+                null
+            )
+        } else {
+            Token(
+                name,
+                value,
+                creation,
+                scope,
+                creation + validity
+            )
+        }
 
     /**
      * Checks if this token is valid
      */
     fun isValid(time: LocalDateTime = Time.now()) =
-            validUntil == null || validUntil >= time
+        validUntil == null || validUntil >= time
 
     /**
      * Validity now

@@ -12,92 +12,107 @@ import org.springframework.stereotype.Component
 
 @Component
 class GQLTypeAccount(
-        private val accountService: AccountService,
-        private val securityService: SecurityService,
-        private val tokensService: TokensService,
-        private val globalRole: GQLTypeGlobalRole,
-        private val authorizedProject: GQLTypeAuthorizedProject,
-        private val token: GQLTypeToken,
-        private val fieldContributors: List<GQLFieldContributor>,
-        private val authenticationSource: GQLTypeAuthenticationSource,
-        private val accountGroupContributors: List<AccountGroupContributor>,
-        private val providedGroupsService: ProvidedGroupsService,
+    private val accountService: AccountService,
+    private val securityService: SecurityService,
+    private val tokensService: TokensService,
+    private val globalRole: GQLTypeGlobalRole,
+    private val authorizedProject: GQLTypeAuthorizedProject,
+    private val token: GQLTypeToken,
+    private val fieldContributors: List<GQLFieldContributor>,
+    private val authenticationSource: GQLTypeAuthenticationSource,
+    private val accountGroupContributors: List<AccountGroupContributor>,
+    private val providedGroupsService: ProvidedGroupsService,
 ) : GQLType {
 
     override fun getTypeName(): String = ACCOUNT
 
     override fun createType(cache: GQLTypeCache): GraphQLObjectType {
         return GraphQLObjectType.newObject()
-                .name(ACCOUNT)
-                .field(idField())
-                .field(nameField("Unique name for the account"))
-                .stringField(Account::fullName, "Full name of the account")
-                .stringField(Account::email, "Email of the account")
-                .field {
-                    it.name("authenticationSource")
-                            .description("Source of authentication (builtin, ldap, etc.)")
-                            .type(authenticationSource.typeRef)
-                }
-                .stringField(Account::role.name, "Security role (admin or none)")
-                .field {
-                    it.name("groups")
-                            .description("List of groups the account belongs to")
-                            .type(listType(GraphQLTypeReference(GQLTypeAccountGroup.ACCOUNT_GROUP)))
-                            .dataFetcher(accountAccountGroupsFetcher())
-                }
-                .field {
-                    it.name("globalRole")
-                            .description("Global role for the account")
-                            .type(globalRole.typeRef)
-                            .dataFetcher(accountGlobalRoleFetcher())
-                }
-                .field {
-                    it.name("authorizedProjects")
-                            .description("List of authorized projects")
-                            .type(listType(authorizedProject.typeRef))
-                            .dataFetcher(accountAuthorizedProjectsFetcher())
-                }
-                .field {
-                    it.name("token")
-                            .description("Authentication token, if any, linked to this account.")
-                            .type(token.typeRef)
-                            .dataFetcher { env ->
-                                val account: Account = env.getSource()
-                                securityService.asAdmin {
-                                    tokensService.getToken(account.id())
-                                }
-                            }
-                }
-                .booleanField(Account::disabled, "Is this account disabled?")
-                .booleanField(Account::locked, "Is this account locked (meaning that no change can be performed)?")
-                // Contributed groups
-                .field {
-                    it.name("contributedGroups")
-                        .description("List of groups contributed to this account. Some groups are available only after the user has logged in.")
-                        .type(listType(GraphQLTypeReference(GQLTypeAccountGroup.ACCOUNT_GROUP)))
-                        .dataFetcher { env ->
-                            val account: Account = env.getSource()
-                            securityService.asAdmin {
-                                accountGroupContributors.flatMap { contributor -> contributor.collectGroups(account) }
+            .name(ACCOUNT)
+            .field(idField())
+            .field(nameField("Unique name for the account"))
+            .stringField(Account::fullName, "Full name of the account")
+            .stringField(Account::email, "Email of the account")
+            .field {
+                it.name("authenticationSource")
+                    .description("Source of authentication (builtin, ldap, etc.)")
+                    .type(authenticationSource.typeRef)
+            }
+            .stringField(Account::role.name, "Security role (admin or none)")
+            .field {
+                it.name("groups")
+                    .description("List of groups the account belongs to")
+                    .type(listType(GraphQLTypeReference(GQLTypeAccountGroup.ACCOUNT_GROUP)))
+                    .dataFetcher(accountAccountGroupsFetcher())
+            }
+            .field {
+                it.name("globalRole")
+                    .description("Global role for the account")
+                    .type(globalRole.typeRef)
+                    .dataFetcher(accountGlobalRoleFetcher())
+            }
+            .field {
+                it.name("authorizedProjects")
+                    .description("List of authorized projects")
+                    .type(listType(authorizedProject.typeRef))
+                    .dataFetcher(accountAuthorizedProjectsFetcher())
+            }
+            .field {
+                it.name("token")
+                    .deprecate("Use the list of tokens. Will be removed in V5.")
+                    .description("Authentication token, if any, linked to this account.")
+                    .type(token.typeRef)
+                    .dataFetcher { env ->
+                        val account: Account = env.getSource()
+                        securityService.asAdmin {
+                            tokensService.getToken(account.id())
+                        }
+                    }
+            }
+            .field {
+                it.name("tokens")
+                    .description("List of authentication tokens linked to this account.")
+                    .type(listType(token.typeRef))
+                    .dataFetcher { env ->
+                        val account: Account = env.getSource()
+                        securityService.asAdmin {
+                            tokensService.getTokens(account.id()).map { t ->
+                                t.obfuscate()
                             }
                         }
-                }
-                // Provided groups
-                .field {
-                    it.name("providedGroups")
-                        .description("List of groups provided to this account. Some groups are available only after the user has logged in.")
-                        .type(listType(GraphQLString))
-                        .dataFetcher { env ->
-                            val account: Account = env.getSource()
-                            securityService.asAdmin {
-                                providedGroupsService.getProvidedGroups(account.id(), account.authenticationSource).toList().sorted()
-                            }
+                    }
+            }
+            .booleanField(Account::disabled, "Is this account disabled?")
+            .booleanField(Account::locked, "Is this account locked (meaning that no change can be performed)?")
+            // Contributed groups
+            .field {
+                it.name("contributedGroups")
+                    .description("List of groups contributed to this account. Some groups are available only after the user has logged in.")
+                    .type(listType(GraphQLTypeReference(GQLTypeAccountGroup.ACCOUNT_GROUP)))
+                    .dataFetcher { env ->
+                        val account: Account = env.getSource()
+                        securityService.asAdmin {
+                            accountGroupContributors.flatMap { contributor -> contributor.collectGroups(account) }
                         }
-                }
-                // Links
-                .fields(Account::class.java.graphQLFieldContributions(fieldContributors))
-                // OK
-                .build()
+                    }
+            }
+            // Provided groups
+            .field {
+                it.name("providedGroups")
+                    .description("List of groups provided to this account. Some groups are available only after the user has logged in.")
+                    .type(listType(GraphQLString))
+                    .dataFetcher { env ->
+                        val account: Account = env.getSource()
+                        securityService.asAdmin {
+                            providedGroupsService.getProvidedGroups(account.id(), account.authenticationSource).toList()
+                                .sorted()
+                        }
+                    }
+            }
+            // Links
+            .fields(Account::class.java.graphQLFieldContributions(fieldContributors))
+            // OK
+            .build()
     }
 
     private fun accountAuthorizedProjectsFetcher() = DataFetcher<Collection<ProjectRoleAssociation>> { env ->

@@ -11,7 +11,7 @@ angular.module('ot.view.user-profile', [
             controller: 'UserProfileCtrl'
         });
     })
-    .controller('UserProfileCtrl', function ($scope, $http, ot, otFormService, otAlertService, otUserService) {
+    .controller('UserProfileCtrl', function ($scope, $http, ot, otFormService, otAlertService, otUserService, otGraphqlService) {
         const view = ot.view();
         view.title = "User profile";
         view.description = "Management of your profile";
@@ -32,36 +32,102 @@ angular.module('ot.view.user-profile', [
         function loadUser() {
             otUserService.getUser().then(function (userResource) {
                 $scope.localUser = userResource;
-                if ($scope.localUser._token) {
-                    ot.call($http.get($scope.localUser._token)).then(function (token) {
-                        $scope.token = token;
-                    });
-                }
+                return otGraphqlService.pageGraphQLCall(
+                    `
+                    query UserTokens {
+                      user {
+                        account {
+                          id
+                          tokens {
+                            name
+                            value
+                            scope
+                            creation
+                            validUntil
+                            valid
+                          }
+                        }
+                      }
+                    }
+                `
+                ).then(data => {
+                    $scope.tokens = data.user.account.tokens;
+                });
             });
         }
 
         loadUser();
 
-        // Changing the token
-        $scope.changeToken = () => {
-            ot.pageCall($http.post($scope.localUser._changeToken)).then((tokenResponse) => {
-                $scope.token = tokenResponse;
-                $scope.copyToken();
-            });
+        // Generating a token
+
+        $scope.token = {
+            name: ''
+        };
+
+        $scope.generateToken = () => {
+            if ($scope.token.name) {
+                otGraphqlService.pageGraphQLCallWithPayloadErrors(
+                    `
+                        mutation GenerateToken($name: String!) {
+                            generateToken(input: {
+                                name: $name,
+                            }) {
+                                errors {
+                                    message
+                                }
+                                token {
+                                    name
+                                    value
+                                    scope
+                                    creation
+                                    validUntil
+                                    valid
+                                }
+                            }
+                        }
+                    `,
+                    {name: $scope.token.name},
+                    'generateToken'
+                ).then(data => {
+                    $scope.token.name = '';
+                    const token = data.generateToken.token;
+                    $scope.tokens.unshift(token);
+                });
+            }
         };
 
         // Copying the token
-        $scope.copyToken = () => {
-            if ($scope.token.token.value) {
-                navigator.clipboard.writeText($scope.token.token.value);
+        $scope.copyToken = (token) => {
+            if (token.value) {
+                navigator.clipboard.writeText(token.value);
+                $scope.tokens.forEach(t => {
+                    t.copied = false;
+                });
+                token.copied = true;
             }
         };
 
         // Revoking the token
-        $scope.revokeToken = () => {
-            otAlertService.confirm({title: "Revoking a token", message: "Are you sure to revoke this API token?"}).then(() => {
-                ot.pageCall($http.post($scope.localUser._revokeToken)).then((tokenResponse) => {
-                    $scope.token = tokenResponse;
+        $scope.revokeToken = (token) => {
+            otAlertService.confirm({
+                title: "Revoking a token",
+                message: "Are you sure to revoke this API token?"
+            }).then(() => {
+                otGraphqlService.pageGraphQLCall(
+                    `
+                        mutation RevokeToken($name: String!) {
+                            revokeToken(input: {
+                                name: $name,
+                            }) {
+                                errors {
+                                    message
+                                }
+                            }
+                        }
+                    `,
+                    {name: token.name}
+                ).then(() => {
+                    loadUser();
                 });
             });
         };

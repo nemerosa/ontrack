@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.boot.ui
 
 import net.nemerosa.ontrack.model.structure.Token
+import net.nemerosa.ontrack.model.structure.TokenOptions
 import net.nemerosa.ontrack.model.structure.TokensService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -13,31 +14,42 @@ import java.util.concurrent.TimeUnit
 @RestController
 @RequestMapping("/rest/tokens")
 class TokensController(
-        private val tokensService: TokensService
+    private val tokensService: TokensService
 ) {
 
     /**
      * Gets the current token
      */
     @get:GetMapping("current")
+    @Deprecated("Use named token. Will be removed in V5.")
     val currentToken: ResponseEntity<TokenResponse>
         get() =
-            tokensService.currentToken.let { ResponseEntity.ok(TokenResponse(it)) }
+            tokensService.getCurrentToken(TokensService.DEFAULT_NAME).let { ResponseEntity.ok(TokenResponse(it)) }
 
     /**
      * Generates a new token for the current user
      */
     @PostMapping("new")
+    @Deprecated("Use named token. Will be removed in V5.")
     fun generateNewToken(): ResponseEntity<TokenResponse> {
-        return ResponseEntity.ok(TokenResponse(tokensService.generateNewToken()))
+        return ResponseEntity.ok(
+            TokenResponse(
+                tokensService.generateNewToken(
+                    options = TokenOptions(
+                        name = TokensService.DEFAULT_NAME,
+                    )
+                )
+            )
+        )
     }
 
     /**
      * Revokes the current token
      */
     @PostMapping("revoke")
+    @Deprecated("Use named token. Will be removed in V5.")
     fun revokeToken(): ResponseEntity<TokenResponse> {
-        tokensService.revokeToken()
+        tokensService.revokeToken(TokensService.DEFAULT_NAME)
         return ResponseEntity.ok(TokenResponse(null))
     }
 
@@ -55,7 +67,7 @@ class TokensController(
      */
     @PostMapping("account/{account}/revoke")
     fun revokeForAccount(@PathVariable account: Int): ResponseEntity<TokenResponse> {
-        tokensService.revokeToken(account)
+        tokensService.revokeAllTokens(account)
         return ResponseEntity.ok(TokenResponse(null))
     }
 
@@ -63,7 +75,11 @@ class TokensController(
      * Generates or prolongates a token for an account
      */
     @PostMapping("account/{account}/generate")
-    fun generateForAccount(@PathVariable account: Int, @RequestBody request: TokenGenerationRequest): ResponseEntity<TokenResponse> {
+    @Deprecated("Use named token. Will be removed in V5.")
+    fun generateForAccount(
+        @PathVariable account: Int,
+        @RequestBody request: TokenGenerationRequest
+    ): ResponseEntity<TokenResponse> {
         val actualDuration = if (request.duration <= 0) {
             null
         } else {
@@ -77,6 +93,7 @@ class TokensController(
      * Gets the token for an account
      */
     @GetMapping("account/{account}")
+    @Deprecated("Use named token. Will be removed in V5.")
     fun getTokenForAccount(@PathVariable account: Int): ResponseEntity<TokenResponse> {
         val token = tokensService.getToken(account)?.obfuscate()
         return ResponseEntity.ok(TokenResponse(token))
@@ -96,8 +113,8 @@ class TokensController(
      * Token creation parameters
      */
     data class TokenGenerationRequest(
-            val duration: Int,
-            val unit: TimeUnit
+        val duration: Int,
+        val unit: TimeUnit
     )
 
 }

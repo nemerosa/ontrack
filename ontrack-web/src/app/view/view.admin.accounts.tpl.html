@@ -1,8 +1,11 @@
 <ot-view>
 
     <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation" ng-class="{'active': activeTab == 'accounts'}"><a ng-click="selectAccountsTab()" aria-controls="accounts" role="tab">Accounts</a></li>
-        <li role="presentation" ng-class="{'active': activeTab == 'account-groups'}"><a ng-click="selectAccountGroupsTab()" aria-controls="account-groups" role="tab">Account groups</a></li>
+        <li role="presentation" ng-class="{'active': activeTab == 'accounts'}"><a ng-click="selectAccountsTab()"
+                                                                                  aria-controls="accounts" role="tab">Accounts</a>
+        </li>
+        <li role="presentation" ng-class="{'active': activeTab == 'account-groups'}"><a
+                ng-click="selectAccountGroupsTab()" aria-controls="account-groups" role="tab">Account groups</a></li>
     </ul>
 
     <div class="panel panel-default" ng-show="activeTab == 'accounts'">
@@ -11,19 +14,21 @@
                 <div class="form-group">
                     <label>
                         <input
-                            id="accountFilter"
-                            class="form-control input-sm"
-                            ng-model="accountFilter.account"
-                            type="text"
-                            placeholder="Filter (name, email, group, ...)"/>
+                                id="accountFilter"
+                                class="form-control input-sm"
+                                ng-model="accountFilter.account"
+                                type="text"
+                                placeholder="Filter (name, email, group, ...)"/>
                     </label>
                 </div>
                 <span class="pull-right">
-                    <button id="admin-accounts-create" class="form-control btn btn-info btn-xs" ng-click="createAccount()">
+                    <button id="admin-accounts-create" class="form-control btn btn-info btn-xs"
+                            ng-click="createAccount()">
                         <span class="fa fa-plus"></span>
                         Create account
                     </button>
-                    <button id="admin-accounts-revoke-all" class="form-control btn btn-warning btn-xs" ng-click="revokeAll()">
+                    <button id="admin-accounts-revoke-all" class="form-control btn btn-warning btn-xs"
+                            ng-click="revokeAll()">
                         <span class="fa fa-ban"></span>
                         Revoke all tokens
                     </button>
@@ -44,7 +49,7 @@
                 <th>Role</th>
                 <th>Groups</th>
                 <th>Status</th>
-                <th>Token</th>
+                <th>Tokens</th>
                 <th>&nbsp;</th>
             </tr>
             </thead>
@@ -84,36 +89,33 @@
                     </span>
                 </td>
                 <td>
-                    <span ng-if="!account.token"
+                    <span ng-if="!account.tokens.length"
                           class="fa fa-ban text-muted"
                           title="No token for this account"></span>
-                    <span ng-if="account.token && account.token.valid && account.token.validUntil"
-                          class="fa fa-check text-success"
-                          title="Token valid until {{ account.token.validUntil | date:'fullDate'}} {{ account.token.validUntil | date:'mediumTime'}}"></span>
-                    <span ng-if="account.token && account.token.valid && !account.token.validUntil"
-                          class="fa fa-check text-success"
-                          title="Token cannot expire"></span>
-                    <span ng-if="account.token && !account.token.valid"
-                          class="fa fa-times text-danger"
-                          title="Token expired"></span>
+                    <span ng-if="account.tokens.length">
+                        <span class="fa fa-list"/>
+                        <span
+                                title="{{ account.tokens.length }} token(s) for this account"
+                        >{{ account.tokens.length }}</span>
+                    </span>
                     <span class="fa fa-trash text-warning ot-command"
-                          title="Revoke token"
-                          ng-if="account.token && account.links._revokeToken"
-                          ng-click="revokeToken(account)"
-                          ></span>
+                          title="Revoke all tokens for this account"
+                          ng-if="account.tokens.length"
+                          ng-click="revokeTokens(account)"
+                    ></span>
                 </td>
                 <td>
                 <span class="ot-command fa fa-users"
                       title="Displays the assigned, contributed and provided groups for this account."
                       ng-if="account.links._update"
                       ng-click="displayGroups(account)"></span>
-                <span class="ot-command ot-command-update"
-                      title="Update account {{account.name}}"
-                      ng-if="account.links._update"
-                      ng-click="updateAccount(account)"></span>
-                <span class="ot-command ot-command-delete" title="Delete account {{account.name}}"
-                      ng-if="account.links._delete"
-                      ng-click="deleteAccount(account)"></span>
+                    <span class="ot-command ot-command-update"
+                          title="Update account {{account.name}}"
+                          ng-if="account.links._update"
+                          ng-click="updateAccount(account)"></span>
+                    <span class="ot-command ot-command-delete" title="Delete account {{account.name}}"
+                          ng-if="account.links._delete"
+                          ng-click="deleteAccount(account)"></span>
                 </td>
             </tr>
             </tbody>
@@ -126,15 +128,16 @@
                 <div class="form-group">
                     <label>
                         <input
-                            id="accountGroupFilter"
-                            class="form-control input-sm"
-                            ng-model="accountFilter.group"
-                            type="text"
-                            placeholder="Filter (name, description)"/>
+                                id="accountGroupFilter"
+                                class="form-control input-sm"
+                                ng-model="accountFilter.group"
+                                type="text"
+                                placeholder="Filter (name, description)"/>
                     </label>
                 </div>
                 <span class="pull-right">
-                    <button class="form-control btn btn-default btn-xs" ng-click="createGroup()">Create group...</button>
+                    <button class="form-control btn btn-default btn-xs"
+                            ng-click="createGroup()">Create group...</button>
                 </span>
             </div>
         </div>
@@ -162,10 +165,10 @@
                       ng-if="group.links._update"
                       title="Update group {{group.name}}"
                       ng-click="updateGroup(group)"></span>
-                <span class="ot-command ot-command-delete"
-                      ng-if="group.links._delete"
-                      title="Delete group {{group.name}}"
-                      ng-click="deleteGroup(group)"></span>
+                    <span class="ot-command ot-command-delete"
+                          ng-if="group.links._delete"
+                          title="Delete group {{group.name}}"
+                          ng-click="deleteGroup(group)"></span>
                 </td>
             </tr>
             </tbody>

@@ -5,10 +5,7 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.model.security.*
-import net.nemerosa.ontrack.model.structure.ID
-import net.nemerosa.ontrack.model.structure.Token
-import net.nemerosa.ontrack.model.structure.TokenAccount
-import net.nemerosa.ontrack.model.structure.TokensService
+import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.test.assertIs
 import org.junit.Before
@@ -90,8 +87,10 @@ class TokenAsPasswordAuthenticationProviderTest {
                 locked = false,
             ),
             token = Token(
+                "default",
                 "xxx",
                 Time.now(),
+                TokenScope.USER,
                 null
             )
         )
@@ -116,8 +115,10 @@ class TokenAsPasswordAuthenticationProviderTest {
                 locked = false,
             ),
             token = Token(
+                "default",
                 "xxx",
                 Time.now() - Duration.ofHours(24),
+                TokenScope.USER,
                 Time.now() - Duration.ofHours(12) // Stopped being valid 12 hours ago
             )
         )
@@ -142,8 +143,10 @@ class TokenAsPasswordAuthenticationProviderTest {
                 locked = false,
             ),
             token = Token(
+                "default",
                 "xxx",
                 Time.now(),
+                TokenScope.USER,
                 null
             )
         )
