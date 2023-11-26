@@ -75,13 +75,23 @@ angular.module('ot.view.user-profile', [
                                 errors {
                                     message
                                 }
+                                token {
+                                    name
+                                    value
+                                    scope
+                                    creation
+                                    validUntil
+                                    valid
+                                }
                             }
                         }
                     `,
                     {name: $scope.token.name},
                     'generateToken'
-                ).then(() => {
-                    loadUser();
+                ).then(data => {
+                    $scope.token.name = '';
+                    const token = data.generateToken.token;
+                    $scope.tokens.unshift(token);
                 });
             }
         };
@@ -90,6 +100,10 @@ angular.module('ot.view.user-profile', [
         $scope.copyToken = (token) => {
             if (token.value) {
                 navigator.clipboard.writeText(token.value);
+                $scope.tokens.forEach(t => {
+                    t.copied = false;
+                });
+                token.copied = true;
             }
         };
 

@@ -76,7 +76,9 @@ class GQLTypeAccount(
                     .dataFetcher { env ->
                         val account: Account = env.getSource()
                         securityService.asAdmin {
-                            tokensService.getTokens(account.id())
+                            tokensService.getTokens(account.id()).map { t ->
+                                t.obfuscate()
+                            }
                         }
                     }
             }

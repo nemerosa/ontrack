@@ -89,7 +89,8 @@
                     </button>
                 </form>
             </div>
-            <table class="table table-hover table-bordered" style="margin-top: 1em;" ng-if="tokens && tokens.length > 0">
+            <table class="table table-hover table-bordered" style="margin-top: 1em;"
+                   ng-if="tokens && tokens.length > 0">
                 <thead>
                 <tr>
                     <th>Name</th>
@@ -110,6 +111,28 @@
                     <td>
                         {{ token.creation | date:'fullDate'}}
                         {{ token.creation | date:'mediumTime'}}
+                        <form class="form-inline" ng-if="token.value">
+                            <input
+                                    class="form-control ot-user-profile-token-value"
+                                    ng-model="token.value"
+                                    type="text"
+                                    readonly
+                                    style="width: 32em;"
+                            />
+                            <button class="btn btn-default ot-user-profile-token-copy"
+                                    title="Copy API token"
+                                    ng-click="copyToken(token)"
+                            >
+                                <i class="fa fa-copy"></i>
+                            </button>
+                            <span class="ot-user-profile-token-copied" ng-show="token.copied">
+                                <span class="fa fa-check text-success"/>
+                                Copied
+                            </span>
+                        </form>
+                        <p class="text-danger" ng-if="token.value">
+                            The token value is only shown now.
+                        </p>
                     </td>
                     <td>
                         <p class="form-control-static" ng-if="token.token.validUntil">
@@ -131,13 +154,7 @@
                     </td>
                     <td>
                         <div class="input-group-btn">
-                            <button class="btn btn-default"
-                                    title="Copy API token"
-                                    ng-click="copyToken(token)"
-                                    ng-disabled="!token.value">
-                                <i class="fa fa-copy"></i>
-                            </button>
-                            <button class="btn btn-danger"
+                            <button class="btn btn-danger ot-user-profile-token-revoke"
                                     ng-click="revokeToken(token)"
                                     title="Revoke token">
                                 <i class="fa fa-trash"></i>
