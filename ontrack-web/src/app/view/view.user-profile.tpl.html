@@ -74,12 +74,14 @@
             <div>
                 <form class="form-inline">
                     <input
+                            id="ot-user-profile-generate-token-name"
                             class="form-control"
                             placeholder="Token name"
                             ng-model="token.name"
                             type="text"
                     />
                     <button class="btn btn-warning form-control"
+                            id="ot-user-profile-generate-token-button"
                             ng-click="generateToken()"
                             title="Generates a new token"
                             ng-disabled="!token.name"
@@ -89,7 +91,7 @@
                     </button>
                 </form>
             </div>
-            <table class="table table-hover table-bordered" style="margin-top: 1em;"
+            <table id="ot-user-profile-token-list" class="table table-hover table-bordered" style="margin-top: 1em;"
                    ng-if="tokens && tokens.length > 0">
                 <thead>
                 <tr>
@@ -101,8 +103,8 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr ng-repeat="token in tokens">
-                    <td>
+                <tr ng-repeat="token in tokens" id="token-{{ token.name }}">
+                    <td class="ot-user-profile-token-name">
                         {{ token.name }}
                     </td>
                     <td>
@@ -126,13 +128,13 @@
                                 <i class="fa fa-copy"></i>
                             </button>
                             <span class="ot-user-profile-token-copied" ng-show="token.copied">
-                                <span class="fa fa-check text-success"/>
+                                <span class="fa fa-check text-success"></span>
                                 Copied
                             </span>
                         </form>
-                        <p class="text-danger" ng-if="token.value">
-                            The token value is only shown now.
-                        </p>
+                        <div class="text-danger" ng-show="token.value">
+                            The token value is only shown once.
+                        </div>
                     </td>
                     <td>
                         <p class="form-control-static" ng-if="token.token.validUntil">

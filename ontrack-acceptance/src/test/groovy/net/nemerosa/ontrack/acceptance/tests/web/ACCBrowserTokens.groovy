@@ -29,7 +29,7 @@ class ACCBrowserTokens extends AcceptanceTestClient {
             // Go to the user profile
             def userProfilePage = homePage.goToUserProfile()
             // Generates and copies the token
-            def token = userProfilePage.generateToken()
+            def token = userProfilePage.generateToken("test")
             // Logout
             def loginPage = userProfilePage.logout()
             // Sign in again
@@ -51,7 +51,7 @@ class ACCBrowserTokens extends AcceptanceTestClient {
             // Go to the user profile
             def userProfilePage = homePage.goToUserProfile()
             // Generates and copies the token
-            def token = userProfilePage.generateToken()
+            def token = userProfilePage.generateToken("another")
             // Uses the token in the API
             def client = ontrackBuilder.authenticate(token).build()
             // Fetches projects for examples
