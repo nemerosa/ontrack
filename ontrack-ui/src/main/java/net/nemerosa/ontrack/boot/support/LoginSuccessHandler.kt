@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.boot.support
 
+import net.nemerosa.ontrack.model.structure.TokenOptions
+import net.nemerosa.ontrack.model.structure.TokenScope
 import net.nemerosa.ontrack.model.structure.TokensService
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache
@@ -78,11 +80,20 @@ class LoginSuccessHandler(
             val tokenCallbackHrefParam =
                 savedRequest.getParameter(PARAM_TOKEN_CALLBACK_HREF_PARAM) ?: DEFAULT_TOKEN_CALLBACK_HREF_PARAM
             if (token && tokenCallback != null) {
+                // Gets any existing token and deletes it
+                val existing = tokensService.getCurrentToken(tokenCallback)
+                if (existing != null) {
+                    tokensService.revokeToken(tokenCallback)
+                }
                 // Generates a token for the logged user
-                val generatedToken = tokensService.currentToken ?: tokensService.generateNewToken()
+                val generatedToken = tokensService.generateNewToken(
+                    TokenOptions(
+                        name = tokenCallback,
+                        scope = TokenScope.NEXT_UI,
+                    )
+                )
                 // Token value
                 val tokenValue = generatedToken.value
-                // TODO Encoding the token with a secret common to both Ontrack & Next UI
                 // Callback URL
                 var url = "${tokenCallback}?${tokenCallbackToken}=$tokenValue"
                 if (!tokenCallbackHref.isNullOrBlank()) {
