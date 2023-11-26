@@ -5,10 +5,7 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.model.security.*
-import net.nemerosa.ontrack.model.structure.ID
-import net.nemerosa.ontrack.model.structure.Token
-import net.nemerosa.ontrack.model.structure.TokenAccount
-import net.nemerosa.ontrack.model.structure.TokensService
+import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.test.assertIs
 import org.junit.Before
 import org.junit.Test
@@ -29,8 +26,8 @@ class TokenHeaderAuthenticationProviderTest {
         tokensService = mock()
         accountService = mock()
         provider = TokenHeaderAuthenticationProvider(
-                tokensService,
-                accountService
+            tokensService,
+            accountService
         )
         source = AuthenticationSource(
             provider = BuiltinAuthenticationSourceProvider.ID,
@@ -63,21 +60,23 @@ class TokenHeaderAuthenticationProviderTest {
     fun `Token found but invalid`() {
         val auth = TokenAuthenticationToken("xxx")
         val tokenAccount = TokenAccount(
-                account = Account(
-                        ID.of(1),
-                        "user",
-                        "User",
-                        "user@test.com",
-                        source,
-                        SecurityRole.USER,
-                        disabled = false,
-                        locked = false,
-                ),
-                token = Token(
-                        "xxx",
-                        Time.now() - Duration.ofHours(24),
-                        Time.now() - Duration.ofHours(12) // Stopped being valid 12 hours ago
-                )
+            account = Account(
+                ID.of(1),
+                "user",
+                "User",
+                "user@test.com",
+                source,
+                SecurityRole.USER,
+                disabled = false,
+                locked = false,
+            ),
+            token = Token(
+                "default",
+                "xxx",
+                Time.now() - Duration.ofHours(24),
+                TokenScope.USER,
+                Time.now() - Duration.ofHours(12) // Stopped being valid 12 hours ago
+            )
         )
         whenever(tokensService.findAccountByToken("xxx")).thenReturn(tokenAccount)
         assertFailsWith<CredentialsExpiredException> {
@@ -89,21 +88,23 @@ class TokenHeaderAuthenticationProviderTest {
     fun `Token found`() {
         val auth = TokenAuthenticationToken("xxx")
         val tokenAccount = TokenAccount(
-                account = Account(
-                        ID.of(1),
-                        "user",
-                        "User",
-                        "user@test.com",
-                        source,
-                        SecurityRole.USER,
-                        disabled = false,
-                        locked = false,
-                ),
-                token = Token(
-                        "xxx",
-                        Time.now(),
-                        null
-                )
+            account = Account(
+                ID.of(1),
+                "user",
+                "User",
+                "user@test.com",
+                source,
+                SecurityRole.USER,
+                disabled = false,
+                locked = false,
+            ),
+            token = Token(
+                "default",
+                "xxx",
+                Time.now(),
+                TokenScope.USER,
+                null
+            )
         )
         whenever(tokensService.findAccountByToken("xxx")).thenReturn(tokenAccount)
         val user = mock<OntrackAuthenticatedUser>()

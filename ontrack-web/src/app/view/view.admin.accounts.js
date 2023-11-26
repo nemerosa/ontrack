@@ -42,7 +42,7 @@ angular.module('ot.view.admin.accounts', [
                 groups {
                   name
                 }
-                token {
+                tokens {
                   creation
                   valid
                   validUntil
@@ -52,7 +52,6 @@ angular.module('ot.view.admin.accounts', [
                 links {
                   _update
                   _delete
-                  _revokeToken
                 }
               }
               accountGroups {
@@ -166,23 +165,49 @@ angular.module('ot.view.admin.accounts', [
         };
 
         // Revoking a token
-        $scope.revokeToken = (account) => {
+        $scope.revokeTokens = (account) => {
             otAlertService.confirm({
                 title: "Token revocation",
-                message: "Do you really want to revoke this token?"
-            }).then(function () {
-                return ot.pageCall($http.post(account.links._revokeToken));
-            }).then(load);
+                message: "Do you really want to revoke all tokens for this account?"
+            }).then(() => otGraphqlService.pageGraphQLCallWithPayloadErrors(
+                `
+                        mutation RevokeAccountTokens(
+                            $accountId: Int!,
+                        ) {
+                            revokeAccountTokens(input: {
+                                accountId: $accountId,
+                            }) {
+                                errors {
+                                    message
+                                }
+                            }
+                        }
+                    `,
+                {
+                    accountId: account.id,
+                },
+                'revokeAccountTokens'
+            )).then(load);
         };
 
         // Revoking all tokens
-        $scope.revokeAll = (account) => {
+        $scope.revokeAll = () => {
             otAlertService.confirm({
                 title: "Token revocation",
                 message: "Do you really want to revoke all the tokens?"
-            }).then(function () {
-                return ot.pageCall($http.post('/rest/tokens/revokeAll'));
-            }).then(load);
+            }).then(() => otGraphqlService.pageGraphQLCallWithPayloadErrors(
+                `
+                        mutation RevokeAllTokens {
+                            revokeAllTokens {
+                                errors {
+                                    message
+                                }
+                            }
+                        }
+                    `,
+                {},
+                'revokeAllTokens'
+            )).then(load);
         };
 
     })

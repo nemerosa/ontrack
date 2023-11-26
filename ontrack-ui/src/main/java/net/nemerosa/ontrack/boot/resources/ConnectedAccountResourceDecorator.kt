@@ -24,18 +24,21 @@ class ConnectedAccountResourceDecorator : AbstractResourceDecorator<ConnectedAcc
                         } ?: false
                 )
                 // Getting the token value
+                // TODO Deprecated, will be removed in V5
                 .link(
                         "_token",
                         on(TokensController::class.java).currentToken,
                         account.isLogged
                 )
                 // Changing the token value
+                // TODO Deprecated, will be removed in V5
                 .link(
                         "_changeToken",
                         on(TokensController::class.java).generateNewToken(),
                         account.isLogged
                 )
                 // Changing the token value
+                // TODO Deprecated, will be removed in V5
                 .link(
                         "_revokeToken",
                         on(TokensController::class.java).revokeToken(),

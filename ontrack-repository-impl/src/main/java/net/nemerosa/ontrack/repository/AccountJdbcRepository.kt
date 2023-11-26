@@ -55,7 +55,7 @@ class AccountJdbcRepository(
                 "SELECT * FROM ACCOUNTS ORDER BY NAME"
         ) { rs: ResultSet, _ ->
             toAccount(rs)
-        }
+        }.filterNotNull()
     }
 
     override fun newAccount(account: Account): Account {
