@@ -17,7 +17,6 @@ import org.springframework.security.config.web.servlet.invoke
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository
-import org.springframework.web.cors.CorsConfiguration
 
 @Configuration
 @EnableWebSecurity
@@ -95,7 +94,7 @@ class WebSecurityConfig(
     fun webSecurity(
         http: HttpSecurity,
         uiSecurityExtensions: List<UISecurityExtension>,
-        tokensService: TokensService,
+        nextUIRedirector: NextUIRedirector,
     ): SecurityFilterChain {
         http {
             // Enabling JS Cookies for CSRF protection (for AngularJS)
@@ -114,13 +113,13 @@ class WebSecurityConfig(
             }
             // UI extensions
             uiSecurityExtensions.forEach { extension ->
-                extension.configure(this, LoginSuccessHandler(tokensService))
+                extension.configure(this, LoginSuccessHandler(nextUIRedirector))
             }
             // Using a form login
             formLogin {
                 loginPage = "/login"
                 permitAll()
-                authenticationSuccessHandler = LoginSuccessHandler(tokensService)
+                authenticationSuccessHandler = LoginSuccessHandler(nextUIRedirector)
             }
             // Logout setup
             logout {

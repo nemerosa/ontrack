@@ -36,7 +36,7 @@ angular.module('ot.directive.userMenu', [
                 };
 
                 $scope.nextUI = () => {
-                    location.href = '/ui';
+                    location.href = '/rest/ui';
                 };
 
                 $scope.logout = function () {

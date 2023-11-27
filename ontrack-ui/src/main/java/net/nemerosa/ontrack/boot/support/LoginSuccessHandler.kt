@@ -1,8 +1,5 @@
 package net.nemerosa.ontrack.boot.support
 
-import net.nemerosa.ontrack.model.structure.TokenOptions
-import net.nemerosa.ontrack.model.structure.TokenScope
-import net.nemerosa.ontrack.model.structure.TokensService
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache
 import org.springframework.security.web.savedrequest.RequestCache
@@ -33,7 +30,7 @@ class LoginSavedRequestFilter: GenericFilterBean() {
 
 
 class LoginSuccessHandler(
-    private val tokensService: TokensService,
+    private val nextUIRedirector: NextUIRedirector,
 ) : SimpleUrlAuthenticationSuccessHandler() {
 
     private val requestCache: RequestCache = HttpSessionRequestCache()
@@ -55,13 +52,7 @@ class LoginSuccessHandler(
          */
         const val PARAM_TOKEN = "token"
         const val PARAM_TOKEN_CALLBACK = "tokenCallback"
-
-        const val PARAM_TOKEN_CALLBACK_TOKEN = "tokenCallbackToken"
-        const val DEFAULT_TOKEN_CALLBACK_TOKEN = "token"
-
         const val PARAM_TOKEN_CALLBACK_HREF = "tokenCallbackHref"
-        const val PARAM_TOKEN_CALLBACK_HREF_PARAM = "tokenCallbackHrefParam"
-        const val DEFAULT_TOKEN_CALLBACK_HREF_PARAM = "href"
     }
 
     private fun SavedRequest.getParameter(name: String): String? = getParameterValues(name)?.firstOrNull()
@@ -74,33 +65,9 @@ class LoginSuccessHandler(
         if (savedRequest != null) {
             val token = savedRequest.getParameter(PARAM_TOKEN)?.toBoolean() ?: false
             val tokenCallback: String? = savedRequest.getParameter(PARAM_TOKEN_CALLBACK)
-            val tokenCallbackToken: String =
-                savedRequest.getParameter(PARAM_TOKEN_CALLBACK_TOKEN) ?: DEFAULT_TOKEN_CALLBACK_TOKEN
             val tokenCallbackHref: String? = savedRequest.getParameter(PARAM_TOKEN_CALLBACK_HREF)
-            val tokenCallbackHrefParam =
-                savedRequest.getParameter(PARAM_TOKEN_CALLBACK_HREF_PARAM) ?: DEFAULT_TOKEN_CALLBACK_HREF_PARAM
             if (token && tokenCallback != null) {
-                // Gets any existing token and deletes it
-                val existing = tokensService.getCurrentToken(tokenCallback)
-                if (existing != null) {
-                    tokensService.revokeToken(tokenCallback)
-                }
-                // Generates a token for the logged user
-                val generatedToken = tokensService.generateNewToken(
-                    TokenOptions(
-                        name = tokenCallback,
-                        scope = TokenScope.NEXT_UI,
-                    )
-                )
-                // Token value
-                val tokenValue = generatedToken.value
-                // Callback URL
-                var url = "${tokenCallback}?${tokenCallbackToken}=$tokenValue"
-                if (!tokenCallbackHref.isNullOrBlank()) {
-                    url += "&${tokenCallbackHrefParam}=${tokenCallbackHref}"
-                }
-                // OK
-                return url
+                return nextUIRedirector.redirectURI(tokenCallback, tokenCallbackHref)
             }
         }
 
