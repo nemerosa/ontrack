@@ -46,7 +46,8 @@ export default function middleware(request) {
                 // OK
                 return response
             } else {
-                const url = `${ontrackUrl()}/login?token=true&tokenCallback=${ontrackUi}/auth&tokenCallbackHref=${request.url}`
+                const tokenCallbackHref = `${ontrackUiUrl()}${path}`
+                const url = `${ontrackUrl()}/login?token=true&tokenCallback=${ontrackUi}/auth&tokenCallbackHref=${tokenCallbackHref}`
                 if (logging) console.log(`[connection][middleware][${path}] Redirecting to login page at ${url}`)
                 return NextResponse.redirect(new URL(url))
             }
