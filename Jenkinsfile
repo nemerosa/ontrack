@@ -286,6 +286,7 @@ pipeline {
                 sh '''
                     echo ${DOCKER_HUB_PSW} | docker login --username ${DOCKER_HUB_USR} --password-stdin
                     docker image push nemerosa/ontrack:${VERSION}
+                    docker image push nemerosa/ontrack-ui:${VERSION}
                 '''
             }
             post {
