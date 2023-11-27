@@ -81,7 +81,8 @@ angular.module('ot.service.user', [
                     // Building the final menu
                     const menu = {
                         groups: groups,
-                        actions: ungrouped
+                        actions: ungrouped,
+                        nextUIProperties: userResource.nextUIProperties,
                     };
                     // Puts the menu into the user object
                     userResource.menu = menu;

@@ -8,6 +8,7 @@ open class ConnectedAccount(
     val account: Account?,
     val preferences: Preferences,
     private val actions: MutableList<Action> = mutableListOf(),
+    val nextUIProperties: NextUIProperties = NextUIProperties(enabled = false),
 ) {
 
     val isLogged: Boolean
@@ -22,6 +23,7 @@ open class ConnectedAccount(
         account = account,
         preferences = preferences,
         actions = actions.filter { it.enabled }.toMutableList(),
+        nextUIProperties = nextUIProperties,
     )
 
     @Suppress("unused")

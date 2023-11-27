@@ -91,6 +91,11 @@ class OntrackConfigProperties {
      */
     var fileKeyStore = FileKeyStoreProperties()
 
+    /**
+     * Next UI properties
+     */
+    var ui = UIProperties()
+
     @PostConstruct
     fun log() {
         if (!configurationTest) {
@@ -103,6 +108,20 @@ class OntrackConfigProperties {
         logger.info("[search] Index batch tracing = ${search.index.tracing}")
         logger.info("[search] Index creation error ignoring = ${search.index.ignoreExisting}")
         logger.info("[document] Documents engine = ${documents.engine}")
+    }
+
+    /**
+     * Next UI properties
+     */
+    class UIProperties {
+        /**
+         * Next UI enabled?
+         */
+        var enabled = false
+        /**
+         * Next UI URL
+         */
+        var uri: String = "http://localhost:3000"
     }
 
     /**

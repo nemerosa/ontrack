@@ -29,7 +29,7 @@ class InfoController(
                 uri(on(javaClass).info())
         )
                 // API links
-                .with("user", uri(on(UserController::class.java).currentUser))
+                .with("user", uri(on(UserController::class.java).getCurrentUser()))
                 // Info message
                 .with("_applicationInfo", uri(on(InfoController::class.java).applicationInfo()))
     }

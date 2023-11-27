@@ -13,8 +13,14 @@
         <!-- All groups -->
         <ot-user-menu-group ng-repeat-start="group in menu.groups" group="group"></ot-user-menu-group>
         <ot-user-menu-action ng-hide="group.collapsed" ng-repeat-end ng-repeat="action in group.actions" action="action" close-action="onAfterAction()"></ot-user-menu-action>
-        <!-- Logout action -->
-        <button class="list-group-item user-menu-item user-menu-action" id="next-ui" ng-click="nextUI()" title="Switch to the experimental new UI" type="button">
+        <!-- Next UI action -->
+        <button
+                ng-if="menu.nextUIProperties.enabled"
+                class="list-group-item user-menu-item user-menu-action"
+                id="next-ui"
+                ng-click="nextUI()"
+                title="Switch to the experimental Next UI"
+                type="button">
             <i class="fa fa-flask"></i>&nbsp;Next UI
         </button>
         <!-- Logout action -->
