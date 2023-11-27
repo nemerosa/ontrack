@@ -8,6 +8,11 @@ pipeline {
 
     parameters {
         booleanParam(
+                name: 'JUST_BUILD_AND_PUSH',
+                defaultValue: false,
+                description: 'Just create the Docker images and push them'
+        )
+        booleanParam(
                 name: 'SKIP_KDSL_ACCEPTANCE',
                 defaultValue: false,
                 description: 'Skipping KDSL acceptance tests'
@@ -143,22 +148,37 @@ pipeline {
                     ontrackCliBuild(name: VERSION)
                 }
                 echo "Version = ${VERSION}"
-                sh '''
-                    ./gradlew \\
-                        test \\
-                        build \\
-                        integrationTest \\
-                        osPackages \\
-                        dockerBuild \\
-                        javadocPackage \\
-                        -Pdocumentation \\
-                        -PbowerOptions='--allow-root' \\
-                        -Dorg.gradle.jvmargs=-Xmx6144m \\
-                        --stacktrace \\
-                        --parallel \\
-                        --no-daemon \\
-                        --console plain
-                '''
+                script {
+                    if (params.JUST_BUILD_AND_PUSH) {
+                        sh '''
+                            ./gradlew \\
+                                dockerBuild \\
+                                -PbowerOptions='--allow-root' \\
+                                -Dorg.gradle.jvmargs=-Xmx6144m \\
+                                --stacktrace \\
+                                --parallel \\
+                                --no-daemon \\
+                                --console plain
+                        '''
+                    } else {
+                        sh '''
+                            ./gradlew \\
+                                test \\
+                                build \\
+                                integrationTest \\
+                                osPackages \\
+                                dockerBuild \\
+                                javadocPackage \\
+                                -Pdocumentation \\
+                                -PbowerOptions='--allow-root' \\
+                                -Dorg.gradle.jvmargs=-Xmx6144m \\
+                                --stacktrace \\
+                                --parallel \\
+                                --no-daemon \\
+                                --console plain
+                        '''
+                    }
+                }
             }
             post {
                 always {
@@ -178,7 +198,7 @@ pipeline {
                     branch 'master'
                 }
                 expression {
-                    return !params.SKIP_KDSL_ACCEPTANCE
+                    return !params.SKIP_KDSL_ACCEPTANCE && !params.JUST_BUILD_AND_PUSH
                 }
             }
             environment {
@@ -216,7 +236,7 @@ pipeline {
                     branch 'master'
                 }
                 expression {
-                    return !params.SKIP_LEGACY_ACCEPTANCE
+                    return !params.SKIP_LEGACY_ACCEPTANCE && !params.JUST_BUILD_AND_PUSH
                 }
             }
             steps {
@@ -253,6 +273,9 @@ pipeline {
                 anyOf {
                     branch 'release/*'
                     branch 'feature/*publication'
+                    expression {
+                        params.JUST_BUILD_AND_PUSH
+                    }
                 }
             }
             environment {
