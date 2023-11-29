@@ -18,7 +18,9 @@ export default function middleware(request) {
 
     const path = request.nextUrl.pathname
 
-    if (!path.startsWith('/_next') && !path.startsWith("/ontrack")) {
+    if (path.startsWith('/api')) {
+        return // Only for the health endpoint
+    } else if (!path.startsWith('/_next') && !path.startsWith("/ontrack")) {
         const logging = isConnectionLoggingEnabled()
         const cookie = request.cookies.get(cookieName)
 
