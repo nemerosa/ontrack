@@ -468,6 +468,7 @@ dockerCompose {
 
 tasks.named<ComposeUp>("localComposeUp") {
     dependsOn(dockerBuild)
+    dependsOn(":ontrack-web-core:dockerBuild")
     doLast {
         val host = servicesInfos["ontrack"]?.host!!
         val port = servicesInfos["ontrack"]?.firstContainer?.tcpPort!!

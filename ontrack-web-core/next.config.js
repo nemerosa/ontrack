@@ -2,8 +2,6 @@ const {PHASE_PRODUCTION_BUILD} = require('next/constants')
 
 module.exports = (phase) => {
     const config = {
-        reactStrictMode: false,
-        output: 'standalone',
         images: {
             unoptimized: true,
         },
