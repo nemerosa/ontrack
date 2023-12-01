@@ -121,7 +121,7 @@ class OntrackConfigProperties {
         /**
          * Next UI URL
          */
-        var uri: String = "http://localhost:3000"
+        var uri: String = "http://localhost:3000/ui"
     }
 
     /**

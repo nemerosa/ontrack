@@ -111,6 +111,8 @@ export default function ConnectionContextProvider({children}) {
                     config,
                 })
             }
+        } else {
+            if (logging) console.log("[connection][provider] No cookie set. No connection is possible.")
         }
     }, [router.asPath])
 

@@ -1,29 +1,32 @@
 import {NextResponse} from "next/server";
 import {cookieName, cookieOptions, isConnectionLoggingEnabled, ontrackUiUrl, ontrackUrl} from "@/connection";
 
-export const config = {
-    matcher: [
-        /*
-         * Match all request paths except for the ones starting with:
-         * - _next/static (static files)
-         * - _next/image (image optimization files)
-         * - favicon.ico (favicon file)
-         * - ontrack_ (logo)
-         */
-        '/((?!api|_next/static|_next/image|favicon.ico|ontrack_).*)',
-    ],
-}
+// export const config = {
+//     matcher: [
+//         /*
+//          * Match all request paths except for the ones starting with:
+//          * - _next/static (static files)
+//          * - _next/image (image optimization files)
+//          * - favicon.ico (favicon file)
+//          * - ontrack_ (logo)
+//          */
+//         '/((?!api|_next/static|_next/image|favicon.ico|ontrack_).*)',
+//     ],
+// }
 
 export default function middleware(request) {
 
+    const logging = isConnectionLoggingEnabled()
     const path = request.nextUrl.pathname
+    // if (logging) console.log(`[connection][middleware][${path}] Path received`)
 
-    if (path.startsWith('/api')) {
-        return NextResponse.next() // Only for the health endpoint
-    } else if (!path.startsWith('/_next') && !path.startsWith("/ontrack")) {
-        const logging = isConnectionLoggingEnabled()
+    if (
+        !path.startsWith('/_next') &&
+        !path.startsWith("/ontrack") &&
+        !path.startsWith("/api") &&
+        !path.startsWith("/favicon")
+    ) {
         const cookie = request.cookies.get(cookieName)
-
         if (cookie) {
             if (logging) console.log(`[connection][middleware][${path}] Cookie is already set`)
             // Already authenticated, going forward

@@ -12,7 +12,6 @@ RUN npm ci --omit=dev
 # but the code hasn't changed.
 FROM base AS builder
 
-ENV NODE_ENV=production
 WORKDIR /opt/app
 COPY . .
 COPY --from=deps /opt/app/node_modules ./node_modules
@@ -22,7 +21,6 @@ RUN npm run build
 FROM base AS runner
 
 WORKDIR /opt/app
-ENV NODE_ENV=production
 COPY --from=builder /opt/app/next.config.js ./
 COPY --from=builder /opt/app/public ./public
 COPY --from=builder /opt/app/.next ./.next

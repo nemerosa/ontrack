@@ -17,6 +17,9 @@ services:
       SPRING_RABBITMQ_HOST: rabbit
       SPRING_RABBITMQ_USERNAME: ontrack
       SPRING_RABBITMQ_PASSWORD: ontrack
+      # Next UI
+      ONTRACK_CONFIG_UI_ENABLED: "true"
+      ONTRACK_CONFIG_UI_URL: "http://localhost:3000/ui" # External URL!
     depends_on:
       postgres:
         condition: service_started
@@ -35,7 +38,8 @@ services:
     environment:
       # External URLs!
       NEXT_PUBLIC_ONTRACK_URL: http://localhost:8080
-      NEXT_PUBLIC_ONTRACK_UI_URL: http://localhost:3000
+      NEXT_PUBLIC_ONTRACK_UI_URL: http://localhost:3000/ui
+      NEXT_PUBLIC_ONTRACK_CONNECTION_LOGGING: "true"
     depends_on:
       ontrack:
         condition: service_healthy
