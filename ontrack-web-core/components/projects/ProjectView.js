@@ -5,7 +5,7 @@ import Head from "next/head";
 import {projectTitle} from "@components/common/Titles";
 import {projectBreadcrumbs} from "@components/common/Breadcrumbs";
 import {CloseCommand, LegacyLinkCommand} from "@components/common/Commands";
-import {homeUri, projectLegacyUri} from "@components/common/Links";
+import {homeUri, legacyProjectUri} from "@components/common/Links";
 import {gqlDecorationFragment, gqlInformationFragment, gqlPropertiesFragment} from "@components/services/fragments";
 import PageSection from "@components/common/PageSection";
 import BranchList from "@components/branches/BranchList";
@@ -107,7 +107,7 @@ export default function ProjectView({id}) {
         <JumpToBranch key="branch" projectName={project.name}/>,
         <LegacyLinkCommand
             key="legacy"
-            href={projectLegacyUri(project)}
+            href={legacyProjectUri(project)}
             text="Legacy project"
             title="Goes to the legacy project page"
         />,

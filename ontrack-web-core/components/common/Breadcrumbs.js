@@ -1,29 +1,31 @@
-import {branchLink, homeLink, projectLink} from "@components/common/Links";
+import BranchLink from "@components/branches/BranchLink";
+import ProjectLink from "@components/projects/ProjectLink";
+import HomeLink from "@components/common/HomeLink";
 
 export function homeBreadcrumbs() {
     return [
-        homeLink(),
+        <HomeLink/>,
     ]
 }
 
-export function projectBreadcrumbs(project) {
+export function projectBreadcrumbs() {
     return [
-        homeLink(),
+        <HomeLink/>,
     ]
 }
 
 export function branchBreadcrumbs(branch) {
     return [
-        homeLink(),
-        projectLink(branch.project),
+        <HomeLink/>,
+        <ProjectLink project={branch.project}/>,
     ]
 }
 
 export function downToBranchBreeadcrumbs({branch}) {
     return [
-        homeLink(),
-        projectLink(branch.project),
-        branchLink(branch),
+        <HomeLink/>,
+        <ProjectLink project={branch.project}/>,
+        <BranchLink branch={branch}/>,
     ]
 }
 

@@ -1,6 +1,6 @@
 import {Popover, Space, Typography} from "antd";
-import {PromotionLevelImage} from "@components/common/Links";
 import AnnotatedDescription from "@components/common/AnnotatedDescription";
+import {PromotionLevelImage} from "@components/promotionLevels/PromotionLevelImage";
 
 export default function PromotionLevel({
                                            promotionLevel, details, size = 16,

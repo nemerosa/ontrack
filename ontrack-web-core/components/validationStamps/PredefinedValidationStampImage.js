@@ -2,8 +2,9 @@ import {useEffect, useState} from "react";
 import {Space, Typography} from "antd";
 import {gql} from "graphql-request";
 import Image from "next/image";
-import {predefinedValidationStampImageUri} from "@components/common/Links";
+import {legacyPredefinedValidationStampImageUri} from "@components/common/Links";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import LegacyImage from "@components/common/LegacyImage";
 
 export default function PredefinedValidationStampImage({name, displayName = true, size = 24}) {
 
@@ -26,8 +27,8 @@ export default function PredefinedValidationStampImage({name, displayName = true
                 const pvs = data.predefinedValidationStampByName
                 if (pvs && pvs.isImage) {
                     setImage(
-                        <Image
-                            src={predefinedValidationStampImageUri(pvs)}
+                        <LegacyImage
+                            href={legacyPredefinedValidationStampImageUri(pvs)}
                             alt={`Predefined validation stamp ${name}`}
                             width={size}
                             height={size}

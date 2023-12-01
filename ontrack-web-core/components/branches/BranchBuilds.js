@@ -5,7 +5,7 @@ import PromotionRun from "@components/promotionRuns/PromotionRun";
 import RangeSelector from "@components/common/RangeSelector";
 import LegacyIndicator from "@components/common/LegacyIndicator";
 import {useRouter} from "next/router";
-import {gitChangeLogUri} from "@components/common/Links";
+import {legacyGitChangeLogUri} from "@components/common/Links";
 import BuildFilterDropdown from "@components/branches/filters/builds/BuildFilterDropdown";
 import ValidationStampFilterDropdown from "@components/branches/filters/validationStamps/ValidationStampFilterDropdown";
 import ValidationStampHeader from "@components/branches/ValidationStampHeader";
@@ -13,6 +13,7 @@ import ValidationRunCell from "@components/branches/ValidationRunCell";
 import {useContext} from "react";
 import ValidationGroups from "@components/validationRuns/ValidationGroups";
 import {ValidationStampFilterContext} from "@components/branches/filters/validationStamps/ValidationStampFilterContext";
+import {useConnection} from "@components/providers/ConnectionContextProvider";
 
 const {Column} = Table;
 
@@ -43,15 +44,16 @@ export default function BranchBuilds({
                                      }) {
 
     const router = useRouter()
+    const connection = useConnection()
     const vsfContext = useContext(ValidationStampFilterContext)
 
     const onChangeLog = () => {
-        if (rangeSelection.isComplete()) {
+        if (connection.environment && rangeSelection.isComplete()) {
             const [from, to] = rangeSelection.selection
             // Legacy only for now
             // TODO This should be an extension
             // noinspection JSIgnoredPromiseFromCall
-            router.push(gitChangeLogUri({from, to}))
+            router.push(`${connection.environment.ontrack.url}${legacyGitChangeLogUri({from, to})}`)
         }
     }
 

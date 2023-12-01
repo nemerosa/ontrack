@@ -1,12 +1,13 @@
 import Image from "next/image";
-import {validationStampImageUri} from "@components/common/Links";
+import {legacyValidationStampImageUri} from "@components/common/Links";
 import {FaWrench} from "react-icons/fa";
+import LegacyImage from "@components/common/LegacyImage";
 
 export default function ValidationStampImage({validationStamp, size = 16}) {
     return (
         validationStamp.image ?
-            <Image
-                src={validationStampImageUri(validationStamp)}
+            <LegacyImage
+                href={legacyValidationStampImageUri(validationStamp)}
                 alt={validationStamp.name}
                 width={size}
                 height={size}

@@ -1,5 +1,5 @@
 import {Tooltip, Typography} from "antd";
-import {branchLink} from "@components/common/Links";
+import BranchLink from "@components/branches/BranchLink";
 
 export default function BranchDisplayNameLink({branch, children}) {
     return (
@@ -8,7 +8,7 @@ export default function BranchDisplayNameLink({branch, children}) {
                 branch && branch.displayName && branch.displayName !== branch.name &&
                 <Tooltip title={branch.name}>
                     <Typography.Text italic ellipsis>
-                        {branchLink(branch, branch.displayName)}
+                        <BranchLink branch={branch} text={branch.displayName}/>
                         {children}
                     </Typography.Text>
                 </Tooltip>
@@ -16,7 +16,7 @@ export default function BranchDisplayNameLink({branch, children}) {
             {
                 branch && (!branch.displayName || branch.displayName === branch.name) &&
                 <Typography.Text italic ellipsis>
-                    {branchLink(branch, branch.name)}
+                    <BranchLink branch={branch} text={branch.name}/>
                     {children}
                 </Typography.Text>
             }

@@ -1,67 +1,47 @@
 import Link from "next/link";
-import clientConfig from "@client/clientConfig";
-import {Space} from "antd";
-import Image from "next/image";
-import LegacyLink from "@components/common/LegacyLink";
 
-const uiConfig = {
-    prefix: '',
-};
-
+/**
+ * @deprecated Use the LegacyLink component
+ */
 export function legacyUri() {
-    const config = clientConfig()
-    return `${config.url}/`
+    return ''
+    // const config = clientConfig()
+    // return `${config.url}/`
 }
 
-export function graphiQLUri() {
-    const config = clientConfig()
-    return `${config.url}/graphiql.html`
+export function legacyGraphiQLUri() {
+    return `/graphiql.html`
 }
 
 export function homeUri() {
-    return `${uiConfig.prefix}/`
-}
-
-export function homeHref(path) {
-    return `${homeUri()}${path}`
-}
-
-export function homeLink(text) {
-    return <Link href={homeUri()}>{text ? text : "Home"}</Link>
+    return `/`
 }
 
 export function projectUri(project) {
-    return `${uiConfig.prefix}/project/${project.id}`
+    return `/project/${project.id}`
 }
 
-export function projectLegacyUri(project) {
-    return `${legacyUri()}#/project/${project.id}`
-}
-
-export function projectLink(project, text) {
-    return <Link href={projectUri(project)}>{text ? text : project.name}</Link>
+export function legacyProjectUri(project) {
+    return `#/project/${project.id}`
 }
 
 export function branchUri(branch) {
-    return `${uiConfig.prefix}/branch/${branch.id}`
+    return `/branch/${branch.id}`
 }
 
 export function branchLegacyUri(branch) {
-    return `${legacyUri()}#/branch/${branch.id}`
-}
-
-export function branchLink(branch, text) {
-    return <Link href={branchUri(branch)}>{text ? text : branch.name}</Link>
+    return `#/branch/${branch.id}`
 }
 
 export function buildUri(build) {
-    return `${uiConfig.prefix}/build/${build.id}`
+    return `/build/${build.id}`
 }
 
 export function buildLegacyUri(build) {
-    return `${legacyUri()}#/build/${build.id}`
+    return `#/build/${build.id}`
 }
 
+// TODO As a component
 export function buildLink(build, text) {
     return <Link
         href={buildUri(build)}
@@ -69,62 +49,34 @@ export function buildLink(build, text) {
     >{text ? text : build.name}</Link>
 }
 
-export function promotionLevelUri(promotionLevel) {
-    return `${legacyUri()}#/promotionLevel/${promotionLevel.id}`
-    // TODO LEGACY return `${uiConfig.prefix}/promotionLevel/${promotionLevel.id}`
+export function legacyPromotionLevelUri(promotionLevel) {
+    return `#/promotionLevel/${promotionLevel.id}`
 }
 
-export function promotionLevelImageUri(promotionLevel) {
-    return `${legacyUri()}rest/structure/promotionLevels/${promotionLevel.id}/image`
+export function legacyPromotionLevelImageUri(promotionLevel) {
+    return `/rest/structure/promotionLevels/${promotionLevel.id}/image`
 }
 
-export function predefinedPromotionLevelImageUri(predefinedPromotionLevel) {
-    return `${legacyUri()}rest/admin/predefinedPromotionLevels/${predefinedPromotionLevel.id}/image`
+export function legacyPredefinedPromotionLevelImageUri(predefinedPromotionLevel) {
+    return `/rest/admin/predefinedPromotionLevels/${predefinedPromotionLevel.id}/image`
 }
 
-export const PromotionLevelImage = ({promotionLevel, size = 16}) => {
-    return (
-        promotionLevel.image ?
-            <Image
-                src={promotionLevelImageUri(promotionLevel)}
-                alt={promotionLevel.name}
-                width={size}
-                height={size}
-            /> : undefined
-    )
+export function legacyPredefinedValidationStampImageUri(predefinedValidationStamp) {
+    return `/rest/admin/predefinedValidationStamps/${predefinedValidationStamp.id}/image`
 }
 
-export function promotionLevelLink(promotionLevel, text) {
-    return <LegacyLink href={promotionLevelUri(promotionLevel)}>
-        <Space>
-            <PromotionLevelImage promotionLevel={promotionLevel}/>
-            {text ? text : promotionLevel.name}
-        </Space>
-    </LegacyLink>
+export function legacyValidationStampImageUri(validationStamp) {
+    return `/rest/structure/validationStamps/${validationStamp.id}/image`
 }
 
-export function predefinedValidationStampImageUri(predefinedValidationStamp) {
-    return `${legacyUri()}rest/admin/predefinedValidationStamps/${predefinedValidationStamp.id}/image`
+export function legacyValidationStampUri(validationStamp) {
+    return `#/validationStamp/${validationStamp.id}`
 }
 
-export function validationStampImageUri(validationStamp) {
-    return `${legacyUri()}rest/structure/validationStamps/${validationStamp.id}/image`
+export function legacyValidationRunUri(validationRun) {
+    return `#/validationRun/${validationRun.id}`
 }
 
-export function validationStampUri(validationStamp) {
-    return `${legacyUri()}#/validationStamp/${validationStamp.id}`
-}
-
-export function validationRunUri(validationRun) {
-    return `${legacyUri()}#/validationRun/${validationRun.id}`
-}
-
-export function buildDependencyDownstreamGraph({id}) {
-    return `${legacyUri()}#/extension/auto-versioning/dependency-graph/build/${id}/downstream`
-}
-
-// TODO Extensions
-
-export function gitChangeLogUri({from, to}) {
-    return `${legacyUri()}/#/extension/git/changelog?from=${from}&to=${to}`
+export function legacyGitChangeLogUri({from, to}) {
+    return `#/extension/git/changelog?from=${from}&to=${to}`
 }

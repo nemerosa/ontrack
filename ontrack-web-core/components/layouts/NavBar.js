@@ -1,10 +1,10 @@
 import {Avatar, Space, Typography} from "antd";
 import UserMenu, {useUserMenu} from "@components/layouts/UserMenu";
-import {homeLink} from "@components/common/Links";
 import {useContext} from "react";
 import {UserContext} from "@components/providers/UserProvider";
 import SimpleImage from "@components/common/SimpleImage";
 import {FaRegUser} from "react-icons/fa";
+import HomeLink from "@components/common/HomeLink";
 
 const {Text} = Typography;
 
@@ -30,13 +30,20 @@ export default function NavBar() {
                 justifyContent: 'space-between',
             }}>
                 <Space direction="horizontal" size={16}>
-                    {
-                        homeLink(<SimpleImage alt="Logo Ontrack" size={32} src="/ontrack-128.png"/>)
-                    }
-                    {
-                        homeLink(<Text
-                            style={{color: "white", fontSize: '175%', verticalAlign: 'middle'}}>Ontrack</Text>)
-                    }
+                    <HomeLink
+                        text={
+                            <SimpleImage alt="Logo Ontrack" size={32} src="/ontrack-128.png"/>
+                        }
+                    />
+                    <HomeLink
+                        text={
+                            <Text
+                                style={{color: "white", fontSize: '175%', verticalAlign: 'middle'}}
+                            >
+                                Ontrack
+                            </Text>
+                        }
+                    />
                 </Space>
                 <Space direction="horizontal" size={8}>
                     {/* TODO <NavBarText text="Search component"/>*/}

@@ -1,6 +1,6 @@
 import {Handle, Position} from "reactflow";
 import {Card, Space, Typography} from "antd";
-import {branchUri, projectLink} from "@components/common/Links";
+import {branchUri} from "@components/common/Links";
 import {FaArrowCircleLeft, FaLink} from "react-icons/fa";
 import Timestamp from "@components/common/Timestamp";
 import Link from "next/link";
@@ -8,6 +8,7 @@ import BuildRef from "@components/links/BuildRef";
 import BuildPromotions from "@components/links/BuildPromotions";
 import BranchDisplayNameLink from "@components/links/BranchDisplayNameLink";
 import {NodeSection} from "@components/links/NodeSection";
+import ProjectLink from "@components/projects/ProjectLink";
 
 export default function BranchNode({data}) {
 
@@ -39,7 +40,7 @@ export default function BranchNode({data}) {
             >
                 <Space direction="vertical">
                     <Typography.Text ellipsis={true}>
-                        {branch && projectLink(branch.project)}
+                        {branch && <ProjectLink project={branch.project}/>}
                     </Typography.Text>
                     <BranchDisplayNameLink branch={branch}>
                         &nbsp;

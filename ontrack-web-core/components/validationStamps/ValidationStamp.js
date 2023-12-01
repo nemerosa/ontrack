@@ -1,6 +1,6 @@
 import {Popover, Space, Typography} from "antd";
 import AnnotatedDescription from "@components/common/AnnotatedDescription";
-import {validationStampUri} from "@components/common/Links";
+import {legacyValidationStampUri} from "@components/common/Links";
 import ValidationStampImage from "@components/validationStamps/ValidationStampImage";
 import LegacyLink from "@components/common/LegacyLink";
 
@@ -52,7 +52,7 @@ function LinkedValidationStamp({
                                       selected={selected}
     />
     if (displayLink) {
-        return <LegacyLink href={link ? link : validationStampUri(validationStamp)}>
+        return <LegacyLink href={link ? link : legacyValidationStampUri(validationStamp)}>
             {core}
         </LegacyLink>
     } else {

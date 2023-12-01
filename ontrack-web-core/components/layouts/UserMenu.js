@@ -1,13 +1,13 @@
 import {Drawer, Menu} from "antd";
 import {useContext, useEffect, useState} from "react";
 import {UserContext} from "@components/providers/UserProvider";
-import {logout} from "@client/login";
-import {graphiQLUri, legacyUri} from "@components/common/Links";
+import {legacyGraphiQLUri, legacyUri} from "@components/common/Links";
 import {useRouter} from "next/router";
 import {FaCode, FaDoorOpen, FaExpandArrowsAlt, FaSignOutAlt} from "react-icons/fa";
 import {MainLayoutContext} from "@components/layouts/MainLayout";
 import Link from "next/link";
 import {useLogout} from "@components/providers/ConnectionContextProvider";
+import LegacyLink from "@components/common/LegacyLink";
 
 export function useUserMenu() {
     const [open, setOpen] = useState(false);
@@ -128,7 +128,7 @@ export default function UserMenu({userMenu}) {
         // GraphiQL
         menu.push({
             key: 'graphiql',
-            label: <Link href={graphiQLUri()}>GraphiQL</Link>,
+            label: <LegacyLink href={legacyGraphiQLUri()}>GraphiQL</LegacyLink>,
             title: "GraphQL IDE",
             icon: <FaCode/>,
         })
@@ -139,11 +139,8 @@ export default function UserMenu({userMenu}) {
         // Adding predefined "Legacy UI"
         menu.push({
             key: 'legacy',
-            label: "Legacy UI",
+            label: <LegacyLink href="/">Legacy UI</LegacyLink>,
             icon: <FaDoorOpen/>,
-            onClick: () => {
-                location.href = legacyUri()
-            }
         })
         // Full view toggle
         menu.push({

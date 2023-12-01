@@ -1,8 +1,8 @@
 import {Space} from "antd";
-import {branchLink} from "@components/common/Links";
 import PromotionRunBox from "@components/promotionRuns/PromotionRunBox";
 import LatestBuildBox from "@components/builds/LatestBuildBox";
 import NoLatestBuildBox from "@components/builds/NoLatestBuildBox";
+import BranchLink from "@components/branches/BranchLink";
 
 export default function BranchLastPromotionBox({branch}) {
 
@@ -12,9 +12,7 @@ export default function BranchLastPromotionBox({branch}) {
     return (
         <>
             <Space direction="vertical" size={4}>
-                {
-                    branchLink(branch)
-                }
+                <BranchLink branch={branch}/>
                 {
                     lastPromotionLevel ?
                         <PromotionRunBox promotionLevel={lastPromotionLevel}></PromotionRunBox> : undefined

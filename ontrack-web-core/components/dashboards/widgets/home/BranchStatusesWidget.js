@@ -4,7 +4,7 @@ import {useEffect, useState} from "react";
 import {gql} from "graphql-request";
 import {Space, Table, Typography} from "antd";
 import {FaBan} from "react-icons/fa";
-import {branchLink, buildLink, projectLink, promotionLevelUri, validationStampUri} from "@components/common/Links";
+import {buildLink, legacyPromotionLevelUri, legacyValidationStampUri} from "@components/common/Links";
 import ValidationRunStatus from "@components/validationRuns/ValidationRunStatus";
 import Timestamp from "@components/common/Timestamp";
 import PredefinedPromotionLevelImage from "@components/promotionLevels/PredefinedPromotionLevelImage";
@@ -12,6 +12,9 @@ import PredefinedValidationStampImage from "@components/validationStamps/Predefi
 import Link from "next/link";
 import {toMilliSeconds} from "@components/common/SelectInterval";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import LegacyLink from "@components/common/LegacyLink";
+import BranchLink from "@components/branches/BranchLink";
+import ProjectLink from "@components/projects/ProjectLink";
 
 export default function BranchStatusesWidget({promotions, validations, refreshInterval, branches, title}) {
 
@@ -143,9 +146,9 @@ export default function BranchStatusesWidget({promotions, validations, refreshIn
                     title: "Branch",
                     render: (_, branch) => {
                         return <Space>
-                            {projectLink(branch.project)}
+                            <ProjectLink project={branch.project}/>
                             <span>/</span>
-                            {branchLink(branch)}
+                            <BranchLink branch={branch}/>
                         </Space>
                     }
                 })
@@ -163,9 +166,9 @@ export default function BranchStatusesWidget({promotions, validations, refreshIn
                                             {
                                                 <Space size={8}>
                                                     {buildLink(run.build)}
-                                                    <Link href={promotionLevelUri(run.promotionLevel)}>
+                                                    <LegacyLink href={legacyPromotionLevelUri(run.promotionLevel)}>
                                                         <Typography.Text type="secondary">[history]</Typography.Text>
-                                                    </Link>
+                                                    </LegacyLink>
                                                 </Space>
                                             }
                                             <Timestamp value={run.creation.time}/>
@@ -195,9 +198,9 @@ export default function BranchStatusesWidget({promotions, validations, refreshIn
                                                         tooltip={true}
                                                         text={buildLink(run.build)}
                                                     />
-                                                    <Link href={validationStampUri(run.validationStamp)}>
+                                                    <LegacyLink href={legacyValidationStampUri(run.validationStamp)}>
                                                         <Typography.Text type="secondary">[history]</Typography.Text>
-                                                    </Link>
+                                                    </LegacyLink>
                                                 </Space>
                                             }
                                             <Timestamp value={run.lastStatus.creation.time}/>
