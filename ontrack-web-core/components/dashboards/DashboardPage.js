@@ -14,7 +14,6 @@ import {
 import {Modal} from "antd";
 import JumpToProject from "@components/projects/JumpToProject";
 import {v4} from "uuid";
-import {legacyUri} from "@components/common/Links";
 import {LegacyLinkCommand} from "@components/common/Commands";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 
@@ -228,7 +227,7 @@ export default function DashboardPage({
         <JumpToProject key="project"/>,
         <LegacyLinkCommand
             key="legacy"
-            href={legacyUri()}
+            href={"/"}
             text="Legacy home"
             title="Goes to the legacy home page"
         />,

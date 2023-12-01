@@ -1,11 +1,10 @@
 import {Drawer, Menu} from "antd";
 import {useContext, useEffect, useState} from "react";
 import {UserContext} from "@components/providers/UserProvider";
-import {legacyGraphiQLUri, legacyUri} from "@components/common/Links";
+import {legacyGraphiQLUri} from "@components/common/Links";
 import {useRouter} from "next/router";
 import {FaCode, FaDoorOpen, FaExpandArrowsAlt, FaSignOutAlt} from "react-icons/fa";
 import {MainLayoutContext} from "@components/layouts/MainLayout";
-import Link from "next/link";
 import {useLogout} from "@components/providers/ConnectionContextProvider";
 import LegacyLink from "@components/common/LegacyLink";
 
