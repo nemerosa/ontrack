@@ -108,6 +108,8 @@ class OntrackConfigProperties {
         logger.info("[search] Index batch tracing = ${search.index.tracing}")
         logger.info("[search] Index creation error ignoring = ${search.index.ignoreExisting}")
         logger.info("[document] Documents engine = ${documents.engine}")
+        logger.info("[ui] Next UI enabled = ${ui.enabled}")
+        logger.info("[ui] Next UI URI = ${ui.uri}")
     }
 
     /**
