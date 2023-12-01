@@ -1,12 +1,12 @@
 import {createContext, useContext, useEffect, useState} from "react";
 import {useRouter} from "next/router";
-import {cookieName, cookieOptions, isConnectionLoggingEnabled, ontrackUiUrl, ontrackUrl} from "@/connection";
+import {cookieName, cookieOptions} from "@/connection";
 import {deleteCookie, getCookie} from "cookies-next";
 import {GraphQLClient} from "graphql-request";
 
-function createConnectionConfig(token) {
+function createConnectionConfig(environment, token) {
     const connectionConfig = {
-        url: ontrackUrl()
+        url: environment.ontrack.url,
     }
     if (process.env.NEXT_PUBLIC_LOCAL === 'true') {
         const username = "admin"
@@ -80,7 +80,7 @@ export const useLogout = () => {
                     // Removing the cookie
                     deleteCookie(cookieName, cookieOptions())
                     // Redirecting to the login page
-                    location.href = `${config.url}/login?logout&targetUrl=${ontrackUiUrl()}`
+                    location.href = `${config.url}/login?logout&targetUrl=${config.environment.ontrack.ui.url}`
                 },
             })
         }
@@ -90,23 +90,26 @@ export const useLogout = () => {
 
 export const ConnectionContext = createContext({})
 
-export default function ConnectionContextProvider({children}) {
+export default function ConnectionContextProvider({environment, children}) {
 
     const router = useRouter()
-    const logging = isConnectionLoggingEnabled()
+    const logging = environment.ontrack.connection.logging
+    const tracing = environment.ontrack.connection.tracing
 
     const [context, setContext] = useState({})
 
     useEffect(() => {
-        if (logging) console.log("[connection][provider] Route changed, checking cookie")
+        if (tracing) console.log("[connection][provider] Route changed, checking cookie")
         const cookie = getCookie(cookieName)
         if (cookie) {
-            if (logging) console.log("[connection][provider] Cookie present, checking token")
+            if (tracing) console.log("[connection][provider] Cookie present, checking token")
             if (cookie && cookie !== context.token) {
-                if (logging) console.log("[connection][provider] Cookie changed, updating context")
-                const config = createConnectionConfig(cookie)
-                if (logging) console.log("[connection][provider] Using config ", config)
+                if (tracing) console.log("[connection][provider] Cookie changed, updating context")
+                const config = createConnectionConfig(environment, cookie)
+                if (tracing) console.log("[connection][provider] Using config ", config)
+                if (tracing) console.log("[connection][provider] Using environment ", environment)
                 setContext({
+                    environment,
                     token: cookie,
                     config,
                 })
@@ -114,7 +117,7 @@ export default function ConnectionContextProvider({children}) {
         } else {
             if (logging) console.log("[connection][provider] No cookie set. No connection is possible.")
         }
-    }, [router.asPath])
+    }, [environment, router.asPath])
 
     return (
         <>

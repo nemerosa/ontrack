@@ -33,18 +33,18 @@ const defaultOntrackUrl = "http://localhost:8080"
 const defaultOntrackUI = "http://localhost:3000"
 
 export const ontrackUrl = () => {
-    return process.env.NEXT_PUBLIC_ONTRACK_URL ?? defaultOntrackUrl
+    return process.env.ONTRACK_URL ?? defaultOntrackUrl
 }
 
 
 export const ontrackUiUrl = () => {
-    return process.env.NEXT_PUBLIC_ONTRACK_UI_URL ?? defaultOntrackUI
+    return process.env.ONTRACK_UI_URL ?? defaultOntrackUI
 }
 
 export const isConnectionLoggingEnabled = () => {
-    return process.env.NEXT_PUBLIC_ONTRACK_CONNECTION_LOGGING === 'true'
+    return process.env.ONTRACK_CONNECTION_LOGGING === 'true'
 }
 
 export const isConnectionTracingEnabled = () => {
-    return process.env.NEXT_PUBLIC_ONTRACK_CONNECTION_TRACING === 'true'
+    return process.env.ONTRACK_CONNECTION_TRACING === 'true'
 }
