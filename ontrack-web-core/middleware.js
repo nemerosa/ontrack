@@ -21,31 +21,31 @@ export default function middleware(request) {
         !path.startsWith("/favicon")
     ) {
         if (logging) console.log(`[connection][middleware][${path}] CHECKING`)
-        const cookie = request.cookies.get(cookieName)
-        if (cookie) {
-            if (logging) console.log(`[connection][middleware][${path}] Cookie is already set`)
-            // Already authenticated, going forward
+        if (path.startsWith('/auth')) {
+            const token = request.nextUrl.searchParams.get('token')
+            const href = request.nextUrl.searchParams.get('href')
+            if (logging) console.log(`[connection][middleware][${path}] Auth request, setting the cookie and redirecting`, {
+                token,
+                href
+            })
+            // Preparing the response
+            const response = NextResponse.redirect(href ?? ontrackUi)
+            // Setting the cookie
+            response.cookies.set(cookieName, token)
+            response.cookies.set({
+                ...cookieOptions(),
+                name: cookieName,
+                value: token,
+            })
+            // OK
+            return response
         } else {
-            const ontrackUi = ontrackUiUrl()
-            if (path.startsWith('/auth')) {
-                const token = request.nextUrl.searchParams.get('token')
-                const href = request.nextUrl.searchParams.get('href')
-                if (logging) console.log(`[connection][middleware][${path}] Auth request, setting the cookie and redirecting`, {
-                    token,
-                    href
-                })
-                // Preparing the response
-                const response = NextResponse.redirect(href ?? ontrackUi)
-                // Setting the cookie
-                response.cookies.set(cookieName, token)
-                response.cookies.set({
-                    ...cookieOptions(),
-                    name: cookieName,
-                    value: token,
-                })
-                // OK
-                return response
+            const cookie = request.cookies.get(cookieName)
+            if (cookie) {
+                if (logging) console.log(`[connection][middleware][${path}] Cookie is already set`)
+                // Already authenticated, going forward
             } else {
+                const ontrackUi = ontrackUiUrl()
                 const tokenCallbackHref = `${ontrackUiUrl()}${path}`
                 const url = `${ontrackUrl()}/login?token=true&tokenCallback=${ontrackUi}/auth&tokenCallbackHref=${tokenCallbackHref}`
                 if (logging) console.log(`[connection][middleware][${path}] Redirecting to login page at ${url}`)
