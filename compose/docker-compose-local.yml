@@ -40,6 +40,7 @@ services:
       NEXT_PUBLIC_ONTRACK_URL: http://localhost:8080
       NEXT_PUBLIC_ONTRACK_UI_URL: http://localhost:3000/ui
       NEXT_PUBLIC_ONTRACK_CONNECTION_LOGGING: "true"
+      NEXT_PUBLIC_ONTRACK_CONNECTION_TRACING: "true"
     depends_on:
       ontrack:
         condition: service_healthy
