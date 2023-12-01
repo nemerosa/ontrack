@@ -4,28 +4,28 @@ import HomeLink from "@components/common/HomeLink";
 
 export function homeBreadcrumbs() {
     return [
-        <HomeLink/>,
+        <HomeLink key="home"/>,
     ]
 }
 
 export function projectBreadcrumbs() {
     return [
-        <HomeLink/>,
+        <HomeLink key="home"/>,
     ]
 }
 
 export function branchBreadcrumbs(branch) {
     return [
-        <HomeLink/>,
-        <ProjectLink project={branch.project}/>,
+        <HomeLink key="home"/>,
+        <ProjectLink project={branch.project} key="project"/>,
     ]
 }
 
 export function downToBranchBreeadcrumbs({branch}) {
     return [
-        <HomeLink/>,
-        <ProjectLink project={branch.project}/>,
-        <BranchLink branch={branch}/>,
+        <HomeLink key="home"/>,
+        <ProjectLink project={branch.project} key="project"/>,
+        <BranchLink branch={branch} key="branch"/>,
     ]
 }
 
