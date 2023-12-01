@@ -44,3 +44,7 @@ export const ontrackUiUrl = () => {
 export const isConnectionLoggingEnabled = () => {
     return process.env.NEXT_PUBLIC_ONTRACK_CONNECTION_LOGGING === 'true'
 }
+
+export const isConnectionTracingEnabled = () => {
+    return process.env.NEXT_PUBLIC_ONTRACK_CONNECTION_TRACING === 'true'
+}

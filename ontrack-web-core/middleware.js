@@ -1,24 +1,18 @@
 import {NextResponse} from "next/server";
-import {cookieName, cookieOptions, isConnectionLoggingEnabled, ontrackUiUrl, ontrackUrl} from "@/connection";
-
-// export const config = {
-//     matcher: [
-//         /*
-//          * Match all request paths except for the ones starting with:
-//          * - _next/static (static files)
-//          * - _next/image (image optimization files)
-//          * - favicon.ico (favicon file)
-//          * - ontrack_ (logo)
-//          */
-//         '/((?!api|_next/static|_next/image|favicon.ico|ontrack_).*)',
-//     ],
-// }
+import {
+    cookieName,
+    cookieOptions,
+    isConnectionLoggingEnabled,
+    isConnectionTracingEnabled,
+    ontrackUiUrl,
+    ontrackUrl
+} from "@/connection";
 
 export default function middleware(request) {
 
     const logging = isConnectionLoggingEnabled()
+    const tracing = logging && isConnectionTracingEnabled()
     const path = request.nextUrl.pathname
-    // if (logging) console.log(`[connection][middleware][${path}] Path received`)
 
     if (
         !path.startsWith('/_next') &&
@@ -26,6 +20,7 @@ export default function middleware(request) {
         !path.startsWith("/api") &&
         !path.startsWith("/favicon")
     ) {
+        if (logging) console.log(`[connection][middleware][${path}] CHECKING`)
         const cookie = request.cookies.get(cookieName)
         if (cookie) {
             if (logging) console.log(`[connection][middleware][${path}] Cookie is already set`)
@@ -57,5 +52,7 @@ export default function middleware(request) {
                 return NextResponse.redirect(new URL(url))
             }
         }
+    } else if (tracing) {
+        console.log(`[connection][middleware][${path}] PASSTHROUGH`)
     }
 }
