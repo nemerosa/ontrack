@@ -19,10 +19,15 @@ val setupTestEnvironment = tasks.getByPath(":localComposeUp")
 
 val tearDownTestEnvironment = tasks.getByPath(":localComposeDown")
 
+val playwrightInstall = tasks.registering(NpmTask::class) {
+    dependsOn("npmInstall")
+    args.set(listOf("run", "playwright-install"))
+}
+
 // Testing
 
 val uiTest by tasks.registering(NpmTask::class) {
-    dependsOn("npmInstall")
+    dependsOn(playwrightInstall)
     dependsOn(setupTestEnvironment)
     finalizedBy(tearDownTestEnvironment)
 
