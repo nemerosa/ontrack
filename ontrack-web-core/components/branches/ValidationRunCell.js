@@ -54,6 +54,7 @@ export default function ValidationRunCell({build, validationStamp, onChange}) {
             {
                 run && <>
                     <ValidationRunStatus
+                        id={`${build.id}-${validationStamp.id}`}
                         onClick={displayRunStatuses}
                         status={run.lastStatus}
                         displayText={false}

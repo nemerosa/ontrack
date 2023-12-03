@@ -1,10 +1,10 @@
 import {Popover, Space, Tooltip} from "antd";
 import ValidationRunStatusIcon from "@components/validationRuns/ValidationRunStatusIcon";
 
-const CoreValidationRunStatus = ({status, displayText = true, text, onClick}) => {
+const CoreValidationRunStatus = ({id, status, displayText = true, text, onClick}) => {
     return (
         <>
-            <Space size={8} className={onClick ? "ot-action" : undefined} onClick={onClick}>
+            <Space data-testid={id} size={8} className={onClick ? "ot-action" : undefined} onClick={onClick}>
                 <ValidationRunStatusIcon statusID={status.statusID}/>
                 {displayText && (text || status.statusID.name)}
             </Space>
@@ -13,6 +13,7 @@ const CoreValidationRunStatus = ({status, displayText = true, text, onClick}) =>
 }
 
 export default function ValidationRunStatus({
+                                                id,
                                                 status,
                                                 tooltip = true,
                                                 tooltipContent,
@@ -20,6 +21,7 @@ export default function ValidationRunStatus({
                                                 onClick,
                                             }) {
     const core = <CoreValidationRunStatus
+        id={id}
         status={status}
         displayText={displayText}
         text={text}

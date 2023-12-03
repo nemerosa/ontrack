@@ -16,6 +16,8 @@ test('changing status', async ({page}) => {
     // Navigating to the branch
     const branchPage = new BranchPage(page, branch)
     await branchPage.goTo()
+    // Displaying the validation run history dialog
+    const runHistoryDialog = await branchPage.validationRunHistory(build, validationStamp)
     // TODO Changing the validation status
     // TODO Checking the validation status has changed
 })
