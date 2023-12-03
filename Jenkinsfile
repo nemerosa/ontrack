@@ -18,6 +18,11 @@ pipeline {
                 description: 'Skipping KDSL acceptance tests'
         )
         booleanParam(
+                name: 'SKIP_NEXT_UI_TESTS',
+                defaultValue: false,
+                description: 'Skipping legacy acceptance tests'
+        )
+        booleanParam(
                 name: 'SKIP_LEGACY_ACCEPTANCE',
                 defaultValue: false,
                 description: 'Skipping legacy acceptance tests'
@@ -226,6 +231,40 @@ pipeline {
                 }
                 failure {
                     archiveArtifacts(artifacts: "ontrack-kdsl-acceptance/build/logs/**", allowEmptyArchive: true)
+                }
+            }
+        }
+
+        stage('Local Next UI tests') {
+            when {
+                not {
+                    branch 'master'
+                }
+                expression {
+                    return !params.SKIP_NEXT_UI_TESTS && !params.JUST_BUILD_AND_PUSH
+                }
+            }
+            steps {
+                timeout(time: 30, unit: 'MINUTES') {
+                    sh '''
+                        ./gradlew \\
+                            -Dorg.gradle.jvmargs=-Xmx3072m \\
+                            --stacktrace \\
+                            --console plain \\
+                            --parallel \\
+                            :ontrack-web-tests:uiTest
+                        '''
+                }
+            }
+            post {
+                always {
+                    ontrackCliValidateTests(
+                            stamp: 'PLAYWRIGHT',
+                            pattern: 'ontrack-web-tests/reports/junit/*.xml',
+                    )
+                }
+                failure {
+                    archiveArtifacts(artifacts: "ontrack-web-tests/reports/html/index.html", allowEmptyArchive: true)
                 }
             }
         }
