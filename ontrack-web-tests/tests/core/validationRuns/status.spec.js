@@ -3,6 +3,7 @@ const {test, expect} = require('@playwright/test');
 const {ontrack} = require("@ontrack/ontrack");
 const {login} = require("../login");
 const {BranchPage} = require("../branches/branch");
+const {generate} = require("@ontrack/utils");
 
 test('changing status', async ({page}) => {
     // Provisioning
@@ -17,7 +18,14 @@ test('changing status', async ({page}) => {
     const branchPage = new BranchPage(page, branch)
     await branchPage.goTo()
     // Displaying the validation run history dialog
-    const runHistoryDialog = await branchPage.validationRunHistory(build, validationStamp)
-    // TODO Changing the validation status
-    // TODO Checking the validation status has changed
+    const runHistoryDialog = await branchPage.validationRunHistory(run)
+    // Changing the validation status
+    const id = generate('id_')
+    const message = `Currently investigation the issue ${id}`;
+    await runHistoryDialog.selectStatus('Investigating')
+    await runHistoryDialog.setDescription(message)
+    await runHistoryDialog.addStatus()
+    // Checking the validation status has changed in the UI
+    await runHistoryDialog.checkStatus('Investigating', message)
+    // TODO Checking through the API
 })

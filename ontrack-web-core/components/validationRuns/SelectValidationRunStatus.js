@@ -5,10 +5,12 @@ import {Select} from "antd";
  *
  * @param statusId ID of a status ID. If not defined, the root statuses are returned.
  * @param all If no [statusId] is defined, and if true, returns all statuses, not only the roots
+ * @param disabled If the selection of status is not enabled
  * @param value Initial value (ID)
  * @param onChange When selection changes
  */
 export default function SelectValidationRunStatus({
+                                                      id,
                                                       statusId,
                                                       all,
                                                       disabled,
@@ -32,6 +34,7 @@ export default function SelectValidationRunStatus({
     return (
         <>
             <Select
+                id={`validation-run-status-${id}`}
                 style={{width: '10em'}}
                 disabled={disabled}
                 options={vrsList}

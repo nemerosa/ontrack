@@ -15,11 +15,12 @@ class BranchPage {
         await expect(this.page.getByTestId('loading-builds')).toBeHidden()
     }
 
-    async validationRunHistory(build, validationStamp) {
+    async validationRunHistory(run) {
+        const {build, validationStamp} = run
         const cell = this.page.getByTestId(`${build.id}-${validationStamp.id}`);
         await expect(cell).toBeVisible()
         await cell.click()
-        const dialog = new ValidationRunHistoryDialog(this.page, build, validationStamp)
+        const dialog = new ValidationRunHistoryDialog(this.page, run)
         await dialog.waitFor()
         return dialog
     }

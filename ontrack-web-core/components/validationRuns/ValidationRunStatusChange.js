@@ -53,7 +53,7 @@ export default function ValidationRunStatusChange({run, onStatusChanged}) {
         <>
             <Rows>
                 <Columns>
-                    <Typography.Text disabled={!nextStatusId}>
+                    <Typography.Text>
                         <FaComment/>
                         &nbsp;
                         Change the status of the run by setting a new status
@@ -61,11 +61,10 @@ export default function ValidationRunStatusChange({run, onStatusChanged}) {
                     </Typography.Text>
                 </Columns>
                 <Columns>
-
                     <SelectValidationRunStatus
+                        id={run.id}
                         statusId={run.lastStatus.statusID.id}
                         onChange={setNextStatusId}
-                        disabled={!nextStatusId}
                     />
                     <Input
                         placeholder="Optional description"
