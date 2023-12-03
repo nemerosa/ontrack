@@ -1,8 +1,8 @@
 import {Select, Space, Typography} from "antd";
 import {useEffect, useState} from "react";
 import {gql} from "graphql-request";
-import {PromotionLevelImage} from "@components/common/Links";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import {PromotionLevelImage} from "@components/promotionLevels/PromotionLevelImage";
 
 export default function SelectPromotionLevel({branch, value, onChange, useName = false, allowClear = false}) {
 

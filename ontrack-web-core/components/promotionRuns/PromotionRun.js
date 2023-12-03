@@ -1,5 +1,3 @@
-import {Popover, Typography} from "antd";
-import {PromotionLevelImage} from "@components/common/Links";
 import PromotionLevel from "@components/promotionLevels/PromotionLevel";
 import Timestamp from "@components/common/Timestamp";
 
