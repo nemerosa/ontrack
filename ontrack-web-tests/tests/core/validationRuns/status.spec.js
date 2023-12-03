@@ -11,7 +11,7 @@ test('changing status', async ({page}) => {
     const branch = await project.createBranch()
     const validationStamp = await branch.createValidationStamp()
     const build = await branch.createBuild()
-    const run = await build.validate(validationStamp, {status: "FAILED"})
+    let run = await build.validate(validationStamp, {status: "FAILED"})
     // Login
     await login(page)
     // Navigating to the branch
@@ -27,5 +27,7 @@ test('changing status', async ({page}) => {
     await runHistoryDialog.addStatus()
     // Checking the validation status has changed in the UI
     await runHistoryDialog.checkStatus('Investigating', message)
-    // TODO Checking through the API
+    // Checking through the API
+    run = await ontrack().getValidationRunById(run.id)
+    expect(run.lastStatus.statusID.id).toBe('INVESTIGATING')
 })

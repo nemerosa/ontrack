@@ -1,5 +1,24 @@
-import {graphQLCallMutation} from "@ontrack/graphql";
+import {graphQLCall, graphQLCallMutation} from "@ontrack/graphql";
 import {gql} from "graphql-request";
+
+const validationRunFragment = gql`
+    fragment ValidationRunData on ValidationRun {
+        id
+        build {
+            id
+            name
+        }
+        validationStamp {
+            id
+            name
+        }
+        lastStatus {
+            statusID {
+                id
+            }
+        }
+    }
+`
 
 export const createValidationRun = async (build, validationStamp, params) => {
 
@@ -21,13 +40,15 @@ export const createValidationRun = async (build, validationStamp, params) => {
                     validationRunStatus: $validationRunStatus,
                 }) {
                     validationRun {
-                        id
+                        ...ValidationRunData
                     }
                     errors {
                         message
                     }
                 }
             }
+            
+            ${validationRunFragment}
         `,
         {
             buildId: build.id,
@@ -36,13 +57,37 @@ export const createValidationRun = async (build, validationStamp, params) => {
         }
     )
 
-    return validationRunInstance(build, validationStamp, data.createValidationRunById.validationRun)
+    return validationRunInstance(build.ontrack, build, validationStamp, data.createValidationRunById.validationRun)
 
 }
 
-const validationRunInstance = (build, validationStamp, data) => {
+export const getValidationRunById = async (ontrack, runId) => {
+    const data = await graphQLCall(
+        ontrack.connection,
+        gql`
+            query GetValidationRunById(
+                $runId: Int!,
+            ) {
+                validationRuns(id: $runId) {
+                    ...ValidationRunData
+                }
+            }
+
+            ${validationRunFragment}
+        `,
+        {
+            runId,
+        }
+    )
+
+    const run = data.validationRuns[0]
+
+    return validationRunInstance(ontrack, run.build, run.validationStamp, run)
+}
+
+const validationRunInstance = (ontrack, build, validationStamp, data) => {
     const run = {
-        ontrack: build.ontrack,
+        ontrack,
         ...data,
         build,
         validationStamp,
