@@ -1,6 +1,6 @@
 // @ts-check
 const {test, expect} = require('@playwright/test');
-const {ui, credentials} = require("./connection");
+const {credentials, ui} = require("@ontrack/connection");
 
 test('login', async ({page}) => {
     const {username, password} = credentials()
