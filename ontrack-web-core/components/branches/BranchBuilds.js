@@ -177,7 +177,7 @@ export default function BranchBuilds({
                                 {/* Loading indicator */}
                                 {
                                     loadingBuilds &&
-                                    <Popover content="Loading builds...">
+                                    <Popover data-testid="loading-builds" content="Loading builds...">
                                         <Spin/>
                                     </Popover>
                                 }

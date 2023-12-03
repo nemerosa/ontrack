@@ -2,6 +2,7 @@
 const {test, expect} = require('@playwright/test');
 const {ontrack} = require("@ontrack/ontrack");
 const {login} = require("../login");
+const {BranchPage} = require("../branches/branch");
 
 test('changing status', async ({page}) => {
     // Provisioning
@@ -12,7 +13,9 @@ test('changing status', async ({page}) => {
     const run = await build.validate(validationStamp, {status: "FAILED"})
     // Login
     await login(page)
-    // TODO Navigating to the branch
+    // Navigating to the branch
+    const branchPage = new BranchPage(page, branch)
+    await branchPage.goTo()
     // TODO Changing the validation status
     // TODO Checking the validation status has changed
 })
