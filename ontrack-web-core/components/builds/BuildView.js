@@ -13,6 +13,8 @@ import {Space} from "antd";
 import Decorations from "@components/framework/decorations/Decorations";
 import BuildInfoViewDrawer from "@components/builds/BuildInfoViewDrawer";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import GridLayoutResetCommand from "@components/grid/GridLayoutResetCommand";
+import GridLayoutContextProvider from "@components/grid/GridLayoutContextProvider";
 
 export default function BuildView({id}) {
 
@@ -64,6 +66,7 @@ export default function BuildView({id}) {
                 setBuild(data.build)
                 setLoadingBuild(false)
                 setCommands([
+                    <GridLayoutResetCommand/>,
                     <LegacyLinkCommand
                         key="legacy"
                         href={buildLegacyUri(data.build)}
@@ -81,21 +84,23 @@ export default function BuildView({id}) {
             <Head>
                 {buildTitle(build)}
             </Head>
-            <MainPage
-                title={
-                    <Space>
-                        {build.name}
-                        <Decorations entity={build}/>
-                    </Space>
-                }
-                breadcrumbs={buildBreadcrumbs(build)}
-                commands={commands}
-            >
-                <LoadingContainer loading={loadingBuild} tip="Loading build">
-                    <BuildContent build={build}/>
-                    <BuildInfoViewDrawer build={build} loading={loadingBuild}/>
-                </LoadingContainer>
-            </MainPage>
+            <GridLayoutContextProvider>
+                <MainPage
+                    title={
+                        <Space>
+                            {build.name}
+                            <Decorations entity={build}/>
+                        </Space>
+                    }
+                    breadcrumbs={buildBreadcrumbs(build)}
+                    commands={commands}
+                >
+                    <LoadingContainer loading={loadingBuild} tip="Loading build">
+                        <BuildContent build={build}/>
+                        <BuildInfoViewDrawer build={build} loading={loadingBuild}/>
+                    </LoadingContainer>
+                </MainPage>
+            </GridLayoutContextProvider>
         </>
     )
 }

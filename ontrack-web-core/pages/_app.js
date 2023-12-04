@@ -1,5 +1,7 @@
 import 'antd/dist/reset.css'
 import '@/styles/globals.css'
+import 'react-grid-layout/css/styles.css'
+import 'react-resizable/css/styles.css'
 import 'reactflow/dist/style.css'
 import UserContextProvider from "@components/providers/UserProvider";
 import EventsContextProvider from "@components/common/EventsContext";

@@ -1,4 +1,3 @@
-import PageSection from "@components/common/PageSection";
 import React, {useEffect, useState} from "react";
 import {gql} from "graphql-request";
 import {Popover, Space, Timeline, Typography} from "antd";
@@ -9,6 +8,7 @@ import BuildPromoteAction from "@components/builds/BuildPromoteAction";
 import {isAuthorized} from "@components/common/authorizations";
 import PromotionRunDeleteAction from "@components/promotionRuns/PromotionRunDeleteAction";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import GridCell from "@components/grid/GridCell";
 
 export default function BuildContentPromotions({build}) {
 
@@ -156,13 +156,13 @@ export default function BuildContentPromotions({build}) {
 
     return (
         <>
-            <PageSection title="Promotions" loading={loading} fullHeight={true}>
+            <GridCell title="Promotions" loading={loading}>
                 <Timeline
                     mode="right"
                     reverse={true}
                     items={promotionRunItems}
                 />
-            </PageSection>
+            </GridCell>
         </>
     )
 }

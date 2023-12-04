@@ -1,16 +1,15 @@
-import PageSection from "@components/common/PageSection";
 import BuildLinksGraph from "@components/links/BuildLinksGraph";
+import GridCell from "@components/grid/GridCell";
 
 export default function BuildContentLinks({build}) {
     return (
         <>
-            <PageSection title="Build links"
-                         padding={false}
-                         fullHeight={true}>
+            <GridCell title="Build links"
+                      padding={false}>
                 <BuildLinksGraph
                     build={build}
                 />
-            </PageSection>
+            </GridCell>
         </>
     )
 }

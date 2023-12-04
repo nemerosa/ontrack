@@ -1,4 +1,3 @@
-import PageSection from "@components/common/PageSection";
 import React, {useEffect, useState} from "react";
 import {gql} from "graphql-request";
 import {Button, Popover, Space, Table, Typography} from "antd";
@@ -14,6 +13,7 @@ import ValidationRunSortingMode from "@components/validationRuns/ValidationRunSo
 import BuildValidateAction from "@components/builds/BuildValidateAction";
 import {isAuthorized} from "@components/common/authorizations";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import GridCell from "@components/grid/GridCell";
 
 export default function BuildContentValidations({build}) {
 
@@ -261,41 +261,40 @@ export default function BuildContentValidations({build}) {
 
     return (
         <>
-            <PageSection title="Validations"
-                         loading={loading}
-                         padding={false}
-                         fullHeight={true}
-                         extra={
-                             <>
-                                 <Space>
-                                     {/* Validates the current build */}
-                                     {
-                                         isAuthorized(build, 'build', 'validate') &&
-                                         <BuildValidateAction
-                                             build={build}
-                                             onValidation={reload}
-                                         >
-                                             <Button>
-                                                 <Space>
-                                                     <FaGavel/>
-                                                     <Typography.Text>Validate</Typography.Text>
-                                                 </Space>
-                                             </Button>
-                                         </BuildValidateAction>
-                                     }
-                                     {/* Reset filter */}
-                                     <Button onClick={resetFilters}>
-                                         <Space>
-                                             <FaEraser/>
-                                             <Typography.Text>Reset filters</Typography.Text>
-                                         </Space>
-                                     </Button>
-                                     {/* Sorting mode */}
-                                     <Typography.Text>Sort:</Typography.Text>
-                                     <ValidationRunSortingMode value={sortingMode} onChange={onSortingModeChanged}/>
-                                 </Space>
-                             </>
-                         }
+            <GridCell title="Validations"
+                      loading={loading}
+                      padding={false}
+                      extra={
+                          <>
+                              <Space>
+                                  {/* Validates the current build */}
+                                  {
+                                      isAuthorized(build, 'build', 'validate') &&
+                                      <BuildValidateAction
+                                          build={build}
+                                          onValidation={reload}
+                                      >
+                                          <Button>
+                                              <Space>
+                                                  <FaGavel/>
+                                                  <Typography.Text>Validate</Typography.Text>
+                                              </Space>
+                                          </Button>
+                                      </BuildValidateAction>
+                                  }
+                                  {/* Reset filter */}
+                                  <Button onClick={resetFilters}>
+                                      <Space>
+                                          <FaEraser/>
+                                          <Typography.Text>Reset filters</Typography.Text>
+                                      </Space>
+                                  </Button>
+                                  {/* Sorting mode */}
+                                  <Typography.Text>Sort:</Typography.Text>
+                                  <ValidationRunSortingMode value={sortingMode} onChange={onSortingModeChanged}/>
+                              </Space>
+                          </>
+                      }
             >
                 <Table
                     dataSource={validationRuns}
@@ -303,7 +302,7 @@ export default function BuildContentValidations({build}) {
                     pagination={pagination}
                     onChange={onTableChange}
                 />
-            </PageSection>
+            </GridCell>
         </>
     )
 }
