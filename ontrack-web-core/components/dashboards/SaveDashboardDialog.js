@@ -7,22 +7,22 @@ import {UserContext} from "@components/providers/UserProvider";
 export function useSaveDashboardDialog(config) {
     return useFormDialog({
         ...config,
-        init: (form, copy) => {
+        init: (form, {copy}) => {
             form.setFieldsValue({
                 name: copy.name,
                 userScope: copy.userScope,
             })
         },
-        prepareValues: (values, copy) => {
+        prepareValues: (values, {copy}) => {
             values.userScope = values.userScope ? values.userScope : "PRIVATE"
             values.uuid = copy.uuid
-            values.layoutKey = copy.layoutKey
             values.widgets = copy.widgets
         },
         query: saveDashboardQuery,
         userNode: 'saveDashboard',
     })
 }
+
 export default function SaveDashboardDialog({saveDashboardDialog}) {
 
     const user = useContext(UserContext)
@@ -42,13 +42,15 @@ export default function SaveDashboardDialog({saveDashboardDialog}) {
 
     return (
         <>
-            <FormDialog dialog={saveDashboardDialog}>
+            <FormDialog
+                dialog={saveDashboardDialog}
+            >
                 <Form.Item name="name"
                            label="Name"
                            rules={[
                                {
                                    required: true,
-                                   message: 'Dashboard name is required.',
+                                   message: 'DashboardOld name is required.',
                                },
                            ]}
                 >
@@ -58,7 +60,6 @@ export default function SaveDashboardDialog({saveDashboardDialog}) {
                            label="User scope"
                 >
                     <Select
-                        defaultValue="PRIVATE"
                         options={options}
                     />
                 </Form.Item>

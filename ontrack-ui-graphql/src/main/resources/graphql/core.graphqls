@@ -57,10 +57,18 @@ extend type Query {
 # Dashboards
 # =================================================================================
 
+type WidgetLayout {
+    x: Int!
+    y: Int!
+    w: Int!
+    h: Int!
+}
+
 type WidgetInstance {
     uuid: String!
     key: String!
     config: JSON!
+    layout: WidgetLayout!
 }
 
 type Widget {
@@ -86,15 +94,8 @@ type Dashboard {
     uuid: String!
     name: String!
     userScope: DashboardContextUserScope!
-    layoutKey: String!
     widgets: [WidgetInstance!]!
     authorizations: DashboardAuthorizations!
-}
-
-type DashboardLayout {
-    key: String!
-    name: String!
-    description: String!
 }
 
 extend type Query {
@@ -102,8 +103,6 @@ extend type Query {
     userDashboard: Dashboard!
     """Gets the list of private & shared dashboards"""
     userDashboards: [Dashboard!]!
-    """List of available layouts"""
-    dashboardLayouts: [DashboardLayout!]!
     """List of available widgets"""
     dashboardWidgets: [Widget!]!
 }
@@ -123,13 +122,20 @@ input WidgetInstanceInput {
     uuid: String
     key: String!
     config: JSON!
+    layout: WidgetLayoutInput!
+}
+
+input WidgetLayoutInput {
+    x: Int!
+    y: Int!
+    w: Int!
+    h: Int!
 }
 
 input SaveDashboardInput {
     uuid: String
     name: String!
     userScope: DashboardContextUserScope!
-    layoutKey: String!
     widgets: [WidgetInstanceInput!]!
     select: Boolean! = true
 }

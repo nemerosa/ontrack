@@ -1,17 +1,17 @@
 import {Form} from "antd";
 import {useContext} from "react";
-import {WidgetContext} from "@components/dashboards/widgets/WidgetContext";
 import SelectProject from "@components/projects/SelectProject";
+import {DashboardWidgetCellContext} from "@components/dashboards/DashboardWidgetCellContextProvider";
 
 export default function FavouriteBranchesWidgetForm({project}) {
 
-    const {editionForm} = useContext(WidgetContext)
+    const {widgetEditionForm} = useContext(DashboardWidgetCellContext)
 
     return (
         <>
             <Form
                 layout="vertical"
-                form={editionForm}
+                form={widgetEditionForm}
             >
                 <Form.Item
                     name="project"

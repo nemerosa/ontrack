@@ -15,14 +15,12 @@ data class Dashboard(
     val uuid: String,
     val name: String,
     val userScope: DashboardContextUserScope,
-    val layoutKey: String,
     val widgets: List<WidgetInstance>,
 ) {
     fun share() = Dashboard(
         uuid = uuid,
         name = name,
         userScope = DashboardContextUserScope.SHARED,
-        layoutKey = layoutKey,
         widgets = widgets
     )
 }

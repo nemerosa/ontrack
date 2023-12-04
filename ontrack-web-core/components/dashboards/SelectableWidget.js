@@ -8,7 +8,7 @@ export default function SelectableWidget({widgetDef, addWidget}) {
                 title={widgetDef.name}
                 extra={
                     <Tooltip key="add" title={`Add the "${widgetDef.name}" widget to the dashboard`}>
-                        <Button type="primary" onClick={addWidget(widgetDef)} icon={<FaPlus/>}/>
+                        <Button type="primary" onClick={() => addWidget(widgetDef)} icon={<FaPlus/>}/>
                     </Tooltip>
                 }
             >

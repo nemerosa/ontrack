@@ -1028,7 +1028,7 @@ type CreateWebhookPayload implements Payload {
     webhook: Webhook
 }
 
-type Dashboard {
+type DashboardOld {
     authorizations: DashboardAuthorizations!
     layoutKey: String!
     name: String!
@@ -3822,7 +3822,7 @@ type Preferences {
     branchViewVsGroups: Boolean!
     "Branch view VS names"
     branchViewVsNames: Boolean!
-    "Dashboard selected by default"
+    "DashboardOld selected by default"
     dashboardUuid: String
     "Selected branch view"
     selectedBranchViewKey: String
@@ -4772,9 +4772,9 @@ type Query {
     "Gets the current user"
     user: User
     "Gets the current dashboard"
-    userDashboard: Dashboard!
+    userDashboard: DashboardOld!
     "Gets the list of private & shared dashboards"
-    userDashboards: [Dashboard!]!
+    userDashboards: [DashboardOld!]!
     "List of validation run statuses"
     validationRunStatusIDList: [ValidationRunStatusID!]!
     validationRuns(
@@ -5019,7 +5019,7 @@ type SaveBuildFilterPayload implements Payload {
 
 type SaveDashboardPayload implements PayloadInterface {
     "Saved dashboard"
-    dashboard: Dashboard
+    dashboard: DashboardOld
     "List of errors"
     errors: [PayloadUserError]
 }
@@ -5710,7 +5710,7 @@ type ShareBuildFilterPayload implements Payload {
 
 type ShareDashboardPayload implements PayloadInterface {
     "Shared dashboard"
-    dashboard: Dashboard
+    dashboard: DashboardOld
     "List of errors"
     errors: [PayloadUserError]
 }
@@ -7923,7 +7923,7 @@ input SetPreferencesInput {
     branchViewVsGroups: Boolean
     "branchViewVsNames field"
     branchViewVsNames: Boolean
-    "Dashboard selected by default"
+    "DashboardOld selected by default"
     dashboardUuid: String
     "Selected branch view"
     selectedBranchViewKey: String

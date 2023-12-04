@@ -78,7 +78,6 @@ class DashboardServiceImpl(
             uuid = input.uuid?.takeIf { it.isNotBlank() } ?: UUID.randomUUID().toString(),
             name = input.name,
             userScope = input.userScope,
-            layoutKey = input.layoutKey,
             widgets = input.widgets.map {
                 WidgetInstance(
                     uuid = it.uuid
@@ -87,6 +86,7 @@ class DashboardServiceImpl(
                         ?: UUID.randomUUID().toString(),
                     key = it.key,
                     config = it.config,
+                    layout = it.layout,
                 )
             }
         )

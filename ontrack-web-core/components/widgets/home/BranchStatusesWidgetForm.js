@@ -1,22 +1,21 @@
 import {Button, Form, Input, Space} from "antd";
-import {useContext, useState} from "react";
-import {WidgetContext} from "@components/dashboards/widgets/WidgetContext";
+import {useContext} from "react";
 import SelectMultiplePromotionLevelNames from "@components/promotionLevels/SelectMultiplePromotionLevelNames";
 import SelectMultipleValidationStampNames from "@components/validationStamps/SelectMultipleValidationStampNames";
 import {FaPlus, FaTrash} from "react-icons/fa";
 import SelectProjectBranch from "@components/branches/SelectProjectBranch";
 import SelectInterval from "@components/common/SelectInterval";
-import {value} from "lodash/seq";
+import {DashboardWidgetCellContext} from "@components/dashboards/DashboardWidgetCellContextProvider";
 
 export default function BranchStatusesWidgetForm({promotions, validations, refreshInterval, branches, title}) {
 
-    const {editionForm} = useContext(WidgetContext)
+    const {widgetEditionForm} = useContext(DashboardWidgetCellContext)
 
     return (
         <>
             <Form
                 layout="vertical"
-                form={editionForm}
+                form={widgetEditionForm}
             >
                 <Form.Item
                     name="title"

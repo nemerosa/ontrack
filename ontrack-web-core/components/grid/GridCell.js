@@ -1,34 +1,32 @@
-import {Button, Card, Space, Spin, Typography} from "antd";
+import {Space, Spin, Typography} from "antd";
 import {FaArrowsAlt} from "react-icons/fa";
 
-export default function GridCell({title, loading, padding = true, extra, children}) {
+import GridCellCommand from "@components/grid/GridCellCommand";
+import Section from "@components/common/Section";
 
-    const bodyStyle = {}
+export default function GridCell({title, titleWidth = 18, loading, padding = true, isDraggable = true, extra, children}) {
+
+    const bodyStyle = {
+        overflowY: 'scroll',
+    }
     if (!padding) {
         bodyStyle.padding = 0
     }
 
     return (
         <>
-            <Card
+            <Section
                 title={loading ? "Loading..." : title}
-                bodyStyle={bodyStyle}
-                headStyle={{
-                    backgroundColor: 'lightgrey'
-                }}
-                style={{
-                    width: '100%',
-                    height: '100%',
-                }}
+                titleWidth={titleWidth}
                 extra={
                     <Space>
                         {extra}
-                        <Button
+                        <GridCellCommand
+                            condition={isDraggable}
+                            icon={<FaArrowsAlt/>}
                             title="Use this handle to drag the widget into another position"
                             className="ot-rgl-draggable-handle"
-                        >
-                            <FaArrowsAlt/>
-                        </Button>
+                        />
                     </Space>
                 }
             >
@@ -42,7 +40,7 @@ export default function GridCell({title, loading, padding = true, extra, childre
                         <Typography.Text>Loading...</Typography.Text>
                     </Space>
                 }
-            </Card>
+            </Section>
         </>
     )
 }

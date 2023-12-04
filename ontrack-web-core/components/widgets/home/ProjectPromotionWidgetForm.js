@@ -1,19 +1,19 @@
-import {WidgetContext} from "@components/dashboards/widgets/WidgetContext";
 import {useContext} from "react";
 import {Form, InputNumber} from "antd";
 import SelectProject from "@components/projects/SelectProject";
 import SelectMultiplePromotionLevelNames from "@components/promotionLevels/SelectMultiplePromotionLevelNames";
 import SelectLabel from "@components/labels/SelectLabel";
+import {DashboardWidgetCellContext} from "@components/dashboards/DashboardWidgetCellContextProvider";
 
 export default function ProjectPromotionWidgetForm({project, promotions, depth, label}) {
 
-    const {editionForm} = useContext(WidgetContext)
+    const {widgetEditionForm} = useContext(DashboardWidgetCellContext)
 
     return (
         <>
             <Form
                 layout="vertical"
-                form={editionForm}
+                form={widgetEditionForm}
             >
                 <Form.Item
                     name="project"

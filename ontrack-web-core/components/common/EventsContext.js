@@ -2,7 +2,7 @@ import {createContext, useContext, useState} from "react";
 
 export const EventsContext = createContext({})
 
-export const useDashboardEventForRefresh = (name) => {
+export const useEventForRefresh = (name) => {
     const dashboardEventsContext = useContext(EventsContext)
 
     const [refreshCount, setRefreshCount] = useState(0)

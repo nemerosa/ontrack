@@ -26,9 +26,6 @@ class DashboardController(
     fun userDashboards(): List<Dashboard> = dashboardService.userDashboards()
 
     @QueryMapping
-    fun dashboardLayouts(): List<DashboardLayout> = DashboardLayouts.layouts
-
-    @QueryMapping
     fun dashboardWidgets(): List<Widget<*>> = widgetService.findAll()
 
     @SchemaMapping

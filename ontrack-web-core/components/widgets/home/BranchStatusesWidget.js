@@ -1,6 +1,4 @@
-import BranchStatusesWidgetForm from "@components/dashboards/widgets/home/BranchStatusesWidgetForm";
-import Widget from "@components/dashboards/widgets/Widget";
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import {gql} from "graphql-request";
 import {Space, Table, Typography} from "antd";
 import {FaBan} from "react-icons/fa";
@@ -9,12 +7,12 @@ import ValidationRunStatus from "@components/validationRuns/ValidationRunStatus"
 import Timestamp from "@components/common/Timestamp";
 import PredefinedPromotionLevelImage from "@components/promotionLevels/PredefinedPromotionLevelImage";
 import PredefinedValidationStampImage from "@components/validationStamps/PredefinedValidationStampImage";
-import Link from "next/link";
 import {toMilliSeconds} from "@components/common/SelectInterval";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import LegacyLink from "@components/common/LegacyLink";
 import BranchLink from "@components/branches/BranchLink";
 import ProjectLink from "@components/projects/ProjectLink";
+import {DashboardWidgetCellContext} from "@components/dashboards/DashboardWidgetCellContextProvider";
 
 export default function BranchStatusesWidget({promotions, validations, refreshInterval, branches, title}) {
 
@@ -221,28 +219,18 @@ export default function BranchStatusesWidget({promotions, validations, refreshIn
         }
     }, [client, promotions, validations, branches, refreshCount])
 
+    const {setTitle} = useContext(DashboardWidgetCellContext)
+    useEffect(() => {
+        setTitle(title ?? "Branch statuses")
+    }, [title])
+
     return (
         <>
-            <Widget
-                title={title ? title : "Branch statuses"}
-                loading={loading}
-                commands={[]}
-                form={
-                    <BranchStatusesWidgetForm
-                        promotions={promotions}
-                        validations={validations}
-                        refreshInterval={refreshInterval}
-                        branches={branches}
-                        title={title}
-                    />
-                }
-            >
-                <Table
-                    dataSource={dataSource}
-                    columns={columns}
-                    pagination={false}
-                />
-            </Widget>
+            <Table
+                dataSource={dataSource}
+                columns={columns}
+                pagination={false}
+            />
         </>
     )
 }
