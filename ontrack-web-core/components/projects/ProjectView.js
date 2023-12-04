@@ -14,7 +14,7 @@ import RowTag from "@components/common/RowTag";
 import BranchBox from "@components/branches/BranchBox";
 import JumpToBranch from "@components/branches/JumpToBranch";
 import ProjectFavourite from "@components/projects/ProjectFavourite";
-import {useDashboardEventForRefresh} from "@components/common/EventsContext";
+import {useEventForRefresh} from "@components/common/EventsContext";
 import ProjectInfoViewDrawer from "@components/projects/ProjectInfoViewDrawer";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 
@@ -28,7 +28,7 @@ export default function ProjectView({id}) {
     const [branches, setBranches] = useState([])
     const [favouriteBranches, setFavouriteBranches] = useState([])
 
-    const favouriteRefreshCount = useDashboardEventForRefresh("branch.favourite")
+    const favouriteRefreshCount = useEventForRefresh("branch.favourite")
 
     useEffect(() => {
         if (id && client) {

@@ -46,7 +46,7 @@ eventsContext.subscribeToEvent("event.name", (values) => {
 or, when only wanting to refresh a call:
 
 ```javascript
-const refreshCount = useDashboardEventForRefresh("event.name")
+const refreshCount = useEventForRefresh("event.name")
 // The refreshCount can be used as a dependency for any React.useEffect:
 useEffect(() => {}, [refreshCount])
 ```

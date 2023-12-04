@@ -1,18 +1,40 @@
 import {gql} from "graphql-request";
 
+export const gqlDashboardFragment = gql`
+    fragment DashboardData on Dashboard {
+        uuid
+        name
+        userScope
+        authorizations {
+            edit
+            share
+            delete
+        }
+        widgets {
+            uuid
+            key
+            config
+            layout {
+                x
+                y
+                w
+                h
+            }
+        }
+    }
+`
+
 export const saveDashboardQuery = gql`
     mutation SaveDashboard(
         $uuid: String,
         $name: String!,
         $userScope: DashboardContextUserScope!,
-        $layoutKey: String!,
         $widgets: [WidgetInstanceInput!]!,
     ) {
         saveDashboard(input: {
             uuid: $uuid,
             name: $name,
             userScope: $userScope,
-            layoutKey: $layoutKey,
             widgets: $widgets,
             select: true,
         }) {
@@ -20,23 +42,12 @@ export const saveDashboardQuery = gql`
                 message
             }
             dashboard {
-                uuid
-                name
-                userScope
-                layoutKey
-                authorizations {
-                    edit
-                    share
-                    delete
-                }
-                widgets {
-                    uuid
-                    key
-                    config
-                }
+                ...DashboardData
             }
         }
     }
+    
+    ${gqlDashboardFragment}
 `
 
 export const shareDashboardQuery = gql`
@@ -46,23 +57,12 @@ export const shareDashboardQuery = gql`
                 message
             }
             dashboard {
-                uuid
-                name
-                userScope
-                layoutKey
-                authorizations {
-                    edit
-                    share
-                    delete
-                }
-                widgets {
-                    uuid
-                    key
-                    config
-                }
+                ...DashboardData
             }
         }
     }
+
+    ${gqlDashboardFragment}
 `
 export const deleteDashboardQuery = gql`
     mutation DeleteDashboard($uuid: String!) {
@@ -77,29 +77,13 @@ export const deleteDashboardQuery = gql`
 export const loadDashboardsQuery = gql`
     query LoadDashboards {
         userDashboards {
-            ...DashboardContent
+            ...DashboardData
         }
         userDashboard {
-            ...DashboardContent
+            ...DashboardData
         }
     }
-
-    fragment DashboardContent on Dashboard {
-        uuid
-        name
-        userScope
-        layoutKey
-        authorizations {
-            edit
-            share
-            delete
-        }
-        widgets {
-            uuid
-            key
-            config
-        }
-    }
+    ${gqlDashboardFragment}
 `
 
 export const selectDashboardQuery = gql`

@@ -1,16 +1,16 @@
 import {Form, InputNumber} from "antd";
 import {useContext} from "react";
-import {WidgetContext} from "@components/dashboards/widgets/WidgetContext";
+import {DashboardWidgetCellContext} from "@components/dashboards/DashboardWidgetCellContextProvider";
 
 export default function LastActiveProjectsWidgetForm({count}) {
 
-    const {editionForm} = useContext(WidgetContext)
+    const {widgetEditionForm} = useContext(DashboardWidgetCellContext)
 
     return (
         <>
             <Form
                 layout="vertical"
-                form={editionForm}
+                form={widgetEditionForm}
             >
                 <Form.Item
                     name="count"

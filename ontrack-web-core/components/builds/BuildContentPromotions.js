@@ -158,6 +158,9 @@ export default function BuildContentPromotions({build}) {
         <>
             <GridCell title="Promotions" loading={loading}>
                 <Timeline
+                    style={{
+                        paddingTop: 16,
+                    }}
                     mode="right"
                     reverse={true}
                     items={promotionRunItems}

@@ -1,13 +1,13 @@
 import {Button, Tooltip} from "antd";
 
-export default function WidgetCommand({condition, title, icon, onAction}) {
+export default function GridCellCommand({condition = true, disabled = false, title, icon, onAction, className}) {
     return (
         <>
             {
                 condition &&
                 <Tooltip title={title}>
                     <div>
-                        <Button icon={icon} onClick={onAction}/>
+                        <Button disabled={disabled} className={className} icon={icon} onClick={onAction}/>
                     </div>
                 </Tooltip>
             }

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.model.dashboards
 
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.dashboards.widgets.LastActiveProjectsWidget
 
 object DefaultDashboards {
@@ -8,9 +9,18 @@ object DefaultDashboards {
         uuid = "0",
         name = "Default dashboard",
         userScope = DashboardContextUserScope.BUILT_IN,
-        layoutKey = DashboardLayouts.defaultLayout.key,
         widgets = listOf(
-            WidgetInstance.fromDefaultWidget("0", LastActiveProjectsWidget())
+            WidgetInstance(
+                uuid = "0",
+                key = LastActiveProjectsWidget.KEY,
+                config = LastActiveProjectsWidget.LastActiveProjectsWidgetConfig(count = 10).asJson(),
+                layout = WidgetLayout(
+                    x = 0,
+                    y = 0,
+                    w = 12,
+                    h = 4,
+                )
+            )
         )
     )
 
