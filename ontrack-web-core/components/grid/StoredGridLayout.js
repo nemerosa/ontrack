@@ -3,7 +3,7 @@ import GridTable from "@components/grid/GridTable";
 import {StoredGridLayoutContext} from "@components/grid/StoredGridLayoutContext";
 import GridTableContextProvider from "@components/grid/GridTableContext";
 
-export default function StoredGridLayout({id, defaultLayout, items}) {
+export default function StoredGridLayout({id, defaultLayout, items, rowHeight = 200}) {
 
     const [layout, setLayout] = useState(defaultLayout)
     const [loaded, setLoaded] = useState(false)
@@ -33,6 +33,7 @@ export default function StoredGridLayout({id, defaultLayout, items}) {
                 loaded &&
                 <GridTableContextProvider>
                     <GridTable
+                        rowHeight={rowHeight}
                         layout={layout}
                         onLayoutChange={onLayoutChange}
                         items={items}
