@@ -20,6 +20,7 @@ class GQLTypeToken : GQLType {
             .description("Authentication token")
             .dateField("creation", "Token creation date.")
             .dateField("validUntil", "Date until the end of validity.")
+            .dateField("lastUsed", "Date when the token was last used.")
             .booleanField("valid", "Validity flag, computed in regard to current time.")
             .stringField("name", "Name of the token")
             .stringField("value", "Value of the token")
