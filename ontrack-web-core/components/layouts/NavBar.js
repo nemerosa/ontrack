@@ -2,7 +2,6 @@ import {Avatar, Space, Typography} from "antd";
 import UserMenu, {useUserMenu} from "@components/layouts/UserMenu";
 import {useContext} from "react";
 import {UserContext} from "@components/providers/UserProvider";
-import SimpleImage from "@components/common/SimpleImage";
 import {FaRegUser} from "react-icons/fa";
 import HomeLink from "@components/common/HomeLink";
 
@@ -32,7 +31,12 @@ export default function NavBar() {
                 <Space direction="horizontal" size={16}>
                     <HomeLink
                         text={
-                            <SimpleImage alt="Logo Ontrack" size={32} src="/ontrack-128.png"/>
+                            <img
+                                src={`/ui/ontrack-128.png`}
+                                alt="Ontrack Logo"
+                                width={24}
+                                height={24}
+                            />
                         }
                     />
                     <HomeLink
