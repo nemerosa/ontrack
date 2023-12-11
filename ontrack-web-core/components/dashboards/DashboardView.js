@@ -1,6 +1,5 @@
 import {useContext, useEffect, useState} from "react";
 import {DashboardContext} from "@components/dashboards/DashboardContextProvider";
-import GridLayout from "@components/grid/GridLayout";
 import DashboardWidgetCell from "@components/dashboards/DashboardWidgetCell";
 import {Alert, Button, Col, Row, Space} from "antd";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
