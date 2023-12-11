@@ -123,6 +123,8 @@ export default function DashboardView() {
                     layout={layout}
                     items={items}
                     rowHeight={rowHeight}
+                    isResizable={false}
+                    isDraggable={false}
                 />
             }
             {
