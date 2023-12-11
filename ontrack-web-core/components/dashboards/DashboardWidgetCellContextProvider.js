@@ -11,10 +11,6 @@ export const DashboardWidgetCellContext = createContext({
     extra: undefined,
     setExtra: (value) => {
     },
-    // Expansion state
-    expanded: false,
-    toggleExpansion: () => {
-    },
     // Dashboard edition
     dashboardEdition: false,
     widgetEdition: false,
@@ -36,17 +32,6 @@ export default function DashboardWidgetCellContextProvider({widget, children}) {
     const [extra, setExtra] = useState()
 
     const dashboardContext = useContext(DashboardContext)
-    const [expanded, setExpanded] = useState(false)
-    useEffect(() => {
-        setExpanded(!dashboardContext?.edition && dashboardContext?.expandedWidget === widget.uuid)
-    }, [dashboardContext?.expandedWidget, dashboardContext?.edition]);
-    const toggleExpansion = () => {
-        if (dashboardContext.expandedWidget === widget.uuid) {
-            dashboardContext.setExpandedWidget(undefined)
-        } else {
-            dashboardContext.setExpandedWidget(widget.uuid)
-        }
-    }
 
     const [widgetEdition, setWidgetEdition] = useState(false)
     const [widgetSaving, setWidgetSaving] = useState(false)
@@ -89,8 +74,6 @@ export default function DashboardWidgetCellContextProvider({widget, children}) {
         setTitle,
         extra,
         setExtra,
-        expanded,
-        toggleExpansion,
         dashboardEdition: dashboardContext?.edition,
         widgetEdition,
         widgetSaving,

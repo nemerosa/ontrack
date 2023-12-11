@@ -1,17 +1,11 @@
 import {Command} from "@components/common/Commands";
 import {FaWindowRestore} from "react-icons/fa";
 import {useContext} from "react";
-import {GridLayoutContext} from "@components/grid/GridLayoutContextProvider";
+import {StoredGridLayoutContext} from "@components/grid/StoredGridLayoutContext";
 
-export default function GridLayoutResetCommand({text, icon, title}) {
+export default function StoredGridLayoutResetCommand({text, icon, title}) {
 
-    const context = useContext(GridLayoutContext)
-
-    const reset = () => {
-        if (context) {
-            context.resetLayout()
-        }
-    }
+    const {resetLayout} = useContext(StoredGridLayoutContext)
 
     return (
         <>
@@ -19,7 +13,7 @@ export default function GridLayoutResetCommand({text, icon, title}) {
                 text={text ?? "Reset layout"}
                 title={title ?? "Resets the layout of the page."}
                 icon={icon ?? <FaWindowRestore/>}
-                action={reset}
+                action={resetLayout}
             />
         </>
     )

@@ -1,8 +1,7 @@
 import BuildContentPromotions from "@components/builds/BuildContentPromotions";
 import BuildContentValidations from "@components/builds/BuildContentValidations";
 import BuildContentLinks from "@components/builds/BuildContentLinks";
-
-import GridLayout, {useStoredLayout} from "@components/grid/GridLayout";
+import StoredGridLayout from "@components/grid/StoredGridLayout";
 
 export default function BuildContent({build}) {
 
@@ -12,29 +11,33 @@ export default function BuildContent({build}) {
         {i: "links", x: 0, y: 1, w: 4, h: 2}
     ]
 
-    const {layout, setLayout} = useStoredLayout("page-build-layout", defaultLayout)
-
-    const items = {
-        promotions: <BuildContentPromotions
-            build={build}
-        />,
-        validations: <BuildContentValidations
-            build={build}
-        />,
-        links: <BuildContentLinks
-            build={build}
-        />,
-    }
+    const items = [
+        {
+            id: "promotions",
+            content: <BuildContentPromotions
+                build={build}
+            />,
+        },
+        {
+            id: "validations",
+            content: <BuildContentValidations
+                build={build}
+            />,
+        },
+        {
+            id: "links",
+            content: <BuildContentLinks
+                build={build}
+            />,
+        },
+    ]
 
     return (
         <>
-            <GridLayout
-                layout={layout}
-                setLayout={setLayout}
-                layoutKey="layoutBuildPage"
+            <StoredGridLayout
+                id="page-build-layout"
+                defaultLayout={defaultLayout}
                 items={items}
-                isDraggable={true}
-                isResizable={true}
             />
         </>
     )
