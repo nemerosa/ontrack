@@ -126,6 +126,18 @@ angular.module('ot.service.chart', [
         };
 
         /**
+         * Formats a duration in human readable format.
+         */
+        const humanDuration = (value) => {
+            return moment.duration(value, 'seconds').humanize({
+                h: 72,
+                m: 120,
+                s: 120,
+                ss: 0
+            });
+        };
+
+        /**
          * Common code for creating a chart service for a chart
          *
          * @param config.chartOptionsKey Storage key for the chart options
@@ -277,12 +289,7 @@ angular.module('ot.service.chart', [
                                 if (value === 0) {
                                     return '0';
                                 } else {
-                                    return moment.duration(value, 'seconds').humanize({
-                                        h: 72,
-                                        m: 300,
-                                        s: 300,
-                                        ss: 0
-                                    });
+                                    return humanDuration(value);
                                 }
                             }
                         }
@@ -294,9 +301,7 @@ angular.module('ot.service.chart', [
                             name: 'Mean',
                             type: 'bar',
                             tooltip: {
-                                valueFormatter: function (value) {
-                                    return value + ' s';
-                                }
+                                valueFormatter: humanDuration
                             },
                             data: chartData.data.mean
                         },
@@ -304,9 +309,7 @@ angular.module('ot.service.chart', [
                             name: '90th percentile',
                             type: 'line',
                             tooltip: {
-                                valueFormatter: function (value) {
-                                    return value + ' s';
-                                }
+                                valueFormatter: humanDuration
                             },
                             data: chartData.data.percentile90
                         },
@@ -314,9 +317,7 @@ angular.module('ot.service.chart', [
                             name: 'Maximum',
                             type: 'line',
                             tooltip: {
-                                valueFormatter: function (value) {
-                                    return value + ' s';
-                                }
+                                valueFormatter: humanDuration
                             },
                             data: chartData.data.maximum
                         }
