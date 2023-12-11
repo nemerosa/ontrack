@@ -6428,6 +6428,7 @@ type Widget {
     description: String!
     key: String!
     name: String!
+    preferredHeight: Int!
 }
 
 type WidgetInstance {

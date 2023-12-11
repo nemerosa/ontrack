@@ -9,6 +9,7 @@ class BranchStatusesWidget: AbstractWidget<BranchStatusesWidgetConfig>(
     name = "Branch statuses",
     description = "Displays the promotions & validations for a set of branches",
     defaultConfig = BranchStatusesWidgetConfig(),
+    preferredHeight = 6,
 ) {
 }
 

@@ -10,6 +10,7 @@ class LastActiveProjectsWidget : AbstractWidget<LastActiveProjectsWidget.LastAct
     name = "Last active projects",
     description = "Displays the list of the last active projects. The number of projects which are displayed can be configured.",
     defaultConfig = LastActiveProjectsWidgetConfig(count = 10),
+    preferredHeight = 4,
 ) {
     data class LastActiveProjectsWidgetConfig(
         val count: Int = 10,

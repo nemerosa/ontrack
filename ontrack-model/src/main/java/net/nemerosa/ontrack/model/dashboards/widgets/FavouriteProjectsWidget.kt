@@ -8,6 +8,7 @@ class FavouriteProjectsWidget : AbstractWidget<FavouriteProjectsWidget.Favourite
     name = "Favourite projects",
     description = "Displays the list of the projects you have selected as favourites.",
     defaultConfig = FavouriteProjectsWidgetConfig.INSTANCE,
+    preferredHeight = 4,
 ) {
     class FavouriteProjectsWidgetConfig : WidgetConfig {
         companion object {

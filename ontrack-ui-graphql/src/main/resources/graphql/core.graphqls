@@ -76,6 +76,7 @@ type Widget {
     name: String!
     description: String!
     defaultConfig: JSON!
+    preferredHeight: Int!
 }
 
 enum DashboardContextUserScope {

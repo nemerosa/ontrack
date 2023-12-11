@@ -6,5 +6,6 @@ interface Widget<C: WidgetConfig> {
     val name: String
     val description: String
     val defaultConfig: C
+    val preferredHeight: Int
 
 }

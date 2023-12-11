@@ -43,12 +43,12 @@ export default function DashboardView() {
         return maxYH
     }
 
-    const computeNewLayoutPosition = () => {
+    const computeNewLayoutPosition = (preferredHeight) => {
         return {
             x: 0,
             y: maxYH() + 1,
             w: 12,
-            h: defaultNewHeight,
+            h: preferredHeight,
         }
     }
 
@@ -86,9 +86,11 @@ export default function DashboardView() {
                             name
                             description
                             defaultConfig
+                            preferredHeight
                         }
                     }
-                `).then(data => {
+                `
+            ).then(data => {
                 setAvailableWidgets(data.dashboardWidgets)
             })
         }
@@ -109,7 +111,7 @@ export default function DashboardView() {
             uuid: uuid,
             key: widgetDef.key,
             config: widgetDef.defaultConfig,
-            layout: computeNewLayoutPosition(),
+            layout: computeNewLayoutPosition(widgetDef.preferredHeight),
         }
         // Adding the widget to the current dashboard
         addWidget(widget)
