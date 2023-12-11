@@ -75,32 +75,32 @@ export default function LastActiveProjectsWidget({count}) {
     return (
         <>
             <NewProjectDialog newProjectDialog={newProjectDialog}/>
-            <div className="ot-section-body-padded">
-                {
-                    projects && projects.length > 0 &&
-                    <Space direction="horizontal" size={16} wrap>
-                        {
-                            projects.map(project => <RowTag key={project.id}>
-                                    <ProjectBox project={project}/>
-                                </RowTag>
-                            )
-                        }
-                    </Space>
-                }
-                {
-                    (!projects || projects.length === 0) && <Empty
-                        image={Empty.PRESENTED_IMAGE_SIMPLE}
-                        description={
-                            <Typography.Text>
-                                No project has been created in Ontrack yet.
-                                You can start <a href="https://static.nemerosa.net/ontrack/release/latest/docs/doc/index.html#feeding">feeding information</a> in Ontrack
-                                automatically from your CI engine, using its API or other means.
-                                Or you can <a onClick={createProject}>create a project</a> using the UI.
-                            </Typography.Text>
-                        }
-                    />
-                }
-            </div>
+            {
+                projects && projects.length > 0 &&
+                <Space direction="horizontal" size={16} wrap>
+                    {
+                        projects.map(project => <RowTag key={project.id}>
+                                <ProjectBox project={project}/>
+                            </RowTag>
+                        )
+                    }
+                </Space>
+            }
+            {
+                (!projects || projects.length === 0) && <Empty
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    description={
+                        <Typography.Text>
+                            No project has been created in Ontrack yet.
+                            You can start <a
+                            href="https://static.nemerosa.net/ontrack/release/latest/docs/doc/index.html#feeding">feeding
+                            information</a> in Ontrack
+                            automatically from your CI engine, using its API or other means.
+                            Or you can <a onClick={createProject}>create a project</a> using the UI.
+                        </Typography.Text>
+                    }
+                />
+            }
         </>
     )
 }

@@ -60,7 +60,7 @@ export default function FavouriteProjectsWidget() {
     }, [])
 
     return (
-        <div className="ot-section-body-padded">
+        <>
             <ProjectList projects={projects}/>
             {
                 (!projects || projects.length === 0) && <Empty
@@ -72,6 +72,6 @@ export default function FavouriteProjectsWidget() {
                     }
                 />
             }
-        </div>
+        </>
     )
 }

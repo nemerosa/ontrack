@@ -64,20 +64,22 @@ export default function DashboardWidgetCellWrapper({widget}) {
                     </>
                 }
             >
-                {
-                    !widgetEdition &&
-                    <Dynamic
-                        path={`widgets/${widget.key}Widget`}
-                        props={widget.config}
-                    />
-                }
-                {
-                    widgetEdition &&
-                    <Dynamic
-                        path={`widgets/${widget.key}WidgetForm`}
-                        props={widget.config}
-                    />
-                }
+                <div className="ot-section-body-padded">
+                    {
+                        !widgetEdition &&
+                        <Dynamic
+                            path={`widgets/${widget.key}Widget`}
+                            props={widget.config}
+                        />
+                    }
+                    {
+                        widgetEdition &&
+                        <Dynamic
+                            path={`widgets/${widget.key}WidgetForm`}
+                            props={widget.config}
+                        />
+                    }
+                </div>
             </GridCell>
         </>
     )

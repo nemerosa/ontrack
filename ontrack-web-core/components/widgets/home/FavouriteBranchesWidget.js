@@ -57,7 +57,7 @@ export default function FavouriteBranchesWidget({project}) {
     }, [client, project, favouriteRefreshCount]);
 
     return (
-        <div className="ot-section-body-padded">
+        <>
             <BranchList
                 branches={branches}
                 showProject={!project}
@@ -68,6 +68,6 @@ export default function FavouriteBranchesWidget({project}) {
                     description="No branch has been marked as a favourite in any project."
                 />
             }
-        </div>
+        </>
     )
 }
