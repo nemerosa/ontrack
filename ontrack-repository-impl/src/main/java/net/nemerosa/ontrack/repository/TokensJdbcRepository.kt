@@ -103,7 +103,8 @@ class TokensJdbcRepository(dataSource: DataSource) : AbstractJdbcRepository(data
             value = rs.getString("VALUE"),
             scope = TokenScope.valueOf(rs.getString("SCOPE")),
             creation = dateTimeFromDB(rs.getString("CREATION"))!!,
-            validUntil = dateTimeFromDB(rs.getString("VALID_UNTIL"))
+            validUntil = dateTimeFromDB(rs.getString("VALID_UNTIL")),
+            lastUsed = dateTimeFromDB(rs.getString("LAST_USED")),
         )
     }
 }

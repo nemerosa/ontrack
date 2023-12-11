@@ -101,7 +101,7 @@ class TokensServiceImpl(
         } else {
             null
         }
-        val tokenObject = Token(options.name, token, creation, options.scope, validUntil)
+        val tokenObject = Token(options.name, token, creation, options.scope, validUntil, lastUsed = null)
         // Saves the token...
         tokensRepository.save(accountId, options.name, token, options.scope, tokenObject.creation, tokenObject.validUntil)
         // ... and returns it
