@@ -30,7 +30,7 @@ class DashboardServiceIT : AbstractDSLTestSupport() {
                             uuid = "0",
                             key = "home/LastActiveProjects",
                             config = mapOf("count" to 10).asJson(),
-                            layout = WidgetLayout(x = 0, y = 0, w = 12, h = 1),
+                            layout = WidgetLayout(x = 0, y = 0, w = 12, h = 4),
                         )
                     ),
                     dashboard.widgets
@@ -53,7 +53,7 @@ class DashboardServiceIT : AbstractDSLTestSupport() {
                             uuid = "0",
                             key = "home/LastActiveProjects",
                             config = mapOf("count" to 10).asJson(),
-                            layout = WidgetLayout(x = 0, y = 0, w = 12, h = 1),
+                            layout = WidgetLayout(x = 0, y = 0, w = 12, h = 4),
                         )
                     ),
                     dashboard.widgets
