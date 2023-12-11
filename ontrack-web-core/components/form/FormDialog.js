@@ -1,4 +1,4 @@
-import {Form, Modal} from "antd";
+import {Button, Form, Modal, Space} from "antd";
 import {useState} from "react";
 import FormErrors from "@components/form/FormErrors";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
@@ -78,14 +78,25 @@ export default function FormDialog({dialog, onValuesChange, children}) {
                 closable={false}
                 confirmLoading={loading}
                 onCancel={onCancel}
-                onOk={onSubmit}
+                footer={null}
             >
                 <Form
                     layout="vertical"
                     form={form}
+                    onFinish={onSubmit}
                     onValuesChange={onValuesChange}
                 >
                     {children}
+                    <Form.Item>
+                        <Space style={{ float: 'right' }}>
+                            <Button type="default" onClick={onCancel}>
+                                Cancel
+                            </Button>
+                            <Button type="primary" htmlType="submit">
+                                OK
+                            </Button>
+                        </Space>
+                    </Form.Item>
                 </Form>
                 <FormErrors errors={formErrors}/>
             </Modal>
