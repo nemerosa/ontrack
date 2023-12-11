@@ -65,4 +65,9 @@ interface TokensRepository {
      */
     fun updateLastUsed(token: Token, lastUsed: LocalDateTime)
 
+    /**
+     * Given a token, updates its validity
+     */
+    fun updateValidUntil(token: Token, validUntil: LocalDateTime)
+
 }

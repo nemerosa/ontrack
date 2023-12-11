@@ -1,7 +1,5 @@
 package net.nemerosa.ontrack.service.security
 
-import com.github.benmanes.caffeine.cache.Cache
-import com.github.benmanes.caffeine.cache.Caffeine
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.model.security.Account
 import net.nemerosa.ontrack.model.security.AccountManagement
@@ -14,6 +12,7 @@ import net.nemerosa.ontrack.repository.TokensRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Duration
+import java.time.LocalDateTime
 
 @Service
 @Transactional
@@ -24,11 +23,6 @@ class TokensServiceImpl(
     private val ontrackConfigProperties: OntrackConfigProperties,
     private val accountService: AccountService
 ) : TokensService {
-
-    private val cache: Cache<String, Boolean> = Caffeine.newBuilder()
-        .maximumSize(ontrackConfigProperties.security.tokens.cache.maxCount)
-        .expireAfterAccess(ontrackConfigProperties.security.tokens.cache.validity)
-        .build()
 
     @Deprecated("Use named tokens")
     override val currentToken: Token?
@@ -79,6 +73,10 @@ class TokensServiceImpl(
         )
     }
 
+    private fun transientValidity() = ontrackConfigProperties.security.tokens.transientValidity
+        .takeIf { !it.isZero }
+        ?: OntrackConfigProperties.TokensProperties.DEFAULT_TRANSIENT_VALIDITY
+
     override fun generateToken(accountId: Int, options: TokenOptions): Token {
         securityService.checkGlobalFunction(AccountManagement::class.java)
         // Generates a new token
@@ -86,9 +84,7 @@ class TokensServiceImpl(
         // Validity
         val systemValidity = ontrackConfigProperties.security.tokens.validity
         val actualValidity = if (options.scope.transient) {
-            ontrackConfigProperties.security.tokens.transientValidity
-                .takeIf { !it.isZero }
-                ?: OntrackConfigProperties.TokensProperties.DEFAULT_TRANSIENT_VALIDITY
+            transientValidity()
         } else if (options.forceUnlimited) {
             options.validity
         } else {
@@ -103,7 +99,14 @@ class TokensServiceImpl(
         }
         val tokenObject = Token(options.name, token, creation, options.scope, validUntil, lastUsed = null)
         // Saves the token...
-        tokensRepository.save(accountId, options.name, token, options.scope, tokenObject.creation, tokenObject.validUntil)
+        tokensRepository.save(
+            accountId,
+            options.name,
+            token,
+            options.scope,
+            tokenObject.creation,
+            tokenObject.validUntil
+        )
         // ... and returns it
         return tokenObject
     }
@@ -118,9 +121,7 @@ class TokensServiceImpl(
         val account = securityService.currentAccount?.account
         // Revokes its token
         account?.apply {
-            val token = tokensRepository.invalidate(id(), name)
-            // Removes any cache token
-            token?.let { cache.invalidate(token) }
+            tokensRepository.invalidate(id(), name)
         }
     }
 
@@ -144,50 +145,35 @@ class TokensServiceImpl(
         return getTokens(accountService.getAccount(ID.of(accountId)))
     }
 
-    override fun isValid(token: String): Boolean {
-        if (ontrackConfigProperties.security.tokens.cache.enabled) {
-            val valid = cache.getIfPresent(token)
-            return if (valid != null) {
-                valid
-            } else {
-                val stillValid = internalValidityCheck(token)
-                cache.put(token, stillValid)
-                return stillValid
-            }
-        } else {
-            return internalValidityCheck(token)
+    override fun isValid(token: String): Boolean = tokensRepository
+        .findAccountByToken(token)
+        ?.let { (_, result) ->
+            result.isValid()
         }
-    }
+        ?: false
 
-    private fun internalValidityCheck(token: String): Boolean =
-        tokensRepository
-            .findAccountByToken(token)
-            ?.let { (_, result) ->
-                result.isValid()
-            }
-            ?: false
-
-    override fun findAccountByToken(token: String): TokenAccount? {
+    override fun findAccountByToken(token: String, refTime: LocalDateTime): TokenAccount? {
         // Find the account ID
         val result = tokensRepository.findAccountByToken(token)
         return result?.let { (accountId, token) ->
-            // Last used date
-            val lastUsed = Time.now()
             // Updating the "last used" date
-            tokensRepository.updateLastUsed(token, lastUsed)
+            tokensRepository.updateLastUsed(token, refTime)
+            // If transient token, increases the validity
+            if (token.scope.transient) {
+                tokensRepository.updateValidUntil(token, refTime + transientValidity())
+            }
             // OK, returning the account AND the token
             TokenAccount(
                 securityService.asAdmin {
                     accountService.getAccount(ID.of(accountId))
                 },
-                token.withLastUsed(lastUsed)
+                token.withLastUsed(refTime)
             )
         }
     }
 
     override fun revokeAll(): Int {
         securityService.checkGlobalFunction(AccountManagement::class.java)
-        cache.invalidateAll()
         return tokensRepository.revokeAll()
     }
 
@@ -198,15 +184,11 @@ class TokensServiceImpl(
 
     override fun revokeToken(accountId: Int, name: String) {
         securityService.checkGlobalFunction(AccountManagement::class.java)
-        val token = tokensRepository.invalidate(accountId, name)
-        token?.let { cache.invalidate(token) }
+        tokensRepository.invalidate(accountId, name)
     }
 
     override fun revokeAllTokens(accountId: Int) {
         securityService.checkGlobalFunction(AccountManagement::class.java)
-        val tokens = tokensRepository.invalidateAll(accountId)
-        tokens.forEach { token ->
-            cache.invalidate(token)
-        }
+        tokensRepository.invalidateAll(accountId)
     }
 }

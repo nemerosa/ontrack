@@ -223,6 +223,7 @@ class OntrackConfigProperties {
     /**
      * Token cache properties
      */
+    @Deprecated("Will be removed in V5")
     class TokensCacheProperties {
         /**
          * Is caching of the tokens enabled?

@@ -107,6 +107,16 @@ class TokensJdbcRepository(dataSource: DataSource) : AbstractJdbcRepository(data
         )
     }
 
+    override fun updateValidUntil(token: Token, validUntil: LocalDateTime) {
+        namedParameterJdbcTemplate!!.update(
+            "UPDATE TOKENS SET VALID_UNTIL = :validUntil WHERE VALUE = :token",
+            mapOf(
+                "validUntil" to dateTimeForDB(validUntil),
+                "token" to token.value,
+            )
+        )
+    }
+
     private fun toToken(rs: ResultSet): Token {
         return Token(
             name = rs.getString("NAME"),

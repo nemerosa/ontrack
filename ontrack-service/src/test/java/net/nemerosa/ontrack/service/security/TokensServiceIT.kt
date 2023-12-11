@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.service.security
 
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.security.Account
@@ -297,6 +299,38 @@ class TokensServiceIT : AbstractDSLTestSupport() {
             asAdmin {
                 val firstToken = tokensService.getTokens(tokenAccount.account).first()
                 assertNotNull(firstToken.lastUsed, "Last used date has been set")
+            }
+        }
+    }
+
+    @Test
+    fun `Transient tokens are automatically prolongated`() {
+        withCustomTokenTransientValidityDuration(Duration.ofHours(2)) {
+            asUser {
+                val token = tokensService.generateNewToken(
+                    TokenOptions(
+                        name = "test",
+                        scope = TokenScope.NEXT_UI,
+                    )
+                )
+                assertNull(token.lastUsed, "Last used date not set on creation")
+                val initialValidUntil = token.validUntil
+                assertNotNull(initialValidUntil, "Validation period set")
+                assertTrue(token.isValid(Time.now() + Duration.ofHours(1)))
+                assertFalse(token.isValid(Time.now() + Duration.ofHours(3)))
+                // Waiting a bit
+                val refTime = Time.now() + Duration.ofHours(1)
+                // Getting the account for this token
+                val tokenAccount = tokensService.findAccountByToken(token.value, refTime)
+                assertNotNull(tokenAccount, "Account found")
+                // Getting the tokens for this account
+                asAdmin {
+                    val firstToken = tokensService.getTokens(tokenAccount.account).first()
+                    assertNotNull(firstToken.lastUsed, "Last used date has been set")
+                    assertNotNull(firstToken.validUntil, "Validity still set") { newValidUntil ->
+                        assertTrue(newValidUntil > initialValidUntil, "Validity has been prolongated")
+                    }
+                }
             }
         }
     }
