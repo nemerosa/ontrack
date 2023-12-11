@@ -43,6 +43,7 @@ angular.module('ot.view.user-profile', [
                             value
                             scope
                             creation
+                            lastUsed
                             validUntil
                             valid
                           }
