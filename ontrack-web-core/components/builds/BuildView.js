@@ -66,7 +66,7 @@ export default function BuildView({id}) {
                 setBuild(data.build)
                 setLoadingBuild(false)
                 setCommands([
-                    <StoredGridLayoutResetCommand/>,
+                    <StoredGridLayoutResetCommand key="reset"/>,
                     <LegacyLinkCommand
                         key="legacy"
                         href={buildLegacyUri(data.build)}

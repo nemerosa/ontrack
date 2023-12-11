@@ -16,7 +16,7 @@ export default function DashboardPage({title}) {
             text="Legacy home"
             title="Goes to the legacy home page"
         />,
-        <DashboardCommandMenu/>,
+        <DashboardCommandMenu key="dashboard"/>,
     ]
 
     return (

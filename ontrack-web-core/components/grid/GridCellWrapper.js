@@ -22,3 +22,5 @@ export const GridCellWrapper = React.forwardRef(({
         </div>
     )
 })
+
+GridCellWrapper.displayName = "GridCellWrapper"
