@@ -171,11 +171,16 @@ class TokensServiceImpl(
         // Find the account ID
         val result = tokensRepository.findAccountByToken(token)
         return result?.let { (accountId, token) ->
+            // Last used date
+            val lastUsed = Time.now()
+            // Updating the "last used" date
+            tokensRepository.updateLastUsed(token, lastUsed)
+            // OK, returning the account AND the token
             TokenAccount(
                 securityService.asAdmin {
                     accountService.getAccount(ID.of(accountId))
                 },
-                token
+                token.withLastUsed(lastUsed)
             )
         }
     }

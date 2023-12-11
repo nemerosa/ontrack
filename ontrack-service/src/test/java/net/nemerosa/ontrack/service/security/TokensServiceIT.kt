@@ -285,6 +285,22 @@ class TokensServiceIT : AbstractDSLTestSupport() {
         }
     }
 
+    @Test
+    fun `Getting an account for a given token set the last used date`() {
+        asUser {
+            val token = tokensService.generateNewToken(TokenOptions("test"))
+            assertNull(token.lastUsed, "Last used date not set on creation")
+            // Getting the account for this token
+            val tokenAccount = tokensService.findAccountByToken(token.value)
+            assertNotNull(tokenAccount, "Account found")
+            // Getting the tokens for this account
+            asAdmin {
+                val firstToken = tokensService.getTokens(tokenAccount.account).first()
+                assertNotNull(firstToken.lastUsed, "Last used date has been set")
+            }
+        }
+    }
+
     private fun accountWithToken(): Account {
         return asUser {
             tokensService.generateNewToken(TokenOptions("test"))

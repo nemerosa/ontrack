@@ -69,4 +69,16 @@ data class Token(
      * Validity now
      */
     val valid: Boolean get() = isValid()
+
+    /**
+     * Setting the last used date
+     */
+    fun withLastUsed(lastUsed: LocalDateTime) = Token(
+        name = name,
+        value = value,
+        creation = creation,
+        scope = scope,
+        validUntil = validUntil,
+        lastUsed = lastUsed,
+    )
 }
