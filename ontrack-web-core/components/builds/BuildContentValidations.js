@@ -24,7 +24,7 @@ export default function BuildContentValidations({build}) {
 
     const [pageRequest, setPageRequest] = useState({
         offset: 0,
-        size: 5,
+        size: 10,
     })
 
     // Filters
@@ -58,7 +58,7 @@ export default function BuildContentValidations({build}) {
 
     const [pagination, setPagination] = useState({
         current: 1,
-        pageSize: 5,
+        pageSize: 10,
         total: 0,
     })
 
@@ -303,6 +303,7 @@ export default function BuildContentValidations({build}) {
                     columns={columns}
                     pagination={pagination}
                     onChange={onTableChange}
+                    size="small"
                 />
             </GridCell>
         </>
