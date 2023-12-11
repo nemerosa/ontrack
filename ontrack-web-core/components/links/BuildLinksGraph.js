@@ -332,7 +332,7 @@ function BuildLinksFlow({build}) {
 
     return (
         <>
-            <div style={{height: '400px'}}>
+            <div style={{height: '100%'}}>
                 <ReactFlow
                     nodes={nodes}
                     edges={edges}

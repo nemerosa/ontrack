@@ -114,6 +114,7 @@ button.ot-validation-stamp-filter-edition {
 
 .ot-section-title-header {
     font-weight: bold;
+    height: 60px;
     padding: 1em;
     background-color: lightgray;
 }
@@ -123,7 +124,7 @@ button.ot-validation-stamp-filter-edition {
 }
 
 .ot-section-body {
-    height: 100%;
+    height: calc(100% - 60px);
     overflow-y: auto;
     overflow-x: hidden;
 }
