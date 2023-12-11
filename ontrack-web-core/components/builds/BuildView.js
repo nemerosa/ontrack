@@ -13,8 +13,8 @@ import {Space} from "antd";
 import Decorations from "@components/framework/decorations/Decorations";
 import BuildInfoViewDrawer from "@components/builds/BuildInfoViewDrawer";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
-import GridLayoutResetCommand from "@components/grid/GridLayoutResetCommand";
-import GridLayoutContextProvider from "@components/grid/GridLayoutContextProvider";
+import StoredGridLayoutResetCommand from "@components/grid/StoredGridLayoutResetCommand";
+import StoredGridLayoutContextProvider from "@components/grid/StoredGridLayoutContext";
 
 export default function BuildView({id}) {
 
@@ -66,7 +66,7 @@ export default function BuildView({id}) {
                 setBuild(data.build)
                 setLoadingBuild(false)
                 setCommands([
-                    <GridLayoutResetCommand/>,
+                    <StoredGridLayoutResetCommand/>,
                     <LegacyLinkCommand
                         key="legacy"
                         href={buildLegacyUri(data.build)}
@@ -84,7 +84,7 @@ export default function BuildView({id}) {
             <Head>
                 {buildTitle(build)}
             </Head>
-            <GridLayoutContextProvider>
+            <StoredGridLayoutContextProvider>
                 <MainPage
                     title={
                         <Space>
@@ -100,7 +100,7 @@ export default function BuildView({id}) {
                         <BuildInfoViewDrawer build={build} loading={loadingBuild}/>
                     </LoadingContainer>
                 </MainPage>
-            </GridLayoutContextProvider>
+            </StoredGridLayoutContextProvider>
         </>
     )
 }

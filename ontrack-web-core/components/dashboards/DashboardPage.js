@@ -4,6 +4,7 @@ import DashboardContextProvider from "@components/dashboards/DashboardContextPro
 import DashboardView from "@components/dashboards/DashboardView";
 import {LegacyLinkCommand} from "@components/common/Commands";
 import DashboardCommandMenu from "@components/dashboards/DashboardCommandMenu";
+import GridTableContextProvider from "@components/grid/GridTableContext";
 
 export default function DashboardPage({title}) {
 
@@ -20,15 +21,17 @@ export default function DashboardPage({title}) {
 
     return (
         <>
-            <DashboardContextProvider>
-                <MainPage
-                    title={title}
-                    breadcrumbs={[]}
-                    commands={commands}
-                >
-                    <DashboardView/>
-                </MainPage>
-            </DashboardContextProvider>
+            <GridTableContextProvider>
+                <DashboardContextProvider>
+                    <MainPage
+                        title={title}
+                        breadcrumbs={[]}
+                        commands={commands}
+                    >
+                        <DashboardView/>
+                    </MainPage>
+                </DashboardContextProvider>
+            </GridTableContextProvider>
         </>
     )
 }

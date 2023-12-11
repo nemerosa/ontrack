@@ -1,4 +1,4 @@
-import {createContext, useEffect, useState} from "react";
+import {createContext, useContext, useEffect, useState} from "react";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
 import {
@@ -9,6 +9,7 @@ import {
     shareDashboardQuery
 } from "@components/dashboards/DashboardConstants";
 import {Modal} from "antd";
+import {GridTableContext} from "@components/grid/GridTableContext";
 
 export const DashboardContext = createContext({
     /**
@@ -23,15 +24,6 @@ export const DashboardContext = createContext({
      * Selecting a dashboard
      */
     selectDashboard: (value) => {
-    },
-    /**
-     * Expanded widget if any
-     */
-    expandedWidget: '',
-    /**
-     * Selecting the widget to be expanded
-     */
-    setExpandedWidget: (uuid) => {
     },
     /**
      * Refreshing the dashboard
@@ -91,11 +83,10 @@ export const DashboardContext = createContext({
 export default function DashboardContextProvider({children}) {
 
     const client = useGraphQLClient()
+    const {clearExpandedId, setExpandable} = useContext(GridTableContext)
 
     const [dashboard, setDashboard] = useState()
     const [dashboardRefresh, setDashboardRefresh] = useState(0)
-
-    const [expandedWidget, setExpandedWidget] = useState('')
 
     const [edition, setEdition] = useState(false)
     const [saving, setSaving] = useState(false)
@@ -147,7 +138,7 @@ export default function DashboardContextProvider({children}) {
 
     const selectDashboard = (value) => {
         if (dashboard?.uuid !== value.uuid) {
-            setExpandedWidget(undefined)
+            clearExpandedId()
             setEdition(false)
             setDashboard(value)
             client.request(
@@ -203,7 +194,8 @@ export default function DashboardContextProvider({children}) {
                 }))
             })
             // Stopping any expansion
-            setExpandedWidget(undefined)
+            clearExpandedId()
+            setExpandable(false)
             // Starting the edition
             setEdition(true)
         }
@@ -213,8 +205,8 @@ export default function DashboardContextProvider({children}) {
         if (edition && copyDashboard) {
             setDashboard(copyDashboard)
             setCopyDashboard(null)
-            setExpandedWidget(undefined)
             setEdition(false)
+            setExpandable(true)
         }
     }
 
@@ -231,6 +223,7 @@ export default function DashboardContextProvider({children}) {
                 refresh()
             }).finally(() => {
                 setSaving(false)
+                setExpandable(true)
             })
         }
         setCopyDashboard(null)
@@ -279,8 +272,6 @@ export default function DashboardContextProvider({children}) {
         dashboard,
         recordLayout,
         selectDashboard,
-        expandedWidget,
-        setExpandedWidget,
         refresh,
         shareDashboard,
         deleteDashboard,

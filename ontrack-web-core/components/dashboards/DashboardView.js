@@ -7,6 +7,7 @@ import {useGraphQLClient} from "@components/providers/ConnectionContextProvider"
 import {gql} from "graphql-request";
 import SelectableWidget from "@components/dashboards/SelectableWidget";
 import {v4} from "uuid";
+import GridTable from "@components/grid/GridTable";
 
 export default function DashboardView() {
 
@@ -18,7 +19,6 @@ export default function DashboardView() {
     const {
         dashboard,
         recordLayout,
-        expandedWidget,
         edition,
         saving,
         saveEdition,
@@ -27,7 +27,7 @@ export default function DashboardView() {
     } = useContext(DashboardContext)
 
     const [layout, setLayout] = useState([])
-    const [items, setItems] = useState({})
+    const [items, setItems] = useState([])
 
     const computeLayout = () => {
         return dashboard.widgets.map(widget => ({
@@ -53,13 +53,10 @@ export default function DashboardView() {
         }
     }
 
-    const buildWidgetItems = (widgets) => widgets.reduce(
-        (map, widget) => {
-            map[widget.uuid] = <DashboardWidgetCell key={widget.uuid} widget={widget}/>
-            return map
-        }
-        , {}
-    )
+    const buildWidgetItems = (widgets) => widgets.map(widget => ({
+        id: widget.uuid,
+        content: <DashboardWidgetCell widget={widget}/>,
+    }))
 
     useEffect(() => {
         if (dashboard) {
@@ -78,31 +75,6 @@ export default function DashboardView() {
         setLayout(newLayout)
         recordLayout(newLayout)
     }
-
-    useEffect(() => {
-        if (dashboard) {
-            if (expandedWidget) {
-                const widget = dashboard.widgets.find(it => it.uuid === expandedWidget)
-                if (widget) {
-                    setLayout([{
-                        i: widget.uuid,
-                        x: 0,
-                        y: 0,
-                        w: 12,
-                        h: Math.max(maxYH(), defaultNewHeight * 2),
-                    }])
-                    setItems(buildWidgetItems([widget]))
-                } else {
-                    setLayout(computeLayout())
-                    setItems(buildWidgetItems(dashboard.widgets))
-                }
-            } else {
-                // No expansion any longer, restoring initial layout
-                setLayout(computeLayout())
-                setItems(buildWidgetItems(dashboard.widgets))
-            }
-        }
-    }, [dashboard, expandedWidget]);
 
     const [availableWidgets, setAvailableWidgets] = useState([])
     useEffect(() => {
@@ -148,7 +120,7 @@ export default function DashboardView() {
         <>
             {
                 dashboard && !edition && layout && items &&
-                <GridLayout
+                <GridTable
                     layout={layout}
                     items={items}
                     rowHeight={rowHeight}
@@ -158,13 +130,11 @@ export default function DashboardView() {
                 dashboard && edition &&
                 <Row>
                     <Col span={18}>
-                        <GridLayout
+                        <GridTable
                             layout={layout}
                             items={items}
                             rowHeight={rowHeight}
-                            setLayout={changeLayout}
-                            isDraggable={true}
-                            isResizable={true}
+                            onLayoutChange={changeLayout}
                         />
                     </Col>
                     <Col span={6} style={{

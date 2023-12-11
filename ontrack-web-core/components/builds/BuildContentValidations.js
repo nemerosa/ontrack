@@ -261,7 +261,8 @@ export default function BuildContentValidations({build}) {
 
     return (
         <>
-            <GridCell title="Validations"
+            <GridCell id="validations"
+                      title="Validations"
                       titleWidth={6}
                       loading={loading}
                       padding={false}
