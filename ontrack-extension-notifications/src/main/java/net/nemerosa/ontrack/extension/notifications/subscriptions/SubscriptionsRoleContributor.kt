@@ -36,6 +36,10 @@ class SubscriptionsRoleContributor : RoleContributor {
                 ProjectSubscriptionsRead::class.java,
                 ProjectSubscriptionsWrite::class.java,
             ),
+            Roles.GLOBAL_AUTOMATION to listOf(
+                ProjectSubscriptionsRead::class.java,
+                ProjectSubscriptionsWrite::class.java,
+            ),
             Roles.GLOBAL_PARTICIPANT to listOf(
                 ProjectSubscriptionsRead::class.java
             )
