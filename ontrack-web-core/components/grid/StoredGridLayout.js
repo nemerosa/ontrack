@@ -12,8 +12,8 @@ export default function StoredGridLayout({id, defaultLayout, items, rowHeight = 
         const value = localStorage.getItem(id)
         if (value) {
             setLayout(JSON.parse(value))
-            setLoaded(true)
         }
+        setLoaded(true)
     }, []);
 
     const {resetLayoutCount} = useContext(StoredGridLayoutContext)
