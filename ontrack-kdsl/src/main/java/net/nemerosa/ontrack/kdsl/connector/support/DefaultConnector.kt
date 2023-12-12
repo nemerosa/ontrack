@@ -43,8 +43,10 @@ class DefaultConnector(
         override val statusCode: Int
             get() = response.statusCodeValue
         override val body: ConnectorResponseBody = object : ConnectorResponseBody {
+            override fun asTextOrNull(charset: Charset): String? =
+                    response.body?.toString(charset)
             override fun asText(charset: Charset): String =
-                response.body?.toString(charset) ?: ""
+                    asTextOrNull(charset) ?: ""
         }
     }
 

@@ -5,13 +5,18 @@ import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannel
 import net.nemerosa.ontrack.extension.notifications.model.Notification
 import net.nemerosa.ontrack.extension.notifications.queue.NotificationQueue
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscription
+import net.nemerosa.ontrack.json.JsonParseException
 import net.nemerosa.ontrack.model.events.Event
+import net.nemerosa.ontrack.model.structure.NameDescription
+import net.nemerosa.ontrack.model.support.ApplicationLogEntry
+import net.nemerosa.ontrack.model.support.ApplicationLogService
 import org.springframework.stereotype.Component
 
 @Component
 class DefaultNotificationDispatcher(
     private val notificationChannelRegistry: NotificationChannelRegistry,
     private val notificationQueue: NotificationQueue,
+    private val applicationLogService: ApplicationLogService,
 ) : NotificationDispatcher {
 
     override fun dispatchEvent(event: Event, eventSubscription: EventSubscription): NotificationDispatchingResult {
@@ -51,6 +56,17 @@ class DefaultNotificationDispatcher(
             notificationQueue.publish(item)
         } else {
             // Log the channel validation message as an error
+            applicationLogService.log(
+                ApplicationLogEntry.error(
+                    channelConfig.exception,
+                    NameDescription.nd("notification-channel-config-invalid", "Notification channel configuration invalid"),
+                    "Cannot validate the configuration for a channel"
+                ).withDetail(
+                    "channelConfig", eventSubscription.channelConfig.toPrettyString()
+                ).withDetail(
+                    "channelConfigMessage", channelConfig.message
+                )
+            )
             // Not processed
             false
         }

@@ -8,6 +8,7 @@ import lombok.experimental.Wither;
 import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.model.structure.NameDescription;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -43,8 +44,12 @@ public class ApplicationLogEntry {
         return create(ApplicationLogEntryLevel.ERROR, exception, type, information);
     }
 
-    private static ApplicationLogEntry create(ApplicationLogEntryLevel level, Throwable exception, NameDescription type, String information) {
-        return new ApplicationLogEntry(
+    public static ApplicationLogEntry error(NameDescription type, String information) {
+        return create(ApplicationLogEntryLevel.ERROR, null, type, information);
+    }
+
+    private static ApplicationLogEntry create(ApplicationLogEntryLevel level, @Nullable Throwable exception, NameDescription type, String information) {
+        ApplicationLogEntry entry = new ApplicationLogEntry(
                 level,
                 Time.now(),
                 null,
@@ -52,7 +57,12 @@ public class ApplicationLogEntry {
                 information,
                 null,
                 Collections.emptyMap()
-        ).withStacktrace(ExceptionUtils.getStackTrace(exception));
+        );
+        if (exception != null) {
+            return entry.withStacktrace(ExceptionUtils.getStackTrace(exception));
+        } else {
+            return entry;
+        }
     }
 
     public ApplicationLogEntry withDetail(String name, String value) {
