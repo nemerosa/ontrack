@@ -12,7 +12,7 @@ abstract class AbstractNotificationChannel<C : Any>(
         val config = channelConfig.parseInto(configClass)
         ValidatedNotificationChannelConfig.config(config)
     } catch (ex: Exception) {
-        ValidatedNotificationChannelConfig.message(ex.message ?: "Cannot parse channel configuration")
+        ValidatedNotificationChannelConfig.error(ex)
     }
 
 }
