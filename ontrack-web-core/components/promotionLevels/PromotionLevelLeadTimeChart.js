@@ -1,13 +1,24 @@
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {useEffect, useState} from "react";
 import {gql} from "graphql-request";
-import {Bar, BarChart, CartesianGrid, Legend, Rectangle, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
+import {
+    Bar,
+    BarChart,
+    CartesianGrid,
+    ComposedChart,
+    Legend, Line,
+    Rectangle,
+    ResponsiveContainer,
+    Tooltip,
+    XAxis,
+    YAxis
+} from "recharts";
 
 export default function PromotionLevelLeadTimeChart({promotionLevel}) {
 
     const client = useGraphQLClient()
 
-    const [meanData, setMeanData] = useState([])
+    const [dataPoints, setDataPoints] = useState([])
 
     useEffect(() => {
         if (client && promotionLevel) {
@@ -17,7 +28,7 @@ export default function PromotionLevelLeadTimeChart({promotionLevel}) {
                         getChart(input: {
                             name: "promotion-level-lead-time",
                             options: {
-                                interval: "1y",
+                                interval: "3m",
                                 period: "1w",
                             },
                             parameters: $parameters,
@@ -41,11 +52,13 @@ export default function PromotionLevelLeadTimeChart({promotionLevel}) {
                  *     maximum: [],
                  * }
                  */
-                setMeanData(
+                setDataPoints(
                     chart.dates.map((date, index) => {
                         return {
                             date,
-                            value: chart.data.mean[index],
+                            mean: chart.data.mean[index],
+                            percentile90: chart.data.percentile90[index],
+                            maximum: chart.data.maximum[index],
                         }
                     })
                 )
@@ -56,16 +69,18 @@ export default function PromotionLevelLeadTimeChart({promotionLevel}) {
     return (
         <>
             <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                    data={meanData}
+                <ComposedChart
+                    data={dataPoints}
                 >
                     <CartesianGrid strokeDasharray="3 3"/>
                     <XAxis dataKey="date" angle={-45} tickMargin={30} height={80} interval="preserveStart"/>
                     <YAxis/>
                     <Tooltip/>
                     <Legend/>
-                    <Bar dataKey="value" fill="#8884d8"/>
-                </BarChart>
+                    <Bar dataKey="mean" fill="#6666aa"/>
+                    <Line type="monotone" connectNulls={true} dataKey="percentile90" stroke="#66aa66"/>
+                    <Line type="monotone" connectNulls={true} dataKey="maximum" stroke="#aa6666"/>
+                </ComposedChart>
             </ResponsiveContainer>
         </>
     )
