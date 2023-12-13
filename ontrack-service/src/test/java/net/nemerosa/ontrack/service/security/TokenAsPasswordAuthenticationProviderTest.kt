@@ -1,15 +1,14 @@
 package net.nemerosa.ontrack.service.security
 
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import io.mockk.every
+import io.mockk.mockk
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.test.assertIs
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.springframework.security.authentication.CredentialsExpiredException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import java.time.Duration
@@ -23,10 +22,10 @@ class TokenAsPasswordAuthenticationProviderTest {
     private val ontrackConfigProperties = OntrackConfigProperties()
     private lateinit var provider: TokenAsPasswordAuthenticationProvider
 
-    @Before
+    @BeforeEach
     fun before() {
-        tokensService = mock()
-        accountService = mock()
+        tokensService = mockk()
+        accountService = mockk()
         provider = TokenAsPasswordAuthenticationProvider(
             tokensService,
             accountService,
@@ -95,7 +94,7 @@ class TokenAsPasswordAuthenticationProviderTest {
                 lastUsed = null,
             )
         )
-        whenever(tokensService.findAccountByToken("xxx")).thenReturn(tokenAccount)
+        every { tokensService.findAccountByToken("xxx", any()) } returns tokenAccount
         assertFailsWith<TokenNameMismatchException> {
             provider.authenticate(auth)
         }
@@ -124,7 +123,7 @@ class TokenAsPasswordAuthenticationProviderTest {
                 lastUsed = null,
             )
         )
-        whenever(tokensService.findAccountByToken("xxx")).thenReturn(tokenAccount)
+        every { tokensService.findAccountByToken("xxx", any()) } returns tokenAccount
         assertFailsWith<CredentialsExpiredException> {
             provider.authenticate(auth)
         }
@@ -153,9 +152,9 @@ class TokenAsPasswordAuthenticationProviderTest {
                 lastUsed = null,
             )
         )
-        whenever(tokensService.findAccountByToken("xxx")).thenReturn(tokenAccount)
-        val user = mock<OntrackAuthenticatedUser>()
-        whenever(accountService.withACL(any())).thenReturn(user)
+        every { tokensService.findAccountByToken("xxx", any()) } returns tokenAccount
+        val user = mockk<OntrackAuthenticatedUser>()
+        every { accountService.withACL(any()) } returns user
         val result = provider.authenticate(auth)
         assertNotNull(result) { authenticated ->
             assertIs<UsernamePasswordAuthenticationToken>(authenticated) { u ->
