@@ -13,6 +13,7 @@ import {
     XAxis,
     YAxis
 } from "recharts";
+import {formatSeconds} from "@components/common/Duration";
 
 export default function PromotionLevelLeadTimeChart({promotionLevel}) {
 
@@ -85,6 +86,10 @@ export default function PromotionLevelLeadTimeChart({promotionLevel}) {
         }
     }
 
+    const durationFormatter = (value) => {
+        return formatSeconds(value, "-")
+    }
+
     return (
         <>
             <ResponsiveContainer width="100%" height="100%">
@@ -93,8 +98,8 @@ export default function PromotionLevelLeadTimeChart({promotionLevel}) {
                 >
                     <CartesianGrid strokeDasharray="3 3"/>
                     <XAxis dataKey="date" angle={-45} tickMargin={30} height={80} interval="preserveStart"/>
-                    <YAxis/>
-                    <Tooltip/>
+                    <YAxis tickFormatter={durationFormatter}/>
+                    <Tooltip formatter={durationFormatter}/>
                     <Legend formatter={legendFormatter} onClick={legendClick} style={{cursor: 'pointer'}}/>
                     <Bar dataKey="mean" fill="#6666aa" hide={inactiveSeries.includes('mean')}/>
                     <Line type="monotone" connectNulls={true} dataKey="percentile90" stroke="#66aa66" hide={inactiveSeries.includes('percentile90')}/>
