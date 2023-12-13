@@ -11,8 +11,11 @@ import {PromotionLevelImage} from "@components/promotionLevels/PromotionLevelIma
 import LoadingContainer from "@components/common/LoadingContainer";
 import StoredGridLayout from "@components/grid/StoredGridLayout";
 import PromotionLevelLeadTimeChart from "@components/promotionLevels/PromotionLevelLeadTimeChart";
+import GridCell from "@components/grid/GridCell";
 
 export default function PromotionLevelView({id}) {
+
+    const chartLeadTime = "chart-lead-time"
 
     const client = useGraphQLClient()
 
@@ -53,13 +56,15 @@ export default function PromotionLevelView({id}) {
     }, [client, id]);
 
     const defaultLayout = [
-        {i: "chart-lead-time", x: 0, y: 0, w: 6, h: 6},
+        {i: chartLeadTime, x: 0, y: 0, w: 6, h: 6},
     ]
 
     const items = [
         {
-            id: "chart-lead-time",
-            content: <PromotionLevelLeadTimeChart promotionLevel={promotionLevel}/>,
+            id: chartLeadTime,
+            content: <GridCell id={chartLeadTime} title="Lead time to promotion">
+                <PromotionLevelLeadTimeChart promotionLevel={promotionLevel}/>
+            </GridCell>,
         },
     ]
 
