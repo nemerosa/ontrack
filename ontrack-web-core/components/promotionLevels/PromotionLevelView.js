@@ -10,6 +10,7 @@ import {promotionLevelBreadcrumbs} from "@components/common/Breadcrumbs";
 import {PromotionLevelImage} from "@components/promotionLevels/PromotionLevelImage";
 import LoadingContainer from "@components/common/LoadingContainer";
 import StoredGridLayout from "@components/grid/StoredGridLayout";
+import PromotionLevelLeadTimeChart from "@components/promotionLevels/PromotionLevelLeadTimeChart";
 
 export default function PromotionLevelView({id}) {
 
@@ -58,7 +59,7 @@ export default function PromotionLevelView({id}) {
     const items = [
         {
             id: "chart-lead-time",
-            content: "TODO Chart lead time",
+            content: <PromotionLevelLeadTimeChart promotionLevel={promotionLevel}/>,
         },
     ]
 
