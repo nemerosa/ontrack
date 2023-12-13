@@ -67,6 +67,7 @@ class TokenAsPasswordAuthenticationProviderTest {
     @Test
     fun `Token not found`() {
         val auth = UsernamePasswordAuthenticationToken("user", "xxx")
+        every { tokensService.findAccountByToken(any(), any()) } returns null
         val result = provider.authenticate(auth)
         assertNull(result)
     }

@@ -51,6 +51,7 @@ class TokenHeaderAuthenticationProviderTest {
     @Test
     fun `Token not found`() {
         val auth = TokenAuthenticationToken("xxx")
+        every { tokensService.findAccountByToken("xxx", any()) } returns null
         val result = provider.authenticate(auth)
         assertNull(result)
     }
