@@ -60,7 +60,7 @@ export default function PromotionLevelLeadTimeChart({promotionLevel}) {
                     data={meanData}
                 >
                     <CartesianGrid strokeDasharray="3 3"/>
-                    <XAxis dataKey="date"/>
+                    <XAxis dataKey="date" angle={-45} tickMargin={30} height={80} interval="preserveStart"/>
                     <YAxis/>
                     <Tooltip/>
                     <Legend/>
