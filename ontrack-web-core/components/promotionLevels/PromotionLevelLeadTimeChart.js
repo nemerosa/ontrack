@@ -74,6 +74,17 @@ export default function PromotionLevelLeadTimeChart({promotionLevel}) {
         return chart.categories[index]
     }
 
+    const [inactiveSeries, setInactiveSeries] = useState([])
+
+    const legendClick = ({dataKey}) => {
+        console.log({dataKey})
+        if (inactiveSeries.includes(dataKey)) {
+            setInactiveSeries(inactiveSeries.filter(el => el !== dataKey));
+        } else {
+            setInactiveSeries(prev => [...prev, dataKey]);
+        }
+    }
+
     return (
         <>
             <ResponsiveContainer width="100%" height="100%">
@@ -84,10 +95,10 @@ export default function PromotionLevelLeadTimeChart({promotionLevel}) {
                     <XAxis dataKey="date" angle={-45} tickMargin={30} height={80} interval="preserveStart"/>
                     <YAxis/>
                     <Tooltip/>
-                    <Legend formatter={legendFormatter}/>
-                    <Bar dataKey="mean" fill="#6666aa"/>
-                    <Line type="monotone" connectNulls={true} dataKey="percentile90" stroke="#66aa66"/>
-                    <Line type="monotone" connectNulls={true} dataKey="maximum" stroke="#aa6666"/>
+                    <Legend formatter={legendFormatter} onClick={legendClick} style={{cursor: 'pointer'}}/>
+                    <Bar dataKey="mean" fill="#6666aa" hide={inactiveSeries.includes('mean')}/>
+                    <Line type="monotone" connectNulls={true} dataKey="percentile90" stroke="#66aa66" hide={inactiveSeries.includes('percentile90')}/>
+                    <Line type="monotone" connectNulls={true} dataKey="maximum" stroke="#aa6666" hide={inactiveSeries.includes('maximum')}/>
                 </ComposedChart>
             </ResponsiveContainer>
         </>
