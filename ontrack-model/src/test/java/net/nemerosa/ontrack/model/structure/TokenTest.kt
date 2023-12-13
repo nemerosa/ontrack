@@ -27,6 +27,7 @@ class TokenTest {
                 "creation" to "2019-04-25T18:22:00Z",
                 "scope" to "USER",
                 "validUntil" to "2019-05-25T18:22:00Z",
+                "lastUsed" to null,
                 "valid" to false
             ).asJson(),
             token.asJson()
