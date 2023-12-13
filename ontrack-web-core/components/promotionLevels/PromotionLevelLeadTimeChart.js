@@ -18,6 +18,9 @@ export default function PromotionLevelLeadTimeChart({promotionLevel}) {
 
     const client = useGraphQLClient()
 
+    const [chart, setChart] = useState({
+        categories: []
+    })
     const [dataPoints, setDataPoints] = useState([])
 
     useEffect(() => {
@@ -52,6 +55,7 @@ export default function PromotionLevelLeadTimeChart({promotionLevel}) {
                  *     maximum: [],
                  * }
                  */
+                setChart(chart)
                 setDataPoints(
                     chart.dates.map((date, index) => {
                         return {
@@ -66,6 +70,10 @@ export default function PromotionLevelLeadTimeChart({promotionLevel}) {
         }
     }, [client, promotionLevel]);
 
+    const legendFormatter = (value, entry, index) => {
+        return chart.categories[index]
+    }
+
     return (
         <>
             <ResponsiveContainer width="100%" height="100%">
@@ -76,7 +84,7 @@ export default function PromotionLevelLeadTimeChart({promotionLevel}) {
                     <XAxis dataKey="date" angle={-45} tickMargin={30} height={80} interval="preserveStart"/>
                     <YAxis/>
                     <Tooltip/>
-                    <Legend/>
+                    <Legend formatter={legendFormatter}/>
                     <Bar dataKey="mean" fill="#6666aa"/>
                     <Line type="monotone" connectNulls={true} dataKey="percentile90" stroke="#66aa66"/>
                     <Line type="monotone" connectNulls={true} dataKey="maximum" stroke="#aa6666"/>
