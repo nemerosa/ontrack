@@ -49,8 +49,8 @@ export function buildLink(build, text) {
     >{text ? text : build.name}</Link>
 }
 
-export function legacyPromotionLevelUri(promotionLevel) {
-    return `#/promotionLevel/${promotionLevel.id}`
+export function promotionLevelUri(promotionLevel) {
+    return `/promotionLevel/${promotionLevel.id}`
 }
 
 export function legacyPromotionLevelImageUri(promotionLevel) {

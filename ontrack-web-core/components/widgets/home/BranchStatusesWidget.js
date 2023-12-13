@@ -2,7 +2,7 @@ import {useContext, useEffect, useState} from "react";
 import {gql} from "graphql-request";
 import {Space, Table, Typography} from "antd";
 import {FaBan} from "react-icons/fa";
-import {buildLink, legacyPromotionLevelUri, legacyValidationStampUri} from "@components/common/Links";
+import {buildLink, promotionLevelUri, legacyValidationStampUri} from "@components/common/Links";
 import ValidationRunStatus from "@components/validationRuns/ValidationRunStatus";
 import Timestamp from "@components/common/Timestamp";
 import PredefinedPromotionLevelImage from "@components/promotionLevels/PredefinedPromotionLevelImage";
@@ -13,6 +13,7 @@ import LegacyLink from "@components/common/LegacyLink";
 import BranchLink from "@components/branches/BranchLink";
 import ProjectLink from "@components/projects/ProjectLink";
 import {DashboardWidgetCellContext} from "@components/dashboards/DashboardWidgetCellContextProvider";
+import Link from "next/link";
 
 export default function BranchStatusesWidget({promotions, validations, refreshInterval, branches, title}) {
 
@@ -164,9 +165,9 @@ export default function BranchStatusesWidget({promotions, validations, refreshIn
                                             {
                                                 <Space size={8}>
                                                     {buildLink(run.build)}
-                                                    <LegacyLink href={legacyPromotionLevelUri(run.promotionLevel)}>
+                                                    <Link href={promotionLevelUri(run.promotionLevel)}>
                                                         <Typography.Text type="secondary">[history]</Typography.Text>
-                                                    </LegacyLink>
+                                                    </Link>
                                                 </Space>
                                             }
                                             <Timestamp value={run.creation.time}/>
