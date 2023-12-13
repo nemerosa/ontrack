@@ -71,11 +71,12 @@ class TokenHeaderAuthenticationProviderTest {
                 locked = false,
             ),
             token = Token(
-                "default",
-                "xxx",
-                Time.now() - Duration.ofHours(24),
-                TokenScope.USER,
-                Time.now() - Duration.ofHours(12) // Stopped being valid 12 hours ago
+                name = "default",
+                value = "xxx",
+                creation = Time.now() - Duration.ofHours(24),
+                scope = TokenScope.USER,
+                validUntil = Time.now() - Duration.ofHours(12), // Stopped being valid 12 hours ago
+                lastUsed = null,
             )
         )
         whenever(tokensService.findAccountByToken("xxx")).thenReturn(tokenAccount)
@@ -99,11 +100,12 @@ class TokenHeaderAuthenticationProviderTest {
                 locked = false,
             ),
             token = Token(
-                "default",
-                "xxx",
-                Time.now(),
-                TokenScope.USER,
-                null
+                name = "default",
+                value = "xxx",
+                creation = Time.now(),
+                scope = TokenScope.USER,
+                validUntil = null,
+                lastUsed = null,
             )
         )
         whenever(tokensService.findAccountByToken("xxx")).thenReturn(tokenAccount)

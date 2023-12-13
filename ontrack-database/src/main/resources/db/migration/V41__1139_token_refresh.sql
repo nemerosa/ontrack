@@ -1,0 +1,3 @@
+-- 41. Last used timestamp on tokens
+
+ALTER TABLE TOKENS ADD COLUMN LAST_USED VARCHAR(24) NULL;

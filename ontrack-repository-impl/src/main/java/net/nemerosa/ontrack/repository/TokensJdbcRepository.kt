@@ -97,13 +97,34 @@ class TokensJdbcRepository(dataSource: DataSource) : AbstractJdbcRepository(data
         return previous
     }
 
+    override fun updateLastUsed(token: Token, lastUsed: LocalDateTime) {
+        namedParameterJdbcTemplate!!.update(
+            "UPDATE TOKENS SET LAST_USED = :lastUsed WHERE VALUE = :token",
+            mapOf(
+                "lastUsed" to dateTimeForDB(lastUsed),
+                "token" to token.value,
+            )
+        )
+    }
+
+    override fun updateValidUntil(token: Token, validUntil: LocalDateTime) {
+        namedParameterJdbcTemplate!!.update(
+            "UPDATE TOKENS SET VALID_UNTIL = :validUntil WHERE VALUE = :token",
+            mapOf(
+                "validUntil" to dateTimeForDB(validUntil),
+                "token" to token.value,
+            )
+        )
+    }
+
     private fun toToken(rs: ResultSet): Token {
         return Token(
             name = rs.getString("NAME"),
             value = rs.getString("VALUE"),
             scope = TokenScope.valueOf(rs.getString("SCOPE")),
             creation = dateTimeFromDB(rs.getString("CREATION"))!!,
-            validUntil = dateTimeFromDB(rs.getString("VALID_UNTIL"))
+            validUntil = dateTimeFromDB(rs.getString("VALID_UNTIL")),
+            lastUsed = dateTimeFromDB(rs.getString("LAST_USED")),
         )
     }
 }

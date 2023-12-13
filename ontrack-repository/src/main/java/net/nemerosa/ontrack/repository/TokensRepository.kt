@@ -60,4 +60,14 @@ interface TokensRepository {
      */
     fun invalidateAll(accountId: Int): List<String>
 
+    /**
+     * Given a token, updates its last used date
+     */
+    fun updateLastUsed(token: Token, lastUsed: LocalDateTime)
+
+    /**
+     * Given a token, updates its validity
+     */
+    fun updateValidUntil(token: Token, validUntil: LocalDateTime)
+
 }

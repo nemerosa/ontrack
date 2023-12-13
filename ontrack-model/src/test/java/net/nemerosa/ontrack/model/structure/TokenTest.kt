@@ -16,7 +16,8 @@ class TokenTest {
             "xxx",
             LocalDateTime.of(2019, 4, 25, 18, 22, 0),
             TokenScope.USER,
-            LocalDateTime.of(2019, 5, 25, 18, 22, 0)
+            LocalDateTime.of(2019, 5, 25, 18, 22, 0),
+            null,
         )
         assertFalse(token.valid, "Invalid token, in the past")
         assertEquals(
@@ -39,7 +40,8 @@ class TokenTest {
             "xxx",
             Time.now(),
             TokenScope.USER,
-            Time.now() + Duration.ofDays(14)
+            Time.now() + Duration.ofDays(14),
+            null,
         )
         val ob = token.obfuscate()
         assertEquals("", ob.value)
@@ -50,7 +52,7 @@ class TokenTest {
     @Test
     fun `Always valid when valid until is null`() {
         val now = Time.now()
-        val token = Token("default", "x", now, TokenScope.USER, null)
+        val token = Token("default", "x", now, TokenScope.USER, null, null)
         assertTrue(token.isValid(), "Valid now")
         assertTrue(token.isValid(now + Duration.ofDays(3650)), "Valid in 10 years")
     }
@@ -58,7 +60,7 @@ class TokenTest {
     @Test
     fun `Limited validity`() {
         val now = Time.now()
-        val token = Token("default", "x", now, TokenScope.USER, now + Duration.ofDays(30))
+        val token = Token("default", "x", now, TokenScope.USER, now + Duration.ofDays(30), null)
         assertTrue(token.isValid(), "Valid now")
         assertTrue(token.isValid(now + Duration.ofDays(29)), "Valid in 29 days")
         assertFalse(token.isValid(Time.now() + Duration.ofDays(31)), "Not valid in 31 days")
@@ -66,26 +68,26 @@ class TokenTest {
 
     @Test
     fun `Token valid with null value`() {
-        val token = Token("default", "x", Time.now(), TokenScope.USER, null).validFor(null)
+        val token = Token("default", "x", Time.now(), TokenScope.USER, null, null).validFor(null)
         assertNull(token.validUntil, "Always valid")
     }
 
     @Test
     fun `Token valid with negative value`() {
-        val token = Token("default", "x", Time.now(), TokenScope.USER, null).validFor(Duration.ofDays(-1))
+        val token = Token("default", "x", Time.now(), TokenScope.USER, null, null).validFor(Duration.ofDays(-1))
         assertNull(token.validUntil, "Always valid")
     }
 
     @Test
     fun `Token valid with zero value`() {
-        val token = Token("default", "x", Time.now(), TokenScope.USER, null).validFor(Duration.ofDays(0))
+        val token = Token("default", "x", Time.now(), TokenScope.USER, null, null).validFor(Duration.ofDays(0))
         assertNull(token.validUntil, "Always valid")
     }
 
     @Test
     fun `Token valid with value`() {
         val now = Time.now()
-        val token = Token("default", "x", now, TokenScope.USER, null).validFor(Duration.ofDays(1))
+        val token = Token("default", "x", now, TokenScope.USER, null, null).validFor(Duration.ofDays(1))
         assertNotNull(token.validUntil, "Validity") {
             val duration = Duration.between(now, it)
             assertEquals(1, duration.toDays())

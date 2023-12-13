@@ -1,7 +1,9 @@
 package net.nemerosa.ontrack.model.structure
 
+import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.model.security.Account
 import java.time.Duration
+import java.time.LocalDateTime
 
 /**
  * Management of account tokens.
@@ -96,7 +98,7 @@ interface TokensService {
      *
      * @return Association of the actual token and its account.
      */
-    fun findAccountByToken(token: String): TokenAccount?
+    fun findAccountByToken(token: String, refTime: LocalDateTime = Time.now()): TokenAccount?
 
     /**
      * Revokes all tokens

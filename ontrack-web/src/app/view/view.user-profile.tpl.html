@@ -98,6 +98,7 @@
                     <th>Name</th>
                     <th>Scope</th>
                     <th>Creation</th>
+                    <th>Last used</th>
                     <th>Valid until</th>
                     <th>&nbsp;</th>
                 </tr>
@@ -135,6 +136,10 @@
                         <div class="text-danger" ng-show="token.value">
                             The token value is only shown once.
                         </div>
+                    </td>
+                    <td>
+                        {{ token.lastUsed | date:'fullDate'}}
+                        {{ token.lastUsed | date:'mediumTime'}}
                     </td>
                     <td>
                         <p class="form-control-static" ng-if="token.validUntil">
