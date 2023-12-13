@@ -27,6 +27,7 @@
     "react-grid-layout": "^1.4.4",
     "react-icons": "^4.9.0",
     "reactflow": "^11.9.4",
+    "recharts": "^2.10.3",
     "uuid": "^9.0.0",
     "web-worker": "^1.2.0"
   }
