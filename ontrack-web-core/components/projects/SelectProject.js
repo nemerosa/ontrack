@@ -5,7 +5,7 @@ import {useGraphQLClient} from "@components/providers/ConnectionContextProvider"
 
 export default function SelectProject({
                                           value, onChange,
-                                          placeholder = "Type the name of the project",
+                                          placeholder = "Project name",
                                           idAsValue = false,
                                       }) {
 
@@ -66,7 +66,7 @@ export default function SelectProject({
                     label: d.name,
                 }))}
                 style={{
-                    width: '15em',
+                    width: '10em',
                 }}
             />
         </>

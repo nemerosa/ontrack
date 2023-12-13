@@ -5,7 +5,7 @@ import {useGraphQLClient} from "@components/providers/ConnectionContextProvider"
 
 export default function SelectBranch({
                                          project, value, onChange, disabled,
-                                         placeholder = "Type the name of the branch",
+                                         placeholder = "Branch name",
                                          idAsValue = false,
                                      }) {
     const [branches, setBranches] = useState([])
@@ -66,7 +66,7 @@ export default function SelectBranch({
                     label: d.name,
                 }))}
                 style={{
-                    width: '15em',
+                    width: '10em',
                 }}
             />
         </>

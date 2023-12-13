@@ -4,7 +4,15 @@ import {gql} from "graphql-request";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {PromotionLevelImage} from "@components/promotionLevels/PromotionLevelImage";
 
-export default function SelectPromotionLevel({branch, value, onChange, useName = false, allowClear = false}) {
+export default function SelectPromotionLevel({
+                                                 branch,
+                                                 value,
+                                                 onChange,
+                                                 useName = false,
+                                                 allowClear = false,
+                                                 disabled = false,
+                                                 placeholder = "Promotion level",
+                                             }) {
 
     const client = useGraphQLClient()
 
@@ -43,7 +51,12 @@ export default function SelectPromotionLevel({branch, value, onChange, useName =
 
     return (
         <Select
+            disabled={disabled}
+            placeholder={placeholder}
             options={options}
+            style={{
+                width: '10em',
+            }}
             value={value}
             onChange={onChange}
             allowClear={allowClear}
