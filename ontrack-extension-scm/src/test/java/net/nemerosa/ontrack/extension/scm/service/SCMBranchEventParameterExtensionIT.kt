@@ -44,6 +44,31 @@ class SCMBranchEventParameterExtensionIT : AbstractDSLTestSupport() {
                             ),
                             parameters
                         )
+
+                        // Gets all the variables for this event (with the case variants)
+                        val caseParameters = eventVariableService.getTemplateParameters(event, caseVariants = true)
+
+                        // Checks all parameters
+                        assertEquals(
+                            mapOf(
+                                "project" to project.name.lowercase(),
+                                "Project" to project.name,
+                                "PROJECT" to project.name.uppercase(),
+                                "branch" to branch.name.lowercase(),
+                                "Branch" to branch.name,
+                                "BRANCH" to branch.name.uppercase(),
+                                "build" to build.name.lowercase(),
+                                "Build" to build.name,
+                                "BUILD" to build.name.uppercase(),
+                                "promotion" to pl.name.lowercase(),
+                                "Promotion" to pl.name,
+                                "PROMOTION" to pl.name.uppercase(),
+                                "scmbranch" to "release/1.23",
+                                "ScmBranch" to "release/1.23",
+                                "SCMBRANCH" to "RELEASE/1.23",
+                            ).toSortedMap(),
+                            caseParameters.toSortedMap()
+                        )
                     }
                 }
             }

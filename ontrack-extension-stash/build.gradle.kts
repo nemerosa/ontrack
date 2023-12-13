@@ -18,6 +18,8 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-actuator")
     testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-issues", configuration = "tests"))
+    testImplementation(project(path = ":ontrack-extension-git", configuration = "tests"))
+    testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
 
     testRuntimeOnly(project(":ontrack-service"))
