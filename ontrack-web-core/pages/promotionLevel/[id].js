@@ -1,6 +1,7 @@
 import {useRouter} from "next/router";
 import MainLayout from "@components/layouts/MainLayout";
 import PromotionLevelView from "@components/promotionLevels/PromotionLevelView";
+import StoredChartOptionsCommandContextProvider from "@components/charts/ChartOptionsDialog";
 
 export default function PromotionLevelPage() {
     const router = useRouter()
@@ -10,7 +11,9 @@ export default function PromotionLevelPage() {
         <>
             <main>
                 <MainLayout>
-                    <PromotionLevelView id={id}/>
+                    <StoredChartOptionsCommandContextProvider id="promotion-charts">
+                        <PromotionLevelView id={id}/>
+                    </StoredChartOptionsCommandContextProvider>
                 </MainLayout>
             </main>
         </>

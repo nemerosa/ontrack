@@ -13,6 +13,7 @@ import StoredGridLayout from "@components/grid/StoredGridLayout";
 import PromotionLevelLeadTimeChart from "@components/promotionLevels/PromotionLevelLeadTimeChart";
 import GridCell from "@components/grid/GridCell";
 import PromotionLevelTTRChart from "@components/promotionLevels/PromotionLevelTTRChart";
+import {useChartOptionsCommand} from "@components/charts/ChartOptionsDialog";
 
 export default function PromotionLevelView({id}) {
 
@@ -62,17 +63,35 @@ export default function PromotionLevelView({id}) {
         {i: chartTTR, x: 6, y: 0, w: 6, h: 6},
     ]
 
+    const {command, interval, period} = useChartOptionsCommand()
+
     const items = [
         {
             id: chartLeadTime,
-            content: <GridCell id={chartLeadTime} title="Lead time to promotion">
-                <PromotionLevelLeadTimeChart promotionLevel={promotionLevel}/>
+            content: <GridCell
+                id={chartLeadTime}
+                title="Lead time to promotion"
+                extra={command}
+            >
+                <PromotionLevelLeadTimeChart
+                    promotionLevel={promotionLevel}
+                    interval={interval}
+                    period={period}
+                />
             </GridCell>,
         },
         {
             id: chartTTR,
-            content: <GridCell id={chartTTR} title="Time to recovery to promotion">
-                <PromotionLevelTTRChart promotionLevel={promotionLevel}/>
+            content: <GridCell
+                id={chartTTR}
+                title="Time to recovery to promotion"
+                extra={command}
+            >
+                <PromotionLevelTTRChart
+                    promotionLevel={promotionLevel}
+                    interval={interval}
+                    period={period}
+                />
             </GridCell>,
         },
     ]
