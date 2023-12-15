@@ -3,18 +3,14 @@ import {DashboardWidgetCellContext} from "@components/dashboards/DashboardWidget
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
 import PromotionLevelLeadTimeChart from "@components/promotionLevels/PromotionLevelLeadTimeChart";
+import {PromotionLevelImage} from "@components/promotionLevels/PromotionLevelImage";
+import {Space, Typography} from "antd";
 
 export default function PromotionLeadTimeChartWidget({project, branch, promotionLevel}) {
 
     const client = useGraphQLClient()
 
     const {setTitle, setExtra} = useContext(DashboardWidgetCellContext)
-
-    useEffect(() => {
-        if (project && branch && promotionLevel) {
-            setTitle(`Lead time to promotion ${promotionLevel} on ${branch}@${project}`)
-        }
-    }, [project, branch, promotionLevel])
 
     const [promotionLevelObject, setPromotionLevelObject] = useState(undefined)
 
@@ -39,7 +35,18 @@ export default function PromotionLeadTimeChartWidget({project, branch, promotion
                     project, branch, promotionLevel
                 }
             ).then(data => {
-                setPromotionLevelObject(data.promotionLevelByName)
+                const pl = data.promotionLevelByName;
+                setPromotionLevelObject(pl)
+                setTitle(
+                    <>
+                        <Space size={4}>
+                            Lead time to
+                            <PromotionLevelImage promotionLevel={pl} />
+                            <Typography.Text strong>{promotionLevel}</Typography.Text>
+                            on {branch}@${project}
+                        </Space>
+                    </>
+                )
             })
         }
     }, [client, project, branch, promotionLevel]);
