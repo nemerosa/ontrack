@@ -5,8 +5,9 @@ import {gql} from "graphql-request";
 import PromotionLevelLeadTimeChart from "@components/promotionLevels/PromotionLevelLeadTimeChart";
 import {PromotionLevelImage} from "@components/promotionLevels/PromotionLevelImage";
 import {Space, Typography} from "antd";
+import ChartOptions from "@components/charts/ChartOptions";
 
-export default function PromotionLeadTimeChartWidget({project, branch, promotionLevel}) {
+export default function PromotionLeadTimeChartWidget({project, branch, promotionLevel, interval, period}) {
 
     const client = useGraphQLClient()
 
@@ -44,6 +45,7 @@ export default function PromotionLeadTimeChartWidget({project, branch, promotion
                             <PromotionLevelImage promotionLevel={pl} />
                             <Typography.Text strong>{promotionLevel}</Typography.Text>
                             on {branch}@${project}
+                            &nbsp;<ChartOptions interval={interval} period={period}/>
                         </Space>
                     </>
                 )
@@ -57,6 +59,8 @@ export default function PromotionLeadTimeChartWidget({project, branch, promotion
                 promotionLevelObject &&
                 <PromotionLevelLeadTimeChart
                     promotionLevel={promotionLevelObject}
+                    interval={interval}
+                    period={period}
                 />
             }
         </>

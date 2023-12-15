@@ -6,8 +6,9 @@ import PromotionLevelLeadTimeChart from "@components/promotionLevels/PromotionLe
 import {PromotionLevelImage} from "@components/promotionLevels/PromotionLevelImage";
 import {Space, Typography} from "antd";
 import PromotionLevelTTRChart from "@components/promotionLevels/PromotionLevelTTRChart";
+import ChartOptions from "@components/charts/ChartOptions";
 
-export default function PromotionTTRChartWidget({project, branch, promotionLevel}) {
+export default function PromotionTTRChartWidget({project, branch, promotionLevel, interval, period}) {
 
     const client = useGraphQLClient()
 
@@ -45,6 +46,7 @@ export default function PromotionTTRChartWidget({project, branch, promotionLevel
                             <PromotionLevelImage promotionLevel={pl} />
                             <Typography.Text strong>{promotionLevel}</Typography.Text>
                             on {branch}@${project}
+                            &nbsp;<ChartOptions interval={interval} period={period}/>
                         </Space>
                     </>
                 )
@@ -58,6 +60,8 @@ export default function PromotionTTRChartWidget({project, branch, promotionLevel
                 promotionLevelObject &&
                 <PromotionLevelTTRChart
                     promotionLevel={promotionLevelObject}
+                    interval={interval}
+                    period={period}
                 />
             }
         </>
