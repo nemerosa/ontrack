@@ -14,6 +14,7 @@ import PromotionLevelLeadTimeChart from "@components/promotionLevels/PromotionLe
 import GridCell from "@components/grid/GridCell";
 import PromotionLevelTTRChart from "@components/promotionLevels/PromotionLevelTTRChart";
 import {useChartOptionsCommand} from "@components/charts/ChartOptionsDialog";
+import StoredGridLayoutResetCommand from "@components/grid/StoredGridLayoutResetCommand";
 
 export default function PromotionLevelView({id}) {
 
@@ -51,7 +52,9 @@ export default function PromotionLevelView({id}) {
                 {id}
             ).then(data => {
                 setPromotionLevel(data.promotionLevel)
-                setCommands([])
+                setCommands([
+                    <StoredGridLayoutResetCommand key="reset"/>,
+                ])
             }).finally(() => {
                 setLoadingPromotionLevel(false)
             })
@@ -59,8 +62,8 @@ export default function PromotionLevelView({id}) {
     }, [client, id]);
 
     const defaultLayout = [
-        {i: chartLeadTime, x: 0, y: 0, w: 6, h: 6},
-        {i: chartTTR, x: 6, y: 0, w: 6, h: 6},
+        {i: chartLeadTime, x: 0, y: 0, w: 6, h: 12},
+        {i: chartTTR, x: 6, y: 0, w: 6, h: 12},
     ]
 
     const {command, interval, period} = useChartOptionsCommand()
