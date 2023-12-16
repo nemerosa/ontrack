@@ -24,13 +24,20 @@ export function useFormDialog(config) {
     }
 }
 
-export default function FormDialog({dialog, onValuesChange, children}) {
+export default function FormDialog({dialog, onValuesChange, children, hasOk = true, header, width, height}) {
 
     const client = useGraphQLClient()
 
     const form = dialog.form
     const [formErrors, setFormErrors] = useState([]);
     const [loading, setLoading] = useState(false)
+
+    const bodyStyle = {}
+    if (height) {
+        bodyStyle.height = height
+        bodyStyle.overflowY = 'auto'
+        bodyStyle.overflowX = 'hidden'
+    }
 
     const onCancel = () => {
         form.resetFields()
@@ -79,6 +86,7 @@ export default function FormDialog({dialog, onValuesChange, children}) {
                 confirmLoading={loading}
                 onCancel={onCancel}
                 footer={null}
+                width={width}
             >
                 <Form
                     layout="vertical"
@@ -86,17 +94,30 @@ export default function FormDialog({dialog, onValuesChange, children}) {
                     onFinish={onSubmit}
                     onValuesChange={onValuesChange}
                 >
-                    {children}
-                    <Form.Item>
-                        <Space style={{ float: 'right' }}>
-                            <Button type="default" onClick={onCancel}>
-                                Cancel
-                            </Button>
-                            <Button type="primary" htmlType="submit">
-                                OK
-                            </Button>
-                        </Space>
-                    </Form.Item>
+                    <Space direction="vertical" className="ot-line">
+                        {
+                            header &&
+                            <div style={{width: '100%'}}>
+                                {header}
+                            </div>
+                        }
+                        <div style={bodyStyle}>
+                            {children}
+                        </div>
+                        <Form.Item>
+                            <Space style={{float: 'right'}}>
+                                <Button type="default" onClick={onCancel}>
+                                    Cancel
+                                </Button>
+                                {
+                                    hasOk &&
+                                    <Button type="primary" htmlType="submit">
+                                        OK
+                                    </Button>
+                                }
+                            </Space>
+                        </Form.Item>
+                    </Space>
                 </Form>
                 <FormErrors errors={formErrors}/>
             </Modal>

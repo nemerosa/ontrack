@@ -11,6 +11,7 @@ export default function SelectableWidget({widgetDef, addWidget}) {
                         <Button type="primary" onClick={() => addWidget(widgetDef)} icon={<FaPlus/>}/>
                     </Tooltip>
                 }
+                style={{height: '100%'}}
             >
                 <p>
                     <Typography.Text type="secondary">{widgetDef.description}</Typography.Text>
