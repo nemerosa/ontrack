@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests
 
+import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.connector.support.DefaultConnector
 import java.util.*
 import kotlin.properties.ReadOnlyProperty
@@ -79,6 +80,8 @@ object ACCProperties {
     }
 
     private fun getOrCreateToken(url: String, username: String, password: String): String {
+        // Unique name for the token
+        val tokenName = uid("acc_")
         // Basic authentication
         val basic: String = "$username:$password".run {
             Base64.getEncoder().encodeToString(toByteArray(Charsets.UTF_8))
@@ -90,8 +93,7 @@ object ACCProperties {
                 "Authorization" to "Basic $basic"
             )
         )
-        // Creating a new token
-        return connector.post("/rest/tokens/new")
+        return connector.post("/rest/tokens/create/${tokenName}")
             .apply {
                 if (statusCode != 200) {
                     error("Cannot get a new token")
