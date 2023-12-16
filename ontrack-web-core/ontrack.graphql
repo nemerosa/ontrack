@@ -4873,6 +4873,8 @@ type Query {
     userDashboard: Dashboard!
     "Gets the list of private & shared dashboards"
     userDashboards: [Dashboard!]!
+    "List of user menu items"
+    userMenuItems: [UserMenuGroup!]!
     "List of validation run statuses"
     validationRunStatusIDList: [ValidationRunStatusID!]!
     validationRuns(
@@ -6035,6 +6037,26 @@ type UserError {
     location: String
     "The error message"
     message: String!
+}
+
+"Item in the user menu"
+type UserMenuAction {
+    "Extension contributing this user menu item"
+    extension: String!
+    "Unique ID for this user menu item in the given extension"
+    id: String!
+    "Display name for this user menu item"
+    name: String!
+}
+
+"Group of user menu items"
+type UserMenuGroup {
+    "ID of the group"
+    id: String!
+    "Items in this group"
+    items: [UserMenuAction!]!
+    "Name of the group"
+    name: String!
 }
 
 "Output type for the validateBuildByIdWithCHML mutation."

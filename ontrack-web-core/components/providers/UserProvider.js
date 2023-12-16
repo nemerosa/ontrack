@@ -19,7 +19,16 @@ const UserContextProvider = ({children}) => {
                 tmpUser = data
                 return gqlClient.request(
                     gql`
-                        query UserAuthorizations {
+                        query User {
+                            userMenuItems {
+                                id
+                                name
+                                items {
+                                    extension
+                                    id
+                                    name
+                                }
+                            }
                             authorizations {
                                 name
                                 action
@@ -29,8 +38,10 @@ const UserContextProvider = ({children}) => {
                     `
                 )
             }).then(data => {
+                // Groups
+                tmpUser.userMenuGroups = data.userMenuItems
+                // Indexing of authorizations
                 const authorizations = data.authorizations
-                // Indexing
                 tmpUser.authorizations = {}
                 authorizations.forEach(authorization => {
                     let domain = tmpUser.authorizations[authorization.name]
