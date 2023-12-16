@@ -52,26 +52,38 @@ class DefaultJenkinsClient(
         return runBlocking {
             logger.debug("run,path=$path,parameters=$parameters")
 
-            // Query
-            val map = LinkedMultiValueMap<String, Any>()
-            parameters.forEach { (key, value) ->
-                map.add(key, value)
+            // Build without parameters
+            if (parameters.isEmpty()) {
+                withContext(Dispatchers.IO) {
+                    client.postForLocation(
+                        "$path/build",
+                        ""
+                    )
+                }
             }
 
-            // Headers (form)
-            val headers = createCSRFHeaders()
-            headers.contentType = MediaType.MULTIPART_FORM_DATA
+            // Build with parameters
+            else {
+                // Query
+                val map = LinkedMultiValueMap<String, Any>()
+                parameters.forEach { (key, value) ->
+                    map.add(key, value)
+                }
 
-            // Request to send
-            val requestEntity = HttpEntity(map, headers)
+                // Headers (form)
+                val headers = createCSRFHeaders()
+                headers.contentType = MediaType.MULTIPART_FORM_DATA
 
-            // Launches the job with parameters and get the queue item
+                // Request to send
+                val requestEntity = HttpEntity(map, headers)
 
-            withContext(Dispatchers.IO) {
-                client.postForLocation(
-                    "$path/buildWithParameters",
-                    requestEntity
-                )
+                // Launches the job with parameters and get the queue item
+                withContext(Dispatchers.IO) {
+                    client.postForLocation(
+                        "$path/buildWithParameters",
+                        requestEntity
+                    )
+                }
             }
         }
     }
