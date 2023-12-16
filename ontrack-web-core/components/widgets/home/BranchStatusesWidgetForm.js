@@ -6,10 +6,16 @@ import {FaPlus, FaTrash} from "react-icons/fa";
 import SelectProjectBranch from "@components/branches/SelectProjectBranch";
 import SelectInterval from "@components/common/SelectInterval";
 import {DashboardWidgetCellContext} from "@components/dashboards/DashboardWidgetCellContextProvider";
+import SortableList, {SortableItem} from "react-easy-sort";
+import {formFieldArraySwap} from "@components/form/formUtils";
 
 export default function BranchStatusesWidgetForm({promotions, validations, refreshInterval, branches, title}) {
 
     const {widgetEditionForm} = useContext(DashboardWidgetCellContext)
+
+    const onSortEnd = (oldIndex, newIndex) => {
+        formFieldArraySwap(widgetEditionForm, "branches", oldIndex, newIndex)
+    }
 
     return (
         <>
@@ -41,41 +47,45 @@ export default function BranchStatusesWidgetForm({promotions, validations, refre
                 <Form.List name="branches" initialValue={branches}>
                     {(fields, {add, remove}) => (
                         <>
-                            {fields.map(({key, name, ...restField}) => (
-                                <Space
-                                    key={key}
-                                    style={{
-                                        display: 'flex',
-                                        marginBottom: 8,
-                                        backgroundColor: '#fcfcfc',
-                                        border: 'dashed 1px blue',
-                                        borderRadius: 8,
-                                        paddingTop: 16,
-                                        paddingLeft: 16,
-                                        paddingRight: 16,
-                                    }}
-                                    align="baseline"
-                                >
-                                    <Form.Item
-                                        {...restField}
-                                        name={name}
-                                        label={
-                                            <Space>
-                                                <FaTrash onClick={() => remove(name)}/>
-                                                Branch
-                                            </Space>
-                                        }
-                                        rules={[
-                                            {
-                                                required: true,
-                                                message: 'Branch is required',
-                                            },
-                                        ]}
-                                    >
-                                        <SelectProjectBranch/>
-                                    </Form.Item>
-                                </Space>
-                            ))}
+                            <SortableList onSortEnd={onSortEnd}>
+                                {fields.map(({key, name, ...restField}) => (
+                                    <SortableItem>
+                                        <Space
+                                            key={key}
+                                            style={{
+                                                display: 'flex',
+                                                marginBottom: 8,
+                                                backgroundColor: '#fcfcfc',
+                                                border: 'dashed 1px blue',
+                                                borderRadius: 8,
+                                                paddingTop: 16,
+                                                paddingLeft: 16,
+                                                paddingRight: 16,
+                                            }}
+                                            align="baseline"
+                                        >
+                                            <Form.Item
+                                                {...restField}
+                                                name={name}
+                                                label={
+                                                    <Space>
+                                                        <FaTrash onClick={() => remove(name)}/>
+                                                        Branch
+                                                    </Space>
+                                                }
+                                                rules={[
+                                                    {
+                                                        required: true,
+                                                        message: 'Branch is required',
+                                                    },
+                                                ]}
+                                            >
+                                                <SelectProjectBranch/>
+                                            </Form.Item>
+                                        </Space>
+                                    </SortableItem>
+                                ))}
+                            </SortableList>
                             <Form.Item>
                                 <Button type="dashed"
                                         onClick={() => add('')} block
