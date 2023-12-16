@@ -18,6 +18,22 @@ class TokensController(
 ) {
 
     /**
+     * Creates a token
+     */
+    @PostMapping("create/{name}")
+    fun createToken(@PathVariable name: String): ResponseEntity<TokenResponse> {
+        return ResponseEntity.ok(
+            TokenResponse(
+                tokensService.generateNewToken(
+                    options = TokenOptions(
+                        name = name,
+                    )
+                )
+            )
+        )
+    }
+
+    /**
      * Gets the current token
      */
     @get:GetMapping("current")
@@ -42,6 +58,10 @@ class TokensController(
             )
         )
     }
+
+    /**
+     *
+     */
 
     /**
      * Revokes the current token

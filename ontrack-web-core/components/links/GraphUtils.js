@@ -43,14 +43,20 @@ export function autoLayout({
         .layout(graph)
         .then((layoutedGraph) => {
             setNodes(layoutedGraph.children.map((node) => {
+                const width = getWidth(node)
+                const height = getHeight(node)
                 return {
                     ...node,
                     // React Flow expects a position property on the node instead of `x`
                     // and `y` fields.
                     position: {
-                        x: node.x - getWidth(node) / 2,
-                        y: node.y - getHeight(node) / 2,
+                        x: node.x - width / 2,
+                        y: node.y - height / 2,
                     },
+                    style: {
+                        width: width,
+                        height: height,
+                    }
                 }
             }))
             setEdges(layoutedGraph.edges)
