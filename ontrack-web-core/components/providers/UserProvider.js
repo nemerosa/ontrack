@@ -9,7 +9,7 @@ const UserContextProvider = ({children}) => {
     const gqlClient = useGraphQLClient()
     const restClient = useRestClient()
 
-    const [user, setUser] = useState({authorizations: {}});
+    const [user, setUser] = useState({authorizations: {}, userMenuGroups: []});
 
     let tmpUser = {}
 

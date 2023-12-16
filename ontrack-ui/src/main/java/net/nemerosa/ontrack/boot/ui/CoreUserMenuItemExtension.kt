@@ -23,16 +23,16 @@ class CoreUserMenuItemExtension(
 
             items += UserMenuItem(
                 groupId = CoreUserMenuGroups.USER,
-                extension = "core",
-                id = "UserProfile",
+                extension = "core/admin",
+                id = "userProfile",
                 name = "User profile",
             )
 
             if (globalSettings) {
                 items += UserMenuItem(
                     groupId = CoreUserMenuGroups.SYSTEM,
-                    extension = "core",
-                    id = "Settings",
+                    extension = "core/admin",
+                    id = "settings",
                     name = "Settings",
                 )
             }
