@@ -2,7 +2,7 @@ import {createContext, useEffect, useState} from "react";
 import {gql} from "graphql-request";
 import {useGraphQLClient, useRestClient} from "@components/providers/ConnectionContextProvider";
 
-export const UserContext = createContext({user: {}});
+export const UserContext = createContext({authorizations: {}, userMenuGroups: []});
 
 const UserContextProvider = ({children}) => {
 

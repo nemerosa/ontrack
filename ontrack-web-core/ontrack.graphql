@@ -821,6 +821,11 @@ type CasC {
     yaml: String!
 }
 
+type ChangePasswordPayload implements PayloadInterface {
+    "List of errors"
+    errors: [PayloadUserError]
+}
+
 "Output type for the changeValidationRunStatusComment mutation."
 type ChangeValidationRunStatusCommentPayload implements Payload {
     "List of errors"
@@ -2708,6 +2713,8 @@ type LockAccountPayload implements Payload {
 }
 
 type Mutation {
+    "Changing the password of the current user"
+    changePassword(input: ChangePasswordInput!): ChangePasswordPayload
     "Change the status of a validation run"
     changeValidationRunStatus(
         "Input for the mutation"
@@ -6773,6 +6780,17 @@ input CHMLLevel {
     level: CHML!
     "Count to reach to raise this level"
     value: Int!
+}
+
+"""
+
+=================================================================================
+User change password
+=================================================================================
+"""
+input ChangePasswordInput {
+    newPassword: String!
+    oldPassword: String!
 }
 
 "Input type for the changeValidationRunStatusComment mutation."

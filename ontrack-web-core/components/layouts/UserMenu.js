@@ -6,7 +6,6 @@ import {FaCode, FaCog, FaDoorOpen, FaExpandArrowsAlt, FaSignOutAlt, FaUser} from
 import {MainLayoutContext} from "@components/layouts/MainLayout";
 import {useLogout} from "@components/providers/ConnectionContextProvider";
 import LegacyLink from "@components/common/LegacyLink";
-import Link from "next/link";
 import UserMenuItemLink from "@components/layouts/UserMenuItemLink";
 
 export function useUserMenu() {

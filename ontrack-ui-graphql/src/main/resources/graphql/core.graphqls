@@ -83,6 +83,25 @@ extend type Query {
 }
 
 # =================================================================================
+# User change password
+# =================================================================================
+
+input ChangePasswordInput {
+    oldPassword: String!
+    newPassword: String!
+}
+
+extend type Mutation {
+    """Changing the password of the current user"""
+    changePassword(input: ChangePasswordInput!): ChangePasswordPayload
+}
+
+type ChangePasswordPayload implements PayloadInterface {
+    "List of errors"
+    errors: [PayloadUserError]
+}
+
+# =================================================================================
 # Dashboards
 # =================================================================================
 
