@@ -1,4 +1,4 @@
-import {createContext, useContext, useEffect, useState} from "react";
+import {createContext, useContext, useEffect, useRef, useState} from "react";
 import {DashboardContext} from "@components/dashboards/DashboardContextProvider";
 import {Form} from "antd";
 
@@ -24,6 +24,10 @@ export const DashboardWidgetCellContext = createContext({
     },
     deleteWidget: () => {
     },
+    // Adjusting the values received from the form
+    onReceivingValues: undefined,
+    onReceivingValuesHandler: (fn) => {
+    },
 })
 
 export default function DashboardWidgetCellContextProvider({widget, children}) {
@@ -41,13 +45,23 @@ export default function DashboardWidgetCellContextProvider({widget, children}) {
         setWidgetEdition(true)
     }
 
+    const onReceivingValues = useRef(undefined);
+
+    const onReceivingValuesHandler = (func) => {
+        onReceivingValues.current = func
+    }
+
     const saveWidgetEdition = () => {
         if (widgetEdition) {
             setWidgetSaving(true)
             // See https://ant.design/components/form#forminstance
             widgetEditionForm.validateFields()
                 .then(values => {
-                    return dashboardContext.saveWidget(widget.uuid, values)
+                    // console.log("DashboardWidgetCellContext@saveWidgetEdition@values", values)
+                    // console.log("DashboardWidgetCellContext@saveWidgetEdition@onReceivingValues", !!onReceivingValues.current)
+                    const actualValues = onReceivingValues.current ? onReceivingValues.current(values) : values
+                    // console.log("DashboardWidgetCellContext@saveWidgetEdition@actualValues", actualValues)
+                    return dashboardContext.saveWidget(widget.uuid, actualValues)
                 })
                 .then(() => {
                     cancelWidgetEdition()
@@ -82,6 +96,7 @@ export default function DashboardWidgetCellContextProvider({widget, children}) {
         saveWidgetEdition,
         cancelWidgetEdition,
         deleteWidget,
+        onReceivingValuesHandler,
     }
 
     return (

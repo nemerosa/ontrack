@@ -4781,6 +4781,15 @@ type Query {
         "ID of the promotion level to look for (required)"
         id: Int!
     ): PromotionLevel
+    "Promotion level by name"
+    promotionLevelByName(
+        "Branch name"
+        branch: String!,
+        "Promotion level name"
+        name: String!,
+        "Project name"
+        project: String!
+    ): PromotionLevel
     "Gets a list of existing available promotion level names"
     promotionLevelNames(
         "Part of the name to look for"
@@ -5931,6 +5940,8 @@ type SubscribeValidationStampToEventsPayload implements Payload {
 type Token {
     "Token creation date."
     creation: LocalDateTime
+    "Date when the token was last used."
+    lastUsed: LocalDateTime
     "Name of the token"
     name: String
     "scope field"

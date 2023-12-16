@@ -125,10 +125,13 @@ button.ot-validation-stamp-filter-edition {
 
 .ot-section-body {
     height: calc(100% - 60px);
+    width: 100%;
     overflow-y: auto;
     overflow-x: hidden;
 }
 
 .ot-section-body-padded {
     padding: 1em;
+    width: 100%;
+    height: 100%;
 }

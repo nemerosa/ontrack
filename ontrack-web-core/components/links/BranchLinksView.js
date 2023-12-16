@@ -4,7 +4,7 @@ import {branchUri} from "@components/common/Links";
 import Head from "next/head";
 import {subBranchTitle} from "@components/common/Titles";
 import MainPage from "@components/layouts/MainPage";
-import {downToBranchBreeadcrumbs} from "@components/common/Breadcrumbs";
+import {downToBranchBreadcrumbs} from "@components/common/Breadcrumbs";
 import LoadingContainer from "@components/common/LoadingContainer";
 import {gql} from "graphql-request";
 import PageSection from "@components/common/PageSection";
@@ -55,7 +55,7 @@ export default function BranchLinksView({id}) {
             </Head>
             <MainPage
                 title="Links"
-                breadcrumbs={downToBranchBreeadcrumbs({branch})}
+                breadcrumbs={downToBranchBreadcrumbs({branch})}
                 commands={commands}
             >
                 <LoadingContainer loading={loadingBranch} tip="Loading branch">

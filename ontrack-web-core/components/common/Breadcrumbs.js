@@ -21,7 +21,7 @@ export function branchBreadcrumbs(branch) {
     ]
 }
 
-export function downToBranchBreeadcrumbs({branch}) {
+export function downToBranchBreadcrumbs({branch}) {
     return [
         <HomeLink key="home"/>,
         <ProjectLink project={branch.project} key="project"/>,
@@ -30,5 +30,9 @@ export function downToBranchBreeadcrumbs({branch}) {
 }
 
 export function buildBreadcrumbs(build) {
-    return downToBranchBreeadcrumbs(build)
+    return downToBranchBreadcrumbs(build)
+}
+
+export function promotionLevelBreadcrumbs(promotionLevel) {
+    return downToBranchBreadcrumbs(promotionLevel)
 }
