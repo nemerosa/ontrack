@@ -49,7 +49,7 @@ export default function BranchStatusesWidgetForm({promotions, validations, refre
                         <>
                             <SortableList onSortEnd={onSortEnd}>
                                 {fields.map(({key, name, ...restField}) => (
-                                    <SortableItem>
+                                    <SortableItem key={key}>
                                         <Space
                                             key={key}
                                             style={{
