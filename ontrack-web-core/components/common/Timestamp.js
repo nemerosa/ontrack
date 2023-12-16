@@ -1,5 +1,5 @@
 import {Typography} from "antd";
-import dayjs from "dayjs";
+import TimestampText from "@components/common/TimestampText";
 
 export default function Timestamp({
                                       value,
@@ -8,15 +8,14 @@ export default function Timestamp({
                                       fontSize = '75%',
                                       prefix = '',
                                       suffix = '',
+                                      format = undefined,
                                   }) {
     return (
         <>
             <Typography.Text type={type} italic={italic} style={{
                 fontSize: fontSize,
             }}>
-                {prefix && `${prefix} `}
-                {dayjs(value).format("YYYY MMM DD, HH:mm")}
-                {suffix && ` ${suffix}`}
+                <TimestampText value={value} prefix={prefix} suffix={suffix} format={format}/>
             </Typography.Text>
         </>
     )

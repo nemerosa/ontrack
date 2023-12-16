@@ -5955,6 +5955,8 @@ type Token {
     name: String
     "scope field"
     scope: TokenScope!
+    "Is this token managed?"
+    transient: Boolean!
     "Validity flag, computed in regard to current time."
     valid: Boolean
     "Date until the end of validity."
