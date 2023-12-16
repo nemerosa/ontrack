@@ -1,19 +1,15 @@
 import {useContext, useEffect, useState} from "react";
 import {DashboardContext} from "@components/dashboards/DashboardContextProvider";
 import DashboardWidgetCell from "@components/dashboards/DashboardWidgetCell";
-import {Alert, Button, Col, Row, Space} from "antd";
-import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
-import {gql} from "graphql-request";
-import SelectableWidget from "@components/dashboards/SelectableWidget";
+import {Alert, Button, Divider, Space} from "antd";
 import {v4} from "uuid";
 import GridTable from "@components/grid/GridTable";
+import {FaPlus} from "react-icons/fa";
+import WidgetSelectionDialog, {useWidgetSelectionDialog} from "@components/dashboards/WidgetSelectionDialog";
 
 export default function DashboardView() {
 
     const rowHeight = 50
-    const defaultNewHeight = 4
-
-    const client = useGraphQLClient()
 
     const {
         dashboard,
@@ -75,27 +71,6 @@ export default function DashboardView() {
         recordLayout(newLayout)
     }
 
-    const [availableWidgets, setAvailableWidgets] = useState([])
-    useEffect(() => {
-        if (client) {
-            client.request(
-                gql`
-                    query DashboardWidgets {
-                        dashboardWidgets {
-                            key
-                            name
-                            description
-                            defaultConfig
-                            preferredHeight
-                        }
-                    }
-                `
-            ).then(data => {
-                setAvailableWidgets(data.dashboardWidgets)
-            })
-        }
-    }, [client])
-
     const onSave = () => {
         saveEdition(layout)
     }
@@ -117,6 +92,12 @@ export default function DashboardView() {
         addWidget(widget)
     }
 
+    const widgetSelectionDialog = useWidgetSelectionDialog({onAddWidget})
+
+    const openWidgetDialog = () => {
+        widgetSelectionDialog.start()
+    }
+
     return (
         <>
             {
@@ -131,57 +112,46 @@ export default function DashboardView() {
             }
             {
                 dashboard && edition &&
-                <Row>
-                    <Col span={18}>
+                <>
+                    <Space direction="vertical" className="ot-line">
+                        <Alert
+                            type="info"
+                            message="Dashboard in edition mode"
+                            action={
+                                <Space>
+                                    <Button
+                                        type="default"
+                                        icon={<FaPlus/>}
+                                        onClick={openWidgetDialog}
+                                    >
+                                        Add a widget...
+                                    </Button>
+                                    <Divider type="vertical"/>
+                                    <Button
+                                        type="primary"
+                                        onClick={onSave}
+                                        disabled={
+                                            saving || !dashboard?.widgets?.length
+                                        }
+                                    >
+                                        Save dashboard
+                                    </Button>
+                                    <Button danger onClick={onStopEdition}>
+                                        Cancel changes
+                                    </Button>
+                                </Space>
+                            }
+                        />
                         <GridTable
                             layout={layout}
                             items={items}
                             rowHeight={rowHeight}
                             onLayoutChange={changeLayout}
                         />
-                    </Col>
-                    <Col span={6} style={{
-                        paddingLeft: '8px',
-                        paddingRight: '8px'
-                    }}>
-                        <Space direction="vertical">
-                            <Alert
-                                type="warning"
-                                message="Dashboard in edition mode."
-                                action={
-                                    <Space>
-                                        <Button
-                                            size="small"
-                                            type="primary"
-                                            onClick={onSave}
-                                            disabled={
-                                                saving || !dashboard?.widgets?.length
-                                            }
-                                        >
-                                            Save dashboard
-                                        </Button>
-                                        <Button size="small" danger onClick={onStopEdition}>
-                                            Cancel changes
-                                        </Button>
-                                    </Space>
-                                }
-                            />
-                            <Row wrap gutter={[16, 16]}>
-                                {
-                                    availableWidgets.map(availableWidget =>
-                                        <Col span={24} key={availableWidget.key}>
-                                            <SelectableWidget
-                                                widgetDef={availableWidget}
-                                                addWidget={onAddWidget}
-                                            />
-                                        </Col>
-                                    )
-                                }
-                            </Row>
-                        </Space>
-                    </Col>
-                </Row>
+                    </Space>
+                </>
             }
+            <WidgetSelectionDialog widgetSelectionDialog={widgetSelectionDialog}/>
         </>
     )
 }
