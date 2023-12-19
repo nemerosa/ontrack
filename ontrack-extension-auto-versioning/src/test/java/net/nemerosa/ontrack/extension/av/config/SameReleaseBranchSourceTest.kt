@@ -57,6 +57,40 @@ class SameReleaseBranchSourceTest {
     }
 
     @Test
+    fun `Old versions must not be targeted by newer versions`() {
+        val dependencyProject = ProjectFixtures.testProject()
+        val dependency1250 = BranchFixtures.testBranch(id = 10, project = dependencyProject, "release/1.25.0")
+        val dependency1251 = BranchFixtures.testBranch(id = 11, project = dependencyProject, "release/1.25.1")
+        val dependency1260 = BranchFixtures.testBranch(id = 12, project = dependencyProject, "release/1.26.0")
+
+        every { structureService.getBranchesForProject(dependencyProject.id) } returns listOf(
+            dependency1250,
+            dependency1251,
+            dependency1260,
+        )
+
+        val targetProject = ProjectFixtures.testProject()
+        val target1250 = BranchFixtures.testBranch(id = 20, project = targetProject, "release/1.25.0")
+        val target1251 = BranchFixtures.testBranch(id = 21, project = targetProject, "release/1.25.1")
+        val target1260 = BranchFixtures.testBranch(id = 22, project = targetProject, "release/1.26.0")
+
+        assertEquals(
+            dependency1260,
+            sameReleaseBranchSource.getLatestBranch("2", dependencyProject, target1260)
+        )
+
+        assertEquals(
+            dependency1251,
+            sameReleaseBranchSource.getLatestBranch("2", dependencyProject, target1251)
+        )
+
+        assertEquals(
+            dependency1251,
+            sameReleaseBranchSource.getLatestBranch("2", dependencyProject, target1250)
+        )
+    }
+
+    @Test
     fun `Different levels`() {
         val dependencyProject = ProjectFixtures.testProject()
         val dependency1250 = BranchFixtures.testBranch(id = 10, project = dependencyProject, "release/1.25.0")
