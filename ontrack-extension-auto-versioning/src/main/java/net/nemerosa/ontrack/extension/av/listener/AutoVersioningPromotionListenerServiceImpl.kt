@@ -66,7 +66,7 @@ class AutoVersioningPromotionListenerServiceImpl(
                 // If present, gets its configurations
                 val autoVersioningConfigurations = config.configurations
                     // Filters the configurations based on the event
-                    .filter { configuration -> promotionEvent.match(branch, configuration, cache) }
+                    .filter { configuration -> promotionEvent.match(branch, configuration) }
                     // Removes any empty setup
                     .takeIf { configurations -> configurations.isNotEmpty() }
                 // Accepting the branch based on having at least one matching configuration
@@ -90,7 +90,6 @@ class AutoVersioningPromotionListenerServiceImpl(
     private fun PromotionEvent.match(
         eligibleTargetBranch: Branch,
         config: AutoVersioningSourceConfig,
-        cache: MutableMap<Pair<Int, String>, Branch?>,
     ): Boolean {
         if (logger.isDebugEnabled) {
             logger.debug(
@@ -103,7 +102,7 @@ class AutoVersioningPromotionListenerServiceImpl(
         }
         val match = config.sourceProject == build.project.name &&
                 config.sourcePromotion == promotion &&
-                sourceBranchMatch(eligibleTargetBranch, config, cache)
+                sourceBranchMatch(eligibleTargetBranch, config)
         if (logger.isDebugEnabled) {
             logger.debug("Promotion event matching: $match")
         }
@@ -113,12 +112,9 @@ class AutoVersioningPromotionListenerServiceImpl(
     private fun PromotionEvent.sourceBranchMatch(
         eligibleTargetBranch: Branch,
         config: AutoVersioningSourceConfig,
-        cache: MutableMap<Pair<Int, String>, Branch?>,
     ): Boolean {
-        val latestSourceBranch = cache.getOrPut(build.projectId() to config.sourceBranch) {
-            logger.debug("""Promotion event matching based on branch latest promotion""")
-            autoVersioningConfigurationService.getLatestBranch(eligibleTargetBranch, build.project, config)
-        }
+        logger.debug("""Promotion event matching based on branch latest promotion""")
+        val latestSourceBranch = autoVersioningConfigurationService.getLatestBranch(eligibleTargetBranch, build.project, config)
         logger.debug("Latest branch: ${latestSourceBranch?.name}")
         // We want the promoted build to be on the latest source branch
         return latestSourceBranch != null && latestSourceBranch.id() == build.branch.id()

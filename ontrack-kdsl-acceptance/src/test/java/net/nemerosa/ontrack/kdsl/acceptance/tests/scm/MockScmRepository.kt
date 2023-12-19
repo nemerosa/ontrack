@@ -13,10 +13,10 @@ import java.util.*
 import kotlin.test.assertFalse
 import kotlin.test.fail
 
-fun withMockScmRepository(
+fun <T> withMockScmRepository(
     ontrack: Ontrack,
-    code: MockScmRepositoryContext.() -> Unit,
-) {
+    code: MockScmRepositoryContext.() -> T,
+): T {
     // Unique name for the repository
     val uuid = UUID.randomUUID().toString()
     val repo = "ontrack-auto-versioning-test-$uuid"
@@ -25,7 +25,7 @@ fun withMockScmRepository(
     val context = MockScmRepositoryContext(ontrack, repo)
 
     // Running the code
-    context.code()
+    return context.code()
 }
 
 class MockScmRepositoryContext(
