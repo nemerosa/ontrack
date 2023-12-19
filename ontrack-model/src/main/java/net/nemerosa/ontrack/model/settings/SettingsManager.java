@@ -8,6 +8,9 @@ public interface SettingsManager<T> {
 
     String getTitle();
 
+    /**
+     * @deprecated Settings form is used only for the legacy V4 UI and will be removed in V5.
+     */
     Form getSettingsForm();
 
     T getSettings();

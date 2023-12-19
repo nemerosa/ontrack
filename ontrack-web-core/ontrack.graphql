@@ -947,6 +947,14 @@ type CreateBuildPayload implements Payload {
     errors: [UserError]
 }
 
+"Output type for the createBuiltInAccount mutation."
+type CreateBuiltInAccountPayload implements Payload {
+    "Created account"
+    account: Account
+    "List of errors"
+    errors: [UserError]
+}
+
 "Output type for the createGitHubConfiguration mutation."
 type CreateGitHubConfigurationPayload implements Payload {
     "Saved configuration"
@@ -2750,6 +2758,11 @@ type Mutation {
         "Input for the mutation"
         input: CreateBuildOrGetInput
     ): CreateBuildOrGetPayload
+    "Creates a built-in account"
+    createBuiltInAccount(
+        "Input for the mutation"
+        input: CreateBuiltInAccountInput
+    ): CreateBuiltInAccountPayload
     "Creates a new GitHub configuration."
     createGitHubConfiguration(
         "Input for the mutation"
@@ -3259,6 +3272,8 @@ type Mutation {
     ): SaveBuildFilterPayload
     "Saves a dashboard"
     saveDashboard(input: SaveDashboardInput!): SaveDashboardPayload
+    "Saving some generic settings"
+    saveSettings(input: SaveSettingsInput!): SaveSettingsPayload
     "Selects a dashboard"
     selectDashboard(input: SelectDashboardInput!): SelectDashboardPayload
     "Sets the auto versioning configuration for a branch"
@@ -5149,6 +5164,11 @@ type SaveDashboardPayload implements PayloadInterface {
     errors: [PayloadUserError]
 }
 
+type SaveSettingsPayload implements PayloadInterface {
+    "List of errors"
+    errors: [PayloadUserError]
+}
+
 "Search result"
 type SearchResult {
     "Score for the search"
@@ -5793,6 +5813,23 @@ type SetValidationStampPropertyPayload implements Payload {
 type Settings {
     "Home page settings"
     homePage: HomePageSettingsType!
+    "List of all settings and their values"
+    list: [SettingsEntry!]!
+    "Getting some settings using their ID"
+    settingsById(
+        "ID of the settings to get"
+        id: String!
+    ): SettingsEntry
+}
+
+"SettingsEntry"
+type SettingsEntry {
+    "id field"
+    id: String!
+    "title field"
+    title: String!
+    "values field"
+    values: JSON!
 }
 
 "Output type for the setupCHMLValidationStamp mutation."
@@ -6887,6 +6924,18 @@ input CreateBuildOrGetInput {
     runInfo: RunInfoInput
 }
 
+"Input type for the createBuiltInAccount mutation."
+input CreateBuiltInAccountInput {
+    "email field"
+    email: String!
+    "fullName field"
+    fullName: String!
+    "name field"
+    name: String!
+    "password field"
+    password: String!
+}
+
 "Input type for the createGitHubConfiguration mutation."
 input CreateGitHubConfigurationInput {
     "ID of the GitHub App to use for authentication"
@@ -7952,6 +8001,13 @@ input SaveDashboardInput {
     userScope: DashboardContextUserScope!
     uuid: String
     widgets: [WidgetInstanceInput!]!
+}
+
+input SaveSettingsInput {
+    "ID of the settings"
+    id: String!
+    "Values for the settings"
+    values: JSON!
 }
 
 input SelectDashboardInput {

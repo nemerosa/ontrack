@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.model.links
 import net.nemerosa.ontrack.model.annotations.APIDescription
 
 @APIDescription("Branch links graph settings")
+@Deprecated("The branch links graph will be removed in V5")
 class BranchLinksSettings(
     @APIDescription("Dependency depth to take into account when computing the branch links graph")
     val depth: Int,

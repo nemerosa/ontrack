@@ -52,16 +52,7 @@ export default function BranchStatusesWidgetForm({promotions, validations, refre
                                     <SortableItem key={key}>
                                         <Space
                                             key={key}
-                                            style={{
-                                                display: 'flex',
-                                                marginBottom: 8,
-                                                backgroundColor: '#fcfcfc',
-                                                border: 'dashed 1px blue',
-                                                borderRadius: 8,
-                                                paddingTop: 16,
-                                                paddingLeft: 16,
-                                                paddingRight: 16,
-                                            }}
+                                            className="ot-form-list-item"
                                             align="baseline"
                                         >
                                             <Form.Item

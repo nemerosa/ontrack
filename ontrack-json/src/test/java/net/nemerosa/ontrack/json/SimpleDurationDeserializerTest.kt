@@ -2,16 +2,33 @@ package net.nemerosa.ontrack.json
 
 import org.junit.jupiter.api.Test
 import java.time.Duration
+import java.time.temporal.ChronoUnit
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
-internal class SimpleDurationDeserializerTest {
+class SimpleDurationDeserializerTest {
 
     @Test
     fun `Blank returns 0`() {
         assertEquals(
             Duration.ZERO,
             SimpleDurationDeserializer.parse("")
+        )
+    }
+
+    @Test
+    fun `x seconds`() {
+        assertEquals(
+            Duration.ofSeconds(86400),
+            SimpleDurationDeserializer.parse("86400s")
+        )
+    }
+
+    @Test
+    fun `x minutes`() {
+        assertEquals(
+            Duration.ofMinutes(14),
+            SimpleDurationDeserializer.parse("14m")
         )
     }
 
@@ -40,9 +57,23 @@ internal class SimpleDurationDeserializerTest {
     }
 
     @Test
-    fun `x days as default`() {
+    fun `x months not supported`() {
+        assertFailsWith<IllegalStateException> {
+            SimpleDurationDeserializer.parse("2M")
+        }
+    }
+
+    @Test
+    fun `x years not supported`() {
+        assertFailsWith<IllegalStateException> {
+            SimpleDurationDeserializer.parse("2y")
+        }
+    }
+
+    @Test
+    fun `x seconds as default`() {
         assertEquals(
-            Duration.ofDays(14),
+            Duration.ofSeconds(14),
             SimpleDurationDeserializer.parse("14")
         )
     }
@@ -57,7 +88,7 @@ internal class SimpleDurationDeserializerTest {
     @Test
     fun `No unit match`() {
         assertFailsWith<IllegalStateException> {
-            SimpleDurationDeserializer.parse("14m")
+            SimpleDurationDeserializer.parse("14x")
         }
     }
 

@@ -135,3 +135,18 @@ button.ot-validation-stamp-filter-edition {
     width: 100%;
     height: 100%;
 }
+
+/**
+ * Item in a Form.List
+ */
+
+.ot-form-list-item {
+    display: flex;
+    margin-bottom: 8px;
+    background-color: #fcfcfc;
+    border: dashed 1px blue;
+    border-radius: 8px;
+    padding-top: 16px;
+    padding-left: 16px;
+    padding-right: 16px;
+}

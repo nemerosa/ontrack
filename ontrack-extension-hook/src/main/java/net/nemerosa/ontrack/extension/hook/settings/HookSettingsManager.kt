@@ -52,7 +52,7 @@ class HookSettingsManager(
                             .value(settings.recordCleanupDuration.toSeconds())
             )
 
-    override fun getId(): String = "queue"
+    override fun getId(): String = "hooks"
 
-    override fun getTitle(): String = "Queue management"
+    override fun getTitle(): String = "Hooks"
 }

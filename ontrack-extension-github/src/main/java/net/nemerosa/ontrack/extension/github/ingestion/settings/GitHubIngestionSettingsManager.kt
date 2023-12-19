@@ -102,5 +102,5 @@ class GitHubIngestionSettingsManager(
 
     override fun getId(): String = "github-ingestion"
 
-    override fun getTitle(): String = "GitHub workflow ingestion"
+    override fun getTitle(): String = "GitHub ingestion"
 }

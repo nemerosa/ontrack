@@ -1,4 +1,4 @@
-import {FaExclamationTriangle, FaInfoCircle, FaTimes} from "react-icons/fa";
+import {FaCheck, FaExclamationTriangle, FaInfoCircle, FaTimes} from "react-icons/fa";
 
 export default function MessageTypeIcon({type}) {
     return (
@@ -11,6 +11,9 @@ export default function MessageTypeIcon({type}) {
             }
             {
                 type === 'INFO' && <FaInfoCircle color="blue"/>
+            }
+            {
+                type === 'SUCCESS' && <FaCheck color="green"/>
             }
         </>
     )

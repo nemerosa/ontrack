@@ -8,11 +8,11 @@ import java.time.Duration
 
 @APIDescription("Hook settings")
 data class HookSettings(
-        @APIDescription("Maximum number of days to keep hook records for non-running requests")
+        @APIDescription("Maximum time to keep hook records for non-running requests")
         @APILabel("Records retention")
         @JsonDeserialize(using = SimpleDurationDeserializer::class)
         val recordRetentionDuration: Duration = DEFAULT_RECORD_RETENTION_DURATION,
-        @APIDescription("Maximum number of days to keep queue records for all kinds of hook requests (counted _after_ the retention)")
+        @APIDescription("Maximum time to keep queue records for all kinds of hook requests (counted _after_ the retention)")
         @APILabel("Records cleanup")
         @JsonDeserialize(using = SimpleDurationDeserializer::class)
         val recordCleanupDuration: Duration = DEFAULT_RECORD_CLEANUP_DURATION,

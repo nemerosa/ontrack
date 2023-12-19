@@ -102,6 +102,27 @@ type ChangePasswordPayload implements PayloadInterface {
 }
 
 # =================================================================================
+# Saving settings (generic mutation)
+# =================================================================================
+
+extend type Mutation {
+    """Saving some generic settings"""
+    saveSettings(input: SaveSettingsInput!): SaveSettingsPayload
+}
+
+input SaveSettingsInput {
+    """ID of the settings"""
+    id: String!
+    """Values for the settings"""
+    values: JSON!
+}
+
+type SaveSettingsPayload implements PayloadInterface {
+    "List of errors"
+    errors: [PayloadUserError]
+}
+
+# =================================================================================
 # Dashboards
 # =================================================================================
 
