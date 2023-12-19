@@ -10,7 +10,7 @@ export const graphQLCallMutation = async (connection, userNode, query, variables
     }
 }
 
-export const graphQLCall = async (connection, query, variables) => {
+export const graphQLCall = async (connection, query, variables = {}) => {
     const username = connection.credentials.username
     const password = connection.credentials.password
 

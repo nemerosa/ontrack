@@ -1,8 +1,29 @@
 import {generate} from "@ontrack/utils";
-import {graphQLCallMutation} from "@ontrack/graphql";
+import {graphQLCall, graphQLCallMutation} from "@ontrack/graphql";
 import {gql} from "graphql-request";
 import {createBranch} from "@ontrack/branch";
 
+const gqlProjectData = gql`
+    fragment ProjectData on Project {
+        id
+        name
+    }
+`
+
+export  const projectList = async (ontrack) => {
+    const data = await graphQLCall(
+        ontrack.connection,
+        gql`
+            query ProjectList {
+                projects {
+                    ...ProjectData
+                }
+            }
+            ${gqlProjectData}
+        `
+    )
+    return data.projects.map(it => projectInstance(ontrack, it))
+}
 
 export const createProject = async (ontrack, name) => {
     const actualName = name ?? generate('prj_')
@@ -18,14 +39,14 @@ export const createProject = async (ontrack, name) => {
                     name: $name,
                 }) {
                     project {
-                        id
-                        name
+                        ...ProjectData
                     }
                     errors {
                         message
                     }
                 }
             }
+            ${gqlProjectData}
         `,
         {
             name: actualName,

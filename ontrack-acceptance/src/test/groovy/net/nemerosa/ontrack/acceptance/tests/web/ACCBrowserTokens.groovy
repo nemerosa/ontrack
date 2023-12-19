@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.acceptance.browser.Browser
 import net.nemerosa.ontrack.acceptance.browser.pages.LoginPage
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTest
 import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
+import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuiteMigrated
 import org.junit.Test
 
 import java.util.concurrent.TimeUnit
@@ -15,6 +16,7 @@ import static net.nemerosa.ontrack.test.TestUtils.uid
 
 @AcceptanceTestSuite
 @AcceptanceTest([AcceptanceTestContext.BROWSER_TEST])
+@AcceptanceTestSuiteMigrated
 class ACCBrowserTokens extends AcceptanceTestClient {
 
     @Test

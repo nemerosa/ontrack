@@ -80,7 +80,8 @@ export const useLogout = () => {
                     // Removing the cookie
                     deleteCookie(cookieName, cookieOptions())
                     // Redirecting to the login page
-                    location.href = `${config.url}/login?logout&targetUrl=${config.environment.ontrack.ui.url}`
+                    console.log("logout", {connection, config})
+                    location.href = `${config.url}/login?logout&targetUrl=${connection.environment.ontrack.ui.url}`
                 },
             })
         }

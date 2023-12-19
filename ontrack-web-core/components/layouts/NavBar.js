@@ -55,6 +55,7 @@ export default function NavBar() {
                     <NavBarText text={user?.account?.fullName}/>
                     <Avatar icon={<FaRegUser/>}
                             onClick={openUserMenu}
+                            className="ot-user-menu"
                             style={{
                                 backgroundColor: 'white',
                                 color: 'black',

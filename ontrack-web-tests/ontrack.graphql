@@ -59,7 +59,9 @@ type Account {
     "Security role (admin or none)"
     role: String
     "Authentication token, if any, linked to this account."
-    token: Token
+    token: Token @deprecated(reason: "Use the list of tokens. Will be removed in V5.")
+    "List of authentication tokens linked to this account."
+    tokens: [Token!]!
 }
 
 type AccountGroup {
@@ -819,6 +821,11 @@ type CasC {
     yaml: String!
 }
 
+type ChangePasswordPayload implements PayloadInterface {
+    "List of errors"
+    errors: [PayloadUserError]
+}
+
 "Output type for the changeValidationRunStatusComment mutation."
 type ChangeValidationRunStatusCommentPayload implements Payload {
     "List of errors"
@@ -940,6 +947,14 @@ type CreateBuildPayload implements Payload {
     errors: [UserError]
 }
 
+"Output type for the createBuiltInAccount mutation."
+type CreateBuiltInAccountPayload implements Payload {
+    "Created account"
+    account: Account
+    "List of errors"
+    errors: [UserError]
+}
+
 "Output type for the createGitHubConfiguration mutation."
 type CreateGitHubConfigurationPayload implements Payload {
     "Saved configuration"
@@ -1028,9 +1043,8 @@ type CreateWebhookPayload implements Payload {
     webhook: Webhook
 }
 
-type DashboardOld {
+type Dashboard {
     authorizations: DashboardAuthorizations!
-    layoutKey: String!
     name: String!
     userScope: DashboardContextUserScope!
     uuid: String!
@@ -1041,12 +1055,6 @@ type DashboardAuthorizations {
     delete: Boolean!
     edit: Boolean!
     share: Boolean!
-}
-
-type DashboardLayout {
-    description: String!
-    key: String!
-    name: String!
 }
 
 type Decoration {
@@ -1348,6 +1356,22 @@ type DeleteProjectMetaInfoPropertyPayload implements Payload {
 type DeleteProjectPayload implements Payload {
     "List of errors"
     errors: [UserError]
+}
+
+"Output type for the deleteProjectSonarQubePropertyById mutation."
+type DeleteProjectSonarQubePropertyByIdPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Project updated"
+    project: Project
+}
+
+"Output type for the deleteProjectSonarQubeProperty mutation."
+type DeleteProjectSonarQubePropertyPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Project updated"
+    project: Project
 }
 
 "Output type for the deleteProjectStalePropertyById mutation."
@@ -1657,6 +1681,14 @@ type FavouriteProjectPayload implements Payload {
     errors: [UserError]
     "Updated project"
     project: Project
+}
+
+"Output type for the generateToken mutation."
+type GenerateTokenPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Generated token"
+    token: Token
 }
 
 type GitChangeLog {
@@ -2689,6 +2721,8 @@ type LockAccountPayload implements Payload {
 }
 
 type Mutation {
+    "Changing the password of the current user"
+    changePassword(input: ChangePasswordInput!): ChangePasswordPayload
     "Change the status of a validation run"
     changeValidationRunStatus(
         "Input for the mutation"
@@ -2724,6 +2758,11 @@ type Mutation {
         "Input for the mutation"
         input: CreateBuildOrGetInput
     ): CreateBuildOrGetPayload
+    "Creates a built-in account"
+    createBuiltInAccount(
+        "Input for the mutation"
+        input: CreateBuiltInAccountInput
+    ): CreateBuiltInAccountPayload
     "Creates a new GitHub configuration."
     createGitHubConfiguration(
         "Input for the mutation"
@@ -2966,6 +3005,16 @@ type Mutation {
         "Input for the mutation"
         input: DeleteProjectMetaInfoPropertyByIdInput
     ): DeleteProjectMetaInfoPropertyByIdPayload
+    "Deletes the sonarQube property on a project identified by name."
+    deleteProjectSonarQubeProperty(
+        "Input for the mutation"
+        input: DeleteProjectSonarQubePropertyInput
+    ): DeleteProjectSonarQubePropertyPayload
+    "Deletes the sonarQube property on a project."
+    deleteProjectSonarQubePropertyById(
+        "Input for the mutation"
+        input: DeleteProjectSonarQubePropertyByIdInput
+    ): DeleteProjectSonarQubePropertyByIdPayload
     "Deletes the stale branches property on a project identified by name."
     deleteProjectStaleProperty(
         "Input for the mutation"
@@ -3121,6 +3170,11 @@ type Mutation {
         "Input for the mutation"
         input: FavouriteProjectInput
     ): FavouriteProjectPayload
+    "Generate a new token"
+    generateToken(
+        "Input for the mutation"
+        input: GenerateTokenInput
+    ): GenerateTokenPayload
     "Checks the dependencies based on the auto versioning information."
     gitHubCheckAutoVersioningByBuildLabel(
         "Input for the mutation"
@@ -3199,6 +3253,18 @@ type Mutation {
     purgeQueueRecordings: PurgeQueueRecordingsPayload
     "Reload the configuration from the CasC files"
     reloadCasc: ReloadCascPayload
+    "Revoke all tokens of the given account"
+    revokeAccountTokens(
+        "Input for the mutation"
+        input: RevokeAccountTokensInput
+    ): RevokeAccountTokensPayload
+    "Revokes all tokens"
+    revokeAllTokens: RevokeAllTokensPayload
+    "Revoke the given token"
+    revokeToken(
+        "Input for the mutation"
+        input: RevokeTokenInput
+    ): RevokeTokenPayload
     "Saves a build filter in the user preferences"
     saveBuildFilter(
         "Input for the mutation"
@@ -3428,6 +3494,16 @@ type Mutation {
         "Input for the mutation"
         input: SetProjectPropertyByIdInput
     ): SetProjectPropertyByIdPayload
+    "Set the sonarQube property on a project identified by name."
+    setProjectSonarQubeProperty(
+        "Input for the mutation"
+        input: SetProjectSonarQubePropertyInput
+    ): SetProjectSonarQubePropertyPayload
+    "Set the sonarQube property on a project."
+    setProjectSonarQubePropertyById(
+        "Input for the mutation"
+        input: SetProjectSonarQubePropertyByIdInput
+    ): SetProjectSonarQubePropertyByIdPayload
     "Set the stale branches property on a project identified by name."
     setProjectStaleProperty(
         "Input for the mutation"
@@ -3610,11 +3686,46 @@ type Mutation {
         "Input for the mutation"
         input: ShareSCMFileChangeFilterInput
     ): ShareSCMFileChangeFilterPayload
+    "Set a list of subscriptions on a branch identified by name."
+    subscribeBranchToEvents(
+        "Input for the mutation"
+        input: SubscribeBranchToEventsInput
+    ): SubscribeBranchToEventsPayload
+    "Set a list of subscriptions on a build identified by name."
+    subscribeBuildToEvents(
+        "Input for the mutation"
+        input: SubscribeBuildToEventsInput
+    ): SubscribeBuildToEventsPayload
+    "Set a list of subscriptions on a project identified by name."
+    subscribeProjectToEvents(
+        "Input for the mutation"
+        input: SubscribeProjectToEventsInput
+    ): SubscribeProjectToEventsPayload
+    "Set a list of subscriptions on a promotion level identified by name."
+    subscribePromotionLevelToEvents(
+        "Input for the mutation"
+        input: SubscribePromotionLevelToEventsInput
+    ): SubscribePromotionLevelToEventsPayload
+    "Set a list of subscriptions on a promotion run identified by name."
+    subscribePromotionRunToEvents(
+        "Input for the mutation"
+        input: SubscribePromotionRunToEventsInput
+    ): SubscribePromotionRunToEventsPayload
     "Creates a subscription to a list of events"
     subscribeToEvents(
         "Input for the mutation"
         input: SubscribeToEventsInput
     ): SubscribeToEventsPayload
+    "Set a list of subscriptions on a validation run identified by name."
+    subscribeValidationRunToEvents(
+        "Input for the mutation"
+        input: SubscribeValidationRunToEventsInput
+    ): SubscribeValidationRunToEventsPayload
+    "Set a list of subscriptions on a validation stamp identified by name."
+    subscribeValidationStampToEvents(
+        "Input for the mutation"
+        input: SubscribeValidationStampToEventsInput
+    ): SubscribeValidationStampToEventsPayload
     "Unmarks a branch as favourite"
     unfavouriteBranch(
         "Input for the mutation"
@@ -3822,7 +3933,7 @@ type Preferences {
     branchViewVsGroups: Boolean!
     "Branch view VS names"
     branchViewVsNames: Boolean!
-    "DashboardOld selected by default"
+    "Dashboard selected by default"
     dashboardUuid: String
     "Selected branch view"
     selectedBranchViewKey: String
@@ -4520,8 +4631,6 @@ type Query {
         "Filter the indicators on their type ID"
         type: String
     ): [ConfigurableIndicatorTypeState!]!
-    "List of available layouts"
-    dashboardLayouts: [DashboardLayout!]!
     "List of available widgets"
     dashboardWidgets: [Widget!]!
     "Getting a project entity using its type and ID."
@@ -4692,6 +4801,15 @@ type Query {
         "ID of the promotion level to look for (required)"
         id: Int!
     ): PromotionLevel
+    "Promotion level by name"
+    promotionLevelByName(
+        "Branch name"
+        branch: String!,
+        "Promotion level name"
+        name: String!,
+        "Project name"
+        project: String!
+    ): PromotionLevel
     "Gets a list of existing available promotion level names"
     promotionLevelNames(
         "Part of the name to look for"
@@ -4772,9 +4890,11 @@ type Query {
     "Gets the current user"
     user: User
     "Gets the current dashboard"
-    userDashboard: DashboardOld!
+    userDashboard: Dashboard!
     "Gets the list of private & shared dashboards"
-    userDashboards: [DashboardOld!]!
+    userDashboards: [Dashboard!]!
+    "List of user menu items"
+    userMenuItems: [UserMenuGroup!]!
     "List of validation run statuses"
     validationRunStatusIDList: [ValidationRunStatusID!]!
     validationRuns(
@@ -4888,6 +5008,24 @@ type RateLimit {
 
 "Output type for the reloadCasc mutation."
 type ReloadCascPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
+"Output type for the revokeAccountTokens mutation."
+type RevokeAccountTokensPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
+"Output type for the revokeAllTokens mutation."
+type RevokeAllTokensPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
+"Output type for the revokeToken mutation."
+type RevokeTokenPayload implements Payload {
     "List of errors"
     errors: [UserError]
 }
@@ -5019,7 +5157,7 @@ type SaveBuildFilterPayload implements Payload {
 
 type SaveDashboardPayload implements PayloadInterface {
     "Saved dashboard"
-    dashboard: DashboardOld
+    dashboard: Dashboard
     "List of errors"
     errors: [PayloadUserError]
 }
@@ -5424,6 +5562,22 @@ type SetProjectPropertyPayload implements Payload {
     project: Project
 }
 
+"Output type for the setProjectSonarQubePropertyById mutation."
+type SetProjectSonarQubePropertyByIdPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Project updated"
+    project: Project
+}
+
+"Output type for the setProjectSonarQubeProperty mutation."
+type SetProjectSonarQubePropertyPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Project updated"
+    project: Project
+}
+
 "Output type for the setProjectStalePropertyById mutation."
 type SetProjectStalePropertyByIdPayload implements Payload {
     "List of errors"
@@ -5710,7 +5864,7 @@ type ShareBuildFilterPayload implements Payload {
 
 type ShareDashboardPayload implements PayloadInterface {
     "Shared dashboard"
-    dashboard: DashboardOld
+    dashboard: Dashboard
     "List of errors"
     errors: [PayloadUserError]
 }
@@ -5740,8 +5894,64 @@ type StepIngestionConfigValidation {
     validationPrefix: Boolean
 }
 
+"Output type for the subscribeBranchToEvents mutation."
+type SubscribeBranchToEventsPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Saved subscription"
+    subscription: EventSubscriptionPayload
+}
+
+"Output type for the subscribeBuildToEvents mutation."
+type SubscribeBuildToEventsPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Saved subscription"
+    subscription: EventSubscriptionPayload
+}
+
+"Output type for the subscribeProjectToEvents mutation."
+type SubscribeProjectToEventsPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Saved subscription"
+    subscription: EventSubscriptionPayload
+}
+
+"Output type for the subscribePromotionLevelToEvents mutation."
+type SubscribePromotionLevelToEventsPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Saved subscription"
+    subscription: EventSubscriptionPayload
+}
+
+"Output type for the subscribePromotionRunToEvents mutation."
+type SubscribePromotionRunToEventsPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Saved subscription"
+    subscription: EventSubscriptionPayload
+}
+
 "Output type for the subscribeToEvents mutation."
 type SubscribeToEventsPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Saved subscription"
+    subscription: EventSubscriptionPayload
+}
+
+"Output type for the subscribeValidationRunToEvents mutation."
+type SubscribeValidationRunToEventsPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Saved subscription"
+    subscription: EventSubscriptionPayload
+}
+
+"Output type for the subscribeValidationStampToEvents mutation."
+type SubscribeValidationStampToEventsPayload implements Payload {
     "List of errors"
     errors: [UserError]
     "Saved subscription"
@@ -5752,10 +5962,20 @@ type SubscribeToEventsPayload implements Payload {
 type Token {
     "Token creation date."
     creation: LocalDateTime
+    "Date when the token was last used."
+    lastUsed: LocalDateTime
+    "Name of the token"
+    name: String
+    "scope field"
+    scope: TokenScope!
+    "Is this token managed?"
+    transient: Boolean!
     "Validity flag, computed in regard to current time."
     valid: Boolean
     "Date until the end of validity."
     validUntil: LocalDateTime
+    "Value of the token"
+    value: String
 }
 
 """
@@ -5839,6 +6059,26 @@ type UserError {
     location: String
     "The error message"
     message: String!
+}
+
+"Item in the user menu"
+type UserMenuAction {
+    "Extension contributing this user menu item"
+    extension: String!
+    "Unique ID for this user menu item in the given extension"
+    id: String!
+    "Display name for this user menu item"
+    name: String!
+}
+
+"Group of user menu items"
+type UserMenuGroup {
+    "ID of the group"
+    id: String!
+    "Items in this group"
+    items: [UserMenuAction!]!
+    "Name of the group"
+    name: String!
 }
 
 "Output type for the validateBuildByIdWithCHML mutation."
@@ -6243,6 +6483,14 @@ type Widget {
     description: String!
     key: String!
     name: String!
+    preferredHeight: Int!
+}
+
+type WidgetInstance {
+    config: JSON!
+    key: String!
+    layout: WidgetLayout!
+    uuid: String!
 }
 
 """
@@ -6251,10 +6499,11 @@ type Widget {
 Dashboards
 =================================================================================
 """
-type WidgetInstance {
-    config: JSON!
-    key: String!
-    uuid: String!
+type WidgetLayout {
+    h: Int!
+    w: Int!
+    x: Int!
+    y: Int!
 }
 
 "List of ways the auto approval is managed."
@@ -6410,6 +6659,12 @@ enum SCMChangeLogFileChangeType {
     UNDEFINED
 }
 
+"Class of tokens"
+enum TokenScope {
+    NEXT_UI
+    USER
+}
+
 "Defines how validation runs should be sorted"
 enum ValidationRunSortingMode {
     ID
@@ -6542,6 +6797,17 @@ input CHMLLevel {
     value: Int!
 }
 
+"""
+
+=================================================================================
+User change password
+=================================================================================
+"""
+input ChangePasswordInput {
+    newPassword: String!
+    oldPassword: String!
+}
+
 "Input type for the changeValidationRunStatusComment mutation."
 input ChangeValidationRunStatusCommentInput {
     "comment field"
@@ -6632,6 +6898,18 @@ input CreateBuildOrGetInput {
     projectName: String
     "Optional run info"
     runInfo: RunInfoInput
+}
+
+"Input type for the createBuiltInAccount mutation."
+input CreateBuiltInAccountInput {
+    "email field"
+    email: String!
+    "fullName field"
+    fullName: String!
+    "name field"
+    name: String!
+    "password field"
+    password: String!
 }
 
 "Input type for the createGitHubConfiguration mutation."
@@ -7043,6 +7321,18 @@ input DeleteProjectMetaInfoPropertyInput {
     project: String!
 }
 
+"Input type for the deleteProjectSonarQubePropertyById mutation."
+input DeleteProjectSonarQubePropertyByIdInput {
+    "ID of the project"
+    id: Int!
+}
+
+"Input type for the deleteProjectSonarQubeProperty mutation."
+input DeleteProjectSonarQubePropertyInput {
+    "Project name"
+    project: String!
+}
+
 "Input type for the deleteProjectStalePropertyById mutation."
 input DeleteProjectStalePropertyByIdInput {
     "ID of the project"
@@ -7300,6 +7590,12 @@ input FavouriteBranchInput {
 input FavouriteProjectInput {
     "Project ID"
     id: Int!
+}
+
+"Input type for the generateToken mutation."
+input GenerateTokenInput {
+    "name field"
+    name: String!
 }
 
 input GenericBuildFilter {
@@ -7637,6 +7933,18 @@ input QueueRecordingFilterInput {
     text: String
 }
 
+"Input type for the revokeAccountTokens mutation."
+input RevokeAccountTokensInput {
+    "accountId field"
+    accountId: Int!
+}
+
+"Input type for the revokeToken mutation."
+input RevokeTokenInput {
+    "name field"
+    name: String!
+}
+
 "Input for some run info"
 input RunInfoInput {
     "Time of the run (in seconds)"
@@ -7664,7 +7972,6 @@ input SaveBuildFilterInput {
 }
 
 input SaveDashboardInput {
-    layoutKey: String!
     name: String!
     select: Boolean! = true
     userScope: DashboardContextUserScope!
@@ -7923,7 +8230,7 @@ input SetPreferencesInput {
     branchViewVsGroups: Boolean
     "branchViewVsNames field"
     branchViewVsNames: Boolean
-    "DashboardOld selected by default"
+    "Dashboard selected by default"
     dashboardUuid: String
     "Selected branch view"
     selectedBranchViewKey: String
@@ -8155,6 +8462,50 @@ input SetProjectPropertyInput {
     property: String!
     "JSON for the property value or null to delete the property"
     value: JSON
+}
+
+"Input type for the setProjectSonarQubePropertyById mutation."
+input SetProjectSonarQubePropertyByIdInput {
+    "Using the branch model to restrict the collection of measures"
+    branchModel: Boolean!
+    "Regex to use to restrict the branches for which the measures are collected"
+    branchPattern: String
+    "Name of the SonarQube configuration to use"
+    configuration: String!
+    "ID of the project"
+    id: Int!
+    "Key of the project in SonarQube"
+    key: String!
+    "List of measures to collect"
+    measures: [String!]!
+    "Overriding the list of measures from the global settings"
+    override: Boolean!
+    "If checked, collected SQ measures will be attached as metrics to the validation."
+    validationMetrics: Boolean!
+    "Validation stamp to listen to"
+    validationStamp: String!
+}
+
+"Input type for the setProjectSonarQubeProperty mutation."
+input SetProjectSonarQubePropertyInput {
+    "Using the branch model to restrict the collection of measures"
+    branchModel: Boolean!
+    "Regex to use to restrict the branches for which the measures are collected"
+    branchPattern: String
+    "Name of the SonarQube configuration to use"
+    configuration: String!
+    "Key of the project in SonarQube"
+    key: String!
+    "List of measures to collect"
+    measures: [String!]!
+    "Overriding the list of measures from the global settings"
+    override: Boolean!
+    "Project name"
+    project: String!
+    "If checked, collected SQ measures will be attached as metrics to the validation."
+    validationMetrics: Boolean!
+    "Validation stamp to listen to"
+    validationStamp: String!
 }
 
 "Input type for the setProjectStalePropertyById mutation."
@@ -8687,6 +9038,92 @@ input StandardBuildFilter {
     withValidationStampStatus: String
 }
 
+"Input type for the subscribeBranchToEvents mutation."
+input SubscribeBranchToEventsInput {
+    "Branch name"
+    branch: String!
+    "Channel to send this event to"
+    channel: String!
+    "Channel configuration"
+    channelConfig: JSON!
+    "List of events types to subscribe to"
+    events: [String!]!
+    "Optional space-separated list of tokens to look for in the events"
+    keywords: String
+    "Project name"
+    project: String!
+}
+
+"Input type for the subscribeBuildToEvents mutation."
+input SubscribeBuildToEventsInput {
+    "Branch name"
+    branch: String!
+    "Build name"
+    build: String!
+    "Channel to send this event to"
+    channel: String!
+    "Channel configuration"
+    channelConfig: JSON!
+    "List of events types to subscribe to"
+    events: [String!]!
+    "Optional space-separated list of tokens to look for in the events"
+    keywords: String
+    "Project name"
+    project: String!
+}
+
+"Input type for the subscribeProjectToEvents mutation."
+input SubscribeProjectToEventsInput {
+    "Channel to send this event to"
+    channel: String!
+    "Channel configuration"
+    channelConfig: JSON!
+    "List of events types to subscribe to"
+    events: [String!]!
+    "Optional space-separated list of tokens to look for in the events"
+    keywords: String
+    "Project name"
+    project: String!
+}
+
+"Input type for the subscribePromotionLevelToEvents mutation."
+input SubscribePromotionLevelToEventsInput {
+    "Branch name"
+    branch: String!
+    "Channel to send this event to"
+    channel: String!
+    "Channel configuration"
+    channelConfig: JSON!
+    "List of events types to subscribe to"
+    events: [String!]!
+    "Optional space-separated list of tokens to look for in the events"
+    keywords: String
+    "Project name"
+    project: String!
+    "Promotion name"
+    promotion: String!
+}
+
+"Input type for the subscribePromotionRunToEvents mutation."
+input SubscribePromotionRunToEventsInput {
+    "Branch name"
+    branch: String!
+    "Build name"
+    build: String!
+    "Channel to send this event to"
+    channel: String!
+    "Channel configuration"
+    channelConfig: JSON!
+    "List of events types to subscribe to"
+    events: [String!]!
+    "Optional space-separated list of tokens to look for in the events"
+    keywords: String
+    "Project name"
+    project: String!
+    "Promotion name"
+    promotion: String!
+}
+
 "Input type for the subscribeToEvents mutation."
 input SubscribeToEventsInput {
     "Channel to send this event to"
@@ -8699,6 +9136,46 @@ input SubscribeToEventsInput {
     keywords: String
     "Target project entity (null for global events)"
     projectEntity: ProjectEntityIDInput
+}
+
+"Input type for the subscribeValidationRunToEvents mutation."
+input SubscribeValidationRunToEventsInput {
+    "Branch name"
+    branch: String!
+    "Build name"
+    build: String!
+    "Channel to send this event to"
+    channel: String!
+    "Channel configuration"
+    channelConfig: JSON!
+    "List of events types to subscribe to"
+    events: [String!]!
+    "Optional space-separated list of tokens to look for in the events"
+    keywords: String
+    "Project name"
+    project: String!
+    "Run name"
+    run: String!
+    "Validation name"
+    validation: String!
+}
+
+"Input type for the subscribeValidationStampToEvents mutation."
+input SubscribeValidationStampToEventsInput {
+    "Branch name"
+    branch: String!
+    "Channel to send this event to"
+    channel: String!
+    "Channel configuration"
+    channelConfig: JSON!
+    "List of events types to subscribe to"
+    events: [String!]!
+    "Optional space-separated list of tokens to look for in the events"
+    keywords: String
+    "Project name"
+    project: String!
+    "Validation name"
+    validation: String!
 }
 
 "Input type for the unfavouriteBranch mutation."
@@ -8931,5 +9408,13 @@ input WebhookExchangeFilter {
 input WidgetInstanceInput {
     config: JSON!
     key: String!
+    layout: WidgetLayoutInput!
     uuid: String
+}
+
+input WidgetLayoutInput {
+    h: Int!
+    w: Int!
+    x: Int!
+    y: Int!
 }
