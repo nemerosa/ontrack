@@ -2,13 +2,16 @@ import MainPage from "@components/layouts/MainPage";
 import JumpToProject from "@components/projects/JumpToProject";
 import DashboardContextProvider from "@components/dashboards/DashboardContextProvider";
 import DashboardView from "@components/dashboards/DashboardView";
-import {LegacyLinkCommand} from "@components/common/Commands";
+import {Command, LegacyLinkCommand} from "@components/common/Commands";
 import DashboardCommandMenu from "@components/dashboards/DashboardCommandMenu";
 import GridTableContextProvider from "@components/grid/GridTableContext";
+import {FaPlus} from "react-icons/fa";
+import NewProjectCommand from "@components/projects/NewProjectCommand";
 
 export default function DashboardPage({title}) {
 
     const commands = [
+        <NewProjectCommand key="create-project"/>,
         <JumpToProject key="project"/>,
         <LegacyLinkCommand
             key="legacy"
