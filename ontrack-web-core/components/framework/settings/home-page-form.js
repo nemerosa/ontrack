@@ -1,7 +1,7 @@
 import SettingsForm from "@components/core/admin/settings/SettingsForm";
 import {Alert, Form, InputNumber} from "antd";
 
-export default function ({id, ...values}) {
+export default function HomePageForm({id, ...values}) {
     return (
         <>
             <SettingsForm id={id} values={values}>

@@ -150,3 +150,28 @@ button.ot-validation-stamp-filter-edition {
     padding-left: 16px;
     padding-right: 16px;
 }
+
+/**
+ * Git plot
+ */
+
+.ot-git-plot-line {
+    height: 24px;
+    vertical-align: baseline;
+}
+
+.ot-git-plot-line-author {
+    background-color: #eee;
+    padding: 2px;
+}
+
+.ot-git-plot-line-timestamp {
+    background-color: #eee;
+    padding: 2px;
+}
+
+.ot-git-plot-line-build {
+    border: solid 1px black;
+    border-radius: 4px;
+    padding: 2px;
+}

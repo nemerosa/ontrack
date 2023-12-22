@@ -123,6 +123,9 @@ class MockSCMExtension(
         private val mockScmProjectProperty: MockSCMProjectProperty,
     ) : SCM {
 
+        override val type: String = "mock"
+        override val engine: String = "mock"
+
         override val repositoryURI: String = "mock:${mockScmProjectProperty.name}"
 
         override val repositoryHtmlURL: String = ""
@@ -160,5 +163,7 @@ class MockSCMExtension(
             reviewers = reviewers,
         )
 
+        override fun getDiffLink(commitFrom: String, commitTo: String): String? =
+            "diff?from=$commitFrom&to=$commitTo"
     }
 }

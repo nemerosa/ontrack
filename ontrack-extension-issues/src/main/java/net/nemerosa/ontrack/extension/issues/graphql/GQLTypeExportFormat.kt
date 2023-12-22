@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.graphql.support.stringField
 import org.springframework.stereotype.Component
 
 @Component
+@Deprecated("Use `IssueExportFormat`")
 class GQLTypeExportFormat : GQLType {
     override fun getTypeName(): String = ExportFormat::class.java.simpleName
 

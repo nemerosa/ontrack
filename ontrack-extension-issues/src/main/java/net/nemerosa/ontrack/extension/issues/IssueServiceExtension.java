@@ -90,6 +90,7 @@ public interface IssueServiceExtension extends Extension {
      * List of supported export formats for the issues.
      *
      * @param issueServiceConfiguration Configuration for the service
+     * @deprecated Export formats are no longer issue service specific - will be removed in V5
      */
     List<ExportFormat> exportFormats(IssueServiceConfiguration issueServiceConfiguration);
 

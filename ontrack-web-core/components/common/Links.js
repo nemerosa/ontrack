@@ -1,14 +1,5 @@
 import Link from "next/link";
 
-/**
- * @deprecated Use the LegacyLink component
- */
-export function legacyUri() {
-    return ''
-    // const config = clientConfig()
-    // return `${config.url}/`
-}
-
 export function legacyGraphiQLUri() {
     return `/graphiql.html`
 }
@@ -39,6 +30,10 @@ export function buildUri(build) {
 
 export function buildLegacyUri(build) {
     return `#/build/${build.id}`
+}
+
+export function scmChangeLogUri(scmType, from, to) {
+    return `/extension/${scmType}/changelog?from=${from}&to=${to}`
 }
 
 // TODO As a component
@@ -75,8 +70,4 @@ export function legacyValidationStampUri(validationStamp) {
 
 export function legacyValidationRunUri(validationRun) {
     return `#/validationRun/${validationRun.id}`
-}
-
-export function legacyGitChangeLogUri({from, to}) {
-    return `#/extension/git/changelog?from=${from}&to=${to}`
 }

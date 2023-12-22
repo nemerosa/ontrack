@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.model.structure.TokenOptions
 import net.nemerosa.ontrack.model.structure.TokenScope
 import net.nemerosa.ontrack.model.structure.TokensService
 import org.springframework.stereotype.Component
+import java.net.URLEncoder
 
 @Component
 class NextUIRedirector(
@@ -45,7 +46,7 @@ class NextUIRedirector(
         // Callback URL
         var url = "${tokenCallback}?${PARAM_TOKEN}=$tokenValue"
         if (!href.isNullOrBlank()) {
-            url += "&${PARAM_HREF}=${href}"
+            url += "&${PARAM_HREF}=${URLEncoder.encode(href, Charsets.UTF_8)}"
         }
         // OK
         return url

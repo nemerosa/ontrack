@@ -3,17 +3,17 @@ import {Button, Col, Popover, Row, Space, Spin, Table, Typography} from "antd";
 import {FaCheckSquare, FaEyeSlash, FaSearch, FaSquare} from "react-icons/fa";
 import PromotionRun from "@components/promotionRuns/PromotionRun";
 import RangeSelector from "@components/common/RangeSelector";
-import LegacyIndicator from "@components/common/LegacyIndicator";
 import {useRouter} from "next/router";
-import {legacyGitChangeLogUri} from "@components/common/Links";
 import BuildFilterDropdown from "@components/branches/filters/builds/BuildFilterDropdown";
 import ValidationStampFilterDropdown from "@components/branches/filters/validationStamps/ValidationStampFilterDropdown";
 import ValidationStampHeader from "@components/branches/ValidationStampHeader";
 import ValidationRunCell from "@components/branches/ValidationRunCell";
-import {useContext} from "react";
+import {useContext, useEffect, useState} from "react";
 import ValidationGroups from "@components/validationRuns/ValidationGroups";
 import {ValidationStampFilterContext} from "@components/branches/filters/validationStamps/ValidationStampFilterContext";
-import {useConnection} from "@components/providers/ConnectionContextProvider";
+import {useConnection, useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import {gql} from "graphql-request";
+import {scmChangeLogUri} from "@components/common/Links";
 
 const {Column} = Table;
 
@@ -43,17 +43,35 @@ export default function BranchBuilds({
                                          onPermalinkBuildFilter,
                                      }) {
 
+    const client = useGraphQLClient()
     const router = useRouter()
     const connection = useConnection()
     const vsfContext = useContext(ValidationStampFilterContext)
 
+    const [scmType, setScmType] = useState('')
+    useEffect(() => {
+        if (client && branch) {
+            client.request(
+                gql`
+                    query BranchScmInfo($id: Int!) {
+                        branch(id: $id) {
+                            scmBranchInfo {
+                                type
+                            }
+                        }
+                    }
+                `,
+                {id: branch.id}
+            ).then(data => {
+                setScmType(data.branch.scmBranchInfo?.type)
+            })
+        }
+    }, [client, branch]);
+
     const onChangeLog = () => {
-        if (connection.environment && rangeSelection.isComplete()) {
+        if (scmType && connection.environment && rangeSelection.isComplete()) {
             const [from, to] = rangeSelection.selection
-            // Legacy only for now
-            // TODO This should be an extension
-            // noinspection JSIgnoredPromiseFromCall
-            router.push(`${connection.environment.ontrack.url}${legacyGitChangeLogUri({from, to})}`)
+            router.push(scmChangeLogUri(scmType, from, to))
         }
     }
 
@@ -150,7 +168,8 @@ export default function BranchBuilds({
                                     onPermalink={onPermalinkBuildFilter}
                                 />
                                 {/* Change log */}
-                                <LegacyIndicator>
+                                {
+                                    scmType &&
                                     <Popover
                                         title="Change log between two builds"
                                         content={
@@ -169,7 +188,7 @@ export default function BranchBuilds({
                                             </Space>
                                         </Button>
                                     </Popover>
-                                </LegacyIndicator>
+                                }
                                 {/* VS filter */}
                                 <ValidationStampFilterDropdown
                                     branch={branch}

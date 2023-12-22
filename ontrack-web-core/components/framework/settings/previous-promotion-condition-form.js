@@ -1,7 +1,7 @@
 import SettingsForm from "@components/core/admin/settings/SettingsForm";
 import {Alert, Form, Switch} from "antd";
 
-export default function ({id, ...values}) {
+export default function PreviousPromotionConditionForm({id, ...values}) {
     return (
         <>
             <SettingsForm id={id} values={values}>

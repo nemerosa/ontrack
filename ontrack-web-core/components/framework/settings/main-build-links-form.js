@@ -1,7 +1,7 @@
 import SettingsForm from "@components/core/admin/settings/SettingsForm";
 import {Form, Select} from "antd";
 
-export default function ({id, ...values}) {
+export default function MainBuildLinksForm({id, ...values}) {
     return (
         <>
             <SettingsForm id={id} values={values}>

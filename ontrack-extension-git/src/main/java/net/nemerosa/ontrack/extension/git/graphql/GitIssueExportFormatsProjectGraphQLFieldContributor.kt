@@ -26,6 +26,7 @@ class GitIssueExportFormatsProjectGraphQLFieldContributor(
                     .name("gitIssueExportFormats")
                     .description("List of formats supported for the export of issues in this project")
                     .type(listType(gqlTypeExportFormat.typeRef))
+                    .deprecate("List of issue export formats can be taken from the root and is now called issueExportFormats.")
                     .dataFetcher { env ->
                         val project: Project = env.getSource()
                         gitService.getIssueExportFormats(project)

@@ -2,7 +2,7 @@ import SettingsForm from "@components/core/admin/settings/SettingsForm";
 import {Form, Select} from "antd";
 import DurationPicker from "@components/common/DurationPicker";
 
-export default function ({id, ...values}) {
+export default function GithubScmCatalogForm({id, ...values}) {
     return (
         <>
             <SettingsForm id={id} values={values}>

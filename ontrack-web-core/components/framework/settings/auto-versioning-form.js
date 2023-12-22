@@ -2,7 +2,7 @@ import SettingsForm from "@components/core/admin/settings/SettingsForm";
 import {Form, Switch} from "antd";
 import DurationPicker from "@components/common/DurationPicker";
 
-export default function ({id, ...values}) {
+export default function AutoVersioningForm({id, ...values}) {
     return (
         <>
             <SettingsForm id={id} values={values}>

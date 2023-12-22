@@ -1,5 +1,6 @@
 import {buildLink} from "@components/common/Links";
+import {buildKnownName} from "@components/common/Titles";
 
 export default function BuildLink({build}) {
-    return buildLink(build, build.releaseProperty?.value?.name ? build.releaseProperty.value.name : build.name)
+    return buildLink(build, buildKnownName(build))
 }

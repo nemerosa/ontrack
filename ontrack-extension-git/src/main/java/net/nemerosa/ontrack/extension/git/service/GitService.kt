@@ -276,5 +276,11 @@ interface GitService : SCMService {
     /**
      * Gets the list of available issue export formats for this project
      */
+    @Deprecated("Export formats are no longer issue service specific - will be removed in V5")
     fun getIssueExportFormats(project: Project): List<ExportFormat>
+
+    /**
+     * Gets a link to view a diff.
+     */
+    fun getDiffLink(gitChangeLog: GitChangeLog): String?
 }

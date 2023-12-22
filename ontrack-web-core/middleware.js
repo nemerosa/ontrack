@@ -13,6 +13,7 @@ export default function middleware(request) {
     const logging = isConnectionLoggingEnabled()
     const tracing = logging && isConnectionTracingEnabled()
     const path = request.nextUrl.pathname
+    const query = request.nextUrl.searchParams.toString()
 
     if (
         !path.startsWith('/_next') &&
@@ -46,7 +47,13 @@ export default function middleware(request) {
                 // Already authenticated, going forward
             } else {
                 const ontrackUi = ontrackUiUrl()
-                const tokenCallbackHref = `${ontrackUiUrl()}${path}`
+
+                let tokenCallbackHref = `${ontrackUi}${path}`
+                if (query) {
+                    tokenCallbackHref += `?${query}`
+                }
+                tokenCallbackHref = encodeURIComponent(tokenCallbackHref)
+
                 const url = `${ontrackUrl()}/login?token=true&tokenCallback=${ontrackUi}/auth&tokenCallbackHref=${tokenCallbackHref}`
                 if (logging) console.log(`[connection][middleware][${path}] Redirecting to login page at ${url}`)
                 return NextResponse.redirect(new URL(url))

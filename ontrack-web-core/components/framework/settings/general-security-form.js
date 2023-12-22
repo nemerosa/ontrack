@@ -1,7 +1,7 @@
 import {Alert, Button, Form, Space, Switch, Typography} from "antd";
 import SettingsForm from "@components/core/admin/settings/SettingsForm";
 
-export default function ({id, ...values}) {
+export default function GeneralSecurityForm({id, ...values}) {
     return (
         <>
             <SettingsForm id={id} values={values}>

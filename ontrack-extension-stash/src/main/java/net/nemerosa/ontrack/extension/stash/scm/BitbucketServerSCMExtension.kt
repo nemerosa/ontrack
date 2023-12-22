@@ -74,6 +74,9 @@ class BitbucketServerSCMExtension(
         private val settings: BitbucketServerSettings,
     ) : SCM {
 
+        override val type: String = "git"
+        override val engine: String = "bitbucket-server"
+
         private val stashConfiguration = StashGitConfiguration(
             configuration = configuration,
             project = project,
@@ -165,6 +168,10 @@ class BitbucketServerSCMExtension(
                 link = "${configuration.url}/projects/${project}/repos/${repositoryName}/pull-requests/${pr.id}/overview",
                 merged = merged
             )
+        }
+
+        override fun getDiffLink(commitFrom: String, commitTo: String): String {
+            return "${configuration.url}/projects/${project}/repos/${repositoryName}/compare/commits?targetBranch=${commitTo}&sourceBranch=${commitFrom}"
         }
 
         private fun waitAndMerge(prId: Int, message: String): Boolean {

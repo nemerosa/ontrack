@@ -48,6 +48,9 @@ class GitSCMExtension(
         // private val property: GitProjectConfigurationProperty,
     ) : SCM {
 
+        override val type: String = "git"
+        override val engine: String = "generic"
+
         override val repositoryURI: String
             get() = unsupported("repositoryURI")
 
@@ -87,6 +90,10 @@ class GitSCMExtension(
             reviewers: List<String>,
         ): SCMPullRequest {
             unsupported("createPR")
+        }
+
+        override fun getDiffLink(commitFrom: String, commitTo: String): String? {
+            unsupported("getDiffLink")
         }
 
         private fun checkProject(other: Project) {

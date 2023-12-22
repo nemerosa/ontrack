@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest
 import net.nemerosa.ontrack.extension.git.GitChangeLogCache
 import net.nemerosa.ontrack.extension.git.model.GitChangeLog
 import net.nemerosa.ontrack.extension.git.service.GitService
+import net.nemerosa.ontrack.extension.scm.service.SCMDetector
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeBuild
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
@@ -19,6 +20,7 @@ import net.nemerosa.ontrack.graphql.support.*
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.ID
+import net.nemerosa.ontrack.model.structure.LinkChangeService
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
 
@@ -35,6 +37,8 @@ class GQLTypeGitChangeLog(
     private val gitService: GitService,
     private val recursiveChangeLogService: RecursiveChangeLogService,
     private val gitChangeLogCache: GitChangeLogCache,
+    private val gqlTypeLinkChange: GQLTypeLinkChange,
+    private val linkChangeService: LinkChangeService,
 ) : GQLType {
 
     override fun getTypeName(): String = GIT_CHANGE_LOG
@@ -74,6 +78,29 @@ class GQLTypeGitChangeLog(
                     .type(GraphQLTypeReference(GQLTypeBuild.BUILD).toNotNull())
                     .dataFetcher { env ->
                         env.getSource<GitChangeLog>().to.build
+                    }
+            }
+            // Link to a diff
+            .field {
+                it.name("diffLink")
+                    .description("Link to a diff between the two builds")
+                    .type(GraphQLString)
+                    .dataFetcher { env ->
+                        val gitChangeLog: GitChangeLog = env.getSource()
+                        gitService.getDiffLink(gitChangeLog)
+                    }
+            }
+            // List of all dependency changes
+            .field {
+                it.name("linkChanges")
+                    .description("All dependency changes")
+                    .type(listType(gqlTypeLinkChange.typeRef))
+                    .dataFetcher { env ->
+                        val gitChangeLog: GitChangeLog = env.getSource()
+                        linkChangeService.linkChanges(
+                            gitChangeLog.from.build,
+                            gitChangeLog.to.build,
+                        )
                     }
             }
             // Commits plot

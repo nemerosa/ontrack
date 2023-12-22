@@ -10,6 +10,16 @@ import net.nemerosa.ontrack.model.structure.Branch
 interface SCM {
 
     /**
+     * Type of SCM (git, etc.)
+     */
+    val type: String
+
+    /**
+     * Flavor/engine of the SCM (github, etc.)
+     */
+    val engine: String
+
+    /**
      * Gets the (clone) URL of the project's repository
      */
     val repositoryURI: String
@@ -86,5 +96,10 @@ interface SCM {
         message: String,
         reviewers: List<String>,
     ): SCMPullRequest
+
+    /**
+     * Gets a link to see the diff between two commits.
+     */
+    fun getDiffLink(commitFrom: String, commitTo: String): String?
 
 }

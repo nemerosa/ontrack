@@ -1,7 +1,7 @@
 import SettingsForm from "@components/core/admin/settings/SettingsForm";
 import {Form, Input, InputNumber, Typography} from "antd";
 
-export default function ({id, ...values}) {
+export default function GithubAvPostProcessingForm({id, ...values}) {
     return (
         <>
             <SettingsForm id={id} values={values}>

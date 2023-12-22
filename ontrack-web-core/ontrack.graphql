@@ -399,6 +399,8 @@ type Branch implements Authorizable & ProjectEntity {
     pullRequest: GitPullRequest
     "When set, adding a release/label on a build will also validate this build."
     releaseValidationProperty: Property
+    "SCM information about the branch"
+    scmBranchInfo: SCMBranchInfo
     "List of branches this branch is a dependency of."
     upstreamLinks(
         "Number of builds to use to get the dependencies"
@@ -1705,6 +1707,8 @@ type GitChangeLog {
         "Name of the project to follow"
         project: String!
     ): GitChangeLog
+    "Link to a diff between the two builds"
+    diffLink: String
     "Export of the change log according to some specifications"
     export(
         "Export specifications"
@@ -1716,6 +1720,8 @@ type GitChangeLog {
     hasIssues: Boolean!
     "List of issues in the change log"
     issues: GitChangeLogIssues
+    "All dependency changes"
+    linkChanges: [LinkChange!]!
     "Project linked to the change log"
     project: Project!
     "If an error has occured during the synchronization"
@@ -2626,6 +2632,14 @@ type Issue {
     url: String
 }
 
+"Format for exporting a list of issues"
+type IssueExportFormat {
+    "Unique ID for this format"
+    id: String!
+    "Display name for this format"
+    name: String!
+}
+
 "Technical representation of an issue service and its configuration"
 type IssueServiceConfigurationRepresentation {
     "ID of the issue service"
@@ -2702,6 +2716,18 @@ type LinkBuildPayload implements Payload {
     build: Build
     "List of errors"
     errors: [UserError]
+}
+
+"Description of a change on a linked dependency."
+type LinkChange {
+    "from field"
+    from: Build
+    "project field"
+    project: Project!
+    "qualifier field"
+    qualifier: String!
+    "to field"
+    to: Build
 }
 
 "Output type for the linksBuild mutation."
@@ -3988,7 +4014,7 @@ type Project implements ProjectEntity {
     "Associates the project with a GitHub repository"
     gitHubProjectConfigurationProperty: Property
     "List of formats supported for the export of issues in this project"
-    gitIssueExportFormats: [ExportFormat!]!
+    gitIssueExportFormats: [ExportFormat!]! @deprecated(reason: "List of issue export formats can be taken from the root and is now called issueExportFormats.")
     "Information about an issue in the project"
     gitIssueInfo(
         "Flag to display only the first branch per type"
@@ -4748,6 +4774,8 @@ type Query {
     indicatorsManagement: IndicatorsManagement! @deprecated(reason: "Will be removed in 4.6")
     "Gets information about the application"
     info: Info
+    "List of available export formats"
+    issueExportFormats: [IssueExportFormat!]!
     "List of all labels"
     labels(
         "Category to look for"
@@ -5068,6 +5096,18 @@ type RunInfo {
     triggerData: String
     "Type of trigger (like \"scm\" or \"user\")"
     triggerType: String
+}
+
+"SCM information for a given branch."
+type SCMBranchInfo {
+    "SCM branch"
+    branch: String!
+    "SCM engine or flavor (like GitHub, etc.)"
+    engine: String!
+    "SCM type (like git, etc.)"
+    type: String!
+    "URI of the repository"
+    uri: String!
 }
 
 "SCM Catalog entry"

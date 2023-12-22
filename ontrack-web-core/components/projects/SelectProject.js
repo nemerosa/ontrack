@@ -66,7 +66,7 @@ export default function SelectProject({
                     label: d.name,
                 }))}
                 style={{
-                    width: '10em',
+                    width: '16em',
                 }}
             />
         </>

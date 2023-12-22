@@ -51,6 +51,9 @@ class TestSCMExtension(
         private val config: TestSCMExtensionSetup,
     ) : SCM {
 
+        override val type: String = "mock"
+        override val engine: String = "test"
+
         override val repositoryURI: String = "uri://test/${name}"
 
         override val repositoryHtmlURL: String = "uri://test/${name}.html"
@@ -69,6 +72,10 @@ class TestSCMExtension(
         }
 
         override fun upload(scmBranch: String, commit: String, path: String, content: ByteArray, message: String) {}
+
+        override fun getDiffLink(commitFrom: String, commitTo: String): String? {
+            TODO("Not yet implemented")
+        }
 
         override fun createPR(
             from: String,

@@ -23,6 +23,7 @@ import net.nemerosa.ontrack.extension.scm.model.SCMBuildView
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFileChangeType
 import net.nemerosa.ontrack.extension.scm.model.SCMPathInfo
 import net.nemerosa.ontrack.extension.scm.service.AbstractSCMChangeLogService
+import net.nemerosa.ontrack.extension.scm.service.SCMDetector
 import net.nemerosa.ontrack.extension.scm.service.SCMUtilsService
 import net.nemerosa.ontrack.git.GitRepositoryClient
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory
@@ -70,6 +71,7 @@ class GitServiceImpl(
     private val gitConfigProperties: GitConfigProperties,
     private val gitPullRequestCache: DefaultGitPullRequestCache,
     private val gitNoRemoteCounter: GitNoRemoteCounter,
+    private val scmDetector: SCMDetector,
     transactionManager: PlatformTransactionManager
 ) : AbstractSCMChangeLogService<GitConfiguration, GitBuildInfo, GitChangeLogIssue>(structureService, propertyService),
     GitService, JobOrchestratorSupplier {
@@ -263,6 +265,18 @@ class GitServiceImpl(
                 uiCommits
             )
         )
+    }
+
+    override fun getDiffLink(gitChangeLog: GitChangeLog): String? {
+        // Gets the build boundaries
+        val buildFrom = gitChangeLog.from.build
+        val buildTo = gitChangeLog.to.build
+        // Commit boundaries
+        val commitFrom = getCommitFromBuild(buildFrom)
+        val commitTo = getCommitFromBuild(buildTo)
+        // SCM
+        val scm = scmDetector.getSCM(gitChangeLog.project)
+        return scm?.getDiffLink(commitFrom, commitTo)
     }
 
     protected fun getCommitFromBuild(build: Build): String {

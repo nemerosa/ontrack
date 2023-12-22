@@ -3,7 +3,7 @@ import {FaArrowsAlt, FaCompressArrowsAlt, FaExpandArrowsAlt} from "react-icons/f
 
 import GridCellCommand from "@components/grid/GridCellCommand";
 import Section from "@components/common/Section";
-import {useContext, useState} from "react";
+import {useContext} from "react";
 import {GridTableContext} from "@components/grid/GridTableContext";
 
 export default function GridCell({
@@ -11,20 +11,13 @@ export default function GridCell({
                                      title,
                                      titleWidth = 18,
                                      loading,
-                                     padding = true,
-                                     isDraggable = true,
+                                     padding = 16,
+                                     isDraggable,
                                      extra,
                                      children
                                  }) {
 
-    const {expandable, expandedId, toggleExpandedId} = useContext(GridTableContext)
-
-    const bodyStyle = {
-        overflowY: 'scroll',
-    }
-    if (!padding) {
-        bodyStyle.padding = 0
-    }
+    const {expandable, draggable, expandedId, toggleExpandedId} = useContext(GridTableContext)
 
     const toggleExpansion = () => {
         if (id) {
@@ -37,6 +30,7 @@ export default function GridCell({
             <Section
                 title={loading ? "Loading..." : title}
                 titleWidth={titleWidth}
+                padding={padding}
                 extra={
                     <Space>
                         {extra}
@@ -57,7 +51,7 @@ export default function GridCell({
                             </>
                         }
                         <GridCellCommand
-                            condition={isDraggable}
+                            condition={isDraggable || draggable}
                             icon={<FaArrowsAlt/>}
                             title="Use this handle to drag the widget into another position"
                             className="ot-rgl-draggable-handle"

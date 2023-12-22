@@ -2,7 +2,7 @@ import SettingsForm from "@components/core/admin/settings/SettingsForm";
 import {Button, Col, Form, Input, Row, Space, Switch} from "antd";
 import {FaPlus, FaTrash} from "react-icons/fa";
 
-export default function ({id, ...values}) {
+export default function JenkinsPipelineLibrariesIndicatorsForm({id, ...values}) {
     return (
         <>
             <SettingsForm id={id} values={values}>

@@ -2,7 +2,7 @@ import SettingsForm from "@components/core/admin/settings/SettingsForm";
 import {Form, Input, Switch} from "antd";
 import {useState} from "react";
 
-export default function ({id, ...values}) {
+export default function LdapForm({id, ...values}) {
 
     const [enabled, setEnabled] = useState(values.enabled)
 
@@ -140,7 +140,7 @@ export default function ({id, ...values}) {
                             label="Group search filter"
                             extra={
                                 <>
-                                    The pattern to be used for the user search. <code>{'{'}0{'}'}</code> is the user's DN. Default to
+                                    The pattern to be used for the user search. <code>{'{'}0{'}'}</code> is the user&apos;s DN. Default to
                                     <code>(member={'{'}0{'}'})</code>.
                                 </>
                             }

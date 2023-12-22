@@ -2,6 +2,7 @@ import {createContext, useState} from "react";
 
 export const GridTableContext = createContext({
     expandable: false,
+    draggable: false,
     setExpandable: (flag) => {
     },
     expandedId: '',
@@ -11,9 +12,10 @@ export const GridTableContext = createContext({
     },
 })
 
-export default function GridTableContextProvider({children}) {
+export default function GridTableContextProvider({isExpandable = true, isDraggable = true, children}) {
 
-    const [expandable, setExpandable] = useState(true)
+    const [expandable, setExpandable] = useState(isExpandable)
+    const [draggable, setDraggable] = useState(isDraggable)
     const [expandedId, setExpandedId] = useState('')
 
     const toggleExpandedId = (id) => {
@@ -32,6 +34,7 @@ export default function GridTableContextProvider({children}) {
 
     const context = {
         expandable,
+        draggable,
         setExpandable,
         expandedId,
         toggleExpandedId,

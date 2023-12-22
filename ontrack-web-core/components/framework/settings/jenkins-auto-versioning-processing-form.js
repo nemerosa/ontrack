@@ -1,7 +1,7 @@
 import SettingsForm from "@components/core/admin/settings/SettingsForm";
 import {Form, Input, InputNumber} from "antd";
 
-export default function ({id, ...values}) {
+export default function JenkinsAutoVersioningProcessingForm({id, ...values}) {
     return (
         <>
             <SettingsForm id={id} values={values}>

@@ -1,5 +1,7 @@
+import DOMPurify from 'dompurify';
+
 export default function SafeHTMLComponent({htmlContent}) {
     return (
-        <div dangerouslySetInnerHTML={{__html: htmlContent}}/>
+        <span dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(htmlContent)}}/>
     );
 }

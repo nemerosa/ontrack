@@ -1,0 +1,12 @@
+"""Format for exporting a list of issues"""
+type IssueExportFormat {
+    """Unique ID for this format"""
+    id: String!
+    """Display name for this format"""
+    name: String!
+}
+
+extend type Query {
+    """List of available export formats"""
+    issueExportFormats: [IssueExportFormat!]!
+}

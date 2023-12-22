@@ -77,9 +77,16 @@ class GitHubSCMExtension(
         private val settings: GitHubSCMCatalogSettings,
     ) : SCM {
 
+        override val type: String = "git"
+        override val engine: String = "github"
+
         override val repositoryURI: String = "${configuration.url}/${repository}.git"
 
         override val repositoryHtmlURL: String = "${configuration.url}/${repository}"
+
+        override fun getDiffLink(commitFrom: String, commitTo: String): String {
+            return "${repositoryHtmlURL}/compare/${commitFrom}...${commitTo}"
+        }
 
         override fun getSCMBranch(branch: Branch): String? {
             val branchProperty: GitBranchConfigurationProperty? =
