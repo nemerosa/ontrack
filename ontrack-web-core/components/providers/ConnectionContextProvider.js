@@ -63,6 +63,19 @@ export const useRestClient = () => {
                     )
                     return response.json()
                 },
+                put: async (uri, body) => {
+                    await fetch(
+                        `${config.url}${uri}`,
+                        {
+                            method: 'PUT',
+                            headers: {
+                                ...config.headers,
+                                "Content-Type": "application/json",
+                            },
+                            body: body,
+                        }
+                    )
+                }
             })
         }
     }, [connection.config]);

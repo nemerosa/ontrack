@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.Base64;
 
 import static net.nemerosa.ontrack.ui.support.UIUtils.setupDefaultImageCache;
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -41,9 +42,9 @@ public class PromotionLevelController extends AbstractResourceController {
     public Resources<PromotionLevel> getPromotionLevelListForBranch(@PathVariable ID branchId) {
         Branch branch = structureService.getBranch(branchId);
         return Resources.of(
-                structureService.getPromotionLevelListForBranch(branchId),
-                uri(on(PromotionLevelController.class).getPromotionLevelListForBranch(branchId))
-        )
+                        structureService.getPromotionLevelListForBranch(branchId),
+                        uri(on(PromotionLevelController.class).getPromotionLevelListForBranch(branchId))
+                )
                 // Create
                 .with(
                         Link.CREATE,
@@ -113,8 +114,24 @@ public class PromotionLevelController extends AbstractResourceController {
         return document;
     }
 
+    @PutMapping("promotionLevels/{promotionLevelId}/image")
+    @ResponseStatus(HttpStatus.OK)
+    public void putPromotionLevelImage(@PathVariable ID promotionLevelId, @RequestBody String imageBase64) {
+        structureService.setPromotionLevelImage(
+                promotionLevelId,
+                new Document(
+                        "image/png",
+                        Base64.getDecoder().decode(imageBase64)
+                )
+        );
+    }
+
+    /**
+     * @deprecated Use the PUT method
+     */
     @RequestMapping(value = "promotionLevels/{promotionLevelId}/image", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.ACCEPTED)
+    @Deprecated(forRemoval = true)
     public void setPromotionLevelImage(@PathVariable ID promotionLevelId, @RequestParam MultipartFile file) throws IOException {
         structureService.setPromotionLevelImage(promotionLevelId, new Document(
                 file.getContentType(),

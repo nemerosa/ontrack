@@ -96,6 +96,43 @@ useFormDialog({
 
 Both the _current_ values of the form and the _initial context_ are passed.
 
+# Passing information to the dialog
+
+The `init` method may load some information and need to pass it to the dialog component. Use a local state
+and pass the state to the configuration.
+
+In the `useFormDialog`:
+
+```javascript
+const [promotionLevel, setPromotionLevel] = useState()
+return useFormDialog({
+    init: (form, context) => {
+        // Loads information
+        // ...
+        // Sets the state
+        setPromotionLevel(/* ... */)
+    },
+    promotionLevel, // <-- registers the state
+})
+```
+
+Use the state into the component:
+
+```javascript
+export default function MyDialog({myDialog}) {
+    return (
+        <>
+            <FormDialog dialog={myDialog}>
+                {
+                    myDialog.promotionLevel && /* ... */
+                }
+            </FormDialog>
+        </>
+    )
+}
+
+```
+
 # GraphQL integration
 
 TBD

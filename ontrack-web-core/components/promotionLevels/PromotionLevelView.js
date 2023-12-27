@@ -15,6 +15,7 @@ import GridCell from "@components/grid/GridCell";
 import PromotionLevelTTRChart from "@components/promotionLevels/PromotionLevelTTRChart";
 import {useChartOptionsCommand} from "@components/charts/ChartOptionsDialog";
 import StoredGridLayoutResetCommand from "@components/grid/StoredGridLayoutResetCommand";
+import PromotionLevelChangeImageCommand from "@components/promotionLevels/PromotionLevelChangeImageCommand";
 
 export default function PromotionLevelView({id}) {
 
@@ -53,6 +54,7 @@ export default function PromotionLevelView({id}) {
             ).then(data => {
                 setPromotionLevel(data.promotionLevel)
                 setCommands([
+                    <PromotionLevelChangeImageCommand key="change-image" id={id}/>,
                     <StoredGridLayoutResetCommand key="reset"/>,
                 ])
             }).finally(() => {

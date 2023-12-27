@@ -24,7 +24,7 @@ export function useFormDialog(config) {
     }
 }
 
-export default function FormDialog({dialog, onValuesChange, children, hasOk = true, header, width, height}) {
+export default function FormDialog({dialog, onValuesChange, children, hasOk = true, submittable = true, header, width, height}) {
 
     const client = useGraphQLClient()
 
@@ -111,7 +111,7 @@ export default function FormDialog({dialog, onValuesChange, children, hasOk = tr
                                 </Button>
                                 {
                                     hasOk &&
-                                    <Button type="primary" htmlType="submit">
+                                    <Button type="primary" htmlType="submit" disabled={!submittable}>
                                         OK
                                     </Button>
                                 }

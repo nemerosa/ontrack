@@ -6,7 +6,7 @@ export default function MainPageCommands({commands}) {
         <Space
             direction="horizontal"
             wrap
-            size={8}>
+            size={4}>
             {commands && commands.map((command, index) => {
                 return <Fragment key={index}>{command}</Fragment>
             })}
