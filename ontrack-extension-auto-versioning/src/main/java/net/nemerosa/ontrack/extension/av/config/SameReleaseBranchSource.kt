@@ -15,7 +15,7 @@ class SameReleaseBranchSource(
 
     override fun getLatestBranch(config: String?, project: Project, targetBranch: Branch): Branch? {
         val levels = (config?.takeIf { it.isNotBlank() } ?: "1").toInt()
-        val pattern = "release\\/(${("\\d+" * levels).joinToString("\\.")})\\..*"
+        val pattern = "release\\/(${("\\d+" * levels).joinToString("\\.")})(\\..*)?"
         val path = branchDisplayNameService.getBranchDisplayName(targetBranch)
         val m = pattern.toRegex().matchEntire(path)
         return if (m != null) {

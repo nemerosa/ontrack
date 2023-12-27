@@ -94,7 +94,7 @@ class Branch(
      */
     fun createBuild(
         name: String,
-        description: String,
+        description: String = "",
         runTime: Int? = null,
     ): Build =
         graphqlConnector.mutate(
