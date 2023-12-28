@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.graphql.schema
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.exceptions.BranchNotFoundException
@@ -12,6 +11,7 @@ import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
+import kotlin.jvm.optionals.getOrNull
 
 @Component
 class PromotionLevelMutations(
@@ -85,6 +85,15 @@ class PromotionLevelMutations(
             ) { input ->
                 structureService.deletePromotionLevel(ID.of(input.id))
             },
+            /**
+             * Bulk update of promotion level
+             */
+            unitMutation<BulkUpdatePromotionLevelByIdInput>(
+                "bulkUpdatePromotionLevelById",
+                "Bulk update of a promotion level"
+            ) { input ->
+                structureService.bulkUpdatePromotionLevels(ID.of(input.id))
+            },
         )
 
     private fun setupPromotionLevel(input: SetupPromotionLevelInput): PromotionLevel {
@@ -154,6 +163,11 @@ data class UpdatePromotionLevelByIdInput(
 )
 
 data class DeletePromotionLevelByIdInput(
+    @APIDescription("Promotion level ID")
+    val id: Int,
+)
+
+data class BulkUpdatePromotionLevelByIdInput(
     @APIDescription("Promotion level ID")
     val id: Int,
 )

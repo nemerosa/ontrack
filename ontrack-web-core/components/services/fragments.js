@@ -1,4 +1,6 @@
 import {gql} from "graphql-request";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import {useEffect, useState} from "react";
 
 export const gqlPromotionLevelFragment = gql`
     fragment PromotionLevelData on PromotionLevel {
@@ -36,6 +38,17 @@ export const getPromotionLevelById = (client, id) => {
         gqlPromotionLevelByIdQuery,
         {id}
     ).then(data => data.promotionLevel)
+}
+
+export const usePromotionLevel = (id) => {
+    const client = useGraphQLClient()
+    const [promotionLevel, setPromotionLevel] = useState()
+    useEffect(() => {
+        if (client && id) {
+            getPromotionLevelById(client, id).then(pl => setPromotionLevel(pl))
+        }
+    }, [client, id]);
+    return promotionLevel
 }
 
 export const gqlDecorationFragment = gql`

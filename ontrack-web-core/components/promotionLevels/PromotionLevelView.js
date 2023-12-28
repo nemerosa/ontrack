@@ -1,5 +1,5 @@
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import Head from "next/head";
 import {promotionLevelTitle} from "@components/common/Titles";
 import StoredGridLayoutContextProvider from "@components/grid/StoredGridLayoutContext";
@@ -20,6 +20,8 @@ import {useEventForRefresh} from "@components/common/EventsContext";
 import PromotionLevelDeleteCommand from "@components/promotionLevels/PromotionLevelDeleteCommand";
 import {getPromotionLevelById} from "@components/services/fragments";
 import {isAuthorized} from "@components/common/authorizations";
+import {UserContext} from "@components/providers/UserProvider";
+import PromotionLevelBulkUpdateCommand from "@components/promotionLevels/PromotionLevelBulkUpdateCommand";
 
 export default function PromotionLevelView({id}) {
 
@@ -34,6 +36,8 @@ export default function PromotionLevelView({id}) {
 
     const refreshCount = useEventForRefresh("promotionLevel.updated")
 
+    const user = useContext(UserContext)
+
     useEffect(() => {
         if (client && id) {
             setLoadingPromotionLevel(true)
@@ -47,13 +51,16 @@ export default function PromotionLevelView({id}) {
                 if (isAuthorized(pl, 'promotion_level', 'delete')) {
                     commands.push(<PromotionLevelDeleteCommand key="delete" id={id}/>)
                 }
+                if (user.authorizations?.promotion_level?.bulkUpdate) {
+                    commands.push(<PromotionLevelBulkUpdateCommand key="bulk-update" id={id}/>)
+                }
                 commands.push(<StoredGridLayoutResetCommand key="reset"/>)
                 setCommands(commands)
             }).finally(() => {
                 setLoadingPromotionLevel(false)
             })
         }
-    }, [client, id, refreshCount]);
+    }, [client, id, refreshCount, user]);
 
     const defaultLayout = [
         {i: chartLeadTime, x: 0, y: 0, w: 6, h: 12},

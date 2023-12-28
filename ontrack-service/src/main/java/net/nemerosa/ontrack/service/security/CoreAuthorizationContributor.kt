@@ -7,8 +7,9 @@ import org.springframework.stereotype.Component
 class CoreAuthorizationContributor : AuthorizationContributor {
 
     companion object {
-        const val PROJECT = "project"
         const val USER = "user"
+        const val PROJECT = "project"
+        const val PROMOTION_LEVEL = "promotion_level"
     }
 
     override fun appliesTo(context: Any): Boolean = context is GlobalAuthorizationContext
@@ -26,6 +27,12 @@ class CoreAuthorizationContributor : AuthorizationContributor {
                 PROJECT,
                 Authorization.CREATE,
                 user.isGranted(ProjectCreation::class.java)
+            ),
+            // Promotion levels
+            Authorization(
+                PROMOTION_LEVEL,
+                "bulkUpdate",
+                user.isGranted(GlobalSettings::class.java)
             ),
         )
 

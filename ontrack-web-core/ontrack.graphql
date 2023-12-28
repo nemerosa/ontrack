@@ -811,6 +811,12 @@ type BuildPaginated {
     pageItems: [Build!]!
 }
 
+"Output type for the bulkUpdatePromotionLevelById mutation."
+type BulkUpdatePromotionLevelByIdPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
 "Configuration as code information"
 type CasC {
     "Renders the current settings as JSON"
@@ -2753,6 +2759,11 @@ type LockAccountPayload implements Payload {
 }
 
 type Mutation {
+    "Bulk update of a promotion level"
+    bulkUpdatePromotionLevelById(
+        "Input for the mutation"
+        input: BulkUpdatePromotionLevelByIdInput
+    ): BulkUpdatePromotionLevelByIdPayload
     "Changing the password of the current user"
     changePassword(input: ChangePasswordInput!): ChangePasswordPayload
     "Change the status of a validation run"
@@ -6877,6 +6888,12 @@ input BuildSearchForm {
     propertyValue: String
     "Matches a build having at least this validation with PASSED as a status."
     validationStampName: String
+}
+
+"Input type for the bulkUpdatePromotionLevelById mutation."
+input BulkUpdatePromotionLevelByIdInput {
+    "Promotion level ID"
+    id: Int!
 }
 
 "CHML level, associated a given CHML type and a value"
