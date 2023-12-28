@@ -19,6 +19,7 @@ import PromotionLevelUpdateCommand from "@components/promotionLevels/PromotionLe
 import {useEventForRefresh} from "@components/common/EventsContext";
 import PromotionLevelDeleteCommand from "@components/promotionLevels/PromotionLevelDeleteCommand";
 import {getPromotionLevelById} from "@components/services/fragments";
+import {isAuthorized} from "@components/common/authorizations";
 
 export default function PromotionLevelView({id}) {
 
@@ -38,12 +39,16 @@ export default function PromotionLevelView({id}) {
             setLoadingPromotionLevel(true)
             getPromotionLevelById(client, id).then(pl => {
                 setPromotionLevel(pl)
-                setCommands([
-                    <PromotionLevelChangeImageCommand key="change-image" id={id}/>,
-                    <PromotionLevelUpdateCommand key="update" id={id}/>,
-                    <PromotionLevelDeleteCommand key="delete" id={id}/>,
-                    <StoredGridLayoutResetCommand key="reset"/>,
-                ])
+                const commands = []
+                if (isAuthorized(pl, 'promotion_level', 'edit')) {
+                    commands.push(<PromotionLevelChangeImageCommand key="change-image" id={id}/>)
+                    commands.push(<PromotionLevelUpdateCommand key="update" id={id}/>)
+                }
+                if (isAuthorized(pl, 'promotion_level', 'delete')) {
+                    commands.push(<PromotionLevelDeleteCommand key="delete" id={id}/>)
+                }
+                commands.push(<StoredGridLayoutResetCommand key="reset"/>)
+                setCommands(commands)
             }).finally(() => {
                 setLoadingPromotionLevel(false)
             })
