@@ -1,6 +1,5 @@
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {useEffect, useState} from "react";
-import {gql} from "graphql-request";
 import Head from "next/head";
 import {promotionLevelTitle} from "@components/common/Titles";
 import StoredGridLayoutContextProvider from "@components/grid/StoredGridLayoutContext";
@@ -16,6 +15,10 @@ import PromotionLevelTTRChart from "@components/promotionLevels/PromotionLevelTT
 import {useChartOptionsCommand} from "@components/charts/ChartOptionsDialog";
 import StoredGridLayoutResetCommand from "@components/grid/StoredGridLayoutResetCommand";
 import PromotionLevelChangeImageCommand from "@components/promotionLevels/PromotionLevelChangeImageCommand";
+import PromotionLevelUpdateCommand from "@components/promotionLevels/PromotionLevelUpdateCommand";
+import {useEventForRefresh} from "@components/common/EventsContext";
+import PromotionLevelDeleteCommand from "@components/promotionLevels/PromotionLevelDeleteCommand";
+import {getPromotionLevelById} from "@components/services/fragments";
 
 export default function PromotionLevelView({id}) {
 
@@ -28,40 +31,24 @@ export default function PromotionLevelView({id}) {
     const [promotionLevel, setPromotionLevel] = useState({branch: {project: {}}})
     const [commands, setCommands] = useState([])
 
+    const refreshCount = useEventForRefresh("promotionLevel.updated")
+
     useEffect(() => {
         if (client && id) {
             setLoadingPromotionLevel(true)
-            client.request(
-                gql`
-                    query LoadPromotionLevel($id: Int!) {
-                        promotionLevel(id: $id) {
-                            id
-                            name
-                            description
-                            image
-                            branch {
-                                id
-                                name
-                                project {
-                                    id
-                                    name
-                                }
-                            }
-                        }
-                    }
-                `,
-                {id}
-            ).then(data => {
-                setPromotionLevel(data.promotionLevel)
+            getPromotionLevelById(client, id).then(pl => {
+                setPromotionLevel(pl)
                 setCommands([
                     <PromotionLevelChangeImageCommand key="change-image" id={id}/>,
+                    <PromotionLevelUpdateCommand key="update" id={id}/>,
+                    <PromotionLevelDeleteCommand key="delete" id={id}/>,
                     <StoredGridLayoutResetCommand key="reset"/>,
                 ])
             }).finally(() => {
                 setLoadingPromotionLevel(false)
             })
         }
-    }, [client, id]);
+    }, [client, id, refreshCount]);
 
     const defaultLayout = [
         {i: chartLeadTime, x: 0, y: 0, w: 6, h: 12},
@@ -116,6 +103,7 @@ export default function PromotionLevelView({id}) {
                     }
                     breadcrumbs={promotionLevelBreadcrumbs(promotionLevel)}
                     commands={commands}
+                    description={promotionLevel.description}
                 >
                     <LoadingContainer loading={loadingPromotionLevel} tip="Loading promotion level">
                         <StoredGridLayout

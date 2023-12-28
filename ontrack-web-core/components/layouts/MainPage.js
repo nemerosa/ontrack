@@ -6,7 +6,7 @@ import MainWarning from "@components/layouts/MainWarning";
 
 const {Content} = Layout;
 
-export default function MainPage({title, breadcrumbs, commands, children}) {
+export default function MainPage({title, breadcrumbs, commands, description, children}) {
 
     const {
         token: {colorBgContainer},
@@ -34,6 +34,7 @@ export default function MainPage({title, breadcrumbs, commands, children}) {
                             breadcrumbs={breadcrumbs}
                             title={title}
                             commands={commands}
+                            description={description}
                         />
                     }
                     <Space direction="vertical" className="ot-line">

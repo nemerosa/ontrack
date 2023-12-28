@@ -6,6 +6,7 @@ import graphql.schema.DataFetchingEnvironment
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.common.and
+import net.nemerosa.ontrack.graphql.schema.authorizations.GQLInterfaceAuthorizableService
 import net.nemerosa.ontrack.graphql.support.*
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
 import net.nemerosa.ontrack.model.pagination.PaginatedList
@@ -16,14 +17,15 @@ import java.time.LocalDateTime
 
 @Component
 class GQLTypePromotionLevel(
-        private val structureService: StructureService,
-        creation: GQLTypeCreation,
-        private val promotionRun: GQLTypePromotionRun,
-        projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>,
-        private val projectEntityInterface: GQLProjectEntityInterface,
-        private val paginatedListFactory: GQLPaginatedListFactory,
-        private val buildDisplayNameService: BuildDisplayNameService,
-        freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>
+    private val gqlInterfaceAuthorizableService: GQLInterfaceAuthorizableService,
+    private val structureService: StructureService,
+    creation: GQLTypeCreation,
+    private val promotionRun: GQLTypePromotionRun,
+    projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>,
+    private val projectEntityInterface: GQLProjectEntityInterface,
+    private val paginatedListFactory: GQLPaginatedListFactory,
+    private val buildDisplayNameService: BuildDisplayNameService,
+    freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>
 ) : AbstractGQLProjectEntity<PromotionLevel>(
         PromotionLevel::class.java,
         ProjectEntityType.PROMOTION_LEVEL,
@@ -38,6 +40,10 @@ class GQLTypePromotionLevel(
             .name(PROMOTION_LEVEL)
             .withInterface(projectEntityInterface.typeRef)
             .fields(projectEntityInterfaceFields())
+            // Authorizations
+            .apply {
+                gqlInterfaceAuthorizableService.apply(this, PromotionLevel::class)
+            }
             // Image flag
             .field {
                 it.name("image")

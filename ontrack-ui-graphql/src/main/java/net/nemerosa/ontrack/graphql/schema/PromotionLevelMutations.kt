@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.exceptions.BranchNotFoundException
+import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.PromotionLevel
@@ -15,6 +16,7 @@ import javax.validation.constraints.Pattern
 @Component
 class PromotionLevelMutations(
     private val structureService: StructureService,
+    private val securityService: SecurityService,
 ) : TypedMutationProvider() {
 
     override val mutations: List<Mutation>
@@ -49,6 +51,39 @@ class PromotionLevelMutations(
                         NameDescription.nd(input.name, input.description)
                     )
                 )
+            },
+            /**
+             * Updating an existing promotion level
+             */
+            simpleMutation(
+                "updatePromotionLevelById",
+                "Updates an existing promotion level",
+                UpdatePromotionLevelByIdInput::class,
+                "promotionLevel",
+                "Updated promotion level",
+                PromotionLevel::class
+            ) { input ->
+                val pl = structureService.getPromotionLevel(ID.of(input.id))
+                structureService.savePromotionLevel(
+                    PromotionLevel(
+                        id = pl.id,
+                        name = input.name,
+                        description = input.description,
+                        branch = pl.branch,
+                        isImage = pl.isImage,
+                        signature = securityService.currentSignature,
+                    )
+                )
+                structureService.getPromotionLevel(ID.of(input.id))
+            },
+            /**
+             * Deleting an existing promotion level
+             */
+            unitMutation<DeletePromotionLevelByIdInput>(
+                "deletePromotionLevelById",
+                "Deletes an existing promotion level"
+            ) { input ->
+                structureService.deletePromotionLevel(ID.of(input.id))
             },
         )
 
@@ -106,3 +141,20 @@ data class CreatePromotionLevelByIdInput(
     @APIDescription("Promotion level description")
     val description: String,
 )
+
+data class UpdatePromotionLevelByIdInput(
+    @APIDescription("Promotion level ID")
+    val id: Int,
+    @get:NotNull(message = "The name is required.")
+    @get:Pattern(regexp = NameDescription.NAME, message = "The name ${NameDescription.NAME_MESSAGE_SUFFIX}")
+    @APIDescription("Promotion level name")
+    val name: String,
+    @APIDescription("Promotion level description")
+    val description: String,
+)
+
+data class DeletePromotionLevelByIdInput(
+    @APIDescription("Promotion level ID")
+    val id: Int,
+)
+

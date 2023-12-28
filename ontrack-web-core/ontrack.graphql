@@ -1408,6 +1408,12 @@ type DeletePromotionLevelAutoPromotionPropertyPayload implements Payload {
     promotionLevel: PromotionLevel
 }
 
+"Output type for the deletePromotionLevelById mutation."
+type DeletePromotionLevelByIdPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
 "Output type for the deletePromotionLevelMessagePropertyById mutation."
 type DeletePromotionLevelMessagePropertyByIdPayload implements Payload {
     "List of errors"
@@ -3061,6 +3067,11 @@ type Mutation {
         "Input for the mutation"
         input: DeletePromotionLevelAutoPromotionPropertyByIdInput
     ): DeletePromotionLevelAutoPromotionPropertyByIdPayload
+    "Deletes an existing promotion level"
+    deletePromotionLevelById(
+        "Input for the mutation"
+        input: DeletePromotionLevelByIdInput
+    ): DeletePromotionLevelByIdPayload
     "Deletes the message property on a promotion level identified by name."
     deletePromotionLevelMessageProperty(
         "Input for the mutation"
@@ -3779,6 +3790,11 @@ type Mutation {
         "Input for the mutation"
         input: UpdateProjectInput
     ): UpdateProjectPayload
+    "Updates an existing promotion level"
+    updatePromotionLevelById(
+        "Input for the mutation"
+        input: UpdatePromotionLevelByIdInput
+    ): UpdatePromotionLevelByIdPayload
     "Updates a validation stamp filter"
     updateValidationStampFilter(
         "Input for the mutation"
@@ -4384,11 +4400,13 @@ type ProjectRole {
     name: String!
 }
 
-type PromotionLevel implements ProjectEntity {
+type PromotionLevel implements Authorizable & ProjectEntity {
     "Link to the image"
     _image: String
     "Description with links."
     annotatedDescription: String
+    "Authorizations for this context"
+    authorizations: [Authorization!]!
     "Allows a promotion level to be granted on a build as soon as a list of validation stamps has been passed"
     autoPromotionProperty: Property
     "Reference to branch"
@@ -6099,6 +6117,14 @@ type UpdateProjectPayload implements Payload {
     project: Project
 }
 
+"Output type for the updatePromotionLevelById mutation."
+type UpdatePromotionLevelByIdPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Updated promotion level"
+    promotionLevel: PromotionLevel
+}
+
 "Output type for the updateValidationStampFilter mutation."
 type UpdateValidationStampFilterPayload implements Payload {
     "List of errors"
@@ -7423,6 +7449,12 @@ input DeletePromotionLevelAutoPromotionPropertyInput {
     project: String!
     "Promotion name"
     promotion: String!
+}
+
+"Input type for the deletePromotionLevelById mutation."
+input DeletePromotionLevelByIdInput {
+    "Promotion level ID"
+    id: Int!
 }
 
 "Input type for the deletePromotionLevelMessagePropertyById mutation."
@@ -9285,6 +9317,16 @@ input UpdateProjectInput {
     id: Int!
     "Project name (leave null to not change)"
     name: String
+}
+
+"Input type for the updatePromotionLevelById mutation."
+input UpdatePromotionLevelByIdInput {
+    "Promotion level description"
+    description: String!
+    "Promotion level ID"
+    id: Int!
+    "Promotion level name"
+    name: String!
 }
 
 "Input type for the updateValidationStampFilter mutation."
