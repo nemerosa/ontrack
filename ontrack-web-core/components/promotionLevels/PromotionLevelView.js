@@ -22,11 +22,13 @@ import {getPromotionLevelById} from "@components/services/fragments";
 import {isAuthorized} from "@components/common/authorizations";
 import {UserContext} from "@components/providers/UserProvider";
 import PromotionLevelBulkUpdateCommand from "@components/promotionLevels/PromotionLevelBulkUpdateCommand";
+import PromotionLevelFrequencyChart from "@components/promotionLevels/PromotionLevelFrequencyChart";
 
 export default function PromotionLevelView({id}) {
 
     const chartLeadTime = "chart-lead-time"
     const chartTTR = "chart-ttr"
+    const chartFrequency = "chart-frequency"
 
     const client = useGraphQLClient()
 
@@ -64,7 +66,8 @@ export default function PromotionLevelView({id}) {
 
     const defaultLayout = [
         {i: chartLeadTime, x: 0, y: 0, w: 6, h: 12},
-        {i: chartTTR, x: 6, y: 0, w: 6, h: 12},
+        {i: chartFrequency, x: 6, y: 0, w: 6, h: 12},
+        {i: chartTTR, x: 0, y: 12, w: 6, h: 12},
     ]
 
     const {command, interval, period} = useChartOptionsCommand()
@@ -78,6 +81,20 @@ export default function PromotionLevelView({id}) {
                 extra={command}
             >
                 <PromotionLevelLeadTimeChart
+                    promotionLevel={promotionLevel}
+                    interval={interval}
+                    period={period}
+                />
+            </GridCell>,
+        },
+        {
+            id: chartFrequency,
+            content: <GridCell
+                id={chartFrequency}
+                title="Frequency to promotion"
+                extra={command}
+            >
+                <PromotionLevelFrequencyChart
                     promotionLevel={promotionLevel}
                     interval={interval}
                     period={period}
