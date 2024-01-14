@@ -1,15 +1,11 @@
 import {Skeleton} from "antd";
 
-export default function LoadingContainer({loading, tip, children}) {
+export default function LoadingContainer({loading, children}) {
     return (
         <>
-            {
-                loading &&
-                <Skeleton active/>
-            }
-            {
-                !loading && children
-            }
+            <Skeleton active loading={loading}>
+                {children}
+            </Skeleton>
         </>
     )
 }

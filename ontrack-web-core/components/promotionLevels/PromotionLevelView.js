@@ -24,6 +24,7 @@ import {UserContext} from "@components/providers/UserProvider";
 import PromotionLevelBulkUpdateCommand from "@components/promotionLevels/PromotionLevelBulkUpdateCommand";
 import PromotionLevelFrequencyChart from "@components/promotionLevels/PromotionLevelFrequencyChart";
 import PromotionLevelStabilityChart from "@components/promotionLevels/PromotionLevelStabilityChart";
+import PromotionLevelHistory from "@components/promotionLevels/PromotionLevelHistory";
 
 export default function PromotionLevelView({id}) {
 
@@ -31,6 +32,7 @@ export default function PromotionLevelView({id}) {
     const chartTTR = "chart-ttr"
     const chartFrequency = "chart-frequency"
     const chartStability = "chart-stability"
+    const sectionHistory = "section-history"
 
     const client = useGraphQLClient()
 
@@ -67,10 +69,13 @@ export default function PromotionLevelView({id}) {
     }, [client, id, refreshCount, user]);
 
     const defaultLayout = [
+        // Charts - 2 x 2
         {i: chartLeadTime, x: 0, y: 0, w: 6, h: 12},
         {i: chartFrequency, x: 6, y: 0, w: 6, h: 12},
         {i: chartTTR, x: 0, y: 12, w: 6, h: 12},
         {i: chartStability, x: 6, y: 12, w: 6, h: 12},
+        // History - table
+        {i: sectionHistory, x: 0, y: 18, w: 12, h: 12},
     ]
 
     const {command, interval, period} = useChartOptionsCommand()
@@ -130,6 +135,17 @@ export default function PromotionLevelView({id}) {
                     interval={interval}
                     period={period}
                 />
+            </GridCell>,
+        },
+        {
+            id: sectionHistory,
+            content: <GridCell
+                id={sectionHistory}
+                title="Promotion history"
+            >
+                <PromotionLevelHistory
+                    promotionLevel={promotionLevel}
+                    />
             </GridCell>,
         },
     ]
