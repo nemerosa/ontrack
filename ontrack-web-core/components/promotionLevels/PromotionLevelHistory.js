@@ -2,19 +2,15 @@ import {useEffect, useState} from "react";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
 import LoadingContainer from "@components/common/LoadingContainer";
-import {Button, Popover, Space, Table, Typography} from "antd";
+import {Button, DatePicker, Input, Popover, Space, Spin, Table, Typography} from "antd";
 import BuildLink from "@components/builds/BuildLink";
 import Decorations from "@components/framework/decorations/Decorations";
 import TimestampText from "@components/common/TimestampText";
 import AnnotatedDescription from "@components/common/AnnotatedDescription";
 import {FaSearch} from "react-icons/fa";
+import TableColumnFilterDropdown from "@components/common/TableColumnFilterDropdown";
 
 const {Column} = Table
-
-// TODO Filter on build name
-// TODO Filter on build version
-// TODO Filter on after date
-// TODO Filter on before date
 
 export default function PromotionLevelHistory({promotionLevel}) {
 
@@ -25,12 +21,29 @@ export default function PromotionLevelHistory({promotionLevel}) {
         size: 5,
     })
 
+    const [filter, setFilter] = useState({
+        name: null,
+        version: null,
+        afterDate: null,
+        beforeDate: null,
+    })
+
+    const onTableChange = (_, filters) => {
+        setFilter({
+            name: filters.build ? filters.build[0] : null,
+            version: filters.build && filters.build.length > 0 ? filters.build[1] : null,
+            afterDate: filters.creation ? filters.creation[0] : null,
+            beforeDate: filters.creation && filters.creation.length > 0 ? filters.creation[1] : null,
+        })
+    }
+
     const [loading, setLoading] = useState(false)
     const [promotions, setPromotions] = useState([])
     const [pageInfo, setPageInfo] = useState()
 
     useEffect(() => {
         if (client && promotionLevel) {
+            setLoading(true)
             client.request(
                 gql`
                     query GetPromotionLevelHistory(
@@ -63,6 +76,9 @@ export default function PromotionLevelHistory({promotionLevel}) {
                                     build {
                                         id
                                         name
+                                        releaseProperty {
+                                            value
+                                        }
                                         decorations {
                                             decorationType
                                             error
@@ -85,10 +101,10 @@ export default function PromotionLevelHistory({promotionLevel}) {
                     id: promotionLevel.id,
                     offset: pagination.offset,
                     size: pagination.size,
-                    name: undefined,
-                    version: undefined,
-                    afterDate: undefined,
-                    beforeDate: undefined,
+                    name: filter.name,
+                    version: filter.version,
+                    afterDate: filter.afterDate,
+                    beforeDate: filter.beforeDate,
                 }
             ).then(data => {
                 setPageInfo(data.promotionLevel.promotionRuns.pageInfo)
@@ -97,9 +113,11 @@ export default function PromotionLevelHistory({promotionLevel}) {
                 } else {
                     setPromotions(data.promotionLevel.promotionRuns.pageItems)
                 }
+            }).finally(() => {
+                setLoading(false)
             })
         }
-    }, [client, promotionLevel, pagination]);
+    }, [client, promotionLevel, pagination, filter]);
 
     const onLoadMore = () => {
         if (pageInfo.nextPage) {
@@ -109,7 +127,7 @@ export default function PromotionLevelHistory({promotionLevel}) {
 
     return (
         <>
-            <LoadingContainer loading={loading} tip="Loading history...">
+            <LoadingContainer loading={loading && pagination.offset === 0} tip="Loading history...">
                 <Table
                     dataSource={promotions}
                     pagination={false}
@@ -125,10 +143,15 @@ export default function PromotionLevelHistory({promotionLevel}) {
                                 >
                                     <Button
                                         onClick={onLoadMore}
-                                        disabled={!pageInfo || !pageInfo.nextPage}
+                                        disabled={loading || !pageInfo || !pageInfo.nextPage}
                                     >
                                         <Space>
-                                            <FaSearch/>
+                                            {
+                                                loading && pagination.offset && <Spin size="small"/>
+                                            }
+                                            {
+                                                !loading && <FaSearch/>
+                                            }
                                             <Typography.Text>Load more...</Typography.Text>
                                         </Space>
                                     </Button>
@@ -136,6 +159,7 @@ export default function PromotionLevelHistory({promotionLevel}) {
                             </Space>
                         </>
                     )}
+                    onChange={onTableChange}
                 >
                     <Column
                         title="Build"
@@ -148,6 +172,26 @@ export default function PromotionLevelHistory({promotionLevel}) {
                                 <Decorations entity={run.build}/>
                             </Space>
                         }
+                        filterDropdown={({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
+                            <TableColumnFilterDropdown
+                                confirm={confirm}
+                                clearFilters={clearFilters}
+                            >
+                                <Input
+                                    placeholder="Build name"
+                                    value={selectedKeys[0]}
+                                    onChange={(e) => setSelectedKeys([e.target.value, selectedKeys[1]])}
+                                    style={{width: 188, marginBottom: 8, display: 'block'}}
+                                />
+                                <Input
+                                    placeholder="Build version"
+                                    value={selectedKeys[1]}
+                                    onChange={(e) => setSelectedKeys([selectedKeys[0], e.target.value])}
+                                    style={{width: 188, marginBottom: 8, display: 'block'}}
+                                />
+                            </TableColumnFilterDropdown>
+                        }
+                        filteredValue={filter.name || filter.version ? [filter.name, filter.version] : null}
                     />
                     <Column
                         title="Creation"
@@ -160,6 +204,24 @@ export default function PromotionLevelHistory({promotionLevel}) {
                                 </Typography.Text>
                             </Space>
                         }
+                        filterDropdown={({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
+                            <TableColumnFilterDropdown
+                                confirm={confirm}
+                                clearFilters={clearFilters}
+                            >
+                                <DatePicker
+                                    placeholder="After"
+                                    value={selectedKeys[0]}
+                                    onChange={date => setSelectedKeys([date, selectedKeys[1]])}
+                                />
+                                <DatePicker
+                                    placeholder="Before"
+                                    value={selectedKeys[1]}
+                                    onChange={date => setSelectedKeys([selectedKeys[0], date])}
+                                />
+                            </TableColumnFilterDropdown>
+                        }
+                        filteredValue={filter.afterDate || filter.beforeDate ? [filter.afterDate, filter.beforeDate] : null}
                     />
                     <Column
                         title="Description"
