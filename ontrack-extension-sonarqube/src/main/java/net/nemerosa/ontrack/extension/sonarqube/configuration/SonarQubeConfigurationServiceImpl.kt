@@ -42,7 +42,7 @@ class SonarQubeConfigurationServiceImpl(
                 else -> ConnectionResult.error("SonarQube health: $health")
             }
         } catch (ex: Exception) {
-            ConnectionResult.error(ex.message)
+            ConnectionResult.error(ex)
         }
     }
 

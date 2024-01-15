@@ -135,4 +135,47 @@ export default function MyDialog({myDialog}) {
 
 # GraphQL integration
 
-TBD
+In some cases, the whole dialog is just about orchestrating some GraphQL calls.
+
+The mutation to call on the dialog success is passed into the `query` parameter while the `userNode` is used to identify the field which contains the user errors.
+
+For example, for the creation of a project:
+
+```javascript
+return useFormDialog({
+    // ...
+    prepareValues: (values) => {
+        values.description = values.description ? values.description : ''
+        values.disabled = values.disabled ? values.disabled : false
+    },
+    query: gql`
+            mutation CreateProject(
+                $name: String!,
+                $description: String,
+                $disabled: Boolean!,
+            ) {
+                createProject(input: {
+                    name: $name,
+                    description: $description,
+                    disabled: $disabled,
+                }) {
+                    errors {
+                        message
+                    }
+                }
+            }
+        `,
+    userNode: 'createProject',
+})
+```
+
+> Note the use of `prepareValues` to prepare the list of variables for the GraphQL query.
+
+In some cases, the query and the node can be dynamic, linked to the context. For these cases, the `query` and the `userNode` can be functions of the context:
+
+```javascript
+return useFormDialog({
+    query: (context) => { /* ... */ },  
+    userNode: (context) => { /* ... */ },  
+})
+```

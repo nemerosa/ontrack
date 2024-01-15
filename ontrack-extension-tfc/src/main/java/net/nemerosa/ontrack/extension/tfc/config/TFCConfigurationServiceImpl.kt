@@ -39,7 +39,7 @@ class TFCConfigurationServiceImpl(
             client.organizations
             ConnectionResult.ok()
         } catch (any: Exception) {
-            ConnectionResult.error(any.message)
+            ConnectionResult.error(any)
         }
     }
 

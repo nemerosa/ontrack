@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.bitbucket.cloud.configuration
 import net.nemerosa.ontrack.extension.bitbucket.cloud.TestOnBitbucketCloud
 import net.nemerosa.ontrack.extension.bitbucket.cloud.bitbucketCloudTestConfigReal
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
-import net.nemerosa.ontrack.model.support.ConnectionResult
+import net.nemerosa.ontrack.model.support.ConnectionResultType
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -108,7 +108,7 @@ class BitbucketCloudConfigurationServiceIT : AbstractDSLTestSupport() {
         asAdmin {
             val config = bitbucketCloudTestConfigReal()
             val result = bitbucketCloudConfigurationService.test(config)
-            assertEquals(ConnectionResult.ConnectionResultType.OK, result.type)
+            assertEquals(ConnectionResultType.OK, result.type)
         }
     }
 

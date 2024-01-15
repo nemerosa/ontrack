@@ -55,7 +55,7 @@ class GitHubConfigurationServiceImpl(
                     .withDetail("github-config-name", configuration.name)
                     .withDetail("github-config-url", configuration.url)
             )
-            ConnectionResult.error(ex.message)
+            ConnectionResult.error(ex)
         }
 
 }

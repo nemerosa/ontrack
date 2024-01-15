@@ -34,6 +34,11 @@ data class Authorization(
          */
         const val SHARE = "share"
 
+        /**
+         * Common actions: settings
+         */
+        const val SETTINGS = "settings"
+
     }
 
 }

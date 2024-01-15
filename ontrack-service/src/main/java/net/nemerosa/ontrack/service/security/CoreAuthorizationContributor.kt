@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component
 class CoreAuthorizationContributor : AuthorizationContributor {
 
     companion object {
+        const val GLOBAL = "global"
         const val USER = "user"
         const val PROJECT = "project"
         const val PROMOTION_LEVEL = "promotion_level"
@@ -16,6 +17,12 @@ class CoreAuthorizationContributor : AuthorizationContributor {
 
     override fun getAuthorizations(user: OntrackAuthenticatedUser, context: Any): List<Authorization> =
         listOf(
+            // Global settings
+            Authorization(
+                GLOBAL,
+                Authorization.SETTINGS,
+                user.isGranted(GlobalSettings::class.java)
+            ),
             // User
             Authorization(
                 USER,

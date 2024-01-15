@@ -24,7 +24,7 @@ export function useFormDialog(config) {
     }
 }
 
-export default function FormDialog({dialog, onValuesChange, children, hasOk = true, submittable = true, header, width, height}) {
+export default function FormDialog({dialog, onValuesChange, children, hasOk = true, submittable = true, header, width, height, extraButtons}) {
 
     const client = useGraphQLClient()
 
@@ -44,6 +44,30 @@ export default function FormDialog({dialog, onValuesChange, children, hasOk = tr
         dialog.setOpen(false)
     }
 
+    const getActualQuery = () => {
+        if (dialog.query) {
+            if (typeof dialog.query === 'function') {
+                return dialog.query(dialog.context)
+            } else {
+                return dialog.query
+            }
+        } else {
+            return undefined
+        }
+    }
+
+    const getActualUserNode = () => {
+        if (dialog.userNode) {
+            if (typeof dialog.userNode === 'function') {
+                return dialog.userNode(dialog.context)
+            } else {
+                return dialog.userNode
+            }
+        } else {
+            return undefined
+        }
+    }
+
     const onSubmit = async () => {
         setLoading(true)
         setFormErrors([])
@@ -52,12 +76,14 @@ export default function FormDialog({dialog, onValuesChange, children, hasOk = tr
             if (dialog.prepareValues) dialog.prepareValues(values, dialog.context)
             let result
             let errors = undefined
-            if (dialog.query) {
+            const actualQuery = getActualQuery()
+            if (actualQuery) {
                 const data = await client.request(
-                    dialog.query,
+                    actualQuery,
                     values
                 )
-                result = data[dialog.userNode]
+                const actualUserNode = getActualUserNode()
+                result = data[actualUserNode]
                 errors = getUserErrors(result)
             } else {
                 result = values
@@ -106,6 +132,9 @@ export default function FormDialog({dialog, onValuesChange, children, hasOk = tr
                         </div>
                         <Form.Item>
                             <Space style={{float: 'right'}}>
+                                {
+                                    extraButtons
+                                }
                                 <Button type="default" onClick={onCancel}>
                                     Cancel
                                 </Button>

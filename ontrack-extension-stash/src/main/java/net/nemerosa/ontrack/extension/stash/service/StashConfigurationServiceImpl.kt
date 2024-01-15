@@ -45,7 +45,7 @@ class StashConfigurationServiceImpl(
                 ConnectionResult.error("Cannot get the content of the Stash home page")
             }
         } catch (ex: Exception) {
-            ConnectionResult.error(ex.message)
+            ConnectionResult.error(ex)
         }
     }
 

@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
 import net.nemerosa.ontrack.model.support.ConnectionResult;
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +28,7 @@ public class JenkinsConfigurationServiceImpl extends AbstractConfigurationServic
     }
 
     @Override
-    protected ConnectionResult validate(JenkinsConfiguration configuration) {
+    protected @NotNull ConnectionResult validate(@NotNull JenkinsConfiguration configuration) {
         JenkinsClient client = jenkinsClientFactory.getClient(configuration);
         try {
             // Gets the basic info
