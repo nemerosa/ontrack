@@ -8,5 +8,5 @@ class PromotionLeadTimeChartWidget: AbstractWidget<PromotionChartWidgetConfig>(
     name = "Lead time to promotion",
     description = "Chart displaying the lead time to promotion.",
     defaultConfig = PromotionChartWidgetConfig(project = null, branch = null, promotionLevel = null),
-    preferredHeight = 4,
+    preferredHeight = 6,
 )

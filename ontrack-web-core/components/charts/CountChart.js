@@ -2,7 +2,7 @@ import {useGraphQLClient} from "@components/providers/ConnectionContextProvider"
 import {useEffect, useState} from "react";
 import {Bar, CartesianGrid, ComposedChart, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
 
-export default function CountChart({query, variables}) {
+export default function CountChart({query, variables, yTickFormatter}) {
 
     const client = useGraphQLClient()
 
@@ -62,7 +62,7 @@ export default function CountChart({query, variables}) {
                 >
                     <CartesianGrid strokeDasharray="3 3"/>
                     <XAxis dataKey="date" angle={-45} tickMargin={30} height={80} interval="preserveStart"/>
-                    <YAxis/>
+                    <YAxis tickFormatter={yTickFormatter}/>
                     <Tooltip/>
                     <Legend formatter={legendFormatter} onClick={legendClick} style={{cursor: 'pointer'}}/>
                     <Bar dataKey="value" fill="#6666aa" hide={inactiveSeries.includes('value')}/>

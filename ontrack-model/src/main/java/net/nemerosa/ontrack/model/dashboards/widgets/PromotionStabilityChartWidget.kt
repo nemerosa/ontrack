@@ -3,10 +3,10 @@ package net.nemerosa.ontrack.model.dashboards.widgets
 import org.springframework.stereotype.Component
 
 @Component
-class PromotionTTRChartWidget : AbstractWidget<PromotionChartWidgetConfig>(
-    key = "home/PromotionTTRChart",
-    name = "Time to recovery to promotion",
-    description = "Chart displaying the time to recovery to promotion.",
+class PromotionStabilityChartWidget: AbstractWidget<PromotionChartWidgetConfig>(
+    key = "home/PromotionStabilityChart",
+    name = "Promotion stability",
+    description = "Chart displaying the percentage of builds being promoted.",
     defaultConfig = PromotionChartWidgetConfig(project = null, branch = null, promotionLevel = null),
     preferredHeight = 6,
 )
