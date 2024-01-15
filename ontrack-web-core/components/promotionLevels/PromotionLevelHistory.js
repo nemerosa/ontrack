@@ -7,14 +7,19 @@ import BuildLink from "@components/builds/BuildLink";
 import Decorations from "@components/framework/decorations/Decorations";
 import TimestampText from "@components/common/TimestampText";
 import AnnotatedDescription from "@components/common/AnnotatedDescription";
-import {FaSearch} from "react-icons/fa";
+import {FaExchangeAlt, FaSearch} from "react-icons/fa";
 import TableColumnFilterDropdown from "@components/common/TableColumnFilterDropdown";
+import useRangeSelection from "@components/common/RangeSelection";
+import RangeSelector from "@components/common/RangeSelector";
+import {useRouter} from "next/router";
+import {scmChangeLogUri} from "@components/common/Links";
 
 const {Column} = Table
 
 export default function PromotionLevelHistory({promotionLevel}) {
 
     const client = useGraphQLClient()
+    const router = useRouter()
 
     const [pagination, setPagination] = useState({
         offset: 0,
@@ -40,6 +45,7 @@ export default function PromotionLevelHistory({promotionLevel}) {
     const [loading, setLoading] = useState(false)
     const [promotions, setPromotions] = useState([])
     const [pageInfo, setPageInfo] = useState()
+    const [scmType, setScmType] = useState('')
 
     useEffect(() => {
         if (client && promotionLevel) {
@@ -56,6 +62,11 @@ export default function PromotionLevelHistory({promotionLevel}) {
                         $beforeDate: LocalDateTime,
                     ) {
                         promotionLevel(id: $id) {
+                            branch {
+                                scmBranchInfo {
+                                    type
+                                }
+                            }
                             promotionRuns: promotionRunsPaginated(
                                 offset: $offset,
                                 size: $size,
@@ -71,6 +82,7 @@ export default function PromotionLevelHistory({promotionLevel}) {
                                     }
                                 }
                                 pageItems {
+                                    id
                                     description
                                     annotatedDescription
                                     build {
@@ -107,6 +119,7 @@ export default function PromotionLevelHistory({promotionLevel}) {
                     beforeDate: filter.beforeDate,
                 }
             ).then(data => {
+                setScmType(data.promotionLevel.branch.scmBranchInfo.type)
                 setPageInfo(data.promotionLevel.promotionRuns.pageInfo)
                 if (pagination.offset > 0) {
                     setPromotions([...promotions, ...data.promotionLevel.promotionRuns.pageItems])
@@ -122,6 +135,19 @@ export default function PromotionLevelHistory({promotionLevel}) {
     const onLoadMore = () => {
         if (pageInfo.nextPage) {
             setPagination(pageInfo.nextPage)
+        }
+    }
+
+    const rangeSelection = useRangeSelection()
+
+    const onChangeLog = () => {
+        if (scmType && rangeSelection.isComplete()) {
+            const [runIdFrom, runIdTo] = rangeSelection.selection
+            const runFrom = promotions.find(it => it.id === runIdFrom)
+            const runTo = promotions.find(it => it.id === runIdTo)
+            if (runFrom && runTo) {
+                router.push(scmChangeLogUri(scmType, runFrom.build.id, runTo.build.id))
+            }
         }
     }
 
@@ -156,11 +182,41 @@ export default function PromotionLevelHistory({promotionLevel}) {
                                         </Space>
                                     </Button>
                                 </Popover>
+                                {
+                                    scmType &&
+                                    <Popover
+                                        content="Change between two selected promotions."
+                                    >
+                                        <Button
+                                            disabled={!rangeSelection || !rangeSelection.isComplete()}
+                                            onClick={onChangeLog}
+                                        >
+                                            <Space>
+                                                <FaExchangeAlt/>
+                                                <Typography.Text>Change log</Typography.Text>
+                                            </Space>
+                                        </Button>
+                                    </Popover>
+                                }
                             </Space>
                         </>
                     )}
                     onChange={onTableChange}
                 >
+                    {
+                        scmType &&
+                        <Column
+                            key="range"
+                            width={32}
+                            render={(_, run) =>
+                                <RangeSelector
+                                    id={run.id}
+                                    title="Select this run as a boundary for a change log."
+                                    rangeSelection={rangeSelection}
+                                />
+                            }
+                        />
+                    }
                     <Column
                         title="Build"
                         key="build"
