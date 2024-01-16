@@ -16,8 +16,11 @@ export function useBuildPromoteDialog(config) {
             })
         },
         prepareValues: (values, context) => {
-            values.buildId = context.build.id
-            values.promotion = values.promotionLevel
+            return {
+                ...values,
+                buildId: context.build.id,
+                promotion: values.promotionLevel,
+            }
         },
         query: gql`
             mutation PromoteBuild($buildId: Int!, $promotion: String!, $description: String, $dateTime: LocalDateTime) {

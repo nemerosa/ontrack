@@ -14,9 +14,12 @@ export function useSaveDashboardDialog(config) {
             })
         },
         prepareValues: (values, {copy}) => {
-            values.userScope = values.userScope ? values.userScope : "PRIVATE"
-            values.uuid = copy.uuid
-            values.widgets = copy.widgets
+            return {
+                ...values,
+                userScope: values.userScope ?? "PRIVATE",
+                uuid: copy.uuid,
+                widgets: copy.widgets,
+            }
         },
         query: saveDashboardQuery,
         userNode: 'saveDashboard',

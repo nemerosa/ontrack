@@ -3,6 +3,8 @@ import {Button} from "antd";
 import {Fragment, useState} from "react";
 import ConnectionResult from "@components/configurations/ConnectionResult";
 import {gql} from "graphql-request";
+import {prepareConfigValues, testConfig} from "@components/configurations/ConfigurationUtils";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 
 export const useConfigurationDialog = ({onSuccess, dialogItems, configurationType}) => {
     return useFormDialog({
@@ -13,15 +15,9 @@ export const useConfigurationDialog = ({onSuccess, dialogItems, configurationTyp
         },
         onSuccess,
         dialogItems,
+        configurationType,
         prepareValues: (values) => {
-            // The mutation expects three fields:
-            // - type: configuration type
-            // - name: the name of the configuration
-            // - data: the values for this configuration
-            // Right now, all values are flattened into the values
-            values.data = {...values}
-            delete values.data.name
-            values.type = configurationType
+            return prepareConfigValues(values, configurationType)
         },
         query: ({creation}) => creation ?
             gql`
@@ -64,10 +60,13 @@ export const useConfigurationDialog = ({onSuccess, dialogItems, configurationTyp
 
 export default function ConfigurationDialog({configurationDialog}) {
 
+    const client = useGraphQLClient()
     const [connectionResult, setConnectionResult] = useState()
 
-    const onTestConfig = () => {
-        // TODO
+    const onTestConfig = async () => {
+        setConnectionResult(undefined)
+        const connectionResult = await testConfig(client, configurationDialog.form.getFieldsValue(true), configurationDialog.configurationType)
+        setConnectionResult(connectionResult)
     }
 
     return (

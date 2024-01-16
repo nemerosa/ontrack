@@ -66,10 +66,11 @@ myDialog.start({/* Context */})
 
 The `useFormDialog` has the following configuration parameters.
 
-| Parameter | Type                    | Default | Description                                                       |
-|-----------|-------------------------|---------|-------------------------------------------------------------------|
-| init      | (form, context) => {}   | _None_  | Used to initialize the dialog form before it's shown to the user. |
-| onSuccess | (values, context) => {} | _None_  | Validations of the values.                                        |
+| Parameter     | Type                    | Default | Description                                                       |
+|---------------|-------------------------|---------|-------------------------------------------------------------------|
+| init          | (form, context) => {}   | _None_  | Used to initialize the dialog form before it's shown to the user. |
+| prepareValues | (values, context) => {} | _None_  | Used to return a new set of values before submitting the form     |
+| onSuccess     | (values, context) => {} | _None_  | Validations of the values.                                        |
 
 
 # Context
@@ -145,8 +146,11 @@ For example, for the creation of a project:
 return useFormDialog({
     // ...
     prepareValues: (values) => {
-        values.description = values.description ? values.description : ''
-        values.disabled = values.disabled ? values.disabled : false
+        return {
+            ...values,
+            description: values.description ?? '',
+            disabled: values.disabled !== null ? values.disabled : false,
+        }
     },
     query: gql`
             mutation CreateProject(

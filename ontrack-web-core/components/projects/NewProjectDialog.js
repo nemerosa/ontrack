@@ -6,8 +6,11 @@ export function useNewProjectDialog({onSuccess}) {
     return useFormDialog({
         onSuccess: onSuccess,
         prepareValues: (values) => {
-            values.description = values.description ? values.description : ''
-            values.disabled = values.disabled ? values.disabled : false
+            return {
+                ...values,
+                description: values.description ?? '',
+                disabled: values.disabled !== null ? values.disabled : false,
+            }
         },
         query: gql`
             mutation CreateProject(

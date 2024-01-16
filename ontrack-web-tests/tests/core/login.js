@@ -3,7 +3,12 @@ import {expect} from "@playwright/test";
 import {selectUserMenu} from "./userMenu";
 import exp from "constants";
 
-export const login = async (page, customerUsername, customPassword, options = {}) => {
+export const login = async (
+    page,
+    customerUsername = undefined,
+    customPassword = undefined,
+    options = {}
+) => {
     let username
     let password
     if (customerUsername) {

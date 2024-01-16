@@ -72,10 +72,12 @@ export default function FormDialog({dialog, onValuesChange, children, hasOk = tr
         setLoading(true)
         setFormErrors([])
         try {
-            const values = await form.validateFields()
-            if (dialog.prepareValues) dialog.prepareValues(values, dialog.context)
+            let values = await form.validateFields()
+            if (dialog.prepareValues) {
+                values = dialog.prepareValues(values, dialog.context)
+            }
             let result
-            let errors = undefined
+            let errors
             const actualQuery = getActualQuery()
             if (actualQuery) {
                 const data = await client.request(
