@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.kdsl.spec.extension.av.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.kdsl.spec.extension.av.setAutoVersioningConfig
 import net.nemerosa.ontrack.kdsl.spec.extension.general.buildLinkDisplayUseLabel
 import net.nemerosa.ontrack.kdsl.spec.extension.general.label
+import org.apache.commons.codec.digest.DigestUtils
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
@@ -717,7 +718,8 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         assertThatMockScmRepository {
                             hasPR(
-                                from = "feature/upgrade-test-AAA-2.0.0",
+                                // fad58de7366495db4650cfefac2fcd61 = md5(main)
+                                from = "feature/upgrade-test-AAA-2.0.0-fad58de7366495db4650cfefac2fcd61",
                                 to = "main"
                             )
                             fileContains("gradle.properties") {
@@ -773,7 +775,8 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         assertThatMockScmRepository {
                             hasPR(
-                                from = "feature/upgrade-test-${dependency.project.name}-2.0.0",
+                                // fad58de7366495db4650cfefac2fcd61 = md5(main)
+                                from = "feature/upgrade-test-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61",
                                 to = "main"
                             )
                             fileContains("gradle.properties") {
