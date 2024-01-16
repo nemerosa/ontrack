@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
 import net.nemerosa.ontrack.model.support.ConnectionResult;
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,12 @@ public class ArtifactoryConfigurationServiceImpl extends AbstractConfigurationSe
     public ArtifactoryConfigurationServiceImpl(ConfigurationRepository configurationRepository, SecurityService securityService, EncryptionService encryptionService, EventPostService eventPostService, EventFactory eventFactory, ArtifactoryClientFactory artifactoryClientFactory, OntrackConfigProperties ontrackConfigProperties) {
         super(ArtifactoryConfiguration.class, configurationRepository, securityService, encryptionService, eventPostService, eventFactory, ontrackConfigProperties);
         this.artifactoryClientFactory = artifactoryClientFactory;
+    }
+
+    @NotNull
+    @Override
+    public String getType() {
+        return "artifactory";
     }
 
     @Override

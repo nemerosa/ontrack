@@ -30,6 +30,8 @@ class TFCConfigurationServiceImpl(
     ontrackConfigProperties
 ), TFCConfigurationService {
 
+    override val type: String = "tfc"
+
     override fun findConfigurationByURL(url: String): TFCConfiguration? =
         configurations.find { url.startsWith(it.url) }
 

@@ -27,6 +27,12 @@ public class JenkinsConfigurationServiceImpl extends AbstractConfigurationServic
         this.jenkinsClientFactory = jenkinsClientFactory;
     }
 
+    @NotNull
+    @Override
+    public String getType() {
+        return "jenkins";
+    }
+
     @Override
     protected @NotNull ConnectionResult validate(@NotNull JenkinsConfiguration configuration) {
         JenkinsClient client = jenkinsClientFactory.getClient(configuration);

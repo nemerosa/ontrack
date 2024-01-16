@@ -32,6 +32,8 @@ class DefaultBitbucketCloudConfigurationService(
     ontrackConfigProperties
 ), BitbucketCloudConfigurationService {
 
+    override val type: String = "bitbucket-cloud"
+
     override fun validate(configuration: BitbucketCloudConfiguration): ConnectionResult {
         val client = bitbucketCloudClientFactory.getBitbucketCloudClient(configuration)
         return try {

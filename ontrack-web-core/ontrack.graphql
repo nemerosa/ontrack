@@ -923,6 +923,14 @@ type ConfigurableIndicatorTypeStateLinks {
     _update: String
 }
 
+"Generic configuration"
+type Configuration {
+    "Specific data for the configuration (may include the name as well)"
+    data: JSON
+    "Unique name for the configuration"
+    name: String!
+}
+
 "Result of testing a configuration"
 type ConnectionResult {
     "Result message"
@@ -967,6 +975,12 @@ type CreateBuildPayload implements Payload {
 type CreateBuiltInAccountPayload implements Payload {
     "Created account"
     account: Account
+    "List of errors"
+    errors: [UserError]
+}
+
+"Output type for the createConfiguration mutation."
+type CreateConfigurationPayload implements Payload {
     "List of errors"
     errors: [UserError]
 }
@@ -1220,6 +1234,12 @@ type DeleteBuildReleasePropertyByIdPayload implements Payload {
 type DeleteBuildReleasePropertyPayload implements Payload {
     "Build updated"
     build: Build
+    "List of errors"
+    errors: [UserError]
+}
+
+"Output type for the deleteConfiguration mutation."
+type DeleteConfigurationPayload implements Payload {
     "List of errors"
     errors: [UserError]
 }
@@ -2836,6 +2856,11 @@ type Mutation {
         "Input for the mutation"
         input: CreateBuiltInAccountInput
     ): CreateBuiltInAccountPayload
+    "Creates a configuration"
+    createConfiguration(
+        "Input for the mutation"
+        input: CreateConfigurationInput
+    ): CreateConfigurationPayload
     "Creates a new GitHub configuration."
     createGitHubConfiguration(
         "Input for the mutation"
@@ -2981,6 +3006,11 @@ type Mutation {
         "Input for the mutation"
         input: DeleteBuildReleasePropertyByIdInput
     ): DeleteBuildReleasePropertyByIdPayload
+    "Deletes a configuration"
+    deleteConfiguration(
+        "Input for the mutation"
+        input: DeleteConfigurationInput
+    ): DeleteConfigurationPayload
     "Deletes a dashboard"
     deleteDashboard(input: DeleteDashboardInput!): DeletionPayload
     "Deletes a Jenkins configuration"
@@ -3816,6 +3846,11 @@ type Mutation {
         "Input for the mutation"
         input: SubscribeValidationStampToEventsInput
     ): SubscribeValidationStampToEventsPayload
+    "Tests a configuration"
+    testConfiguration(
+        "Input for the mutation"
+        input: TestConfigurationInput
+    ): TestConfigurationPayload
     "Tests a Jenkins configuration"
     testJenkinsConfiguration(
         "Input for the mutation"
@@ -3841,6 +3876,11 @@ type Mutation {
         "Input for the mutation"
         input: UnshareSCMFileChangeFilterInput
     ): UnshareSCMFileChangeFilterPayload
+    "Updates a configuration"
+    updateConfiguration(
+        "Input for the mutation"
+        input: UpdateConfigurationInput
+    ): UpdateConfigurationPayload
     "Updates a Jenkins configuration"
     updateJenkinsConfiguration(
         "Input for the mutation"
@@ -4738,6 +4778,11 @@ type Query {
         "Filter the indicators on their type ID"
         type: String
     ): [ConfigurableIndicatorTypeState!]!
+    "Gets a list of configuration for a given type."
+    configurations(
+        "Configuration type"
+        configurationType: String!
+    ): [Configuration!]!
     "List of available widgets"
     dashboardWidgets: [Widget!]!
     "Getting a project entity using its type and ID."
@@ -6103,6 +6148,14 @@ type SubscribeValidationStampToEventsPayload implements Payload {
     subscription: EventSubscriptionPayload
 }
 
+"Output type for the testConfiguration mutation."
+type TestConfigurationPayload implements Payload {
+    "Result of the test"
+    connectionResult: ConnectionResult
+    "List of errors"
+    errors: [UserError]
+}
+
 "Output type for the testJenkinsConfiguration mutation."
 type TestJenkinsConfigurationPayload implements Payload {
     "Result of the test"
@@ -6176,6 +6229,12 @@ type UnlockAccountPayload implements Payload {
 
 "Output type for the unshareSCMFileChangeFilter mutation."
 type UnshareSCMFileChangeFilterPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
+"Output type for the updateConfiguration mutation."
+type UpdateConfigurationPayload implements Payload {
     "List of errors"
     errors: [UserError]
 }
@@ -7091,6 +7150,16 @@ input CreateBuiltInAccountInput {
     password: String!
 }
 
+"Input type for the createConfiguration mutation."
+input CreateConfigurationInput {
+    "data field"
+    data: JSON!
+    "name field"
+    name: String!
+    "type field"
+    type: String!
+}
+
 "Input type for the createGitHubConfiguration mutation."
 input CreateGitHubConfigurationInput {
     "ID of the GitHub App to use for authentication"
@@ -7385,6 +7454,14 @@ input DeleteBuildReleasePropertyInput {
     build: String!
     "Project name"
     project: String!
+}
+
+"Input type for the deleteConfiguration mutation."
+input DeleteConfigurationInput {
+    "name field"
+    name: String!
+    "type field"
+    type: String!
 }
 
 input DeleteDashboardInput {
@@ -9388,6 +9465,16 @@ input SubscribeValidationStampToEventsInput {
     validation: String!
 }
 
+"Input type for the testConfiguration mutation."
+input TestConfigurationInput {
+    "data field"
+    data: JSON!
+    "name field"
+    name: String!
+    "type field"
+    type: String!
+}
+
 "Input type for the testJenkinsConfiguration mutation."
 input TestJenkinsConfigurationInput {
     "name field"
@@ -9424,6 +9511,16 @@ input UnshareSCMFileChangeFilterInput {
     name: String!
     "ID of the project"
     projectId: Int!
+}
+
+"Input type for the updateConfiguration mutation."
+input UpdateConfigurationInput {
+    "data field"
+    data: JSON!
+    "name field"
+    name: String!
+    "type field"
+    type: String!
 }
 
 "Input type for the updateJenkinsConfiguration mutation."

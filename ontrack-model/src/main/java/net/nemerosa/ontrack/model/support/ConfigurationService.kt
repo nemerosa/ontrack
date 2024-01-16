@@ -11,6 +11,13 @@ import java.util.function.Function
 interface ConfigurationService<T : Configuration<T>> {
 
     /**
+     * ID (type) of the configuration service.
+     *
+     * This is used for the generic API to manage the configurations.
+     */
+    val type: String
+
+    /**
      * Gets the list of configurations.
      */
     val configurations: List<T>

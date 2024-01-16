@@ -33,6 +33,8 @@ class GitHubConfigurationServiceImpl(
     ontrackConfigProperties
 ), GitHubConfigurationService {
 
+    override val type: String = "github"
+
     override fun checkConfigurationFields(configuration: GitHubEngineConfiguration) {
         configuration.checkFields()
     }

@@ -30,6 +30,8 @@ class SonarQubeConfigurationServiceImpl(
         ontrackConfigProperties
 ), SonarQubeConfigurationService {
 
+    override val type: String = "sonarqube"
+
     override fun validate(configuration: SonarQubeConfiguration): ConnectionResult {
         // Gets a client
         val client = sonarQubeClientFactory.getClient(configuration)

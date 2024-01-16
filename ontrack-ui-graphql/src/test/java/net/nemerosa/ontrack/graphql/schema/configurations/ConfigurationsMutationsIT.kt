@@ -1,7 +1,8 @@
-package net.nemerosa.ontrack.extension.jenkins
+package net.nemerosa.ontrack.graphql.schema.configurations
 
+import net.nemerosa.ontrack.extension.jenkins.JenkinsConfigurationService
+import net.nemerosa.ontrack.extension.jenkins.JenkinsTestSupport
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
-import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.test.TestUtils
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -9,7 +10,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-class JenkinsGraphQLControllerIT : AbstractQLKTITSupport() {
+class ConfigurationsMutationsIT : AbstractQLKTITSupport() {
 
     @Autowired
     private lateinit var jenkinsConfigurationService: JenkinsConfigurationService
@@ -18,7 +19,7 @@ class JenkinsGraphQLControllerIT : AbstractQLKTITSupport() {
     private lateinit var jenkinsTestSupport: JenkinsTestSupport
 
     @Test
-    fun `Creating a Jenkins configuration with GraphQL`() {
+    fun `Creating a Jenkins configuration with the generic GraphQL mutation`() {
         asAdmin {
             withDisabledConfigurationTest {
                 val name = TestUtils.uid("jc")
@@ -26,11 +27,14 @@ class JenkinsGraphQLControllerIT : AbstractQLKTITSupport() {
                 run(
                     """
                         mutation {
-                            createJenkinsConfiguration(input: {
+                            createConfiguration(input: {
+                                type: "jenkins",
                                 name: "$name",
-                                url: "$url",
-                                user: "some-user",
-                                password: "some-password"
+                                data: {
+                                    url: "$url",
+                                    user: "some-user",
+                                    password: "some-password"
+                                }
                             }) {
                                 errors {
                                     message
@@ -39,7 +43,7 @@ class JenkinsGraphQLControllerIT : AbstractQLKTITSupport() {
                         }
                     """
                 ) { data ->
-                    checkGraphQLUserErrors(data, "createJenkinsConfiguration")
+                    checkGraphQLUserErrors(data, "createConfiguration")
                     assertNotNull(jenkinsConfigurationService.findConfiguration(name), "Config has been found") {
                         assertEquals(url, it.url)
                     }
@@ -49,16 +53,19 @@ class JenkinsGraphQLControllerIT : AbstractQLKTITSupport() {
     }
 
     @Test
-    fun `Creating a Jenkins configuration with GraphQL cannot override an existing configuration`() {
+    fun `Creating a Jenkins configuration with the generic GraphQL mutation cannot override an existing configuration`() {
         jenkinsTestSupport.withConfig { config ->
             run(
                 """
                     mutation {
-                        createJenkinsConfiguration(input: {
+                        createConfiguration(input: {
+                            type: "jenkins",
                             name: "${config.name}",
-                            url: "some-other-url",
-                            user: "some-other-user",
-                            password: "some-other-password"
+                            data: {
+                                url: "some-other-url",
+                                user: "some-other-user",
+                                password: "some-other-password"
+                            }
                         }) {
                             errors {
                                 message
@@ -68,7 +75,7 @@ class JenkinsGraphQLControllerIT : AbstractQLKTITSupport() {
                 """
             ) { data ->
                 assertUserError(
-                    data, "createJenkinsConfiguration",
+                    data, "createConfiguration",
                     message = "Configuration already exists with same name: ${config.name}"
                 )
             }
@@ -76,16 +83,19 @@ class JenkinsGraphQLControllerIT : AbstractQLKTITSupport() {
     }
 
     @Test
-    fun `Updating a Jenkins configuration - the password is not required`() {
+    fun `Updating a Jenkins configuration with the generic GraphQL mutation - the password is not required`() {
         jenkinsTestSupport.withConfig { config ->
             val url = "https://jenkins.nemerosa.net"
             run(
                 """
                         mutation {
-                            updateJenkinsConfiguration(input: {
+                            updateConfiguration(input: {
+                                type: "jenkins",
                                 name: "${config.name}",
-                                url: "$url",
-                                user: "${config.user}"
+                                data: {
+                                    url: "$url",
+                                    user: "${config.user}"
+                                }
                             }) {
                                 errors {
                                     message
@@ -94,7 +104,7 @@ class JenkinsGraphQLControllerIT : AbstractQLKTITSupport() {
                         }
                     """
             ) { data ->
-                checkGraphQLUserErrors(data, "saveJenkinsConfiguration")
+                checkGraphQLUserErrors(data, "updateConfiguration")
                 assertNotNull(jenkinsConfigurationService.findConfiguration(config.name), "Config has been found") {
                     assertEquals(url, it.url)
                     assertEquals(config.user, it.user)
@@ -105,16 +115,19 @@ class JenkinsGraphQLControllerIT : AbstractQLKTITSupport() {
     }
 
     @Test
-    fun `Updating a Jenkins configuration - changing the password`() {
+    fun `Updating a Jenkins configuration with the generic GraphQL mutation - changing the password`() {
         jenkinsTestSupport.withConfig { config ->
             run(
                 """
                         mutation {
-                            updateJenkinsConfiguration(input: {
+                            updateConfiguration(input: {
+                                type: "jenkins",
                                 name: "${config.name}",
-                                url: "${config.url}",
-                                user: "${config.user}",
-                                password: "new-password",
+                                data: {
+                                    url: "${config.url}",
+                                    user: "${config.user}",
+                                    password: "new-password",
+                                }
                             }) {
                                 errors {
                                     message
@@ -123,7 +136,7 @@ class JenkinsGraphQLControllerIT : AbstractQLKTITSupport() {
                         }
                     """
             ) { data ->
-                checkGraphQLUserErrors(data, "saveJenkinsConfiguration")
+                checkGraphQLUserErrors(data, "updateConfiguration")
                 assertNotNull(jenkinsConfigurationService.findConfiguration(config.name), "Config has been found") {
                     assertEquals(config.url, it.url)
                     assertEquals(config.user, it.user)
@@ -134,12 +147,13 @@ class JenkinsGraphQLControllerIT : AbstractQLKTITSupport() {
     }
 
     @Test
-    fun `Deleting a Jenkins configuration`() {
+    fun `Deleting a Jenkins configuration using the generic GraphQL mutation`() {
         jenkinsTestSupport.withConfig { config ->
             run(
                 """
                         mutation {
-                            deleteJenkinsConfiguration(input: {
+                            deleteConfiguration(input: {
+                                type: "jenkins",
                                 name: "${config.name}"
                             }) {
                                 errors {
@@ -149,32 +163,8 @@ class JenkinsGraphQLControllerIT : AbstractQLKTITSupport() {
                         }
                     """
             ) { data ->
-                checkGraphQLUserErrors(data, "deleteJenkinsConfiguration")
+                checkGraphQLUserErrors(data, "deleteConfiguration")
                 assertNull(jenkinsConfigurationService.findConfiguration(config.name), "Config has been deleted")
-            }
-        }
-    }
-
-    @Test
-    fun `Getting the Jenkins configuration with GraphQL`() {
-        jenkinsTestSupport.withConfig { config ->
-            run(
-                """
-                        {
-                            jenkinsConfigurations {
-                                name
-                                url
-                                user
-                            }
-                        }
-                    """
-            ) { data ->
-                val configurations = data.path("jenkinsConfigurations")
-                val node = configurations.find { it.getRequiredTextField("name") == config.name }
-                assertNotNull(node, "Jenkins config found") {
-                    assertEquals(config.url, it.getRequiredTextField("url"))
-                    assertEquals(config.user, it.getRequiredTextField("user"))
-                }
             }
         }
     }

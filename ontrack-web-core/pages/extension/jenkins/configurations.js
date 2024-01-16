@@ -2,7 +2,7 @@ import StandardPage from "@components/layouts/StandardPage";
 import {useContext, useEffect, useState} from "react";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
-import {message, Space, Table} from "antd";
+import {Form, Input, message, Space, Table} from "antd";
 import Link from "next/link";
 import JenkinsConfigurationDialog, {
     useJenkinsConfigurationDialog
@@ -12,6 +12,7 @@ import {FaPencilAlt, FaPlus, FaQuestionCircle} from "react-icons/fa";
 import {Command} from "@components/common/Commands";
 import InlineCommand from "@components/common/InlineCommand";
 import InlineConfirmCommand from "@components/common/InlineConfirmCommand";
+import ConfigurationPage from "@components/configurations/ConfigurationPage";
 
 const {Column} = Table
 
@@ -129,68 +130,125 @@ export default function JenkinsConfigurationsPage() {
         ).then(reload)
     }
 
+    // ==== Generic
+
+    const columns = [
+        {
+            title: "Name",
+            key: "name",
+            dataIndex: "name"
+        },
+        {
+            title: "URL",
+            key: "url",
+            dataIndex: "url",
+            render: (value) => <Link href={value}>{value}</Link>,
+        },
+        {
+            title: "User",
+            key: "user",
+            dataIndex: "user"
+        },
+    ]
+
+    const dialogItems = [
+        <Form.Item
+            name="name"
+            label="Configuration name"
+            rules={[{required: true, message: 'Name is required.',},]}
+        >
+            <Input/>
+        </Form.Item>,
+        <Form.Item
+            name="url"
+            label="Jenkins URL"
+            rules={[{required: true, message: 'URL is required.',},]}
+        >
+            <Input/>
+        </Form.Item>,
+        <Form.Item
+            name="user"
+            label="Jenkins username"
+        >
+            <Input/>
+        </Form.Item>,
+        <Form.Item
+            name="password"
+            label="Jenkins password"
+        >
+            <Input.Password/>
+        </Form.Item>,
+    ]
+
     return (
         <>
-            {contextHolder}
-            <StandardPage
+            <ConfigurationPage
                 pageTitle="Jenkins configurations"
-                additionalCommands={
-                    user?.authorizations?.global?.settings ? [
-                        <Command icon={<FaPlus/>} action={onCreateConfig} text="Create Jenkins config"/>
-                    ] : []
-                }
+                configurationType="jenkins"
+                columns={columns}
+                dialogItems={dialogItems}
             >
-                <Table
-                    loading={loading}
-                    dataSource={configurations}
-                    pagination={false}
-                >
-                    <Column
-                        title="Name"
-                        key="name"
-                        dataIndex="name"
-                    />
-                    <Column
-                        title="URL"
-                        key="url"
-                        dataIndex="url"
-                        render={(value) => <Link href={value}>{value}</Link>}
-                    />
-                    <Column
-                        title="User"
-                        key="user"
-                        dataIndex="user"
-                    />
-                    <Column
-                        key="actions"
-                        render={(_, config) =>
-                            <Space>
-                                {
-                                    user?.authorizations?.global?.settings &&
-                                    <Space>
-                                        <InlineCommand
-                                            title="Tests this configuration"
-                                            icon={<FaQuestionCircle/>}
-                                            onClick={onTestConfig(config)}
-                                        />
-                                        <InlineCommand
-                                            title="Updates this configuration"
-                                            icon={<FaPencilAlt/>}
-                                            onClick={onUpdateConfig(config)}
-                                        />
-                                        <InlineConfirmCommand
-                                            title="Deletes the configuration"
-                                            confirm="Do you really want to delete this configuration?"
-                                            onConfirm={() => deleteConfig(config)}
-                                        />
-                                    </Space>
-                                }
-                            </Space>
-                        }
-                    />
-                </Table>
-            </StandardPage>
-            <JenkinsConfigurationDialog jenkinsConfigurationDialog={dialog}/>
+            </ConfigurationPage>
+            {contextHolder}
+            {/*<StandardPage*/}
+            {/*    pageTitle="Jenkins configurations"*/}
+            {/*    additionalCommands={*/}
+            {/*        user?.authorizations?.global?.settings ? [*/}
+            {/*            <Command icon={<FaPlus/>} action={onCreateConfig} text="Create Jenkins config"/>*/}
+            {/*        ] : []*/}
+            {/*    }*/}
+            {/*>*/}
+            {/*    <Table*/}
+            {/*        loading={loading}*/}
+            {/*        dataSource={configurations}*/}
+            {/*        pagination={false}*/}
+            {/*    >*/}
+            {/*        <Column*/}
+            {/*            title="Name"*/}
+            {/*            key="name"*/}
+            {/*            dataIndex="name"*/}
+            {/*        />*/}
+            {/*        <Column*/}
+            {/*            title="URL"*/}
+            {/*            key="url"*/}
+            {/*            dataIndex="url"*/}
+            {/*            render={(value) => <Link href={value}>{value}</Link>}*/}
+            {/*        />*/}
+            {/*        <Column*/}
+            {/*            title="User"*/}
+            {/*            key="user"*/}
+            {/*            dataIndex="user"*/}
+            {/*        />*/}
+            {/*        <Column*/}
+            {/*            key="actions"*/}
+            {/*            render={(_, config) =>*/}
+            {/*                <Space>*/}
+            {/*                    {*/}
+            {/*                        user?.authorizations?.global?.settings &&*/}
+            {/*                        <Space>*/}
+            {/*                            <InlineCommand*/}
+            {/*                                title="Tests this configuration"*/}
+            {/*                                icon={<FaQuestionCircle/>}*/}
+            {/*                                onClick={onTestConfig(config)}*/}
+            {/*                            />*/}
+            {/*                            <InlineCommand*/}
+            {/*                                title="Updates this configuration"*/}
+            {/*                                icon={<FaPencilAlt/>}*/}
+            {/*                                onClick={onUpdateConfig(config)}*/}
+            {/*                            />*/}
+            {/*                            <InlineConfirmCommand*/}
+            {/*                                title="Deletes the configuration"*/}
+            {/*                                confirm="Do you really want to delete this configuration?"*/}
+            {/*                                onConfirm={() => deleteConfig(config)}*/}
+            {/*                            />*/}
+            {/*                        </Space>*/}
+            {/*                    }*/}
+            {/*                </Space>*/}
+            {/*            }*/}
+            {/*        />*/}
+            {/*    </Table>*/}
+            {/*</StandardPage>*/}
+            {/*<JenkinsConfigurationDialog jenkinsConfigurationDialog={dialog}/>*/}
         </>
     )
 }

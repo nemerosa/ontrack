@@ -9,12 +9,19 @@ import net.nemerosa.ontrack.model.support.ConfigurationRepository;
 import net.nemerosa.ontrack.model.support.ConnectionResult;
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TestConfigurationServiceImpl extends AbstractConfigurationService<TestConfiguration>
         implements TestConfigurationService {
+
+    @NotNull
+    @Override
+    public String getType() {
+        return "test";
+    }
 
     @Autowired
     public TestConfigurationServiceImpl(ConfigurationRepository configurationRepository, SecurityService securityService, EncryptionService encryptionService, EventPostService eventPostService, EventFactory eventFactory, OntrackConfigProperties ontrackConfigProperties) {
