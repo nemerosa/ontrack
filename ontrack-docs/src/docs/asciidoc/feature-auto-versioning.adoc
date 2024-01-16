@@ -163,10 +163,15 @@ configurations:
     targetPropertyType: String?
     # Check if the PR must be approved automatically or not (`true` by default)
     autoApproval: Boolean?,
-    # Prefix to use for the upgrade branch in Git, defaults to `feature/auto-upgrade-<project>-<version>`.
+    # Prefix to use for the upgrade branch in Git, defaults to `feature/auto-upgrade-<project>-<version>-<branch>`.
     # If set manually, the `<project>` and `<version>` tokens can be used to be replaced respectively
     # by the dependency project (the `project` above) and the actual version.
+    #
+    # The `<branch>` token is replaced by the MD5 digest of the target branch.
+    #
     # Only the `<version>` token is required.
+    #
+    # Starting from 4.7.30 & 4.8.14, the `<branch>` token is not required but will be added (with the `-<branch>` suffix) if not present.
     upgradeBranchPattern: String?
     # Type of post-processing to launch after the version has been updated
     postProcessing: String?

@@ -26,7 +26,7 @@ data class AutoVersioningSourceConfig(
     override val targetPropertyType: String? = null,
     @APIDescription("Check if the PR must be approved automatically or not (`true` by default)")
     val autoApproval: Boolean? = null,
-    @APIDescription("Prefix to use for the upgrade branch in Git, defaults to `feature/auto-upgrade-<project>-<version>`")
+    @APIDescription("Prefix to use for the upgrade branch in Git, defaults to `feature/auto-upgrade-<project>-<version>-<branch>`")
     val upgradeBranchPattern: String? = null,
     @APIDescription("Type of post processing to launch after the version has been updated")
     val postProcessing: String? = null,
@@ -104,12 +104,20 @@ data class AutoVersioningSourceConfig(
             branch: String,
             branchHash: Boolean,
         ): String {
+
+            // Makes sure the <branch> pattern is always included
+            val actualPattern = if (upgradeBranchPattern.contains("<branch>")) {
+                upgradeBranchPattern
+            } else {
+                "${upgradeBranchPattern}-<branch>"
+            }
+
             val branchToken = if (branchHash) {
                 DigestUtils.md5Hex(branch)
             } else {
                 branch
             }
-            return upgradeBranchPattern
+            return actualPattern
                 .replace("<project>", project)
                 .replace("<version>", version)
                 .replace("<branch>", branchToken)

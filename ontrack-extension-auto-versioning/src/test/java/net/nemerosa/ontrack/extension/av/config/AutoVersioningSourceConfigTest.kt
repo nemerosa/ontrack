@@ -117,7 +117,7 @@ class AutoVersioningSourceConfigTest {
     @Test
     fun `Branch with project and version`() {
         assertEquals(
-            "custom-with-PRJ-and-1.0.0",
+            "custom-with-PRJ-and-1.0.0-100b8cad7cf2a56f6df78f171f97a1ec",
             AutoVersioningSourceConfig.getUpgradeBranch(
                 "custom-with-<project>-and-<version>",
                 "PRJ",
@@ -131,9 +131,23 @@ class AutoVersioningSourceConfigTest {
     @Test
     fun `Branch with version only`() {
         assertEquals(
-            "custom-for-1.0.0",
+            "custom-for-1.0.0-100b8cad7cf2a56f6df78f171f97a1ec",
             AutoVersioningSourceConfig.getUpgradeBranch(
                 "custom-for-<version>",
+                "PRJ",
+                "1.0.0",
+                "any",
+                true
+            )
+        )
+    }
+
+    @Test
+    fun `Branch with version and branch`() {
+        assertEquals(
+            "custom-for-1.0.0-100b8cad7cf2a56f6df78f171f97a1ec",
+            AutoVersioningSourceConfig.getUpgradeBranch(
+                "custom-for-<version>-<branch>",
                 "PRJ",
                 "1.0.0",
                 "any",
