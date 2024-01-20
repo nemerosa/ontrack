@@ -34,6 +34,7 @@ export default function ConfigurationPage({
                         configurations(configurationType: $configurationType) {
                             name
                             data
+                            extra
                         }
                     }
                 `,
@@ -44,6 +45,7 @@ export default function ConfigurationPage({
                 setConfigurations(data.configurations.map(it => ({
                     ...it.data,
                     name: it.name,
+                    extra: it.extra,
                 })))
             }).finally(() => {
                 setLoading(false)

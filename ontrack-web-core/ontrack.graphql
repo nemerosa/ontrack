@@ -927,6 +927,8 @@ type ConfigurableIndicatorTypeStateLinks {
 type Configuration {
     "Specific data for the configuration (may include the name as well)"
     data: JSON
+    "Addition data outside of the configuration itself"
+    extra: JSON
     "Unique name for the configuration"
     name: String!
 }

@@ -2,7 +2,17 @@ import {Drawer, Menu} from "antd";
 import {useContext, useEffect, useState} from "react";
 import {UserContext} from "@components/providers/UserProvider";
 import {legacyGraphiQLUri} from "@components/common/Links";
-import {FaCode, FaCog, FaDoorOpen, FaExpandArrowsAlt, FaJenkins, FaList, FaSignOutAlt, FaUser} from "react-icons/fa";
+import {
+    FaCode,
+    FaCog,
+    FaDoorOpen,
+    FaExpandArrowsAlt,
+    FaGithub,
+    FaJenkins,
+    FaList,
+    FaSignOutAlt,
+    FaUser
+} from "react-icons/fa";
 import {MainLayoutContext} from "@components/layouts/MainLayout";
 import {useLogout} from "@components/providers/ConnectionContextProvider";
 import LegacyLink from "@components/common/LegacyLink";
@@ -38,6 +48,7 @@ export default function UserMenu({userMenu}) {
 
     const itemIcons = {
         'extension/jenkins/configurations': <FaJenkins/>,
+        'extension/github/configurations': <FaGithub/>,
     }
 
     useEffect(() => {

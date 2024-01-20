@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.extension.github.app.GitHubAppTokenService
 import net.nemerosa.ontrack.extension.github.app.client.GitHubAppAccount
 
 fun GitHubAppTokenService.getAppInstallationToken(configuration: GitHubEngineConfiguration): String? =
-    if (configuration.authenticationType() == GitHubAuthenticationType.APP) {
+    if (configuration.authenticationType == GitHubAuthenticationType.APP) {
         getAppInstallationToken(
             configuration.name,
             configuration.appId!!,
@@ -17,11 +17,14 @@ fun GitHubAppTokenService.getAppInstallationToken(configuration: GitHubEngineCon
     }
 
 fun GitHubAppTokenService.getAppInstallationTokenInformation(configuration: GitHubEngineConfiguration): GitHubAppToken? =
-    if (configuration.authenticationType() == GitHubAuthenticationType.APP) {
+    if (configuration.authenticationType == GitHubAuthenticationType.APP &&
+        configuration.appId != null &&
+        configuration.appPrivateKey != null
+    ) {
         getAppInstallationTokenInformation(
             configuration.name,
-            configuration.appId!!,
-            configuration.appPrivateKey!!,
+            configuration.appId,
+            configuration.appPrivateKey,
             configuration.appInstallationAccountName
         )
     } else {
@@ -29,13 +32,16 @@ fun GitHubAppTokenService.getAppInstallationTokenInformation(configuration: GitH
     }
 
 fun GitHubAppTokenService.getAppInstallationAccount(configuration: GitHubEngineConfiguration): GitHubAppAccount? =
-    if (configuration.authenticationType() == GitHubAuthenticationType.APP) {
+    if (configuration.authenticationType == GitHubAuthenticationType.APP &&
+        configuration.appId != null &&
+        configuration.appPrivateKey != null
+    ) {
         getAppInstallationAccount(
             configuration.name,
-            configuration.appId!!,
-            configuration.appPrivateKey!!,
+            configuration.appId,
+            configuration.appPrivateKey,
             configuration.appInstallationAccountName
         )
     } else {
-        error("This configuration is not using a GitHub App.")
+        error("This configuration is not using a valid GitHub App.")
     }

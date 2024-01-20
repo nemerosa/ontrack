@@ -20,6 +20,7 @@ class GQLTypeConfiguration : GQLType {
             .description("Generic configuration")
             .stringField(Data::name)
             .jsonField(Data::data)
+            .jsonField(Data::extra)
             .build()
 
     data class Data(
@@ -27,6 +28,8 @@ class GQLTypeConfiguration : GQLType {
         val name: String,
         @APIDescription("Specific data for the configuration (may include the name as well)")
         val data: JsonNode,
+        @APIDescription("Addition data outside of the configuration itself")
+        val extra: JsonNode?,
     )
 
 }

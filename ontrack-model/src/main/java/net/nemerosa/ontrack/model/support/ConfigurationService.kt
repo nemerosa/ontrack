@@ -113,4 +113,12 @@ interface ConfigurationService<T : Configuration<T>> {
      * Adds a configuration event listener to this service
      */
     fun addConfigurationServiceListener(listener: ConfigurationServiceListener<T>)
+
+    /**
+     * Given a configuration, optionally returns some extra data about it.
+     *
+     * @param config Configuration
+     * @return Extra data (or null if there is none)
+     */
+    fun getConfigExtraData(config: T): Any? = null
 }

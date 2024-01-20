@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.model
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import net.nemerosa.ontrack.extension.github.app.GitHubApp
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Memo
@@ -21,6 +22,7 @@ import net.nemerosa.ontrack.model.support.CredentialsConfiguration
  * @property appInstallationAccountName Account name of the GitHub App installation (used when more than 1 installation for the app)
  * @property autoMergeToken Token for an account used to approve pull requests for auto approval processes
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 open class GitHubEngineConfiguration(
     override val name: String,
     url: String?,
@@ -36,25 +38,22 @@ open class GitHubEngineConfiguration(
     /**
      * Authentication type
      */
-    fun authenticationType(): GitHubAuthenticationType =
-        when {
+    val authenticationType: GitHubAuthenticationType
+        get() = when {
             !appId.isNullOrBlank() -> GitHubAuthenticationType.APP
             !oauth2Token.isNullOrBlank() -> when {
                 user.isNullOrBlank() -> GitHubAuthenticationType.TOKEN
                 else -> GitHubAuthenticationType.USER_TOKEN
             }
-            !password.isNullOrBlank() -> GitHubAuthenticationType.PASSWORD
+
+            !user.isNullOrBlank() -> GitHubAuthenticationType.PASSWORD
             else -> GitHubAuthenticationType.ANONYMOUS
         }
 
     /**
      * End point
      */
-    val url: String
-
-    init {
-        this.url = if (url.isNullOrBlank()) GITHUB_COM else url
-    }
+    val url: String = if (url.isNullOrBlank()) GITHUB_COM else url
 
     override val descriptor: ConfigurationDescriptor
         get() = ConfigurationDescriptor(
@@ -83,7 +82,7 @@ open class GitHubEngineConfiguration(
      * - no other receiver credentials entry is filled in (type == anonymous)
      */
     override fun injectCredentials(oldConfig: GitHubEngineConfiguration): GitHubEngineConfiguration {
-        val authenticationType = this.authenticationType()
+        val authenticationType = this.authenticationType
         return GitHubEngineConfiguration(
             name = name,
             url = url,

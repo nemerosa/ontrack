@@ -64,7 +64,7 @@ class DefaultOntrackGitHubClient(
         }
 
     override val organizations: List<GitHubUser>
-        get() = if (configuration.authenticationType() == GitHubAuthenticationType.APP) {
+        get() = if (configuration.authenticationType == GitHubAuthenticationType.APP) {
             listOfNotNull(
                 gitHubAppTokenService.getAppInstallationAccount(configuration)?.run {
                     GitHubUser(
@@ -347,7 +347,7 @@ class DefaultOntrackGitHubClient(
             if (token != null) {
                 defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer $token")
             } else {
-                when (configuration.authenticationType()) {
+                when (configuration.authenticationType) {
                     GitHubAuthenticationType.ANONYMOUS -> this // Nothing to be done
                     GitHubAuthenticationType.PASSWORD -> {
                         basicAuthentication(configuration.user, configuration.password)

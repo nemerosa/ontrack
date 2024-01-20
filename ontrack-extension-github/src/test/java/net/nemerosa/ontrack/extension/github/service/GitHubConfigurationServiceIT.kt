@@ -44,7 +44,7 @@ class GitHubConfigurationServiceIT : AbstractGitHubTestSupport() {
                 // Checks the new configuration
                 assertEquals(
                     GitHubAuthenticationType.APP,
-                    gitConfigurationService.getConfiguration(config.name).authenticationType()
+                    gitConfigurationService.getConfiguration(config.name).authenticationType
                 )
             }
         }

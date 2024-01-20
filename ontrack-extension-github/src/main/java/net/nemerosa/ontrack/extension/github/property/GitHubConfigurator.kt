@@ -69,7 +69,7 @@ class GitHubConfigurator(
     }
 
     private fun getAuthenticator(configuration: GitHubEngineConfiguration): GitRepositoryAuthenticator =
-        when (configuration.authenticationType()) {
+        when (configuration.authenticationType) {
             GitHubAuthenticationType.ANONYMOUS -> AnonymousGitRepositoryAuthenticator.INSTANCE
             GitHubAuthenticationType.PASSWORD -> UsernamePasswordGitRepositoryAuthenticator(
                 configuration.user!!,
