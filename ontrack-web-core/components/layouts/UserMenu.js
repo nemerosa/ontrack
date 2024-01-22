@@ -8,8 +8,10 @@ import {
     FaDoorOpen,
     FaExpandArrowsAlt,
     FaGithub,
+    FaInfo,
     FaJenkins,
     FaList,
+    FaMagic,
     FaSignOutAlt,
     FaUser
 } from "react-icons/fa";
@@ -44,11 +46,13 @@ export default function UserMenu({userMenu}) {
         configurations: <FaList/>,
         system: <FaCog/>,
         user: <FaUser/>,
+        information: <FaInfo/>,
     }
 
     const itemIcons = {
         'extension/jenkins/configurations': <FaJenkins/>,
         'extension/github/configurations': <FaGithub/>,
+        'extension/auto-versioning/audit/global': <FaMagic/>,
     }
 
     useEffect(() => {
