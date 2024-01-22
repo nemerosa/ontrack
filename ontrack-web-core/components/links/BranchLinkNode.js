@@ -1,11 +1,10 @@
 import {Handle, Position} from "reactflow";
 import {Card, Space, Typography} from "antd";
-import {FaArrowLeft, FaCaretRight, FaCheck, FaLink, FaMagic, FaTimes} from "react-icons/fa";
-import BuildRef from "@components/links/BuildRef";
-import BuildPromotions from "@components/links/BuildPromotions";
+import {FaCaretRight, FaLink, FaMagic} from "react-icons/fa";
 import AutoVersioningInfo from "@components/links/AutoVersioningInfo";
 import {NodeSection} from "@components/links/NodeSection";
-import CheckIcon from "@components/common/CheckIcon";
+import LatestLinkInfo from "@components/links/LatestLinkInfo";
+import ProjectLink from "@components/projects/ProjectLink";
 
 export default function BranchLinkNode({data}) {
 
@@ -37,6 +36,7 @@ export default function BranchLinkNode({data}) {
                 <Space direction="vertical">
                     <Space>
                         <FaLink/>
+                        <ProjectLink project={targetBuild.branch.project}/>
                         {
                             qualifier &&
                             <Typography.Text>{qualifier}</Typography.Text>
@@ -47,20 +47,11 @@ export default function BranchLinkNode({data}) {
                         icon={<FaCaretRight/>}
                         title="Latest link"
                     >
-                        <Space>
-                            <Space direction="vertical">
-                                <BuildRef build={sourceBuild}/>
-                                <BuildPromotions build={sourceBuild}/>
-                            </Space>
-                            <Space direction="vertical">
-                                <FaArrowLeft/>
-                                <CheckIcon value={latestOk}/>
-                            </Space>
-                            <Space direction="vertical">
-                                <BuildRef build={targetBuild}/>
-                                <BuildPromotions build={targetBuild}/>
-                            </Space>
-                        </Space>
+                        <LatestLinkInfo
+                            sourceBuild={sourceBuild}
+                            latestOk={latestOk}
+                            targetBuild={targetBuild}
+                        />
                     </NodeSection>
                     {/* AV information */}
                     {
