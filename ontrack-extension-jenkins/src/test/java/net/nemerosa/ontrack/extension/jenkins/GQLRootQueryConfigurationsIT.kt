@@ -1,6 +1,5 @@
-package net.nemerosa.ontrack.graphql.schema.configurations
+package net.nemerosa.ontrack.extension.jenkins
 
-import net.nemerosa.ontrack.extension.jenkins.JenkinsTestSupport
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.json.getTextField

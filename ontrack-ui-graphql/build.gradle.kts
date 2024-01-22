@@ -23,8 +23,6 @@ dependencies {
     testImplementation(project(":ontrack-repository-impl"))
     testImplementation(project(":ontrack-extension-general"))
     testImplementation(project(":ontrack-extension-ldap"))
-    testImplementation(project(":ontrack-extension-jenkins"))
-    testImplementation(project(path = ":ontrack-extension-jenkins", configuration = "tests"))
 
     testRuntimeOnly(project(":ontrack-service"))
 }
