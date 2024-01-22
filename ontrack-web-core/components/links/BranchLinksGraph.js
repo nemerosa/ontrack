@@ -17,6 +17,14 @@ function BranchLinksFlow({branch}) {
         fragment BuildInfo on Build {
             id
             name
+            branch {
+                id
+                name
+                project {
+                    id
+                    name
+                }
+            }
             releaseProperty {
                 value
             }
