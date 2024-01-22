@@ -30,7 +30,7 @@ export default function BuildNode({data}) {
                         build && <BranchDisplayNameLink branch={build.branch}/>
                     }
                     <Typography.Text strong>
-                        {build && <BuildLink build={build}></BuildLink>}
+                        {build && <BuildLink build={build} displayTooltip={true}></BuildLink>}
                     </Typography.Text>
                     <Timestamp value={build?.creation?.time}/>
                     <BuildPromotions build={build}/>
