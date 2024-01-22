@@ -2,7 +2,17 @@ import {Drawer, Menu} from "antd";
 import {useContext, useEffect, useState} from "react";
 import {UserContext} from "@components/providers/UserProvider";
 import {legacyGraphiQLUri} from "@components/common/Links";
-import {FaCode, FaCog, FaDoorOpen, FaExpandArrowsAlt, FaSignOutAlt, FaUser} from "react-icons/fa";
+import {
+    FaCode,
+    FaCog,
+    FaDoorOpen,
+    FaExpandArrowsAlt,
+    FaGithub,
+    FaJenkins,
+    FaList,
+    FaSignOutAlt,
+    FaUser
+} from "react-icons/fa";
 import {MainLayoutContext} from "@components/layouts/MainLayout";
 import {useLogout} from "@components/providers/ConnectionContextProvider";
 import LegacyLink from "@components/common/LegacyLink";
@@ -31,8 +41,14 @@ export default function UserMenu({userMenu}) {
     }
 
     const groupIcons = {
+        configurations: <FaList/>,
         system: <FaCog/>,
         user: <FaUser/>,
+    }
+
+    const itemIcons = {
+        'extension/jenkins/configurations': <FaJenkins/>,
+        'extension/github/configurations': <FaGithub/>,
     }
 
     useEffect(() => {
@@ -45,6 +61,7 @@ export default function UserMenu({userMenu}) {
                 icon: groupIcons[group.id],
                 children: group.items.map(item => ({
                     key: `${item.extension}-${item.id}`,
+                    icon: itemIcons[`${item.extension}/${item.id}`],
                     label: <UserMenuItemLink item={item}/>,
                 }))
             })

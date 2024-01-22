@@ -30,6 +30,8 @@ class SonarQubeConfigurationServiceImpl(
         ontrackConfigProperties
 ), SonarQubeConfigurationService {
 
+    override val type: String = "sonarqube"
+
     override fun validate(configuration: SonarQubeConfiguration): ConnectionResult {
         // Gets a client
         val client = sonarQubeClientFactory.getClient(configuration)
@@ -42,7 +44,7 @@ class SonarQubeConfigurationServiceImpl(
                 else -> ConnectionResult.error("SonarQube health: $health")
             }
         } catch (ex: Exception) {
-            ConnectionResult.error(ex.message)
+            ConnectionResult.error(ex)
         }
     }
 

@@ -22,9 +22,11 @@ export function useBuildValidateDialog(config) {
             })
         },
         prepareValues: (values, context) => {
-            values.buildId = context.build.id
-            values.dataTypeId = dataType?.descriptor?.id
-            console.log({values})
+            return {
+                ...values,
+                buildId: context.build.id,
+                dataTypeId: dataType?.descriptor?.id,
+            }
         },
         query: gql`
             mutation ValidateBuild(

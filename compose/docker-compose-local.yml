@@ -17,6 +17,8 @@ services:
       SPRING_RABBITMQ_HOST: rabbit
       SPRING_RABBITMQ_USERNAME: ontrack
       SPRING_RABBITMQ_PASSWORD: ontrack
+      # Running in test mode, not testing the configurations
+      ONTRACK_CONFIG_CONFIGURATION_TEST: "false"
       # Next UI
       ONTRACK_CONFIG_UI_ENABLED: "true"
       ONTRACK_CONFIG_UI_URL: "http://localhost:3000/ui" # External URL!

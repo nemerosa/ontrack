@@ -24,7 +24,7 @@ class GitHubEngineConfigurationTest {
         )
         val injected = new.injectCredentials(old)
         injected.checkFields() // Must pass
-        assertEquals(GitHubAuthenticationType.TOKEN, injected.authenticationType())
+        assertEquals(GitHubAuthenticationType.TOKEN, injected.authenticationType)
     }
 
     @Test
@@ -43,7 +43,7 @@ class GitHubEngineConfigurationTest {
         )
         val injected = new.injectCredentials(old)
         injected.checkFields() // Must pass
-        assertEquals(GitHubAuthenticationType.APP, injected.authenticationType())
+        assertEquals(GitHubAuthenticationType.APP, injected.authenticationType)
     }
 
     @Test
@@ -61,7 +61,7 @@ class GitHubEngineConfigurationTest {
         )
         val injected = new.injectCredentials(old)
         injected.checkFields() // Must pass
-        assertEquals(GitHubAuthenticationType.APP, injected.authenticationType())
+        assertEquals(GitHubAuthenticationType.APP, injected.authenticationType)
     }
 
     @Test
@@ -262,6 +262,7 @@ class GitHubEngineConfigurationTest {
                 "appPrivateKey" to null,
                 "appInstallationAccountName" to null,
                 "autoMergeToken" to null,
+                "authenticationType" to "ANONYMOUS",
             ).asJson(),
             GitHubEngineConfiguration(
                 "ontrack",
@@ -303,6 +304,7 @@ class GitHubEngineConfigurationTest {
                 "appPrivateKey" to null,
                 "appInstallationAccountName" to null,
                 "autoMergeToken" to null,
+                "authenticationType" to "TOKEN",
             ).asJson(),
             GitHubEngineConfiguration(
                 "ontrack",
@@ -350,6 +352,7 @@ class GitHubEngineConfigurationTest {
                 "appPrivateKey" to "xxxxxxx",
                 "appInstallationAccountName" to null,
                 "autoMergeToken" to null,
+                "authenticationType" to "APP",
             ).asJson(),
             GitHubEngineConfiguration(
                 "ontrack",
@@ -383,6 +386,29 @@ class GitHubEngineConfigurationTest {
     }
 
     @Test
+    fun `App from JSON with authentication type being saved`() {
+        assertEquals(
+            GitHubEngineConfiguration(
+                "ontrack",
+                GitHubEngineConfiguration.GITHUB_COM,
+                appId = "123456",
+                appPrivateKey = "xxxxxxx",
+            ),
+            mapOf(
+                "name" to "ontrack",
+                "url" to "https://github.com",
+                "user" to null,
+                "password" to null,
+                "oauth2Token" to null,
+                "appId" to "123456",
+                "appPrivateKey" to "xxxxxxx",
+                "appInstallationAccountName" to null,
+                "authenticationType" to "APP",
+            ).asJson().parse()
+        )
+    }
+
+    @Test
     fun `App installation to json`() {
         assertEquals(
             mapOf(
@@ -395,6 +421,7 @@ class GitHubEngineConfigurationTest {
                 "appPrivateKey" to "xxxxxxx",
                 "appInstallationAccountName" to "test",
                 "autoMergeToken" to null,
+                "authenticationType" to "APP",
             ).asJson(),
             GitHubEngineConfiguration(
                 "ontrack",
@@ -512,7 +539,7 @@ class GitHubEngineConfigurationTest {
     fun `Anonymous mode`() {
         assertEquals(
             GitHubAuthenticationType.ANONYMOUS,
-            GitHubEngineConfiguration("Test", null).authenticationType()
+            GitHubEngineConfiguration("Test", null).authenticationType
         )
     }
 
@@ -524,7 +551,7 @@ class GitHubEngineConfigurationTest {
                 "Test", null,
                 user = "user",
                 password = "xxx",
-            ).authenticationType()
+            ).authenticationType
         )
     }
 
@@ -536,7 +563,7 @@ class GitHubEngineConfigurationTest {
                 "Test", null,
                 user = "user",
                 oauth2Token = "xxx",
-            ).authenticationType()
+            ).authenticationType
         )
     }
 
@@ -547,7 +574,7 @@ class GitHubEngineConfigurationTest {
             GitHubEngineConfiguration(
                 "Test", null,
                 oauth2Token = "xxx",
-            ).authenticationType()
+            ).authenticationType
         )
     }
 
@@ -559,7 +586,7 @@ class GitHubEngineConfigurationTest {
                 "Test", null,
                 appId = "123456",
                 appPrivateKey = "xxx",
-            ).authenticationType()
+            ).authenticationType
         )
     }
 
@@ -574,7 +601,7 @@ class GitHubEngineConfigurationTest {
                 oauth2Token = "xxx",
                 appId = "123456",
                 appPrivateKey = "xxx",
-            ).authenticationType()
+            ).authenticationType
         )
     }
 }

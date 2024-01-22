@@ -64,7 +64,7 @@ class GQLTypeGitHubEngineConfiguration(
                 .type(GraphQLString)
                 .dataFetcher { env ->
                     val config: GitHubEngineConfiguration = env.getSource()
-                    config.authenticationType().name
+                    config.authenticationType.name
                 }
         }
         .field {
@@ -73,7 +73,7 @@ class GQLTypeGitHubEngineConfiguration(
                 .type(gqlTypeGitHubAppToken.typeRef)
                 .dataFetcher { env ->
                     val config: GitHubEngineConfiguration = env.getSource()
-                    if (config.authenticationType() == GitHubAuthenticationType.APP) {
+                    if (config.authenticationType == GitHubAuthenticationType.APP) {
                         gitHubAppTokenService.getAppInstallationTokenInformation(config)
                     } else {
                         null

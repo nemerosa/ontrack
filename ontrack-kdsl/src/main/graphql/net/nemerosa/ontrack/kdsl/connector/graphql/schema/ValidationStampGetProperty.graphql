@@ -1,0 +1,10 @@
+query ValidationStampGetProperty(
+    $id: Int!,
+    $type: String!,
+) {
+    validationStamp(id: $id) {
+        properties(type: $type) {
+            value
+        }
+    }
+}

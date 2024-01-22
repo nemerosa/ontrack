@@ -40,6 +40,12 @@ abstract class AbstractConfigurationService<T : Configuration<T>>(
 
     override fun newConfiguration(configuration: T): T {
         checkAccess()
+
+        val existing = findConfiguration(configuration.name)
+        if (existing != null) {
+            throw ConfigurationAlreadyExistsException(configuration.name)
+        }
+
         validateAndCheck(configuration)
         configurationRepository.save(encrypt(configuration))
         eventPostService.post(eventFactory.newConfiguration(configuration))
@@ -112,7 +118,7 @@ abstract class AbstractConfigurationService<T : Configuration<T>>(
         checkConfigurationFields(configuration)
         if (ontrackConfigProperties.configurationTest) {
             val result = validate(configuration)
-            if (result.type == ConnectionResult.ConnectionResultType.ERROR) {
+            if (result.type == ConnectionResultType.ERROR) {
                 throw ConfigurationValidationException(configuration, result.message)
             }
         }

@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.bitbucket.cloud.configuration
 
 import net.nemerosa.ontrack.extension.support.ConfigurationConnectorStatusIndicator
 import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.model.support.ConnectionResult
+import net.nemerosa.ontrack.model.support.ConnectionResultType
 import net.nemerosa.ontrack.model.support.Connector
 import net.nemerosa.ontrack.model.support.ConnectorDescription
 import org.springframework.stereotype.Component
@@ -15,7 +15,7 @@ class BitbucketCloudConnectorStatusIndicator(
 
     override fun connect(config: BitbucketCloudConfiguration) {
         val result = configurationService.test(config)
-        if (result.type != ConnectionResult.ConnectionResultType.OK) {
+        if (result.type != ConnectionResultType.OK) {
             throw IllegalStateException(result.message)
         }
     }

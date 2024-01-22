@@ -16,7 +16,10 @@ export const usePromotionLevelUpdateDialog = () => {
             getPromotionLevelById(client, id).then(pl => form.setFieldsValue(pl))
         },
         prepareValues: (values, {id}) => {
-            values.id = id
+            return {
+                ...values,
+                id,
+            }
         },
         query: gql`
             mutation UpdatePromotionLevel(

@@ -12,5 +12,6 @@ class CoreUserMenuGroupExtension : AbstractExtension(CoreExtensionFeature.INSTAN
     override val groups: List<UserMenuGroup> = listOf(
         UserMenuGroup(CoreUserMenuGroups.USER, "User information"),
         UserMenuGroup(CoreUserMenuGroups.SYSTEM, "System"),
+        UserMenuGroup(CoreUserMenuGroups.CONFIGURATIONS, "Configurations"),
     )
 }

@@ -1,0 +1,14 @@
+"""Jenkins configuration"""
+type JenkinsConfiguration {
+    """Name of the configuration"""
+    name: String!
+    """URL of Jenkins"""
+    url: String!
+    """Username used to connect"""
+    user: String
+}
+
+extend type Query {
+    """List of Jenkins configurations"""
+    jenkinsConfigurations: [JenkinsConfiguration!]!
+}

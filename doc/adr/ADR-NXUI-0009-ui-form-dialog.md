@@ -66,10 +66,11 @@ myDialog.start({/* Context */})
 
 The `useFormDialog` has the following configuration parameters.
 
-| Parameter | Type                    | Default | Description                                                       |
-|-----------|-------------------------|---------|-------------------------------------------------------------------|
-| init      | (form, context) => {}   | _None_  | Used to initialize the dialog form before it's shown to the user. |
-| onSuccess | (values, context) => {} | _None_  | Validations of the values.                                        |
+| Parameter     | Type                    | Default | Description                                                       |
+|---------------|-------------------------|---------|-------------------------------------------------------------------|
+| init          | (form, context) => {}   | _None_  | Used to initialize the dialog form before it's shown to the user. |
+| prepareValues | (values, context) => {} | _None_  | Used to return a new set of values before submitting the form     |
+| onSuccess     | (values, context) => {} | _None_  | Validations of the values.                                        |
 
 
 # Context
@@ -135,4 +136,50 @@ export default function MyDialog({myDialog}) {
 
 # GraphQL integration
 
-TBD
+In some cases, the whole dialog is just about orchestrating some GraphQL calls.
+
+The mutation to call on the dialog success is passed into the `query` parameter while the `userNode` is used to identify the field which contains the user errors.
+
+For example, for the creation of a project:
+
+```javascript
+return useFormDialog({
+    // ...
+    prepareValues: (values) => {
+        return {
+            ...values,
+            description: values.description ?? '',
+            disabled: values.disabled !== null ? values.disabled : false,
+        }
+    },
+    query: gql`
+            mutation CreateProject(
+                $name: String!,
+                $description: String,
+                $disabled: Boolean!,
+            ) {
+                createProject(input: {
+                    name: $name,
+                    description: $description,
+                    disabled: $disabled,
+                }) {
+                    errors {
+                        message
+                    }
+                }
+            }
+        `,
+    userNode: 'createProject',
+})
+```
+
+> Note the use of `prepareValues` to prepare the list of variables for the GraphQL query.
+
+In some cases, the query and the node can be dynamic, linked to the context. For these cases, the `query` and the `userNode` can be functions of the context:
+
+```javascript
+return useFormDialog({
+    query: (context) => { /* ... */ },  
+    userNode: (context) => { /* ... */ },  
+})
+```

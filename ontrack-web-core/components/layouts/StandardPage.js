@@ -6,13 +6,14 @@ import {homeBreadcrumbs} from "@components/common/Breadcrumbs";
 import {CloseToHomeCommand} from "@components/common/Commands";
 
 export default function StandardPage({
-                                       pageTitle,
-                                       breadcrumbs = homeBreadcrumbs(),
-                                       commands = [
-                                           <CloseToHomeCommand key="home"/>,
-                                       ],
-                                       children,
-                                   }) {
+                                         pageTitle,
+                                         breadcrumbs = homeBreadcrumbs(),
+                                         commands = [
+                                             <CloseToHomeCommand key="home"/>,
+                                         ],
+                                         additionalCommands = [],
+                                         children,
+                                     }) {
     return (
         <>
             <main>
@@ -23,7 +24,7 @@ export default function StandardPage({
                     <MainPage
                         title={pageTitle}
                         breadcrumbs={breadcrumbs}
-                        commands={commands}
+                        commands={[...additionalCommands, ...commands]}
                     >
                         {children}
                     </MainPage>

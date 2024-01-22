@@ -11,6 +11,13 @@ import java.util.function.Function
 interface ConfigurationService<T : Configuration<T>> {
 
     /**
+     * ID (type) of the configuration service.
+     *
+     * This is used for the generic API to manage the configurations.
+     */
+    val type: String
+
+    /**
      * Gets the list of configurations.
      */
     val configurations: List<T>
@@ -106,4 +113,12 @@ interface ConfigurationService<T : Configuration<T>> {
      * Adds a configuration event listener to this service
      */
     fun addConfigurationServiceListener(listener: ConfigurationServiceListener<T>)
+
+    /**
+     * Given a configuration, optionally returns some extra data about it.
+     *
+     * @param config Configuration
+     * @return Extra data (or null if there is none)
+     */
+    fun getConfigExtraData(config: T): Any? = null
 }

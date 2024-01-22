@@ -14,6 +14,7 @@ import net.nemerosa.ontrack.model.structure.PropertyService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
 import net.nemerosa.ontrack.model.support.ConfigurationValidationException;
 import net.nemerosa.ontrack.model.support.ConnectionResult;
+import net.nemerosa.ontrack.model.support.ConnectionResultType;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +65,7 @@ public class ConfigurationServiceIT extends AbstractServiceTestJUnit4Support {
         ConnectionResult result = asUser().with(GlobalSettings.class).call(() ->
                 configurationService.test(configuration)
         );
-        assertEquals(ConnectionResult.ConnectionResultType.OK, result.getType());
+        assertEquals(ConnectionResultType.OK, result.getType());
     }
 
     @Test

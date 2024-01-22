@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.extension.stash.model.StashConfiguration
 import net.nemerosa.ontrack.extension.stash.service.StashConfigurationService
 import net.nemerosa.ontrack.extension.support.ConfigurationConnectorStatusIndicator
 import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.model.support.ConnectionResult
+import net.nemerosa.ontrack.model.support.ConnectionResultType
 import net.nemerosa.ontrack.model.support.Connector
 import net.nemerosa.ontrack.model.support.ConnectorDescription
 import org.springframework.stereotype.Component
@@ -17,7 +17,7 @@ class BitbucketConnectorStatusIndicator(
 
     override fun connect(config: StashConfiguration) {
         val result = configurationService.test(config)
-        if (result.type != ConnectionResult.ConnectionResultType.OK) {
+        if (result.type != ConnectionResultType.OK) {
             throw IllegalStateException(result.message)
         }
     }

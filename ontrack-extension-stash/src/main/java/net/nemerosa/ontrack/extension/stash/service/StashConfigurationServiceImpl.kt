@@ -36,6 +36,8 @@ class StashConfigurationServiceImpl(
         ontrackConfigProperties
 ), StashConfigurationService {
 
+    override val type: String = "bitbucket-server"
+
     override fun validate(configuration: StashConfiguration): ConnectionResult {
         return try {
             val client = getHttpClient(configuration)
@@ -45,7 +47,7 @@ class StashConfigurationServiceImpl(
                 ConnectionResult.error("Cannot get the content of the Stash home page")
             }
         } catch (ex: Exception) {
-            ConnectionResult.error(ex.message)
+            ConnectionResult.error(ex)
         }
     }
 

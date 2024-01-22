@@ -1,7 +1,10 @@
 package net.nemerosa.ontrack.extension.github.service
 
+import net.nemerosa.ontrack.extension.github.app.GitHubAppTokenService
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory
+import net.nemerosa.ontrack.extension.github.model.GitHubAuthenticationType
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
+import net.nemerosa.ontrack.extension.github.model.getAppInstallationTokenInformation
 import net.nemerosa.ontrack.extension.support.AbstractConfigurationService
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventPostService
@@ -22,7 +25,8 @@ class GitHubConfigurationServiceImpl(
     eventFactory: EventFactory,
     private val gitHubClientFactory: OntrackGitHubClientFactory,
     ontrackConfigProperties: OntrackConfigProperties,
-    private val applicationLogService: ApplicationLogService
+    private val applicationLogService: ApplicationLogService,
+    private val gitHubAppTokenService: GitHubAppTokenService,
 ) : AbstractConfigurationService<GitHubEngineConfiguration>(
     GitHubEngineConfiguration::class.java,
     configurationRepository,
@@ -33,8 +37,20 @@ class GitHubConfigurationServiceImpl(
     ontrackConfigProperties
 ), GitHubConfigurationService {
 
+    override val type: String = "github"
+
     override fun checkConfigurationFields(configuration: GitHubEngineConfiguration) {
         configuration.checkFields()
+    }
+
+    override fun getConfigExtraData(config: GitHubEngineConfiguration): Any? {
+        val client = gitHubClientFactory.create(config)
+        val extra = mutableMapOf<String, Any?>()
+        extra["rateLimit"] = client.getRateLimit()
+        if (config.authenticationType == GitHubAuthenticationType.APP) {
+            extra["appToken"] = gitHubAppTokenService.getAppInstallationTokenInformation(config)
+        }
+        return extra
     }
 
     override fun validate(configuration: GitHubEngineConfiguration): ConnectionResult =
@@ -55,7 +71,7 @@ class GitHubConfigurationServiceImpl(
                     .withDetail("github-config-name", configuration.name)
                     .withDetail("github-config-url", configuration.url)
             )
-            ConnectionResult.error(ex.message)
+            ConnectionResult.error(ex)
         }
 
 }

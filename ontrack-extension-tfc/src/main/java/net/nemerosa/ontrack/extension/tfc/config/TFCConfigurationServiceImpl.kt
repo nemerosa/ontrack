@@ -30,6 +30,8 @@ class TFCConfigurationServiceImpl(
     ontrackConfigProperties
 ), TFCConfigurationService {
 
+    override val type: String = "tfc"
+
     override fun findConfigurationByURL(url: String): TFCConfiguration? =
         configurations.find { url.startsWith(it.url) }
 
@@ -39,7 +41,7 @@ class TFCConfigurationServiceImpl(
             client.organizations
             ConnectionResult.ok()
         } catch (any: Exception) {
-            ConnectionResult.error(any.message)
+            ConnectionResult.error(any)
         }
     }
 

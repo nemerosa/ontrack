@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationRepository;
 import net.nemerosa.ontrack.model.support.ConnectionResult;
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,12 @@ public class GitConfigurationServiceImpl extends AbstractConfigurationService<Ba
     public GitConfigurationServiceImpl(ConfigurationRepository configurationRepository, SecurityService securityService, EncryptionService encryptionService, EventPostService eventPostService, EventFactory eventFactory, GitRepositoryClientFactory repositoryClientFactory, OntrackConfigProperties ontrackConfigProperties) {
         super(BasicGitConfiguration.class, configurationRepository, securityService, encryptionService, eventPostService, eventFactory, ontrackConfigProperties);
         this.repositoryClientFactory = repositoryClientFactory;
+    }
+
+    @NotNull
+    @Override
+    public String getType() {
+        return "git";
     }
 
     @Override

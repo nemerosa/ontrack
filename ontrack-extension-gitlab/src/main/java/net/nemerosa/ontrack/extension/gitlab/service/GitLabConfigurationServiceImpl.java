@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.model.security.EncryptionService;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.model.support.*;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +43,12 @@ public class GitLabConfigurationServiceImpl extends AbstractConfigurationService
         );
         this.gitLabClientFactory = gitLabClientFactory;
         this.applicationLogService = applicationLogService;
+    }
+
+    @NotNull
+    @Override
+    public String getType() {
+        return "gitlab";
     }
 
     @Override
