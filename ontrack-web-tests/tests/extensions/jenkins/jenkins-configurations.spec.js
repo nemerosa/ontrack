@@ -11,7 +11,7 @@ test('creation of a Jenkins configuration', async ({page}) => {
     const jenkinsConfigurationsPage = new JenkinsConfigurationsPage(page)
     await jenkinsConfigurationsPage.goTo()
     // Creating a new configuration
-    const url = generate(`https://${generate("jen-")}.com`);
+    const url = `https://${generate("jen-")}.com`
     await jenkinsConfigurationsPage.createConfig({
         name: generate("jen-"),
         url: url,
