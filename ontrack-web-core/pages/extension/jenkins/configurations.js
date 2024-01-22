@@ -25,6 +25,7 @@ export default function JenkinsConfigurationsPage() {
 
     const dialogItems = [
         <Form.Item
+            key="name"
             name="name"
             label="Configuration name"
             rules={[{required: true, message: 'Name is required.',},]}
@@ -32,6 +33,7 @@ export default function JenkinsConfigurationsPage() {
             <Input/>
         </Form.Item>,
         <Form.Item
+            key="url"
             name="url"
             label="Jenkins URL"
             rules={[{required: true, message: 'URL is required.',},]}
@@ -39,12 +41,14 @@ export default function JenkinsConfigurationsPage() {
             <Input/>
         </Form.Item>,
         <Form.Item
+            key="user"
             name="user"
             label="Jenkins username"
         >
             <Input/>
         </Form.Item>,
         <Form.Item
+            key="password"
             name="password"
             label="Jenkins password"
         >

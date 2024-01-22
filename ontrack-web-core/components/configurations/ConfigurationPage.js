@@ -145,7 +145,7 @@ export default function ConfigurationPage({
                 pageTitle={pageTitle}
                 additionalCommands={
                     user?.authorizations?.global?.settings ? [
-                        <Command icon={<FaPlus/>} action={onCreateConfig} text="Create config"/>
+                        <Command key="create-config" icon={<FaPlus/>} action={onCreateConfig} text="Create config"/>
                     ] : []
                 }
             >
