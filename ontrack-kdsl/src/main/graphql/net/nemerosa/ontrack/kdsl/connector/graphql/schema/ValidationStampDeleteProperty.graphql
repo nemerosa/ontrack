@@ -1,0 +1,12 @@
+mutation ValidationStampDeleteProperty(
+    $id: Int!,
+    $type: String!,
+) {
+    setValidationStampPropertyById(input: {
+        id: $id,
+        property: $type,
+        value: null,
+    }) {
+        ...PayloadUserErrors
+    }
+}

@@ -1,0 +1,13 @@
+mutation ValidationStampSetProperty(
+    $id: Int!,
+    $type: String!,
+    $value: JSON!,
+) {
+    setValidationStampPropertyById(input: {
+        id: $id,
+        property: $type,
+        value: $value,
+    }) {
+        ...PayloadUserErrors
+    }
+}
