@@ -18,7 +18,7 @@
     "elkjs": "^0.8.2",
     "eslint": "8.38.0",
     "eslint-config-next": "13.3.0",
-    "graphql": "^16.6.0",
+    "graphql": "^16.8.1",
     "graphql-request": "^5.2.0",
     "lodash": "^4.17.21",
     "lodash.debounce": "^4.0.8",
