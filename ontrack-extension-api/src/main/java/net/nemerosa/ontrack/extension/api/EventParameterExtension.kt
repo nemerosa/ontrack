@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity
  * This extension allows the enrichment of template parameters values
  * for an [event][Event].
  */
+@Deprecated("Will be removed in V5. Use the new template engine instead.")
 interface EventParameterExtension : Extension {
 
     /**

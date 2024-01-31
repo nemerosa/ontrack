@@ -5,13 +5,14 @@ import java.net.URLEncoder
 /**
  * Simple expansion of string templates using `{var}` as a replaceable pattern and a map of string values.
  */
+@Deprecated("Will be removed in V5. Use the new templating service.")
 object SimpleExpand {
 
     /**
      * Regular expression to identify the replacements
      */
     @Suppress("RegExpRedundantEscape")
-    private val regex = "\\{([A-Za-z0-9_]+)(?:\\|([A-Za-z0-9_]+))?\\}".toRegex()
+    val regex = "\\{([A-Za-z0-9_]+)(?:\\|([A-Za-z0-9_]+))?\\}".toRegex()
 
     /**
      * Performs an expansion.

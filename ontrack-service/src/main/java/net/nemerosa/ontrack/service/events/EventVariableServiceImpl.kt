@@ -17,6 +17,29 @@ class EventVariableServiceImpl(
         extensionManager.getExtensions(EventParameterExtension::class.java)
     }
 
+    override fun getTemplateContext(event: Event): Map<String, Any> {
+        val result = mutableMapOf<String, Any>()
+        // Entities
+        event.entities.forEach { (_, entity) ->
+            entity.nameValues.forEach { (name, value) ->
+                result[name] = value
+            }
+        }
+        // Extra entities
+        event.extraEntities.forEach { (_, entity) ->
+            entity.nameValues.forEach { (name, value) ->
+                result[name] = value
+            }
+        }
+        // Values
+        event.values.forEach { (_, item) ->
+            result[item.name] = item.value
+        }
+        // OK
+        return result.toMap()
+    }
+
+    @Deprecated("Will be removed in V5. Use the new templating service instead.")
     override fun getTemplateParameters(event: Event, caseVariants: Boolean): Map<String, String> {
         val result = mutableMapOf<String, String>()
         // Entities
