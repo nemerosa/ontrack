@@ -25,6 +25,7 @@ dependencies {
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))
+    testImplementation(project(":ontrack-extension-general"))
     testImplementation(project(":ontrack-it-utils"))
 
     testImplementation("com.icegreen:greenmail:1.6.8")

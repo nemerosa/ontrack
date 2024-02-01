@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.model.events.HtmlNotificationEventRenderer
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.Event
+import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.EventVariableService
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.textField
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Component
 class MailNotificationChannel(
     private val mailService: MailService,
     private val htmlNotificationEventRenderer: HtmlNotificationEventRenderer,
-    private val eventVariableService: EventVariableService,
+    private val eventTemplatingService: EventTemplatingService,
 ) : AbstractNotificationChannel<MailNotificationChannelConfig>(MailNotificationChannelConfig::class) {
 
     override val type: String = "mail"
@@ -39,8 +40,11 @@ class MailNotificationChannel(
 
     override fun publish(config: MailNotificationChannelConfig, event: Event): NotificationResult {
         // Subject as a template
-        val parameters = eventVariableService.getTemplateParameters(event, caseVariants = true)
-        val subject = SimpleExpand.expand(config.subject, parameters)
+        val subject = eventTemplatingService.render(
+            template = config.subject,
+            event = event,
+            renderer = htmlNotificationEventRenderer,
+        )
         // Formatting the message
         val message = event.render(htmlNotificationEventRenderer)
         // Sending the message
