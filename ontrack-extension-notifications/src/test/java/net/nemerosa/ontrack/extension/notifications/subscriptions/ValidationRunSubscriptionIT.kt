@@ -27,6 +27,7 @@ class ValidationRunSubscriptionIT : AbstractNotificationTestSupport() {
                             projectEntity = vsb,
                             keywords = "failed", // Status
                             origin = "test",
+                            contentTemplate = null,
                             EventFactory.NEW_VALIDATION_RUN
                     )
                     build {

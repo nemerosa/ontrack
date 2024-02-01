@@ -23,6 +23,7 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                 projectEntity = this,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             // Query
@@ -75,6 +76,7 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                 projectEntity = this,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             eventSubscriptionService.subscribe(
@@ -83,6 +85,7 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                 projectEntity = this,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_VALIDATION_RUN
             )
             // Query
@@ -136,6 +139,7 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                 projectEntity = null,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             eventSubscriptionService.subscribe(
@@ -144,6 +148,7 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                 projectEntity = null,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_VALIDATION_RUN
             )
             // Query

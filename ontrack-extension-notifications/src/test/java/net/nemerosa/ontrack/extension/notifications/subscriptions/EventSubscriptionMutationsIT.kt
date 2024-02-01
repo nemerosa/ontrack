@@ -131,6 +131,7 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                     projectEntity = this,
                     keywords = null,
                     origin = "test",
+                    contentTemplate = null,
                     EventFactory.NEW_PROMOTION_RUN,
                 )
                 // Disabling
@@ -203,6 +204,7 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                 projectEntity = null,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_PROMOTION_RUN,
             )
             // Disabling
@@ -319,6 +321,7 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                 projectEntity = null,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_PROMOTION_RUN,
             )
             run("""
@@ -347,6 +350,7 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                     projectEntity = this,
                     keywords = null,
                     origin = "test",
+                    contentTemplate = null,
                     EventFactory.NEW_PROMOTION_RUN,
                 )
                 run("""

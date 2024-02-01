@@ -24,6 +24,7 @@ class MockNotificationIT : AbstractNotificationTestSupport() {
                 projectEntity = this,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_BRANCH,
             )
             // Creating a branch

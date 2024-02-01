@@ -123,7 +123,7 @@ class EntitySubscriptionsCascContext(
     private fun deleteSubscriptions(existing: EntitySubscriptionCascContextData) {
         val entity = findEntity(existing.entity)
         if (entity != null) {
-            logger.debug("Deleting subscriptions for entity ${existing.entity}")
+            logger.debug("Deleting subscriptions for entity {}", existing.entity)
             eventSubscriptionService.deleteSubscriptionsByEntity(entity)
         } else {
             logger.info("Cannot find entity ${existing.entity}. Not deleting its subscriptions.")
@@ -136,7 +136,7 @@ class EntitySubscriptionsCascContext(
     ) {
         val entity = findEntity(existing.entity)
         if (entity != null) {
-            logger.debug("Modifying subscriptions for entity ${existing.entity}")
+            logger.debug("Modifying subscriptions for entity {}", existing.entity)
             // Gets the existing subscriptions for this entity
             val entitySubscriptions = eventSubscriptionService.filterSubscriptions(
                 EventSubscriptionFilter(
@@ -152,6 +152,7 @@ class EntitySubscriptionsCascContext(
                     channel = it.data.channel,
                     channelConfig = it.data.channelConfig,
                     disabled = it.data.disabled,
+                    contentTemplate = it.data.contentTemplate,
                 ) to it.id
             }
             syncForward(
@@ -184,7 +185,7 @@ class EntitySubscriptionsCascContext(
     private fun createSubscriptions(item: EntitySubscriptionCascContextData) {
         val entity = findEntity(item.entity)
         if (entity != null) {
-            logger.debug("Creating subscriptions for entity ${item.entity}")
+            logger.debug("Creating subscriptions for entity {}", item.entity)
             item.subscriptions.forEach { subscription ->
                 logger.info("Subscribing to ${item.entity}: $subscription")
                 subscribe(entity, subscription)
@@ -207,6 +208,7 @@ class EntitySubscriptionsCascContext(
                 channelConfig = subscription.channelConfig,
                 disabled = subscription.disabled ?: false,
                 origin = EventSubscriptionOrigins.CASC,
+                contentTemplate = subscription.contentTemplate,
             )
         )
     }

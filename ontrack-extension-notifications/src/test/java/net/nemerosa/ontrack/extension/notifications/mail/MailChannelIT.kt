@@ -33,6 +33,7 @@ class MailChannelIT : AbstractMailTestSupport() {
                         projectEntity = pl,
                         keywords = null,
                         origin = "test",
+                        contentTemplate = null,
                         EventFactory.NEW_PROMOTION_RUN,
                     )
                     // Promotion

@@ -44,6 +44,7 @@ internal class DefaultEventSubscriptionServiceTest {
                 keywords = "test",
                 disabled = false,
                 origin = "unknown",
+                contentTemplate = null,
             ),
             parsed
         )

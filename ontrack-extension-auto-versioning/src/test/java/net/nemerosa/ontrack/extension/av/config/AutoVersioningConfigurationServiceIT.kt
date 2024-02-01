@@ -201,7 +201,8 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                                 "target" to target,
                             ).asJson(),
                             disabled = false,
-                            origin = "auto-versioning"
+                            origin = "auto-versioning",
+                            contentTemplate = null,
                         )
                     ),
                     subscriptions
@@ -276,7 +277,8 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                                     "target" to target,
                                 ).asJson(),
                                 disabled = false,
-                                origin = "auto-versioning"
+                                origin = "auto-versioning",
+                                contentTemplate = null,
                             ),
                             EventSubscription(
                                 projectEntity = this,
@@ -290,7 +292,8 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                                     "target" to target,
                                 ).asJson(),
                                 disabled = false,
-                                origin = "auto-versioning"
+                                origin = "auto-versioning",
+                                contentTemplate = null,
                             ),
                         ).toSet(),
                         subscriptions.toSet()
@@ -369,7 +372,8 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                                     "target" to target,
                                 ).asJson(),
                                 disabled = false,
-                                origin = "auto-versioning"
+                                origin = "auto-versioning",
+                                contentTemplate = null,
                             ),
                             EventSubscription(
                                 projectEntity = this,
@@ -383,7 +387,8 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                                     "target" to "$target-error",
                                 ).asJson(),
                                 disabled = false,
-                                origin = "auto-versioning"
+                                origin = "auto-versioning",
+                                contentTemplate = null,
                             ),
                             EventSubscription(
                                 projectEntity = this,
@@ -396,7 +401,8 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                                     "target" to "$target-timeout",
                                 ).asJson(),
                                 disabled = false,
-                                origin = "auto-versioning"
+                                origin = "auto-versioning",
+                                contentTemplate = null,
                             ),
                         ).toSet(),
                         newSubscriptions.toSet()
@@ -457,7 +463,8 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                                     "target" to target,
                                 ).asJson(),
                                 disabled = false,
-                                origin = "auto-versioning"
+                                origin = "auto-versioning",
+                                contentTemplate = null,
                             ),
                         ).toSet(),
                         subscriptions.toSet()
@@ -496,6 +503,7 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                         projectEntity = this,
                         keywords = "test",
                         origin = "test",
+                        contentTemplate = null,
                         AutoVersioningEvents.AUTO_VERSIONING_ERROR,
                     )
                     // Setting an AV configuration with notifications
@@ -540,7 +548,8 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                                     "target" to target,
                                 ).asJson(),
                                 disabled = false,
-                                origin = "auto-versioning"
+                                origin = "auto-versioning",
+                                contentTemplate = null,
                             )
                         ),
                         subscriptions
@@ -566,7 +575,8 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                                     "target" to target,
                                 ).asJson(),
                                 disabled = false,
-                                origin = "test"
+                                origin = "test",
+                                contentTemplate = null,
                             )
                         ),
                         otherSubscriptions
