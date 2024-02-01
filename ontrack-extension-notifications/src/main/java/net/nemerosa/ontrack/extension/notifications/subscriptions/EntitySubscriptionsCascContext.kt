@@ -54,6 +54,7 @@ class EntitySubscriptionsCascContext(
                         cascField(SubscriptionsCascContextData::channel),
                         cascField(SubscriptionsCascContextData::channelConfig),
                         cascField(SubscriptionsCascContextData::disabled),
+                        cascField(SubscriptionsCascContextData::contentTemplate),
                     )
                 )
             )
