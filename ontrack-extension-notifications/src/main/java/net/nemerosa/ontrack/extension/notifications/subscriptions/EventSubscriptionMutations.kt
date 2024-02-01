@@ -38,6 +38,7 @@ class EventSubscriptionMutations(
                     jsonInputField(SubscribeToEventsInput::channelConfig),
                     stringListInputField(SubscribeToEventsInput::events),
                     stringInputField(SubscribeToEventsInput::keywords),
+                    stringInputField(SubscribeToEventsInput::contentTemplate),
                 )
 
             override val outputFields: List<GraphQLFieldDefinition> = listOf(

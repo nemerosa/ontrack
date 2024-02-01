@@ -17,7 +17,8 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
         asAdmin {
             project {
                 branch {
-                    run("""
+                    run(
+                        """
                         mutation {
                             subscribeBranchToEvents(input: {
                                 project: "${project.name}",
@@ -39,7 +40,8 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                                 }
                             }
                         }
-                    """) { data ->
+                    """
+                    ) { data ->
                         checkGraphQLUserErrors(data, "subscribeBranchToEvents") { payload ->
                             val id = payload.getRequiredJsonField("subscription").getRequiredTextField("id")
                             val subscription: EventSubscription = eventSubscriptionService.getSubscriptionById(this, id)
@@ -72,7 +74,8 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
             project {
                 branch {
                     val pl = promotionLevel("GOLD")
-                    run("""
+                    run(
+                        """
                         mutation {
                             subscribePromotionLevelToEvents(input: {
                                 project: "${project.name}",
@@ -94,7 +97,8 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                                 }
                             }
                         }
-                    """) { data ->
+                    """
+                    ) { data ->
                         checkGraphQLUserErrors(data, "subscribePromotionLevelToEvents") { payload ->
                             val id = payload.getRequiredJsonField("subscription").getRequiredTextField("id")
                             val subscription: EventSubscription = eventSubscriptionService.getSubscriptionById(pl, id)
@@ -122,6 +126,73 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
     }
 
     @Test
+    fun `Settings subscriptions using the promotion level mutation with a custom content template`() {
+        asAdmin {
+            project {
+                branch {
+                    val pl = promotionLevel("GOLD")
+                    run(
+                        """
+                        mutation SetupPromotionSubscription(
+                            ${'$'}contentTemplate: String!,
+                        ) {
+                            subscribePromotionLevelToEvents(input: {
+                                project: "${project.name}",
+                                branch: "$name",
+                                promotion: "GOLD",
+                                channel: "mock",
+                                channelConfig: {
+                                    target: "#test"
+                                },
+                                events: [
+                                    "new_promotion_run"
+                                ],
+                                contentTemplate: ${'$'}contentTemplate,
+                            }) {
+                                errors {
+                                    message
+                                }
+                                subscription {
+                                    id
+                                }
+                            }
+                        }
+                    """,
+                        variables = mapOf(
+                            "contentTemplate" to "Change log for this promotion!"
+                        )
+                    ) { data ->
+                        checkGraphQLUserErrors(data, "subscribePromotionLevelToEvents") { payload ->
+                            val id = payload.getRequiredJsonField("subscription").getRequiredTextField("id")
+                            val subscription: EventSubscription = eventSubscriptionService.getSubscriptionById(pl, id)
+                            assertEquals(
+                                setOf(
+                                    "new_promotion_run"
+                                ),
+                                subscription.events
+                            )
+                            assertEquals(pl, subscription.projectEntity)
+                            assertEquals(null, subscription.keywords)
+                            assertEquals(
+                                "mock",
+                                subscription.channel
+                            )
+                            assertEquals(
+                                mapOf("target" to "#test").asJson(),
+                                subscription.channelConfig
+                            )
+                            assertEquals(
+                                "Change log for this promotion!",
+                                subscription.contentTemplate,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Disabling and enabling a subscription for an entity`() {
         asAdmin {
             project {
@@ -135,7 +206,8 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                     EventFactory.NEW_PROMOTION_RUN,
                 )
                 // Disabling
-                run("""
+                run(
+                    """
                     mutation {
                         disableSubscription(input: {
                             projectEntity: {
@@ -153,7 +225,8 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                             }
                         }
                     }
-                """) { data ->
+                """
+                ) { data ->
                     checkGraphQLUserErrors(data, "disableSubscription") { payload ->
                         assertEquals(record.id, payload.path("subscription").getRequiredTextField("id"))
                         assertEquals(true, payload.path("subscription").getRequiredBooleanField("disabled"))
@@ -163,7 +236,8 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                     }
                 }
                 // Enabling
-                run("""
+                run(
+                    """
                     mutation {
                         enableSubscription(input: {
                             projectEntity: {
@@ -181,7 +255,8 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                             }
                         }
                     }
-                """) { data ->
+                """
+                ) { data ->
                     checkGraphQLUserErrors(data, "enableSubscription") { payload ->
                         assertEquals(record.id, payload.path("subscription").getRequiredTextField("id"))
                         assertEquals(false, payload.path("subscription").getRequiredBooleanField("disabled"))
@@ -208,7 +283,8 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                 EventFactory.NEW_PROMOTION_RUN,
             )
             // Disabling
-            run("""
+            run(
+                """
                     mutation {
                         disableSubscription(input: {
                             id: "${record.id}"
@@ -222,7 +298,8 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                             }
                         }
                     }
-                """) { data ->
+                """
+            ) { data ->
                 checkGraphQLUserErrors(data, "disableSubscription") { payload ->
                     assertEquals(record.id, payload.path("subscription").getRequiredTextField("id"))
                     assertEquals(true, payload.path("subscription").getRequiredBooleanField("disabled"))
@@ -232,7 +309,8 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                 }
             }
             // Enabling
-            run("""
+            run(
+                """
                     mutation {
                         enableSubscription(input: {
                             id: "${record.id}"
@@ -246,7 +324,8 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                             }
                         }
                     }
-                """) { data ->
+                """
+            ) { data ->
                 checkGraphQLUserErrors(data, "enableSubscription") { payload ->
                     assertEquals(record.id, payload.path("subscription").getRequiredTextField("id"))
                     assertEquals(false, payload.path("subscription").getRequiredBooleanField("disabled"))
@@ -259,9 +338,10 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
     }
 
     @Test
-    fun `Creating a subscription`() {
+    fun `Creating a global subscription without a template`() {
         project {
-            run("""
+            run(
+                """
                 mutation {
                     subscribeToEvents(input: {
                         projectEntity: {
@@ -276,7 +356,7 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                             "new_branch",
                             "delete_branch",
                             "new_promotion_run"
-                        ]
+                        ],
                     }) {
                         errors {
                             message
@@ -286,7 +366,8 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                         }
                     }
                 }
-            """) { data ->
+            """
+            ) { data ->
                 checkGraphQLUserErrors(data, "subscribeToEvents") { payload ->
                     val id = payload.getRequiredJsonField("subscription").getRequiredTextField("id")
                     val subscription: EventSubscription = eventSubscriptionService.getSubscriptionById(this, id)
@@ -307,6 +388,71 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                         mapOf("target" to "#test").asJson(),
                         subscription.channelConfig
                     )
+                    assertEquals(
+                        null,
+                        subscription.contentTemplate,
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creating a global subscription with a template`() {
+        project {
+            run(
+                """
+                mutation {
+                    subscribeToEvents(input: {
+                        projectEntity: {
+                            type: PROJECT,
+                            id: $id
+                        },
+                        channel: "mock",
+                        channelConfig: {
+                            target: "#test"
+                        },
+                        events: [
+                            "new_branch",
+                            "delete_branch",
+                            "new_promotion_run"
+                        ],
+                        contentTemplate: "This is a poor template",
+                    }) {
+                        errors {
+                            message
+                        }
+                        subscription {
+                            id
+                        }
+                    }
+                }
+            """
+            ) { data ->
+                checkGraphQLUserErrors(data, "subscribeToEvents") { payload ->
+                    val id = payload.getRequiredJsonField("subscription").getRequiredTextField("id")
+                    val subscription: EventSubscription = eventSubscriptionService.getSubscriptionById(this, id)
+                    assertEquals(
+                        setOf(
+                            "new_branch",
+                            "delete_branch",
+                            "new_promotion_run"
+                        ),
+                        subscription.events
+                    )
+                    assertEquals(this, subscription.projectEntity)
+                    assertEquals(
+                        "mock",
+                        subscription.channel
+                    )
+                    assertEquals(
+                        mapOf("target" to "#test").asJson(),
+                        subscription.channelConfig
+                    )
+                    assertEquals(
+                        "This is a poor template",
+                        subscription.contentTemplate,
+                    )
                 }
             }
         }
@@ -324,7 +470,8 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                 contentTemplate = null,
                 EventFactory.NEW_PROMOTION_RUN,
             )
-            run("""
+            run(
+                """
                     mutation {
                         deleteSubscription(input:{id: "${subscription.id}"}) {
                             errors {
@@ -332,10 +479,13 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                             }
                         }
                     }
-                """) { data ->
+                """
+            ) { data ->
                 checkGraphQLUserErrors(data, "deleteSubscription")
-                assertNull(eventSubscriptionService.findSubscriptionById(null, subscription.id),
-                    "Subscription has been deleted")
+                assertNull(
+                    eventSubscriptionService.findSubscriptionById(null, subscription.id),
+                    "Subscription has been deleted"
+                )
             }
         }
     }
@@ -353,7 +503,8 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                     contentTemplate = null,
                     EventFactory.NEW_PROMOTION_RUN,
                 )
-                run("""
+                run(
+                    """
                     mutation {
                         deleteSubscription(input:{
                             id: "${subscription.id}",
@@ -367,10 +518,13 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                             }
                         }
                     }
-                """) { data ->
+                """
+                ) { data ->
                     checkGraphQLUserErrors(data, "deleteSubscription")
-                    assertNull(eventSubscriptionService.findSubscriptionById(this, subscription.id),
-                        "Subscription has been deleted")
+                    assertNull(
+                        eventSubscriptionService.findSubscriptionById(this, subscription.id),
+                        "Subscription has been deleted"
+                    )
                 }
             }
         }
