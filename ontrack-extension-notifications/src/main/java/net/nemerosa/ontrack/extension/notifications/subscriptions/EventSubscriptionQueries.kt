@@ -71,6 +71,7 @@ class GQLRootQueryEventSubscriptions(
                         keywords = it.data.keywords,
                         disabled = it.data.disabled,
                         origin = it.data.origin,
+                        contentTemplate = it.data.contentTemplate,
                     )
                 }
             }

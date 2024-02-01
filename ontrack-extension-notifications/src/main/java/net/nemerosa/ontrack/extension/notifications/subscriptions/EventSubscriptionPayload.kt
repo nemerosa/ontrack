@@ -19,4 +19,6 @@ data class EventSubscriptionPayload(
     val disabled: Boolean,
     @APIDescription("Origin of the subscription (used for filtering)")
     val origin: String,
+    @APIDescription("Optional template to use for the message")
+    val contentTemplate: String?,
 )

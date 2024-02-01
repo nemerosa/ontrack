@@ -123,6 +123,7 @@ class EventSubscriptionMutations(
                     keywords = record.data.keywords,
                     disabled = record.data.disabled,
                     origin = record.data.origin,
+                    contentTemplate = record.data.contentTemplate,
                 )
             },
 
@@ -146,6 +147,7 @@ class EventSubscriptionMutations(
                     keywords = record.data.keywords,
                     disabled = record.data.disabled,
                     origin = record.data.origin,
+                    contentTemplate = record.data.contentTemplate,
                 )
             },
         )
@@ -178,6 +180,7 @@ class EventSubscriptionMutations(
             keywords = record.data.keywords,
             disabled = record.data.disabled,
             origin = record.data.origin,
+            contentTemplate = record.data.contentTemplate,
         )
     }
 
