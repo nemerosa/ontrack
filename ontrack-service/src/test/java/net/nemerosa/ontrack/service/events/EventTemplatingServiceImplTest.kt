@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.EventVariableService
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.model.templating.TemplatingService
 import net.nemerosa.ontrack.service.templating.TemplatingServiceImpl
 import org.junit.jupiter.api.BeforeEach
@@ -31,6 +32,7 @@ class EventTemplatingServiceImplTest {
         templatingService = TemplatingServiceImpl(
             templatingSources = emptyList(),
             templatingFilters = emptyList(),
+            ontrackConfigProperties = OntrackConfigProperties(),
         )
         eventTemplatingService = EventTemplatingServiceImpl(
             eventVariableService,

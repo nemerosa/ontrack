@@ -32,10 +32,12 @@ class Event(
     fun <T : ProjectEntity?> getExtraEntity(entityType: ProjectEntityType): T =
         extraEntities[entityType] as T ?: error("Missing extra entity X_$entityType in the event.")
 
+    @Deprecated("Will be removed in 4.8")
     fun renderText(): String {
         return render(PlainEventRenderer.INSTANCE)
     }
 
+    @Deprecated("Will be removed in 4.8")
     fun render(eventRenderer: EventRenderer): String {
         val m = EXPRESSION.matcher(eventType.template)
         val output = StringBuilder()
@@ -166,7 +168,7 @@ class Event(
         }
 
         fun withValidationRunStatus(statusID: ValidationRunStatusID): EventBuilder {
-            return with("status", NameValue(statusID.id, statusID.name))
+            return with("STATUS", NameValue(statusID.name, statusID.id))
         }
 
         fun with(name: String, value: NameValue): EventBuilder {
@@ -191,8 +193,6 @@ class Event(
                 ref,
                 values
             )
-            // Checks the event can be resolved with all its references
-            event.renderText()
             // OK
             return event
         }

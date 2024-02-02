@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.service.templating
 import net.nemerosa.ontrack.model.events.EventRenderer
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.model.templating.AbstractTemplatingSource
 import net.nemerosa.ontrack.model.templating.TemplatingFilter
 import net.nemerosa.ontrack.model.templating.TemplatingService
@@ -63,6 +64,7 @@ class TemplatingServiceImplTest {
         templatingService = TemplatingServiceImpl(
             templatingSources = templatingSources,
             templatingFilters = templatingFilters,
+            ontrackConfigProperties = OntrackConfigProperties(),
         )
     }
 

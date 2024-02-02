@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.common.SimpleExpand
 import net.nemerosa.ontrack.model.events.EventRenderer
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.model.templating.*
 import org.springframework.stereotype.Service
 
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service
 class TemplatingServiceImpl(
     templatingSources: List<TemplatingSource>,
     templatingFilters: List<TemplatingFilter>,
+    private val ontrackConfigProperties: OntrackConfigProperties,
 ) : TemplatingService {
 
     private val sourcesPerProjectEntityType = ProjectEntityType.values().associate { type ->
@@ -26,7 +28,7 @@ class TemplatingServiceImpl(
 
     @Suppress("RegExpUnnecessaryNonCapturingGroup")
     private val regexToken =
-        "^([a-z][a-zA-Z]+)(?:\\.([a-zA-Z_-]+))?(?:\\?((?:[a-zA-Z]+=[a-zA-Z0-9\\s_-]+)(?:&[a-zA-Z]+=[a-zA-Z0-9\\s_-]+)*))?(?:\\|([a-zA-Z_-]+))?\$".toRegex()
+        "^([a-zA-Z_]+)(?:\\.([a-zA-Z_-]+))?(?:\\?((?:[a-zA-Z]+=[a-zA-Z0-9\\s_-]+)(?:&[a-zA-Z]+=[a-zA-Z0-9\\s_-]+)*))?(?:\\|([a-zA-Z_-]+))?\$".toRegex()
 
     @Deprecated("Legacy templates will be removed in V5.")
     override fun isLegacyTemplate(template: String): Boolean =
@@ -71,7 +73,17 @@ class TemplatingServiceImpl(
                 throw TemplatingExpressionFormatException(expression)
             }
         } catch (ex: TemplatingException) {
-            return "#error"
+            // Dealing with the error
+            return when (ontrackConfigProperties.templating.errors) {
+                OntrackConfigProperties.TemplatingErrors.IGNORE -> "#error"
+                OntrackConfigProperties.TemplatingErrors.MESSAGE -> "#<${ex.message}>"
+                OntrackConfigProperties.TemplatingErrors.LOGGING_STACK -> {
+                    ex.printStackTrace()
+                    "#<${ex.message}>"
+                }
+
+                OntrackConfigProperties.TemplatingErrors.THROW -> throw ex
+            }
         }
     }
 

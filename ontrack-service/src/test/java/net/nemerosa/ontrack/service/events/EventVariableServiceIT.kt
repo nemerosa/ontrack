@@ -49,6 +49,41 @@ class EventVariableServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    fun `Context associated with a validation run`() {
+        asAdmin {
+            project {
+                branch {
+                    val vs = validationStamp()
+                    build {
+                        val build = this
+                        val run = validate(vs)
+
+                        // Creates an event for this run
+                        val event = eventFactory.newValidationRun(run)
+
+                        // Gets the templating context
+                        val context = eventVariableService.getTemplateContext(event)
+
+                        // Checks all parameters
+                        assertEquals(
+                            mapOf(
+                                "project" to project,
+                                "branch" to branch,
+                                "build" to build,
+                                "validationStamp" to vs,
+                                "validationRun" to run,
+                                "STATUS" to run.lastStatus.statusID.id,
+                                "STATUS_NAME" to run.lastStatus.statusID.name,
+                            ),
+                            context
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Variables associated with a promotion run`() {
         asAdmin {
             project {

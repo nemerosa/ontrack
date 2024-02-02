@@ -46,7 +46,7 @@ public class ConfigurationServiceTest {
     @Test
     public void event_on_new_configuration() {
         TestConfiguration config = config("test");
-        Event event = Event.of(EventFactory.NEW_CONFIGURATION).with("configuration", "test").get();
+        Event event = Event.of(EventFactory.NEW_CONFIGURATION).with("CONFIGURATION", "test").build();
         when(eventFactory.newConfiguration(config)).thenReturn(event);
         configurationService.newConfiguration(config);
         verify(eventPostService).post(event);
@@ -55,7 +55,7 @@ public class ConfigurationServiceTest {
     @Test
     public void event_on_update_configuration() {
         TestConfiguration config = config("test");
-        Event event = Event.of(EventFactory.UPDATE_CONFIGURATION).with("configuration", "test").get();
+        Event event = Event.of(EventFactory.UPDATE_CONFIGURATION).with("CONFIGURATION", "test").build();
         when(eventFactory.updateConfiguration(config)).thenReturn(event);
         when(configurationRepository.find(TestConfiguration.class, "test")).thenReturn(config);
         configurationService.updateConfiguration("test", config);
@@ -65,7 +65,7 @@ public class ConfigurationServiceTest {
     @Test
     public void event_on_delete_configuration() {
         TestConfiguration config = config("test");
-        Event event = Event.of(EventFactory.DELETE_CONFIGURATION).with("configuration", "test").get();
+        Event event = Event.of(EventFactory.DELETE_CONFIGURATION).with("CONFIGURATION", "test").build();
         when(configurationRepository.find(TestConfiguration.class, "test")).thenReturn(config);
         when(eventFactory.deleteConfiguration(config.withPassword("xxxxx"))).thenReturn(event);
         when(encryptionService.decrypt(PLAIN_PASSWORD)).thenReturn("xxxxx");

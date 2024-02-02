@@ -28,9 +28,18 @@ class EventVariableServiceImpl(
         event.extraEntities.forEach { (type, entity) ->
             result["x${type.varName.replaceFirstChar { it.uppercase() }}"] = entity
         }
+        // Ref entity
+        val ref = event.ref
+        if (ref != null) {
+            val refEntity = event.entities[ref]
+            if (refEntity != null) {
+                result["entity"] = refEntity
+            }
+        }
         // Values
-        event.values.forEach { (_, item) ->
-            result[item.name] = item.value
+        event.values.forEach { (name, item) ->
+            result[name] = item.value
+            result["${name}_NAME"] = item.name
         }
         // OK
         return result.toMap()

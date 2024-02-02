@@ -1,22 +1,17 @@
-package net.nemerosa.ontrack.model.events;
+package net.nemerosa.ontrack.model.events
 
-import net.nemerosa.ontrack.model.events.EventFactory;
-import net.nemerosa.ontrack.model.events.EventFactoryImpl;
-import net.nemerosa.ontrack.model.events.EventType;
-import net.nemerosa.ontrack.model.events.SimpleEventType;
-import org.junit.Test;
+import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
 
-import static org.junit.Assert.assertEquals;
-
-public class EventFactoryTest {
+class EventFactoryTest {
 
     @Test
-    public void custom_event_type() {
-        EventFactory factory = new EventFactoryImpl();
-        factory.register(SimpleEventType.of("custom-type", "My custom event type"));
-        EventType eventType = factory.toEventType("custom-type");
-        assertEquals("custom-type", eventType.getId());
-        assertEquals("My custom event type", eventType.getTemplate());
+    fun custom_event_type() {
+        val factory: EventFactory = EventFactoryImpl()
+        factory.register(SimpleEventType.of("custom-type", "My custom event type"))
+        val eventType = factory.toEventType("custom-type")
+        assertEquals("custom-type", eventType.id)
+        assertEquals("My custom event type", eventType.template)
     }
 
 }

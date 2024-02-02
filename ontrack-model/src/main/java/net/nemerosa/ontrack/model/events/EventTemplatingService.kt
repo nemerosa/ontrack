@@ -29,8 +29,8 @@ interface EventTemplatingService {
      */
     fun renderEvent(
         event: Event,
-        template: String?,
-        renderer: EventRenderer,
+        template: String? = null,
+        renderer: EventRenderer = PlainEventRenderer.INSTANCE,
     ): String
 
 }

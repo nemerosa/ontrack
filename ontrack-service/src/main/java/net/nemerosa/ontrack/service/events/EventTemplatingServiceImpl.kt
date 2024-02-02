@@ -15,15 +15,11 @@ class EventTemplatingServiceImpl(
 ) : EventTemplatingService {
 
     override fun renderEvent(event: Event, template: String?, renderer: EventRenderer): String =
-        if (template.isNullOrBlank()) {
-            event.render(renderer)
-        } else {
-            render(
-                template = template,
-                event = event,
-                renderer = renderer,
-            )
-        }
+        render(
+            template = template?.takeIf { it.isNotBlank() } ?: event.eventType.template,
+            event = event,
+            renderer = renderer,
+        )
 
     override fun render(template: String, event: Event, renderer: EventRenderer): String =
         if (templatingService.isLegacyTemplate(template)) {

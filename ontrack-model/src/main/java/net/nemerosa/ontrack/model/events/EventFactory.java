@@ -11,47 +11,47 @@ import java.util.Collection;
  */
 public interface EventFactory {
 
-    EventType NEW_PROJECT = SimpleEventType.of("new_project", "New project ${PROJECT}.");
-    EventType UPDATE_PROJECT = SimpleEventType.of("update_project", "Project ${PROJECT} has been updated.");
-    EventType ENABLE_PROJECT = SimpleEventType.of("enable_project", "Project ${PROJECT} has been enabled.");
-    EventType DISABLE_PROJECT = SimpleEventType.of("disable_project", "Project ${PROJECT} has been disabled.");
-    EventType DELETE_PROJECT = SimpleEventType.of("delete_project", "Project ${:project} has been deleted.");
+    EventType NEW_PROJECT = SimpleEventType.of("new_project", "New project ${project}.");
+    EventType UPDATE_PROJECT = SimpleEventType.of("update_project", "Project ${project} has been updated.");
+    EventType ENABLE_PROJECT = SimpleEventType.of("enable_project", "Project ${project} has been enabled.");
+    EventType DISABLE_PROJECT = SimpleEventType.of("disable_project", "Project ${project} has been disabled.");
+    EventType DELETE_PROJECT = SimpleEventType.of("delete_project", "Project ${PROJECT} has been deleted.");
 
-    EventType NEW_BRANCH = SimpleEventType.of("new_branch", "New branch ${BRANCH} for project ${PROJECT}.");
-    EventType UPDATE_BRANCH = SimpleEventType.of("update_branch", "Branch ${BRANCH} in ${PROJECT} has been updated.");
-    EventType ENABLE_BRANCH = SimpleEventType.of("enable_branch", "Branch ${BRANCH} in ${PROJECT} has been enabled.");
-    EventType DISABLE_BRANCH = SimpleEventType.of("disable_branch", "Branch ${BRANCH} in ${PROJECT} has been disabled.");
-    EventType DELETE_BRANCH = SimpleEventType.of("delete_branch", "Branch ${:branch} has been deleted from ${PROJECT}.");
+    EventType NEW_BRANCH = SimpleEventType.of("new_branch", "New branch ${branch} for project ${project}.");
+    EventType UPDATE_BRANCH = SimpleEventType.of("update_branch", "Branch ${branch} in ${project} has been updated.");
+    EventType ENABLE_BRANCH = SimpleEventType.of("enable_branch", "Branch ${branch} in ${project} has been enabled.");
+    EventType DISABLE_BRANCH = SimpleEventType.of("disable_branch", "Branch ${branch} in ${project} has been disabled.");
+    EventType DELETE_BRANCH = SimpleEventType.of("delete_branch", "Branch ${BRANCH} has been deleted from ${project}.");
 
-    EventType NEW_BUILD = SimpleEventType.of("new_build", "New build ${BUILD} for branch ${BRANCH} in ${PROJECT}.");
-    EventType UPDATE_BUILD = SimpleEventType.of("update_build", "Build ${BUILD} for branch ${BRANCH} in ${PROJECT} has been updated.");
-    EventType DELETE_BUILD = SimpleEventType.of("delete_build", "Build ${:build} for branch ${BRANCH} in ${PROJECT} has been deleted.");
+    EventType NEW_BUILD = SimpleEventType.of("new_build", "New build ${build} for branch ${branch} in ${project}.");
+    EventType UPDATE_BUILD = SimpleEventType.of("update_build", "Build ${build} for branch ${branch} in ${project} has been updated.");
+    EventType DELETE_BUILD = SimpleEventType.of("delete_build", "Build ${BUILD} for branch ${branch} in ${project} has been deleted.");
 
-    EventType NEW_PROMOTION_LEVEL = SimpleEventType.of("new_promotion_level", "New promotion level ${PROMOTION_LEVEL} for branch ${BRANCH} in ${PROJECT}.");
-    EventType IMAGE_PROMOTION_LEVEL = SimpleEventType.of("image_promotion_level", "Image for promotion level ${PROMOTION_LEVEL} for branch ${BRANCH} in ${PROJECT} has changed.");
-    EventType UPDATE_PROMOTION_LEVEL = SimpleEventType.of("update_promotion_level", "Promotion level ${PROMOTION_LEVEL} for branch ${BRANCH} in ${PROJECT} has changed.");
-    EventType DELETE_PROMOTION_LEVEL = SimpleEventType.of("delete_promotion_level", "Promotion level ${:promotion_level} for branch ${BRANCH} in ${PROJECT} has been deleted.");
-    EventType REORDER_PROMOTION_LEVEL = SimpleEventType.of("reorder_promotion_level", "Promotion levels for branch ${BRANCH} in ${PROJECT} have been reordered.");
+    EventType NEW_PROMOTION_LEVEL = SimpleEventType.of("new_promotion_level", "New promotion level ${promotionLevel} for branch ${branch} in ${project}.");
+    EventType IMAGE_PROMOTION_LEVEL = SimpleEventType.of("image_promotion_level", "Image for promotion level ${promotionLevel} for branch ${branch} in ${project} has changed.");
+    EventType UPDATE_PROMOTION_LEVEL = SimpleEventType.of("update_promotion_level", "Promotion level ${promotionLevel} for branch ${branch} in ${project} has changed.");
+    EventType DELETE_PROMOTION_LEVEL = SimpleEventType.of("delete_promotion_level", "Promotion level ${PROMOTION_LEVEL} for branch ${branch} in ${project} has been deleted.");
+    EventType REORDER_PROMOTION_LEVEL = SimpleEventType.of("reorder_promotion_level", "Promotion levels for branch ${branch} in ${project} have been reordered.");
 
-    EventType NEW_VALIDATION_STAMP = SimpleEventType.of("new_validation_stamp", "New validation stamp ${VALIDATION_STAMP} for branch ${BRANCH} in ${PROJECT}.");
-    EventType IMAGE_VALIDATION_STAMP = SimpleEventType.of("image_validation_stamp", "Image for validation stamp ${VALIDATION_STAMP} for branch ${BRANCH} in ${PROJECT} has changed.");
-    EventType UPDATE_VALIDATION_STAMP = SimpleEventType.of("update_validation_stamp", "Validation stamp ${VALIDATION_STAMP} for branch ${BRANCH} in ${PROJECT} has been updated.");
-    EventType DELETE_VALIDATION_STAMP = SimpleEventType.of("delete_validation_stamp", "Validation stamp ${:validation_stamp} for branch ${BRANCH} in ${PROJECT} has been deleted.");
-    EventType REORDER_VALIDATION_STAMP = SimpleEventType.of("reorder_validation_stamp", "Validation stamps for branch ${BRANCH} in ${PROJECT} have been reordered.");
+    EventType NEW_VALIDATION_STAMP = SimpleEventType.of("new_validation_stamp", "New validation stamp ${validationStamp} for branch ${branch} in ${project}.");
+    EventType IMAGE_VALIDATION_STAMP = SimpleEventType.of("image_validation_stamp", "Image for validation stamp ${validationStamp} for branch ${branch} in ${project} has changed.");
+    EventType UPDATE_VALIDATION_STAMP = SimpleEventType.of("update_validation_stamp", "Validation stamp ${validationStamp} for branch ${branch} in ${project} has been updated.");
+    EventType DELETE_VALIDATION_STAMP = SimpleEventType.of("delete_validation_stamp", "Validation stamp ${VALIDATION_STAMP} for branch ${branch} in ${project} has been deleted.");
+    EventType REORDER_VALIDATION_STAMP = SimpleEventType.of("reorder_validation_stamp", "Validation stamps for branch ${branch} in ${project} have been reordered.");
 
-    EventType NEW_PROMOTION_RUN = SimpleEventType.of("new_promotion_run", "Build ${BUILD} has been promoted to ${PROMOTION_LEVEL} for branch ${BRANCH} in ${PROJECT}.");
-    EventType DELETE_PROMOTION_RUN = SimpleEventType.of("delete_promotion_run", "Promotion ${PROMOTION_LEVEL} of build ${BUILD} has been deleted for branch ${BRANCH} in ${PROJECT}.");
+    EventType NEW_PROMOTION_RUN = SimpleEventType.of("new_promotion_run", "Build ${build} has been promoted to ${promotionLevel} for branch ${branch} in ${project}.");
+    EventType DELETE_PROMOTION_RUN = SimpleEventType.of("delete_promotion_run", "Promotion ${promotionLevel} of build ${build} has been deleted for branch ${branch} in ${project}.");
 
-    EventType NEW_VALIDATION_RUN = SimpleEventType.of("new_validation_run", "Build ${BUILD} has run for ${VALIDATION_STAMP} with status ${:status} in branch ${BRANCH} in ${PROJECT}.");
-    EventType NEW_VALIDATION_RUN_STATUS = SimpleEventType.of("new_validation_run_status", "Status for ${VALIDATION_STAMP} validation ${VALIDATION_RUN} for build ${BUILD} in branch ${BRANCH} of ${PROJECT} has changed to ${:status}.");
-    EventType UPDATE_VALIDATION_RUN_STATUS_COMMENT = SimpleEventType.of("update_validation_run_status_comment", "A status message for ${VALIDATION_STAMP} validation ${VALIDATION_RUN} for build ${BUILD} in branch ${BRANCH} of ${PROJECT} has changed.");
+    EventType NEW_VALIDATION_RUN = SimpleEventType.of("new_validation_run", "Build ${build} has run for the ${validationStamp} with status ${STATUS_NAME} in branch ${branch} in ${project}.");
+    EventType NEW_VALIDATION_RUN_STATUS = SimpleEventType.of("new_validation_run_status", "Status for the ${validationStamp} validation ${validationRun} for build ${build} in branch ${branch} of ${project} has changed to ${STATUS_NAME}.");
+    EventType UPDATE_VALIDATION_RUN_STATUS_COMMENT = SimpleEventType.of("update_validation_run_status_comment", "A status message for the ${validationStamp} validation ${validationRun} for build ${build} in branch ${branch} of ${project} has changed.");
 
-    EventType PROPERTY_CHANGE = SimpleEventType.of("property_change", "${:property} property has changed for ${:entity} ${REF}.");
-    EventType PROPERTY_DELETE = SimpleEventType.of("property_delete", "${:property} property has been removed from ${:entity} ${REF}.");
+    EventType PROPERTY_CHANGE = SimpleEventType.of("property_change", "${PROPERTY_NAME} property has changed for ${entity.qualifiedLongName}.");
+    EventType PROPERTY_DELETE = SimpleEventType.of("property_delete", "${PROPERTY_NAME} property has been removed from ${entity.qualifiedLongName}.");
 
-    EventType NEW_CONFIGURATION = SimpleEventType.of("new_configuration", "${:configuration} configuration has been created.");
-    EventType UPDATE_CONFIGURATION = SimpleEventType.of("update_configuration", "${:configuration} configuration has been updated.");
-    EventType DELETE_CONFIGURATION = SimpleEventType.of("delete_configuration", "${:configuration} configuration has been deleted.");
+    EventType NEW_CONFIGURATION = SimpleEventType.of("new_configuration", "${CONFIGURATION} configuration has been created.");
+    EventType UPDATE_CONFIGURATION = SimpleEventType.of("update_configuration", "${CONFIGURATION} configuration has been updated.");
+    EventType DELETE_CONFIGURATION = SimpleEventType.of("delete_configuration", "${CONFIGURATION} configuration has been deleted.");
 
     /**
      * Gets an event type using its {@linkplain EventType#getId()}  id}.
