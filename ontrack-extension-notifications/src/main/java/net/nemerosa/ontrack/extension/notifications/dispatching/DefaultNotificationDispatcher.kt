@@ -51,6 +51,7 @@ class DefaultNotificationDispatcher(
                 channel = eventSubscription.channel,
                 channelConfig = eventSubscription.channelConfig,
                 event = event,
+                template = eventSubscription.contentTemplate,
             )
             // Publication of the event
             notificationQueue.publish(item)

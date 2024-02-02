@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.extension.jenkins.client.JenkinsJob
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResultType
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventFactoryImpl
+import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.EventVariableService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.test.TestUtils.uid
@@ -26,7 +27,7 @@ class JenkinsNotificationChannelTest {
 
     private lateinit var jenkinsNotificationChannel: JenkinsNotificationChannel
 
-    private lateinit var eventVariableService: EventVariableService
+    private lateinit var eventTemplatingService: EventTemplatingService
 
     private lateinit var jenkinsConfigName: String
     private lateinit var jenkinsConfig: JenkinsConfiguration
@@ -54,12 +55,12 @@ class JenkinsNotificationChannelTest {
         jenkinsClientFactory = mockk()
         every { jenkinsClientFactory.getClient(jenkinsConfig) } returns jenkinsClient
 
-        eventVariableService = mockk()
+        eventTemplatingService = mockk()
 
         jenkinsNotificationChannel = JenkinsNotificationChannel(
             jenkinsConfigurationService,
             jenkinsClientFactory,
-            eventVariableService,
+            eventTemplatingService,
         )
     }
 
@@ -70,7 +71,7 @@ class JenkinsNotificationChannelTest {
 
         every { jenkinsClient.fireAndForgetJob(JOB, emptyMap()) } returns URI("uri:queue")
 
-        val result = jenkinsNotificationChannel.publish(config, event)
+        val result = jenkinsNotificationChannel.publish(config, event, null)
 
         assertEquals(NotificationResultType.OK, result.type)
     }
@@ -84,11 +85,15 @@ class JenkinsNotificationChannelTest {
         )
         val event = newPromotionRunEvent()
 
-        every { jenkinsClient.fireAndForgetJob(JOB, mapOf(
-            "PROMOTION" to PROMOTION, // Parameter correctly expanded
-        )) } returns URI("uri:queue")
+        every {
+            jenkinsClient.fireAndForgetJob(
+                JOB, mapOf(
+                    "PROMOTION" to PROMOTION, // Parameter correctly expanded
+                )
+            )
+        } returns URI("uri:queue")
 
-        val result = jenkinsNotificationChannel.publish(config, event)
+        val result = jenkinsNotificationChannel.publish(config, event, null)
 
         assertEquals(NotificationResultType.OK, result.type)
     }
@@ -100,7 +105,7 @@ class JenkinsNotificationChannelTest {
 
         every { jenkinsClient.fireAndForgetJob(JOB, emptyMap()) } returns null
 
-        val result = jenkinsNotificationChannel.publish(config, event)
+        val result = jenkinsNotificationChannel.publish(config, event, null)
 
         assertEquals(NotificationResultType.ERROR, result.type)
     }
@@ -121,7 +126,7 @@ class JenkinsNotificationChannelTest {
 
         every { jenkinsClient.runJob(JOB, emptyMap(), any(), any()) } returns jenkinsBuild
 
-        val result = jenkinsNotificationChannel.publish(config, event)
+        val result = jenkinsNotificationChannel.publish(config, event, null)
 
         assertEquals(NotificationResultType.OK, result.type)
     }
@@ -142,14 +147,14 @@ class JenkinsNotificationChannelTest {
 
         every { jenkinsClient.runJob(JOB, emptyMap(), any(), any()) } returns jenkinsBuild
 
-        val result = jenkinsNotificationChannel.publish(config, event)
+        val result = jenkinsNotificationChannel.publish(config, event, null)
 
         assertEquals(NotificationResultType.ERROR, result.type)
     }
 
     private fun newJenkinsNotificationConfig(
         callMode: JenkinsNotificationChannelConfigCallMode = JenkinsNotificationChannelConfigCallMode.ASYNC,
-        parameters: Map<String,String> = emptyMap(),
+        parameters: Map<String, String> = emptyMap(),
     ) = JenkinsNotificationChannelConfig(
         config = jenkinsConfigName,
         job = JOB,
@@ -167,11 +172,11 @@ class JenkinsNotificationChannelTest {
         val promotionRun = PromotionRun.of(build, promotionLevel, Signature.of("test"), null).withId(ID.of(10000))
         val event = EventFactoryImpl().newPromotionRun(promotionRun)
 
-        every {
-            eventVariableService.getTemplateParameters(event, any())
-        } returns mapOf(
-            "Promotion" to promotionLevel.name,
-        )
+//        every {
+//            eventTemplatingService.
+//        } returns mapOf(
+//            TODO "Promotion" to promotionLevel.name,
+//        )
 
         return event
     }

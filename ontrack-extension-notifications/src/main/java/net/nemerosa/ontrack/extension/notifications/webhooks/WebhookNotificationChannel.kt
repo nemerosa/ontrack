@@ -19,7 +19,11 @@ class WebhookNotificationChannel(
     private val securityService: SecurityService,
 ) : AbstractNotificationChannel<WebhookNotificationChannelConfig>(WebhookNotificationChannelConfig::class) {
 
-    override fun publish(config: WebhookNotificationChannelConfig, event: Event): NotificationResult {
+    override fun publish(
+        config: WebhookNotificationChannelConfig,
+        event: Event,
+        template: String?,
+    ): NotificationResult {
         // Gets the webhook
         val webhook = webhookAdminService.findWebhookByName(config.name)
             ?: return NotificationResult.notConfigured("Webhook [${config.name}] is not configured.")

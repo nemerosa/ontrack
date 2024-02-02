@@ -10,4 +10,5 @@ data class Notification(
     val channel: String,
     val channelConfig: JsonNode,
     val event: Event,
+    val template: String?,
 )

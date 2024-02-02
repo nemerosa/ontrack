@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.extension.slack.service.SlackNotificationType
 import net.nemerosa.ontrack.extension.slack.service.SlackService
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventFactory
+import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.NameDescription
@@ -34,10 +35,12 @@ class SlackNotificationChannelTest {
     fun before() {
         slackService = mockk()
         cachedSettingsService = mockk()
+        val eventTemplatingService = mockk<EventTemplatingService>()
         channel = SlackNotificationChannel(
             slackService,
             cachedSettingsService,
-            SlackNotificationEventRenderer(OntrackConfigProperties())
+            SlackNotificationEventRenderer(OntrackConfigProperties()),
+            eventTemplatingService,
         )
 
         project = Project.of(NameDescription.nd("project", "Test project")).withId(ID.of(1))
@@ -51,9 +54,13 @@ class SlackNotificationChannelTest {
         )
         every { slackService.sendNotification(any(), any(), any()) } returns true
         val config = SlackNotificationChannelConfig(channel = "#test", type = SlackNotificationType.SUCCESS)
-        val result = channel.publish(config, event)
+        val result = channel.publish(config, event, template = null)
         verify {
-            slackService.sendNotification("#test", "Project <http://localhost:8080/#/project/1|project> has been disabled.", SlackNotificationType.SUCCESS)
+            slackService.sendNotification(
+                "#test",
+                "Project <http://localhost:8080/#/project/1|project> has been disabled.",
+                SlackNotificationType.SUCCESS
+            )
         }
         assertEquals(NotificationResultType.OK, result.type)
         assertNull(result.message)
@@ -66,7 +73,7 @@ class SlackNotificationChannelTest {
         )
         every { slackService.sendNotification(any(), any(), any()) } returns false // <== returning an error
         val config = SlackNotificationChannelConfig(channel = "#test")
-        val result = channel.publish(config, event)
+        val result = channel.publish(config, event, template = null)
         assertEquals(NotificationResultType.ERROR, result.type)
         assertEquals("Slack message could not be sent. Check the operational logs.", result.message)
     }

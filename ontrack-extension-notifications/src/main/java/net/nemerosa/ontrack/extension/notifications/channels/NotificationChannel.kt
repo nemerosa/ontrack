@@ -18,8 +18,9 @@ interface NotificationChannel<C> {
      *
      * @param config Configuration for the channel
      * @param event Event to send notification about
+     * @param template Alternative template to the default event message
      */
-    fun publish(config: C, event: Event): NotificationResult
+    fun publish(config: C, event: Event, template: String?): NotificationResult
 
     /**
      * Given a search token, returns a configuration which would match a JSON.

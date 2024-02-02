@@ -6,6 +6,8 @@ import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.events.Event
+import net.nemerosa.ontrack.model.events.EventTemplatingService
+import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.textField
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -23,15 +25,26 @@ import org.springframework.stereotype.Component
     havingValue = "true",
     matchIfMissing = false,
 )
-class InMemoryNotificationChannel :
+class InMemoryNotificationChannel(
+    private val eventTemplatingService: EventTemplatingService,
+) :
     AbstractNotificationChannel<InMemoryNotificationChannelConfig>(InMemoryNotificationChannelConfig::class) {
 
     private val messages = mutableMapOf<String, MutableList<String>>()
 
     internal fun getMessages(group: String) = messages[group] ?: emptyList()
 
-    override fun publish(config: InMemoryNotificationChannelConfig, event: Event): NotificationResult {
-        messages.getOrPut(config.group) { mutableListOf() }.add(event.renderText())
+    override fun publish(
+        config: InMemoryNotificationChannelConfig,
+        event: Event,
+        template: String?
+    ): NotificationResult {
+        val text = eventTemplatingService.renderEvent(
+            event,
+            template,
+            PlainEventRenderer()
+        )
+        messages.getOrPut(config.group) { mutableListOf() }.add(text)
         return NotificationResult.ok()
     }
 

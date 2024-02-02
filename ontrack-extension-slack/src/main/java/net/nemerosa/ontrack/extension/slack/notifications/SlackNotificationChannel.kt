@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.slack.SlackSettings
 import net.nemerosa.ontrack.extension.slack.service.SlackService
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.Event
+import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.enumField
 import net.nemerosa.ontrack.model.form.textField
@@ -18,11 +19,16 @@ class SlackNotificationChannel(
     private val slackService: SlackService,
     private val cachedSettingsService: CachedSettingsService,
     private val slackNotificationEventRenderer: SlackNotificationEventRenderer,
+    private val eventTemplatingService: EventTemplatingService,
 ) : AbstractNotificationChannel<SlackNotificationChannelConfig>(SlackNotificationChannelConfig::class) {
 
-    override fun publish(config: SlackNotificationChannelConfig, event: Event): NotificationResult {
+    override fun publish(
+        config: SlackNotificationChannelConfig,
+        event: Event,
+        template: String?
+    ): NotificationResult {
         // Formatting the message
-        val message = format(event)
+        val message = format(event, template)
         // Sending the message
         val sent = slackService.sendNotification(config.channel, message, config.type)
         // Result
@@ -33,7 +39,11 @@ class SlackNotificationChannel(
         }
     }
 
-    private fun format(event: Event): String = event.render(slackNotificationEventRenderer)
+    private fun format(event: Event, template: String?): String = eventTemplatingService.renderEvent(
+        event,
+        template,
+        slackNotificationEventRenderer,
+    )
 
     override fun toSearchCriteria(text: String): JsonNode =
         mapOf(SlackNotificationChannelConfig::channel.name to text).asJson()

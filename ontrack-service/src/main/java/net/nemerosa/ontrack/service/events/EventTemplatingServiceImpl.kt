@@ -14,6 +14,17 @@ class EventTemplatingServiceImpl(
     private val templatingService: TemplatingService,
 ) : EventTemplatingService {
 
+    override fun renderEvent(event: Event, template: String?, renderer: EventRenderer): String =
+        if (template.isNullOrBlank()) {
+            event.render(renderer)
+        } else {
+            render(
+                template = template,
+                event = event,
+                renderer = renderer,
+            )
+        }
+
     override fun render(template: String, event: Event, renderer: EventRenderer): String =
         if (templatingService.isLegacyTemplate(template)) {
             val parameters = eventVariableService.getTemplateParameters(event, caseVariants = true)

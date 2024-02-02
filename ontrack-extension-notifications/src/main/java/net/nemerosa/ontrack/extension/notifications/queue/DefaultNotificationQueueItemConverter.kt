@@ -22,6 +22,7 @@ class DefaultNotificationQueueItemConverter(
         extraEntities = item.event.extraEntities.mapValues { (_, entity) -> entity.id() },
         ref = item.event.ref,
         values = item.event.values,
+        template = item.template,
     )
 
     override fun convertFromQueue(item: NotificationQueueItem) = Notification(
@@ -38,6 +39,7 @@ class DefaultNotificationQueueItemConverter(
             },
             item.ref,
             item.values,
-        )
+        ),
+        template = item.template,
     )
 }

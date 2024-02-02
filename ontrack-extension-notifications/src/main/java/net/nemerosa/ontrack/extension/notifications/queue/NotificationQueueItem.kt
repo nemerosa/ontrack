@@ -14,4 +14,5 @@ data class NotificationQueueItem(
     val extraEntities: Map<ProjectEntityType, Int>,
     val ref: ProjectEntityType?,
     val values: Map<String, NameValue>,
+    val template: String?,
 )

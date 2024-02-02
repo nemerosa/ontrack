@@ -41,7 +41,11 @@ class DefaultNotificationProcessingService(
         if (validatedConfig.config != null) {
             try {
                 meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_publishing, item)
-                val result = channel.publish(validatedConfig.config, item.event)
+                val result = channel.publish(
+                    config = validatedConfig.config,
+                    event = item.event,
+                    template = item.template,
+                )
                 meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_result, item, result)
                 record(
                     channel = channel.type,

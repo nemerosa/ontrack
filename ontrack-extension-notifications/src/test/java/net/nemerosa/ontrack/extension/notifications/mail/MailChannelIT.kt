@@ -103,8 +103,10 @@ class MailChannelIT : AbstractMailTestSupport() {
                                     ${project.name} $name has been released.
                                     
                                     It's actually been promoted to ${pl.name}.
-                                """.trimIndent(),
+                                """.trimIndent()
+                                    .lines().map { it.trim() },
                                 GreenMailUtil.getBody(message)
+                                    .lines().map { it.trim() }
                             )
                         } else {
                             fail(
