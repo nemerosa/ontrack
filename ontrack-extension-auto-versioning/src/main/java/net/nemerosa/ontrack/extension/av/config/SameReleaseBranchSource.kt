@@ -13,7 +13,7 @@ class SameReleaseBranchSource(
     private val regexBranchSource: RegexBranchSource,
 ) : AbstractBranchSource("same-release") {
 
-    override fun getLatestBranch(config: String?, project: Project, targetBranch: Branch): Branch? {
+    override fun getLatestBranch(config: String?, project: Project, targetBranch: Branch, promotion: String): Branch? {
         val levels = (config?.takeIf { it.isNotBlank() } ?: "1").toInt()
         val pattern = "release\\/(${("\\d+" * levels).joinToString("\\.")})(\\..*)?"
         val path = branchDisplayNameService.getBranchDisplayName(targetBranch)
@@ -21,10 +21,10 @@ class SameReleaseBranchSource(
         return if (m != null) {
             val base = m.groupValues[1]
             val sourceRegex = "release\\/${base}\\..*"
-            regexBranchSource.getLatestBranch(sourceRegex, project, targetBranch)
+            regexBranchSource.getLatestBranch(sourceRegex, project, targetBranch, promotion)
         } else {
             // No match, returning the branch with the same name
-            sameBranchSource.getLatestBranch(null, project, targetBranch)
+            sameBranchSource.getLatestBranch(null, project, targetBranch, promotion)
         }
     }
 

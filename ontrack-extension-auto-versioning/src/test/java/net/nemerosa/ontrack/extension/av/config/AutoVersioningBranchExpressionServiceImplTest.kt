@@ -35,12 +35,13 @@ class AutoVersioningBranchExpressionServiceImplTest {
             branchSource.getLatestBranch(
                 null,
                 anySourceBranch.project,
-                eligibleTargetBranch
+                eligibleTargetBranch,
+                "ANY"
             )
         } returns anySourceBranch
 
         val latestBranch =
-            autoVersioningBranchExpressionService.getLatestBranch(eligibleTargetBranch, anySourceBranch.project, "same")
+            autoVersioningBranchExpressionService.getLatestBranch(eligibleTargetBranch, "ANY", anySourceBranch.project, "same")
         assertEquals(anySourceBranch, latestBranch, "Using the same branch")
     }
 
@@ -49,10 +50,10 @@ class AutoVersioningBranchExpressionServiceImplTest {
         val eligibleTargetBranch = BranchFixtures.testBranch()
         val anySourceBranch = BranchFixtures.testBranch()
 
-        every { branchSource.getLatestBranch(null, anySourceBranch.project, eligibleTargetBranch) } returns null
+        every { branchSource.getLatestBranch(null, anySourceBranch.project, eligibleTargetBranch, "ANY") } returns null
 
         val latestBranch =
-            autoVersioningBranchExpressionService.getLatestBranch(eligibleTargetBranch, anySourceBranch.project, "same")
+            autoVersioningBranchExpressionService.getLatestBranch(eligibleTargetBranch, "ANY", anySourceBranch.project, "same")
         assertNull(latestBranch, "Not the same branch")
     }
 

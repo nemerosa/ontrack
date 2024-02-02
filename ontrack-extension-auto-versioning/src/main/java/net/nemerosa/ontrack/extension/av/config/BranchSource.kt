@@ -15,8 +15,9 @@ interface BranchSource {
      * @param config Configuration for this branch source
      * @param project Source project
      * @param targetBranch Target branch for the auto versioning
+     * @param promotion Promotion being done
      */
-    fun getLatestBranch(config: String?, project: Project, targetBranch: Branch): Branch?
+    fun getLatestBranch(config: String?, project: Project, targetBranch: Branch, promotion: String): Branch?
 
     /**
      * Identifier for this branch source

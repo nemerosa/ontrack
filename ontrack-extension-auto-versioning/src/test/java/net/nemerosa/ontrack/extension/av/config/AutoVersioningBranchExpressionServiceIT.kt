@@ -24,9 +24,10 @@ class AutoVersioningBranchExpressionServiceIT : AbstractDSLTestSupport() {
 
                     val latest =
                         autoVersioningBranchExpressionService.getLatestBranch(
-                            target,
-                            source11.project,
-                            "regex:release-1\\.1.*"
+                            eligibleTargetBranch = target,
+                            promotion = "ANY",
+                            project = source11.project,
+                            avBranchExpression = "regex:release-1\\.1.*",
                         )
                     assertEquals(source12, latest)
                 }
@@ -45,7 +46,12 @@ class AutoVersioningBranchExpressionServiceIT : AbstractDSLTestSupport() {
                         val target = this
 
                         val latest =
-                            autoVersioningBranchExpressionService.getLatestBranch(target, source.project, "same")
+                            autoVersioningBranchExpressionService.getLatestBranch(
+                                eligibleTargetBranch = target,
+                                promotion = "ANY",
+                                project = source.project,
+                                avBranchExpression = "same"
+                            )
                         assertEquals(source, latest)
                     }
                 }
@@ -67,17 +73,32 @@ class AutoVersioningBranchExpressionServiceIT : AbstractDSLTestSupport() {
 
                     assertEquals(
                         source2411,
-                        autoVersioningBranchExpressionService.getLatestBranch(target, source, "same-release:2")
+                        autoVersioningBranchExpressionService.getLatestBranch(
+                            eligibleTargetBranch = target,
+                            promotion = "ANY",
+                            project = source,
+                            avBranchExpression = "same-release:2"
+                        )
                     )
 
                     assertEquals(
                         source2500,
-                        autoVersioningBranchExpressionService.getLatestBranch(target, source, "same-release:1")
+                        autoVersioningBranchExpressionService.getLatestBranch(
+                            eligibleTargetBranch = target,
+                            promotion = "ANY",
+                            project = source,
+                            avBranchExpression = "same-release:1"
+                        )
                     )
 
                     assertEquals(
                         source2500,
-                        autoVersioningBranchExpressionService.getLatestBranch(target, source, "same-release")
+                        autoVersioningBranchExpressionService.getLatestBranch(
+                            eligibleTargetBranch = target,
+                            promotion = "ANY",
+                            project = source,
+                            avBranchExpression = "same-release"
+                        )
                     )
                 }
             }

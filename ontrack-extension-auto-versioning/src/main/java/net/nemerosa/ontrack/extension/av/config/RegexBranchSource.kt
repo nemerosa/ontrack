@@ -17,7 +17,7 @@ class RegexBranchSource(
 
     private val ordering = OptionalVersionBranchOrdering(branchDisplayNameService)
 
-    override fun getLatestBranch(config: String?, project: Project, targetBranch: Branch): Branch? {
+    override fun getLatestBranch(config: String?, project: Project, targetBranch: Branch, promotion: String): Branch? {
         val sourceRegex = config?.toRegex() ?: throw BranchSourceMissingConfigurationException(id)
         // Version-based ordering
         val versionComparator = ordering.getComparator(config)

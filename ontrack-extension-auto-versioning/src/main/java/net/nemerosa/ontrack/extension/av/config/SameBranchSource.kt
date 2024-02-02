@@ -14,7 +14,7 @@ class SameBranchSource(
     private val structureService: StructureService,
 ) : AbstractBranchSource("same") {
 
-    override fun getLatestBranch(config: String?, project: Project, targetBranch: Branch): Branch? =
+    override fun getLatestBranch(config: String?, project: Project, targetBranch: Branch, promotion: String): Branch? =
         structureService.findBranchByName(
             project = project.name,
             branch = targetBranch.name,

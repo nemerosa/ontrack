@@ -134,12 +134,18 @@ class AutoVersioningConfigurationServiceImpl(
     ): Branch? =
         if (config.sourceBranch.startsWith("&")) {
             val avBranchExpression = config.sourceBranch.drop(1)
-            autoVersioningBranchExpressionService.getLatestBranch(eligibleTargetBranch, project, avBranchExpression)
+            autoVersioningBranchExpressionService.getLatestBranch(
+                eligibleTargetBranch = eligibleTargetBranch,
+                promotion = config.sourcePromotion,
+                project = project,
+                avBranchExpression = avBranchExpression
+            )
         } else {
             regexBranchSource.getLatestBranch(
-                config.sourceBranch,
-                project,
-                eligibleTargetBranch
+                config = config.sourceBranch,
+                project = project,
+                targetBranch = eligibleTargetBranch,
+                promotion = config.sourcePromotion,
             )
         }
 

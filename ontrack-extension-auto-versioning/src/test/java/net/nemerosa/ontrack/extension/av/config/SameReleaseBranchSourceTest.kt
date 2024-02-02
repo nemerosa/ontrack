@@ -50,10 +50,10 @@ class SameReleaseBranchSourceTest {
         )
 
         val target = BranchFixtures.testBranch(name = "release/1.24.6")
-        assertEquals(dependency2411, sameReleaseBranchSource.getLatestBranch("2", dependencyProject, target))
-        assertEquals(dependency2500, sameReleaseBranchSource.getLatestBranch("1", dependencyProject, target))
-        assertEquals(dependency2500, sameReleaseBranchSource.getLatestBranch("", dependencyProject, target))
-        assertEquals(dependency2500, sameReleaseBranchSource.getLatestBranch("", dependencyProject, target))
+        assertEquals(dependency2411, sameReleaseBranchSource.getLatestBranch("2", dependencyProject, target, "ANY"))
+        assertEquals(dependency2500, sameReleaseBranchSource.getLatestBranch("1", dependencyProject, target, "ANY"))
+        assertEquals(dependency2500, sameReleaseBranchSource.getLatestBranch("", dependencyProject, target, "ANY"))
+        assertEquals(dependency2500, sameReleaseBranchSource.getLatestBranch("", dependencyProject, target, "ANY"))
     }
 
     @Test
@@ -76,17 +76,17 @@ class SameReleaseBranchSourceTest {
 
         assertEquals(
             dependency1260,
-            sameReleaseBranchSource.getLatestBranch("2", dependencyProject, target1260)
+            sameReleaseBranchSource.getLatestBranch("2", dependencyProject, target1260, "ANY")
         )
 
         assertEquals(
             dependency1251,
-            sameReleaseBranchSource.getLatestBranch("2", dependencyProject, target1251)
+            sameReleaseBranchSource.getLatestBranch("2", dependencyProject, target1251, "ANY")
         )
 
         assertEquals(
             dependency1251,
-            sameReleaseBranchSource.getLatestBranch("2", dependencyProject, target1250)
+            sameReleaseBranchSource.getLatestBranch("2", dependencyProject, target1250, "ANY")
         )
     }
 
@@ -104,9 +104,9 @@ class SameReleaseBranchSourceTest {
         )
 
         val target = BranchFixtures.testBranch(name = "release/1.26")
-        assertEquals(dependency1261, sameReleaseBranchSource.getLatestBranch("2", dependencyProject, target))
-        assertEquals(dependency1261, sameReleaseBranchSource.getLatestBranch("1", dependencyProject, target))
-        assertEquals(dependency1261, sameReleaseBranchSource.getLatestBranch("", dependencyProject, target))
+        assertEquals(dependency1261, sameReleaseBranchSource.getLatestBranch("2", dependencyProject, target, "ANY"))
+        assertEquals(dependency1261, sameReleaseBranchSource.getLatestBranch("1", dependencyProject, target, "ANY"))
+        assertEquals(dependency1261, sameReleaseBranchSource.getLatestBranch("", dependencyProject, target, "ANY"))
     }
 
 }

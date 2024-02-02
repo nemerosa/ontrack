@@ -9,10 +9,10 @@ class AutoVersioningBranchExpressionServiceImpl(
     private val branchSourceFactory: BranchSourceFactory,
 ) : AutoVersioningBranchExpressionService {
 
-    override fun getLatestBranch(eligibleTargetBranch: Branch, project: Project, avBranchExpression: String): Branch? {
+    override fun getLatestBranch(eligibleTargetBranch: Branch, promotion: String, project: Project, avBranchExpression: String): Branch? {
         val (id, config) = BranchSourceExpression.parseBranchSourceExpression(avBranchExpression)
         val branchSource = branchSourceFactory.getBranchSource(id)
-        return branchSource.getLatestBranch(config, project, eligibleTargetBranch)
+        return branchSource.getLatestBranch(config, project, eligibleTargetBranch, promotion)
     }
 
 }
