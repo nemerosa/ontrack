@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.extension.slack.service.SlackService
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventTemplatingService
+import net.nemerosa.ontrack.model.events.MockEventTemplatingService
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.NameDescription
@@ -35,7 +36,7 @@ class SlackNotificationChannelTest {
     fun before() {
         slackService = mockk()
         cachedSettingsService = mockk()
-        val eventTemplatingService = mockk<EventTemplatingService>()
+        val eventTemplatingService = MockEventTemplatingService()
         channel = SlackNotificationChannel(
             slackService,
             cachedSettingsService,
@@ -58,7 +59,7 @@ class SlackNotificationChannelTest {
         verify {
             slackService.sendNotification(
                 "#test",
-                "Project <http://localhost:8080/#/project/1|project> has been disabled.",
+                "Project project has been disabled.",
                 SlackNotificationType.SUCCESS
             )
         }
