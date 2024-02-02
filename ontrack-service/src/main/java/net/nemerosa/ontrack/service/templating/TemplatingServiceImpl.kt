@@ -27,7 +27,7 @@ class TemplatingServiceImpl(
 
     @Suppress("RegExpUnnecessaryNonCapturingGroup")
     private val regexToken =
-        "^([a-z_]+)(?:\\.([a-zA-Z_-]+))?(?:\\?((?:[a-zA-Z]+=[a-zA-Z0-9\\s_-]+)(?:&[a-zA-Z]+=[a-zA-Z0-9\\s_-]+)*))?(?:\\|([a-zA-Z_-]+))?\$".toRegex()
+        "^([a-z][a-zA-Z]+)(?:\\.([a-zA-Z_-]+))?(?:\\?((?:[a-zA-Z]+=[a-zA-Z0-9\\s_-]+)(?:&[a-zA-Z]+=[a-zA-Z0-9\\s_-]+)*))?(?:\\|([a-zA-Z_-]+))?\$".toRegex()
 
     @Deprecated("Legacy templates will be removed in V5.")
     override fun isLegacyTemplate(template: String): Boolean =
