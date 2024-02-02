@@ -8,10 +8,36 @@ import net.nemerosa.ontrack.extension.av.config.AutoVersioningNotification
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
 import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.test.TestUtils.uid
 import java.util.*
 
 object AutoVersioningTestFixtures {
+
+    fun Build.createOrder(
+        targetBranch: Branch,
+        targetVersion: String = "2.0.0",
+    ) = AutoVersioningOrder(
+        uuid = UUID.randomUUID().toString(),
+        sourceProject = project.name,
+        sourceBuildId = id(),
+        sourcePromotion = "GOLD",
+        sourceBackValidation = null,
+        branch = targetBranch,
+        targetPaths = listOf("gradle.properties"),
+        targetRegex = null,
+        targetProperty = "version",
+        targetPropertyRegex = null,
+        targetPropertyType = null,
+        targetVersion = targetVersion,
+        autoApproval = true,
+        upgradeBranchPattern = "feature/version-<version>",
+        postProcessing = null,
+        postProcessingConfig = NullNode.instance,
+        validationStamp = null,
+        autoApprovalMode = AutoApprovalMode.SCM,
+        reviewers = emptyList(),
+    )
 
     fun Branch.createOrder(
         sourceProject: String,

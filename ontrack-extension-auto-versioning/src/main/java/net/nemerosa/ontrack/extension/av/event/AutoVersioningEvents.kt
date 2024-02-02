@@ -8,9 +8,9 @@ object AutoVersioningEvents {
     val AUTO_VERSIONING_SUCCESS: EventType = SimpleEventType.of(
         "auto-versioning-success",
         """
-                Auto versioning of ${'$'}{PROJECT}/${'$'}{BRANCH} for dependency ${'$'}{X_PROJECT} version "${'$'}{:version}" has been done.
+                Auto versioning of ${'$'}{project}/${'$'}{branch} for dependency ${'$'}{xProject} version "${'$'}{VERSION}" has been done.
                 
-                ${'$'}{:message}
+                ${'$'}{MESSAGE}
                 
                 Pull request ${'$'}{:pr-name:pr-link}
             """.trimIndent()
@@ -21,7 +21,7 @@ object AutoVersioningEvents {
         """
                 Auto versioning of ${'$'}{PROJECT}/${'$'}{BRANCH} for dependency ${'$'}{X_PROJECT} version "${'$'}{:version}" has failed.
                 
-                ${'$'}{:message}
+                ${'$'}{MESSAGE}
                 
                 Error: ${'$'}{:error}
             """.trimIndent()
@@ -30,7 +30,7 @@ object AutoVersioningEvents {
     val AUTO_VERSIONING_POST_PROCESSING_ERROR: EventType = SimpleEventType.of(
         "auto-versioning-post-processing-error",
         """
-                Auto versioning post-processing of ${'$'}{PROJECT}/${'$'}{BRANCH} for dependency ${'$'}{X_PROJECT} version "${'$'}{:version}" has failed.
+                Auto versioning post-processing of ${'$'}{project}/${'$'}{branch} for dependency ${'$'}{x_project} version "${'$'}{VERSION}" has failed.
 
                 ${'$'}{:message:link}
             """.trimIndent()
@@ -39,7 +39,7 @@ object AutoVersioningEvents {
     val AUTO_VERSIONING_PR_MERGE_TIMEOUT_ERROR: EventType = SimpleEventType.of(
         "auto-versioning-pr-merge-timeout-error",
         """
-                Auto versioning of ${'$'}{PROJECT}/${'$'}{BRANCH} for dependency ${'$'}{X_PROJECT} version "${'$'}{:version}" has failed.
+                Auto versioning of ${'$'}{project}/${'$'}{branch} for dependency ${'$'}{x_project} version "${'$'}{VERSION}" has failed.
                 
                 Timeout while waiting for the PR to be ready to be merged.
                 

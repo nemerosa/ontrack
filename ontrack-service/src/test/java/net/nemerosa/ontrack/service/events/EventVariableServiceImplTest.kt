@@ -57,4 +57,23 @@ class EventVariableServiceImplTest {
             context
         )
     }
+
+    @Test
+    fun `Context for an extra entity`() {
+        val branch = BranchFixtures.testBranch()
+        val eventType = SimpleEventType.of("sample", "Not used in this test")
+        val event = Event.of(eventType)
+            .withExtra(branch)
+            .build()
+        val context = eventVariableService.getTemplateContext(event)
+
+        // Checks all parameters
+        assertEquals(
+            mapOf(
+                "x_project" to branch.project,
+                "x_branch" to branch,
+            ),
+            context
+        )
+    }
 }
