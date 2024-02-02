@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventVariableService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.nameValues
+import net.nemerosa.ontrack.model.structure.varName
 import org.springframework.stereotype.Service
 
 @Service
@@ -20,16 +21,12 @@ class EventVariableServiceImpl(
     override fun getTemplateContext(event: Event): Map<String, Any> {
         val result = mutableMapOf<String, Any>()
         // Entities
-        event.entities.forEach { (_, entity) ->
-            entity.nameValues.forEach { (name, value) ->
-                result[name] = value
-            }
+        event.entities.forEach { (type, entity) ->
+            result[type.varName] = entity
         }
         // Extra entities
-        event.extraEntities.forEach { (_, entity) ->
-            entity.nameValues.forEach { (name, value) ->
-                result[name] = value
-            }
+        event.extraEntities.forEach { (type, entity) ->
+            result["x${type.varName.replaceFirstChar { it.uppercase() }}"] = entity
         }
         // Values
         event.values.forEach { (_, item) ->
