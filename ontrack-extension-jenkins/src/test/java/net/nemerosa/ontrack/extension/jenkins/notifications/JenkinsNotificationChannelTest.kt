@@ -80,7 +80,7 @@ class JenkinsNotificationChannelTest {
     fun `Async job with parameters successfully queued`() {
         val config = newJenkinsNotificationConfig(
             parameters = mapOf(
-                "PROMOTION" to "{Promotion}",
+                "PROMOTION" to PROMOTION
             )
         )
         val event = newPromotionRunEvent()
@@ -88,7 +88,7 @@ class JenkinsNotificationChannelTest {
         every {
             jenkinsClient.fireAndForgetJob(
                 JOB, mapOf(
-                    "PROMOTION" to PROMOTION, // Parameter correctly expanded
+                    "PROMOTION" to PROMOTION,
                 )
             )
         } returns URI("uri:queue")
@@ -172,11 +172,12 @@ class JenkinsNotificationChannelTest {
         val promotionRun = PromotionRun.of(build, promotionLevel, Signature.of("test"), null).withId(ID.of(10000))
         val event = EventFactoryImpl().newPromotionRun(promotionRun)
 
-//        every {
-//            eventTemplatingService.
-//        } returns mapOf(
-//            TODO "Promotion" to promotionLevel.name,
-//        )
+        every {
+            eventTemplatingService.render(any(), any(), any())
+        } answers {
+            // Unchanged path
+            it.invocation.args.first() as String
+        }
 
         return event
     }
