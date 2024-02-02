@@ -13,7 +13,7 @@ class HtmlNotificationEventRenderer(
     ontrackConfigProperties: OntrackConfigProperties,
 ) : AbstractUrlNotificationEventRenderer(ontrackConfigProperties) {
 
-    override fun render(projectEntity: ProjectEntity, event: Event): String {
+    override fun render(projectEntity: ProjectEntity): String {
         val pageUrl = getUrl(ProjectEntityPageBuilder.getEntityPageRelativeURI(projectEntity))
         return """<a href="$pageUrl">${getProjectEntityName(projectEntity)}</a>"""
     }

@@ -4,7 +4,6 @@ import net.nemerosa.ontrack.common.SimpleExpand
 import net.nemerosa.ontrack.model.events.EventRenderer
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
-import net.nemerosa.ontrack.model.structure.displayName
 import net.nemerosa.ontrack.model.templating.*
 import org.springframework.stereotype.Service
 
@@ -117,7 +116,7 @@ class TemplatingServiceImpl(
         // If not field, using the entity name
         if (field.isNullOrBlank()) {
             if (config.isNullOrBlank()) {
-                entity.displayName
+                renderer.render(entity)
             } else {
                 throw TemplatingEntityNameHavingConfigException()
             }

@@ -17,6 +17,7 @@ dependencies {
     implementation("org.slf4j:slf4j-api")
     implementation("com.slack.api:slack-api-client:${slackVersion}")
 
+    testImplementation(project(":ontrack-extension-general"))
     testImplementation(project(path = ":ontrack-model", configuration = "tests"))
     testImplementation(project(path = ":ontrack-ui-support", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
