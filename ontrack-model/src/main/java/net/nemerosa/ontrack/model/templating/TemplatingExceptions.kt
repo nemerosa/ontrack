@@ -2,38 +2,40 @@ package net.nemerosa.ontrack.model.templating
 
 import net.nemerosa.ontrack.model.exceptions.InputException
 
-class TemplatingNoContextFoundException(contextKey: String) : InputException(
+abstract class TemplatingException(message: String): InputException(message)
+
+class TemplatingNoContextFoundException(contextKey: String) : TemplatingException(
     """Templating key not found in context: $contextKey"""
 )
 
-class TemplatingConfiguredLiteralException(contextKey: String) : InputException(
+class TemplatingConfiguredLiteralException(contextKey: String) : TemplatingException(
     """Templating key refers to a literal and should not be configured nor having a field: $contextKey"""
 )
 
-class TemplatingExpressionFormatException(expression: String) : InputException(
+class TemplatingExpressionFormatException(expression: String) : TemplatingException(
     """Templating expression is malformed: $expression"""
 )
 
-class TemplatingEntityNameHavingConfigException : InputException(
+class TemplatingEntityNameHavingConfigException : TemplatingException(
     """Templating refers to a project entity name. No config is expected in this case."""
 )
 
-class TemplatingNoFieldSourceException(field: String) : InputException(
+class TemplatingNoFieldSourceException(field: String) : TemplatingException(
     """Templating field is not bound to any source: $field"""
 )
 
-class TemplatingMultipleFieldSourcesException(field: String) : InputException(
+class TemplatingMultipleFieldSourcesException(field: String) : TemplatingException(
     """Templating field is bound to more than 1 source: $field"""
 )
 
-class TemplatingMissingConfigParam(key: String) : InputException(
+class TemplatingMissingConfigParam(key: String) : TemplatingException(
     """Missing required templating config param: $key"""
 )
 
-class TemplatingConfigFormatException(expression: String) : InputException(
+class TemplatingConfigFormatException(expression: String) : TemplatingException(
     """Misconfigured configuration: $expression"""
 )
 
-class TemplatingFilterNotFoundException(filter: String) : InputException(
+class TemplatingFilterNotFoundException(filter: String) : TemplatingException(
     """Templating filter not found: $filter"""
 )

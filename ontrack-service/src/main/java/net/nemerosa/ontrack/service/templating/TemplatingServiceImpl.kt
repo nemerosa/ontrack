@@ -52,22 +52,26 @@ class TemplatingServiceImpl(
         context: Map<String, Any>,
         renderer: EventRenderer,
     ): String {
-        val m = regexToken.matchEntire(expression)
-        return if (m != null) {
-            val contextKey = m.groupValues[1]
-            val field = m.groupValues.getOrNull(2)
-            val config = m.groupValues.getOrNull(3)
-            val filter = m.groupValues.getOrNull(4)
-            render(
-                contextKey = contextKey,
-                field = field,
-                config = config,
-                filter = filter,
-                context = context,
-                renderer = renderer,
-            )
-        } else {
-            throw TemplatingExpressionFormatException(expression)
+        try {
+            val m = regexToken.matchEntire(expression)
+            return if (m != null) {
+                val contextKey = m.groupValues[1]
+                val field = m.groupValues.getOrNull(2)
+                val config = m.groupValues.getOrNull(3)
+                val filter = m.groupValues.getOrNull(4)
+                render(
+                    contextKey = contextKey,
+                    field = field,
+                    config = config,
+                    filter = filter,
+                    context = context,
+                    renderer = renderer,
+                )
+            } else {
+                throw TemplatingExpressionFormatException(expression)
+            }
+        } catch (ex: TemplatingException) {
+            return "#error"
         }
     }
 

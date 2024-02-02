@@ -22,6 +22,30 @@ class PlainNotificationEventRendererIT : AbstractDSLTestSupport() {
     private val plainEventRenderer = PlainEventRenderer.INSTANCE
 
     @Test
+    fun `Rendering of errors`() {
+        asAdmin {
+            project {
+                val event = eventFactory.newProject(this)
+
+                val text = eventTemplatingService.renderEvent(
+                    event = event,
+                    template = """
+                        Project ${'$'}{projectx} has been created.
+                    """.trimIndent(),
+                    renderer = plainEventRenderer,
+                )
+
+                assertEquals(
+                    """
+                        Project #error has been created.
+                    """.trimIndent(),
+                    text
+                )
+            }
+        }
+    }
+
+    @Test
     fun `Rendering of entity links with the HTML renderer`() {
         asAdmin {
             project {

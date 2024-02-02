@@ -85,7 +85,7 @@ class MailChannelIT : AbstractMailTestSupport() {
                         contentTemplate = """
                             ${'$'}{project} ${'$'}{build} has been released.
                             
-                            It's actually been promoted to ${'$'}{promotion}.
+                            It's actually been promoted to ${'$'}{promotionLevel}.
                         """.trimIndent(),
                         EventFactory.NEW_PROMOTION_RUN,
                     )
@@ -100,9 +100,9 @@ class MailChannelIT : AbstractMailTestSupport() {
                         if (message != null) {
                             assertEquals(
                                 """
-                                    ${project.name} $name has been released.
+                                    <a href="http://localhost:8080/#/project/${project.id}">${project.name}</a> <a href="http://localhost:8080/#/build/$id">$name</a> has been released.
                                     
-                                    It's actually been promoted to ${pl.name}.
+                                    It's actually been promoted to <a href="http://localhost:8080/#/promotionLevel/${pl.id}">${pl.name}</a>.
                                 """.trimIndent()
                                     .lines().map { it.trim() },
                                 GreenMailUtil.getBody(message)

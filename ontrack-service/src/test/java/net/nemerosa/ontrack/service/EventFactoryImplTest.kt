@@ -43,7 +43,10 @@ class EventFactoryImplTest {
         assertEquals("user", e.signature?.user?.name)
         assertEquals(e.entities.size, 3)
         assertEquals("New build 1 for branch B in P.", e.renderText())
-        assertEquals("""New build <a href="#/build/100">1</a> for branch <a href="#/branch/10">B</a> in <a href="#/project/1">P</a>.""", e.render(testRenderer))
+        assertEquals(
+            """New build <a href="#/build/100">1</a> for branch <a href="#/branch/10">B</a> in <a href="#/project/1">P</a>.""",
+            e.render(testRenderer)
+        )
     }
 
     @Test
@@ -115,15 +118,18 @@ class EventFactoryImplTest {
         val e = factory.newPromotionRun(promotionRun())
         assertEquals("user", e.signature?.user?.name)
         assertEntities(
-                e,
-                ProjectEntityType.PROJECT,
-                ProjectEntityType.BRANCH,
-                ProjectEntityType.BUILD,
-                ProjectEntityType.PROMOTION_LEVEL,
-                ProjectEntityType.PROMOTION_RUN
+            e,
+            ProjectEntityType.PROJECT,
+            ProjectEntityType.BRANCH,
+            ProjectEntityType.BUILD,
+            ProjectEntityType.PROMOTION_LEVEL,
+            ProjectEntityType.PROMOTION_RUN
         )
         assertEquals("Build 1 has been promoted to COPPER for branch B in P.", e.renderText())
-        assertEquals("""Build <a href="#/build/100">1</a> has been promoted to <a href="#/promotionLevel/100">COPPER</a> for branch <a href="#/branch/10">B</a> in <a href="#/project/1">P</a>.""", e.render(testRenderer))
+        assertEquals(
+            """Build <a href="#/build/100">1</a> has been promoted to <a href="#/promotionLevel/100">COPPER</a> for branch <a href="#/branch/10">B</a> in <a href="#/project/1">P</a>.""",
+            e.render(testRenderer)
+        )
     }
 
     @Test
@@ -131,12 +137,12 @@ class EventFactoryImplTest {
         val e = factory.deletePromotionRun(promotionRun())
         assertNull(e.signature)
         assertEntities(
-                e,
-                ProjectEntityType.PROJECT,
-                ProjectEntityType.BRANCH,
-                ProjectEntityType.BUILD,
-                ProjectEntityType.PROMOTION_LEVEL,
-                ProjectEntityType.PROMOTION_RUN
+            e,
+            ProjectEntityType.PROJECT,
+            ProjectEntityType.BRANCH,
+            ProjectEntityType.BUILD,
+            ProjectEntityType.PROMOTION_LEVEL,
+            ProjectEntityType.PROMOTION_RUN
         )
         assertEquals("Promotion COPPER of build 1 has been deleted for branch B in P.", e.renderText())
     }
@@ -147,7 +153,10 @@ class EventFactoryImplTest {
         assertEquals("user", e.signature?.user?.name)
         assertEquals(e.entities.size, 5)
         assertEquals("Build 1 has run for SMOKE with status Failed in branch B in P.", e.renderText())
-        assertEquals("""Build <a href="#/build/100">1</a> has run for <a href="#/validationStamp/100">SMOKE</a> with status <i class="status">Failed</i> in branch <a href="#/branch/10">B</a> in <a href="#/project/1">P</a>.""", e.render(testRenderer))
+        assertEquals(
+            """Build <a href="#/build/100">1</a> has run for <a href="#/validationStamp/100">SMOKE</a> with status <i class="status">Failed</i> in branch <a href="#/branch/10">B</a> in <a href="#/project/1">P</a>.""",
+            e.render(testRenderer)
+        )
     }
 
     @Test
@@ -155,8 +164,14 @@ class EventFactoryImplTest {
         val e = factory.newValidationRunStatus(validationRun())
         assertEquals("user", e.signature?.user?.name)
         assertEquals(e.entities.size, 5)
-        assertEquals("Status for SMOKE validation #1 for build 1 in branch B of P has changed to Failed.", e.renderText())
-        assertEquals("""Status for <a href="#/validationStamp/100">SMOKE</a> validation <a href="#/validationRun/1000">#1</a> for build <a href="#/build/100">1</a> in branch <a href="#/branch/10">B</a> of <a href="#/project/1">P</a> has changed to <i class="status">Failed</i>.""", e.render(testRenderer))
+        assertEquals(
+            "Status for SMOKE validation #1 for build 1 in branch B of P has changed to Failed.",
+            e.renderText()
+        )
+        assertEquals(
+            """Status for <a href="#/validationStamp/100">SMOKE</a> validation <a href="#/validationRun/1000">#1</a> for build <a href="#/build/100">1</a> in branch <a href="#/branch/10">B</a> of <a href="#/project/1">P</a> has changed to <i class="status">Failed</i>.""",
+            e.render(testRenderer)
+        )
     }
 
     @Test
@@ -194,10 +209,10 @@ class EventFactoryImplTest {
     private fun promotionRun(): PromotionRun {
         val branch = branch()
         return PromotionRun.of(
-                Build.of(branch, nd("1", "Build"), Signature.of("user")).withId(ID.of(100)),
-                PromotionLevel.of(branch, nd("COPPER", "")).withId(ID.of(100)),
-                Signature.of("user"),
-                ""
+            Build.of(branch, nd("1", "Build"), Signature.of("user")).withId(ID.of(100)),
+            PromotionLevel.of(branch, nd("COPPER", "")).withId(ID.of(100)),
+            Signature.of("user"),
+            ""
         ).withId(ID.of(1000))
     }
 
@@ -206,12 +221,12 @@ class EventFactoryImplTest {
     private fun validationRun(): ValidationRun {
         val branch = branch()
         return ValidationRun.of(
-                Build.of(branch, nd("1", "Build"), Signature.of("user")).withId(ID.of(100)),
-                ValidationStamp.of(branch, nd("SMOKE", "")).withId(ID.of(100)),
-                1,
-                Signature.of("user"),
-                ValidationRunStatusID.STATUS_FAILED,
-                ""
+            Build.of(branch, nd("1", "Build"), Signature.of("user")).withId(ID.of(100)),
+            ValidationStamp.of(branch, nd("SMOKE", "")).withId(ID.of(100)),
+            1,
+            Signature.of("user"),
+            ValidationRunStatusID.STATUS_FAILED,
+            ""
         ).withId(ID.of(1000))
     }
 
@@ -225,20 +240,20 @@ class EventFactoryImplTest {
 
     private val testRenderer: EventRenderer = object : EventRenderer {
 
-        override fun render(e: ProjectEntity, event: Event): String {
-            return when (e) {
-                is Project -> link(e.name, "project/${e.id}")
-                is Branch -> link(e.name, "branch/${e.id}")
-                is PromotionLevel -> link(e.name, "promotionLevel/${e.id}")
-                is ValidationStamp -> link(e.name, "validationStamp/${e.id}")
-                is Build -> link(e.name, "build/${e.id}")
-                is ValidationRun -> link("#${e.runOrder}", "validationRun/${e.id}")
-                else -> throw EventCannotRenderEntityException(e.entityDisplayName, e)
+        override fun render(projectEntity: ProjectEntity): String {
+            return when (projectEntity) {
+                is Project -> link(projectEntity.name, "project/${projectEntity.id}")
+                is Branch -> link(projectEntity.name, "branch/${projectEntity.id}")
+                is PromotionLevel -> link(projectEntity.name, "promotionLevel/${projectEntity.id}")
+                is ValidationStamp -> link(projectEntity.name, "validationStamp/${projectEntity.id}")
+                is Build -> link(projectEntity.name, "build/${projectEntity.id}")
+                is ValidationRun -> link("#${projectEntity.runOrder}", "validationRun/${projectEntity.id}")
+                else -> throw EventCannotRenderEntityException(projectEntity.entityDisplayName, projectEntity)
             }
         }
 
         override fun render(valueKey: String, value: NameValue, event: Event): String =
-                """<i class="$valueKey">${value.value}</i>"""
+            """<i class="$valueKey">${value.value}</i>"""
 
         override fun renderLink(text: NameValue, link: NameValue, event: Event): String =
             """<a href="${link.value}">${text.value}</a>"""
@@ -248,12 +263,12 @@ class EventFactoryImplTest {
 
     private fun assertEntities(e: Event, vararg types: ProjectEntityType) {
         assertEquals(
-                types.toSet(),
-                e.entities.map { it.key }.toSet()
+            types.toSet(),
+            e.entities.map { it.key }.toSet()
         )
         assertEquals(
-                types.toSet(),
-                e.entities.map { it.value.projectEntityType }.toSet()
+            types.toSet(),
+            e.entities.map { it.value.projectEntityType }.toSet()
         )
     }
 

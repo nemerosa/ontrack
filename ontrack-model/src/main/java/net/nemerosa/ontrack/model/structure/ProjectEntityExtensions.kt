@@ -56,7 +56,7 @@ val ProjectEntity.displayName: String
         is Build -> name
         is ValidationStamp -> name
         is PromotionLevel -> name
-        is ValidationRun -> "${build.name}/${validationStamp.name}"
+        is ValidationRun -> "#$runOrder"
         is PromotionRun -> "${build.name}/${promotionLevel.name}"
         else -> throw IllegalStateException("Unknown project entity: $this")
     }
