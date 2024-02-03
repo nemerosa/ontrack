@@ -21,7 +21,6 @@ class SlackNotificationEventRenderer(
 
     override fun render(valueKey: String, value: NameValue, event: Event): String = "_${value.value}_"
 
-    override fun renderLink(text: NameValue, link: NameValue, event: Event): String =
-        """<${link.value}|${text.value}>"""
+    override fun renderLink(text: String, href: String): String = """<$href|$text>"""
 
 }

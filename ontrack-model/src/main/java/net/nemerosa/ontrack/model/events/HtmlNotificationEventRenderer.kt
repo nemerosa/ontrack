@@ -20,7 +20,7 @@ class HtmlNotificationEventRenderer(
 
     override fun render(valueKey: String, value: NameValue, event: Event): String = value.value
 
-    override fun renderLink(text: NameValue, link: NameValue, event: Event): String {
-        return """<a href="${link.value}">${text.value}</a>"""
+    override fun renderLink(text: String, href: String): String {
+        return """<a href="$href">$text</a>"""
     }
 }

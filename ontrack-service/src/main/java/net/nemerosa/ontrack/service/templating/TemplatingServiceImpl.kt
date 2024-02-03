@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service
 class TemplatingServiceImpl(
     templatingSources: List<TemplatingSource>,
     templatingFilters: List<TemplatingFilter>,
+    templatingFunctions: List<TemplatingFunction>,
     private val ontrackConfigProperties: OntrackConfigProperties,
 ) : TemplatingService {
 
@@ -22,13 +23,14 @@ class TemplatingServiceImpl(
     }
 
     private val filtersById = templatingFilters.associateBy { it.id }
+    private val functionsById = templatingFunctions.associateBy { it.id }
 
     private val regexExpressions =
         "\\$\\{([^\\}]+)\\}".toRegex()
 
     @Suppress("RegExpUnnecessaryNonCapturingGroup")
     private val regexToken =
-        "^([a-zA-Z_]+)(?:\\.([a-zA-Z_-]+))?(?:\\?((?:[a-zA-Z]+=[a-zA-Z0-9\\s_-]+)(?:&[a-zA-Z]+=[a-zA-Z0-9\\s_-]+)*))?(?:\\|([a-zA-Z_-]+))?\$".toRegex()
+        "^([a-zA-Z_]+|#)(?:\\.([a-zA-Z_-]+))?(?:\\?((?:[a-zA-Z]+=[a-zA-Z0-9\\s_-]+)(?:&[a-zA-Z]+=[a-zA-Z0-9\\s_-]+)*))?(?:\\|([a-zA-Z_-]+))?\$".toRegex()
 
     @Deprecated("Legacy templates will be removed in V5.")
     override fun isLegacyTemplate(template: String): Boolean =
@@ -61,14 +63,32 @@ class TemplatingServiceImpl(
                 val field = m.groupValues.getOrNull(2)
                 val config = m.groupValues.getOrNull(3)
                 val filter = m.groupValues.getOrNull(4)
-                render(
-                    contextKey = contextKey,
-                    field = field,
-                    config = config,
-                    filter = filter,
-                    context = context,
-                    renderer = renderer,
-                )
+                val text = if (contextKey == "#") {
+                    if (field.isNullOrBlank()) {
+                        throw TemplatingMissingFunctionException()
+                    } else {
+                        renderFunction(
+                            functionId = field,
+                            config = config,
+                            context = context,
+                            renderer = renderer,
+                        )
+                    }
+                } else {
+                    renderContext(
+                        contextKey = contextKey,
+                        field = field,
+                        config = config,
+                        context = context,
+                        renderer = renderer,
+                    )
+                }
+                // Filtering
+                return if (filter.isNullOrBlank()) {
+                    text
+                } else {
+                    applyFilter(filter, text)
+                }
             } else {
                 throw TemplatingExpressionFormatException(expression)
             }
@@ -87,11 +107,33 @@ class TemplatingServiceImpl(
         }
     }
 
-    private fun render(
+    private fun renderFunction(
+        functionId: String,
+        config: String?,
+        context: Map<String, Any>,
+        renderer: EventRenderer
+    ): String {
+        // Gets the function
+        val function = functionsById[functionId]
+            ?: throw TemplatingFunctionNotFoundException(functionId)
+        // Configuration
+        val configMap: Map<String, String> = if (config.isNullOrBlank()) {
+            emptyMap()
+        } else {
+            parseTemplatingConfig(config)
+        }
+        // Callback
+        val expressionResolver: (String) -> String = { expression: String ->
+            renderExpression(expression, context, renderer)
+        }
+        // Rendering of the function
+        return function.render(configMap, context, renderer, expressionResolver)
+    }
+
+    private fun renderContext(
         contextKey: String,
         field: String?,
         config: String?,
-        filter: String?,
         context: Map<String, Any>,
         renderer: EventRenderer
     ): String {
@@ -100,7 +142,7 @@ class TemplatingServiceImpl(
         // If no context, we need to throw an error
             ?: throw TemplatingNoContextFoundException(contextKey)
         // If the value is a project entity, we may find a specialized renderer
-        val text = if (contextValue is ProjectEntity) {
+        return if (contextValue is ProjectEntity) {
             renderEntity(
                 entity = contextValue,
                 field = field,
@@ -115,12 +157,6 @@ class TemplatingServiceImpl(
         // Formatting error
         else {
             throw TemplatingConfiguredLiteralException(contextKey)
-        }
-        // Filtering
-        return if (filter.isNullOrBlank()) {
-            text
-        } else {
-            applyFilter(filter, text)
         }
     }
 

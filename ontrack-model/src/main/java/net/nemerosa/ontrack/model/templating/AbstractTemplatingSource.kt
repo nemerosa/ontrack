@@ -18,7 +18,4 @@ abstract class AbstractTemplatingSource(
     override fun validFor(projectEntityType: ProjectEntityType): Boolean =
         projectEntityType in types
 
-    protected fun Map<String, String>.getRequiredParam(key: String) =
-        this[key] ?: throw TemplatingMissingConfigParam(key)
-
 }

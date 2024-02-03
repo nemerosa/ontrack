@@ -16,6 +16,14 @@ class TemplatingExpressionFormatException(expression: String) : TemplatingExcept
     """Templating expression is malformed: $expression"""
 )
 
+class TemplatingMissingFunctionException : TemplatingException(
+    """Templating function is expected after #"""
+)
+
+class TemplatingFunctionNotFoundException(function: String) : TemplatingException(
+    """Templating function not found: $function"""
+)
+
 class TemplatingEntityNameHavingConfigException : TemplatingException(
     """Templating refers to a project entity name. No config is expected in this case."""
 )

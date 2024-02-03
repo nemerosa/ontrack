@@ -15,5 +15,16 @@ interface EventRenderer {
 
     fun render(valueKey: String, value: NameValue, event: Event): String
 
-    fun renderLink(text: NameValue, link: NameValue, event: Event): String
+    @Deprecated("Will be removed in V5. Use renderLink witn strings and without event.")
+    fun renderLink(text: NameValue, link: NameValue, event: Event): String =
+        renderLink(text.value, link.value)
+
+    /**
+     * Renders a link.
+     *
+     * @param text Text for the link
+     * @param href Address for the link
+     * @return A valid link for this renderer
+     */
+    fun renderLink(text: String, href: String): String
 }

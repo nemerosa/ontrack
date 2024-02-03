@@ -32,6 +32,7 @@ class EventTemplatingServiceImplTest {
         templatingService = TemplatingServiceImpl(
             templatingSources = emptyList(),
             templatingFilters = emptyList(),
+            templatingFunctions = emptyList(),
             ontrackConfigProperties = OntrackConfigProperties(),
         )
         eventTemplatingService = EventTemplatingServiceImpl(

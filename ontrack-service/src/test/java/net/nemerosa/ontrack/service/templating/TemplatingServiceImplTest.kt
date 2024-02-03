@@ -1,12 +1,11 @@
 package net.nemerosa.ontrack.service.templating
 
 import net.nemerosa.ontrack.model.events.EventRenderer
+import net.nemerosa.ontrack.model.events.HtmlNotificationEventRenderer
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
-import net.nemerosa.ontrack.model.templating.AbstractTemplatingSource
-import net.nemerosa.ontrack.model.templating.TemplatingFilter
-import net.nemerosa.ontrack.model.templating.TemplatingService
+import net.nemerosa.ontrack.model.templating.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -16,9 +15,13 @@ import kotlin.test.assertTrue
 class TemplatingServiceImplTest {
 
     private lateinit var templatingService: TemplatingService
+    private lateinit var ontrackConfigProperties: OntrackConfigProperties
 
     @BeforeEach
     fun init() {
+
+        ontrackConfigProperties = OntrackConfigProperties()
+        ontrackConfigProperties.templating.errors = OntrackConfigProperties.TemplatingErrors.MESSAGE
 
         val scmBranchSource = object : AbstractTemplatingSource(
             field = "scmBranch",
@@ -41,8 +44,8 @@ class TemplatingServiceImplTest {
                 configMap: Map<String, String>,
                 renderer: EventRenderer
             ): String {
-                val name = configMap.getRequiredParam("name")
-                val organization = configMap.getRequiredParam("org")
+                val name = configMap.getRequiredTemplatingParam("name")
+                val organization = configMap.getRequiredTemplatingParam("org")
                 return "https://github.com/$organization/$name"
             }
         }
@@ -61,10 +64,15 @@ class TemplatingServiceImplTest {
             uppercaseTemplatingFilter,
         )
 
+        val templatingFunctions = listOf<TemplatingFunction>(
+            LinkTemplatingFunction(),
+        )
+
         templatingService = TemplatingServiceImpl(
             templatingSources = templatingSources,
             templatingFilters = templatingFilters,
-            ontrackConfigProperties = OntrackConfigProperties(),
+            templatingFunctions = templatingFunctions,
+            ontrackConfigProperties = ontrackConfigProperties,
         )
     }
 
@@ -72,9 +80,15 @@ class TemplatingServiceImplTest {
     fun `Checking the legacy templates`() {
         assertFalse(templatingService.isLegacyTemplate("No expression at all."), "Plain text")
         assertTrue(templatingService.isLegacyTemplate("Getting a {branch} name the old way."), "Legacy")
-        assertTrue(templatingService.isLegacyTemplate("Getting a {branch|uppercase} name the old way."), "Legacy with filter")
+        assertTrue(
+            templatingService.isLegacyTemplate("Getting a {branch|uppercase} name the old way."),
+            "Legacy with filter"
+        )
         assertFalse(templatingService.isLegacyTemplate("Getting a ${'$'}{branch} name the new way."), "New templating")
-        assertFalse(templatingService.isLegacyTemplate("Getting a ${'$'}{branch} name the new way and left over {branch}."), "New templating mixed")
+        assertFalse(
+            templatingService.isLegacyTemplate("Getting a ${'$'}{branch} name the new way and left over {branch}."),
+            "New templating mixed"
+        )
     }
 
     @Test
@@ -95,6 +109,46 @@ class TemplatingServiceImplTest {
             """
                 Branch ${branch.name} has been created
                 in project ${branch.project.name}.
+            """.trimIndent(),
+            text
+        )
+    }
+
+    @Test
+    fun `Rendering links for HTML`() {
+        val text = templatingService.render(
+            template = """
+                Link to ${'$'}{#.link?href=LINK_HREF&text=LINK_TEXT}.
+            """.trimIndent(),
+            context = mapOf(
+                "LINK_TEXT" to "Ontrack",
+                "LINK_HREF" to "https://nemerosa.github.io/ontrack",
+            ),
+            renderer = HtmlNotificationEventRenderer(ontrackConfigProperties)
+        )
+        assertEquals(
+            """
+                Link to <a href="https://nemerosa.github.io/ontrack">Ontrack</a>.
+            """.trimIndent(),
+            text
+        )
+    }
+
+    @Test
+    fun `Rendering links for text`() {
+        val text = templatingService.render(
+            template = """
+                Link to ${'$'}{#.link?href=LINK_HREF&text=LINK_TEXT}.
+            """.trimIndent(),
+            context = mapOf(
+                "LINK_TEXT" to "Ontrack",
+                "LINK_HREF" to "https://nemerosa.github.io/ontrack",
+            ),
+            renderer = PlainEventRenderer.INSTANCE
+        )
+        assertEquals(
+            """
+                Link to Ontrack.
             """.trimIndent(),
             text
         )
