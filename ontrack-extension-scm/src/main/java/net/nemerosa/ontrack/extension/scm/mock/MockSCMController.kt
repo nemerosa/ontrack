@@ -29,6 +29,25 @@ class MockSCMController(
     }
 
     /**
+     * Registers an issue in the associated mock issue service
+     */
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    @PostMapping("/issue")
+    fun registerIssue(@RequestBody registration: IssueRegistration) {
+        mockSCMExtension.repository(registration.name)
+            .registerIssue(registration.key, registration.message)
+    }
+
+    /**
+     * Registers a commit in the repository for a given branch
+     */
+    @PostMapping("/commit")
+    fun registerCommit(@RequestBody registration: CommitRegistration) = CommitResponse(
+        commitId = mockSCMExtension.repository(registration.name)
+            .registerCommit(registration.scmBranch, registration.message)
+    )
+
+    /**
      * Gets a file content for a branch
      */
     @GetMapping("/file")
@@ -73,6 +92,22 @@ class MockSCMController(
 
     data class FileContent(
         val text: String,
+    )
+
+    data class IssueRegistration(
+        val name: String,
+        val key: String,
+        val message: String,
+    )
+
+    data class CommitRegistration(
+        val name: String,
+        val scmBranch: String,
+        val message: String,
+    )
+
+    data class CommitResponse(
+        val commitId: String,
     )
 
 }

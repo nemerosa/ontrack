@@ -55,9 +55,26 @@ class MockSCMExtension(
         val name: String,
     ) {
 
+        private val issues = mutableMapOf<String, MockIssue>()
+
+        private val commits = mutableMapOf<String, MutableList<MockCommit>>()
+
         private val files = mutableMapOf<String, MutableMap<String, String>>()
         private val createdBranches = mutableMapOf<String, String>()
         private val createdPullRequests = mutableListOf<MockPullRequest>()
+
+        fun registerIssue(key: String, message: String) {
+            issues[key] = MockIssue(key, message)
+        }
+
+        fun registerCommit(scmBranch: String, message: String): String {
+            val list = commits.getOrPut(scmBranch) {
+                mutableListOf()
+            }
+            val id = (list.size + 1).toString()
+            list += MockCommit(id = id, message = message)
+            return id
+        }
 
         fun registerFile(scmBranch: String, path: String, content: String) {
             val branch = files.getOrPut(scmBranch) {

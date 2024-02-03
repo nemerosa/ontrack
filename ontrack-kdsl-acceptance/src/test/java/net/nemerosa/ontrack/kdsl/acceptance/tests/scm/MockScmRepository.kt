@@ -59,6 +59,7 @@ class MockScmRepositoryContext(
         ontrack.connector.post(
             "/extension/scm/mock/issue",
             body = mapOf(
+                "name" to repository,
                 "key" to key,
                 "message" to message,
             )
@@ -68,13 +69,18 @@ class MockScmRepositoryContext(
     /**
      * Registering a commit in the repository
      */
-    private fun repositoryCommit(message: String): String {
+    private fun repositoryCommit(
+        message: String,
+        branch: String = "main",
+    ): String {
         return ontrack.connector.post(
             "/extension/scm/mock/commit",
             body = mapOf(
+                "name" to repository,
+                "scmBranch" to branch,
                 "message" to message,
             )
-        ).body.asJson().path("commit").asText()
+        ).body.asJson().path("commitId").asText()
     }
 
     /**
