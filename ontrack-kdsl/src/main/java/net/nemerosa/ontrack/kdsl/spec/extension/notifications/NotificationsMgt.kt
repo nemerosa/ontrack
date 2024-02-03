@@ -22,6 +22,7 @@ class NotificationsMgt(connector: Connector) : Connected(connector) {
      * @param keywords Space-separated list of keywords to filter the events
      * @param events Events to listen to
      * @param projectEntity Entity to listen to (null for global subscriptions)
+     * @param contentTemplate Custom template for the event
      */
     fun subscribe(
         channel: String,
@@ -29,6 +30,7 @@ class NotificationsMgt(connector: Connector) : Connected(connector) {
         keywords: String?,
         events: List<String>,
         projectEntity: ProjectEntity?,
+        contentTemplate: String? = null,
     ) {
         if (projectEntity != null) {
             graphqlConnector.mutate(
@@ -38,7 +40,8 @@ class NotificationsMgt(connector: Connector) : Connected(connector) {
                     channel,
                     channelConfig.asJson(),
                     Input.optional(keywords),
-                    events
+                    events,
+                    Input.optional(contentTemplate),
                 )
             ) {
                 it?.subscribeToEvents()?.fragments()?.payloadUserErrors()?.convert()

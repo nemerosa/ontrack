@@ -4,8 +4,10 @@ import net.nemerosa.ontrack.kdsl.acceptance.tests.ACCProperties
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
 import net.nemerosa.ontrack.kdsl.connector.parse
 import net.nemerosa.ontrack.kdsl.spec.Branch
+import net.nemerosa.ontrack.kdsl.spec.Build
 import net.nemerosa.ontrack.kdsl.spec.Ontrack
 import net.nemerosa.ontrack.kdsl.spec.Project
+import net.nemerosa.ontrack.kdsl.spec.extension.git.gitCommitProperty
 import net.nemerosa.ontrack.kdsl.spec.extension.scm.mockScmBranchProperty
 import net.nemerosa.ontrack.kdsl.spec.extension.scm.mockScmProjectProperty
 import org.springframework.web.client.HttpClientErrorException.NotFound
@@ -48,6 +50,41 @@ class MockScmRepositoryContext(
                 "content" to content(),
             )
         )
+    }
+
+    /**
+     * Declaring a new issue in the linked mock issue service.
+     */
+    fun repositoryIssue(key: String, message: String) {
+        ontrack.connector.post(
+            "/extension/scm/mock/issue",
+            body = mapOf(
+                "key" to key,
+                "message" to message,
+            )
+        )
+    }
+
+    /**
+     * Registering a commit in the repository
+     */
+    private fun repositoryCommit(message: String): String {
+        return ontrack.connector.post(
+            "/extension/scm/mock/commit",
+            body = mapOf(
+                "message" to message,
+            )
+        ).body.asJson().path("commit").asText()
+    }
+
+    /**
+     * Registering a commit in the repository and declaring it for the current build.
+     */
+    fun Build.withRepositoryCommit(message: String) {
+        // Declaring the commit first
+        val commitId = repositoryCommit(message)
+        // Setting the Git commit property for this build
+        gitCommitProperty = commitId
     }
 
     fun Project.configuredForMockScm() {
