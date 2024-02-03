@@ -145,4 +145,73 @@ class ACCAutoVersioningConfigNotifications : AbstractACCAutoVersioningTestSuppor
         }
     }
 
+    @Test
+    fun `Auto versioning notification for success with a custom template`() {
+        val projectGroup = uid("tar-g-")
+        withMockScmRepository(ontrack) {
+            withAutoVersioning {
+                repositoryFile("gradle.properties") {
+                    "some-version = 1.0.0"
+                }
+                val dependency = branchWithPromotion(promotion = "IRON")
+
+                project {
+
+                    branch {
+                        configuredForMockRepository()
+                        setAutoVersioningConfig(
+                            listOf(
+                                AutoVersioningSourceConfig(
+                                    sourceProject = dependency.project.name,
+                                    sourceBranch = dependency.name,
+                                    sourcePromotion = "IRON",
+                                    targetPath = "gradle.properties",
+                                    targetProperty = "some-version",
+                                    notifications = listOf(
+                                        AutoVersioningNotification(
+                                            channel = "in-memory",
+                                            config = mapOf("group" to projectGroup).asJson(),
+                                            scope = listOf(
+                                                AutoVersioningNotificationScope.SUCCESS
+                                            ),
+                                            notificationTemplate = """
+                                                Auto versioning of ${'$'}{project}/${'$'}{branch} for dependency ${'$'}{xProject} version "${'$'}{VERSION}" has been done.
+                                                
+                                                The change log will be here soon, based on the ${'$'}{PROMOTION} promotion.
+                                            """.trimIndent(),
+                                        )
+                                    )
+                                )
+                            )
+                        )
+
+                        dependency.apply {
+                            build(name = "2.0.0") {
+                                promote("IRON")
+                            }
+                        }
+
+                        waitForAutoVersioningCompletion()
+
+                        // Check a success notification has been received at target branch level
+                        waitUntil(
+                            timeout = 10_000,
+                            interval = 500L,
+                            task = "Success notification at target level",
+                            onTimeout = displayNotifications(projectGroup)
+                        ) {
+                            ontrack.notifications.inMemory.group(projectGroup).firstOrNull() ==
+                                    """
+                                        Auto versioning of ${project.name}/$name for dependency ${dependency.project.name} version "2.0.0" has been done.
+                                        
+                                        The change log will be here soon, based on the IRON promotion.
+                                    """.trimIndent()
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+
 }
