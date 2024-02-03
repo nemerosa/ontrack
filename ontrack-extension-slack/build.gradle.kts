@@ -6,7 +6,7 @@ plugins {
 
 apply<OntrackExtensionPlugin>()
 
-val slackVersion = "1.29.2"
+val slackVersion = "1.38.0"
 
 dependencies {
     api(project(":ontrack-extension-support"))
