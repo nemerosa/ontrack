@@ -11,7 +11,7 @@ class MockEventTemplatingService : EventTemplatingService {
 
     override fun renderEvent(event: Event, template: String?, renderer: EventRenderer): String =
         if (template.isNullOrBlank()) {
-            event.renderText()
+            event.eventType.template // Not rendering the template
         } else {
             template // Not rendering the template
         }

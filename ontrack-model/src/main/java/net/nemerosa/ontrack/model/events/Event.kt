@@ -33,11 +33,6 @@ class Event(
         extraEntities[entityType] as T ?: error("Missing extra entity X_$entityType in the event.")
 
     @Deprecated("Will be removed in 4.8")
-    fun renderText(): String {
-        return render(PlainEventRenderer.INSTANCE)
-    }
-
-    @Deprecated("Will be removed in 4.8")
     fun render(eventRenderer: EventRenderer): String {
         val m = EXPRESSION.matcher(eventType.template)
         val output = StringBuilder()
