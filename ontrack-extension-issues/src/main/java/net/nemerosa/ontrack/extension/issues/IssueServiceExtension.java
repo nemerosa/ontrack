@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.model.extension.Extension;
 import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.support.MessageAnnotator;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -41,7 +42,7 @@ public interface IssueServiceExtension extends Extension {
      * @param name Name of the configuration
      * @return Configuration or <code>null</code> if not found
      */
-    IssueServiceConfiguration getConfigurationByName(String name);
+    @Nullable IssueServiceConfiguration getConfigurationByName(@NotNull String name);
 
     /**
      * Checks if a token may represent a valid issue token.

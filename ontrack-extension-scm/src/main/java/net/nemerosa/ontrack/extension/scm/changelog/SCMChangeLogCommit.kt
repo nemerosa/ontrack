@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.scm.model
+package net.nemerosa.ontrack.extension.scm.changelog
 
 import java.time.LocalDateTime
 

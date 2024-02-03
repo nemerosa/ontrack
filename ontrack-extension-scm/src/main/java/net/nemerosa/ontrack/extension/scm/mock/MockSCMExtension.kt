@@ -1,17 +1,32 @@
 package net.nemerosa.ontrack.extension.scm.mock
 
 import net.nemerosa.ontrack.common.RunProfile
+import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest
+import net.nemerosa.ontrack.extension.issues.IssueServiceExtension
+import net.nemerosa.ontrack.extension.issues.export.ExportFormat
+import net.nemerosa.ontrack.extension.issues.export.ExportedIssues
+import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
+import net.nemerosa.ontrack.extension.issues.model.Issue
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
 import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
+import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogCommit
+import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogEnabled
 import net.nemerosa.ontrack.extension.scm.service.SCM
 import net.nemerosa.ontrack.extension.scm.service.SCMExtension
 import net.nemerosa.ontrack.extension.scm.service.SCMPath
 import net.nemerosa.ontrack.extension.scm.service.SCMPullRequest
 import net.nemerosa.ontrack.extension.support.AbstractExtension
+import net.nemerosa.ontrack.model.extension.ExtensionFeature
 import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.PropertyService
+import net.nemerosa.ontrack.model.support.MessageAnnotation.Companion.of
+import net.nemerosa.ontrack.model.support.MessageAnnotator
+import net.nemerosa.ontrack.model.support.RegexMessageAnnotator
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
+import java.util.*
 
 @Component
 @Profile(value = [RunProfile.DEV, RunProfile.ACC, RunProfile.UNIT_TEST])
@@ -64,7 +79,7 @@ class MockSCMExtension(
         private val createdPullRequests = mutableListOf<MockPullRequest>()
 
         fun registerIssue(key: String, message: String) {
-            issues[key] = MockIssue(key, message)
+            issues[key] = MockIssue(name, key, message)
         }
 
         fun registerCommit(scmBranch: String, message: String): String {
@@ -72,7 +87,11 @@ class MockSCMExtension(
                 mutableListOf()
             }
             val id = (list.size + 1).toString()
-            list += MockCommit(id = id, message = message)
+            list += MockCommit(
+                repository = name,
+                id = id,
+                message = message,
+            )
             return id
         }
 
@@ -134,11 +153,42 @@ class MockSCMExtension(
             MockBranch(it)
         }
 
+        fun findIssue(key: String) = issues[key]
+
+        fun getCommits(fromCommit: String, toCommit: String): List<SCMChangeLogCommit> {
+            val fromBranch = commits.entries.find { (_, commits) ->
+                commits.any { it.id == fromCommit }
+            }
+            val toBranch = commits.entries.find { (_, commits) ->
+                commits.any { it.id == toCommit }
+            }
+
+            if (fromBranch == null || toBranch == null) {
+                return emptyList()
+            } else if (fromBranch.key == toBranch.key) {
+                val allCommits = fromBranch.value
+                val indexFrom = allCommits.indexOfFirst { it.id == fromCommit }
+                val indexTo = allCommits.indexOfFirst { it.id == toCommit }
+                val lowIndex = minOf(indexFrom, indexTo)
+                val highIndex = maxOf(indexFrom, indexTo)
+                return if (lowIndex == highIndex) {
+                    emptyList()
+                } else {
+                    allCommits.subList(
+                        lowIndex + 1, // We don't want the first commit
+                        highIndex + 1, // We want the last commit
+                    ).reversed() // We want the commits from the most recent to the oldest
+                }
+            } else {
+                TODO("The Mock SCM does not support yet getting a change log between two branches")
+            }
+        }
+
     }
 
     private inner class MockSCM(
         private val mockScmProjectProperty: MockSCMProjectProperty,
-    ) : SCM {
+    ) : SCM, SCMChangeLogEnabled {
 
         override val type: String = "mock"
         override val engine: String = "mock"
@@ -182,5 +232,100 @@ class MockSCMExtension(
 
         override fun getDiffLink(commitFrom: String, commitTo: String): String? =
             "diff?from=$commitFrom&to=$commitTo"
+
+        override fun getBuildCommit(build: Build): String? =
+            propertyService.getPropertyValue(build, MockSCMBuildCommitPropertyType::class.java)?.id
+
+        override suspend fun getCommits(fromCommit: String, toCommit: String): List<SCMChangeLogCommit> =
+            repository(mockScmProjectProperty.name).getCommits(fromCommit, toCommit)
+
+        override fun getConfiguredIssueService(): ConfiguredIssueService =
+            ConfiguredIssueService(
+                MockIssueServiceExtension(repository),
+                MockIssueServiceConfiguration.INSTANCE,
+            )
+    }
+
+    class MockIssueServiceConfiguration : IssueServiceConfiguration {
+        override val serviceId: String = "mock"
+        override val name: String = "mock"
+
+        companion object {
+            val INSTANCE = MockIssueServiceConfiguration()
+        }
+    }
+
+    inner class MockIssueServiceExtension(
+        private val repositoryName: String,
+    ) : IssueServiceExtension {
+
+        private val issuePattern = "([A-Z]+-\\d+)"
+        private val issueRegex = issuePattern.toRegex()
+
+        override fun getId(): String = "mock"
+
+        override fun getName(): String = "Mock issues"
+
+        override fun getConfigurationList(): List<IssueServiceConfiguration> = emptyList()
+
+        override fun getConfigurationByName(name: String): IssueServiceConfiguration? = null
+
+        override fun validIssueToken(token: String?): Boolean = true // Anything goes
+
+        override fun extractIssueKeysFromMessage(
+            issueServiceConfiguration: IssueServiceConfiguration,
+            message: String,
+        ): Set<String> =
+            issueRegex.findAll(message).map { m ->
+                m.groupValues[1]
+            }.toSet()
+
+        override fun getMessageAnnotator(issueServiceConfiguration: IssueServiceConfiguration?): Optional<MessageAnnotator> {
+            return Optional.of(
+                RegexMessageAnnotator(issuePattern) { key: String? ->
+                    of("a")
+                        .attr("href", "mock://$name/issue/$key")
+                        .text(key)
+                }
+            )
+        }
+
+        override fun getLinkForAllIssues(
+            issueServiceConfiguration: IssueServiceConfiguration?,
+            issues: MutableList<Issue>?
+        ): String {
+            TODO("Not yet implemented")
+        }
+
+        override fun getIssue(issueServiceConfiguration: IssueServiceConfiguration, issueKey: String): Issue? =
+            repository(repositoryName).findIssue(issueKey)
+
+        @Deprecated("Will be removed in V5. Deprecated in Java")
+        override fun exportFormats(issueServiceConfiguration: IssueServiceConfiguration?): MutableList<ExportFormat> {
+            TODO("Not yet implemented")
+        }
+
+        override fun exportIssues(
+            issueServiceConfiguration: IssueServiceConfiguration?,
+            issues: MutableList<out Issue>?,
+            request: IssueChangeLogExportRequest?
+        ): ExportedIssues {
+            TODO("Not yet implemented")
+        }
+
+        override fun getIssueId(
+            issueServiceConfiguration: IssueServiceConfiguration?,
+            token: String?
+        ): Optional<String> {
+            TODO("Not yet implemented")
+        }
+
+        override fun getMessageRegex(issueServiceConfiguration: IssueServiceConfiguration?, issue: Issue?): String {
+            TODO("Not yet implemented")
+        }
+
+        override val feature: ExtensionFeature
+            get() = TODO("Not yet implemented")
+
     }
 }

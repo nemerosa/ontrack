@@ -12,7 +12,9 @@ import java.util.stream.Collectors;
  * @param <S> Type of SCM data associated with the branch
  * @param <T> Type of SCM data associated with a build
  * @param <I> Type of issue associated with this change log
+ * @deprecated Use the new scm.SCMChangeLogService
  */
+@Deprecated
 public abstract class AbstractSCMChangeLogService<S, T, I extends SCMChangeLogIssue> {
 
     protected final StructureService structureService;
