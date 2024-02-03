@@ -47,7 +47,7 @@ class AutoVersioningConfigurationServiceImpl(
             channel = notification.channel,
             channelConfig = notification.config,
             disabled = false,
-            contentTemplate = null, // TODO #1168 Enrich the AV model with the possibility to add a config template
+            contentTemplate = notification.notificationTemplate,
             origin = AutoVersioningNotification.ORIGIN,
         )
     }

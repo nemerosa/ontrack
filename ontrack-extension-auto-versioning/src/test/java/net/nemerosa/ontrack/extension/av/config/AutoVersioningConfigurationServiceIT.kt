@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.av.config
 import net.nemerosa.ontrack.extension.av.AbstractAutoVersioningTestSupport
 import net.nemerosa.ontrack.extension.av.AutoVersioningTestFixtures
 import net.nemerosa.ontrack.extension.av.event.AutoVersioningEvents
-import net.nemerosa.ontrack.extension.av.setAutoVersioning
 import net.nemerosa.ontrack.extension.notifications.mock.MockNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.mock.MockNotificationChannelConfig
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscription
@@ -167,7 +166,8 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                                     channel = "mock",
                                     config = mapOf(
                                         "target" to target
-                                    ).asJson()
+                                    ).asJson(),
+                                    notificationTemplate = null,
                                 )
                             )
                         )
@@ -234,7 +234,8 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                                         ).asJson(),
                                         scope = listOf(
                                             AutoVersioningNotificationScope.SUCCESS
-                                        )
+                                        ),
+                                        notificationTemplate = null,
                                     )
                                 )
                             ),
@@ -249,7 +250,8 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                                         ).asJson(),
                                         scope = listOf(
                                             AutoVersioningNotificationScope.ERROR
-                                        )
+                                        ),
+                                        notificationTemplate = null,
                                     )
                                 )
                             )
@@ -313,7 +315,8 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                                         ).asJson(),
                                         scope = listOf(
                                             AutoVersioningNotificationScope.SUCCESS
-                                        )
+                                        ),
+                                        notificationTemplate = null,
                                     )
                                 )
                             ),
@@ -328,7 +331,8 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                                         ).asJson(),
                                         scope = listOf(
                                             AutoVersioningNotificationScope.ERROR
-                                        )
+                                        ),
+                                        notificationTemplate = null,
                                     )
                                 )
                             ),
@@ -344,7 +348,8 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                                         ).asJson(),
                                         scope = listOf(
                                             AutoVersioningNotificationScope.PR_TIMEOUT
-                                        )
+                                        ),
+                                        notificationTemplate = null,
                                     )
                                 )
                             ),
@@ -433,6 +438,7 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                                         config = mapOf(
                                             "target" to target
                                         ).asJson(),
+                                        notificationTemplate = null,
                                     )
                                 )
                             ),
@@ -488,6 +494,69 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
     }
 
     @Test
+    fun `Registering a notification with a custom template`() {
+        asAdmin {
+            val target = uid("t")
+            val source = project {
+                branch("main")
+            }
+            project {
+                branch {
+                    // Setting an AV configuration with notifications and custom template
+                    val config = AutoVersioningConfig(
+                        listOf(
+                            AutoVersioningTestFixtures.sourceConfig(
+                                sourceProject = source.name,
+                                sourceBranch = "main",
+                                notifications = listOf(
+                                    AutoVersioningNotification(
+                                        channel = "mock",
+                                        config = mapOf(
+                                            "target" to target
+                                        ).asJson(),
+                                        scope = listOf(AutoVersioningNotificationScope.SUCCESS),
+                                        notificationTemplate = """
+                                            My custom template.
+                                        """.trimIndent(),
+                                    )
+                                )
+                            )
+                        )
+                    )
+                    autoVersioningConfigurationService.setupAutoVersioning(this, config)
+
+                    // Checks the subscriptions
+                    val subscriptions = eventSubscriptionService.filterSubscriptions(
+                        EventSubscriptionFilter(
+                            entity = toProjectEntityID(),
+                            channel = "mock",
+                        )
+                    ).pageItems.map { it.data }
+                    assertEquals(
+                        listOf(
+                            EventSubscription(
+                                projectEntity = this,
+                                events = setOf(
+                                    "auto-versioning-success",
+                                ),
+                                keywords = "${source.name} ${project.name} $name",
+                                channel = "mock",
+                                channelConfig = mapOf(
+                                    "target" to target,
+                                ).asJson(),
+                                disabled = false,
+                                origin = "auto-versioning",
+                                contentTemplate = "My custom template.",
+                            )
+                        ),
+                        subscriptions
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Registering notifications keeps non AV notifications`() {
         asAdmin {
             val target = uid("t")
@@ -517,7 +586,8 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                                         channel = "mock",
                                         config = mapOf(
                                             "target" to target
-                                        ).asJson()
+                                        ).asJson(),
+                                        notificationTemplate = null,
                                     )
                                 )
                             )
