@@ -23,7 +23,7 @@ class MockSCMTester(
     }
 
     inner class MockSCMRepositoryContext(
-        private val repositoryName: String,
+        val repositoryName: String,
     ) {
 
         private fun Project.configureMockSCMProject() {
