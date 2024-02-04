@@ -29,7 +29,7 @@ class ACCChangeLogNotifications : AbstractACCDSLNotificationsTestSupport() {
                         contentTemplate = """
                             Version ${'$'}{build.release} has been released.
                             
-                            ${'$'}{promotionRun.changeLog?format=text}
+                            ${'$'}{promotionRun.changelog}
                         """.trimIndent()
                     )
 
@@ -45,7 +45,7 @@ class ACCChangeLogNotifications : AbstractACCDSLNotificationsTestSupport() {
                     }
                     build {
                         repositoryIssue("ISS-21", "Some new feature")
-                        withRepositoryCommit("ISS-21 Some commits for a feature")
+                        withRepositoryCommit("ISS-21 Some commits for a feature", property = false)
                         withRepositoryCommit("ISS-21 Some fixes for a feature")
                     }
                     build {
@@ -57,11 +57,12 @@ class ACCChangeLogNotifications : AbstractACCDSLNotificationsTestSupport() {
                         repositoryIssue("ISS-23", "Some nicer UI")
                         withRepositoryCommit("ISS-23 Fixing some CSS")
 
-                        val run = promote(pl.name)
+                        promote(pl.name)
 
                         waitUntil(
                             timeout = 30_000,
                             interval = 500L,
+                            task = "Waiting for the two notifications"
                         ) {
                             // Two promotions have been done!
                             ontrack.notifications.inMemory.group(group).size == 2
@@ -73,9 +74,9 @@ class ACCChangeLogNotifications : AbstractACCDSLNotificationsTestSupport() {
                             """
                                 Version 1.2.0 has been released.
                                 
-                                * ISS-23 Some nicer UI
-                                * ISS-22 Some fixes are needed
                                 * ISS-21 Some new feature
+                                * ISS-22 Some fixes are needed
+                                * ISS-23 Some nicer UI
                             """.trimIndent(),
                             message
                         )
@@ -83,11 +84,6 @@ class ACCChangeLogNotifications : AbstractACCDSLNotificationsTestSupport() {
                 }
             }
         }
-    }
-
-    @Test
-    fun `Sending a recursive change log on a promotion run`() {
-        TODO()
     }
 
 }
