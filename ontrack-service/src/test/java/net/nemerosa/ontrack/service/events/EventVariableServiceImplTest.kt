@@ -70,8 +70,8 @@ class EventVariableServiceImplTest {
         // Checks all parameters
         assertEquals(
             mapOf(
-                "x_project" to branch.project,
-                "x_branch" to branch,
+                "xProject" to branch.project,
+                "xBranch" to branch,
             ),
             context
         )

@@ -100,6 +100,7 @@ class Event(
 
         fun withExtra(entity: ProjectEntity): EventBuilder {
             extraEntities[entity.projectEntityType] = entity
+            extraEntities[ProjectEntityType.PROJECT] = entity.project
             return this
         }
 
