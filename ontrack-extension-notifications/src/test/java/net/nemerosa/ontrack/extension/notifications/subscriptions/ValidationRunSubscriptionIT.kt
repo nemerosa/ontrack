@@ -45,7 +45,7 @@ class ValidationRunSubscriptionIT : AbstractNotificationTestSupport() {
                         assertNotNull(mockNotificationChannel.messages[target], "Message received") { messages ->
                             assertEquals(1, messages.size, "One message received")
                             assertEquals(
-                                    "Build $name has run for ${vsb.name} with status Failed in branch ${branch.name} in ${project.name}.",
+                                    "Build $name has run for the ${vsb.name} with status Failed in branch ${branch.name} in ${project.name}.",
                                     messages.first()
                             )
                         }

@@ -35,7 +35,7 @@ class EventTemplatingServiceIT : AbstractDSLTestSupport() {
                             template = """
                                 Build ${'$'}{build} on branch ${'$'}{branch}
                                 of project ${'$'}{project} has been promoted to
-                                ${'$'}{promotion|uppercase}.
+                                ${'$'}{promotionLevel|uppercase}.
                             """.trimIndent(),
                             event = event,
                             renderer = PlainEventRenderer()

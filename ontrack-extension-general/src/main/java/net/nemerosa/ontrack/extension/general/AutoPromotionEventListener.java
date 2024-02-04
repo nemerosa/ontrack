@@ -46,7 +46,7 @@ public class AutoPromotionEventListener implements EventListener {
 
     private void onDeleteValidationStamp(Event event) {
         // Gets the validation stamp ID
-        int validationStampId = event.getIntValue("validation_stamp_id");
+        int validationStampId = event.getIntValue("VALIDATION_STAMP_ID");
         // Branch
         Branch branch = event.getEntity(ProjectEntityType.BRANCH);
         // Gets all promotion levels for this branch
@@ -57,7 +57,7 @@ public class AutoPromotionEventListener implements EventListener {
 
     private void onDeletePromotionLevel(Event event) {
         // Gets the promotion level ID
-        int promotionLevelId = event.getIntValue("promotion_level_id");
+        int promotionLevelId = event.getIntValue("PROMOTION_LEVEL_ID");
         // Branch
         Branch branch = event.getEntity(ProjectEntityType.BRANCH);
         // Gets all promotion levels for this branch
