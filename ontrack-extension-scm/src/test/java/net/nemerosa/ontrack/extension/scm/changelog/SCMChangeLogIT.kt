@@ -68,7 +68,7 @@ class SCMChangeLogIT : AbstractDSLTestSupport() {
                                     "ISS-22" to "Some fixes are needed",
                                     "ISS-23" to "Some nicer UI",
                                 ),
-                                changeLog.issues.map { it.displayKey to it.summary },
+                                changeLog.issues?.issues?.map { it.displayKey to it.summary },
                                 "Change log issues"
                             )
 

@@ -7,5 +7,5 @@ data class SCMChangeLog(
     val from: Build,
     val to: Build,
     val commits: List<SCMChangeLogCommit>,
-    val issues: List<Issue>,
+    val issues: SCMChangeLogIssues?,
 )

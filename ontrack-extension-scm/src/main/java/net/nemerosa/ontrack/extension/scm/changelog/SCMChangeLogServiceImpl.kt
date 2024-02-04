@@ -35,7 +35,7 @@ class SCMChangeLogServiceImpl(
 
         // Getting the issue service
         val configuredIssueService: ConfiguredIssueService? = scm.getConfiguredIssueService()
-        val issues = if (configuredIssueService != null) {
+        val issuesChangeLog: SCMChangeLogIssues? = if (configuredIssueService != null) {
             // Index of issues
             val index = mutableMapOf<String, Issue>()
             // For all commits in this commit log
@@ -52,9 +52,14 @@ class SCMChangeLogServiceImpl(
                 }
             }
             // OK
-            index.values.sortedBy { it.key }
+            val issues = index.values.sortedBy { it.key }
+            val issueServiceConfiguration = configuredIssueService.issueServiceConfigurationRepresentation
+            SCMChangeLogIssues(
+                issueServiceConfiguration,
+                issues
+            )
         } else {
-            emptyList()
+            null
         }
 
         // OK
@@ -62,7 +67,7 @@ class SCMChangeLogServiceImpl(
             from = from,
             to = to,
             commits = commits,
-            issues = issues,
+            issues = issuesChangeLog,
         )
     }
 
