@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @deprecated Use the templating service.
+ * @deprecated Will be removed in V5. Use the templating service.
  */
 @Deprecated
 public interface IssueExportService {
