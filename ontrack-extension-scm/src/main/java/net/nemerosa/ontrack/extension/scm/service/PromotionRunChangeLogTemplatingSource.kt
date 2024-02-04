@@ -5,9 +5,13 @@ import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLog
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogService
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.events.EventRenderer
-import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.ProjectEntity
+import net.nemerosa.ontrack.model.structure.ProjectEntityType
+import net.nemerosa.ontrack.model.structure.PromotionRun
 import net.nemerosa.ontrack.model.templating.AbstractTemplatingSource
 import net.nemerosa.ontrack.model.templating.getBooleanTemplatingParam
+import net.nemerosa.ontrack.model.templating.getListStringsTemplatingParam
 import org.springframework.stereotype.Component
 
 @Component
@@ -22,6 +26,8 @@ class PromotionRunChangeLogTemplatingSource(
     override fun render(entity: ProjectEntity, configMap: Map<String, String>, renderer: EventRenderer): String =
         if (entity is PromotionRun) {
             val useProject = configMap.getBooleanTemplatingParam("useProject", true)
+            val projects = configMap.getListStringsTemplatingParam("project") ?: emptyList()
+
             // First boundary is the build being promoted
             val toBuild = entity.build
             // We now need to look for the previous promotion, on the same branch first
@@ -36,22 +42,18 @@ class PromotionRunChangeLogTemplatingSource(
             }
             // We now have two boundaries
             else {
-                val project = configMap["project"]
-                // We carry on getting the change log for THIS project
-                if (project.isNullOrBlank()) {
-                    // Getting the change log
-                    val changeLog = runBlocking {
-                        scmChangeLogService.getChangeLog(
-                            from = fromBuild,
-                            to = toBuild
+                // ... getting the change log, recursively or not
+                runBlocking {
+                    scmChangeLogService.getChangeLog(
+                        fromBuild,
+                        toBuild,
+                        projects,
+                    )?.let { scmChangeLog ->
+                        renderChangeLog(
+                            changeLog = scmChangeLog,
+                            renderer = renderer
                         )
-                    }
-                    // Rendering it
-                    renderChangeLog(changeLog, renderer)
-                }
-                // We need to get a recursive change log
-                else {
-                    TODO("Recursive change log")
+                    } ?: ""
                 }
             }
         } else {

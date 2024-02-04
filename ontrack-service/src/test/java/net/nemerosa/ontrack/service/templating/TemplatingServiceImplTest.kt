@@ -35,6 +35,20 @@ class TemplatingServiceImplTest {
                 "feature/${entity.displayName}"
         }
 
+        val listProjectSource = object : AbstractTemplatingSource(
+            field = "list",
+            type = ProjectEntityType.PROJECT
+        ) {
+            override fun render(
+                entity: ProjectEntity,
+                configMap: Map<String, String>,
+                renderer: EventRenderer
+            ): String {
+                val list = configMap.getListStringsTemplatingParam("projects") ?: emptyList()
+                return renderer.renderList(list)
+            }
+        }
+
         val repositorySource = object : AbstractTemplatingSource(
             field = "repository",
             type = ProjectEntityType.PROJECT
@@ -52,6 +66,7 @@ class TemplatingServiceImplTest {
 
         val templatingSources = listOf(
             scmBranchSource,
+            listProjectSource,
             repositorySource,
         )
 
@@ -88,6 +103,32 @@ class TemplatingServiceImplTest {
         assertFalse(
             templatingService.isLegacyTemplate("Getting a ${'$'}{branch} name the new way and left over {branch}."),
             "New templating mixed"
+        )
+    }
+
+    @Test
+    fun `Using list of strings as config parameters for a source`() {
+        val project = ProjectFixtures.testProject()
+        val text = templatingService.render(
+            template = """
+                List:
+                
+                ${'$'}{project.list?projects=one,two,three}
+            """.trimIndent(),
+            context = mapOf(
+                "project" to project,
+            ),
+            renderer = PlainEventRenderer()
+        )
+        assertEquals(
+            """
+                List:
+                
+                * one
+                * two
+                * three
+            """.trimIndent(),
+            text
         )
     }
 

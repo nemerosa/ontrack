@@ -92,7 +92,7 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
 
     @Test
     fun `Getting a recursive change log in a template`() {
-        prepareTest { fromBuild, run, repositoryName ->
+        prepareTest { fromBuild, run, _ ->
             project {
                 branch {
                     val pl = promotionLevel()
@@ -123,14 +123,67 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
                         // OK
                         assertEquals(
                             """
-                                Version ${run.project.name} ${run.build.name} has been released.
-                                
                                 * ISS-21 Some new feature
                                 * ISS-22 Some fixes are needed
                                 * ISS-23 Some nicer UI
                             """.trimIndent(),
                             text,
                         )
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Getting a deep recursive change log in a template`() {
+        prepareTest { fromBuild, run, _ ->
+            project {
+                val one = this
+                branch {
+                    val oneFrom = build {
+                        linkTo(fromBuild)
+                    }
+                    val oneTo = build {
+                        linkTo(run.build)
+                    }
+
+                    project {
+                        branch {
+                            val pl = promotionLevel()
+                            build {
+                                linkTo(oneFrom)
+                                promote(pl)
+                            }
+                            build {
+                                linkTo(oneTo)
+                                val topRun = promote(pl)
+
+                                val event = eventFactory.newPromotionRun(topRun)
+
+                                // Template
+                                val template = """
+                                    ${'$'}{promotionRun.changelog?project=${one.project.name},${run.project.name}}
+                                """.trimIndent()
+
+                                // Rendering
+                                val text = eventTemplatingService.render(
+                                    template = template,
+                                    event = event,
+                                    renderer = PlainEventRenderer.INSTANCE
+                                )
+
+                                // OK
+                                assertEquals(
+                                    """
+                                        * ISS-21 Some new feature
+                                        * ISS-22 Some fixes are needed
+                                        * ISS-23 Some nicer UI
+                                    """.trimIndent(),
+                                    text,
+                                )
+                            }
+                        }
                     }
                 }
             }

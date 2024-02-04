@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
+import kotlin.test.fail
 
 class SCMChangeLogIT : AbstractDSLTestSupport() {
 
@@ -47,7 +48,7 @@ class SCMChangeLogIT : AbstractDSLTestSupport() {
                                     from = from,
                                     to = this@build,
                                 )
-                            }
+                            } ?: fail("Could not get a change log")
 
                             // Checking the commits
                             assertEquals(

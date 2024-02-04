@@ -12,8 +12,13 @@ interface SCMChangeLogService {
      *
      * @param from Build boundary
      * @param to Build boundary
-     * @return Change log containing the commits and the issues
+     * @param projects List of projects to follow to get a recursive change log
+     * @return Change log containing the commits and the issues or `null` if the change is empty
      */
-    suspend fun getChangeLog(from: Build, to: Build): SCMChangeLog
+    suspend fun getChangeLog(
+        from: Build,
+        to: Build,
+        projects: List<String> = emptyList(),
+    ): SCMChangeLog?
 
 }
