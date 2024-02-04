@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
-// TODO Testing with Markdown renderer
 // TODO Testing with dependency change log
 // TODO useProject config parameter to get change logs across branches
 
@@ -25,6 +24,9 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var htmlNotificationEventRenderer: HtmlNotificationEventRenderer
+
+    @Autowired
+    private lateinit var markdownEventRenderer: MarkdownEventRenderer
 
     @Test
     fun `Getting a plain text change log in a template`() {
@@ -64,6 +66,26 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
                     <li><a href="mock://${repositoryName}/issue/ISS-22">ISS-22</a> Some fixes are needed</li>
                     <li><a href="mock://${repositoryName}/issue/ISS-23">ISS-23</a> Some nicer UI</li>
                 </ul>
+            """.trimIndent()
+        }
+    }
+
+    @Test
+    fun `Getting a Markdown change log in a template`() {
+        doTestRendering(
+            renderer = markdownEventRenderer,
+            template = """
+                # Version ${'$'}{project} ${'$'}{build} has been released
+                
+                ${'$'}{promotionRun.changelog}
+            """.trimIndent(),
+        ) { run, repositoryName ->
+            """
+                # Version [${run.project.name}](http://localhost:8080/#/project/${run.project.id}) [${run.build.name}](http://localhost:8080/#/build/${run.build.id}) has been released
+            
+                * [ISS-21](mock://${repositoryName}/issue/ISS-21) Some new feature
+                * [ISS-22](mock://${repositoryName}/issue/ISS-22) Some fixes are needed
+                * [ISS-23](mock://${repositoryName}/issue/ISS-23) Some nicer UI
             """.trimIndent()
         }
     }
