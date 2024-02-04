@@ -6,6 +6,7 @@ import java.time.LocalDateTime
 
 data class MockCommit(
     val repository: String,
+    val revision: Long,
     override val id: String,
     override val message: String,
 ) : SCMChangeLogCommit {

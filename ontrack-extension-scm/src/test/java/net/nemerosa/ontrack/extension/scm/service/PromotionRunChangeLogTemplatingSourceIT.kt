@@ -5,11 +5,13 @@ import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.events.*
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.PromotionRun
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties
+import net.nemerosa.ontrack.test.TestUtils.uid
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
-
-// TODO useProject config parameter to get change logs across branches
 
 class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
 
@@ -27,6 +29,16 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var markdownEventRenderer: MarkdownEventRenderer
+
+    @BeforeEach
+    fun init() {
+        ontrackConfigProperties.templating.errors = OntrackConfigProperties.TemplatingErrors.MESSAGE
+    }
+
+    @AfterEach
+    fun tearDown() {
+        ontrackConfigProperties.templating.errors = OntrackConfigProperties.TemplatingErrors.IGNORE
+    }
 
     @Test
     fun `Getting a plain text change log in a template`() {
@@ -183,6 +195,99 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
                                     text,
                                 )
                             }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Getting change log across branches is implemented by default`() {
+        doTestAcrossBranches(
+            template = """
+                ${'$'}{promotionRun.changelog}
+            """.trimIndent(),
+            expectedText = """
+                * ISS-21 Some new feature
+                * ISS-22 Some fixes are needed
+                * ISS-23 Some nicer UI
+            """.trimIndent(),
+        )
+    }
+
+    @Test
+    fun `Getting change log across branches can be disabled`() {
+        doTestAcrossBranches(
+            template = """
+                ${'$'}{promotionRun.changelog?acrossBranches=false}
+            """.trimIndent(),
+            expectedText = "",
+        )
+    }
+
+    @Test
+    fun `Empty change log can have a default value if not available`() {
+        doTestAcrossBranches(
+            template = """
+                ${'$'}{promotionRun.changelog?acrossBranches=false&empty=No change log is available.}
+            """.trimIndent(),
+            expectedText = "No change log is available.",
+        )
+    }
+
+    private fun doTestAcrossBranches(
+        template: String,
+        expectedText: String,
+    ) {
+        asAdmin {
+            mockSCMTester.withMockSCMRepository {
+                project {
+                    val plName = uid("pl-")
+                    branch {
+                        configureMockSCMBranch("release/1.26")
+                        val pl = promotionLevel(plName)
+                        build {
+                            // Mock termination commit
+                            repositoryIssue("ISS-20", "Last issue before the change log")
+                            withRepositoryCommit("ISS-20 Last commit before the change log")
+                            // Promotion boundary
+                            promote(pl)
+                        }
+                        // Additional builds since the promotion
+                        build {
+                            repositoryIssue("ISS-21", "Some new feature")
+                            withRepositoryCommit("ISS-21 Some commits for a feature", property = false)
+                            withRepositoryCommit("ISS-21 Some fixes for a feature")
+                        }
+                    }
+                    branch {
+                        configureMockSCMBranch("release/1.27")
+                        val pl = promotionLevel(plName)
+                        build {
+                            repositoryIssue("ISS-22", "Some fixes are needed")
+                            withRepositoryCommit("ISS-22 Fixing some bugs")
+                        }
+                        build {
+                            repositoryIssue("ISS-23", "Some nicer UI")
+                            withRepositoryCommit("ISS-23 Fixing some CSS")
+
+                            // Promotion boundary
+                            val run = promote(pl)
+                            val event = eventFactory.newPromotionRun(run)
+
+                            // Rendering
+                            val text = eventTemplatingService.render(
+                                template = template,
+                                event = event,
+                                renderer = PlainEventRenderer.INSTANCE
+                            )
+
+                            // OK
+                            assertEquals(
+                                expectedText,
+                                text,
+                            )
                         }
                     }
                 }

@@ -5,10 +5,7 @@ import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLog
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogService
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.events.EventRenderer
-import net.nemerosa.ontrack.model.structure.Build
-import net.nemerosa.ontrack.model.structure.ProjectEntity
-import net.nemerosa.ontrack.model.structure.ProjectEntityType
-import net.nemerosa.ontrack.model.structure.PromotionRun
+import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.templating.AbstractTemplatingSource
 import net.nemerosa.ontrack.model.templating.getBooleanTemplatingParam
 import net.nemerosa.ontrack.model.templating.getListStringsTemplatingParam
@@ -16,6 +13,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class PromotionRunChangeLogTemplatingSource(
+    private val structureService: StructureService,
     private val buildFilterService: BuildFilterService,
     private val scmChangeLogService: SCMChangeLogService,
 ) : AbstractTemplatingSource(
@@ -23,9 +21,10 @@ class PromotionRunChangeLogTemplatingSource(
     type = ProjectEntityType.PROMOTION_RUN,
 ) {
 
-    override fun render(entity: ProjectEntity, configMap: Map<String, String>, renderer: EventRenderer): String =
-        if (entity is PromotionRun) {
-            val useProject = configMap.getBooleanTemplatingParam("useProject", true)
+    override fun render(entity: ProjectEntity, configMap: Map<String, String>, renderer: EventRenderer): String {
+        val empty = configMap["empty"] ?: ""
+        return if (entity is PromotionRun) {
+            val acrossBranches = configMap.getBooleanTemplatingParam("acrossBranches", true)
             val projects = configMap.getListStringsTemplatingParam("project") ?: emptyList()
 
             // First boundary is the build being promoted
@@ -33,12 +32,12 @@ class PromotionRunChangeLogTemplatingSource(
             // We now need to look for the previous promotion, on the same branch first
             var fromBuild = getPreviousPromotionOnBranch(entity)
             // If nothing on the branch, we may try at project level
-            if (fromBuild == null && useProject) {
+            if (fromBuild == null && acrossBranches) {
                 fromBuild = getPreviousPromotionOnProject(entity)
             }
             // If no previous build, we don't have any change log
             if (fromBuild == null) {
-                ""
+                empty
             }
             // We now have two boundaries
             else {
@@ -53,12 +52,13 @@ class PromotionRunChangeLogTemplatingSource(
                             changeLog = scmChangeLog,
                             renderer = renderer
                         )
-                    } ?: ""
+                    } ?: empty
                 }
             }
         } else {
-            ""
+            empty
         }
+    }
 
     private fun renderChangeLog(changeLog: SCMChangeLog, renderer: EventRenderer): String {
         return renderer.renderList(
@@ -82,7 +82,14 @@ class PromotionRunChangeLogTemplatingSource(
     }
 
     private fun getPreviousPromotionOnProject(run: PromotionRun): Build? {
-        TODO()
+        val builds = structureService.buildSearch(
+            projectId = run.project.id,
+            form = BuildSearchForm(
+                maximumCount = 2,  // We need the current build, and the previous one
+                promotionName = run.promotionLevel.name,
+            )
+        )
+        return builds.drop(1).firstOrNull()
     }
 
 }

@@ -27,6 +27,7 @@ import net.nemerosa.ontrack.model.support.RegexMessageAnnotator
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 import java.util.*
+import java.util.concurrent.atomic.AtomicLong
 
 @Component
 @Profile(value = [RunProfile.DEV, RunProfile.ACC, RunProfile.UNIT_TEST])
@@ -62,17 +63,15 @@ class MockSCMExtension(
         val reviewers: List<String>,
     )
 
-    data class MockBranch(
-        val name: String,
-    )
-
     class MockRepository(
         val name: String,
     ) {
 
+        private val revisionCount = AtomicLong(0)
+
         private val issues = mutableMapOf<String, MockIssue>()
 
-        private val commits = mutableMapOf<String, MutableList<MockCommit>>()
+        private val branches = mutableListOf<MockBranch>()
 
         private val files = mutableMapOf<String, MutableMap<String, String>>()
         private val createdBranches = mutableMapOf<String, String>()
@@ -83,12 +82,20 @@ class MockSCMExtension(
         }
 
         fun registerCommit(scmBranch: String, message: String): String {
-            val list = commits.getOrPut(scmBranch) {
-                mutableListOf()
+            val branch = branches.find { it.name == scmBranch } ?: branches.run {
+                val newBranch = MockBranch(scmBranch)
+                add(newBranch)
+                newBranch
             }
-            val id = (list.size + 1).toString()
-            list += MockCommit(
+            val indexOnBranch = (branch.commits.size + 1)
+            val normalizedBranchName = scmBranch.replace(
+                "[^a-zA-Z0-9\\.]".toRegex(),
+                "-"
+            )
+            val id = "$normalizedBranchName-$indexOnBranch"
+            branch.commits += MockCommit(
                 repository = name,
+                revision = revisionCount.incrementAndGet(),
                 id = id,
                 message = message,
             )
@@ -156,17 +163,17 @@ class MockSCMExtension(
         fun findIssue(key: String) = issues[key]
 
         fun getCommits(fromCommit: String, toCommit: String): List<SCMChangeLogCommit> {
-            val fromBranch = commits.entries.find { (_, commits) ->
+            val fromBranch = branches.find { (_, commits) ->
                 commits.any { it.id == fromCommit }
             }
-            val toBranch = commits.entries.find { (_, commits) ->
+            val toBranch = branches.find { (_, commits) ->
                 commits.any { it.id == toCommit }
             }
 
             if (fromBranch == null || toBranch == null) {
                 return emptyList()
-            } else if (fromBranch.key == toBranch.key) {
-                val allCommits = fromBranch.value
+            } else if (fromBranch.name == toBranch.name) {
+                val allCommits = fromBranch.commits
                 val indexFrom = allCommits.indexOfFirst { it.id == fromCommit }
                 val indexTo = allCommits.indexOfFirst { it.id == toCommit }
                 val lowIndex = minOf(indexFrom, indexTo)
@@ -180,7 +187,58 @@ class MockSCMExtension(
                     ).reversed() // We want the commits from the most recent to the oldest
                 }
             } else {
-                TODO("The Mock SCM does not support yet getting a change log between two branches")
+                /**
+                 * WARNING: THE MOCK SCM IS NOT A SCM AND THE WAY THIS IS COMPUTED BELOW IS ONLY
+                 *          SUITABLE FOR TESTS!!
+                 */
+                // Ordering the branches from the oldest to the newest
+                val (oldestBranch, newestBranch) = listOf(fromBranch, toBranch).sortedBy { branch ->
+                    branches.indexOfFirst { it.name == branch.name }
+                }
+                val oldestCommit: String
+                val newestCommit: String
+                if (oldestBranch.name == fromBranch.name) {
+                    oldestCommit = fromCommit
+                    newestCommit = toCommit
+                } else {
+                    oldestCommit = toCommit
+                    newestCommit = fromCommit
+                }
+                // List of commits to gather
+                val commits = mutableListOf<MockCommit>()
+                // Index branches boundaries
+                val oldestBranchIndex = branches.indexOfFirst { it.name == oldestBranch.name }
+                val newestBranchIndex = branches.indexOfFirst { it.name == newestBranch.name }
+                (oldestBranchIndex..newestBranchIndex).forEach { index ->
+                    val branch = branches[index]
+                    // If oldest branch, take commits only from the oldest commit (excluded)
+                    if (branch.name == oldestBranch.name) {
+                        var found = false
+                        branch.commits.forEach { commit ->
+                            if (found) {
+                                commits += commit
+                            } else {
+                                found = commit.id == oldestCommit
+                            }
+                        }
+                    }
+                    // If newest branch, take commits only until the newest commit (included)
+                    else if (branch.name == newestBranch.name) {
+                        var found = false
+                        branch.commits.forEach { commit ->
+                            if (!found) {
+                                commits += commit
+                            }
+                            found = commit.id == newestCommit
+                        }
+                    }
+                    // If anything else, take all the commits
+                    else {
+                        commits += branch.commits
+                    }
+                }
+                // OK
+                return commits.reversed()
             }
         }
 
