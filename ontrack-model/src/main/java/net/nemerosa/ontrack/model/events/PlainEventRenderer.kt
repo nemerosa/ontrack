@@ -12,6 +12,9 @@ class PlainEventRenderer : AbstractEventRenderer() {
 
     override fun renderLink(text: String, href: String): String = text
 
+    override fun renderList(list: List<String>): String =
+        list.joinToString("\n") { "* $it" }
+
     companion object {
         @JvmField
         val INSTANCE: EventRenderer = PlainEventRenderer()

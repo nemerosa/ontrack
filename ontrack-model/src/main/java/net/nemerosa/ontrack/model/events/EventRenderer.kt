@@ -13,6 +13,7 @@ interface EventRenderer {
      */
     fun render(projectEntity: ProjectEntity): String
 
+    @Deprecated("Will be removed in V5. Render text directly without the renderer.")
     fun render(valueKey: String, value: NameValue, event: Event): String
 
     @Deprecated("Will be removed in V5. Use renderLink witn strings and without event.")
@@ -27,4 +28,14 @@ interface EventRenderer {
      * @return A valid link for this renderer
      */
     fun renderLink(text: String, href: String): String
+
+    /**
+     * Renders a list.
+     *
+     * Typically rendered as a bullet list.
+     *
+     * @param list List of already rendered texts
+     * @return Valid list for the renderer
+     */
+    fun renderList(list: List<String>): String
 }

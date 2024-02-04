@@ -11,8 +11,7 @@ import org.springframework.stereotype.Component
 @Component
 class SlackNotificationEventRenderer(
     ontrackConfigProperties: OntrackConfigProperties,
-) :
-    AbstractUrlNotificationEventRenderer(ontrackConfigProperties) {
+) : AbstractUrlNotificationEventRenderer(ontrackConfigProperties) {
 
     override fun render(projectEntity: ProjectEntity): String {
         val pageUrl = getUrl(ProjectEntityPageBuilder.getEntityPageRelativeURI(projectEntity))
@@ -22,5 +21,8 @@ class SlackNotificationEventRenderer(
     override fun render(valueKey: String, value: NameValue, event: Event): String = "_${value.value}_"
 
     override fun renderLink(text: String, href: String): String = """<$href|$text>"""
+
+    override fun renderList(list: List<String>): String =
+        list.joinToString("\n") { "* $it" }
 
 }

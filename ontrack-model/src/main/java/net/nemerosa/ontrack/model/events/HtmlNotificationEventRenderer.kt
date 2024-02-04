@@ -23,4 +23,12 @@ class HtmlNotificationEventRenderer(
     override fun renderLink(text: String, href: String): String {
         return """<a href="$href">$text</a>"""
     }
+
+    override fun renderList(list: List<String>): String {
+        return """
+            <ul>
+                ${list.joinToString("\n") { """    <li>$it</li>""" }}
+            </ul>
+        """.trimIndent()
+    }
 }
