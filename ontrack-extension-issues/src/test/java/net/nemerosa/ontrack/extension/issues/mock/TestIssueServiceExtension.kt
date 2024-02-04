@@ -45,7 +45,7 @@ class TestIssueServiceExtension(
     override fun getConfigurationList(): List<IssueServiceConfiguration> =
             listOf(TestIssueServiceConfiguration.INSTANCE)
 
-    override fun getConfigurationByName(name: String?): IssueServiceConfiguration? =
+    override fun getConfigurationByName(name: String): IssueServiceConfiguration? =
             if (name == TestIssueServiceConfiguration.INSTANCE.name) {
                 TestIssueServiceConfiguration.INSTANCE
             } else {

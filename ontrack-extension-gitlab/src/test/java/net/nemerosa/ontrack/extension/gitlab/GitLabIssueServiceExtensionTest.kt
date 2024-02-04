@@ -13,12 +13,12 @@ import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
 import net.nemerosa.ontrack.extension.stale.StaleExtensionFeature
 import org.gitlab4j.api.Constants
-import org.junit.Assert.*
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import java.util.*
+import kotlin.test.*
 
 class GitLabIssueServiceExtensionTest {
 
@@ -29,7 +29,7 @@ class GitLabIssueServiceExtensionTest {
     private lateinit var gitHubClientFactory: OntrackGitLabClientFactory
     private lateinit var issueWrapper: GitLabIssueWrapper
 
-    @Before
+    @BeforeEach
     fun init() {
         configurationService = mock(GitLabConfigurationService::class.java)
         gitHubClientFactory = mock(OntrackGitLabClientFactory::class.java)
@@ -75,14 +75,17 @@ class GitLabIssueServiceExtensionTest {
                 engineConfiguration
         )
         val configuration = extension.getConfigurationByName("test:nemerosa/ontrack")
-        assertNotNull(configuration)
-        assertEquals("test:nemerosa/ontrack", configuration.name)
-        assertEquals("gitlab", configuration.serviceId)
+        assertNotNull(configuration) {
+            assertEquals("test:nemerosa/ontrack", configuration?.name)
+            assertEquals("gitlab", configuration?.serviceId)
+        }
     }
 
-    @Test(expected = IllegalStateException::class)
+    @Test
     fun get_configuration_by_name_using_wrong_id() {
-        extension.getConfigurationByName("test")
+        assertFailsWith<IllegalStateException> {
+            extension.getConfigurationByName("test")
+        }
     }
 
     @Test
@@ -152,13 +155,15 @@ class GitLabIssueServiceExtensionTest {
                 )
         )
         val configuration = extension.getConfigurationByName("Test:nemerosa/ontrack")
-        assertEquals("gitlab", configuration.serviceId)
-        assertEquals("Test:nemerosa/ontrack", configuration.name)
-        assertTrue(configuration is GitLabIssueServiceConfiguration)
-        val issueServiceConfiguration = configuration as GitLabIssueServiceConfiguration
-        assertEquals("Test", issueServiceConfiguration.configuration.name)
-        assertEquals("https://gitlab.test.com", issueServiceConfiguration.configuration.url)
-        assertEquals("nemerosa/ontrack", issueServiceConfiguration.repository)
+        assertNotNull(configuration) {
+            assertEquals("gitlab", it.serviceId)
+            assertEquals("Test:nemerosa/ontrack", it.name)
+            assertTrue(configuration is GitLabIssueServiceConfiguration)
+            val issueServiceConfiguration = configuration
+            assertEquals("Test", issueServiceConfiguration.configuration.name)
+            assertEquals("https://gitlab.test.com", issueServiceConfiguration.configuration.url)
+            assertEquals("nemerosa/ontrack", issueServiceConfiguration.repository)
+        }
     }
 
     @Test
