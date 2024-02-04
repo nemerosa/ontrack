@@ -36,15 +36,23 @@ class PromotionRunChangeLogTemplatingSource(
             }
             // We now have two boundaries
             else {
-                // Getting the change log
-                val changeLog = runBlocking {
-                    scmChangeLogService.getChangeLog(
-                        from = fromBuild,
-                        to = toBuild
-                    )
+                val project = configMap["project"]
+                // We carry on getting the change log for THIS project
+                if (project.isNullOrBlank()) {
+                    // Getting the change log
+                    val changeLog = runBlocking {
+                        scmChangeLogService.getChangeLog(
+                            from = fromBuild,
+                            to = toBuild
+                        )
+                    }
+                    // Rendering it
+                    renderChangeLog(changeLog, renderer)
                 }
-                // Rendering it
-                renderChangeLog(changeLog, renderer)
+                // We need to get a recursive change log
+                else {
+                    TODO("Recursive change log")
+                }
             }
         } else {
             ""

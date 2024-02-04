@@ -3,12 +3,12 @@ package net.nemerosa.ontrack.extension.scm.service
 import net.nemerosa.ontrack.extension.scm.mock.MockSCMTester
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.events.*
+import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.PromotionRun
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
-// TODO Testing with dependency change log
 // TODO useProject config parameter to get change logs across branches
 
 class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
@@ -90,10 +90,59 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
         }
     }
 
-    fun doTestRendering(
-        renderer: EventRenderer,
-        template: String,
-        expectedText: (run: PromotionRun, repositoryName: String) -> String,
+    @Test
+    fun `Getting a recursive change log in a template`() {
+        prepareTest { fromBuild, run, repositoryName ->
+            project {
+                branch {
+                    val pl = promotionLevel()
+
+                    build {
+                        linkTo(fromBuild)
+                        promote(pl)
+                    }
+
+                    build {
+                        linkTo(run.build)
+                        val parentRun = promote(pl)
+
+                        val event = eventFactory.newPromotionRun(parentRun)
+
+                        // Template
+                        val template = """
+                            ${'$'}{promotionRun.changelog?project=${run.project.name}}
+                        """.trimIndent()
+
+                        // Rendering
+                        val text = eventTemplatingService.render(
+                            template = template,
+                            event = event,
+                            renderer = PlainEventRenderer.INSTANCE
+                        )
+
+                        // OK
+                        assertEquals(
+                            """
+                                Version ${run.project.name} ${run.build.name} has been released.
+                                
+                                * ISS-21 Some new feature
+                                * ISS-22 Some fixes are needed
+                                * ISS-23 Some nicer UI
+                            """.trimIndent(),
+                            text,
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun prepareTest(
+        code: (
+            fromBuild: Build,
+            run: PromotionRun,
+            repositoryName: String,
+        ) -> Unit,
     ) {
         asAdmin {
             mockSCMTester.withMockSCMRepository {
@@ -104,7 +153,7 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
                         val pl = promotionLevel()
 
                         build {}
-                        build {
+                        val from = build {
                             // Mock termination commit
                             repositoryIssue("ISS-20", "Last issue before the change log")
                             withRepositoryCommit("ISS-20 Last commit before the change log")
@@ -126,26 +175,37 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
 
                             // Promotion boundary
                             val run = promote(pl)
-                            val event = eventFactory.newPromotionRun(run)
 
-                            // Rendering
-                            val text = eventTemplatingService.render(
-                                template = template,
-                                event = event,
-                                renderer = renderer
-                            )
-
-                            // OK
-                            val expectedLines = expectedText(run, repositoryName).lines().map { it.trim() }
-                            val actualLines = text.lines().map { it.trim() }
-                            assertEquals(
-                                expectedLines,
-                                actualLines,
-                            )
+                            code(from, run, repositoryName)
                         }
                     }
                 }
             }
+        }
+    }
+
+    fun doTestRendering(
+        renderer: EventRenderer,
+        template: String,
+        expectedText: (run: PromotionRun, repositoryName: String) -> String,
+    ) {
+        prepareTest { _, run, repositoryName ->
+            val event = eventFactory.newPromotionRun(run)
+
+            // Rendering
+            val text = eventTemplatingService.render(
+                template = template,
+                event = event,
+                renderer = renderer
+            )
+
+            // OK
+            val expectedLines = expectedText(run, repositoryName).lines().map { it.trim() }
+            val actualLines = text.lines().map { it.trim() }
+            assertEquals(
+                expectedLines,
+                actualLines,
+            )
         }
     }
 
