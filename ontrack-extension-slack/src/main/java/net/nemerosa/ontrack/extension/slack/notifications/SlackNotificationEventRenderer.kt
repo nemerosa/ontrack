@@ -1,11 +1,9 @@
 package net.nemerosa.ontrack.extension.slack.notifications
 
 import net.nemerosa.ontrack.model.events.AbstractUrlNotificationEventRenderer
-import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.structure.ProjectEntity
-import net.nemerosa.ontrack.model.support.NameValue
-import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.model.structure.ProjectEntityPageBuilder
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.springframework.stereotype.Component
 
 @Component
@@ -18,7 +16,7 @@ class SlackNotificationEventRenderer(
         return "<$pageUrl|${getProjectEntityName(projectEntity)}>"
     }
 
-    override fun render(valueKey: String, value: NameValue, event: Event): String = "_${value.value}_"
+    override fun renderStrong(value: String): String = "**${value}**"
 
     override fun renderLink(text: String, href: String): String = """<$href|$text>"""
 

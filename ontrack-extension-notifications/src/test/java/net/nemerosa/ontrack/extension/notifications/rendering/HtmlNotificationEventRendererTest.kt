@@ -15,6 +15,14 @@ class HtmlNotificationEventRendererTest {
     )
 
     @Test
+    fun `Value rendering`() {
+        assertEquals(
+            "<b>Some value</b>",
+            htmlNotificationEventRenderer.renderStrong("Some value")
+        )
+    }
+
+    @Test
     fun `Link rendering`() {
         val text = htmlNotificationEventRenderer.renderLink("PRJ", "https://ontrack.nemerosa.net/#/project/1")
         assertEquals(

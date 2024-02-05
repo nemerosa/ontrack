@@ -15,6 +15,14 @@ class MarkdownNotificationEventRendererTest {
     )
 
     @Test
+    fun `Value rendering`() {
+        assertEquals(
+            "**Some value**",
+            markdownEventRenderer.renderStrong("Some value")
+        )
+    }
+
+    @Test
     fun `Link rendering`() {
         val text = markdownEventRenderer.renderLink("PRJ", "https://ontrack.nemerosa.net/#/project/1")
         assertEquals(

@@ -13,8 +13,13 @@ interface EventRenderer {
      */
     fun render(projectEntity: ProjectEntity): String
 
+    /**
+     * Renders a value and gives it some emphasis.
+     */
+    fun renderStrong(value: String): String
+
     @Deprecated("Will be removed in V5. Render text directly without the renderer.")
-    fun render(valueKey: String, value: NameValue, event: Event): String
+    fun render(valueKey: String, value: NameValue, event: Event): String = renderStrong(value.value)
 
     @Deprecated("Will be removed in V5. Use renderLink witn strings and without event.")
     fun renderLink(text: NameValue, link: NameValue, event: Event): String =

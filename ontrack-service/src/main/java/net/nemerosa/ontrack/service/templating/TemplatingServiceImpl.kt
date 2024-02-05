@@ -87,7 +87,7 @@ class TemplatingServiceImpl(
                 return if (filter.isNullOrBlank()) {
                     text
                 } else {
-                    applyFilter(filter, text)
+                    applyFilter(filter, text, renderer)
                 }
             } else {
                 throw TemplatingExpressionFormatException(expression)
@@ -160,8 +160,8 @@ class TemplatingServiceImpl(
         }
     }
 
-    private fun applyFilter(filter: String, text: String): String =
-        filtersById[filter]?.apply(text)
+    private fun applyFilter(filter: String, text: String, renderer: EventRenderer): String =
+        filtersById[filter]?.apply(text, renderer)
             ?: throw TemplatingFilterNotFoundException(filter)
 
     private fun renderEntity(entity: ProjectEntity, field: String?, config: String?, renderer: EventRenderer): String =

@@ -13,6 +13,13 @@ class SlackNotificationEventRendererTest {
         }
     )
 
+    @Test
+    fun `Value rendering`() {
+        assertEquals(
+            "**Some value**",
+            slackNotificationEventRenderer.renderStrong("Some value")
+        )
+    }
 
     @Test
     fun `Link rendering`() {

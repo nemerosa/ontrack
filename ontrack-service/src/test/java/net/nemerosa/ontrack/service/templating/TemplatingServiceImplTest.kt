@@ -72,7 +72,7 @@ class TemplatingServiceImplTest {
 
         val uppercaseTemplatingFilter = object : TemplatingFilter {
             override val id: String = "uppercase"
-            override fun apply(text: String): String = text.uppercase()
+            override fun apply(text: String, renderer: EventRenderer): String = text.uppercase()
         }
 
         val templatingFilters = listOf<TemplatingFilter>(

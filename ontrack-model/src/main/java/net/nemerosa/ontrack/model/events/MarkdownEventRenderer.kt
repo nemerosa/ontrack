@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.model.events
 
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityPageBuilder
-import net.nemerosa.ontrack.model.support.NameValue
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.springframework.stereotype.Component
 
@@ -16,7 +15,7 @@ class MarkdownEventRenderer(
         return """[${getProjectEntityName(projectEntity)}]($pageUrl)"""
     }
 
-    override fun render(valueKey: String, value: NameValue, event: Event): String = value.value
+    override fun renderStrong(value: String): String = "**${value}**"
 
     override fun renderLink(text: String, href: String): String =
         """[$text]($href)"""

@@ -1,11 +1,8 @@
 package net.nemerosa.ontrack.model.events
 
-import net.nemerosa.ontrack.model.events.AbstractUrlNotificationEventRenderer
-import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.structure.ProjectEntity
-import net.nemerosa.ontrack.model.support.NameValue
-import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.model.structure.ProjectEntityPageBuilder
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.springframework.stereotype.Component
 
 @Component
@@ -18,7 +15,7 @@ class HtmlNotificationEventRenderer(
         return """<a href="$pageUrl">${getProjectEntityName(projectEntity)}</a>"""
     }
 
-    override fun render(valueKey: String, value: NameValue, event: Event): String = value.value
+    override fun renderStrong(value: String): String = "<b>$value</b>"
 
     override fun renderLink(text: String, href: String): String {
         return """<a href="$href">$text</a>"""
