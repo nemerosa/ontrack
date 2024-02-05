@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.git.graphql
+package net.nemerosa.ontrack.extension.issues.graphql
 
 import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation
