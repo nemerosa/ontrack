@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.stash.model.BitbucketProject
 import net.nemerosa.ontrack.extension.stash.model.BitbucketRepository
 import net.nemerosa.ontrack.extension.stash.model.StashConfiguration
 import net.nemerosa.ontrack.extension.stash.scm.BitbucketServerPR
+import net.nemerosa.ontrack.json.parse
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.http.HttpEntity
@@ -159,6 +160,17 @@ class BitbucketClientImpl(
             JsonNode::class.java
         )
     }
+
+    override fun getCommits(
+        repo: BitbucketRepository,
+        fromCommit: String,
+        toCommit: String
+    ): List<BitbucketServerCommit> =
+        template.getForObject<JsonNode>(
+            "/rest/api/latest/projects/${repo.project}/repos/${repo.repository}/commits?since=$fromCommit&until=$toCommit&limit=150"
+        ).path("values").map {
+            it.parse<BitbucketServerCommit>()
+        }
 
     private val template = RestTemplateBuilder()
         .rootUri(configuration.url)

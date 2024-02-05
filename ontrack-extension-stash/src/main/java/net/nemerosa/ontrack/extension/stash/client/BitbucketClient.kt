@@ -100,4 +100,9 @@ interface BitbucketClient {
      */
     fun mergePR(repo: BitbucketRepository, prId: Int, message: String)
 
+    /**
+     * Gets a list of commits between two boundaries.
+     */
+    fun getCommits(repo: BitbucketRepository, fromCommit: String, toCommit: String): List<BitbucketServerCommit>
+
 }
