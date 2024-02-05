@@ -141,6 +141,9 @@ pipeline {
                 ONTRACK_TEST_EXTENSION_GITHUB_APP_INSTALLATION = 'nemerosa'
                 ONTRACK_TEST_EXTENSION_GITHUB_PATHS_IMAGES_PROMOTION = 'images/iron.png'
                 ONTRACK_TEST_EXTENSION_GITHUB_PATHS_IMAGES_VALIDATION = 'images/site.png'
+                ONTRACK_TEST_EXTENSION_GITHUB_CHANGELOG_FROM = '5b0db7c7132eaf29820b42aef3a018a47e1f411f'
+                ONTRACK_TEST_EXTENSION_GITHUB_CHANGELOG_TO = '36e95eded56bcfead06a55238ccb315fbfe211a8'
+                ONTRACK_TEST_EXTENSION_GITHUB_CHANGELOG_MESSAGES = 'nemerosa/ontrack#978 Promotion image|nemerosa/ontrack#978 Validation image|nemerosa/ontrack#928 Explicitly skipping the jobs|nemerosa/ontrack#928 Sample GitHub ingestion configuration file'
             }
             steps {
                 sh ''' ./gradlew clean versionDisplay versionFile --no-daemon'''

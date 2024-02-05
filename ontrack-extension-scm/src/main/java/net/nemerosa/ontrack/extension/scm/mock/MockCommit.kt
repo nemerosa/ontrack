@@ -14,6 +14,5 @@ data class MockCommit(
     override val author: String = "unknown"
     override val authorEmail: String? = null
     override val timestamp: LocalDateTime = Time.now()
-    override val formattedMessage: String = message
     override val link: String = "mock://$repository/$id"
 }

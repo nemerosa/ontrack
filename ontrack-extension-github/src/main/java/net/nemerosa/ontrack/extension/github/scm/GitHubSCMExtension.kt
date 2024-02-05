@@ -6,7 +6,9 @@ import kotlinx.coroutines.withTimeoutOrNull
 import net.nemerosa.ontrack.common.BaseException
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
+import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.extension.github.GitHubExtensionFeature
+import net.nemerosa.ontrack.extension.github.GitHubIssueServiceExtension
 import net.nemerosa.ontrack.extension.github.catalog.GitHubSCMCatalogSettings
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClient
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory
@@ -14,6 +16,12 @@ import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationProperty
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
+import net.nemerosa.ontrack.extension.github.service.GitHubIssueServiceConfiguration
+import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
+import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation
+import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogCommit
+import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogEnabled
 import net.nemerosa.ontrack.extension.scm.service.SCM
 import net.nemerosa.ontrack.extension.scm.service.SCMExtension
 import net.nemerosa.ontrack.extension.scm.service.SCMPath
@@ -22,6 +30,7 @@ import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.exceptions.InputException
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.PropertyService
 import org.springframework.stereotype.Component
@@ -36,6 +45,8 @@ class GitHubSCMExtension(
     private val clientFactory: OntrackGitHubClientFactory,
     private val cachedSettingsService: CachedSettingsService,
     private val gitHubConfigurationService: GitHubConfigurationService,
+    private val issueServiceRegistry: IssueServiceRegistry,
+    private val issueServiceExtension: GitHubIssueServiceExtension,
 ) : AbstractExtension(gitHubExtensionFeature), SCMExtension {
 
     override fun getSCM(project: Project): SCM? {
@@ -46,6 +57,7 @@ class GitHubSCMExtension(
             GitHubSCM(
                 configuration = property.configuration,
                 repository = property.repository,
+                issueServiceConfigurationIdentifier = property.issueServiceConfigurationIdentifier,
                 settings = settings,
             )
         }
@@ -63,6 +75,7 @@ class GitHubSCMExtension(
         val scm = GitHubSCM(
             configuration = config,
             repository = "$owner/$repo",
+            issueServiceConfigurationIdentifier = null,
             settings = cachedSettingsService.getCachedSettings(GitHubSCMCatalogSettings::class.java),
         )
         return SCMPath(
@@ -74,8 +87,9 @@ class GitHubSCMExtension(
     private inner class GitHubSCM(
         private val configuration: GitHubEngineConfiguration,
         override val repository: String,
+        private val issueServiceConfigurationIdentifier: String?,
         private val settings: GitHubSCMCatalogSettings,
-    ) : SCM {
+    ) : SCMChangeLogEnabled {
 
         override val type: String = "git"
         override val engine: String = "github"
@@ -187,6 +201,33 @@ class GitHubSCMExtension(
             )
             // Merged
             return true
+        }
+
+        override fun getBuildCommit(build: Build): String? =
+            propertyService.getPropertyValue(build, GitCommitPropertyType::class.java)?.commit
+
+        override fun getConfiguredIssueService(): ConfiguredIssueService? {
+            return if (
+                issueServiceConfigurationIdentifier.isNullOrBlank() ||
+                IssueServiceConfigurationRepresentation.isSelf(issueServiceConfigurationIdentifier)
+            ) {
+                ConfiguredIssueService(
+                    issueServiceExtension,
+                    GitHubIssueServiceConfiguration(
+                        configuration,
+                        repository
+                    )
+                )
+            } else {
+                issueServiceRegistry.getConfiguredIssueService(issueServiceConfigurationIdentifier)
+            }
+        }
+
+        override suspend fun getCommits(fromCommit: String, toCommit: String): List<SCMChangeLogCommit> {
+            val commits = client.compareCommits(repository, fromCommit, toCommit)
+            return commits.map { commit ->
+                GitHubSCMChangeLogCommit(commit)
+            }.sortedBy { it.timestamp }
         }
 
         private val client: OntrackGitHubClient by lazy {

@@ -19,7 +19,5 @@ data class GitUICommit(
 
     override val timestamp = commit.commitTime
 
-    override val formattedMessage = fullAnnotatedMessage
-
     override val shortId = commit.shortId
 }

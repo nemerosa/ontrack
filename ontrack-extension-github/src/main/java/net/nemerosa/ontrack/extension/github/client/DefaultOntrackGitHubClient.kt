@@ -749,6 +749,21 @@ class DefaultOntrackGitHubClient(
         }
     }
 
+    override fun compareCommits(repository: String, base: String, head: String): List<GitHubCommit> {
+        // Getting a client
+        val client = createGitHubRestTemplate()
+        // Gets the repository for this project
+        val (owner, name) = getRepositoryParts(repository)
+        // Call
+        return client<List<GitHubCommit>>("Comparing commits") {
+            getForObject<JsonNode>(
+                "/repos/$owner/$name/compare/$base...$head"
+            ).path("commits").map { commitNode ->
+                commitNode.parse()
+            }
+        }.reversed()
+    }
+
     private fun JsonNode.getUserField(field: String): GitHubUser? =
         getJsonField(field)?.run {
             GitHubUser(

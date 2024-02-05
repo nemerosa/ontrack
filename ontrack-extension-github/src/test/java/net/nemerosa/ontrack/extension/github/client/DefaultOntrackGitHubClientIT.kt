@@ -106,4 +106,17 @@ class DefaultOntrackGitHubClientIT {
         }
     }
 
+    @Test
+    fun `Getting a list of commits for a change log`() {
+        val commits = client.compareCommits(
+            repository = githubTestEnv.fullRepository,
+            base = githubTestEnv.changeLog.from,
+            head = githubTestEnv.changeLog.to,
+        )
+        assertEquals(
+            githubTestEnv.changeLog.messages,
+            commits.map { it.commit.message }
+        )
+    }
+
 }

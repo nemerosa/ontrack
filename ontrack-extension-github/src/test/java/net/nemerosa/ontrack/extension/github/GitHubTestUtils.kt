@@ -21,6 +21,7 @@ data class GitHubTestEnv(
     val branch: String,
     val readme: String,
     val paths: GitHubTestEnvKnownPaths,
+    val changeLog: GitHubTestChangeLog,
 ) {
     val fullRepository: String = "$organization/$repository"
 }
@@ -32,6 +33,12 @@ data class GitHubTestEnvKnownPaths(
 data class GitHubTestEnvKnownImagesPaths(
     val validation: String,
     val promotion: String,
+)
+
+data class GitHubTestChangeLog(
+    val from: String,
+    val to: String,
+    val messages: List<String>,
 )
 
 /**
@@ -57,6 +64,11 @@ val githubTestEnv: GitHubTestEnv by lazy {
                 promotion = getEnv("ontrack.test.extension.github.paths.images.promotion"),
             ),
         ),
+        changeLog = GitHubTestChangeLog(
+            from = getEnv("ontrack.test.extension.github.changelog.from"),
+            to = getEnv("ontrack.test.extension.github.changelog.to"),
+            messages = getEnv("ontrack.test.extension.github.changelog.messages").split("|"),
+        )
     )
 }
 

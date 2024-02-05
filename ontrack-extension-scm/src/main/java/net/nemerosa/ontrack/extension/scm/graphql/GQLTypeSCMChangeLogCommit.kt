@@ -24,7 +24,6 @@ class GQLTypeSCMChangeLogCommit : GQLType {
             .stringField(SCMChangeLogCommit::author)
             .stringField(SCMChangeLogCommit::authorEmail)
             .stringField(SCMChangeLogCommit::message)
-            .stringField(SCMChangeLogCommit::formattedMessage)
             .stringField(SCMChangeLogCommit::link)
             .dateField(
                 name = SCMChangeLogCommit::timestamp.name,

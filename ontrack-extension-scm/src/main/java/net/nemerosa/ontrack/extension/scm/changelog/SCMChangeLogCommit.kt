@@ -46,12 +46,6 @@ interface SCMChangeLogCommit {
     val message: String
 
     /**
-     * Annotated message
-     */
-    @APIDescription("Annotated message")
-    val formattedMessage: String
-
-    /**
      * Link to the commit
      */
     @APIDescription("Link to the commit")
