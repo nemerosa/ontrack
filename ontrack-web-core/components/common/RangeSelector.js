@@ -3,7 +3,9 @@ import {Typography} from "antd";
 import {useState} from "react";
 
 export default function RangeSelector({
-                                          id, title,
+                                          id,
+                                          idPrefix = 'range',
+                                          title,
                                           rangeSelection
                                       }) {
 
@@ -18,11 +20,13 @@ export default function RangeSelector({
             {
                 (rangeSelection && rangeSelection.isSelected && rangeSelection.isSelected(id)) ?
                     <FaCheckSquare
+                        id={`${idPrefix}-${id}`}
                         className="ot-action"
                         title={title}
                         onClick={onSelect}
                     /> :
                     <FaSquare
+                        id={`${idPrefix}-${id}`}
                         className="ot-hover-transparent-10 ot-action"
                         title={title}
                         onClick={onSelect}
