@@ -11,7 +11,7 @@ export function subBranchTitle(branch, what) {
 }
 
 export function buildKnownName(build) {
-    return build.releaseProperty?.value?.name ?? build.name
+    return build?.releaseProperty?.value?.name ?? build?.name
 }
 
 export function buildLinkName({qualifier, build}) {

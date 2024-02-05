@@ -1,6 +1,6 @@
 import {useRouter} from "next/router";
 import MainLayout from "@components/layouts/MainLayout";
-import GitChangeLogView from "@components/extension/git/GitChangeLogView";
+import ScmChangeLogView from "@components/extension/scm/ScmChangeLogView";
 
 export default function GitChangeLogPage() {
     const router = useRouter()
@@ -9,7 +9,7 @@ export default function GitChangeLogPage() {
         <>
             <main>
                 <MainLayout>
-                    <GitChangeLogView from={from} to={to}/>
+                    <ScmChangeLogView from={from} to={to}/>
                 </MainLayout>
             </main>
         </>

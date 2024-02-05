@@ -1,3 +1,5 @@
+import {expect} from "@playwright/test";
+
 const {createMockSCMContext} = require("@ontrack/extensions/scm/scm");
 const {ontrack} = require("@ontrack/ontrack");
 
@@ -56,7 +58,17 @@ export class SCMChangeLogPage {
     }
 
     async checkDisplayed() {
-        // TODO
+        await expect(this.page.getByText("Change log from")).toBeVisible()
+    }
+
+    async checkBuildFrom({name}) {
+        await expect(this.page.getByText(`From ${name}`, {exact: true})).toBeVisible()
+        await expect(this.page.getByRole('link', {name: name})).toBeVisible()
+    }
+
+    async checkBuildTo({name}) {
+        await expect(this.page.getByText(`To ${name}`, {exact: true})).toBeVisible()
+        await expect(this.page.getByRole('link', {name: name})).toBeVisible()
     }
 
 }

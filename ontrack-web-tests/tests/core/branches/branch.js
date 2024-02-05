@@ -7,6 +7,7 @@ class BranchPage {
     constructor(page, branch) {
         this.page = page;
         this.branch = branch;
+        this.changeLogButton = this.page.getByRole('button', {name: 'Change log', exact: true})
     }
 
     async goTo() {
@@ -17,17 +18,12 @@ class BranchPage {
     }
 
     async checkChangeLogButtonPresent({disabled}) {
-        const locator = this.changeLogButton()
-        await expect(locator).toBeVisible()
+        await expect(this.changeLogButton).toBeVisible()
         if (disabled) {
-            await expect(locator).toBeDisabled()
+            await expect(this.changeLogButton).toBeDisabled()
         } else {
-            await expect(locator).toBeEnabled()
+            await expect(this.changeLogButton).toBeEnabled()
         }
-    }
-
-    changeLogButton() {
-        return this.page.changeLogButton('button', {name: 'Change log', exact: true});
     }
 
     async selectBuild({id}) {
@@ -35,7 +31,7 @@ class BranchPage {
     }
 
     async goToChangeLog() {
-        await this.page.changeLogButton().click()
+        await this.changeLogButton.click()
         const changeLogPage = new SCMChangeLogPage(this.page)
         await changeLogPage.checkDisplayed()
         return changeLogPage

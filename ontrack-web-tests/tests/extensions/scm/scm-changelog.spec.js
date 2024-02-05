@@ -26,4 +26,8 @@ test("SCM change log", async ({page}) => {
 
     // Going to the change log page
     const changeLogPage = await branchPage.goToChangeLog()
+
+    // Expecting the build sections to be visible
+    await changeLogPage.checkBuildFrom(from)
+    await changeLogPage.checkBuildTo(to)
 })
