@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class GQLTypeSCMChangeLog(
-    private val gqlTypeSCMChangeLogCommit: GQLTypeSCMChangeLogCommit,
+    private val gqlTypeSCMDecoratedCommit: GQLTypeSCMDecoratedCommit,
     private val gqlTypeSCMChangeLogIssues: GQLTypeSCMChangeLogIssues,
 ) : GQLType {
 
@@ -27,7 +27,7 @@ class GQLTypeSCMChangeLog(
             .field {
                 it.name(SCMChangeLog::commits.name)
                     .description(getPropertyDescription(SCMChangeLog::commits))
-                    .type(listType(gqlTypeSCMChangeLogCommit.typeRef))
+                    .type(listType(gqlTypeSCMDecoratedCommit.typeRef))
             }
             .field(
                 SCMChangeLog::issues,

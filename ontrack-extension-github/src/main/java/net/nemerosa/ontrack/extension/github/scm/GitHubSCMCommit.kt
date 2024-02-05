@@ -2,10 +2,10 @@ package net.nemerosa.ontrack.extension.github.scm
 
 import net.nemerosa.ontrack.extension.github.client.GitHubAuthor
 import net.nemerosa.ontrack.extension.github.client.GitHubCommit
-import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogCommit
+import net.nemerosa.ontrack.extension.scm.changelog.SCMCommit
 import java.time.LocalDateTime
 
-class GitHubSCMChangeLogCommit(commit: GitHubCommit) : SCMChangeLogCommit {
+class GitHubSCMCommit(commit: GitHubCommit) : SCMCommit {
 
     override val id: String = commit.sha
 

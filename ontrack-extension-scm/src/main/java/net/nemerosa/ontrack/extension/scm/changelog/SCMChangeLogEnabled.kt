@@ -32,7 +32,7 @@ interface SCMChangeLogEnabled : SCM {
      * Given two boundaries (as defined by the [getBuildCommit] function, returns
      * a list of commits between the two.
      */
-    suspend fun getCommits(fromCommit: String, toCommit: String): List<SCMChangeLogCommit>
+    suspend fun getCommits(fromCommit: String, toCommit: String): List<SCMCommit>
 
     /**
      * Gets the configured issue service for this SCM.

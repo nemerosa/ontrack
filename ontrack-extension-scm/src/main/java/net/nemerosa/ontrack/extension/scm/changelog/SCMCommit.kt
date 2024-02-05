@@ -4,10 +4,10 @@ import net.nemerosa.ontrack.model.annotations.APIDescription
 import java.time.LocalDateTime
 
 /**
- * Common attributes for a commit (or revision) in a change log.
+ * Common attributes for a commit.
  */
-@APIDescription("Common attributes for a commit (or revision) in a change log.")
-interface SCMChangeLogCommit {
+@APIDescription("Common attributes for a commit (or revision).")
+interface SCMCommit {
 
     /**
      * Identifier of the commit

@@ -8,13 +8,13 @@ import java.time.LocalDateTime
 import java.time.Month
 import kotlin.test.assertEquals
 
-class GitHubSCMChangeLogCommitTest {
+class GitHubSCMCommitTest {
 
     @Test
     fun `Parsing from JSON`() {
         val json = TestUtils.resourceJson("/client/commit.json")
         val ghCommit = json.parse<GitHubCommit>()
-        val commit = GitHubSCMChangeLogCommit(ghCommit)
+        val commit = GitHubSCMCommit(ghCommit)
 
         assertEquals(
             "215b979b3e1f4c484e3e3d1af4330baf8e95f4c4",

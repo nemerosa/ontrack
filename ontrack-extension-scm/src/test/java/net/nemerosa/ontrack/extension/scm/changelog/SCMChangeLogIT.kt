@@ -58,7 +58,7 @@ class SCMChangeLogIT : AbstractDSLTestSupport() {
                                     "ISS-21 Some fixes for a feature",
                                     "ISS-21 Some commits for a feature",
                                 ),
-                                changeLog.commits.map { it.message },
+                                changeLog.commits.map { it.commit.message },
                                 "Change log commits"
                             )
 

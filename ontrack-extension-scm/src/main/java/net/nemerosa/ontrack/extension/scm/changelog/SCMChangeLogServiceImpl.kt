@@ -62,6 +62,13 @@ class SCMChangeLogServiceImpl(
         // Getting the list of commits
         val commits = scm.getCommits(fromCommit, toCommit)
 
+        // Decoration of the commits
+        val decoratedCommits = commits.map { commit ->
+            SCMDecoratedCommit(
+                commit = commit,
+            )
+        }
+
         // Getting the issue service
         val configuredIssueService: ConfiguredIssueService? = scm.getConfiguredIssueService()
         val issuesChangeLog: SCMChangeLogIssues? = if (configuredIssueService != null) {
@@ -95,7 +102,7 @@ class SCMChangeLogServiceImpl(
         return SCMChangeLog(
             from = from,
             to = to,
-            commits = commits,
+            commits = decoratedCommits,
             issues = issuesChangeLog,
         )
     }

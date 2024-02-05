@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.scm.changelog
 
+import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogCommit
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.structure.Build
 
@@ -10,7 +11,7 @@ data class SCMChangeLog(
     @APIDescription("Boundary for the change log")
     val to: Build,
     @APIDescription("List of commits between the builds")
-    val commits: List<SCMChangeLogCommit>,
+    val commits: List<SCMDecoratedCommit>,
     @APIDescription("List of issues between the builds")
     val issues: SCMChangeLogIssues?,
 )

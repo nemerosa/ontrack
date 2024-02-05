@@ -51,7 +51,9 @@ class GQLRootQuerySCMChangeLogIT : AbstractQLKTITSupport() {
                                         to: ${this@build.id}
                                     ) {
                                         commits {
-                                            message
+                                            commit {
+                                                message
+                                            }
                                         }
                                         issues {
                                             issues {
@@ -68,10 +70,18 @@ class GQLRootQuerySCMChangeLogIT : AbstractQLKTITSupport() {
                                 assertEquals(
                                     mapOf(
                                         "commits" to listOf(
-                                            mapOf("message" to "ISS-23 Fixing some CSS"),
-                                            mapOf("message" to "ISS-22 Fixing some bugs"),
-                                            mapOf("message" to "ISS-21 Some fixes for a feature"),
-                                            mapOf("message" to "ISS-21 Some commits for a feature"),
+                                            mapOf(
+                                                "commit" to mapOf("message" to "ISS-23 Fixing some CSS")
+                                            ),
+                                            mapOf(
+                                                "commit" to mapOf("message" to "ISS-22 Fixing some bugs")
+                                            ),
+                                            mapOf(
+                                                "commit" to mapOf("message" to "ISS-21 Some fixes for a feature")
+                                            ),
+                                            mapOf(
+                                                "commit" to mapOf("message" to "ISS-21 Some commits for a feature")
+                                            ),
                                         ),
                                         "issues" to mapOf(
                                             "issues" to listOf(

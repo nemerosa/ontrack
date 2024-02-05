@@ -9,8 +9,8 @@ import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
 import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
-import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogCommit
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogEnabled
+import net.nemerosa.ontrack.extension.scm.changelog.SCMCommit
 import net.nemerosa.ontrack.extension.scm.service.SCM
 import net.nemerosa.ontrack.extension.scm.service.SCMExtension
 import net.nemerosa.ontrack.extension.scm.service.SCMPath
@@ -162,7 +162,7 @@ class MockSCMExtension(
 
         fun findIssue(key: String) = issues[key]
 
-        fun getCommits(fromCommit: String, toCommit: String): List<SCMChangeLogCommit> {
+        fun getCommits(fromCommit: String, toCommit: String): List<SCMCommit> {
             val fromBranch = branches.find { (_, commits) ->
                 commits.any { it.id == fromCommit }
             }
@@ -294,7 +294,7 @@ class MockSCMExtension(
         override fun getBuildCommit(build: Build): String? =
             propertyService.getPropertyValue(build, MockSCMBuildCommitPropertyType::class.java)?.id
 
-        override suspend fun getCommits(fromCommit: String, toCommit: String): List<SCMChangeLogCommit> =
+        override suspend fun getCommits(fromCommit: String, toCommit: String): List<SCMCommit> =
             repository(mockScmProjectProperty.name).getCommits(fromCommit, toCommit)
 
         override fun getConfiguredIssueService(): ConfiguredIssueService =

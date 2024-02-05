@@ -20,8 +20,8 @@ import net.nemerosa.ontrack.extension.github.service.GitHubIssueServiceConfigura
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation
-import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogCommit
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogEnabled
+import net.nemerosa.ontrack.extension.scm.changelog.SCMCommit
 import net.nemerosa.ontrack.extension.scm.service.SCM
 import net.nemerosa.ontrack.extension.scm.service.SCMExtension
 import net.nemerosa.ontrack.extension.scm.service.SCMPath
@@ -223,10 +223,10 @@ class GitHubSCMExtension(
             }
         }
 
-        override suspend fun getCommits(fromCommit: String, toCommit: String): List<SCMChangeLogCommit> {
+        override suspend fun getCommits(fromCommit: String, toCommit: String): List<SCMCommit> {
             val commits = client.compareCommits(repository, fromCommit, toCommit)
             return commits.map { commit ->
-                GitHubSCMChangeLogCommit(commit)
+                GitHubSCMCommit(commit)
             }.sortedBy { it.timestamp }
         }
 
