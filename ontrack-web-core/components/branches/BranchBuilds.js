@@ -48,7 +48,7 @@ export default function BranchBuilds({
     const connection = useConnection()
     const vsfContext = useContext(ValidationStampFilterContext)
 
-    const [scmType, setScmType] = useState('')
+    const [scmChangeLogEnabled, setScmChangeLogEnabled] = useState(false)
     useEffect(() => {
         if (client && branch) {
             client.request(
@@ -56,22 +56,22 @@ export default function BranchBuilds({
                     query BranchScmInfo($id: Int!) {
                         branch(id: $id) {
                             scmBranchInfo {
-                                type
+                                changeLogs
                             }
                         }
                     }
                 `,
                 {id: branch.id}
             ).then(data => {
-                setScmType(data.branch.scmBranchInfo?.type)
+                setScmChangeLogEnabled(data.branch.scmBranchInfo?.changeLogs)
             })
         }
     }, [client, branch]);
 
     const onChangeLog = () => {
-        if (scmType && connection.environment && rangeSelection.isComplete()) {
+        if (scmChangeLogEnabled && connection.environment && rangeSelection.isComplete()) {
             const [from, to] = rangeSelection.selection
-            router.push(scmChangeLogUri(scmType, from, to))
+            router.push(scmChangeLogUri(from, to))
         }
     }
 
@@ -169,7 +169,7 @@ export default function BranchBuilds({
                                 />
                                 {/* Change log */}
                                 {
-                                    scmType &&
+                                    scmChangeLogEnabled &&
                                     <Popover
                                         title="Change log between two builds"
                                         content={

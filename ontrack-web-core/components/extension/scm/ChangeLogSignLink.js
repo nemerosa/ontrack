@@ -37,7 +37,7 @@ export default function ChangeLogSignLink({from, to}) {
                 from && to && from.id !== to.id &&
                 <Space>
                     <FaNotEqual color="orange"/>
-                    <Link href={scmChangeLogUri(from.branch.scmBranchInfo.type, from.id, to.id)}>
+                    <Link href={scmChangeLogUri(from.id, to.id)}>
                         <Typography.Link>
                             Change log
                         </Typography.Link>

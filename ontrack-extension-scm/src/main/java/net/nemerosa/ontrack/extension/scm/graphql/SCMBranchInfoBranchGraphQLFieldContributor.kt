@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.scm.graphql
 
 import graphql.schema.GraphQLFieldDefinition
+import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogEnabled
 import net.nemerosa.ontrack.extension.scm.service.SCMBranchInfo
 import net.nemerosa.ontrack.extension.scm.service.SCMDetector
 import net.nemerosa.ontrack.graphql.schema.GQLProjectEntityFieldContributor
@@ -42,6 +43,7 @@ class SCMBranchInfoBranchGraphQLFieldContributor(
             engine = scm.engine,
             uri = scm.repositoryURI,
             branch = scmBranch,
+            changeLogs = scm is SCMChangeLogEnabled,
         )
     }
 }
