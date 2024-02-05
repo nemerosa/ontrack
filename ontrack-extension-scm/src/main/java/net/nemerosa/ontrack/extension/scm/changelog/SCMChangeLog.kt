@@ -10,6 +10,10 @@ data class SCMChangeLog(
     val from: Build,
     @APIDescription("Boundary for the change log")
     val to: Build,
+    @APIDescription("Boundary commit for the change log")
+    val fromCommit: String,
+    @APIDescription("Boundary commit for the change log")
+    val toCommit: String,
     @APIDescription("List of commits between the builds")
     val commits: List<SCMDecoratedCommit>,
     @APIDescription("List of issues between the builds")

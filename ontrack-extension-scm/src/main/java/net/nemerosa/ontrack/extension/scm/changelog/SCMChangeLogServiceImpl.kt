@@ -103,6 +103,8 @@ class SCMChangeLogServiceImpl(
         return SCMChangeLog(
             from = from,
             to = to,
+            fromCommit = fromCommit,
+            toCommit = toCommit,
             commits = decoratedCommits,
             issues = issuesChangeLog,
         )

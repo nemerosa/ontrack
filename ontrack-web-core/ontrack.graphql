@@ -5322,6 +5322,8 @@ type SCMCatalogTeamStats {
 type SCMChangeLog {
     "List of commits between the builds"
     commits: [SCMDecoratedCommit!]!
+    "URL to get the file diff between the two builds"
+    diffLink: String
     "Boundary for the change log"
     from: Build!
     "List of issues between the builds"

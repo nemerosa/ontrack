@@ -82,6 +82,11 @@ export class SCMChangeLogPage {
         await expect(container.getByRole('link', {name: name})).toBeVisible()
     }
 
+    async checkCommitDiffLink() {
+        const container = this.page.locator('#commits')
+        await expect(container.getByRole('link', {name: 'diff'})).toBeVisible()
+    }
+
     async checkCommitMessage(message, {present = true}) {
         const container = this.page.locator('#commits')
         const locator = container.getByText(message, {exact: false})

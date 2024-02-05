@@ -1,7 +1,9 @@
 package net.nemerosa.ontrack.extension.scm.graphql
 
+import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLog
+import net.nemerosa.ontrack.extension.scm.service.SCMDetector
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.field
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Component
 class GQLTypeSCMChangeLog(
     private val gqlTypeSCMDecoratedCommit: GQLTypeSCMDecoratedCommit,
     private val gqlTypeSCMChangeLogIssues: GQLTypeSCMChangeLogIssues,
+    private val scmDetector: SCMDetector,
 ) : GQLType {
 
     override fun getTypeName(): String = SCMChangeLog::class.java.simpleName
@@ -33,5 +36,17 @@ class GQLTypeSCMChangeLog(
                 SCMChangeLog::issues,
                 gqlTypeSCMChangeLogIssues
             )
+
+            .field {
+                it.name("diffLink")
+                    .description("URL to get the file diff between the two builds")
+                    .type(GraphQLString)
+                    .dataFetcher { env ->
+                        val changeLog = env.getSource<SCMChangeLog>()
+                        val project = changeLog.from.project
+                        scmDetector.getSCM(project)?.getDiffLink(changeLog.fromCommit, changeLog.toCommit)
+                    }
+            }
+
             .build()
 }

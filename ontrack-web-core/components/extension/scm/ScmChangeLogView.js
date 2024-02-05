@@ -73,6 +73,7 @@ export default function ScmChangeLogView({from, to}) {
                             buildTo: to {
                                 ...BuildData
                             }
+                            diffLink
                             commits {
                                 commit {
                                     id

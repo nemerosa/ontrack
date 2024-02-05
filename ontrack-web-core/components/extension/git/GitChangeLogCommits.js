@@ -21,7 +21,7 @@ export default function GitChangeLogCommits({id, commits, diffLink}) {
                 id={id}
                 title={
                     <>
-                        {/* TODO Commits (<Link href={diffLink}>diff</Link>)*/}
+                        Commits (<Link href={diffLink}>diff</Link>)
                     </>
                 }
             >

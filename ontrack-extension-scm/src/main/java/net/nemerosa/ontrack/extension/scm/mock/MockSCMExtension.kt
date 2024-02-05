@@ -289,7 +289,7 @@ class MockSCMExtension(
             reviewers = reviewers,
         )
 
-        override fun getDiffLink(commitFrom: String, commitTo: String): String? =
+        override fun getDiffLink(commitFrom: String, commitTo: String): String =
             "diff?from=$commitFrom&to=$commitTo"
 
         override fun getBuildCommit(build: Build): String? =

@@ -31,6 +31,9 @@ test("SCM change log", async ({page}) => {
     await changeLogPage.checkBuildFrom(from)
     await changeLogPage.checkBuildTo(to)
 
+    // Expecting the build diff to be there
+    await changeLogPage.checkCommitDiffLink()
+
     // Expecting some commits to show
     await changeLogPage.checkCommitMessage(commits[4], {present: true})
     await changeLogPage.checkCommitMessage(commits[3], {present: true})
