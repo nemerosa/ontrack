@@ -13,9 +13,6 @@ class GQLRootQuerySCMChangeLogIT : AbstractQLKTITSupport() {
     @Autowired
     private lateinit var mockSCMTester: MockSCMTester
 
-    @Autowired
-    private lateinit var scmChangeLogService: SCMChangeLogService
-
     @Test
     fun `Getting a change log using the SCM API`() {
         asAdmin {
@@ -24,28 +21,33 @@ class GQLRootQuerySCMChangeLogIT : AbstractQLKTITSupport() {
                     branch {
                         configureMockSCMBranch()
 
-                        build {}
+                        build("1.01") {}
                         val from = build {
                             // Mock termination commit
                             repositoryIssue("ISS-20", "Last issue before the change log")
                             withRepositoryCommit("ISS-20 Last commit before the change log")
                         }
-                        build {
+                        build("1.02") {
                             repositoryIssue("ISS-21", "Some new feature")
                             withRepositoryCommit("ISS-21 Some commits for a feature", property = false)
                             withRepositoryCommit("ISS-21 Some fixes for a feature")
                         }
-                        build {
+                        build("1.03") {
                             repositoryIssue("ISS-22", "Some fixes are needed")
                             withRepositoryCommit("ISS-22 Fixing some bugs")
                         }
-                        build {
+                        build("1.04") {
                             repositoryIssue("ISS-23", "Some nicer UI")
                             withRepositoryCommit("ISS-23 Fixing some CSS")
 
                             run(
                                 """
                                 {
+                                    branch(id: ${from.branch.id}) {
+                                        builds {
+                                            name
+                                        }
+                                    }
                                     scmChangeLog(
                                         from: ${from.id},
                                         to: ${this@build.id}
@@ -55,6 +57,9 @@ class GQLRootQuerySCMChangeLogIT : AbstractQLKTITSupport() {
                                                 message
                                             }
                                             annotatedMessage
+                                            build {
+                                                name
+                                            }
                                         }
                                         issues {
                                             issues {
@@ -67,6 +72,9 @@ class GQLRootQuerySCMChangeLogIT : AbstractQLKTITSupport() {
                                 }
                             """.trimIndent()
                             ) { data ->
+                                data.path("branch").path("builds").forEach { build ->
+                                    println(build.path("name").asText())
+                                }
                                 val changeLog = data.path("scmChangeLog")
                                 assertEquals(
                                     mapOf(
@@ -76,24 +84,34 @@ class GQLRootQuerySCMChangeLogIT : AbstractQLKTITSupport() {
                                                     "message" to "ISS-23 Fixing some CSS",
                                                 ),
                                                 "annotatedMessage" to """<a href="mock://Mock issues/issue/ISS-23">ISS-23</a> Fixing some CSS""",
+                                                "build" to mapOf(
+                                                    "name" to "1.04"
+                                                ),
                                             ),
                                             mapOf(
                                                 "commit" to mapOf(
                                                     "message" to "ISS-22 Fixing some bugs"
                                                 ),
                                                 "annotatedMessage" to """<a href="mock://Mock issues/issue/ISS-22">ISS-22</a> Fixing some bugs""",
+                                                "build" to mapOf(
+                                                    "name" to "1.03"
+                                                ),
                                             ),
                                             mapOf(
                                                 "commit" to mapOf(
                                                     "message" to "ISS-21 Some fixes for a feature"
                                                 ),
                                                 "annotatedMessage" to """<a href="mock://Mock issues/issue/ISS-21">ISS-21</a> Some fixes for a feature""",
+                                                "build" to mapOf(
+                                                    "name" to "1.02"
+                                                ),
                                             ),
                                             mapOf(
                                                 "commit" to mapOf(
                                                     "message" to "ISS-21 Some commits for a feature"
                                                 ),
                                                 "annotatedMessage" to """<a href="mock://Mock issues/issue/ISS-21">ISS-21</a> Some commits for a feature""",
+                                                "build" to null,
                                             ),
                                         ),
                                         "issues" to mapOf(

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.scm.mock
 
 import net.nemerosa.ontrack.common.RunProfile
+import net.nemerosa.ontrack.common.generateRandomString
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest
 import net.nemerosa.ontrack.extension.issues.IssueServiceExtension
 import net.nemerosa.ontrack.extension.issues.export.ExportFormat
@@ -17,10 +18,7 @@ import net.nemerosa.ontrack.extension.scm.service.SCMPath
 import net.nemerosa.ontrack.extension.scm.service.SCMPullRequest
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.extension.ExtensionFeature
-import net.nemerosa.ontrack.model.structure.Branch
-import net.nemerosa.ontrack.model.structure.Build
-import net.nemerosa.ontrack.model.structure.Project
-import net.nemerosa.ontrack.model.structure.PropertyService
+import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.MessageAnnotation.Companion.of
 import net.nemerosa.ontrack.model.support.MessageAnnotator
 import net.nemerosa.ontrack.model.support.RegexMessageAnnotator
@@ -34,6 +32,7 @@ import java.util.concurrent.atomic.AtomicLong
 class MockSCMExtension(
     extensionFeature: SCMExtensionFeature,
     private val propertyService: PropertyService,
+    private val structureService: StructureService,
 ) : AbstractExtension(extensionFeature), SCMExtension {
 
     override fun getSCM(project: Project): SCM? =
@@ -92,7 +91,9 @@ class MockSCMExtension(
                 "[^a-zA-Z0-9\\.]".toRegex(),
                 "-"
             )
-            val id = "$normalizedBranchName-$indexOnBranch"
+            val prefix = "$normalizedBranchName-$indexOnBranch"
+            val randomPart = generateRandomString(7)
+            val id = "$prefix-$randomPart"
             branch.commits += MockCommit(
                 repository = name,
                 revision = revisionCount.incrementAndGet(),
@@ -302,6 +303,15 @@ class MockSCMExtension(
                 MockIssueServiceExtension(repository),
                 MockIssueServiceConfiguration.INSTANCE,
             )
+
+        override fun findBuildByCommit(project: Project, id: String): Build? =
+            propertyService.findByEntityTypeAndSearchArguments(
+                entityType = ProjectEntityType.BUILD,
+                propertyType = MockSCMBuildCommitPropertyType::class,
+                searchArguments = MockSCMBuildCommitProperty.getSearchArguments(id)
+            ).firstOrNull()?.let { buildId ->
+                structureService.getBuild(buildId)
+            }
     }
 
     class MockIssueServiceConfiguration : IssueServiceConfiguration {

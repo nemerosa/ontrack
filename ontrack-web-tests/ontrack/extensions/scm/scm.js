@@ -15,6 +15,7 @@ class MockSCMContext {
 
     constructor(repositoryName) {
         this.repositoryName = repositoryName
+        this.commitIdsPerMessage = {}
     }
 
     async configureProjectForMockSCM(project) {
@@ -126,7 +127,9 @@ class MockSCMContext {
                 message,
             }
         )
-        return json.commitId
+        const id = json.commitId;
+        this.commitIdsPerMessage[message] = id
+        return id
     }
 
     async setBuildWithCommits(buildPromise, commits, branch = 'main') {

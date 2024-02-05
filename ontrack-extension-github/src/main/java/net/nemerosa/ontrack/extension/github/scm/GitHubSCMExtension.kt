@@ -29,10 +29,7 @@ import net.nemerosa.ontrack.extension.scm.service.SCMPullRequest
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.exceptions.InputException
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
-import net.nemerosa.ontrack.model.structure.Branch
-import net.nemerosa.ontrack.model.structure.Build
-import net.nemerosa.ontrack.model.structure.Project
-import net.nemerosa.ontrack.model.structure.PropertyService
+import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 
 /**
@@ -47,6 +44,7 @@ class GitHubSCMExtension(
     private val gitHubConfigurationService: GitHubConfigurationService,
     private val issueServiceRegistry: IssueServiceRegistry,
     private val issueServiceExtension: GitHubIssueServiceExtension,
+    private val structureService: StructureService,
 ) : AbstractExtension(gitHubExtensionFeature), SCMExtension {
 
     override fun getSCM(project: Project): SCM? {
@@ -229,6 +227,15 @@ class GitHubSCMExtension(
                 GitHubSCMCommit(commit)
             }.sortedBy { it.timestamp }
         }
+
+        override fun findBuildByCommit(project: Project, id: String): Build? =
+            propertyService.findByEntityTypeAndSearchArguments(
+                entityType = ProjectEntityType.BUILD,
+                propertyType = GitCommitPropertyType::class,
+                searchArguments = GitCommitPropertyType.getGitCommitSearchArguments(id)
+            ).firstOrNull()?.let { buildId ->
+                structureService.getBuild(buildId)
+            }
 
         private val client: OntrackGitHubClient by lazy {
             clientFactory.create(configuration)

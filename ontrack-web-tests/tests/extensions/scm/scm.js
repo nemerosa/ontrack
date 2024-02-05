@@ -24,29 +24,39 @@ export async function provisionChangeLog() {
     await mockSCMContext.repositoryIssue({key: "ISS-22", summary: "Some fixes are needed"})
     await mockSCMContext.repositoryIssue({key: "ISS-23", summary: "Some nicer UI"})
 
+    const builds = []
+
     const from = await mockSCMContext.setBuildWithCommits(
         branch.createBuild(),
         commits.slice(0, 1)
     )
+    builds.push(from)
 
-    await mockSCMContext.setBuildWithCommits(
-        branch.createBuild(),
-        commits.slice(1, 3)
+    builds.push(
+        await mockSCMContext.setBuildWithCommits(
+            branch.createBuild(),
+            commits.slice(1, 3)
+        )
     )
 
-    await mockSCMContext.setBuildWithCommits(
-        branch.createBuild(),
-        commits.slice(3, 4)
+    builds.push(
+        await mockSCMContext.setBuildWithCommits(
+            branch.createBuild(),
+            commits.slice(3, 4)
+        )
     )
 
     const to = await mockSCMContext.setBuildWithCommits(
         branch.createBuild(),
         commits.slice(4)
     )
+    builds.push(to)
 
     return {
         from,
         to,
+        mockSCMContext,
+        builds,
     }
 }
 
@@ -61,23 +71,36 @@ export class SCMChangeLogPage {
     }
 
     async checkBuildFrom({name}) {
-        await expect(this.page.getByText(`From ${name}`, {exact: true})).toBeVisible()
-        await expect(this.page.getByRole('link', {name: name})).toBeVisible()
+        const container = this.page.locator('#from')
+        await expect(container.getByText(`From ${name}`, {exact: true})).toBeVisible()
+        await expect(container.getByRole('link', {name: name})).toBeVisible()
     }
 
     async checkBuildTo({name}) {
-        await expect(this.page.getByText(`To ${name}`, {exact: true})).toBeVisible()
-        await expect(this.page.getByRole('link', {name: name})).toBeVisible()
+        const container = this.page.locator('#to')
+        await expect(container.getByText(`To ${name}`, {exact: true})).toBeVisible()
+        await expect(container.getByRole('link', {name: name})).toBeVisible()
     }
 
     async checkCommitMessage(message, {present = true}) {
-        console.log("checkCommitMessage", {message, present})
         const container = this.page.locator('#commits')
         const locator = container.getByText(message, {exact: false})
         if (present) {
             await expect(locator).toBeVisible()
         } else {
             await expect(locator).not.toBeVisible()
+        }
+    }
+
+    async checkCommitBuild(message, mockSCMContext, build, {expected = true}) {
+        const commitId = mockSCMContext.commitIdsPerMessage[message]
+        const commitLocator = this.page.locator(`#commit-${commitId}`)
+        await expect(commitLocator.getByText(message)).toBeVisible()
+        const buildLinkLocator = commitLocator.getByRole('link', {name: build.name});
+        if (expected) {
+            await expect(buildLinkLocator).toBeVisible()
+        } else {
+            await expect(buildLinkLocator).not.toBeVisible()
         }
     }
 

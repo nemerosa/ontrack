@@ -7,7 +7,7 @@ const {provisionChangeLog, commits} = require("./scm");
 
 test("SCM change log", async ({page}) => {
     // Provisioning
-    const {from, to} = await provisionChangeLog()
+    const {from, to, mockSCMContext, builds} = await provisionChangeLog()
 
     // Login & going to the branch page
     await login(page)
@@ -39,4 +39,10 @@ test("SCM change log", async ({page}) => {
 
     // ... some not
     await changeLogPage.checkCommitMessage(commits[0], {present: false})
+
+    // Checks build links
+    await changeLogPage.checkCommitBuild(commits[4], mockSCMContext, to, {expected: true})
+    await changeLogPage.checkCommitBuild(commits[3], mockSCMContext, builds[2], {expected: true})
+    await changeLogPage.checkCommitBuild(commits[2], mockSCMContext, builds[1], {expected: true})
+    await changeLogPage.checkCommitBuild(commits[1], mockSCMContext, builds[1], {expected: false})
 })

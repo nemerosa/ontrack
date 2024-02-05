@@ -2,10 +2,12 @@ package net.nemerosa.ontrack.extension.scm.graphql
 
 import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLObjectType
+import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogEnabled
 import net.nemerosa.ontrack.extension.scm.changelog.SCMDecoratedCommit
 import net.nemerosa.ontrack.extension.scm.service.SCMDetector
 import net.nemerosa.ontrack.graphql.schema.GQLType
+import net.nemerosa.ontrack.graphql.schema.GQLTypeBuild
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.field
 import net.nemerosa.ontrack.graphql.support.getTypeDescription
@@ -48,14 +50,21 @@ class GQLTypeSCMDecoratedCommit(
                     }
             }
 
-//            .field {
-//                it.name("build")
-//                    .description("Any build linked to this commit")
-//                    .type(GraphQLTypeReference(GQLTypeBuild.BUILD))
-//                    .dataFetcher { env ->
-//                        val (project, commit) = env.getSource<SCMDecoratedCommit>()
-//                    }
-//            }
+            .field {
+                it.name("build")
+                    .description("Any build linked to this commit")
+                    .type(GraphQLTypeReference(GQLTypeBuild.BUILD))
+                    .dataFetcher { env ->
+                        val (project, commit) = env.getSource<SCMDecoratedCommit>()
+                        val scm = scmDetector.getSCM(project)
+                        if (scm != null && scm is SCMChangeLogEnabled) {
+                            val build = scm.findBuildByCommit(project, commit.id)
+                            build
+                        } else {
+                            null
+                        }
+                    }
+            }
 
             .build()
 

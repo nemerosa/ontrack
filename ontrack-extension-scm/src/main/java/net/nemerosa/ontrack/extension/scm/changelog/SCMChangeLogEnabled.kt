@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.scm.changelog
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
 import net.nemerosa.ontrack.extension.scm.service.SCM
 import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.Project
 
 /**
  * Marks a [SCM] as being able to compute a change log.
@@ -38,5 +39,10 @@ interface SCMChangeLogEnabled : SCM {
      * Gets the configured issue service for this SCM.
      */
     fun getConfiguredIssueService(): ConfiguredIssueService?
+
+    /**
+     * Finding a build using its commit
+     */
+    fun findBuildByCommit(project: Project, id: String): Build?
 
 }

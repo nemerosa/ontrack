@@ -5360,6 +5360,8 @@ type SCMCommit {
 type SCMDecoratedCommit {
     "Annotated message with links"
     annotatedMessage: String!
+    "Any build linked to this commit"
+    build: Build
     "commit field"
     commit: SCMCommit!
 }

@@ -83,49 +83,49 @@ export default function ScmChangeLogView({from, to}) {
                                     timestamp
                                 }
                                 annotatedMessage
-                                #                                # TODO build {
-                                #                                    id
-                                #                                    name
-                                #                                    creation {
-                                #                                        time
-                                #                                    }
-                                #                                    releaseProperty {
-                                #                                        value
-                                #                                    }
-                                #                                    promotionRuns(lastPerLevel: true) {
-                                #                                        creation {
-                                #                                            time
-                                #                                        }
-                                #                                        annotatedDescription
-                                #                                        description
-                                #                                        promotionLevel {
-                                #                                            id
-                                #                                            name
-                                #                                            image
-                                #                                            _image
-                                #                                        }
-                                #                                    }
-                                #                                    usingQualified {
-                                #                                        pageItems {
-                                #                                            qualifier
-                                #                                            build {
-                                #                                                id
-                                #                                                branch {
-                                #                                                    project {
-                                #                                                        name
-                                #                                                    }
-                                #                                                }
-                                #                                                name
-                                #                                                releaseProperty {
-                                #                                                    value
-                                #                                                }
-                                #                                                creation {
-                                #                                                    time
-                                #                                                }
-                                #                                            }
-                                #                                        }
-                                #                                    }
-                                #                                }
+                                build {
+                                    id
+                                    name
+                                    creation {
+                                        time
+                                    }
+                                    releaseProperty {
+                                        value
+                                    }
+                                    promotionRuns(lastPerLevel: true) {
+                                        creation {
+                                            time
+                                        }
+                                        annotatedDescription
+                                        description
+                                        promotionLevel {
+                                            id
+                                            name
+                                            image
+                                            _image
+                                        }
+                                    }
+                                    usingQualified {
+                                        pageItems {
+                                            qualifier
+                                            build {
+                                                id
+                                                branch {
+                                                    project {
+                                                        name
+                                                    }
+                                                }
+                                                name
+                                                releaseProperty {
+                                                    value
+                                                }
+                                                creation {
+                                                    time
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                             issues {
                                 issueServiceConfiguration {

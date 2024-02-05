@@ -199,6 +199,8 @@ type AutoVersioningNotification {
     channel: String!
     "config field"
     config: JSON!
+    "Optional notification template used to override the default text"
+    notificationTemplate: String
     "scope field"
     scope: [AutoVersioningNotificationScope!]!
 }
@@ -277,7 +279,7 @@ type AutoVersioningSourceConfig {
     targetPropertyType: String
     "Regex to use in the target file to identify the line to replace with the new version. The first matching group must be the version."
     targetRegex: String
-    "Prefix to use for the upgrade branch in Git, defaults to `feature/auto-upgrade-<project>-<version>`"
+    "Prefix to use for the upgrade branch in Git, defaults to `feature/auto-upgrade-<project>-<version>-<branch>`"
     upgradeBranchPattern: String
     "Validation stamp to create on auto versioning (optional)"
     validationStamp: String
@@ -399,6 +401,8 @@ type Branch implements Authorizable & ProjectEntity {
     pullRequest: GitPullRequest
     "When set, adding a release/label on a build will also validate this build."
     releaseValidationProperty: Property
+    "SCM information about the branch"
+    scmBranchInfo: SCMBranchInfo
     "List of branches this branch is a dependency of."
     upstreamLinks(
         "Number of builds to use to get the dependencies"
@@ -585,6 +589,8 @@ type Build implements Authorizable & ProjectEntity {
     messageProperty: Property
     "List of meta information properties"
     metaInfoProperty: Property
+    "Mock SCM used for testing only"
+    mockSCMBuildCommitProperty: Property
     name: String
     "Next build"
     nextBuild: Build
@@ -809,6 +815,12 @@ type BuildPaginated {
     pageItems: [Build!]!
 }
 
+"Output type for the bulkUpdatePromotionLevelById mutation."
+type BulkUpdatePromotionLevelByIdPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
 "Configuration as code information"
 type CasC {
     "Renders the current settings as JSON"
@@ -915,6 +927,24 @@ type ConfigurableIndicatorTypeStateLinks {
     _update: String
 }
 
+"Generic configuration"
+type Configuration {
+    "Specific data for the configuration (may include the name as well)"
+    data: JSON
+    "Addition data outside of the configuration itself"
+    extra: JSON
+    "Unique name for the configuration"
+    name: String!
+}
+
+"Result of testing a configuration"
+type ConnectionResult {
+    "Result message"
+    message: String!
+    "Type of result"
+    type: ConnectionResultType!
+}
+
 "Output type for the createBranchOrGet mutation."
 type CreateBranchOrGetPayload implements Payload {
     "Created or existing branch"
@@ -955,10 +985,22 @@ type CreateBuiltInAccountPayload implements Payload {
     errors: [UserError]
 }
 
+"Output type for the createConfiguration mutation."
+type CreateConfigurationPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
 "Output type for the createGitHubConfiguration mutation."
 type CreateGitHubConfigurationPayload implements Payload {
     "Saved configuration"
     configuration: GitHubEngineConfiguration
+    "List of errors"
+    errors: [UserError]
+}
+
+"Output type for the createJenkinsConfiguration mutation."
+type CreateJenkinsConfigurationPayload implements Payload {
     "List of errors"
     errors: [UserError]
 }
@@ -1202,6 +1244,18 @@ type DeleteBuildReleasePropertyPayload implements Payload {
     errors: [UserError]
 }
 
+"Output type for the deleteConfiguration mutation."
+type DeleteConfigurationPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
+"Output type for the deleteJenkinsConfiguration mutation."
+type DeleteJenkinsConfigurationPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
 "Output type for the deleteNotificationRecords mutation."
 type DeleteNotificationRecordsPayload implements Payload {
     "List of errors"
@@ -1404,6 +1458,12 @@ type DeletePromotionLevelAutoPromotionPropertyPayload implements Payload {
     errors: [UserError]
     "Promotion level updated"
     promotionLevel: PromotionLevel
+}
+
+"Output type for the deletePromotionLevelById mutation."
+type DeletePromotionLevelByIdPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
 }
 
 "Output type for the deletePromotionLevelMessagePropertyById mutation."
@@ -1627,6 +1687,8 @@ type EventSubscriptionPayload {
     channelConfig: JSON!
     "Textual description of the channel configuration"
     channelConfigText: String!
+    "Optional template to use for the message"
+    contentTemplate: String
     "If this subscription is disabled"
     disabled: Boolean
     "List of events types to subscribe to"
@@ -1705,6 +1767,8 @@ type GitChangeLog {
         "Name of the project to follow"
         project: String!
     ): GitChangeLog
+    "Link to a diff between the two builds"
+    diffLink: String
     "Export of the change log according to some specifications"
     export(
         "Export specifications"
@@ -1716,6 +1780,8 @@ type GitChangeLog {
     hasIssues: Boolean!
     "List of issues in the change log"
     issues: GitChangeLogIssues
+    "All dependency changes"
+    linkChanges: [LinkChange!]!
     "Project linked to the change log"
     project: Project!
     "If an error has occured during the synchronization"
@@ -2048,8 +2114,6 @@ type GitUICommit {
     build: Build
     "commit field"
     commit: GitCommit!
-    "formattedMessage field"
-    formattedMessage: String!
     "fullAnnotatedMessage field"
     fullAnnotatedMessage: String!
     "id field"
@@ -2626,6 +2690,14 @@ type Issue {
     url: String
 }
 
+"Format for exporting a list of issues"
+type IssueExportFormat {
+    "Unique ID for this format"
+    id: String!
+    "Display name for this format"
+    name: String!
+}
+
 "Technical representation of an issue service and its configuration"
 type IssueServiceConfigurationRepresentation {
     "ID of the issue service"
@@ -2640,6 +2712,16 @@ type IssueServiceConfigurationRepresentation {
 type IssueStatus {
     "Name of the status"
     name: String
+}
+
+"Jenkins configuration"
+type JenkinsConfiguration {
+    "Name of the configuration"
+    name: String!
+    "URL of Jenkins"
+    url: String!
+    "Username used to connect"
+    user: String
 }
 
 "JobIngestionConfigValidation"
@@ -2704,6 +2786,18 @@ type LinkBuildPayload implements Payload {
     errors: [UserError]
 }
 
+"Description of a change on a linked dependency."
+type LinkChange {
+    "from field"
+    from: Build
+    "project field"
+    project: Project!
+    "qualifier field"
+    qualifier: String!
+    "to field"
+    to: Build
+}
+
 "Output type for the linksBuild mutation."
 type LinksBuildPayload implements Payload {
     "Build linked from"
@@ -2721,6 +2815,11 @@ type LockAccountPayload implements Payload {
 }
 
 type Mutation {
+    "Bulk update of a promotion level"
+    bulkUpdatePromotionLevelById(
+        "Input for the mutation"
+        input: BulkUpdatePromotionLevelByIdInput
+    ): BulkUpdatePromotionLevelByIdPayload
     "Changing the password of the current user"
     changePassword(input: ChangePasswordInput!): ChangePasswordPayload
     "Change the status of a validation run"
@@ -2763,11 +2862,21 @@ type Mutation {
         "Input for the mutation"
         input: CreateBuiltInAccountInput
     ): CreateBuiltInAccountPayload
+    "Creates a configuration"
+    createConfiguration(
+        "Input for the mutation"
+        input: CreateConfigurationInput
+    ): CreateConfigurationPayload
     "Creates a new GitHub configuration."
     createGitHubConfiguration(
         "Input for the mutation"
         input: CreateGitHubConfigurationInput
     ): CreateGitHubConfigurationPayload
+    "Creates a Jenkins configuration"
+    createJenkinsConfiguration(
+        "Input for the mutation"
+        input: CreateJenkinsConfigurationInput
+    ): CreateJenkinsConfigurationPayload
     "Creates a new project"
     createProject(
         "Input for the mutation"
@@ -2903,8 +3012,18 @@ type Mutation {
         "Input for the mutation"
         input: DeleteBuildReleasePropertyByIdInput
     ): DeleteBuildReleasePropertyByIdPayload
+    "Deletes a configuration"
+    deleteConfiguration(
+        "Input for the mutation"
+        input: DeleteConfigurationInput
+    ): DeleteConfigurationPayload
     "Deletes a dashboard"
     deleteDashboard(input: DeleteDashboardInput!): DeletionPayload
+    "Deletes a Jenkins configuration"
+    deleteJenkinsConfiguration(
+        "Input for the mutation"
+        input: DeleteJenkinsConfigurationInput
+    ): DeleteJenkinsConfigurationPayload
     "Deleting notification records"
     deleteNotificationRecords(
         "Input for the mutation"
@@ -3035,6 +3154,11 @@ type Mutation {
         "Input for the mutation"
         input: DeletePromotionLevelAutoPromotionPropertyByIdInput
     ): DeletePromotionLevelAutoPromotionPropertyByIdPayload
+    "Deletes an existing promotion level"
+    deletePromotionLevelById(
+        "Input for the mutation"
+        input: DeletePromotionLevelByIdInput
+    ): DeletePromotionLevelByIdPayload
     "Deletes the message property on a promotion level identified by name."
     deletePromotionLevelMessageProperty(
         "Input for the mutation"
@@ -3272,6 +3396,8 @@ type Mutation {
     ): SaveBuildFilterPayload
     "Saves a dashboard"
     saveDashboard(input: SaveDashboardInput!): SaveDashboardPayload
+    "Saving some generic settings"
+    saveSettings(input: SaveSettingsInput!): SaveSettingsPayload
     "Selects a dashboard"
     selectDashboard(input: SelectDashboardInput!): SelectDashboardPayload
     "Sets the auto versioning configuration for a branch"
@@ -3726,6 +3852,16 @@ type Mutation {
         "Input for the mutation"
         input: SubscribeValidationStampToEventsInput
     ): SubscribeValidationStampToEventsPayload
+    "Tests a configuration"
+    testConfiguration(
+        "Input for the mutation"
+        input: TestConfigurationInput
+    ): TestConfigurationPayload
+    "Tests a Jenkins configuration"
+    testJenkinsConfiguration(
+        "Input for the mutation"
+        input: TestJenkinsConfigurationInput
+    ): TestJenkinsConfigurationPayload
     "Unmarks a branch as favourite"
     unfavouriteBranch(
         "Input for the mutation"
@@ -3746,11 +3882,26 @@ type Mutation {
         "Input for the mutation"
         input: UnshareSCMFileChangeFilterInput
     ): UnshareSCMFileChangeFilterPayload
+    "Updates a configuration"
+    updateConfiguration(
+        "Input for the mutation"
+        input: UpdateConfigurationInput
+    ): UpdateConfigurationPayload
+    "Updates a Jenkins configuration"
+    updateJenkinsConfiguration(
+        "Input for the mutation"
+        input: UpdateJenkinsConfigurationInput
+    ): UpdateJenkinsConfigurationPayload
     "Updates an existing project"
     updateProject(
         "Input for the mutation"
         input: UpdateProjectInput
     ): UpdateProjectPayload
+    "Updates an existing promotion level"
+    updatePromotionLevelById(
+        "Input for the mutation"
+        input: UpdatePromotionLevelByIdInput
+    ): UpdatePromotionLevelByIdPayload
     "Updates a validation stamp filter"
     updateValidationStampFilter(
         "Input for the mutation"
@@ -3986,7 +4137,7 @@ type Project implements ProjectEntity {
     "Associates the project with a GitHub repository"
     gitHubProjectConfigurationProperty: Property
     "List of formats supported for the export of issues in this project"
-    gitIssueExportFormats: [ExportFormat!]!
+    gitIssueExportFormats: [ExportFormat!]! @deprecated(reason: "List of issue export formats can be taken from the root and is now called issueExportFormats.")
     "Information about an issue in the project"
     gitIssueInfo(
         "Flag to display only the first branch per type"
@@ -4356,11 +4507,13 @@ type ProjectRole {
     name: String!
 }
 
-type PromotionLevel implements ProjectEntity {
+type PromotionLevel implements Authorizable & ProjectEntity {
     "Link to the image"
     _image: String
     "Description with links."
     annotatedDescription: String
+    "Authorizations for this context"
+    authorizations: [Authorization!]!
     "Allows a promotion level to be granted on a build as soon as a list of validation stamps has been passed"
     autoPromotionProperty: Property
     "Reference to branch"
@@ -4631,6 +4784,11 @@ type Query {
         "Filter the indicators on their type ID"
         type: String
     ): [ConfigurableIndicatorTypeState!]!
+    "Gets a list of configuration for a given type."
+    configurations(
+        "Configuration type"
+        configurationType: String!
+    ): [Configuration!]!
     "List of available widgets"
     dashboardWidgets: [Widget!]!
     "Getting a project entity using its type and ID."
@@ -4661,7 +4819,7 @@ type Query {
         from: Int!,
         "ID of the build to end the change log with"
         to: Int!
-    ): GitChangeLog
+    ): GitChangeLog @deprecated(reason: "Will be removed in V5. Prefer using the `scmChangeLog` query.")
     "Gets a change log by its UUID"
     gitChangeLogByUUID(
         "UUID of the change log"
@@ -4746,6 +4904,10 @@ type Query {
     indicatorsManagement: IndicatorsManagement! @deprecated(reason: "Will be removed in 4.6")
     "Gets information about the application"
     info: Info
+    "List of available export formats"
+    issueExportFormats: [IssueExportFormat!]!
+    "List of Jenkins configurations"
+    jenkinsConfigurations: [JenkinsConfiguration!]!
     "List of all labels"
     labels(
         "Category to look for"
@@ -4872,6 +5034,15 @@ type Query {
     scmCatalogTeamStats: [SCMCatalogTeamStats!]!
     "List of teams indexed by the SCM catalog"
     scmCatalogTeams: [SCMCatalogTeam!]!
+    "Query to get a change log between two builds."
+    scmChangeLog(
+        "ID of the build from"
+        from: Int!,
+        "List of projects to follow one by one for a get deep change log"
+        projects: [String!],
+        "ID of the build to"
+        to: Int!
+    ): SCMChangeLog
     "Performs a search in Ontrack"
     search(
         "Offset for the page"
@@ -5068,6 +5239,20 @@ type RunInfo {
     triggerType: String
 }
 
+"SCM information for a given branch."
+type SCMBranchInfo {
+    "SCM branch"
+    branch: String!
+    "Are change logs enabled for this SCM?"
+    changeLogs: Boolean
+    "SCM engine or flavor (like GitHub, etc.)"
+    engine: String!
+    "SCM type (like git, etc.)"
+    type: String!
+    "URI of the repository"
+    uri: String!
+}
+
 "SCM Catalog entry"
 type SCMCatalogEntry {
     "SCM Config name"
@@ -5133,6 +5318,54 @@ type SCMCatalogTeamStats {
     teamCount: Int
 }
 
+"Representation of a change log between two builds"
+type SCMChangeLog {
+    "List of commits between the builds"
+    commits: [SCMDecoratedCommit!]!
+    "Boundary for the change log"
+    from: Build!
+    "List of issues between the builds"
+    issues: SCMChangeLogIssues
+    "Boundary for the change log"
+    to: Build!
+}
+
+"SCMChangeLogIssues"
+type SCMChangeLogIssues {
+    "issueServiceConfiguration field"
+    issueServiceConfiguration: IssueServiceConfigurationRepresentation!
+    "issues field"
+    issues: [Issue!]!
+}
+
+"Common attributes for a commit (or revision)."
+type SCMCommit {
+    "Author of the commit"
+    author: String!
+    "Mail of the author of the commit. Can be `null` if not available."
+    authorEmail: String
+    "Identifier of the commit"
+    id: String!
+    "Link to the commit"
+    link: String!
+    "Message associated with the commit"
+    message: String!
+    "Short identifier for the commit"
+    shortId: String!
+    "Timestamp of the commit"
+    timestamp: LocalDateTime!
+}
+
+"SCMDecoratedCommit"
+type SCMDecoratedCommit {
+    "Annotated message with links"
+    annotatedMessage: String!
+    "Any build linked to this commit"
+    build: Build
+    "commit field"
+    commit: SCMCommit!
+}
+
 "Saved file change filter"
 type SCMFileChangeFilter {
     "Name of the filter"
@@ -5158,6 +5391,11 @@ type SaveBuildFilterPayload implements Payload {
 type SaveDashboardPayload implements PayloadInterface {
     "Saved dashboard"
     dashboard: Dashboard
+    "List of errors"
+    errors: [PayloadUserError]
+}
+
+type SaveSettingsPayload implements PayloadInterface {
     "List of errors"
     errors: [PayloadUserError]
 }
@@ -5806,6 +6044,23 @@ type SetValidationStampPropertyPayload implements Payload {
 type Settings {
     "Home page settings"
     homePage: HomePageSettingsType!
+    "List of all settings and their values"
+    list: [SettingsEntry!]!
+    "Getting some settings using their ID"
+    settingsById(
+        "ID of the settings to get"
+        id: String!
+    ): SettingsEntry
+}
+
+"SettingsEntry"
+type SettingsEntry {
+    "id field"
+    id: String!
+    "title field"
+    title: String!
+    "values field"
+    values: JSON!
 }
 
 "Output type for the setupCHMLValidationStamp mutation."
@@ -5958,6 +6213,22 @@ type SubscribeValidationStampToEventsPayload implements Payload {
     subscription: EventSubscriptionPayload
 }
 
+"Output type for the testConfiguration mutation."
+type TestConfigurationPayload implements Payload {
+    "Result of the test"
+    connectionResult: ConnectionResult
+    "List of errors"
+    errors: [UserError]
+}
+
+"Output type for the testJenkinsConfiguration mutation."
+type TestJenkinsConfigurationPayload implements Payload {
+    "Result of the test"
+    connectionResult: ConnectionResult
+    "List of errors"
+    errors: [UserError]
+}
+
 "Authentication token"
 type Token {
     "Token creation date."
@@ -6027,12 +6298,32 @@ type UnshareSCMFileChangeFilterPayload implements Payload {
     errors: [UserError]
 }
 
+"Output type for the updateConfiguration mutation."
+type UpdateConfigurationPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
+"Output type for the updateJenkinsConfiguration mutation."
+type UpdateJenkinsConfigurationPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
 "Output type for the updateProject mutation."
 type UpdateProjectPayload implements Payload {
     "List of errors"
     errors: [UserError]
     "Updated project"
     project: Project
+}
+
+"Output type for the updatePromotionLevelById mutation."
+type UpdatePromotionLevelByIdPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Updated promotion level"
+    promotionLevel: PromotionLevel
 }
 
 "Output type for the updateValidationStampFilter mutation."
@@ -6566,6 +6857,12 @@ enum ConfigurableIndicatorAttributeType {
     REQUIRED
 }
 
+"Type of result returned when checking a configuration"
+enum ConnectionResultType {
+    ERROR
+    OK
+}
+
 enum DashboardContextUserScope {
     BUILT_IN
     PRIVATE
@@ -6718,6 +7015,8 @@ input AutoVersioningNotificationInput {
     channel: String!
     "config field"
     config: JSON!
+    "Optional notification template used to override the default text"
+    notificationTemplate: String
     "scope field"
     scope: [AutoVersioningNotificationScope!]!
 }
@@ -6757,7 +7056,7 @@ input AutoVersioningSourceConfigInput {
     targetPropertyType: String
     "Regex to use in the target file to identify the line to replace with the new version. The first matching group must be the version."
     targetRegex: String
-    "Prefix to use for the upgrade branch in Git, defaults to `feature/auto-upgrade-<project>-<version>`"
+    "Prefix to use for the upgrade branch in Git, defaults to `feature/auto-upgrade-<project>-<version>-<branch>`"
     upgradeBranchPattern: String
     "Validation stamp to create on auto versioning (optional)"
     validationStamp: String
@@ -6787,6 +7086,12 @@ input BuildSearchForm {
     propertyValue: String
     "Matches a build having at least this validation with PASSED as a status."
     validationStampName: String
+}
+
+"Input type for the bulkUpdatePromotionLevelById mutation."
+input BulkUpdatePromotionLevelByIdInput {
+    "Promotion level ID"
+    id: Int!
 }
 
 "CHML level, associated a given CHML type and a value"
@@ -6912,6 +7217,16 @@ input CreateBuiltInAccountInput {
     password: String!
 }
 
+"Input type for the createConfiguration mutation."
+input CreateConfigurationInput {
+    "data field"
+    data: JSON!
+    "name field"
+    name: String!
+    "type field"
+    type: String!
+}
+
 "Input type for the createGitHubConfiguration mutation."
 input CreateGitHubConfigurationInput {
     "ID of the GitHub App to use for authentication"
@@ -6931,6 +7246,18 @@ input CreateGitHubConfigurationInput {
     "GitHub server URL. Null will be replaced by https://github.com"
     url: String
     "User name for authentication"
+    user: String
+}
+
+"Input type for the createJenkinsConfiguration mutation."
+input CreateJenkinsConfigurationInput {
+    "name field"
+    name: String!
+    "password field"
+    password: String
+    "url field"
+    url: String!
+    "user field"
     user: String
 }
 
@@ -7196,9 +7523,23 @@ input DeleteBuildReleasePropertyInput {
     project: String!
 }
 
+"Input type for the deleteConfiguration mutation."
+input DeleteConfigurationInput {
+    "name field"
+    name: String!
+    "type field"
+    type: String!
+}
+
 input DeleteDashboardInput {
     "UUID of the dashboard to delete"
     uuid: String!
+}
+
+"Input type for the deleteJenkinsConfiguration mutation."
+input DeleteJenkinsConfigurationInput {
+    "name field"
+    name: String!
 }
 
 "Input type for the deleteNotificationRecords mutation."
@@ -7359,6 +7700,12 @@ input DeletePromotionLevelAutoPromotionPropertyInput {
     project: String!
     "Promotion name"
     promotion: String!
+}
+
+"Input type for the deletePromotionLevelById mutation."
+input DeletePromotionLevelByIdInput {
+    "Promotion level ID"
+    id: Int!
 }
 
 "Input type for the deletePromotionLevelMessagePropertyById mutation."
@@ -7977,6 +8324,13 @@ input SaveDashboardInput {
     userScope: DashboardContextUserScope!
     uuid: String
     widgets: [WidgetInstanceInput!]!
+}
+
+input SaveSettingsInput {
+    "ID of the settings"
+    id: String!
+    "Values for the settings"
+    values: JSON!
 }
 
 input SelectDashboardInput {
@@ -9046,6 +9400,8 @@ input SubscribeBranchToEventsInput {
     channel: String!
     "Channel configuration"
     channelConfig: JSON!
+    "Optional template to use for the message"
+    contentTemplate: String
     "List of events types to subscribe to"
     events: [String!]!
     "Optional space-separated list of tokens to look for in the events"
@@ -9064,6 +9420,8 @@ input SubscribeBuildToEventsInput {
     channel: String!
     "Channel configuration"
     channelConfig: JSON!
+    "Optional template to use for the message"
+    contentTemplate: String
     "List of events types to subscribe to"
     events: [String!]!
     "Optional space-separated list of tokens to look for in the events"
@@ -9078,6 +9436,8 @@ input SubscribeProjectToEventsInput {
     channel: String!
     "Channel configuration"
     channelConfig: JSON!
+    "Optional template to use for the message"
+    contentTemplate: String
     "List of events types to subscribe to"
     events: [String!]!
     "Optional space-separated list of tokens to look for in the events"
@@ -9094,6 +9454,8 @@ input SubscribePromotionLevelToEventsInput {
     channel: String!
     "Channel configuration"
     channelConfig: JSON!
+    "Optional template to use for the message"
+    contentTemplate: String
     "List of events types to subscribe to"
     events: [String!]!
     "Optional space-separated list of tokens to look for in the events"
@@ -9114,6 +9476,8 @@ input SubscribePromotionRunToEventsInput {
     channel: String!
     "Channel configuration"
     channelConfig: JSON!
+    "Optional template to use for the message"
+    contentTemplate: String
     "List of events types to subscribe to"
     events: [String!]!
     "Optional space-separated list of tokens to look for in the events"
@@ -9130,6 +9494,8 @@ input SubscribeToEventsInput {
     channel: String!
     "Channel configuration"
     channelConfig: JSON!
+    "Optional template to use for the message"
+    contentTemplate: String
     "List of events types to subscribe to"
     events: [String!]!
     "Optional space-separated list of tokens to look for in the events"
@@ -9148,6 +9514,8 @@ input SubscribeValidationRunToEventsInput {
     channel: String!
     "Channel configuration"
     channelConfig: JSON!
+    "Optional template to use for the message"
+    contentTemplate: String
     "List of events types to subscribe to"
     events: [String!]!
     "Optional space-separated list of tokens to look for in the events"
@@ -9168,6 +9536,8 @@ input SubscribeValidationStampToEventsInput {
     channel: String!
     "Channel configuration"
     channelConfig: JSON!
+    "Optional template to use for the message"
+    contentTemplate: String
     "List of events types to subscribe to"
     events: [String!]!
     "Optional space-separated list of tokens to look for in the events"
@@ -9176,6 +9546,28 @@ input SubscribeValidationStampToEventsInput {
     project: String!
     "Validation name"
     validation: String!
+}
+
+"Input type for the testConfiguration mutation."
+input TestConfigurationInput {
+    "data field"
+    data: JSON!
+    "name field"
+    name: String!
+    "type field"
+    type: String!
+}
+
+"Input type for the testJenkinsConfiguration mutation."
+input TestJenkinsConfigurationInput {
+    "name field"
+    name: String!
+    "password field"
+    password: String
+    "url field"
+    url: String!
+    "user field"
+    user: String
 }
 
 "Input type for the unfavouriteBranch mutation."
@@ -9204,6 +9596,28 @@ input UnshareSCMFileChangeFilterInput {
     projectId: Int!
 }
 
+"Input type for the updateConfiguration mutation."
+input UpdateConfigurationInput {
+    "data field"
+    data: JSON!
+    "name field"
+    name: String!
+    "type field"
+    type: String!
+}
+
+"Input type for the updateJenkinsConfiguration mutation."
+input UpdateJenkinsConfigurationInput {
+    "name field"
+    name: String!
+    "password field"
+    password: String
+    "url field"
+    url: String!
+    "user field"
+    user: String
+}
+
 "Input type for the updateProject mutation."
 input UpdateProjectInput {
     "Project description (leave null to not change)"
@@ -9214,6 +9628,16 @@ input UpdateProjectInput {
     id: Int!
     "Project name (leave null to not change)"
     name: String
+}
+
+"Input type for the updatePromotionLevelById mutation."
+input UpdatePromotionLevelByIdInput {
+    "Promotion level description"
+    description: String!
+    "Promotion level ID"
+    id: Int!
+    "Promotion level name"
+    name: String!
 }
 
 "Input type for the updateValidationStampFilter mutation."
