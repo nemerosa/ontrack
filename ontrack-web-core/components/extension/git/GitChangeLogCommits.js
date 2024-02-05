@@ -40,7 +40,7 @@ export default function GitChangeLogCommits({id, commits, diffLink}) {
                             commits &&
                             commits.map(commit =>
                                 <GitChangeLogCommit
-                                    key={commit.id}
+                                    key={commit.commit.id}
                                     commit={commit}
                                 />
                             )

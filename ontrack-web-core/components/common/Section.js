@@ -1,13 +1,13 @@
 import {Col, Row} from "antd";
 
-export default function Section({title, extra, padding = 0, titleWidth = 18, children}) {
+export default function Section({id, title, extra, padding = 0, titleWidth = 18, children}) {
 
     const bodyStyle = {
         padding: padding ?? 0
     }
 
     return (
-        <div className="ot-section-container">
+        <div className="ot-section-container" id={id}>
             <div className="ot-section-title-header">
                 <Row align="middle">
                     <Col span={titleWidth} className="ot-section-title">

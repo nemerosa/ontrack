@@ -65,6 +65,7 @@ class SCMChangeLogServiceImpl(
         // Decoration of the commits
         val decoratedCommits = commits.map { commit ->
             SCMDecoratedCommit(
+                project = from.project,
                 commit = commit,
             )
         }

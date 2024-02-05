@@ -74,56 +74,58 @@ export default function ScmChangeLogView({from, to}) {
                                 ...BuildData
                             }
                             commits {
-                                id
-                                shortId
-                                # TODO annotatedMessage
-                                message
-                                link
-                                author
-                                timestamp
-#                                # TODO build {
-#                                    id
-#                                    name
-#                                    creation {
-#                                        time
-#                                    }
-#                                    releaseProperty {
-#                                        value
-#                                    }
-#                                    promotionRuns(lastPerLevel: true) {
-#                                        creation {
-#                                            time
-#                                        }
-#                                        annotatedDescription
-#                                        description
-#                                        promotionLevel {
-#                                            id
-#                                            name
-#                                            image
-#                                            _image
-#                                        }
-#                                    }
-#                                    usingQualified {
-#                                        pageItems {
-#                                            qualifier
-#                                            build {
-#                                                id
-#                                                branch {
-#                                                    project {
-#                                                        name
-#                                                    }
-#                                                }
-#                                                name
-#                                                releaseProperty {
-#                                                    value
-#                                                }
-#                                                creation {
-#                                                    time
-#                                                }
-#                                            }
-#                                        }
-#                                    }
-#                                }
+                                commit {
+                                    id
+                                    shortId
+                                    message
+                                    link
+                                    author
+                                    timestamp
+                                }
+                                annotatedMessage
+                                #                                # TODO build {
+                                #                                    id
+                                #                                    name
+                                #                                    creation {
+                                #                                        time
+                                #                                    }
+                                #                                    releaseProperty {
+                                #                                        value
+                                #                                    }
+                                #                                    promotionRuns(lastPerLevel: true) {
+                                #                                        creation {
+                                #                                            time
+                                #                                        }
+                                #                                        annotatedDescription
+                                #                                        description
+                                #                                        promotionLevel {
+                                #                                            id
+                                #                                            name
+                                #                                            image
+                                #                                            _image
+                                #                                        }
+                                #                                    }
+                                #                                    usingQualified {
+                                #                                        pageItems {
+                                #                                            qualifier
+                                #                                            build {
+                                #                                                id
+                                #                                                branch {
+                                #                                                    project {
+                                #                                                        name
+                                #                                                    }
+                                #                                                }
+                                #                                                name
+                                #                                                releaseProperty {
+                                #                                                    value
+                                #                                                }
+                                #                                                creation {
+                                #                                                    time
+                                #                                                }
+                                #                                            }
+                                #                                        }
+                                #                                    }
+                                #                                }
                             }
                             issues {
                                 issueServiceConfiguration {
@@ -160,14 +162,21 @@ export default function ScmChangeLogView({from, to}) {
         {
             id: "from",
             content: <Skeleton loading={loading}>
-                <ChangeLogBuild id="from" title={`From ${buildKnownName(changeLog.buildFrom)}`}
-                                build={changeLog.buildFrom}/>
+                {
+                    changeLog.buildFrom.creation &&
+                    <ChangeLogBuild id="from" title={`From ${buildKnownName(changeLog.buildFrom)}`}
+                                    build={changeLog.buildFrom}/>
+                }
             </Skeleton>,
         },
         {
             id: "to",
             content: <Skeleton loading={loading}>
-                <ChangeLogBuild id="to" title={`To ${buildKnownName(changeLog.buildTo)}`} build={changeLog.buildTo}/>
+                {
+                    changeLog.buildTo.creation &&
+                    <ChangeLogBuild id="to" title={`To ${buildKnownName(changeLog.buildTo)}`}
+                                    build={changeLog.buildTo}/>
+                }
             </Skeleton>,
         },
         {

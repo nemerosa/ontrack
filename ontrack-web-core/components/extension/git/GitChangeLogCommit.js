@@ -11,15 +11,15 @@ export default function GitChangeLogCommit({commit}) {
         <div className="ot-git-plot-line">
             <Space size={8}>
                 {/* Commit short hash */}
-                <Link href={commit.link} title="Link to the commit in the SCM">
-                    <Typography.Text code>{commit.shortId}</Typography.Text>
+                <Link href={commit.commit.link} title="Link to the commit in the SCM">
+                    <Typography.Text code>{commit.commit.shortId}</Typography.Text>
                 </Link>
-                {/* TODO Annotated message */}
-                {/*<SafeHTMLComponent htmlContent={commit.annotatedMessage}/>*/}
+                {/* Annotated message */}
+                <SafeHTMLComponent htmlContent={commit.annotatedMessage}/>
                 {/* Author */}
-                <span className="ot-git-plot-line-author" title="Author for the commit">{commit.author}</span>
+                <span className="ot-git-plot-line-author" title="Author for the commit">{commit.commit.author}</span>
                 {/* Timestamp */}
-                <span className="ot-git-plot-line-timestamp" title="Timestamp for the commit"><TimestampText value={commit.timestamp}/></span>
+                <span className="ot-git-plot-line-timestamp" title="Timestamp for the commit"><TimestampText value={commit.commit.timestamp}/></span>
                 {/* TODO Build decoration */}
                 {/*{*/}
                 {/*    commit.build &&*/}

@@ -2,7 +2,7 @@
 const {test} = require('@playwright/test')
 const {login} = require("../../core/login");
 const {BranchPage} = require("../../core/branches/branch");
-const {provisionChangeLog} = require("./scm");
+const {provisionChangeLog, commits} = require("./scm");
 
 
 test("SCM change log", async ({page}) => {
@@ -30,4 +30,13 @@ test("SCM change log", async ({page}) => {
     // Expecting the build sections to be visible
     await changeLogPage.checkBuildFrom(from)
     await changeLogPage.checkBuildTo(to)
+
+    // Expecting some commits to show
+    await changeLogPage.checkCommitMessage(commits[4], {present: true})
+    await changeLogPage.checkCommitMessage(commits[3], {present: true})
+    await changeLogPage.checkCommitMessage(commits[2], {present: true})
+    await changeLogPage.checkCommitMessage(commits[1], {present: true})
+
+    // ... some not
+    await changeLogPage.checkCommitMessage(commits[0], {present: false})
 })

@@ -2114,8 +2114,6 @@ type GitUICommit {
     build: Build
     "commit field"
     commit: GitCommit!
-    "formattedMessage field"
-    formattedMessage: String!
     "fullAnnotatedMessage field"
     fullAnnotatedMessage: String!
     "id field"
@@ -5323,7 +5321,7 @@ type SCMCatalogTeamStats {
 "Representation of a change log between two builds"
 type SCMChangeLog {
     "List of commits between the builds"
-    commits: [SCMChangeLogCommit!]!
+    commits: [SCMDecoratedCommit!]!
     "Boundary for the change log"
     from: Build!
     "List of issues between the builds"
@@ -5332,14 +5330,20 @@ type SCMChangeLog {
     to: Build!
 }
 
-"Common attributes for a commit (or revision) in a change log."
-type SCMChangeLogCommit {
+"SCMChangeLogIssues"
+type SCMChangeLogIssues {
+    "issueServiceConfiguration field"
+    issueServiceConfiguration: IssueServiceConfigurationRepresentation!
+    "issues field"
+    issues: [Issue!]!
+}
+
+"Common attributes for a commit (or revision)."
+type SCMCommit {
     "Author of the commit"
     author: String!
     "Mail of the author of the commit. Can be `null` if not available."
     authorEmail: String
-    "Annotated message"
-    formattedMessage: String!
     "Identifier of the commit"
     id: String!
     "Link to the commit"
@@ -5352,12 +5356,12 @@ type SCMChangeLogCommit {
     timestamp: LocalDateTime!
 }
 
-"SCMChangeLogIssues"
-type SCMChangeLogIssues {
-    "issueServiceConfiguration field"
-    issueServiceConfiguration: IssueServiceConfigurationRepresentation!
-    "issues field"
-    issues: [Issue!]!
+"SCMDecoratedCommit"
+type SCMDecoratedCommit {
+    "Annotated message with links"
+    annotatedMessage: String!
+    "commit field"
+    commit: SCMCommit!
 }
 
 "Saved file change filter"

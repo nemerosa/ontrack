@@ -54,6 +54,7 @@ class GQLRootQuerySCMChangeLogIT : AbstractQLKTITSupport() {
                                             commit {
                                                 message
                                             }
+                                            annotatedMessage
                                         }
                                         issues {
                                             issues {
@@ -71,16 +72,28 @@ class GQLRootQuerySCMChangeLogIT : AbstractQLKTITSupport() {
                                     mapOf(
                                         "commits" to listOf(
                                             mapOf(
-                                                "commit" to mapOf("message" to "ISS-23 Fixing some CSS")
+                                                "commit" to mapOf(
+                                                    "message" to "ISS-23 Fixing some CSS",
+                                                ),
+                                                "annotatedMessage" to """<a href="mock://Mock issues/issue/ISS-23">ISS-23</a> Fixing some CSS""",
                                             ),
                                             mapOf(
-                                                "commit" to mapOf("message" to "ISS-22 Fixing some bugs")
+                                                "commit" to mapOf(
+                                                    "message" to "ISS-22 Fixing some bugs"
+                                                ),
+                                                "annotatedMessage" to """<a href="mock://Mock issues/issue/ISS-22">ISS-22</a> Fixing some bugs""",
                                             ),
                                             mapOf(
-                                                "commit" to mapOf("message" to "ISS-21 Some fixes for a feature")
+                                                "commit" to mapOf(
+                                                    "message" to "ISS-21 Some fixes for a feature"
+                                                ),
+                                                "annotatedMessage" to """<a href="mock://Mock issues/issue/ISS-21">ISS-21</a> Some fixes for a feature""",
                                             ),
                                             mapOf(
-                                                "commit" to mapOf("message" to "ISS-21 Some commits for a feature")
+                                                "commit" to mapOf(
+                                                    "message" to "ISS-21 Some commits for a feature"
+                                                ),
+                                                "annotatedMessage" to """<a href="mock://Mock issues/issue/ISS-21">ISS-21</a> Some commits for a feature""",
                                             ),
                                         ),
                                         "issues" to mapOf(
