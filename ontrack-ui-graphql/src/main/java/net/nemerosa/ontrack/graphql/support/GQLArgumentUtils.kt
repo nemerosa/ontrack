@@ -18,10 +18,11 @@ import net.nemerosa.ontrack.graphql.schema.listInputType
 fun stringListArgument(
     name: String,
     description: String,
+    nullable: Boolean = false,
 ): GraphQLArgument = GraphQLArgument.newArgument()
     .name(name)
     .description(description)
-    .type(listInputType(GraphQLString))
+    .type(listInputType(GraphQLString, nullable = nullable))
     .build()
 
 /**
