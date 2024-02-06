@@ -1,0 +1,21 @@
+{
+  "message": "More work on feature 1",
+  "authorTimestamp": 1359075920,
+  "committer": {
+    "name": "Charlie",
+    "emailAddress": "charlie@example.com"
+  },
+  "committerTimestamp": 1449075830,
+  "parents": [
+    {
+      "id": "abcdef0123abcdef4567abcdef8987abcdef6543",
+      "displayId": "abcdef0"
+    }
+  ],
+  "author": {
+    "name": "Charlie",
+    "emailAddress": "charlie@example.com"
+  },
+  "id": "abcdef0123abcdef4567abcdef8987abcdef6543",
+  "displayId": "abcdef0"
+}
