@@ -4,7 +4,8 @@ import net.nemerosa.ontrack.extension.notifications.NotificationsConfigPropertie
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry
 import net.nemerosa.ontrack.model.support.ApplicationLogService
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMessagePreparator
 import org.springframework.stereotype.Component
@@ -13,26 +14,32 @@ import javax.mail.internet.InternetAddress
 
 
 @Component
-@ConditionalOnBean(JavaMailSender::class)
 class DefaultMailService(
-    private val javaMailSender: JavaMailSender,
+    private val javaMailSender: JavaMailSender?,
     private val applicationLogService: ApplicationLogService,
     private val notificationsConfigProperties: NotificationsConfigProperties,
 ) : MailService {
 
+    private val logger: Logger = LoggerFactory.getLogger(DefaultMailService::class.java)
+
     override fun sendMail(to: String, cc: String?, subject: String, body: String?): Boolean = try {
-        val preparator = MimeMessagePreparator { mimeMessage ->
-            mimeMessage.setRecipients(Message.RecipientType.TO, to)
-            if (!cc.isNullOrBlank()) {
-                mimeMessage.setRecipients(Message.RecipientType.CC, cc)
+        if (javaMailSender != null) {
+            val preparator = MimeMessagePreparator { mimeMessage ->
+                mimeMessage.setRecipients(Message.RecipientType.TO, to)
+                if (!cc.isNullOrBlank()) {
+                    mimeMessage.setRecipients(Message.RecipientType.CC, cc)
+                }
+                mimeMessage.setFrom(InternetAddress(notificationsConfigProperties.mail.from))
+                mimeMessage.subject = subject
+                mimeMessage.setText(body, Charsets.UTF_8.name(), "html")
             }
-            mimeMessage.setFrom(InternetAddress(notificationsConfigProperties.mail.from))
-            mimeMessage.subject = subject
-            mimeMessage.setText(body, Charsets.UTF_8.name(), "html")
+            javaMailSender.send(preparator)
+            // OK
+            true
+        } else {
+            logger.warn("Mails cannot be sent because mail sender is not available.")
+            false
         }
-        javaMailSender.send(preparator)
-        // OK
-        true
     } catch (ex: Exception) {
         // Logs the error
         applicationLogService.log(
