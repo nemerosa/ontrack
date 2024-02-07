@@ -4,8 +4,11 @@ import {useEffect, useState} from "react";
 import {useTemplateRenderers} from "@components/extension/issues/SelectIssueExportFormat";
 import {Dropdown, Space, Spin} from "antd";
 import {FaCheck, FaDownload, FaTools} from "react-icons/fa";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 
-export default function ChangeLogIssues({id, issues}) {
+export default function ChangeLogIssues({id, from, to, issues}) {
+
+    const client = useGraphQLClient()
 
     const [issueServiceId, setIssueServiceId] = useState('')
     useEffect(() => {
@@ -76,50 +79,54 @@ export default function ChangeLogIssues({id, issues}) {
     }, [templateRenderers, preferences]);
 
     const [exporting, setExporting] = useState(false)
-    // const [exportedContent, setExportedContent] = useState('')
-    // const [exportCopied, setExportCopied] = useState(false)
-    //
-    // const onExport = () => {
-    //     setExporting(true)
-    //     setExportedContent('')
-    //     setExportCopied(false)
-    //
-    //     const grouping = preferences.groups
-    //         .map(({name, list}) => (
-    //             `${name}=${
-    //                 list.map(it => it.mapping).join(',')
-    //             }`
-    //         ))
-    //         .join('|')
-    //
-    //     client.request(
-    //         gql`
-    //             query ChangeLogExport(
-    //                 $uuid: String!,
-    //                 $format: String!,
-    //                 $grouping: String!,
-    //             ) {
-    //                 gitChangeLogByUUID(uuid: $uuid) {
-    //                     export(request: {
-    //                         format: $format,
-    //                         grouping: $grouping,
-    //                     })
-    //                 }
-    //             }
-    //         `,
-    //         {
-    //             uuid: changeLogUuid,
-    //             format: preferences.format,
-    //             grouping,
-    //         }
-    //     ).then(data => {
-    //         const content = data.gitChangeLogByUUID.export
-    //         setExportedContent(content)
-    //     }).finally(() => {
-    //         setExporting(false)
-    //     })
-    // }
-    //
+    const [exportedContent, setExportedContent] = useState('')
+    const [exportCopied, setExportCopied] = useState(false)
+
+    const onExport = () => {
+        setExporting(true)
+        setExportedContent('')
+        setExportCopied(false)
+
+        const grouping = preferences.groups
+            .map(({name, list}) => (
+                `${name}=${
+                    list.map(it => it.mapping).join(',')
+                }`
+            ))
+            .join('|')
+
+        client.request(
+            gql`
+                query ChangeLogExport(
+                    $from: Int!,
+                    $to: Int!,
+                    $format: String!,
+                    $grouping: String!,
+                ) {
+                    scmChangeLog(from: $from, to: $to) {
+                        export(
+                            request: {
+                                format: $format,
+                                grouping: $grouping,
+                            }
+                        )
+                    }
+                }
+            `,
+            {
+                from,
+                to,
+                format: preferences.format,
+                grouping,
+            }
+        ).then(data => {
+            const content = data.scmChangeLog.export
+            setExportedContent(content)
+        }).finally(() => {
+            setExporting(false)
+        })
+    }
+
     // const onCopy = () => {
     //     if (exportedContent) {
     //         setExportCopied(copy(exportedContent))
@@ -165,7 +172,7 @@ export default function ChangeLogIssues({id, issues}) {
                             trigger="click"
                             disabled={exporting}
                             menu={{items}}
-                            // onClick={onExport}
+                            onClick={onExport}
                         >
                             <Space>
                                 {exporting ? <Spin size="small"/> : <FaDownload/>}

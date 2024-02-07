@@ -233,7 +233,7 @@ export default function ScmChangeLogView({from, to}) {
                     {
                         id: "issues",
                         content: <Skeleton loading={loading}>
-                            <ChangeLogIssues id="issues" issues={changeLog.issues}/>
+                            <ChangeLogIssues id="issues" from={from} to={to} issues={changeLog.issues}/>
                         </Skeleton>,
                     },
                 ]
