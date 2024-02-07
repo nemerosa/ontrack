@@ -26,18 +26,26 @@ class MockSCMTester(
         val repositoryName: String,
     ) {
 
-        private fun Project.configureMockSCMProject() {
+        private fun Project.configureMockSCMProject(
+            issueServiceIdentifier: String? = null
+        ) {
             propertyService.editProperty(
                 this,
                 MockSCMProjectPropertyType::class.java,
-                MockSCMProjectProperty(this@MockSCMRepositoryContext.repositoryName)
+                MockSCMProjectProperty(
+                    name = this@MockSCMRepositoryContext.repositoryName,
+                    issueServiceIdentifier = issueServiceIdentifier,
+                )
             )
         }
 
         fun Branch.configureMockSCMBranch(
-            scmBranch: String = "main"
+            scmBranch: String = "main",
+            issueServiceIdentifier: String? = null,
         ) {
-            project.configureMockSCMProject()
+            project.configureMockSCMProject(
+                issueServiceIdentifier = issueServiceIdentifier,
+            )
             propertyService.editProperty(
                 this,
                 MockSCMBranchPropertyType::class.java,

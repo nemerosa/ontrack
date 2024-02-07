@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.common.generateRandomString
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest
 import net.nemerosa.ontrack.extension.issues.IssueServiceExtension
+import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
 import net.nemerosa.ontrack.extension.issues.export.ExportFormat
 import net.nemerosa.ontrack.extension.issues.export.ExportedIssues
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
@@ -33,6 +34,7 @@ class MockSCMExtension(
     extensionFeature: SCMExtensionFeature,
     private val propertyService: PropertyService,
     private val structureService: StructureService,
+    private val issueServiceRegistry: IssueServiceRegistry,
 ) : AbstractExtension(extensionFeature), SCMExtension {
 
     override fun getSCM(project: Project): SCM? =
@@ -298,11 +300,15 @@ class MockSCMExtension(
         override suspend fun getCommits(fromCommit: String, toCommit: String): List<SCMCommit> =
             repository(mockScmProjectProperty.name).getCommits(fromCommit, toCommit)
 
-        override fun getConfiguredIssueService(): ConfiguredIssueService =
-            ConfiguredIssueService(
-                MockIssueServiceExtension(repository),
-                MockIssueServiceConfiguration.INSTANCE,
-            )
+        override fun getConfiguredIssueService(): ConfiguredIssueService? =
+            if (mockScmProjectProperty.issueServiceIdentifier != null) {
+                issueServiceRegistry.getConfiguredIssueService(mockScmProjectProperty.issueServiceIdentifier)
+            } else {
+                ConfiguredIssueService(
+                    MockIssueServiceExtension(repository),
+                    MockIssueServiceConfiguration.INSTANCE,
+                )
+            }
 
         override fun findBuildByCommit(project: Project, id: String): Build? =
             propertyService.findByEntityTypeAndSearchArguments(
