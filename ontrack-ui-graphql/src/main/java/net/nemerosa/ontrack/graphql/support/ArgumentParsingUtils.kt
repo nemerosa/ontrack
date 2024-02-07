@@ -6,11 +6,18 @@ import net.nemerosa.ontrack.json.parseInto
 import net.nemerosa.ontrack.model.exceptions.InputException
 import kotlin.reflect.KClass
 
-inline fun <reified T : Any> mutationInput(env: DataFetchingEnvironment): T =
-    mutationInput(T::class, env)
+inline fun <reified T : Any> parseArgument(env: DataFetchingEnvironment): T =
+    parseArgument(T::class, env)
 
-fun <T : Any> mutationInput(type: KClass<T>, env: DataFetchingEnvironment): T {
-    val input = env.arguments["input"] ?: throw MutationMissingInputException()
+fun <T : Any> parseArgument(type: KClass<T>, env: DataFetchingEnvironment): T {
+    return parseOptionalArgument(type, env) ?: throw MutationMissingInputException()
+}
+
+inline fun <reified T : Any> parseOptionalArgument(env: DataFetchingEnvironment): T? =
+    parseOptionalArgument(T::class, env)
+
+fun <T : Any> parseOptionalArgument(type: KClass<T>, env: DataFetchingEnvironment): T? {
+    val input = env.arguments["input"] ?: return null
     return input.asJson().parseInto(type)
 }
 

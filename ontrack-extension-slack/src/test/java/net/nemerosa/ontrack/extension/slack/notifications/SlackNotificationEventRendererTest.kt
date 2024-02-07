@@ -40,4 +40,33 @@ class SlackNotificationEventRendererTest {
         )
     }
 
+    @Test
+    fun `Rendering space`() {
+        assertEquals(
+            """
+One
+
+Two
+""",
+            """
+One${slackNotificationEventRenderer.renderSpace()}Two
+"""
+        )
+    }
+
+    @Test
+    fun `Rendering section`() {
+        assertEquals(
+            """
+                **My title**
+                
+                My content
+            """.trimIndent(),
+            slackNotificationEventRenderer.renderSection(
+                "My title",
+                "My content"
+            )
+        )
+    }
+
 }

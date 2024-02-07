@@ -30,5 +30,17 @@ class HtmlNotificationEventRenderer(
                 ${list.joinToString("\n") { """    <li>$it</li>""" }}
             </ul>
         """.trimIndent()
+
+
     }
+
+    override fun renderSpace(): String = "<br/><br/>"
+
+    override fun renderSection(title: String, content: String): String =
+        """
+            <h3>$title</h3>
+            <div>
+                $content
+            </div>
+        """.trimIndent()
 }

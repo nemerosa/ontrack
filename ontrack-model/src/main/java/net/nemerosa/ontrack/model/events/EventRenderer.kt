@@ -53,4 +53,14 @@ interface EventRenderer {
      * @return Valid list for the renderer
      */
     fun renderList(list: List<String>): String
+
+    /**
+     * Renders a separator between two sections.
+     */
+    fun renderSpace(): String
+
+    /**
+     * Renders a section with a [title] and some [content].
+     */
+    fun renderSection(title: String, content: String): String
 }

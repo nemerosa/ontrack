@@ -2,14 +2,16 @@ package net.nemerosa.ontrack.extension.scm.graphql
 
 import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLObjectType
+import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLog
+import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogExportInput
+import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogExportService
+import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogService
 import net.nemerosa.ontrack.extension.scm.service.SCMDetector
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.GQLTypeLinkChange
-import net.nemerosa.ontrack.graphql.support.field
-import net.nemerosa.ontrack.graphql.support.getTypeDescription
-import net.nemerosa.ontrack.graphql.support.listType
+import net.nemerosa.ontrack.graphql.support.*
 import net.nemerosa.ontrack.model.annotations.getPropertyDescription
 import net.nemerosa.ontrack.model.structure.LinkChangeService
 import org.springframework.stereotype.Component
@@ -21,6 +23,7 @@ class GQLTypeSCMChangeLog(
     private val gqlTypeLinkChange: GQLTypeLinkChange,
     private val linkChangeService: LinkChangeService,
     private val scmDetector: SCMDetector,
+    private val scmChangeLogExportService: SCMChangeLogExportService,
 ) : GQLType {
 
     override fun getTypeName(): String = SCMChangeLog::class.java.simpleName
@@ -61,6 +64,25 @@ class GQLTypeSCMChangeLog(
                         linkChangeService.linkChanges(
                             changeLog.from,
                             changeLog.to,
+                        )
+                    }
+            }
+
+            .field {
+                it.name("export")
+                    .description("Exporting the issues of a change log")
+                    .argument { arg ->
+                        arg.name("request")
+                            .description("How to generate the exported change log")
+                            .type(GraphQLTypeReference("SCMChangeLogExportInput")) // Defined in templating.graphqls
+                    }
+                    .type(GraphQLString)
+                    .dataFetcher { env ->
+                        val changeLog = env.getSource<SCMChangeLog>()
+                        val input = parseOptionalArgument<SCMChangeLogExportInput>(env)
+                        scmChangeLogExportService.export(
+                            changeLog = changeLog,
+                            input = input,
                         )
                     }
             }

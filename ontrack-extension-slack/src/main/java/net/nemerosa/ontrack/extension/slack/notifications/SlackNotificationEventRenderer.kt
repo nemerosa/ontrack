@@ -26,4 +26,12 @@ class SlackNotificationEventRenderer(
     override fun renderList(list: List<String>): String =
         list.joinToString("\n") { "* $it" }
 
+    override fun renderSpace(): String = "\n\n"
+
+    override fun renderSection(title: String, content: String): String =
+        """
+            **$title**
+            
+            $content
+        """.trimIndent()
 }

@@ -102,7 +102,9 @@ public interface IssueServiceExtension extends Extension {
      * @param issues                    List of issues to export
      * @param request                   Specification for the export
      * @throws net.nemerosa.ontrack.extension.issues.model.IssueExportFormatNotFoundException If the format is not supported.
+     * @deprecated Will be removed in V5. Use the template service instead.
      */
+    @Deprecated
     ExportedIssues exportIssues(IssueServiceConfiguration issueServiceConfiguration, List<? extends Issue> issues, IssueChangeLogExportRequest request);
 
     /**
@@ -154,4 +156,6 @@ public interface IssueServiceExtension extends Extension {
     default String getDisplayKey(IssueServiceConfiguration issueServiceConfiguration, String key) {
         return key;
     }
+
+    Set<String> getIssueTypes(IssueServiceConfiguration issueServiceConfiguration, Issue issue);
 }

@@ -371,6 +371,11 @@ class MockSCMExtension(
             TODO("Not yet implemented")
         }
 
+        override fun getIssueTypes(
+            issueServiceConfiguration: IssueServiceConfiguration,
+            issue: Issue
+        ): Set<String> = emptySet()
+
         override fun getIssue(issueServiceConfiguration: IssueServiceConfiguration, issueKey: String): Issue? =
             repository(repositoryName).findIssue(issueKey)
 

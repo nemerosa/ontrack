@@ -41,4 +41,32 @@ class HtmlNotificationEventRendererTest {
         )
     }
 
+    @Test
+    fun `Rendering space`() {
+        assertEquals(
+            """
+                One<br/><br/>Two
+            """.trimIndent(),
+            """
+                One${htmlNotificationEventRenderer.renderSpace()}Two
+            """.trimIndent()
+        )
+    }
+
+    @Test
+    fun `Rendering section`() {
+        assertEquals(
+            """
+                <h3>My title</h3>
+                <div>
+                    My content
+                </div>
+            """.trimIndent(),
+            htmlNotificationEventRenderer.renderSection(
+                "My title",
+                "My content"
+            )
+        )
+    }
+
 }

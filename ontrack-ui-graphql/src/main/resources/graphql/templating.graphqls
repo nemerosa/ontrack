@@ -14,3 +14,53 @@ extend type Query {
     """Getting the list of template renderers"""
     templatingRenderers: [TemplatingRenderer!]!
 }
+
+"""
+Request for the export of a change log.
+
+This request defines how to group issues by type and which format
+to use for the export.
+
+If no grouping is specified, the issues will be returned as a list, without any grouping.
+
+The exclude field is used to exclude some issues from the export using their type.
+
+Note that both the export format and the type of issues are specific notions linked to the issue service
+(JIRA, GitHub...) that produces the issues.
+"""
+input SCMChangeLogExportInput {
+    """Selected format. Defaults to plain text."""
+    format: String
+    """
+    Specification for the grouping, none by default.
+
+    This specification describes how to group issues using their type. This format is independent from
+    the issue service and this service is responsible for the actual mapping of issue "types" into actual
+    issue fields. For example, for GitHub, an issue type is mapped on a label.
+    The format of the specification is:
+
+    ----
+    specification := "" | ${'$'}group ( "|" ${'$'}group)*
+    group         := ${'$'}name "=" ${'$'}type ( "," ${'$'}type)*
+    ----
+
+    For example:
+
+    ----
+    Bugs=bug|Features=feature,enhancement
+    ----
+
+    Any issue that would not be mapped in a group will be assigned arbitrarily to the group defined by
+    altGroup property.
+
+    If the specification is empty, no grouping will be done.
+    """
+    grouping: String
+    exclude: String
+    """
+    Title of the group to use when an issue does not belong to any group. It defaults to "Other".
+    If left empty, any issue not belonging to a group would be excluded from the export. This field
+    is not used when no grouping is specified.
+    """
+    altGroup: String
+}
