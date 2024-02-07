@@ -133,7 +133,6 @@ pipeline {
                 ONTRACK_TEST_EXTENSION_GITHUB_ORGANIZATION = 'nemerosa'
                 ONTRACK_TEST_EXTENSION_GITHUB_REPOSITORY = 'ontrack-github-integration-test'
                 ONTRACK_TEST_EXTENSION_GITHUB_BRANCH = 'v1'
-                ONTRACK_TEST_EXTENSION_GITHUB_ISSUE = '1'
                 ONTRACK_TEST_EXTENSION_GITHUB_PR = '3'
                 ONTRACK_TEST_EXTENSION_GITHUB_TEAM = 'ontrack-integration-tests'
                 ONTRACK_TEST_EXTENSION_GITHUB_APP_ID = '143291'
@@ -144,6 +143,13 @@ pipeline {
                 ONTRACK_TEST_EXTENSION_GITHUB_CHANGELOG_FROM = '5b0db7c7132eaf29820b42aef3a018a47e1f411f'
                 ONTRACK_TEST_EXTENSION_GITHUB_CHANGELOG_TO = '36e95eded56bcfead06a55238ccb315fbfe211a8'
                 ONTRACK_TEST_EXTENSION_GITHUB_CHANGELOG_MESSAGES = 'nemerosa/ontrack#978 Promotion image|nemerosa/ontrack#978 Validation image|nemerosa/ontrack#928 Explicitly skipping the jobs|nemerosa/ontrack#928 Sample GitHub ingestion configuration file'
+                ONTRACK_TEST_EXTENSION_GITHUB_ISSUES_FROM = '36e95eded56bcfead06a55238ccb315fbfe211a8'
+                ONTRACK_TEST_EXTENSION_GITHUB_ISSUES_ISSUE = '1'
+                ONTRACK_TEST_EXTENSION_GITHUB_ISSUES_ISSUESUMMARY = 'Test issue'
+                ONTRACK_TEST_EXTENSION_GITHUB_ISSUES_TO = '901130bc4655a8180c2034f0619768c7343095bb'
+                ONTRACK_TEST_EXTENSION_GITHUB_ISSUES_MESSAGES = '#1 Commit with issue'
+                ONTRACK_TEST_EXTENSION_GITHUB_ISSUES_ISSUELABELS = 'type:defect'
+                ONTRACK_TEST_EXTENSION_GITHUB_ISSUES_MILESTONE = 'v1'
             }
             steps {
                 sh ''' ./gradlew clean versionDisplay versionFile --no-daemon'''

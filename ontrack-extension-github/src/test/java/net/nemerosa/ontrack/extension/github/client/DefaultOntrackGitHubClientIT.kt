@@ -54,9 +54,9 @@ class DefaultOntrackGitHubClientIT {
 
     @Test
     fun `Getting an issue`() {
-        val issue = client.getIssue(githubTestEnv.fullRepository, githubTestEnv.issue)
-        assertNotNull(issue, "Issue ${githubTestEnv.fullRepository}#${githubTestEnv.issue} has been found") {
-            assertEquals("#${githubTestEnv.issue}", it.displayKey)
+        val issue = client.getIssue(githubTestEnv.fullRepository, githubTestEnv.issues.issue)
+        assertNotNull(issue, "Issue ${githubTestEnv.fullRepository}#${githubTestEnv.issues.issue} has been found") {
+            assertEquals("#${githubTestEnv.issues.issue}", it.displayKey)
         }
     }
 
