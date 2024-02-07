@@ -4826,7 +4826,7 @@ type Query {
     gitChangeLogByUUID(
         "UUID of the change log"
         uuid: String!
-    ): GitChangeLog
+    ): GitChangeLog @deprecated(reason: "Will be removed in V5. Prefer using the `scmChangeLog` query.")
     "Getting Ontrack information about a Git commit and a project."
     gitCommitInfo(
         "Commit hash (full form) to look for."
@@ -4907,7 +4907,7 @@ type Query {
     "Gets information about the application"
     info: Info
     "List of available export formats"
-    issueExportFormats: [IssueExportFormat!]!
+    issueExportFormats: [IssueExportFormat!]! @deprecated(reason: "Use the templating service")
     "List of Jenkins configurations"
     jenkinsConfigurations: [JenkinsConfiguration!]!
     "List of all labels"
@@ -5060,6 +5060,8 @@ type Query {
     searchResultTypes: [SearchResultType!]!
     "Ontrack settings"
     settings: Settings!
+    "Getting the list of template renderers"
+    templatingRenderers: [TemplatingRenderer!]!
     "Gets the current user"
     user: User
     "Gets the current dashboard"
@@ -6217,6 +6219,14 @@ type SubscribeValidationStampToEventsPayload implements Payload {
     errors: [UserError]
     "Saved subscription"
     subscription: EventSubscriptionPayload
+}
+
+"Definition of a renderer"
+type TemplatingRenderer {
+    "Technical ID for the renderer"
+    id: String!
+    "Display name for the renderer"
+    name: String!
 }
 
 "Output type for the testConfiguration mutation."

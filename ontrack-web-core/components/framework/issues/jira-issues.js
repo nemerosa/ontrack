@@ -14,7 +14,6 @@ const {Column} = Table
 export default function MockIssues({issues}) {
     return (
         <>
-            {JSON.stringify(issues)}
             <Table
                 dataSource={issues}
                 size="small"

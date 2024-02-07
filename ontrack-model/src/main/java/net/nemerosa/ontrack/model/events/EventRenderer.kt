@@ -5,6 +5,16 @@ import net.nemerosa.ontrack.model.support.NameValue
 
 interface EventRenderer {
 
+    /**
+     * ID of this renderer
+     */
+    val id: String
+
+    /**
+     * Display name for this renderer
+     */
+    val name: String
+
     @Deprecated("Will be removed in V5. Use render without event.")
     fun render(projectEntity: ProjectEntity, event: Event): String = render(projectEntity)
 

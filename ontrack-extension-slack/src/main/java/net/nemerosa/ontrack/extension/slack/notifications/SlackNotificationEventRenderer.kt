@@ -11,6 +11,9 @@ class SlackNotificationEventRenderer(
     ontrackConfigProperties: OntrackConfigProperties,
 ) : AbstractUrlNotificationEventRenderer(ontrackConfigProperties) {
 
+    override val id: String = "slack"
+    override val name: String = "Slack"
+
     override fun render(projectEntity: ProjectEntity): String {
         val pageUrl = getUrl(ProjectEntityPageBuilder.getEntityPageRelativeURI(projectEntity))
         return "<$pageUrl|${getProjectEntityName(projectEntity)}>"

@@ -3,33 +3,33 @@ import {useGraphQLClient} from "@components/providers/ConnectionContextProvider"
 import {gql} from "graphql-request";
 import {Select} from "antd";
 
-export const useIssueExportFormats = () => {
+export const useTemplateRenderers = () => {
     const client = useGraphQLClient()
-    const [formats, setFormats] = useState([])
+    const [templateRenderers, setTemplateRenderers] = useState([])
 
     useEffect(() => {
         if (client) {
             client.request(
                 gql`
-                    query IssueExportFormats {
-                        issueExportFormats {
+                    query TemplatingRenderers {
+                        templatingRenderers {
                             id
                             name
                         }
                     }
                 `
             ).then(data => {
-                setFormats(data.issueExportFormats)
+                setTemplateRenderers(data.templatingRenderers)
             })
         }
     }, [client]);
 
-    return formats
+    return templateRenderers
 }
 
 export default function SelectIssueExportFormat({value, onChange}) {
 
-    const exportFormats = useIssueExportFormats()
+    const exportFormats = useTemplateRenderers()
     const [exportFormatOptions, setExportFormatOptions] = useState([])
     useEffect(() => {
         setExportFormatOptions(exportFormats.map(format => ({

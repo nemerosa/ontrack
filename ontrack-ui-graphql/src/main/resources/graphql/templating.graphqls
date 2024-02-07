@@ -1,0 +1,16 @@
+# =================================================================================
+# Templating
+# =================================================================================
+
+"""Definition of a renderer"""
+type TemplatingRenderer {
+    """Technical ID for the renderer"""
+    id: String!
+    """Display name for the renderer"""
+    name: String!
+}
+
+extend type Query {
+    """Getting the list of template renderers"""
+    templatingRenderers: [TemplatingRenderer!]!
+}

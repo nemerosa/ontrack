@@ -2,8 +2,13 @@ package net.nemerosa.ontrack.model.events
 
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.displayName
+import org.springframework.stereotype.Component
 
+@Component
 class PlainEventRenderer : AbstractEventRenderer() {
+
+    override val id: String = "text"
+    override val name: String = "Text"
 
     override fun render(projectEntity: ProjectEntity): String = projectEntity.displayName
 

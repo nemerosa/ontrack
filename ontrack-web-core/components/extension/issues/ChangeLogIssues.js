@@ -1,7 +1,9 @@
 import GridCell from "@components/grid/GridCell";
 import {Dynamic} from "@components/common/Dynamic";
 import {useEffect, useState} from "react";
-import {useIssueExportFormats} from "@components/extension/issues/SelectIssueExportFormat";
+import {useTemplateRenderers} from "@components/extension/issues/SelectIssueExportFormat";
+import {Dropdown, Space, Spin} from "antd";
+import {FaCheck, FaDownload, FaTools} from "react-icons/fa";
 
 export default function ChangeLogIssues({id, issues}) {
 
@@ -14,66 +16,66 @@ export default function ChangeLogIssues({id, issues}) {
 
     // const client = useGraphQLClient()
 
-    const exportFormats = useIssueExportFormats()
-    //
-    // const [preferences, setPreferences] = useState({
-    //     format: 'text',
-    //     groups: [],
-    //     exclude: '',
-    //     altGroup: '',
-    // })
-    //
-    // useEffect(() => {
-    //     const storedPreferences = localStorage.getItem('change-log-issues-export')
-    //     if (storedPreferences) {
-    //         setPreferences(JSON.parse(storedPreferences))
-    //     }
-    // }, []);
-    //
-    // const savePreferences = (values) => {
-    //     setPreferences(values)
-    //     localStorage.setItem('change-log-issues-export', JSON.stringify(values))
-    // }
-    //
-    // const selectFormat = (id) => {
-    //     const newPreferences = {
-    //         ...preferences,
-    //         format: id,
-    //     }
-    //     savePreferences(newPreferences)
-    // }
-    //
-    // const [items, setItems] = useState([])
-    //
-    // useEffect(() => {
-    //     const items = []
-    //
-    //     exportFormats.forEach(exportFormat => {
-    //         items.push({
-    //             key: exportFormat.id,
-    //             label: <Space>
-    //                 {
-    //                     exportFormat.id === preferences.format && <FaCheck/>
-    //                 }
-    //                 {exportFormat.name}
-    //             </Space>,
-    //             onClick: () => selectFormat(exportFormat.id)
-    //         })
-    //     })
-    //
-    //     items.push({type: 'divider'})
-    //     items.push({
-    //         key: 'options',
-    //         label: "Options...",
-    //         icon: <FaTools/>,
-    //         onClick: startIssueChangeLogExportRequestDialog,
-    //     })
-    //
-    //     setItems(items)
-    //
-    // }, [exportFormats, preferences]);
-    //
-    // const [exporting, setExporting] = useState(false)
+    const templateRenderers = useTemplateRenderers()
+
+    const [preferences, setPreferences] = useState({
+        format: 'text',
+        groups: [],
+        exclude: '',
+        altGroup: '',
+    })
+
+    useEffect(() => {
+        const storedPreferences = localStorage.getItem('change-log-issues-export')
+        if (storedPreferences) {
+            setPreferences(JSON.parse(storedPreferences))
+        }
+    }, []);
+
+    const savePreferences = (values) => {
+        setPreferences(values)
+        localStorage.setItem('change-log-issues-export', JSON.stringify(values))
+    }
+
+    const selectFormat = (id) => {
+        const newPreferences = {
+            ...preferences,
+            format: id,
+        }
+        savePreferences(newPreferences)
+    }
+
+    const [items, setItems] = useState([])
+
+    useEffect(() => {
+        const items = []
+
+        templateRenderers.forEach(renderer => {
+            items.push({
+                key: renderer.id,
+                label: <Space>
+                    {
+                        renderer.id === preferences.format && <FaCheck/>
+                    }
+                    {renderer.name}
+                </Space>,
+                onClick: () => selectFormat(renderer.id)
+            })
+        })
+
+        items.push({type: 'divider'})
+        items.push({
+            key: 'options',
+            label: "Options...",
+            icon: <FaTools/>,
+            // TODO onClick: startIssueChangeLogExportRequestDialog,
+        })
+
+        setItems(items)
+
+    }, [templateRenderers, preferences]);
+
+    const [exporting, setExporting] = useState(false)
     // const [exportedContent, setExportedContent] = useState('')
     // const [exportCopied, setExportCopied] = useState(false)
     //
@@ -140,38 +142,38 @@ export default function ChangeLogIssues({id, issues}) {
                 id={id}
                 title="Issues"
                 padding={0}
-                // extra={
-                //     <>
-                //         {
-                //             exportCopied &&
-                //             <CheckStatus
-                //                 value={true}
-                //                 text="Export copied"
-                //             />
-                //         }
-                //         {
-                //             exportedContent && !exportCopied &&
-                //             <Button
-                //                 icon={<FaCopy/>}
-                //                 onClick={onCopy}
-                //             >
-                //                 Export ready - click to copy
-                //             </Button>
-                //         }
-                //         <Dropdown.Button
-                //             type="primary"
-                //             trigger="click"
-                //             disabled={loading || exporting}
-                //             menu={{items}}
-                //             onClick={onExport}
-                //         >
-                //             <Space>
-                //                 {exporting ? <Spin size="small"/> : <FaDownload/>}
-                //                 Export
-                //             </Space>
-                //         </Dropdown.Button>
-                //     </>
-                // }
+                extra={
+                    <>
+                        {/*//         {*/}
+                        {/*//             exportCopied &&*/}
+                        {/*//             <CheckStatus*/}
+                        {/*//                 value={true}*/}
+                        {/*//                 text="Export copied"*/}
+                        {/*//             />*/}
+                        {/*//         }*/}
+                        {/*//         {*/}
+                        {/*//             exportedContent && !exportCopied &&*/}
+                        {/*//             <Button*/}
+                        {/*//                 icon={<FaCopy/>}*/}
+                        {/*//                 onClick={onCopy}*/}
+                        {/*//             >*/}
+                        {/*//                 Export ready - click to copy*/}
+                        {/*//             </Button>*/}
+                        {/*//         }*/}
+                        <Dropdown.Button
+                            type="primary"
+                            trigger="click"
+                            disabled={exporting}
+                            menu={{items}}
+                            // onClick={onExport}
+                        >
+                            <Space>
+                                {exporting ? <Spin size="small"/> : <FaDownload/>}
+                                Export
+                            </Space>
+                        </Dropdown.Button>
+                    </>
+                }
             >
                 {
                     issueServiceId &&

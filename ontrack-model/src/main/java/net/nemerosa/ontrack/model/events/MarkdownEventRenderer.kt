@@ -10,6 +10,9 @@ class MarkdownEventRenderer(
     ontrackConfigProperties: OntrackConfigProperties,
 ) : AbstractUrlNotificationEventRenderer(ontrackConfigProperties) {
 
+    override val id: String = "markdown"
+    override val name: String = "Markdown"
+
     override fun render(projectEntity: ProjectEntity): String {
         val pageUrl = getUrl(ProjectEntityPageBuilder.getEntityPageRelativeURI(projectEntity))
         return """[${getProjectEntityName(projectEntity)}]($pageUrl)"""
