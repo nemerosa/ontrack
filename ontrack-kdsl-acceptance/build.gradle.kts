@@ -30,28 +30,10 @@ configure<ComposeExtension> {
 
 val kdslAcceptanceTestComposeUp by tasks.named("kdslAcceptanceTestComposeUp") {
     dependsOn(":dockerBuild")
-}
-
-val kdslPreAcceptanceTest by tasks.registering {
-    dependsOn("kdslAcceptanceTestComposeUp")
-    // When done
-    doLast {
-        val host = tasks.named<ComposeUp>("kdslAcceptanceTestComposeUp").get().servicesInfos["ontrack"]?.host!!
-        val ontrackContainer = tasks.named<ComposeUp>("kdslAcceptanceTestComposeUp").get().servicesInfos["ontrack"]?.firstContainer!!
-        val uiPort = ontrackContainer.ports[8080]
-        val mgtPort = ontrackContainer.ports[8800]
-        val ontrackUrl: String by rootProject.extra("http://$host:$uiPort")
-        val ontrackMgtUrl: String by rootProject.extra("http://$host:$mgtPort/manage")
-        logger.info("KDSL Acceptance Test Ontrack URL = $ontrackUrl")
-        logger.info("KDSL Acceptance Test Ontrack Mgt URL = $ontrackMgtUrl")
-    }
+    dependsOn(":ontrack-web-core:dockerBuild")
 }
 
 // Pre-acceptance tests: stopping the environment
-
-val kdslPostAcceptanceTest by tasks.registering {
-    dependsOn("kdslAcceptanceTestComposeDown")
-}
 
 val kdslAcceptanceTestComposeDown by tasks.named("kdslAcceptanceTestComposeDown") {
     mustRunAfter("kdslAcceptanceTest")
@@ -72,19 +54,15 @@ val kdslAcceptanceTest by tasks.registering(Test::class) {
     include("**/ACC*.class")
     minHeapSize = "512m"
     maxHeapSize = "3072m"
-    dependsOn(kdslPreAcceptanceTest)
-    finalizedBy(kdslPostAcceptanceTest)
+    dependsOn(kdslAcceptanceTestComposeUp)
+    finalizedBy(kdslAcceptanceTestComposeDown)
     /**
      * Sets the Ontrack URL
      */
     doFirst {
-        val ontrackUrl = rootProject.ext["ontrackUrl"] ?: error("ontrackUrl must be defined")
-        val ontrackMgtUrl = rootProject.ext["ontrackMgtUrl"] ?: error("ontrackMgtUrl must be defined")
-        println("Setting Ontrack URL for KDSL Acceptance Tests: $ontrackUrl")
-        println("Setting Ontrack Mgt URL for KDSL Acceptance Tests: $ontrackMgtUrl")
-        systemProperty("ontrack.acceptance.connection.url", ontrackUrl)
+        systemProperty("ontrack.acceptance.connection.url", "http://localhost:8080")
         systemProperty("ontrack.acceptance.connection.username", "admin")
         systemProperty("ontrack.acceptance.connection.password", "admin")
-        systemProperty("ontrack.acceptance.connection.mgt.url", ontrackMgtUrl)
+        systemProperty("ontrack.acceptance.connection.mgt.url", "http://localhost:8800")
     }
 }
