@@ -2,7 +2,7 @@
 const {test} = require('@playwright/test')
 const {login} = require("../../core/login");
 const {BranchPage} = require("../../core/branches/branch");
-const {provisionChangeLog, commits} = require("./scm");
+const {provisionChangeLog, commits, issues} = require("./scm");
 
 
 test("SCM change log", async ({page}) => {
@@ -31,6 +31,10 @@ test("SCM change log", async ({page}) => {
     await changeLogPage.checkBuildFrom(from)
     await changeLogPage.checkBuildTo(to)
 
+    /**
+     * Commits
+     */
+
     // Expecting the build diff to be there
     await changeLogPage.checkCommitDiffLink()
 
@@ -43,9 +47,20 @@ test("SCM change log", async ({page}) => {
     // ... some not
     await changeLogPage.checkCommitMessage(commits[0], {present: false})
 
-    // Checks build links
+    // Checks build attached to commits
     await changeLogPage.checkCommitBuild(commits[4], mockSCMContext, to, {expected: true})
     await changeLogPage.checkCommitBuild(commits[3], mockSCMContext, builds[2], {expected: true})
     await changeLogPage.checkCommitBuild(commits[2], mockSCMContext, builds[1], {expected: true})
     await changeLogPage.checkCommitBuild(commits[1], mockSCMContext, builds[1], {expected: false})
+
+    /**
+     * Issues
+     */
+
+    // Expecting the issues to be displayed
+    for (const key of Object.keys(issues)) {
+        const summary = issues[key]
+        await changeLogPage.checkIssue({key, summary, visible: (key !== "ISS-20")})
+    }
+
 })

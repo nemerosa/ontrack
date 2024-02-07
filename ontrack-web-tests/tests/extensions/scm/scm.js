@@ -11,6 +11,13 @@ export const commits = [
     "ISS-23 Fixing some CSS",
 ]
 
+export const issues = {
+    "ISS-20": "Last issue before the change log",
+    "ISS-21": "Some new feature",
+    "ISS-22": "Some fixes are needed",
+    "ISS-23": "Some nicer UI",
+}
+
 export async function provisionChangeLog() {
     const mockSCMContext = createMockSCMContext()
     const project = await ontrack().createProject()
@@ -19,10 +26,10 @@ export async function provisionChangeLog() {
     const branch = await project.createBranch()
     await mockSCMContext.configureBranchForMockSCM(branch)
 
-    await mockSCMContext.repositoryIssue({key: "ISS-20", summary: "Last issue before the change log"})
-    await mockSCMContext.repositoryIssue({key: "ISS-21", summary: "Some new feature"})
-    await mockSCMContext.repositoryIssue({key: "ISS-22", summary: "Some fixes are needed"})
-    await mockSCMContext.repositoryIssue({key: "ISS-23", summary: "Some nicer UI"})
+    for (const key of Object.keys(issues)) {
+        const summary = issues[key]
+        await mockSCMContext.repositoryIssue({key, summary})
+    }
 
     const builds = []
 
@@ -106,6 +113,19 @@ export class SCMChangeLogPage {
             await expect(buildLinkLocator).toBeVisible()
         } else {
             await expect(buildLinkLocator).not.toBeVisible()
+        }
+    }
+
+    async checkIssue({key, summary, visible}) {
+        const container = this.page.locator('#issues')
+        const link = container.getByRole('link', {name: key});
+        const text = container.getByText(summary, {exact: true});
+        if (visible) {
+            await expect(link).toBeVisible()
+            await expect(text).toBeVisible()
+        } else {
+            await expect(link).not.toBeVisible()
+            await expect(text).not.toBeVisible()
         }
     }
 
