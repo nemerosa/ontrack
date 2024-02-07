@@ -16,6 +16,12 @@ class GQLRootQuerySCMChangeLogIT : AbstractQLKTITSupport() {
     @Test
     fun `Getting a change log using the SCM API`() {
         asAdmin {
+            val dependency = project {
+                branch {
+                    build("3.0.1")
+                    build("3.0.4")
+                }
+            }
             mockSCMTester.withMockSCMRepository {
                 project {
                     branch {
@@ -26,6 +32,8 @@ class GQLRootQuerySCMChangeLogIT : AbstractQLKTITSupport() {
                             // Mock termination commit
                             repositoryIssue("ISS-20", "Last issue before the change log")
                             withRepositoryCommit("ISS-20 Last commit before the change log")
+                            // Link to change
+                            linkTo(dependency, "3.0.1")
                         }
                         build("1.02") {
                             repositoryIssue("ISS-21", "Some new feature")
@@ -39,6 +47,8 @@ class GQLRootQuerySCMChangeLogIT : AbstractQLKTITSupport() {
                         build("1.04") {
                             repositoryIssue("ISS-23", "Some nicer UI")
                             withRepositoryCommit("ISS-23 Fixing some CSS")
+                            // Link to change
+                            linkTo(dependency, "3.0.4")
 
                             run(
                                 """
@@ -52,6 +62,17 @@ class GQLRootQuerySCMChangeLogIT : AbstractQLKTITSupport() {
                                         from: ${from.id},
                                         to: ${this@build.id}
                                     ) {
+                                        linkChanges {
+                                            project {
+                                                name
+                                            }
+                                            from {
+                                                name
+                                            }
+                                            to {
+                                                name
+                                            }
+                                        }
                                         commits {
                                             commit {
                                                 message
@@ -78,6 +99,19 @@ class GQLRootQuerySCMChangeLogIT : AbstractQLKTITSupport() {
                                 val changeLog = data.path("scmChangeLog")
                                 assertEquals(
                                     mapOf(
+                                        "linkChanges" to listOf(
+                                            mapOf(
+                                                "project" to mapOf(
+                                                    "name" to dependency.name
+                                                ),
+                                                "from" to mapOf(
+                                                    "name" to "3.0.1"
+                                                ),
+                                                "to" to mapOf(
+                                                    "name" to "3.0.4"
+                                                ),
+                                            )
+                                        ),
                                         "commits" to listOf(
                                             mapOf(
                                                 "commit" to mapOf(

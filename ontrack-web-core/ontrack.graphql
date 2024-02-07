@@ -5330,6 +5330,8 @@ type SCMChangeLog {
     from: Build!
     "List of issues between the builds"
     issues: SCMChangeLogIssues
+    "All dependency changes"
+    linkChanges: [LinkChange!]!
     "Boundary for the change log"
     to: Build!
 }

@@ -45,11 +45,11 @@ class SCMChangeLogServiceImpl(
         }
     }
 
-    private suspend fun computeChangeLog(from: Build, to: Build): SCMChangeLog {
+    private suspend fun computeChangeLog(from: Build, to: Build): SCMChangeLog? {
 
-        val scm = scmDetector.getSCM(from.project) ?: throw ProjectNoSCMException()
-        if (scm !is SCMChangeLogEnabled) {
-            throw SCMChangeLogNotEnabledException(from.project.name)
+        val scm = scmDetector.getSCM(from.project)
+        if (scm == null || scm !is SCMChangeLogEnabled) {
+            return null
         }
 
         // Gets the two boundaries

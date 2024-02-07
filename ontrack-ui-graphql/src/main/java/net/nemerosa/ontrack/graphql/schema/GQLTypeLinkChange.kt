@@ -1,8 +1,6 @@
-package net.nemerosa.ontrack.extension.git.graphql
+package net.nemerosa.ontrack.graphql.schema
 
 import graphql.schema.GraphQLObjectType
-import net.nemerosa.ontrack.graphql.schema.GQLType
-import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.field
 import net.nemerosa.ontrack.graphql.support.stringField
 import net.nemerosa.ontrack.model.structure.LinkChange

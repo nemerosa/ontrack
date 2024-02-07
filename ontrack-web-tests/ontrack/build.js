@@ -2,6 +2,7 @@ import {generate} from "@ontrack/utils";
 import {graphQLCallMutation} from "@ontrack/graphql";
 import {gql} from "graphql-request";
 import {createValidationRun} from "@ontrack/validationRun";
+import {createBuildLink} from "@ontrack/links";
 
 export const createBuild = async (branch, name) => {
     const actualName = name ?? generate('b_')
@@ -46,6 +47,7 @@ const buildInstance = (branch, data) => {
     }
 
     build.validate = async (validationStamp, config) => createValidationRun(build, validationStamp, config)
+    build.linkTo = async (other, qualifier = "") => createBuildLink(build, other, qualifier)
 
     return build
 }

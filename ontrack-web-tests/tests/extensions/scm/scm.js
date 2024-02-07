@@ -38,10 +38,17 @@ export async function provisionChangeLog(
         }
     }
 
+    const dependency = await ontrack().createProject()
+    const depBranch = await dependency.createBranch()
+    const depFrom = await depBranch.createBuild("3.0.1")
+    const depTo = await depBranch.createBuild("3.0.4")
+
     const builds = []
 
-    const from = await mockSCMContext.setBuildWithCommits(
-        branch.createBuild(),
+    const from = await branch.createBuild()
+    await from.linkTo(depFrom)
+    await mockSCMContext.setBuildWithCommits(
+        from,
         commits.slice(0, 1)
     )
     builds.push(from)
@@ -60,8 +67,10 @@ export async function provisionChangeLog(
         )
     )
 
-    const to = await mockSCMContext.setBuildWithCommits(
-        branch.createBuild(),
+    const to = await branch.createBuild()
+    await to.linkTo(depTo)
+    await mockSCMContext.setBuildWithCommits(
+        to,
         commits.slice(4)
     )
     builds.push(to)

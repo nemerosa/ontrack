@@ -6,15 +6,15 @@ import Head from "next/head";
 import {buildKnownName, title} from "@components/common/Titles";
 import MainPage from "@components/layouts/MainPage";
 import LoadingContainer from "@components/common/LoadingContainer";
-import {downToBranchBreadcrumbs} from "@components/common/Breadcrumbs";
+import {downToBranchBreadcrumbs, homeBreadcrumbs} from "@components/common/Breadcrumbs";
 import {CloseCommand} from "@components/common/Commands";
-import {branchUri} from "@components/common/Links";
+import {branchUri, homeUri} from "@components/common/Links";
 import GridTable from "@components/grid/GridTable";
 import GridTableContextProvider, {GridTableContext} from "@components/grid/GridTableContext";
 import GitChangeLogCommits from "@components/extension/git/GitChangeLogCommits";
 import ChangeLogIssues from "@components/extension/issues/ChangeLogIssues";
 import ChangeLogLinks from "@components/extension/scm/ChangeLogLinks";
-import {Skeleton, Typography} from "antd";
+import {Empty, Skeleton, Typography} from "antd";
 
 export default function ScmChangeLogView({from, to}) {
 
@@ -74,6 +74,32 @@ export default function ScmChangeLogView({from, to}) {
                                 ...BuildData
                             }
                             diffLink
+                            linkChanges {
+                                project {
+                                    id
+                                    name
+                                }
+                                qualifier
+                                from {
+                                    branch {
+                                        scmBranchInfo {
+                                            changeLogs
+                                        }
+                                    }
+                                    id
+                                    name
+                                    releaseProperty {
+                                        value
+                                    }
+                                }
+                                to {
+                                    id
+                                    name
+                                    releaseProperty {
+                                        value
+                                    }
+                                }
+                            }
                             commits {
                                 commit {
                                     id
@@ -165,74 +191,108 @@ export default function ScmChangeLogView({from, to}) {
         {i: "issues", x: 0, y: 22, w: 12, h: 10},
     ]
 
-    const items = [
-        {
-            id: "from",
-            content: <Skeleton loading={loading}>
-                {
-                    changeLog.buildFrom.creation &&
-                    <ChangeLogBuild id="from" title={`From ${buildKnownName(changeLog.buildFrom)}`}
-                                    build={changeLog.buildFrom}/>
-                }
-            </Skeleton>,
-        },
-        {
-            id: "to",
-            content: <Skeleton loading={loading}>
-                {
-                    changeLog.buildTo.creation &&
-                    <ChangeLogBuild id="to" title={`To ${buildKnownName(changeLog.buildTo)}`}
-                                    build={changeLog.buildTo}/>
-                }
-            </Skeleton>,
-        },
-        {
-            id: "links",
-            // TODO content: <ChangeLogLinks id="links" changeLogUuid={changeLogUuid}/>
-            content: <Typography.Text>TODO Links</Typography.Text>
-        },
-        {
-            id: "commits",
-            content: <Skeleton loading={loading}>
-                <GitChangeLogCommits id="commits" commits={changeLog.commits} diffLink={changeLog.diffLink}/>
-            </Skeleton>,
-        },
-        {
-            id: "issues",
-            content: <Skeleton loading={loading}>
-                <ChangeLogIssues id="issues" issues={changeLog.issues}/>
-            </Skeleton>,
-        },
-    ]
+    const [items, setItems] = useState([])
+
+    useEffect(() => {
+        if (changeLog) {
+            setItems(
+                [
+                    {
+                        id: "from",
+                        content: <Skeleton loading={loading}>
+                            {
+                                changeLog.buildFrom.creation &&
+                                <ChangeLogBuild id="from" title={`From ${buildKnownName(changeLog.buildFrom)}`}
+                                                build={changeLog.buildFrom}/>
+                            }
+                        </Skeleton>,
+                    },
+                    {
+                        id: "to",
+                        content: <Skeleton loading={loading}>
+                            {
+                                changeLog.buildTo.creation &&
+                                <ChangeLogBuild id="to" title={`To ${buildKnownName(changeLog.buildTo)}`}
+                                                build={changeLog.buildTo}/>
+                            }
+                        </Skeleton>,
+                    },
+                    {
+                        id: "links",
+                        content: <Skeleton loading={loading}>
+                            <ChangeLogLinks id="links" linkChanges={changeLog.linkChanges}/>
+                        </Skeleton>,
+                    },
+                    {
+                        id: "commits",
+                        content: <Skeleton loading={loading}>
+                            <GitChangeLogCommits id="commits" commits={changeLog.commits}
+                                                 diffLink={changeLog.diffLink}/>
+                        </Skeleton>,
+                    },
+                    {
+                        id: "issues",
+                        content: <Skeleton loading={loading}>
+                            <ChangeLogIssues id="issues" issues={changeLog.issues}/>
+                        </Skeleton>,
+                    },
+                ]
+            )
+        }
+    }, [changeLog]);
 
     return (
         <>
             <Head>
-                {title(`Change log | From ${buildKnownName(changeLog.buildFrom)} to ${buildKnownName(changeLog.buildTo)}`)}
+                {
+                    changeLog ?
+                        title(`Change log | From ${buildKnownName(changeLog.buildFrom)} to ${buildKnownName(changeLog.buildTo)}`) :
+                        "Change log"
+                }
             </Head>
             <MainPage
                 title={
-                    `Change log from ${buildKnownName(changeLog.buildFrom)} to ${buildKnownName(changeLog.buildTo)}`
+                    changeLog ?
+                        `Change log from ${buildKnownName(changeLog.buildFrom)} to ${buildKnownName(changeLog.buildTo)}` :
+                        "No change log"
                 }
-                breadcrumbs={changeLog.buildFrom.branch ? downToBranchBreadcrumbs(changeLog.buildFrom) : []}
+                breadcrumbs={
+                    changeLog && changeLog.buildFrom.branch ? downToBranchBreadcrumbs(changeLog.buildFrom) : homeBreadcrumbs()
+                }
                 commands={[
                     <CloseCommand
                         key="close"
-                        href={changeLog.buildFrom.branch ? branchUri(changeLog.buildFrom.branch) : ''}
+                        href={
+                            changeLog && changeLog.buildFrom.branch ? branchUri(changeLog.buildFrom.branch) : homeUri()
+                        }
                     />,
                 ]}
             >
-                <GridTableContextProvider isExpandable={false} isDraggable={false}>
-                    <LoadingContainer loading={loading} tip="Loading change log">
-                        <GridTable
-                            rowHeight={30}
-                            layout={defaultLayout}
-                            items={items}
-                            isResizable={false}
-                            isDraggable={false}
-                        />
-                    </LoadingContainer>
-                </GridTableContextProvider>
+                {
+                    changeLog && items &&
+                    <GridTableContextProvider isExpandable={false} isDraggable={false}>
+                        <LoadingContainer loading={loading} tip="Loading change log">
+                            <GridTable
+                                rowHeight={30}
+                                layout={defaultLayout}
+                                items={items}
+                                isResizable={false}
+                                isDraggable={false}
+                            />
+                        </LoadingContainer>
+                    </GridTableContextProvider>
+                }
+                {
+                    !changeLog && <Empty
+                        description={
+                            <Typography.Text>
+                                No change log could be computed for these builds.
+
+                                It&apos;s likely you have been redirected to a wrong page.
+                            </Typography.Text>
+                        }
+                    />
+                }
             </MainPage>
         </>
     )
