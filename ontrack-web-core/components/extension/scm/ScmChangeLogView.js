@@ -130,11 +130,16 @@ export default function ScmChangeLogView({from, to}) {
                             }
                             issues {
                                 issueServiceConfiguration {
-                                    id
+                                    serviceId
                                 }
                                 issues {
                                     displayKey
                                     summary
+                                    url
+                                    status {
+                                        name
+                                    }
+                                    updateTime
                                 }
                             }
                         }
@@ -193,8 +198,9 @@ export default function ScmChangeLogView({from, to}) {
         },
         {
             id: "issues",
-            // TODO content: <ChangeLogIssues id="issues" changeLogUuid={changeLogUuid}/>
-            content: <Typography.Text>TODO Issues</Typography.Text>
+            content: <Skeleton loading={loading}>
+                <ChangeLogIssues id="issues" issues={changeLog.issues}/>
+            </Skeleton>,
         },
     ]
 
