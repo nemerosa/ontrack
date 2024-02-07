@@ -3,11 +3,20 @@ const {test} = require('@playwright/test')
 const {login} = require("../../core/login");
 const {BranchPage} = require("../../core/branches/branch");
 const {provisionChangeLog, commits, issues} = require("./scm");
+const {generate} = require("@ontrack/utils");
+const {ontrack} = require("@ontrack/ontrack");
 
 
-test("SCM change log", async ({page}) => {
+const doTestSCMChangeLog = async (
+    page,
+    issueServiceId = undefined,
+    issueServiceIdentifier = undefined
+) => {
     // Provisioning
-    const {from, to, mockSCMContext, builds} = await provisionChangeLog()
+    const {from, to, mockSCMContext, builds} = await provisionChangeLog(
+        issueServiceId,
+        issueServiceIdentifier,
+    )
 
     // Login & going to the branch page
     await login(page)
@@ -62,5 +71,26 @@ test("SCM change log", async ({page}) => {
         const summary = issues[key]
         await changeLogPage.checkIssue({key, summary, visible: (key !== "ISS-20")})
     }
+}
 
+
+test("SCM change log", async ({page}) => {
+    await doTestSCMChangeLog(page)
+})
+
+test('JIRA SCM change log', async ({page}) => {
+    // Creates the JIRA mock configuration
+    const configName = generate("mock-")
+    await ontrack().configurations.jira.createConfig({
+        name: configName,
+        url: "mock://jira",
+        user: "",
+        password: "",
+    })
+    // Running the test
+    await doTestSCMChangeLog(
+        page,
+        'jira',
+        `jira//${configName}`
+    )
 })

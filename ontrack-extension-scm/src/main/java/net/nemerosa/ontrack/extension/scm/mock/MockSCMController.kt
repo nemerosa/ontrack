@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.scm.mock
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import net.nemerosa.ontrack.common.RunProfile
 import org.springframework.context.annotation.Profile
 import org.springframework.http.HttpStatus
@@ -94,6 +95,7 @@ class MockSCMController(
         val text: String,
     )
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     data class IssueRegistration(
         val name: String,
         val key: String,

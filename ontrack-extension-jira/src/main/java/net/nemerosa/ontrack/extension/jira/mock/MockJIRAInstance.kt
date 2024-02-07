@@ -3,7 +3,9 @@ package net.nemerosa.ontrack.extension.jira.mock
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.jira.JIRAConfigurationProperties
 import net.nemerosa.ontrack.extension.jira.model.JIRAIssue
+import net.nemerosa.ontrack.extension.jira.model.JIRALink
 import net.nemerosa.ontrack.extension.jira.model.JIRAStatus
+import net.nemerosa.ontrack.extension.jira.model.JIRAVersion
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 
@@ -25,24 +27,44 @@ class MockJIRAInstance {
 
     val projectNames: List<String> get() = projects.keys.sorted()
 
-    fun registerIssue(key: String, summary: String) {
+    fun registerIssue(key: String, summary: String, linkedKey: String? = null): JIRAIssue {
         val projectName = key.substringBefore("-")
         val project = projects.getOrPut(projectName) {
             JIRAProject(projectName)
         }
-        project.issues[key] = JIRAIssue(
+        val openStatus = JIRAStatus("Open", "https://mock/status/Open")
+        val issue = JIRAIssue(
             url = "mock://jira/$projectName/$key",
             key = key,
             summary = summary,
-            status = JIRAStatus("Open", "mock"),
+            status = openStatus,
             assignee = "unknown",
             updateTime = Time.now(),
             fields = emptyList(),
-            affectedVersions = emptyList(),
-            fixVersions = emptyList(),
+            affectedVersions = listOf(
+                JIRAVersion("4.6", true),
+                JIRAVersion("4.7", true),
+            ),
+            fixVersions = listOf(
+                JIRAVersion("4.8", false),
+            ),
             issueType = "Defect",
-            links = emptyList(),
+            links = if (linkedKey.isNullOrBlank()) {
+                emptyList()
+            } else {
+                listOf(
+                    JIRALink(
+                        key = linkedKey,
+                        url = "mock://jira/$projectName/$linkedKey",
+                        status = openStatus,
+                        linkName = "Relates to",
+                        link = "Relates to",
+                    )
+                )
+            },
         )
+        project.issues[key] = issue
+        return issue
     }
 
     fun getIssue(key: String): JIRAIssue? {

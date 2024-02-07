@@ -18,17 +18,24 @@ export const issues = {
     "ISS-23": "Some nicer UI",
 }
 
-export async function provisionChangeLog() {
+export async function provisionChangeLog(
+    issueServiceId = undefined,
+    issueServiceIdentifier = undefined,
+) {
     const mockSCMContext = createMockSCMContext()
     const project = await ontrack().createProject()
-    await mockSCMContext.configureProjectForMockSCM(project)
+    await mockSCMContext.configureProjectForMockSCM(project, issueServiceIdentifier)
 
     const branch = await project.createBranch()
     await mockSCMContext.configureBranchForMockSCM(branch)
 
     for (const key of Object.keys(issues)) {
         const summary = issues[key]
-        await mockSCMContext.repositoryIssue({key, summary})
+        if (key === 'ISS-23') {
+            await mockSCMContext.repositoryIssue({key, summary, issueServiceId: issueServiceId, linkedKey: 'ISS-10'})
+        } else {
+            await mockSCMContext.repositoryIssue({key, summary, issueServiceId: issueServiceId})
+        }
     }
 
     const builds = []

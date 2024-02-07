@@ -2680,6 +2680,8 @@ type Issue {
     displayKey: String
     "Key of the issue"
     key: String
+    "JSON representation of the issue containing custom fields"
+    rawIssue: JSON!
     "Status of the issue"
     status: IssueStatus
     "Title / summary for the issue"

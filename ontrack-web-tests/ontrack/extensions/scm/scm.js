@@ -18,7 +18,7 @@ class MockSCMContext {
         this.commitIdsPerMessage = {}
     }
 
-    async configureProjectForMockSCM(project) {
+    async configureProjectForMockSCM(project, issueServiceIdentifier) {
         return graphQLCallMutation(
             project.ontrack.connection,
             'setProjectPropertyById',
@@ -41,7 +41,8 @@ class MockSCMContext {
             {
                 projectId: project.id,
                 value: {
-                    name: this.repositoryName
+                    name: this.repositoryName,
+                    issueServiceIdentifier: issueServiceIdentifier,
                 }
             }
         )
@@ -105,16 +106,22 @@ class MockSCMContext {
         )
     }
 
-    async repositoryIssue({key, summary}) {
-        await restCallPost(
+    async repositoryIssue({key, summary, issueServiceId, linkedKey}) {
+        const response = await restCallPost(
             ontrack().connection,
-            "/extension/scm/mock/issue",
+            `/extension/${issueServiceId ?? 'scm'}/mock/issue`,
             {
                 name: this.repositoryName,
                 key,
                 message: summary,
+                linkedKey,
             }
         )
+        if (!response.ok) {
+            const message = `Could not create mock issue ${key}`;
+            console.log(message)
+            throw message
+        }
     }
 
     async repositoryCommit({branch = 'main', message}) {

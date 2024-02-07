@@ -140,6 +140,7 @@ export default function ScmChangeLogView({from, to}) {
                                         name
                                     }
                                     updateTime
+                                    rawIssue
                                 }
                             }
                         }
