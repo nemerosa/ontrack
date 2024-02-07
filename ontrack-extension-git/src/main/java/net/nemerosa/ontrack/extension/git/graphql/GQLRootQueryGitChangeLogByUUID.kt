@@ -17,6 +17,7 @@ class GQLRootQueryGitChangeLogByUUID(
     override fun getFieldDefinition(): GraphQLFieldDefinition = GraphQLFieldDefinition.newFieldDefinition()
         .name("gitChangeLogByUUID")
         .description("Gets a change log by its UUID")
+        .deprecate("Will be removed in V5. Prefer using the `scmChangeLog` query.")
         .argument {
             it.name("uuid")
                 .description("UUID of the change log")

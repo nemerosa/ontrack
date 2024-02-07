@@ -1,6 +1,7 @@
 import GridCell from "@components/grid/GridCell";
 import {Dynamic} from "@components/common/Dynamic";
 import {useEffect, useState} from "react";
+import {useIssueExportFormats} from "@components/extension/issues/SelectIssueExportFormat";
 
 export default function ChangeLogIssues({id, issues}) {
 
@@ -13,7 +14,7 @@ export default function ChangeLogIssues({id, issues}) {
 
     // const client = useGraphQLClient()
 
-    // const exportFormats = useIssueExportFormats()
+    const exportFormats = useIssueExportFormats()
     //
     // const [preferences, setPreferences] = useState({
     //     format: 'text',
