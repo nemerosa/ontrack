@@ -1,7 +1,7 @@
 import GridCell from "@components/grid/GridCell";
 import {Dynamic} from "@components/common/Dynamic";
 import {useEffect, useState} from "react";
-import {useTemplateRenderers} from "@components/extension/issues/SelectIssueExportFormat";
+import {useTemplateRenderers} from "@components/extension/issues/SelectTemplateRenderer";
 import {Dropdown, Space, Spin} from "antd";
 import {FaCheck, FaDownload, FaTools} from "react-icons/fa";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";

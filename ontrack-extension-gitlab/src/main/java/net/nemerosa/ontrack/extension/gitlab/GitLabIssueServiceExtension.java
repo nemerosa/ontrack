@@ -147,7 +147,7 @@ public class GitLabIssueServiceExtension extends AbstractIssueServiceExtension {
     }
 
     @Override
-    protected Set<String> getIssueTypes(IssueServiceConfiguration issueServiceConfiguration, Issue issue) {
+    public Set<String> getIssueTypes(IssueServiceConfiguration issueServiceConfiguration, Issue issue) {
         GitLabIssueWrapper wrapper = (GitLabIssueWrapper) issue;
         return new HashSet<>(wrapper.getLabels());
     }

@@ -27,7 +27,7 @@ export const useTemplateRenderers = () => {
     return templateRenderers
 }
 
-export default function SelectIssueExportFormat({value, onChange}) {
+export default function SelectTemplateRenderer({value, onChange}) {
 
     const exportFormats = useTemplateRenderers()
     const [exportFormatOptions, setExportFormatOptions] = useState([])

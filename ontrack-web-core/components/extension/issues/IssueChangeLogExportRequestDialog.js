@@ -1,6 +1,6 @@
 import FormDialog, {useFormDialog} from "@components/form/FormDialog";
 import {Button, Card, Form, Input, Space} from "antd";
-import SelectIssueExportFormat from "@components/extension/issues/SelectIssueExportFormat";
+import SelectTemplateRenderer from "@components/extension/issues/SelectTemplateRenderer";
 import {FaPlus, FaTimes, FaTrash} from "react-icons/fa";
 
 export const useIssueChangeLogExportRequestDialog = ({onSuccess}) => {
@@ -22,7 +22,7 @@ export default function IssueChangeLogExportRequestDialog({issueChangeLogExportR
                 name="format"
                 label="Format"
             >
-                <SelectIssueExportFormat/>
+                <SelectTemplateRenderer/>
             </Form.Item>
             <Form.List name="groups">
                 {(fields, {add, remove}) => (
