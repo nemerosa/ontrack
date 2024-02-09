@@ -78,8 +78,8 @@ class MockSCMExtension(
         private val createdBranches = mutableMapOf<String, String>()
         private val createdPullRequests = mutableListOf<MockPullRequest>()
 
-        fun registerIssue(key: String, message: String) {
-            issues[key] = MockIssue(name, key, message)
+        fun registerIssue(key: String, message: String, vararg types: String) {
+            issues[key] = MockIssue(name, key, message, types = types.toSet())
         }
 
         fun registerCommit(scmBranch: String, message: String): String {
@@ -374,7 +374,11 @@ class MockSCMExtension(
         override fun getIssueTypes(
             issueServiceConfiguration: IssueServiceConfiguration,
             issue: Issue
-        ): Set<String> = emptySet()
+        ): Set<String> = if (issue is MockIssue) {
+            issue.types ?: emptySet()
+        } else {
+            emptySet()
+        }
 
         override fun getIssue(issueServiceConfiguration: IssueServiceConfiguration, issueKey: String): Issue? =
             repository(repositoryName).findIssue(issueKey)

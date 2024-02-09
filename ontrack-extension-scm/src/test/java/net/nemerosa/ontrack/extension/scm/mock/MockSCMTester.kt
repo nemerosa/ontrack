@@ -53,7 +53,7 @@ class MockSCMTester(
             )
         }
 
-        fun repositoryIssue(key: String, message: String) {
+        fun repositoryIssue(key: String, message: String, type: String? = null) {
             mockSCMExtension.repository(repositoryName).registerIssue(key, message)
         }
 

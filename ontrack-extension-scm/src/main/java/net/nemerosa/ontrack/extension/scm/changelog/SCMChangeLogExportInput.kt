@@ -20,14 +20,14 @@ data class SCMChangeLogExportInput(
     val groupingSpecification: Map<String, Set<String>>
         @JsonIgnore
         get() {
-            val result = LinkedHashMap<String, Set<String>>()
-            if (!StringUtils.isBlank(this.grouping)) {
-                val groups = StringUtils.split(this.grouping, '|')
+            val result = mutableMapOf<String, Set<String>>()
+            if (!grouping.isNullOrBlank()) {
+                val groups = grouping.split('|')
                 for (group in groups) {
-                    val groupSpec = StringUtils.split(group.trim(), '=')
-                    if (groupSpec.size != 2) throw ExportRequestGroupingFormatException(this.grouping)
+                    val groupSpec = group.trim().split('=')
+                    if (groupSpec.size != 2) throw ExportRequestGroupingFormatException(grouping)
                     val groupName = groupSpec[0].trim()
-                    result[groupName] = StringUtils.split(groupSpec[1].trim(), ',').map {
+                    result[groupName] = groupSpec[1].trim().split(',').map {
                         it.trim()
                     }.toSet()
                 }
@@ -40,10 +40,10 @@ data class SCMChangeLogExportInput(
      */
     val excludedTypes: Set<String>
         @JsonIgnore
-        get() = if (StringUtils.isBlank(this.exclude)) {
+        get() = if (exclude.isNullOrBlank()) {
             emptySet()
         } else {
-            StringUtils.split(this.exclude, ",").map { it.trim() }.toSet()
+            exclude.split(",").map { it.trim() }.toSet()
         }
 
 }

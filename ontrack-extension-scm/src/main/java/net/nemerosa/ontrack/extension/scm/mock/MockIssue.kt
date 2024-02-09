@@ -9,6 +9,7 @@ data class MockIssue(
     val repositoryName: String,
     override val key: String,
     val message: String,
+    val types: Set<String>? = null,
 ) : Issue {
     override val summary: String = message
     override val url: String = "mock://$repositoryName/issue/$key"

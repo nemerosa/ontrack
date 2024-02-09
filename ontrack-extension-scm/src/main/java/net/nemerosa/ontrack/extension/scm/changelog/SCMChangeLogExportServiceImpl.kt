@@ -73,7 +73,7 @@ class SCMChangeLogExportServiceImpl(
             if (groupName.isNotBlank()) {
                 s.append(renderer.renderSection(groupName, renderedIssues))
             } else {
-                s.append(issues)
+                s.append(renderedIssues)
             }
         }
 
