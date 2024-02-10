@@ -44,13 +44,11 @@ class SlackNotificationEventRendererTest {
     fun `Rendering space`() {
         assertEquals(
             """
-One
-
-Two
-""",
-            """
-One${slackNotificationEventRenderer.renderSpace()}Two
-"""
+                |One
+                |
+                |Two
+            """.trimMargin(),
+            "One${slackNotificationEventRenderer.renderSpace()}Two"
         )
     }
 
@@ -58,10 +56,10 @@ One${slackNotificationEventRenderer.renderSpace()}Two
     fun `Rendering section`() {
         assertEquals(
             """
-                **My title**
-                
-                My content
-            """.trimIndent(),
+                |**My title**
+                |
+                |My content
+            """.trimMargin(),
             slackNotificationEventRenderer.renderSection(
                 "My title",
                 "My content"

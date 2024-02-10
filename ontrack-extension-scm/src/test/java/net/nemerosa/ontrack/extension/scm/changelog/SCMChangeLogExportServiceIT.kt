@@ -15,7 +15,7 @@ class SCMChangeLogExportServiceIT : AbstractSCMChangeLogTestSupport() {
 
     @Test
     fun `Exporting a change log as plain text without grouping`() {
-        prepareChangeLogTestCase { from, to ->
+        prepareChangeLogTestCase { repositoryName, from, to ->
 
             // Getting the change log
             val changeLog = runBlocking {
@@ -45,7 +45,7 @@ class SCMChangeLogExportServiceIT : AbstractSCMChangeLogTestSupport() {
 
     @Test
     fun `Exporting a change log as markdown with grouping`() {
-        prepareChangeLogTestCase { from, to ->
+        prepareChangeLogTestCase { repositoryName, from, to ->
 
             // Getting the change log
             val changeLog = runBlocking {
@@ -69,12 +69,12 @@ class SCMChangeLogExportServiceIT : AbstractSCMChangeLogTestSupport() {
                 """
                     ## Defects
                     
-                    * ISS-22 Some fixes are needed
+                    * [ISS-22](mock://$repositoryName/issue/ISS-22) Some fixes are needed
                     
                     ## Features
                     
-                    * ISS-21 Some new feature
-                    * ISS-23 Some nicer UI
+                    * [ISS-21](mock://$repositoryName/issue/ISS-21) Some new feature
+                    * [ISS-23](mock://$repositoryName/issue/ISS-23) Some nicer UI
                     """.trimIndent(),
                 text
             )

@@ -30,8 +30,8 @@ class SlackNotificationEventRenderer(
 
     override fun renderSection(title: String, content: String): String =
         """
-            **$title**
-            
-            $content
-        """.trimIndent()
+            |**$title**
+            |
+            |$content
+        """.trimMargin()
 }

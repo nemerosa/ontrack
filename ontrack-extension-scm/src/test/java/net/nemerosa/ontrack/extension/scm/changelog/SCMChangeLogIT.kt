@@ -13,7 +13,7 @@ class SCMChangeLogIT : AbstractSCMChangeLogTestSupport() {
 
     @Test
     fun `Getting a change log using the SCM API`() {
-        prepareChangeLogTestCase { from, to ->
+        prepareChangeLogTestCase { _, from, to ->
             val changeLog = runBlocking {
                 scmChangeLogService.getChangeLog(
                     from = from,

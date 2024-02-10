@@ -54,7 +54,17 @@ class MockSCMTester(
         }
 
         fun repositoryIssue(key: String, message: String, type: String? = null) {
-            mockSCMExtension.repository(repositoryName).registerIssue(key, message)
+            mockSCMExtension
+                .repository(repositoryName)
+                .registerIssue(
+                    key = key,
+                    message = message,
+                    types = if (type.isNullOrBlank()) {
+                        emptyArray()
+                    } else {
+                        arrayOf(type)
+                    },
+                )
         }
 
         fun Build.withRepositoryCommit(message: String, property: Boolean = true) {

@@ -11,7 +11,7 @@ abstract class AbstractSCMChangeLogTestSupport : AbstractDSLTestSupport() {
     private lateinit var mockSCMTester: MockSCMTester
 
     protected fun prepareChangeLogTestCase(
-        code: (from: Build, to: Build) -> Unit,
+        code: (repositoryName: String, from: Build, to: Build) -> Unit,
     ) {
         asAdmin {
             mockSCMTester.withMockSCMRepository {
@@ -39,6 +39,7 @@ abstract class AbstractSCMChangeLogTestSupport : AbstractDSLTestSupport() {
                             withRepositoryCommit("ISS-23 Fixing some CSS")
 
                             code(
+                                repositoryName,
                                 from,
                                 this@build,
                             )

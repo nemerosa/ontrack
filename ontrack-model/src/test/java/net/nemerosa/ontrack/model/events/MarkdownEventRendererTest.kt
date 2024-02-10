@@ -28,10 +28,10 @@ One${renderer.renderSpace()}Two
     fun `Rendering section`() {
         assertEquals(
             """
-                ## My title
-                
-                My content
-            """.trimIndent(),
+                |## My title
+                |
+                |My content
+            """.trimMargin(),
             renderer.renderSection(
                 "My title",
                 "My content"

@@ -11,13 +11,11 @@ class PlainEventRendererTest {
     fun `Rendering space`() {
         assertEquals(
             """
-One
-
-Two
-""",
-            """
-One${renderer.renderSpace()}Two
-"""
+                |One
+                |
+                |Two
+            """.trimMargin(),
+            "One${renderer.renderSpace()}Two"
         )
     }
 
@@ -25,10 +23,10 @@ One${renderer.renderSpace()}Two
     fun `Rendering section`() {
         assertEquals(
             """
-                My title
-                
-                My content
-            """.trimIndent(),
+                |My title
+                |
+                |My content
+            """.trimMargin(),
             renderer.renderSection(
                 "My title",
                 "My content"
