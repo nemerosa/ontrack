@@ -1,9 +1,9 @@
 // @ts-check
-const {test} = require('@playwright/test')
+const {test, expect} = require('@playwright/test')
 const {login} = require("../../core/login");
 const {BranchPage} = require("../../core/branches/branch");
 const {provisionChangeLog, commits, issues} = require("./scm");
-const {generate} = require("@ontrack/utils");
+const {generate, trimIndent} = require("@ontrack/utils");
 const {ontrack} = require("@ontrack/ontrack");
 
 
@@ -71,6 +71,9 @@ const doTestSCMChangeLog = async (
         const summary = issues[key]
         await changeLogPage.checkIssue({key, summary, visible: (key !== "ISS-20")})
     }
+
+    // Returning the change log page for more tests
+    return changeLogPage
 }
 
 
@@ -78,7 +81,8 @@ test("SCM change log", async ({page}) => {
     await doTestSCMChangeLog(page)
 })
 
-test('JIRA SCM change log', async ({page}) => {
+test('JIRA SCM change log', async ({page, context}) => {
+    await context.grantPermissions(['clipboard-read'])
     // Creates the JIRA mock configuration
     const configName = generate("mock-")
     await ontrack().configurations.jira.createConfig({
@@ -87,10 +91,16 @@ test('JIRA SCM change log', async ({page}) => {
         user: "",
         password: "",
     })
+
     // Running the test
-    await doTestSCMChangeLog(
+    const changeLogPage = await doTestSCMChangeLog(
         page,
         'jira',
         `jira//${configName}`
     )
+
+    // Exporting the change log with default parameters
+    await changeLogPage.launchExport()
+    // Copying the text
+    await changeLogPage.copyExport()
 })

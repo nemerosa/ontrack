@@ -145,4 +145,13 @@ export class SCMChangeLogPage {
         }
     }
 
+    async launchExport() {
+        await this.page.getByRole('button', {name: 'Export'}).click()
+    }
+
+    async copyExport() {
+        await this.page.getByRole('button', {name: 'Export ready'}).click()
+        await expect(this.page.getByText('Export copied')).toBeVisible()
+    }
+
 }
