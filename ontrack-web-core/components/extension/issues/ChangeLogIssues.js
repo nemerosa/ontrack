@@ -2,9 +2,12 @@ import GridCell from "@components/grid/GridCell";
 import {Dynamic} from "@components/common/Dynamic";
 import {useEffect, useState} from "react";
 import {useTemplateRenderers} from "@components/extension/issues/SelectTemplateRenderer";
-import {Dropdown, Space, Spin} from "antd";
-import {FaCheck, FaDownload, FaTools} from "react-icons/fa";
+import {Button, Dropdown, Space, Spin} from "antd";
+import {FaCheck, FaCopy, FaDownload, FaTools} from "react-icons/fa";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import copy from "copy-to-clipboard";
+import CheckStatus from "@components/common/CheckStatus";
+import {gql} from "graphql-request";
 
 export default function ChangeLogIssues({id, from, to, issues}) {
 
@@ -101,13 +104,17 @@ export default function ChangeLogIssues({id, from, to, issues}) {
                     $from: Int!,
                     $to: Int!,
                     $format: String!,
-                    $grouping: String!,
+                    $grouping: String,
+                    $exclude: String,
+                    $altGroup: String,
                 ) {
                     scmChangeLog(from: $from, to: $to) {
                         export(
                             request: {
                                 format: $format,
                                 grouping: $grouping,
+                                exclude: $exclude,
+                                altGroup: $altGroup,
                             }
                         )
                     }
@@ -118,6 +125,8 @@ export default function ChangeLogIssues({id, from, to, issues}) {
                 to,
                 format: preferences.format,
                 grouping,
+                exclude: null, // TODO
+                altGroup: null, // TODO
             }
         ).then(data => {
             const content = data.scmChangeLog.export
@@ -127,12 +136,12 @@ export default function ChangeLogIssues({id, from, to, issues}) {
         })
     }
 
-    // const onCopy = () => {
-    //     if (exportedContent) {
-    //         setExportCopied(copy(exportedContent))
-    //     }
-    // }
-    //
+    const onCopy = () => {
+        if (exportedContent) {
+            setExportCopied(copy(exportedContent))
+        }
+    }
+
     // const issueChangeLogExportRequestDialog = useIssueChangeLogExportRequestDialog({
     //     onSuccess: (values) => {
     //         savePreferences(values)
@@ -151,22 +160,22 @@ export default function ChangeLogIssues({id, from, to, issues}) {
                 padding={0}
                 extra={
                     <>
-                        {/*//         {*/}
-                        {/*//             exportCopied &&*/}
-                        {/*//             <CheckStatus*/}
-                        {/*//                 value={true}*/}
-                        {/*//                 text="Export copied"*/}
-                        {/*//             />*/}
-                        {/*//         }*/}
-                        {/*//         {*/}
-                        {/*//             exportedContent && !exportCopied &&*/}
-                        {/*//             <Button*/}
-                        {/*//                 icon={<FaCopy/>}*/}
-                        {/*//                 onClick={onCopy}*/}
-                        {/*//             >*/}
-                        {/*//                 Export ready - click to copy*/}
-                        {/*//             </Button>*/}
-                        {/*//         }*/}
+                        {
+                            exportCopied &&
+                            <CheckStatus
+                                value={true}
+                                text="Export copied"
+                            />
+                        }
+                        {
+                            exportedContent && !exportCopied &&
+                            <Button
+                                icon={<FaCopy/>}
+                                onClick={onCopy}
+                            >
+                                Export ready - click to copy
+                            </Button>
+                        }
                         <Dropdown.Button
                             type="primary"
                             trigger="click"
