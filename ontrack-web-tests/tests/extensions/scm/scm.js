@@ -145,6 +145,11 @@ export class SCMChangeLogPage {
         }
     }
 
+    async selectExportFormat(format) {
+        await this.page.getByRole('button', { name: 'ellipsis' }).click()
+        await this.page.getByRole('menuitem', { name: format }).click()
+    }
+
     async launchExport() {
         await this.page.getByRole('button', {name: 'Export'}).click()
     }

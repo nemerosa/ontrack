@@ -82,7 +82,6 @@ test("SCM change log", async ({page}) => {
 })
 
 test('JIRA SCM change log', async ({page, context}) => {
-    await context.grantPermissions(['clipboard-read'])
     // Creates the JIRA mock configuration
     const configName = generate("mock-")
     await ontrack().configurations.jira.createConfig({
@@ -102,5 +101,13 @@ test('JIRA SCM change log', async ({page, context}) => {
     // Exporting the change log with default parameters
     await changeLogPage.launchExport()
     // Copying the text
+    await changeLogPage.copyExport()
+
+    /**
+     * Exporting the change log for Markdown and default parameters
+     */
+
+    await changeLogPage.selectExportFormat('Markdown')
+    await changeLogPage.launchExport()
     await changeLogPage.copyExport()
 })
