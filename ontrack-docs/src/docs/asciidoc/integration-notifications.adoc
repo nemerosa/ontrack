@@ -1,26 +1,35 @@
 [[notifications]]
 === Notifications
 
-Ontrack has the possibility to send send notifications to different <<notifications-backends,backends>> like some webhooks, email, Slack messages, etc.
+Ontrack has the possibility to send notifications to different <<notifications-backends,backends>> like some webhooks, email, Slack messages, etc.
 
 [WARNING]
 ====
 By default, notifications are _not_ enabled. You need to activate them by setting the <<configuration-properties-notifications,`ontrack.config.extension.notifications.enabled`>> configuration property to `true`.
 ====
 
-A notification is the association between an _event_ occurring on an _entity_ and sent to a given _backend_ using some _configuration_.
+A notification is the association between an _event_ occurring on an _entity_ and sent to a given _channel_ using some _configuration_.
 
 For example, a notification can be:
 
 * event: a build has been <<model,promoted>>
 * entity: the branch the build <<model,belongs to>>
-* backend: email
-* backend configuration: the subject & the email addresses
+* channel: email
+* channel configuration: the subject & the email addresses
+* an optional custom template
 
 In this example, the body of the email would be a text like "Build B of branch R in project P has been promoted to P", which various links to Ontrack.
 
+[NOTE]
+====
+By default, the notifications use the <<appendix-events,default templates>> of the events but a
+<<appendix-templating,custom template>> can be provided.
+====
+
 Administrators of Ontrack can create and configure the different <<notifications-backends,backends>>.
+
 They can also configure the notifications at entity level to respond to some events using notification configurations (<<notifications-subscriptions,_subscriptions_>>).
+
 Subscriptions can be either <<notifications-subscriptions-local,local>> (subscribing to the events on a given branch) or <<notifications-subscriptions-global,global>> (subscribing to the events in all Ontrack, regardless of the entity).
 
 [[notifications-backends]]
@@ -57,6 +66,7 @@ image::integration-notifications-new-subscription.png["New subscription dialog",
 * keywords - space-separated list of words which will be used to restrict the events being listened to
 * channel - destination for the notification.
 Depending on the channel being selected, additional fields are needed (for example, for a Slack notification, the Slack channel is required)
+* custom template - if provided, it'll override the default template associated with the event. See <<appendix-templating>> for its syntax.
 
 On the subscription list, you can:
 
@@ -84,6 +94,8 @@ ontrack:
                   channel: slack
                   channel-config:
                     channel: "#my-channel"
+                  contentTemplate: |
+                    Promoted to ${promotionLevel}.
 ----
 ====
 
