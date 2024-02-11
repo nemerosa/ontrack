@@ -1,142 +1,443 @@
-package net.nemerosa.ontrack.model.events;
+package net.nemerosa.ontrack.model.events
 
-import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.model.support.Configuration;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.Collection;
+import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.support.Configuration
 
 /**
  * Factory for events.
  */
-public interface EventFactory {
-
-    EventType NEW_PROJECT = SimpleEventType.of("new_project", "New project ${project}.", "When a project is created.");
-    EventType UPDATE_PROJECT = SimpleEventType.of("update_project", "Project ${project} has been updated.", "When a project is updated.");
-    EventType ENABLE_PROJECT = SimpleEventType.of("enable_project", "Project ${project} has been enabled.", "When a project becomes enabled again.");
-    EventType DISABLE_PROJECT = SimpleEventType.of("disable_project", "Project ${project} has been disabled.", "When a project is disabled.");
-    EventType DELETE_PROJECT = SimpleEventType.of("delete_project", "Project ${PROJECT} has been deleted.", "When a project is deleted.");
-
-    EventType NEW_BRANCH = SimpleEventType.of("new_branch", "New branch ${branch} for project ${project}.", "When a branch is created.");
-    EventType UPDATE_BRANCH = SimpleEventType.of("update_branch", "Branch ${branch} in ${project} has been updated.", "When a branch is updated.");
-    EventType ENABLE_BRANCH = SimpleEventType.of("enable_branch", "Branch ${branch} in ${project} has been enabled.", "When a branch becomes enabled again.");
-    EventType DISABLE_BRANCH = SimpleEventType.of("disable_branch", "Branch ${branch} in ${project} has been disabled.", "When a branch is disabled.");
-    EventType DELETE_BRANCH = SimpleEventType.of("delete_branch", "Branch ${BRANCH} has been deleted from ${project}.", "When a branch is deleted.");
-
-    EventType NEW_BUILD = SimpleEventType.of("new_build", "New build ${build} for branch ${branch} in ${project}.", "When a build is created.");
-    EventType UPDATE_BUILD = SimpleEventType.of("update_build", "Build ${build} for branch ${branch} in ${project} has been updated.", "When a build is updated.");
-    EventType DELETE_BUILD = SimpleEventType.of("delete_build", "Build ${BUILD} for branch ${branch} in ${project} has been deleted.", "When a build is deleted.");
-
-    EventType NEW_PROMOTION_LEVEL = SimpleEventType.of("new_promotion_level", "New promotion level ${promotionLevel} for branch ${branch} in ${project}.", "When a promotion level is created.");
-    EventType IMAGE_PROMOTION_LEVEL = SimpleEventType.of("image_promotion_level", "Image for promotion level ${promotionLevel} for branch ${branch} in ${project} has changed.", "When a promotion level's image is updated.");
-    EventType UPDATE_PROMOTION_LEVEL = SimpleEventType.of("update_promotion_level", "Promotion level ${promotionLevel} for branch ${branch} in ${project} has changed.", "When a promotion level is updated.");
-    EventType DELETE_PROMOTION_LEVEL = SimpleEventType.of("delete_promotion_level", "Promotion level ${PROMOTION_LEVEL} for branch ${branch} in ${project} has been deleted.", "When a promotion level is deleted.");
-    EventType REORDER_PROMOTION_LEVEL = SimpleEventType.of("reorder_promotion_level", "Promotion levels for branch ${branch} in ${project} have been reordered.", "When the promotion levels of a branch are reordered.");
-
-    EventType NEW_VALIDATION_STAMP = SimpleEventType.of("new_validation_stamp", "New validation stamp ${validationStamp} for branch ${branch} in ${project}.", "When a validation stamp is created.");
-    EventType IMAGE_VALIDATION_STAMP = SimpleEventType.of("image_validation_stamp", "Image for validation stamp ${validationStamp} for branch ${branch} in ${project} has changed.", "When a validation stamp's image is updated.");
-    EventType UPDATE_VALIDATION_STAMP = SimpleEventType.of("update_validation_stamp", "Validation stamp ${validationStamp} for branch ${branch} in ${project} has been updated.", "When a validation stamp is updated.");
-    EventType DELETE_VALIDATION_STAMP = SimpleEventType.of("delete_validation_stamp", "Validation stamp ${VALIDATION_STAMP} for branch ${branch} in ${project} has been deleted.", "When a validation stamp is deleted.");
-    EventType REORDER_VALIDATION_STAMP = SimpleEventType.of("reorder_validation_stamp", "Validation stamps for branch ${branch} in ${project} have been reordered.", "When the validation stamps of a branch are reordered.");
-
-    EventType NEW_PROMOTION_RUN = SimpleEventType.of("new_promotion_run", "Build ${build} has been promoted to ${promotionLevel} for branch ${branch} in ${project}.", "When a build is promoted.");
-    EventType DELETE_PROMOTION_RUN = SimpleEventType.of("delete_promotion_run", "Promotion ${promotionLevel} of build ${build} has been deleted for branch ${branch} in ${project}.", "When the promotion of a build is deleted.");
-
-    EventType NEW_VALIDATION_RUN = SimpleEventType.of("new_validation_run", "Build ${build} has run for the ${validationStamp} with status ${STATUS_NAME} in branch ${branch} in ${project}.", "When a build is validated.");
-    EventType NEW_VALIDATION_RUN_STATUS = SimpleEventType.of("new_validation_run_status", "Status for the ${validationStamp} validation ${validationRun} for build ${build} in branch ${branch} of ${project} has changed to ${STATUS_NAME}.", "When the status of the validation of a build is updated.");
-    EventType UPDATE_VALIDATION_RUN_STATUS_COMMENT = SimpleEventType.of("update_validation_run_status_comment", "A status message for the ${validationStamp} validation ${validationRun} for build ${build} in branch ${branch} of ${project} has changed.", "When the status message of the validation of a build is updated.");
-
-    EventType PROPERTY_CHANGE = SimpleEventType.of("property_change", "${PROPERTY_NAME} property has changed for ${entity.qualifiedLongName}.", "When a property is edited.");
-    EventType PROPERTY_DELETE = SimpleEventType.of("property_delete", "${PROPERTY_NAME} property has been removed from ${entity.qualifiedLongName}.", "When a property is deleted.");
-
-    EventType NEW_CONFIGURATION = SimpleEventType.of("new_configuration", "${CONFIGURATION} configuration has been created.", "When a configuration is created.");
-    EventType UPDATE_CONFIGURATION = SimpleEventType.of("update_configuration", "${CONFIGURATION} configuration has been updated.", "When a configuration is updated.");
-    EventType DELETE_CONFIGURATION = SimpleEventType.of("delete_configuration", "${CONFIGURATION} configuration has been deleted.", "When a configuration is deleted.");
+interface EventFactory {
 
     /**
-     * Gets an event type using its {@linkplain EventType#getId()}  id}.
+     * Gets an event type using its [EventType.id]  id}.
      */
-    EventType toEventType(String id);
+    fun toEventType(id: String): EventType
 
     /**
      * Allows a third-party extension to register an additional event type.
      *
      * @param eventType Event type to register.
      */
-    void register(EventType eventType);
+    fun register(eventType: EventType)
 
     // List of known events
+    fun newProject(project: Project): Event
 
-    Event newProject(Project project);
+    fun updateProject(project: Project): Event
 
-    Event updateProject(Project project);
+    fun disableProject(project: Project): Event
 
-    Event disableProject(Project project);
+    fun enableProject(project: Project): Event
 
-    Event enableProject(Project project);
+    fun deleteProject(project: Project): Event
 
-    Event deleteProject(Project project);
+    fun newBranch(branch: Branch): Event
 
-    Event newBranch(Branch branch);
+    fun updateBranch(branch: Branch): Event
 
-    Event updateBranch(Branch branch);
+    fun disableBranch(branch: Branch): Event
 
-    Event disableBranch(Branch branch);
+    fun enableBranch(branch: Branch): Event
 
-    Event enableBranch(Branch branch);
+    fun deleteBranch(branch: Branch): Event
 
-    Event deleteBranch(Branch branch);
+    fun newBuild(build: Build): Event
 
-    Event newBuild(Build build);
+    fun updateBuild(build: Build): Event
 
-    Event updateBuild(Build build);
+    fun deleteBuild(build: Build): Event
 
-    Event deleteBuild(Build build);
+    fun newPromotionLevel(promotionLevel: PromotionLevel): Event
 
-    Event newPromotionLevel(PromotionLevel promotionLevel);
+    fun imagePromotionLevel(promotionLevel: PromotionLevel): Event
 
-    Event imagePromotionLevel(PromotionLevel promotionLevel);
+    fun updatePromotionLevel(promotionLevel: PromotionLevel): Event
 
-    Event updatePromotionLevel(PromotionLevel promotionLevel);
+    fun deletePromotionLevel(promotionLevel: PromotionLevel): Event
 
-    Event deletePromotionLevel(PromotionLevel promotionLevel);
+    fun reorderPromotionLevels(branch: Branch): Event
 
-    Event reorderPromotionLevels(Branch branch);
+    fun newPromotionRun(promotionRun: PromotionRun): Event
 
-    Event newPromotionRun(PromotionRun promotionRun);
+    fun deletePromotionRun(promotionRun: PromotionRun): Event
 
-    Event deletePromotionRun(PromotionRun promotionRun);
+    fun newValidationStamp(validationStamp: ValidationStamp): Event
 
-    Event newValidationStamp(ValidationStamp validationStamp);
+    fun imageValidationStamp(validationStamp: ValidationStamp): Event
 
-    Event imageValidationStamp(ValidationStamp validationStamp);
+    fun updateValidationStamp(validationStamp: ValidationStamp): Event
 
-    Event updateValidationStamp(ValidationStamp validationStamp);
+    fun deleteValidationStamp(validationStamp: ValidationStamp): Event
 
-    Event deleteValidationStamp(ValidationStamp validationStamp);
+    fun reorderValidationStamps(branch: Branch): Event
 
-    Event reorderValidationStamps(Branch branch);
+    fun newValidationRun(validationRun: ValidationRun): Event
 
-    Event newValidationRun(ValidationRun validationRun);
+    fun newValidationRunStatus(validationRun: ValidationRun): Event
 
-    Event newValidationRunStatus(ValidationRun validationRun);
+    fun updateValidationRunStatusComment(validationRun: ValidationRun): Event
 
-    Event updateValidationRunStatusComment(ValidationRun validationRun);
+    fun <T> propertyChange(entity: ProjectEntity, propertyType: PropertyType<T>): Event
 
-    <T> Event propertyChange(ProjectEntity entity, PropertyType<T> propertyType);
-
-    <T> Event propertyDelete(ProjectEntity entity, PropertyType<T> propertyType);
+    fun <T> propertyDelete(entity: ProjectEntity, propertyType: PropertyType<T>): Event
 
     // Configurations
+    fun <T : Configuration<T>> newConfiguration(configuration: T): Event
 
-    <T extends Configuration<T>> Event newConfiguration(T configuration);
+    fun <T : Configuration<T>> updateConfiguration(configuration: T): Event
 
-    <T extends Configuration<T>> Event updateConfiguration(T configuration);
-
-    <T extends Configuration<T>> Event deleteConfiguration(T configuration);
+    fun <T : Configuration<T>> deleteConfiguration(configuration: T): Event
 
     // Getting the list of all possible event types
+    val eventTypes: Collection<EventType>
 
-    @NotNull
-    Collection<EventType> getEventTypes();
+    companion object {
+        val NEW_PROJECT: EventType =
+            SimpleEventType(
+                id = "new_project",
+                template = "New project \${project}.",
+                description = "When a project is created.",
+                context = eventContext(
+                    eventProject("Created project"),
+                ),
+            )
+
+        val UPDATE_PROJECT: EventType =
+            SimpleEventType(
+                id = "update_project",
+                template = "Project \${project} has been updated.",
+                description = "When a project is updated.",
+                context = eventContext(
+                    eventProject("Updated project"),
+                ),
+            )
+
+        val ENABLE_PROJECT: EventType =
+            SimpleEventType(
+                id = "enable_project",
+                template = "Project \${project} has been enabled.",
+                description = "When a project becomes enabled again.",
+                context = eventContext(
+                    eventProject("Enabled project"),
+                ),
+            )
+
+        val DISABLE_PROJECT: EventType =
+            SimpleEventType(
+                id = "disable_project",
+                template = "Project \${project} has been disabled.",
+                description = "When a project is disabled.",
+                context = eventContext(
+                    eventProject("Disabled project"),
+                ),
+            )
+
+        val DELETE_PROJECT: EventType =
+            SimpleEventType(
+                id = "delete_project",
+                template = "Project \${PROJECT} has been deleted.",
+                description = "When a project is deleted.",
+                context = eventContext(
+                    eventValue("PROJECT", "Name of the deleted project"),
+                ),
+            )
+
+        val NEW_BRANCH: EventType =
+            SimpleEventType(
+                id = "new_branch",
+                template = "New branch \${branch} for project \${project}.",
+                description = "When a branch is created.",
+                context = eventContext(
+                    eventProject("Branch's project"),
+                    eventBranch("Created branch"),
+                ),
+            )
+
+        val UPDATE_BRANCH: EventType =
+            SimpleEventType(
+                id = "update_branch",
+                template = "Branch \${branch} in \${project} has been updated.",
+                description = "When a branch is updated.",
+                context = eventContext(
+                    eventProject("Branch's project"),
+                    eventBranch("Updated branch"),
+                ),
+            )
+        val ENABLE_BRANCH: EventType =
+            SimpleEventType(
+                id = "enable_branch",
+                template = "Branch \${branch} in \${project} has been enabled.",
+                description = "When a branch becomes enabled again.",
+                context = eventContext(
+                    eventProject("Branch's project"),
+                    eventBranch("Enabled branch"),
+                ),
+            )
+
+        val DISABLE_BRANCH: EventType =
+            SimpleEventType(
+                id = "disable_branch",
+                template = "Branch \${branch} in \${project} has been disabled.",
+                description = "When a branch is disabled.",
+                context = eventContext(
+                    eventProject("Branch's project"),
+                    eventBranch("Disabled branch"),
+                ),
+            )
+        val DELETE_BRANCH: EventType =
+            SimpleEventType(
+                id = "delete_branch",
+                template = "Branch \${BRANCH} has been deleted from \${project}.",
+                description = "When a branch is deleted.",
+                context = eventContext(
+                    eventProject("Branch's project"),
+                    eventValue("BRANCH", "Name of the deleted branch"),
+                ),
+            )
+
+        val NEW_BUILD: EventType =
+            SimpleEventType(
+                id = "new_build",
+                template = "New build \${build} for branch \${branch} in \${project}.",
+                description = "When a build is created.",
+                context = eventContext(
+                    eventProject("Build's project"),
+                    eventBranch("Build's branch"),
+                    eventBuild("Created build"),
+                ),
+            )
+        val UPDATE_BUILD: EventType = SimpleEventType(
+            id = "update_build",
+            template = "Build \${build} for branch \${branch} in \${project} has been updated.",
+            description = "When a build is updated.",
+            context = eventContext(
+                eventProject("Build's project"),
+                eventBranch("Build's branch"),
+                eventBuild("Updated build"),
+            ),
+        )
+        val DELETE_BUILD: EventType = SimpleEventType(
+            id = "delete_build",
+            template = "Build \${BUILD} for branch \${branch} in \${project} has been deleted.",
+            description = "When a build is deleted.",
+            context = eventContext(
+                eventProject("Build's project"),
+                eventBranch("Build's branch"),
+                eventValue("BUILD", "Name of the deleted build"),
+            ),
+        )
+
+        val NEW_PROMOTION_LEVEL: EventType = SimpleEventType(
+            id = "new_promotion_level",
+            template = "New promotion level \${promotionLevel} for branch \${branch} in \${project}.",
+            description = "When a promotion level is created.",
+            context = eventContext(
+                eventProject("Promotion level's project"),
+                eventBranch("Promotion level's branch"),
+                eventPromotionLevel("Created promotion level"),
+            ),
+        )
+        val IMAGE_PROMOTION_LEVEL: EventType = SimpleEventType(
+            id = "image_promotion_level",
+            template = "Image for promotion level \${promotionLevel} for branch \${branch} in \${project} has changed.",
+            description = "When a promotion level's image is updated.",
+            context = eventContext(
+                eventProject("Promotion level's project"),
+                eventBranch("Promotion level's branch"),
+                eventPromotionLevel("Updated promotion level"),
+            ),
+        )
+        val UPDATE_PROMOTION_LEVEL: EventType = SimpleEventType(
+            id = "update_promotion_level",
+            template = "Promotion level \${promotionLevel} for branch \${branch} in \${project} has changed.",
+            description = "When a promotion level is updated.",
+            context = eventContext(
+                eventProject("Promotion level's project"),
+                eventBranch("Promotion level's branch"),
+                eventPromotionLevel("Updated promotion level"),
+            ),
+        )
+        val DELETE_PROMOTION_LEVEL: EventType = SimpleEventType(
+            id = "delete_promotion_level",
+            template = "Promotion level \${PROMOTION_LEVEL} for branch \${branch} in \${project} has been deleted.",
+            description = "When a promotion level is deleted.",
+            context = eventContext(
+                eventProject("Promotion level's project"),
+                eventBranch("Promotion level's branch"),
+                eventValue("PROMOTION_LEVEL", "Deleted promotion level"),
+                eventValue("PROMOTION_LEVEL_ID", "ID of the deleted promotion level"),
+            ),
+        )
+        val REORDER_PROMOTION_LEVEL: EventType = SimpleEventType(
+            id = "reorder_promotion_level",
+            template = "Promotion levels for branch \${branch} in \${project} have been reordered.",
+            description = "When the promotion levels of a branch are reordered.",
+            context = eventContext(
+                eventProject("Promotion levels project"),
+                eventBranch("Promotion levels branch"),
+            ),
+        )
+
+        val NEW_VALIDATION_STAMP: EventType = SimpleEventType(
+            id = "new_validation_stamp",
+            template = "New validation stamp \${validationStamp} for branch \${branch} in \${project}.",
+            description = "When a validation stamp is created.",
+            context = eventContext(
+                eventProject("Validation stamp's project"),
+                eventBranch("Validation stamp's branch"),
+                eventValidationStamp("Created validation stamp"),
+            ),
+        )
+        val IMAGE_VALIDATION_STAMP: EventType = SimpleEventType(
+            id = "image_validation_stamp",
+            template = "Image for validation stamp \${validationStamp} for branch \${branch} in \${project} has changed.",
+            description = "When a validation stamp's image is updated.",
+            context = eventContext(
+                eventProject("Validation stamp's project"),
+                eventBranch("Validation stamp's branch"),
+                eventValidationStamp("Updated validation stamp"),
+            ),
+        )
+        val UPDATE_VALIDATION_STAMP: EventType = SimpleEventType(
+            id = "update_validation_stamp",
+            template = "Validation stamp \${validationStamp} for branch \${branch} in \${project} has been updated.",
+            description = "When a validation stamp is updated.",
+            context = eventContext(
+                eventProject("Validation stamp's project"),
+                eventBranch("Validation stamp's branch"),
+                eventValidationStamp("Updated validation stamp"),
+            ),
+        )
+        val DELETE_VALIDATION_STAMP: EventType = SimpleEventType(
+            id = "delete_validation_stamp",
+            template = "Validation stamp \${VALIDATION_STAMP} for branch \${branch} in \${project} has been deleted.",
+            description = "When a validation stamp is deleted.",
+            context = eventContext(
+                eventProject("Validation stamp's project"),
+                eventBranch("Validation stamp's branch"),
+                eventValue("VALIDATION_STAMP", "Name of the deleted validation stamp"),
+                eventValue("VALIDATION_STAMP_ID", "ID of the deleted validation stamp"),
+            ),
+        )
+        val REORDER_VALIDATION_STAMP: EventType = SimpleEventType(
+            id = "reorder_validation_stamp",
+            template = "Validation stamps for branch \${branch} in \${project} have been reordered.",
+            description = "When the validation stamps of a branch are reordered.",
+            context = eventContext(
+                eventProject("Validation stamps project"),
+                eventBranch("Validation stamps branch"),
+            ),
+        )
+
+        val NEW_PROMOTION_RUN: EventType = SimpleEventType(
+            id = "new_promotion_run",
+            template = "Build \${build} has been promoted to \${promotionLevel} for branch \${branch} in \${project}.",
+            description = "When a build is promoted.",
+            context = eventContext(
+                eventProject("Project"),
+                eventBranch("Branch"),
+                eventBuild("Promoted build"),
+                eventPromotionLevel("Promotion level"),
+                eventPromotionRun("Promotion run"),
+            ),
+        )
+        val DELETE_PROMOTION_RUN: EventType = SimpleEventType(
+            id = "delete_promotion_run",
+            template = "Promotion \${promotionLevel} of build \${build} has been deleted for branch \${branch} in \${project}.",
+            description = "When the promotion of a build is deleted.",
+            context = eventContext(
+                eventProject("Project"),
+                eventBranch("Branch"),
+                eventBuild("Promoted build"),
+                eventPromotionLevel("Promotion level"),
+            ),
+        )
+
+        val NEW_VALIDATION_RUN: EventType = SimpleEventType(
+            id = "new_validation_run",
+            template = "Build \${build} has run for the \${validationStamp} with status \${STATUS_NAME} in branch \${branch} in \${project}.",
+            description = "When a build is validated.",
+            context = eventContext(
+                eventProject("Project"),
+                eventBranch("Branch"),
+                eventBuild("Validated build"),
+                eventValidationStamp("Validation stamp"),
+                eventValidationRun("Validation run"),
+                eventValue("STATUS", "ID of the validation run status"),
+                eventValue("STATUS_NAME", "Name of the validation run status"),
+            ),
+        )
+        val NEW_VALIDATION_RUN_STATUS: EventType = SimpleEventType(
+            id = "new_validation_run_status",
+            template = "Status for the \${validationStamp} validation \${validationRun} for build \${build} in branch \${branch} of \${project} has changed to \${STATUS_NAME}.",
+            description = "When the status of the validation of a build is updated.",
+            context = eventContext(
+                eventProject("Project"),
+                eventBranch("Branch"),
+                eventBuild("Validated build"),
+                eventValidationStamp("Validation stamp"),
+                eventValidationRun("Validation run"),
+                eventValue("STATUS", "ID of the validation run status"),
+                eventValue("STATUS_NAME", "Name of the validation run status"),
+            ),
+        )
+        val UPDATE_VALIDATION_RUN_STATUS_COMMENT: EventType = SimpleEventType(
+            id = "update_validation_run_status_comment",
+            template = "A status message for the \${validationStamp} validation \${validationRun} for build \${build} in branch \${branch} of \${project} has changed.",
+            description = "When the status message of the validation of a build is updated.",
+            context = eventContext(
+                eventProject("Project"),
+                eventBranch("Branch"),
+                eventBuild("Validated build"),
+                eventValidationStamp("Validation stamp"),
+                eventValidationRun("Validation run"),
+            ),
+        )
+
+        val PROPERTY_CHANGE: EventType = SimpleEventType(
+            id = "property_change",
+            template = "\${PROPERTY_NAME} property has changed for \${entity.qualifiedLongName}.",
+            description = "When a property is edited.",
+            context = eventContext(
+                eventAnyEntity("Entity where the property has been edited"),
+                eventValue("PROPERTY", "FQCN of the property type"),
+                eventValue("PROPERTY_NAME", "Display name of the property"),
+            ),
+        )
+        val PROPERTY_DELETE: EventType = SimpleEventType(
+            id = "property_delete",
+            template = "\${PROPERTY_NAME} property has been removed from \${entity.qualifiedLongName}.",
+            description = "When a property is deleted.",
+            context = eventContext(
+                eventAnyEntity("Entity where the property has been edited"),
+                eventValue("PROPERTY", "FQCN of the property type"),
+                eventValue("PROPERTY_NAME", "Display name of the property"),
+            ),
+        )
+
+        val NEW_CONFIGURATION: EventType = SimpleEventType(
+            id = "new_configuration",
+            template = "\${CONFIGURATION} configuration has been created.",
+            description = "When a configuration is created.",
+            context = eventContext(
+                eventValue("CONFIGURATION", "Name of the configuration")
+            ),
+        )
+        val UPDATE_CONFIGURATION: EventType = SimpleEventType(
+            id = "update_configuration",
+            template = "\${CONFIGURATION} configuration has been updated.",
+            description = "When a configuration is updated.",
+            context = eventContext(
+                eventValue("CONFIGURATION", "Name of the configuration")
+            ),
+        )
+        val DELETE_CONFIGURATION: EventType = SimpleEventType(
+            id = "delete_configuration",
+            template = "\${CONFIGURATION} configuration has been deleted.",
+            description = "When a configuration is deleted.",
+            context = eventContext(
+                eventValue("CONFIGURATION", "Name of the configuration")
+            ),
+        )
+    }
 }

@@ -18,4 +18,9 @@ interface EventType {
      * Description for this event
      */
     val description: String
+
+    /**
+     * Description of the context for the event
+     */
+    val context: EventTypeContext
 }

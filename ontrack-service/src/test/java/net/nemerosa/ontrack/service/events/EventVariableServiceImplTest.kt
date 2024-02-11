@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.service.events
 
 import io.mockk.mockk
-import net.nemerosa.ontrack.model.events.Event
-import net.nemerosa.ontrack.model.events.EventFactoryImpl
-import net.nemerosa.ontrack.model.events.EventVariableService
-import net.nemerosa.ontrack.model.events.SimpleEventType
+import net.nemerosa.ontrack.model.events.*
 import net.nemerosa.ontrack.model.structure.BranchFixtures
 import net.nemerosa.ontrack.model.structure.ValidationRunFixtures
 import org.junit.jupiter.api.Test
@@ -41,7 +38,7 @@ class EventVariableServiceImplTest {
     @Test
     fun `Entity context for the ref entity of an event`() {
         val branch = BranchFixtures.testBranch()
-        val eventType = SimpleEventType.of("sample", "Not used in this test", "Some description")
+        val eventType = SimpleEventType("sample", "Not used in this test", "Some description", emptyEventContext())
         val event = Event.of(eventType)
             .withRef(branch)
             .build()
@@ -61,7 +58,7 @@ class EventVariableServiceImplTest {
     @Test
     fun `Context for an extra entity`() {
         val branch = BranchFixtures.testBranch()
-        val eventType = SimpleEventType.of("sample", "Not used in this test", "Some description")
+        val eventType = SimpleEventType("sample", "Not used in this test", "Some description", emptyEventContext())
         val event = Event.of(eventType)
             .withExtra(branch)
             .build()

@@ -1,11 +1,7 @@
 package net.nemerosa.ontrack.service.events
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
-import net.nemerosa.ontrack.model.events.Event
-import net.nemerosa.ontrack.model.events.EventFactory
-import net.nemerosa.ontrack.model.events.EventPostService
-import net.nemerosa.ontrack.model.events.EventQueryService
-import net.nemerosa.ontrack.model.events.SimpleEventType
+import net.nemerosa.ontrack.model.events.*
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -26,7 +22,7 @@ class EventPostServiceIT : AbstractDSLTestSupport() {
     @Test
     fun `Saving large events values`() {
         val id = uid("testing-")
-        val eventType = SimpleEventType.of(id, "Testing event.", "Some description")
+        val eventType = SimpleEventType(id, "Testing event.", "Some description", emptyEventContext())
         eventFactory.register(eventType)
         project {
             val event = Event.of(eventType)

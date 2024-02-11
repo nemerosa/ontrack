@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.av.event
 
-import net.nemerosa.ontrack.model.events.EventType
-import net.nemerosa.ontrack.model.events.SimpleEventType
+import net.nemerosa.ontrack.model.events.*
 
 object AutoVersioningEvents {
 
@@ -14,7 +13,16 @@ object AutoVersioningEvents {
             
             Pull request ${'$'}{#.link?text=PR_NAME&href=PR_LINK}
         """.trimIndent(),
-        description = "When an auto versioning request succeeds with the creation of a PR (merged or not)."
+        description = "When an auto versioning request succeeds with the creation of a PR (merged or not).",
+        context = eventContext(
+            eventProject("Target project"),
+            eventBranch("Target branch"),
+            eventXProject("Dependency/source project"),
+            eventValue("VERSION", "Version being set"),
+            eventValue("MESSAGE", "Auto versioning message"),
+            eventValue("PR_NAME", "Title of the PR having been created"),
+            eventValue("PR_LINK", "Link to the PR having been created"),
+        ),
     )
 
     val AUTO_VERSIONING_ERROR: EventType = SimpleEventType(
@@ -26,7 +34,15 @@ object AutoVersioningEvents {
             
             Error: ${'$'}{ERROR}
         """.trimIndent(),
-        description = "When an auto versioning request fails because of a general error."
+        description = "When an auto versioning request fails because of a general error.",
+        context = eventContext(
+            eventProject("Target project"),
+            eventBranch("Target branch"),
+            eventXProject("Dependency/source project"),
+            eventValue("VERSION", "Version being set"),
+            eventValue("MESSAGE", "Auto versioning message"),
+            eventValue("ERROR", "Error message"),
+        ),
     )
 
     val AUTO_VERSIONING_POST_PROCESSING_ERROR: EventType = SimpleEventType(
@@ -36,7 +52,15 @@ object AutoVersioningEvents {
 
             ${'$'}{#.link?text=MESSAGE&href=LINK}
         """.trimIndent(),
-        description = "When an auto versioning request fails because of the post-processing."
+        description = "When an auto versioning request fails because of the post-processing.",
+        context = eventContext(
+            eventProject("Target project"),
+            eventBranch("Target branch"),
+            eventXProject("Dependency/source project"),
+            eventValue("VERSION", "Version being set"),
+            eventValue("MESSAGE", "Auto versioning message"),
+            eventValue("LINK", "Link to the post processing process"),
+        ),
     )
 
     val AUTO_VERSIONING_PR_MERGE_TIMEOUT_ERROR: EventType = SimpleEventType(
@@ -48,7 +72,15 @@ object AutoVersioningEvents {
             
             Pull request ${'$'}{#.link?text=PR_NAME&href=PR_LINK}
         """.trimIndent(),
-        description = "When an auto versioning request fails because the corresponding PR could not be merged in time."
+        description = "When an auto versioning request fails because the corresponding PR could not be merged in time.",
+        context = eventContext(
+            eventProject("Target project"),
+            eventBranch("Target branch"),
+            eventXProject("Dependency/source project"),
+            eventValue("VERSION", "Version being set"),
+            eventValue("PR_NAME", "Title of the PR having been created"),
+            eventValue("PR_LINK", "Link to the PR having been created"),
+        ),
     )
 
 }
