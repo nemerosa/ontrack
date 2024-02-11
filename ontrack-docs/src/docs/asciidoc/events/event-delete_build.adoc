@@ -1,0 +1,12 @@
+[[event-delete_build]]
+=== delete_build
+
+When a build is deleted.
+
+Default template:
+
+[source]
+----
+Build ${BUILD} for branch ${branch} in ${project} has been deleted.
+----
+

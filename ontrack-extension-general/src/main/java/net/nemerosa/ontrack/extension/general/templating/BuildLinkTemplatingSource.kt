@@ -1,6 +1,9 @@
 package net.nemerosa.ontrack.extension.general.templating
 
 import net.nemerosa.ontrack.extension.general.ReleasePropertyType
+import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.docs.Documentation
+import net.nemerosa.ontrack.model.docs.DocumentationExampleCode
 import net.nemerosa.ontrack.model.events.EventRenderer
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.templating.AbstractTemplatingSource
@@ -11,6 +14,9 @@ import org.springframework.stereotype.Component
  * Given a [build][Build], returns the name of a linked build.
  */
 @Component
+@APIDescription("Gettings a linked build and displaying its name or release name.")
+@Documentation(BuildLinkTemplatingSourceDocumentation::class)
+@DocumentationExampleCode("${'$'}{build.linked?project=dependency&mode=auto}")
 class BuildLinkTemplatingSource(
     private val structureService: StructureService,
     private val propertyService: PropertyService,

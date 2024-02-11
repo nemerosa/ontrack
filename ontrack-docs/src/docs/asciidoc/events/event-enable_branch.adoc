@@ -1,0 +1,12 @@
+[[event-enable_branch]]
+=== enable_branch
+
+When a branch becomes enabled again.
+
+Default template:
+
+[source]
+----
+Branch ${branch} in ${project} has been enabled.
+----
+

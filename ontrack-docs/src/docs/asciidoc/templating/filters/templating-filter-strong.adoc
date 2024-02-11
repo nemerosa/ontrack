@@ -1,0 +1,11 @@
+[[templating-filter-strong]]
+==== strong
+
+Making a value in a stronger typography
+
+Example:
+
+[source]
+----
+${VALUE|string}
+----

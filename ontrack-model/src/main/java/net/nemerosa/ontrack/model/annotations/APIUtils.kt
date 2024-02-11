@@ -44,6 +44,12 @@ fun getPropertyName(property: KProperty<*>): String =
         ?: property.name
 
 /**
+ * Getting the description for a class
+ */
+fun <T : Any> getAPITypeDescription(type: KClass<T>): String? =
+    type.findAnnotation<APIDescription>()?.value
+
+/**
  * Getting the name for a class
  *
  * Will use in order:

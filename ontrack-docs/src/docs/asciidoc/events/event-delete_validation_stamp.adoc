@@ -1,0 +1,12 @@
+[[event-delete_validation_stamp]]
+=== delete_validation_stamp
+
+When a validation stamp is deleted.
+
+Default template:
+
+[source]
+----
+Validation stamp ${VALIDATION_STAMP} for branch ${branch} in ${project} has been deleted.
+----
+

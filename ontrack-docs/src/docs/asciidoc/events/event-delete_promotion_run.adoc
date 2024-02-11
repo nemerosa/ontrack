@@ -1,0 +1,12 @@
+[[event-delete_promotion_run]]
+=== delete_promotion_run
+
+When the promotion of a build is deleted.
+
+Default template:
+
+[source]
+----
+Promotion ${promotionLevel} of build ${build} has been deleted for branch ${branch} in ${project}.
+----
+

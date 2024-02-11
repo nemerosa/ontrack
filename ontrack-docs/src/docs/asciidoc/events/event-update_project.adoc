@@ -1,0 +1,12 @@
+[[event-update_project]]
+=== update_project
+
+When a project is updated.
+
+Default template:
+
+[source]
+----
+Project ${project} has been updated.
+----
+

@@ -41,7 +41,7 @@ class EventVariableServiceImplTest {
     @Test
     fun `Entity context for the ref entity of an event`() {
         val branch = BranchFixtures.testBranch()
-        val eventType = SimpleEventType.of("sample", "Not used in this test")
+        val eventType = SimpleEventType.of("sample", "Not used in this test", "Some description")
         val event = Event.of(eventType)
             .withRef(branch)
             .build()
@@ -61,7 +61,7 @@ class EventVariableServiceImplTest {
     @Test
     fun `Context for an extra entity`() {
         val branch = BranchFixtures.testBranch()
-        val eventType = SimpleEventType.of("sample", "Not used in this test")
+        val eventType = SimpleEventType.of("sample", "Not used in this test", "Some description")
         val event = Event.of(eventType)
             .withExtra(branch)
             .build()

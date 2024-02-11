@@ -1,0 +1,12 @@
+[[event-disable_branch]]
+=== disable_branch
+
+When a branch is disabled.
+
+Default template:
+
+[source]
+----
+Branch ${branch} in ${project} has been disabled.
+----
+

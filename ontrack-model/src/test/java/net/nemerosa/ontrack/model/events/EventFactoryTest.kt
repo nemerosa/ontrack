@@ -8,7 +8,7 @@ class EventFactoryTest {
     @Test
     fun custom_event_type() {
         val factory: EventFactory = EventFactoryImpl()
-        factory.register(SimpleEventType.of("custom-type", "My custom event type"))
+        factory.register(SimpleEventType.of("custom-type", "My custom event type", "When a test is passed."))
         val eventType = factory.toEventType("custom-type")
         assertEquals("custom-type", eventType.id)
         assertEquals("My custom event type", eventType.template)

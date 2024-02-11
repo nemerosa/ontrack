@@ -1,0 +1,12 @@
+[[event-delete_project]]
+=== delete_project
+
+When a project is deleted.
+
+Default template:
+
+[source]
+----
+Project ${PROJECT} has been deleted.
+----
+

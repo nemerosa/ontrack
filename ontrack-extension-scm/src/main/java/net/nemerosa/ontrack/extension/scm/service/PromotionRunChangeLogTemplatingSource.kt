@@ -3,7 +3,10 @@ package net.nemerosa.ontrack.extension.scm.service
 import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLog
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogService
+import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
+import net.nemerosa.ontrack.model.docs.Documentation
+import net.nemerosa.ontrack.model.docs.DocumentationExampleCode
 import net.nemerosa.ontrack.model.events.EventRenderer
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.templating.AbstractTemplatingSource
@@ -12,6 +15,23 @@ import net.nemerosa.ontrack.model.templating.getListStringsTemplatingParam
 import org.springframework.stereotype.Component
 
 @Component
+@APIDescription("""
+    Renders a change log for this promotion run.
+    
+    The "to build" is the one being promoted.
+     
+    The "from build" is the last build (before this one) having been promoted to the associated
+    promotion level.
+    
+    If no such previous build is found on the associated branch, the search will be done
+    across the whole project, unless the `acrossBranches` configuration parameter is set to `false`.
+    
+    If `project` is set to a comma-separated list of strings, the change log will be rendered 
+    for the recursive links, in the order to the projects being set (going deeper and deeper
+    in the links). 
+""")
+@Documentation(PromotionRunChangeLogTemplatingSourceDocumentation::class)
+@DocumentationExampleCode("${'$'}{promotionRun.changelog}")
 class PromotionRunChangeLogTemplatingSource(
     private val structureService: StructureService,
     private val buildFilterService: BuildFilterService,

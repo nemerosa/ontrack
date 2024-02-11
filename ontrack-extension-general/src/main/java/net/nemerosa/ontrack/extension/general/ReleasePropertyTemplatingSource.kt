@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.general
 
+import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.docs.DocumentationExampleCode
 import net.nemerosa.ontrack.model.events.EventRenderer
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.ProjectEntity
@@ -9,6 +11,8 @@ import net.nemerosa.ontrack.model.templating.AbstractTemplatingSource
 import org.springframework.stereotype.Component
 
 @Component
+@APIDescription("Gets the release/version/label associated to a build or renders an empty string is there is none.")
+@DocumentationExampleCode("${'$'}{build.release}")
 class ReleasePropertyTemplatingSource(
     private val propertyService: PropertyService,
 ) : AbstractTemplatingSource(

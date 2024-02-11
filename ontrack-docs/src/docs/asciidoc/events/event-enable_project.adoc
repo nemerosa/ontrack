@@ -1,0 +1,12 @@
+[[event-enable_project]]
+=== enable_project
+
+When a project becomes enabled again.
+
+Default template:
+
+[source]
+----
+Project ${project} has been enabled.
+----
+

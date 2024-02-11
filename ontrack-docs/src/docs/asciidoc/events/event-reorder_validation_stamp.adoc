@@ -1,0 +1,12 @@
+[[event-reorder_validation_stamp]]
+=== reorder_validation_stamp
+
+When the validation stamps of a branch are reordered.
+
+Default template:
+
+[source]
+----
+Validation stamps for branch ${branch} in ${project} have been reordered.
+----
+

@@ -1,0 +1,12 @@
+[[event-reorder_promotion_level]]
+=== reorder_promotion_level
+
+When the promotion levels of a branch are reordered.
+
+Default template:
+
+[source]
+----
+Promotion levels for branch ${branch} in ${project} have been reordered.
+----
+

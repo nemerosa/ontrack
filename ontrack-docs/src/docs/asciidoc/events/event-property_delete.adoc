@@ -1,0 +1,12 @@
+[[event-property_delete]]
+=== property_delete
+
+When a property is deleted.
+
+Default template:
+
+[source]
+----
+${PROPERTY_NAME} property has been removed from ${entity.qualifiedLongName}.
+----
+

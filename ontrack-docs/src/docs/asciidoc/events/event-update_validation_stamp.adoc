@@ -1,0 +1,12 @@
+[[event-update_validation_stamp]]
+=== update_validation_stamp
+
+When a validation stamp is updated.
+
+Default template:
+
+[source]
+----
+Validation stamp ${validationStamp} for branch ${branch} in ${project} has been updated.
+----
+

@@ -1,0 +1,14 @@
+[[event-auto-versioning-post-processing-error]]
+=== auto-versioning-post-processing-error
+
+When an auto versioning request fails because of the post-processing.
+
+Default template:
+
+[source]
+----
+Auto versioning post-processing of ${project}/${branch} for dependency ${xProject} version "${VERSION}" has failed.
+
+${#.link?text=MESSAGE&href=LINK}
+----
+

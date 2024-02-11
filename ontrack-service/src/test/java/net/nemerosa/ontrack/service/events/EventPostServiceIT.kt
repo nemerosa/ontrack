@@ -26,7 +26,7 @@ class EventPostServiceIT : AbstractDSLTestSupport() {
     @Test
     fun `Saving large events values`() {
         val id = uid("testing-")
-        val eventType = SimpleEventType.of(id, "Testing event.")
+        val eventType = SimpleEventType.of(id, "Testing event.", "Some description")
         eventFactory.register(eventType)
         project {
             val event = Event.of(eventType)

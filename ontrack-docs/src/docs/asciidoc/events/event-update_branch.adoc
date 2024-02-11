@@ -1,0 +1,12 @@
+[[event-update_branch]]
+=== update_branch
+
+When a branch is updated.
+
+Default template:
+
+[source]
+----
+Branch ${branch} in ${project} has been updated.
+----
+

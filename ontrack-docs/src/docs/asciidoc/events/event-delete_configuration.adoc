@@ -1,0 +1,12 @@
+[[event-delete_configuration]]
+=== delete_configuration
+
+When a configuration is deleted.
+
+Default template:
+
+[source]
+----
+${CONFIGURATION} configuration has been deleted.
+----
+

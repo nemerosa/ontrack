@@ -1,0 +1,21 @@
+[[templating-source-linked]]
+==== linked
+
+Gettings a linked build and displaying its name or release name.
+
+* **mode** - How to the linked build must be rendered.
+
+- name: build name only
+- release: build release/version/label (required in this case)
+- auto: build release/version/label if available, build name otherwise
+
+* **project** - Name of the project to get a link to.
+
+* **qualifier** - Qualifier of the link (optional).
+
+Example:
+
+[source]
+----
+${build.linked?project=dependency&mode=auto}
+----

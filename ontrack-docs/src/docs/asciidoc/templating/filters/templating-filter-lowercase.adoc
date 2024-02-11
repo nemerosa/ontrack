@@ -1,0 +1,11 @@
+[[templating-filter-lowercase]]
+==== lowercase
+
+Making a value lower case
+
+Example:
+
+[source]
+----
+${project|lowercase}
+----
