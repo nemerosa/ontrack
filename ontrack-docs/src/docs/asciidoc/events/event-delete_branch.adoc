@@ -1,5 +1,5 @@
 [[event-delete_branch]]
-=== delete_branch
+===== delete_branch
 
 When a branch is deleted.
 

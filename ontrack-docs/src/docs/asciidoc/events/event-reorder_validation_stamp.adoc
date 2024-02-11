@@ -1,5 +1,5 @@
 [[event-reorder_validation_stamp]]
-=== reorder_validation_stamp
+===== reorder_validation_stamp
 
 When the validation stamps of a branch are reordered.
 

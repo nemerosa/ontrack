@@ -1,5 +1,5 @@
 [[event-update_validation_run_status_comment]]
-=== update_validation_run_status_comment
+===== update_validation_run_status_comment
 
 When the status message of the validation of a build is updated.
 

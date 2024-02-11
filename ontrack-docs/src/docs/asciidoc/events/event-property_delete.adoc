@@ -1,5 +1,5 @@
 [[event-property_delete]]
-=== property_delete
+===== property_delete
 
 When a property is deleted.
 

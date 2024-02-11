@@ -1,5 +1,5 @@
 [[event-new_build]]
-=== new_build
+===== new_build
 
 When a build is created.
 

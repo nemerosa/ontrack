@@ -1,5 +1,5 @@
 [[event-auto-versioning-post-processing-error]]
-=== auto-versioning-post-processing-error
+===== auto-versioning-post-processing-error
 
 When an auto versioning request fails because of the post-processing.
 

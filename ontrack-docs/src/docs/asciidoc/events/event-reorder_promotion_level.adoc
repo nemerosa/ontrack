@@ -1,5 +1,5 @@
 [[event-reorder_promotion_level]]
-=== reorder_promotion_level
+===== reorder_promotion_level
 
 When the promotion levels of a branch are reordered.
 

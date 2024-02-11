@@ -1,5 +1,5 @@
 [[event-disable_project]]
-=== disable_project
+===== disable_project
 
 When a project is disabled.
 

@@ -1,5 +1,5 @@
 [[event-update_branch]]
-=== update_branch
+===== update_branch
 
 When a branch is updated.
 

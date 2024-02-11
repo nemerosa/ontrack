@@ -1,5 +1,5 @@
 [[event-image_validation_stamp]]
-=== image_validation_stamp
+===== image_validation_stamp
 
 When a validation stamp's image is updated.
 

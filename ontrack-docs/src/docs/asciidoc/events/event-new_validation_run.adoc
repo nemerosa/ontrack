@@ -1,5 +1,5 @@
 [[event-new_validation_run]]
-=== new_validation_run
+===== new_validation_run
 
 When a build is validated.
 

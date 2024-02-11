@@ -1,5 +1,5 @@
 [[event-new_configuration]]
-=== new_configuration
+===== new_configuration
 
 When a configuration is created.
 

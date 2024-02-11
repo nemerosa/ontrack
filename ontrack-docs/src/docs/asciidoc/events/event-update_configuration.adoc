@@ -1,5 +1,5 @@
 [[event-update_configuration]]
-=== update_configuration
+===== update_configuration
 
 When a configuration is updated.
 

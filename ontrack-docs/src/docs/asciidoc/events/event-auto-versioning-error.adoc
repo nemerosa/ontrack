@@ -1,5 +1,5 @@
 [[event-auto-versioning-error]]
-=== auto-versioning-error
+===== auto-versioning-error
 
 When an auto versioning request fails because of a general error.
 

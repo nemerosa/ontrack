@@ -5,6 +5,8 @@ include::configuration-properties.adoc[]
 
 include::appendix-templating.adoc[]
 
+include::appendix-events.adoc[]
+
 // include::appendix-deprecations.adoc[]
 
 // include::appendix-roadmap.adoc[]

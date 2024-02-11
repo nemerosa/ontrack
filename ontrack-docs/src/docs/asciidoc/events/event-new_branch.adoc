@@ -1,5 +1,5 @@
 [[event-new_branch]]
-=== new_branch
+===== new_branch
 
 When a branch is created.
 

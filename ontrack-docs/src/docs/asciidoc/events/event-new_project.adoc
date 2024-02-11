@@ -1,5 +1,5 @@
 [[event-new_project]]
-=== new_project
+===== new_project
 
 When a project is created.
 

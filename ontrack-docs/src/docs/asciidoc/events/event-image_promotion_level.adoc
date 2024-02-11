@@ -1,5 +1,5 @@
 [[event-image_promotion_level]]
-=== image_promotion_level
+===== image_promotion_level
 
 When a promotion level's image is updated.
 

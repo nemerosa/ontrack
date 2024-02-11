@@ -1,5 +1,5 @@
 [[event-delete_promotion_level]]
-=== delete_promotion_level
+===== delete_promotion_level
 
 When a promotion level is deleted.
 

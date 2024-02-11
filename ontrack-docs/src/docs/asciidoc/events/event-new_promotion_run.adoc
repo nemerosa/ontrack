@@ -1,5 +1,5 @@
 [[event-new_promotion_run]]
-=== new_promotion_run
+===== new_promotion_run
 
 When a build is promoted.
 

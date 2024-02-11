@@ -1,5 +1,5 @@
 [[event-update_validation_stamp]]
-=== update_validation_stamp
+===== update_validation_stamp
 
 When a validation stamp is updated.
 

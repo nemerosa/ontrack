@@ -1,5 +1,5 @@
 [[event-new_validation_run_status]]
-=== new_validation_run_status
+===== new_validation_run_status
 
 When the status of the validation of a build is updated.
 

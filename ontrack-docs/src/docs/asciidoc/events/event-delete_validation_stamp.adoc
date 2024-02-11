@@ -1,5 +1,5 @@
 [[event-delete_validation_stamp]]
-=== delete_validation_stamp
+===== delete_validation_stamp
 
 When a validation stamp is deleted.
 

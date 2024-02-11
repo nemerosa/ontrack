@@ -1,5 +1,5 @@
 [[event-delete_build]]
-=== delete_build
+===== delete_build
 
 When a build is deleted.
 

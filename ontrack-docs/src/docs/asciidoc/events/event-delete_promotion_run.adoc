@@ -1,5 +1,5 @@
 [[event-delete_promotion_run]]
-=== delete_promotion_run
+===== delete_promotion_run
 
 When the promotion of a build is deleted.
 

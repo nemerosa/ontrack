@@ -1,5 +1,5 @@
 [[event-update_promotion_level]]
-=== update_promotion_level
+===== update_promotion_level
 
 When a promotion level is updated.
 

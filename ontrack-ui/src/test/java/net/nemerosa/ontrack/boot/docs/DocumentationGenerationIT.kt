@@ -89,6 +89,16 @@ class DocumentationGenerationIT : AbstractDSLTestSupport() {
     @Test
     fun `Events generation`() {
         withDirectory("events") {
+
+            writeIndex(
+                fileId = "appendix-event-index",
+                level = 4,
+                title = "List of events",
+                items = eventFactory.eventTypes.associate { eventType ->
+                    getEventTypeFileId(eventType) to eventType.id
+                }
+            )
+
             eventFactory.eventTypes.forEach { eventType ->
                 generateEventType(this, eventType)
             }
@@ -98,11 +108,11 @@ class DocumentationGenerationIT : AbstractDSLTestSupport() {
     private fun generateEventType(directoryContext: DirectoryContext, eventType: EventType) {
         val id = eventType.id
 
-        val fileId = "event-$id"
+        val fileId = getEventTypeFileId(eventType)
 
         directoryContext.writeFile(
             fileId = fileId,
-            level = 3,
+            level = 5,
             title = id,
         ) { s ->
 
@@ -129,6 +139,8 @@ class DocumentationGenerationIT : AbstractDSLTestSupport() {
 
         }
     }
+
+    private fun getEventTypeFileId(eventType: EventType) = "event-${eventType.id}"
 
     private fun generateTemplatingFunction(directoryContext: DirectoryContext, templatingFunction: TemplatingFunction) {
         val id = templatingFunction.id

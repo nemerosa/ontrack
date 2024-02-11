@@ -1,5 +1,5 @@
 [[event-property_change]]
-=== property_change
+===== property_change
 
 When a property is edited.
 

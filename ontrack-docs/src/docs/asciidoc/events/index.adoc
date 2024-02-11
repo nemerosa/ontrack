@@ -1,0 +1,78 @@
+[[appendix-event-index]]
+==== List of events
+
+* <<event-update_project,update_project>>
+* <<event-reorder_promotion_level,reorder_promotion_level>>
+* <<event-disable_project,disable_project>>
+* <<event-new_validation_run,new_validation_run>>
+* <<event-update_configuration,update_configuration>>
+* <<event-delete_branch,delete_branch>>
+* <<event-delete_promotion_run,delete_promotion_run>>
+* <<event-delete_validation_stamp,delete_validation_stamp>>
+* <<event-auto-versioning-post-processing-error,auto-versioning-post-processing-error>>
+* <<event-delete_configuration,delete_configuration>>
+* <<event-update_build,update_build>>
+* <<event-delete_promotion_level,delete_promotion_level>>
+* <<event-image_promotion_level,image_promotion_level>>
+* <<event-new_validation_run_status,new_validation_run_status>>
+* <<event-property_delete,property_delete>>
+* <<event-reorder_validation_stamp,reorder_validation_stamp>>
+* <<event-new_project,new_project>>
+* <<event-enable_project,enable_project>>
+* <<event-new_validation_stamp,new_validation_stamp>>
+* <<event-image_validation_stamp,image_validation_stamp>>
+* <<event-update_validation_run_status_comment,update_validation_run_status_comment>>
+* <<event-disable_branch,disable_branch>>
+* <<event-new_configuration,new_configuration>>
+* <<event-auto-versioning-error,auto-versioning-error>>
+* <<event-delete_project,delete_project>>
+* <<event-update_branch,update_branch>>
+* <<event-update_promotion_level,update_promotion_level>>
+* <<event-update_validation_stamp,update_validation_stamp>>
+* <<event-new_promotion_level,new_promotion_level>>
+* <<event-delete_build,delete_build>>
+* <<event-property_change,property_change>>
+* <<event-new_promotion_run,new_promotion_run>>
+* <<event-new_build,new_build>>
+* <<event-auto-versioning-success,auto-versioning-success>>
+* <<event-new_branch,new_branch>>
+* <<event-enable_branch,enable_branch>>
+* <<event-auto-versioning-pr-merge-timeout-error,auto-versioning-pr-merge-timeout-error>>
+
+include::event-update_project.adoc[]
+include::event-reorder_promotion_level.adoc[]
+include::event-disable_project.adoc[]
+include::event-new_validation_run.adoc[]
+include::event-update_configuration.adoc[]
+include::event-delete_branch.adoc[]
+include::event-delete_promotion_run.adoc[]
+include::event-delete_validation_stamp.adoc[]
+include::event-auto-versioning-post-processing-error.adoc[]
+include::event-delete_configuration.adoc[]
+include::event-update_build.adoc[]
+include::event-delete_promotion_level.adoc[]
+include::event-image_promotion_level.adoc[]
+include::event-new_validation_run_status.adoc[]
+include::event-property_delete.adoc[]
+include::event-reorder_validation_stamp.adoc[]
+include::event-new_project.adoc[]
+include::event-enable_project.adoc[]
+include::event-new_validation_stamp.adoc[]
+include::event-image_validation_stamp.adoc[]
+include::event-update_validation_run_status_comment.adoc[]
+include::event-disable_branch.adoc[]
+include::event-new_configuration.adoc[]
+include::event-auto-versioning-error.adoc[]
+include::event-delete_project.adoc[]
+include::event-update_branch.adoc[]
+include::event-update_promotion_level.adoc[]
+include::event-update_validation_stamp.adoc[]
+include::event-new_promotion_level.adoc[]
+include::event-delete_build.adoc[]
+include::event-property_change.adoc[]
+include::event-new_promotion_run.adoc[]
+include::event-new_build.adoc[]
+include::event-auto-versioning-success.adoc[]
+include::event-new_branch.adoc[]
+include::event-enable_branch.adoc[]
+include::event-auto-versioning-pr-merge-timeout-error.adoc[]

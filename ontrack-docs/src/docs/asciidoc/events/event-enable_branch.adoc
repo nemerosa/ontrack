@@ -1,5 +1,5 @@
 [[event-enable_branch]]
-=== enable_branch
+===== enable_branch
 
 When a branch becomes enabled again.
 

@@ -1,5 +1,5 @@
 [[event-auto-versioning-success]]
-=== auto-versioning-success
+===== auto-versioning-success
 
 When an auto versioning request succeeds with the creation of a PR (merged or not).
 

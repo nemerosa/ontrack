@@ -1,5 +1,5 @@
 [[event-new_validation_stamp]]
-=== new_validation_stamp
+===== new_validation_stamp
 
 When a validation stamp is created.
 
