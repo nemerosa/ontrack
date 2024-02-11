@@ -1,0 +1,18 @@
+[[event-image_validation_stamp]]
+===== image_validation_stamp
+
+When a validation stamp's image is updated.
+
+Context:
+
+* `project` - project - Validation stamp's project
+* `branch` - branch - Validation stamp's branch
+* `validationStamp` - validation stamp - Updated validation stamp
+
+Default template:
+
+[source]
+----
+Image for validation stamp ${validationStamp} for branch ${branch} in ${project} has changed.
+----
+

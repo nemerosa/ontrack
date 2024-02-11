@@ -1,27 +1,37 @@
 package net.nemerosa.ontrack.extension.slack.notifications
 
 import net.nemerosa.ontrack.model.events.AbstractUrlNotificationEventRenderer
-import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.structure.ProjectEntity
-import net.nemerosa.ontrack.model.support.NameValue
-import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.model.structure.ProjectEntityPageBuilder
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.springframework.stereotype.Component
 
 @Component
 class SlackNotificationEventRenderer(
     ontrackConfigProperties: OntrackConfigProperties,
-) :
-    AbstractUrlNotificationEventRenderer(ontrackConfigProperties) {
+) : AbstractUrlNotificationEventRenderer(ontrackConfigProperties) {
 
-    override fun render(projectEntity: ProjectEntity, event: Event): String {
+    override val id: String = "slack"
+    override val name: String = "Slack"
+
+    override fun render(projectEntity: ProjectEntity): String {
         val pageUrl = getUrl(ProjectEntityPageBuilder.getEntityPageRelativeURI(projectEntity))
         return "<$pageUrl|${getProjectEntityName(projectEntity)}>"
     }
 
-    override fun render(valueKey: String, value: NameValue, event: Event): String = "_${value.value}_"
+    override fun renderStrong(value: String): String = "**${value}**"
 
-    override fun renderLink(text: NameValue, link: NameValue, event: Event): String =
-        """<${link.value}|${text.value}>"""
+    override fun renderLink(text: String, href: String): String = """<$href|$text>"""
 
+    override fun renderList(list: List<String>): String =
+        list.joinToString("\n") { "* $it" }
+
+    override fun renderSpace(): String = "\n\n"
+
+    override fun renderSection(title: String, content: String): String =
+        """
+            |**$title**
+            |
+            |$content
+        """.trimMargin()
 }

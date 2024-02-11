@@ -1,0 +1,25 @@
+[[event-auto-versioning-error]]
+===== auto-versioning-error
+
+When an auto versioning request fails because of a general error.
+
+Context:
+
+* `project` - project - Target project
+* `branch` - branch - Target branch
+* `xProject` - project - Dependency/source project
+* `VERSION` - string - Version being set
+* `MESSAGE` - string - Auto versioning message
+* `ERROR` - string - Error message
+
+Default template:
+
+[source]
+----
+Auto versioning of ${project}/${branch} for dependency ${xProject} version "${VERSION}" has failed.
+
+${MESSAGE}
+
+Error: ${ERROR}
+----
+

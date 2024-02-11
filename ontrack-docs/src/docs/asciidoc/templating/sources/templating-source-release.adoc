@@ -1,0 +1,15 @@
+[[templating-source-release]]
+===== release
+
+Gets the release/version/label associated to a build or renders an empty string is there is none.
+
+Applicable for:
+
+* build
+
+Example:
+
+[source]
+----
+${build.release}
+----

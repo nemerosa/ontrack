@@ -12,7 +12,6 @@ data class GitHubTestEnv(
     val token: String,
     val organization: String,
     val repository: String,
-    val issue: Int,
     val pr: Int,
     val team: String,
     val appId: String,
@@ -21,6 +20,8 @@ data class GitHubTestEnv(
     val branch: String,
     val readme: String,
     val paths: GitHubTestEnvKnownPaths,
+    val changeLog: GitHubTestChangeLog,
+    val issues: GitHubTestIssues,
 ) {
     val fullRepository: String = "$organization/$repository"
 }
@@ -34,6 +35,22 @@ data class GitHubTestEnvKnownImagesPaths(
     val promotion: String,
 )
 
+data class GitHubTestChangeLog(
+    val from: String,
+    val to: String,
+    val messages: List<String>,
+)
+
+data class GitHubTestIssues(
+    val from: String,
+    val to: String,
+    val messages: List<String>,
+    val issue: Int,
+    val issueSummary: String,
+    val issueLabels: List<String>,
+    val milestone: String,
+)
+
 /**
  * Actual environment for system tests.
  */
@@ -43,7 +60,6 @@ val githubTestEnv: GitHubTestEnv by lazy {
         token = getEnv("ontrack.test.extension.github.token"),
         organization = getEnv("ontrack.test.extension.github.organization"),
         repository = getEnv("ontrack.test.extension.github.repository"),
-        issue = getEnv("ontrack.test.extension.github.issue").toInt(),
         pr = getEnv("ontrack.test.extension.github.pr").toInt(),
         team = getEnv("ontrack.test.extension.github.team"),
         appId = getEnv("ontrack.test.extension.github.app.id"),
@@ -57,6 +73,20 @@ val githubTestEnv: GitHubTestEnv by lazy {
                 promotion = getEnv("ontrack.test.extension.github.paths.images.promotion"),
             ),
         ),
+        changeLog = GitHubTestChangeLog(
+            from = getEnv("ontrack.test.extension.github.changelog.from"),
+            to = getEnv("ontrack.test.extension.github.changelog.to"),
+            messages = getEnv("ontrack.test.extension.github.changelog.messages").split("|"),
+        ),
+        issues = GitHubTestIssues(
+            from = getEnv("ontrack.test.extension.github.issues.from"),
+            to = getEnv("ontrack.test.extension.github.issues.to"),
+            messages = getEnv("ontrack.test.extension.github.issues.messages").split("|"),
+            issue = getEnv("ontrack.test.extension.github.issues.issue").toInt(),
+            issueSummary = getEnv("ontrack.test.extension.github.issues.issueSummary"),
+            issueLabels = getEnv("ontrack.test.extension.github.issues.issueLabels").split("|"),
+            milestone = getEnv("ontrack.test.extension.github.issues.milestone"),
+        )
     )
 }
 

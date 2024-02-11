@@ -1,0 +1,11 @@
+[[templating-filter-uppercase]]
+===== uppercase
+
+Making a value upper case
+
+Example:
+
+[source]
+----
+${project|uppercase}
+----

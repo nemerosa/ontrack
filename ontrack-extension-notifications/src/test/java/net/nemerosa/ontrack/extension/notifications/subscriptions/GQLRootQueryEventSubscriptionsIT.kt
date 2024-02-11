@@ -23,11 +23,13 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                 projectEntity = this,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             // Query
             asUser().with(this, ProjectSubscriptionsRead::class.java).call {
-                run("""
+                run(
+                    """
                     query {
                         eventSubscriptions(filter: {
                             entity: {
@@ -38,15 +40,19 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                             writeSubscriptionGranted
                         }
                     }
-                """) { data ->
-                    assertFalse(data.getRequiredJsonField("eventSubscriptions")
-                        .getRequiredBooleanField("writeSubscriptionGranted"))
+                """
+                ) { data ->
+                    assertFalse(
+                        data.getRequiredJsonField("eventSubscriptions")
+                            .getRequiredBooleanField("writeSubscriptionGranted")
+                    )
                 }
             }
             // Query
             asUser().with(this, ProjectSubscriptionsRead::class.java).with(this, ProjectSubscriptionsWrite::class.java)
                 .call {
-                    run("""
+                    run(
+                        """
                     query {
                         eventSubscriptions(filter: {
                             entity: {
@@ -57,9 +63,12 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                             writeSubscriptionGranted
                         }
                     }
-                """) { data ->
-                        assertTrue(data.getRequiredJsonField("eventSubscriptions")
-                            .getRequiredBooleanField("writeSubscriptionGranted"))
+                """
+                    ) { data ->
+                        assertTrue(
+                            data.getRequiredJsonField("eventSubscriptions")
+                                .getRequiredBooleanField("writeSubscriptionGranted")
+                        )
                     }
                 }
         }
@@ -75,6 +84,7 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                 projectEntity = this,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             eventSubscriptionService.subscribe(
@@ -83,10 +93,12 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                 projectEntity = this,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_VALIDATION_RUN
             )
             // Query
-            run("""
+            run(
+                """
                     query {
                         eventSubscriptions(filter: {
                             entity: {
@@ -102,7 +114,8 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                             }
                         }
                     }
-            """) { data ->
+            """
+            ) { data ->
                 assertEquals(
                     mapOf(
                         "eventSubscriptions" to mapOf(
@@ -126,6 +139,91 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
     }
 
     @Test
+    fun `Getting the subscriptions for an entity with a content template`() {
+        project {
+            eventSubscriptionService.subscribe(
+                channel = mockNotificationChannel,
+                channelConfig = MockNotificationChannelConfig("#one"),
+                projectEntity = this,
+                keywords = null,
+                origin = "test",
+                contentTemplate = "Some template.",
+                EventFactory.NEW_PROMOTION_RUN
+            )
+            // Query
+            run(
+                """
+                    query {
+                        eventSubscriptions(filter: {
+                            entity: {
+                                type: PROJECT,
+                                id: $id
+                            }
+                        }) {
+                            pageItems {
+                                contentTemplate
+                            }
+                        }
+                    }
+            """
+            ) { data ->
+                assertEquals(
+                    mapOf(
+                        "eventSubscriptions" to mapOf(
+                            "pageItems" to listOf(
+                                mapOf(
+                                    "contentTemplate" to "Some template.",
+                                )
+                            )
+                        )
+                    ).asJson(),
+                    data
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Getting a global subscription with a content template`() {
+        asAdmin {
+            eventSubscriptionService.removeAllGlobal()
+            eventSubscriptionService.subscribe(
+                channel = mockNotificationChannel,
+                channelConfig = MockNotificationChannelConfig("#one"),
+                projectEntity = null,
+                keywords = null,
+                origin = "test",
+                contentTemplate = "This is my template.",
+                EventFactory.NEW_PROMOTION_RUN
+            )
+            run(
+                """
+                    query {
+                        eventSubscriptions {
+                            pageItems {
+                                contentTemplate
+                            }
+                        }
+                    }
+            """
+            ) { data ->
+                assertEquals(
+                    mapOf(
+                        "eventSubscriptions" to mapOf(
+                            "pageItems" to listOf(
+                                mapOf(
+                                    "contentTemplate" to "This is my template.",
+                                )
+                            )
+                        )
+                    ).asJson(),
+                    data
+                )
+            }
+        }
+    }
+
+    @Test
     fun `Filtering the global subscriptions using event type`() {
         asAdmin {
             eventSubscriptionService.removeAllGlobal()
@@ -136,6 +234,7 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                 projectEntity = null,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             eventSubscriptionService.subscribe(
@@ -144,10 +243,12 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                 projectEntity = null,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_VALIDATION_RUN
             )
             // Query
-            run("""
+            run(
+                """
                     query {
                         eventSubscriptions(filter: {
                             eventType: "new_promotion_run"
@@ -159,7 +260,8 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                             }
                         }
                     }
-            """) { data ->
+            """
+            ) { data ->
                 assertEquals(
                     mapOf(
                         "eventSubscriptions" to mapOf(

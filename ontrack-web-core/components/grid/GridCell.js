@@ -28,6 +28,7 @@ export default function GridCell({
     return (
         <>
             <Section
+                id={id}
                 title={loading ? "Loading..." : title}
                 titleWidth={titleWidth}
                 padding={padding}

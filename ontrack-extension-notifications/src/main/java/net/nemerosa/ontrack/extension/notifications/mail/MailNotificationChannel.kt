@@ -1,13 +1,13 @@
 package net.nemerosa.ontrack.extension.notifications.mail
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.common.SimpleExpand
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.Event
-import net.nemerosa.ontrack.model.events.EventVariableService
+import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.HtmlNotificationEventRenderer
+import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.textField
 import org.slf4j.Logger
@@ -21,7 +21,7 @@ class MailNotificationChannel(
     javaMailSender: JavaMailSender?,
     private val mailService: MailService,
     private val htmlNotificationEventRenderer: HtmlNotificationEventRenderer,
-    private val eventVariableService: EventVariableService,
+    private val eventTemplatingService: EventTemplatingService,
 ) : AbstractNotificationChannel<MailNotificationChannelConfig>(MailNotificationChannelConfig::class) {
 
     private val logger: Logger = LoggerFactory.getLogger(MailNotificationChannel::class.java)
@@ -46,12 +46,19 @@ class MailNotificationChannel(
 
     override fun toText(config: MailNotificationChannelConfig): String = config.subject
 
-    override fun publish(config: MailNotificationChannelConfig, event: Event): NotificationResult {
+    override fun publish(config: MailNotificationChannelConfig, event: Event, template: String?): NotificationResult {
         // Subject as a template
-        val parameters = eventVariableService.getTemplateParameters(event, caseVariants = true)
-        val subject = SimpleExpand.expand(config.subject, parameters)
+        val subject = eventTemplatingService.render(
+            template = config.subject,
+            event = event,
+            renderer = PlainEventRenderer.INSTANCE, // Using plain text for the subject
+        )
         // Formatting the message
-        val message = event.render(htmlNotificationEventRenderer)
+        val message = eventTemplatingService.renderEvent(
+            event = event,
+            template = template,
+            renderer = htmlNotificationEventRenderer,
+        )
         // Sending the message
         val sent = mailService.sendMail(
             to = config.to,

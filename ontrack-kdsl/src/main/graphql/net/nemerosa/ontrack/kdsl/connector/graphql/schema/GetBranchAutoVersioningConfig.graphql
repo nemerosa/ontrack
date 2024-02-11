@@ -18,6 +18,12 @@ query GetBranchAutoVersioningConfig(
                 targetRegex
                 upgradeBranchPattern
                 validationStamp
+                notifications {
+                    channel
+                    config
+                    scope
+                    notificationTemplate
+                }
             }
         }
     }

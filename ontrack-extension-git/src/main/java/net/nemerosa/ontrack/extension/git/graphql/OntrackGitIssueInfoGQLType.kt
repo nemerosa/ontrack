@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.git.graphql
 
 import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.extension.git.model.OntrackGitIssueInfo
+import net.nemerosa.ontrack.extension.issues.graphql.IssueServiceConfigurationRepresentationGQLType
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.GQLScalarJSON

@@ -1,54 +1,31 @@
 import GridCell from "@components/grid/GridCell";
-import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
-import {useEffect, useState} from "react";
-import {gql} from "graphql-request";
 import {Dynamic} from "@components/common/Dynamic";
-import {Button, Dropdown, Space, Spin} from "antd";
+import {useEffect, useState} from "react";
+import {useTemplateRenderers} from "@components/extension/issues/SelectTemplateRenderer";
+import {Button, Dropdown, Input, Modal, Space, Spin} from "antd";
 import {FaCheck, FaCopy, FaDownload, FaTools} from "react-icons/fa";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import copy from "copy-to-clipboard";
 import CheckStatus from "@components/common/CheckStatus";
-import copy from 'copy-to-clipboard';
+import {gql} from "graphql-request";
 import IssueChangeLogExportRequestDialog, {
     useIssueChangeLogExportRequestDialog
 } from "@components/extension/issues/IssueChangeLogExportRequestDialog";
-import {useIssueExportFormats} from "@components/extension/issues/SelectIssueExportFormat";
 
-export default function ChangeLogIssues({id, changeLogUuid}) {
+export default function ChangeLogIssues({id, from, to, issues}) {
 
     const client = useGraphQLClient()
 
-    const [loading, setLoading] = useState(true)
-    const [issues, setIssues] = useState([])
     const [issueServiceId, setIssueServiceId] = useState('')
-
-    const exportFormats = useIssueExportFormats()
-
     useEffect(() => {
-        if (client && changeLogUuid) {
-            setLoading(true)
-            client.request(
-                gql`
-                    query ChangeLogIssues($uuid: String!) {
-                        gitChangeLogByUUID(uuid: $uuid) {
-                            issues {
-                                issueServiceConfiguration {
-                                    serviceId
-                                }
-                                list {
-                                    issue: issueObject
-                                }
-                            }
-                        }
-                    }
-                `,
-                {uuid: changeLogUuid}
-            ).then(data => {
-                setIssueServiceId(data.gitChangeLogByUUID.issues.issueServiceConfiguration.serviceId)
-                setIssues(data.gitChangeLogByUUID.issues.list)
-            }).finally(() => {
-                setLoading(false)
-            })
+        if (issues) {
+            setIssueServiceId(issues.issueServiceConfiguration.serviceId)
         }
-    }, [client, changeLogUuid]);
+    }, [issues])
+
+    // const client = useGraphQLClient()
+
+    const templateRenderers = useTemplateRenderers()
 
     const [preferences, setPreferences] = useState({
         format: 'text',
@@ -82,16 +59,16 @@ export default function ChangeLogIssues({id, changeLogUuid}) {
     useEffect(() => {
         const items = []
 
-        exportFormats.forEach(exportFormat => {
+        templateRenderers.forEach(renderer => {
             items.push({
-                key: exportFormat.id,
+                key: renderer.id,
                 label: <Space>
                     {
-                        exportFormat.id === preferences.format && <FaCheck/>
+                        renderer.id === preferences.format && <FaCheck/>
                     }
-                    {exportFormat.name}
+                    {renderer.name}
                 </Space>,
-                onClick: () => selectFormat(exportFormat.id)
+                onClick: () => selectFormat(renderer.id)
             })
         })
 
@@ -105,10 +82,11 @@ export default function ChangeLogIssues({id, changeLogUuid}) {
 
         setItems(items)
 
-    }, [exportFormats, preferences]);
+    }, [templateRenderers, preferences]);
 
     const [exporting, setExporting] = useState(false)
     const [exportedContent, setExportedContent] = useState('')
+    const [exportedContentShowing, setExportedContentShowing] = useState(false)
     const [exportCopied, setExportCopied] = useState(false)
 
     const onExport = () => {
@@ -127,29 +105,48 @@ export default function ChangeLogIssues({id, changeLogUuid}) {
         client.request(
             gql`
                 query ChangeLogExport(
-                    $uuid: String!,
+                    $from: Int!,
+                    $to: Int!,
                     $format: String!,
-                    $grouping: String!,
+                    $grouping: String,
+                    $exclude: String,
+                    $altGroup: String,
                 ) {
-                    gitChangeLogByUUID(uuid: $uuid) {
-                        export(request: {
-                            format: $format,
-                            grouping: $grouping,
-                        })
+                    scmChangeLog(from: $from, to: $to) {
+                        export(
+                            request: {
+                                format: $format,
+                                grouping: $grouping,
+                                exclude: $exclude,
+                                altGroup: $altGroup,
+                            }
+                        )
                     }
                 }
             `,
             {
-                uuid: changeLogUuid,
+                from,
+                to,
                 format: preferences.format,
                 grouping,
+                exclude: null, // TODO
+                altGroup: null, // TODO
             }
         ).then(data => {
-            const content = data.gitChangeLogByUUID.export
+            const content = data.scmChangeLog.export
             setExportedContent(content)
+            showExportedContent()
         }).finally(() => {
             setExporting(false)
         })
+    }
+
+    const showExportedContent = () => {
+        setExportedContentShowing(true)
+    }
+
+    const closeExportedContent = () => {
+        setExportedContentShowing(false)
     }
 
     const onCopy = () => {
@@ -173,30 +170,13 @@ export default function ChangeLogIssues({id, changeLogUuid}) {
             <GridCell
                 id={id}
                 title="Issues"
-                loading={loading}
                 padding={0}
                 extra={
                     <>
-                        {
-                            exportCopied &&
-                            <CheckStatus
-                                value={true}
-                                text="Export copied"
-                            />
-                        }
-                        {
-                            exportedContent && !exportCopied &&
-                            <Button
-                                icon={<FaCopy/>}
-                                onClick={onCopy}
-                            >
-                                Export ready - click to copy
-                            </Button>
-                        }
                         <Dropdown.Button
                             type="primary"
                             trigger="click"
-                            disabled={loading || exporting}
+                            disabled={exporting}
                             menu={{items}}
                             onClick={onExport}
                         >
@@ -212,10 +192,45 @@ export default function ChangeLogIssues({id, changeLogUuid}) {
                     issueServiceId &&
                     <Dynamic
                         path={`framework/issues/${issueServiceId}-issues`}
-                        props={{issues}}
+                        props={{issues: issues.issues}}
                     />
                 }
             </GridCell>
+
+            <Modal title="Exported change log"
+                   open={exportedContentShowing}
+                   disabled={true}
+                   footer={() => (
+                       <>
+                           <Button
+                               icon={exportCopied ? <FaCheck/> : <FaCopy/>}
+                               onClick={onCopy}
+                               disabled={exportCopied}
+                           >
+                               {
+                                   exportCopied ? 'Copied' : 'Copy'
+                               }
+                           </Button>
+                           <Button
+                               id="close-exported-content"
+                               onClick={closeExportedContent}
+                               type="primary"
+                           >
+                               Close
+                           </Button>
+                       </>
+                   )}
+                   onCancel={closeExportedContent}
+                   width="70%"
+            >
+                <Input.TextArea
+                    id="exported-content"
+                    placeholder="Exported content"
+                    value={exportedContent}
+                    rows={20}
+                />
+            </Modal>
+
             <IssueChangeLogExportRequestDialog issueChangeLogExportRequestDialog={issueChangeLogExportRequestDialog}/>
         </>
     )

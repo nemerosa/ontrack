@@ -1,0 +1,18 @@
+[[event-delete_build]]
+===== delete_build
+
+When a build is deleted.
+
+Context:
+
+* `project` - project - Build's project
+* `branch` - branch - Build's branch
+* `BUILD` - string - Name of the deleted build
+
+Default template:
+
+[source]
+----
+Build ${BUILD} for branch ${branch} in ${project} has been deleted.
+----
+

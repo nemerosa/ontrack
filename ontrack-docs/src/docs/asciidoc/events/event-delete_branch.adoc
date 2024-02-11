@@ -1,0 +1,17 @@
+[[event-delete_branch]]
+===== delete_branch
+
+When a branch is deleted.
+
+Context:
+
+* `project` - project - Branch's project
+* `BRANCH` - string - Name of the deleted branch
+
+Default template:
+
+[source]
+----
+Branch ${BRANCH} has been deleted from ${project}.
+----
+

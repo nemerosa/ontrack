@@ -40,8 +40,8 @@ services:
   ontrack:
     image: "nemerosa/ontrack:${ONTRACK_VERSION:-latest}"
     ports:
-      - "8080"
-      - "8800"
+      - "8080:8080"
+      - "8800:8800"
     depends_on:
       postgres:
         condition: service_started
@@ -54,7 +54,11 @@ services:
     environment:
       # Test configuration
       PROFILE: acceptance
+      # Disabling the test of new configurations
       ONTRACK_CONFIG_CONFIGURATION_TEST: "false"
+      # Next UI
+      ONTRACK_CONFIG_UI_ENABLED: "true"
+      ONTRACK_CONFIG_UI_URL: "http://localhost:3000/ui" # External URL!
       # ... GH ingestion
       ONTRACK_EXTENSION_GITHUB_INGESTION_HOOK_SIGNATURE_DISABLED: "true"
       ONTRACK_EXTENSION_GITHUB_INGESTION_PROCESSING_REPOSITORIES_TEST_REPOSITORY: "test-routing-repository"
@@ -67,6 +71,8 @@ services:
       ONTRACK_EXTENSION_AUTOVERSIONING_QUEUE_SCALE: 10
       # ... TFC hook signature check disabled
       ONTRACK_EXTENSION_TFC_HOOK_SIGNATURE_DISABLED: "true"
+      # ... JIRA mock server
+      ONTRACK_CONFIG_EXTENSION_JIRA_MOCK_ENABLED: "true"
       # General configuration
       JAVA_OPTIONS: "-Xmx2048m -Xms2048m"
       # Database
@@ -82,3 +88,18 @@ services:
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_RABBITMQ_USERNAME: ontrack
       SPRING_RABBITMQ_PASSWORD: ontrack
+
+  # Ontrack UI
+  ui:
+    image: "nemerosa/ontrack-ui:${ONTRACK_VERSION:-latest}"
+    environment:
+      # External URLs!
+      ONTRACK_URL: http://localhost:8080
+      ONTRACK_UI_URL: http://localhost:3000/ui
+      ONTRACK_CONNECTION_LOGGING: "true"
+      ONTRACK_CONNECTION_TRACING: "true"
+    depends_on:
+      ontrack:
+        condition: service_healthy
+    ports:
+      - "3000:3000"

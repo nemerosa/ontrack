@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.git.graphql
 
 import net.nemerosa.ontrack.model.structure.Build
 
+@Deprecated("Will be removed in V5. Replaced by the SCM change log service.")
 interface RecursiveChangeLogService {
 
     /**

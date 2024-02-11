@@ -145,6 +145,7 @@ class GitController(
      * Change log entry point
      */
     @GetMapping("changelog")
+    @Deprecated("Will be removed in V5. Use the scmChangeLog GraphQL query instead.")
     fun changeLog(request: BuildDiffRequest): BuildDiff {
         val changeLog = gitService.changeLog(request)
         // Stores in cache
@@ -157,6 +158,7 @@ class GitController(
      * Change log export, list of formats
      */
     @GetMapping("changelog/export/{projectId}/formats")
+    @Deprecated("Will be removed in V5. Use the templating service instead.")
     fun changeLogExportFormats(@PathVariable projectId: ID): Resources<ExportFormat> {
         val project = structureService.getProject(projectId)
         val formats = gitService.getIssueExportFormats(project)
@@ -170,6 +172,7 @@ class GitController(
      * Change log export
      */
     @GetMapping("changelog/export")
+    @Deprecated("Will be removed in V5. Use the templating service instead.")
     fun changeLog(request: IssueChangeLogExportRequest): ResponseEntity<String> {
         // Gets the change log
         val changeLog = gitService.changeLog(request)
@@ -229,6 +232,7 @@ class GitController(
      * Change log commits
      */
     @GetMapping("changelog/{uuid}/commits")
+    @Deprecated("Will be removed in V5. Use the scmChangeLog GraphQL query instead.")
     fun changeLogCommits(
         @PathVariable uuid: String
     ): GitChangeLogCommits {
@@ -253,6 +257,7 @@ class GitController(
      * Change log issues
      */
     @GetMapping("changelog/{uuid}/issues")
+    @Deprecated("Will be removed in V5. Use the scmChangeLog GraphQL query instead.")
     fun changeLogIssues(@PathVariable uuid: String): GitChangeLogIssues {
         // Gets the change log
         val changeLog = getChangeLog(uuid)
@@ -284,6 +289,7 @@ class GitController(
      * Change log files
      */
     @GetMapping("changelog/{uuid}/files")
+    @Deprecated("Will be removed in V5. Use the scmChangeLog GraphQL query instead.")
     fun changeLogFiles(@PathVariable uuid: String): GitChangeLogFiles {
         // Gets the change log
         val changeLog = getChangeLog(uuid)

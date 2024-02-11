@@ -1,0 +1,16 @@
+[[event-update_configuration]]
+===== update_configuration
+
+When a configuration is updated.
+
+Context:
+
+* `CONFIGURATION` - string - Name of the configuration
+
+Default template:
+
+[source]
+----
+${CONFIGURATION} configuration has been updated.
+----
+

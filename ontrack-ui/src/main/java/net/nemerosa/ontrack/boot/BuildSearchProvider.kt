@@ -64,7 +64,7 @@ class BuildSearchProvider(
                 searchIndexService.updateSearchIndex(this, BuildSearchItem(build))
             }
             EventFactory.DELETE_BUILD -> {
-                val buildId = event.getIntValue("build_id")
+                val buildId = event.getIntValue("BUILD_ID")
                 searchIndexService.deleteSearchIndex(this, buildId)
             }
         }

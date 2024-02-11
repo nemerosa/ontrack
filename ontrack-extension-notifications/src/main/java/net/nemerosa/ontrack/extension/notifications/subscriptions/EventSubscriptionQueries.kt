@@ -46,8 +46,10 @@ class GQLRootQueryEventSubscriptions(
                     .dataFetcher { env ->
                         val projectEntity: ProjectEntity? = env.getContext<GraphQLContext>().get(CONTEXT_PROJECT_ENTITY)
                         if (projectEntity != null) {
-                            securityService.isProjectFunctionGranted(projectEntity,
-                                ProjectSubscriptionsWrite::class.java)
+                            securityService.isProjectFunctionGranted(
+                                projectEntity,
+                                ProjectSubscriptionsWrite::class.java
+                            )
                         } else {
                             securityService.isGlobalFunctionGranted(GlobalSubscriptionsManage::class.java)
                         }
@@ -56,9 +58,13 @@ class GQLRootQueryEventSubscriptions(
             ),
             itemPaginatedListProvider = { env, _, offset, size ->
                 // Parsing of the filter
-                val filter = env.getArgument<Any>("filter").asJson().parse<EventSubscriptionFilter>()
-                    // Pagination from the root arguments
-                    .withPage(offset, size)
+                val filterArgument: Any? = env.getArgument<Any>("filter")
+                val rawFilter = filterArgument
+                    ?.asJson()
+                    ?.parse<EventSubscriptionFilter>()
+                    ?: EventSubscriptionFilter()
+                // Pagination from the root arguments
+                val filter = rawFilter.withPage(offset, size)
                 // Setting the context
                 getProjectEntity(filter)?.let { env.getContext<GraphQLContext>().put(CONTEXT_PROJECT_ENTITY, it) }
                 // Getting the list
@@ -71,6 +77,7 @@ class GQLRootQueryEventSubscriptions(
                         keywords = it.data.keywords,
                         disabled = it.data.disabled,
                         origin = it.data.origin,
+                        contentTemplate = it.data.contentTemplate,
                     )
                 }
             }

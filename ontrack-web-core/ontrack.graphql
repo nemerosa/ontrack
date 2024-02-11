@@ -199,6 +199,8 @@ type AutoVersioningNotification {
     channel: String!
     "config field"
     config: JSON!
+    "Optional notification template used to override the default text"
+    notificationTemplate: String
     "scope field"
     scope: [AutoVersioningNotificationScope!]!
 }
@@ -277,7 +279,7 @@ type AutoVersioningSourceConfig {
     targetPropertyType: String
     "Regex to use in the target file to identify the line to replace with the new version. The first matching group must be the version."
     targetRegex: String
-    "Prefix to use for the upgrade branch in Git, defaults to `feature/auto-upgrade-<project>-<version>`"
+    "Prefix to use for the upgrade branch in Git, defaults to `feature/auto-upgrade-<project>-<version>-<branch>`"
     upgradeBranchPattern: String
     "Validation stamp to create on auto versioning (optional)"
     validationStamp: String
@@ -587,6 +589,8 @@ type Build implements Authorizable & ProjectEntity {
     messageProperty: Property
     "List of meta information properties"
     metaInfoProperty: Property
+    "Mock SCM used for testing only"
+    mockSCMBuildCommitProperty: Property
     name: String
     "Next build"
     nextBuild: Build
@@ -1683,6 +1687,8 @@ type EventSubscriptionPayload {
     channelConfig: JSON!
     "Textual description of the channel configuration"
     channelConfigText: String!
+    "Optional template to use for the message"
+    contentTemplate: String
     "If this subscription is disabled"
     disabled: Boolean
     "List of events types to subscribe to"
@@ -2108,8 +2114,6 @@ type GitUICommit {
     build: Build
     "commit field"
     commit: GitCommit!
-    "formattedMessage field"
-    formattedMessage: String!
     "fullAnnotatedMessage field"
     fullAnnotatedMessage: String!
     "id field"
@@ -2676,6 +2680,8 @@ type Issue {
     displayKey: String
     "Key of the issue"
     key: String
+    "JSON representation of the issue containing custom fields"
+    rawIssue: JSON!
     "Status of the issue"
     status: IssueStatus
     "Title / summary for the issue"
@@ -4815,12 +4821,12 @@ type Query {
         from: Int!,
         "ID of the build to end the change log with"
         to: Int!
-    ): GitChangeLog
+    ): GitChangeLog @deprecated(reason: "Will be removed in V5. Prefer using the `scmChangeLog` query.")
     "Gets a change log by its UUID"
     gitChangeLogByUUID(
         "UUID of the change log"
         uuid: String!
-    ): GitChangeLog
+    ): GitChangeLog @deprecated(reason: "Will be removed in V5. Prefer using the `scmChangeLog` query.")
     "Getting Ontrack information about a Git commit and a project."
     gitCommitInfo(
         "Commit hash (full form) to look for."
@@ -4901,7 +4907,7 @@ type Query {
     "Gets information about the application"
     info: Info
     "List of available export formats"
-    issueExportFormats: [IssueExportFormat!]!
+    issueExportFormats: [IssueExportFormat!]! @deprecated(reason: "Use the templating service")
     "List of Jenkins configurations"
     jenkinsConfigurations: [JenkinsConfiguration!]!
     "List of all labels"
@@ -5030,6 +5036,15 @@ type Query {
     scmCatalogTeamStats: [SCMCatalogTeamStats!]!
     "List of teams indexed by the SCM catalog"
     scmCatalogTeams: [SCMCatalogTeam!]!
+    "Query to get a change log between two builds."
+    scmChangeLog(
+        "ID of the build from"
+        from: Int!,
+        "List of projects to follow one by one for a get deep change log"
+        projects: [String!],
+        "ID of the build to"
+        to: Int!
+    ): SCMChangeLog
     "Performs a search in Ontrack"
     search(
         "Offset for the page"
@@ -5045,6 +5060,8 @@ type Query {
     searchResultTypes: [SearchResultType!]!
     "Ontrack settings"
     settings: Settings!
+    "Getting the list of template renderers"
+    templatingRenderers: [TemplatingRenderer!]!
     "Gets the current user"
     user: User
     "Gets the current dashboard"
@@ -5230,6 +5247,8 @@ type RunInfo {
 type SCMBranchInfo {
     "SCM branch"
     branch: String!
+    "Are change logs enabled for this SCM?"
+    changeLogs: Boolean
     "SCM engine or flavor (like GitHub, etc.)"
     engine: String!
     "SCM type (like git, etc.)"
@@ -5301,6 +5320,63 @@ type SCMCatalogTeamStats {
     entryCount: Int
     "Number of teams"
     teamCount: Int
+}
+
+"Representation of a change log between two builds"
+type SCMChangeLog {
+    "List of commits between the builds"
+    commits: [SCMDecoratedCommit!]!
+    "URL to get the file diff between the two builds"
+    diffLink: String
+    "Exporting the issues of a change log"
+    export(
+        "How to generate the exported change log"
+        request: SCMChangeLogExportInput
+    ): String
+    "Boundary for the change log"
+    from: Build!
+    "List of issues between the builds"
+    issues: SCMChangeLogIssues
+    "All dependency changes"
+    linkChanges: [LinkChange!]!
+    "Boundary for the change log"
+    to: Build!
+}
+
+"SCMChangeLogIssues"
+type SCMChangeLogIssues {
+    "issueServiceConfiguration field"
+    issueServiceConfiguration: IssueServiceConfigurationRepresentation!
+    "issues field"
+    issues: [Issue!]!
+}
+
+"Common attributes for a commit (or revision)."
+type SCMCommit {
+    "Author of the commit"
+    author: String!
+    "Mail of the author of the commit. Can be `null` if not available."
+    authorEmail: String
+    "Identifier of the commit"
+    id: String!
+    "Link to the commit"
+    link: String!
+    "Message associated with the commit"
+    message: String!
+    "Short identifier for the commit"
+    shortId: String!
+    "Timestamp of the commit"
+    timestamp: LocalDateTime!
+}
+
+"SCMDecoratedCommit"
+type SCMDecoratedCommit {
+    "Annotated message with links"
+    annotatedMessage: String!
+    "Any build linked to this commit"
+    build: Build
+    "commit field"
+    commit: SCMCommit!
 }
 
 "Saved file change filter"
@@ -6150,6 +6226,14 @@ type SubscribeValidationStampToEventsPayload implements Payload {
     subscription: EventSubscriptionPayload
 }
 
+"Definition of a renderer"
+type TemplatingRenderer {
+    "Technical ID for the renderer"
+    id: String!
+    "Display name for the renderer"
+    name: String!
+}
+
 "Output type for the testConfiguration mutation."
 type TestConfigurationPayload implements Payload {
     "Result of the test"
@@ -6952,6 +7036,8 @@ input AutoVersioningNotificationInput {
     channel: String!
     "config field"
     config: JSON!
+    "Optional notification template used to override the default text"
+    notificationTemplate: String
     "scope field"
     scope: [AutoVersioningNotificationScope!]!
 }
@@ -6991,7 +7077,7 @@ input AutoVersioningSourceConfigInput {
     targetPropertyType: String
     "Regex to use in the target file to identify the line to replace with the new version. The first matching group must be the version."
     targetRegex: String
-    "Prefix to use for the upgrade branch in Git, defaults to `feature/auto-upgrade-<project>-<version>`"
+    "Prefix to use for the upgrade branch in Git, defaults to `feature/auto-upgrade-<project>-<version>-<branch>`"
     upgradeBranchPattern: String
     "Validation stamp to create on auto versioning (optional)"
     validationStamp: String
@@ -8241,6 +8327,59 @@ input RunInfoInput {
     triggerType: String
 }
 
+"""
+
+Request for the export of a change log.
+
+This request defines how to group issues by type and which format
+to use for the export.
+
+If no grouping is specified, the issues will be returned as a list, without any grouping.
+
+The exclude field is used to exclude some issues from the export using their type.
+
+Note that both the export format and the type of issues are specific notions linked to the issue service
+(JIRA, GitHub...) that produces the issues.
+"""
+input SCMChangeLogExportInput {
+    """
+
+    Title of the group to use when an issue does not belong to any group. It defaults to "Other".
+    If left empty, any issue not belonging to a group would be excluded from the export. This field
+    is not used when no grouping is specified.
+    """
+    altGroup: String
+    exclude: String
+    "Selected format. Defaults to plain text."
+    format: String
+    """
+
+    Specification for the grouping, none by default.
+
+    This specification describes how to group issues using their type. This format is independent from
+    the issue service and this service is responsible for the actual mapping of issue "types" into actual
+    issue fields. For example, for GitHub, an issue type is mapped on a label.
+    The format of the specification is:
+
+    ----
+    specification := "" | ${'$'}group ( "|" ${'$'}group)*
+    group         := ${'$'}name "=" ${'$'}type ( "," ${'$'}type)*
+    ----
+
+    For example:
+
+    ----
+    Bugs=bug|Features=feature,enhancement
+    ----
+
+    Any issue that would not be mapped in a group will be assigned arbitrarily to the group defined by
+    altGroup property.
+
+    If the specification is empty, no grouping will be done.
+    """
+    grouping: String
+}
+
 "Input type for the saveBuildFilter mutation."
 input SaveBuildFilterInput {
     "branchId field"
@@ -9335,6 +9474,8 @@ input SubscribeBranchToEventsInput {
     channel: String!
     "Channel configuration"
     channelConfig: JSON!
+    "Optional template to use for the message"
+    contentTemplate: String
     "List of events types to subscribe to"
     events: [String!]!
     "Optional space-separated list of tokens to look for in the events"
@@ -9353,6 +9494,8 @@ input SubscribeBuildToEventsInput {
     channel: String!
     "Channel configuration"
     channelConfig: JSON!
+    "Optional template to use for the message"
+    contentTemplate: String
     "List of events types to subscribe to"
     events: [String!]!
     "Optional space-separated list of tokens to look for in the events"
@@ -9367,6 +9510,8 @@ input SubscribeProjectToEventsInput {
     channel: String!
     "Channel configuration"
     channelConfig: JSON!
+    "Optional template to use for the message"
+    contentTemplate: String
     "List of events types to subscribe to"
     events: [String!]!
     "Optional space-separated list of tokens to look for in the events"
@@ -9383,6 +9528,8 @@ input SubscribePromotionLevelToEventsInput {
     channel: String!
     "Channel configuration"
     channelConfig: JSON!
+    "Optional template to use for the message"
+    contentTemplate: String
     "List of events types to subscribe to"
     events: [String!]!
     "Optional space-separated list of tokens to look for in the events"
@@ -9403,6 +9550,8 @@ input SubscribePromotionRunToEventsInput {
     channel: String!
     "Channel configuration"
     channelConfig: JSON!
+    "Optional template to use for the message"
+    contentTemplate: String
     "List of events types to subscribe to"
     events: [String!]!
     "Optional space-separated list of tokens to look for in the events"
@@ -9419,6 +9568,8 @@ input SubscribeToEventsInput {
     channel: String!
     "Channel configuration"
     channelConfig: JSON!
+    "Optional template to use for the message"
+    contentTemplate: String
     "List of events types to subscribe to"
     events: [String!]!
     "Optional space-separated list of tokens to look for in the events"
@@ -9437,6 +9588,8 @@ input SubscribeValidationRunToEventsInput {
     channel: String!
     "Channel configuration"
     channelConfig: JSON!
+    "Optional template to use for the message"
+    contentTemplate: String
     "List of events types to subscribe to"
     events: [String!]!
     "Optional space-separated list of tokens to look for in the events"
@@ -9457,6 +9610,8 @@ input SubscribeValidationStampToEventsInput {
     channel: String!
     "Channel configuration"
     channelConfig: JSON!
+    "Optional template to use for the message"
+    contentTemplate: String
     "List of events types to subscribe to"
     events: [String!]!
     "Optional space-separated list of tokens to look for in the events"

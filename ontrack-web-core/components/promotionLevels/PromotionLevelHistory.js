@@ -45,7 +45,7 @@ export default function PromotionLevelHistory({promotionLevel}) {
     const [loading, setLoading] = useState(false)
     const [promotions, setPromotions] = useState([])
     const [pageInfo, setPageInfo] = useState()
-    const [scmType, setScmType] = useState('')
+    const [scmChangeLogEnabled, setScmChangeLogEnabled] = useState('')
 
     useEffect(() => {
         if (client && promotionLevel) {
@@ -64,7 +64,7 @@ export default function PromotionLevelHistory({promotionLevel}) {
                         promotionLevel(id: $id) {
                             branch {
                                 scmBranchInfo {
-                                    type
+                                    changeLogs
                                 }
                             }
                             promotionRuns: promotionRunsPaginated(
@@ -119,7 +119,7 @@ export default function PromotionLevelHistory({promotionLevel}) {
                     beforeDate: filter.beforeDate,
                 }
             ).then(data => {
-                setScmType(data.promotionLevel.branch.scmBranchInfo.type)
+                setScmChangeLogEnabled(data.promotionLevel.branch.scmBranchInfo?.changeLogs)
                 setPageInfo(data.promotionLevel.promotionRuns.pageInfo)
                 if (pagination.offset > 0) {
                     setPromotions([...promotions, ...data.promotionLevel.promotionRuns.pageItems])
@@ -141,12 +141,12 @@ export default function PromotionLevelHistory({promotionLevel}) {
     const rangeSelection = useRangeSelection()
 
     const onChangeLog = () => {
-        if (scmType && rangeSelection.isComplete()) {
+        if (scmChangeLogEnabled && rangeSelection.isComplete()) {
             const [runIdFrom, runIdTo] = rangeSelection.selection
             const runFrom = promotions.find(it => it.id === runIdFrom)
             const runTo = promotions.find(it => it.id === runIdTo)
             if (runFrom && runTo) {
-                router.push(scmChangeLogUri(scmType, runFrom.build.id, runTo.build.id))
+                router.push(scmChangeLogUri(runFrom.build.id, runTo.build.id))
             }
         }
     }
@@ -183,7 +183,7 @@ export default function PromotionLevelHistory({promotionLevel}) {
                                     </Button>
                                 </Popover>
                                 {
-                                    scmType &&
+                                    scmChangeLogEnabled &&
                                     <Popover
                                         content="Change between two selected promotions."
                                     >
@@ -204,7 +204,7 @@ export default function PromotionLevelHistory({promotionLevel}) {
                     onChange={onTableChange}
                 >
                     {
-                        scmType &&
+                        scmChangeLogEnabled &&
                         <Column
                             key="range"
                             width={32}

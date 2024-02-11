@@ -1,0 +1,20 @@
+[[event-update_validation_run_status_comment]]
+===== update_validation_run_status_comment
+
+When the status message of the validation of a build is updated.
+
+Context:
+
+* `project` - project - Project
+* `branch` - branch - Branch
+* `build` - build - Validated build
+* `validationStamp` - validation stamp - Validation stamp
+* `validationRun` - validation run - Validation run
+
+Default template:
+
+[source]
+----
+A status message for the ${validationStamp} validation ${validationRun} for build ${build} in branch ${branch} of ${project} has changed.
+----
+

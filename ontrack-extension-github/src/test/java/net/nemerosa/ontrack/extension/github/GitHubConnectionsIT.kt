@@ -74,8 +74,8 @@ class GitHubConnectionsIT : AbstractGitHubTestSupport() {
         }
         // Testing the API
         val client = clientFactory.create(configuration)
-        val issue = client.getIssue(githubTestEnv.fullRepository, githubTestEnv.issue)
-        assertNotNull(issue, "Issue ${githubTestEnv.fullRepository}#${githubTestEnv.issue} has been found")
+        val issue = client.getIssue(githubTestEnv.fullRepository, githubTestEnv.issues.issue)
+        assertNotNull(issue, "Issue ${githubTestEnv.fullRepository}#${githubTestEnv.issues.issue} has been found")
         // Testing the local sync
         project {
             setProperty(

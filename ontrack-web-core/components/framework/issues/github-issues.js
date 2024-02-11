@@ -18,7 +18,7 @@ export default function GithubIssues({issues}) {
                 <Column
                     key="id"
                     title="ID"
-                    render={(_, {issue}) => (
+                    render={(_, issue) => (
                         <Link href={issue.url}>
                             <Typography.Text code>
                                 {issue.displayKey}
@@ -29,43 +29,43 @@ export default function GithubIssues({issues}) {
                 <Column
                     key="state"
                     title="State"
-                    render={(_, {issue}) => (
-                        <GitHubIssueState state={issue.state}/>
+                    render={(_, {rawIssue}) => (
+                        <GitHubIssueState state={rawIssue.state}/>
                     )}
                 />
                 <Column
                     key="title"
                     title="Title"
-                    render={(_, {issue}) => (
-                        <Typography.Text>{issue.summary}</Typography.Text>
+                    render={(_, issue) => (
+                        <Typography.Text>issue.summary</Typography.Text>
                     )}
                 />
                 <Column
                     key="milestone"
                     title="Milestone"
-                    render={(_, {issue}) => (
-                        <GitHubMilestone milestone={issue.milestone}/>
+                    render={(_, {rawIssue}) => (
+                        <GitHubMilestone milestone={rawIssue.milestone}/>
                     )}
                 />
                 <Column
                     key="assignee"
                     title="Assignee"
-                    render={(_, {issue}) => (
-                        <GitHubUser user={issue.assignee}/>
+                    render={(_, {rawIssue}) => (
+                        <GitHubUser user={rawIssue.assignee}/>
                     )}
                 />
                 <Column
                     key="updatedAt"
                     title="Last update"
-                    render={(_, {issue}) =>
+                    render={(_, issue) =>
                         <TimestampText value={issue.updateTime}/>
                     }
                 />
                 <Column
                     key="labels"
                     title="Labels"
-                    render={(_, {issue}) =>
-                        <GitHubLabels labels={issue.labels}/>
+                    render={(_, {rawIssue}) =>
+                        <GitHubLabels labels={rawIssue.labels}/>
                     }
                 />
             </Table>

@@ -31,6 +31,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 projectEntity = null,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_BRANCH,
             )
             // Project level
@@ -41,6 +42,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                     projectEntity = this,
                     keywords = null,
                     origin = "test",
+                    contentTemplate = null,
                     EventFactory.NEW_BRANCH,
                 )
             }
@@ -75,6 +77,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                     projectEntity = this, // Branch
                     keywords = null,
                     origin = "test",
+                    contentTemplate = null,
                     EventFactory.NEW_PROMOTION_RUN
                 )
                 // Subscription at project level
@@ -84,6 +87,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                     projectEntity = project,
                     keywords = null,
                     origin = "test",
+                    contentTemplate = null,
                     EventFactory.NEW_PROMOTION_RUN
                 )
                 // Gettings the subscriptions for this project & the new promotion run event
@@ -151,6 +155,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                     projectEntity = project,
                     keywords = "GOLD",
                     origin = "test",
+                    contentTemplate = null,
                     EventFactory.NEW_PROMOTION_RUN,
                 )
                 // Build to promote
@@ -184,6 +189,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 projectEntity = this,
                 keywords = "GOLD main",
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_PROMOTION_RUN,
             )
             // Promotion on the other branch ==> no notification
@@ -214,6 +220,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 projectEntity = null,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             assertNotNull(eventSubscriptionService.findSubscriptionById(null, record.id)) {
@@ -238,6 +245,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 projectEntity = this,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             branch {
@@ -248,6 +256,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                     projectEntity = this,
                     keywords = null,
                     origin = "test",
+                    contentTemplate = null,
                     EventFactory.NEW_PROMOTION_RUN
                 )
                 promotionLevel {
@@ -258,6 +267,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                         projectEntity = this,
                         keywords = null,
                         origin = "test",
+                        contentTemplate = null,
                         EventFactory.NEW_PROMOTION_RUN
                     )
                     // Looking for all subscriptions on this promotion, and recursively
@@ -291,6 +301,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 projectEntity = null,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             val subscriptions = eventSubscriptionService.filterSubscriptions(
@@ -312,6 +323,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 projectEntity = null,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             val project = project {
@@ -321,6 +333,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                     projectEntity = this,
                     keywords = null,
                     origin = "test",
+                    contentTemplate = null,
                     EventFactory.NEW_PROMOTION_RUN
                 )
             }
@@ -343,6 +356,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 projectEntity = null,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             eventSubscriptionService.subscribe(
@@ -351,6 +365,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 projectEntity = null,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             val page = eventSubscriptionService.filterSubscriptions(
@@ -375,6 +390,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 projectEntity = null,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             eventSubscriptionService.subscribe(
@@ -383,6 +399,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 projectEntity = null,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             val page = eventSubscriptionService.filterSubscriptions(
@@ -411,6 +428,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 projectEntity = null,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             eventSubscriptionService.subscribe(
@@ -419,6 +437,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 projectEntity = null,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_VALIDATION_RUN
             )
             //
@@ -453,6 +472,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 projectEntity = null,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             runBlocking {
@@ -464,6 +484,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 projectEntity = null,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             val page = eventSubscriptionService.filterSubscriptions(
@@ -493,6 +514,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                     projectEntity = null,
                     keywords = null,
                     origin = "test",
+                    contentTemplate = null,
                     EventFactory.NEW_PROMOTION_RUN
                 )
                 securityService.currentSignature
@@ -504,6 +526,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                     projectEntity = null,
                     keywords = null,
                     origin = "test",
+                    contentTemplate = null,
                     EventFactory.NEW_VALIDATION_RUN
                 )
             }
@@ -542,6 +565,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 projectEntity = this,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             branch {
@@ -552,6 +576,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                     projectEntity = this,
                     keywords = null,
                     origin = "test",
+                    contentTemplate = null,
                     EventFactory.NEW_PROMOTION_RUN
                 )
                 promotionLevel {
@@ -562,6 +587,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                         projectEntity = this,
                         keywords = null,
                         origin = "test",
+                        contentTemplate = null,
                         EventFactory.NEW_PROMOTION_RUN
                     )
                     // Looking for all subscriptions on this promotion, and recursively
@@ -593,6 +619,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 projectEntity = this,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             eventSubscriptionService.subscribe(
@@ -601,6 +628,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 projectEntity = this,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             // Looking for all subscriptions on this promotion, and recursively
@@ -626,6 +654,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 projectEntity = this,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             eventSubscriptionService.subscribe(
@@ -634,6 +663,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 projectEntity = this,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             // Looking for all subscriptions on this promotion, and recursively
@@ -663,6 +693,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 projectEntity = this,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             runBlocking {
@@ -674,6 +705,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 projectEntity = this,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             // Looking for all subscriptions on this promotion, and recursively
@@ -697,24 +729,26 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
     fun `Filtering the subscriptions for an entity using creator`() {
         project {
             // Subscribe for events on this project for the two different creators
-            val user1 = asUser().with(this, ProjectSubscriptionsWrite::class.java).call {
+            val user1 = asUser().withProjectFunction(this, ProjectSubscriptionsWrite::class.java).call {
                 eventSubscriptionService.subscribe(
                     channel = mockNotificationChannel,
                     channelConfig = MockNotificationChannelConfig("#one"),
                     projectEntity = this,
                     keywords = null,
                     origin = "test",
+                    contentTemplate = null,
                     EventFactory.NEW_PROMOTION_RUN
                 )
                 securityService.currentSignature
             }
-            val user2 = asUser().with(this, ProjectSubscriptionsWrite::class.java).call {
+            val user2 = asUser().withProjectFunction(this, ProjectSubscriptionsWrite::class.java).call {
                 eventSubscriptionService.subscribe(
                     channel = mockNotificationChannel,
                     channelConfig = MockNotificationChannelConfig("#two"),
                     projectEntity = this,
                     keywords = null,
                     origin = "test",
+                    contentTemplate = null,
                     EventFactory.NEW_PROMOTION_RUN
                 )
                 securityService.currentSignature
@@ -752,6 +786,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 projectEntity = this,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
             eventSubscriptionService.subscribe(
@@ -760,6 +795,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 projectEntity = this,
                 keywords = null,
                 origin = "test",
+                contentTemplate = null,
                 EventFactory.NEW_VALIDATION_RUN
             )
             //

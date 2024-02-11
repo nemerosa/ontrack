@@ -8,8 +8,6 @@ open class GitChangeLogCommits(
     val log: GitUILog
 ) : SCMChangeLogCommits {
 
-    override fun getCommits(): List<SCMChangeLogCommit> {
-        return log.commits
-    }
+    override val commits: List<SCMChangeLogCommit> = log.commits
 
 }

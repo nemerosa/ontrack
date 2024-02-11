@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.model.events
 
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.NameValue
-import org.apache.commons.lang3.StringUtils
 import java.util.regex.Pattern
 
 /**
@@ -26,68 +25,7 @@ class Event(
 
     @Suppress("UNCHECKED_CAST")
     fun <T : ProjectEntity> getEntity(entityType: ProjectEntityType): T =
-        entities[entityType] as T ?: error("Missing entity $entityType in the event.")
-
-    @Suppress("UNCHECKED_CAST")
-    fun <T : ProjectEntity?> getExtraEntity(entityType: ProjectEntityType): T =
-        extraEntities[entityType] as T ?: error("Missing extra entity X_$entityType in the event.")
-
-    fun renderText(): String {
-        return render(PlainEventRenderer.INSTANCE)
-    }
-
-    fun render(eventRenderer: EventRenderer): String {
-        val m = EXPRESSION.matcher(eventType.template)
-        val output = StringBuilder()
-        while (m.find()) {
-            val value = expandExpression(m.group(1), eventRenderer)
-            m.appendReplacement(output, value)
-        }
-        m.appendTail(output)
-        return output.toString()
-    }
-
-    private fun expandExpression(expression: String, eventRenderer: EventRenderer): String {
-        return if (StringUtils.startsWith(expression, ":")) {
-            val linkIndex = expression.indexOf(":", 1)
-            if (linkIndex > 0) {
-                val textKey = expression.substring(1, linkIndex)
-                val text = values[textKey] ?: throw EventMissingValueException(eventType.template, textKey)
-                val linkKey = expression.substring(linkIndex + 1)
-                val link = values[linkKey] ?: throw EventMissingValueException(eventType.template, linkKey)
-                eventRenderer.renderLink(text, link, this)
-            } else {
-                val valueKey = expression.substring(1)
-                val value = values[valueKey] ?: throw EventMissingValueException(eventType.template, valueKey)
-                eventRenderer.render(valueKey, value, this)
-            }
-        } else if ("REF" == expression) {
-            if (ref == null) {
-                throw EventMissingRefEntityException(eventType.template)
-            } else {
-                val entity = entities[ref] ?: throw EventMissingEntityException(eventType.template, ref)
-                eventRenderer.render(entity, this)
-            }
-        } else if (expression.startsWith("X_")) {
-            // Final reference
-            val type = expression.substring(2)
-            // Project entity type
-            val projectEntityType = ProjectEntityType.valueOf(type)
-            // Gets the corresponding entity
-            val projectEntity = extraEntities[projectEntityType]
-                ?: throw EventMissingEntityException(eventType.template, projectEntityType)
-            // Rendering
-            eventRenderer.render(projectEntity, this)
-        } else {
-            // Project entity type
-            val projectEntityType = ProjectEntityType.valueOf(expression)
-            // Gets the corresponding entity
-            val projectEntity = entities[projectEntityType]
-                ?: throw EventMissingEntityException(eventType.template, projectEntityType)
-            // Rendering
-            eventRenderer.render(projectEntity, this)
-        }
-    }
+        entities[entityType] as T? ?: error("Missing entity $entityType in the event.")
 
     fun withSignature(signature: Signature?): Event = Event(
         eventType,
@@ -162,11 +100,12 @@ class Event(
 
         fun withExtra(entity: ProjectEntity): EventBuilder {
             extraEntities[entity.projectEntityType] = entity
+            extraEntities[ProjectEntityType.PROJECT] = entity.project
             return this
         }
 
         fun withValidationRunStatus(statusID: ValidationRunStatusID): EventBuilder {
-            return with("status", NameValue(statusID.id, statusID.name))
+            return with("STATUS", NameValue(statusID.name, statusID.id))
         }
 
         fun with(name: String, value: NameValue): EventBuilder {
@@ -191,8 +130,6 @@ class Event(
                 ref,
                 values
             )
-            // Checks the event can be resolved with all its references
-            event.renderText()
             // OK
             return event
         }

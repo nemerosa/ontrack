@@ -7,6 +7,10 @@ import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @deprecated Will be removed in V5. Use the templating service.
+ */
+@Deprecated
 public interface IssueExportService {
 
     String NO_GROUP = "";

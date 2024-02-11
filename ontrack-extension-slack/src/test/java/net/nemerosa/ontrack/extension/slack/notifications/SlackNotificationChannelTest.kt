@@ -9,11 +9,12 @@ import net.nemerosa.ontrack.extension.slack.service.SlackNotificationType
 import net.nemerosa.ontrack.extension.slack.service.SlackService
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventFactory
+import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
-import net.nemerosa.ontrack.model.structure.ID
-import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.Project
+import net.nemerosa.ontrack.model.structure.ProjectFixtures
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
+import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -26,22 +27,38 @@ class SlackNotificationChannelTest {
     private lateinit var project: Project
     private lateinit var event: Event
 
+    private lateinit var eventTemplatingService: EventTemplatingService
     private lateinit var cachedSettingsService: CachedSettingsService
     private lateinit var slackService: SlackService
     private lateinit var channel: SlackNotificationChannel
+    private lateinit var slackNotificationEventRenderer: SlackNotificationEventRenderer
 
     @BeforeEach
     fun before() {
         slackService = mockk()
         cachedSettingsService = mockk()
+
+        project = ProjectFixtures.testProject(name = uid("prj-"))
+        event = Event.of(EventFactory.DISABLE_PROJECT).withProject(project).build()
+
+        slackNotificationEventRenderer = SlackNotificationEventRenderer(OntrackConfigProperties())
+
+        eventTemplatingService = mockk()
+        every {
+            eventTemplatingService.renderEvent(
+                event = event,
+                template = null,
+                renderer = slackNotificationEventRenderer,
+            )
+        } returns event.eventType.template
+
         channel = SlackNotificationChannel(
             slackService,
             cachedSettingsService,
-            SlackNotificationEventRenderer(OntrackConfigProperties())
+            slackNotificationEventRenderer,
+            eventTemplatingService,
         )
 
-        project = Project.of(NameDescription.nd("project", "Test project")).withId(ID.of(1))
-        event = Event.of(EventFactory.DISABLE_PROJECT).withProject(project).get()
     }
 
     @Test
@@ -49,11 +66,16 @@ class SlackNotificationChannelTest {
         every { cachedSettingsService.getCachedSettings(SlackSettings::class.java) } returns SlackSettings(
             enabled = true
         )
+
         every { slackService.sendNotification(any(), any(), any()) } returns true
         val config = SlackNotificationChannelConfig(channel = "#test", type = SlackNotificationType.SUCCESS)
-        val result = channel.publish(config, event)
+        val result = channel.publish(config, event, template = null)
         verify {
-            slackService.sendNotification("#test", "Project <http://localhost:8080/#/project/1|project> has been disabled.", SlackNotificationType.SUCCESS)
+            slackService.sendNotification(
+                "#test",
+                event.eventType.template,
+                SlackNotificationType.SUCCESS
+            )
         }
         assertEquals(NotificationResultType.OK, result.type)
         assertNull(result.message)
@@ -66,7 +88,7 @@ class SlackNotificationChannelTest {
         )
         every { slackService.sendNotification(any(), any(), any()) } returns false // <== returning an error
         val config = SlackNotificationChannelConfig(channel = "#test")
-        val result = channel.publish(config, event)
+        val result = channel.publish(config, event, template = null)
         assertEquals(NotificationResultType.ERROR, result.type)
         assertEquals("Slack message could not be sent. Check the operational logs.", result.message)
     }

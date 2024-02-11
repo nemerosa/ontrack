@@ -32,8 +32,8 @@ export function buildLegacyUri(build) {
     return `#/build/${build.id}`
 }
 
-export function scmChangeLogUri(scmType, from, to) {
-    return `/extension/${scmType}/changelog?from=${from}&to=${to}`
+export function scmChangeLogUri(from, to) {
+    return `/extension/scm/changelog?from=${from}&to=${to}`
 }
 
 // TODO As a component

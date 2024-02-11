@@ -80,7 +80,7 @@ class ProjectSearchProvider(
                 searchIndexService.updateSearchIndex(this, project.asSearchItem())
             }
             EventFactory.DELETE_PROJECT -> {
-                val projectId = event.getIntValue("project_id")
+                val projectId = event.getIntValue("PROJECT_ID")
                 searchIndexService.deleteSearchIndex(this, projectId)
             }
         }

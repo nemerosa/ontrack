@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.av.config
 
 import net.nemerosa.ontrack.extension.av.AbstractAutoVersioningTestSupport
 import net.nemerosa.ontrack.extension.av.AutoVersioningTestFixtures.sourceConfig
+import net.nemerosa.ontrack.json.asJson
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
@@ -61,6 +62,79 @@ internal class AutoVersioningMutationsIT : AbstractAutoVersioningTestSupport() {
                                         targetPath = "gradle.properties",
                                         targetProperty = "b-version",
                                         autoApprovalMode = AutoApprovalMode.CLIENT,
+                                    ),
+                                )
+                            ),
+                            config
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Setting a configuration with a custom notification template`() {
+        asAdmin {
+            project {
+                branch {
+                    run(
+                        """
+                        mutation {
+                            setAutoVersioningConfig(input: {
+                                branchId: $id,
+                                configurations: [
+                                    {
+                                        sourceProject: "A",
+                                        sourceBranch: "main",
+                                        sourcePromotion: "GOLD",
+                                        targetPath: "gradle.properties",
+                                        targetProperty: "a-version",
+                                        notifications: [
+                                            {
+                                               channel: "mock",
+                                               config: {
+                                                  target: "#my-target"
+                                               },
+                                               scope: [
+                                                 SUCCESS
+                                               ],
+                                               notificationTemplate: "My custom template."
+                                            }
+                                        ]
+                                    },
+                                ]
+                            }) {
+                                errors {
+                                    message
+                                }
+                            }
+                        }
+                    """
+                    ) { data ->
+                        checkGraphQLUserErrors(data, "setAutoVersioningConfig")
+                        val config = autoVersioningConfigurationService.getAutoVersioning(this)
+                        assertEquals(
+                            AutoVersioningConfig(
+                                listOf(
+                                    sourceConfig(
+                                        sourceProject = "A",
+                                        sourceBranch = "main",
+                                        sourcePromotion = "GOLD",
+                                        targetPath = "gradle.properties",
+                                        targetProperty = "a-version",
+                                        notifications = listOf(
+                                            AutoVersioningNotification(
+                                                channel = "mock",
+                                                config = mapOf(
+                                                    "target" to "#my-target"
+                                                ).asJson(),
+                                                scope = listOf(
+                                                    AutoVersioningNotificationScope.SUCCESS
+                                                ),
+                                                notificationTemplate = "My custom template."
+                                            )
+                                        )
                                     ),
                                 )
                             ),

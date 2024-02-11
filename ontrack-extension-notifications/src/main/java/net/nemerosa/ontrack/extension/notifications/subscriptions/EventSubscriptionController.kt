@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannel
 import net.nemerosa.ontrack.model.annotations.getPropertyDescription
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.form.Form
+import net.nemerosa.ontrack.model.form.Memo
 import net.nemerosa.ontrack.model.form.MultiSelection
 import net.nemerosa.ontrack.model.form.ServiceConfigurator
 import net.nemerosa.ontrack.model.form.Text
@@ -111,6 +112,14 @@ class EventSubscriptionController(
                         )
                     }
                 )
+        )
+        // Content template
+        .with(
+            Memo.of(EventSubscription::contentTemplate.name)
+                .label("Content")
+                .help(getPropertyDescription(EventSubscription::contentTemplate))
+                .optional()
+                .value(subscription?.contentTemplate)
         )
 
     private fun <C> channelConfigForm(channel: NotificationChannel<C>): Form =

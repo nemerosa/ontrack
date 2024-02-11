@@ -20,6 +20,7 @@ class GQLRootQueryGitChangeLog(
 
     override fun getFieldDefinition(): GraphQLFieldDefinition = GraphQLFieldDefinition.newFieldDefinition()
         .name("gitChangeLog")
+        .deprecate("Will be removed in V5. Prefer using the `scmChangeLog` query.")
         .argument {
             it.name("from")
                 .description("ID of the build to start the change log with")

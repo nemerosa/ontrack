@@ -161,7 +161,14 @@ interface OntrackGitHubClient {
      * @param content Content of the file as binary
      * @param message Commit message
      */
-    fun setFileContent(repository: String, branch: String, sha: String, path: String, content: ByteArray, message: String)
+    fun setFileContent(
+        repository: String,
+        branch: String,
+        sha: String,
+        path: String,
+        content: ByteArray,
+        message: String
+    )
 
     /**
      * Creates a pull request
@@ -219,5 +226,18 @@ interface OntrackGitHubClient {
      * @param message Commit message
      */
     fun mergePR(repository: String, pr: Int, message: String)
+
+    /**
+     * Gets a list of commits between a base and a head.
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @param base Base commit
+     * @param head Head commit
+     */
+    fun compareCommits(
+        repository: String,
+        base: String,
+        head: String,
+    ): List<GitHubCommit>
 
 }

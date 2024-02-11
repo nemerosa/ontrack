@@ -14,6 +14,7 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity
  * @property channelConfig Specific configuration of the channel
  * @property disabled If the subscription is disabled
  * @property origin Origin of the subscription (used for filtering)
+ * @property contentTemplate Optional template to use for the message
  */
 data class EventSubscription(
     val projectEntity: ProjectEntity?,
@@ -28,6 +29,8 @@ data class EventSubscription(
     val disabled: Boolean,
     @APIDescription("Origin of the subscription (used for filtering)")
     val origin: String,
+    @APIDescription("Optional template to use for the message")
+    val contentTemplate: String?,
 ) {
     fun disabled(disabled: Boolean) = EventSubscription(
         projectEntity = projectEntity,
@@ -36,6 +39,7 @@ data class EventSubscription(
         channel = channel,
         channelConfig = channelConfig,
         disabled = disabled,
-        origin = origin
+        origin = origin,
+        contentTemplate = contentTemplate,
     )
 }

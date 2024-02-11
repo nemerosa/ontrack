@@ -1,0 +1,17 @@
+[[templating-function-link]]
+===== link
+
+Creates a link
+
+Configuration:
+
+* **href** - Address for the link. This must be a value which is part of the templating context.
+
+* **text** - Text of the link. This must be a value which is part of the templating context.
+
+Example:
+
+[source]
+----
+#.link?text=PR_TITLE&href=PR_LINK
+----

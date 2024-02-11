@@ -1,0 +1,25 @@
+[[event-auto-versioning-pr-merge-timeout-error]]
+===== auto-versioning-pr-merge-timeout-error
+
+When an auto versioning request fails because the corresponding PR could not be merged in time.
+
+Context:
+
+* `project` - project - Target project
+* `branch` - branch - Target branch
+* `xProject` - project - Dependency/source project
+* `VERSION` - string - Version being set
+* `PR_NAME` - string - Title of the PR having been created
+* `PR_LINK` - string - Link to the PR having been created
+
+Default template:
+
+[source]
+----
+Auto versioning of ${project}/${branch} for dependency ${xProject} version "${VERSION}" has failed.
+
+Timeout while waiting for the PR to be ready to be merged.
+
+Pull request ${#.link?text=PR_NAME&href=PR_LINK}
+----
+

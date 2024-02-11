@@ -1,0 +1,18 @@
+[[event-image_promotion_level]]
+===== image_promotion_level
+
+When a promotion level's image is updated.
+
+Context:
+
+* `project` - project - Promotion level's project
+* `branch` - branch - Promotion level's branch
+* `promotionLevel` - promotion level - Updated promotion level
+
+Default template:
+
+[source]
+----
+Image for promotion level ${promotionLevel} for branch ${branch} in ${project} has changed.
+----
+

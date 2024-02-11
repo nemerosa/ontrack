@@ -16,6 +16,8 @@ data class SubscriptionsCascContextData(
     val channelConfig: JsonNode,
     @APIDescription("Is this channel disabled?")
     val disabled: Boolean? = null,
+    @APIDescription("Optional template to use for the message")
+    val contentTemplate: String?,
 ) {
     fun normalized() = SubscriptionsCascContextData(
         events = events.sorted(),
@@ -23,5 +25,6 @@ data class SubscriptionsCascContextData(
         channel = channel,
         channelConfig = channelConfig,
         disabled = disabled ?: false,
+        contentTemplate = contentTemplate,
     )
 }

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.av.config
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.graphql.support.ListRef
+import net.nemerosa.ontrack.model.annotations.APIDescription
 
 /**
  * Subscription to an auto versioning event.
@@ -9,12 +10,15 @@ import net.nemerosa.ontrack.graphql.support.ListRef
  * @property scope List of events to listen to
  * @property channel ID of the channel to listen to
  * @property config JSON configuration for the subscription
+ * @property notificationTemplate Optional notification template used to override the default text
  */
 data class AutoVersioningNotification(
     val channel: String,
     val config: JsonNode,
     @ListRef
     val scope: List<AutoVersioningNotificationScope> = listOf(AutoVersioningNotificationScope.ALL),
+    @APIDescription("Optional notification template used to override the default text")
+    val notificationTemplate: String?,
 ) {
     companion object {
         /**

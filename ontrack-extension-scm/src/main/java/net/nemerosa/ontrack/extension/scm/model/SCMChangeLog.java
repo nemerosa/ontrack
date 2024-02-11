@@ -11,9 +11,12 @@ import java.util.UUID;
 
 /**
  * @param <T> Type of SCM data associated with a build
+ *
+ * @deprecated Will be removed in V5. Use the new scm.SCMChangeLog
  */
 @EqualsAndHashCode(callSuper = false)
 @Data
+@Deprecated
 public class SCMChangeLog<T> extends BuildDiff {
 
     private final String uuid;

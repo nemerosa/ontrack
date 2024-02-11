@@ -96,6 +96,11 @@ class OntrackConfigProperties {
      */
     var ui = UIProperties()
 
+    /**
+     * Templating settings
+     */
+    var templating = TemplatingProperties()
+
     @PostConstruct
     fun log() {
         if (!configurationTest) {
@@ -110,6 +115,7 @@ class OntrackConfigProperties {
         logger.info("[document] Documents engine = ${documents.engine}")
         logger.info("[ui] Next UI enabled = ${ui.enabled}")
         logger.info("[ui] Next UI URI = ${ui.uri}")
+        logger.info("[templating] Errors = ${templating.errors}")
     }
 
     /**
@@ -167,6 +173,38 @@ class OntrackConfigProperties {
              */
             const val DEFAULT = JDBC
         }
+    }
+
+    /**
+     * Templating settings
+     */
+    class TemplatingProperties {
+        /**
+         * How to deal with templating errors?
+         */
+        var errors: TemplatingErrors = TemplatingErrors.IGNORE
+    }
+
+    /**
+     * How to deal with templating errors?
+     */
+    enum class TemplatingErrors {
+        /**
+         * Ignoring the errors (default)
+         */
+        IGNORE,
+        /**
+         * Message in the rendering
+         */
+        MESSAGE,
+        /**
+         * Logging the errors stacks (ok for testing) and using the message into the rendering
+         */
+        LOGGING_STACK,
+        /**
+         * Throwing the errors (not recommended)
+         */
+        THROW,
     }
 
     /**

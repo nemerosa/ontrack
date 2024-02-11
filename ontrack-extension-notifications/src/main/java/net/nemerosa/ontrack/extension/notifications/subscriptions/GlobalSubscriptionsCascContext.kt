@@ -25,6 +25,7 @@ class GlobalSubscriptionsCascContext(
             cascField(SubscriptionsCascContextData::channel),
             cascField(SubscriptionsCascContextData::channelConfig),
             cascField(SubscriptionsCascContextData::disabled),
+            cascField(SubscriptionsCascContextData::contentTemplate),
         )
     )
 
@@ -49,6 +50,7 @@ class GlobalSubscriptionsCascContext(
                     channelConfig = subscription.channelConfig,
                     disabled = subscription.disabled ?: false,
                     origin = EventSubscriptionOrigins.CASC,
+                    contentTemplate = subscription.contentTemplate?.trimIndent(),
                 )
             )
         }
@@ -66,6 +68,7 @@ class GlobalSubscriptionsCascContext(
                 channel = it.data.channel,
                 channelConfig = it.data.channelConfig,
                 disabled = it.data.disabled,
+                contentTemplate = it.data.contentTemplate,
             )
         }.asJson()
 

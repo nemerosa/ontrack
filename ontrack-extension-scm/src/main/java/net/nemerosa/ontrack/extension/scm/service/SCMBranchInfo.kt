@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.model.annotations.APIDescription
  * @property engine SCM engine or flavor (like GitHub, etc.)
  * @property uri URI of the repository
  * @property branch SCM branch
+ * @property changeLogs Are change logs enabled for this SCM?
  */
 @APIDescription("SCM information for a given branch.")
 data class SCMBranchInfo(
@@ -20,4 +21,6 @@ data class SCMBranchInfo(
     val uri: String,
     @APIDescription("SCM branch")
     val branch: String,
+    @APIDescription("Are change logs enabled for this SCM?")
+    val changeLogs: Boolean?,
 )

@@ -155,7 +155,7 @@ public class GitHubIssueServiceExtension extends AbstractIssueServiceExtension {
     }
 
     @Override
-    protected Set<String> getIssueTypes(IssueServiceConfiguration issueServiceConfiguration, Issue issue) {
+    public Set<String> getIssueTypes(IssueServiceConfiguration issueServiceConfiguration, Issue issue) {
         GitHubIssue gitHubIssue = (GitHubIssue) issue;
         return gitHubIssue.getLabels().stream().map(GitHubLabel::getName).collect(Collectors.toSet());
     }

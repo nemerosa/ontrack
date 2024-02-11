@@ -111,6 +111,7 @@ class DefaultEventSubscriptionService(
                     keywords = subscription.keywords,
                     disabled = subscription.disabled,
                     origin = subscription.origin,
+                    contentTemplate = subscription.contentTemplate,
                 )
                 storageService.store(
                     GLOBAL_STORE,
@@ -124,12 +125,13 @@ class DefaultEventSubscriptionService(
     }
 
     private fun EventSubscription.toSubscriptionRecord() = SubscriptionRecord(
-        channel,
-        channelConfig,
-        events,
-        keywords,
-        disabled,
-        origin,
+        channel = channel,
+        channelConfig = channelConfig,
+        events = events,
+        keywords = keywords,
+        disabled = disabled,
+        origin = origin,
+        contentTemplate = contentTemplate,
     )
 
     override fun findSubscriptionById(projectEntity: ProjectEntity?, id: String): EventSubscription? =
@@ -164,6 +166,7 @@ class DefaultEventSubscriptionService(
         keywords = keywords,
         disabled = disabled,
         origin = origin,
+        contentTemplate = contentTemplate,
     )
 
     override fun deleteSubscriptionById(projectEntity: ProjectEntity?, id: String) {
@@ -351,6 +354,7 @@ class DefaultEventSubscriptionService(
                     keywords = record.keywords,
                     disabled = record.disabled,
                     origin = record.origin,
+                    contentTemplate = record.contentTemplate,
                 )
             )
         }
@@ -476,6 +480,7 @@ class DefaultEventSubscriptionService(
                     keywords = record.keywords,
                     disabled = record.disabled,
                     origin = record.origin,
+                    contentTemplate = record.contentTemplate,
                 )
             )
             if (event.matchesKeywords(subscription.data.keywords)) {
@@ -504,6 +509,7 @@ class DefaultEventSubscriptionService(
                 keywords = it.keywords,
                 disabled = it.disabled,
                 origin = it.origin,
+                contentTemplate = it.contentTemplate,
             )
         )
     }
@@ -518,6 +524,7 @@ class DefaultEventSubscriptionService(
         val keywords: String?,
         val disabled: Boolean,
         val origin: String,
+        val contentTemplate: String?,
     )
 
     /**
@@ -531,9 +538,19 @@ class DefaultEventSubscriptionService(
         val keywords: String?,
         val disabled: Boolean,
         val origin: String = EventSubscriptionOrigins.UNKNOWN,
+        val contentTemplate: String?,
     ) {
         fun disabled(disabled: Boolean) =
-            SignedSubscriptionRecord(signature, channel, channelConfig, events, keywords, disabled, origin)
+            SignedSubscriptionRecord(
+                signature = signature,
+                channel = channel,
+                channelConfig = channelConfig,
+                events = events,
+                keywords = keywords,
+                disabled = disabled,
+                origin = origin,
+                contentTemplate = contentTemplate,
+            )
     }
 
 }

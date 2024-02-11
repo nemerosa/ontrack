@@ -5,6 +5,11 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
+import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
+import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
+import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
+import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogEnabled
+import net.nemerosa.ontrack.extension.scm.changelog.SCMCommit
 import net.nemerosa.ontrack.extension.scm.service.SCM
 import net.nemerosa.ontrack.extension.scm.service.SCMExtension
 import net.nemerosa.ontrack.extension.scm.service.SCMPath
@@ -21,18 +26,18 @@ import net.nemerosa.ontrack.extension.stash.service.StashConfigurationService
 import net.nemerosa.ontrack.extension.stash.settings.BitbucketServerSettings
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
-import net.nemerosa.ontrack.model.structure.Branch
-import net.nemerosa.ontrack.model.structure.Project
-import net.nemerosa.ontrack.model.structure.PropertyService
+import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 
 @Component
 class BitbucketServerSCMExtension(
     extensionFeature: StashExtensionFeature,
     private val propertyService: PropertyService,
+    private val structureService: StructureService,
     private val bitbucketClientFactory: BitbucketClientFactory,
     private val cachedSettingsService: CachedSettingsService,
     private val stashConfigurationService: StashConfigurationService,
+    private val issueServiceRegistry: IssueServiceRegistry,
 ) : AbstractExtension(extensionFeature), SCMExtension {
 
     override val type: String = "bitbucket-server"
@@ -48,6 +53,7 @@ class BitbucketServerSCMExtension(
             configuration = config,
             project = project,
             repositoryName = repository,
+            issueServiceConfigurationIdentifier = null,
             settings = cachedSettingsService.getCachedSettings(BitbucketServerSettings::class.java)
         )
         return SCMPath(
@@ -63,6 +69,7 @@ class BitbucketServerSCMExtension(
             configuration = property.configuration,
             project = property.project,
             repositoryName = property.repository,
+            issueServiceConfigurationIdentifier = property.issueServiceConfigurationIdentifier,
             settings = cachedSettingsService.getCachedSettings(BitbucketServerSettings::class.java),
         )
     }
@@ -71,8 +78,9 @@ class BitbucketServerSCMExtension(
         private val configuration: StashConfiguration,
         private val project: String,
         private val repositoryName: String,
+        private val issueServiceConfigurationIdentifier: String?,
         private val settings: BitbucketServerSettings,
-    ) : SCM {
+    ) : SCMChangeLogEnabled {
 
         override val type: String = "git"
         override val engine: String = "bitbucket-server"
@@ -173,6 +181,33 @@ class BitbucketServerSCMExtension(
         override fun getDiffLink(commitFrom: String, commitTo: String): String {
             return "${configuration.url}/projects/${project}/repos/${repositoryName}/compare/commits?targetBranch=${commitTo}&sourceBranch=${commitFrom}"
         }
+
+        override fun getBuildCommit(build: Build): String? =
+            propertyService.getPropertyValue(build, GitCommitPropertyType::class.java)?.commit
+
+        override suspend fun getCommits(fromCommit: String, toCommit: String): List<SCMCommit> =
+            client
+                .getCommits(repo, fromCommit, toCommit)
+                .map { commit ->
+                    BitbucketServerSCMCommit(
+                        root = configuration.url,
+                        repo = repo,
+                        commit = commit
+                    )
+                }
+                .sortedBy { it.timestamp }
+
+        override fun getConfiguredIssueService(): ConfiguredIssueService? =
+            issueServiceConfigurationIdentifier?.let { issueServiceRegistry.getConfiguredIssueService(it) }
+
+        override fun findBuildByCommit(project: Project, id: String): Build? =
+            propertyService.findByEntityTypeAndSearchArguments(
+                entityType = ProjectEntityType.BUILD,
+                propertyType = GitCommitPropertyType::class,
+                searchArguments = GitCommitPropertyType.getGitCommitSearchArguments(id)
+            ).firstOrNull()?.let { buildId ->
+                structureService.getBuild(buildId)
+            }
 
         private fun waitAndMerge(prId: Int, message: String): Boolean {
             // Waits for the PR checks to be OK

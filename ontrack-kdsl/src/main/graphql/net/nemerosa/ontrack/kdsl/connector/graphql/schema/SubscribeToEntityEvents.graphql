@@ -5,6 +5,7 @@ mutation SubscribeToEntityEvents(
     $channelConfig: JSON!,
     $keywords: String,
     $events: [String!]!,
+    $contentTemplate: String,
 ) {
     subscribeToEvents(input: {
         projectEntity: {
@@ -15,6 +16,7 @@ mutation SubscribeToEntityEvents(
         channelConfig: $channelConfig,
         keywords: $keywords,
         events: $events,
+        contentTemplate: $contentTemplate,
     }) {
         ...PayloadUserErrors
     }

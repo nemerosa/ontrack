@@ -4,7 +4,6 @@ import net.nemerosa.ontrack.kdsl.connector.graphql.convert
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.GetBranchAutoVersioningConfigQuery
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.SetAutoVersioningConfigMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.AutoVersioningNotificationInput
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.AutoVersioningNotificationScope
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.AutoVersioningSourceConfigInput
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 import net.nemerosa.ontrack.kdsl.spec.Branch
@@ -47,8 +46,11 @@ fun Branch.setAutoVersioningConfig(
                                 .channel(n.channel)
                                 .config(n.config)
                                 .scope(n.scope.map { s ->
-                                    AutoVersioningNotificationScope.valueOf(s.name)
+                                    net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.AutoVersioningNotificationScope.valueOf(
+                                        s.name
+                                    )
                                 })
+                                .notificationTemplate(n.notificationTemplate)
                                 .build()
                         }
                     )
@@ -80,6 +82,16 @@ fun Branch.getAutoVersioningConfig(): List<AutoVersioningSourceConfig> =
                 net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.AutoApprovalMode.CLIENT -> AutoApprovalMode.CLIENT
                 net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.AutoApprovalMode.SCM -> AutoApprovalMode.SCM
                 else -> null
+            },
+            notifications = it.notifications()?.map { n ->
+                AutoVersioningNotification(
+                    channel = n.channel(),
+                    config = n.config(),
+                    scope = n.scope().map { s ->
+                        AutoVersioningNotificationScope.valueOf(s.name)
+                    },
+                    notificationTemplate = n.notificationTemplate(),
+                )
             },
         )
     } ?: emptyList()

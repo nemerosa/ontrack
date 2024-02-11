@@ -38,6 +38,7 @@ class EventSubscriptionMutations(
                     jsonInputField(SubscribeToEventsInput::channelConfig),
                     stringListInputField(SubscribeToEventsInput::events),
                     stringInputField(SubscribeToEventsInput::keywords),
+                    stringInputField(SubscribeToEventsInput::contentTemplate),
                 )
 
             override val outputFields: List<GraphQLFieldDefinition> = listOf(
@@ -62,6 +63,7 @@ class EventSubscriptionMutations(
                     channelConfig = getRequiredMutationInputField(env, SubscribeToEventsInput::channelConfig.name),
                     events = getRequiredMutationInputField(env, SubscribeToEventsInput::events.name),
                     keywords = getMutationInputField(env, SubscribeToEventsInput::keywords.name),
+                    contentTemplate = getMutationInputField(env, SubscribeToEventsInput::contentTemplate.name),
                 )
                 // OK
                 return mapOf("subscription" to payload)
@@ -88,6 +90,7 @@ class EventSubscriptionMutations(
                     channelConfig = input.channelConfig,
                     events = input.events,
                     keywords = input.keywords,
+                    contentTemplate = input.contentTemplate,
                 )
             },
 
@@ -121,6 +124,7 @@ class EventSubscriptionMutations(
                     keywords = record.data.keywords,
                     disabled = record.data.disabled,
                     origin = record.data.origin,
+                    contentTemplate = record.data.contentTemplate,
                 )
             },
 
@@ -144,6 +148,7 @@ class EventSubscriptionMutations(
                     keywords = record.data.keywords,
                     disabled = record.data.disabled,
                     origin = record.data.origin,
+                    contentTemplate = record.data.contentTemplate,
                 )
             },
         )
@@ -153,7 +158,8 @@ class EventSubscriptionMutations(
         channel: String,
         channelConfig: JsonNode,
         events: List<String>,
-        keywords: String?
+        keywords: String?,
+        contentTemplate: String?,
     ): EventSubscriptionPayload {
         val record = eventSubscriptionService.subscribe(
             EventSubscription(
@@ -164,6 +170,7 @@ class EventSubscriptionMutations(
                 keywords = keywords,
                 disabled = false,
                 origin = EventSubscriptionOrigins.API,
+                contentTemplate = contentTemplate?.trimIndent(),
             )
         )
         return EventSubscriptionPayload(
@@ -174,6 +181,7 @@ class EventSubscriptionMutations(
             keywords = record.data.keywords,
             disabled = record.data.disabled,
             origin = record.data.origin,
+            contentTemplate = record.data.contentTemplate,
         )
     }
 
@@ -225,5 +233,7 @@ data class SubscribeToEventsInput(
     val events: List<String>,
     @APIDescription("Optional space-separated list of tokens to look for in the events")
     val keywords: String?,
+    @APIDescription("Optional template to use for the message")
+    val contentTemplate: String?,
 )
 

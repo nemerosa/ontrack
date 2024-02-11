@@ -1,16 +1,32 @@
 package net.nemerosa.ontrack.model.events
 
 import net.nemerosa.ontrack.model.structure.ProjectEntity
-import net.nemerosa.ontrack.model.support.NameValue
+import net.nemerosa.ontrack.model.structure.displayName
+import org.springframework.stereotype.Component
 
+@Component
 class PlainEventRenderer : AbstractEventRenderer() {
 
-    override fun render(projectEntity: ProjectEntity, event: Event): String =
-        getProjectEntityName(projectEntity)
+    override val id: String = "text"
+    override val name: String = "Text"
 
-    override fun render(valueKey: String, value: NameValue, event: Event): String = value.value
+    override fun render(projectEntity: ProjectEntity): String = projectEntity.displayName
 
-    override fun renderLink(text: NameValue, link: NameValue, event: Event): String = text.value
+    override fun renderStrong(value: String): String = value
+
+    override fun renderLink(text: String, href: String): String = text
+
+    override fun renderList(list: List<String>): String =
+        list.joinToString("\n") { "* $it" }
+
+    override fun renderSpace(): String = "\n\n"
+
+    override fun renderSection(title: String, content: String): String =
+        """
+            |$title
+            |
+            |$content
+        """.trimMargin()
 
     companion object {
         @JvmField

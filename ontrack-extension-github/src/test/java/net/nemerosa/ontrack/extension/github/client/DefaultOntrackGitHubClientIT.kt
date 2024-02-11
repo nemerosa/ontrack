@@ -54,9 +54,9 @@ class DefaultOntrackGitHubClientIT {
 
     @Test
     fun `Getting an issue`() {
-        val issue = client.getIssue(githubTestEnv.fullRepository, githubTestEnv.issue)
-        assertNotNull(issue, "Issue ${githubTestEnv.fullRepository}#${githubTestEnv.issue} has been found") {
-            assertEquals("#${githubTestEnv.issue}", it.displayKey)
+        val issue = client.getIssue(githubTestEnv.fullRepository, githubTestEnv.issues.issue)
+        assertNotNull(issue, "Issue ${githubTestEnv.fullRepository}#${githubTestEnv.issues.issue} has been found") {
+            assertEquals("#${githubTestEnv.issues.issue}", it.displayKey)
         }
     }
 
@@ -104,6 +104,19 @@ class DefaultOntrackGitHubClientIT {
                 assertEquals(GitHubRepositoryPermission.READ, it.permission)
             }
         }
+    }
+
+    @Test
+    fun `Getting a list of commits for a change log`() {
+        val commits = client.compareCommits(
+            repository = githubTestEnv.fullRepository,
+            base = githubTestEnv.changeLog.from,
+            head = githubTestEnv.changeLog.to,
+        )
+        assertEquals(
+            githubTestEnv.changeLog.messages,
+            commits.map { it.commit.message }
+        )
     }
 
 }

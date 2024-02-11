@@ -8,18 +8,18 @@ import PromotionRun from "@components/promotionRuns/PromotionRun";
 
 export default function GitChangeLogCommit({commit}) {
     return (
-        <div className="ot-git-plot-line">
+        <div className="ot-git-plot-line" id={`commit-${commit.commit.id}`}>
             <Space size={8}>
-                {/* Commmit short hash */}
-                <Link href={commit.link}>
-                    <Typography.Text code>{commit.shortId}</Typography.Text>
+                {/* Commit short hash */}
+                <Link href={commit.commit.link} title="Link to the commit in the SCM">
+                    <Typography.Text code>{commit.commit.shortId}</Typography.Text>
                 </Link>
                 {/* Annotated message */}
                 <SafeHTMLComponent htmlContent={commit.annotatedMessage}/>
                 {/* Author */}
-                <span className="ot-git-plot-line-author">{commit.author}</span>
+                <span className="ot-git-plot-line-author" title="Author for the commit">{commit.commit.author}</span>
                 {/* Timestamp */}
-                <span className="ot-git-plot-line-timestamp"><TimestampText value={commit.timestamp}/></span>
+                <span className="ot-git-plot-line-timestamp" title="Timestamp for the commit"><TimestampText value={commit.commit.timestamp}/></span>
                 {/* Build decoration */}
                 {
                     commit.build &&

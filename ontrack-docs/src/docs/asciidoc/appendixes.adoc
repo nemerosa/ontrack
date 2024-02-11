@@ -3,7 +3,9 @@
 
 include::configuration-properties.adoc[]
 
-include::appendix-event-variables.adoc
+include::appendix-templating.adoc[]
+
+include::appendix-events.adoc[]
 
 // include::appendix-deprecations.adoc[]
 

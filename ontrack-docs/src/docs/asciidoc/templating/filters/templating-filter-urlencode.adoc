@@ -1,0 +1,11 @@
+[[templating-filter-urlencode]]
+===== urlencode
+
+URL encoding of the value
+
+Example:
+
+[source]
+----
+${branch.scmBranch|urlencode}
+----

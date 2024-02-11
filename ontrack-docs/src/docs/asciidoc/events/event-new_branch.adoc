@@ -1,0 +1,17 @@
+[[event-new_branch]]
+===== new_branch
+
+When a branch is created.
+
+Context:
+
+* `project` - project - Branch's project
+* `branch` - branch - Created branch
+
+Default template:
+
+[source]
+----
+New branch ${branch} for project ${project}.
+----
+

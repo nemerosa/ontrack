@@ -1,37 +1,45 @@
 package net.nemerosa.ontrack.extension.jenkins.notifications
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.common.SimpleExpand
 import net.nemerosa.ontrack.extension.jenkins.JenkinsConfiguration
 import net.nemerosa.ontrack.extension.jenkins.JenkinsConfigurationService
 import net.nemerosa.ontrack.extension.jenkins.client.JenkinsClient
-import net.nemerosa.ontrack.extension.jenkins.client.JenkinsClientFactory
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.Event
-import net.nemerosa.ontrack.model.events.EventVariableService
+import net.nemerosa.ontrack.model.events.EventTemplatingService
+import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.form.*
-import org.springframework.stereotype.Component
 
 abstract class AbstractJenkinsNotificationChannel(
     private val jenkinsConfigurationService: JenkinsConfigurationService,
-    private val eventVariableService: EventVariableService,
+    private val eventTemplatingService: EventTemplatingService,
 ) : AbstractNotificationChannel<JenkinsNotificationChannelConfig>(
     JenkinsNotificationChannelConfig::class
 ) {
-    override fun publish(config: JenkinsNotificationChannelConfig, event: Event): NotificationResult {
-        // Computing the expansion parameters
-        val templateParameters = eventVariableService.getTemplateParameters(event, caseVariants = true)
+    override fun publish(
+        config: JenkinsNotificationChannelConfig,
+        event: Event,
+        template: String?
+    ): NotificationResult {
         // Gets the Jenkins configuration
         val jenkinsConfig = jenkinsConfigurationService.findConfiguration(config.config)
             ?: return NotificationResult.invalidConfiguration("Jenkins configuration cannot be found: ${config.config}")
         // Gets the Jenkins client
         val jenkinsClient = createJenkinsClient(jenkinsConfig)
         // Running the job
-        val job = SimpleExpand.expand(config.job, templateParameters)
+        val job = eventTemplatingService.render(
+            template = config.job,
+            event = event,
+            renderer = PlainEventRenderer.INSTANCE,
+        )
         val parameters = config.parameters.associate {
-            it.name to SimpleExpand.expand(it.value, templateParameters)
+            it.name to eventTemplatingService.render(
+                template = it.value,
+                event = event,
+                renderer = PlainEventRenderer.INSTANCE
+            )
         }
         val error = when (config.callMode) {
             JenkinsNotificationChannelConfigCallMode.ASYNC -> launchAsync(jenkinsClient, job, parameters)

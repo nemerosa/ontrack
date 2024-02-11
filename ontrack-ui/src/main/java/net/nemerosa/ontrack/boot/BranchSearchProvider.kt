@@ -63,7 +63,7 @@ class BranchSearchProvider(
                 searchIndexService.updateSearchIndex(this, branch.asSearchItem())
             }
             EventFactory.DELETE_BRANCH -> {
-                val branchId = event.getIntValue("branch_id")
+                val branchId = event.getIntValue("BRANCH_ID")
                 searchIndexService.deleteSearchIndex(this, branchId)
             }
         }

@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.github
 
+import io.mockk.every
+import io.mockk.mockk
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.git.GitExtensionFeature
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory
@@ -13,11 +15,12 @@ import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
 import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
 import net.nemerosa.ontrack.extension.stale.StaleExtensionFeature
-import org.junit.Assert.*
-import org.junit.Before
-import org.junit.Test
-import org.mockito.Mockito.`when`
-import org.mockito.Mockito.mock
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class GitHubIssueServiceExtensionTest {
 
@@ -25,45 +28,46 @@ class GitHubIssueServiceExtensionTest {
     private lateinit var configuration: IssueServiceConfiguration
     private lateinit var configurationService: GitHubConfigurationService
 
-    @Before
+    @BeforeEach
     fun init() {
-        configurationService = mock(GitHubConfigurationService::class.java)
-        val gitHubClientFactory = mock(OntrackGitHubClientFactory::class.java)
-        val issueExportServiceFactory = mock(IssueExportServiceFactory::class.java)
+        configurationService = mockk<GitHubConfigurationService>()
+        val gitHubClientFactory = mockk<OntrackGitHubClientFactory>()
+        val issueExportServiceFactory = mockk<IssueExportServiceFactory>()
         extension = GitHubIssueServiceExtension(
-                GitHubExtensionFeature(GitExtensionFeature(SCMExtensionFeature(), StaleExtensionFeature())),
-                configurationService,
-                gitHubClientFactory,
-                issueExportServiceFactory
+            GitHubExtensionFeature(GitExtensionFeature(SCMExtensionFeature(), StaleExtensionFeature())),
+            configurationService,
+            gitHubClientFactory,
+            issueExportServiceFactory
         )
         val engineConfiguration = GitHubEngineConfiguration(
-                "test",
-                "url",
-                "",
-                "",
-                ""
+            "test",
+            "url",
+            "",
+            "",
+            ""
         )
         configuration = GitHubIssueServiceConfiguration(
-                engineConfiguration,
-                "nemerosa/ontrack"
+            engineConfiguration,
+            "nemerosa/ontrack"
         )
     }
 
     @Test
     fun issueServiceIdentifierContainsBothConfigurationAndRepository() {
-        `when`(configurationService.getConfiguration("Test")).thenReturn(
-                GitHubEngineConfiguration(
-                        "Test", null, null, null, null
-                )
+        every {
+            configurationService.getConfiguration("Test")
+        } returns GitHubEngineConfiguration(
+            "Test", null, null, null, null
         )
         val configuration = extension.getConfigurationByName("Test:nemerosa/ontrack")
-        assertEquals("github", configuration.serviceId)
-        assertEquals("Test:nemerosa/ontrack", configuration.name)
-        assertTrue(configuration is GitHubIssueServiceConfiguration)
-        val issueServiceConfiguration = configuration as GitHubIssueServiceConfiguration
-        assertEquals("Test", issueServiceConfiguration.configuration.name)
-        assertEquals("https://github.com", issueServiceConfiguration.configuration.url)
-        assertEquals("nemerosa/ontrack", issueServiceConfiguration.repository)
+        assertNotNull(configuration) {
+            assertEquals("github", it.serviceId)
+            assertEquals("Test:nemerosa/ontrack", it.name)
+            assertTrue(configuration is GitHubIssueServiceConfiguration)
+            assertEquals("Test", configuration.configuration.name)
+            assertEquals("https://github.com", configuration.configuration.url)
+            assertEquals("nemerosa/ontrack", configuration.repository)
+        }
     }
 
     @Test
@@ -96,8 +100,8 @@ class GitHubIssueServiceExtensionTest {
     fun extractIssueKeysFromMessage_one() {
         val keys = extension.extractIssueKeysFromMessage(configuration, "#12 One GitHub issue")
         assertEquals(
-                setOf("12"),
-                keys
+            setOf("12"),
+            keys
         )
     }
 
@@ -105,8 +109,8 @@ class GitHubIssueServiceExtensionTest {
     fun extractIssueKeysFromMessage_two() {
         val keys = extension.extractIssueKeysFromMessage(configuration, "#12 Two GitHub #45 issue")
         assertEquals(
-                setOf("12", "45"),
-                keys
+            setOf("12", "45"),
+            keys
         )
     }
 
@@ -124,18 +128,18 @@ class GitHubIssueServiceExtensionTest {
     @Test
     fun `Message regular expression`() {
         val issue = GitHubIssue(
-                id = 625,
-                url = "...",
-                summary = "...",
-                body = "...",
-                bodyHtml = "...",
-                assignee = GitHubUser("login", "..."),
-                labels = emptyList(),
-                state = GitHubState.open,
-                milestone = null,
-                createdAt = Time.now(),
-                updateTime = Time.now(),
-                closedAt = null
+            id = 625,
+            url = "...",
+            summary = "...",
+            body = "...",
+            bodyHtml = "...",
+            assignee = GitHubUser("login", "..."),
+            labels = emptyList(),
+            state = GitHubState.open,
+            milestone = null,
+            createdAt = Time.now(),
+            updateTime = Time.now(),
+            closedAt = null
         )
         val regex = extension.getMessageRegex(configuration, issue).toRegex()
         kotlin.test.assertTrue(regex.containsMatchIn("#625"))

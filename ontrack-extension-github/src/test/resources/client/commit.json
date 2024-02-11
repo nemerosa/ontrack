@@ -1,0 +1,79 @@
+{
+  "sha": "215b979b3e1f4c484e3e3d1af4330baf8e95f4c4",
+  "node_id": "C_kwDOGMj0ztoAKDIxNWI5NzliM2UxZjRjNDg0ZTNlM2QxYWY0MzMwYmFmOGU5NWY0YzQ",
+  "commit": {
+    "author": {
+      "name": "Damien Coraboeuf",
+      "email": "damien.coraboeuf@nemerosa.com",
+      "date": "2021-11-09T15:54:03Z"
+    },
+    "committer": {
+      "name": "GitHub",
+      "email": "noreply@github.com",
+      "date": "2021-11-09T15:54:03Z"
+    },
+    "message": "nemerosa/ontrack#928 Sample GitHub ingestion configuration file",
+    "tree": {
+      "sha": "5b45b20f168103482f67d43f318d391800b43787",
+      "url": "https://api.github.com/repos/nemerosa/ontrack-github-integration-test/git/trees/5b45b20f168103482f67d43f318d391800b43787"
+    },
+    "url": "https://api.github.com/repos/nemerosa/ontrack-github-integration-test/git/commits/215b979b3e1f4c484e3e3d1af4330baf8e95f4c4",
+    "comment_count": 0,
+    "verification": {
+      "verified": true,
+      "reason": "valid",
+      "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsBcBAABCAAQBQJhipmbCRBK7hj4Ov3rIwAAgkMIAGdNOOijmz8E6OXFRYQk8PJ0\nmvq1qyy7K5zhYBg9CYpuK8XIMlmMWvtTiy+cqCXouqQ2xgYB1Jr+ahGlwaipdFBv\nMBtjk+EM5LTKNrIIQWEnDUhpnMWKnEgrVjSMXiN/10iIo37QpKAJWXc2DrHh8fD7\nKoYGxONYro1kpis49pVhvTtLdXnZEm1gQszT/m2vbNGmXMykt9gFjOjT3Qf+0qF8\nlENh+OVy3lHA3nRIHqSVVvLLjEeH/g7JdRgcBtSoSZPHsFMlj3c8UrFeNW3fq5/E\n5/kXJXdc7ubew2qaWi9T4Ivhu++Q/Qo8vAnatqgLjR4qRbVF2QUwj7px05+54GY=\n=545h\n-----END PGP SIGNATURE-----\n",
+      "payload": "tree 5b45b20f168103482f67d43f318d391800b43787\nparent 5b0db7c7132eaf29820b42aef3a018a47e1f411f\nauthor Damien Coraboeuf <damien.coraboeuf@nemerosa.com> 1636473243 +0100\ncommitter GitHub <noreply@github.com> 1636473243 +0100\n\nnemerosa/ontrack#928 Sample GitHub ingestion configuration file"
+    }
+  },
+  "url": "https://api.github.com/repos/nemerosa/ontrack-github-integration-test/commits/215b979b3e1f4c484e3e3d1af4330baf8e95f4c4",
+  "html_url": "https://github.com/nemerosa/ontrack-github-integration-test/commit/215b979b3e1f4c484e3e3d1af4330baf8e95f4c4",
+  "comments_url": "https://api.github.com/repos/nemerosa/ontrack-github-integration-test/commits/215b979b3e1f4c484e3e3d1af4330baf8e95f4c4/comments",
+  "author": {
+    "login": "dcoraboeuf",
+    "id": 1206964,
+    "node_id": "MDQ6VXNlcjEyMDY5NjQ=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1206964?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/dcoraboeuf",
+    "html_url": "https://github.com/dcoraboeuf",
+    "followers_url": "https://api.github.com/users/dcoraboeuf/followers",
+    "following_url": "https://api.github.com/users/dcoraboeuf/following{/other_user}",
+    "gists_url": "https://api.github.com/users/dcoraboeuf/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/dcoraboeuf/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/dcoraboeuf/subscriptions",
+    "organizations_url": "https://api.github.com/users/dcoraboeuf/orgs",
+    "repos_url": "https://api.github.com/users/dcoraboeuf/repos",
+    "events_url": "https://api.github.com/users/dcoraboeuf/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/dcoraboeuf/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "committer": {
+    "login": "web-flow",
+    "id": 19864447,
+    "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/web-flow",
+    "html_url": "https://github.com/web-flow",
+    "followers_url": "https://api.github.com/users/web-flow/followers",
+    "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+    "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+    "organizations_url": "https://api.github.com/users/web-flow/orgs",
+    "repos_url": "https://api.github.com/users/web-flow/repos",
+    "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/web-flow/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "parents": [
+    {
+      "sha": "5b0db7c7132eaf29820b42aef3a018a47e1f411f",
+      "url": "https://api.github.com/repos/nemerosa/ontrack-github-integration-test/commits/5b0db7c7132eaf29820b42aef3a018a47e1f411f",
+      "html_url": "https://github.com/nemerosa/ontrack-github-integration-test/commit/5b0db7c7132eaf29820b42aef3a018a47e1f411f"
+    }
+  ]
+}

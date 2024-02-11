@@ -47,6 +47,7 @@ class AutoVersioningConfigurationServiceImpl(
             channel = notification.channel,
             channelConfig = notification.config,
             disabled = false,
+            contentTemplate = notification.notificationTemplate,
             origin = AutoVersioningNotification.ORIGIN,
         )
     }

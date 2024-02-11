@@ -96,11 +96,13 @@ interface GitService : SCMService {
     /**
      * Change log
      */
+    @Deprecated("Will be removed in V5. Use the SCMChangeLogService instead.")
     fun changeLog(request: BuildDiffRequest): GitChangeLog
 
     /**
      * Change log commits
      */
+    @Deprecated("Will be removed in V5. Use the SCMChangeLogService instead.")
     fun getChangeLogCommits(
         changeLog: GitChangeLog,
     ): GitChangeLogCommits
@@ -108,16 +110,19 @@ interface GitService : SCMService {
     /**
      * Change log issues IDs
      */
+    @Deprecated("Will be removed in V5. Use the SCMChangeLogService instead.")
     fun getChangeLogIssuesIds(changeLog: GitChangeLog): List<String>
 
     /**
      * Change log issues
      */
+    @Deprecated("Will be removed in V5. Use the SCMChangeLogService instead.")
     fun getChangeLogIssues(changeLog: GitChangeLog): GitChangeLogIssues
 
     /**
      * Change log files
      */
+    @Deprecated("Will be removed in V5. Use the SCMChangeLogService instead.")
     fun getChangeLogFiles(changeLog: GitChangeLog): GitChangeLogFiles
 
     /**

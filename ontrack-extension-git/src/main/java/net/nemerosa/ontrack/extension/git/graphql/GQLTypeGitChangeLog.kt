@@ -11,17 +11,11 @@ import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest
 import net.nemerosa.ontrack.extension.git.GitChangeLogCache
 import net.nemerosa.ontrack.extension.git.model.GitChangeLog
 import net.nemerosa.ontrack.extension.git.service.GitService
-import net.nemerosa.ontrack.extension.scm.service.SCMDetector
-import net.nemerosa.ontrack.graphql.schema.GQLType
-import net.nemerosa.ontrack.graphql.schema.GQLTypeBuild
-import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
-import net.nemerosa.ontrack.graphql.schema.GQLTypeProject
+import net.nemerosa.ontrack.graphql.schema.*
 import net.nemerosa.ontrack.graphql.support.*
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.structure.Build
-import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.LinkChangeService
-import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
 
 /**

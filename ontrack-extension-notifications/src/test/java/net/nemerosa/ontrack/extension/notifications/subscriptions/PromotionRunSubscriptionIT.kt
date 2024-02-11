@@ -26,6 +26,7 @@ class PromotionRunSubscriptionIT : AbstractNotificationTestSupport() {
                             projectEntity = this, // The branch
                             keywords = silver.name, // Promotion level name
                             origin = "test",
+                        contentTemplate = null,
                             EventFactory.NEW_PROMOTION_RUN
                     )
                     build {

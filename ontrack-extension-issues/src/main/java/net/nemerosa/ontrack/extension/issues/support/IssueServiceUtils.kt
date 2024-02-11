@@ -35,6 +35,7 @@ object IssueServiceUtils {
     }
 
     @JvmStatic
+    @Deprecated("Will be removed in V5. Use the SCM change log service.")
     fun groupIssues(
             issueServiceConfiguration: IssueServiceConfiguration,
             issues: List<Issue>,

@@ -19,6 +19,7 @@ fun <C> EventSubscriptionService.subscribe(
     projectEntity: ProjectEntity?,
     keywords: String?,
     origin: String,
+    contentTemplate: String?,
     vararg eventTypes: EventType,
 ) = subscribe(
     EventSubscription(
@@ -29,6 +30,7 @@ fun <C> EventSubscriptionService.subscribe(
         keywords = keywords,
         disabled = false,
         origin = origin,
+        contentTemplate = contentTemplate,
     )
 )
 

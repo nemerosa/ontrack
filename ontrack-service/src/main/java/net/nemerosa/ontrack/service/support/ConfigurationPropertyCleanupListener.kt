@@ -24,8 +24,8 @@ class ConfigurationPropertyCleanupListener(
 
     override fun onEvent(event: Event) {
         if (event.eventType === EventFactory.DELETE_CONFIGURATION) {
-            val configurationName = event.getValue("configuration")
-            val configurationType = event.getValue("configurationType")
+            val configurationName = event.getValue("CONFIGURATION")
+            val configurationType = event.getValue("CONFIGURATION_TYPE")
             cleanup(configurationName, configurationType)
         }
     }

@@ -1,4 +1,4 @@
-import {Space, Typography} from "antd";
+import {Space, Tooltip, Typography} from "antd";
 import {FaEquals, FaMinus, FaNotEqual, FaPlus} from "react-icons/fa";
 import Link from "next/link";
 import {scmChangeLogUri} from "@components/common/Links";
@@ -36,12 +36,28 @@ export default function ChangeLogSignLink({from, to}) {
             {
                 from && to && from.id !== to.id &&
                 <Space>
-                    <FaNotEqual color="orange"/>
-                    <Link href={scmChangeLogUri(from.branch.scmBranchInfo.type, from.id, to.id)}>
-                        <Typography.Link>
-                            Change log
-                        </Typography.Link>
-                    </Link>
+                    {
+                        from.branch.scmBranchInfo?.changeLogs &&
+                        <>
+                            <FaNotEqual color="orange"/>
+                            <Link href={scmChangeLogUri(from.id, to.id)}>
+                                <Typography.Link>
+                                    Change log
+                                </Typography.Link>
+                            </Link>
+                        </>
+                    }
+                    {
+                        !from.branch.scmBranchInfo?.changeLogs &&
+                        <>
+                            <FaNotEqual color="red"/>
+                            <Tooltip title="Builds are different but no change is available.">
+                                <Typography.Text disabled>
+                                    Change log
+                                </Typography.Text>
+                            </Tooltip>
+                        </>
+                    }
                 </Space>
             }
         </>

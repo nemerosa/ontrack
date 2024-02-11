@@ -1,0 +1,16 @@
+[[event-disable_project]]
+===== disable_project
+
+When a project is disabled.
+
+Context:
+
+* `project` - project - Disabled project
+
+Default template:
+
+[source]
+----
+Project ${project} has been disabled.
+----
+

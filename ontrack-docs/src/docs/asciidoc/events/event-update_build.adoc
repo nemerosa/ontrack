@@ -1,0 +1,18 @@
+[[event-update_build]]
+===== update_build
+
+When a build is updated.
+
+Context:
+
+* `project` - project - Build's project
+* `branch` - branch - Build's branch
+* `build` - build - Updated build
+
+Default template:
+
+[source]
+----
+Build ${build} for branch ${branch} in ${project} has been updated.
+----
+

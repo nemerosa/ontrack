@@ -188,7 +188,7 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
     }
 
     @Test
-    fun rendering() {
+    fun `Rendering without a template`() {
         val target = uid("t")
         project {
             casc(
@@ -234,6 +234,7 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                                     "target" to "$target-silver"
                                 ),
                                 "disabled" to null,
+                                "contentTemplate" to null,
                             ),
                             mapOf(
                                 "events" to listOf("new_promotion_run"),
@@ -243,6 +244,60 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                                     "target" to "$target-gold"
                                 ),
                                 "disabled" to null,
+                                "contentTemplate" to null,
+                            ),
+                        )
+                    )
+                ).asJson(),
+                json
+            )
+        }
+    }
+
+    @Test
+    fun `Rendering with a template`() {
+        val target = uid("t")
+        project {
+            casc(
+                """
+                    ontrack:
+                        extensions:
+                            notifications:
+                                entity-subscriptions:
+                                    - entity:
+                                        project: $name
+                                      subscriptions:
+                                        - events:
+                                            - new_promotion_run
+                                          keywords: "SILVER"
+                                          channel: mock
+                                          channel-config:
+                                            target: "$target-silver"
+                                          contentTemplate: |
+                                            This is my template.
+                """.trimIndent()
+            )
+            // Rendering
+            val json = entitySubscriptionsCascContext.render()
+            assertEquals(
+                listOf(
+                    mapOf(
+                        "entity" to mapOf(
+                            "project" to name,
+                            "branch" to null,
+                            "promotion" to null,
+                            "validation" to null,
+                        ),
+                        "subscriptions" to listOf(
+                            mapOf(
+                                "events" to listOf("new_promotion_run"),
+                                "keywords" to "SILVER",
+                                "channel" to "mock",
+                                "channel-config" to mapOf(
+                                    "target" to "$target-silver"
+                                ),
+                                "disabled" to null,
+                                "contentTemplate" to "This is my template.",
                             ),
                         )
                     )
@@ -713,6 +768,82 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
     }
 
     @Test
+    fun `Subscription for a promotion with some content template`() {
+        val target = uid("t")
+        project {
+            branch {
+                val pl = promotionLevel()
+                casc(
+                    """
+                        ontrack:
+                            extensions:
+                                notifications:
+                                    entity-subscriptions:
+                                        - entity:
+                                            project: ${pl.project.name}
+                                            branch: ${pl.branch.name}
+                                            promotion: ${pl.name}
+                                          subscriptions:
+                                            - events:
+                                                - new_promotion_run
+                                              keywords: ""
+                                              channel: mock
+                                              channel-config:
+                                                target: "$target"
+                                              contentTemplate: |
+                                                Change log for ${'$'}{build.release}
+                                                
+                                                ${'$'}{changelog?format=text}
+                                                
+                                                ${'$'}{changelog?format=text&project=dep-01}
+                    """.trimIndent()
+                )
+                // Checks that we can find this subscription
+                asAdmin {
+                    val subscriptions = eventSubscriptionService.filterSubscriptions(
+                        EventSubscriptionFilter(
+                            entity = pl.toProjectEntityID(),
+                            origin = "casc",
+                        )
+                    )
+                    assertEquals(1, subscriptions.pageItems.size)
+                    val subscription = subscriptions.pageItems.first()
+                    assertEquals(
+                        setOf("new_promotion_run"),
+                        subscription.data.events
+                    )
+                    assertEquals(
+                        "",
+                        subscription.data.keywords
+                    )
+                    assertEquals(
+                        "mock",
+                        subscription.data.channel
+                    )
+                    assertEquals(
+                        mapOf("target" to target).asJson(),
+                        subscription.data.channelConfig
+                    )
+                    assertEquals(
+                        false,
+                        subscription.data.disabled
+                    )
+                    assertEquals(
+                        """
+                            Change log for ${'$'}{build.release}
+                            
+                            ${'$'}{changelog?format=text}
+                            
+                            ${'$'}{changelog?format=text&project=dep-01}
+                        """.trimIndent(),
+                        subscription.data.contentTemplate
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Duplicated entity`() {
         val target = uid("t")
         project {
@@ -744,10 +875,12 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                     """
                 )
             }
-            assertEquals("""
+            assertEquals(
+                """
                 Duplicate entities in the notifications:
                  * $name
-            """.trimIndent(), ex.message)
+            """.trimIndent(), ex.message
+            )
         }
     }
 

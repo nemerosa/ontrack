@@ -14,6 +14,7 @@ abstract class AbstractACCDSLNotificationsTestSupport : AbstractACCDSLTestSuppor
         channelConfig: Any,
         keywords: String?,
         events: List<String>,
+        contentTemplate: String? = null,
     ) {
         ontrack.notifications.subscribe(
             channel,
@@ -21,6 +22,7 @@ abstract class AbstractACCDSLNotificationsTestSupport : AbstractACCDSLTestSuppor
             keywords,
             events,
             projectEntity = this,
+            contentTemplate = contentTemplate,
         )
     }
 

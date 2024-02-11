@@ -86,6 +86,4 @@ public abstract class AbstractIssueServiceExtension extends AbstractExtension im
         return "(?:\\s|^)(" + displayKey + ")(?:[^\\d]|$)";
     }
 
-    protected abstract Set<String> getIssueTypes(IssueServiceConfiguration issueServiceConfiguration, Issue issue);
-
 }

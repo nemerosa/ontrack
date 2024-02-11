@@ -1,0 +1,22 @@
+[[event-new_validation_run]]
+===== new_validation_run
+
+When a build is validated.
+
+Context:
+
+* `project` - project - Project
+* `branch` - branch - Branch
+* `build` - build - Validated build
+* `validationStamp` - validation stamp - Validation stamp
+* `validationRun` - validation run - Validation run
+* `STATUS` - string - ID of the validation run status
+* `STATUS_NAME` - string - Name of the validation run status
+
+Default template:
+
+[source]
+----
+Build ${build} has run for the ${validationStamp} with status ${STATUS_NAME} in branch ${branch} in ${project}.
+----
+

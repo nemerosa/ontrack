@@ -1,0 +1,16 @@
+[[event-new_project]]
+===== new_project
+
+When a project is created.
+
+Context:
+
+* `project` - project - Created project
+
+Default template:
+
+[source]
+----
+New project ${project}.
+----
+
