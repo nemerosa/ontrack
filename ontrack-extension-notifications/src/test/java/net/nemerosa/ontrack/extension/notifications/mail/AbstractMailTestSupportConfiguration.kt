@@ -38,9 +38,11 @@ class AbstractMailTestSupportConfiguration(
 
     @Bean
     fun mailNotificationChannel(
+        javaMailSender: JavaMailSender,
         mailService: MailService,
         htmlNotificationEventRenderer: HtmlNotificationEventRenderer,
     ) = MailNotificationChannel(
+        javaMailSender,
         mailService,
         htmlNotificationEventRenderer,
         eventTemplatingService,
