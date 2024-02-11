@@ -36,7 +36,7 @@ class RegexBranchSourceTest {
         val dependency = BranchFixtures.testBranch()
         val target = BranchFixtures.testBranch()
         assertFailsWith<BranchSourceMissingConfigurationException> {
-            regexBranchSource.getLatestBranch(null, dependency.project, target)
+            regexBranchSource.getLatestBranch(null, dependency.project, target, "ANY")
         }
     }
 
@@ -54,7 +54,7 @@ class RegexBranchSourceTest {
         )
 
         val target = BranchFixtures.testBranch()
-        val latest = regexBranchSource.getLatestBranch("release/1\\.1.*", dependencyProject, target)
+        val latest = regexBranchSource.getLatestBranch("release/1\\.1.*", dependencyProject, target, "ANY")
         assertEquals(dependency12, latest)
     }
 

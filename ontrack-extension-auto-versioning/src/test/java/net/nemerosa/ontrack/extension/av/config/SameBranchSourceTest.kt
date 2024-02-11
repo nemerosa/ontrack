@@ -29,7 +29,7 @@ class SameBranchSourceTest {
 
         every { structureService.findBranchByName(dependency.project.name, dependency.name) } returns Optional.of(dependency)
 
-        val latest = source.getLatestBranch(null, dependency.project, parent)
+        val latest = source.getLatestBranch(null, dependency.project, parent, "ANY")
         assertEquals(dependency, latest)
     }
 
@@ -40,7 +40,7 @@ class SameBranchSourceTest {
 
         every { structureService.findBranchByName(dependency.project.name, dependency.name) } returns Optional.empty()
 
-        val latest = source.getLatestBranch(null, dependency.project, parent)
+        val latest = source.getLatestBranch(null, dependency.project, parent, "ANY")
         assertEquals(null, latest)
     }
 

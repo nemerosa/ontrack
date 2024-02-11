@@ -13,10 +13,11 @@ interface AutoVersioningBranchExpressionService {
      * as the [eligibleTargetBranch] branch in the [project] source project.
      *
      * @param eligibleTargetBranch Eligible target branch for auto versioning
+     * @param promotion Promotion being done
      * @param project Source project where to look for the branch
      * @param avBranchExpression Expression
      * @return Eligible source branch
      */
-    fun getLatestBranch(eligibleTargetBranch: Branch, project: Project, avBranchExpression: String): Branch?
+    fun getLatestBranch(eligibleTargetBranch: Branch, promotion: String, project: Project, avBranchExpression: String): Branch?
 
 }

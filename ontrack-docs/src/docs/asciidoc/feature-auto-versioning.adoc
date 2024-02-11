@@ -251,6 +251,37 @@ Example: if you have a branch `release-1.24` on a parent project `P` and you wan
 sourceBranch: "&same"
 ----
 
+====== `&most-recent`
+
+Two branches (`release/1.1` & `release/1.2`) are available for a project which is dependency of an auto versioned parent project with the following default branch source:
+
+[source,yaml]
+----
+branch: 'release\/1\..*'
+----
+
+In this scenario, no promotion has been granted yet in `release 1.2` of the dependency.
+
+When 1.1 is promoted, Ontrack identifies a branch on the parent project to be a potential candidate for auto versioning.
+
+This branch is configured to accept only the latest `release/1.*` branch, which is - now - the `release/1.2`.
+
+Therefore, a 1.1 promotion is no longer eligible as soon as the 1.2 branch was created (and registered in Ontrack).
+
+What exactly do we want to achieve? In this scenario, we always want the version promoted in 1.1 as long as there is none in 1.2. Let's imagine we promote a 1.1 while 1.2 was already promoted, what then? How do we protect ourselves?
+
+The idea is to accept a promotion as long as there is no such a promotion in later branches.
+
+* a 1.1 is promoted and there is no such promotion in more recent branches (1.2, etc.) - we accept it
+* a 1.1 is promoted and there is already such a promotion in a more recent branch (1.2 for example) - we reject it
+
+To implement this strategy, we have to use:
+
+[source,yaml]
+----
+branch: '&most-recent:release\/1\..*'
+----
+
 ====== `&same-release`
 
 On the same model as the "&same" `sourceBranch` parameter, there is the possibility to get a "&same-release" branch source.
