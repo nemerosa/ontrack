@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.api.support.TestConfiguration
 import net.nemerosa.ontrack.extension.api.support.TestConfiguration.Companion.config
 import net.nemerosa.ontrack.extension.api.support.TestConfigurationService
 import net.nemerosa.ontrack.extension.api.support.TestConfigurationServiceImpl
+import net.nemerosa.ontrack.it.MockSecurityService
 import net.nemerosa.ontrack.model.events.Event.Companion.of
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventPostService
@@ -14,6 +15,7 @@ import net.nemerosa.ontrack.model.security.EncryptionService
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.ConfigurationRepository
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
+import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -27,10 +29,18 @@ class ConfigurationServiceTest {
 
     @BeforeEach
     fun before() {
-        configurationRepository = mockk<ConfigurationRepository>()
-        val securityService = mockk<SecurityService>()
-        encryptionService = mockk<EncryptionService>()
-        eventPostService = mockk<EventPostService>()
+        configurationRepository = mockk<ConfigurationRepository>(relaxed = true)
+
+        every {
+            configurationRepository.find(
+                TestConfiguration::class.java,
+                any()
+            )
+        } returns null
+
+        val securityService = MockSecurityService()
+        encryptionService = mockk<EncryptionService>(relaxed = true)
+        eventPostService = mockk<EventPostService>(relaxed = true)
         eventFactory = mockk<EventFactory>()
         val ontrackConfigProperties = OntrackConfigProperties()
         configurationService = TestConfigurationServiceImpl(
@@ -45,8 +55,10 @@ class ConfigurationServiceTest {
 
     @Test
     fun event_on_new_configuration() {
-        val config = config("test")
-        val event = of(EventFactory.NEW_CONFIGURATION).with("CONFIGURATION", "test").build()
+        val name = uid("cfg-")
+        val config = config(name)
+        val event = of(EventFactory.NEW_CONFIGURATION).with("CONFIGURATION", name).build()
+
         every { eventFactory.newConfiguration(config) } returns event
         configurationService.newConfiguration(config)
         verify {
@@ -58,14 +70,17 @@ class ConfigurationServiceTest {
     fun event_on_update_configuration() {
         val config = config("test")
         val event = of(EventFactory.UPDATE_CONFIGURATION).with("CONFIGURATION", "test").build()
+
         every {
             eventFactory.updateConfiguration(config)
         } returns event
+
         every {
             configurationRepository.find(
                 TestConfiguration::class.java, "test"
             )
         } returns config
+
         configurationService.updateConfiguration("test", config)
         verify {
             eventPostService.post(event)
