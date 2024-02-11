@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component
 @DocumentationExampleCode("${'$'}{branch.qualifiedLongName}")
 class EntityQualifiedLongNameTemplatingSource : TemplatingSource {
 
-    override fun validFor(projectEntityType: ProjectEntityType): Boolean = true
+    override val types: Set<ProjectEntityType> = ProjectEntityType.values().toSet()
 
     override val field: String = "qualifiedLongName"
 

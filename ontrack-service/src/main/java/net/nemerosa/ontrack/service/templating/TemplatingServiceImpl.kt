@@ -16,9 +16,9 @@ class TemplatingServiceImpl(
     private val ontrackConfigProperties: OntrackConfigProperties,
 ) : TemplatingService {
 
-    private val sourcesPerProjectEntityType = ProjectEntityType.values().associate { type ->
-        type to templatingSources.filter { source ->
-            source.validFor(type)
+    private val sourcesPerProjectEntityType = ProjectEntityType.values().associateWith { type ->
+        templatingSources.filter { source ->
+            type in source.types
         }
     }
 

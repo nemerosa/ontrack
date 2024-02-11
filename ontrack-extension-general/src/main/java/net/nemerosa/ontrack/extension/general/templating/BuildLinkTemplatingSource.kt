@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component
  * Given a [build][Build], returns the name of a linked build.
  */
 @Component
-@APIDescription("Gettings a linked build and displaying its name or release name.")
+@APIDescription("Getting a linked build and displaying its name or release name.")
 @Documentation(BuildLinkTemplatingSourceDocumentation::class)
 @DocumentationExampleCode("${'$'}{build.linked?project=dependency&mode=auto}")
 class BuildLinkTemplatingSource(

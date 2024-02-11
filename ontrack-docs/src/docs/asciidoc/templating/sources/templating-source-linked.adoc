@@ -1,7 +1,13 @@
 [[templating-source-linked]]
 ==== linked
 
-Gettings a linked build and displaying its name or release name.
+Getting a linked build and displaying its name or release name.
+
+Applicable for:
+
+* build
+
+Configuration:
 
 * **mode** - How to the linked build must be rendered.
 

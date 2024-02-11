@@ -140,6 +140,7 @@ class DocumentationGenerationIT : AbstractDSLTestSupport() {
         val description = getAPITypeDescription(templatingSource::class)
         val parameters = getFieldsDocumentation(templatingSource::class)
         val example = getDocumentationExampleCode(templatingSource::class)
+        val types = templatingSource.types
 
         val fileId = "templating-source-$field"
 
@@ -150,7 +151,13 @@ class DocumentationGenerationIT : AbstractDSLTestSupport() {
             header = description,
             fields = parameters,
             example = example,
-        )
+        ) { s ->
+            s.append("Applicable for:\n\n")
+            types.forEach { type ->
+                s.append("* ").append(type.displayName).append("\n")
+            }
+            s.append("\n")
+        }
     }
 
     private class DirectoryContext(
@@ -184,6 +191,7 @@ class DocumentationGenerationIT : AbstractDSLTestSupport() {
             header: String?,
             fields: Map<String, String>,
             example: String?,
+            extendedHeader: (s: StringBuilder) -> Unit = {},
         ) {
             writeFile(
                 fileId = fileId,
@@ -195,9 +203,14 @@ class DocumentationGenerationIT : AbstractDSLTestSupport() {
                     s.append(header.trimIndent()).append("\n").append("\n")
                 }
 
-                fields.toSortedMap().forEach { (name, description) ->
-                    s.append("* **").append(name).append("** - ").append(description.trimIndent()).append("\n")
-                        .append("\n")
+                extendedHeader(s)
+
+                if (fields.isNotEmpty()) {
+                    s.append("Configuration:\n\n")
+                    fields.toSortedMap().forEach { (name, description) ->
+                        s.append("* **").append(name).append("** - ").append(description.trimIndent()).append("\n")
+                            .append("\n")
+                    }
                 }
 
                 if (!example.isNullOrBlank()) {

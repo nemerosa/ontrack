@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.model.structure.ProjectEntityType
 
 abstract class AbstractTemplatingSource(
     override val field: String,
-    private val types: Set<ProjectEntityType>,
+    override val types: Set<ProjectEntityType>,
 ) : TemplatingSource {
 
     constructor(
@@ -14,8 +14,5 @@ abstract class AbstractTemplatingSource(
         field = field,
         types = setOf(type)
     )
-
-    override fun validFor(projectEntityType: ProjectEntityType): Boolean =
-        projectEntityType in types
 
 }

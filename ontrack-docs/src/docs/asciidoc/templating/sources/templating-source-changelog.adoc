@@ -15,6 +15,12 @@ If `project` is set to a comma-separated list of strings, the change log will be
 for the recursive links, in the order to the projects being set (going deeper and deeper
 in the links). 
 
+Applicable for:
+
+* promotion run
+
+Configuration:
+
 * **acrossBranches** - By default, if a previous promotion is not found on the current branch, it'll be looked for in all branches of the projects. Set this parameter to `false` to disable this behaviour.
 
 * **projects** - Use a comma-separated list of projects to get a deep changelog.

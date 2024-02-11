@@ -3,6 +3,10 @@
 
 Gets the SCM branch associated with a branch. Renders an empty string if there is none.
 
+Applicable for:
+
+* branch
+
 Example:
 
 [source]

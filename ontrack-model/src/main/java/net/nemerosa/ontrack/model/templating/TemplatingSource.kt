@@ -9,7 +9,7 @@ import net.nemerosa.ontrack.model.structure.ProjectEntityType
  */
 interface TemplatingSource {
 
-    fun validFor(projectEntityType: ProjectEntityType): Boolean
+    val types: Set<ProjectEntityType>
 
     val field: String
 
