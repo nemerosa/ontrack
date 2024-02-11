@@ -119,12 +119,13 @@ test('JIRA SCM change log', async ({page, context}) => {
      */
 
     await changeLogPage.selectExportFormat('Markdown')
+    await changeLogPage.launchExport()
     await changeLogPage.checkExportedContent(
         trimIndent(
             `
-                * [ISS-21](mock://$repositoryName/issue/ISS-21) Some new feature
-                * [ISS-22](mock://$repositoryName/issue/ISS-22) Some fixes are needed
-                * [ISS-23](mock://$repositoryName/issue/ISS-23) Some nicer UI
+                * [ISS-21](mock://jira/ISS/ISS-21) Some new feature
+                * [ISS-22](mock://jira/ISS/ISS-22) Some fixes are needed
+                * [ISS-23](mock://jira/ISS/ISS-23) Some nicer UI
             `
         )
     )
