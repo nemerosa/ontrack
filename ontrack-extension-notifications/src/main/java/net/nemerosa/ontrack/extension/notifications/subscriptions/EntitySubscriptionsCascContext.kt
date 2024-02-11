@@ -209,7 +209,7 @@ class EntitySubscriptionsCascContext(
                 channelConfig = subscription.channelConfig,
                 disabled = subscription.disabled ?: false,
                 origin = EventSubscriptionOrigins.CASC,
-                contentTemplate = subscription.contentTemplate,
+                contentTemplate = subscription.contentTemplate?.trimIndent(),
             )
         )
     }

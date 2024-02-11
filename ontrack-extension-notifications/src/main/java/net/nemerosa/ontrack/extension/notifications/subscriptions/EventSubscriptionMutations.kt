@@ -170,7 +170,7 @@ class EventSubscriptionMutations(
                 keywords = keywords,
                 disabled = false,
                 origin = EventSubscriptionOrigins.API,
-                contentTemplate = contentTemplate,
+                contentTemplate = contentTemplate?.trimIndent(),
             )
         )
         return EventSubscriptionPayload(
