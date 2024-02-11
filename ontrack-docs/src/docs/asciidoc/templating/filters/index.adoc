@@ -3,10 +3,10 @@
 
 * <<templating-filter-lowercase,lowercase>>
 * <<templating-filter-strong,strong>>
-* <<templating-filter-urlencode,urlencode>>
 * <<templating-filter-uppercase,uppercase>>
+* <<templating-filter-urlencode,urlencode>>
 
 include::templating-filter-lowercase.adoc[]
 include::templating-filter-strong.adoc[]
-include::templating-filter-urlencode.adoc[]
 include::templating-filter-uppercase.adoc[]
+include::templating-filter-urlencode.adoc[]

@@ -1,14 +1,14 @@
 [[appendix-templating-sources-index]]
 ==== List of templating sources
 
-* <<templating-source-release,release>>
+* <<templating-source-changelog,changelog>>
 * <<templating-source-linked,linked>>
 * <<templating-source-qualifiedLongName,qualifiedLongName>>
-* <<templating-source-changelog,changelog>>
+* <<templating-source-release,release>>
 * <<templating-source-scmBranch,scmBranch>>
 
-include::templating-source-release.adoc[]
+include::templating-source-changelog.adoc[]
 include::templating-source-linked.adoc[]
 include::templating-source-qualifiedLongName.adoc[]
-include::templating-source-changelog.adoc[]
+include::templating-source-release.adoc[]
 include::templating-source-scmBranch.adoc[]

@@ -248,11 +248,12 @@ class DocumentationGenerationIT : AbstractDSLTestSupport() {
                 level = level,
                 title = title,
             ) { s ->
-                items.forEach { (id, title) ->
+                val sortedItems = items.toSortedMap()
+                sortedItems.forEach { (id, title) ->
                     s.append("* ").append("<<$id,$title>>\n")
                 }
                 s.append("\n")
-                items.forEach { (id, _) ->
+                sortedItems.forEach { (id, _) ->
                     s.append("include::$id.adoc[]\n")
                 }
             }
