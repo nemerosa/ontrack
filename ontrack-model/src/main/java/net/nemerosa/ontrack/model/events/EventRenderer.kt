@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.model.events
 
 import net.nemerosa.ontrack.model.structure.ProjectEntity
-import net.nemerosa.ontrack.model.support.NameValue
 
 interface EventRenderer {
 
@@ -15,9 +14,6 @@ interface EventRenderer {
      */
     val name: String
 
-    @Deprecated("Will be removed in V5. Use render without event.")
-    fun render(projectEntity: ProjectEntity, event: Event): String = render(projectEntity)
-
     /**
      * Rendering the link to an entity.
      */
@@ -27,13 +23,6 @@ interface EventRenderer {
      * Renders a value and gives it some emphasis.
      */
     fun renderStrong(value: String): String
-
-    @Deprecated("Will be removed in V5. Render text directly without the renderer.")
-    fun render(valueKey: String, value: NameValue, event: Event): String = renderStrong(value.value)
-
-    @Deprecated("Will be removed in V5. Use renderLink witn strings and without event.")
-    fun renderLink(text: NameValue, link: NameValue, event: Event): String =
-        renderLink(text.value, link.value)
 
     /**
      * Renders a link.
