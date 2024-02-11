@@ -180,4 +180,36 @@ export class SCMChangeLogPage {
         }
     }
 
+    async selectExportOptions({format, groups}) {
+        console.log("Filling export config: ", {format, groups})
+        await this.page.getByRole('button', {name: 'ellipsis'}).click()
+        await this.page.getByRole('menuitem', {name: 'Options'}).click()
+
+        const addGroupButton = this.page.getByRole('button', {name: "Add group"})
+        await expect(addGroupButton).toBeVisible()
+
+        // Selecting the format
+        await this.page.getByTestId('format').click()
+        await this.page.getByTitle(format).locator('div').click()
+
+        // Adding all groups
+        for (const groupNumber in groups) {
+            const {group, types} = groups[groupNumber]
+            console.log("Filling group mappings: ", {group, types})
+            await addGroupButton.click()
+            const containerRegex = new RegExp(`^Group ${Number(groupNumber) + 1}`)
+            const container = this.page.locator('div').filter({hasText: containerRegex})
+
+            await this.page.locator(`#groups_${groupNumber}_name`).fill(group)
+
+            for (const typeNumber in types) {
+                const type = types[typeNumber]
+                await container.getByRole('button', {name: 'Add mapping'}).click()
+                await container.locator(`#groups_${groupNumber}_list_${typeNumber}_mapping`).fill(type)
+            }
+        }
+
+        await this.page.getByRole('button', {name: 'OK'}).click()
+    }
+
 }

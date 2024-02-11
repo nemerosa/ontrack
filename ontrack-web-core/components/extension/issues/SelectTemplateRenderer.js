@@ -40,11 +40,13 @@ export default function SelectTemplateRenderer({value, onChange}) {
 
     return (
         <>
-            <Select
-                value={value}
-                onChange={onChange}
-                options={exportFormatOptions}
-            />
+            <div data-testid="format">
+                <Select
+                    value={value}
+                    onChange={onChange}
+                    options={exportFormatOptions}
+                />
+            </div>
         </>
     )
 }

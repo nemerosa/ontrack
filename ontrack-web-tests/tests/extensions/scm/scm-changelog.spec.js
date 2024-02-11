@@ -129,5 +129,42 @@ test('JIRA SCM change log', async ({page, context}) => {
             `
         )
     )
+
+    /**
+     * Exporting the change log for Markdown and grouping parameters
+     */
+
+    await changeLogPage.selectExportOptions({
+        format: 'Markdown',
+        groups: [
+            {
+                group: "Features",
+                types: [
+                    "feature",
+                    "enhancement",
+                ]
+            },
+            {
+                group: "Fixes",
+                types: [
+                    "defect",
+                ]
+            },
+        ]
+    })
     await changeLogPage.launchExport()
+    await changeLogPage.checkExportedContent(
+        trimIndent(
+            `
+                ## Features
+                
+                * [ISS-21](mock://jira/ISS/ISS-21) Some new feature
+                * [ISS-23](mock://jira/ISS/ISS-23) Some nicer UI
+                
+                ## Fixes
+                
+                * [ISS-22](mock://jira/ISS/ISS-22) Some fixes are needed
+            `
+        )
+    )
 })

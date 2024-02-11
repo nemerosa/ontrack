@@ -1,5 +1,5 @@
 import FormDialog, {useFormDialog} from "@components/form/FormDialog";
-import {Button, Card, Form, Input, Space} from "antd";
+import {Button, Card, Form, Input, Space, Typography} from "antd";
 import SelectTemplateRenderer from "@components/extension/issues/SelectTemplateRenderer";
 import {FaPlus, FaTimes, FaTrash} from "react-icons/fa";
 
@@ -80,8 +80,10 @@ export default function IssueChangeLogExportRequestDialog({issueChangeLogExportR
                                                         </Space>
                                                     ))}
                                                     <Button type="dashed" onClick={() => subOpt.add()} block>
-                                                        <FaPlus/>
-                                                        Add mapping
+                                                        <Space>
+                                                            <FaPlus/>
+                                                            <Typography.Text>Add mapping</Typography.Text>
+                                                        </Space>
                                                     </Button>
                                                 </div>
                                             )}
@@ -90,8 +92,10 @@ export default function IssueChangeLogExportRequestDialog({issueChangeLogExportR
                                 </Card>
                             ))}
                             <Button type="dashed" onClick={() => add()} block>
-                                <FaPlus/>
-                                Add group
+                                <Space>
+                                    <FaPlus/>
+                                    <Typography.Text>Add group</Typography.Text>
+                                </Space>
                             </Button>
                         </div>
                     </>
