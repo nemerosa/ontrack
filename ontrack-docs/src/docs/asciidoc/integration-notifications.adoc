@@ -126,6 +126,33 @@ image::integration-notifications-recording-details.png[Notification recording de
 
 Finally, the administrator can filter recordings on their results and the _Delete ALL records_ can be used to clear out all recordings.
 
+[[notifications-examples]]
+==== Examples
+
+This section shows a number of custom templates for some events.
+
+To send a change log on a promotion, subscribe to the <<event-new_promotion_run,`new_promotion_run`>> event and use for example:
+
+[source,text]
+----
+Change log:
+
+${promotionRun.changelog}
+----
+
+If the project builds have linked to a `dependency` project's builds, it may be interesting to follow the links recursively:
+
+[source,text]
+----
+Change log for ${build.release}:
+
+${promotionRun.changelog}
+
+Change log for the dependency:
+
+${promotionRun.changelog?project=dependency}
+----
+
 [[notifications-metrics]]
 ==== Metrics
 
