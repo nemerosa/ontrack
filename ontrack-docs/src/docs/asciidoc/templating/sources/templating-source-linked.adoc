@@ -1,5 +1,5 @@
 [[templating-source-linked]]
-==== linked
+===== linked
 
 Getting a linked build and displaying its name or release name.
 

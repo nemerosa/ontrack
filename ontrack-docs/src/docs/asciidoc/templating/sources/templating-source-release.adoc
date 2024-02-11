@@ -1,5 +1,5 @@
 [[templating-source-release]]
-==== release
+===== release
 
 Gets the release/version/label associated to a build or renders an empty string is there is none.
 

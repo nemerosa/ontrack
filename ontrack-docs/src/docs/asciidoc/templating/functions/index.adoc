@@ -1,0 +1,6 @@
+[[appendix-templating-functions-index]]
+==== List of templating functions
+
+* <<templating-function-link,link>>
+
+include::templating-function-link.adoc[]

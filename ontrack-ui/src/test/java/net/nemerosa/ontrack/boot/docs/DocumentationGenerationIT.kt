@@ -32,6 +32,16 @@ class DocumentationGenerationIT : AbstractDSLTestSupport() {
     @Test
     fun `Templating functions generation`() {
         withDirectory("templating/functions") {
+
+            writeIndex(
+                fileId = "appendix-templating-functions-index",
+                level = 4,
+                title = "List of templating functions",
+                items = templatingFunctions.associate { templatingFunction ->
+                    getTemplatingFunctionFileId(templatingFunction) to templatingFunction.id
+                }
+            )
+
             templatingFunctions.forEach { templatingFunction ->
                 generateTemplatingFunction(this, templatingFunction)
             }
@@ -116,17 +126,20 @@ class DocumentationGenerationIT : AbstractDSLTestSupport() {
         val parameters = getFieldsDocumentation(templatingFunction::class)
         val example = getDocumentationExampleCode(templatingFunction::class)
 
-        val fileId = "templating-function-$id"
+        val fileId = getTemplatingFunctionFileId(templatingFunction)
 
         directoryContext.writeFile(
             fileId = fileId,
-            level = 4,
+            level = 5,
             title = id,
             header = description,
             fields = parameters,
             example = example,
         )
     }
+
+    private fun getTemplatingFunctionFileId(templatingFunction: TemplatingFunction) =
+        "templating-function-${templatingFunction.id}"
 
     private fun generateTemplatingFilter(directoryContext: DirectoryContext, templatingFilter: TemplatingFilter) {
         val id = templatingFilter.id
@@ -156,7 +169,7 @@ class DocumentationGenerationIT : AbstractDSLTestSupport() {
 
         directoryContext.writeFile(
             fileId = fileId,
-            level = 4,
+            level = 5,
             title = field,
             header = description,
             fields = parameters,
@@ -170,7 +183,8 @@ class DocumentationGenerationIT : AbstractDSLTestSupport() {
         }
     }
 
-    private fun getTemplatingSourceFileId(templatingSource: TemplatingSource) = "templating-source-${templatingSource.field}"
+    private fun getTemplatingSourceFileId(templatingSource: TemplatingSource) =
+        "templating-source-${templatingSource.field}"
 
     private class DirectoryContext(
         val dir: File,
@@ -201,7 +215,7 @@ class DocumentationGenerationIT : AbstractDSLTestSupport() {
             fileId: String,
             level: Int,
             title: String,
-            items: Map<String,String>,
+            items: Map<String, String>,
         ) {
             writeFile(
                 fileId = fileId,
