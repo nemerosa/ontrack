@@ -27,7 +27,7 @@ class MockJIRAInstance {
 
     val projectNames: List<String> get() = projects.keys.sorted()
 
-    fun registerIssue(key: String, summary: String, linkedKey: String? = null): JIRAIssue {
+    fun registerIssue(key: String, summary: String, type: String?, linkedKey: String? = null): JIRAIssue {
         val projectName = key.substringBefore("-")
         val project = projects.getOrPut(projectName) {
             JIRAProject(projectName)
@@ -48,7 +48,7 @@ class MockJIRAInstance {
             fixVersions = listOf(
                 JIRAVersion("4.8", false),
             ),
-            issueType = "Defect",
+            issueType = type ?: "defect",
             links = if (linkedKey.isNullOrBlank()) {
                 emptyList()
             } else {

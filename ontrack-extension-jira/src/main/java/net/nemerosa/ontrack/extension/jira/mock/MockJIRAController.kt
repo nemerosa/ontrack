@@ -29,6 +29,7 @@ class MockJIRAController(
         instance.registerIssue(
             key = input.key,
             summary = input.message,
+            type = input.type,
             linkedKey = input.linkedKey,
         )
 
@@ -37,6 +38,7 @@ class MockJIRAController(
         val key: String,
         val message: String,
         val linkedKey: String?,
+        val type: String?,
     )
 
 }

@@ -39,10 +39,10 @@ class JIRAChangeLogIT : AbstractQLKTITSupport() {
                 password = null,
             )
 
-            mockJIRAInstance.registerIssue("ISS-20", "Last issue before the change log")
-            mockJIRAInstance.registerIssue("ISS-21", "Some new feature")
-            mockJIRAInstance.registerIssue("ISS-22", "Some fixes are needed")
-            mockJIRAInstance.registerIssue("ISS-23", "Some nicer UI")
+            mockJIRAInstance.registerIssue("ISS-20", "defect", "Last issue before the change log")
+            mockJIRAInstance.registerIssue("ISS-21", "feature", "Some new feature")
+            mockJIRAInstance.registerIssue("ISS-22", "defect", "Some fixes are needed")
+            mockJIRAInstance.registerIssue("ISS-23", "enhancement", "Some nicer UI")
 
             jiraConfigurationService.newConfiguration(config)
 
