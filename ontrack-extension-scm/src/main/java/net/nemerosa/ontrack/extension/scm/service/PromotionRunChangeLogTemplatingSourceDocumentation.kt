@@ -7,4 +7,6 @@ data class PromotionRunChangeLogTemplatingSourceDocumentation(
     val acrossBranches: Boolean = true,
     @APIDescription("Use a comma-separated list of projects to get a deep changelog.")
     val projects: List<String> = emptyList(),
+    @APIDescription("Include a title for the change log")
+    val title: Boolean = false,
 )

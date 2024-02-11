@@ -15,7 +15,8 @@ import net.nemerosa.ontrack.model.templating.getListStringsTemplatingParam
 import org.springframework.stereotype.Component
 
 @Component
-@APIDescription("""
+@APIDescription(
+    """
     Renders a change log for this promotion run.
     
     The "to build" is the one being promoted.
@@ -29,13 +30,15 @@ import org.springframework.stereotype.Component
     If `project` is set to a comma-separated list of strings, the change log will be rendered 
     for the recursive links, in the order to the projects being set (going deeper and deeper
     in the links). 
-""")
+"""
+)
 @Documentation(PromotionRunChangeLogTemplatingSourceDocumentation::class)
 @DocumentationExampleCode("${'$'}{promotionRun.changelog}")
 class PromotionRunChangeLogTemplatingSource(
     private val structureService: StructureService,
     private val buildFilterService: BuildFilterService,
     private val scmChangeLogService: SCMChangeLogService,
+    private val buildDisplayNameService: BuildDisplayNameService,
 ) : AbstractTemplatingSource(
     field = "changelog",
     type = ProjectEntityType.PROMOTION_RUN,
@@ -44,6 +47,7 @@ class PromotionRunChangeLogTemplatingSource(
     override fun render(entity: ProjectEntity, configMap: Map<String, String>, renderer: EventRenderer): String {
         val empty = configMap["empty"] ?: ""
         return if (entity is PromotionRun) {
+            val title = configMap.getBooleanTemplatingParam("title", false)
             val acrossBranches = configMap.getBooleanTemplatingParam("acrossBranches", true)
             val projects = configMap.getListStringsTemplatingParam("project") ?: emptyList()
 
@@ -62,7 +66,7 @@ class PromotionRunChangeLogTemplatingSource(
             // We now have two boundaries
             else {
                 // ... getting the change log, recursively or not
-                runBlocking {
+                val changeLog = runBlocking {
                     scmChangeLogService.getChangeLog(
                         fromBuild,
                         toBuild,
@@ -73,6 +77,26 @@ class PromotionRunChangeLogTemplatingSource(
                             renderer = renderer
                         )
                     } ?: empty
+                }
+                // Title?
+                if (title) {
+                    val fromName = renderer.renderStrong(
+                        buildDisplayNameService.getBuildDisplayName(fromBuild)
+                    )
+                    val toName = renderer.renderStrong(
+                        buildDisplayNameService.getBuildDisplayName(toBuild)
+                    )
+
+                    val titleText = """
+                        Change log from $fromName to $toName
+                    """.trimIndent()
+
+                    renderer.renderSection(
+                        title = titleText,
+                        content = changeLog,
+                    )
+                } else {
+                    changeLog
                 }
             }
         } else {

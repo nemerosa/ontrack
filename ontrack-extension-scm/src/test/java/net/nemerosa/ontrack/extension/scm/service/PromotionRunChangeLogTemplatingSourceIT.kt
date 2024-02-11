@@ -49,7 +49,7 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
                 
                 ${'$'}{promotionRun.changelog}
             """.trimIndent(),
-        ) { run, _ ->
+        ) { _, run, _ ->
             """
                 Version ${run.project.name} ${run.build.name} has been released.
                 
@@ -69,7 +69,7 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
                 
                 ${'$'}{promotionRun.changelog}
             """.trimIndent(),
-        ) { run, repositoryName ->
+        ) { _, run, repositoryName ->
             """
                 <h3>Version <a href="http://localhost:8080/#/project/${run.project.id}">${run.project.name}</a> <a href="http://localhost:8080/#/build/${run.build.id}">${run.build.name}</a> has been released</h3>
                 
@@ -91,9 +91,31 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
                 
                 ${'$'}{promotionRun.changelog}
             """.trimIndent(),
-        ) { run, repositoryName ->
+        ) { _, run, repositoryName ->
             """
                 # Version [${run.project.name}](http://localhost:8080/#/project/${run.project.id}) [${run.build.name}](http://localhost:8080/#/build/${run.build.id}) has been released
+            
+                * [ISS-21](mock://${repositoryName}/issue/ISS-21) Some new feature
+                * [ISS-22](mock://${repositoryName}/issue/ISS-22) Some fixes are needed
+                * [ISS-23](mock://${repositoryName}/issue/ISS-23) Some nicer UI
+            """.trimIndent()
+        }
+    }
+
+    @Test
+    fun `Getting a Markdown change log in a template with a title`() {
+        doTestRendering(
+            renderer = markdownEventRenderer,
+            template = """
+                # Version ${'$'}{project} ${'$'}{build} has been released
+                
+                ${'$'}{promotionRun.changelog?title=true}
+            """.trimIndent(),
+        ) { fromBuild, run, repositoryName ->
+            """
+                # Version [${run.project.name}](http://localhost:8080/#/project/${run.project.id}) [${run.build.name}](http://localhost:8080/#/build/${run.build.id}) has been released
+                
+                ## Change log from **${fromBuild.name}** to **${run.build.name}**
             
                 * [ISS-21](mock://${repositoryName}/issue/ISS-21) Some new feature
                 * [ISS-22](mock://${repositoryName}/issue/ISS-22) Some fixes are needed
@@ -345,9 +367,9 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
     fun doTestRendering(
         renderer: EventRenderer,
         template: String,
-        expectedText: (run: PromotionRun, repositoryName: String) -> String,
+        expectedText: (fromBuild: Build, run: PromotionRun, repositoryName: String) -> String,
     ) {
-        prepareTest { _, run, repositoryName ->
+        prepareTest { fromBuild, run, repositoryName ->
             val event = eventFactory.newPromotionRun(run)
 
             // Rendering
@@ -358,7 +380,7 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
             )
 
             // OK
-            val expectedLines = expectedText(run, repositoryName).lines().map { it.trim() }
+            val expectedLines = expectedText(fromBuild, run, repositoryName).lines().map { it.trim() }
             val actualLines = text.lines().map { it.trim() }
             assertEquals(
                 expectedLines,
