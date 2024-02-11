@@ -32,7 +32,7 @@ export default function MockIssues({issues}) {
                     render={(_, issue) => <Typography.Text>{issue.status.name}</Typography.Text>}
                 />
                 <Column
-                    key="summarry"
+                    key="summary"
                     title="Summary"
                     render={(_, issue) => (
                         <Typography.Text>{issue.summary}</Typography.Text>
