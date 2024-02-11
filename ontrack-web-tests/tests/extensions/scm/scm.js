@@ -146,17 +146,26 @@ export class SCMChangeLogPage {
     }
 
     async selectExportFormat(format) {
-        await this.page.getByRole('button', { name: 'ellipsis' }).click()
-        await this.page.getByRole('menuitem', { name: format }).click()
+        await this.page.getByRole('button', {name: 'ellipsis'}).click()
+        await this.page.getByRole('menuitem', {name: format}).click()
     }
 
     async launchExport() {
         await this.page.getByRole('button', {name: 'Export'}).click()
     }
 
-    async copyExport() {
-        await this.page.getByRole('button', {name: 'Export ready'}).click()
-        await expect(this.page.getByText('Export copied')).toBeVisible()
+    async checkExportedContent(expectedValue, close = true) {
+        // Waits for the text area to be visible
+        const input = await this.page.getByPlaceholder('Exported content')
+        await expect(input).toBeVisible()
+
+        // Checks its content
+        await expect(input).toHaveValue(expectedValue)
+
+        // Closing the dialog
+        if (close) {
+            await this.page.locator('#close-exported-content').click()
+        }
     }
 
 }

@@ -213,7 +213,7 @@ export default function ChangeLogIssues({id, from, to, issues}) {
             <Modal title="Exported change log"
                    open={exportedContentShowing}
                    disabled={true}
-                   footer={(_, {OkBtn}) => (
+                   footer={() => (
                        <>
                            <Button
                                icon={exportCopied ? <FaCheck/> : <FaCopy/>}
@@ -224,15 +224,21 @@ export default function ChangeLogIssues({id, from, to, issues}) {
                                    exportCopied ? 'Copied' : 'Copy'
                                }
                            </Button>
-                           <OkBtn/>
+                           <Button
+                               id="close-exported-content"
+                               onClick={closeExportedContent}
+                               type="primary"
+                           >
+                               Close
+                           </Button>
                        </>
                    )}
-                   onOk={closeExportedContent}
                    onCancel={closeExportedContent}
                    width="70%"
             >
                 <Input.TextArea
                     id="exported-content"
+                    placeholder="Exported content"
                     value={exportedContent}
                     rows={20}
                 />

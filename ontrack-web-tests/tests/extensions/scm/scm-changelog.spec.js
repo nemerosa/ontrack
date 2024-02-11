@@ -5,7 +5,6 @@ const {BranchPage} = require("../../core/branches/branch");
 const {provisionChangeLog, commits, issues} = require("./scm");
 const {generate, trimIndent} = require("@ontrack/utils");
 const {ontrack} = require("@ontrack/ontrack");
-const {readClipboard} = require("../../core/utils");
 
 
 const doTestSCMChangeLog = async (
@@ -100,18 +99,18 @@ test('JIRA SCM change log', async ({page, context}) => {
         `jira//${configName}`
     )
 
-    // Exporting the change log with default parameters
-    await changeLogPage.launchExport()
-    // Copying the text
-    await changeLogPage.copyExport()
+    /**
+     * Exporting the change log with default parameters
+     */
 
-    const defaultContent = await readClipboard(page)
-    await expect(defaultContent).toBe(
+    await changeLogPage.launchExport()
+    await changeLogPage.checkExportedContent(
         trimIndent(
             `
                 * ISS-21 Some new feature
                 * ISS-22 Some fixes are needed
-                * ISS-23 Some nicer UI`
+                * ISS-23 Some nicer UI
+            `
         )
     )
 
@@ -121,5 +120,13 @@ test('JIRA SCM change log', async ({page, context}) => {
 
     await changeLogPage.selectExportFormat('Markdown')
     await changeLogPage.launchExport()
-    await changeLogPage.copyExport()
+    await changeLogPage.checkExportedContent(
+        trimIndent(
+            `
+                * ISS-21 Some new feature
+                * ISS-22 Some fixes are needed
+                * ISS-23 Some nicer UI
+            `
+        )
+    )
 })
