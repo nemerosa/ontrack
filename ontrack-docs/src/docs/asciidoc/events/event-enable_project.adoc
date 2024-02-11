@@ -3,6 +3,10 @@
 
 When a project becomes enabled again.
 
+Context:
+
+* `project` - project - Enabled project
+
 Default template:
 
 [source]

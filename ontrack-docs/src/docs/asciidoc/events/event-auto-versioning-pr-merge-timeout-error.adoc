@@ -3,6 +3,15 @@
 
 When an auto versioning request fails because the corresponding PR could not be merged in time.
 
+Context:
+
+* `project` - project - Target project
+* `branch` - branch - Target branch
+* `xProject` - project - Dependency/source project
+* `VERSION` - string - Version being set
+* `PR_NAME` - string - Title of the PR having been created
+* `PR_LINK` - string - Link to the PR having been created
+
 Default template:
 
 [source]

@@ -3,6 +3,11 @@
 
 When a branch is updated.
 
+Context:
+
+* `project` - project - Branch's project
+* `branch` - branch - Updated branch
+
 Default template:
 
 [source]

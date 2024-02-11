@@ -3,6 +3,15 @@
 
 When an auto versioning request fails because of the post-processing.
 
+Context:
+
+* `project` - project - Target project
+* `branch` - branch - Target branch
+* `xProject` - project - Dependency/source project
+* `VERSION` - string - Version being set
+* `MESSAGE` - string - Auto versioning message
+* `LINK` - string - Link to the post processing process
+
 Default template:
 
 [source]

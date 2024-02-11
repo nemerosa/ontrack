@@ -3,6 +3,12 @@
 
 When a promotion level is created.
 
+Context:
+
+* `project` - project - Promotion level's project
+* `branch` - branch - Promotion level's branch
+* `promotionLevel` - promotion level - Created promotion level
+
 Default template:
 
 [source]

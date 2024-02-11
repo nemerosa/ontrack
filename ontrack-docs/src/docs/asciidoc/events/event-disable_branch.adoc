@@ -3,6 +3,11 @@
 
 When a branch is disabled.
 
+Context:
+
+* `project` - project - Branch's project
+* `branch` - branch - Disabled branch
+
 Default template:
 
 [source]

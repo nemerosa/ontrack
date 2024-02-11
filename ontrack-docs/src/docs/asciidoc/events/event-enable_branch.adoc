@@ -3,6 +3,11 @@
 
 When a branch becomes enabled again.
 
+Context:
+
+* `project` - project - Branch's project
+* `branch` - branch - Enabled branch
+
 Default template:
 
 [source]

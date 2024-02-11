@@ -3,6 +3,13 @@
 
 When the promotion of a build is deleted.
 
+Context:
+
+* `project` - project - Project
+* `branch` - branch - Branch
+* `build` - build - Promoted build
+* `promotionLevel` - promotion level - Promotion level
+
 Default template:
 
 [source]

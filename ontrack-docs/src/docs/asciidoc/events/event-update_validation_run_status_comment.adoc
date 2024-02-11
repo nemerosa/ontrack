@@ -3,6 +3,14 @@
 
 When the status message of the validation of a build is updated.
 
+Context:
+
+* `project` - project - Project
+* `branch` - branch - Branch
+* `build` - build - Validated build
+* `validationStamp` - validation stamp - Validation stamp
+* `validationRun` - validation run - Validation run
+
 Default template:
 
 [source]

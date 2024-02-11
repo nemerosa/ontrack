@@ -3,6 +3,10 @@
 
 When a project is updated.
 
+Context:
+
+* `project` - project - Updated project
+
 Default template:
 
 [source]

@@ -3,6 +3,16 @@
 
 When an auto versioning request succeeds with the creation of a PR (merged or not).
 
+Context:
+
+* `project` - project - Target project
+* `branch` - branch - Target branch
+* `xProject` - project - Dependency/source project
+* `VERSION` - string - Version being set
+* `MESSAGE` - string - Auto versioning message
+* `PR_NAME` - string - Title of the PR having been created
+* `PR_LINK` - string - Link to the PR having been created
+
 Default template:
 
 [source]

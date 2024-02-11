@@ -3,6 +3,10 @@
 
 When a project is disabled.
 
+Context:
+
+* `project` - project - Disabled project
+
 Default template:
 
 [source]

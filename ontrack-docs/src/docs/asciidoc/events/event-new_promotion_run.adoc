@@ -3,6 +3,14 @@
 
 When a build is promoted.
 
+Context:
+
+* `project` - project - Project
+* `branch` - branch - Branch
+* `build` - build - Promoted build
+* `promotionLevel` - promotion level - Promotion level
+* `promotionRun` - promotion run - Promotion run
+
 Default template:
 
 [source]

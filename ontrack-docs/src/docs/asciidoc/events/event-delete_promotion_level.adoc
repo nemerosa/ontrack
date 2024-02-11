@@ -3,6 +3,13 @@
 
 When a promotion level is deleted.
 
+Context:
+
+* `project` - project - Promotion level's project
+* `branch` - branch - Promotion level's branch
+* `PROMOTION_LEVEL` - string - Deleted promotion level
+* `PROMOTION_LEVEL_ID` - string - ID of the deleted promotion level
+
 Default template:
 
 [source]

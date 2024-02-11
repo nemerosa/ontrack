@@ -3,6 +3,12 @@
 
 When a validation stamp is created.
 
+Context:
+
+* `project` - project - Validation stamp's project
+* `branch` - branch - Validation stamp's branch
+* `validationStamp` - validation stamp - Created validation stamp
+
 Default template:
 
 [source]

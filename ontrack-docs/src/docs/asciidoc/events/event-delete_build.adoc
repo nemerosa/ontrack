@@ -3,6 +3,12 @@
 
 When a build is deleted.
 
+Context:
+
+* `project` - project - Build's project
+* `branch` - branch - Build's branch
+* `BUILD` - string - Name of the deleted build
+
 Default template:
 
 [source]

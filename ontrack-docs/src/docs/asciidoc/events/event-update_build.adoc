@@ -3,6 +3,12 @@
 
 When a build is updated.
 
+Context:
+
+* `project` - project - Build's project
+* `branch` - branch - Build's branch
+* `build` - build - Updated build
+
 Default template:
 
 [source]

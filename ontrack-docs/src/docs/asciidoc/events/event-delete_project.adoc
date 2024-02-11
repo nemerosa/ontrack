@@ -3,6 +3,10 @@
 
 When a project is deleted.
 
+Context:
+
+* `PROJECT` - string - Name of the deleted project
+
 Default template:
 
 [source]

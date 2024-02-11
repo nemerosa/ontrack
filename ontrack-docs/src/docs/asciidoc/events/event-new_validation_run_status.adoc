@@ -3,6 +3,16 @@
 
 When the status of the validation of a build is updated.
 
+Context:
+
+* `project` - project - Project
+* `branch` - branch - Branch
+* `build` - build - Validated build
+* `validationStamp` - validation stamp - Validation stamp
+* `validationRun` - validation run - Validation run
+* `STATUS` - string - ID of the validation run status
+* `STATUS_NAME` - string - Name of the validation run status
+
 Default template:
 
 [source]

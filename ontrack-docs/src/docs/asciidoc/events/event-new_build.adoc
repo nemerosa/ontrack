@@ -3,6 +3,12 @@
 
 When a build is created.
 
+Context:
+
+* `project` - project - Build's project
+* `branch` - branch - Build's branch
+* `build` - build - Created build
+
 Default template:
 
 [source]

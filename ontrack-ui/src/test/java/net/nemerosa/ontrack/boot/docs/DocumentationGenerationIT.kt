@@ -4,8 +4,7 @@ import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.annotations.getAPITypeDescription
 import net.nemerosa.ontrack.model.docs.getDocumentationExampleCode
 import net.nemerosa.ontrack.model.docs.getFieldsDocumentation
-import net.nemerosa.ontrack.model.events.EventFactory
-import net.nemerosa.ontrack.model.events.EventType
+import net.nemerosa.ontrack.model.events.*
 import net.nemerosa.ontrack.model.templating.TemplatingFilter
 import net.nemerosa.ontrack.model.templating.TemplatingFunction
 import net.nemerosa.ontrack.model.templating.TemplatingSource
@@ -79,7 +78,20 @@ class DocumentationGenerationIT : AbstractDSLTestSupport() {
 
             s.append(eventType.description).append("\n\n")
 
-            s.append("Default template:\n\n")
+            s.append("Context:\n\n")
+
+            eventType.context.items.forEach { (name, item) ->
+                s.append("* ")
+                s.append("`$name` - ")
+                when (item) {
+                    is EventTypeContextEntity -> s.append(item.projectEntityType.displayName)
+                    is EventTypeContextAnyEntity -> s.append("any entity")
+                    is EventTypeContextValue -> s.append("string")
+                }
+                s.append(" - ").append(item.description).append("\n")
+            }
+
+            s.append("\nDefault template:\n\n")
             s.append("[source]\n")
             s.append("----\n")
             s.append(eventType.template)

@@ -3,6 +3,10 @@
 
 When a configuration is updated.
 
+Context:
+
+* `CONFIGURATION` - string - Name of the configuration
+
 Default template:
 
 [source]

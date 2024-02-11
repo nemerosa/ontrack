@@ -3,6 +3,11 @@
 
 When a branch is created.
 
+Context:
+
+* `project` - project - Branch's project
+* `branch` - branch - Created branch
+
 Default template:
 
 [source]

@@ -3,6 +3,11 @@
 
 When the promotion levels of a branch are reordered.
 
+Context:
+
+* `project` - project - Promotion levels project
+* `branch` - branch - Promotion levels branch
+
 Default template:
 
 [source]

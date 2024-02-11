@@ -3,6 +3,12 @@
 
 When a property is edited.
 
+Context:
+
+* `entity` - any entity - Entity where the property has been edited
+* `PROPERTY` - string - FQCN of the property type
+* `PROPERTY_NAME` - string - Display name of the property
+
 Default template:
 
 [source]
