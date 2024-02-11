@@ -2,7 +2,7 @@ import GridCell from "@components/grid/GridCell";
 import {Dynamic} from "@components/common/Dynamic";
 import {useEffect, useState} from "react";
 import {useTemplateRenderers} from "@components/extension/issues/SelectTemplateRenderer";
-import {Button, Dropdown, Space, Spin} from "antd";
+import {Button, Dropdown, Input, Modal, Space, Spin} from "antd";
 import {FaCheck, FaCopy, FaDownload, FaTools} from "react-icons/fa";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import copy from "copy-to-clipboard";
@@ -83,6 +83,7 @@ export default function ChangeLogIssues({id, from, to, issues}) {
 
     const [exporting, setExporting] = useState(false)
     const [exportedContent, setExportedContent] = useState('')
+    const [exportedContentShowing, setExportedContentShowing] = useState(false)
     const [exportCopied, setExportCopied] = useState(false)
 
     const onExport = () => {
@@ -131,9 +132,18 @@ export default function ChangeLogIssues({id, from, to, issues}) {
         ).then(data => {
             const content = data.scmChangeLog.export
             setExportedContent(content)
+            showExportedContent()
         }).finally(() => {
             setExporting(false)
         })
+    }
+
+    const showExportedContent = () => {
+        setExportedContentShowing(true)
+    }
+
+    const closeExportedContent = () => {
+        setExportedContentShowing(false)
     }
 
     const onCopy = () => {
@@ -160,22 +170,22 @@ export default function ChangeLogIssues({id, from, to, issues}) {
                 padding={0}
                 extra={
                     <>
-                        {
-                            exportCopied &&
-                            <CheckStatus
-                                value={true}
-                                text="Export copied"
-                            />
-                        }
-                        {
-                            exportedContent && !exportCopied &&
-                            <Button
-                                icon={<FaCopy/>}
-                                onClick={onCopy}
-                            >
-                                Export ready - click to copy
-                            </Button>
-                        }
+                        {/*{*/}
+                        {/*    exportCopied &&*/}
+                        {/*    <CheckStatus*/}
+                        {/*        value={true}*/}
+                        {/*        text="Export copied"*/}
+                        {/*    />*/}
+                        {/*}*/}
+                        {/*{*/}
+                        {/*    exportedContent && !exportCopied &&*/}
+                        {/*    <Button*/}
+                        {/*        icon={<FaCopy/>}*/}
+                        {/*        onClick={onCopy}*/}
+                        {/*    >*/}
+                        {/*        Export ready - click to copy*/}
+                        {/*    </Button>*/}
+                        {/*}*/}
                         <Dropdown.Button
                             type="primary"
                             trigger="click"
@@ -199,6 +209,35 @@ export default function ChangeLogIssues({id, from, to, issues}) {
                     />
                 }
             </GridCell>
+
+            <Modal title="Exported change log"
+                   open={exportedContentShowing}
+                   disabled={true}
+                   footer={(_, {OkBtn}) => (
+                       <>
+                           <Button
+                               icon={exportCopied ? <FaCheck/> : <FaCopy/>}
+                               onClick={onCopy}
+                               disabled={exportCopied}
+                           >
+                               {
+                                   exportCopied ? 'Copied' : 'Copy'
+                               }
+                           </Button>
+                           <OkBtn/>
+                       </>
+                   )}
+                   onOk={closeExportedContent}
+                   onCancel={closeExportedContent}
+                   width="70%"
+            >
+                <Input.TextArea
+                    id="exported-content"
+                    value={exportedContent}
+                    rows={20}
+                />
+            </Modal>
+
             {/*<IssueChangeLogExportRequestDialog issueChangeLogExportRequestDialog={issueChangeLogExportRequestDialog}/>*/}
         </>
     )

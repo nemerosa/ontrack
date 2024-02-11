@@ -5,6 +5,7 @@ const {BranchPage} = require("../../core/branches/branch");
 const {provisionChangeLog, commits, issues} = require("./scm");
 const {generate, trimIndent} = require("@ontrack/utils");
 const {ontrack} = require("@ontrack/ontrack");
+const {readClipboard} = require("../../core/utils");
 
 
 const doTestSCMChangeLog = async (
@@ -82,6 +83,7 @@ test("SCM change log", async ({page}) => {
 })
 
 test('JIRA SCM change log', async ({page, context}) => {
+    await context.grantPermissions(['clipboard-read'])
     // Creates the JIRA mock configuration
     const configName = generate("mock-")
     await ontrack().configurations.jira.createConfig({
@@ -102,6 +104,16 @@ test('JIRA SCM change log', async ({page, context}) => {
     await changeLogPage.launchExport()
     // Copying the text
     await changeLogPage.copyExport()
+
+    const defaultContent = await readClipboard(page)
+    await expect(defaultContent).toBe(
+        trimIndent(
+            `
+                * ISS-21 Some new feature
+                * ISS-22 Some fixes are needed
+                * ISS-23 Some nicer UI`
+        )
+    )
 
     /**
      * Exporting the change log for Markdown and default parameters
