@@ -1,5 +1,5 @@
 [[templating-filter-uppercase]]
-==== uppercase
+===== uppercase
 
 Making a value upper case
 

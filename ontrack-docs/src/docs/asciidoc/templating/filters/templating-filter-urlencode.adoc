@@ -1,5 +1,5 @@
 [[templating-filter-urlencode]]
-==== urlencode
+===== urlencode
 
 URL encoding of the value
 

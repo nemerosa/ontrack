@@ -51,6 +51,16 @@ class DocumentationGenerationIT : AbstractDSLTestSupport() {
     @Test
     fun `Templating filters generation`() {
         withDirectory("templating/filters") {
+
+            writeIndex(
+                fileId = "appendix-templating-filters-index",
+                level = 4,
+                title = "List of templating filters",
+                items = templatingFilters.associate { templatingFilter ->
+                    getTemplatingFilterFileId(templatingFilter) to templatingFilter.id
+                }
+            )
+
             templatingFilters.forEach { templatingFilter ->
                 generateTemplatingFilter(this, templatingFilter)
             }
@@ -146,17 +156,20 @@ class DocumentationGenerationIT : AbstractDSLTestSupport() {
         val description = getAPITypeDescription(templatingFilter::class)
         val example = getDocumentationExampleCode(templatingFilter::class)
 
-        val fileId = "templating-filter-$id"
+        val fileId = getTemplatingFilterFileId(templatingFilter)
 
         directoryContext.writeFile(
             fileId = fileId,
-            level = 4,
+            level = 5,
             title = id,
             header = description,
             fields = emptyMap(),
             example = example,
         )
     }
+
+    private fun getTemplatingFilterFileId(templatingFilter: TemplatingFilter) =
+        "templating-filter-${templatingFilter.id}"
 
     private fun generateTemplatingSource(directoryContext: DirectoryContext, templatingSource: TemplatingSource) {
         val field = templatingSource.field

@@ -1,5 +1,5 @@
 [[templating-filter-strong]]
-==== strong
+===== strong
 
 Making a value in a stronger typography
 
