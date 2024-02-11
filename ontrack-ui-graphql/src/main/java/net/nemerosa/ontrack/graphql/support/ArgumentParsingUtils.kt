@@ -6,18 +6,18 @@ import net.nemerosa.ontrack.json.parseInto
 import net.nemerosa.ontrack.model.exceptions.InputException
 import kotlin.reflect.KClass
 
-inline fun <reified T : Any> parseArgument(env: DataFetchingEnvironment): T =
-    parseArgument(T::class, env)
+inline fun <reified T : Any> parseArgument(argName: String, env: DataFetchingEnvironment): T =
+    parseArgument(T::class, argName, env)
 
-fun <T : Any> parseArgument(type: KClass<T>, env: DataFetchingEnvironment): T {
-    return parseOptionalArgument(type, env) ?: throw MutationMissingInputException()
+fun <T : Any> parseArgument(type: KClass<T>, argName: String, env: DataFetchingEnvironment): T {
+    return parseOptionalArgument(type, argName, env) ?: throw MutationMissingInputException()
 }
 
-inline fun <reified T : Any> parseOptionalArgument(env: DataFetchingEnvironment): T? =
-    parseOptionalArgument(T::class, env)
+inline fun <reified T : Any> parseOptionalArgument(argName: String, env: DataFetchingEnvironment): T? =
+    parseOptionalArgument(T::class, argName, env)
 
-fun <T : Any> parseOptionalArgument(type: KClass<T>, env: DataFetchingEnvironment): T? {
-    val input = env.arguments["input"] ?: return null
+fun <T : Any> parseOptionalArgument(type: KClass<T>, argName: String, env: DataFetchingEnvironment): T? {
+    val input = env.getArgument<Any?>(argName) ?: return null
     return input.asJson().parseInto(type)
 }
 

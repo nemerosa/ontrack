@@ -170,22 +170,6 @@ export default function ChangeLogIssues({id, from, to, issues}) {
                 padding={0}
                 extra={
                     <>
-                        {/*{*/}
-                        {/*    exportCopied &&*/}
-                        {/*    <CheckStatus*/}
-                        {/*        value={true}*/}
-                        {/*        text="Export copied"*/}
-                        {/*    />*/}
-                        {/*}*/}
-                        {/*{*/}
-                        {/*    exportedContent && !exportCopied &&*/}
-                        {/*    <Button*/}
-                        {/*        icon={<FaCopy/>}*/}
-                        {/*        onClick={onCopy}*/}
-                        {/*    >*/}
-                        {/*        Export ready - click to copy*/}
-                        {/*    </Button>*/}
-                        {/*}*/}
                         <Dropdown.Button
                             type="primary"
                             trigger="click"

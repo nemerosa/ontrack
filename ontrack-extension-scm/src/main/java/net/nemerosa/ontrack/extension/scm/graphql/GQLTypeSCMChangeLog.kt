@@ -79,7 +79,7 @@ class GQLTypeSCMChangeLog(
                     .type(GraphQLString)
                     .dataFetcher { env ->
                         val changeLog = env.getSource<SCMChangeLog>()
-                        val input = parseOptionalArgument<SCMChangeLogExportInput>(env)
+                        val input = parseOptionalArgument<SCMChangeLogExportInput>("request", env)
                         scmChangeLogExportService.export(
                             changeLog = changeLog,
                             input = input,

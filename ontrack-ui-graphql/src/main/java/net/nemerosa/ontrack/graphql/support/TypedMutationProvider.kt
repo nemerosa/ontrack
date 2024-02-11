@@ -108,7 +108,7 @@ abstract class TypedMutationProvider protected constructor(
         )
 
         override fun fetch(env: DataFetchingEnvironment): Any {
-            val input = parseArgument(input, env)
+            val input = parseArgument(input, "input", env)
             validateInput(input)
             return mapOf(outputName to fetcher(input))
         }
@@ -125,7 +125,7 @@ abstract class TypedMutationProvider protected constructor(
         override fun inputFields(dictionary: MutableSet<GraphQLType>): List<GraphQLInputObjectField> = asInputFields(input, dictionary)
 
         override fun fetch(env: DataFetchingEnvironment): Any {
-            val input = parseArgument(input, env)
+            val input = parseArgument(input, "input", env)
             validateInput(input)
             fetcher(input)
             // Nothing to return
