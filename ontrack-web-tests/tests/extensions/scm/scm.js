@@ -12,10 +12,22 @@ export const commits = [
 ]
 
 export const issues = {
-    "ISS-20": "Last issue before the change log",
-    "ISS-21": "Some new feature",
-    "ISS-22": "Some fixes are needed",
-    "ISS-23": "Some nicer UI",
+    "ISS-20": {
+        summary: "Last issue before the change log",
+        type: "defect"
+    },
+    "ISS-21": {
+        summary: "Some new feature",
+        type: "feature"
+    },
+    "ISS-22": {
+        summary: "Some fixes are needed",
+        type: "defect"
+    },
+    "ISS-23": {
+        summary: "Some nicer UI",
+        type: "enhancement"
+    },
 }
 
 export async function provisionChangeLog(
@@ -30,11 +42,11 @@ export async function provisionChangeLog(
     await mockSCMContext.configureBranchForMockSCM(branch)
 
     for (const key of Object.keys(issues)) {
-        const summary = issues[key]
+        const {summary, type} = issues[key]
         if (key === 'ISS-23') {
-            await mockSCMContext.repositoryIssue({key, summary, issueServiceId: issueServiceId, linkedKey: 'ISS-10'})
+            await mockSCMContext.repositoryIssue({key, summary, type, issueServiceId: issueServiceId, linkedKey: 'ISS-10'})
         } else {
-            await mockSCMContext.repositoryIssue({key, summary, issueServiceId: issueServiceId})
+            await mockSCMContext.repositoryIssue({key, summary, type, issueServiceId: issueServiceId})
         }
     }
 

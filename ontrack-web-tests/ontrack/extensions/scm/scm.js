@@ -106,7 +106,7 @@ class MockSCMContext {
         )
     }
 
-    async repositoryIssue({key, summary, issueServiceId, linkedKey}) {
+    async repositoryIssue({key, summary, type, issueServiceId, linkedKey}) {
         const response = await restCallPost(
             ontrack().connection,
             `/extension/${issueServiceId ?? 'scm'}/mock/issue`,
@@ -114,6 +114,7 @@ class MockSCMContext {
                 name: this.repositoryName,
                 key,
                 message: summary,
+                type,
                 linkedKey,
             }
         )

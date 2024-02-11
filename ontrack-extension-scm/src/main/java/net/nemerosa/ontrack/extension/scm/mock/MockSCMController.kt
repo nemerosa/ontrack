@@ -36,7 +36,11 @@ class MockSCMController(
     @PostMapping("/issue")
     fun registerIssue(@RequestBody registration: IssueRegistration) {
         mockSCMExtension.repository(registration.name)
-            .registerIssue(registration.key, registration.message)
+            .registerIssue(
+                registration.key,
+                registration.message,
+                *registration.types(),
+            )
     }
 
     /**
@@ -99,8 +103,15 @@ class MockSCMController(
     data class IssueRegistration(
         val name: String,
         val key: String,
+        val type: String? = null,
         val message: String,
-    )
+    ) {
+        fun types() = if (type.isNullOrBlank()) {
+            emptyArray()
+        } else {
+            arrayOf(type)
+        }
+    }
 
     data class CommitRegistration(
         val name: String,

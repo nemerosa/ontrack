@@ -8,6 +8,9 @@ import {useGraphQLClient} from "@components/providers/ConnectionContextProvider"
 import copy from "copy-to-clipboard";
 import CheckStatus from "@components/common/CheckStatus";
 import {gql} from "graphql-request";
+import IssueChangeLogExportRequestDialog, {
+    useIssueChangeLogExportRequestDialog
+} from "@components/extension/issues/IssueChangeLogExportRequestDialog";
 
 export default function ChangeLogIssues({id, from, to, issues}) {
 
@@ -74,7 +77,7 @@ export default function ChangeLogIssues({id, from, to, issues}) {
             key: 'options',
             label: "Options...",
             icon: <FaTools/>,
-            // TODO onClick: startIssueChangeLogExportRequestDialog,
+            onClick: startIssueChangeLogExportRequestDialog,
         })
 
         setItems(items)
@@ -152,15 +155,15 @@ export default function ChangeLogIssues({id, from, to, issues}) {
         }
     }
 
-    // const issueChangeLogExportRequestDialog = useIssueChangeLogExportRequestDialog({
-    //     onSuccess: (values) => {
-    //         savePreferences(values)
-    //     }
-    // })
-    //
-    // const startIssueChangeLogExportRequestDialog = () => {
-    //     issueChangeLogExportRequestDialog.start(preferences)
-    // }
+    const issueChangeLogExportRequestDialog = useIssueChangeLogExportRequestDialog({
+        onSuccess: (values) => {
+            savePreferences(values)
+        }
+    })
+
+    const startIssueChangeLogExportRequestDialog = () => {
+        issueChangeLogExportRequestDialog.start(preferences)
+    }
 
     return (
         <>
@@ -228,7 +231,7 @@ export default function ChangeLogIssues({id, from, to, issues}) {
                 />
             </Modal>
 
-            {/*<IssueChangeLogExportRequestDialog issueChangeLogExportRequestDialog={issueChangeLogExportRequestDialog}/>*/}
+            <IssueChangeLogExportRequestDialog issueChangeLogExportRequestDialog={issueChangeLogExportRequestDialog}/>
         </>
     )
 }

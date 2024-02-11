@@ -68,7 +68,7 @@ const doTestSCMChangeLog = async (
 
     // Expecting the issues to be displayed
     for (const key of Object.keys(issues)) {
-        const summary = issues[key]
+        const {summary} = issues[key]
         await changeLogPage.checkIssue({key, summary, visible: (key !== "ISS-20")})
     }
 
