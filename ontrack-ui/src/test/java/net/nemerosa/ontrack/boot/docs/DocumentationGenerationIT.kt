@@ -50,6 +50,16 @@ class DocumentationGenerationIT : AbstractDSLTestSupport() {
     @Test
     fun `Templating sources generation`() {
         withDirectory("templating/sources") {
+
+            writeIndex(
+                fileId = "appendix-templating-sources-index",
+                level = 4,
+                title = "List of templating sources",
+                items = templatingSources.associate { templatingSource ->
+                    getTemplatingSourceFileId(templatingSource) to templatingSource.field
+                }
+            )
+
             templatingSources.forEach { templatingSource ->
                 generateTemplatingSource(this, templatingSource)
             }
@@ -142,7 +152,7 @@ class DocumentationGenerationIT : AbstractDSLTestSupport() {
         val example = getDocumentationExampleCode(templatingSource::class)
         val types = templatingSource.types
 
-        val fileId = "templating-source-$field"
+        val fileId = getTemplatingSourceFileId(templatingSource)
 
         directoryContext.writeFile(
             fileId = fileId,
@@ -160,17 +170,20 @@ class DocumentationGenerationIT : AbstractDSLTestSupport() {
         }
     }
 
+    private fun getTemplatingSourceFileId(templatingSource: TemplatingSource) = "templating-source-${templatingSource.field}"
+
     private class DirectoryContext(
         val dir: File,
     ) {
 
         fun writeFile(
             fileId: String,
+            fileName: String = fileId,
             level: Int,
             title: String,
             code: (s: StringBuilder) -> Unit,
         ) {
-            val file = File(dir, "${fileId}.adoc")
+            val file = File(dir, "${fileName}.adoc")
 
             val s = StringBuilder()
 
@@ -182,6 +195,28 @@ class DocumentationGenerationIT : AbstractDSLTestSupport() {
             code(s)
 
             file.writeText(s.toString())
+        }
+
+        fun writeIndex(
+            fileId: String,
+            level: Int,
+            title: String,
+            items: Map<String,String>,
+        ) {
+            writeFile(
+                fileId = fileId,
+                fileName = "index",
+                level = level,
+                title = title,
+            ) { s ->
+                items.forEach { (id, title) ->
+                    s.append("* ").append("<<$id,$title>>\n")
+                }
+                s.append("\n")
+                items.forEach { (id, _) ->
+                    s.append("include::$id.adoc[]\n")
+                }
+            }
         }
 
         fun writeFile(
