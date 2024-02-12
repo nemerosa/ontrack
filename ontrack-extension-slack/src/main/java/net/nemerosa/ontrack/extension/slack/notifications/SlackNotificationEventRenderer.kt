@@ -19,7 +19,7 @@ class SlackNotificationEventRenderer(
         return "<$pageUrl|${getProjectEntityName(projectEntity)}>"
     }
 
-    override fun renderStrong(value: String): String = "**${value}**"
+    override fun renderStrong(value: String): String = "*${value}*"
 
     override fun renderLink(text: String, href: String): String = """<$href|$text>"""
 
@@ -30,7 +30,7 @@ class SlackNotificationEventRenderer(
 
     override fun renderSection(title: String, content: String): String =
         """
-            |**$title**
+            |*$title*
             |
             |$content
         """.trimMargin()

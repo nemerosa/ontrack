@@ -80,6 +80,9 @@ class PromotionRunChangeLogTemplatingSource(
                 }
                 // Title?
                 if (title) {
+                    val projectName = renderer.renderStrong(
+                        fromBuild.project.name
+                    )
                     val fromName = renderer.renderStrong(
                         buildDisplayNameService.getBuildDisplayName(fromBuild)
                     )
@@ -88,7 +91,7 @@ class PromotionRunChangeLogTemplatingSource(
                     )
 
                     val titleText = """
-                        Change log from $fromName to $toName
+                        Change log for $projectName from $fromName to $toName
                     """.trimIndent()
 
                     renderer.renderSection(

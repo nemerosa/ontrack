@@ -14,9 +14,9 @@ class SlackNotificationEventRendererTest {
     )
 
     @Test
-    fun `Value rendering`() {
+    fun `Value strong rendering`() {
         assertEquals(
-            "**Some value**",
+            "*Some value*",
             slackNotificationEventRenderer.renderStrong("Some value")
         )
     }
@@ -56,7 +56,7 @@ class SlackNotificationEventRendererTest {
     fun `Rendering section`() {
         assertEquals(
             """
-                |**My title**
+                |*My title*
                 |
                 |My content
             """.trimMargin(),
