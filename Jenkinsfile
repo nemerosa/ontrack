@@ -1,4 +1,4 @@
-@Library("ontrack-jenkins-cli-pipeline@1.3.1") _
+@Library("ontrack-jenkins-cli-pipeline@2.0.0") _
 
 pipeline {
 
@@ -99,6 +99,9 @@ pipeline {
                                 'new_validation_run',
                         ],
                         keywords: 'failed',
+                        contentTemplate: '''\
+                            ${build.release|strong} has failed on ${validationStamp}. 
+                        '''
                 )
                 ontrackCliSetupPromotionLevelNotifications(
                         promotion: 'BRONZE',
@@ -110,6 +113,25 @@ pipeline {
                         events: [
                                 'new_promotion_run',
                         ],
+                        contentTemplate: '''\
+                            ${build.release|strong} has been promoted to ${promotionLevel}. 
+                        '''
+                )
+                ontrackCliSetupPromotionLevelNotifications(
+                        promotion: 'RELEASE',
+                        channel: 'slack',
+                        channelConfig: [
+                                channel: '#releases',
+                                type: 'SUCCESS'
+                        ],
+                        events: [
+                                'new_promotion_run',
+                        ],
+                        contentTemplate: '''\
+                            Ontrack ${build.release|strong} has been released.
+                            
+                            ${promotionRun.changelog?title=true}
+                            ''',
                 )
             }
         }
@@ -375,12 +397,6 @@ pipeline {
 
             }
             post {
-                success {
-                    script {
-                        def text = readFile file: "build/slack.txt"
-                        slackSend channel: "#releases", color: "good", message: text
-                    }
-                }
                 always {
                     ontrackCliValidate(
                             stamp: 'GITHUB.RELEASE',
