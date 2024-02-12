@@ -100,7 +100,7 @@ pipeline {
                         ],
                         keywords: 'failed',
                         contentTemplate: '''\
-                            ${build.release|strong} has failed on ${validationStamp}. 
+                            Build ${build} has failed on ${validationStamp}. 
                         '''
                 )
                 ontrackCliSetupPromotionLevelNotifications(
@@ -114,7 +114,7 @@ pipeline {
                                 'new_promotion_run',
                         ],
                         contentTemplate: '''\
-                            ${build.release|strong} has been promoted to ${promotionLevel}. 
+                            Build ${build} has been promoted to ${promotionLevel}. 
                         '''
                 )
                 ontrackCliSetupPromotionLevelNotifications(

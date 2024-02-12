@@ -115,7 +115,7 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
             """
                 # Version [${run.project.name}](http://localhost:8080/#/project/${run.project.id}) [${run.build.name}](http://localhost:8080/#/build/${run.build.id}) has been released
                 
-                ## Change log from **${fromBuild.name}** to **${run.build.name}**
+                ## Change log for **${run.project.name}** from **${fromBuild.name}** to **${run.build.name}**
             
                 * [ISS-21](mock://${repositoryName}/issue/ISS-21) Some new feature
                 * [ISS-22](mock://${repositoryName}/issue/ISS-22) Some fixes are needed
