@@ -185,9 +185,11 @@ class BitbucketServerSCMExtension(
         override fun getBuildCommit(build: Build): String? =
             propertyService.getPropertyValue(build, GitCommitPropertyType::class.java)?.commit
 
-        override suspend fun getCommits(fromCommit: String, toCommit: String): List<SCMCommit> =
-            client
-                .getCommits(repo, fromCommit, toCommit)
+        override suspend fun getCommits(fromCommit: String, toCommit: String): List<SCMCommit> {
+            val commits = client.getCommits(repo, fromCommit, toCommit)
+                .takeIf { it.isNotEmpty() }
+                ?: client.getCommits(repo, toCommit, fromCommit)
+            return commits
                 .map { commit ->
                     BitbucketServerSCMCommit(
                         root = configuration.url,
@@ -196,6 +198,7 @@ class BitbucketServerSCMExtension(
                     )
                 }
                 .sortedBy { it.timestamp }
+        }
 
         override fun getConfiguredIssueService(): ConfiguredIssueService? =
             issueServiceConfigurationIdentifier?.let { issueServiceRegistry.getConfiguredIssueService(it) }

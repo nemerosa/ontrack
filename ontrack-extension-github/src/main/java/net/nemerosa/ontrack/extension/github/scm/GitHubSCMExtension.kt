@@ -223,6 +223,8 @@ class GitHubSCMExtension(
 
         override suspend fun getCommits(fromCommit: String, toCommit: String): List<SCMCommit> {
             val commits = client.compareCommits(repository, fromCommit, toCommit)
+                .takeIf { it.isNotEmpty() }
+                ?: client.compareCommits(repository, toCommit, fromCommit)
             return commits.map { commit ->
                 GitHubSCMCommit(commit)
             }.sortedBy { it.timestamp }
