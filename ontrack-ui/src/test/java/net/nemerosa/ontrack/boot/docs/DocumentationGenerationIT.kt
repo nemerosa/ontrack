@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.model.events.*
 import net.nemerosa.ontrack.model.templating.TemplatingFilter
 import net.nemerosa.ontrack.model.templating.TemplatingFunction
 import net.nemerosa.ontrack.model.templating.TemplatingSource
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.io.File
@@ -15,6 +16,7 @@ import java.io.File
 /**
  * Generation of the documentation
  */
+@Disabled("To be launched manually when need be")
 class DocumentationGenerationIT : AbstractDSLTestSupport() {
 
     @Autowired
