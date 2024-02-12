@@ -128,7 +128,7 @@ pipeline {
                                 'new_promotion_run',
                         ],
                         contentTemplate: '''\
-                            Ontrack ${build.release|strong} has been released.
+                            Ontrack ${build} has been released.
                             
                             ${promotionRun.changelog?title=true}
                             ''',
