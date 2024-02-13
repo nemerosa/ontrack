@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.json.getRequiredBooleanField
 import net.nemerosa.ontrack.json.getRequiredJsonField
 import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.model.events.EventFactory
+import net.nemerosa.ontrack.model.structure.toProjectEntityID
 import org.junit.jupiter.api.Test
 import kotlin.test.*
 
@@ -187,6 +188,91 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                             )
                         }
                     }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Settings subscriptions using the promotion level mutation with a custom content template and updating it`() {
+        asAdmin {
+            project {
+                branch {
+                    val pl = promotionLevel("GOLD")
+                    // Creating the initial subscription
+                    run(
+                        """
+                        mutation SetupPromotionSubscription(
+                            ${'$'}contentTemplate: String!,
+                        ) {
+                            subscribePromotionLevelToEvents(input: {
+                                project: "${project.name}",
+                                branch: "$name",
+                                promotion: "GOLD",
+                                channel: "mock",
+                                channelConfig: {
+                                    target: "#test"
+                                },
+                                events: [
+                                    "new_promotion_run"
+                                ],
+                                contentTemplate: ${'$'}contentTemplate,
+                            }) {
+                                errors {
+                                    message
+                                }
+                                subscription {
+                                    id
+                                }
+                            }
+                        }
+                    """,
+                        variables = mapOf(
+                            "contentTemplate" to "Change log for this promotion!"
+                        )
+                    ) {}
+                    // Updating the content template
+                    run(
+                        """
+                        mutation SetupPromotionSubscription(
+                            ${'$'}contentTemplate: String!,
+                        ) {
+                            subscribePromotionLevelToEvents(input: {
+                                project: "${project.name}",
+                                branch: "$name",
+                                promotion: "GOLD",
+                                channel: "mock",
+                                channelConfig: {
+                                    target: "#test"
+                                },
+                                events: [
+                                    "new_promotion_run"
+                                ],
+                                contentTemplate: ${'$'}contentTemplate,
+                            }) {
+                                errors {
+                                    message
+                                }
+                                subscription {
+                                    id
+                                }
+                            }
+                        }
+                    """,
+                        variables = mapOf(
+                            "contentTemplate" to "Change log for this promotion with a link ${'$'}{promotionLevel}!"
+                        )
+                    ) {}
+                    // Checking that only the last subscription has been taken into account
+                    val subscriptions = eventSubscriptionService.filterSubscriptions(
+                        EventSubscriptionFilter(entity = pl.toProjectEntityID())
+                    ).pageItems
+                    assertEquals(1, subscriptions.size, "Only one subscription must be kept")
+                    val subscription = subscriptions.first()
+                    assertEquals(
+                        "Change log for this promotion with a link ${'$'}{promotionLevel}!",
+                        subscription.data.contentTemplate
+                    )
                 }
             }
         }

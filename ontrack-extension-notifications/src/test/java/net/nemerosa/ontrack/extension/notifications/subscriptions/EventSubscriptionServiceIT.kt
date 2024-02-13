@@ -162,13 +162,17 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 build {
                     // Creates a SILVER promotion, checks it's not notified
                     promote(silver)
-                    assertNull(mockNotificationChannel.messages[target],
-                        "No notification received for the the silver promotion")
+                    assertNull(
+                        mockNotificationChannel.messages[target],
+                        "No notification received for the the silver promotion"
+                    )
                     // Creates a GOLD promotion, checks it's notified
                     promote(gold)
                     assertNotNull(mockNotificationChannel.messages[target]) {
-                        assertEquals("Build $name has been promoted to GOLD for branch ${branch.name} in ${project.name}.",
-                            it.first())
+                        assertEquals(
+                            "Build $name has been promoted to GOLD for branch ${branch.name} in ${project.name}.",
+                            it.first()
+                        )
                     }
                 }
             }
@@ -196,16 +200,20 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             val otherPromotion = other.promotionLevel("GOLD")
             other.build {
                 promote(otherPromotion)
-                assertNull(mockNotificationChannel.messages[target],
-                    "No notification received for the the gold promotion on the other branch")
+                assertNull(
+                    mockNotificationChannel.messages[target],
+                    "No notification received for the the gold promotion on the other branch"
+                )
             }
             // Promotion on the main branch ==> notification
             val mainPromotion = main.promotionLevel("GOLD")
             main.build {
                 promote(mainPromotion)
                 assertNotNull(mockNotificationChannel.messages[target]) {
-                    assertEquals("Build $name has been promoted to GOLD for branch ${branch.name} in ${project.name}.",
-                        it.first())
+                    assertEquals(
+                        "Build $name has been promoted to GOLD for branch ${branch.name} in ${project.name}.",
+                        it.first()
+                    )
                 }
             }
         }
@@ -307,8 +315,10 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             val subscriptions = eventSubscriptionService.filterSubscriptions(
                 EventSubscriptionFilter(size = 1000)
             ).pageItems
-            assertNotNull(subscriptions.find { it.data.channelConfig.getTextField("target") == target },
-                "Finding the global subscription")
+            assertNotNull(
+                subscriptions.find { it.data.channelConfig.getTextField("target") == target },
+                "Finding the global subscription"
+            )
         }
     }
 
@@ -816,6 +826,81 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             assertEquals(
                 setOf("new_promotion_run"),
                 subscription.data.events
+            )
+        }
+    }
+
+    @Test
+    fun `Content template is not part of what identifies a subscription`() {
+        project {
+            // Initial subscription with a first template
+            eventSubscriptionService.subscribe(
+                channel = mockNotificationChannel,
+                channelConfig = MockNotificationChannelConfig("#one"),
+                projectEntity = this,
+                keywords = null,
+                origin = "test",
+                contentTemplate = "This is the first template",
+                EventFactory.NEW_PROMOTION_RUN
+            )
+            // Second subscription with a different template
+            eventSubscriptionService.subscribe(
+                channel = mockNotificationChannel,
+                channelConfig = MockNotificationChannelConfig("#one"),
+                projectEntity = this,
+                keywords = null,
+                origin = "test",
+                contentTemplate = "This is the second template",
+                EventFactory.NEW_PROMOTION_RUN
+            )
+            // Getting the list of subscriptions for this entity
+            val subscriptions = eventSubscriptionService.filterSubscriptions(
+                EventSubscriptionFilter(entity = toProjectEntityID())
+            ).pageItems
+            // We expect only the second subscription to have been kept
+            assertEquals(1, subscriptions.size, "Only one subscription must be kept")
+            val subscription = subscriptions.first()
+            assertEquals(
+                "This is the second template",
+                subscription.data.contentTemplate
+            )
+        }
+    }
+
+    @Test
+    fun `Content template is not part of what identifies a global subscription`() {
+        asAdmin {
+            eventSubscriptionService.removeAllGlobal()
+            // Initial subscription with a first template
+            eventSubscriptionService.subscribe(
+                channel = mockNotificationChannel,
+                channelConfig = MockNotificationChannelConfig("#one"),
+                projectEntity = null,
+                keywords = null,
+                origin = "test",
+                contentTemplate = "This is the first template",
+                EventFactory.NEW_PROMOTION_RUN
+            )
+            // Second subscription with a different template
+            eventSubscriptionService.subscribe(
+                channel = mockNotificationChannel,
+                channelConfig = MockNotificationChannelConfig("#one"),
+                projectEntity = null,
+                keywords = null,
+                origin = "test",
+                contentTemplate = "This is the second template",
+                EventFactory.NEW_PROMOTION_RUN
+            )
+            // Getting the list of global subscriptions
+            val subscriptions = eventSubscriptionService.filterSubscriptions(
+                EventSubscriptionFilter()
+            ).pageItems
+            // We expect only the second subscription to have been kept
+            assertEquals(1, subscriptions.size, "Only one subscription must be kept")
+            val subscription = subscriptions.first()
+            assertEquals(
+                "This is the second template",
+                subscription.data.contentTemplate
             )
         }
     }

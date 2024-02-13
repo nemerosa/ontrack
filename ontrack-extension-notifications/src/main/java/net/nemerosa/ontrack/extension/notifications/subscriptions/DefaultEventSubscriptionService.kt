@@ -1,14 +1,11 @@
 package net.nemerosa.ontrack.extension.notifications.subscriptions
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.ObjectNode
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannelRegistry
 import net.nemerosa.ontrack.extension.notifications.channels.getChannel
-import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.json.asJsonString
-import net.nemerosa.ontrack.json.format
-import net.nemerosa.ontrack.json.parseOrNull
+import net.nemerosa.ontrack.json.*
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.pagination.spanningPaginatedList
@@ -21,6 +18,7 @@ import net.nemerosa.ontrack.repository.support.store.EntityDataStoreFilter
 import net.nemerosa.ontrack.repository.support.store.EntityDataStoreRecord
 import org.springframework.stereotype.Service
 import java.util.*
+import kotlin.jvm.optionals.getOrNull
 
 @Service
 class DefaultEventSubscriptionService(
@@ -39,88 +37,96 @@ class DefaultEventSubscriptionService(
     override fun subscribe(subscription: EventSubscription): SavedEventSubscription {
         // Record to save
         val record = subscription.toSubscriptionRecord()
-        return if (subscription.projectEntity != null) {
+        if (subscription.projectEntity != null) {
             // Checking the ACL
             securityService.checkProjectFunction(subscription.projectEntity, ProjectSubscriptionsWrite::class.java)
+            // For the filtering we must not take into account volatile parts like a custom template
+            val recordId = record.asJson() as ObjectNode
+            recordId.remove(SubscriptionRecord::contentTemplate.name)
             // Tries to find any matching subscription
             val filter = EntityDataStoreFilter(
                 entity = subscription.projectEntity,
                 category = ENTITY_STORE,
-                jsonFilter = "json::jsonb = CAST(:json AS JSONB)",
-                jsonFilterCriterias = mapOf("json" to record.asJson().asJsonString()),
+                jsonFilter = "json::jsonb @> CAST(:json AS JSONB)",
+                jsonFilterCriterias = mapOf("json" to recordId.asJsonString()),
             )
             val records = entityDataStore.getByFilter(
                 filter
             )
             // One existing record
-            if (records.size == 1) {
-                // Just returns the existing record
-                val existingRecord = records.first()
-                SavedEventSubscription(
-                    id = existingRecord.name,
-                    signature = existingRecord.signature,
-                    data = subscription,
-                )
-            } else {
-                // If more than 1 record, this is abnormal, we remove the old records
-                entityDataStore.deleteByFilter(filter)
-                // New ID
-                val id = UUID.randomUUID().toString()
-                // Saves the subscription
-                val newRecord = entityDataStore.replaceOrAddObject(
-                    subscription.projectEntity,
-                    ENTITY_STORE,
-                    id,
-                    securityService.currentSignature,
-                    null,
-                    record
-                )
-                // OK
-                SavedEventSubscription(id, newRecord.signature, subscription)
+            val existingRecord = records.firstOrNull()
+            if (existingRecord != null) {
+                // If this is STRICTLY the same, returns it
+                if (existingRecord.data.parse<SubscriptionRecord>() == record) {
+                    return SavedEventSubscription(
+                        id = existingRecord.name,
+                        signature = existingRecord.signature,
+                        data = subscription,
+                    )
+                }
             }
+            // If more than 1 record, or 1 record by different, replacing the subscription
+            entityDataStore.deleteByFilter(filter)
+            // New ID
+            val id = UUID.randomUUID().toString()
+            // Saves the subscription
+            val newRecord = entityDataStore.replaceOrAddObject(
+                subscription.projectEntity,
+                ENTITY_STORE,
+                id,
+                securityService.currentSignature,
+                null,
+                record
+            )
+            // OK
+            return SavedEventSubscription(id, newRecord.signature, subscription)
         } else {
             securityService.checkGlobalFunction(GlobalSubscriptionsManage::class.java)
             // Gets any existing subscription
-            val existingRecordJson = record.asJson().format()
+            // For the filtering we must not take into account volatile parts like a custom template
+            val recordId = record.asJson() as ObjectNode
+            recordId.remove(SubscriptionRecord::contentTemplate.name)
             val existingRecords = storageService.filterRecords(
                 store = GLOBAL_STORE,
                 type = SignedSubscriptionRecord::class,
-                query = """data::jsonb @> '$existingRecordJson'"""
+                query = """data::jsonb @> '${recordId.format()}'"""
             )
-            // One existing record, we just return it
+            // One existing record
             if (existingRecords.size == 1) {
                 val (id, existingRecord) = existingRecords.toList().first()
-                SavedEventSubscription(
-                    id = id,
-                    signature = existingRecord.signature,
-                    data = subscription,
-                )
-            } else {
-                // If more than 1 record, this is abnormal, we remove the old records
-                existingRecords.forEach { (id, _) ->
-                    storageService.delete(GLOBAL_STORE, id)
+                // If this is STRICTLY the same, returns it
+                if (existingRecord.contentTemplate == record.contentTemplate) {
+                    return SavedEventSubscription(
+                        id = id,
+                        signature = existingRecord.signature,
+                        data = subscription,
+                    )
                 }
-                // New ID
-                val id = UUID.randomUUID().toString()
-                // Saves the subscription
-                val storedRecord = SignedSubscriptionRecord(
-                    signature = securityService.currentSignature,
-                    channel = subscription.channel,
-                    channelConfig = subscription.channelConfig,
-                    events = subscription.events,
-                    keywords = subscription.keywords,
-                    disabled = subscription.disabled,
-                    origin = subscription.origin,
-                    contentTemplate = subscription.contentTemplate,
-                )
-                storageService.store(
-                    GLOBAL_STORE,
-                    id,
-                    storedRecord
-                )
-                // OK
-                SavedEventSubscription(id, storedRecord.signature, subscription)
             }
+            // If more than 1 record, or 1 record by different, replacing the subscription
+            existingRecords.forEach { (id, _) ->
+                storageService.delete(GLOBAL_STORE, id)
+            }
+            // New ID
+            val id = UUID.randomUUID().toString()
+            // Saves the subscription
+            val storedRecord = SignedSubscriptionRecord(
+                signature = securityService.currentSignature,
+                channel = subscription.channel,
+                channelConfig = subscription.channelConfig,
+                events = subscription.events,
+                keywords = subscription.keywords,
+                disabled = subscription.disabled,
+                origin = subscription.origin,
+                contentTemplate = subscription.contentTemplate,
+            )
+            storageService.store(
+                GLOBAL_STORE,
+                id,
+                storedRecord
+            )
+            // OK
+            return SavedEventSubscription(id, storedRecord.signature, subscription)
         }
     }
 
