@@ -65,6 +65,7 @@ angular.module('ontrack.extension.notifications', [
                     events
                     keywords
                     disabled
+                    contentTemplate
                 }
             }
         }`;
@@ -137,6 +138,7 @@ angular.module('ontrack.extension.notifications', [
                 $channelConfig: JSON!,
                 $events: [String!]!,
                 $keywords: String,
+                $contentTemplate: String,
             ) {
               subscribeToEvents(input: {
                 projectEntity: {
@@ -147,6 +149,7 @@ angular.module('ontrack.extension.notifications', [
                 channelConfig: $channelConfig,
                 events: $events,
                 keywords: $keywords, 
+                contentTemplate: $contentTemplate,
               }) {
                 errors {
                   message
@@ -158,6 +161,7 @@ angular.module('ontrack.extension.notifications', [
                   channelConfigText
                   events
                   keywords
+                  contentTemplate
                   disabled
                 }
               }
@@ -200,7 +204,8 @@ angular.module('ontrack.extension.notifications', [
                 channel: form.channel.id,
                 channelConfig: form.channel.data,
                 events: form.events,
-                keywords: form.keywords
+                keywords: form.keywords,
+                contentTemplate: form.contentTemplate,
             };
             const d = $q.defer();
             otGraphqlService.graphQLCall(newSubscriptionQuery, newSubscriptionQueryVariables).then(data => {
@@ -289,6 +294,7 @@ angular.module('ontrack.extension.notifications', [
                     events
                     keywords
                     disabled
+                    contentTemplate
                 }
             }
         }`;
@@ -341,12 +347,14 @@ angular.module('ontrack.extension.notifications', [
                 $channelConfig: JSON!,
                 $events: [String!]!,
                 $keywords: String,
+                $contentTemplate: String,
             ) {
               subscribeToEvents(input: {
                 channel: $channel,
                 channelConfig: $channelConfig,
                 events: $events,
                 keywords: $keywords, 
+                contentTemplate: $contentTemplate,
               }) {
                 errors {
                   message
@@ -358,6 +366,7 @@ angular.module('ontrack.extension.notifications', [
                   channelConfigText
                   events
                   keywords
+                  contentTemplate
                   disabled
                 }
               }
@@ -392,7 +401,8 @@ angular.module('ontrack.extension.notifications', [
                 channel: form.channel.id,
                 channelConfig: form.channel.data,
                 events: form.events,
-                keywords: form.keywords
+                keywords: form.keywords,
+                contentTemplate: form.contentTemplate,
             };
             const d = $q.defer();
             otGraphqlService.graphQLCall(newSubscriptionQuery, newSubscriptionQueryVariables).then(data => {

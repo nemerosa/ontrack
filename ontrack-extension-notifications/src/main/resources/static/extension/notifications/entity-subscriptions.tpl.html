@@ -11,7 +11,7 @@
         </div>
     </div>
 
-    <table class="table">
+    <table class="table table-bordered">
         <thead>
         <tr>
             <th>Events</th>
@@ -32,6 +32,9 @@
                 <span class="ot-label-suite">
                     <span class="label label-info" ng-repeat="event in subscription.events">{{ event }}</span>
                 </span>
+                <p ng-if="subscription.contentTemplate" class="well well-sm" style="margin-top: 8px;">
+                    <code title="Custom template">{{ subscription.contentTemplate }}</code>
+                </p>
             </td>
             <td>
                 {{ subscription.keywords }}
