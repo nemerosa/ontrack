@@ -61,6 +61,8 @@ class SCMChangeLogServiceImpl(
 
         // Getting the list of commits
         val commits = scm.getCommits(fromCommit, toCommit)
+            // ... sorted from the newest to the oldest
+            .sortedByDescending { it.timestamp }
 
         // Decoration of the commits
         val decoratedCommits = commits.map { commit ->

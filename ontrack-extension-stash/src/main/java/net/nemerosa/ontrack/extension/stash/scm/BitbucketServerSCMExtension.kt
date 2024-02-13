@@ -197,7 +197,6 @@ class BitbucketServerSCMExtension(
                         commit = commit
                     )
                 }
-                .sortedBy { it.timestamp }
         }
 
         override fun getConfiguredIssueService(): ConfiguredIssueService? =

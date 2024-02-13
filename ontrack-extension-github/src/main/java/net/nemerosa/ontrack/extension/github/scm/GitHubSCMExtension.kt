@@ -227,7 +227,7 @@ class GitHubSCMExtension(
                 ?: client.compareCommits(repository, toCommit, fromCommit)
             return commits.map { commit ->
                 GitHubSCMCommit(commit)
-            }.sortedBy { it.timestamp }
+            }
         }
 
         override fun findBuildByCommit(project: Project, id: String): Build? =
