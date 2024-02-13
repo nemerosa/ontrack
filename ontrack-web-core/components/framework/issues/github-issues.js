@@ -37,7 +37,7 @@ export default function GithubIssues({issues}) {
                     key="title"
                     title="Title"
                     render={(_, issue) => (
-                        <Typography.Text>issue.summary</Typography.Text>
+                        <Typography.Text>{issue.summary}</Typography.Text>
                     )}
                 />
                 <Column

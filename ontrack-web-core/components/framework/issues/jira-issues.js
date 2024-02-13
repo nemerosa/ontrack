@@ -1,10 +1,6 @@
 import {Table, Typography} from "antd";
 import Link from "next/link";
-import GitHubIssueState from "@components/extension/github/GitHubIssueState";
-import GitHubMilestone from "@components/extension/github/GitHubMilestone";
-import GitHubUser from "@components/extension/github/GitHubUser";
 import TimestampText from "@components/common/TimestampText";
-import GitHubLabels from "@components/extension/github/GitHubLabels";
 import JiraIssueStatus from "@components/extension/jira/JiraIssueStatus";
 import JiraIssueVersions from "@components/extension/jira/JiraIssueVersions";
 import JiraIssueLinks from "@components/extension/jira/JiraIssueLinks";
