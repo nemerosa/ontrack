@@ -11,7 +11,7 @@ import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class MetaInfoSearchIT : AbstractSearchTestSupport() {
+class MetaInfoSearchIT : AbstractSearchJUnit4TestSupport() {
 
     @Test
     fun `Looking for builds with meta information after creation`() {

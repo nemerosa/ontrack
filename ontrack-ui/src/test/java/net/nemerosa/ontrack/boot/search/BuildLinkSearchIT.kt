@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.extension.general.BUILD_LINK_SEARCH_INDEX
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.SearchRequest
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -16,7 +16,14 @@ class BuildLinkSearchIT : AbstractSearchTestSupport() {
             // Indexation
             index(BUILD_LINK_SEARCH_INDEX)
             // Looks for the source using target complete reference
-            val results = asUser { searchService.paginatedSearch(SearchRequest("${target.project.name}:${target.name}", "build-link")).items }
+            val results = asUser {
+                searchService.paginatedSearch(
+                    SearchRequest(
+                        "${target.project.name}:${target.name}",
+                        "build-link"
+                    )
+                ).items
+            }
             assertTrue(results.isNotEmpty())
             results[0].apply {
                 assertEquals(source.entityDisplayName, title)
@@ -28,7 +35,7 @@ class BuildLinkSearchIT : AbstractSearchTestSupport() {
     @Test
     fun `Looking for linked build base on target project and release property`() {
         // Target build
-        val version = uid("V")
+        val version = uid("v-")
         val target = project<Build> {
             branch<Build> {
                 build {
@@ -47,11 +54,18 @@ class BuildLinkSearchIT : AbstractSearchTestSupport() {
         // Indexation
         index(BUILD_LINK_SEARCH_INDEX)
         // Looks for the source using target complete reference
-        val results = asUser { searchService.paginatedSearch(SearchRequest("${target.project.name}:$version", "build-link")).items }
+        val results = asUser {
+            searchService.paginatedSearch(
+                SearchRequest(
+                    "${target.project.name}:$version",
+                    "build-link"
+                )
+            ).items
+        }
         assertTrue(results.isNotEmpty())
         results[0].apply {
             assertEquals(source.entityDisplayName, title)
-            assertEquals("Linked to ${target.project.name}:${target.name}", description)
+            assertEquals("Linked to ${target.project.name}:$version", description)
         }
     }
 
@@ -61,7 +75,8 @@ class BuildLinkSearchIT : AbstractSearchTestSupport() {
             // Indexation
             index(BUILD_LINK_SEARCH_INDEX)
             // Looks for the source using target project only
-            val results = asUser { searchService.paginatedSearch(SearchRequest(target.project.name, "build-link")).items }
+            val results =
+                asUser { searchService.paginatedSearch(SearchRequest(target.project.name, "build-link")).items }
             assertTrue(results.isNotEmpty())
             results[0].apply {
                 assertEquals(source.entityDisplayName, title)
@@ -99,17 +114,32 @@ class BuildLinkSearchIT : AbstractSearchTestSupport() {
         // Looks for the source using target complete reference
         withNoGrantViewToAll {
             asUserWithView(authorizedSource, target) {
-                val results = searchService.paginatedSearch(SearchRequest("${target.project.name}:${target.name}", "build-link")).items
+                val results = searchService.paginatedSearch(
+                    SearchRequest(
+                        "${target.project.name}:${target.name}",
+                        "build-link"
+                    )
+                ).items
                 assertTrue(results.any { it.title == authorizedSource.entityDisplayName })
                 assertTrue(results.none { it.title == restrictedSource.entityDisplayName })
             }
             asUserWithView(target) {
-                val results = searchService.paginatedSearch(SearchRequest("${target.project.name}:${target.name}", "build-link")).items
+                val results = searchService.paginatedSearch(
+                    SearchRequest(
+                        "${target.project.name}:${target.name}",
+                        "build-link"
+                    )
+                ).items
                 assertTrue(results.none { it.title == authorizedSource.entityDisplayName })
                 assertTrue(results.none { it.title == restrictedSource.entityDisplayName })
             }
             asUser().call {
-                val results = searchService.paginatedSearch(SearchRequest("${target.project.name}:${target.name}", "build-link")).items
+                val results = searchService.paginatedSearch(
+                    SearchRequest(
+                        "${target.project.name}:${target.name}",
+                        "build-link"
+                    )
+                ).items
                 assertTrue(results.none { it.title == authorizedSource.entityDisplayName })
                 assertTrue(results.none { it.title == restrictedSource.entityDisplayName })
             }
@@ -128,8 +158,16 @@ class BuildLinkSearchIT : AbstractSearchTestSupport() {
             // Looks for the build based on the link
             withNoGrantViewToAll {
                 asUserWithView(source, target) {
-                    val results = searchService.paginatedSearch(SearchRequest("${target.project.name}:${target.name}", "build-link")).items
-                    assertTrue(results.none { it.title == source.entityDisplayName }, "Build with link shound not be found any longer")
+                    val results = searchService.paginatedSearch(
+                        SearchRequest(
+                            "${target.project.name}:${target.name}",
+                            "build-link"
+                        )
+                    ).items
+                    assertTrue(
+                        results.none { it.title == source.entityDisplayName },
+                        "Build with link shound not be found any longer"
+                    )
                 }
             }
         }
@@ -186,8 +224,16 @@ class BuildLinkSearchIT : AbstractSearchTestSupport() {
     private fun assertBuildNotFoundOnLink(source: Build, target: Build) {
         withNoGrantViewToAll {
             asUserWithView(source, target) {
-                val results = searchService.paginatedSearch(SearchRequest("${target.project.name}:${target.name}", "build-link")).items
-                assertTrue(results.none { it.title == source.entityDisplayName }, "Build with link shound not be found any longer")
+                val results = searchService.paginatedSearch(
+                    SearchRequest(
+                        "${target.project.name}:${target.name}",
+                        "build-link"
+                    )
+                ).items
+                assertTrue(
+                    results.none { it.title == source.entityDisplayName },
+                    "Build with link shound not be found any longer"
+                )
             }
         }
     }
@@ -195,7 +241,12 @@ class BuildLinkSearchIT : AbstractSearchTestSupport() {
     private fun assertBuildFoundOnLink(source: Build, target: Build) {
         withNoGrantViewToAll {
             asUserWithView(source, target) {
-                val results = searchService.paginatedSearch(SearchRequest("${target.project.name}:${target.name}", "build-link")).items
+                val results = searchService.paginatedSearch(
+                    SearchRequest(
+                        "${target.project.name}:${target.name}",
+                        "build-link"
+                    )
+                ).items
                 assertTrue(results.any { it.title == source.entityDisplayName }, "Build with link immediately found")
             }
         }
