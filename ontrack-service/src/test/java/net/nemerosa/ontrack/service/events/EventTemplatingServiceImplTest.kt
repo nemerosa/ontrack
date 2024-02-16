@@ -6,6 +6,9 @@ import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.EventVariableService
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
+import net.nemerosa.ontrack.model.structure.EntityDisplayNameService
+import net.nemerosa.ontrack.model.structure.ProjectEntity
+import net.nemerosa.ontrack.model.structure.defaultDisplayName
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.model.templating.TemplatingService
 import net.nemerosa.ontrack.service.templating.TemplatingServiceImpl
@@ -18,6 +21,7 @@ class EventTemplatingServiceImplTest {
     private lateinit var eventVariableService: EventVariableService
     private lateinit var templatingService: TemplatingService
     private lateinit var eventTemplatingService: EventTemplatingService
+    private lateinit var entityDisplayNameService: EntityDisplayNameService
 
     @BeforeEach
     fun init() {
@@ -29,11 +33,18 @@ class EventTemplatingServiceImplTest {
             "branch" to "release/1.27"
         )
 
+        entityDisplayNameService = mockk()
+        every { entityDisplayNameService.getEntityDisplayName(any()) } answers {
+            val entity = it.invocation.args.first() as ProjectEntity
+            entity.defaultDisplayName
+        }
+
         templatingService = TemplatingServiceImpl(
             templatingSources = emptyList(),
             templatingFilters = emptyList(),
             templatingFunctions = emptyList(),
             ontrackConfigProperties = OntrackConfigProperties(),
+            entityDisplayNameService = entityDisplayNameService,
         )
         eventTemplatingService = EventTemplatingServiceImpl(
             eventVariableService,

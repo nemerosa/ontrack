@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.service.templating
 
+import io.mockk.every
+import io.mockk.mockk
 import net.nemerosa.ontrack.model.events.EventRenderer
 import net.nemerosa.ontrack.model.events.HtmlNotificationEventRenderer
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
@@ -16,6 +18,7 @@ class TemplatingServiceImplTest {
 
     private lateinit var templatingService: TemplatingService
     private lateinit var ontrackConfigProperties: OntrackConfigProperties
+    private lateinit var entityDisplayNameService: EntityDisplayNameService
 
     @BeforeEach
     fun init() {
@@ -83,11 +86,18 @@ class TemplatingServiceImplTest {
             LinkTemplatingFunction(),
         )
 
+        entityDisplayNameService = mockk()
+        every { entityDisplayNameService.getEntityDisplayName(any()) } answers {
+            val entity = it.invocation.args.first() as ProjectEntity
+            entity.defaultDisplayName
+        }
+
         templatingService = TemplatingServiceImpl(
             templatingSources = templatingSources,
             templatingFilters = templatingFilters,
             templatingFunctions = templatingFunctions,
             ontrackConfigProperties = ontrackConfigProperties,
+            entityDisplayNameService = entityDisplayNameService,
         )
     }
 

@@ -38,6 +38,7 @@ class PromotionRunChangeLogTemplatingSource(
     private val structureService: StructureService,
     private val buildFilterService: BuildFilterService,
     private val scmChangeLogService: SCMChangeLogService,
+    private val entityDisplayNameService: EntityDisplayNameService,
 ) : AbstractTemplatingSource(
     field = "changelog",
     type = ProjectEntityType.PROMOTION_RUN,
@@ -80,9 +81,9 @@ class PromotionRunChangeLogTemplatingSource(
                 // Title?
                 if (title) {
 
-                    val projectName = renderer.render(fromBuild.project)
-                    val fromName = renderer.render(fromBuild)
-                    val toName = renderer.render(toBuild)
+                    val projectName = entityDisplayNameService.render(fromBuild.project, renderer)
+                    val fromName = entityDisplayNameService.render(fromBuild, renderer)
+                    val toName = entityDisplayNameService.render(toBuild, renderer)
 
                     val titleText = """
                         Change log for $projectName from $fromName to $toName

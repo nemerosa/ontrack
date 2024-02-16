@@ -1,7 +1,5 @@
 package net.nemerosa.ontrack.model.events
 
-import net.nemerosa.ontrack.model.structure.ProjectEntity
-import net.nemerosa.ontrack.model.structure.ProjectEntityPageBuilder
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.springframework.stereotype.Component
 
@@ -12,11 +10,6 @@ class MarkdownEventRenderer(
 
     override val id: String = "markdown"
     override val name: String = "Markdown"
-
-    override fun render(projectEntity: ProjectEntity): String {
-        val pageUrl = getUrl(ProjectEntityPageBuilder.getEntityPageRelativeURI(projectEntity))
-        return """[${getProjectEntityName(projectEntity)}]($pageUrl)"""
-    }
 
     override fun renderStrong(value: String): String = "**${value}**"
 

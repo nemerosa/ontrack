@@ -28,9 +28,9 @@ class ReleasePropertyTemplatingSourceIT : AbstractDSLTestSupport() {
                         val event = eventFactory.newBuild(build)
 
                         assertEquals(
-                            "Release: 1.0.0",
+                            "Release: 1.0.0 for 1.0.0",
                             eventTemplatingService.render(
-                                template = "Release: ${'$'}{build.release}",
+                                template = "Release: ${'$'}{build.release} for ${'$'}{build}",
                                 event = event,
                                 renderer = PlainEventRenderer.INSTANCE
                             )
@@ -52,9 +52,9 @@ class ReleasePropertyTemplatingSourceIT : AbstractDSLTestSupport() {
                         val event = eventFactory.newBuild(build)
 
                         assertEquals(
-                            "Release: ",
+                            "Release:  for ${build.name}",
                             eventTemplatingService.render(
-                                template = "Release: ${'$'}{build.release}",
+                                template = "Release: ${'$'}{build.release} for ${'$'}{build}",
                                 event = event,
                                 renderer = PlainEventRenderer.INSTANCE
                             )

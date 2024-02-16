@@ -16,8 +16,11 @@ interface EventRenderer {
 
     /**
      * Rendering the link to an entity.
+     *
+     * @param projectEntity Entity to render
+     * @param name Name to use
      */
-    fun render(projectEntity: ProjectEntity): String
+    fun render(projectEntity: ProjectEntity, name: String): String
 
     /**
      * Renders a value and gives it some emphasis.

@@ -33,7 +33,7 @@ class SlackNotificationEventRendererTest {
     @Test
     fun `Branch link`() {
         val branch = BranchFixtures.testBranch()
-        val text = slackNotificationEventRenderer.render(branch)
+        val text = slackNotificationEventRenderer.render(branch, branch.name)
         assertEquals(
             """<https://ontrack.nemerosa.net/#/branch/${branch.id}|${branch.name}>""",
             text
