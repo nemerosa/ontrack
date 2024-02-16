@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.kdsl.spec.extension.av.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.kdsl.spec.extension.av.setAutoVersioningConfig
 import net.nemerosa.ontrack.kdsl.spec.extension.notifications.notifications
 import org.junit.jupiter.api.Test
+import kotlin.math.exp
 
 /**
  * Testing the notifications registered in the AV configuration.
@@ -65,7 +66,7 @@ class ACCAutoVersioningConfigNotifications : AbstractACCAutoVersioningTestSuppor
                         ) {
                             ontrack.notifications.inMemory.group(projectGroup).firstOrNull() ==
                                     """
-                                        Auto versioning of ${project.name}/$name for dependency ${dependency.project.name} version "2.0.0" has failed.
+                                        Auto versioning of ${project.name}/main for dependency ${dependency.project.name} version "2.0.0" has failed.
     
                                         Cannot find version in "gradle.properties".
     
@@ -131,7 +132,7 @@ class ACCAutoVersioningConfigNotifications : AbstractACCAutoVersioningTestSuppor
                         ) {
                             ontrack.notifications.inMemory.group(projectGroup).firstOrNull() ==
                                     """
-                                        Auto versioning of ${project.name}/$name for dependency ${dependency.project.name} version "2.0.0" has been done.
+                                        Auto versioning of ${project.name}/main for dependency ${dependency.project.name} version "2.0.0" has been done.
                                         
                                         Auto versioning PR has been created, approved and merged.
                                         
@@ -194,18 +195,19 @@ class ACCAutoVersioningConfigNotifications : AbstractACCAutoVersioningTestSuppor
                         waitForAutoVersioningCompletion()
 
                         // Check a success notification has been received at target branch level
+                        val expectedMessage = """
+                            Auto versioning of ${project.name}/main for dependency ${dependency.project.name} version "2.0.0" has been done.
+                            
+                            The change log will be here soon, based on the IRON promotion.
+                        """.trimIndent()
                         waitUntil(
                             timeout = 10_000,
                             interval = 500L,
                             task = "Success notification at target level",
-                            onTimeout = displayNotifications(projectGroup)
+                            onTimeout = displayNotifications(projectGroup, expectedMessage)
                         ) {
                             ontrack.notifications.inMemory.group(projectGroup).firstOrNull() ==
-                                    """
-                                        Auto versioning of ${project.name}/$name for dependency ${dependency.project.name} version "2.0.0" has been done.
-                                        
-                                        The change log will be here soon, based on the IRON promotion.
-                                    """.trimIndent()
+                                    expectedMessage
                         }
 
                     }
