@@ -1,38 +1,34 @@
-import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import {useConnection} from "@components/providers/ConnectionContextProvider";
 import {useContext, useEffect, useState} from "react";
-import {gql} from "graphql-request";
 import {UserContext} from "@components/providers/UserProvider";
-import {FaCheck, FaCopy, FaEdit, FaLock, FaPlus, FaTrash, FaUserLock, FaUsers, FaWindowRestore} from "react-icons/fa";
-import {Button, Dropdown, Space, Typography} from "antd";
+import {
+    FaCheck,
+    FaCopy,
+    FaEdit,
+    FaLock,
+    FaPlus,
+    FaRegCopy,
+    FaTrash,
+    FaUserLock,
+    FaUsers,
+    FaWindowRestore
+} from "react-icons/fa";
+import {Button, Dropdown, message, Space, Typography} from "antd";
 import {DashboardContext} from "@components/dashboards/DashboardContextProvider";
 import SaveDashboardDialog, {useSaveDashboardDialog} from "@components/dashboards/SaveDashboardDialog";
-import {gqlDashboardFragment} from "@components/dashboards/DashboardConstants";
+import {useRouter} from "next/router";
+import copy from "copy-to-clipboard";
+import Link from "next/link";
 
 export default function DashboardCommandMenu() {
 
-    const client = useGraphQLClient()
     const user = useContext(UserContext)
 
-    const [dashboards, setDashboards] = useState([])
-    const context = useContext(DashboardContext)
+    const [messageApi, contextHolder] = message.useMessage()
 
-    useEffect(() => {
-        if (client) {
-            client.request(
-                gql`
-                    query UserDashboards {
-                        userDashboards {
-                            ...DashboardData
-                        }
-                    }
-                    
-                    ${gqlDashboardFragment}
-                `
-            ).then(data => {
-                setDashboards(data.userDashboards)
-            })
-        }
-    }, [client, context?.dashboard])
+    const router = useRouter()
+    const {environment} = useConnection()
+    const context = useContext(DashboardContext)
 
     const saveDashboardDialog = useSaveDashboardDialog({
         onSuccess: (_, {__, edition}) => {
@@ -42,6 +38,23 @@ export default function DashboardCommandMenu() {
             }
         }
     })
+
+    const copyDashboard = () => {
+        const selectedDashboard = context?.dashboard
+        if (selectedDashboard) {
+            const link = `${environment.ontrack.ui.url}${router.pathname}?dashboard=${selectedDashboard.uuid}`
+            if (copy(link)) {
+                message.success(
+                    <Space direction="vertical">
+                        <Typography.Paragraph>Dashboard URL copied</Typography.Paragraph>
+                        <Typography.Paragraph>
+                            <Link href={link}>{link}</Link>
+                        </Typography.Paragraph>
+                    </Space>
+                )
+            }
+        }
+    }
 
     const editDashboard = () => {
         context.startEdition()
@@ -82,7 +95,7 @@ export default function DashboardCommandMenu() {
         const menu = []
 
         // All dashboards
-        dashboards.forEach(dashboard => {
+        context?.dashboards.forEach(dashboard => {
 
             // Type of dashboards
             let icon = undefined
@@ -120,6 +133,16 @@ export default function DashboardCommandMenu() {
 
         // Separator
         menu.push({type: 'divider'})
+
+        // Copying URL to current dashboard
+        if (context?.dashboard) {
+            menu.push({
+                key: 'copy',
+                icon: <FaRegCopy/>,
+                label: "Copy dashboard URL",
+                onClick: copyDashboard,
+            })
+        }
 
         // Editing current
         if (context?.dashboard && context.dashboard.authorizations.edit) {
@@ -174,10 +197,11 @@ export default function DashboardCommandMenu() {
         // OK
         setItems(menu)
 
-    }, [dashboards, context?.dashboard, user]);
+    }, [context.dashboards?.length, context?.dashboard, user]);
 
     return (
         <>
+            {contextHolder}
             <Dropdown menu={{items}}>
                 <Button
                     type="text"

@@ -10,8 +10,13 @@ import {
 } from "@components/dashboards/DashboardConstants";
 import {Modal} from "antd";
 import {GridTableContext} from "@components/grid/GridTableContext";
+import {useRouter} from "next/router";
 
 export const DashboardContext = createContext({
+    /**
+     * List of available dashboards
+     */
+    dashboards: [],
     /**
      * Selected dashboard
      */
@@ -19,7 +24,8 @@ export const DashboardContext = createContext({
     /**
      * Records a nex layout for the widgets
      */
-    recordLayout: (layout) => {},
+    recordLayout: (layout) => {
+    },
     /**
      * Selecting a dashboard
      */
@@ -85,6 +91,7 @@ export default function DashboardContextProvider({children}) {
     const client = useGraphQLClient()
     const {clearExpandedId, setExpandable} = useContext(GridTableContext)
 
+    const [dashboards, setDashboards] = useState([])
     const [dashboard, setDashboard] = useState()
     const [dashboardRefresh, setDashboardRefresh] = useState(0)
 
@@ -92,11 +99,16 @@ export default function DashboardContextProvider({children}) {
     const [saving, setSaving] = useState(false)
     const [copyDashboard, setCopyDashboard] = useState()
 
+    const router = useRouter()
+
     useEffect(() => {
         if (client) {
             client.request(
                 gql`
                     query UserDashboard {
+                        userDashboards {
+                            ...DashboardData
+                        }
                         userDashboard {
                             ...DashboardData
                         }
@@ -105,10 +117,14 @@ export default function DashboardContextProvider({children}) {
                     ${gqlDashboardFragment}
                 `
             ).then(data => {
-                setDashboard(data.userDashboard)
+                setDashboards(data.userDashboards)
+                const dashboardId = router.query.dashboard
+                const initialDashboard =
+                    data.userDashboards.find(it => it.uuid === dashboardId) ?? data.userDashboard
+                setDashboard(initialDashboard)
             })
         }
-    }, [client, dashboardRefresh]);
+    }, [client, dashboardRefresh, router.query.dashboard]);
 
     const widgetLayout = (layout, uuid) => {
         const item = layout.find(it => it.i === uuid)
@@ -269,6 +285,7 @@ export default function DashboardContextProvider({children}) {
     }
 
     const context = {
+        dashboards,
         dashboard,
         recordLayout,
         selectDashboard,
