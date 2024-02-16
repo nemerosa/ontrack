@@ -2,11 +2,11 @@ import MainPage from "@components/layouts/MainPage";
 import JumpToProject from "@components/projects/JumpToProject";
 import DashboardContextProvider from "@components/dashboards/DashboardContextProvider";
 import DashboardView from "@components/dashboards/DashboardView";
-import {Command, LegacyLinkCommand} from "@components/common/Commands";
+import {LegacyLinkCommand} from "@components/common/Commands";
 import DashboardCommandMenu from "@components/dashboards/DashboardCommandMenu";
 import GridTableContextProvider from "@components/grid/GridTableContext";
-import {FaPlus} from "react-icons/fa";
 import NewProjectCommand from "@components/projects/NewProjectCommand";
+import DashboardPageTitle from "@components/dashboards/DashboardPageTitle";
 
 export default function DashboardPage({title}) {
 
@@ -27,7 +27,9 @@ export default function DashboardPage({title}) {
             <GridTableContextProvider>
                 <DashboardContextProvider>
                     <MainPage
-                        title={title}
+                        title={
+                            <DashboardPageTitle title={title}/>
+                        }
                         breadcrumbs={[]}
                         commands={commands}
                     >
