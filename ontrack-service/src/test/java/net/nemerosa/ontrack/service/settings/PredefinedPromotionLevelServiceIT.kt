@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service.settings
 
 import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.common.getOrNull
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.exceptions.PredefinedPromotionLevelNameAlreadyDefinedException
 import net.nemerosa.ontrack.model.security.GlobalSettings
@@ -9,6 +10,7 @@ import net.nemerosa.ontrack.model.security.PromotionLevelEdit
 import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.PredefinedPromotionLevel
+import net.nemerosa.ontrack.model.structure.PromotionLevel
 import net.nemerosa.ontrack.test.TestUtils
 import org.springframework.beans.factory.annotation.Autowired
 
@@ -16,22 +18,22 @@ import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import kotlin.test.*
 
-class PredefinedPromotionLevelServiceIT: AbstractServiceTestSupport() {
+class PredefinedPromotionLevelServiceIT : AbstractDSLTestSupport() {
 
     @Autowired
-    private lateinit var service: PredefinedPromotionLevelService 
+    private lateinit var service: PredefinedPromotionLevelService
 
     @Test
     fun `Predefined promotion level creation`() {
         val name = uid("PVS")
         val predefinedPromotionLevel = asUser().with(GlobalSettings::class.java).call {
             service.newPredefinedPromotionLevel(
-                    PredefinedPromotionLevel.of(
-                            NameDescription.nd(
-                                    name,
-                                    "Predefined $name"
-                            )
+                PredefinedPromotionLevel.of(
+                    NameDescription.nd(
+                        name,
+                        "Predefined $name"
                     )
+                )
             )
         }
         assertNotNull(predefinedPromotionLevel) {
@@ -45,24 +47,24 @@ class PredefinedPromotionLevelServiceIT: AbstractServiceTestSupport() {
         // Once --> OK
         asUser().with(GlobalSettings::class.java).call {
             service.newPredefinedPromotionLevel(
-                    PredefinedPromotionLevel.of(
-                            NameDescription.nd(
-                                    name,
-                                    "Predefined $name"
-                            )
+                PredefinedPromotionLevel.of(
+                    NameDescription.nd(
+                        name,
+                        "Predefined $name"
                     )
+                )
             )
         }
         // Twice --> NOK
         asUser().with(GlobalSettings::class.java).call {
             assertFailsWith<PredefinedPromotionLevelNameAlreadyDefinedException> {
                 service.newPredefinedPromotionLevel(
-                        PredefinedPromotionLevel.of(
-                                NameDescription.nd(
-                                        name,
-                                        "Predefined other $name"
-                                )
+                    PredefinedPromotionLevel.of(
+                        NameDescription.nd(
+                            name,
+                            "Predefined other $name"
                         )
+                    )
                 )
             }
         }
@@ -83,11 +85,11 @@ class PredefinedPromotionLevelServiceIT: AbstractServiceTestSupport() {
         // Updates the PL1 description and image
         asUser().withProjectFunction(pl1, PromotionLevelEdit::class.java).call {
             structureService.savePromotionLevel(
-                    pl1.withDescription("My new description")
+                pl1.withDescription("My new description")
             )
             structureService.setPromotionLevelImage(
-                    pl1.id,
-                    Document("image/png", TestUtils.resourceBytes("/promotionLevelImage1.png"))
+                pl1.id,
+                Document("image/png", TestUtils.resourceBytes("/promotionLevelImage1.png"))
             )
         }
 
@@ -132,18 +134,18 @@ class PredefinedPromotionLevelServiceIT: AbstractServiceTestSupport() {
         // Predefined promotion level
         val ppl = asAdmin().call {
             service.newPredefinedPromotionLevel(
-                    PredefinedPromotionLevel.of(NameDescription.nd(pl1Name, ""))
+                PredefinedPromotionLevel.of(NameDescription.nd(pl1Name, ""))
             )
         }
 
         // Updates the PL1 description and image
         asUser().withProjectFunction(pl1, PromotionLevelEdit::class.java).call {
             structureService.savePromotionLevel(
-                    pl1.withDescription("My new description")
+                pl1.withDescription("My new description")
             )
             structureService.setPromotionLevelImage(
-                    pl1.id,
-                    Document("image/png", TestUtils.resourceBytes("/promotionLevelImage1.png"))
+                pl1.id,
+                Document("image/png", TestUtils.resourceBytes("/promotionLevelImage1.png"))
             )
         }
 
@@ -170,6 +172,35 @@ class PredefinedPromotionLevelServiceIT: AbstractServiceTestSupport() {
             assertNotNull(pl) {
                 assertEquals("My new description", it.description)
                 assertTrue(it.isImage)
+            }
+        }
+    }
+
+    @Test
+    fun `Updating a promotion level must keep the predefined promotion level description`() {
+        asAdmin {
+            val plName = uid("pl-")
+            val ppl = service.newPredefinedPromotionLevel(
+                PredefinedPromotionLevel.of(
+                    NameDescription.nd(plName, "Description at predefined level")
+                )
+            )
+
+            project {
+                branch {
+                    // Creating a promotion level
+                    val pl1 = promotionLevel(name = plName)
+                    // Predefined description must have been set
+                    assertEquals(ppl.description, pl1.description)
+
+                    // Updating the promotion level without a description
+                    structureService.savePromotionLevel(
+                        pl1.withDescription("")
+                    )
+                    val pl2 = structureService.getPromotionLevel(pl1.id)
+                    // Predefined description must have been kept
+                    assertEquals(ppl.description, pl2.description)
+                }
             }
         }
     }

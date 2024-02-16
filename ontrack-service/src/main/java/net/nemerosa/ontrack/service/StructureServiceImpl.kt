@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.common.Document
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.api.BuildValidationExtension
 import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.model.Ack
@@ -24,13 +23,13 @@ import net.nemerosa.ontrack.repository.*
 import net.nemerosa.ontrack.service.ImageHelper.checkImage
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.Validate
-import org.jetbrains.annotations.Nullable
 import org.slf4j.LoggerFactory
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.*
 import java.util.function.BiFunction
+import kotlin.jvm.optionals.getOrNull
 
 @Service
 @UserTransaction
@@ -686,10 +685,20 @@ class StructureServiceImpl(
         isEntityDefined(promotionLevel.branch.project, "Project must be defined")
         // Security
         securityService.checkProjectFunction(promotionLevel.projectId(), PromotionLevelEdit::class.java)
+        // Gets any corresponding predefined promotion level
+        val ppl = securityService.asAdmin {
+            predefinedPromotionLevelService.findPredefinedPromotionLevelByName(promotionLevel.name)
+        }.getOrNull()
+        // Using the predefined description if the input's description is blank or null
+        val actualPromotionLevel = if (ppl != null && promotionLevel.description.isNullOrBlank()) {
+            promotionLevel.withDescription(ppl.description)
+        } else {
+            promotionLevel
+        }
         // Repository
-        structureRepository.savePromotionLevel(promotionLevel)
+        structureRepository.savePromotionLevel(actualPromotionLevel)
         // Event
-        eventPostService.post(eventFactory.updatePromotionLevel(promotionLevel))
+        eventPostService.post(eventFactory.updatePromotionLevel(actualPromotionLevel))
     }
 
     override fun deletePromotionLevel(promotionLevelId: ID): Ack {
