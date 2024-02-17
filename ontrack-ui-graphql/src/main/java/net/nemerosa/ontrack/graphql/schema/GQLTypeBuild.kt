@@ -240,13 +240,14 @@ class GQLTypeBuild(
                             .build()
                     ),
                     itemPaginatedListProvider = { environment, build, offset, size ->
-                        val filter: (Build) -> Boolean = getFilter(environment)
+                        val filter: (BuildLink) -> Boolean = getFilter(environment)
                         structureService.getBuildsUsedBy(
                             build,
                             offset,
-                            size,
-                            filter
-                        )
+                            size
+                        ) { candidate ->
+                            filter(BuildLink(candidate, ""))
+                        }
                     }
                 )
             )
@@ -261,6 +262,11 @@ class GQLTypeBuild(
                         newArgument()
                             .name("project")
                             .description("Keeps only links targeted from this project")
+                            .type(GraphQLString)
+                            .build(),
+                        newArgument()
+                            .name("qualifier")
+                            .description("Keeps only links targeted for this qualifier")
                             .type(GraphQLString)
                             .build(),
                         newArgument()
@@ -283,14 +289,14 @@ class GQLTypeBuild(
                     ),
                     itemPaginatedListProvider = { environment, build, offset, size ->
                         val depth = environment.getArgument<Int>("depth") ?: 0
-                        var filter: (Build) -> Boolean = getFilter(environment)
+                        var filter: (BuildLink) -> Boolean = getFilter(environment)
                         val label: String? = environment.getArgument("label")
                         if (!label.isNullOrBlank()) {
                             val (labelCategory, labelName) = Label.categoryAndNameFromDisplay(label)
                             val actualLabel = labelManagementService.findLabels(labelCategory, labelName).firstOrNull()
                                 ?: throw LabelNotFoundException(labelCategory, labelName)
                             filter = filter and {
-                                projectLabelManagementService.hasProjectLabel(it.project, actualLabel)
+                                projectLabelManagementService.hasProjectLabel(it.build.project, actualLabel)
                             }
                         }
                         structureService.getQualifiedBuildsUsedBy(
@@ -328,9 +334,10 @@ class GQLTypeBuild(
                         structureService.getBuildsUsing(
                             build,
                             offset,
-                            size,
-                            filter
-                        )
+                            size
+                        ) { candidate ->
+                            filter(BuildLink(candidate, ""))
+                        }
                     }
                 )
             )
@@ -395,20 +402,24 @@ class GQLTypeBuild(
             .build()
     }
 
-    private fun getFilter(environment: DataFetchingEnvironment): (Build) -> Boolean {
+    private fun getFilter(environment: DataFetchingEnvironment): (BuildLink) -> Boolean {
         val projectName: String? = environment.getArgument("project")
+        val qualifier: String? = environment.getArgument("qualifier")
         val branchName: String? = environment.getArgument("branch")
-        val filter: (Build) -> Boolean = if (branchName != null) {
-            if (projectName == null) {
+        val filter: (BuildLink) -> Boolean = if (branchName != null) {
+            if (projectName.isNullOrBlank()) {
                 throw IllegalArgumentException("`project` is required")
             } else {
                 {
-                    it.branch.project.name == projectName && it.branch.name == branchName
+                    it.build.branch.project.name == projectName &&
+                            it.build.branch.name == branchName &&
+                            (qualifier == null || qualifier == it.qualifier)
                 }
             }
-        } else if (projectName != null) {
+        } else if (!projectName.isNullOrBlank()) {
             {
-                it.branch.project.name == projectName
+                it.build.branch.project.name == projectName &&
+                        (qualifier == null || qualifier == it.qualifier)
             }
         } else {
             { true }

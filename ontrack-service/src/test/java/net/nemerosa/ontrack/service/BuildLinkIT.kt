@@ -699,7 +699,7 @@ class BuildLinkIT : AbstractDSLTestSupport() {
             val links = structureService.getQualifiedBuildsUsedBy(
                 build = p
             ) { candidate ->
-                projectLabelManagementService.hasProjectLabel(candidate.project, label)
+                projectLabelManagementService.hasProjectLabel(candidate.build.project, label)
             }
             assertEquals(
                 listOf(
@@ -739,7 +739,7 @@ class BuildLinkIT : AbstractDSLTestSupport() {
                 build = p,
                 depth = 1, // We don't expect s layer
             ) { candidate ->
-                projectLabelManagementService.hasProjectLabel(candidate.project, label)
+                projectLabelManagementService.hasProjectLabel(candidate.build.project, label)
             }
             assertEquals(
                 listOf(
@@ -759,7 +759,7 @@ class BuildLinkIT : AbstractDSLTestSupport() {
                 build = p,
                 depth = 10,
             ) { candidate ->
-                projectLabelManagementService.hasProjectLabel(candidate.project, label)
+                projectLabelManagementService.hasProjectLabel(candidate.build.project, label)
             }
             assertEquals(
                 listOf(

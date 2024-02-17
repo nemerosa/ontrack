@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.scm.graphql
 
 import graphql.schema.GraphQLFieldDefinition
 import kotlinx.coroutines.runBlocking
+import net.nemerosa.ontrack.extension.scm.changelog.ProjectLink
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogService
 import net.nemerosa.ontrack.graphql.schema.GQLRootQuery
 import net.nemerosa.ontrack.graphql.support.intArgument
@@ -27,7 +28,11 @@ class GQLRootQuerySCMChangeLog(
         .argument(
             stringListArgument(
                 ARG_PROJECTS,
-                "List of projects to follow one by one for a get deep change log",
+                """
+                    List of projects to follow one by one for a get deep change log. Each item
+                    in the list is either a project name, or a project name and qualifier separated
+                    by a colon (:).
+                    """.trimIndent(),
                 nullable = true
             )
         )
@@ -42,7 +47,9 @@ class GQLRootQuerySCMChangeLog(
                 scmChangeLogService.getChangeLog(
                     from = buildFrom,
                     to = buildTo,
-                    projects = projects ?: emptyList(),
+                    projects = projects
+                        ?.map { ProjectLink.parse(it) }
+                        ?: emptyList(),
                 )
             }
         }

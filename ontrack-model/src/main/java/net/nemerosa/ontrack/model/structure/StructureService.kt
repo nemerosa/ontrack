@@ -173,7 +173,7 @@ interface StructureService {
      * @param offset Offset for pagination
      * @param size   Page size for pagination
      * @param depth  If greater than 0, looks for children up to this depth
-     * @param filter Optional filter on the builds
+     * @param filter Optional filter on the build link
      * @return List of qualified build links which are used by the given one
      */
     fun getQualifiedBuildsUsedBy(
@@ -181,7 +181,7 @@ interface StructureService {
         offset: Int = 0,
         size: Int = 10,
         depth: Int = 0,
-        filter: (Build) -> Boolean = { true },
+        filter: (link: BuildLink) -> Boolean = { true },
     ): PaginatedList<BuildLink>
 
     /**
@@ -193,7 +193,7 @@ interface StructureService {
      * @param filter Optional filter on the builds
      * @return List of builds which use the given one
      */
-    @Deprecated("Only qualified build links should be used")
+    @Deprecated("Will be removed in V5. Only qualified build links should be used")
     fun getBuildsUsing(build: Build, offset: Int = 0, size: Int = 10, filter: (Build) -> Boolean = { true }): PaginatedList<Build>
 
     /**
@@ -202,10 +202,10 @@ interface StructureService {
      * @param build  Source build
      * @param offset Offset for pagination
      * @param size   Page size for pagination
-     * @param filter Optional filter on the builds
+     * @param filter Optional filter on the build links
      * @return List of builds which use the given one
      */
-    fun getQualifiedBuildsUsing(build: Build, offset: Int = 0, size: Int = 10, filter: (Build) -> Boolean = { true }): PaginatedList<BuildLink>
+    fun getQualifiedBuildsUsing(build: Build, offset: Int = 0, size: Int = 10, filter: (BuildLink) -> Boolean = { true }): PaginatedList<BuildLink>
 
     fun editBuildLinks(build: Build, form: BuildLinkForm)
 

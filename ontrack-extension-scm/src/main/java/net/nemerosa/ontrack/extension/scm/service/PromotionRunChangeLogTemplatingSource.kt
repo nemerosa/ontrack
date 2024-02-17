@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.scm.service
 
 import kotlinx.coroutines.runBlocking
+import net.nemerosa.ontrack.extension.scm.changelog.ProjectLink
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLog
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogService
 import net.nemerosa.ontrack.model.annotations.APIDescription
@@ -70,7 +71,7 @@ class PromotionRunChangeLogTemplatingSource(
                     scmChangeLogService.getChangeLog(
                         fromBuild,
                         toBuild,
-                        projects,
+                        projects.map { ProjectLink.parse(it) },
                     )?.let { scmChangeLog ->
                         renderChangeLog(
                             changeLog = scmChangeLog,

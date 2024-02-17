@@ -34,10 +34,8 @@ class BuildLinkTemplatingSource(
             val linked = structureService.getQualifiedBuildsUsedBy(
                 build = entity,
             ) { candidate ->
-                candidate.project.name == project
-            }.pageItems.filter { link ->
-                qualifier == link.qualifier
-            }.firstOrNull()
+                candidate.build.project.name == project && candidate.qualifier == qualifier
+            }.pageItems.firstOrNull()
             if (linked != null) {
                 val release = propertyService.getPropertyValue(linked.build, ReleasePropertyType::class.java)?.name
                 when (mode) {

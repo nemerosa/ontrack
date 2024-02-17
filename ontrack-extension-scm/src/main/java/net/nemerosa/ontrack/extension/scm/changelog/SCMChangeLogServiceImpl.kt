@@ -14,7 +14,7 @@ class SCMChangeLogServiceImpl(
     private val structureService: StructureService,
 ) : SCMChangeLogService {
 
-    override suspend fun getChangeLog(from: Build, to: Build, projects: List<String>): SCMChangeLog? {
+    override suspend fun getChangeLog(from: Build, to: Build, projects: List<ProjectLink>): SCMChangeLog? {
 
         if (from.project.id() != to.project.id()) {
             throw SCMChangeLogNotSameProjectException()
@@ -28,10 +28,12 @@ class SCMChangeLogServiceImpl(
 
             // Gets the link to the dependency
             val linkedFrom = structureService.getQualifiedBuildsUsedBy(from, size = 1) {
-                it.branch.project.name == project
+                it.build.branch.project.name == project.project &&
+                        it.qualifier == project.qualifier
             }.pageItems.firstOrNull()?.build
             val linkedTo = structureService.getQualifiedBuildsUsedBy(to, size = 1) {
-                it.branch.project.name == project
+                it.build.branch.project.name == project.project &&
+                        it.qualifier == project.qualifier
             }.pageItems.firstOrNull()?.build
 
             // If one of the links is absent, giving up

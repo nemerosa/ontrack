@@ -138,7 +138,8 @@ class AutoVersioningValidationServiceImpl(
     ): BuildVersionInfo? {
         // Using build links first
         val link = structureService.getQualifiedBuildsUsedBy(build, 0, 1) {
-            it.project.name == config.sourceProject
+            it.build.project.name == config.sourceProject &&
+                    (config.qualifier == null || config.qualifier == it.qualifier)
         }.pageItems.firstOrNull()?.build
         return if (link != null) {
             val linkedVersion = link.run {

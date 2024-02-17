@@ -445,7 +445,7 @@ class StructureServiceImpl(
         offset: Int,
         size: Int,
         depth: Int,
-        filter: (Build) -> Boolean
+        filter: (BuildLink) -> Boolean
     ): PaginatedList<BuildLink> {
         securityService.checkProjectFunction(build, ProjectView::class.java)
         // First level dependency (depth == 0)
@@ -458,7 +458,7 @@ class StructureServiceImpl(
                 securityService.isProjectFunctionGranted(b.build, ProjectView::class.java)
             }
         // OK
-        return PaginatedList.create(list.filter { filter(it.build) }, offset, size)
+        return PaginatedList.create(list.filter(filter), offset, size)
     }
 
     private fun internalQualifiedBuildsUsedBy(
@@ -503,14 +503,14 @@ class StructureServiceImpl(
         build: Build,
         offset: Int,
         size: Int,
-        filter: (Build) -> Boolean
+        filter: (BuildLink) -> Boolean
     ): PaginatedList<BuildLink> {
         securityService.checkProjectFunction(build, ProjectView::class.java)
         // Gets the complete list, filtered by ACL
         val list = buildLinkRepository.getQualifiedBuildsUsing(build)
             .filter { b -> securityService.isProjectFunctionGranted(b.build, ProjectView::class.java) }
         // OK
-        return PaginatedList.create(list.filter { filter(it.build) }, offset, size)
+        return PaginatedList.create(list.filter { filter(it) }, offset, size)
     }
 
     override fun editBuildLinks(build: Build, form: BuildLinkForm) {
