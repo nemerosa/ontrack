@@ -30,8 +30,8 @@ class BuildLinkDecorationExtension(
 
         // Gets the main links from this build
         var extraLinks = false
-        val mainLinks = structureService.getQualifiedBuildsUsedBy(entity as Build, 0, Int.MAX_VALUE) { target ->
-            val mainLink = labels.isEmpty() || mainBuildLinksFilterService.isMainBuidLink(target, labels)
+        val mainLinks = structureService.getQualifiedBuildsUsedBy(entity as Build, 0, Int.MAX_VALUE) { link ->
+            val mainLink = labels.isEmpty() || mainBuildLinksFilterService.isMainBuidLink(link.build, labels)
             // There are extra links if a target build is NOT a main link
             extraLinks = extraLinks || !mainLink
             // OK
