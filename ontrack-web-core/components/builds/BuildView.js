@@ -37,6 +37,9 @@ export default function BuildView({id}) {
                                 user
                                 time
                             }
+                            releaseProperty {
+                                value
+                            }
                             properties {
                                 ...propertiesFragment
                             }
