@@ -62,6 +62,9 @@ export default function ProjectPromotionWidget({project, promotions, depth, labe
                             time
                             user
                         }
+                        releaseProperty {
+                            value
+                        }
                         decorations {
                             ...decorationContent
                         }
@@ -133,6 +136,7 @@ export default function ProjectPromotionWidget({project, promotions, depth, labe
                     render={(_, run) => <Space>
                         <BuildBox
                             build={run.build}
+                            displayDecorations={false}
                             creationDisplayMode="tooltip"
                         />
                         <Space size={8}>

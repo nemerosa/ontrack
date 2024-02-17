@@ -1,7 +1,7 @@
 import {Popover, Space} from "antd";
-import {buildLink} from "@components/common/Links";
 import Decorations from "@components/framework/decorations/Decorations";
 import Timestamp from "@components/common/Timestamp";
+import BuildLink from "@components/builds/BuildLink";
 
 /**
  *
@@ -27,7 +27,7 @@ export default function BuildBox({
     const core =
         <Space direction="vertical" size={0}>
             <Space>
-                {buildLink(build, text)}
+                <BuildLink build={build} text={text}/>
                 {
                     displayDecorations && <Decorations entity={build}/>
                 }
