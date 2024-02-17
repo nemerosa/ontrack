@@ -6,7 +6,6 @@ import {Button, Dropdown, Input, Modal, Space, Spin} from "antd";
 import {FaCheck, FaCopy, FaDownload, FaTools} from "react-icons/fa";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import copy from "copy-to-clipboard";
-import CheckStatus from "@components/common/CheckStatus";
 import {gql} from "graphql-request";
 import IssueChangeLogExportRequestDialog, {
     useIssueChangeLogExportRequestDialog

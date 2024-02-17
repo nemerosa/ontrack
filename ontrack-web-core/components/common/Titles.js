@@ -33,3 +33,5 @@ export function promotionLevelTitle(promotionLevel) {
 export function title(text) {
     return <title>{`Ontrack | ${text ? text : "loading..."}`}</title>
 }
+
+export const pageTitle = title
