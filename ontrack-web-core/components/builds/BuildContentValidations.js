@@ -102,7 +102,7 @@ export default function BuildContentValidations({build}) {
                 setValidationStamps(data.branches[0].validationStamps.sort(sortingByText))
             })
         }
-    }, [client]);
+    }, [client, build.branch.id]);
 
     useEffect(() => {
         if (client) {
