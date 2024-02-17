@@ -163,6 +163,7 @@ export default function ProjectPromotionWidget({project, promotions, depth, labe
                                     link={dependency}
                                     displayPromotions={true}
                                     displayProject={false}
+                                    displayDecorations={false}
                                 />
                             } else {
                                 return <Popover content={`No dependency on ${projectName}`}>
