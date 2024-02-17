@@ -22,7 +22,7 @@ export default function BuildNode({data}) {
                     } : {}
                 }
             >
-                <Space direction="vertical">
+                <Space direction="vertical" className="ot-line">
                     <Typography.Text ellipsis={true}>
                         {build && <ProjectLink project={build.branch.project}/>}
                     </Typography.Text>
