@@ -2,17 +2,18 @@ package net.nemerosa.ontrack.boot.search
 
 import net.nemerosa.ontrack.extension.general.ReleaseProperty
 import net.nemerosa.ontrack.extension.general.ReleasePropertyType
-import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.graphql.AbstractQLKTITJUnit4Support
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.TestPropertySource
 
 @TestPropertySource(
-    properties = [
-        "ontrack.config.search.index.immediate=true"
-    ]
+        properties = [
+            "ontrack.config.search.index.immediate=true"
+        ]
 )
-abstract class AbstractSearchTestSupport : AbstractQLKTITSupport() {
+@Deprecated("JUnit 4 is deprecated.")
+abstract class AbstractSearchJUnit4TestSupport : AbstractQLKTITJUnit4Support() {
 
     @Autowired
     protected lateinit var searchService: SearchService

@@ -11,25 +11,30 @@ val ProjectEntity.nameValues: Map<String, String>
         is Project -> mapOf(
             "project" to name
         )
+
         is Branch -> mapOf(
             "project" to project.name,
             "branch" to name
         )
+
         is Build -> mapOf(
             "project" to project.name,
             "branch" to branch.name,
             "build" to name
         )
+
         is ValidationStamp -> mapOf(
             "project" to project.name,
             "branch" to branch.name,
             "validation" to name
         )
+
         is PromotionLevel -> mapOf(
             "project" to project.name,
             "branch" to branch.name,
             "promotion" to name
         )
+
         is ValidationRun -> mapOf(
             "project" to project.name,
             "branch" to build.branch.name,
@@ -37,29 +42,25 @@ val ProjectEntity.nameValues: Map<String, String>
             "validation" to validationStamp.name,
             "run" to runOrder.toString()
         )
+
         is PromotionRun -> mapOf(
             "project" to project.name,
             "branch" to build.branch.name,
             "build" to build.name,
             "promotion" to promotionLevel.name
         )
+
         else -> throw IllegalStateException("Unknown project entity: $this")
     }
 
 /**
  * Name for an entity
  */
-val ProjectEntity.displayName: String
-    get() = when (this) {
-        is Project -> name
-        is Branch -> name
-        is Build -> name
-        is ValidationStamp -> name
-        is PromotionLevel -> name
-        is ValidationRun -> "#$runOrder"
-        is PromotionRun -> "${build.name}/${promotionLevel.name}"
-        else -> throw IllegalStateException("Unknown project entity: $this")
-    }
+@Deprecated(
+    "Will be removed in V5. The EntityDisplayNameService must be used instead",
+    replaceWith = ReplaceWith("defaultDisplayName")
+)
+val ProjectEntity.displayName: String get() = defaultDisplayName
 
 /**
  * List of names of this entity
@@ -69,25 +70,30 @@ val ProjectEntityType.names: List<String>
         ProjectEntityType.PROJECT -> listOf(
             "project"
         )
+
         ProjectEntityType.BRANCH -> listOf(
             "project",
             "branch"
         )
+
         ProjectEntityType.BUILD -> listOf(
             "project",
             "branch",
             "build"
         )
+
         ProjectEntityType.VALIDATION_STAMP -> listOf(
             "project",
             "branch",
             "validation"
         )
+
         ProjectEntityType.PROMOTION_LEVEL -> listOf(
             "project",
             "branch",
             "promotion"
         )
+
         ProjectEntityType.VALIDATION_RUN -> listOf(
             "project",
             "branch",
@@ -95,6 +101,7 @@ val ProjectEntityType.names: List<String>
             "validation",
             "run"
         )
+
         ProjectEntityType.PROMOTION_RUN -> listOf(
             "project",
             "branch",
@@ -113,21 +120,25 @@ fun ProjectEntityType.loadByNames(structureService: StructureService, names: Map
             names.require("project"),
             names.require("branch")
         ).orElse(null)
+
         ProjectEntityType.BUILD -> structureService.findBuildByName(
             names.require("project"),
             names.require("branch"),
             names.require("build")
         ).orElse(null)
+
         ProjectEntityType.VALIDATION_STAMP -> structureService.findValidationStampByName(
             names.require("project"),
             names.require("branch"),
             names.require("validation")
         ).orElse(null)
+
         ProjectEntityType.PROMOTION_LEVEL -> structureService.findPromotionLevelByName(
             names.require("project"),
             names.require("branch"),
             names.require("promotion")
         ).orElse(null)
+
         ProjectEntityType.VALIDATION_RUN -> {
             // Gets the build
             val build = structureService.findBuildByName(
@@ -152,6 +163,7 @@ fun ProjectEntityType.loadByNames(structureService: StructureService, names: Map
                 count = 10
             ).find { it.runOrder == order }
         }
+
         ProjectEntityType.PROMOTION_RUN -> {
             // Gets the build
             val build = structureService.findBuildByName(

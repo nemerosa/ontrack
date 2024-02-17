@@ -90,11 +90,16 @@ abstract class AbstractACCAutoVersioningTestSupport : AbstractACCDSLTestSupport(
         }
     }
 
-    protected fun displayNotifications(group: String): () -> Unit = {
+    protected fun displayNotifications(group: String, expectedMessage: String? = null): () -> Unit = {
         println("Notifications for group $group:")
         ontrack.notifications.inMemory.group(group).forEach {
-            println("--------------")
+            println(">>>>>>>>>>>>>>>>")
             println(it)
+            println("<<<<<<<<<<<<<<<<")
+        }
+        if (!expectedMessage.isNullOrBlank()) {
+            println("Expected message:")
+            println(expectedMessage)
         }
     }
 

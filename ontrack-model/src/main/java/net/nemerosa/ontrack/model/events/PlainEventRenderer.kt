@@ -10,7 +10,7 @@ class PlainEventRenderer : AbstractEventRenderer() {
     override val id: String = "text"
     override val name: String = "Text"
 
-    override fun render(projectEntity: ProjectEntity): String = projectEntity.displayName
+    override fun render(projectEntity: ProjectEntity, name: String): String = name
 
     override fun renderStrong(value: String): String = value
 

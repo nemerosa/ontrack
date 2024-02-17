@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service.templating
 
 import net.nemerosa.ontrack.common.SimpleExpand
 import net.nemerosa.ontrack.model.events.EventRenderer
+import net.nemerosa.ontrack.model.structure.EntityDisplayNameService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
@@ -14,6 +15,7 @@ class TemplatingServiceImpl(
     templatingFilters: List<TemplatingFilter>,
     templatingFunctions: List<TemplatingFunction>,
     private val ontrackConfigProperties: OntrackConfigProperties,
+    private val entityDisplayNameService: EntityDisplayNameService,
 ) : TemplatingService {
 
     private val sourcesPerProjectEntityType = ProjectEntityType.values().associateWith { type ->
@@ -168,7 +170,7 @@ class TemplatingServiceImpl(
         // If not field, using the entity name
         if (field.isNullOrBlank()) {
             if (config.isNullOrBlank()) {
-                renderer.render(entity)
+                renderer.render(entity, entityDisplayNameService.getEntityDisplayName(entity))
             } else {
                 throw TemplatingEntityNameHavingConfigException()
             }

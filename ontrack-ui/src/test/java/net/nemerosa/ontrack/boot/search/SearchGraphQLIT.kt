@@ -4,10 +4,9 @@ import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class SearchGraphQLIT : AbstractSearchTestSupport() {
+class SearchGraphQLIT : AbstractSearchJUnit4TestSupport() {
 
     @Test
     fun `Looking for a branch`() {

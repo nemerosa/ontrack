@@ -9,7 +9,7 @@ import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class ReleaseSearchIT : AbstractSearchTestSupport() {
+class ReleaseSearchIT : AbstractSearchJUnit4TestSupport() {
 
     @Test
     @Ignore("flaky")

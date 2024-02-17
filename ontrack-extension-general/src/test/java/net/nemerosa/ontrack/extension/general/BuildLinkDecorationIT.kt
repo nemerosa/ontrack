@@ -30,11 +30,11 @@ class BuildLinkDecorationIT : AbstractDSLTestJUnit4Support() {
     }
 
     @Test
-    fun `Build link decoration using build name when having label when project not configured`() {
+    fun `Build link decoration using label when having label when project not configured`() {
         testBuildLinkDisplayOptions(
                 useLabel = null,
                 label = targetLabel,
-                expectedLabel = targetBuildName
+                expectedLabel = targetLabel
         )
     }
 

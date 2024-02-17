@@ -12,7 +12,7 @@ import kotlin.test.assertTrue
 /**
  * Search indexation for branches
  */
-class BranchSearchIT : AbstractSearchTestSupport() {
+class BranchSearchIT : AbstractSearchJUnit4TestSupport() {
 
     @Test
     fun `Indexation of branches and looking for branches`() {

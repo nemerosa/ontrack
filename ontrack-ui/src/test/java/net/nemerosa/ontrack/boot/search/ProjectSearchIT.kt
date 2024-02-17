@@ -12,7 +12,7 @@ import kotlin.test.assertTrue
 /**
  * Search indexation for projects
  */
-class ProjectSearchIT : AbstractSearchTestSupport() {
+class ProjectSearchIT : AbstractSearchJUnit4TestSupport() {
 
     @Test
     fun `Searching for a project after its creation`() {

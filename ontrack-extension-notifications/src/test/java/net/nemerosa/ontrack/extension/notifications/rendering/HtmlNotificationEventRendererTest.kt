@@ -34,7 +34,7 @@ class HtmlNotificationEventRendererTest {
     @Test
     fun `Branch link`() {
         val branch = BranchFixtures.testBranch()
-        val text = htmlNotificationEventRenderer.render(branch)
+        val text = htmlNotificationEventRenderer.render(branch, branch.name)
         assertEquals(
             """<a href="https://ontrack.nemerosa.net/#/branch/${branch.id}">${branch.name}</a>""",
             text

@@ -7,7 +7,7 @@ import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Test
 import kotlin.test.assertTrue
 
-class BuildSearchIT : AbstractSearchTestSupport() {
+class BuildSearchIT : AbstractSearchJUnit4TestSupport() {
 
     @Test
     fun `Searching builds`() {

@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.boot.search
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class SearchIT : AbstractSearchTestSupport() {
+class SearchIT : AbstractSearchJUnit4TestSupport() {
 
     @Test
     fun `List of result types`() {

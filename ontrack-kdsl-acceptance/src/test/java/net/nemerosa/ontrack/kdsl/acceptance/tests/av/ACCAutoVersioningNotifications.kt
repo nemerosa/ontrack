@@ -63,21 +63,22 @@ class ACCAutoVersioningNotifications : AbstractACCAutoVersioningTestSupport() {
 
                         waitForAutoVersioningCompletion()
 
+                        val expectedMessage = """
+                            Auto versioning of ${project.name}/main for dependency ${dependency.project.name} version "2.0.0" has failed.
+
+                            Cannot find version in "gradle.properties".
+
+                            Error: Cannot find version in "gradle.properties".
+                        """.trimIndent()
+
                         // Check an error notification has been received at source level
                         waitUntil(
                             timeout = 30_000,
                             interval = 500L,
                             task = "Error notification at dependency level",
-                            onTimeout = displayNotifications(dependencyGroup)
+                            onTimeout = displayNotifications(dependencyGroup, expectedMessage)
                         ) {
-                            ontrack.notifications.inMemory.group(dependencyGroup).firstOrNull() ==
-                                    """
-                                        Auto versioning of ${project.name}/$name for dependency ${dependency.project.name} version "2.0.0" has failed.
-    
-                                        Cannot find version in "gradle.properties".
-    
-                                        Error: Cannot find version in "gradle.properties".
-                                    """.trimIndent()
+                            ontrack.notifications.inMemory.group(dependencyGroup).firstOrNull() == expectedMessage
                         }
 
                         // Check an error notification has been received at source level
@@ -85,16 +86,9 @@ class ACCAutoVersioningNotifications : AbstractACCAutoVersioningTestSupport() {
                             timeout = 30_000,
                             interval = 500L,
                             task = "Error notification at target level",
-                            onTimeout = displayNotifications(projectGroup)
+                            onTimeout = displayNotifications(projectGroup, expectedMessage)
                         ) {
-                            ontrack.notifications.inMemory.group(projectGroup).firstOrNull() ==
-                                    """
-                                        Auto versioning of ${project.name}/$name for dependency ${dependency.project.name} version "2.0.0" has failed.
-    
-                                        Cannot find version in "gradle.properties".
-    
-                                        Error: Cannot find version in "gradle.properties".
-                                    """.trimIndent()
+                            ontrack.notifications.inMemory.group(projectGroup).firstOrNull() == expectedMessage
                         }
 
                     }
@@ -158,20 +152,21 @@ class ACCAutoVersioningNotifications : AbstractACCAutoVersioningTestSupport() {
                         waitForAutoVersioningCompletion()
 
                         // Check a success notification has been received at source level
-                        waitUntil(
-                            timeout = 60_000,
-                            interval = 500L,
-                            task = "Success notification at dependency level",
-                            onTimeout = displayNotifications(dependencyGroup)
-                        ) {
-                            ontrack.notifications.inMemory.group(dependencyGroup).firstOrNull() ==
-                                    """
-                                        Auto versioning of ${project.name}/$name for dependency ${dependency.project.name} version "2.0.0" has been done.
+                        val expectedMessage = """
+                                        Auto versioning of ${project.name}/main for dependency ${dependency.project.name} version "2.0.0" has been done.
                                         
                                         Auto versioning PR has been created, approved and merged.
                                         
                                         Pull request #1
                                     """.trimIndent()
+
+                        waitUntil(
+                            timeout = 60_000,
+                            interval = 500L,
+                            task = "Success notification at dependency level",
+                            onTimeout = displayNotifications(dependencyGroup, expectedMessage)
+                        ) {
+                            ontrack.notifications.inMemory.group(dependencyGroup).firstOrNull() == expectedMessage
                         }
 
                         // Check a success notification has been received at target level
@@ -182,13 +177,7 @@ class ACCAutoVersioningNotifications : AbstractACCAutoVersioningTestSupport() {
                             onTimeout = displayNotifications(projectGroup)
                         ) {
                             ontrack.notifications.inMemory.group(projectGroup).firstOrNull() ==
-                                    """
-                                        Auto versioning of ${project.name}/$name for dependency ${dependency.project.name} version "2.0.0" has been done.
-                                        
-                                        Auto versioning PR has been created, approved and merged.
-                                        
-                                        Pull request #1
-                                    """.trimIndent()
+                                    expectedMessage
                         }
 
                     }
