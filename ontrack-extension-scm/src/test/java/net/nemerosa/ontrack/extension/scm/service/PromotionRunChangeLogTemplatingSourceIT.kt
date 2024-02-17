@@ -170,6 +170,51 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    fun `Getting a recursive change log in a template using qualifiers`() {
+        prepareTest { fromBuild, run, _ ->
+            project {
+                branch {
+                    val pl = promotionLevel()
+
+                    build {
+                        linkTo(fromBuild, qualifier = "sub")
+                        promote(pl)
+                    }
+
+                    build {
+                        linkTo(run.build, qualifier = "sub")
+                        val parentRun = promote(pl)
+
+                        val event = eventFactory.newPromotionRun(parentRun)
+
+                        // Template
+                        val template = """
+                            ${'$'}{promotionRun.changelog?project=${run.project.name}:sub}
+                        """.trimIndent()
+
+                        // Rendering
+                        val text = eventTemplatingService.render(
+                            template = template,
+                            event = event,
+                            renderer = PlainEventRenderer.INSTANCE
+                        )
+
+                        // OK
+                        assertEquals(
+                            """
+                                * ISS-21 Some new feature
+                                * ISS-22 Some fixes are needed
+                                * ISS-23 Some nicer UI
+                            """.trimIndent(),
+                            text,
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Getting a deep recursive change log in a template`() {
         prepareTest { fromBuild, run, _ ->
             project {
