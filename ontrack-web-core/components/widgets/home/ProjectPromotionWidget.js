@@ -62,6 +62,9 @@ export default function ProjectPromotionWidget({project, promotions, depth, labe
                             time
                             user
                         }
+                        releaseProperty {
+                            value
+                        }
                         decorations {
                             ...decorationContent
                         }
@@ -133,6 +136,7 @@ export default function ProjectPromotionWidget({project, promotions, depth, labe
                     render={(_, run) => <Space>
                         <BuildBox
                             build={run.build}
+                            displayDecorations={false}
                             creationDisplayMode="tooltip"
                         />
                         <Space size={8}>
@@ -159,6 +163,7 @@ export default function ProjectPromotionWidget({project, promotions, depth, labe
                                     link={dependency}
                                     displayPromotions={true}
                                     displayProject={false}
+                                    displayDecorations={false}
                                 />
                             } else {
                                 return <Popover content={`No dependency on ${projectName}`}>

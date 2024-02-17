@@ -8,10 +8,12 @@ export default function BuildDependency({
                                             displayProject = true,
                                             displayPromotions,
                                             displayBox = false,
-                                            displayIcon = false
+                                            displayIcon = false,
+                                            displayDecorations = true,
                                         }) {
     return (
         <BuildBox
+            displayDecorations={displayDecorations}
             className={displayBox ? "ot-dependency" : undefined}
             build={link.build}
             text={
