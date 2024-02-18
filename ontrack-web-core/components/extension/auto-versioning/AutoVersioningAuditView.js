@@ -1,9 +1,9 @@
 import {useEffect, useState} from "react";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
-import {Space, Spin, Table, Tooltip, Typography} from "antd";
+import {Button, Popover, Space, Spin, Table, Tooltip, Typography} from "antd";
 import AutoVersioningAuditEntryTarget from "@components/extension/auto-versioning/AutoVersioningAuditEntryTarget";
-import {FaSquare} from "react-icons/fa";
+import {FaSearch, FaSquare} from "react-icons/fa";
 import AutoVersioningAuditEntryState from "@components/extension/auto-versioning/AutoVersioningAuditEntryState";
 import AutoVersioningAuditEntryPR from "@components/extension/auto-versioning/AutoVersioningAuditEntryPR";
 import AutoVersioningAuditEntryQueuing from "@components/extension/auto-versioning/AutoVersioningAuditEntryQueuing";
@@ -100,13 +100,23 @@ export default function AutoVersioningAuditView() {
             )
             .then(data => {
                 setPageInfo(data.autoVersioningAuditEntries.pageInfo)
-                setEntries(data.autoVersioningAuditEntries.pageItems)
+                if (pagination.offset > 0) {
+                    setEntries([...entries, ...data.autoVersioningAuditEntries.pageItems])
+                } else {
+                    setEntries(data.autoVersioningAuditEntries.pageItems)
+                }
             })
             .finally(() => {
                 setLoading(false)
             })
         }
-    }, [client])
+    }, [client, pagination])
+
+    const onLoadMore = () => {
+        if (pageInfo.nextPage) {
+            setPagination(pageInfo.nextPage)
+        }
+    }
 
     return (
         <>
@@ -119,6 +129,29 @@ export default function AutoVersioningAuditView() {
                     loading={loading}
                     pagination={false}
                     size="small"
+                    footer={() => (
+                        <>
+                            <Space>
+                                <Popover
+                                    content={
+                                        (pageInfo && pageInfo.nextPage) ?
+                                            "There are more entries to be loaded" :
+                                            "There are no more entries to be loaded"
+                                    }
+                                >
+                                    <Button
+                                        onClick={onLoadMore}
+                                        disabled={!pageInfo || !pageInfo.nextPage}
+                                    >
+                                        <Space>
+                                            <FaSearch/>
+                                            <Typography.Text>Load more...</Typography.Text>
+                                        </Space>
+                                    </Button>
+                                </Popover>
+                            </Space>
+                        </>
+                    )}
                 >
 
                     <Column
