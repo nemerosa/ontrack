@@ -23,14 +23,18 @@ configure<ComposeExtension> {
     createNested("kdslAcceptanceTest").apply {
         useComposeFiles.addAll(listOf("src/test/compose/docker-compose.yml"))
         setProjectName("kdsl")
-        environment.put("ONTRACK_VERSION", project.version.toString())
+        // environment.put("ONTRACK_VERSION", project.version.toString())
         captureContainersOutputToFiles.set(file("build/logs/containers"))
     }
 }
 
+val isCI = System.getenv("CI") == "true"
+
 val kdslAcceptanceTestComposeUp by tasks.named("kdslAcceptanceTestComposeUp") {
-    dependsOn(":dockerBuild")
-    dependsOn(":ontrack-web-core:dockerBuild")
+    if (!isCI) {
+        dependsOn(":dockerBuild")
+        dependsOn(":ontrack-web-core:dockerBuild")
+    }
 }
 
 // Pre-acceptance tests: stopping the environment
