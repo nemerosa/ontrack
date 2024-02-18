@@ -5,6 +5,7 @@ import {Space, Spin, Table, Typography} from "antd";
 import AutoVersioningAuditEntryTarget from "@components/extension/auto-versioning/AutoVersioningAuditEntryTarget";
 import {FaSquare} from "react-icons/fa";
 import AutoVersioningAuditEntryState from "@components/extension/auto-versioning/AutoVersioningAuditEntryState";
+import AutoVersioningAuditEntryPR from "@components/extension/auto-versioning/AutoVersioningAuditEntryPR";
 
 const {Column} = Table
 
@@ -206,7 +207,14 @@ export default function AutoVersioningAuditView() {
                         }
                     />
 
-                    {/* TODO PR */}
+                    <Column
+                        key="pr"
+                        title="PR"
+                        render={(_, entry) =>
+                            <AutoVersioningAuditEntryPR entry={entry}/>
+                        }
+                    />
+
                     {/* TODO Queuing info */}
                     {/* TODO Timestamp */}
                     {/* TODO Duration */}
