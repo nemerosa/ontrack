@@ -219,7 +219,7 @@ export default function AutoVersioningAuditView() {
                         key="state"
                         title="State"
                         render={(_, entry) =>
-                            <AutoVersioningAuditEntryState entry={entry}/>
+                            <AutoVersioningAuditEntryState status={entry.mostRecentState}/>
                         }
                     />
 
@@ -260,9 +260,6 @@ export default function AutoVersioningAuditView() {
                             />
                         }
                     />
-
-                    {/* TODO Details buttons */}
-                    {/* TODO Showing the details */}
 
                 </Table>
 
