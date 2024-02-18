@@ -6,6 +6,7 @@ import AutoVersioningAuditEntryTarget from "@components/extension/auto-versionin
 import {FaSquare} from "react-icons/fa";
 import AutoVersioningAuditEntryState from "@components/extension/auto-versioning/AutoVersioningAuditEntryState";
 import AutoVersioningAuditEntryPR from "@components/extension/auto-versioning/AutoVersioningAuditEntryPR";
+import AutoVersioningAuditEntryQueuing from "@components/extension/auto-versioning/AutoVersioningAuditEntryQueuing";
 
 const {Column} = Table
 
@@ -114,6 +115,7 @@ export default function AutoVersioningAuditView() {
                     dataSource={entries}
                     loading={loading}
                     pagination={false}
+                    size="small"
                 >
 
                     <Column
@@ -215,7 +217,14 @@ export default function AutoVersioningAuditView() {
                         }
                     />
 
-                    {/* TODO Queuing info */}
+                    <Column
+                        key="queuing"
+                        title="Queuing"
+                        render={(_, entry) =>
+                            <AutoVersioningAuditEntryQueuing entry={entry}/>
+                        }
+                    />
+
                     {/* TODO Timestamp */}
                     {/* TODO Duration */}
                     {/* TODO Details buttons */}
