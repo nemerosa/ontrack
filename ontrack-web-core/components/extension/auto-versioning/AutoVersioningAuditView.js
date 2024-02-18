@@ -111,6 +111,7 @@ export default function AutoVersioningAuditView() {
                 {/* List */}
                 <Table
                     dataSource={entries}
+                    loading={loading}
                     pagination={false}
                 >
 
