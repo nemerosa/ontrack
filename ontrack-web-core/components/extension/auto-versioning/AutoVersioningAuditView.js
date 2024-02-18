@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
-import {Space, Spin, Table, Typography} from "antd";
+import {Space, Spin, Table, Tooltip, Typography} from "antd";
 import AutoVersioningAuditEntryTarget from "@components/extension/auto-versioning/AutoVersioningAuditEntryTarget";
 import {FaSquare} from "react-icons/fa";
 import AutoVersioningAuditEntryState from "@components/extension/auto-versioning/AutoVersioningAuditEntryState";
@@ -9,6 +9,7 @@ import AutoVersioningAuditEntryPR from "@components/extension/auto-versioning/Au
 import AutoVersioningAuditEntryQueuing from "@components/extension/auto-versioning/AutoVersioningAuditEntryQueuing";
 import TimestampText from "@components/common/TimestampText";
 import Duration from "@components/common/Duration";
+import Link from "next/link";
 
 const {Column} = Table
 
@@ -119,6 +120,17 @@ export default function AutoVersioningAuditView() {
                     pagination={false}
                     size="small"
                 >
+
+                    <Column
+                        key="uuid"
+                        title="UUID"
+                        render={(_, entry) =>
+                            <Tooltip title="Displays the details of this entry into a separate page.">
+                                <Link
+                                    href={`/extension/auto-versioning/audit/detail/${entry.order.uuid}`}>{entry.order.uuid}</Link>
+                            </Tooltip>
+                        }
+                    />
 
                     <Column
                         key="target"
