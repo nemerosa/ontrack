@@ -7,7 +7,19 @@ dayjs.extend(duration);
 dayjs.extend(relativeTime);
 
 export const formatSeconds = (seconds, nanValue = "-") => {
-    return seconds && !isNaN(seconds) ? dayjs.duration(seconds, "seconds").humanize() : nanValue
+    if (typeof seconds === 'number' && !isNaN(seconds)) {
+        if (seconds < 60) {
+            if (seconds <= 1) {
+                return `${seconds} second`
+            } else {
+                return `${seconds} seconds`
+            }
+        } else {
+            return dayjs.duration(seconds, "seconds").humanize()
+        }
+    } else {
+        return nanValue
+    }
 }
 
 export default function Duration({

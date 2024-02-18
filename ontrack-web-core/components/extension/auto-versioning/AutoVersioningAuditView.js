@@ -7,6 +7,8 @@ import {FaSquare} from "react-icons/fa";
 import AutoVersioningAuditEntryState from "@components/extension/auto-versioning/AutoVersioningAuditEntryState";
 import AutoVersioningAuditEntryPR from "@components/extension/auto-versioning/AutoVersioningAuditEntryPR";
 import AutoVersioningAuditEntryQueuing from "@components/extension/auto-versioning/AutoVersioningAuditEntryQueuing";
+import TimestampText from "@components/common/TimestampText";
+import Duration from "@components/common/Duration";
 
 const {Column} = Table
 
@@ -225,8 +227,28 @@ export default function AutoVersioningAuditView() {
                         }
                     />
 
-                    {/* TODO Timestamp */}
-                    {/* TODO Duration */}
+                    <Column
+                        key="timestamp"
+                        title="Timestamp"
+                        render={(_, entry) =>
+                            <TimestampText
+                                value={entry.mostRecentState.creation.time}
+                                format="YYYY MMM DD, HH:mm:ss"
+                            />
+                        }
+                    />
+
+                    <Column
+                        key="duration"
+                        title="Duration"
+                        render={(_, entry) =>
+                            <Duration
+                                displaySeconds={true}
+                                seconds={Math.floor(entry.duration / 1000)}
+                            />
+                        }
+                    />
+
                     {/* TODO Details buttons */}
                     {/* TODO Showing the details */}
 
