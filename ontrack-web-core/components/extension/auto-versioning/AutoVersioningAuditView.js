@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
-import {Button, Popover, Space, Spin, Table, Tooltip, Typography} from "antd";
+import {Button, Input, Popover, Space, Spin, Table, Tooltip, Typography} from "antd";
 import AutoVersioningAuditEntryTarget from "@components/extension/auto-versioning/AutoVersioningAuditEntryTarget";
 import {FaSearch, FaSquare} from "react-icons/fa";
 import AutoVersioningAuditEntryState from "@components/extension/auto-versioning/AutoVersioningAuditEntryState";
@@ -10,6 +10,11 @@ import AutoVersioningAuditEntryQueuing from "@components/extension/auto-versioni
 import TimestampText from "@components/common/TimestampText";
 import Duration from "@components/common/Duration";
 import Link from "next/link";
+import TableColumnFilterDropdown from "@components/common/TableColumnFilterDropdown";
+import TableColumnFilterDropdownInput from "@components/common/TableColumnFilterDropdownInput";
+import SelectAutoVersioningAuditState from "@components/extension/auto-versioning/SelectAutoVersioningAuditState";
+import SelectAutoVersioningAuditRunningState
+    from "@components/extension/auto-versioning/SelectAutoVersioningAuditRunningState";
 
 const {Column} = Table
 
@@ -27,6 +32,30 @@ export default function AutoVersioningAuditView() {
 
     const [pageInfo, setPageInfo] = useState({})
 
+    const [filter, setFilter] = useState({
+        targetProject: null,
+        targetBranch: null,
+        sourceProject: null,
+        version: null,
+        state: null,
+        running: null,
+        routing: null,
+        queue: null,
+    })
+
+    const onTableChange = (_, filters) => {
+        setFilter({
+            targetProject: filters.target ? filters.target[0] : null,
+            targetBranch: filters.target && filters.target.length > 0 ? filters.target[1] : null,
+            sourceProject: filters.source && filters.source[0],
+            version: filters.version && filters.version[0],
+            state: filters.state && filters.state[0],
+            running: filters.running && filters.running[0],
+            routing: filters.queuing && filters.queuing[0],
+            queue: filters.queuing && filters.queuing.length > 0 && filters.queuing[1],
+        })
+    }
+
     useEffect(() => {
         if (client) {
             setLoading(true)
@@ -35,10 +64,28 @@ export default function AutoVersioningAuditView() {
                     query AutoVersioningAudit(
                         $offset: Int!,
                         $size: Int!,
+                        $targetProject: String,
+                        $targetBranch: String,
+                        $sourceProject: String,
+                        $version: String,
+                        $state: String,
+                        $running: Boolean,
+                        $routing: String,
+                        $queue: String,
                     ) {
                         autoVersioningAuditEntries(
                             offset: $offset,
                             size: $size,
+                            filter: {
+                                project: $targetProject,
+                                branch: $targetBranch,
+                                source: $sourceProject,
+                                version: $version,
+                                state: $state,
+                                running: $running,
+                                routing: $routing,
+                                queue: $queue,
+                            }
                         ) {
                             pageInfo {
                                 nextPage {
@@ -96,12 +143,20 @@ export default function AutoVersioningAuditView() {
                 {
                     offset: pagination.offset,
                     size: pagination.size,
+                    targetProject: filter.targetProject,
+                    targetBranch: filter.targetBranch,
+                    sourceProject: filter.sourceProject,
+                    version: filter.version,
+                    state: filter.state,
+                    running: filter.running,
+                    routing: filter.routing,
+                    queue: filter.queue,
                 }
             )
             .then(data => {
                 setPageInfo(data.autoVersioningAuditEntries.pageInfo)
                 if (pagination.offset > 0) {
-                    setEntries([...entries, ...data.autoVersioningAuditEntries.pageItems])
+                    setEntries((entries) => [...entries, ...data.autoVersioningAuditEntries.pageItems])
                 } else {
                     setEntries(data.autoVersioningAuditEntries.pageItems)
                 }
@@ -110,7 +165,7 @@ export default function AutoVersioningAuditView() {
                 setLoading(false)
             })
         }
-    }, [client, pagination])
+    }, [client, pagination, filter])
 
     const onLoadMore = () => {
         if (pageInfo.nextPage) {
@@ -121,14 +176,13 @@ export default function AutoVersioningAuditView() {
     return (
         <>
             <Space className="ot-line" direction="vertical">
-                {/* TODO Filter form */}
-
                 {/* List */}
                 <Table
                     dataSource={entries}
                     loading={loading}
                     pagination={false}
                     size="small"
+                    onChange={onTableChange}
                     footer={() => (
                         <>
                             <Space>
@@ -171,6 +225,26 @@ export default function AutoVersioningAuditView() {
                         render={(_, entry) =>
                             <AutoVersioningAuditEntryTarget entry={entry}/>
                         }
+                        filterDropdown={({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
+                            <TableColumnFilterDropdown
+                                confirm={confirm}
+                                clearFilters={clearFilters}
+                            >
+                                <Input
+                                    placeholder="Target project"
+                                    value={selectedKeys[0]}
+                                    onChange={(e) => setSelectedKeys([e.target.value, selectedKeys[1]])}
+                                    style={{width: 188, marginBottom: 8, display: 'block'}}
+                                />
+                                <Input
+                                    placeholder="Target branch"
+                                    value={selectedKeys[1]}
+                                    onChange={(e) => setSelectedKeys([selectedKeys[0], e.target.value])}
+                                    style={{width: 188, marginBottom: 8, display: 'block'}}
+                                />
+                            </TableColumnFilterDropdown>
+                        }
+                        filteredValue={filter.targetProject || filter.targetBranch ? [filter.targetProject, filter.targetBranch] : null}
                     />
 
                     <Column
@@ -179,6 +253,16 @@ export default function AutoVersioningAuditView() {
                         render={(_, entry) =>
                             <Typography.Text>{entry.order.sourceProject}</Typography.Text>
                         }
+                        filterDropdown={({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
+                            <TableColumnFilterDropdownInput
+                                confirm={confirm}
+                                clearFilters={clearFilters}
+                                placeholder="Source project"
+                                selectedKeys={selectedKeys}
+                                setSelectedKeys={setSelectedKeys}
+                            />
+                        }
+                        filteredValue={filter.sourceProject}
                     />
 
                     <Column
@@ -187,6 +271,16 @@ export default function AutoVersioningAuditView() {
                         render={(_, entry) =>
                             <Typography.Text>{entry.order.targetVersion}</Typography.Text>
                         }
+                        filterDropdown={({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
+                            <TableColumnFilterDropdownInput
+                                confirm={confirm}
+                                clearFilters={clearFilters}
+                                placeholder="Version"
+                                selectedKeys={selectedKeys}
+                                setSelectedKeys={setSelectedKeys}
+                            />
+                        }
+                        filteredValue={filter.version}
                     />
 
                     <Column
@@ -246,6 +340,18 @@ export default function AutoVersioningAuditView() {
                                 }
                             </>
                         }
+                        filterDropdown={({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
+                            <TableColumnFilterDropdown
+                                confirm={confirm}
+                                clearFilters={clearFilters}
+                            >
+                                <SelectAutoVersioningAuditRunningState
+                                    value={selectedKeys}
+                                    onChange={value => setSelectedKeys([value])}
+                                />
+                            </TableColumnFilterDropdown>
+                        }
+                        filteredValue={filter.running}
                     />
 
                     <Column
@@ -254,6 +360,18 @@ export default function AutoVersioningAuditView() {
                         render={(_, entry) =>
                             <AutoVersioningAuditEntryState status={entry.mostRecentState}/>
                         }
+                        filterDropdown={({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
+                            <TableColumnFilterDropdown
+                                confirm={confirm}
+                                clearFilters={clearFilters}
+                            >
+                                <SelectAutoVersioningAuditState
+                                    value={selectedKeys}
+                                    onChange={value => setSelectedKeys([value])}
+                                />
+                            </TableColumnFilterDropdown>
+                        }
+                        filteredValue={filter.state}
                     />
 
                     <Column
@@ -270,6 +388,26 @@ export default function AutoVersioningAuditView() {
                         render={(_, entry) =>
                             <AutoVersioningAuditEntryQueuing entry={entry}/>
                         }
+                        filterDropdown={({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
+                            <TableColumnFilterDropdown
+                                confirm={confirm}
+                                clearFilters={clearFilters}
+                            >
+                                <Input
+                                    placeholder="Routing"
+                                    value={selectedKeys[0]}
+                                    onChange={(e) => setSelectedKeys([e.target.value, selectedKeys[1]])}
+                                    style={{width: 188, marginBottom: 8, display: 'block'}}
+                                />
+                                <Input
+                                    placeholder="Queue"
+                                    value={selectedKeys[1]}
+                                    onChange={(e) => setSelectedKeys([selectedKeys[0], e.target.value])}
+                                    style={{width: 188, marginBottom: 8, display: 'block'}}
+                                />
+                            </TableColumnFilterDropdown>
+                        }
+                        filteredValue={filter.routing || filter.queue ? [filter.routing, filter.queue] : null}
                     />
 
                     <Column
