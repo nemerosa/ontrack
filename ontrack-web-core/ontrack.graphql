@@ -542,7 +542,7 @@ type BranchLinksNode {
 
 type Build implements Authorizable & ProjectEntity {
     "Actions for a Build"
-    actions: BuildActions
+    actions: BuildActions @deprecated(reason: "Will be removed in V5. User `userMenuActions` instead.")
     "Description with links."
     annotatedDescription: String
     "Authorizations for this context"
@@ -4100,7 +4100,7 @@ type Preferences {
 
 type Project implements ProjectEntity {
     "Actions for a Project"
-    actions: ProjectActions
+    actions: ProjectActions @deprecated(reason: "Will be removed in V5. User `userMenuActions` instead.")
     "Description with links."
     annotatedDescription: String
     "If set, this property allows promotion levels to be created automatically from predefined promotion levels"
@@ -6377,7 +6377,7 @@ type User {
     "Account associated to the user"
     account: Account
     "Actions for a RootUser"
-    actions: RootUserActions
+    actions: RootUserActions @deprecated(reason: "Will be removed in V5. User `userMenuActions` instead.")
 }
 
 "Representation of an error."
@@ -6394,6 +6394,8 @@ type UserError {
 type UserMenuAction {
     "Extension contributing this user menu item"
     extension: String!
+    "ID of the group this item belongs to"
+    groupId: String!
     "Unique ID for this user menu item in the given extension"
     id: String!
     "Display name for this user menu item"

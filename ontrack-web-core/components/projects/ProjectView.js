@@ -22,6 +22,7 @@ import ProjectFavourite from "@components/projects/ProjectFavourite";
 import {useEventForRefresh} from "@components/common/EventsContext";
 import ProjectInfoViewDrawer from "@components/projects/ProjectInfoViewDrawer";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import UserMenuActions from "@components/entities/UserMenuActions";
 
 export default function ProjectView({id}) {
 
@@ -113,6 +114,7 @@ export default function ProjectView({id}) {
     }, [client, id, favouriteRefreshCount])
 
     const commands = [
+        <UserMenuActions key="userMenuActions" actions={project.userMenuActions}/>,
         <JumpToBranch key="branch" projectName={project.name}/>,
         <LegacyLinkCommand
             key="legacy"
@@ -120,7 +122,7 @@ export default function ProjectView({id}) {
             text="Legacy project"
             title="Goes to the legacy project page"
         />,
-        <CloseCommand key="close" href={homeUri()}/>
+        <CloseCommand key="close" href={homeUri()}/>,
     ]
 
     return (

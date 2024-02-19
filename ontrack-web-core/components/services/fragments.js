@@ -82,6 +82,7 @@ export const gqlInformationFragment = gql`
 
 export const gqlUserMenuActionFragment = gql`
     fragment userMenuActionFragment on UserMenuAction {
+        groupId
         extension
         id
         name

@@ -29,6 +29,14 @@ export function useUserMenu() {
     }
 }
 
+
+export const groupIcons = {
+    configurations: <FaList/>,
+    system: <FaCog/>,
+    user: <FaUser/>,
+    information: <FaInfo/>,
+}
+
 export default function UserMenu({userMenu}) {
 
     const logout = useLogout()
@@ -40,13 +48,6 @@ export default function UserMenu({userMenu}) {
 
     const expandFullView = () => {
         toggleExpansion()
-    }
-
-    const groupIcons = {
-        configurations: <FaList/>,
-        system: <FaCog/>,
-        user: <FaUser/>,
-        information: <FaInfo/>,
     }
 
     const itemIcons = {

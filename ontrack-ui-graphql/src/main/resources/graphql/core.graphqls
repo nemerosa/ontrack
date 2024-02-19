@@ -50,6 +50,8 @@ type UserMenuGroup {
 
 """Item in the user menu"""
 type UserMenuAction {
+    """ID of the group this item belongs to"""
+    groupId: String!
     """Extension contributing this user menu item"""
     extension: String!
     """Unique ID for this user menu item in the given extension"""
