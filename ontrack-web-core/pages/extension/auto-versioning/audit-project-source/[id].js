@@ -8,6 +8,7 @@ import AutoVersioningAuditView from "@components/extension/auto-versioning/AutoV
 import {downToProjectBreadcrumbs} from "@components/common/Breadcrumbs";
 import {CloseCommand} from "@components/common/Commands";
 import {projectUri} from "@components/common/Links";
+import AutoVersioningAuditContextProvider from "@components/extension/auto-versioning/AutoVersioningAuditContext";
 
 export default function AutoVersioningAuditProjectTargetPage() {
     const router = useRouter()
@@ -55,7 +56,9 @@ export default function AutoVersioningAuditProjectTargetPage() {
                 breadcrumbs={breadcrumbs}
                 commands={commands}
             >
-                <AutoVersioningAuditView sourceProject={project}/>
+                <AutoVersioningAuditContextProvider sourceProject={project}>
+                    <AutoVersioningAuditView/>
+                </AutoVersioningAuditContextProvider>
             </StandardPage>
         </>
     )

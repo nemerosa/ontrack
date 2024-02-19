@@ -1,6 +1,7 @@
 import StandardPage from "@components/layouts/StandardPage";
 import AutoVersioningAuditView from "@components/extension/auto-versioning/AutoVersioningAuditView";
 import {projectBreadcrumbs} from "@components/common/Breadcrumbs";
+import AutoVersioningAuditContextProvider from "@components/extension/auto-versioning/AutoVersioningAuditContext";
 
 export default function AutoVersioningAuditGlobalPage() {
     return (
@@ -9,7 +10,9 @@ export default function AutoVersioningAuditGlobalPage() {
                 pageTitle="Auto-versioning audit"
                 breadcrumbs={projectBreadcrumbs()}
             >
-                <AutoVersioningAuditView/>
+                <AutoVersioningAuditContextProvider>
+                    <AutoVersioningAuditView/>
+                </AutoVersioningAuditContextProvider>
             </StandardPage>
         </>
     )

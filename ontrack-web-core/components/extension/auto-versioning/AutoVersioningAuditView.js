@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
 import {Button, Input, Popover, Space, Spin, Table, Tooltip, Typography} from "antd";
@@ -15,11 +15,14 @@ import TableColumnFilterDropdownInput from "@components/common/TableColumnFilter
 import SelectAutoVersioningAuditState from "@components/extension/auto-versioning/SelectAutoVersioningAuditState";
 import SelectAutoVersioningAuditRunningState
     from "@components/extension/auto-versioning/SelectAutoVersioningAuditRunningState";
+import {AutoVersioningAuditContext} from "@components/extension/auto-versioning/AutoVersioningAuditContext";
 
 const {Column} = Table
 
-export default function AutoVersioningAuditView({sourceProject}) {
+export default function AutoVersioningAuditView() {
 
+    const {sourceProject} = useContext(AutoVersioningAuditContext)
+    
     const client = useGraphQLClient()
 
     const [loading, setLoading] = useState(false)
