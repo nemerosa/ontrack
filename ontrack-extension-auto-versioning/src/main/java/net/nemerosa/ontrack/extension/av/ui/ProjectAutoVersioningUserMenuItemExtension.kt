@@ -19,13 +19,13 @@ class ProjectAutoVersioningUserMenuItemExtension(
             listOf(
                 UserMenuItem(
                     groupId = CoreUserMenuGroups.INFORMATION,
-                    extension = autoVersioningExtensionFeature.id,
+                    extension = autoVersioningExtensionFeature,
                     id = "audit-project-target/${projectEntity.id}",
                     name = "Auto versioning audit (target)",
                 ),
                 UserMenuItem(
                     groupId = CoreUserMenuGroups.INFORMATION,
-                    extension = autoVersioningExtensionFeature.id,
+                    extension = autoVersioningExtensionFeature,
                     id = "audit-project-source/${projectEntity.id}",
                     name = "Auto versioning audit (source)",
                 ),

@@ -88,3 +88,10 @@ export const gqlUserMenuActionFragment = gql`
         name
     }
 `
+
+export const gqlProjectCommonFragment = gql`
+    fragment projectCommonFragment on Project {
+        id
+        name
+    }
+`
