@@ -18,7 +18,7 @@ import SelectAutoVersioningAuditRunningState
 
 const {Column} = Table
 
-export default function AutoVersioningAuditView() {
+export default function AutoVersioningAuditView({sourceProject}) {
 
     const client = useGraphQLClient()
 
@@ -247,23 +247,25 @@ export default function AutoVersioningAuditView() {
                         filteredValue={filter.targetProject || filter.targetBranch ? [filter.targetProject, filter.targetBranch] : null}
                     />
 
-                    <Column
-                        key="source"
-                        title="Source project"
-                        render={(_, entry) =>
-                            <Typography.Text>{entry.order.sourceProject}</Typography.Text>
-                        }
-                        filterDropdown={({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
-                            <TableColumnFilterDropdownInput
-                                confirm={confirm}
-                                clearFilters={clearFilters}
-                                placeholder="Source project"
-                                selectedKeys={selectedKeys}
-                                setSelectedKeys={setSelectedKeys}
-                            />
-                        }
-                        filteredValue={filter.sourceProject}
-                    />
+                    {!sourceProject &&
+                        <Column
+                            key="source"
+                            title="Source project"
+                            render={(_, entry) =>
+                                <Typography.Text>{entry.order.sourceProject}</Typography.Text>
+                            }
+                            filterDropdown={({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
+                                <TableColumnFilterDropdownInput
+                                    confirm={confirm}
+                                    clearFilters={clearFilters}
+                                    placeholder="Source project"
+                                    selectedKeys={selectedKeys}
+                                    setSelectedKeys={setSelectedKeys}
+                                />
+                            }
+                            filteredValue={filter.sourceProject}
+                        />
+                    }
 
                     <Column
                         key="version"

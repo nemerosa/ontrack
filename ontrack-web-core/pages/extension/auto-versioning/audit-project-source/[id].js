@@ -5,6 +5,9 @@ import {gql} from "graphql-request";
 import {gqlProjectCommonFragment, gqlPropertiesFragment} from "@components/services/fragments";
 import StandardPage from "@components/layouts/StandardPage";
 import AutoVersioningAuditView from "@components/extension/auto-versioning/AutoVersioningAuditView";
+import {downToProjectBreadcrumbs} from "@components/common/Breadcrumbs";
+import {CloseCommand} from "@components/common/Commands";
+import {projectUri} from "@components/common/Links";
 
 export default function AutoVersioningAuditProjectTargetPage() {
     const router = useRouter()
@@ -15,6 +18,8 @@ export default function AutoVersioningAuditProjectTargetPage() {
     const client = useGraphQLClient()
 
     const [project, setProject] = useState()
+    const [breadcrumbs, setBreadcrumbs] = useState([])
+    const [commands, setCommands] = useState([])
     useEffect(() => {
         if (client && id) {
             client.request(
@@ -31,7 +36,14 @@ export default function AutoVersioningAuditProjectTargetPage() {
                 `,
                 {id}
             ).then(data => {
-                setProject(data.projects[0])
+                const project = data.projects[0];
+                setProject(project)
+                setBreadcrumbs(
+                    downToProjectBreadcrumbs({project})
+                )
+                setCommands([
+                    <CloseCommand key="close" href={projectUri(project)}/>,
+                ])
             })
         }
     }, [client, id]);
@@ -39,7 +51,9 @@ export default function AutoVersioningAuditProjectTargetPage() {
     return (
         <>
             <StandardPage
-                pageTitle={`Auto-versioning audit for source project ${project?.name}`}
+                pageTitle="Auto-versioning audit as source project"
+                breadcrumbs={breadcrumbs}
+                commands={commands}
             >
                 <AutoVersioningAuditView sourceProject={project}/>
             </StandardPage>

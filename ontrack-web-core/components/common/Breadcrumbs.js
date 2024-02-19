@@ -14,11 +14,15 @@ export function projectBreadcrumbs() {
     ]
 }
 
-export function branchBreadcrumbs(branch) {
+export function downToProjectBreadcrumbs({project}) {
     return [
         <HomeLink key="home"/>,
-        <ProjectLink project={branch.project} key="project"/>,
+        <ProjectLink project={project} key="project"/>,
     ]
+}
+
+export function branchBreadcrumbs(branch) {
+    return downToProjectBreadcrumbs(branch)
 }
 
 export function downToBranchBreadcrumbs({branch}) {
