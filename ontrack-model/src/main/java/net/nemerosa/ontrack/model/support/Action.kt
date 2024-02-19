@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.model.support
 
 import java.net.URI
 
-@Deprecated("In V5, use UserMenuItem.")
+@Deprecated("Will be removed in V5. Use UserMenuItem(s) instead.")
 class Action(
     val id: String,
     val name: String,

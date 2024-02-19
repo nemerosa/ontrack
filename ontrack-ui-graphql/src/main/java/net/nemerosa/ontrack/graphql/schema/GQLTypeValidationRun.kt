@@ -5,6 +5,7 @@ import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLObjectType.newObject
 import graphql.schema.GraphQLTypeReference
+import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.graphql.schema.authorizations.GQLInterfaceAuthorizableService
 import net.nemerosa.ontrack.graphql.support.booleanArgument
 import net.nemerosa.ontrack.graphql.support.listType
@@ -26,13 +27,15 @@ class GQLTypeValidationRun(
     private val validationRunData: GQLTypeValidationRunData,
     private val projectEntityInterface: GQLProjectEntityInterface,
     private val gqlInterfaceAuthorizableService: GQLInterfaceAuthorizableService,
-    freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>
+    freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>,
+    extensionManager: ExtensionManager,
 ) : AbstractGQLProjectEntity<ValidationRun>(
     ValidationRun::class.java,
     ProjectEntityType.VALIDATION_RUN,
     projectEntityFieldContributors,
     creation,
-    freeTextAnnotatorContributors
+    freeTextAnnotatorContributors,
+    extensionManager,
 ) {
 
     override fun getTypeName() = VALIDATION_RUN

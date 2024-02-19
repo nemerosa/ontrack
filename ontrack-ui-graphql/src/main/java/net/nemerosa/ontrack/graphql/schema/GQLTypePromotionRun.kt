@@ -4,6 +4,7 @@ import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
+import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.graphql.schema.authorizations.GQLInterfaceAuthorizableService
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.structure.PromotionRun
@@ -18,12 +19,14 @@ class GQLTypePromotionRun(
     private val projectEntityInterface: GQLProjectEntityInterface,
     freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>,
     private val gqlInterfaceAuthorizableService: GQLInterfaceAuthorizableService,
+    extensionManager: ExtensionManager,
 ) : AbstractGQLProjectEntity<PromotionRun>(
     PromotionRun::class.java,
     ProjectEntityType.PROMOTION_RUN,
     projectEntityFieldContributors,
     creation,
-    freeTextAnnotatorContributors
+    freeTextAnnotatorContributors,
+    extensionManager,
 ) {
 
     override fun getTypeName(): String = PROMOTION_RUN

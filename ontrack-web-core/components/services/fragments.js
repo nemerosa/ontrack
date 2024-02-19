@@ -79,3 +79,11 @@ export const gqlInformationFragment = gql`
         data
     }
 `
+
+export const gqlUserMenuActionFragment = gql`
+    fragment userMenuActionFragment on UserMenuAction {
+        extension
+        id
+        name
+    }
+`

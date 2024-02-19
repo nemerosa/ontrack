@@ -40,6 +40,7 @@ class UIActionsGraphQLServiceImpl(
         return GraphQLFieldDefinition.newFieldDefinition()
                 .name("actions")
                 .description(typeDescription)
+                .deprecate("Will be removed in V5. User `userMenuActions` instead.")
                 .type(gqlType.build())
                 .dataFetcher { it.getSource<T>() }
                 .build()

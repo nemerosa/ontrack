@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.graphql.schema
 
 import graphql.Scalars
 import graphql.schema.*
+import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.graphql.schema.authorizations.GQLInterfaceAuthorizableService
 import net.nemerosa.ontrack.graphql.support.disabledField
 import net.nemerosa.ontrack.graphql.support.listType
@@ -28,12 +29,14 @@ class GQLTypeBranch(
     private val gqlPaginatedListFactory: GQLPaginatedListFactory,
     private val branchFavouriteService: BranchFavouriteService,
     private val gqlInterfaceAuthorizableService: GQLInterfaceAuthorizableService,
+    extensionManager: ExtensionManager,
 ) : AbstractGQLProjectEntity<Branch>(
     Branch::class.java,
     ProjectEntityType.BRANCH,
     projectEntityFieldContributors,
     creation,
-    freeTextAnnotatorContributors
+    freeTextAnnotatorContributors,
+    extensionManager,
 ) {
 
     override fun getTypeName(): String = BRANCH

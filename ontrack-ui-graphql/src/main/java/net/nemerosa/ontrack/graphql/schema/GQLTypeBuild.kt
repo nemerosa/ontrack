@@ -7,6 +7,7 @@ import graphql.schema.GraphQLArgument.newArgument
 import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
 import graphql.schema.GraphQLObjectType.newObject
 import net.nemerosa.ontrack.common.and
+import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.graphql.schema.actions.UIActionsGraphQLService
 import net.nemerosa.ontrack.graphql.schema.actions.actions
 import net.nemerosa.ontrack.graphql.schema.authorizations.GQLInterfaceAuthorizableService
@@ -40,13 +41,15 @@ class GQLTypeBuild(
     private val projectLabelManagementService: ProjectLabelManagementService,
     creation: GQLTypeCreation,
     projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>,
-    freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>
+    freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>,
+    extensionManager: ExtensionManager,
 ) : AbstractGQLProjectEntity<Build>(
     Build::class.java,
     ProjectEntityType.BUILD,
     projectEntityFieldContributors,
     creation,
-    freeTextAnnotatorContributors
+    freeTextAnnotatorContributors,
+    extensionManager,
 ) {
 
     override fun getTypeName() = BUILD

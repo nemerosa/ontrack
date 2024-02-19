@@ -7,7 +7,7 @@ import graphql.schema.GraphQLArgument.newArgument
 import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLObjectType.newObject
-import net.nemerosa.ontrack.common.and
+import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.graphql.schema.actions.UIActionsGraphQLService
 import net.nemerosa.ontrack.graphql.schema.actions.actions
 import net.nemerosa.ontrack.graphql.support.disabledField
@@ -18,31 +18,31 @@ import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.FreeTextAnnotatorContributor
 import org.springframework.stereotype.Component
-import java.util.regex.Pattern
 
 @Component
 class GQLTypeProject(
-        private val uiActionsGraphQLService: UIActionsGraphQLService,
-        private val structureService: StructureService,
-        private val projectLabelManagementService: ProjectLabelManagementService,
-        creation: GQLTypeCreation,
-        private val branch: GQLTypeBranch,
-        private val validationRun: GQLTypeValidationRun,
-        projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>,
-        private val projectEntityInterface: GQLProjectEntityInterface,
-        private val label: GQLTypeLabel,
-        private val branchFavouriteService: BranchFavouriteService,
-        private val projectFavouriteService: ProjectFavouriteService,
-        private val branchModelMatcherService: BranchModelMatcherService,
-        private val paginatedListFactory: GQLPaginatedListFactory,
-        private val validationRunSearchService: ValidationRunSearchService,
-        freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>
+    private val uiActionsGraphQLService: UIActionsGraphQLService,
+    private val structureService: StructureService,
+    private val projectLabelManagementService: ProjectLabelManagementService,
+    creation: GQLTypeCreation,
+    private val branch: GQLTypeBranch,
+    private val validationRun: GQLTypeValidationRun,
+    projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>,
+    private val projectEntityInterface: GQLProjectEntityInterface,
+    private val label: GQLTypeLabel,
+    private val projectFavouriteService: ProjectFavouriteService,
+    private val branchModelMatcherService: BranchModelMatcherService,
+    private val paginatedListFactory: GQLPaginatedListFactory,
+    private val validationRunSearchService: ValidationRunSearchService,
+    freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>,
+    extensionManager: ExtensionManager,
 ) : AbstractGQLProjectEntity<Project>(
         Project::class.java,
         ProjectEntityType.PROJECT,
         projectEntityFieldContributors,
         creation,
-        freeTextAnnotatorContributors
+        freeTextAnnotatorContributors,
+        extensionManager,
 ) {
 
     override fun getTypeName(): String {

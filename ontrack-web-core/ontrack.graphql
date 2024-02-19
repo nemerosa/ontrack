@@ -408,6 +408,8 @@ type Branch implements Authorizable & ProjectEntity {
         "Number of builds to use to get the dependencies"
         builds: Int
     ): [BranchLink!]!
+    "List of actions available for this entity"
+    userMenuActions: [UserMenuAction!]!
     "List of issues reported into the validation run statuses"
     validationIssues(
         "Maximum number of validation runs to fetch per validation stamp in order to get the issues"
@@ -636,6 +638,8 @@ type Build implements Authorizable & ProjectEntity {
         "Size of the page"
         size: Int = 20
     ): BuildLinkPaginated
+    "List of actions available for this entity"
+    userMenuActions: [UserMenuAction!]!
     "List of builds being used by this one."
     using(
         "Keeps only links targeted from this branch. `project` argument is also required."
@@ -659,6 +663,8 @@ type Build implements Authorizable & ProjectEntity {
         offset: Int = 0,
         "Keeps only links targeted from this project"
         project: String,
+        "Keeps only links targeted for this qualifier"
+        qualifier: String,
         "Size of the page"
         size: Int = 20
     ): BuildLinkPaginated
@@ -4212,6 +4218,8 @@ type Project implements ProjectEntity {
     staleProperty: Property
     "Associates the project with a Bitbucket Server repository"
     stashProjectConfigurationProperty: Property
+    "List of actions available for this entity"
+    userMenuActions: [UserMenuAction!]!
     "Searching for validation runs in the project"
     validationRuns(
         "Branch where to look for validation runs (regular expression, defaults to all)"
@@ -4576,6 +4584,8 @@ type PromotionLevel implements Authorizable & ProjectEntity {
         "Fully qualified name of the property type"
         type: String
     ): [Property!]!
+    "List of actions available for this entity"
+    userMenuActions: [UserMenuAction!]!
 }
 
 "PromotionLevel links"
@@ -4632,6 +4642,8 @@ type PromotionRun implements Authorizable & ProjectEntity {
         "Fully qualified name of the property type"
         type: String
     ): [Property!]!
+    "List of actions available for this entity"
+    userMenuActions: [UserMenuAction!]!
 }
 
 "PromotionRun links"
@@ -5040,7 +5052,12 @@ type Query {
     scmChangeLog(
         "ID of the build from"
         from: Int!,
-        "List of projects to follow one by one for a get deep change log"
+        """
+
+        List of projects to follow one by one for a get deep change log. Each item
+        in the list is either a project name, or a project name and qualifier separated
+        by a colon (:).
+        """
         projects: [String!],
         "ID of the build to"
         to: Int!
@@ -6536,6 +6553,8 @@ type ValidationRun implements Authorizable & ProjectEntity {
     runInfo: RunInfo
     "Run order"
     runOrder: Int
+    "List of actions available for this entity"
+    userMenuActions: [UserMenuAction!]!
     "Link to the GitHub Workflow Job which created this validation run."
     validationRunGitHubWorkflowJobProperty: Property
     "List of validation statuses"
@@ -6653,6 +6672,8 @@ type ValidationStamp implements ProjectEntity {
         "Fully qualified name of the property type"
         type: String
     ): [Property!]!
+    "List of actions available for this entity"
+    userMenuActions: [UserMenuAction!]!
     "List of runs for this validation stamp"
     validationRuns(
         "Maximum number of validation runs"

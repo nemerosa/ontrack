@@ -9,7 +9,10 @@ import java.util.Optional;
 /**
  * Allows a {@link net.nemerosa.ontrack.model.structure.ProjectEntity} to get extended
  * by custom actions.
+ *
+ * @deprecated Will be removed in V5. Use UserMenuItemExtension instead.
  */
+@Deprecated
 public interface ProjectEntityActionExtension extends Extension {
 
     /**
