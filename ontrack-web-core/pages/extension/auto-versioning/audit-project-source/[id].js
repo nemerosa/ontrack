@@ -9,6 +9,7 @@ import {downToProjectBreadcrumbs} from "@components/common/Breadcrumbs";
 import {CloseCommand} from "@components/common/Commands";
 import {projectUri} from "@components/common/Links";
 import AutoVersioningAuditContextProvider from "@components/extension/auto-versioning/AutoVersioningAuditContext";
+import {Skeleton} from "antd";
 
 export default function AutoVersioningAuditProjectTargetPage() {
     const router = useRouter()
@@ -56,9 +57,11 @@ export default function AutoVersioningAuditProjectTargetPage() {
                 breadcrumbs={breadcrumbs}
                 commands={commands}
             >
-                <AutoVersioningAuditContextProvider sourceProject={project}>
-                    <AutoVersioningAuditView/>
-                </AutoVersioningAuditContextProvider>
+                <Skeleton active loading={!project}>
+                    <AutoVersioningAuditContextProvider sourceProject={project}>
+                        <AutoVersioningAuditView/>
+                    </AutoVersioningAuditContextProvider>
+                </Skeleton>
             </StandardPage>
         </>
     )

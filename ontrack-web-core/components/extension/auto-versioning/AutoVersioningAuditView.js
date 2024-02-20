@@ -21,11 +21,12 @@ const {Column} = Table
 
 export default function AutoVersioningAuditView() {
 
-    const {sourceProject} = useContext(AutoVersioningAuditContext)
-    
+    const context = useContext(AutoVersioningAuditContext)
+
     const client = useGraphQLClient()
 
-    const [loading, setLoading] = useState(false)
+    const [filterReady, setFilterReady] = useState(false)
+    const [loading, setLoading] = useState(true)
     const [entries, setEntries] = useState([])
 
     const [pagination, setPagination] = useState({
@@ -46,6 +47,20 @@ export default function AutoVersioningAuditView() {
         queue: null,
     })
 
+    useEffect(() => {
+        if (context) {
+            const {sourceProject, targetProject, targetBranch} = context
+            if (sourceProject) {
+                setFilter(filter => ({...filter, sourceProject: sourceProject.name}))
+            } else if (targetProject) {
+                setFilter(filter => ({...filter, targetProject: targetProject.name}))
+            } else if (targetBranch) {
+                setFilter(filter => ({...filter, targetBranch: targetBranch.name}))
+            }
+            setFilterReady(true)
+        }
+    }, [context]);
+
     const onTableChange = (_, filters) => {
         setFilter({
             targetProject: filters.target ? filters.target[0] : null,
@@ -60,7 +75,7 @@ export default function AutoVersioningAuditView() {
     }
 
     useEffect(() => {
-        if (client) {
+        if (client && filterReady) {
             setLoading(true)
             client.request(
                 gql`
@@ -250,7 +265,7 @@ export default function AutoVersioningAuditView() {
                         filteredValue={filter.targetProject || filter.targetBranch ? [filter.targetProject, filter.targetBranch] : null}
                     />
 
-                    {!sourceProject &&
+                    {!context.sourceProject &&
                         <Column
                             key="source"
                             title="Source project"
