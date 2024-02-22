@@ -5,6 +5,7 @@ import BuildNode from "@components/links/BuildNode";
 import BuildGroupNode from "@components/links/BuildGroupNode";
 import {autoLayout} from "@components/links/GraphUtils";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import {Skeleton} from "antd";
 
 function BuildLinksFlow({build}) {
 
@@ -275,8 +276,11 @@ function BuildLinksFlow({build}) {
         return nodeId
     }
 
+    const [loading, setLoading] = useState(true)
+
     useEffect(() => {
         if (client) {
+            setLoading(true)
             client.request(
                 buildQuery,
                 {buildId: build.id}
@@ -321,6 +325,8 @@ function BuildLinksFlow({build}) {
                     setNodes,
                     setEdges,
                 })
+            }).finally(() => {
+                setLoading(false)
             })
         }
     }, [client, build])
@@ -333,16 +339,18 @@ function BuildLinksFlow({build}) {
     return (
         <>
             <div style={{height: '100%'}}>
-                <ReactFlow
-                    nodes={nodes}
-                    edges={edges}
-                    onNodesChange={onNodesChange}
-                    fitView={true}
-                    nodeTypes={nodeTypes}
-                >
-                    <Background/>
-                    <Controls/>
-                </ReactFlow>
+                <Skeleton active loading={loading}>
+                    <ReactFlow
+                        nodes={nodes}
+                        edges={edges}
+                        onNodesChange={onNodesChange}
+                        fitView={true}
+                        nodeTypes={nodeTypes}
+                    >
+                        <Background/>
+                        <Controls/>
+                    </ReactFlow>
+                </Skeleton>
             </div>
         </>
     )

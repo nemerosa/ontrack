@@ -5,6 +5,7 @@ import BranchNode from "@components/links/BranchNode";
 import BranchLinkNode from "@components/links/BranchLinkNode";
 import {autoLayout} from "@components/links/GraphUtils";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import {Skeleton} from "antd";
 
 function BranchLinksFlow({branch}) {
 
@@ -301,8 +302,11 @@ function BranchLinksFlow({branch}) {
         })
     }
 
+    const [loading, setLoading] = useState(true)
+
     useEffect(() => {
         if (client && branch) {
+            setLoading(true)
             client.request(
                 branchQuery,
                 {branchId: branch.id}
@@ -338,6 +342,8 @@ function BranchLinksFlow({branch}) {
                     setNodes,
                     setEdges,
                 })
+            }).finally(() => {
+                setLoading(false)
             })
         }
     }, [client, branch]);
@@ -350,16 +356,18 @@ function BranchLinksFlow({branch}) {
     return (
         <>
             <div style={{height: '800px'}}>
-                <ReactFlow
-                    nodes={nodes}
-                    edges={edges}
-                    onNodesChange={onNodesChange}
-                    fitView={true}
-                    nodeTypes={nodeTypes}
-                >
-                    <Background/>
-                    <Controls/>
-                </ReactFlow>
+                <Skeleton active loading={loading}>
+                    <ReactFlow
+                        nodes={nodes}
+                        edges={edges}
+                        onNodesChange={onNodesChange}
+                        fitView={true}
+                        nodeTypes={nodeTypes}
+                    >
+                        <Background/>
+                        <Controls/>
+                    </ReactFlow>
+                </Skeleton>
             </div>
         </>
     )
