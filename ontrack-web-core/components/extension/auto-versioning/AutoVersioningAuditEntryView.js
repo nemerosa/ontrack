@@ -17,17 +17,8 @@ export default function AutoVersioningAuditEntryView({uuid}) {
     const [commands, setCommands] = useState([])
     useEffect(() => {
         if (auditContext) {
-            const {sourceProject, targetProject, targetBranch} = auditContext
             // Sets the breadcrumbs
-            if (sourceProject) {
-                setBreadcrumbs(downToProjectBreadcrumbs({project: sourceProject}))
-            } else if (targetBranch) {
-                setBreadcrumbs(downToBranchBreadcrumbs({branch: targetBranch}))
-            } else if (targetProject) {
-                setBreadcrumbs(downToProjectBreadcrumbs({project: targetProject}))
-            } else {
-                setBreadcrumbs(homeBreadcrumbs())
-            }
+            setBreadcrumbs(homeBreadcrumbs())
             // TODO Sets the commands
         }
     }, [auditContext]);
@@ -68,6 +59,7 @@ export default function AutoVersioningAuditEntryView({uuid}) {
                                     uuid
                                     sourceProject
                                     branch {
+                                        id
                                         name
                                         project {
                                             id
