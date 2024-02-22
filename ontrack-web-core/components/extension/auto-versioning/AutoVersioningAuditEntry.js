@@ -4,7 +4,6 @@ import AutoVersioningAuditEntryState from "@components/extension/auto-versioning
 import TimestampText from "@components/common/TimestampText";
 import {FaInfoCircle} from "react-icons/fa";
 import AutoVersioningAuditEntryStateData from "@components/extension/auto-versioning/AutoVersioningAuditEntryStateData";
-import ProjectLink from "@components/projects/ProjectLink";
 import ProjectLinkByName from "@components/projects/ProjectLinkByName";
 
 export default function AutoVersioningAuditEntry({entry}) {

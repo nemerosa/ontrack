@@ -16,6 +16,7 @@ import SelectAutoVersioningAuditState from "@components/extension/auto-versionin
 import SelectAutoVersioningAuditRunningState
     from "@components/extension/auto-versioning/SelectAutoVersioningAuditRunningState";
 import {AutoVersioningAuditContext} from "@components/extension/auto-versioning/AutoVersioningAuditContext";
+import ProjectLinkByName from "@components/projects/ProjectLinkByName";
 
 const {Column} = Table
 
@@ -270,7 +271,7 @@ export default function AutoVersioningAuditView() {
                             key="source"
                             title="Source project"
                             render={(_, entry) =>
-                                <Typography.Text>{entry.order.sourceProject}</Typography.Text>
+                                <ProjectLinkByName name={entry.order.sourceProject}/>
                             }
                             filterDropdown={({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
                                 <TableColumnFilterDropdownInput
