@@ -2,47 +2,47 @@ import {useRouter} from "next/router";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {useEffect, useState} from "react";
 import {gql} from "graphql-request";
-import {gqlProjectCommonFragment} from "@components/services/fragments";
+import {gqlBranchCommonFragment} from "@components/services/fragments";
 import StandardPage from "@components/layouts/StandardPage";
 import AutoVersioningAuditView from "@components/extension/auto-versioning/AutoVersioningAuditView";
-import {downToProjectBreadcrumbs} from "@components/common/Breadcrumbs";
+import {downToBranchBreadcrumbs} from "@components/common/Breadcrumbs";
 import {CloseCommand} from "@components/common/Commands";
-import {projectUri} from "@components/common/Links";
+import {branchUri} from "@components/common/Links";
 import AutoVersioningAuditContextProvider from "@components/extension/auto-versioning/AutoVersioningAuditContext";
 import {Skeleton} from "antd";
 
-export default function AutoVersioningAuditProjectTargetPage() {
+export default function AutoVersioningAuditBranchTargetPage() {
     const router = useRouter()
     const {id} = router.query
 
     const client = useGraphQLClient()
 
-    const [project, setProject] = useState()
+    const [branch, setBranch] = useState()
     const [breadcrumbs, setBreadcrumbs] = useState([])
     const [commands, setCommands] = useState([])
     useEffect(() => {
         if (client && id) {
             client.request(
                 gql`
-                    query GetProject(
+                    query GetBranch(
                         $id: Int!,
                     ) {
-                        projects(id: $id) {
-                            ...projectCommonFragment
+                        branch(id: $id) {
+                            ...branchCommonFragment
                         }
                     }
 
-                    ${gqlProjectCommonFragment}
+                    ${gqlBranchCommonFragment}
                 `,
                 {id}
             ).then(data => {
-                const project = data.projects[0];
-                setProject(project)
+                const branch = data.branch;
+                setBranch(branch)
                 setBreadcrumbs(
-                    downToProjectBreadcrumbs({project})
+                    downToBranchBreadcrumbs({branch})
                 )
                 setCommands([
-                    <CloseCommand key="close" href={projectUri(project)}/>,
+                    <CloseCommand key="close" href={branchUri(branch)}/>,
                 ])
             })
         }
@@ -51,12 +51,12 @@ export default function AutoVersioningAuditProjectTargetPage() {
     return (
         <>
             <StandardPage
-                pageTitle="Auto-versioning audit as target project"
+                pageTitle="Auto-versioning audit as target branch"
                 breadcrumbs={breadcrumbs}
                 commands={commands}
             >
-                <Skeleton active loading={!project}>
-                    <AutoVersioningAuditContextProvider targetProject={project}>
+                <Skeleton active loading={!branch}>
+                    <AutoVersioningAuditContextProvider targetBranch={branch}>
                         <AutoVersioningAuditView/>
                     </AutoVersioningAuditContextProvider>
                 </Skeleton>

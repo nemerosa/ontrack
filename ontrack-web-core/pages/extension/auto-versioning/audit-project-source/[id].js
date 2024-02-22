@@ -2,7 +2,7 @@ import {useRouter} from "next/router";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {useEffect, useState} from "react";
 import {gql} from "graphql-request";
-import {gqlProjectCommonFragment, gqlPropertiesFragment} from "@components/services/fragments";
+import {gqlProjectCommonFragment} from "@components/services/fragments";
 import StandardPage from "@components/layouts/StandardPage";
 import AutoVersioningAuditView from "@components/extension/auto-versioning/AutoVersioningAuditView";
 import {downToProjectBreadcrumbs} from "@components/common/Breadcrumbs";

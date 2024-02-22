@@ -239,7 +239,7 @@ export default function AutoVersioningAuditView() {
                     />
 
                     {
-                        !context.targetProject &&
+                        (!context.targetBranch) &&
                         <Column
                             key="target"
                             title="Target"

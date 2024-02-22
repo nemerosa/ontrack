@@ -95,3 +95,15 @@ export const gqlProjectCommonFragment = gql`
         name
     }
 `
+
+export const gqlBranchCommonFragment = gql`
+    fragment branchCommonFragment on Branch {
+        id
+        name
+        project {
+            ...projectCommonFragment
+        }
+    }
+    
+    ${gqlProjectCommonFragment}
+`
