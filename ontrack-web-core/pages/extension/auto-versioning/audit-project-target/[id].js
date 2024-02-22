@@ -51,12 +51,12 @@ export default function AutoVersioningAuditProjectTargetPage() {
     return (
         <>
             <StandardPage
-                pageTitle="Auto-versioning audit as source project"
+                pageTitle="Auto-versioning audit as target project"
                 breadcrumbs={breadcrumbs}
                 commands={commands}
             >
                 <Skeleton active loading={!project}>
-                    <AutoVersioningAuditContextProvider sourceProject={project}>
+                    <AutoVersioningAuditContextProvider targetProject={project}>
                         <AutoVersioningAuditView/>
                     </AutoVersioningAuditContextProvider>
                 </Skeleton>

@@ -238,33 +238,36 @@ export default function AutoVersioningAuditView() {
                         }
                     />
 
-                    <Column
-                        key="target"
-                        title="Target"
-                        render={(_, entry) =>
-                            <AutoVersioningAuditEntryTarget entry={entry}/>
-                        }
-                        filterDropdown={({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
-                            <TableColumnFilterDropdown
-                                confirm={confirm}
-                                clearFilters={clearFilters}
-                            >
-                                <Input
-                                    placeholder="Target project"
-                                    value={selectedKeys[0]}
-                                    onChange={(e) => setSelectedKeys([e.target.value, selectedKeys[1]])}
-                                    style={{width: 188, marginBottom: 8, display: 'block'}}
-                                />
-                                <Input
-                                    placeholder="Target branch"
-                                    value={selectedKeys[1]}
-                                    onChange={(e) => setSelectedKeys([selectedKeys[0], e.target.value])}
-                                    style={{width: 188, marginBottom: 8, display: 'block'}}
-                                />
-                            </TableColumnFilterDropdown>
-                        }
-                        filteredValue={filter.targetProject || filter.targetBranch ? [filter.targetProject, filter.targetBranch] : null}
-                    />
+                    {
+                        !context.targetProject &&
+                        <Column
+                            key="target"
+                            title="Target"
+                            render={(_, entry) =>
+                                <AutoVersioningAuditEntryTarget entry={entry}/>
+                            }
+                            filterDropdown={({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
+                                <TableColumnFilterDropdown
+                                    confirm={confirm}
+                                    clearFilters={clearFilters}
+                                >
+                                    <Input
+                                        placeholder="Target project"
+                                        value={selectedKeys[0]}
+                                        onChange={(e) => setSelectedKeys([e.target.value, selectedKeys[1]])}
+                                        style={{width: 188, marginBottom: 8, display: 'block'}}
+                                    />
+                                    <Input
+                                        placeholder="Target branch"
+                                        value={selectedKeys[1]}
+                                        onChange={(e) => setSelectedKeys([selectedKeys[0], e.target.value])}
+                                        style={{width: 188, marginBottom: 8, display: 'block'}}
+                                    />
+                                </TableColumnFilterDropdown>
+                            }
+                            filteredValue={filter.targetProject || filter.targetBranch ? [filter.targetProject, filter.targetBranch] : null}
+                        />
+                    }
 
                     {!context.sourceProject &&
                         <Column

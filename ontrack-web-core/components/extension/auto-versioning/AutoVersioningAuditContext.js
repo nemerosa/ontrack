@@ -6,10 +6,12 @@ export const AutoVersioningAuditContext = createContext({
     targetBranch: undefined,
 })
 
-export default function AutoVersioningAuditContextProvider({sourceProject, children}) {
+export default function AutoVersioningAuditContextProvider({sourceProject, targetProject, targetBranch, children}) {
 
     const context = {
         sourceProject,
+        targetProject,
+        targetBranch,
     }
 
     return (
