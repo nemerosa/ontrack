@@ -110,7 +110,10 @@ export default function AutoVersioningAuditEntry({entry}) {
         {
             children: <AutoVersioningAuditEntryState status={item}/>,
             label: <Space>
-                <TimestampText value={item.creation.time}/>
+                <TimestampText
+                    value={item.creation.time}
+                    format="YYYY MMM DD, HH:mm:ss"
+                />
                 <Popover
                     content={
                         <AutoVersioningAuditEntryStateData data={item.data}/>
