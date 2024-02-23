@@ -18,7 +18,7 @@ interface SCMChangeLogService {
     suspend fun getChangeLog(
         from: Build,
         to: Build,
-        projects: List<ProjectLink> = emptyList(),
+        projects: List<DependencyLink> = emptyList(),
     ): SCMChangeLog?
 
 }

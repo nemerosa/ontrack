@@ -144,7 +144,7 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
 
                         // Template
                         val template = """
-                            ${'$'}{promotionRun.changelog?project=${run.project.name}}
+                            ${'$'}{promotionRun.changelog?dependencies=${run.project.name}}
                         """.trimIndent()
 
                         // Rendering
@@ -189,7 +189,7 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
 
                         // Template
                         val template = """
-                            ${'$'}{promotionRun.changelog?project=${run.project.name}:sub}
+                            ${'$'}{promotionRun.changelog?dependencies=${run.project.name}:sub}
                         """.trimIndent()
 
                         // Rendering
@@ -242,7 +242,7 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
 
                                 // Template
                                 val template = """
-                                    ${'$'}{promotionRun.changelog?project=${one.project.name},${run.project.name}}
+                                    ${'$'}{promotionRun.changelog?dependencies=${one.project.name},${run.project.name}}
                                 """.trimIndent()
 
                                 // Rendering

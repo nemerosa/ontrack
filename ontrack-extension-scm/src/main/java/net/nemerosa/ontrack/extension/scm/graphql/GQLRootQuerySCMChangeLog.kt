@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.scm.graphql
 
 import graphql.schema.GraphQLFieldDefinition
 import kotlinx.coroutines.runBlocking
-import net.nemerosa.ontrack.extension.scm.changelog.ProjectLink
+import net.nemerosa.ontrack.extension.scm.changelog.DependencyLink
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogService
 import net.nemerosa.ontrack.graphql.schema.GQLRootQuery
 import net.nemerosa.ontrack.graphql.support.intArgument
@@ -48,7 +48,7 @@ class GQLRootQuerySCMChangeLog(
                     from = buildFrom,
                     to = buildTo,
                     projects = projects
-                        ?.map { ProjectLink.parse(it) }
+                        ?.map { DependencyLink.parse(it) }
                         ?: emptyList(),
                 )
             }

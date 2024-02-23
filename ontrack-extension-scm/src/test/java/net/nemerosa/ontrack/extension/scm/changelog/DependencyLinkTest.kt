@@ -3,27 +3,27 @@ package net.nemerosa.ontrack.extension.scm.changelog
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-class ProjectLinkTest {
+class DependencyLinkTest {
 
     @Test
     fun `Project name only`() {
         assertEquals(
-            ProjectLink(
+            DependencyLink(
                 project = "my-project",
                 qualifier = ""
             ),
-            ProjectLink.parse("my-project")
+            DependencyLink.parse("my-project")
         )
     }
 
     @Test
     fun `Project name and qualifier`() {
         assertEquals(
-            ProjectLink(
+            DependencyLink(
                 project = "my-project",
                 qualifier = "production"
             ),
-            ProjectLink.parse("my-project:production")
+            DependencyLink.parse("my-project:production")
         )
     }
 

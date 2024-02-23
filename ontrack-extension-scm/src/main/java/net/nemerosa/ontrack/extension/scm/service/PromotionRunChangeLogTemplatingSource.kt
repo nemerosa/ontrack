@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.scm.service
 
 import kotlinx.coroutines.runBlocking
-import net.nemerosa.ontrack.extension.scm.changelog.ProjectLink
+import net.nemerosa.ontrack.extension.scm.changelog.DependencyLink
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLog
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogService
 import net.nemerosa.ontrack.model.annotations.APIDescription
@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component
     in the links). 
 """
 )
-@Documentation(PromotionRunChangeLogTemplatingSourceDocumentation::class)
+@Documentation(PromotionRunChangeLogTemplatingSourceConfig::class)
 @DocumentationExampleCode("${'$'}{promotionRun.changelog}")
 class PromotionRunChangeLogTemplatingSource(
     private val structureService: StructureService,
@@ -48,9 +48,9 @@ class PromotionRunChangeLogTemplatingSource(
     override fun render(entity: ProjectEntity, configMap: Map<String, String>, renderer: EventRenderer): String {
         val empty = configMap["empty"] ?: ""
         return if (entity is PromotionRun) {
-            val title = configMap.getBooleanTemplatingParam("title", false)
-            val acrossBranches = configMap.getBooleanTemplatingParam("acrossBranches", true)
-            val projects = configMap.getListStringsTemplatingParam("project") ?: emptyList()
+            val title = configMap.getBooleanTemplatingParam(PromotionRunChangeLogTemplatingSourceConfig::title.name, false)
+            val acrossBranches = configMap.getBooleanTemplatingParam(PromotionRunChangeLogTemplatingSourceConfig::acrossBranches.name, true)
+            val dependencies = configMap.getListStringsTemplatingParam(PromotionRunChangeLogTemplatingSourceConfig::dependencies.name) ?: emptyList()
 
             // First boundary is the build being promoted
             val toBuild = entity.build
@@ -71,7 +71,7 @@ class PromotionRunChangeLogTemplatingSource(
                     scmChangeLogService.getChangeLog(
                         fromBuild,
                         toBuild,
-                        projects.map { ProjectLink.parse(it) },
+                        dependencies.map { DependencyLink.parse(it) },
                     )?.let { scmChangeLog ->
                         renderChangeLog(
                             changeLog = scmChangeLog,

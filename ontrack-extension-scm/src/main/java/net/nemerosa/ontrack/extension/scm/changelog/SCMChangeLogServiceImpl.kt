@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.scm.changelog
 
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
 import net.nemerosa.ontrack.extension.issues.model.Issue
-import net.nemerosa.ontrack.extension.scm.service.ProjectNoSCMException
 import net.nemerosa.ontrack.extension.scm.service.SCMDetector
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.StructureService
@@ -14,7 +13,7 @@ class SCMChangeLogServiceImpl(
     private val structureService: StructureService,
 ) : SCMChangeLogService {
 
-    override suspend fun getChangeLog(from: Build, to: Build, projects: List<ProjectLink>): SCMChangeLog? {
+    override suspend fun getChangeLog(from: Build, to: Build, projects: List<DependencyLink>): SCMChangeLog? {
 
         if (from.project.id() != to.project.id()) {
             throw SCMChangeLogNotSameProjectException()
