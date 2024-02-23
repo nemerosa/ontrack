@@ -215,6 +215,98 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    fun `Getting a recursive change log in a template using a title`() {
+        prepareTest { fromBuild, run, _ ->
+            project {
+                branch {
+                    val pl = promotionLevel()
+
+                    build {
+                        linkTo(fromBuild, qualifier = "sub")
+                        promote(pl)
+                    }
+
+                    build {
+                        linkTo(run.build, qualifier = "sub")
+                        val parentRun = promote(pl)
+
+                        val event = eventFactory.newPromotionRun(parentRun)
+
+                        // Template
+                        val template = """
+                            ${'$'}{promotionRun.changelog?title=true&dependencies=${run.project.name}:sub}
+                        """.trimIndent()
+
+                        // Rendering
+                        val text = eventTemplatingService.render(
+                            template = template,
+                            event = event,
+                            renderer = PlainEventRenderer.INSTANCE
+                        )
+
+                        // OK
+                        assertEquals(
+                            """
+                                Change log for ${fromBuild.project.name} from ${fromBuild.name} to ${run.build.name}
+                                
+                                * ISS-21 Some new feature
+                                * ISS-22 Some fixes are needed
+                                * ISS-23 Some nicer UI
+                            """.trimIndent(),
+                            text,
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Getting a recursive change log in a template using a title when there is no change`() {
+        prepareTest { fromBuild, run, _ ->
+            project {
+                branch {
+                    val pl = promotionLevel()
+
+                    build {
+                        linkTo(fromBuild, qualifier = "sub")
+                        promote(pl)
+                    }
+
+                    build {
+                        linkTo(fromBuild, qualifier = "sub") // Targeting the same build --> no change
+                        val parentRun = promote(pl)
+
+                        val event = eventFactory.newPromotionRun(parentRun)
+
+                        // Template
+                        val template = """
+                            ${'$'}{promotionRun.changelog?title=true&empty=No change&dependencies=${run.project.name}:sub}
+                        """.trimIndent()
+
+                        // Rendering
+                        val text = eventTemplatingService.render(
+                            template = template,
+                            event = event,
+                            renderer = PlainEventRenderer.INSTANCE
+                        )
+
+                        // OK
+                        assertEquals(
+                            """
+                                Project ${fromBuild.project.name} version ${fromBuild.name}
+                                
+                                No change
+                            """.trimIndent(),
+                            text,
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Getting a deep recursive change log in a template`() {
         prepareTest { fromBuild, run, _ ->
             project {

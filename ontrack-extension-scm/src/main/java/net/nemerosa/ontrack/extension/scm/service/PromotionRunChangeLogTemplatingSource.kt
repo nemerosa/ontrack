@@ -48,9 +48,15 @@ class PromotionRunChangeLogTemplatingSource(
     override fun render(entity: ProjectEntity, configMap: Map<String, String>, renderer: EventRenderer): String {
         val empty = configMap["empty"] ?: ""
         return if (entity is PromotionRun) {
-            val title = configMap.getBooleanTemplatingParam(PromotionRunChangeLogTemplatingSourceConfig::title.name, false)
-            val acrossBranches = configMap.getBooleanTemplatingParam(PromotionRunChangeLogTemplatingSourceConfig::acrossBranches.name, true)
-            val dependencies = configMap.getListStringsTemplatingParam(PromotionRunChangeLogTemplatingSourceConfig::dependencies.name) ?: emptyList()
+            val title =
+                configMap.getBooleanTemplatingParam(PromotionRunChangeLogTemplatingSourceConfig::title.name, false)
+            val acrossBranches = configMap.getBooleanTemplatingParam(
+                PromotionRunChangeLogTemplatingSourceConfig::acrossBranches.name,
+                true
+            )
+            val dependencies =
+                configMap.getListStringsTemplatingParam(PromotionRunChangeLogTemplatingSourceConfig::dependencies.name)
+                    ?: emptyList()
 
             // First boundary is the build being promoted
             val toBuild = entity.build
@@ -72,30 +78,41 @@ class PromotionRunChangeLogTemplatingSource(
                         fromBuild,
                         toBuild,
                         dependencies.map { DependencyLink.parse(it) },
-                    )?.let { scmChangeLog ->
+                    )
+                }
+                // Rendered change log
+                val renderedChangeLog = changeLog
+                    ?.takeIf { it.from.id() != it.to.id() }
+                    ?.let { scmChangeLog ->
                         renderChangeLog(
                             changeLog = scmChangeLog,
                             renderer = renderer
                         )
                     } ?: empty
-                }
                 // Title?
-                if (title) {
+                if (title && changeLog != null) {
 
-                    val projectName = entityDisplayNameService.render(fromBuild.project, renderer)
-                    val fromName = entityDisplayNameService.render(fromBuild, renderer)
-                    val toName = entityDisplayNameService.render(toBuild, renderer)
+                    val projectName = entityDisplayNameService.render(changeLog.from.project, renderer)
+                    val fromName = entityDisplayNameService.render(changeLog.from, renderer)
+                    val toName = entityDisplayNameService.render(changeLog.to, renderer)
 
-                    val titleText = """
-                        Change log for $projectName from $fromName to $toName
-                    """.trimIndent()
+                    val titleText = if (changeLog.from.id() != changeLog.to.id()) {
+                        """
+                            Change log for $projectName from $fromName to $toName
+                        """.trimIndent()
+
+                    } else {
+                        """
+                            Project $projectName version $fromName
+                        """.trimIndent()
+                    }
 
                     renderer.renderSection(
                         title = titleText,
-                        content = changeLog,
+                        content = renderedChangeLog,
                     )
                 } else {
-                    changeLog
+                    renderedChangeLog
                 }
             }
         } else {
