@@ -16,6 +16,7 @@ import JumpToBranch from "@components/branches/JumpToBranch";
 import {FaLink} from "react-icons/fa";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gqlGetBranch} from "@components/services/branches";
+import UserMenuActions from "@components/entities/UserMenuActions";
 
 export default function BranchPageView({id}) {
     const [loadingBranch, setLoadingBranch] = useState(true)
@@ -83,6 +84,7 @@ export default function BranchPageView({id}) {
                     //     initialSelectedViewKey={initialSelectedViewKey}
                     //     onBranchViewSelected={onBranchViewSelected}
                     // />,
+                    <UserMenuActions key="userMenuActions" actions={branch.userMenuActions}/>,
                     <JumpToBranch key="branch" projectName={branch.project.name}/>,
                     <Command
                         key="links"

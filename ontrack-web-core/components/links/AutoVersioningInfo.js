@@ -1,5 +1,5 @@
 import {Space, Spin, Tooltip, Typography} from "antd";
-import {FaCalendar, FaCodeBranch, FaMedal, FaTag, FaThumbsUp} from "react-icons/fa";
+import {FaCalendar, FaCodeBranch, FaInfoCircle, FaMedal, FaTag, FaThumbsUp} from "react-icons/fa";
 import BuildRef from "@components/links/BuildRef";
 import Rows from "@components/common/Rows";
 import Columns from "@components/common/Columns";
@@ -67,6 +67,10 @@ export default function AutoVersioningInfo({autoVersioning, branchLink}) {
                                             </Typography.Text>
                                         </Columns>
                                     }
+                                    <Columns>
+                                        <FaInfoCircle color="blue"/>
+                                        <Link href={`/extension/auto-versioning/audit/detail/${autoVersioning.status.order.uuid}`}>More info...</Link>
+                                    </Columns>
                                 </Rows>
                             }
                         >

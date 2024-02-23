@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component
 class CoreUserMenuGroupExtension : AbstractExtension(CoreExtensionFeature.INSTANCE), UserMenuGroupExtension {
     override val groups: List<UserMenuGroup> = listOf(
         UserMenuGroup(CoreUserMenuGroups.USER, "User information"),
+        UserMenuGroup(CoreUserMenuGroups.INFORMATION, "Information"),
         UserMenuGroup(CoreUserMenuGroups.SYSTEM, "System"),
         UserMenuGroup(CoreUserMenuGroups.CONFIGURATIONS, "Configurations"),
     )

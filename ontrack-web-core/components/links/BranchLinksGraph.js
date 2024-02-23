@@ -88,6 +88,7 @@ function BranchLinksFlow({branch}) {
                         }
                         status {
                             order {
+                                uuid
                                 targetVersion
                             }
                             running

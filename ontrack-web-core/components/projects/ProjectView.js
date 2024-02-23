@@ -6,7 +6,12 @@ import {projectTitle} from "@components/common/Titles";
 import {projectBreadcrumbs} from "@components/common/Breadcrumbs";
 import {CloseCommand, LegacyLinkCommand} from "@components/common/Commands";
 import {homeUri, legacyProjectUri} from "@components/common/Links";
-import {gqlDecorationFragment, gqlInformationFragment, gqlPropertiesFragment} from "@components/services/fragments";
+import {
+    gqlDecorationFragment,
+    gqlInformationFragment,
+    gqlPropertiesFragment,
+    gqlUserMenuActionFragment
+} from "@components/services/fragments";
 import PageSection from "@components/common/PageSection";
 import BranchList from "@components/branches/BranchList";
 import {Empty, Space} from "antd";
@@ -17,6 +22,7 @@ import ProjectFavourite from "@components/projects/ProjectFavourite";
 import {useEventForRefresh} from "@components/common/EventsContext";
 import ProjectInfoViewDrawer from "@components/projects/ProjectInfoViewDrawer";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import UserMenuActions from "@components/entities/UserMenuActions";
 
 export default function ProjectView({id}) {
 
@@ -44,6 +50,9 @@ export default function ProjectView({id}) {
                             }
                             information {
                                 ...informationFragment
+                            }
+                            userMenuActions {
+                                ...userMenuActionFragment
                             }
                             branches(order: true, count: 6) {
                                 project {
@@ -91,6 +100,7 @@ export default function ProjectView({id}) {
                     ${gqlDecorationFragment}
                     ${gqlPropertiesFragment}
                     ${gqlInformationFragment}
+                    ${gqlUserMenuActionFragment}
                 `,
                 {id}
             ).then(data => {
@@ -104,6 +114,7 @@ export default function ProjectView({id}) {
     }, [client, id, favouriteRefreshCount])
 
     const commands = [
+        <UserMenuActions key="userMenuActions" actions={project.userMenuActions}/>,
         <JumpToBranch key="branch" projectName={project.name}/>,
         <LegacyLinkCommand
             key="legacy"
@@ -111,7 +122,7 @@ export default function ProjectView({id}) {
             text="Legacy project"
             title="Goes to the legacy project page"
         />,
-        <CloseCommand key="close" href={homeUri()}/>
+        <CloseCommand key="close" href={homeUri()}/>,
     ]
 
     return (

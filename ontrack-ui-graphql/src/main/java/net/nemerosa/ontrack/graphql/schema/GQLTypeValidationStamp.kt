@@ -8,6 +8,7 @@ import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLObjectType.newObject
 import graphql.schema.GraphQLTypeReference
+import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
 import net.nemerosa.ontrack.model.structure.*
@@ -16,21 +17,23 @@ import org.springframework.stereotype.Component
 
 @Component
 class GQLTypeValidationStamp(
-        private val structureService: StructureService,
-        creation: GQLTypeCreation,
-        private val projectEntityInterface: GQLProjectEntityInterface,
-        private val paginatedListFactory: GQLPaginatedListFactory,
-        private val validationRun: GQLTypeValidationRun,
-        private val validationRunStatusService: ValidationRunStatusService,
-        private val validationDataTypeConfig: GQLTypeValidationDataTypeConfig,
-        projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>,
-        freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>
+    private val structureService: StructureService,
+    creation: GQLTypeCreation,
+    private val projectEntityInterface: GQLProjectEntityInterface,
+    private val paginatedListFactory: GQLPaginatedListFactory,
+    private val validationRun: GQLTypeValidationRun,
+    private val validationRunStatusService: ValidationRunStatusService,
+    private val validationDataTypeConfig: GQLTypeValidationDataTypeConfig,
+    projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>,
+    freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>,
+    extensionManager: ExtensionManager,
 ) : AbstractGQLProjectEntity<ValidationStamp>(
         ValidationStamp::class.java,
         ProjectEntityType.VALIDATION_STAMP,
         projectEntityFieldContributors,
         creation,
-        freeTextAnnotatorContributors
+        freeTextAnnotatorContributors,
+        extensionManager,
 ) {
 
     override fun getTypeName() = VALIDATION_STAMP

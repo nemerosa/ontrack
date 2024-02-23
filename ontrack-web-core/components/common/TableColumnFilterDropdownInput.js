@@ -1,5 +1,4 @@
-import {Button, Input, Space} from "antd";
-import {FaSearch} from "react-icons/fa";
+import {Input} from "antd";
 import TableColumnFilterDropdown from "@components/common/TableColumnFilterDropdown";
 
 export default function TableColumnFilterDropdownInput({
@@ -19,7 +18,7 @@ export default function TableColumnFilterDropdownInput({
             >
                 <Input
                     placeholder={placeholder}
-                    value={selectedKeys[0]}
+                    value={selectedKeys}
                     onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
                     onPressEnter={() => confirm()}
                     style={{width: 188, display: 'block'}}

@@ -79,3 +79,31 @@ export const gqlInformationFragment = gql`
         data
     }
 `
+
+export const gqlUserMenuActionFragment = gql`
+    fragment userMenuActionFragment on UserMenuAction {
+        groupId
+        extension
+        id
+        name
+    }
+`
+
+export const gqlProjectCommonFragment = gql`
+    fragment projectCommonFragment on Project {
+        id
+        name
+    }
+`
+
+export const gqlBranchCommonFragment = gql`
+    fragment branchCommonFragment on Branch {
+        id
+        name
+        project {
+            ...projectCommonFragment
+        }
+    }
+    
+    ${gqlProjectCommonFragment}
+`

@@ -8,8 +8,10 @@ import {
     FaDoorOpen,
     FaExpandArrowsAlt,
     FaGithub,
+    FaInfo,
     FaJenkins,
     FaList,
+    FaMagic,
     FaSignOutAlt,
     FaUser
 } from "react-icons/fa";
@@ -27,6 +29,14 @@ export function useUserMenu() {
     }
 }
 
+
+export const groupIcons = {
+    configurations: <FaList/>,
+    system: <FaCog/>,
+    user: <FaUser/>,
+    information: <FaInfo/>,
+}
+
 export default function UserMenu({userMenu}) {
 
     const logout = useLogout()
@@ -40,15 +50,10 @@ export default function UserMenu({userMenu}) {
         toggleExpansion()
     }
 
-    const groupIcons = {
-        configurations: <FaList/>,
-        system: <FaCog/>,
-        user: <FaUser/>,
-    }
-
     const itemIcons = {
         'extension/jenkins/configurations': <FaJenkins/>,
         'extension/github/configurations': <FaGithub/>,
+        'extension/auto-versioning/audit/global': <FaMagic/>,
     }
 
     useEffect(() => {

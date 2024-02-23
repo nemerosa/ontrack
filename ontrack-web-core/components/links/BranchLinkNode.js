@@ -8,8 +8,6 @@ import ProjectLink from "@components/projects/ProjectLink";
 
 export default function BranchLinkNode({data}) {
 
-    console.log({data})
-
     const {link, sourceBranch, targetBranch} = data
     const {qualifier, sourceBuild, targetBuild, autoVersioning} = link
 

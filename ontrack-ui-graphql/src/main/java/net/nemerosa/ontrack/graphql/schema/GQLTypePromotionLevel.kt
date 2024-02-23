@@ -6,6 +6,7 @@ import graphql.schema.DataFetchingEnvironment
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.common.and
+import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.graphql.schema.authorizations.GQLInterfaceAuthorizableService
 import net.nemerosa.ontrack.graphql.support.*
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
@@ -25,13 +26,15 @@ class GQLTypePromotionLevel(
     private val projectEntityInterface: GQLProjectEntityInterface,
     private val paginatedListFactory: GQLPaginatedListFactory,
     private val buildDisplayNameService: BuildDisplayNameService,
-    freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>
+    freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>,
+    extensionManager: ExtensionManager,
 ) : AbstractGQLProjectEntity<PromotionLevel>(
         PromotionLevel::class.java,
         ProjectEntityType.PROMOTION_LEVEL,
         projectEntityFieldContributors,
         creation,
-        freeTextAnnotatorContributors
+        freeTextAnnotatorContributors,
+        extensionManager,
 ) {
 
     override fun getTypeName(): String = PROMOTION_LEVEL
