@@ -295,6 +295,7 @@ pipeline {
                     )
                 }
                 failure {
+                    archiveArtifacts(artifacts: "ontrack-kdsl-acceptance/build/logs/**", allowEmptyArchive: true)
                     archiveArtifacts(artifacts: "ontrack-web-tests/reports/html/index.html", allowEmptyArchive: true)
                 }
             }
