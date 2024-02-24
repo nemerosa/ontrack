@@ -37,6 +37,13 @@
 
                 <ul class="nav navbar-nav navbar-right">
 
+                    <!-- Next UI action -->
+                    <li>
+                        <p class="ot-navbar-next-ui">
+                            <a href="/rest/ui" title="Try the Next UI of Ontrack"><i class="fa fa-flask"></i>&nbsp;Next UI</a>
+                        </p>
+                    </li>
+
                     <!-- Application info messages -->
 
                     <li class="dropdown"
@@ -53,7 +60,8 @@
 
                     <!-- User menu -->
                     <li>
-                        <p id="header-user-menu" class="navbar-text ot-action" title="Displays/hides the main menu" ng-click="toggleUserMenu()"><i
+                        <p id="header-user-menu" class="navbar-text ot-action" title="Displays/hides the main menu"
+                           ng-click="toggleUserMenu()"><i
                                 class="fa fa-bars"
                                 ng-class="{
                                     'fa-rotate-90': userMenu.active
