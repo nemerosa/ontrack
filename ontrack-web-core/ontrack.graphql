@@ -1681,6 +1681,8 @@ type EntityCounts {
 type EntityInformation {
     "Associated data"
     data: JSON
+    "Display name for this information"
+    title: String!
     "Type of information"
     type: String!
 }

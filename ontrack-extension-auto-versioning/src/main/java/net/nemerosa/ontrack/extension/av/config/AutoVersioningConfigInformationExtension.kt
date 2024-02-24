@@ -17,6 +17,8 @@ class AutoVersioningConfigInformationExtension(
     private val autoVersioningConfigurationService: AutoVersioningConfigurationService,
 ) : AbstractExtension(extensionFeature), EntityInformationExtension {
 
+    override val title: String = "Auto-versioning"
+
     override fun getInformation(entity: ProjectEntity): EntityInformation? =
         if (entity is Branch) {
             autoVersioningConfigurationService.getAutoVersioning(entity)?.let { config ->

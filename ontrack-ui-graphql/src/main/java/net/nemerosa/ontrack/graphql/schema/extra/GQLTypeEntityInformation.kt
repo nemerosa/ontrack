@@ -20,5 +20,6 @@ class GQLTypeEntityInformation : GQLType {
             .description(getTypeDescription(EntityInformation::class))
             .jsonField(EntityInformation::data)
             .stringField(EntityInformation::type)
+            .stringField(EntityInformation::title)
             .build()
 }

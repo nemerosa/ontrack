@@ -19,6 +19,8 @@ class BranchGitHubIngestionConfigInformationExtension(
     private val configService: ConfigService,
 ) : AbstractExtension(extensionFeature), EntityInformationExtension {
 
+    override val title: String = "GitHub ingestion config"
+
     override fun getInformation(entity: ProjectEntity): EntityInformation? =
         if (entity is Branch) {
             configService.findConfig(entity)?.let { config ->

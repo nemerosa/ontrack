@@ -1,6 +1,6 @@
 import ListSection from "@components/common/ListSection";
-import Information from "@components/framework/information/Information";
 import {FaInfoCircle} from "react-icons/fa";
+import {Dynamic} from "@components/common/Dynamic";
 
 export default function InformationSection({entity, loading}) {
     return (
@@ -10,10 +10,19 @@ export default function InformationSection({entity, loading}) {
                     icon={<FaInfoCircle/>}
                     title="Information"
                     loading={loading}
-                    items={entity.information.filter(it => it.data)}
-                    renderItem={(info) => (
-                        <Information info={info}/>
-                    )}
+                    items={
+                        entity.information
+                            .filter(it => it.data)
+                            .map(info => {
+                                    const shortTypeName = info.type.slice("net.nemerosa.ontrack.extension.".length)
+                                    return {
+                                        title: info.title,
+                                        icon: <Dynamic path={`framework/information/${shortTypeName}/Icon`}/>,
+                                        content: <Dynamic path={`framework/information/${shortTypeName}/Display`} props={{info}}/>,
+                                    }
+                                }
+                            )
+                    }
                 />
             }
         </>

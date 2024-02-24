@@ -18,6 +18,8 @@ class SCMCatalogTeamsInformation(
     private val catalogLinkService: CatalogLinkService
 ) : AbstractExtension(extensionFeature), EntityInformationExtension {
 
+    override val title: String = "SCM Teams"
+
     override fun getInformation(entity: ProjectEntity): EntityInformation? =
         if (entity is Project) {
             catalogLinkService.getSCMCatalogEntry(entity)

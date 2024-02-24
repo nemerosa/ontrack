@@ -76,6 +76,7 @@ export const gqlPropertiesFragment = gql`
 export const gqlInformationFragment = gql`
     fragment informationFragment on EntityInformation {
         type
+        title
         data
     }
 `

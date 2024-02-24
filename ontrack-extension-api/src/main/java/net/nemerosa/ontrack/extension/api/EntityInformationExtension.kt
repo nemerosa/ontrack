@@ -13,4 +13,9 @@ interface EntityInformationExtension : Extension {
      * Gets information for an entity. Returns `null` when none is available.
      */
     fun getInformation(entity: ProjectEntity): EntityInformation?
+
+    /**
+     * Display name for this information
+     */
+    val title: String
 }

@@ -14,6 +14,8 @@ class RunInfoInformationExtension(
         private val runInfoService: RunInfoService
 ) : AbstractExtension(extensionFeature), EntityInformationExtension {
 
+    override val title: String = "Run info"
+
     override fun getInformation(entity: ProjectEntity): EntityInformation? {
         return if (entity is RunnableEntity) {
             // Gets the run info if any

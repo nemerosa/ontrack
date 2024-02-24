@@ -22,6 +22,8 @@ class GitPullRequestInformationExtension(
     private val gitService: GitService
 ) : AbstractExtension(extensionFeature), EntityInformationExtension {
 
+    override val title: String = "Pull request"
+
     override fun getInformation(entity: ProjectEntity): EntityInformation? =
             if (entity is Branch) {
                 val property: GitBranchConfigurationProperty? = propertyService.getProperty(entity, GitBranchConfigurationPropertyType::class.java).value

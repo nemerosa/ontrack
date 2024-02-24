@@ -14,6 +14,8 @@ class SonarQubeMeasuresInformationExtension(
         private val sonarQubeMeasuresCollectionService: SonarQubeMeasuresCollectionService
 ) : AbstractExtension(extensionFeature), EntityInformationExtension {
 
+    override val title: String = "SonarQube measures"
+
     override fun getInformation(entity: ProjectEntity): EntityInformation? {
         return if (entity is Build) {
             val measures = sonarQubeMeasuresCollectionService.getMeasures(entity)

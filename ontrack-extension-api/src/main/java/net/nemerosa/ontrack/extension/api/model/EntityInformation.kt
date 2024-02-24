@@ -29,6 +29,12 @@ class EntityInformation(
     val type: String = extension.javaClass.name
 
     /**
+     * Title
+     */
+    @APIDescription("Display name for this information")
+    val title: String = extension.title
+
+    /**
      * Extension feature
      */
     val feature: ExtensionFeatureDescription = extension.feature.featureDescription
