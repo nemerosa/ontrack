@@ -22,10 +22,15 @@ class BitbucketServerSCMCommit(
 
     private val actualTimestamp = commit.authorTimestamp ?: commit.committerTimestamp
 
-    override val timestamp: LocalDateTime = LocalDateTime.ofEpochSecond(actualTimestamp, 0, ZoneOffset.UTC)
+    /**
+     * Contrarily to what is mentioned in the REST API documentation
+     * at https://developer.atlassian.com/server/bitbucket/rest/v811/api-group-repository/#api-api-latest-projects-projectkey-repos-repositoryslug-commits-commitid-get
+     * the timestamps ARE NOT expressed in seconds, but in milliseconds
+     */
+    override val timestamp: LocalDateTime = LocalDateTime.ofEpochSecond((actualTimestamp / 1000), 0, ZoneOffset.UTC)
 
     override val message: String = commit.message
 
-    override val link: String = "$root/projects/${repo.project}/repos/${repo.project}/commits/$$id"
+    override val link: String = "$root/projects/${repo.project}/repos/${repo.project}/commits/$id"
 
 }

@@ -1,11 +1,11 @@
 {
   "message": "More work on feature 1",
-  "authorTimestamp": 1359075920,
+  "authorTimestamp": 1708774267000,
   "committer": {
     "name": "Charlie",
     "emailAddress": "charlie@example.com"
   },
-  "committerTimestamp": 1449075830,
+  "committerTimestamp": 1708774267000,
   "parents": [
     {
       "id": "abcdef0123abcdef4567abcdef8987abcdef6543",

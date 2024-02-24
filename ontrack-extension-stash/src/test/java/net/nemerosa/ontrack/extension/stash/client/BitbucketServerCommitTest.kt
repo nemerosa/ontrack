@@ -24,11 +24,11 @@ class BitbucketServerCommitTest {
             commit.message
         )
         assertEquals(
-            1359075920,
+            1708774267000,
             commit.authorTimestamp
         )
         assertEquals(
-            1449075830,
+            1708774267000,
             commit.committerTimestamp
         )
         assertEquals(

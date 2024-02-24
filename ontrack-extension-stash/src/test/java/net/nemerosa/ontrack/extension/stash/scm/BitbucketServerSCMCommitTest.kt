@@ -33,7 +33,7 @@ class BitbucketServerSCMCommitTest {
             commit.message
         )
         assertEquals(
-            LocalDateTime.of(2013, Month.JANUARY, 25, 1, 5, 20),
+            LocalDateTime.of(2024, Month.FEBRUARY, 24, 11, 31, 7),
             commit.timestamp
         )
         assertEquals(
