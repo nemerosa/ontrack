@@ -261,7 +261,10 @@ pipeline {
                     )
                 }
                 failure {
-                    archiveArtifacts(artifacts: "ontrack-kdsl-acceptance/build/logs/**", allowEmptyArchive: true)
+                    script {
+                        sh 'mv ontrack-kdsl-acceptance/build/logs ontrack-kdsl-acceptance/build/logs-kdsl'
+                    }
+                    archiveArtifacts(artifacts: "ontrack-kdsl-acceptance/build/logs-kdsl/**", allowEmptyArchive: true)
                 }
             }
         }
@@ -295,7 +298,10 @@ pipeline {
                     )
                 }
                 failure {
-                    archiveArtifacts(artifacts: "ontrack-kdsl-acceptance/build/logs/**", allowEmptyArchive: true)
+                    script {
+                        sh 'mv ontrack-kdsl-acceptance/build/logs ontrack-kdsl-acceptance/build/logs-ui'
+                    }
+                    archiveArtifacts(artifacts: "ontrack-kdsl-acceptance/build/logs-ui/**", allowEmptyArchive: true)
                     archiveArtifacts(artifacts: "ontrack-web-tests/reports/html/index.html", allowEmptyArchive: true)
                 }
             }
