@@ -1,10 +1,10 @@
-import {Typography} from "antd";
+import {Tag} from "antd";
 
 export default function Display({property}) {
 
     return (
         <>
-            <Typography.Text>{property.value.name}</Typography.Text>
+            <Tag color="green">{property.value.name}</Tag>
         </>
     )
 }
