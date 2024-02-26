@@ -1,6 +1,5 @@
 import {useContext} from "react";
 import {UserContext} from "@components/providers/UserProvider";
-import Section from "@components/common/Section";
 import Head from "next/head";
 import {title} from "@components/common/Titles";
 import MainPage from "@components/layouts/MainPage";
@@ -9,6 +8,7 @@ import UserProfileChangePassword from "@components/core/admin/userProfile/UserPr
 import UserProfileTokens from "@components/core/admin/userProfile/UserProfileTokens";
 import {homeUri} from "@components/common/Links";
 import {CloseCommand} from "@components/common/Commands";
+import PageSection from "@components/common/PageSection";
 
 export default function UserProfileView() {
 
@@ -28,13 +28,13 @@ export default function UserProfileView() {
             >
                 {
                     authorizations?.user?.changePassword &&
-                    <Section title="Change password" padding={16}>
+                    <PageSection title="Change password">
                         <UserProfileChangePassword/>
-                    </Section>
+                    </PageSection>
                 }
-                <Section title="API tokens" padding={16}>
+                <PageSection title="API tokens">
                     <UserProfileTokens/>
-                </Section>
+                </PageSection>
             </MainPage>
         </>
     )

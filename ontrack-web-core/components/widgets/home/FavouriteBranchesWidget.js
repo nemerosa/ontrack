@@ -5,6 +5,7 @@ import {useEventForRefresh} from "@components/common/EventsContext";
 import {Empty} from "antd";
 import {DashboardWidgetCellContext} from "@components/dashboards/DashboardWidgetCellContextProvider";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import PaddedContent from "@components/common/PaddedContent";
 
 export default function FavouriteBranchesWidget({project}) {
 
@@ -57,7 +58,7 @@ export default function FavouriteBranchesWidget({project}) {
     }, [client, project, favouriteRefreshCount]);
 
     return (
-        <>
+        <PaddedContent>
             <BranchList
                 branches={branches}
                 showProject={!project}
@@ -68,6 +69,6 @@ export default function FavouriteBranchesWidget({project}) {
                     description="No branch has been marked as a favourite in any project."
                 />
             }
-        </>
+        </PaddedContent>
     )
 }

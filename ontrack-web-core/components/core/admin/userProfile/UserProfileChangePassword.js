@@ -1,7 +1,6 @@
 import {Button, Form, Input, Space, Spin} from "antd";
 import CheckIcon from "@components/common/CheckIcon";
 import FormErrors from "@components/form/FormErrors";
-import Section from "@components/common/Section";
 import {useState} from "react";
 import {gql} from "graphql-request";
 import {getUserErrors} from "@components/services/graphql-utils";

@@ -146,6 +146,8 @@ export default function ProjectView({id}) {
                         <PageSection
                             loading={loadingProject}
                             title="Favourite branches"
+                            height="250px"
+                            padding={true}
                         >
                             <BranchList
                                 branches={favouriteBranches}
@@ -156,6 +158,8 @@ export default function ProjectView({id}) {
                     <PageSection
                         loading={loadingProject}
                         title="Last active branches"
+                        height="300px"
+                        padding={true}
                     >
                         {
                             (!branches || branches.length === 0) &&

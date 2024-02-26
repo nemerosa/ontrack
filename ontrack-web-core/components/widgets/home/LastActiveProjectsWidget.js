@@ -7,6 +7,7 @@ import {useGraphQLClient} from "@components/providers/ConnectionContextProvider"
 import {gql} from "graphql-request";
 import {gqlDecorationFragment} from "@components/services/fragments";
 import {DashboardWidgetCellContext} from "@components/dashboards/DashboardWidgetCellContextProvider";
+import PaddedContent from "@components/common/PaddedContent";
 
 export default function LastActiveProjectsWidget({count}) {
 
@@ -43,7 +44,7 @@ export default function LastActiveProjectsWidget({count}) {
     }, [client, count, projectsRefreshCount, favouritesRefresh]);
 
     return (
-        <>
+        <PaddedContent>
             {
                 projects && projects.length > 0 &&
                 <Space direction="horizontal" size={16} wrap>
@@ -69,6 +70,6 @@ export default function LastActiveProjectsWidget({count}) {
                     }
                 />
             }
-        </>
+        </PaddedContent>
     )
 }

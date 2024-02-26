@@ -8,7 +8,7 @@ import PromotionRun from "@components/promotionRuns/PromotionRun";
 export default function ChangeLogBuild({id, title, build}) {
     return (
         <>
-            <GridCell id={id} title={title}>
+            <GridCell id={id} title={title} padding={true}>
                 <Space direction="vertical">
                     <Space>
                         <BranchLink branch={build.branch}/>

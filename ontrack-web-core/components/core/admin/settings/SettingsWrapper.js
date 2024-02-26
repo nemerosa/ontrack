@@ -1,8 +1,8 @@
 import {Dynamic} from "@components/common/Dynamic";
-import Section from "@components/common/Section";
 import {useEffect, useState} from "react";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
+import PageSection from "@components/common/PageSection";
 
 export default function SettingsWrapper({entryId}) {
 
@@ -35,15 +35,14 @@ export default function SettingsWrapper({entryId}) {
         <>
             {
                 entry &&
-                <Section
-                    padding={16}
+                <PageSection
                     title={entry.title}
                 >
                     <Dynamic
                         path={`framework/settings/${entry.id}-form`}
                         props={{...entry.values, id: entry.id}}
                     />
-                </Section>
+                </PageSection>
             }
         </>
     )

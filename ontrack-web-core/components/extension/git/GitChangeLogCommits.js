@@ -19,6 +19,7 @@ export default function GitChangeLogCommits({id, commits, diffLink}) {
         <>
             <GridCell
                 id={id}
+                padding={true}
                 title={
                     <>
                         Commits (<Link href={diffLink}>diff</Link>)

@@ -156,7 +156,7 @@ export default function BuildContentPromotions({build}) {
 
     return (
         <>
-            <GridCell id="promotions" title="Promotions" loading={loading}>
+            <GridCell id="promotions" title="Promotions" loading={loading} padding={true}>
                 <Timeline
                     style={{
                         paddingTop: 16,

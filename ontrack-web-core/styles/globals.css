@@ -102,41 +102,6 @@ button.ot-validation-stamp-filter-edition {
 }
 
 /**
- * Section
- */
-
-.ot-section-container {
-    border: solid 1px lightgray;
-    border-radius: 8px;
-    width: 100%;
-    height: 100%;
-}
-
-.ot-section-title-header {
-    font-weight: bold;
-    height: 60px;
-    padding: 1em;
-    background-color: lightgray;
-}
-
-.ot-section-extra {
-    text-align: right;
-}
-
-.ot-section-body {
-    height: calc(100% - 60px);
-    width: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-
-.ot-section-body-padded {
-    padding: 1em;
-    width: 100%;
-    height: 100%;
-}
-
-/**
  * Item in a Form.List
  */
 

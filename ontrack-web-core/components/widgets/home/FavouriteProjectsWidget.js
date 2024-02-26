@@ -6,6 +6,7 @@ import ProjectList from "@components/projects/ProjectList";
 import {useEventForRefresh} from "@components/common/EventsContext";
 import {DashboardWidgetCellContext} from "@components/dashboards/DashboardWidgetCellContextProvider";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import PaddedContent from "@components/common/PaddedContent";
 
 export default function FavouriteProjectsWidget() {
 
@@ -60,7 +61,7 @@ export default function FavouriteProjectsWidget() {
     }, [])
 
     return (
-        <>
+        <PaddedContent>
             <ProjectList projects={projects}/>
             {
                 (!projects || projects.length === 0) && <Empty
@@ -72,6 +73,6 @@ export default function FavouriteProjectsWidget() {
                     }
                 />
             }
-        </>
+        </PaddedContent>
     )
 }

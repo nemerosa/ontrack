@@ -169,7 +169,6 @@ export default function ChangeLogIssues({id, from, to, issues}) {
             <GridCell
                 id={id}
                 title="Issues"
-                padding={0}
                 extra={
                     <>
                         <Dropdown.Button

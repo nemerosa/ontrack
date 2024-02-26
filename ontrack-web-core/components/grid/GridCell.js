@@ -1,19 +1,18 @@
-import {Space, Spin, Typography} from "antd";
+import {Space} from "antd";
 import {FaArrowsAlt, FaCompressArrowsAlt, FaExpandArrowsAlt} from "react-icons/fa";
 
 import GridCellCommand from "@components/grid/GridCellCommand";
-import Section from "@components/common/Section";
 import {useContext} from "react";
 import {GridTableContext} from "@components/grid/GridTableContext";
+import PageSection from "@components/common/PageSection";
 
 export default function GridCell({
                                      id,
                                      title,
-                                     titleWidth = 18,
                                      loading,
-                                     padding = 16,
                                      isDraggable,
                                      extra,
+                                     padding = false,
                                      children
                                  }) {
 
@@ -27,11 +26,9 @@ export default function GridCell({
 
     return (
         <>
-            <Section
+            <PageSection
                 id={id}
                 title={loading ? "Loading..." : title}
-                titleWidth={titleWidth}
-                padding={padding}
                 extra={
                     <Space>
                         {extra}
@@ -59,18 +56,13 @@ export default function GridCell({
                         />
                     </Space>
                 }
+                loading={loading}
+                padding={padding}
             >
                 {
-                    !loading && children
+                    children
                 }
-                {
-                    loading &&
-                    <Space>
-                        <Spin/>
-                        <Typography.Text>Loading...</Typography.Text>
-                    </Space>
-                }
-            </Section>
+            </PageSection>
         </>
     )
 }

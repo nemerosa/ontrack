@@ -5,6 +5,7 @@ import {DashboardWidgetCellContext} from "@components/dashboards/DashboardWidget
 import {FaPencilAlt, FaRegSave, FaTrash, FaWindowClose} from "react-icons/fa";
 
 import GridCellCommand from "@components/grid/GridCellCommand";
+import PaddedContent from "@components/common/PaddedContent";
 
 export default function DashboardWidgetCellWrapper({widget}) {
 
@@ -64,7 +65,7 @@ export default function DashboardWidgetCellWrapper({widget}) {
                     </>
                 }
             >
-                <div className="ot-section-body-padded">
+                <div>
                     {
                         !widgetEdition &&
                         <Dynamic
@@ -74,10 +75,12 @@ export default function DashboardWidgetCellWrapper({widget}) {
                     }
                     {
                         widgetEdition &&
-                        <Dynamic
-                            path={`widgets/${widget.key}WidgetForm`}
-                            props={widget.config}
-                        />
+                        <PaddedContent>
+                            <Dynamic
+                                path={`widgets/${widget.key}WidgetForm`}
+                                props={widget.config}
+                            />
+                        </PaddedContent>
                     }
                 </div>
             </GridCell>
