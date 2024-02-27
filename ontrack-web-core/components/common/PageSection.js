@@ -27,6 +27,7 @@ export default function PageSection({
                 padding: padding ? 16 : 0,
                 height: 'calc(100% - 48px)',
                 width: '100%',
+                overflowY: 'auto',
             }}
         >
             <Skeleton active loading={loading}>
