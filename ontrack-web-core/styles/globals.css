@@ -125,6 +125,14 @@ button.ot-validation-stamp-filter-edition {
 }
 
 /**
+ * Auto refresh
+ */
+
+.ot-auto-refresh-enabled > button {
+    background-color: hsl(80, 61%, 80%);
+}
+
+/**
  * Git plot
  */
 

@@ -17,6 +17,7 @@ import SelectAutoVersioningAuditRunningState
     from "@components/extension/auto-versioning/SelectAutoVersioningAuditRunningState";
 import {AutoVersioningAuditContext} from "@components/extension/auto-versioning/AutoVersioningAuditContext";
 import ProjectLinkByName from "@components/projects/ProjectLinkByName";
+import {AutoRefreshButton, AutoRefreshContextProvider} from "@components/common/AutoRefresh";
 
 const {Column} = Table
 
@@ -75,7 +76,7 @@ export default function AutoVersioningAuditView() {
         })
     }
 
-    useEffect(() => {
+    const onRefresh = () => {
         if (client && filterReady) {
             setLoading(true)
             client.request(
@@ -184,7 +185,9 @@ export default function AutoVersioningAuditView() {
                 setLoading(false)
             })
         }
-    }, [client, pagination, filter])
+    }
+
+    useEffect(onRefresh, [client, pagination, filter])
 
     const onLoadMore = () => {
         if (pageInfo.nextPage) {
@@ -195,56 +198,223 @@ export default function AutoVersioningAuditView() {
     return (
         <>
             <Space className="ot-line" direction="vertical">
-                {/* List */}
-                <Table
-                    dataSource={entries}
-                    loading={loading}
-                    pagination={false}
-                    size="small"
-                    onChange={onTableChange}
-                    footer={() => (
-                        <>
-                            <Space>
-                                <Popover
-                                    content={
-                                        (pageInfo && pageInfo.nextPage) ?
-                                            "There are more entries to be loaded" :
-                                            "There are no more entries to be loaded"
-                                    }
-                                >
-                                    <Button
-                                        onClick={onLoadMore}
-                                        disabled={!pageInfo || !pageInfo.nextPage}
+                <AutoRefreshContextProvider onRefresh={onRefresh}>
+                    <Table
+                        dataSource={entries}
+                        loading={loading}
+                        pagination={false}
+                        size="small"
+                        onChange={onTableChange}
+                        footer={() => (
+                            <>
+                                <Space>
+                                    <Popover
+                                        content={
+                                            (pageInfo && pageInfo.nextPage) ?
+                                                "There are more entries to be loaded" :
+                                                "There are no more entries to be loaded"
+                                        }
                                     >
-                                        <Space>
-                                            <FaSearch/>
-                                            <Typography.Text>Load more...</Typography.Text>
-                                        </Space>
-                                    </Button>
-                                </Popover>
-                            </Space>
-                        </>
-                    )}
-                >
+                                        <Button
+                                            onClick={onLoadMore}
+                                            disabled={!pageInfo || !pageInfo.nextPage}
+                                        >
+                                            <Space>
+                                                <FaSearch/>
+                                                <Typography.Text>Load more...</Typography.Text>
+                                            </Space>
+                                        </Button>
+                                    </Popover>
+                                    <AutoRefreshButton/>
+                                </Space>
+                            </>
+                        )}
+                    >
 
-                    <Column
-                        key="uuid"
-                        title="UUID"
-                        render={(_, entry) =>
-                            <Tooltip title="Displays the details of this entry into a separate page.">
-                                <Link
-                                    href={`/extension/auto-versioning/audit/detail/${entry.order.uuid}`}>{entry.order.uuid}</Link>
-                            </Tooltip>
-                        }
-                    />
-
-                    {
-                        (!context.targetBranch) &&
                         <Column
-                            key="target"
-                            title="Target"
+                            key="uuid"
+                            title="UUID"
                             render={(_, entry) =>
-                                <AutoVersioningAuditEntryTarget entry={entry}/>
+                                <Tooltip title="Displays the details of this entry into a separate page.">
+                                    <Link
+                                        href={`/extension/auto-versioning/audit/detail/${entry.order.uuid}`}>{entry.order.uuid}</Link>
+                                </Tooltip>
+                            }
+                        />
+
+                        {
+                            (!context.targetBranch) &&
+                            <Column
+                                key="target"
+                                title="Target"
+                                render={(_, entry) =>
+                                    <AutoVersioningAuditEntryTarget entry={entry}/>
+                                }
+                                filterDropdown={({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
+                                    <TableColumnFilterDropdown
+                                        confirm={confirm}
+                                        clearFilters={clearFilters}
+                                    >
+                                        <Input
+                                            placeholder="Target project"
+                                            value={selectedKeys[0]}
+                                            onChange={(e) => setSelectedKeys([e.target.value, selectedKeys[1]])}
+                                            style={{width: 188, marginBottom: 8, display: 'block'}}
+                                        />
+                                        <Input
+                                            placeholder="Target branch"
+                                            value={selectedKeys[1]}
+                                            onChange={(e) => setSelectedKeys([selectedKeys[0], e.target.value])}
+                                            style={{width: 188, marginBottom: 8, display: 'block'}}
+                                        />
+                                    </TableColumnFilterDropdown>
+                                }
+                                filteredValue={filter.targetProject || filter.targetBranch ? [filter.targetProject, filter.targetBranch] : null}
+                            />
+                        }
+
+                        {!context.sourceProject &&
+                            <Column
+                                key="source"
+                                title="Source project"
+                                render={(_, entry) =>
+                                    <ProjectLinkByName name={entry.order.sourceProject}/>
+                                }
+                                filterDropdown={({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
+                                    <TableColumnFilterDropdownInput
+                                        confirm={confirm}
+                                        clearFilters={clearFilters}
+                                        placeholder="Source project"
+                                        selectedKeys={selectedKeys}
+                                        setSelectedKeys={setSelectedKeys}
+                                    />
+                                }
+                                filteredValue={filter.sourceProject}
+                            />
+                        }
+
+                        <Column
+                            key="version"
+                            title="Version"
+                            render={(_, entry) =>
+                                <Typography.Text>{entry.order.targetVersion}</Typography.Text>
+                            }
+                            filterDropdown={({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
+                                <TableColumnFilterDropdownInput
+                                    confirm={confirm}
+                                    clearFilters={clearFilters}
+                                    placeholder="Version"
+                                    selectedKeys={selectedKeys}
+                                    setSelectedKeys={setSelectedKeys}
+                                />
+                            }
+                            filteredValue={filter.version}
+                        />
+
+                        <Column
+                            key="post-processing"
+                            title="Post processing"
+                            render={(_, entry) =>
+                                <>
+                                    {
+                                        entry.order.postProcessing &&
+                                        <Typography.Text>{entry.order.postProcessing}</Typography.Text>
+                                    }
+                                    {
+                                        !entry.order.postProcessing &&
+                                        <Typography.Text disabled italic>None</Typography.Text>
+                                    }
+                                </>
+                            }
+                        />
+
+                        <Column
+                            key="approval"
+                            title="Approval"
+                            render={(_, entry) =>
+                                <>
+                                    {
+                                        entry.order.autoApproval &&
+                                        <Typography.Text>{entry.order.autoApprovalMode}</Typography.Text>
+                                    }
+                                    {
+                                        !entry.order.autoApproval &&
+                                        <Typography.Text disabled italic>Manual</Typography.Text>
+                                    }
+                                </>
+                            }
+                        />
+
+                        <Column
+                            key="running"
+                            title="Running"
+                            render={(_, entry) =>
+                                <>
+                                    {
+                                        entry.running &&
+                                        <Space>
+                                            <Spin size="small"/>
+                                            Running
+                                        </Space>
+                                    }
+                                    {
+                                        !entry.running &&
+                                        <Typography.Text disabled>
+                                            <Space>
+                                                <FaSquare/>
+                                                Finished
+                                            </Space>
+                                        </Typography.Text>
+                                    }
+                                </>
+                            }
+                            filterDropdown={({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
+                                <TableColumnFilterDropdown
+                                    confirm={confirm}
+                                    clearFilters={clearFilters}
+                                >
+                                    <SelectAutoVersioningAuditRunningState
+                                        value={selectedKeys}
+                                        onChange={value => setSelectedKeys([value])}
+                                    />
+                                </TableColumnFilterDropdown>
+                            }
+                            filteredValue={filter.running}
+                        />
+
+                        <Column
+                            key="state"
+                            title="State"
+                            render={(_, entry) =>
+                                <AutoVersioningAuditEntryState status={entry.mostRecentState}/>
+                            }
+                            filterDropdown={({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
+                                <TableColumnFilterDropdown
+                                    confirm={confirm}
+                                    clearFilters={clearFilters}
+                                >
+                                    <SelectAutoVersioningAuditState
+                                        value={selectedKeys}
+                                        onChange={value => setSelectedKeys([value])}
+                                    />
+                                </TableColumnFilterDropdown>
+                            }
+                            filteredValue={filter.state}
+                        />
+
+                        <Column
+                            key="pr"
+                            title="PR"
+                            render={(_, entry) =>
+                                <AutoVersioningAuditEntryPR entry={entry}/>
+                            }
+                        />
+
+                        <Column
+                            key="queuing"
+                            title="Queuing"
+                            render={(_, entry) =>
+                                <AutoVersioningAuditEntryQueuing entry={entry}/>
                             }
                             filterDropdown={({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
                                 <TableColumnFilterDropdown
@@ -252,214 +422,46 @@ export default function AutoVersioningAuditView() {
                                     clearFilters={clearFilters}
                                 >
                                     <Input
-                                        placeholder="Target project"
+                                        placeholder="Routing"
                                         value={selectedKeys[0]}
                                         onChange={(e) => setSelectedKeys([e.target.value, selectedKeys[1]])}
                                         style={{width: 188, marginBottom: 8, display: 'block'}}
                                     />
                                     <Input
-                                        placeholder="Target branch"
+                                        placeholder="Queue"
                                         value={selectedKeys[1]}
                                         onChange={(e) => setSelectedKeys([selectedKeys[0], e.target.value])}
                                         style={{width: 188, marginBottom: 8, display: 'block'}}
                                     />
                                 </TableColumnFilterDropdown>
                             }
-                            filteredValue={filter.targetProject || filter.targetBranch ? [filter.targetProject, filter.targetBranch] : null}
+                            filteredValue={filter.routing || filter.queue ? [filter.routing, filter.queue] : null}
                         />
-                    }
 
-                    {!context.sourceProject &&
                         <Column
-                            key="source"
-                            title="Source project"
+                            key="timestamp"
+                            title="Timestamp"
                             render={(_, entry) =>
-                                <ProjectLinkByName name={entry.order.sourceProject}/>
-                            }
-                            filterDropdown={({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
-                                <TableColumnFilterDropdownInput
-                                    confirm={confirm}
-                                    clearFilters={clearFilters}
-                                    placeholder="Source project"
-                                    selectedKeys={selectedKeys}
-                                    setSelectedKeys={setSelectedKeys}
+                                <TimestampText
+                                    value={entry.mostRecentState.creation.time}
+                                    format="YYYY MMM DD, HH:mm:ss"
                                 />
                             }
-                            filteredValue={filter.sourceProject}
                         />
-                    }
 
-                    <Column
-                        key="version"
-                        title="Version"
-                        render={(_, entry) =>
-                            <Typography.Text>{entry.order.targetVersion}</Typography.Text>
-                        }
-                        filterDropdown={({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
-                            <TableColumnFilterDropdownInput
-                                confirm={confirm}
-                                clearFilters={clearFilters}
-                                placeholder="Version"
-                                selectedKeys={selectedKeys}
-                                setSelectedKeys={setSelectedKeys}
-                            />
-                        }
-                        filteredValue={filter.version}
-                    />
-
-                    <Column
-                        key="post-processing"
-                        title="Post processing"
-                        render={(_, entry) =>
-                            <>
-                                {
-                                    entry.order.postProcessing &&
-                                    <Typography.Text>{entry.order.postProcessing}</Typography.Text>
-                                }
-                                {
-                                    !entry.order.postProcessing &&
-                                    <Typography.Text disabled italic>None</Typography.Text>
-                                }
-                            </>
-                        }
-                    />
-
-                    <Column
-                        key="approval"
-                        title="Approval"
-                        render={(_, entry) =>
-                            <>
-                                {
-                                    entry.order.autoApproval &&
-                                    <Typography.Text>{entry.order.autoApprovalMode}</Typography.Text>
-                                }
-                                {
-                                    !entry.order.autoApproval &&
-                                    <Typography.Text disabled italic>Manual</Typography.Text>
-                                }
-                            </>
-                        }
-                    />
-
-                    <Column
-                        key="running"
-                        title="Running"
-                        render={(_, entry) =>
-                            <>
-                                {
-                                    entry.running &&
-                                    <Space>
-                                        <Spin size="small"/>
-                                        Running
-                                    </Space>
-                                }
-                                {
-                                    !entry.running &&
-                                    <Typography.Text disabled>
-                                        <Space>
-                                            <FaSquare/>
-                                            Finished
-                                        </Space>
-                                    </Typography.Text>
-                                }
-                            </>
-                        }
-                        filterDropdown={({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
-                            <TableColumnFilterDropdown
-                                confirm={confirm}
-                                clearFilters={clearFilters}
-                            >
-                                <SelectAutoVersioningAuditRunningState
-                                    value={selectedKeys}
-                                    onChange={value => setSelectedKeys([value])}
+                        <Column
+                            key="duration"
+                            title="Duration"
+                            render={(_, entry) =>
+                                <Duration
+                                    displaySeconds={true}
+                                    seconds={Math.floor(entry.duration / 1000)}
                                 />
-                            </TableColumnFilterDropdown>
-                        }
-                        filteredValue={filter.running}
-                    />
+                            }
+                        />
 
-                    <Column
-                        key="state"
-                        title="State"
-                        render={(_, entry) =>
-                            <AutoVersioningAuditEntryState status={entry.mostRecentState}/>
-                        }
-                        filterDropdown={({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
-                            <TableColumnFilterDropdown
-                                confirm={confirm}
-                                clearFilters={clearFilters}
-                            >
-                                <SelectAutoVersioningAuditState
-                                    value={selectedKeys}
-                                    onChange={value => setSelectedKeys([value])}
-                                />
-                            </TableColumnFilterDropdown>
-                        }
-                        filteredValue={filter.state}
-                    />
-
-                    <Column
-                        key="pr"
-                        title="PR"
-                        render={(_, entry) =>
-                            <AutoVersioningAuditEntryPR entry={entry}/>
-                        }
-                    />
-
-                    <Column
-                        key="queuing"
-                        title="Queuing"
-                        render={(_, entry) =>
-                            <AutoVersioningAuditEntryQueuing entry={entry}/>
-                        }
-                        filterDropdown={({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
-                            <TableColumnFilterDropdown
-                                confirm={confirm}
-                                clearFilters={clearFilters}
-                            >
-                                <Input
-                                    placeholder="Routing"
-                                    value={selectedKeys[0]}
-                                    onChange={(e) => setSelectedKeys([e.target.value, selectedKeys[1]])}
-                                    style={{width: 188, marginBottom: 8, display: 'block'}}
-                                />
-                                <Input
-                                    placeholder="Queue"
-                                    value={selectedKeys[1]}
-                                    onChange={(e) => setSelectedKeys([selectedKeys[0], e.target.value])}
-                                    style={{width: 188, marginBottom: 8, display: 'block'}}
-                                />
-                            </TableColumnFilterDropdown>
-                        }
-                        filteredValue={filter.routing || filter.queue ? [filter.routing, filter.queue] : null}
-                    />
-
-                    <Column
-                        key="timestamp"
-                        title="Timestamp"
-                        render={(_, entry) =>
-                            <TimestampText
-                                value={entry.mostRecentState.creation.time}
-                                format="YYYY MMM DD, HH:mm:ss"
-                            />
-                        }
-                    />
-
-                    <Column
-                        key="duration"
-                        title="Duration"
-                        render={(_, entry) =>
-                            <Duration
-                                displaySeconds={true}
-                                seconds={Math.floor(entry.duration / 1000)}
-                            />
-                        }
-                    />
-
-                </Table>
-
-                {/* TODO Pagination (more) */}
-
+                    </Table>
+                </AutoRefreshContextProvider>
             </Space>
         </>
     )
