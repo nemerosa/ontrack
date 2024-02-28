@@ -39,9 +39,7 @@ val kdslAcceptanceTestComposeUp by tasks.named("kdslAcceptanceTestComposeUp") {
 
 // Pre-acceptance tests: stopping the environment
 
-val kdslAcceptanceTestComposeDown by tasks.named("kdslAcceptanceTestComposeDown") {
-    mustRunAfter("kdslAcceptanceTest")
-}
+val kdslAcceptanceTestComposeDown by tasks.named("kdslAcceptanceTestComposeDown")
 
 // Restricting unit tests
 
