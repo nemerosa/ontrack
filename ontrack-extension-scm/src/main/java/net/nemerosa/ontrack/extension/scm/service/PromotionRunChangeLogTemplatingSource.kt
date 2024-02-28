@@ -90,27 +90,33 @@ class PromotionRunChangeLogTemplatingSource(
                         )
                     } ?: empty
                 // Title?
-                if (title && changeLog != null) {
+                if (title) {
+                    if (changeLog != null) {
 
-                    val projectName = entityDisplayNameService.render(changeLog.from.project, renderer)
-                    val fromName = entityDisplayNameService.render(changeLog.from, renderer)
-                    val toName = entityDisplayNameService.render(changeLog.to, renderer)
+                        val projectName = entityDisplayNameService.render(changeLog.from.project, renderer)
+                        val fromName = entityDisplayNameService.render(changeLog.from, renderer)
+                        val toName = entityDisplayNameService.render(changeLog.to, renderer)
 
-                    val titleText = if (changeLog.from.id() != changeLog.to.id()) {
-                        """
+                        val titleText = if (changeLog.from.id() != changeLog.to.id()) {
+                            """
                             Change log for $projectName from $fromName to $toName
                         """.trimIndent()
 
-                    } else {
-                        """
+                        } else {
+                            """
                             Project $projectName version $fromName
                         """.trimIndent()
-                    }
+                        }
 
-                    renderer.renderSection(
-                        title = titleText,
-                        content = renderedChangeLog,
-                    )
+                        renderer.renderSection(
+                            title = titleText,
+                            content = renderedChangeLog,
+                        )
+                    } else {
+                        // Change log not defined, and still asking for a title without a reference
+                        // Skipping
+                        ""
+                    }
                 } else {
                     renderedChangeLog
                 }

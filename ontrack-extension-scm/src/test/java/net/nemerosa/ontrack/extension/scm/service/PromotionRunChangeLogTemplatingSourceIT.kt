@@ -307,6 +307,47 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    fun `Recursive change log in a template using a title must be skipped when dependencies are missing`() {
+        prepareTest { fromBuild, run, _ ->
+            project {
+                branch {
+                    val pl = promotionLevel()
+
+                    build {
+                        // linkTo(fromBuild, qualifier = "sub") Missing dependency
+                        promote(pl)
+                    }
+
+                    build {
+                        linkTo(fromBuild, qualifier = "sub") // Targeting the same build --> no change
+                        val parentRun = promote(pl)
+
+                        val event = eventFactory.newPromotionRun(parentRun)
+
+                        // Template
+                        val template = """
+                            ${'$'}{promotionRun.changelog?title=true&empty=No change&dependencies=${run.project.name}:sub}
+                        """.trimIndent()
+
+                        // Rendering
+                        val text = eventTemplatingService.render(
+                            template = template,
+                            event = event,
+                            renderer = PlainEventRenderer.INSTANCE
+                        )
+
+                        // OK
+                        assertEquals(
+                            "",
+                            text,
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Getting a deep recursive change log in a template`() {
         prepareTest { fromBuild, run, _ ->
             project {
