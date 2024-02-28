@@ -1,13 +1,14 @@
 import Head from "next/head";
 import {pageTitle} from "@components/common/Titles";
-import {Empty, Skeleton, Space} from "antd";
+import {Empty, Skeleton} from "antd";
 import MainPage from "@components/layouts/MainPage";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {useContext, useEffect, useState} from "react";
 import {gql} from "graphql-request";
 import AutoVersioningAuditEntry from "@components/extension/auto-versioning/AutoVersioningAuditEntry";
 import {AutoVersioningAuditContext} from "@components/extension/auto-versioning/AutoVersioningAuditContext";
-import {downToBranchBreadcrumbs, downToProjectBreadcrumbs, homeBreadcrumbs} from "@components/common/Breadcrumbs";
+import {homeBreadcrumbs} from "@components/common/Breadcrumbs";
+import {AutoRefreshContextProvider} from "@components/common/AutoRefresh";
 
 export default function AutoVersioningAuditEntryView({uuid}) {
 
@@ -19,15 +20,16 @@ export default function AutoVersioningAuditEntryView({uuid}) {
         if (auditContext) {
             // Sets the breadcrumbs
             setBreadcrumbs(homeBreadcrumbs())
-            // TODO Sets the commands
         }
     }, [auditContext]);
 
     const client = useGraphQLClient()
 
     const [loading, setLoading] = useState(true)
+    const [initialLoad, setInitialLoad] = useState(false)
     const [entry, setEntry] = useState({})
-    useEffect(() => {
+
+    const loadEntry = () => {
         if (client && uuid) {
             setLoading(true)
             client.request(
@@ -91,9 +93,14 @@ export default function AutoVersioningAuditEntryView({uuid}) {
                     setEntry(entries[0])
                 }
             }).finally(() => {
+                setInitialLoad(true)
                 setLoading(false)
             })
         }
+    }
+
+    useEffect(() => {
+        loadEntry()
     }, [client, uuid]);
 
     const [title, setTitle] = useState('')
@@ -113,14 +120,16 @@ export default function AutoVersioningAuditEntryView({uuid}) {
                 breadcrumbs={breadcrumbs}
                 commands={commands}
             >
-                <Skeleton active loading={loading}>
-                    {
-                        entry && <AutoVersioningAuditEntry entry={entry}/>
-                    }
-                    {
-                        !entry && <Empty description="Audit entry not found"/>
-                    }
-                </Skeleton>
+                <AutoRefreshContextProvider onRefresh={loadEntry}>
+                    <Skeleton active loading={loading && !initialLoad}>
+                        {
+                            entry && <AutoVersioningAuditEntry entry={entry}/>
+                        }
+                        {
+                            !entry && <Empty description="Audit entry not found"/>
+                        }
+                    </Skeleton>
+                </AutoRefreshContextProvider>
             </MainPage>
         </>
     )

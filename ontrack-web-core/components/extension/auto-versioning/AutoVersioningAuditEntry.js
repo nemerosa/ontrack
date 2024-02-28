@@ -1,4 +1,4 @@
-import {Col, Descriptions, Popover, Row, Space, Timeline, Typography} from "antd";
+import {Col, Descriptions, Flex, Popover, Row, Space, Timeline, Typography} from "antd";
 import AutoVersioningAuditEntryTarget from "@components/extension/auto-versioning/AutoVersioningAuditEntryTarget";
 import AutoVersioningAuditEntryState from "@components/extension/auto-versioning/AutoVersioningAuditEntryState";
 import TimestampText from "@components/common/TimestampText";
@@ -7,6 +7,7 @@ import AutoVersioningAuditEntryStateData from "@components/extension/auto-versio
 import ProjectLinkByName from "@components/projects/ProjectLinkByName";
 import AutoVersioningAuditProjectSourceLink
     from "@components/extension/auto-versioning/AutoVersioningAuditProjectSourceLink";
+import {AutoRefreshButton} from "@components/common/AutoRefresh";
 
 export default function AutoVersioningAuditEntry({entry}) {
 
@@ -132,13 +133,20 @@ export default function AutoVersioningAuditEntry({entry}) {
         <>
             <Row>
                 <Col span={14}>
-                    <Timeline
-                        style={{
-                            paddingTop: '3em',
-                        }}
-                        items={history}
-                        mode="right"
-                    />
+                    <Space direction="vertical" className="ot-line">
+                        <Timeline
+                            style={{
+                                paddingTop: '3em',
+                            }}
+                            items={history}
+                            mode="right"
+                        />
+                        <Flex justify="center">
+                            <div>
+                                <AutoRefreshButton/>
+                            </div>
+                        </Flex>
+                    </Space>
                 </Col>
                 <Col span={10}>
                     <Descriptions
