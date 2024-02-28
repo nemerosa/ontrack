@@ -25,6 +25,7 @@ export default function GitChangeLogCommits({id, commits, diffLink}) {
                     dataSource={commits}
                     pagination={false}
                     size="small"
+                    rowKey={(commit) => `commit-${commit.commit.id}`}
                 >
 
                     <Column
@@ -41,6 +42,7 @@ export default function GitChangeLogCommits({id, commits, diffLink}) {
                     <Column
                         key="message"
                         title="Message"
+                        className="ot-git-change-log-commit-message"
                         render={(_, commit) =>
                             <Typography.Paragraph>
                                 <SafeHTMLComponent htmlContent={commit.annotatedMessage}/>
@@ -69,6 +71,7 @@ export default function GitChangeLogCommits({id, commits, diffLink}) {
                     <Column
                         key="build"
                         title="Build"
+                        className="ot-git-change-log-commit-build"
                         render={(_, commit) =>
                             commit.build && <Space size={8}>
                                 <Link href={buildUri(commit.build)}>

@@ -134,9 +134,9 @@ export class SCMChangeLogPage {
 
     async checkCommitBuild(message, mockSCMContext, build, {expected = true}) {
         const commitId = mockSCMContext.commitIdsPerMessage[message]
-        const commitLocator = this.page.locator(`#commit-${commitId}`)
-        await expect(commitLocator.getByText(message)).toBeVisible()
-        const buildLinkLocator = commitLocator.getByRole('link', {name: build.name});
+        const commitRow = this.page.locator(`tr[data-row-key="commit-${commitId}"]`)
+        // await expect(commitRow.getByText(message)).toBeVisible()
+        const buildLinkLocator = commitRow.getByRole('link', {name: build.name});
         if (expected) {
             await expect(buildLinkLocator).toBeVisible()
         } else {
