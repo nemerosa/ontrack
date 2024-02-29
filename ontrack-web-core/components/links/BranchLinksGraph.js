@@ -180,7 +180,7 @@ function BranchLinksFlow({branch}) {
     const collectDownstreamNodes = (startNode, nodes, edges, nodesCache, edgesCache) => {
         const {branch} = startNode.data
 
-        branch.downstreamLinks.forEach(link => {
+        branch.downstreamLinks?.forEach(link => {
             const qualifier = link.qualifier
             const childBranch = link.branch
 
@@ -243,7 +243,7 @@ function BranchLinksFlow({branch}) {
     const collectUpstreamNodes = (startNode, nodes, edges, nodesCache, edgesCache) => {
         const {branch} = startNode.data
 
-        branch.upstreamLinks.forEach(link => {
+        branch.upstreamLinks?.forEach(link => {
             const qualifier = link.qualifier
             const parentBranch = link.branch
 

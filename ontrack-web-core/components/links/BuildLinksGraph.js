@@ -162,7 +162,7 @@ function BuildLinksFlow({build}) {
      * A _box_ is the aggregation of build upstream dependencies for the same project and qualifier.
      */
     const collectUpstreamBoxes = (build, currentBox, boxes) => {
-        build.usedByQualified.pageItems.forEach(link => {
+        build.usedByQualified?.pageItems?.forEach(link => {
             const parent = link.build
             const parentProject = parent.branch.project.name
             const parentBoxId = parentProject
@@ -251,7 +251,7 @@ function BuildLinksFlow({build}) {
             nodesCache[nodeId] = node
         }
         // Direct dependencies
-        build.usingQualified.pageItems.forEach(link => {
+        build.usingQualified?.pageItems?.forEach(link => {
             const child = link.build
             // Build the child node
             collectDownstreamNodes(child, nodes, edges, nodesCache, edgesCache)
