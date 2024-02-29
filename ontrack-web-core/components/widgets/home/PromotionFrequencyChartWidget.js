@@ -20,7 +20,7 @@ export default function PromotionFrequencyChartWidget({project, branch, promotio
                         Frequency of
                         <PromotionLevelImage promotionLevel={promotionLevelObject}/>
                         <Typography.Text strong>{promotionLevel}</Typography.Text>
-                        on {branch}@${project}
+                        on {branch}@{project}
                         &nbsp;<ChartOptions interval={interval} period={period}/>
                     </Space>
                 </>

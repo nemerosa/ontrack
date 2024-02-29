@@ -20,7 +20,7 @@ export default function PromotionStabilityChartWidget({project, branch, promotio
                         Stability of
                         <PromotionLevelImage promotionLevel={promotionLevelObject}/>
                         <Typography.Text strong>{promotionLevel}</Typography.Text>
-                        on {branch}@${project}
+                        on {branch}@{project}
                         &nbsp;<ChartOptions interval={interval} period={period}/>
                     </Space>
                 </>
