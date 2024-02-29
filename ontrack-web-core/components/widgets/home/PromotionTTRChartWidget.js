@@ -1,10 +1,8 @@
 import {useContext, useEffect} from "react";
 import {DashboardWidgetCellContext} from "@components/dashboards/DashboardWidgetCellContextProvider";
-import {PromotionLevelImage} from "@components/promotionLevels/PromotionLevelImage";
-import {Space, Typography} from "antd";
 import PromotionLevelTTRChart from "@components/promotionLevels/PromotionLevelTTRChart";
-import ChartOptions from "@components/charts/ChartOptions";
 import {usePromotionLevel} from "@components/widgets/home/promotionChartUtils";
+import PromotionChartTitle from "@components/widgets/home/PromotionChartTitle";
 
 export default function PromotionTTRChartWidget({project, branch, promotionLevel, interval, period}) {
 
@@ -16,13 +14,14 @@ export default function PromotionTTRChartWidget({project, branch, promotionLevel
         if (promotionLevelObject) {
             setTitle(
                 <>
-                    <Space size={4}>
-                        TTR to
-                        <PromotionLevelImage promotionLevel={promotionLevelObject}/>
-                        <Typography.Text strong>{promotionLevel}</Typography.Text>
-                        on {branch}@{project}
-                        &nbsp;<ChartOptions interval={interval} period={period}/>
-                    </Space>
+                    <PromotionChartTitle
+                        prefix="TTR to"
+                        project={project}
+                        branch={branch}
+                        promotionLevel={promotionLevelObject}
+                        interval={interval}
+                        period={period}
+                    />
                 </>
             )
         }

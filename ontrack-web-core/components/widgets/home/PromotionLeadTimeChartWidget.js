@@ -1,10 +1,8 @@
 import {useContext, useEffect} from "react";
 import {DashboardWidgetCellContext} from "@components/dashboards/DashboardWidgetCellContextProvider";
 import PromotionLevelLeadTimeChart from "@components/promotionLevels/PromotionLevelLeadTimeChart";
-import {PromotionLevelImage} from "@components/promotionLevels/PromotionLevelImage";
-import {Space, Typography} from "antd";
-import ChartOptions from "@components/charts/ChartOptions";
 import {usePromotionLevel} from "@components/widgets/home/promotionChartUtils";
+import PromotionChartTitle from "@components/widgets/home/PromotionChartTitle";
 
 export default function PromotionLeadTimeChartWidget({project, branch, promotionLevel, interval, period}) {
 
@@ -16,13 +14,14 @@ export default function PromotionLeadTimeChartWidget({project, branch, promotion
         if (promotionLevelObject) {
             setTitle(
                 <>
-                    <Space size={4}>
-                        Lead time to
-                        <PromotionLevelImage promotionLevel={promotionLevelObject}/>
-                        <Typography.Text strong>{promotionLevel}</Typography.Text>
-                        on {branch}@{project}
-                        &nbsp;<ChartOptions interval={interval} period={period}/>
-                    </Space>
+                    <PromotionChartTitle
+                        prefix="Lead time to"
+                        project={project}
+                        branch={branch}
+                        promotionLevel={promotionLevelObject}
+                        interval={interval}
+                        period={period}
+                    />
                 </>
             )
         }

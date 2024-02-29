@@ -1,10 +1,8 @@
 import {useContext, useEffect} from "react";
 import {DashboardWidgetCellContext} from "@components/dashboards/DashboardWidgetCellContextProvider";
 import {usePromotionLevel} from "@components/widgets/home/promotionChartUtils";
-import {Space, Typography} from "antd";
-import {PromotionLevelImage} from "@components/promotionLevels/PromotionLevelImage";
-import ChartOptions from "@components/charts/ChartOptions";
 import PromotionLevelStabilityChart from "@components/promotionLevels/PromotionLevelStabilityChart";
+import PromotionChartTitle from "@components/widgets/home/PromotionChartTitle";
 
 export default function PromotionStabilityChartWidget({project, branch, promotionLevel, interval, period}) {
 
@@ -16,13 +14,14 @@ export default function PromotionStabilityChartWidget({project, branch, promotio
         if (promotionLevelObject) {
             setTitle(
                 <>
-                    <Space size={4}>
-                        Stability of
-                        <PromotionLevelImage promotionLevel={promotionLevelObject}/>
-                        <Typography.Text strong>{promotionLevel}</Typography.Text>
-                        on {branch}@{project}
-                        &nbsp;<ChartOptions interval={interval} period={period}/>
-                    </Space>
+                    <PromotionChartTitle
+                        prefix="Stability of"
+                        project={project}
+                        branch={branch}
+                        promotionLevel={promotionLevelObject}
+                        interval={interval}
+                        period={period}
+                    />
                 </>
             )
         }
