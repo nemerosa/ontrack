@@ -65,7 +65,7 @@ export default function DashboardWidgetCellWrapper({widget}) {
                     </>
                 }
             >
-                <div>
+                <div className="ot-block">
                     {
                         !widgetEdition &&
                         <Dynamic

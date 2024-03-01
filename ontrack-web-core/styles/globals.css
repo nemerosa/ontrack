@@ -6,6 +6,14 @@
 }
 
 /**
+ * For any component which must span 100% of the horizontal AND vertical space
+ */
+.ot-block {
+    width: 100%;
+    height: 100%;
+}
+
+/**
  * Change the transparency of an item on hover
  */
 
