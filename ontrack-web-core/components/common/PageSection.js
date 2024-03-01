@@ -25,7 +25,7 @@ export default function PageSection({
             }}
             bodyStyle={{
                 padding: padding ? 16 : 0,
-                height: 'calc(100% - 48px)',
+                height: 'calc(100% - 47px)',
                 width: '100%',
                 overflowY: 'auto',
             }}
