@@ -1,5 +1,4 @@
 import com.avast.gradle.dockercompose.ComposeExtension
-import com.avast.gradle.dockercompose.tasks.ComposeUp
 
 plugins {
     `java-library`
