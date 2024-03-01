@@ -24,6 +24,7 @@ configure<ComposeExtension> {
         setProjectName("kdsl")
         // environment.put("ONTRACK_VERSION", project.version.toString())
         captureContainersOutputToFiles.set(file("build/logs/containers"))
+        composeLogToFile.set(file("build/logs/compose"))
     }
 }
 
