@@ -41,7 +41,7 @@ plugins {
     id("nebula.deb") version "8.1.0"
     id("nebula.rpm") version "8.1.0"
     id("org.sonarqube") version "2.5"
-    id("com.avast.gradle.docker-compose") version "0.17.6"
+    id("com.avast.gradle.docker-compose") version "0.16.12"
     id("com.bmuschko.docker-remote-api") version "9.3.1"
     id("org.springframework.boot") version Versions.springBootVersion apply false
     id("io.freefair.aggregate-javadoc") version "4.1.2"
