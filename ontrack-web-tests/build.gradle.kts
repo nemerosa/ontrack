@@ -15,6 +15,8 @@ configure<NodeExtension> {
 
 // Test environment
 
+val isCI = System.getenv("CI") == "true"
+
 val playwrightInstall by tasks.registering(NpmTask::class) {
     dependsOn("npmInstall")
     args.set(listOf("run", "playwright-install"))
@@ -29,8 +31,10 @@ val playwrightSetup by tasks.registering(NpmTask::class) {
 
 val uiTest by tasks.registering(NpmTask::class) {
     dependsOn(playwrightSetup)
-    dependsOn(":ontrack-kdsl-acceptance:kdslAcceptanceTestComposeUp")
-    finalizedBy(":ontrack-kdsl-acceptance:kdslAcceptanceTestComposeDown")
+    if (!isCI) {
+        dependsOn(":ontrack-kdsl-acceptance:kdslAcceptanceTestComposeUp")
+        finalizedBy(":ontrack-kdsl-acceptance:kdslAcceptanceTestComposeDown")
+    }
 
     args.set(listOf("run", "test"))
 }

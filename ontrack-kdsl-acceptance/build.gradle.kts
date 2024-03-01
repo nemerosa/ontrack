@@ -56,7 +56,9 @@ val kdslAcceptanceTest by tasks.registering(Test::class) {
     minHeapSize = "512m"
     maxHeapSize = "3072m"
     dependsOn(kdslAcceptanceTestComposeUp)
-    finalizedBy(kdslAcceptanceTestComposeDown)
+    if (!isCI) {
+        finalizedBy(kdslAcceptanceTestComposeDown)
+    }
     /**
      * Sets the Ontrack URL
      */
