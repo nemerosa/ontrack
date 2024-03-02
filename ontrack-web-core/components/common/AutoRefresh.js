@@ -1,10 +1,14 @@
 import React, {createContext, useContext, useEffect, useRef, useState} from "react";
 import {Dropdown, Space, Tooltip, Typography} from "antd";
 import {FaSync} from "react-icons/fa";
+import SelectableMenuItem from "@components/common/SelectableMenuItem";
 
 export const AutoRefreshContext = createContext({
     autoRefreshEnabled: false,
     toggleEnabled: () => {
+    },
+    autoRefreshIntervalSeconds: 60,
+    setAutoRefreshIntervalSeconds: () => {
     },
 })
 
@@ -12,6 +16,7 @@ export function AutoRefreshContextProvider({children, onRefresh}) {
 
     const autoRefreshIdRef = useRef(0)
     const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(false)
+    const [autoRefreshIntervalSeconds, setAutoRefreshIntervalSeconds] = useState(60)
 
     const toggleEnabled = () => {
         setAutoRefreshEnabled(state => !state)
@@ -20,6 +25,8 @@ export function AutoRefreshContextProvider({children, onRefresh}) {
     const context = {
         autoRefreshEnabled,
         toggleEnabled,
+        autoRefreshIntervalSeconds,
+        setAutoRefreshIntervalSeconds,
     }
 
     const refresh = () => {
@@ -66,31 +73,25 @@ export function AutoRefreshButton() {
 
     const autoRefresh = useContext(AutoRefreshContext)
 
-    const items = [
-        {
-            key: '30',
-            label: "Every 30 seconds",
-        },
-        {
-            key: '60',
-            label: "Every minutes",
-        },
-        {
-            key: '120',
-            label: "Every 2 minutes",
-        },
-        {
-            key: '300',
-            label: "Every 5 minutes",
-        },
-        {
-            key: '600',
-            label: "Every 10 minutes",
-        },
+    const allowedValues = [
+        [30, "Every 30 seconds"],
+        [60, "Every minute"],
+        [120, "Every 2 minutes"],
+        [300, "Every 5 minutes"],
+        [600, "Every 10 minutes"],
     ]
+
+    const items = allowedValues.map(([seconds, text]) => ({
+        key: String(seconds),
+        label: <SelectableMenuItem
+            value={autoRefresh.autoRefreshIntervalSeconds === seconds}
+            text={text}
+        />,
+    }))
 
     const handleMenuClick = (e) => {
         const seconds = Number(e.key)
+        autoRefresh.setAutoRefreshIntervalSeconds(seconds)
     }
 
     const menuProps = {
