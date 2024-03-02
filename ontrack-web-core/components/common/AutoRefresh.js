@@ -29,9 +29,7 @@ export function AutoRefreshContextProvider({children, onRefresh}) {
     }
 
     const close = () => {
-        console.log("AutoRefresh.close", autoRefreshIdRef.current)
         if (autoRefreshIdRef.current) {
-            console.log("AutoRefresh.clearInterval", autoRefreshIdRef.current)
             clearInterval(autoRefreshIdRef.current)
             autoRefreshIdRef.current = 0
         }
@@ -41,20 +39,16 @@ export function AutoRefreshContextProvider({children, onRefresh}) {
         if (autoRefreshEnabled) {
             if (!autoRefreshIdRef.current) {
                 refresh()
-                const intervalId = setInterval(refresh, 5000) // TODO Use the selected interval
-                console.log("AutoRefresh.start", intervalId)
-                autoRefreshIdRef.current = intervalId
+                 // TODO Use the selected interval
+                autoRefreshIdRef.current = setInterval(refresh, 5000)
             }
         } else {
-            console.log("AutoRefresh.close on !refresh", autoRefreshIdRef.current)
             close()
         }
     }, [autoRefreshEnabled])
 
     useEffect(() => {
-        console.log("AutoRefresh.mount", autoRefreshIdRef.current)
         return () => {
-            console.log("AutoRefresh.unmount", autoRefreshIdRef.current)
             close()
         }
     }, []);
