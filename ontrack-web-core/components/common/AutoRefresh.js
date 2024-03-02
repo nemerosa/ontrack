@@ -17,6 +17,7 @@ export function AutoRefreshContextProvider({children, onRefresh}) {
     const autoRefreshIdRef = useRef(0)
     const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(false)
     const [autoRefreshIntervalSeconds, setAutoRefreshIntervalSeconds] = useState(60)
+    const autoRefreshIntervalSecondsRef = useRef(autoRefreshIntervalSeconds)
 
     const toggleEnabled = () => {
         setAutoRefreshEnabled(state => !state)
@@ -42,17 +43,30 @@ export function AutoRefreshContextProvider({children, onRefresh}) {
         }
     }
 
+    const startRefresh = () => {
+        if (autoRefreshIntervalSecondsRef.current > 0) {
+            autoRefreshIdRef.current = setInterval(refresh, autoRefreshIntervalSecondsRef.current * 1000)
+        }
+    }
+
     useEffect(() => {
         if (autoRefreshEnabled) {
             if (!autoRefreshIdRef.current) {
                 refresh()
-                 // TODO Use the selected interval
-                autoRefreshIdRef.current = setInterval(refresh, 5000)
+                startRefresh()
             }
         } else {
             close()
         }
     }, [autoRefreshEnabled])
+
+    useEffect(() => {
+        if (autoRefreshIdRef.current && autoRefreshEnabled) {
+            clearInterval(autoRefreshIdRef.current)
+            autoRefreshIntervalSecondsRef.current = autoRefreshIntervalSeconds
+            startRefresh()
+        }
+    }, [autoRefreshIntervalSeconds, autoRefreshEnabled]);
 
     useEffect(() => {
         return () => {
@@ -74,6 +88,8 @@ export function AutoRefreshButton() {
     const autoRefresh = useContext(AutoRefreshContext)
 
     const allowedValues = [
+        [5, "Every 5 seconds"],
+        [10, "Every 10 seconds"],
         [30, "Every 30 seconds"],
         [60, "Every minute"],
         [120, "Every 2 minutes"],
