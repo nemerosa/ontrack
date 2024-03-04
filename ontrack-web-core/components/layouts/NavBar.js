@@ -53,9 +53,8 @@ export default function NavBar() {
                     {/* TODO <NavBarText text="Search component"/>*/}
                     {/* TODO <NavBarText text="App messages"/>*/}
                     <NavBarText text={user?.account?.fullName}/>
-                    <Avatar icon={<FaRegUser/>}
+                    <Avatar icon={<FaRegUser id="user-menu"/>}
                             onClick={openUserMenu}
-                            className="ot-user-menu"
                             style={{
                                 backgroundColor: 'white',
                                 color: 'black',
