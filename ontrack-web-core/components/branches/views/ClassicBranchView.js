@@ -124,6 +124,13 @@ export default function ClassicBranchView({branch}) {
                                 description
                                 annotatedDescription
                                 image
+                                dataType {
+                                    descriptor {
+                                        id
+                                        displayName
+                                    }
+                                    config
+                                }
                             }
                         }
                     }

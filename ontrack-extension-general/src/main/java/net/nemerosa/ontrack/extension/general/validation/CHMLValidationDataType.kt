@@ -2,10 +2,7 @@ package net.nemerosa.ontrack.extension.general.validation
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.general.GeneralExtensionFeature
-import net.nemerosa.ontrack.json.getInt
-import net.nemerosa.ontrack.json.getRequiredEnum
-import net.nemerosa.ontrack.json.parse
-import net.nemerosa.ontrack.json.toJson
+import net.nemerosa.ontrack.json.*
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.selection
 import net.nemerosa.ontrack.model.structure.AbstractValidationDataType
@@ -98,9 +95,7 @@ class CHMLValidationDataType(
     override fun fromForm(node: JsonNode?): CHMLValidationDataTypeData? =
         node?.let {
             CHMLValidationDataTypeData(
-                CHML.values().associate {
-                    it to (node.getInt(it.name) ?: 0)
-                }
+                CHML.values().associateWith { (node.getIntField(it.name) ?: 0) }
             )
         }
 
