@@ -27,6 +27,7 @@
     "react-ace": "^10.1.0",
     "react-dom": "18.2.0",
     "react-easy-sort": "^1.6.0",
+    "react-error-boundary": "^4.0.13",
     "react-grid-layout": "^1.4.4",
     "react-icons": "^4.9.0",
     "reactflow": "^11.9.4",
