@@ -1,10 +1,11 @@
 import {Layout} from "antd";
 import NavBar from "@components/layouts/NavBar";
-import {createContext, useContext, useEffect, useState} from "react";
+import {createContext, useEffect, useState} from "react";
 import MainLayoutRestoreViewButton from "@components/layouts/MainLayoutRestoreViewButton";
 import {useRouter} from "next/router";
+import LayoutContent from "@components/layouts/LayoutContent";
 
-const {Content, Header} = Layout;
+const {Header} = Layout;
 
 export const MainLayoutContext = createContext({expanded: false})
 
@@ -31,16 +32,16 @@ export default function MainLayout({children}) {
                         <Header>
                             <NavBar/>
                         </Header>
-                        <Content>
+                        <LayoutContent>
                             {children}
-                        </Content>
+                        </LayoutContent>
                     </Layout>
                 }
                 {
                     expanded && <Layout>
-                        <Content>
+                        <LayoutContent>
                             {children}
-                        </Content>
+                        </LayoutContent>
                     </Layout>
                 }
                 <MainLayoutRestoreViewButton/>
