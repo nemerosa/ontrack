@@ -6,8 +6,8 @@ const {Content, Header} = Layout;
 
 export default function LayoutContent({children}) {
 
-    const logError = (error) => {
-        console.log(error)
+    const logError = (error, info) => {
+        console.log({error, componentStack: info?.componentStack})
     }
 
     return <Content>

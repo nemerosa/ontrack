@@ -17,7 +17,7 @@ export function useBuildValidateDialog(config) {
         ...config,
         dataType, setDataType,
         init: (form, context) => {
-            setDataType(context.validationStamp.dataType)
+            setDataType(context.validationStamp?.dataType)
             form.setFieldsValue({
                 validationStamp: context.validationStamp?.name,
             })

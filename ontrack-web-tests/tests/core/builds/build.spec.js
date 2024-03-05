@@ -33,3 +33,18 @@ test('build page with links', async ({page}) => {
     const buildPage = new BuildPage(page, build)
     await buildPage.goTo()
 })
+
+test('build page with validations without a type', async ({page}) => {
+    // Provisioning
+    const project = await ontrack().createProject()
+    const branch = await project.createBranch()
+    const validationStamp = await branch.createValidationStamp()
+    const build = await branch.createBuild()
+    await build.validate(validationStamp, {status: "FAILED"})
+
+    // Login
+    await login(page)
+    // Navigating to the build
+    const buildPage = new BuildPage(page, build)
+    await buildPage.goTo()
+})
