@@ -24,7 +24,6 @@ export default function useRangeSelection() {
                 setSelection([selection[0], x])
             }
         }
-        // console.log({newSelection: JSON.stringify(selection)})
     }
 
     return {

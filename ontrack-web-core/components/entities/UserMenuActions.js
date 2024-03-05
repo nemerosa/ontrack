@@ -8,8 +8,6 @@ export default function UserMenuActions({actions}) {
 
     const [items, setItems] = useState([])
 
-    console.log({actions})
-
     useEffect(() => {
         if (actions) {
             setItems(

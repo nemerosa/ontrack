@@ -16,9 +16,6 @@ export default function SelectCHMLLevel({value, onChange, style}) {
         }
     ))
 
-    console.log({values})
-    console.log({options})
-
     return (
         <Select
             options={options}

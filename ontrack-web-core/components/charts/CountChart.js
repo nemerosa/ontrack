@@ -46,7 +46,6 @@ export default function CountChart({query, variables, yTickFormatter}) {
     const [inactiveSeries, setInactiveSeries] = useState([])
 
     const legendClick = ({dataKey}) => {
-        console.log({dataKey})
         if (inactiveSeries.includes(dataKey)) {
             setInactiveSeries(inactiveSeries.filter(el => el !== dataKey));
         } else {

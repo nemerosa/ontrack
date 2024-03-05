@@ -51,7 +51,6 @@ export default function DurationChart({query, variables}) {
     const [inactiveSeries, setInactiveSeries] = useState([])
 
     const legendClick = ({dataKey}) => {
-        console.log({dataKey})
         if (inactiveSeries.includes(dataKey)) {
             setInactiveSeries(inactiveSeries.filter(el => el !== dataKey));
         } else {

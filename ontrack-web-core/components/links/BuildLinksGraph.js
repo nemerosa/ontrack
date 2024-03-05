@@ -198,11 +198,9 @@ function BuildLinksFlow({build}) {
         collectUpstreamBoxes(build, {
             id: rootNodeId,
         }, boxes)
-        console.log({boxes})
 
         for (const boxId in boxes) {
             const box = boxes[boxId]
-            console.log({box})
             // We take boxes into account only if they contain builds
             if (box.builds.length > 0) {
                 let boxNode
