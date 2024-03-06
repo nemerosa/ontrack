@@ -23,5 +23,6 @@ class BitbucketServerSettingsCasc(
         "Global settings for Bitbucket Server",
         cascField(BitbucketServerSettings::autoMergeTimeout),
         cascField(BitbucketServerSettings::autoMergeInterval),
+        cascField(BitbucketServerSettings::maxCommits),
     )
 }

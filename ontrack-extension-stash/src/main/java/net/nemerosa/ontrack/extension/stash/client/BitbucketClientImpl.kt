@@ -24,7 +24,8 @@ import java.time.LocalDateTime
  * Reference at https://docs.atlassian.com/bitbucket-server/rest/5.16.0/bitbucket-rest.html
  */
 class BitbucketClientImpl(
-    private val configuration: StashConfiguration
+    private val configuration: StashConfiguration,
+    private val maxCommits: Int,
 ) : BitbucketClient {
 
     override val projects: List<BitbucketProject>
@@ -167,7 +168,7 @@ class BitbucketClientImpl(
         toCommit: String
     ): List<BitbucketServerCommit> =
         template.getForObject<JsonNode>(
-            "/rest/api/latest/projects/${repo.project}/repos/${repo.repository}/commits?since=$fromCommit&until=$toCommit&limit=150"
+            "/rest/api/latest/projects/${repo.project}/repos/${repo.repository}/commits?since=$fromCommit&until=$toCommit&limit=$maxCommits"
         ).path("values").map {
             it.parse<BitbucketServerCommit>()
         }

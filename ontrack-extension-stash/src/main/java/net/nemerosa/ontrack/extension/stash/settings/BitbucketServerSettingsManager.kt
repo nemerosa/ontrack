@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.stash.settings
 
 import net.nemerosa.ontrack.model.form.Form
+import net.nemerosa.ontrack.model.form.intField
 import net.nemerosa.ontrack.model.form.longField
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.AbstractSettingsManager
@@ -34,6 +35,10 @@ class BitbucketServerSettingsManager(
             .longField(
                 BitbucketServerSettings::autoMergeInterval,
                 settings.autoMergeInterval
+            )
+            .intField(
+                BitbucketServerSettings::maxCommits,
+                settings.maxCommits
             )
 
     override fun getId(): String = "bitbucket-server"

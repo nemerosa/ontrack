@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.stash.settings
 
 import net.nemerosa.ontrack.model.settings.SettingsProvider
 import net.nemerosa.ontrack.model.support.SettingsRepository
+import net.nemerosa.ontrack.model.support.getInt
 import net.nemerosa.ontrack.model.support.getLong
 import org.springframework.stereotype.Component
 
@@ -19,6 +20,10 @@ class BitbucketServerSettingsProvider(
             BitbucketServerSettings::autoMergeInterval,
             BitbucketServerSettings.DEFAULT_AUTO_MERGE_INTERVAL
         ),
+        maxCommits = settingsRepository.getInt(
+            BitbucketServerSettings::maxCommits,
+            BitbucketServerSettings.DEFAULT_MAX_COMMITS
+        )
     )
 
     override fun getSettingsClass(): Class<BitbucketServerSettings> = BitbucketServerSettings::class.java

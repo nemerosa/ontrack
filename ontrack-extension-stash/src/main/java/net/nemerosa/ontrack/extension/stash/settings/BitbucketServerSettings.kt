@@ -17,9 +17,12 @@ data class BitbucketServerSettings(
     @APILabel("Auto merge interval")
     @APIDescription("Number of milliseconds to wait between each auto merge control")
     val autoMergeInterval: Long = DEFAULT_AUTO_MERGE_INTERVAL,
+    @APILabel("Maximum number of commits to return for a change log")
+    val maxCommits: Int = DEFAULT_MAX_COMMITS,
 ) {
     companion object {
         val DEFAULT_AUTO_MERGE_TIMEOUT = Duration.ofMinutes(10).toMillis()
         val DEFAULT_AUTO_MERGE_INTERVAL = Duration.ofSeconds(30).toMillis()
+        const val DEFAULT_MAX_COMMITS: Int = 1000
     }
 }
