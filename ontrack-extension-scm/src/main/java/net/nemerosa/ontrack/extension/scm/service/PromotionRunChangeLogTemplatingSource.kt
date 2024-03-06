@@ -57,6 +57,10 @@ class PromotionRunChangeLogTemplatingSource(
             val dependencies =
                 configMap.getListStringsTemplatingParam(PromotionRunChangeLogTemplatingSourceConfig::dependencies.name)
                     ?: emptyList()
+            val allQualifiers = configMap.getBooleanTemplatingParam(
+                PromotionRunChangeLogTemplatingSourceConfig::allQualifiers.name,
+                false
+            )
 
             // First boundary is the build being promoted
             val toBuild = entity.build
@@ -72,57 +76,162 @@ class PromotionRunChangeLogTemplatingSource(
             }
             // We now have two boundaries
             else {
-                // ... getting the change log, recursively or not
-                val changeLog = runBlocking {
-                    scmChangeLogService.getChangeLog(
-                        fromBuild,
-                        toBuild,
-                        dependencies.map { DependencyLink.parse(it) },
-                    )
-                }
-                // Rendered change log
-                val renderedChangeLog = changeLog
-                    ?.takeIf { it.from.id() != it.to.id() }
-                    ?.let { scmChangeLog ->
-                        renderChangeLog(
-                            changeLog = scmChangeLog,
-                            renderer = renderer
-                        )
-                    } ?: empty
-                // Title?
-                if (title) {
-                    if (changeLog != null) {
-
-                        val projectName = entityDisplayNameService.render(changeLog.from.project, renderer)
-                        val fromName = entityDisplayNameService.render(changeLog.from, renderer)
-                        val toName = entityDisplayNameService.render(changeLog.to, renderer)
-
-                        val titleText = if (changeLog.from.id() != changeLog.to.id()) {
-                            """
-                            Change log for $projectName from $fromName to $toName
-                        """.trimIndent()
-
-                        } else {
-                            """
-                            Project $projectName version $fromName
-                        """.trimIndent()
-                        }
-
-                        renderer.renderSection(
-                            title = titleText,
-                            content = renderedChangeLog,
-                        )
-                    } else {
-                        // Change log not defined, and still asking for a title without a reference
-                        // Skipping
-                        ""
-                    }
+                if (allQualifiers && dependencies.isNotEmpty()) {
+                    renderAllQualifiers(fromBuild, toBuild, dependencies, renderer, empty, title)
                 } else {
-                    renderedChangeLog
+                    // Single change log
+                    renderChangeLog(fromBuild, toBuild, dependencies, renderer, empty, title)
                 }
             }
         } else {
             empty
+        }
+    }
+
+    private fun renderAllQualifiers(
+        fromBuild: Build,
+        toBuild: Build,
+        dependencies: List<String>,
+        renderer: EventRenderer,
+        empty: String,
+        title: Boolean,
+    ): String {
+        // Gets the change log boundaries but for the last dependency
+        val parsedDependencies = dependencies.map { DependencyLink.parse(it) }
+        val firstDependencies = parsedDependencies.dropLast(1)
+        val lastDependencyProject = parsedDependencies.last().project
+        val (deepFrom, deepTo) = runBlocking {
+            scmChangeLogService.getChangeLogBoundaries(
+                from = fromBuild,
+                to = toBuild,
+                dependencies = firstDependencies,
+            )
+        } ?: return ""
+
+        // Gets all links to the last dependency project and all the common qualifiers
+        // Including the default qualifier
+        val qualifiers = collectAllQualifiers(lastDependencyProject, deepFrom, deepTo)
+
+        // For each qualifier (including the default one), get a change log
+        val qualifiedChangeLogs = runBlocking {
+            qualifiers.associateWith { qualifier ->
+                scmChangeLogService.getChangeLog(
+                    from = deepFrom,
+                    to = deepTo,
+                    dependencies = listOf(
+                        DependencyLink(
+                            project = lastDependencyProject,
+                            qualifier = qualifier,
+                        )
+                    )
+                )
+            }
+        }
+
+        // Renders as a list
+        return qualifiedChangeLogs.entries
+            .filter { (_, changeLog) -> changeLog != null && !changeLog.isEmpty() }
+            .joinToString(
+                separator = renderer.renderSpace()
+            ) { (qualifier, changeLog) ->
+                check(changeLog != null) {
+                    "At this stage, the change log cannot be null"
+                }
+                renderChangeLog(
+                    changeLog = changeLog,
+                    renderer = renderer,
+                    empty = empty,
+                    title = title,
+                    projectNameSuffix = if (qualifier.isBlank()) {
+                        ""
+                    } else {
+                        " [$qualifier]"
+                    }
+                )
+            }
+    }
+
+    private fun collectAllQualifiers(projectName: String, vararg builds: Build): List<String> {
+        val qualifiers = mutableSetOf<String>()
+        for (build in builds) {
+            val linkQualifiers = structureService.getQualifiedBuildsUsedBy(build, size = 100) {
+                it.build.project.name == projectName
+            }.pageItems.map { it.qualifier }.filter { it.isNotBlank() }.toSet()
+            qualifiers += linkQualifiers
+        }
+        // Sorting the qualifiers
+        val sortedQualifiers = qualifiers.sorted().toMutableList()
+        // Always adding the default qualifier
+        sortedQualifiers.add(0, "")
+        // OK
+        return sortedQualifiers.toList()
+    }
+
+    private fun renderChangeLog(
+        fromBuild: Build,
+        toBuild: Build,
+        dependencies: List<String>,
+        renderer: EventRenderer,
+        empty: String,
+        title: Boolean
+    ): String {
+        // ... getting the change log, recursively or not
+        val changeLog = runBlocking {
+            scmChangeLogService.getChangeLog(
+                fromBuild,
+                toBuild,
+                dependencies.map { DependencyLink.parse(it) },
+            )
+        }
+        return renderChangeLog(changeLog, renderer, empty, title)
+    }
+
+    private fun renderChangeLog(
+        changeLog: SCMChangeLog?,
+        renderer: EventRenderer,
+        empty: String,
+        title: Boolean,
+        projectNameSuffix: String = "",
+    ): String {
+        // Rendered change log
+        val renderedChangeLog = changeLog
+            ?.takeIf { it.from.id() != it.to.id() }
+            ?.let { scmChangeLog ->
+                renderChangeLog(
+                    changeLog = scmChangeLog,
+                    renderer = renderer
+                )
+            } ?: empty
+        // Title?
+        return if (title) {
+            if (changeLog != null) {
+
+                val projectName = entityDisplayNameService.render(changeLog.from.project, renderer)
+                val fromName = entityDisplayNameService.render(changeLog.from, renderer)
+                val toName = entityDisplayNameService.render(changeLog.to, renderer)
+
+                val titleText = if (changeLog.from.id() != changeLog.to.id()) {
+                    """
+                            Change log for $projectName$projectNameSuffix from $fromName to $toName
+                        """.trimIndent()
+
+                } else {
+                    """
+                            Project $projectName$projectNameSuffix version $fromName
+                        """.trimIndent()
+                }
+
+                renderer.renderSection(
+                    title = titleText,
+                    content = renderedChangeLog,
+                )
+            } else {
+                // Change log not defined, and still asking for a title without a reference
+                // Skipping
+                ""
+            }
+        } else {
+            renderedChangeLog
         }
     }
 

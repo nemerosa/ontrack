@@ -13,17 +13,18 @@ class SCMChangeLogServiceImpl(
     private val structureService: StructureService,
 ) : SCMChangeLogService {
 
-    override suspend fun getChangeLog(from: Build, to: Build, projects: List<DependencyLink>): SCMChangeLog? {
-
+    override suspend fun getChangeLogBoundaries(
+        from: Build,
+        to: Build,
+        dependencies: List<DependencyLink>
+    ): Pair<Build, Build>? {
         if (from.project.id() != to.project.id()) {
             throw SCMChangeLogNotSameProjectException()
-        }
-
-        return if (projects.isEmpty()) {
-            computeChangeLog(from, to)
+        } else if (dependencies.isEmpty()) {
+            return from to to
         } else {
-            val project = projects.first()
-            val restProjects = projects.drop(1)
+            val project = dependencies.first()
+            val restProjects = dependencies.drop(1)
 
             // Gets the link to the dependency
             val linkedFrom = structureService.getQualifiedBuildsUsedBy(from, size = 1) {
@@ -37,12 +38,17 @@ class SCMChangeLogServiceImpl(
 
             // If one of the links is absent, giving up
             if (linkedFrom == null || linkedTo == null) {
-                null
+                return null
+            } else {
+                return getChangeLogBoundaries(linkedFrom, linkedTo, restProjects)
             }
-            // Following the links recursively
-            else {
-                getChangeLog(linkedFrom, linkedTo, restProjects)
-            }
+        }
+    }
+
+    override suspend fun getChangeLog(from: Build, to: Build, dependencies: List<DependencyLink>): SCMChangeLog? {
+        val boundaries = getChangeLogBoundaries(from, to, dependencies)
+        return boundaries?.let { (f, t) ->
+            computeChangeLog(f, t)
         }
     }
 

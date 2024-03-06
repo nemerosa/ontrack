@@ -126,7 +126,7 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
 
     @Test
     fun `Getting a recursive change log in a template`() {
-        prepareTest { fromBuild, run, _ ->
+        prepareTest { fromBuild, run, _, _ ->
             project {
                 branch {
                     val pl = promotionLevel()
@@ -171,7 +171,7 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
 
     @Test
     fun `Getting a recursive change log in a template using qualifiers`() {
-        prepareTest { fromBuild, run, _ ->
+        prepareTest { fromBuild, run, _, _ ->
             project {
                 branch {
                     val pl = promotionLevel()
@@ -216,7 +216,7 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
 
     @Test
     fun `Getting a recursive change log in a template using a title`() {
-        prepareTest { fromBuild, run, _ ->
+        prepareTest { fromBuild, run, _, _ ->
             project {
                 branch {
                     val pl = promotionLevel()
@@ -263,7 +263,7 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
 
     @Test
     fun `Getting a recursive change log in a template using a title when there is no change`() {
-        prepareTest { fromBuild, run, _ ->
+        prepareTest { fromBuild, run, _, _ ->
             project {
                 branch {
                     val pl = promotionLevel()
@@ -308,7 +308,7 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
 
     @Test
     fun `Recursive change log in a template using a title must be skipped when dependencies are missing`() {
-        prepareTest { fromBuild, run, _ ->
+        prepareTest { fromBuild, run, _, _ ->
             project {
                 branch {
                     val pl = promotionLevel()
@@ -349,7 +349,7 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
 
     @Test
     fun `Getting a deep recursive change log in a template`() {
-        prepareTest { fromBuild, run, _ ->
+        prepareTest { fromBuild, run, _, _ ->
             project {
                 val one = this
                 branch {
@@ -436,6 +436,64 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
         )
     }
 
+    @Test
+    fun `Looping over all qualifiers in a recursive change log`() {
+        prepareTest { _, _, (one, two, three, four), repositoryName ->
+            project {
+                branch {
+                    val pl = promotionLevel()
+                    val parentFrom = build {
+                        promote(pl)
+                    }
+                    val parentTo = build()
+
+                    // Default links (no change log)
+                    parentFrom.linkTo(one, "")
+                    parentTo.linkTo(one, "")
+
+                    // Qualified link with one change log
+                    parentFrom.linkTo(one, "module-1")
+                    parentTo.linkTo(two, "module-1")
+
+                    // Qualified link with one change log
+                    parentFrom.linkTo(two, "module-2")
+                    parentTo.linkTo(four, "module-2")
+
+                    // Change log anchor
+                    val run = parentTo.promote(pl)
+                    val event = eventFactory.newPromotionRun(run)
+
+                    // Template
+                    val template = """
+                        ${'$'}{promotionRun.changelog?title=true&dependencies=${one.project.name}&allQualifiers=true}
+                    """.trimIndent()
+
+                    // Rendering
+                    val text = eventTemplatingService.render(
+                        template = template,
+                        event = event,
+                        renderer = PlainEventRenderer.INSTANCE
+                    )
+
+                    // Checking the change log
+                    assertEquals(
+                        """
+                            Change log for ${one.project.name} [module-1] from ${one.name} to ${two.name}
+                            
+                            * ISS-21 Some new feature
+                            
+                            Change log for ${one.project.name} [module-2] from ${two.name} to ${four.name}
+                            
+                            * ISS-22 Some fixes are needed
+                            * ISS-23 Some nicer UI
+                        """.trimIndent(),
+                        text,
+                    )
+                }
+            }
+        }
+    }
+
     private fun doTestAcrossBranches(
         template: String,
         expectedText: String,
@@ -499,6 +557,7 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
         code: (
             fromBuild: Build,
             run: PromotionRun,
+            builds: List<Build>,
             repositoryName: String,
         ) -> Unit,
     ) {
@@ -518,23 +577,27 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
                             // Promotion boundary
                             promote(pl)
                         }
-                        build {
+                        val two = build {
                             repositoryIssue("ISS-21", "Some new feature")
                             withRepositoryCommit("ISS-21 Some commits for a feature", property = false)
                             withRepositoryCommit("ISS-21 Some fixes for a feature")
                         }
-                        build {
+                        val three = build {
                             repositoryIssue("ISS-22", "Some fixes are needed")
                             withRepositoryCommit("ISS-22 Fixing some bugs")
                         }
                         build {
+                            val to = this
                             repositoryIssue("ISS-23", "Some nicer UI")
                             withRepositoryCommit("ISS-23 Fixing some CSS")
 
                             // Promotion boundary
                             val run = promote(pl)
 
-                            code(from, run, repositoryName)
+                            // All builds
+                            val builds = listOf(from, two, three, to)
+
+                            code(from, run, builds, repositoryName)
                         }
                     }
                 }
@@ -547,7 +610,7 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
         template: String,
         expectedText: (fromBuild: Build, run: PromotionRun, repositoryName: String) -> String,
     ) {
-        prepareTest { fromBuild, run, repositoryName ->
+        prepareTest { fromBuild, run, _, repositoryName ->
             val event = eventFactory.newPromotionRun(run)
 
             // Rendering

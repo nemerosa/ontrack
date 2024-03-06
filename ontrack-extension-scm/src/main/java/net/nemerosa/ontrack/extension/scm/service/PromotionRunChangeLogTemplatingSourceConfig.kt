@@ -9,4 +9,6 @@ data class PromotionRunChangeLogTemplatingSourceConfig(
     val dependencies: List<String> = emptyList(),
     @APIDescription("Include a title for the change log")
     val title: Boolean = false,
+    @APIDescription("Loop over all qualifiers for the last level of `dependencies`, including the default one. Qualifiers at `dependencies` take precedence.")
+    val allQualifiers: Boolean = false,
 )

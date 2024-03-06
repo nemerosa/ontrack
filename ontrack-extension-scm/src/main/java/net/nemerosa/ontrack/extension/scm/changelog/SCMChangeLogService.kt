@@ -8,17 +8,22 @@ import net.nemerosa.ontrack.model.structure.Build
 interface SCMChangeLogService {
 
     /**
+     * Gets the boundaries for a change log
+     */
+    suspend fun getChangeLogBoundaries(from: Build, to: Build, dependencies: List<DependencyLink>): Pair<Build,Build>?
+
+    /**
      * Gets a change log between two builds in the same project.
      *
      * @param from Build boundary
      * @param to Build boundary
-     * @param projects List of project links to follow to get a recursive change log
+     * @param dependencies List of project links to follow to get a recursive change log
      * @return Change log containing the commits and the issues or `null` if the change is empty
      */
     suspend fun getChangeLog(
         from: Build,
         to: Build,
-        projects: List<DependencyLink> = emptyList(),
+        dependencies: List<DependencyLink> = emptyList(),
     ): SCMChangeLog?
 
 }

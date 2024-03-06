@@ -47,7 +47,7 @@ class GQLRootQuerySCMChangeLog(
                 scmChangeLogService.getChangeLog(
                     from = buildFrom,
                     to = buildTo,
-                    projects = projects
+                    dependencies = projects
                         ?.map { DependencyLink.parse(it) }
                         ?: emptyList(),
                 )

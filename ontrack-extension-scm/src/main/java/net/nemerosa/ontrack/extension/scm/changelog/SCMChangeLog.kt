@@ -18,4 +18,6 @@ data class SCMChangeLog(
     val commits: List<SCMDecoratedCommit>,
     @APIDescription("List of issues between the builds")
     val issues: SCMChangeLogIssues?,
-)
+) {
+    fun isEmpty() = fromCommit == toCommit
+}
