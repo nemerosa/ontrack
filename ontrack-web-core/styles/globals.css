@@ -156,13 +156,3 @@ button.ot-validation-stamp-filter-edition {
     border-radius: 4px;
     padding: 2px;
 }
-
-/**
- * Jira extensions
- */
-
-.ot-extension-jira-issue-link {
-    padding: 4px;
-    border: solid 1px black;
-    border-radius: 4px;
-}
