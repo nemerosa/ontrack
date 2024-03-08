@@ -336,7 +336,7 @@ function BuildLinksFlow({build}) {
 
     return (
         <>
-            <div style={{height: '100%'}}>
+            <div style={{height: '800px'}}>
                 <Skeleton active loading={loading}>
                     <ReactFlow
                         nodes={nodes}

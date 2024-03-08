@@ -1,10 +1,13 @@
 import {Handle, Position} from "reactflow";
-import {Card, Space, Typography} from "antd";
+import {Card, Space, Tooltip, Typography} from "antd";
 import BuildLink from "@components/builds/BuildLink";
 import Timestamp from "@components/common/Timestamp";
 import BuildPromotions from "@components/links/BuildPromotions";
 import BranchDisplayNameLink from "@components/links/BranchDisplayNameLink";
 import ProjectLink from "@components/projects/ProjectLink";
+import Link from "next/link";
+import {branchLinksUri, branchUri} from "@components/common/Links";
+import {FaProjectDiagram} from "react-icons/fa";
 
 export default function BuildNode({data}) {
 
@@ -27,7 +30,12 @@ export default function BuildNode({data}) {
                         {build && <ProjectLink project={build.branch.project} shorten={true}/>}
                     </Typography.Text>
                     {
-                        build && <BranchDisplayNameLink branch={build.branch}/>
+                        build && <Space>
+                            <BranchDisplayNameLink branch={build.branch}/>
+                            <Tooltip title="Graph of branch links">
+                                <Link href={branchLinksUri(build.branch)}><FaProjectDiagram size="12"/></Link>
+                            </Tooltip>
+                        </Space>
                     }
                     <Typography.Text strong>
                         {build && <BuildLink build={build} displayTooltip={true}></BuildLink>}

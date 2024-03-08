@@ -10,6 +10,10 @@ export function subBranchTitle(branch, what) {
     return title(branch ? `${what} | ${branch.name} / ${branch.project.name}` : undefined)
 }
 
+export function subBuildTitle(build, what) {
+    return title(build ? `${what} | ${buildKnownName(build)} / ${build.branch.project.name}` : '')
+}
+
 export function buildKnownName(build) {
     return build?.releaseProperty?.value?.name ?? build?.name
 }

@@ -1,14 +1,16 @@
 import BuildContentPromotions from "@components/builds/BuildContentPromotions";
 import BuildContentValidations from "@components/builds/BuildContentValidations";
-import BuildContentLinks from "@components/builds/BuildContentLinks";
+import BuildContentLinksUsing from "@components/builds/BuildContentLinksUsing";
 import StoredGridLayout from "@components/grid/StoredGridLayout";
+import BuildContentLinksUsedBy from "@components/builds/BuildContentLinksUsedBy";
 
 export default function BuildContent({build}) {
 
     const defaultLayout = [
-        {i: "promotions", x: 0, y: 0, w: 4, h: 6},
-        {i: "validations", x: 6, y: 0, w: 8, h: 18},
-        {i: "links", x: 0, y: 1, w: 4, h: 12}
+        {i: "promotions", x: 0, y: 0, w: 4, h: 9},
+        {i: "validations", x: 6, y: 0, w: 8, h: 9},
+        {i: "using", x: 0, y: 9, w: 6, h: 9},
+        {i: "usedBy", x: 6, y: 9, w: 6, h: 9}
     ]
 
     const items = [
@@ -25,8 +27,14 @@ export default function BuildContent({build}) {
             />,
         },
         {
-            id: "links",
-            content: <BuildContentLinks
+            id: "using",
+            content: <BuildContentLinksUsing
+                build={build}
+            />,
+        },
+        {
+            id: "usedBy",
+            content: <BuildContentLinksUsedBy
                 build={build}
             />,
         },

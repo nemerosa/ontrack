@@ -1,8 +1,12 @@
 import {Typography} from "antd";
 
 export default function ShortenedName({text, suffixCount = 12}) {
-    const start = text.slice(0, text.length - suffixCount);
-    const suffix = text.slice(-suffixCount).trim();
+    let actualText = text
+    let suffix = undefined
+    if (actualText.length > 12) {
+        actualText = text.slice(0, text.length - suffixCount).trim()
+        suffix = text.slice(-suffixCount).trim()
+    }
     return (
         <Typography.Text
             style={{
@@ -12,7 +16,7 @@ export default function ShortenedName({text, suffixCount = 12}) {
                 suffix,
             }}
         >
-            {start}
+            {actualText}
         </Typography.Text>
     )
 }

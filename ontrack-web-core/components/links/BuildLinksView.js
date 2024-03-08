@@ -1,49 +1,56 @@
 import {useEffect, useState} from "react";
 import {CloseCommand} from "@components/common/Commands";
-import {branchUri} from "@components/common/Links";
+import {buildUri} from "@components/common/Links";
 import Head from "next/head";
-import {subBranchTitle} from "@components/common/Titles";
+import {subBuildTitle} from "@components/common/Titles";
 import MainPage from "@components/layouts/MainPage";
-import {downToBranchBreadcrumbs} from "@components/common/Breadcrumbs";
+import {downToBuildBreadcrumbs} from "@components/common/Breadcrumbs";
 import LoadingContainer from "@components/common/LoadingContainer";
 import {gql} from "graphql-request";
 import PageSection from "@components/common/PageSection";
-import BranchLinksGraph from "@components/links/BranchLinksGraph";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import BuildLinksGraph from "@components/links/BuildLinksGraph";
 
-export default function BranchLinksView({id}) {
+export default function BuildLinksView({id}) {
 
     const client = useGraphQLClient()
 
-    const [loadingBranch, setLoadingBranch] = useState(true)
-    const [branch, setBranch] = useState({project: {}})
+    const [loadingBuild, setLoadingBuild] = useState(true)
+    const [build, setBuild] = useState({branch: {project: ''}})
     const [commands, setCommands] = useState([])
 
     useEffect(() => {
         if (id && client) {
-            setLoadingBranch(true)
+            setLoadingBuild(true)
             client.request(
                 gql`
-                    query GetBranch($id: Int!) {
-                        branches(id: $id) {
+                    query GetBuild($id: Int!) {
+                        build(id: $id) {
                             id
                             name
-                            project {
+                            branch {
                                 id
                                 name
+                                project {
+                                    id
+                                    name
+                                }
+                            }
+                            releaseProperty {
+                                value
                             }
                         }
                     }
                 `,
                 {id}
             ).then(data => {
-                const branch = data.branches[0]
-                setBranch(branch)
+                const build = data.build
+                setBuild(build)
                 setCommands([
-                    <CloseCommand key="close" href={branchUri(branch)}/>,
+                    <CloseCommand key="close" href={buildUri(build)}/>,
                 ])
             }).finally(() => {
-                setLoadingBranch(false)
+                setLoadingBuild(false)
             })
         }
     }, [id, client])
@@ -51,18 +58,18 @@ export default function BranchLinksView({id}) {
     return (
         <>
             <Head>
-                {subBranchTitle(branch, "Links")}
+                {subBuildTitle(build, "Links")}
             </Head>
             <MainPage
                 title="Links"
-                breadcrumbs={downToBranchBreadcrumbs({branch})}
+                breadcrumbs={downToBuildBreadcrumbs({build: build})}
                 commands={commands}
             >
-                <LoadingContainer loading={loadingBranch} tip="Loading branch">
+                <LoadingContainer loading={loadingBuild} tip="Loading build">
                     <PageSection title={undefined}
                                  padding={false}
                     >
-                        <BranchLinksGraph branch={branch}/>
+                        <BuildLinksGraph build={build}/>
                     </PageSection>
                 </LoadingContainer>
             </MainPage>

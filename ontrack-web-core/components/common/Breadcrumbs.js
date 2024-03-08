@@ -1,6 +1,7 @@
 import BranchLink from "@components/branches/BranchLink";
 import ProjectLink from "@components/projects/ProjectLink";
 import HomeLink from "@components/common/HomeLink";
+import BuildLink from "@components/builds/BuildLink";
 
 export function homeBreadcrumbs() {
     return [
@@ -35,6 +36,15 @@ export function downToBranchBreadcrumbs({branch}) {
 
 export function buildBreadcrumbs(build) {
     return downToBranchBreadcrumbs(build)
+}
+
+export function downToBuildBreadcrumbs({build}) {
+    return [
+        <HomeLink key="home"/>,
+        <ProjectLink project={build.branch.project} key="project"/>,
+        <BranchLink branch={build.branch} key="branch"/>,
+        <BuildLink build={build} key="build"/>
+    ]
 }
 
 export function promotionLevelBreadcrumbs(promotionLevel) {

@@ -1,7 +1,7 @@
 import {Handle, Position} from "reactflow";
-import {Card, Space, Typography} from "antd";
-import {branchUri} from "@components/common/Links";
-import {FaArrowCircleLeft, FaLink} from "react-icons/fa";
+import {Card, Space, Tooltip, Typography} from "antd";
+import {branchLinksUri, branchUri, buildLinksUri} from "@components/common/Links";
+import {FaArrowCircleLeft, FaLink, FaProjectDiagram} from "react-icons/fa";
 import Timestamp from "@components/common/Timestamp";
 import Link from "next/link";
 import BuildRef from "@components/links/BuildRef";
@@ -52,7 +52,12 @@ export default function BranchNode({data}) {
                             icon={<FaArrowCircleLeft/>}
                             title="Latest build"
                         >
-                            <BuildRef build={latestBuild}/>
+                            <Space>
+                                <BuildRef build={latestBuild}/>
+                                <Tooltip title="Graph of build links">
+                                    <Link href={buildLinksUri(latestBuild)}><FaProjectDiagram size="12"/></Link>
+                                </Tooltip>
+                            </Space>
                             <Timestamp value={latestBuild?.creation?.time}/>
                             <BuildPromotions build={latestBuild}/>
                         </NodeSection>

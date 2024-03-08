@@ -20,12 +20,20 @@ export function branchUri(branch) {
     return `/branch/${branch.id}`
 }
 
+export function branchLinksUri(branch) {
+    return `/branch/${branch.id}/links`
+}
+
 export function branchLegacyUri(branch) {
     return `#/branch/${branch.id}`
 }
 
 export function buildUri(build) {
     return `/build/${build.id}`
+}
+
+export function buildLinksUri(build) {
+    return `/build/${build.id}/links`
 }
 
 export function buildLegacyUri(build) {
