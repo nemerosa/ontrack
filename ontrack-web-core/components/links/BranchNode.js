@@ -38,9 +38,9 @@ export default function BranchNode({data}) {
                     }
                 }
             >
-                <Space direction="vertical">
-                    <Typography.Text ellipsis={true}>
-                        {branch && <ProjectLink project={branch.project}/>}
+                <Space direction="vertical" className="ot-line">
+                    <Typography.Text>
+                        {branch && <ProjectLink project={branch.project} shorten={true}/>}
                     </Typography.Text>
                     <BranchDisplayNameLink branch={branch}>
                         &nbsp;

@@ -23,8 +23,8 @@ export default function BuildNode({data}) {
                 }
             >
                 <Space direction="vertical" className="ot-line">
-                    <Typography.Text ellipsis={true}>
-                        {build && <ProjectLink project={build.branch.project}/>}
+                    <Typography.Text>
+                        {build && <ProjectLink project={build.branch.project} shorten={true}/>}
                     </Typography.Text>
                     {
                         build && <BranchDisplayNameLink branch={build.branch}/>
