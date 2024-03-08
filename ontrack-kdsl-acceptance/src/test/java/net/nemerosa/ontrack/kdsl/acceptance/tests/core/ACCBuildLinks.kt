@@ -164,8 +164,10 @@ class ACCBuildLinks : AbstractACCDSLTestSupport() {
                     }
                     build("202311041017") {
                         linksTo(
+                            "aggregator" to "1.0.120",
                             "aggregator@live" to "1.0.120",
                             "aggregator@preview" to "1.0.122",
+                            "aggregator@dev" to "1.0.122",
                         )
                     }
                 }

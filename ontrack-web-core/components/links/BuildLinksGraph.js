@@ -255,19 +255,39 @@ function BuildLinksFlow({build}) {
             collectDownstreamNodes(child, nodes, edges, nodesCache, edgesCache)
             // Adding an edge
             let edgeId = `${build.id}-${child.id}`
-            if (link.qualifier) {
-                edgeId += `-${link.qualifier}`
-            }
-            if (!edgesCache[edgeId]) {
+            const cachedEdge = edgesCache[edgeId]
+            if (cachedEdge) {
+                // Edge already exists, completing the qualifiers
+                if (cachedEdge.qualifiers.indexOf(link.qualifier) < 0) {
+                    cachedEdge.qualifiers.push(link.qualifier)
+                    if (cachedEdge.qualifiers.length === 1 && cachedEdge.qualifiers[0] === '') {
+                        cachedEdge.label = ''
+                    } else {
+                        cachedEdge.label = ''
+                        cachedEdge.qualifiers.forEach(qualifier => {
+                            if (cachedEdge.label.length > 0) {
+                                cachedEdge.label += ' / '
+                            }
+                            if (qualifier) {
+                                cachedEdge.label += qualifier
+                            } else {
+                                cachedEdge.label += 'default'
+                            }
+                        })
+                    }
+                }
+            } else {
+                // New edge
                 const edge = {
                     id: edgeId,
                     source: String(build.id),
                     target: String(child.id),
                     type: 'smoothstep',
+                    qualifiers: [link.qualifier],
                     label: link.qualifier,
                 }
                 edges.push(edge)
-                edgesCache[edgeId] = edgeId
+                edgesCache[edgeId] = edge
             }
         })
         // OK
