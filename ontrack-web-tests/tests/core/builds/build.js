@@ -14,7 +14,8 @@ export class BuildPage {
         // Widgets must be visible
         await expect(this.page.getByText("Promotions")).toBeVisible()
         await expect(this.page.getByText("Validations")).toBeVisible()
-        await expect(this.page.getByText("Links")).toBeVisible()
+        await expect(this.page.getByText("Downstream links")).toBeVisible()
+        await expect(this.page.getByText("Upstream links")).toBeVisible()
     }
 
 }
