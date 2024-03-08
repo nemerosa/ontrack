@@ -1,4 +1,4 @@
-import {Descriptions, Typography} from "antd";
+import {Descriptions, Input, Typography} from "antd";
 
 export default function AutoVersioningAuditEntryStateData({data}) {
 
@@ -8,7 +8,15 @@ export default function AutoVersioningAuditEntryStateData({data}) {
         const value = data[key]
         return {
             label: key,
-            children: <Typography.Text>{JSON.stringify(value)}</Typography.Text>
+            children: key === 'error' ?
+                <Input.TextArea
+                    style={{
+                        width: '70em',
+                    }}
+                    value={value}
+                    rows={8}
+                /> :
+                <Typography.Text>{JSON.stringify(value)}</Typography.Text>
         }
     })
 
