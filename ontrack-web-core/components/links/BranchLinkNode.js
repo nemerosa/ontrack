@@ -41,16 +41,11 @@ export default function BranchLinkNode({data}) {
                         }
                     </Space>
                     {/* Latest link */}
-                    <NodeSection
-                        icon={<FaCaretRight/>}
-                        title="Latest link"
-                    >
-                        <LatestLinkInfo
-                            sourceBuild={sourceBuild}
-                            latestOk={latestOk}
-                            targetBuild={targetBuild}
-                        />
-                    </NodeSection>
+                    <LatestLinkInfo
+                        sourceBuild={sourceBuild}
+                        latestOk={latestOk}
+                        targetBuild={targetBuild}
+                    />
                     {/* AV information */}
                     {
                         autoVersioning &&
