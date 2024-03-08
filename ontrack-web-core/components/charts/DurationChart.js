@@ -1,7 +1,8 @@
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {useEffect, useState} from "react";
 import {formatSeconds} from "@components/common/Duration";
-import {Bar, CartesianGrid, ComposedChart, Legend, Line, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
+import {Bar, CartesianGrid, ComposedChart, Legend, Line, Tooltip, XAxis, YAxis} from "recharts";
+import ChartContainer from "@components/charts/ChartContainer";
 
 export default function DurationChart({query, variables}) {
 
@@ -64,7 +65,7 @@ export default function DurationChart({query, variables}) {
 
     return (
         <>
-            <ResponsiveContainer width="100%" height="100%">
+            <ChartContainer>
                 <ComposedChart
                     data={dataPoints}
                 >
@@ -77,7 +78,7 @@ export default function DurationChart({query, variables}) {
                     <Line type="monotone" connectNulls={true} dataKey="percentile90" stroke="#66aa66" hide={inactiveSeries.includes('percentile90')}/>
                     <Line type="monotone" connectNulls={true} dataKey="maximum" stroke="#aa6666" hide={inactiveSeries.includes('maximum')}/>
                 </ComposedChart>
-            </ResponsiveContainer>
+            </ChartContainer>
         </>
     )
 }

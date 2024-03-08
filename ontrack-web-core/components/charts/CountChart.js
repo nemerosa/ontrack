@@ -1,6 +1,7 @@
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {useEffect, useState} from "react";
-import {Bar, CartesianGrid, ComposedChart, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
+import {Bar, CartesianGrid, ComposedChart, Legend, Tooltip, XAxis, YAxis} from "recharts";
+import ChartContainer from "@components/charts/ChartContainer";
 
 export default function CountChart({query, variables, yTickFormatter}) {
 
@@ -55,7 +56,7 @@ export default function CountChart({query, variables, yTickFormatter}) {
 
     return (
         <>
-            <ResponsiveContainer width="100%" height="100%">
+            <ChartContainer>
                 <ComposedChart
                     data={dataPoints}
                 >
@@ -66,7 +67,7 @@ export default function CountChart({query, variables, yTickFormatter}) {
                     <Legend formatter={legendFormatter} onClick={legendClick} style={{cursor: 'pointer'}}/>
                     <Bar dataKey="value" fill="#6666aa" hide={inactiveSeries.includes('value')}/>
                 </ComposedChart>
-            </ResponsiveContainer>
+            </ChartContainer>
         </>
     )
 }
