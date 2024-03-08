@@ -33,9 +33,11 @@ class AutoVersioningPromotionListenerServiceImpl(
         // Cache for the project last source branches
         val cache = mutableMapOf<Pair<Int, String>, Branch?>()
         // Filters the branches based on their configuration and the triggering event
-        val configuredBranches = branches.mapNotNull {
-            filterBranch(it, promotionEvent, cache)
-        }
+        val configuredBranches = branches
+            .filter { !it.isDisabled && !it.project.isDisabled }
+            .mapNotNull {
+                filterBranch(it, promotionEvent, cache)
+            }
         // Logging
         if (logger.isDebugEnabled) {
             configuredBranches.forEach { configuredBranch ->
@@ -114,7 +116,8 @@ class AutoVersioningPromotionListenerServiceImpl(
         config: AutoVersioningSourceConfig,
     ): Boolean {
         logger.debug("""Promotion event matching based on branch latest promotion""")
-        val latestSourceBranch = autoVersioningConfigurationService.getLatestBranch(eligibleTargetBranch, build.project, config)
+        val latestSourceBranch =
+            autoVersioningConfigurationService.getLatestBranch(eligibleTargetBranch, build.project, config)
         logger.debug("Latest branch: ${latestSourceBranch?.name}")
         // We want the promoted build to be on the latest source branch
         return latestSourceBranch != null && latestSourceBranch.id() == build.branch.id()

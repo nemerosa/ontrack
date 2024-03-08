@@ -6,11 +6,12 @@ object BranchFixtures {
         id: Int = 10,
         project: Project = ProjectFixtures.testProject(),
         name: String = "main",
+        disabled: Boolean = false,
     ) = Branch(
         id = ID.of(id),
         name = name,
         description = "main branch",
-        isDisabled = false,
+        isDisabled = disabled,
         project = project,
         signature = Signature.of("test"),
     )
