@@ -408,6 +408,8 @@ type Branch implements Authorizable & ProjectEntity {
         "Number of builds to use to get the dependencies"
         builds: Int
     ): [BranchLink!]!
+    "List of actions available for this entity"
+    userMenuActions: [UserMenuAction!]!
     "List of issues reported into the validation run statuses"
     validationIssues(
         "Maximum number of validation runs to fetch per validation stamp in order to get the issues"
@@ -540,7 +542,7 @@ type BranchLinksNode {
 
 type Build implements Authorizable & ProjectEntity {
     "Actions for a Build"
-    actions: BuildActions
+    actions: BuildActions @deprecated(reason: "Will be removed in V5. User `userMenuActions` instead.")
     "Description with links."
     annotatedDescription: String
     "Authorizations for this context"
@@ -636,6 +638,8 @@ type Build implements Authorizable & ProjectEntity {
         "Size of the page"
         size: Int = 20
     ): BuildLinkPaginated
+    "List of actions available for this entity"
+    userMenuActions: [UserMenuAction!]!
     "List of builds being used by this one."
     using(
         "Keeps only links targeted from this branch. `project` argument is also required."
@@ -659,6 +663,8 @@ type Build implements Authorizable & ProjectEntity {
         offset: Int = 0,
         "Keeps only links targeted from this project"
         project: String,
+        "Keeps only links targeted for this qualifier"
+        qualifier: String,
         "Size of the page"
         size: Int = 20
     ): BuildLinkPaginated
@@ -1675,6 +1681,8 @@ type EntityCounts {
 type EntityInformation {
     "Associated data"
     data: JSON
+    "Display name for this information"
+    title: String!
     "Type of information"
     type: String!
 }
@@ -2680,6 +2688,8 @@ type Issue {
     displayKey: String
     "Key of the issue"
     key: String
+    "JSON representation of the issue containing custom fields"
+    rawIssue: JSON!
     "Status of the issue"
     status: IssueStatus
     "Title / summary for the issue"
@@ -4092,7 +4102,7 @@ type Preferences {
 
 type Project implements ProjectEntity {
     "Actions for a Project"
-    actions: ProjectActions
+    actions: ProjectActions @deprecated(reason: "Will be removed in V5. User `userMenuActions` instead.")
     "Description with links."
     annotatedDescription: String
     "If set, this property allows promotion levels to be created automatically from predefined promotion levels"
@@ -4210,6 +4220,8 @@ type Project implements ProjectEntity {
     staleProperty: Property
     "Associates the project with a Bitbucket Server repository"
     stashProjectConfigurationProperty: Property
+    "List of actions available for this entity"
+    userMenuActions: [UserMenuAction!]!
     "Searching for validation runs in the project"
     validationRuns(
         "Branch where to look for validation runs (regular expression, defaults to all)"
@@ -4574,6 +4586,8 @@ type PromotionLevel implements Authorizable & ProjectEntity {
         "Fully qualified name of the property type"
         type: String
     ): [Property!]!
+    "List of actions available for this entity"
+    userMenuActions: [UserMenuAction!]!
 }
 
 "PromotionLevel links"
@@ -4630,6 +4644,8 @@ type PromotionRun implements Authorizable & ProjectEntity {
         "Fully qualified name of the property type"
         type: String
     ): [Property!]!
+    "List of actions available for this entity"
+    userMenuActions: [UserMenuAction!]!
 }
 
 "PromotionRun links"
@@ -4824,7 +4840,7 @@ type Query {
     gitChangeLogByUUID(
         "UUID of the change log"
         uuid: String!
-    ): GitChangeLog
+    ): GitChangeLog @deprecated(reason: "Will be removed in V5. Prefer using the `scmChangeLog` query.")
     "Getting Ontrack information about a Git commit and a project."
     gitCommitInfo(
         "Commit hash (full form) to look for."
@@ -4905,7 +4921,7 @@ type Query {
     "Gets information about the application"
     info: Info
     "List of available export formats"
-    issueExportFormats: [IssueExportFormat!]!
+    issueExportFormats: [IssueExportFormat!]! @deprecated(reason: "Use the templating service")
     "List of Jenkins configurations"
     jenkinsConfigurations: [JenkinsConfiguration!]!
     "List of all labels"
@@ -5038,7 +5054,12 @@ type Query {
     scmChangeLog(
         "ID of the build from"
         from: Int!,
-        "List of projects to follow one by one for a get deep change log"
+        """
+
+        List of projects to follow one by one for a get deep change log. Each item
+        in the list is either a project name, or a project name and qualifier separated
+        by a colon (:).
+        """
         projects: [String!],
         "ID of the build to"
         to: Int!
@@ -5058,6 +5079,8 @@ type Query {
     searchResultTypes: [SearchResultType!]!
     "Ontrack settings"
     settings: Settings!
+    "Getting the list of template renderers"
+    templatingRenderers: [TemplatingRenderer!]!
     "Gets the current user"
     user: User
     "Gets the current dashboard"
@@ -5322,10 +5345,19 @@ type SCMCatalogTeamStats {
 type SCMChangeLog {
     "List of commits between the builds"
     commits: [SCMDecoratedCommit!]!
+    "URL to get the file diff between the two builds"
+    diffLink: String
+    "Exporting the issues of a change log"
+    export(
+        "How to generate the exported change log"
+        request: SCMChangeLogExportInput
+    ): String
     "Boundary for the change log"
     from: Build!
     "List of issues between the builds"
     issues: SCMChangeLogIssues
+    "All dependency changes"
+    linkChanges: [LinkChange!]!
     "Boundary for the change log"
     to: Build!
 }
@@ -6213,6 +6245,14 @@ type SubscribeValidationStampToEventsPayload implements Payload {
     subscription: EventSubscriptionPayload
 }
 
+"Definition of a renderer"
+type TemplatingRenderer {
+    "Technical ID for the renderer"
+    id: String!
+    "Display name for the renderer"
+    name: String!
+}
+
 "Output type for the testConfiguration mutation."
 type TestConfigurationPayload implements Payload {
     "Result of the test"
@@ -6339,7 +6379,7 @@ type User {
     "Account associated to the user"
     account: Account
     "Actions for a RootUser"
-    actions: RootUserActions
+    actions: RootUserActions @deprecated(reason: "Will be removed in V5. User `userMenuActions` instead.")
 }
 
 "Representation of an error."
@@ -6356,6 +6396,8 @@ type UserError {
 type UserMenuAction {
     "Extension contributing this user menu item"
     extension: String!
+    "ID of the group this item belongs to"
+    groupId: String!
     "Unique ID for this user menu item in the given extension"
     id: String!
     "Display name for this user menu item"
@@ -6515,6 +6557,8 @@ type ValidationRun implements Authorizable & ProjectEntity {
     runInfo: RunInfo
     "Run order"
     runOrder: Int
+    "List of actions available for this entity"
+    userMenuActions: [UserMenuAction!]!
     "Link to the GitHub Workflow Job which created this validation run."
     validationRunGitHubWorkflowJobProperty: Property
     "List of validation statuses"
@@ -6632,6 +6676,8 @@ type ValidationStamp implements ProjectEntity {
         "Fully qualified name of the property type"
         type: String
     ): [Property!]!
+    "List of actions available for this entity"
+    userMenuActions: [UserMenuAction!]!
     "List of runs for this validation stamp"
     validationRuns(
         "Maximum number of validation runs"
@@ -8304,6 +8350,59 @@ input RunInfoInput {
     triggerData: String
     "Type of trigger (like \"scm\" or \"user\")"
     triggerType: String
+}
+
+"""
+
+Request for the export of a change log.
+
+This request defines how to group issues by type and which format
+to use for the export.
+
+If no grouping is specified, the issues will be returned as a list, without any grouping.
+
+The exclude field is used to exclude some issues from the export using their type.
+
+Note that both the export format and the type of issues are specific notions linked to the issue service
+(JIRA, GitHub...) that produces the issues.
+"""
+input SCMChangeLogExportInput {
+    """
+
+    Title of the group to use when an issue does not belong to any group. It defaults to "Other".
+    If left empty, any issue not belonging to a group would be excluded from the export. This field
+    is not used when no grouping is specified.
+    """
+    altGroup: String
+    exclude: String
+    "Selected format. Defaults to plain text."
+    format: String
+    """
+
+    Specification for the grouping, none by default.
+
+    This specification describes how to group issues using their type. This format is independent from
+    the issue service and this service is responsible for the actual mapping of issue "types" into actual
+    issue fields. For example, for GitHub, an issue type is mapped on a label.
+    The format of the specification is:
+
+    ----
+    specification := "" | ${'$'}group ( "|" ${'$'}group)*
+    group         := ${'$'}name "=" ${'$'}type ( "," ${'$'}type)*
+    ----
+
+    For example:
+
+    ----
+    Bugs=bug|Features=feature,enhancement
+    ----
+
+    Any issue that would not be mapped in a group will be assigned arbitrarily to the group defined by
+    altGroup property.
+
+    If the specification is empty, no grouping will be done.
+    """
+    grouping: String
 }
 
 "Input type for the saveBuildFilter mutation."

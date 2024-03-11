@@ -9,7 +9,6 @@ import net.nemerosa.ontrack.model.form.multiStrings
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
 import org.apache.commons.lang3.StringUtils
-import java.util.regex.Pattern
 
 /**
  * JIRA configuration.
@@ -26,8 +25,8 @@ open class JIRAConfiguration(
     val url: String,
     user: String?,
     password: String?,
-    val include: List<String>,
-    val exclude: List<String>,
+    val include: List<String> = emptyList(),
+    val exclude: List<String> = emptyList(),
 ) : UserPasswordConfiguration<JIRAConfiguration>(name, user, password), IssueServiceConfiguration {
 
     private val includeRegexes: List<Regex> by lazy {
