@@ -108,7 +108,9 @@ public interface IssueServiceExtension extends Extension {
      * @param issueServiceConfiguration Configuration for the service
      * @param issue                     Issue to look for
      * @return Regular expression
+     * @deprecated Will be removed in V5. Convert to using the SCM API.
      */
+    @Deprecated
     String getMessageRegex(IssueServiceConfiguration issueServiceConfiguration, Issue issue);
 
 
