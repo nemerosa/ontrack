@@ -30,11 +30,22 @@ open class JIRAConfiguration(
 ) : UserPasswordConfiguration<JIRAConfiguration>(name, user, password), IssueServiceConfiguration {
 
     private val includeRegexes: List<Regex> by lazy {
-        include.map { it.toRegex() }
+        include.map { adjustRegexForProject(it).toRegex() }
     }
 
     private val excludeRegexes: List<Regex> by lazy {
-        exclude.map { it.toRegex() }
+        exclude.map { adjustRegexForProject(it).toRegex() }
+    }
+
+    private fun adjustRegexForProject(regex: String): String {
+        var result = regex
+        if (!regex.startsWith("^")) {
+            result = "^${result}"
+        }
+        if (!regex.endsWith("$")) {
+            result += "$"
+        }
+        return result
     }
 
     override fun obfuscate(): JIRAConfiguration {
@@ -84,12 +95,14 @@ open class JIRAConfiguration(
 
     fun isValidIssueKey(token: String): Boolean {
         if (token.isNotBlank() && token.matches(ISSUE_PATTERN_REGEX)) {
+            // Project name
+            val project = token.substringBefore("-")
             // Included?
-            if (include.isNotEmpty() && includeRegexes.none { token.matches(it) }) {
+            if (include.isNotEmpty() && includeRegexes.none { it.matches(project) }) {
                 return false
             }
             // Excluded?
-            if (exclude.isNotEmpty() && excludeRegexes.any { token.matches(it) }) {
+            if (exclude.isNotEmpty() && excludeRegexes.any { it.matches(project) }) {
                 return false
             }
             // OK

@@ -6,6 +6,7 @@ import io.mockk.just
 import io.mockk.mockk
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
+import net.nemerosa.ontrack.extension.jira.JIRAFixtures.jiraConfiguration
 import net.nemerosa.ontrack.extension.jira.client.JIRAClient
 import net.nemerosa.ontrack.extension.jira.model.JIRAIssue
 import net.nemerosa.ontrack.extension.jira.model.JIRALink
@@ -98,6 +99,52 @@ class JIRAServiceExtensionTest {
         )
         assertEquals(
             setOf("TEST-12", "PRJ-12", "PRJ-13"),
+            issues
+        )
+    }
+
+    @Test
+    fun `Extract key from message with exclusion list`() {
+        val config = jiraConfiguration(
+            exclude = listOf("TEST")
+        )
+        val issues = service.extractIssueKeysFromMessage(
+            config,
+            "TEST-12, PRJ-12, PRJ-13 List of issues"
+        )
+        assertEquals(
+            setOf("PRJ-12", "PRJ-13"),
+            issues
+        )
+    }
+
+    @Test
+    fun `Extract key from message with inclusion list`() {
+        val config = jiraConfiguration(
+            include = listOf("PRJ")
+        )
+        val issues = service.extractIssueKeysFromMessage(
+            config,
+            "TEST-12, PRJ-12, PRJ-13 List of issues"
+        )
+        assertEquals(
+            setOf("PRJ-12", "PRJ-13"),
+            issues
+        )
+    }
+
+    @Test
+    fun `Extract key from message with inclusion and exclusion list`() {
+        val config = jiraConfiguration(
+            include = listOf("PRJ.*"),
+            exclude = listOf("PRJX")
+        )
+        val issues = service.extractIssueKeysFromMessage(
+            config,
+            "TEST-12, PRJ-12, PRJ-13, PRJX-14 List of issues"
+        )
+        assertEquals(
+            setOf("PRJ-12", "PRJ-13"),
             issues
         )
     }
@@ -198,16 +245,6 @@ class JIRAServiceExtensionTest {
             emptyList(),
             "Defect",
             emptyList()
-        )
-
-    private fun jiraConfiguration() =
-        JIRAConfiguration(
-            name = "test",
-            url = "http://jira",
-            user = "user",
-            password = "secret",
-            include = emptyList(),
-            exclude = emptyList()
         )
 
 }
