@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.jira
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Form.Companion.defaultNameField
@@ -20,6 +21,7 @@ import org.apache.commons.lang3.StringUtils
  * @param include List of regular expressions for the accepted JIRA projects (default = empty = all of them)
  * @param exclude List of regular expressions for the JIRA projects to not accept (default = empty = none of them)
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 open class JIRAConfiguration(
     name: String,
     val url: String,

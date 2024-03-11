@@ -9,7 +9,7 @@ import {
     FaExpandArrowsAlt,
     FaGithub,
     FaInfo,
-    FaJenkins,
+    FaJenkins, FaJira,
     FaList,
     FaMagic,
     FaSignOutAlt,
@@ -53,6 +53,7 @@ export default function UserMenu({userMenu}) {
     const itemIcons = {
         'extension/jenkins/configurations': <FaJenkins/>,
         'extension/github/configurations': <FaGithub/>,
+        'extension/jira/configurations': <FaJira/>,
         'extension/auto-versioning/audit/global': <FaMagic/>,
     }
 
