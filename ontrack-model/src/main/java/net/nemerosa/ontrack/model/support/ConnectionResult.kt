@@ -5,7 +5,8 @@ import net.nemerosa.ontrack.model.annotations.APIDescription
 /**
  * Result of a connection test.
  */
-class ConnectionResult(
+// #542 Using open as a workaround
+open class ConnectionResult(
     @APIDescription("Type of result")
     val type: ConnectionResultType,
     @APIDescription("Result message")
