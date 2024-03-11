@@ -10,11 +10,13 @@ export const AutoRefreshContext = createContext({
     autoRefreshIntervalSeconds: 60,
     setAutoRefreshIntervalSeconds: () => {
     },
+    autoRefreshCount: 0,
 })
 
 export function AutoRefreshContextProvider({children, onRefresh}) {
 
     const autoRefreshIdRef = useRef(0)
+    const [autoRefreshCount, setAutoRefreshCount] = useState(0)
     const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(false)
     const [autoRefreshIntervalSeconds, setAutoRefreshIntervalSeconds] = useState(60)
     const autoRefreshIntervalSecondsRef = useRef(autoRefreshIntervalSeconds)
@@ -28,9 +30,11 @@ export function AutoRefreshContextProvider({children, onRefresh}) {
         toggleEnabled,
         autoRefreshIntervalSeconds,
         setAutoRefreshIntervalSeconds,
+        autoRefreshCount,
     }
 
     const refresh = () => {
+        setAutoRefreshCount(count => count + 1)
         if (onRefresh) {
             onRefresh()
         }

@@ -1,11 +1,12 @@
 import {applyNodeChanges, Background, Controls, MarkerType, ReactFlow, ReactFlowProvider} from "reactflow";
-import {useCallback, useEffect, useMemo, useState} from "react";
+import {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import {gql} from "graphql-request";
 import BranchNode from "@components/links/BranchNode";
 import BranchLinkNode from "@components/links/BranchLinkNode";
 import {autoLayout} from "@components/links/GraphUtils";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {Skeleton} from "antd";
+import {AutoRefreshContext} from "@components/common/AutoRefresh";
 
 function BranchLinksFlow({branch}) {
 
@@ -303,10 +304,11 @@ function BranchLinksFlow({branch}) {
         })
     }
 
+    const {autoRefreshCount} = useContext(AutoRefreshContext)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        if (client && branch) {
+        if (client && branch && branch.id) {
             setLoading(true)
             client.request(
                 branchQuery,
@@ -347,7 +349,7 @@ function BranchLinksFlow({branch}) {
                 setLoading(false)
             })
         }
-    }, [client, branch]);
+    }, [client, branch, autoRefreshCount]);
 
     const onNodesChange = useCallback(
         (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
@@ -357,7 +359,7 @@ function BranchLinksFlow({branch}) {
     return (
         <>
             <div style={{height: '800px'}}>
-                <Skeleton active loading={loading}>
+                <Skeleton active loading={loading || !branch}>
                     <ReactFlow
                         nodes={nodes}
                         edges={edges}

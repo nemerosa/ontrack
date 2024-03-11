@@ -5,11 +5,11 @@ import Head from "next/head";
 import {subBranchTitle} from "@components/common/Titles";
 import MainPage from "@components/layouts/MainPage";
 import {downToBranchBreadcrumbs} from "@components/common/Breadcrumbs";
-import LoadingContainer from "@components/common/LoadingContainer";
 import {gql} from "graphql-request";
 import PageSection from "@components/common/PageSection";
 import BranchLinksGraph from "@components/links/BranchLinksGraph";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import {AutoRefreshButton, AutoRefreshContextProvider} from "@components/common/AutoRefresh";
 
 export default function BranchLinksView({id}) {
 
@@ -58,13 +58,19 @@ export default function BranchLinksView({id}) {
                 breadcrumbs={downToBranchBreadcrumbs({branch})}
                 commands={commands}
             >
-                <LoadingContainer loading={loadingBranch} tip="Loading branch">
-                    <PageSection title={undefined}
-                                 padding={false}
+                <AutoRefreshContextProvider>
+                    <PageSection
+                        title={undefined}
+                        extra={
+                            <>
+                                <AutoRefreshButton/>
+                            </>
+                        }
+                        padding={false}
                     >
                         <BranchLinksGraph branch={branch}/>
                     </PageSection>
-                </LoadingContainer>
+                </AutoRefreshContextProvider>
             </MainPage>
         </>
     )
