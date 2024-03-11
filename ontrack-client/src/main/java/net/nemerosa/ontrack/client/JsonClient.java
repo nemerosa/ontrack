@@ -4,6 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.common.Document;
 import org.apache.http.HttpEntity;
 
+/**
+ * @deprecated Will be removed in V5. Use the Spring Rest Template instead.
+ */
+@Deprecated
 public interface JsonClient {
 
     JsonNode toNode(Object data);

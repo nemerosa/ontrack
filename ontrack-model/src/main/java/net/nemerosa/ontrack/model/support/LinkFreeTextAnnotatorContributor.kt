@@ -15,13 +15,13 @@ class LinkFreeTextAnnotatorContributor : FreeTextAnnotatorContributor {
 
     override fun getMessageAnnotators(entity: ProjectEntity): List<MessageAnnotator> =
             listOf(
-                    RegexMessageAnnotator(
-                            pattern
-                    ) { link ->
-                        MessageAnnotation.of("a")
-                                .attr("href", link)
-                                .attr("target", "_blank")
-                                .text(link)
-                    }
+                LegacyRegexMessageAnnotator(
+                    pattern
+                ) { link ->
+                    MessageAnnotation.of("a")
+                        .attr("href", link)
+                        .attr("target", "_blank")
+                        .text(link)
+                }
             )
 }

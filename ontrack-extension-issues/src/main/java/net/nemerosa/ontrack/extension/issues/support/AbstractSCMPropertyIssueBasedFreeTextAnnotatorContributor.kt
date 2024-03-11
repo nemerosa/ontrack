@@ -38,6 +38,6 @@ abstract class AbstractSCMPropertyIssueBasedFreeTextAnnotatorContributor<T, P : 
                                 )
                             }
                 }
-        return configuredIssueService?.messageAnnotator?.orElse(null)
+        return configuredIssueService?.messageAnnotator
     }
 }

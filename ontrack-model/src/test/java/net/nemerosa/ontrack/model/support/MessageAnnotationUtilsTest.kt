@@ -6,25 +6,29 @@ import org.junit.Test
 
 class MessageAnnotationUtilsTest {
 
-    private val linkFreeTextAnnotatorContributor = RegexMessageAnnotator("((https?://|ftp://|www\\.)\\S+)") { link ->
-        MessageAnnotation.of("a")
+    private val linkFreeTextAnnotatorContributor =
+        LegacyRegexMessageAnnotator("((https?://|ftp://|www\\.)\\S+)") { link ->
+            MessageAnnotation.of("a")
                 .attr("href", link)
                 .attr("target", "_blank")
                 .text(link)
-    }
+        }
 
-    private val jiraIssueMessageAnnotator = RegexMessageAnnotator("([A-Z]+-\\d+)") { match ->
-        MessageAnnotation.of("a").attr("href", "http://jira/browse/$match").text(match)
-    }
+    private val jiraIssueMessageAnnotator =
+        LegacyRegexMessageAnnotator("([A-Z]+-\\d+)") { match ->
+            MessageAnnotation.of("a").attr("href", "http://jira/browse/$match").text(match)
+        }
 
-    private val issueMessageAnnotator = RegexMessageAnnotator("(#\\d+)") { match ->
-        val id = match.substring(1)
-        MessageAnnotation.of("link").attr("url", "http://test/id/$id").text(match)
-    }
+    private val issueMessageAnnotator =
+        LegacyRegexMessageAnnotator("(#\\d+)") { match ->
+            val id = match.substring(1)
+            MessageAnnotation.of("link").attr("url", "http://test/id/$id").text(match)
+        }
 
-    private val numberMessageAnnotator = RegexMessageAnnotator("(\\d+)") { match ->
-        MessageAnnotation.of("emphasis").text(match)
-    }
+    private val numberMessageAnnotator =
+        LegacyRegexMessageAnnotator("(\\d+)") { match ->
+            MessageAnnotation.of("emphasis").text(match)
+        }
 
     @Test
     fun `Link with dashes`() {

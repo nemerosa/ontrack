@@ -1,217 +1,146 @@
-package net.nemerosa.ontrack.extension.jira;
+package net.nemerosa.ontrack.extension.jira
 
-import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory;
-import net.nemerosa.ontrack.extension.issues.model.Issue;
-import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
-import net.nemerosa.ontrack.extension.issues.support.AbstractIssueServiceExtension;
-import net.nemerosa.ontrack.extension.jira.client.JIRAClient;
-import net.nemerosa.ontrack.extension.jira.model.JIRAIssue;
-import net.nemerosa.ontrack.extension.jira.tx.JIRASession;
-import net.nemerosa.ontrack.extension.jira.tx.JIRASessionFactory;
-import net.nemerosa.ontrack.model.structure.Project;
-import net.nemerosa.ontrack.model.structure.PropertyService;
-import net.nemerosa.ontrack.model.support.MessageAnnotation;
-import net.nemerosa.ontrack.model.support.MessageAnnotator;
-import net.nemerosa.ontrack.model.support.RegexMessageAnnotator;
-import net.nemerosa.ontrack.tx.Transaction;
-import net.nemerosa.ontrack.tx.TransactionService;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.stream.Collectors;
-
-import static java.lang.String.format;
+import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
+import net.nemerosa.ontrack.extension.issues.model.Issue
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
+import net.nemerosa.ontrack.extension.issues.support.AbstractIssueServiceExtension
+import net.nemerosa.ontrack.extension.jira.model.JIRAIssue
+import net.nemerosa.ontrack.extension.jira.model.JIRALink
+import net.nemerosa.ontrack.extension.jira.tx.JIRASession
+import net.nemerosa.ontrack.extension.jira.tx.JIRASessionFactory
+import net.nemerosa.ontrack.model.structure.PropertyService
+import net.nemerosa.ontrack.model.support.MessageAnnotation
+import net.nemerosa.ontrack.model.support.MessageAnnotator
+import net.nemerosa.ontrack.model.support.RegexMessageAnnotator
+import net.nemerosa.ontrack.tx.Transaction
+import net.nemerosa.ontrack.tx.TransactionResourceProvider
+import net.nemerosa.ontrack.tx.TransactionService
+import org.springframework.stereotype.Component
 
 @Component
-public class JIRAServiceExtension extends AbstractIssueServiceExtension {
+class JIRAServiceExtension(
+    extensionFeature: JIRAExtensionFeature,
+    private val jiraConfigurationService: JIRAConfigurationService,
+    private val jiraSessionFactory: JIRASessionFactory,
+    private val transactionService: TransactionService,
+    issueExportServiceFactory: IssueExportServiceFactory,
+    private val propertyService: PropertyService
+) : AbstractIssueServiceExtension(extensionFeature, SERVICE, "JIRA", issueExportServiceFactory) {
 
-    public static final String SERVICE = "jira";
-    private final JIRAConfigurationService jiraConfigurationService;
-    private final JIRASessionFactory jiraSessionFactory;
-    private final TransactionService transactionService;
-    private final PropertyService propertyService;
-
-    @Autowired
-    public JIRAServiceExtension(
-            JIRAExtensionFeature extensionFeature,
-            JIRAConfigurationService jiraConfigurationService,
-            JIRASessionFactory jiraSessionFactory,
-            TransactionService transactionService,
-            IssueExportServiceFactory issueExportServiceFactory,
-            PropertyService propertyService) {
-        super(extensionFeature, SERVICE, "JIRA", issueExportServiceFactory);
-        this.jiraConfigurationService = jiraConfigurationService;
-        this.jiraSessionFactory = jiraSessionFactory;
-        this.transactionService = transactionService;
-        this.propertyService = propertyService;
+    override fun getConfigurationList(): List<IssueServiceConfiguration> {
+        return jiraConfigurationService.configurations
     }
 
-    @Override
-    public List<? extends IssueServiceConfiguration> getConfigurationList() {
-        return jiraConfigurationService.getConfigurations();
+    override fun getConfigurationByName(name: String): IssueServiceConfiguration? {
+        return jiraConfigurationService.findConfiguration(name)
     }
 
-    @Override
-    public IssueServiceConfiguration getConfigurationByName(String name) {
-        return jiraConfigurationService.getOptionalConfiguration(name).orElse(null);
-    }
-
-    @Override
-    public Optional<String> getIssueId(IssueServiceConfiguration issueServiceConfiguration, String token) {
-        return validIssueToken(token) ? Optional.of(token) : Optional.empty();
-    }
-
-    @Override
-    public Collection<? extends Issue> getLinkedIssues(Project project, IssueServiceConfiguration issueServiceConfiguration, Issue issue) {
-        // Gets a list of link names to follow
-        return propertyService.getProperty(project, JIRAFollowLinksPropertyType.class).option()
-                .map(property -> {
-                    Map<String, JIRAIssue> issues = new LinkedHashMap<>();
-                    followLinks(
-                            (JIRAConfiguration) issueServiceConfiguration,
-                            (JIRAIssue) issue,
-                            new HashSet<>(property.getLinkNames()),
-                            issues
-                    );
-                    return issues.values();
-                })
-                .orElse(Collections.singleton((JIRAIssue) issue));
-    }
-
-    @Override
-    public boolean validIssueToken(String token) {
-        return StringUtils.isNotBlank(token) && JIRAConfiguration.ISSUE_PATTERN.matcher(token).matches();
-    }
-
-    @Override
-    public Set<String> extractIssueKeysFromMessage(IssueServiceConfiguration issueServiceConfiguration, String message) {
-        return extractJIRAIssuesFromMessage((JIRAConfiguration) issueServiceConfiguration, message);
-    }
-
-    @Override
-    public Optional<MessageAnnotator> getMessageAnnotator(IssueServiceConfiguration issueServiceConfiguration) {
-        JIRAConfiguration configuration = (JIRAConfiguration) issueServiceConfiguration;
-        return Optional.of(
-                new RegexMessageAnnotator(
-                        JIRAConfiguration.ISSUE_PATTERN,
-                        key -> MessageAnnotation.of("a")
-                                .attr("href", configuration.getIssueURL(key))
-                                .text(key)
-                )
-        );
-    }
-
-    @Override
-    public String getLinkForAllIssues(IssueServiceConfiguration issueServiceConfiguration, List<Issue> issues) {
-        Validate.notNull(issueServiceConfiguration, "The issue service configuration is required");
-        Validate.notNull(issues, "The list of issues must not be null");
-        JIRAConfiguration configuration = (JIRAConfiguration) issueServiceConfiguration;
-        if (issues.size() == 0) {
-            // Nothing to link to
-            return "";
-        } else if (issues.size() == 1) {
-            // Link to one issue
-            return format(
-                    "%s/browse/%s",
-                    configuration.getUrl(),
-                    issues.iterator().next().getKey()
-            );
+    override fun getIssueId(issueServiceConfiguration: IssueServiceConfiguration, token: String): String? =
+        if (issueServiceConfiguration is JIRAConfiguration && issueServiceConfiguration.isValidIssueKey(token)) {
+            token
         } else {
-            try {
-                return format(
-                        "%s/secure/IssueNavigator.jspa?reset=true&mode=hide&jqlQuery=%s",
-                        configuration.getUrl(),
-                        URLEncoder.encode(
-                                format(
-                                        "key in (%s)",
-                                        StringUtils.join(
-                                                issues.stream()
-                                                        .map(i -> String.format("\"%s\"", i.getKey()))
-                                                        .collect(Collectors.toList()),
-                                                ","
-                                        )
-                                ),
-                                "UTF-8"
-                        )
-                );
-            } catch (UnsupportedEncodingException e) {
-                throw new IllegalStateException("UTF-8 not supported");
-            }
+            null
+        }
+
+    override fun extractIssueKeysFromMessage(
+        issueServiceConfiguration: IssueServiceConfiguration,
+        message: String
+    ): Set<String> {
+        return extractJIRAIssuesFromMessage(issueServiceConfiguration as JIRAConfiguration, message)
+    }
+
+    override fun getMessageAnnotator(issueServiceConfiguration: IssueServiceConfiguration): MessageAnnotator {
+        val configuration = issueServiceConfiguration as JIRAConfiguration
+        return RegexMessageAnnotator(
+            JIRAConfiguration.ISSUE_PATTERN_REGEX
+        ) { key: String ->
+            MessageAnnotation.of("a")
+                .attr("href", configuration.getIssueURL(key))
+                .text(key)
         }
     }
 
-    @Override
-    public Issue getIssue(IssueServiceConfiguration issueServiceConfiguration, String issueKey) {
-        return getIssue((JIRAConfiguration) issueServiceConfiguration, issueKey);
+    override fun getIssue(issueServiceConfiguration: IssueServiceConfiguration, issueKey: String): Issue? {
+        return getIssue(issueServiceConfiguration as JIRAConfiguration, issueKey)
     }
 
-    @Override
-    public Set<String> getIssueTypes(IssueServiceConfiguration issueServiceConfiguration, Issue issue) {
-        if (issue != null) {
-            JIRAIssue jiraIssue = (JIRAIssue) issue;
-            return Collections.singleton(jiraIssue.getIssueType());
-        } else {
-            return Collections.emptySet();
-        }
+    override fun getIssueTypes(issueServiceConfiguration: IssueServiceConfiguration, issue: Issue): Set<String> {
+        val jiraIssue = issue as JIRAIssue
+        return setOf(jiraIssue.issueType)
     }
 
     /**
      * Given an issue seed, and a list of link names, follows the given links recursively and
-     * puts the associated issues into the {@code collectedIssues} map.
+     * puts the associated issues into the `collectedIssues` map.
      *
      * @param configuration   JIRA configuration to use to load the issues
      * @param seed            Issue to start from.
      * @param linkNames       Links to follow
      * @param collectedIssues Collected issues, indexed by their key
      */
-    public void followLinks(JIRAConfiguration configuration, JIRAIssue seed, Set<String> linkNames, Map<String, JIRAIssue> collectedIssues) {
-        try (Transaction tx = transactionService.start()) {
-            JIRASession session = getJIRASession(tx, configuration);
+    fun followLinks(
+        configuration: JIRAConfiguration,
+        seed: JIRAIssue,
+        linkNames: Set<String?>,
+        collectedIssues: MutableMap<String, JIRAIssue>
+    ) {
+        transactionService.start().use { tx ->
+            val session = getJIRASession(tx, configuration)
             // Gets the client from the current session
-            JIRAClient client = session.getClient();
+            val client = session.client
             // Puts the seed into the list
-            collectedIssues.put(seed.getKey(), seed);
+            collectedIssues[seed.key] = seed
             // Gets the linked issue keys
-            seed.getLinks().stream()
-                    .filter(linkedIssue -> linkNames.contains(linkedIssue.getLinkName()))
-                    .filter(linkedIssue -> !collectedIssues.containsKey(linkedIssue.getKey()))
-                    .map(linkedIssue -> client.getIssue(linkedIssue.getKey(), configuration))
-                    .forEach(linkedIssue -> followLinks(configuration, linkedIssue, linkNames, collectedIssues));
+            seed.links.stream()
+                .filter { linkedIssue: JIRALink -> linkNames.contains(linkedIssue.linkName) }
+                .filter { linkedIssue: JIRALink -> !collectedIssues.containsKey(linkedIssue.key) }
+                .map { linkedIssue: JIRALink -> client.getIssue(linkedIssue.key, configuration) }
+                .forEach { linkedIssue: JIRAIssue? ->
+                    if (linkedIssue != null) {
+                        followLinks(
+                            configuration,
+                            linkedIssue,
+                            linkNames,
+                            collectedIssues
+                        )
+                    }
+                }
         }
     }
 
-    public JIRAIssue getIssue(JIRAConfiguration configuration, String key) {
-        try (Transaction tx = transactionService.start()) {
-            JIRASession session = getJIRASession(tx, configuration);
+    fun getIssue(configuration: JIRAConfiguration, key: String): JIRAIssue? {
+        transactionService.start().use { tx ->
+            val session = getJIRASession(tx, configuration)
             // Gets the JIRA issue
-            return session.getClient().getIssue(key, configuration);
+            return session.client.getIssue(key, configuration)
         }
     }
 
-    private JIRASession getJIRASession(Transaction tx, final JIRAConfiguration configuration) {
-        return tx.getResource(JIRASession.class, configuration.getName(), () -> jiraSessionFactory.create(configuration));
-    }
+    private fun getJIRASession(tx: Transaction, configuration: JIRAConfiguration): JIRASession =
+        tx.getResource(
+            JIRASession::class.java,
+            configuration.name,
+            object : TransactionResourceProvider<JIRASession> {
+                override fun createTxResource(): JIRASession = jiraSessionFactory.create(configuration)
+            }
+        )
 
-    protected Set<String> extractJIRAIssuesFromMessage(JIRAConfiguration configuration, String message) {
-        Set<String> result = new HashSet<>();
-        if (StringUtils.isNotBlank(message)) {
-            Matcher matcher = JIRAConfiguration.ISSUE_PATTERN.matcher(message);
-            while (matcher.find()) {
-                // Gets the issue
-                String issueKey = matcher.group();
-                // Adds to the result
-                if (configuration.isIssue(issueKey)) {
-                    result.add(issueKey);
+    protected fun extractJIRAIssuesFromMessage(configuration: JIRAConfiguration, message: String): Set<String> {
+        val result = mutableSetOf<String>()
+        if (message.isNotBlank()) {
+            val matchers = JIRAConfiguration.ISSUE_PATTERN_REGEX.findAll(message)
+            matchers.forEach { matcher ->
+                val issueKey = matcher.groupValues[1]
+                if (configuration.isValidIssueKey(issueKey)) {
+                    result += issueKey
                 }
             }
         }
         // OK
-        return result;
+        return result
+    }
+
+    companion object {
+        const val SERVICE: String = "jira"
     }
 }

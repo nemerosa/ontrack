@@ -135,6 +135,15 @@ fun JsonNode.getTextField(field: String): String? = if (has(field)) {
 }
 
 /**
+ * Gets a list of strings
+ */
+fun JsonNode.getListStringField(field: String): List<String>? = if (has(field)) {
+    get(field).map { it.asText() }
+} else {
+    null
+}
+
+/**
  * Gets a required string field
  */
 fun JsonNode.getRequiredTextField(field: String): String =
@@ -191,12 +200,15 @@ fun JsonNode.merge(
                 }
             }
         }
+
         node.isNullOrNullNode() -> {
             this
         }
+
         this.isNullOrNullNode() -> {
             node
         }
+
         else -> {
             when (conflictResolution) {
                 JsonConflictResolution.ABORT -> error("Cannot merge JSON because of type conflict.")

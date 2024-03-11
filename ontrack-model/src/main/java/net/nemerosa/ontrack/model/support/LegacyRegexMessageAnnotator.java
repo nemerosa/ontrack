@@ -6,16 +6,20 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class RegexMessageAnnotator extends AbstractMessageAnnotator {
+/**
+ * @deprecated Will be removed in V5. Use RegexMessageAnnotator instead.
+ */
+@Deprecated
+public class LegacyRegexMessageAnnotator extends AbstractMessageAnnotator {
 
     private final Pattern pattern;
     private final Function<String, MessageAnnotation> annotationFactory;
 
-    public RegexMessageAnnotator(String pattern, Function<String, MessageAnnotation> annotationFactory) {
+    public LegacyRegexMessageAnnotator(String pattern, Function<String, MessageAnnotation> annotationFactory) {
         this(Pattern.compile(pattern), annotationFactory);
     }
 
-    public RegexMessageAnnotator(Pattern pattern, Function<String, MessageAnnotation> annotationFactory) {
+    public LegacyRegexMessageAnnotator(Pattern pattern, Function<String, MessageAnnotation> annotationFactory) {
         this.pattern = pattern;
         this.annotationFactory = annotationFactory;
     }

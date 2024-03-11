@@ -3,19 +3,22 @@ package net.nemerosa.ontrack.extension.jira.client
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.client.ClientForbiddenException
 import net.nemerosa.ontrack.client.ClientNotFoundException
-import net.nemerosa.ontrack.client.JsonClient
 import net.nemerosa.ontrack.extension.jira.JIRAConfiguration
 import net.nemerosa.ontrack.extension.jira.model.*
+import net.nemerosa.ontrack.json.getRequiredTextField
 import org.apache.commons.lang3.StringUtils
+import org.springframework.web.client.RestTemplate
+import org.springframework.web.client.getForObject
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 
-class JIRAClientImpl(private val jsonClient: JsonClient) : JIRAClient {
+class JIRAClientImpl(
+    private val restTemplate: RestTemplate,
+) : JIRAClient {
 
     private val issues: ConcurrentMap<Pair<String, String>, JIRAIssue> = ConcurrentHashMap()
 
@@ -32,9 +35,9 @@ class JIRAClientImpl(private val jsonClient: JsonClient) : JIRAClient {
     }
 
     private fun fetchIssue(key: String, configuration: JIRAConfiguration): JIRAIssue? {
-        val node: JsonNode
         try {
-            node = jsonClient.get("/rest/api/2/issue/%s?expand=names", key)
+            val node = restTemplate.getForObject<JsonNode>("/rest/api/2/issue/$key?expand=names")
+            return toIssue(configuration, node)
         } catch (ex: ClientForbiddenException) {
             // The issue cannot be accessed
             // For the moment, ignoring silently
@@ -43,17 +46,15 @@ class JIRAClientImpl(private val jsonClient: JsonClient) : JIRAClient {
             return null
         }
 
-        return toIssue(configuration, node)
     }
 
-    override fun getProjects(): List<String> {
-        val node = jsonClient.get("/rest/api/2/project")
-        val projects = ArrayList<String>()
-        for (child in node) {
-            projects.add(child.path("key").asText())
+    override val projects: List<String>
+        get() {
+            val node = restTemplate.getForObject<JsonNode>("/rest/api/2/project")
+            return node.map {
+                it.getRequiredTextField("key")
+            }
         }
-        return projects
-    }
 
     override fun close() {}
 
@@ -75,11 +76,11 @@ class JIRAClientImpl(private val jsonClient: JsonClient) : JIRAClient {
                 val fieldNode = field(node, name)
                 // Creates the field
                 fields.add(
-                        JIRAField(
-                                name,
-                                displayName,
-                                fieldNode
-                        )
+                    JIRAField(
+                        name,
+                        displayName,
+                        fieldNode
+                    )
                 )
             }
 
@@ -99,53 +100,57 @@ class JIRAClientImpl(private val jsonClient: JsonClient) : JIRAClient {
                 val inwardKey = issueLinkNode.path("inwardIssue").path("key").asText()
                 val outwardKey = issueLinkNode.path("outwardIssue").path("key").asText()
                 if (StringUtils.isNotBlank(inwardKey)) {
-                    links.add(JIRALink(
+                    links.add(
+                        JIRALink(
                             inwardKey,
                             configuration.getIssueURL(inwardKey),
                             getStatus(issueLinkNode.path("inwardIssue")),
                             issueLinkNode.path("type").path("name").asText(),
                             issueLinkNode.path("type").path("inward").asText()
-                    ))
+                        )
+                    )
                 } else if (StringUtils.isNotBlank(outwardKey)) {
-                    links.add(JIRALink(
+                    links.add(
+                        JIRALink(
                             outwardKey,
                             configuration.getIssueURL(outwardKey),
                             getStatus(issueLinkNode.path("outwardIssue")),
                             issueLinkNode.path("type").path("name").asText(),
                             issueLinkNode.path("type").path("outward").asText()
-                    ))
+                        )
+                    )
                 }
             }
 
             // JIRA issue
             return JIRAIssue(
-                    configuration.getIssueURL(key),
-                    key,
-                    fieldValue(node, "summary"),
-                    status,
-                    field(node, "assignee").path("name").asText(),
-                    parseFromJIRA(fieldValue(node, "updated")),
-                    fields,
-                    affectedVersions,
-                    fixVersions,
-                    field(node, "issuetype").path("name").asText(),
-                    links
+                configuration.getIssueURL(key),
+                key,
+                fieldValue(node, "summary"),
+                status,
+                field(node, "assignee").path("name").asText(),
+                parseFromJIRA(fieldValue(node, "updated")),
+                fields,
+                affectedVersions,
+                fixVersions,
+                field(node, "issuetype").path("name").asText(),
+                links
             )
         }
 
         private fun getStatus(node: JsonNode): JIRAStatus {
             val statusNode = field(node, "status")
             return JIRAStatus(
-                    statusNode.path("name").asText(),
-                    statusNode.path("iconUrl").asText()
+                statusNode.path("name").asText(),
+                statusNode.path("iconUrl").asText()
             )
         }
 
         @JvmStatic
         fun parseFromJIRA(value: String): LocalDateTime {
             return LocalDateTime.ofInstant(
-                    ZonedDateTime.parse(value, JIRA_DATA_TIME).toInstant(),
-                    ZoneOffset.UTC
+                ZonedDateTime.parse(value, JIRA_DATA_TIME).toInstant(),
+                ZoneOffset.UTC
             )
         }
 
@@ -154,10 +159,10 @@ class JIRAClientImpl(private val jsonClient: JsonClient) : JIRAClient {
             val versions = ArrayList<JIRAVersion>()
             for (versionNode in versionField) {
                 versions.add(
-                        JIRAVersion(
-                                versionNode.path("name").asText(),
-                                versionNode.path("released").asBoolean()
-                        )
+                    JIRAVersion(
+                        versionNode.path("name").asText(),
+                        versionNode.path("released").asBoolean()
+                    )
                 )
             }
             return versions

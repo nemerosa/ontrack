@@ -17,10 +17,7 @@ import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
 import net.nemerosa.ontrack.extension.stale.StaleExtensionFeature
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class GitHubIssueServiceExtensionTest {
 
@@ -73,21 +70,19 @@ class GitHubIssueServiceExtensionTest {
     @Test
     fun getIssueId_full() {
         val o = extension.getIssueId(configuration, "#12")
-        assertTrue(o.isPresent)
-        assertEquals("12", o.get())
+        assertEquals("12", o)
     }
 
     @Test
     fun getIssueId_numeric() {
         val o = extension.getIssueId(configuration, "12")
-        assertTrue(o.isPresent)
-        assertEquals("12", o.get())
+        assertEquals("12", o)
     }
 
     @Test
     fun getIssueId_not_valid() {
         val o = extension.getIssueId(configuration, "mm")
-        assertFalse(o.isPresent)
+        assertNull(o)
     }
 
     @Test
@@ -142,13 +137,13 @@ class GitHubIssueServiceExtensionTest {
             closedAt = null
         )
         val regex = extension.getMessageRegex(configuration, issue).toRegex()
-        kotlin.test.assertTrue(regex.containsMatchIn("#625"))
-        kotlin.test.assertTrue(regex.containsMatchIn("#625 at the beginning"))
-        kotlin.test.assertTrue(regex.containsMatchIn("In the #625 middle"))
-        kotlin.test.assertTrue(regex.containsMatchIn("In the end #625"))
-        kotlin.test.assertTrue(regex.containsMatchIn("#625: with separator"))
-        kotlin.test.assertFalse(regex.containsMatchIn("Too many #6250 digits"))
-        kotlin.test.assertFalse(regex.containsMatchIn("Too many digits #6250"))
+        assertTrue(regex.containsMatchIn("#625"))
+        assertTrue(regex.containsMatchIn("#625 at the beginning"))
+        assertTrue(regex.containsMatchIn("In the #625 middle"))
+        assertTrue(regex.containsMatchIn("In the end #625"))
+        assertTrue(regex.containsMatchIn("#625: with separator"))
+        assertFalse(regex.containsMatchIn("Too many #6250 digits"))
+        assertFalse(regex.containsMatchIn("Too many digits #6250"))
     }
 
 }

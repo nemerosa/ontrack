@@ -1,7 +1,5 @@
 package net.nemerosa.ontrack.extension.issues.combined
 
-import net.nemerosa.ontrack.common.asOptional
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest
 import net.nemerosa.ontrack.extension.issues.IssueServiceExtension
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
@@ -15,6 +13,7 @@ import net.nemerosa.ontrack.model.support.MessageAnnotator
 import org.apache.commons.lang3.StringUtils
 import org.springframework.stereotype.Component
 import java.util.*
+import kotlin.jvm.optionals.getOrNull
 
 @Component
 class CombinedIssueServiceExtension(
@@ -52,19 +51,11 @@ class CombinedIssueServiceExtension(
         return configurationService.getConfigurationByName(name).orElse(null)
     }
 
-    /**
-     * Without any specific configuration, we have to assume the token is valid.
-     */
-    override fun validIssueToken(token: String): Boolean {
-        return true
-    }
-
     override fun getMessageRegex(issueServiceConfiguration: IssueServiceConfiguration, issue: Issue): String {
         return getConfiguredIssueServices(issueServiceConfiguration)
-            .stream()
-            .findFirst()
-            .map { o -> o.getMessageRegex(issue) }
-            .orElse("")
+            .firstOrNull()
+            ?.getMessageRegex(issue)
+            ?: ""
     }
 
     override fun extractIssueKeysFromMessage(
@@ -83,16 +74,16 @@ class CombinedIssueServiceExtension(
             }
     }
 
-    override fun getMessageAnnotator(issueServiceConfiguration: IssueServiceConfiguration): Optional<MessageAnnotator> {
+    override fun getMessageAnnotator(issueServiceConfiguration: IssueServiceConfiguration): MessageAnnotator? {
         // Gets all the defined message annotators
         val messageAnnotators = getConfiguredIssueServices(issueServiceConfiguration)
             .mapNotNull { configuredIssueService ->
                 configuredIssueService.issueServiceExtension.getMessageAnnotator(
                     configuredIssueService.issueServiceConfiguration
-                ).getOrNull()
+                )
             }
         return if (messageAnnotators.isEmpty()) {
-            Optional.empty()
+            null
         } else {
             // For each message annotator, gets the list of annotation
             val messageAnnotator = MessageAnnotator { text ->
@@ -100,15 +91,8 @@ class CombinedIssueServiceExtension(
                     .map { messageAnnotator -> messageAnnotator.annotate(text).toSet() }
                     .fold(emptySet()) { acc, values -> acc + values }
             }
-            Optional.of(messageAnnotator)
+            messageAnnotator
         }
-    }
-
-    override fun getLinkForAllIssues(
-        issueServiceConfiguration: IssueServiceConfiguration,
-        issues: List<Issue>
-    ): String? {
-        return null
     }
 
     override fun getIssue(issueServiceConfiguration: IssueServiceConfiguration, issueKey: String): Issue? {
@@ -120,6 +104,7 @@ class CombinedIssueServiceExtension(
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun exportFormats(issueServiceConfiguration: IssueServiceConfiguration): List<ExportFormat> {
         return getConfiguredIssueServices(issueServiceConfiguration)
             .map { configuredIssueService ->
@@ -161,13 +146,14 @@ class CombinedIssueServiceExtension(
         )
     }
 
-    override fun getIssueId(issueServiceConfiguration: IssueServiceConfiguration, token: String): Optional<String> {
-        return getConfiguredIssueServices(issueServiceConfiguration).firstNotNullOfOrNull { configuredIssueService ->
-            configuredIssueService.issueServiceExtension.getIssueId(
-                configuredIssueService.issueServiceConfiguration,
-                token
-            ).getOrNull()
-        }.asOptional()
+    override fun getIssueId(issueServiceConfiguration: IssueServiceConfiguration, token: String): String? {
+        return getConfiguredIssueServices(issueServiceConfiguration)
+            .firstNotNullOfOrNull { configuredIssueService ->
+                configuredIssueService.issueServiceExtension.getIssueId(
+                    configuredIssueService.issueServiceConfiguration,
+                    token
+                )
+            }
     }
 
     override fun getIssueTypes(

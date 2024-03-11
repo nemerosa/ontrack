@@ -88,6 +88,21 @@ fun Form.selectionOfString(
     )
 
 /**
+ * Multiple strings
+ */
+fun Form.multiStrings(
+    property: KProperty1<*, List<String>?>,
+    value: List<String>?,
+): Form =
+    with(
+        MultiStrings.of(property.name)
+            .label(getPropertyLabel(property))
+            .help(getPropertyDescription(property))
+            .optional(property.returnType.isMarkedNullable)
+            .value(value)
+    )
+
+/**
  * Multiform field
  */
 fun <T> Form.multiform(

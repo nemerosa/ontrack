@@ -22,10 +22,9 @@ import net.nemerosa.ontrack.model.extension.ExtensionFeature
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.MessageAnnotation.Companion.of
 import net.nemerosa.ontrack.model.support.MessageAnnotator
-import net.nemerosa.ontrack.model.support.RegexMessageAnnotator
+import net.nemerosa.ontrack.model.support.LegacyRegexMessageAnnotator
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
-import java.util.*
 import java.util.concurrent.atomic.AtomicLong
 
 @Component
@@ -344,7 +343,7 @@ class MockSCMExtension(
 
         override fun getConfigurationByName(name: String): IssueServiceConfiguration? = null
 
-        override fun validIssueToken(token: String?): Boolean = true // Anything goes
+        private fun validIssueToken(token: String?): Boolean = true // Anything goes
 
         override fun extractIssueKeysFromMessage(
             issueServiceConfiguration: IssueServiceConfiguration,
@@ -354,21 +353,12 @@ class MockSCMExtension(
                 m.groupValues[1]
             }.toSet()
 
-        override fun getMessageAnnotator(issueServiceConfiguration: IssueServiceConfiguration?): Optional<MessageAnnotator> {
-            return Optional.of(
-                RegexMessageAnnotator(issuePattern) { key: String? ->
-                    of("a")
-                        .attr("href", "mock://$name/issue/$key")
-                        .text(key)
-                }
-            )
-        }
-
-        override fun getLinkForAllIssues(
-            issueServiceConfiguration: IssueServiceConfiguration?,
-            issues: MutableList<Issue>?
-        ): String {
-            TODO("Not yet implemented")
+        override fun getMessageAnnotator(issueServiceConfiguration: IssueServiceConfiguration): MessageAnnotator {
+            return LegacyRegexMessageAnnotator(issuePattern) { key: String? ->
+                of("a")
+                    .attr("href", "mock://$name/issue/$key")
+                    .text(key)
+            }
         }
 
         override fun getIssueTypes(
@@ -399,7 +389,7 @@ class MockSCMExtension(
         override fun getIssueId(
             issueServiceConfiguration: IssueServiceConfiguration?,
             token: String?
-        ): Optional<String> {
+        ): String? {
             TODO("Not yet implemented")
         }
 

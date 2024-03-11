@@ -1,10 +1,11 @@
-package net.nemerosa.ontrack.extension.gitlab
+package net.nemerosa.ontrack.extension.github
 
-import net.nemerosa.ontrack.extension.gitlab.client.OntrackGitLabClientFactory
-import net.nemerosa.ontrack.extension.gitlab.model.GitLabIssueServiceConfiguration
-import net.nemerosa.ontrack.extension.gitlab.model.GitLabIssueWrapper
-import net.nemerosa.ontrack.extension.gitlab.property.GitLabGitConfiguration
-import net.nemerosa.ontrack.extension.gitlab.service.GitLabConfigurationService
+import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory
+import net.nemerosa.ontrack.extension.github.model.GitHubIssue
+import net.nemerosa.ontrack.extension.github.model.GitHubLabel
+import net.nemerosa.ontrack.extension.github.property.GitHubGitConfiguration
+import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
+import net.nemerosa.ontrack.extension.github.service.GitHubIssueServiceConfiguration
 import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
@@ -12,52 +13,52 @@ import net.nemerosa.ontrack.extension.issues.support.AbstractIssueServiceExtensi
 import net.nemerosa.ontrack.model.support.MessageAnnotation.Companion.of
 import net.nemerosa.ontrack.model.support.MessageAnnotator
 import net.nemerosa.ontrack.model.support.LegacyRegexMessageAnnotator
-import org.apache.commons.lang3.StringUtils
 import org.springframework.stereotype.Component
+import java.util.*
 import java.util.regex.Pattern
+import java.util.stream.Collectors
 
 @Component
-class GitLabIssueServiceExtension(
-    extensionFeature: GitLabExtensionFeature,
+class GitHubIssueServiceExtension(
+    extensionFeature: GitHubExtensionFeature,
+    private val configurationService: GitHubConfigurationService,
+    private val gitHubClientFactory: OntrackGitHubClientFactory,
     issueExportServiceFactory: IssueExportServiceFactory,
-    private val configurationService: GitLabConfigurationService,
-    private val gitLabClientFactory: OntrackGitLabClientFactory,
 ) : AbstractIssueServiceExtension(
     extensionFeature,
-    GITLAB_SERVICE_ID,
-    "GitLab",
+    GITHUB_SERVICE_ID,
+    "GitHub",
     issueExportServiceFactory,
 ) {
+
     /**
-     * The GitLab configurations are not selectable outside GitLab configurations and this method returns an empty list.
+     * The GitHub configurations are not selectable and this method returns an empty list.
      */
     override fun getConfigurationList(): List<IssueServiceConfiguration> {
         return emptyList()
     }
 
     /**
-     * A GitLab configuration name
+     * A GitHub configuration name
      *
      * @param name Name of the configuration and repository.
      * @return Wrapper for the GitHub issue service.
-     * @see net.nemerosa.ontrack.extension.gitlab.property.GitLabGitConfiguration
+     * @see net.nemerosa.ontrack.extension.github.property.GitHubGitConfiguration
      */
     override fun getConfigurationByName(name: String): IssueServiceConfiguration? {
         // Parsing of the name
-        val tokens = StringUtils.split(name, GitLabGitConfiguration.CONFIGURATION_REPOSITORY_SEPARATOR)
-        check(!(tokens == null || tokens.size != 2)) {
-            "The GitLab issue configuration identifier name is expected using configuration:repository as a format"
-        }
+        val tokens = name.split(GitHubGitConfiguration.CONFIGURATION_REPOSITORY_SEPARATOR)
+        check(tokens.size == 2) { "The GitHub issue configuration identifier name is expected using configuration:repository as a format" }
         val configuration = tokens[0]
         val repository = tokens[1]
-        return GitLabIssueServiceConfiguration(
+        return GitHubIssueServiceConfiguration(
             configurationService.getConfiguration(configuration),
             repository
         )
     }
 
-    private fun validIssueToken(token: String): Boolean {
-        return Pattern.matches(GITLAB_ISSUE_PATTERN, token)
+    fun validIssueToken(token: String?): Boolean {
+        return Pattern.matches(GITHUB_ISSUE_PATTERN, token)
     }
 
     override fun extractIssueKeysFromMessage(
@@ -65,8 +66,8 @@ class GitLabIssueServiceExtension(
         message: String
     ): Set<String> {
         val result: MutableSet<String> = HashSet()
-        if (StringUtils.isNotBlank(message)) {
-            val matcher = Pattern.compile(GITLAB_ISSUE_PATTERN).matcher(message)
+        if (message.isNotBlank()) {
+            val matcher = Pattern.compile(GITHUB_ISSUE_PATTERN).matcher(message)
             while (matcher.find()) {
                 // Gets the issue
                 val issueKey = matcher.group(1)
@@ -79,22 +80,29 @@ class GitLabIssueServiceExtension(
     }
 
     override fun getMessageAnnotator(issueServiceConfiguration: IssueServiceConfiguration): MessageAnnotator {
-        val configuration = issueServiceConfiguration as GitLabIssueServiceConfiguration
+        val configuration = issueServiceConfiguration as GitHubIssueServiceConfiguration
         return LegacyRegexMessageAnnotator(
-            GITLAB_ISSUE_PATTERN
+            GITHUB_ISSUE_PATTERN
         ) { key: String ->
             of("a")
                 .attr(
                     "href",
-                    "${configuration.configuration.url}/${configuration.repository}/issues/${key.substring(1)}"
+                    String.format(
+                        "%s/%s/issues/%s",
+                        configuration.configuration.url,
+                        configuration.repository,
+                        key.substring(1)
+                    )
                 )
                 .text(key)
         }
     }
 
     override fun getIssue(issueServiceConfiguration: IssueServiceConfiguration, issueKey: String): Issue? {
-        val configuration = issueServiceConfiguration as GitLabIssueServiceConfiguration
-        val client = gitLabClientFactory.create(configuration.configuration)
+        val configuration = issueServiceConfiguration as GitHubIssueServiceConfiguration
+        val client = gitHubClientFactory.create(
+            configuration.configuration
+        )
         return client.getIssue(
             configuration.repository,
             getIssueId(issueKey)
@@ -102,7 +110,7 @@ class GitLabIssueServiceExtension(
     }
 
     override fun getIssueId(issueServiceConfiguration: IssueServiceConfiguration, token: String): String? {
-        return if (StringUtils.isNumeric(token) || validIssueToken(token)) {
+        return if (token.toIntOrNull() != null || validIssueToken(token)) {
             getIssueId(token).toString()
         } else {
             null
@@ -117,17 +125,17 @@ class GitLabIssueServiceExtension(
         }
     }
 
-    fun getIssueId(token: String?): Int {
-        return StringUtils.stripStart(token, "#").toInt(10)
+    fun getIssueId(token: String): Int {
+        return token.trimStart('#').toInt(10)
     }
 
     override fun getIssueTypes(issueServiceConfiguration: IssueServiceConfiguration, issue: Issue): Set<String> {
-        val wrapper = issue as GitLabIssueWrapper
-        return HashSet(wrapper.labels)
+        val gitHubIssue = issue as GitHubIssue
+        return gitHubIssue.labels.stream().map(GitHubLabel::name).collect(Collectors.toSet())
     }
 
     companion object {
-        const val GITLAB_SERVICE_ID: String = "gitlab"
-        private const val GITLAB_ISSUE_PATTERN = "#(\\d+)"
+        const val GITHUB_SERVICE_ID: String = "github"
+        const val GITHUB_ISSUE_PATTERN: String = "#(\\d+)"
     }
 }

@@ -37,6 +37,8 @@ class JIRAChangeLogIT : AbstractQLKTITSupport() {
                 url = "https://jira.nemerosa.net",
                 user = null,
                 password = null,
+                include = emptyList(),
+                exclude = emptyList(),
             )
 
             mockJIRAInstance.registerIssue(

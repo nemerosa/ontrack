@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.extension.jira
 
-import net.nemerosa.ontrack.client.ClientNotFoundException
-import net.nemerosa.ontrack.client.JsonClient
+import io.mockk.Runs
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
-import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.jira.client.JIRAClient
-import net.nemerosa.ontrack.extension.jira.client.JIRAClientImpl
 import net.nemerosa.ontrack.extension.jira.model.JIRAIssue
 import net.nemerosa.ontrack.extension.jira.model.JIRALink
 import net.nemerosa.ontrack.extension.jira.model.JIRAStatus
@@ -14,18 +14,10 @@ import net.nemerosa.ontrack.extension.jira.tx.JIRASession
 import net.nemerosa.ontrack.extension.jira.tx.JIRASessionFactory
 import net.nemerosa.ontrack.model.structure.PropertyService
 import net.nemerosa.ontrack.model.support.MessageAnnotationUtils
-import net.nemerosa.ontrack.test.assertPresent
 import net.nemerosa.ontrack.tx.DefaultTransactionService
-import org.junit.Before
-import org.junit.Test
-import org.mockito.Mockito.`when`
-import org.mockito.Mockito.mock
-import java.net.URLEncoder
-import java.util.*
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import kotlin.test.*
 
 class JIRAServiceExtensionTest {
 
@@ -34,28 +26,29 @@ class JIRAServiceExtensionTest {
     private lateinit var session: JIRASession
     private lateinit var service: JIRAServiceExtension
 
-    @Before
+    @BeforeEach
     fun before() {
-        jiraSessionFactory = mock(JIRASessionFactory::class.java)
+        jiraSessionFactory = mockk<JIRASessionFactory>()
         val transactionService = DefaultTransactionService()
-        val jiraConfigurationService = mock(JIRAConfigurationService::class.java)
+        val jiraConfigurationService = mockk<JIRAConfigurationService>()
 
-        client = mock(JIRAClient::class.java)
+        client = mockk<JIRAClient>()
 
-        session = mock(JIRASession::class.java)
-        `when`(session.client).thenReturn(client)
+        session = mockk<JIRASession>()
+        every { session.close() } just Runs
+        every { session.client } returns client
 
-        val issueExportServiceFactory = mock(IssueExportServiceFactory::class.java)
+        val issueExportServiceFactory = mockk<IssueExportServiceFactory>()
 
-        val propertyService = mock(PropertyService::class.java)
+        val propertyService = mockk<PropertyService>()
 
         service = JIRAServiceExtension(
-                JIRAExtensionFeature(),
-                jiraConfigurationService,
-                jiraSessionFactory,
-                transactionService,
-                issueExportServiceFactory,
-                propertyService
+            extensionFeature = JIRAExtensionFeature(),
+            jiraConfigurationService = jiraConfigurationService,
+            jiraSessionFactory = jiraSessionFactory,
+            transactionService = transactionService,
+            issueExportServiceFactory = issueExportServiceFactory,
+            propertyService = propertyService
         )
     }
 
@@ -63,13 +56,8 @@ class JIRAServiceExtensionTest {
     fun issueNotFound() {
         val config = jiraConfiguration()
 
-        val jsonClient = mock(JsonClient::class.java)
-        `when`(jsonClient.get("/rest/api/2/issue/%s?expand=names", "XXX-1")).thenThrow(
-                ClientNotFoundException("XXX-1")
-        )
-        client = JIRAClientImpl(jsonClient)
-        `when`(session.client).thenReturn(client)
-        `when`(jiraSessionFactory.create(config)).thenReturn(session)
+        every { jiraSessionFactory.create(config) } returns session
+        every { client.getIssue("XXX-1", config) } returns null
 
         val issue = service.getIssue(config, "XXX-1")
         assertNull(issue)
@@ -78,31 +66,25 @@ class JIRAServiceExtensionTest {
     @Test
     fun getIssueTypes() {
         val issue = createIssue(1)
-        val types = service.getIssueTypes(null, issue)
+        val types = service.getIssueTypes(jiraConfiguration(), issue)
         assertEquals(
-                setOf("Defect"),
-                types
+            setOf("Defect"),
+            types
         )
-    }
-
-    @Test
-    fun getIssueTypes_for_null() {
-        val types = service.getIssueTypes(null, null)
-        assertTrue(types.isEmpty())
     }
 
     @Test
     fun getMessageAnnotator() {
         val config = jiraConfiguration()
         val annotator = service.getMessageAnnotator(config)
-        assertPresent(annotator) {
+        assertNotNull(annotator) {
             val message = MessageAnnotationUtils.annotate(
-                    "TEST-12, PRJ-12, PRJ-13 List of issues",
-                    listOf(it)
+                "TEST-12, PRJ-12, PRJ-13 List of issues",
+                listOf(it)
             )
             assertEquals(
-                    "<a href=\"http://jira/browse/TEST-12\">TEST-12</a>, <a href=\"http://jira/browse/PRJ-12\">PRJ-12</a>, <a href=\"http://jira/browse/PRJ-13\">PRJ-13</a> List of issues",
-                    message
+                "<a href=\"http://jira/browse/TEST-12\">TEST-12</a>, <a href=\"http://jira/browse/PRJ-12\">PRJ-12</a>, <a href=\"http://jira/browse/PRJ-13\">PRJ-13</a> List of issues",
+                message
             )
         }
     }
@@ -111,64 +93,12 @@ class JIRAServiceExtensionTest {
     fun extractIssueKeysFromMessage() {
         val config = jiraConfiguration()
         val issues = service.extractIssueKeysFromMessage(
-                config,
-                "TEST-12, PRJ-12, PRJ-13 List of issues"
+            config,
+            "TEST-12, PRJ-12, PRJ-13 List of issues"
         )
         assertEquals(
-                setOf("TEST-12", "PRJ-12", "PRJ-13"),
-                issues
-        )
-    }
-
-    @Test(expected = NullPointerException::class)
-    fun getLinkForAllIssues_null_config() {
-        service.getLinkForAllIssues(null, Collections.emptyList())
-    }
-
-    @Test(expected = NullPointerException::class)
-    fun getLinkForAllIssues_null_issues() {
-        service.getLinkForAllIssues(
-                jiraConfiguration(),
-                null)
-    }
-
-    @Test
-    fun getLinkForAllIssues_no_issue() {
-        val link = service.getLinkForAllIssues(
-                jiraConfiguration(),
-                Collections.emptyList()
-        )
-        assertEquals("", link, "The link for no issue is empty")
-    }
-
-    @Test
-    fun getLinkForAllIssues_one_issue() {
-        val issue = mock(Issue::class.java)
-        `when`(issue.key).thenReturn("PRJ-13")
-        val link = service.getLinkForAllIssues(
-                jiraConfiguration(),
-                listOf(issue)
-        )
-        assertEquals("http://jira/browse/PRJ-13", link)
-    }
-
-    @Test
-    fun getLinkForAllIssues_two_issues() {
-        val issue1 = mock(Issue::class.java)
-        `when`(issue1.key).thenReturn("PRJ-13")
-        val issue2 = mock(Issue::class.java)
-        `when`(issue2.key).thenReturn("PRJ-15")
-        val link = service.getLinkForAllIssues(
-                jiraConfiguration(),
-                listOf(issue1, issue2)
-        )
-        assertEquals(
-                "http://jira/secure/IssueNavigator.jspa?reset=true&mode=hide&jqlQuery=${
-                URLEncoder.encode(
-                        "key in (\"PRJ-13\",\"PRJ-15\")",
-                        "UTF-8")
-                }",
-                link
+            setOf("TEST-12", "PRJ-12", "PRJ-13"),
+            issues
         )
     }
 
@@ -176,51 +106,59 @@ class JIRAServiceExtensionTest {
     fun `Following links`() {
         // Configuration to test with
         val config = jiraConfiguration()
-        `when`(jiraSessionFactory.create(config)).thenReturn(session)
+        every { jiraSessionFactory.create(config) } returns session
         // Creating issues
         var issue1 = createIssue(1)
         var issue2 = createIssue(2)
         var issue3 = createIssue(3)
         var issue4 = createIssue(4)
         // Linking issues together
-        issue1 = issue1.withLinks(listOf(
+        issue1 = issue1.withLinks(
+            listOf(
                 createLink(2, "Depends", "depends on"),
                 createLink(3, "Depends", "depends on")
-        ))
-        issue2 = issue2.withLinks(listOf(
+            )
+        )
+        issue2 = issue2.withLinks(
+            listOf(
                 createLink(1, "Depends", "is depended on by"),
                 createLink(4, "Depends", "depends on")
-        ))
-        issue3 = issue3.withLinks(listOf(
+            )
+        )
+        issue3 = issue3.withLinks(
+            listOf(
                 createLink(1, "Depends", "is depended on by")
-        ))
-        issue4 = issue4.withLinks(listOf(
+            )
+        )
+        issue4 = issue4.withLinks(
+            listOf(
                 createLink(2, "Depends", "is depended on by")
-        ))
+            )
+        )
 
         // Client
-        `when`(client.getIssue("TEST-1", config)).thenReturn(issue1)
-        `when`(client.getIssue("TEST-2", config)).thenReturn(issue2)
-        `when`(client.getIssue("TEST-3", config)).thenReturn(issue3)
-        `when`(client.getIssue("TEST-4", config)).thenReturn(issue4)
+        every { client.getIssue("TEST-1", config) } returns issue1
+        every { client.getIssue("TEST-2", config) } returns issue2
+        every { client.getIssue("TEST-3", config) } returns issue3
+        every { client.getIssue("TEST-4", config) } returns issue4
 
         // Links from 1
         var issues = mutableMapOf<String, JIRAIssue>()
         service.followLinks(config, issue1, setOf("Depends"), issues)
         assertEquals(
-                setOf(
-                        "TEST-1", "TEST-2", "TEST-3", "TEST-4"
-                ),
-                issues.values.map { it.key }.toSet()
+            setOf(
+                "TEST-1", "TEST-2", "TEST-3", "TEST-4"
+            ),
+            issues.values.map { it.key }.toSet()
         )
         // Links from 4
         issues = mutableMapOf()
         service.followLinks(config, issue4, setOf("Depends"), issues)
         assertEquals(
-                setOf(
-                        "TEST-1", "TEST-2", "TEST-3", "TEST-4"
-                ),
-                issues.values.map { it.key }.toSet()
+            setOf(
+                "TEST-1", "TEST-2", "TEST-3", "TEST-4"
+            ),
+            issues.values.map { it.key }.toSet()
         )
     }
 
@@ -239,30 +177,37 @@ class JIRAServiceExtensionTest {
     }
 
     private fun createLink(i: Int, name: String, relation: String) =
-            JIRALink(
-                    "TEST-$i",
-                    "...",
-                    JIRAStatus("Open", "..."),
-                    name,
-                    relation
-            )
+        JIRALink(
+            "TEST-$i",
+            "...",
+            JIRAStatus("Open", "..."),
+            name,
+            relation
+        )
 
     private fun createIssue(i: Int) =
-            JIRAIssue(
-                    "http://host/browser/TEST-$i",
-                    "TEST-$i",
-                    "Issue $i",
-                    JIRAStatus("Open", "..."),
-                    "",
-                    Time.now(),
-                    emptyList(),
-                    emptyList(),
-                    emptyList(),
-                    "Defect",
-                    emptyList()
-            )
+        JIRAIssue(
+            "http://host/browser/TEST-$i",
+            "TEST-$i",
+            "Issue $i",
+            JIRAStatus("Open", "..."),
+            "",
+            Time.now(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            "Defect",
+            emptyList()
+        )
 
     private fun jiraConfiguration() =
-            JIRAConfiguration("test", "http://jira", "user", "secret")
+        JIRAConfiguration(
+            name = "test",
+            url = "http://jira",
+            user = "user",
+            password = "secret",
+            include = emptyList(),
+            exclude = emptyList()
+        )
 
 }

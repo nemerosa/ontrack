@@ -18,5 +18,5 @@ class MockJIRASessionFactory(
     private val instance: MockJIRAInstance,
 ) : JIRASessionFactory {
 
-    override fun create(configuration: JIRAConfiguration): JIRASession = MockJIRASession(instance, configuration)
+    override fun create(configuration: JIRAConfiguration): JIRASession = MockJIRASession(instance)
 }

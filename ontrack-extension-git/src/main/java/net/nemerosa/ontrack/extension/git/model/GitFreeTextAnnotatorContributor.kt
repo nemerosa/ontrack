@@ -8,14 +8,13 @@ import org.springframework.stereotype.Component
 
 @Component
 class GitFreeTextAnnotatorContributor(
-        private val gitService: GitService
+    private val gitService: GitService
 ) : FreeTextAnnotatorContributor {
     override fun getMessageAnnotators(entity: ProjectEntity): List<MessageAnnotator> {
         val projectConfiguration: GitConfiguration? = gitService.getProjectConfiguration(entity.project)
         return listOfNotNull(
-                projectConfiguration?.configuredIssueService
-                        ?.messageAnnotator
-                        ?.orElse(null)
+            projectConfiguration?.configuredIssueService
+                ?.messageAnnotator
         )
     }
 }

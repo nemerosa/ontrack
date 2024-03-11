@@ -124,8 +124,8 @@ class GitServiceImpl(
                     // Build/tag sync job
                     if (branchConfiguration.buildTagInterval > 0 && branchConfiguration.buildCommitLink?.link is IndexableBuildGitCommitLink<*>) {
                         jobs.add(
-                                JobRegistration.of(createBuildSyncJob(branch))
-                                        .everyMinutes(branchConfiguration.buildTagInterval.toLong())
+                            JobRegistration.of(createBuildSyncJob(branch))
+                                .everyMinutes(branchConfiguration.buildTagInterval.toLong())
                         )
                     }
                 }
@@ -707,7 +707,7 @@ class GitServiceImpl(
             // Gets the message annotator
             val messageAnnotator = configuredIssueService.messageAnnotator
             // If present annotate the messages
-            messageAnnotator.map { listOf(it) }.orElseGet { emptyList<MessageAnnotator?>() }
+            listOfNotNull(messageAnnotator)
         } else {
             emptyList()
         }

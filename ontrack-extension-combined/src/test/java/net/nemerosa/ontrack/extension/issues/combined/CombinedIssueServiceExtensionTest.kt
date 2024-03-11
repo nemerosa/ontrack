@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.issues.combined
 
 import io.mockk.every
 import io.mockk.mockk
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest
 import net.nemerosa.ontrack.extension.issues.IssueServiceExtension
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
@@ -15,9 +14,7 @@ import net.nemerosa.ontrack.model.support.MessageAnnotation
 import net.nemerosa.ontrack.model.support.MessageAnnotator
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.*
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
@@ -35,14 +32,14 @@ class CombinedIssueServiceExtensionTest {
         val issueServiceRegistry = mockk<IssueServiceRegistry>()
         val configurationService = mockk<CombinedIssueServiceConfigurationService>()
         service = CombinedIssueServiceExtension(
-                CombinedIssueServiceExtensionFeature(),
-                issueServiceRegistry,
-                configurationService
+            CombinedIssueServiceExtensionFeature(),
+            issueServiceRegistry,
+            configurationService
         )
 
         configuration = CombinedIssueServiceConfiguration(
-                "test",
-                listOf("type1:test", "type2:test")
+            "test",
+            listOf("type1:test", "type2:test")
         )
 
         type1IssueService = mockk<IssueServiceExtension>()
@@ -55,16 +52,16 @@ class CombinedIssueServiceExtensionTest {
             issueServiceRegistry.getConfiguredIssueService("type1:test")
         } returns
                 ConfiguredIssueService(
-                        type1IssueService,
-                        testConfiguration
+                    type1IssueService,
+                    testConfiguration
                 )
 
         every {
             issueServiceRegistry.getConfiguredIssueService("type2:test")
         } returns
                 ConfiguredIssueService(
-                        type2IssueService,
-                        testConfiguration
+                    type2IssueService,
+                    testConfiguration
                 )
     }
 
@@ -84,15 +81,15 @@ class CombinedIssueServiceExtensionTest {
 
         val keys = service.extractIssueKeysFromMessage(configuration, message)
         assertEquals(
-                setOf("ONTRACK-1", "1"),
-                keys
+            setOf("ONTRACK-1", "1"),
+            keys
         )
     }
 
     @Test
     fun `No issue found`() {
-        every { type1IssueService.getIssue(testConfiguration, "1")} returns null
-        every { type2IssueService.getIssue(testConfiguration, "1")} returns null
+        every { type1IssueService.getIssue(testConfiguration, "1") } returns null
+        every { type2IssueService.getIssue(testConfiguration, "1") } returns null
         assertNull(service.getIssue(configuration, "1"))
     }
 
@@ -102,13 +99,13 @@ class CombinedIssueServiceExtensionTest {
         every {
             type1IssueService.getIssue(testConfiguration, "1")
         } returns issue1
-        every { type2IssueService.getIssue(testConfiguration, "1")} returns null
+        every { type2IssueService.getIssue(testConfiguration, "1") } returns null
         assertEquals(issue1, service.getIssue(configuration, "1"))
     }
 
     @Test
     fun `One issue found - 2`() {
-        every { type1IssueService.getIssue(testConfiguration, "1")} returns null
+        every { type1IssueService.getIssue(testConfiguration, "1") } returns null
         val issue2 = mockk<Issue>()
         every {
             type2IssueService.getIssue(testConfiguration, "1")
@@ -133,55 +130,55 @@ class CombinedIssueServiceExtensionTest {
     fun `Getting the issue ID - not valid for both`() {
         every {
             type1IssueService.getIssueId(testConfiguration, "X")
-        } returns Optional.empty()
+        } returns null
         every {
             type2IssueService.getIssueId(testConfiguration, "X")
-        } returns Optional.empty()
-        assertFalse(service.getIssueId(configuration, "X").isPresent)
+        } returns null
+        assertNull(service.getIssueId(configuration, "X"))
     }
 
     @Test
     fun `Getting the issue ID - valid for first`() {
         every {
             type1IssueService.getIssueId(testConfiguration, "#1")
-        } returns Optional.of("1")
+        } returns "1"
         every {
             type2IssueService.getIssueId(testConfiguration, "#1")
-        } returns Optional.empty()
-        assertEquals("1", service.getIssueId(configuration, "#1").get())
+        } returns null
+        assertEquals("1", service.getIssueId(configuration, "#1"))
     }
 
     @Test
     fun `Getting the issue ID - valid for second`() {
         every {
             type1IssueService.getIssueId(testConfiguration, "#1")
-        } returns Optional.empty()
+        } returns null
         every {
             type2IssueService.getIssueId(testConfiguration, "#1")
-        } returns Optional.of("1")
-        assertEquals("1", service.getIssueId(configuration, "#1").get())
+        } returns "1"
+        assertEquals("1", service.getIssueId(configuration, "#1"))
     }
 
     @Test
     fun `Getting the issue ID - valid for both - takes the first`() {
         every {
             type1IssueService.getIssueId(testConfiguration, "#1")
-        } returns Optional.of("11")
+        } returns "11"
         every {
             type2IssueService.getIssueId(testConfiguration, "#1")
-        } returns Optional.of("12")
-        assertEquals("11", service.getIssueId(configuration, "#1").get())
+        } returns "12"
+        assertEquals("11", service.getIssueId(configuration, "#1"))
     }
 
     @Test
     fun `Message annotator - none returned`() {
         every {
             type1IssueService.getMessageAnnotator(testConfiguration)
-        } returns Optional.empty()
+        } returns null
         every {
             type2IssueService.getMessageAnnotator(testConfiguration)
-        } returns Optional.empty()
-        assertFalse(service.getMessageAnnotator(configuration).isPresent)
+        } returns null
+        assertNull(service.getMessageAnnotator(configuration))
     }
 
     @Test
@@ -196,16 +193,16 @@ class CombinedIssueServiceExtensionTest {
 
         every {
             type1IssueService.getMessageAnnotator(testConfiguration)
-        } returns Optional.of(messageAnnotator1)
+        } returns messageAnnotator1
         every {
             type2IssueService.getMessageAnnotator(testConfiguration)
-        } returns Optional.empty()
+        } returns null
 
-        val messageAnnotator = service.getMessageAnnotator(configuration).getOrNull()
+        val messageAnnotator = service.getMessageAnnotator(configuration)
         assertNotNull(messageAnnotator) {
             assertEquals(
-                    setOf(annotation1),
-                    it.annotate(text)
+                setOf(annotation1),
+                it.annotate(text)
             )
         }
     }
@@ -223,16 +220,16 @@ class CombinedIssueServiceExtensionTest {
 
         every {
             type1IssueService.getMessageAnnotator(testConfiguration)
-        } returns Optional.empty()
+        } returns null
         every {
             type2IssueService.getMessageAnnotator(testConfiguration)
-        } returns Optional.of(messageAnnotator2)
+        } returns messageAnnotator2
 
-        val messageAnnotator = service.getMessageAnnotator(configuration).getOrNull()
+        val messageAnnotator = service.getMessageAnnotator(configuration)
         assertNotNull(messageAnnotator) {
             assertEquals(
-                    setOf(annotation21, annotation22),
-                    it.annotate(text)
+                setOf(annotation21, annotation22),
+                it.annotate(text)
             )
         }
     }
@@ -256,16 +253,16 @@ class CombinedIssueServiceExtensionTest {
 
         every {
             type1IssueService.getMessageAnnotator(testConfiguration)
-        } returns Optional.of(messageAnnotator1)
+        } returns messageAnnotator1
         every {
             type2IssueService.getMessageAnnotator(testConfiguration)
-        } returns Optional.of(messageAnnotator2)
+        } returns messageAnnotator2
 
-        val messageAnnotator = service.getMessageAnnotator(configuration).getOrNull()
+        val messageAnnotator = service.getMessageAnnotator(configuration)
         assertNotNull(messageAnnotator) {
             assertEquals(
-                    setOf(annotation1, annotation21, annotation22),
-                    it.annotate(text)
+                setOf(annotation1, annotation21, annotation22),
+                it.annotate(text)
             )
         }
     }
@@ -283,8 +280,8 @@ class CombinedIssueServiceExtensionTest {
         val formats = service.exportFormats(configuration).toSet()
 
         assertEquals(
-                setOf(ExportFormat.HTML, ExportFormat.MARKDOWN, ExportFormat.TEXT),
-                formats
+            setOf(ExportFormat.HTML, ExportFormat.MARKDOWN, ExportFormat.TEXT),
+            formats
         )
     }
 
@@ -323,14 +320,16 @@ class CombinedIssueServiceExtensionTest {
 
         every {
             type1IssueService.exportIssues(testConfiguration, issues, exportRequest)
-        } returns ExportedIssues("text", """
+        } returns ExportedIssues(
+            "text", """
             #1 Issue 1
             """.trimIndent()
         )
 
         every {
             type2IssueService.exportIssues(testConfiguration, issues, exportRequest)
-        } returns ExportedIssues("text", """
+        } returns ExportedIssues(
+            "text", """
             PRJ-2 Issue 2
             """.trimIndent()
         )
@@ -338,11 +337,12 @@ class CombinedIssueServiceExtensionTest {
         val export = service.exportIssues(configuration, issues, exportRequest)
 
         assertEquals("text", export.format)
-        assertEquals("""
+        assertEquals(
+            """
                 #1 Issue 1
                 PRJ-2 Issue 2
                 """.trimIndent(),
-                export.content
+            export.content
         )
 
 

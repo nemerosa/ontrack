@@ -21,13 +21,12 @@ public class ConfiguredIssueService {
     private final IssueServiceConfiguration issueServiceConfiguration;
 
     public String formatIssuesInMessage(String message) {
-        return issueServiceExtension.getMessageAnnotator(issueServiceConfiguration)
-                .map(annotator -> MessageAnnotationUtils.annotate(message, Collections.singletonList(annotator)))
-                .orElse("");
-    }
-
-    public String getLinkForAllIssues(List<Issue> issues) {
-        return issueServiceExtension.getLinkForAllIssues(issueServiceConfiguration, issues);
+        MessageAnnotator messageAnnotator = issueServiceExtension.getMessageAnnotator(issueServiceConfiguration);
+        if (messageAnnotator != null) {
+            return MessageAnnotationUtils.annotate(message, Collections.singletonList(messageAnnotator));
+        } else {
+            return "";
+        }
     }
 
     @Nullable
@@ -42,7 +41,7 @@ public class ConfiguredIssueService {
         );
     }
 
-    public Optional<MessageAnnotator> getMessageAnnotator() {
+    public MessageAnnotator getMessageAnnotator() {
         return issueServiceExtension.getMessageAnnotator(issueServiceConfiguration);
     }
 
@@ -50,21 +49,18 @@ public class ConfiguredIssueService {
         return issueServiceExtension.extractIssueKeysFromMessage(issueServiceConfiguration, message);
     }
 
-    public Optional<String> getIssueId(String token) {
+    public @Nullable String getIssueId(@NotNull String token) {
         return issueServiceExtension.getIssueId(issueServiceConfiguration, token);
     }
 
     /**
      * Given an issue key, returns its display form.
+     *
      * @param key Key ID
      * @return Display key
      */
     public String getDisplayKey(String key) {
         return issueServiceExtension.getDisplayKey(issueServiceConfiguration, key);
-    }
-
-    public Collection<? extends Issue> getLinkedIssues(Project project, Issue issue) {
-        return issueServiceExtension.getLinkedIssues(project, issueServiceConfiguration, issue);
     }
 
     @NotNull

@@ -38,7 +38,7 @@ class GQLTypeSCMDecoratedCommit(
                         val (project, commit) = env.getSource<SCMDecoratedCommit>()
                         val scm = scmDetector.getSCM(project)
                         if (scm != null && scm is SCMChangeLogEnabled) {
-                            val annotator = scm.getConfiguredIssueService()?.messageAnnotator?.getOrNull()
+                            val annotator = scm.getConfiguredIssueService()?.messageAnnotator
                             if (annotator != null) {
                                 MessageAnnotationUtils.annotate(commit.message, listOf(annotator))
                             } else {

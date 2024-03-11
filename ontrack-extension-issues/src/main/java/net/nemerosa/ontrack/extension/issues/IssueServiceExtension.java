@@ -6,12 +6,12 @@ import net.nemerosa.ontrack.extension.issues.export.ExportedIssues;
 import net.nemerosa.ontrack.extension.issues.model.Issue;
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.model.extension.Extension;
-import net.nemerosa.ontrack.model.structure.Project;
 import net.nemerosa.ontrack.model.support.MessageAnnotator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Defines a generic service used to access issues from a ticketing system like
@@ -45,14 +45,6 @@ public interface IssueServiceExtension extends Extension {
     @Nullable IssueServiceConfiguration getConfigurationByName(@NotNull String name);
 
     /**
-     * Checks if a token may represent a valid issue token.
-     *
-     * @param token Token to test
-     * @return <code>true</code> if the token may represent an issue
-     */
-    boolean validIssueToken(String token);
-
-    /**
      * Given a message, extracts the issue keys from the message
      *
      * @param issueServiceConfiguration Configuration for the service
@@ -65,17 +57,7 @@ public interface IssueServiceExtension extends Extension {
      * Returns a message annotator that can be used to extract information from a commit message. According
      * to the service type and its configuration, they could be or not a possible annotator.
      */
-    Optional<MessageAnnotator> getMessageAnnotator(IssueServiceConfiguration issueServiceConfiguration);
-
-    /**
-     * Given a list of issues, returns a link that allows the user to display the list of
-     * all those issues in a browser.
-     *
-     * @param issueServiceConfiguration Configuration for the service
-     * @param issues                    List of issues to display. Can be empty, but not <code>null</code>.
-     * @return Link
-     */
-    String getLinkForAllIssues(IssueServiceConfiguration issueServiceConfiguration, List<Issue> issues);
+    @Nullable MessageAnnotator getMessageAnnotator(@NotNull IssueServiceConfiguration issueServiceConfiguration);
 
     /**
      * Given a key, tries to find the issue with this key.
@@ -115,24 +97,10 @@ public interface IssueServiceExtension extends Extension {
      *
      * @param issueServiceConfiguration Configuration for the service
      * @param token                     Token to transform into a key
-     * @return Valid token or {@link java.util.Optional#empty()}.
+     * @return Valid token or null.
      */
-    Optional<String> getIssueId(IssueServiceConfiguration issueServiceConfiguration, String token);
-
-    /**
-     * Gets the list of linked issues that can be used to look for issues references (commits, revisions...)
-     * accross severak branches.
-     * <p>
-     * By default, returns a collection that contains only {@code issue}.
-     *
-     * @param project                   Project to use for any additional configuration
-     * @param issueServiceConfiguration Configuration for the service
-     * @param issue                     Root or seeding issue
-     * @return List of issues linked to {@code issue}. It must include the initial {@code issue}.
-     */
-    default Collection<? extends Issue> getLinkedIssues(Project project, IssueServiceConfiguration issueServiceConfiguration, Issue issue) {
-        return Collections.singleton(issue);
-    }
+    @Nullable
+    String getIssueId(IssueServiceConfiguration issueServiceConfiguration, String token);
 
     /**
      * Creates a regular expression to use when looking for this issue in a message.
@@ -157,5 +125,5 @@ public interface IssueServiceExtension extends Extension {
         return key;
     }
 
-    Set<String> getIssueTypes(IssueServiceConfiguration issueServiceConfiguration, Issue issue);
+    @NotNull Set<String> getIssueTypes(@NotNull IssueServiceConfiguration issueServiceConfiguration, @NotNull Issue issue);
 }

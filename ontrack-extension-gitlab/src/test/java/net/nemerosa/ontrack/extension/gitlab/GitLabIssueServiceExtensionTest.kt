@@ -35,32 +35,32 @@ class GitLabIssueServiceExtensionTest {
         gitHubClientFactory = mock(OntrackGitLabClientFactory::class.java)
         val issueExportServiceFactory = mock(IssueExportServiceFactory::class.java)
         extension = GitLabIssueServiceExtension(
-                GitLabExtensionFeature(GitExtensionFeature(SCMExtensionFeature(), StaleExtensionFeature())),
-                issueExportServiceFactory,
-                configurationService,
-                gitHubClientFactory
+            GitLabExtensionFeature(GitExtensionFeature(SCMExtensionFeature(), StaleExtensionFeature())),
+            issueExportServiceFactory,
+            configurationService,
+            gitHubClientFactory
         )
         engineConfiguration = GitLabConfiguration(
-                "test",
-                "url",
-                "",
-                "",
-                false
+            "test",
+            "url",
+            "",
+            "",
+            false
         )
         configuration = GitLabIssueServiceConfiguration(
-                engineConfiguration,
-                "nemerosa/ontrack"
+            engineConfiguration,
+            "nemerosa/ontrack"
         )
         issueWrapper = GitLabIssueWrapper(
-                GitLabIssue().apply {
-                    id = 1
-                    webUrl = "url/1"
-                    title = "Issue 1"
-                    state = Constants.IssueState.OPENED
-                    updatedAt = Date()
-                    labels = emptyList()
-                },
-                "url/xxx"
+            GitLabIssue().apply {
+                id = 1
+                webUrl = "url/1"
+                title = "Issue 1"
+                state = Constants.IssueState.OPENED
+                updatedAt = Date()
+                labels = emptyList()
+            },
+            "url/xxx"
         )
     }
 
@@ -72,7 +72,7 @@ class GitLabIssueServiceExtensionTest {
     @Test
     fun get_configuration_by_name() {
         `when`(configurationService.getConfiguration("test")).thenReturn(
-                engineConfiguration
+            engineConfiguration
         )
         val configuration = extension.getConfigurationByName("test:nemerosa/ontrack")
         assertNotNull(configuration) {
@@ -90,7 +90,7 @@ class GitLabIssueServiceExtensionTest {
 
     @Test
     fun message_annotator() {
-        val messageAnnotator = extension.getMessageAnnotator(configuration).orElse(null)
+        val messageAnnotator = extension.getMessageAnnotator(configuration)
         assertNotNull(messageAnnotator)
         val messageAnnotations = messageAnnotator.annotate("Message for #12")
         assertEquals(2, messageAnnotations.size.toLong())
@@ -106,17 +106,10 @@ class GitLabIssueServiceExtensionTest {
             assertEquals("a", annotation.type)
             assertEquals("#12", annotation.text)
             assertEquals(
-                    Collections.singletonMap("href", "url/nemerosa/ontrack/issues/12"),
-                    annotation.attributes
+                Collections.singletonMap("href", "url/nemerosa/ontrack/issues/12"),
+                annotation.attributes
             )
         }
-    }
-
-    @Test
-    fun no_link_for_all_issues() {
-        val issue = mock(Issue::class.java)
-        val link = extension.getLinkForAllIssues(configuration, listOf(issue))
-        assertNull(link)
     }
 
     @Test
@@ -138,7 +131,7 @@ class GitLabIssueServiceExtensionTest {
         assertNull(get_issue_test("18", 0))
     }
 
-    protected fun get_issue_test(token: String, id: Int): Issue? {
+    private fun get_issue_test(token: String, id: Int): Issue? {
         val client = mock(OntrackGitLabClient::class.java)
         `when`(client.getIssue(configuration.repository, id)).thenReturn(issueWrapper)
         `when`(gitHubClientFactory.create(configuration.configuration)).thenReturn(client)
@@ -148,11 +141,11 @@ class GitLabIssueServiceExtensionTest {
     @Test
     fun issueServiceIdentifierContainsBothConfigurationAndRepository() {
         `when`(configurationService.getConfiguration("Test")).thenReturn(
-                GitLabConfiguration(
-                        "Test",
-                        "https://gitlab.test.com", null, null,
-                        false
-                )
+            GitLabConfiguration(
+                "Test",
+                "https://gitlab.test.com", null, null,
+                false
+            )
         )
         val configuration = extension.getConfigurationByName("Test:nemerosa/ontrack")
         assertNotNull(configuration) {
@@ -169,21 +162,19 @@ class GitLabIssueServiceExtensionTest {
     @Test
     fun getIssueId_full() {
         val o = extension.getIssueId(configuration, "#12")
-        assertTrue(o.isPresent)
-        assertEquals("12", o.orElse(null))
+        assertEquals("12", o)
     }
 
     @Test
     fun getIssueId_numeric() {
         val o = extension.getIssueId(configuration, "12")
-        assertTrue(o.isPresent)
-        assertEquals("12", o.orElse(null))
+        assertEquals("12", o)
     }
 
     @Test
     fun getIssueId_not_valid() {
         val o = extension.getIssueId(configuration, "mm")
-        assertFalse(o.isPresent)
+        assertNull(o)
     }
 
     @Test
@@ -196,8 +187,8 @@ class GitLabIssueServiceExtensionTest {
     fun extractIssueKeysFromMessage_one() {
         val keys = extension.extractIssueKeysFromMessage(configuration, "#12 One GitHub issue")
         assertEquals(
-                setOf("12"),
-                keys
+            setOf("12"),
+            keys
         )
     }
 
@@ -205,8 +196,8 @@ class GitLabIssueServiceExtensionTest {
     fun extractIssueKeysFromMessage_two() {
         val keys = extension.extractIssueKeysFromMessage(configuration, "#12 Two GitHub #45 issue")
         assertEquals(
-                setOf("12", "45"),
-                keys
+            setOf("12", "45"),
+            keys
         )
     }
 
