@@ -136,6 +136,7 @@ export default function AutoVersioningAuditView() {
                                     uuid
                                     sourceProject
                                     branch {
+                                        id
                                         name
                                         project {
                                             id
