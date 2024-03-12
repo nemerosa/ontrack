@@ -494,6 +494,55 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
         }
     }
 
+    @Test
+    fun `Looping over all qualifiers with fallback to default qualifier in a recursive change log`() {
+        prepareTest { _, _, (one, two, three, four), repositoryName ->
+            project {
+                branch {
+                    val pl = promotionLevel()
+                    val parentFrom = build {
+                        promote(pl)
+                    }
+                    val parentTo = build()
+
+                    // Default links (no change log)
+                    parentFrom.linkTo(one, "")
+                    parentTo.linkTo(one, "")
+
+                    // Qualified link with change log with fallback to default
+                    // parentFrom.linkTo(one, "module-1") No previous link
+                    parentTo.linkTo(two, "module-1")
+
+                    // Change log anchor
+                    val run = parentTo.promote(pl)
+                    val event = eventFactory.newPromotionRun(run)
+
+                    // Template
+                    val template = """
+                        ${'$'}{promotionRun.changelog?title=true&dependencies=${one.project.name}&allQualifiers=true&defaultQualifierFallback=true}
+                    """.trimIndent()
+
+                    // Rendering
+                    val text = eventTemplatingService.render(
+                        template = template,
+                        event = event,
+                        renderer = PlainEventRenderer.INSTANCE
+                    )
+
+                    // Checking the change log
+                    assertEquals(
+                        """
+                            Change log for ${one.project.name} [module-1] from ${one.name} to ${two.name}
+                            
+                            * ISS-21 Some new feature
+                        """.trimIndent(),
+                        text,
+                    )
+                }
+            }
+        }
+    }
+
     private fun doTestAcrossBranches(
         template: String,
         expectedText: String,

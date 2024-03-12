@@ -11,4 +11,6 @@ data class PromotionRunChangeLogTemplatingSourceConfig(
     val title: Boolean = false,
     @APIDescription("Loop over all qualifiers for the last level of `dependencies`, including the default one. Qualifiers at `dependencies` take precedence.")
     val allQualifiers: Boolean = false,
+    @APIDescription("If a qualifier has no previous link, uses the default qualifier (empty) qualifier.")
+    val defaultQualifierFallback: Boolean = false,
 )

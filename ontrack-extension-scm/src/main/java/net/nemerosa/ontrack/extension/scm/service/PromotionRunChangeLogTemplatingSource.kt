@@ -61,6 +61,10 @@ class PromotionRunChangeLogTemplatingSource(
                 PromotionRunChangeLogTemplatingSourceConfig::allQualifiers.name,
                 false
             )
+            val defaultQualifierFallback = configMap.getBooleanTemplatingParam(
+                PromotionRunChangeLogTemplatingSourceConfig::defaultQualifierFallback.name,
+                false
+            )
 
             // First boundary is the build being promoted
             val toBuild = entity.build
@@ -77,10 +81,10 @@ class PromotionRunChangeLogTemplatingSource(
             // We now have two boundaries
             else {
                 if (allQualifiers && dependencies.isNotEmpty()) {
-                    renderAllQualifiers(fromBuild, toBuild, dependencies, renderer, empty, title)
+                    renderAllQualifiers(fromBuild, toBuild, dependencies, defaultQualifierFallback, renderer, empty, title)
                 } else {
                     // Single change log
-                    renderChangeLog(fromBuild, toBuild, dependencies, renderer, empty, title)
+                    renderChangeLog(fromBuild, toBuild, dependencies, defaultQualifierFallback, renderer, empty, title)
                 }
             }
         } else {
@@ -92,6 +96,7 @@ class PromotionRunChangeLogTemplatingSource(
         fromBuild: Build,
         toBuild: Build,
         dependencies: List<String>,
+        defaultQualifierFallback: Boolean,
         renderer: EventRenderer,
         empty: String,
         title: Boolean,
@@ -105,6 +110,7 @@ class PromotionRunChangeLogTemplatingSource(
                 from = fromBuild,
                 to = toBuild,
                 dependencies = firstDependencies,
+                defaultQualifierFallback = defaultQualifierFallback,
             )
         } ?: return ""
 
@@ -123,7 +129,8 @@ class PromotionRunChangeLogTemplatingSource(
                             project = lastDependencyProject,
                             qualifier = qualifier,
                         )
-                    )
+                    ),
+                    defaultQualifierFallback = defaultQualifierFallback,
                 )
             }
         }
@@ -171,6 +178,7 @@ class PromotionRunChangeLogTemplatingSource(
         fromBuild: Build,
         toBuild: Build,
         dependencies: List<String>,
+        defaultQualifierFallback: Boolean,
         renderer: EventRenderer,
         empty: String,
         title: Boolean
@@ -181,6 +189,7 @@ class PromotionRunChangeLogTemplatingSource(
                 fromBuild,
                 toBuild,
                 dependencies.map { DependencyLink.parse(it) },
+                defaultQualifierFallback,
             )
         }
         return renderChangeLog(changeLog, renderer, empty, title)

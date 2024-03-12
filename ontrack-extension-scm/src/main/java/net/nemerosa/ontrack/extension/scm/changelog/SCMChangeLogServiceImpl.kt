@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.scm.service.SCMDetector
 import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.BuildLink
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Service
 
@@ -13,10 +14,34 @@ class SCMChangeLogServiceImpl(
     private val structureService: StructureService,
 ) : SCMChangeLogService {
 
+    private fun getQualifiedBuild(
+        build: Build,
+        dependencyProject: String,
+        dependencyQualifier: String,
+    ): Build? =
+        structureService.getQualifiedBuildsUsedBy(build, size = 1) {
+            it.build.branch.project.name == dependencyProject &&
+                    it.qualifier == dependencyQualifier
+        }.pageItems.firstOrNull()?.build
+
+    private fun getQualifiedBuild(
+        build: Build,
+        dependencyProject: String,
+        dependencyQualifier: String,
+        defaultQualifierFallback: Boolean,
+    ): Build? =
+        getQualifiedBuild(build, dependencyProject, dependencyQualifier)
+            ?: if (defaultQualifierFallback && dependencyQualifier != BuildLink.DEFAULT) {
+                getQualifiedBuild(build, dependencyProject, BuildLink.DEFAULT)
+            } else {
+                null
+            }
+
     override suspend fun getChangeLogBoundaries(
         from: Build,
         to: Build,
-        dependencies: List<DependencyLink>
+        dependencies: List<DependencyLink>,
+        defaultQualifierFallback: Boolean,
     ): Pair<Build, Build>? {
         if (from.project.id() != to.project.id()) {
             throw SCMChangeLogNotSameProjectException()
@@ -27,14 +52,8 @@ class SCMChangeLogServiceImpl(
             val restProjects = dependencies.drop(1)
 
             // Gets the link to the dependency
-            val linkedFrom = structureService.getQualifiedBuildsUsedBy(from, size = 1) {
-                it.build.branch.project.name == project.project &&
-                        it.qualifier == project.qualifier
-            }.pageItems.firstOrNull()?.build
-            val linkedTo = structureService.getQualifiedBuildsUsedBy(to, size = 1) {
-                it.build.branch.project.name == project.project &&
-                        it.qualifier == project.qualifier
-            }.pageItems.firstOrNull()?.build
+            val linkedFrom = getQualifiedBuild(from, project.project, project.qualifier, defaultQualifierFallback)
+            val linkedTo = getQualifiedBuild(to, project.project, project.qualifier, defaultQualifierFallback)
 
             // If one of the links is absent, giving up
             if (linkedFrom == null || linkedTo == null) {
@@ -45,8 +64,13 @@ class SCMChangeLogServiceImpl(
         }
     }
 
-    override suspend fun getChangeLog(from: Build, to: Build, dependencies: List<DependencyLink>): SCMChangeLog? {
-        val boundaries = getChangeLogBoundaries(from, to, dependencies)
+    override suspend fun getChangeLog(
+        from: Build,
+        to: Build,
+        dependencies: List<DependencyLink>,
+        defaultQualifierFallback: Boolean,
+    ): SCMChangeLog? {
+        val boundaries = getChangeLogBoundaries(from, to, dependencies, defaultQualifierFallback)
         return boundaries?.let { (f, t) ->
             computeChangeLog(f, t)
         }
