@@ -46,6 +46,11 @@ class GitHubConfigurationServiceImpl(
     override fun getConfigExtraData(config: GitHubEngineConfiguration): Any? {
         val client = gitHubClientFactory.create(config)
         val extra = mutableMapOf<String, Any?>()
+
+        // The authentication type is cancelled by the obfuscation
+        // so we need to record it differently.
+        extra[GitHubEngineConfiguration::authenticationType.name] = config.authenticationType
+
         extra["rateLimit"] = client.getRateLimit()
         if (config.authenticationType == GitHubAuthenticationType.APP) {
             extra["appToken"] = gitHubAppTokenService.getAppInstallationTokenInformation(config)

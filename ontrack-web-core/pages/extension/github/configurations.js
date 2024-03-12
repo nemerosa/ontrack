@@ -22,7 +22,7 @@ export default function GitHubConfigurationsPage() {
         {
             title: "Authentication",
             key: "authentication",
-            render: (_, config) => <GitHubConfigAuthenticationType authenticationType={config.authenticationType}/>
+            render: (_, config) => <GitHubConfigAuthenticationType authenticationType={config.extra?.authenticationType}/>
         },
         {
             title: "Rate limits",
