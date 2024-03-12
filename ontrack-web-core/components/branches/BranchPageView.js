@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import {CloseCommand, Command, LegacyLinkCommand} from "@components/common/Commands";
-import {branchLegacyUri, branchUri, projectUri} from "@components/common/Links";
+import {branchLegacyUri, branchLinksUri, branchUri, projectUri} from "@components/common/Links";
 import Head from "next/head";
 import {branchTitle} from "@components/common/Titles";
 import MainPage from "@components/layouts/MainPage";
@@ -13,7 +13,7 @@ import {getBranchViews} from "@components/branches/views/branchViews";
 import {usePreferences} from "@components/providers/PreferencesProvider";
 import {useRouter} from "next/router";
 import JumpToBranch from "@components/branches/JumpToBranch";
-import {FaLink} from "react-icons/fa";
+import {FaProjectDiagram} from "react-icons/fa";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gqlGetBranch} from "@components/services/branches";
 import UserMenuActions from "@components/entities/UserMenuActions";
@@ -88,8 +88,8 @@ export default function BranchPageView({id}) {
                     <JumpToBranch key="branch" projectName={branch.project.name}/>,
                     <Command
                         key="links"
-                        icon={<FaLink/>}
-                        href={`${branchUri(branch)}/links`}
+                        icon={<FaProjectDiagram/>}
+                        href={branchLinksUri(branch)}
                         text="Links"
                         title="Displays downstream and upstream dependencies"
                     />,

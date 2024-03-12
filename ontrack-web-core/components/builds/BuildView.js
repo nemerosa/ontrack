@@ -5,8 +5,8 @@ import {buildBreadcrumbs} from "@components/common/Breadcrumbs";
 import LoadingContainer from "@components/common/LoadingContainer";
 import {useEffect, useState} from "react";
 import {gql} from "graphql-request";
-import {CloseCommand, LegacyLinkCommand} from "@components/common/Commands";
-import {branchUri, buildLegacyUri} from "@components/common/Links";
+import {CloseCommand, Command, LegacyLinkCommand} from "@components/common/Commands";
+import {branchUri, buildLegacyUri, buildLinksUri} from "@components/common/Links";
 import {gqlDecorationFragment, gqlInformationFragment, gqlPropertiesFragment} from "@components/services/fragments";
 import BuildContent from "@components/builds/BuildContent";
 import {Space} from "antd";
@@ -15,6 +15,7 @@ import BuildInfoViewDrawer from "@components/builds/BuildInfoViewDrawer";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import StoredGridLayoutResetCommand from "@components/grid/StoredGridLayoutResetCommand";
 import StoredGridLayoutContextProvider from "@components/grid/StoredGridLayoutContext";
+import {FaProjectDiagram} from "react-icons/fa";
 
 export default function BuildView({id}) {
 
@@ -70,6 +71,13 @@ export default function BuildView({id}) {
                 setLoadingBuild(false)
                 setCommands([
                     <StoredGridLayoutResetCommand key="reset"/>,
+                    <Command
+                        key="links"
+                        icon={<FaProjectDiagram/>}
+                        href={buildLinksUri(data.build)}
+                        text="Links"
+                        title="Displays downstream and upstream dependencies"
+                    />,
                     <LegacyLinkCommand
                         key="legacy"
                         href={buildLegacyUri(data.build)}
