@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.extension.jira.client
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.client.ClientForbiddenException
-import net.nemerosa.ontrack.client.ClientNotFoundException
 import net.nemerosa.ontrack.extension.jira.JIRAConfiguration
 import net.nemerosa.ontrack.extension.jira.model.*
 import net.nemerosa.ontrack.json.getRequiredTextField
 import org.apache.commons.lang3.StringUtils
+import org.springframework.web.client.HttpClientErrorException.Forbidden
+import org.springframework.web.client.HttpClientErrorException.NotFound
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.getForObject
 import java.time.LocalDateTime
@@ -38,11 +38,11 @@ class JIRAClientImpl(
         try {
             val node = restTemplate.getForObject<JsonNode>("/rest/api/2/issue/$key?expand=names")
             return toIssue(configuration, node)
-        } catch (ex: ClientForbiddenException) {
+        } catch (ex: Forbidden) {
             // The issue cannot be accessed
             // For the moment, ignoring silently
             return null
-        } catch (ex: ClientNotFoundException) {
+        } catch (ex: NotFound) {
             return null
         }
 

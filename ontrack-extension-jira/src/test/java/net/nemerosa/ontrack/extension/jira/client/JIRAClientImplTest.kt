@@ -1,14 +1,24 @@
 package net.nemerosa.ontrack.extension.jira.client
 
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.mockk.every
+import io.mockk.mockk
 import net.nemerosa.ontrack.extension.jira.JIRAConfiguration
+import net.nemerosa.ontrack.extension.jira.JIRAFixtures
 import net.nemerosa.ontrack.extension.jira.model.JIRALink
 import net.nemerosa.ontrack.extension.jira.model.JIRAStatus
 import net.nemerosa.ontrack.extension.jira.model.JIRAVersion
 import org.junit.jupiter.api.Test
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
+import org.springframework.web.client.HttpClientErrorException
+import org.springframework.web.client.RestTemplate
+import org.springframework.web.client.getForObject
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class JIRAClientImplTest {
 
@@ -60,16 +70,16 @@ class JIRAClientImplTest {
             assertEquals("dcoraboeuf", issue.assignee)
             assertEquals(listOf(JIRAVersion("1.0", true)), issue.affectedVersions)
             assertEquals(
-                    listOf(
-                            JIRALink(
-                                    "PRJ-900",
-                                    "http://jira/browse/PRJ-900",
-                                    JIRAStatus("Open", "http://jira/images/icons/statuses/open.png"),
-                                    "Blocks",
-                                    "is blocked by"
-                            )
-                    ),
-                    issue.links
+                listOf(
+                    JIRALink(
+                        "PRJ-900",
+                        "http://jira/browse/PRJ-900",
+                        JIRAStatus("Open", "http://jira/images/icons/statuses/open.png"),
+                        "Blocks",
+                        "is blocked by"
+                    )
+                ),
+                issue.links
             )
         }
     }
@@ -92,16 +102,16 @@ class JIRAClientImplTest {
             assertEquals("dcoraboeuf", issue.assignee)
             assertEquals(listOf(JIRAVersion("1.0", true)), issue.affectedVersions)
             assertEquals(
-                    listOf(
-                            JIRALink(
-                                    "PRJ-900",
-                                    "http://jira/browse/PRJ-900",
-                                    JIRAStatus("Open", "http://jira/images/icons/statuses/open.png"),
-                                    "Blocks",
-                                    "blocks"
-                            )
-                    ),
-                    issue.links
+                listOf(
+                    JIRALink(
+                        "PRJ-900",
+                        "http://jira/browse/PRJ-900",
+                        JIRAStatus("Open", "http://jira/images/icons/statuses/open.png"),
+                        "Blocks",
+                        "blocks"
+                    )
+                ),
+                issue.links
             )
         }
     }
@@ -124,25 +134,63 @@ class JIRAClientImplTest {
             assertEquals("dcoraboeuf", issue.assignee)
             assertEquals(listOf(JIRAVersion("1.0", true)), issue.affectedVersions)
             assertEquals(
-                    listOf(
-                            JIRALink(
-                                    "PRJ-900",
-                                    "http://jira/browse/PRJ-900",
-                                    JIRAStatus("Open", "http://jira/images/icons/statuses/open.png"),
-                                    "Blocks",
-                                    "blocks"
-                            ),
-                            JIRALink(
-                                    "PRJ-901",
-                                    "http://jira/browse/PRJ-901",
-                                    JIRAStatus("Open", "http://jira/images/icons/statuses/open.png"),
-                                    "Blocks",
-                                    "is blocked by"
-                            ),
+                listOf(
+                    JIRALink(
+                        "PRJ-900",
+                        "http://jira/browse/PRJ-900",
+                        JIRAStatus("Open", "http://jira/images/icons/statuses/open.png"),
+                        "Blocks",
+                        "blocks"
                     ),
-                    issue.links
+                    JIRALink(
+                        "PRJ-901",
+                        "http://jira/browse/PRJ-901",
+                        JIRAStatus("Open", "http://jira/images/icons/statuses/open.png"),
+                        "Blocks",
+                        "is blocked by"
+                    ),
+                ),
+                issue.links
             )
         }
+    }
+
+    @Test
+    fun `Forbidden access returns a null issue`() {
+        val template = mockk<RestTemplate>()
+        val client = JIRAClientImpl(template)
+        val config = JIRAFixtures.jiraConfiguration()
+
+        every {
+            template.getForObject<JsonNode>("/rest/api/2/issue/XXX-1?expand=names")
+        } throws HttpClientErrorException.create(
+            HttpStatus.FORBIDDEN,
+            "Forbidden",
+            HttpHeaders(),
+            ByteArray(0),
+            null
+        )
+
+        assertNull(client.getIssue("XXX-1", config))
+    }
+
+    @Test
+    fun `Not found returns a null issue`() {
+        val template = mockk<RestTemplate>()
+        val client = JIRAClientImpl(template)
+        val config = JIRAFixtures.jiraConfiguration()
+
+        every {
+            template.getForObject<JsonNode>("/rest/api/2/issue/XXX-1?expand=names")
+        } throws HttpClientErrorException.create(
+            HttpStatus.NOT_FOUND,
+            "Not found",
+            HttpHeaders(),
+            ByteArray(0),
+            null
+        )
+
+        assertNull(client.getIssue("XXX-1", config))
     }
 
 }
