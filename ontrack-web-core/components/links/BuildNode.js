@@ -24,6 +24,9 @@ export default function BuildNode({data}) {
                         border: 'solid 3px blue'
                     } : {}
                 }
+                bodyStyle={{
+                    overflow: 'hidden'
+                }}
             >
                 <Space direction="vertical" className="ot-line">
                     <Typography.Text>

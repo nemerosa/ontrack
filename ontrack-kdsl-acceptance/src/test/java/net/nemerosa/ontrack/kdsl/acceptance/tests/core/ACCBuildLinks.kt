@@ -53,6 +53,11 @@ class ACCBuildLinks : AbstractACCDSLTestSupport() {
                         promote(BRONZE)
                     }
                 }
+                branch("feature-ISS-21-very-long-too-long-branch-name") {
+                    configuredForMockRepository(scmBranch = "feature/ISS-21-very-long-too-long-branch-name")
+                    build("feature-ISS-21-very-long-too-long-branch-name-1") {}
+                    build("feature-ISS-21-very-long-too-long-branch-name-2") {}
+                }
             }
         }
 
@@ -70,6 +75,14 @@ class ACCBuildLinks : AbstractACCDSLTestSupport() {
                         promote(BRONZE)
                         linksTo(
                             "module-one" to "1.23.2",
+                        )
+                    }
+                }
+                branch("feature-ISS-21-very-long-too-long-branch-name") {
+                    configuredForMockRepository(scmBranch = "feature/ISS-21-very-long-too-long-branch-name")
+                    build("feature-ISS-21-very-long-too-long-branch-name-1") {
+                        linksTo(
+                            "module-one" to "feature-ISS-21-very-long-too-long-branch-name-2",
                         )
                     }
                 }
