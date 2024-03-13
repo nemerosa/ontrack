@@ -6,8 +6,9 @@ import BuildPromotions from "@components/links/BuildPromotions";
 import BranchDisplayNameLink from "@components/links/BranchDisplayNameLink";
 import ProjectLink from "@components/projects/ProjectLink";
 import Link from "next/link";
-import {branchLinksUri, branchUri} from "@components/common/Links";
+import {branchLinksUri} from "@components/common/Links";
 import {FaProjectDiagram} from "react-icons/fa";
+import {truncate} from "@components/common/ShortenedName";
 
 export default function BuildNode({data}) {
 
