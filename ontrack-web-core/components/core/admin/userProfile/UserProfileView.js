@@ -28,11 +28,11 @@ export default function UserProfileView() {
             >
                 {
                     authorizations?.user?.changePassword &&
-                    <PageSection title="Change password">
+                    <PageSection title="Change password" padding={true}>
                         <UserProfileChangePassword/>
                     </PageSection>
                 }
-                <PageSection title="API tokens">
+                <PageSection title="API tokens" padding={true}>
                     <UserProfileTokens/>
                 </PageSection>
             </MainPage>
