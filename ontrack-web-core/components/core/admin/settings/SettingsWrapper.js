@@ -37,6 +37,7 @@ export default function SettingsWrapper({entryId}) {
                 entry &&
                 <PageSection
                     title={entry.title}
+                    padding={true}
                 >
                     <Dynamic
                         path={`framework/settings/${entry.id}-form`}
