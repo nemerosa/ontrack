@@ -16,6 +16,7 @@ import ValidationDataType from "@components/framework/validation-data-type/Valid
 import InfoBox from "@components/common/InfoBox";
 import ValidationRunData from "@components/framework/validation-run-data/ValidationRunData";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import RunInfo from "@components/common/RunInfo";
 
 export function useValidationRunHistoryDialog() {
     const [open, setOpen] = useState(false)
@@ -296,6 +297,11 @@ export default function ValidationRunHistoryDialog({dialog, onChange}) {
                                         {
                                             run.data &&
                                             <ValidationRunData data={run.data}/>
+                                        }
+                                        {/* Run info */}
+                                        {
+                                            run.runInfo &&
+                                            <RunInfo info={run.runInfo}/>
                                         }
                                         {/* List of statuses */}
                                         <List
