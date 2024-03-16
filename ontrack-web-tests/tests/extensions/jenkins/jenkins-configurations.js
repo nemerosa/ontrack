@@ -25,4 +25,11 @@ export class JenkinsConfigurationsPage {
     async checkConfigurationCreated(url) {
         await expect(this.page.getByText(url, {exact: true})).toBeVisible()
     }
+
+    async testConfiguration(name) {
+        const configRow = this.page.locator(`tr[data-row-key="config-${name}"]`)
+        const testButton = configRow.locator('.ot-configuration-test')
+        await testButton.click()
+        await expect(this.page.locator('.ant-message-success').getByText("Connection OK")).toBeVisible()
+    }
 }

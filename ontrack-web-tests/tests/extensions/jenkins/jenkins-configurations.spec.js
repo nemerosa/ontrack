@@ -21,3 +21,22 @@ test('creation of a Jenkins configuration', async ({page}) => {
     // Checks the configuration has been created
     await jenkinsConfigurationsPage.checkConfigurationCreated(url)
 })
+
+test('testing a Jenkins configuration', async ({page}) => {
+    // Login
+    await login(page)
+    // Going to the Jenkins configurations page
+    const jenkinsConfigurationsPage = new JenkinsConfigurationsPage(page)
+    await jenkinsConfigurationsPage.goTo()
+    // Creating a new configuration
+    const name = generate("jen-");
+    const url = `https://${name}.com`
+    await jenkinsConfigurationsPage.createConfig({
+        name: name,
+        url: url,
+        user: "some-user",
+        password: "some-password",
+    })
+    // Testing this configuration
+    await jenkinsConfigurationsPage.testConfiguration(name)
+})

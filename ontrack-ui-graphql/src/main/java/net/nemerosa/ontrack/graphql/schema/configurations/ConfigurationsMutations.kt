@@ -6,13 +6,17 @@ import net.nemerosa.ontrack.graphql.schema.Mutation
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.json.parseInto
 import net.nemerosa.ontrack.model.support.*
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
 @Component
 class ConfigurationsMutations(
     private val configurationServiceFactory: ConfigurationServiceFactory,
+    private val ontrackConfigProperties: OntrackConfigProperties,
 ) : TypedMutationProvider() {
 
+    private val logger: Logger = LoggerFactory.getLogger(ConfigurationsMutations::class.java)
 
     override val mutations: List<Mutation> = listOf(
         simpleMutation(
@@ -71,7 +75,12 @@ class ConfigurationsMutations(
         data: ObjectNode,
     ): ConnectionResult {
         val config = parse(service, name, data)
-        return service.test(config)
+        return if (ontrackConfigProperties.configurationTest) {
+            service.test(config)
+        } else {
+            logger.warn("Testing configurations is disabled.")
+            ConnectionResult.ok()
+        }
     }
 
     private fun <T : Configuration<T>> parseAndCreate(

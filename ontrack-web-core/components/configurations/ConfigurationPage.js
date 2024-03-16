@@ -71,7 +71,9 @@ export default function ConfigurationPage({
 
     const onTestConfig = (config) => {
         return async () => {
-            const connectionResult = await testConfig(client, config, configurationType)
+            const data = {...config}
+            delete data.extra
+            const connectionResult = await testConfig(client, data, configurationType)
             if (connectionResult) {
                 if (connectionResult.type === 'OK') {
                     messageApi.success("Connection OK")
@@ -119,6 +121,7 @@ export default function ConfigurationPage({
                     user?.authorizations?.global?.settings &&
                     <Space>
                         <InlineCommand
+                            className="ot-configuration-test"
                             title="Tests this configuration"
                             icon={<FaQuestionCircle/>}
                             onClick={onTestConfig(config)}
@@ -153,6 +156,7 @@ export default function ConfigurationPage({
                     loading={loading}
                     dataSource={configurations}
                     columns={[...columns, actionsColumn]}
+                    rowKey={(configuration) => `config-${configuration.name}`}
                 />
             </StandardPage>
             <ConfigurationDialog configurationDialog={dialog}/>
