@@ -22,7 +22,11 @@ const refDataSignature = {
          * All possible statuses
          */
         list: [],
-    }
+    },
+    /**
+     * Version of Ontrack
+     */
+    version: ''
 }
 
 export const RefDataContext = createContext(refDataSignature)
@@ -73,11 +77,17 @@ export default function RefDataContextProvider({children}) {
                             passed
                             followingStatuses
                         }
+                        info {
+                            version {
+                                display
+                            }
+                        }
                     }
                 `
             ).then(data => {
                 setRefData({
                     validationRunStatuses: validationRunStatuses(data.validationRunStatusIDList),
+                    version: data.info.version.display,
                 })
             })
         }

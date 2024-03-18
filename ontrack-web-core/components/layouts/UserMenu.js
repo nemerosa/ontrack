@@ -1,4 +1,4 @@
-import {Drawer, Menu} from "antd";
+import {Drawer, Menu, Typography} from "antd";
 import {useContext, useEffect, useState} from "react";
 import {UserContext} from "@components/providers/UserProvider";
 import {legacyGraphiQLUri} from "@components/common/Links";
@@ -12,13 +12,14 @@ import {
     FaJenkins, FaJira,
     FaList,
     FaMagic,
-    FaSignOutAlt,
+    FaSignOutAlt, FaTag,
     FaUser
 } from "react-icons/fa";
 import {MainLayoutContext} from "@components/layouts/MainLayout";
 import {useLogout} from "@components/providers/ConnectionContextProvider";
 import LegacyLink from "@components/common/LegacyLink";
 import UserMenuItemLink from "@components/layouts/UserMenuItemLink";
+import {useRefData} from "@components/providers/RefDataProvider";
 
 export function useUserMenu() {
     const [open, setOpen] = useState(false);
@@ -42,6 +43,7 @@ export default function UserMenu({userMenu}) {
     const logout = useLogout()
 
     const {toggleExpansion} = useContext(MainLayoutContext)
+    const {version} = useRefData()
 
     const user = useContext(UserContext)
     const [items, setItems] = useState([])
@@ -112,6 +114,16 @@ export default function UserMenu({userMenu}) {
             onClick: () => {
                 if (logout) logout.call()
             },
+        })
+        // Version
+        menu.push({
+            type: 'divider',
+        })
+        menu.push({
+            key: 'version',
+            label: <Typography.Text type="secondary">Version: {version}</Typography.Text>,
+            icon: <FaTag/>,
+            disabled: true,
         })
         // Registers the menu
         setItems(menu)
