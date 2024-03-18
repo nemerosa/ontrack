@@ -2824,6 +2824,14 @@ type LockAccountPayload implements Payload {
     errors: [UserError]
 }
 
+"Message"
+type Message {
+    "content field"
+    content: String!
+    "type field"
+    type: MessageType!
+}
+
 type Mutation {
     "Bulk update of a promotion level"
     bulkUpdatePromotionLevelById(
@@ -4887,6 +4895,8 @@ type Query {
         "Issue key"
         issue: String!
     ): OntrackGitIssueInfo
+    "List of global messages"
+    globalMessages: [Message!]!
     "List of global security roles"
     globalRoles(
         "Filter by role name"
@@ -6950,6 +6960,14 @@ enum IngestionHookPayloadStatus {
     ERRORED
     PROCESSING
     SCHEDULED
+}
+
+"List of types of messages"
+enum MessageType {
+    ERROR
+    INFO
+    SUCCESS
+    WARNING
 }
 
 "Type of result for a notification"

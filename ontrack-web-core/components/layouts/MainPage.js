@@ -3,6 +3,7 @@ import MainPageBar from "@components/layouts/MainPageBar";
 import {useContext} from "react";
 import {MainLayoutContext} from "@components/layouts/MainLayout";
 import MainWarning from "@components/layouts/MainWarning";
+import MainGlobalMessages from "@components/layouts/MainGlobalMessages";
 
 const {Content} = Layout;
 
@@ -39,6 +40,7 @@ export default function MainPage({title, breadcrumbs, commands, description, chi
                     }
                     <Space direction="vertical" className="ot-line">
                         <MainWarning/>
+                        <MainGlobalMessages/>
                         {children}
                     </Space>
                 </Content>
