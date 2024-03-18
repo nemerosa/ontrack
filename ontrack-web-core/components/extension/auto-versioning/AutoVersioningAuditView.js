@@ -57,7 +57,7 @@ export default function AutoVersioningAuditView() {
             } else if (targetProject) {
                 setFilter(filter => ({...filter, targetProject: targetProject.name}))
             } else if (targetBranch) {
-                setFilter(filter => ({...filter, targetBranch: targetBranch.name}))
+                setFilter(filter => ({...filter, targetProject: targetBranch.project.name, targetBranch: targetBranch.name}))
             }
             setFilterReady(true)
         }
@@ -244,7 +244,6 @@ export default function AutoVersioningAuditView() {
                         />
 
                         {
-                            (!context.targetBranch) &&
                             <Column
                                 key="target"
                                 title="Target"
