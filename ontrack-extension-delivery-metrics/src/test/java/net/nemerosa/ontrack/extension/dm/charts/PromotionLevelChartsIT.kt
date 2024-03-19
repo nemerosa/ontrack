@@ -6,10 +6,12 @@ import net.nemerosa.ontrack.extension.chart.GetChartInput
 import net.nemerosa.ontrack.extension.chart.GetChartOptions
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.model.structure.PromotionLevel
 import net.nemerosa.ontrack.model.structure.Signature
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.test.assertEquals
 
@@ -21,6 +23,89 @@ internal class PromotionLevelChartsIT : AbstractDSLTestSupport() {
     @Test
     @Disabled("flaky")
     fun `Promotion level lead time`() {
+        withLeadTime { now, pl ->
+            val data = chartService.getChart(
+                GetChartInput(
+                    name = "promotion-level-lead-time",
+                    options = GetChartOptions(
+                        ref = now,
+                        interval = "4w",
+                        period = "1w"
+                    ),
+                    parameters = mapOf("id" to pl.id()).asJson()
+                )
+            )
+
+            assertEquals(
+                expectedLeadTimeData(now).asJson(),
+                data
+            )
+        }
+    }
+
+    @Test
+    @Disabled("flaky")
+    fun `E2E lead time on same project`() {
+        withLeadTime { now, pl ->
+            val data = chartService.getChart(
+                GetChartInput(
+                    name = "e2e-lead-time",
+                    options = GetChartOptions(
+                        ref = now,
+                        interval = "4w",
+                        period = "1w"
+                    ),
+                    parameters = mapOf(
+                        "refPromotionId" to pl.id(),
+                        "targetProject" to pl.project.name,
+                    ).asJson()
+                )
+            )
+
+            assertEquals(
+                expectedLeadTimeData(now).asJson(),
+                data
+            )
+        }
+    }
+
+    private fun expectedLeadTimeData(now: LocalDateTime) = mapOf(
+        "categories" to listOf(
+            "Mean",
+            "90th percentile",
+            "Maximum",
+        ),
+        "dates" to (-4L..-1).map { n ->
+            now.plusWeeks(n).format(DateTimeFormatter.ISO_DATE)
+        },
+        "data" to mapOf(
+            "mean" to listOf(
+                19800.0,
+                9000.0,
+                3600.0,
+                Double.NaN,
+            ),
+            "percentile90" to listOf(
+                25200.0,
+                10800.0,
+                3600.0,
+                Double.NaN,
+            ),
+            "maximum" to listOf(
+                25200.0,
+                10800.0,
+                3600.0,
+                Double.NaN,
+            ),
+        )
+    )
+
+    private fun withLeadTime(
+        code: (
+            now: LocalDateTime,
+            pl: PromotionLevel,
+        ) -> Unit,
+    ) {
         asAdmin {
             project {
                 branch {
@@ -56,51 +141,7 @@ internal class PromotionLevelChartsIT : AbstractDSLTestSupport() {
                         }
                     }
 
-                    val data = chartService.getChart(
-                        GetChartInput(
-                            name = "promotion-level-lead-time",
-                            options = GetChartOptions(
-                                ref = now,
-                                interval = "4w",
-                                period = "1w"
-                            ),
-                            parameters = mapOf("id" to pl.id()).asJson()
-                        )
-                    )
-
-                    assertEquals(
-                        mapOf(
-                            "categories" to listOf(
-                                "Mean",
-                                "90th percentile",
-                                "Maximum",
-                            ),
-                            "dates" to (-4L..-1).map { n ->
-                                now.plusWeeks(n).format(DateTimeFormatter.ISO_DATE)
-                            },
-                            "data" to mapOf(
-                                "mean" to listOf(
-                                    19800.0,
-                                    9000.0,
-                                    3600.0,
-                                    Double.NaN,
-                                ),
-                                "percentile90" to listOf(
-                                    25200.0,
-                                    10800.0,
-                                    3600.0,
-                                    Double.NaN,
-                                ),
-                                "maximum" to listOf(
-                                    25200.0,
-                                    10800.0,
-                                    3600.0,
-                                    Double.NaN,
-                                ),
-                            )
-                        ).asJson(),
-                        data
-                    )
+                    code(now, pl)
                 }
             }
         }
