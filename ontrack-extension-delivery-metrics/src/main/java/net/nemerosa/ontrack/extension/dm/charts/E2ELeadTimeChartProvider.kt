@@ -33,7 +33,8 @@ class E2ELeadTimeChartProvider(
             refPromotionId = subject.id(),
             samePromotion = true,
             targetPromotionId = null,
-            targetProject = subject.project.name
+            targetProject = subject.project.name,
+            maxDepth = 5,
         ).asJson(),
     )
 
@@ -43,7 +44,7 @@ class E2ELeadTimeChartProvider(
 
     override fun getChart(options: GetChartOptions, parameters: E2EChartParameters): DurationChart {
         val filter = EndToEndPromotionFilter(
-            maxDepth = 1,
+            maxDepth = parameters.maxDepth,
             promotionId = parameters.refPromotionId,
             samePromotion = parameters.samePromotion,
             targetPromotionId = parameters.targetPromotionId,
@@ -53,7 +54,6 @@ class E2ELeadTimeChartProvider(
         )
         val items = mutableListOf<DurationChartItemData>()
         endToEndPromotionsHelper.forEachEndToEndPromotionRecord(filter) { record ->
-            val refTime = record.ref.promotionCreation
             promotionLevelLeadTimeMetrics.recordTime(record)?.let { (timestamp, duration) ->
                 items += DurationChartItemData(
                     timestamp = timestamp,

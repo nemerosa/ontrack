@@ -1,0 +1,15 @@
+query GetChart(
+    $name: String!,
+    $interval: String!,
+    $period: String!,
+    $parameters: JSON!,
+) {
+    getChart(input: {
+        name: $name,
+        options: {
+            interval: $interval,
+            period: $period,
+        },
+        parameters: $parameters,
+    })
+}

@@ -7,12 +7,14 @@ import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.ProjectEntityType
  * Representation of a promotion level.
  *
  * @property connector Ontrack connector
+ * @property branch Parent branch
  * @property id Promotion level ID
  * @property name Promotion level name
  * @property description Promotion level description
  */
 class PromotionLevel(
     connector: Connector,
+    val branch: Branch,
     id: UInt,
     val name: String,
     val description: String?,

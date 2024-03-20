@@ -15,6 +15,7 @@ export default function E2ELeadTimeChartWidget({
                                                    targetProject,
                                                    targetBranch,
                                                    targetPromotionLevel,
+                                                   maxDepth = 5,
                                                    interval,
                                                    period
                                                }) {
@@ -57,6 +58,7 @@ export default function E2ELeadTimeChartWidget({
                 <E2ELeadTimeChart
                     promotionLevel={promotionLevelObject}
                     targetPromotionLevel={targetPromotionLevelObject}
+                    maxDepth={maxDepth}
                     interval={interval}
                     period={period}
                 />

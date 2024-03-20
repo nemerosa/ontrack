@@ -1,40 +1,50 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.core
 
 import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.kdsl.acceptance.tests.AbstractACCDSLTestSupport
-import net.nemerosa.ontrack.kdsl.spec.admin.admin
-import org.junit.jupiter.api.Disabled
+import net.nemerosa.ontrack.kdsl.spec.PromotionLevel
+import net.nemerosa.ontrack.kdsl.spec.charts.getChart
 import org.junit.jupiter.api.Test
 
-@Disabled // Only used locally to create some data
 class ACCE2EPromotions: AbstractACCDSLTestSupport() {
 
     @Test
     fun `End to end promotion data`() {
-        end2endPromotionData()
+        end2endPromotionData { refPromotion, targetPromotion ->
+
+            val chart = ontrack.getChart(
+                name = "e2e-lead-time",
+                interval = "1w",
+                period = "1d",
+                parameters = mapOf(
+                    "refPromotionId" to refPromotion.id,
+                    "samePromotion" to false,
+                    "targetPromotionId" to targetPromotion.id,
+                    "targetProject" to targetPromotion.branch.project.name,
+                    "maxDepth" to 5,
+                ).asJson()
+            )
+
+            println(chart)
+
+        }
     }
 
-    private fun end2endPromotionData() {
-
-        // Predefined promotions
-        ontrack.admin.predefinedPromotionLevels.apply {
-            createPredefinedPromotionLevel(
-                name = ACCBuildLinks.SILVER,
-                image = ACCBuildLinks::class.java.getResource("/promotions/silver.png")
-            )
-            createPredefinedPromotionLevel(
-                name = ACCBuildLinks.GOLD,
-                image = ACCBuildLinks::class.java.getResource("/promotions/gold.png")
-            )
-        }
+    private fun end2endPromotionData(
+        code: (refPromotion: PromotionLevel, targetPromotion: PromotionLevel) -> Unit
+    ) {
 
         // Reference time
         val ref = Time.now().minusHours(8)
 
+        lateinit var refPromotion: PromotionLevel
+        lateinit var targetPromotion: PromotionLevel
+
         // Module
         project("module", deleteFirst = true) {
             branch("main") {
-                promotion(ACCBuildLinks.GOLD)
+                refPromotion = promotion(ACCBuildLinks.GOLD)
                 build("1") {
                     updateCreationTime(ref)
                     promote(ACCBuildLinks.GOLD, dateTime = ref)
@@ -80,7 +90,7 @@ class ACCE2EPromotions: AbstractACCDSLTestSupport() {
         // Aggregator
         project("aggregator", deleteFirst = true) {
             branch("main") {
-                promotion(ACCBuildLinks.SILVER)
+                targetPromotion = promotion(ACCBuildLinks.SILVER)
                 build("1") {
                     updateCreationTime(ref.plusMinutes(120))
                     linksTo("application" to "1")
@@ -101,6 +111,12 @@ class ACCE2EPromotions: AbstractACCDSLTestSupport() {
                 }
             }
         }
+
+        // OK
+        code(
+            refPromotion,
+            targetPromotion,
+        )
     }
 
 }

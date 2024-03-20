@@ -1,7 +1,13 @@
 import {gql} from "graphql-request";
 import DurationChart from "@components/charts/DurationChart";
 
-export default function E2ELeadTimeChart({promotionLevel, targetPromotionLevel, interval = "3m", period = "1w"}) {
+export default function E2ELeadTimeChart({
+                                             promotionLevel,
+                                             targetPromotionLevel,
+                                             maxDepth = 5,
+                                             interval = "3m",
+                                             period = "1w"
+                                         }) {
 
     return (
         <>
@@ -28,6 +34,7 @@ export default function E2ELeadTimeChart({promotionLevel, targetPromotionLevel, 
                             samePromotion: promotionLevel.name === targetPromotionLevel.name,
                             targetPromotionId: promotionLevel.name === targetPromotionLevel.name ? null : targetPromotionLevel.id,
                             targetProject: targetPromotionLevel.branch.project.name,
+                            maxDepth: maxDepth,
                         },
                         interval,
                         period,

@@ -7,11 +7,13 @@ export default function E2ELeadTimeChartWidgetForm({
                                                        targetProject,
                                                        targetBranch,
                                                        targetPromotionLevel,
+                                                       maxDepth,
                                                        interval,
                                                        period
                                                    }) {
     return <E2EChartWidgetForm project={project} branch={branch} promotionLevel={promotionLevel}
                                targetProject={targetProject} targetBranch={targetBranch}
                                targetPromotionLevel={targetPromotionLevel}
+                               maxDepth={maxDepth}
                                interval={interval} period={period}/>
 }

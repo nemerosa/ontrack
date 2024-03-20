@@ -9,4 +9,5 @@ data class E2EChartParameters(
     val samePromotion: Boolean,
     val targetPromotionId: Int?,
     val targetProject: String,
+    val maxDepth: Int = 5,
 )

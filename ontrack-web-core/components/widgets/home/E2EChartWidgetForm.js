@@ -1,6 +1,6 @@
 import {useContext} from "react";
 import {DashboardWidgetCellContext} from "@components/dashboards/DashboardWidgetCellContextProvider";
-import {Form} from "antd";
+import {Form, InputNumber} from "antd";
 import SelectProjectBranchPromotionLevel from "@components/promotionLevels/SelectProjectBranchPromotionLevel";
 import SelectChartPeriod from "@components/charts/SelectChartPeriod";
 import SelectChartInterval from "@components/charts/SelectChartInterval";
@@ -12,6 +12,7 @@ export default function E2EChartWidgetForm({
                                                targetProject,
                                                targetBranch,
                                                targetPromotionLevel,
+                                               maxDepth,
                                                interval,
                                                period
                                            }) {
@@ -31,6 +32,7 @@ export default function E2EChartWidgetForm({
             targetProject: values.targetPromotionLevel.project,
             targetBranch: values.targetPromotionLevel.branch,
             targetPromotionLevel: values.targetPromotionLevel.promotionLevel,
+            maxDepth: values.maxDepth,
         }
     }
 
@@ -55,6 +57,14 @@ export default function E2EChartWidgetForm({
                     initialValue={{targetProject, targetBranch, targetPromotionLevel}}
                 >
                     <SelectProjectBranchPromotionLevel/>
+                </Form.Item>
+                <Form.Item
+                    name="maxDepth"
+                    label="Max depth"
+                    extra="Maximum number of levels to go through to get dependencies"
+                    initialValue={maxDepth}
+                >
+                    <InputNumber min={1} max={10}/>
                 </Form.Item>
                 <Form.Item
                     name="interval"
