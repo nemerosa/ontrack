@@ -7,6 +7,7 @@ plugins {
 
 dependencies {
     testImplementation(project(":ontrack-json"))
+    testImplementation(project(":ontrack-common"))
     testImplementation("org.springframework.boot:spring-boot-starter")
     testImplementation("org.springframework:spring-web")
     testImplementation(project(":ontrack-kdsl"))

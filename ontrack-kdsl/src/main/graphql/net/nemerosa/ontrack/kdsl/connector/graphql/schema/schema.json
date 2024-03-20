@@ -2505,6 +2505,29 @@
               "deprecationReason": null
             },
             {
+              "name": "userMenuActions",
+              "description": "List of actions available for this entity",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "UserMenuAction"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "buildFilterForms",
               "description": "List of forms for the build filters (for the creation of new filters)",
               "args": [],
@@ -4405,6 +4428,29 @@
               "deprecationReason": null
             },
             {
+              "name": "userMenuActions",
+              "description": "List of actions available for this entity",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "UserMenuAction"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "decorations",
               "description": "List of decorations",
               "args": [
@@ -4513,6 +4559,18 @@
             {
               "name": "gitCommitProperty",
               "description": "Git commit",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "Property",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "mockSCMBuildCommitProperty",
+              "description": "Mock SCM used for testing only",
               "args": [],
               "type": {
                 "kind": "OBJECT",
@@ -4650,18 +4708,6 @@
               "type": {
                 "kind": "OBJECT",
                 "name": "GitChangeLog",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "actions",
-              "description": "Actions for a Build",
-              "args": [],
-              "type": {
-                "kind": "OBJECT",
-                "name": "BuildActions",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -4938,6 +4984,16 @@
                 {
                   "name": "project",
                   "description": "Keeps only links targeted from this project",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "qualifier",
+                  "description": "Keeps only links targeted for this qualifier",
                   "type": {
                     "kind": "SCALAR",
                     "name": "String",
@@ -14883,6 +14939,22 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "title",
+              "description": "Display name for this information",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "inputFields": null,
@@ -18531,22 +18603,6 @@
               "deprecationReason": null
             },
             {
-              "name": "formattedMessage",
-              "description": "formattedMessage field",
-              "args": [],
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
               "name": "fullAnnotatedMessage",
               "description": "fullAnnotatedMessage field",
               "args": [],
@@ -21940,6 +21996,22 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "rawIssue",
+              "description": "JSON representation of the issue containing custom fields",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "JSON",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "inputFields": null,
@@ -22967,6 +23039,84 @@
           "possibleTypes": null
         },
         {
+          "kind": "OBJECT",
+          "name": "Message",
+          "description": "Message",
+          "fields": [
+            {
+              "name": "content",
+              "description": "content field",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "type",
+              "description": "type field",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "ENUM",
+                  "name": "MessageType",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "ENUM",
+          "name": "MessageType",
+          "description": "List of types of messages",
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": [
+            {
+              "name": "ERROR",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "WARNING",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "SUCCESS",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "INFO",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "possibleTypes": null
+        },
+        {
           "kind": "INPUT_OBJECT",
           "name": "MetaInfoPropertyItemInput",
           "description": "Meta information property",
@@ -23418,6 +23568,29 @@
               "type": {
                 "kind": "OBJECT",
                 "name": "CreateBuildPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "updateBuild",
+              "description": "Updates an existing build",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "UpdateBuildInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "UpdateBuildPayload",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -30010,6 +30183,11 @@
             },
             {
               "kind": "OBJECT",
+              "name": "UpdateBuildPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
               "name": "UpdateConfigurationPayload",
               "ofType": null
             },
@@ -30530,6 +30708,29 @@
                 "kind": "SCALAR",
                 "name": "String",
                 "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "userMenuActions",
+              "description": "List of actions available for this entity",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "UserMenuAction"
+                    }
+                  }
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -31103,18 +31304,6 @@
                   "name": "Boolean",
                   "ofType": null
                 }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "actions",
-              "description": "Actions for a Project",
-              "args": [],
-              "type": {
-                "kind": "OBJECT",
-                "name": "ProjectActions",
-                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -33249,6 +33438,29 @@
               "deprecationReason": null
             },
             {
+              "name": "userMenuActions",
+              "description": "List of actions available for this entity",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "UserMenuAction"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "_image",
               "description": "Link to the image",
               "args": [],
@@ -33814,6 +34026,29 @@
                 "kind": "SCALAR",
                 "name": "String",
                 "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "userMenuActions",
+              "description": "List of actions available for this entity",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "UserMenuAction"
+                    }
+                  }
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -34520,6 +34755,29 @@
               "deprecationReason": null
             },
             {
+              "name": "templatingRenderers",
+              "description": "Getting the list of template renderers",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "TemplatingRenderer"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "jenkinsConfigurations",
               "description": "List of Jenkins configurations",
               "args": [],
@@ -34550,29 +34808,6 @@
                 "kind": "OBJECT",
                 "name": "NotificationSettings",
                 "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "issueExportFormats",
-              "description": "List of available export formats",
-              "args": [],
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "LIST",
-                  "name": null,
-                  "ofType": {
-                    "kind": "NON_NULL",
-                    "name": null,
-                    "ofType": {
-                      "kind": "OBJECT",
-                      "name": "IssueExportFormat"
-                    }
-                  }
-                }
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -35747,6 +35982,29 @@
               "deprecationReason": null
             },
             {
+              "name": "globalMessages",
+              "description": "List of global messages",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "Message"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "authenticationSources",
               "description": "List of all authentication sources.",
               "args": [
@@ -36147,74 +36405,6 @@
                     }
                   }
                 }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "gitChangeLog",
-              "description": null,
-              "args": [
-                {
-                  "name": "from",
-                  "description": "ID of the build to start the change log with",
-                  "type": {
-                    "kind": "NON_NULL",
-                    "name": null,
-                    "ofType": {
-                      "kind": "SCALAR",
-                      "name": "Int",
-                      "ofType": null
-                    }
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "to",
-                  "description": "ID of the build to end the change log with",
-                  "type": {
-                    "kind": "NON_NULL",
-                    "name": null,
-                    "ofType": {
-                      "kind": "SCALAR",
-                      "name": "Int",
-                      "ofType": null
-                    }
-                  },
-                  "defaultValue": null
-                }
-              ],
-              "type": {
-                "kind": "OBJECT",
-                "name": "GitChangeLog",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "gitChangeLogByUUID",
-              "description": "Gets a change log by its UUID",
-              "args": [
-                {
-                  "name": "uuid",
-                  "description": "UUID of the change log",
-                  "type": {
-                    "kind": "NON_NULL",
-                    "name": null,
-                    "ofType": {
-                      "kind": "SCALAR",
-                      "name": "String",
-                      "ofType": null
-                    }
-                  },
-                  "defaultValue": null
-                }
-              ],
-              "type": {
-                "kind": "OBJECT",
-                "name": "GitChangeLog",
-                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -36789,6 +36979,65 @@
                     }
                   }
                 }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "scmChangeLog",
+              "description": "Query to get a change log between two builds.",
+              "args": [
+                {
+                  "name": "from",
+                  "description": "ID of the build from",
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Int",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "to",
+                  "description": "ID of the build to",
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Int",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "projects",
+                  "description": "List of projects to follow one by one for a get deep change log. Each item\nin the list is either a project name, or a project name and qualifier separated\nby a colon (:).",
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "SCALAR",
+                        "name": "String",
+                        "ofType": null
+                      }
+                    }
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "SCMChangeLog",
+                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -38039,6 +38288,18 @@
               "deprecationReason": null
             },
             {
+              "name": "changeLogs",
+              "description": "Are change logs enabled for this SCM?",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "engine",
               "description": "SCM engine or flavor (like GitHub, etc.)",
               "args": [],
@@ -38462,6 +38723,193 @@
           "possibleTypes": null
         },
         {
+          "kind": "OBJECT",
+          "name": "SCMChangeLog",
+          "description": "Representation of a change log between two builds",
+          "fields": [
+            {
+              "name": "from",
+              "description": "Boundary for the change log",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "Build",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "to",
+              "description": "Boundary for the change log",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "Build",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "commits",
+              "description": "List of commits between the builds",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "SCMDecoratedCommit"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "issues",
+              "description": "List of issues between the builds",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "SCMChangeLogIssues",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "diffLink",
+              "description": "URL to get the file diff between the two builds",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "linkChanges",
+              "description": "All dependency changes",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "LinkChange"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "export",
+              "description": "Exporting the issues of a change log",
+              "args": [
+                {
+                  "name": "request",
+                  "description": "How to generate the exported change log",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "SCMChangeLogExportInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "SCMChangeLogExportInput",
+          "description": "Request for the export of a change log.\n\nThis request defines how to group issues by type and which format\nto use for the export.\n\nIf no grouping is specified, the issues will be returned as a list, without any grouping.\n\nThe exclude field is used to exclude some issues from the export using their type.\n\nNote that both the export format and the type of issues are specific notions linked to the issue service\n(JIRA, GitHub...) that produces the issues.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "format",
+              "description": "Selected format. Defaults to plain text.",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "grouping",
+              "description": "Specification for the grouping, none by default.\n\nThis specification describes how to group issues using their type. This format is independent from\nthe issue service and this service is responsible for the actual mapping of issue \"types\" into actual\nissue fields. For example, for GitHub, an issue type is mapped on a label.\nThe format of the specification is:\n\n----\nspecification := \"\" | ${'$'}group ( \"|\" ${'$'}group)*\ngroup         := ${'$'}name \"=\" ${'$'}type ( \",\" ${'$'}type)*\n----\n\nFor example:\n\n----\nBugs=bug|Features=feature,enhancement\n----\n\nAny issue that would not be mapped in a group will be assigned arbitrarily to the group defined by\naltGroup property.\n\nIf the specification is empty, no grouping will be done.",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "exclude",
+              "description": null,
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "altGroup",
+              "description": "Title of the group to use when an issue does not belong to any group. It defaults to \"Other\".\nIf left empty, any issue not belonging to a group would be excluded from the export. This field\nis not used when no grouping is specified.",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
           "kind": "ENUM",
           "name": "SCMChangeLogFileChangeType",
           "description": "Type of change on a file.",
@@ -38506,6 +38954,230 @@
               "deprecationReason": null
             }
           ],
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "SCMChangeLogIssues",
+          "description": "SCMChangeLogIssues",
+          "fields": [
+            {
+              "name": "issues",
+              "description": "issues field",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "Issue"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "issueServiceConfiguration",
+              "description": "issueServiceConfiguration field",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "IssueServiceConfigurationRepresentation",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "SCMCommit",
+          "description": "Common attributes for a commit (or revision).",
+          "fields": [
+            {
+              "name": "id",
+              "description": "Identifier of the commit",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "shortId",
+              "description": "Short identifier for the commit",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "author",
+              "description": "Author of the commit",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "authorEmail",
+              "description": "Mail of the author of the commit. Can be `null` if not available.",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "message",
+              "description": "Message associated with the commit",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "link",
+              "description": "Link to the commit",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "timestamp",
+              "description": "Timestamp of the commit",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "LocalDateTime",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "SCMDecoratedCommit",
+          "description": "SCMDecoratedCommit",
+          "fields": [
+            {
+              "name": "commit",
+              "description": "commit field",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "SCMCommit",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "annotatedMessage",
+              "description": "Annotated message with links",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "build",
+              "description": "Any build linked to this commit",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "Build",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
           "possibleTypes": null
         },
         {
@@ -50135,6 +50807,49 @@
           "possibleTypes": null
         },
         {
+          "kind": "OBJECT",
+          "name": "TemplatingRenderer",
+          "description": "Definition of a renderer",
+          "fields": [
+            {
+              "name": "id",
+              "description": "Technical ID for the renderer",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "name",
+              "description": "Display name for the renderer",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
           "kind": "INPUT_OBJECT",
           "name": "TestConfigurationInput",
           "description": "Input type for the testConfiguration mutation.",
@@ -50839,6 +51554,86 @@
         },
         {
           "kind": "INPUT_OBJECT",
+          "name": "UpdateBuildInput",
+          "description": "Input type for the updateBuild mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "creation",
+              "description": "Creation timestamp to update",
+              "type": {
+                "kind": "SCALAR",
+                "name": "LocalDateTime",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id",
+              "description": "ID of the build to update",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "UpdateBuildPayload",
+          "description": "Output type for the updateBuild mutation.",
+          "fields": [
+            {
+              "name": "build",
+              "description": "Updated build",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "Build",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
           "name": "UpdateConfigurationInput",
           "description": "Input type for the updateConfiguration mutation.",
           "fields": null,
@@ -51320,18 +52115,6 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
-            },
-            {
-              "name": "actions",
-              "description": "Actions for a RootUser",
-              "args": [],
-              "type": {
-                "kind": "OBJECT",
-                "name": "RootUserActions",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
             }
           ],
           "inputFields": null,
@@ -51399,6 +52182,22 @@
           "name": "UserMenuAction",
           "description": "Item in the user menu",
           "fields": [
+            {
+              "name": "groupId",
+              "description": "ID of the group this item belongs to",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
             {
               "name": "extension",
               "description": "Extension contributing this user menu item",
@@ -53032,6 +53831,29 @@
               "deprecationReason": null
             },
             {
+              "name": "userMenuActions",
+              "description": "List of actions available for this entity",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "UserMenuAction"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "decorations",
               "description": "List of decorations",
               "args": [
@@ -53895,6 +54717,29 @@
                 "kind": "SCALAR",
                 "name": "String",
                 "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "userMenuActions",
+              "description": "List of actions available for this entity",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "UserMenuAction"
+                    }
+                  }
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null

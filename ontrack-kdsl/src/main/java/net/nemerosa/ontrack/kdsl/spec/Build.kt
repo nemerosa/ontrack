@@ -1,19 +1,19 @@
 package net.nemerosa.ontrack.kdsl.spec
 
+import com.apollographql.apollo.api.Input
 import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.GraphQLMissingDataException
 import net.nemerosa.ontrack.kdsl.connector.graphql.checkData
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
 import net.nemerosa.ontrack.kdsl.connector.graphql.paginate
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.BuildUsingQuery
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.BuildValidationRunsQuery
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.CreatePromotionRunMutation
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.LinksBuildMutation
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.*
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.LinksBuildInputItem
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.ProjectEntityType
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.RunInfoInput
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 import net.nemerosa.ontrack.kdsl.connector.support.PaginatedList
 import net.nemerosa.ontrack.kdsl.connector.support.emptyPaginatedList
+import java.time.LocalDateTime
 
 /**
  * Representation of a build.
@@ -42,11 +42,13 @@ class Build(
     fun promote(
         promotion: String,
         description: String = "",
+        dateTime: LocalDateTime? = null,
     ): PromotionRun = graphqlConnector.mutate(
         CreatePromotionRunMutation(
             id.toInt(),
             promotion,
-            description
+            description,
+            Input.optional(dateTime),
         )
     ) {
         it?.createPromotionRunById()?.fragments()?.payloadUserErrors()?.convert()
@@ -124,5 +126,21 @@ class Build(
     fun linksTo(vararg links: Pair<String, String>) {
         linksTo(links.toMap())
     }
+
+    /**
+     * Updates the creation time for a build
+     */
+    fun updateCreationTime(time: LocalDateTime): Build =
+        graphqlConnector.mutate(
+            UpdateBuildCreationTimeMutation(
+                id.toInt(),
+                time
+            )
+        ) {
+            it?.updateBuild()?.fragments()?.payloadUserErrors()?.convert()
+        }
+            ?.checkData { it.updateBuild()?.build() }
+            ?.fragments()?.buildFragment()?.toBuild(this)
+            ?: throw GraphQLMissingDataException("Did not get back the updated build")
 
 }
