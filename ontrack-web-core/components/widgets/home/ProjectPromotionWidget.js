@@ -8,6 +8,8 @@ import {FaBan} from "react-icons/fa";
 import BuildDependency from "@components/builds/BuildDependency";
 import {DashboardWidgetCellContext} from "@components/dashboards/DashboardWidgetCellContextProvider";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import BuildLink from "@components/builds/BuildLink";
+import PromotionRuns from "@components/promotionRuns/PromotionRuns";
 
 const {Column} = Table;
 
@@ -134,10 +136,9 @@ export default function ProjectPromotionWidget({project, promotions, depth, labe
                 <Column
                     title="Last build"
                     render={(_, run) => <Space>
-                        <BuildBox
+                        <BuildLink
                             build={run.build}
-                            displayDecorations={false}
-                            creationDisplayMode="tooltip"
+                            displayTooltip={true}
                         />
                         <Space size={8}>
                             {
@@ -159,12 +160,13 @@ export default function ProjectPromotionWidget({project, promotions, depth, labe
                         render={(_, run) => {
                             const dependency = run.dependencies && run.dependencies[projectName]
                             if (dependency) {
-                                return <BuildDependency
-                                    link={dependency}
-                                    displayPromotions={true}
-                                    displayProject={false}
-                                    displayDecorations={false}
-                                />
+                                return <Space>
+                                    <BuildLink
+                                        build={dependency.build}
+                                        displayTooltip={true}
+                                    />
+                                    <PromotionRuns promotionRuns={dependency.build.promotionRuns}/>
+                                </Space>
                             } else {
                                 return <Popover content={`No dependency on ${projectName}`}>
                                     <FaBan/>
