@@ -23,6 +23,7 @@ configure<ComposeExtension> {
         useComposeFiles.addAll(listOf("src/test/compose/docker-compose.yml"))
         setProjectName("kdsl")
         // environment.put("ONTRACK_VERSION", project.version.toString())
+        captureContainersOutput.set(true)
         captureContainersOutputToFiles.set(file("build/logs/containers"))
         composeLogToFile.set(file("build/logs/compose"))
         retainContainersOnStartupFailure.set(true)
