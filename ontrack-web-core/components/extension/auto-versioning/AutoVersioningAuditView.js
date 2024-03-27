@@ -57,7 +57,11 @@ export default function AutoVersioningAuditView() {
             } else if (targetProject) {
                 setFilter(filter => ({...filter, targetProject: targetProject.name}))
             } else if (targetBranch) {
-                setFilter(filter => ({...filter, targetProject: targetBranch.project.name, targetBranch: targetBranch.name}))
+                setFilter(filter => ({
+                    ...filter,
+                    targetProject: targetBranch.project.name,
+                    targetBranch: targetBranch.name
+                }))
             }
             setFilterReady(true)
         }
@@ -135,6 +139,7 @@ export default function AutoVersioningAuditView() {
                                 order {
                                     uuid
                                     sourceProject
+                                    sourcePromotion
                                     branch {
                                         id
                                         name
@@ -292,6 +297,14 @@ export default function AutoVersioningAuditView() {
                                 filteredValue={filter.sourceProject}
                             />
                         }
+
+                        <Column
+                            key="promotion"
+                            title="Promotion"
+                            render={(_, entry) =>
+                                <Typography.Text>{entry.order.sourcePromotion}</Typography.Text>
+                            }
+                        />
 
                         <Column
                             key="version"
