@@ -89,12 +89,46 @@ class AutoVersioningSourceConfigTest {
     @Test
     fun `Default upgrade branch with hash`() {
         assertEquals(
-            "feature/auto-upgrade-PRJ-1.0.0-282ac72ea57724cbae42b590bc0bf3a0",
+            "feature/auto-upgrade-PRJ-1.0.0-c55cefaf36fcdce3f97fdd15ba82e6b6",
             AutoVersioningSourceConfig.getUpgradeBranch(
                 AutoVersioningSourceConfig.DEFAULT_UPGRADE_BRANCH_PATTERN,
                 "PRJ",
                 "1.0.0",
                 "branch-name",
+                "GOLD",
+                listOf("gradle.properties"),
+                true
+            )
+        )
+    }
+
+    @Test
+    fun `Default upgrade branch hash is different for a different promotion`() {
+        assertEquals(
+            "feature/auto-upgrade-PRJ-1.0.0-b65e603d45e3d6a8d9caefc689a45b27",
+            AutoVersioningSourceConfig.getUpgradeBranch(
+                AutoVersioningSourceConfig.DEFAULT_UPGRADE_BRANCH_PATTERN,
+                "PRJ",
+                "1.0.0",
+                "branch-name",
+                "SILVER",
+                listOf("gradle.properties"),
+                true
+            )
+        )
+    }
+
+    @Test
+    fun `Default upgrade branch hash is different for a different path`() {
+        assertEquals(
+            "feature/auto-upgrade-PRJ-1.0.0-db6bfe675fdca14ad9cac17e6b786a90",
+            AutoVersioningSourceConfig.getUpgradeBranch(
+                AutoVersioningSourceConfig.DEFAULT_UPGRADE_BRANCH_PATTERN,
+                "PRJ",
+                "1.0.0",
+                "branch-name",
+                "SILVER",
+                listOf("pom.xml"),
                 true
             )
         )
@@ -109,6 +143,8 @@ class AutoVersioningSourceConfigTest {
                 "PRJ",
                 "1.0.0",
                 "branch-name",
+                "GOLD",
+                listOf("gradle.properties"),
                 false
             )
         )
@@ -117,12 +153,14 @@ class AutoVersioningSourceConfigTest {
     @Test
     fun `Branch with project and version`() {
         assertEquals(
-            "custom-with-PRJ-and-1.0.0-100b8cad7cf2a56f6df78f171f97a1ec",
+            "custom-with-PRJ-and-1.0.0-7b5b8ade11d6930b82a8e54e0333d547",
             AutoVersioningSourceConfig.getUpgradeBranch(
                 "custom-with-<project>-and-<version>",
                 "PRJ",
                 "1.0.0",
                 "any",
+                "GOLD",
+                listOf("gradle.properties"),
                 true
             )
         )
@@ -131,12 +169,14 @@ class AutoVersioningSourceConfigTest {
     @Test
     fun `Branch with version only`() {
         assertEquals(
-            "custom-for-1.0.0-100b8cad7cf2a56f6df78f171f97a1ec",
+            "custom-for-1.0.0-7b5b8ade11d6930b82a8e54e0333d547",
             AutoVersioningSourceConfig.getUpgradeBranch(
                 "custom-for-<version>",
                 "PRJ",
                 "1.0.0",
                 "any",
+                "GOLD",
+                listOf("gradle.properties"),
                 true
             )
         )
@@ -145,12 +185,14 @@ class AutoVersioningSourceConfigTest {
     @Test
     fun `Branch with version and branch`() {
         assertEquals(
-            "custom-for-1.0.0-100b8cad7cf2a56f6df78f171f97a1ec",
+            "custom-for-1.0.0-7b5b8ade11d6930b82a8e54e0333d547",
             AutoVersioningSourceConfig.getUpgradeBranch(
                 "custom-for-<version>-<branch>",
                 "PRJ",
                 "1.0.0",
                 "any",
+                "GOLD",
+                listOf("gradle.properties"),
                 true
             )
         )

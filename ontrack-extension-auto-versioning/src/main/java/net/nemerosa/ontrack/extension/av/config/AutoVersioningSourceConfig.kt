@@ -93,6 +93,8 @@ data class AutoVersioningSourceConfig(
          * @param project Replacement of the `<project>` token
          * @param version Replacement of the `<version>` token
          * @param branch Replacement of the `<branch>` token
+         * @param promotion Source promotion
+         * @param paths List of updated paths
          * @param branchHash Flag to indicate if the [branch] value must be hashed before being injected (because
          * a complete branch name would be too long)
          * @return Branch name to use
@@ -102,6 +104,8 @@ data class AutoVersioningSourceConfig(
             project: String,
             version: String,
             branch: String,
+            promotion: String,
+            paths: List<String>,
             branchHash: Boolean,
         ): String {
 
@@ -113,7 +117,7 @@ data class AutoVersioningSourceConfig(
             }
 
             val branchToken = if (branchHash) {
-                DigestUtils.md5Hex(branch)
+                DigestUtils.md5Hex("$branch,$promotion,${paths.joinToString(",")}")
             } else {
                 branch
             }

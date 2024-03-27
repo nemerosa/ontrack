@@ -42,6 +42,7 @@ object AutoVersioningTestFixtures {
     fun Branch.createOrder(
         sourceProject: String,
         targetVersion: String = "2.0.0",
+        targetPaths: List<String> = listOf("gradle.properties"),
         sourceBuildId: Int? = null,
         sourceBackValidation: String? = null,
     ) = AutoVersioningOrder(
@@ -51,7 +52,7 @@ object AutoVersioningTestFixtures {
         sourcePromotion = null,
         sourceBackValidation = sourceBackValidation,
         branch = this,
-        targetPaths = listOf("gradle.properties"),
+        targetPaths = targetPaths,
         targetRegex = null,
         targetProperty = "version",
         targetPropertyRegex = null,

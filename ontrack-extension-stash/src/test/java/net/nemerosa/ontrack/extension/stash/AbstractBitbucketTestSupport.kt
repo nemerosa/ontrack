@@ -16,7 +16,7 @@ abstract class AbstractBitbucketTestSupport : AbstractQLKTITSupport() {
     @Autowired
     protected lateinit var stashConfigurationService: StashConfigurationService
 
-    fun Project.bitbucketServerConfig() {
+    fun Project.bitbucketServerConfig(): StashConfiguration {
         // Creates a BB server configuration
         val config = createBitbucketServerConfig()
         // Sets it to the project
@@ -29,6 +29,8 @@ abstract class AbstractBitbucketTestSupport : AbstractQLKTITSupport() {
                 issueServiceConfigurationIdentifier = null,
             )
         )
+        // OK
+        return config
     }
 
     fun createBitbucketServerConfig(): StashConfiguration {

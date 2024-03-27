@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.av.audit
 
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditStoreConstants.STORE_CATEGORY
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
 import net.nemerosa.ontrack.json.parse
@@ -15,6 +14,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
+import kotlin.jvm.optionals.getOrNull
 
 /**
  * Auto versioning audit store based on the entity data store of the source project.
@@ -42,12 +42,14 @@ class AutoVersioningAuditStoreImpl(
          * * from the same source than the order
          * * with the same target than the order
          * * whose state is running and not processing
+         * * with the same set of paths
          */
         val filter = AutoVersioningAuditQueryFilter(
             source = order.sourceProject,
             project = order.branch.project.name,
             branch = order.branch.name,
             states = AutoVersioningAuditState.runningAndNotProcessingStates,
+            targetPaths = order.targetPaths,
         )
         findByFilter(filter).forEach { entry ->
             logger.debug("Cancelling {}", entry)
@@ -60,7 +62,7 @@ class AutoVersioningAuditStoreImpl(
         }
     }
 
-    override fun create(order: AutoVersioningOrder, routing: String) {
+    override fun create(order: AutoVersioningOrder, routing: String): AutoVersioningOrder {
         val signature = signature()
         entityDataStore.addObject(
             order.branch,
@@ -82,6 +84,7 @@ class AutoVersioningAuditStoreImpl(
                     targetVersion = targetVersion,
                     autoApproval = autoApproval,
                     upgradeBranchPattern = upgradeBranchPattern,
+                    upgradeBranch = null, // Not known yet
                     postProcessing = postProcessing,
                     postProcessingConfig = postProcessingConfig,
                     validationStamp = validationStamp,
@@ -99,12 +102,14 @@ class AutoVersioningAuditStoreImpl(
                 )
             }
         )
+        return order
     }
 
     override fun addState(
         targetBranch: Branch,
         uuid: String,
         queue: String?,
+        upgradeBranch: String?,
         state: AutoVersioningAuditState,
         vararg data: Pair<String, String>,
     ) {
@@ -119,7 +124,9 @@ class AutoVersioningAuditStoreImpl(
                 data = data.toMap()
             )
 
-            if (queue != null) {
+            if (queue != null || upgradeBranch != null) {
+                val actualQueue = queue ?: initialData.queue
+                val actualUpgradeBranch = upgradeBranch ?: initialData.upgradeBranch
                 initialData = initialData.run {
                     AutoVersioningAuditStoreData(
                         sourceProject = sourceProject,
@@ -134,13 +141,14 @@ class AutoVersioningAuditStoreImpl(
                         targetVersion = targetVersion,
                         autoApproval = autoApproval,
                         upgradeBranchPattern = upgradeBranchPattern,
+                        upgradeBranch = actualUpgradeBranch,
                         postProcessing = postProcessing,
                         postProcessingConfig = postProcessingConfig,
                         validationStamp = validationStamp,
                         autoApprovalMode = autoApprovalMode,
                         states = states,
                         routing = routing,
-                        queue = queue,
+                        queue = actualQueue,
                         reviewers = reviewers,
                     )
                 }
@@ -214,6 +222,7 @@ class AutoVersioningAuditStoreImpl(
                 audit = states,
                 routing = routing,
                 queue = queue,
+                upgradeBranch = upgradeBranch,
             )
         }
 

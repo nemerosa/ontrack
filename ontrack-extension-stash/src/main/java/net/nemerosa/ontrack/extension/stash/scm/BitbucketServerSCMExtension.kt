@@ -166,7 +166,7 @@ class BitbucketServerSCMExtension(
                 if (remoteAutoMerge) {
                     error("Server-side auto merge is not supported for Bitbucket Server")
                 } else {
-                    merged = waitAndMerge(prId, message)
+                    merged = waitAndMerge(prId, from, message)
                 }
             }
             // PR
@@ -211,7 +211,7 @@ class BitbucketServerSCMExtension(
                 structureService.getBuild(buildId)
             }
 
-        private fun waitAndMerge(prId: Int, message: String): Boolean {
+        private fun waitAndMerge(prId: Int, from: String, message: String): Boolean {
             // Waits for the PR checks to be OK
             val autoApprovalTimeoutMillis = settings.autoMergeTimeout
             val autoApprovalIntervalMillis = settings.autoMergeInterval
@@ -232,6 +232,10 @@ class BitbucketServerSCMExtension(
                 prId,
                 message
             )
+            // Deleting the source branch
+            if (settings.autoDeleteBranch) {
+                client.deleteBranch(repo, from)
+            }
             // Merged
             return true
         }

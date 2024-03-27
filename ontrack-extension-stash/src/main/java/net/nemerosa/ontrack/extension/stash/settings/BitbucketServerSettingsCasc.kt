@@ -24,5 +24,6 @@ class BitbucketServerSettingsCasc(
         cascField(BitbucketServerSettings::autoMergeTimeout),
         cascField(BitbucketServerSettings::autoMergeInterval),
         cascField(BitbucketServerSettings::maxCommits),
+        cascField(BitbucketServerSettings::autoDeleteBranch),
     )
 }

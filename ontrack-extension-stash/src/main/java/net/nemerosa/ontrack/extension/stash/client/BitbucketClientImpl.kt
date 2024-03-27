@@ -12,10 +12,13 @@ import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
 import org.springframework.web.client.HttpClientErrorException.NotFound
+import org.springframework.web.client.HttpMessageConverterExtractor
+import org.springframework.web.client.RequestCallback
 import org.springframework.web.client.getForObject
 import java.time.LocalDateTime
 
@@ -63,6 +66,26 @@ class BitbucketClientImpl(
         )
             ?.latestCommit
             ?: throw BitbucketServerCannotCreateBranchException()
+
+    override fun deleteBranch(repo: BitbucketRepository, branch: String) {
+        val request = mapOf(
+            "name" to "refs/heads/$branch"
+        )
+        val requestCallback: RequestCallback = template.httpEntityCallback<Any>(request, JsonNode::class.java)
+        template.execute<Any>(
+            "/rest/branch-utils/latest/projects/${repo.project}/repos/${repo.repository}/branches",
+            HttpMethod.DELETE,
+            requestCallback,
+            null,
+        )
+    }
+
+    override fun isBranchExisting(repo: BitbucketRepository, branch: String): Boolean {
+        val response = template.getForObject<FindBranchesResponse>(
+            "/rest/api/1.0/projects/${repo.project}/repos/${repo.repository}/branches?filterText=${branch}"
+        )
+        return response.values.any { it.displayId == branch }
+    }
 
     override fun download(repo: BitbucketRepository, branch: String?, path: String): ByteArray? =
         try {
@@ -215,6 +238,14 @@ class BitbucketClientImpl(
     private class RepositoriesResponseItem(
         @Suppress("unused") val id: Int,
         val slug: String
+    )
+
+    private class FindBranchesResponse(
+        val values: List<FindBranchesItem>,
+    )
+
+    private class FindBranchesItem(
+        val displayId: String,
     )
 
     private class RepositoryLastModifiedResponse(

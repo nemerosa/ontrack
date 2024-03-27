@@ -75,6 +75,7 @@ class AutoVersioningAuditStoreJdbcHelper(
                 audit = data.states,
                 routing = data.routing,
                 queue = data.queue,
+                upgradeBranch = data.upgradeBranch,
             )
         }
     }
@@ -133,6 +134,14 @@ class AutoVersioningAuditStoreJdbcHelper(
             jsonQueries += "S.json::jsonb->>'queue' = :queue"
             params += "queue" to it
         }
+        // Filter on paths
+        filter.targetPaths?.takeIf { it.isNotEmpty() }?.let { paths ->
+            jsonQueries += """
+                array_to_string(array(select jsonb_array_elements_text(json::jsonb->'targetPaths')), ',') = :targetPaths
+            """
+            params += "targetPaths" to paths.joinToString(",")
+        }
+
         // JSON filter
         if (jsonQueries.isNotEmpty()) {
             query += " AND ${jsonQueries.joinToString(" AND ")}"

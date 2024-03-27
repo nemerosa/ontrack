@@ -4,6 +4,9 @@ import net.nemerosa.ontrack.extension.scm.service.*
 import net.nemerosa.ontrack.extension.stash.AbstractBitbucketTestSupport
 import net.nemerosa.ontrack.extension.stash.TestOnBitbucketServer
 import net.nemerosa.ontrack.extension.stash.bitbucketServerEnv
+import net.nemerosa.ontrack.extension.stash.client.BitbucketClientFactory
+import net.nemerosa.ontrack.extension.stash.model.BitbucketRepository
+import net.nemerosa.ontrack.extension.stash.model.StashConfiguration
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -20,6 +23,9 @@ class BitbucketServerSCMExtensionRealIT : AbstractBitbucketTestSupport() {
 
     @Autowired
     private lateinit var scmDetector: SCMDetector
+
+    @Autowired
+    private lateinit var bitbucketClientFactory: BitbucketClientFactory
 
     @Test
     fun `Using a complete SCM reference to download a file`() {
@@ -69,7 +75,7 @@ class BitbucketServerSCMExtensionRealIT : AbstractBitbucketTestSupport() {
 
     @Test
     fun `Creating a branch`() {
-        withScm { scm ->
+        withScm { scm, _ ->
             val branchName = uid("branch/")
             val commit = scm.createBranch(bitbucketServerEnv.defaultBranch, branchName)
             assertTrue(commit.isNotBlank(), "Commit returned")
@@ -78,7 +84,7 @@ class BitbucketServerSCMExtensionRealIT : AbstractBitbucketTestSupport() {
 
     @Test
     fun `Creating a pull request with reviewers`() {
-        withScm { scm ->
+        withScm { scm, _ ->
             // Creating the branch
             val branchName = uid("branch/")
             scm.createBranch(bitbucketServerEnv.defaultBranch, branchName)
@@ -110,7 +116,7 @@ class BitbucketServerSCMExtensionRealIT : AbstractBitbucketTestSupport() {
 
     @Test
     fun `Editing and downloading a file on a branch`() {
-        withScm { scm ->
+        withScm { scm, _ ->
             val branchName = uid("branch/")
             val fileName = uid("file_")
             val fileContent = uid("content_")
@@ -137,24 +143,34 @@ class BitbucketServerSCMExtensionRealIT : AbstractBitbucketTestSupport() {
 
     @Test
     fun `Creating a PR without auto approval`() {
-        withPR(autoApproval = false) { pr ->
+        withPR(autoApproval = false) { pr, _, _ ->
             assertFalse(pr.merged, "PR not merged")
         }
     }
 
     @Test
     fun `Creating a PR with auto approval`() {
-        withPR(autoApproval = true) { pr ->
+        withPR(autoApproval = true) { pr, head, config ->
             assertTrue(pr.merged, "PR is merged")
+            // Checks that the source branch has been deleted
+            val client = bitbucketClientFactory.getBitbucketClient(config)
+            val repo = BitbucketRepository(
+                project = bitbucketServerEnv.project,
+                repository = bitbucketServerEnv.repository,
+            )
+            assertFalse(
+                client.isBranchExisting(repo, head),
+                "PR source branch has been deleted: $head"
+            )
         }
     }
 
     private fun withPR(
         autoApproval: Boolean,
         remoteAutoMerge: Boolean = false,
-        code: (SCMPullRequest) -> Unit,
+        code: (pr: SCMPullRequest, head: String, config: StashConfiguration) -> Unit,
     ) {
-        withScm { scm ->
+        withScm { scm, config ->
             val commonName = uid("branch-")
             val baseName = "base/$commonName"
             val headName = "head/$commonName"
@@ -194,15 +210,15 @@ class BitbucketServerSCMExtensionRealIT : AbstractBitbucketTestSupport() {
             )
             // Checks
             assertTrue(pr.id.isNotBlank(), "PR created")
-            code(pr)
+            code(pr, headName, config)
         }
     }
 
-    private fun withScm(code: (SCM) -> Unit) {
+    private fun withScm(code: (scm: SCM, config: StashConfiguration) -> Unit) {
         project {
-            bitbucketServerConfig()
+            val config = bitbucketServerConfig()
             val scm = scmDetector.getSCM(this) ?: fail("No SCM for project")
-            code(scm)
+            code(scm, config)
         }
     }
 

@@ -19,10 +19,13 @@ data class BitbucketServerSettings(
     val autoMergeInterval: Long = DEFAULT_AUTO_MERGE_INTERVAL,
     @APILabel("Maximum number of commits to return for a change log")
     val maxCommits: Int = DEFAULT_MAX_COMMITS,
+    @APIDescription("Deleting the source branch when an auto-versioning PR is merged")
+    val autoDeleteBranch: Boolean = DEFAULT_AUTO_DELETE_BRANCH,
 ) {
     companion object {
         val DEFAULT_AUTO_MERGE_TIMEOUT = Duration.ofMinutes(10).toMillis()
         val DEFAULT_AUTO_MERGE_INTERVAL = Duration.ofSeconds(30).toMillis()
         const val DEFAULT_MAX_COMMITS: Int = 1000
+        const val DEFAULT_AUTO_DELETE_BRANCH: Boolean = true
     }
 }

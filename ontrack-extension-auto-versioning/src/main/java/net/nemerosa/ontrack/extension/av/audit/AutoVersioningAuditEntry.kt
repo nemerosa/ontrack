@@ -11,6 +11,8 @@ data class AutoVersioningAuditEntry(
     val routing: String,
     @APIDescription("Actual queue where the order was posted")
     val queue: String?,
+    @APIDescription("Actual SCM branch being used")
+    val upgradeBranch: String?,
 ) {
     val mostRecentState: AutoVersioningAuditEntryState get() = audit.first()
     val running: Boolean get() = mostRecentState.state.isRunning

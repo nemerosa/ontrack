@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.av.audit
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import net.nemerosa.ontrack.model.annotations.API
 import net.nemerosa.ontrack.model.annotations.APIDescription
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -18,7 +19,9 @@ class AutoVersioningAuditQueryFilter(
     @APIDescription("Actual queue the order was posted to")
     val queue: String? = null,
     val offset: Int = 0,
-    val count: Int = 10
+    val count: Int = 10,
+    @APIDescription("Set of paths")
+    val targetPaths: List<String>? = null,
 ) {
     fun withOffset(value: Int) = AutoVersioningAuditQueryFilter(
         project = project,
@@ -32,7 +35,8 @@ class AutoVersioningAuditQueryFilter(
         routing = routing,
         queue = queue,
         offset = value,
-        count = count
+        count = count,
+        targetPaths = targetPaths,
     )
     fun withCount(value: Int) = AutoVersioningAuditQueryFilter(
         project = project,
@@ -46,6 +50,7 @@ class AutoVersioningAuditQueryFilter(
         routing = routing,
         queue = queue,
         offset = offset,
-        count = value
+        count = value,
+        targetPaths = targetPaths,
     )
 }

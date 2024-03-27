@@ -3,10 +3,12 @@ package net.nemerosa.ontrack.extension.stash.settings
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.intField
 import net.nemerosa.ontrack.model.form.longField
+import net.nemerosa.ontrack.model.form.yesNoField
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.AbstractSettingsManager
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.support.SettingsRepository
+import net.nemerosa.ontrack.model.support.setBoolean
 import net.nemerosa.ontrack.model.support.setLong
 import org.springframework.stereotype.Component
 
@@ -24,6 +26,7 @@ class BitbucketServerSettingsManager(
     override fun doSaveSettings(settings: BitbucketServerSettings) {
         settingsRepository.setLong<BitbucketServerSettings>(settings::autoMergeTimeout)
         settingsRepository.setLong<BitbucketServerSettings>(settings::autoMergeInterval)
+        settingsRepository.setBoolean<BitbucketServerSettings>(settings::autoDeleteBranch)
     }
 
     override fun getSettingsForm(settings: BitbucketServerSettings): Form =
@@ -39,6 +42,10 @@ class BitbucketServerSettingsManager(
             .intField(
                 BitbucketServerSettings::maxCommits,
                 settings.maxCommits
+            )
+            .yesNoField(
+                BitbucketServerSettings::autoDeleteBranch,
+                settings.autoDeleteBranch
             )
 
     override fun getId(): String = "bitbucket-server"

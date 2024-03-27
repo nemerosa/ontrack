@@ -105,4 +105,21 @@ interface BitbucketClient {
      */
     fun getCommits(repo: BitbucketRepository, fromCommit: String, toCommit: String): List<BitbucketServerCommit>
 
+    /**
+     * Deletes a branch.
+     *
+     * @param repo Repository where the PR is
+     * @param branch Branch to delete
+     */
+    fun deleteBranch(repo: BitbucketRepository, branch: String)
+
+    /**
+     * Checks if a branch exists.
+     *
+     * @param repo Repository where the branch is
+     * @param branch Branch to look for
+     * @return True if the branch exists
+     */
+    fun isBranchExisting(repo: BitbucketRepository, branch: String): Boolean
+
 }
