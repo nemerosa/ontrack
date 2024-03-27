@@ -1,0 +1,14 @@
+mutation UpdateBuildCreationTime(
+    $id: Int!,
+    $time: LocalDateTime!,
+) {
+    updateBuild(input: {
+        id: $id,
+        creation: $time
+    }) {
+        build {
+            ...BuildFragment
+        }
+        ...PayloadUserErrors
+    }
+}

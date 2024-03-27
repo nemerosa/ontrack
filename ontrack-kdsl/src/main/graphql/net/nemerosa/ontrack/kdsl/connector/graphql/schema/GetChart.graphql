@@ -1,0 +1,17 @@
+query GetChart(
+    $name: String!,
+    $ref: LocalDateTime,
+    $interval: String!,
+    $period: String!,
+    $parameters: JSON!,
+) {
+    getChart(input: {
+        name: $name,
+        options: {
+            ref: $ref,
+            interval: $interval,
+            period: $period,
+        },
+        parameters: $parameters,
+    })
+}

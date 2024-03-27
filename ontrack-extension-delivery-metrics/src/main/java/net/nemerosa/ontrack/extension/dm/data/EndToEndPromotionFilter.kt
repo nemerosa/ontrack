@@ -9,6 +9,7 @@ data class EndToEndPromotionFilter(
     val beforeTime: LocalDateTime? = null,
     val samePromotion: Boolean = true,
     val promotionId: Int? = null,
+    val targetPromotionId: Int? = null,
     val refProject: String? = null,
     val targetProject: String? = null,
     val buildOrder: Boolean? = true,

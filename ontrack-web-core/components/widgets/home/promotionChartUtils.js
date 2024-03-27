@@ -21,6 +21,14 @@ export const usePromotionLevel = (project, branch, promotionLevel) => {
                             name
                             description
                             image
+                            branch {
+                                id
+                                name
+                                project {
+                                    id
+                                    name
+                                }
+                            }
                         }
                     }
                 `,

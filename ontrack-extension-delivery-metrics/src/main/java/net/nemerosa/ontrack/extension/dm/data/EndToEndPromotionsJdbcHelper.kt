@@ -96,6 +96,10 @@ class EndToEndPromotionsJdbcHelper(
             query += " and ref_project = :refProject"
             params.addValue("refProject", filter.refProject)
         }
+        if (filter.targetPromotionId != null) {
+            query += " and promotion_id = :targetPromotionId"
+            params.addValue("targetPromotionId", filter.targetPromotionId)
+        }
         if (filter.targetProject != null) {
             query += " and project = :targetProject"
             params.addValue("targetProject", filter.targetProject)

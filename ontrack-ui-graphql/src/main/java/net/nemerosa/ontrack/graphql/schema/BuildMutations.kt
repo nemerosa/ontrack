@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.graphql.schema
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.graphql.support.ListRef
 import net.nemerosa.ontrack.graphql.support.TypeRef
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
@@ -11,8 +10,10 @@ import net.nemerosa.ontrack.model.exceptions.ProjectNotFoundException
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
+import java.time.LocalDateTime
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
+import kotlin.jvm.optionals.getOrNull
 
 @Component
 class BuildMutations(
@@ -40,6 +41,33 @@ class BuildMutations(
             // Run info
             if (input.runInfo != null) {
                 runInfoService.setRunInfo(build, input.runInfo)
+            }
+            // OK
+            build
+        },
+        /**
+         * Updating a build
+         */
+        simpleMutation(
+            name = "updateBuild",
+            description = "Updates an existing build",
+            input = UpdateBuildInput::class,
+            outputName = "build",
+            outputDescription = "Updated build",
+            outputType = Build::class
+        ) { input ->
+            var build = structureService.getBuild(ID.of(input.id))
+            var changed = false
+            // Creation timestamp
+            if (input.creation != null) {
+                build = build.withSignature(
+                    build.signature.withTime(input.creation)
+                )
+                changed = true
+            }
+            // Saving it
+            if (changed) {
+                build = structureService.saveBuild(build)
             }
             // OK
             build
@@ -216,6 +244,13 @@ data class CreateBuildInput(
     @TypeRef
     val runInfo: RunInfoInput?,
 ) : BuildInput
+
+data class UpdateBuildInput(
+    @APIDescription("ID of the build to update")
+    val id: Int,
+    @APIDescription("Creation timestamp to update")
+    val creation: LocalDateTime? = null,
+)
 
 data class CreateBuildOrGetInput(
     @APIDescription("Project ID (required unless project name is provided)")

@@ -15,6 +15,7 @@ import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
  */
 fun PromotionLevelFragment.toPromotionLevel(connected: Connected) = PromotionLevel(
     connector = connected.connector,
+    branch = branch()?.fragments()?.branchFragment()?.toBranch(connected) ?: error("Missing parent branch"),
     id = id().toUInt(),
     name = name()!!,
     description = description(),
