@@ -54,7 +54,7 @@ export default function E2EChartWidgetForm({
                 <Form.Item
                     name="targetPromotionLevel"
                     label="... to promotion level"
-                    initialValue={{targetProject, targetBranch, targetPromotionLevel}}
+                    initialValue={{project: targetProject, branch: targetBranch, promotionLevel: targetPromotionLevel}}
                 >
                     <SelectProjectBranchPromotionLevel/>
                 </Form.Item>
