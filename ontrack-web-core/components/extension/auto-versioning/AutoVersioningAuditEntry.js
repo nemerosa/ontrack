@@ -101,6 +101,11 @@ export default function AutoVersioningAuditEntry({entry}) {
             children: <Typography.Text code>{entry.order.upgradeBranchPattern}</Typography.Text>,
         },
         {
+            key: 'upgradeBranch',
+            label: "Upgrade branch",
+            children: <Typography.Text code>{entry.upgradeBranch}</Typography.Text>,
+        },
+        {
             key: 'validationStamp',
             label: "Validation stamp",
             children: <Typography.Text code>{entry.order.validationStamp}</Typography.Text>,

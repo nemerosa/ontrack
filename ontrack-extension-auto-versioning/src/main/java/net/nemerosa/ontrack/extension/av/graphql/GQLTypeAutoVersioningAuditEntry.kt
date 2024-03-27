@@ -48,6 +48,8 @@ class GQLTypeAutoVersioningAuditEntry(
                     .description("Elapsed time between the creation of this process and its last state (in ms)")
                     .type(Scalars.GraphQLInt)
             }
+            // Upgrade branch
+            .stringField(AutoVersioningAuditEntry::upgradeBranch)
             // Routing & queue
             .stringField(AutoVersioningAuditEntry::routing)
             .stringField(AutoVersioningAuditEntry::queue)

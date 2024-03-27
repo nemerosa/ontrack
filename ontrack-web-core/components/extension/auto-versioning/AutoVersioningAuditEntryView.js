@@ -57,6 +57,7 @@ export default function AutoVersioningAuditEntryView({uuid}) {
                                 }
                                 routing
                                 queue
+                                upgradeBranch
                                 order {
                                     uuid
                                     sourceProject

@@ -165,6 +165,8 @@ type AutoVersioningAuditEntry {
     routing: String!
     "Running state"
     running: Boolean
+    "Actual SCM branch being used"
+    upgradeBranch: String
 }
 
 type AutoVersioningAuditEntryPaginated {
@@ -3900,6 +3902,11 @@ type Mutation {
         "Input for the mutation"
         input: UnshareSCMFileChangeFilterInput
     ): UnshareSCMFileChangeFilterPayload
+    "Updates an existing build"
+    updateBuild(
+        "Input for the mutation"
+        input: UpdateBuildInput
+    ): UpdateBuildPayload
     "Updates a configuration"
     updateConfiguration(
         "Input for the mutation"
@@ -6344,6 +6351,14 @@ type UnlockAccountPayload implements Payload {
 
 "Output type for the unshareSCMFileChangeFilter mutation."
 type UnshareSCMFileChangeFilterPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
+"Output type for the updateBuild mutation."
+type UpdateBuildPayload implements Payload {
+    "Updated build"
+    build: Build
     "List of errors"
     errors: [UserError]
 }
@@ -9711,6 +9726,14 @@ input UnshareSCMFileChangeFilterInput {
     name: String!
     "ID of the project"
     projectId: Int!
+}
+
+"Input type for the updateBuild mutation."
+input UpdateBuildInput {
+    "Creation timestamp to update"
+    creation: LocalDateTime
+    "ID of the build to update"
+    id: Int!
 }
 
 "Input type for the updateConfiguration mutation."
