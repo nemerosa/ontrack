@@ -225,6 +225,8 @@ type AutoVersioningOrder {
     reviewers: [String!]!
     "Source project for the processing order"
     sourceProject: String!
+    "Source promotion for the processing order"
+    sourcePromotion: String
     "List of paths to update with the target version"
     targetPaths: [String]
     "Property in the target file"

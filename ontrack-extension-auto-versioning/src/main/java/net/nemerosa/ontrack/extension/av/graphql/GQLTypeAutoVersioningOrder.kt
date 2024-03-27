@@ -27,6 +27,7 @@ class GQLTypeAutoVersioningOrder(
             .description("Auto versioning processing order")
             .stringField(AutoVersioningOrder::uuid, "UUID for the processing order")
             .stringField(AutoVersioningOrder::sourceProject, "Source project for the processing order")
+            .stringField(AutoVersioningOrder::sourcePromotion, "Source promotion for the processing order")
             .field {
                 it.name("branch")
                     .description("Target branch for the processing order")

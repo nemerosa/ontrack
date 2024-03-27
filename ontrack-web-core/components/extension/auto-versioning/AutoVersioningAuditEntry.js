@@ -26,6 +26,11 @@ export default function AutoVersioningAuditEntry({entry}) {
             </Space>,
         },
         {
+            key: 'promotion',
+            label: "Promotion",
+            children: entry.order.sourcePromotion,
+        },
+        {
             key: 'version',
             label: "Version",
             children: entry.order.targetVersion,

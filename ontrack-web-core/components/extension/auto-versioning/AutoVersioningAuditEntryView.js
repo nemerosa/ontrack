@@ -61,6 +61,7 @@ export default function AutoVersioningAuditEntryView({uuid}) {
                                 order {
                                     uuid
                                     sourceProject
+                                    sourcePromotion
                                     branch {
                                         id
                                         name
