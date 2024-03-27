@@ -1,13 +1,13 @@
-import LegacyLink from "@components/common/LegacyLink";
 import {Space} from "antd";
-import {legacyValidationStampUri} from "@components/common/Links";
+import {validationStampUri} from "@components/common/Links";
 import ValidationStampImage from "@components/validationStamps/ValidationStampImage";
+import Link from "next/link";
 
 export default function ValidationStampLink({validationStamp, text}) {
-    return <LegacyLink href={legacyValidationStampUri(validationStamp)}>
+    return <Link href={validationStampUri(validationStamp)}>
         <Space>
             <ValidationStampImage validationStamp={validationStamp}/>
             {text ? text : validationStamp.name}
         </Space>
-    </LegacyLink>
+    </Link>
 }

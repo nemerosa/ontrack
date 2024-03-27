@@ -56,6 +56,10 @@ export function promotionLevelUri(promotionLevel) {
     return `/promotionLevel/${promotionLevel.id}`
 }
 
+export function validationStampUri(validationStamp) {
+    return `/validationStamp/${validationStamp.id}`
+}
+
 export function legacyPromotionLevelImageUri(promotionLevel) {
     return `/rest/structure/promotionLevels/${promotionLevel.id}/image`
 }
@@ -70,10 +74,6 @@ export function legacyPredefinedValidationStampImageUri(predefinedValidationStam
 
 export function legacyValidationStampImageUri(validationStamp) {
     return `/rest/structure/validationStamps/${validationStamp.id}/image`
-}
-
-export function legacyValidationStampUri(validationStamp) {
-    return `#/validationStamp/${validationStamp.id}`
 }
 
 export function legacyValidationRunUri(validationRun) {

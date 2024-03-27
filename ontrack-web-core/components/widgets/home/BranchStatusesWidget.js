@@ -2,14 +2,13 @@ import {useContext, useEffect, useState} from "react";
 import {gql} from "graphql-request";
 import {Space, Table, Typography} from "antd";
 import {FaBan} from "react-icons/fa";
-import {legacyValidationStampUri, promotionLevelUri} from "@components/common/Links";
+import {promotionLevelUri, validationStampUri} from "@components/common/Links";
 import ValidationRunStatus from "@components/validationRuns/ValidationRunStatus";
 import Timestamp from "@components/common/Timestamp";
 import PredefinedPromotionLevelImage from "@components/promotionLevels/PredefinedPromotionLevelImage";
 import PredefinedValidationStampImage from "@components/validationStamps/PredefinedValidationStampImage";
 import {toMilliSeconds} from "@components/common/SelectInterval";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
-import LegacyLink from "@components/common/LegacyLink";
 import BranchLink from "@components/branches/BranchLink";
 import ProjectLink from "@components/projects/ProjectLink";
 import {DashboardWidgetCellContext} from "@components/dashboards/DashboardWidgetCellContextProvider";
@@ -204,9 +203,9 @@ export default function BranchStatusesWidget({promotions, validations, refreshIn
                                                             />
                                                         }
                                                     />
-                                                    <LegacyLink href={legacyValidationStampUri(run.validationStamp)}>
+                                                    <Link href={validationStampUri(run.validationStamp)}>
                                                         <Typography.Text type="secondary">[history]</Typography.Text>
-                                                    </LegacyLink>
+                                                    </Link>
                                                 </Space>
                                             }
                                             <Timestamp value={run.lastStatus.creation.time}/>

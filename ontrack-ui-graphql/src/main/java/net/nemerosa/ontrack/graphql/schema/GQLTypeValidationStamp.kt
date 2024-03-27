@@ -9,6 +9,7 @@ import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLObjectType.newObject
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.extension.api.ExtensionManager
+import net.nemerosa.ontrack.graphql.schema.authorizations.GQLInterfaceAuthorizableService
 import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
 import net.nemerosa.ontrack.model.structure.*
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class GQLTypeValidationStamp(
+    private val gqlInterfaceAuthorizableService: GQLInterfaceAuthorizableService,
     private val structureService: StructureService,
     creation: GQLTypeCreation,
     private val projectEntityInterface: GQLProjectEntityInterface,
@@ -43,6 +45,10 @@ class GQLTypeValidationStamp(
                 .name(VALIDATION_STAMP)
                 .withInterface(projectEntityInterface.typeRef)
                 .fields(projectEntityInterfaceFields())
+                // Authorizations
+                .apply {
+                    gqlInterfaceAuthorizableService.apply(this, PromotionLevel::class)
+                }
                 // Image flag
                 .field { f ->
                     f.name("image")

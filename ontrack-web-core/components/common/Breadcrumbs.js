@@ -50,3 +50,7 @@ export function downToBuildBreadcrumbs({build}) {
 export function promotionLevelBreadcrumbs(promotionLevel) {
     return downToBranchBreadcrumbs(promotionLevel)
 }
+
+export function validationStampBreadcrumbs(validationStamp) {
+    return downToBranchBreadcrumbs(validationStamp)
+}

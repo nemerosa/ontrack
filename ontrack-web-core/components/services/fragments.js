@@ -51,6 +51,51 @@ export const usePromotionLevel = (id) => {
     return promotionLevel
 }
 
+export const gqlValidationStampFragment = gql`
+    fragment ValidationStampData on ValidationStamp {
+        id
+        name
+        description
+        image
+        dataType {
+            descriptor {
+                id
+                displayName
+            }
+            config
+        }
+        authorizations {
+            name
+            action
+            authorized
+        }
+        branch {
+            id
+            name
+            project {
+                id
+                name
+            }
+        }
+    }
+`
+
+export const gqlValidationStampByIdQuery = gql`
+    query ValidationStampById($id: Int!) {
+        validationStamp(id: $id) {
+            ...ValidationStampData
+        }
+    }
+    ${gqlValidationStampFragment}
+`
+
+export const getValidationStampById = (client, id) => {
+    return client.request(
+        gqlValidationStampByIdQuery,
+        {id}
+    ).then(data => data.validationStamp)
+}
+
 export const gqlDecorationFragment = gql`
     fragment decorationContent on Decoration {
         decorationType
