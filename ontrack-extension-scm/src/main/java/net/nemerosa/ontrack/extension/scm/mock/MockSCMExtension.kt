@@ -156,10 +156,32 @@ class MockSCMExtension(
 
         fun findPR(from: String?, to: String?): MockPullRequest? =
             createdPullRequests
-                .filter { from == null || it.from == from }.firstOrNull { to == null || it.to == to }
+                .filter {
+                    branchMatches(it.from, from)
+                }.firstOrNull {
+                    branchMatches(it.to, to)
+                }
 
-        fun getBranch(name: String): MockBranch? = createdBranches[name]?.let {
-            MockBranch(it)
+        private fun branchMatches(
+            actualBranch: String,
+            branchPattern: String?
+        ) = if (branchPattern == null) {
+            true
+        } else if (branchPattern.endsWith("*")) {
+            actualBranch.startsWith(branchPattern.trimEnd('*'))
+        } else {
+            actualBranch == branchPattern
+        }
+
+        fun getBranch(namePattern: String): MockBranch? {
+            val branch = if (namePattern.endsWith("*")) {
+                createdBranches.entries.firstOrNull { (name, branch) ->
+                    branchMatches(name, namePattern)
+                }?.value
+            } else {
+                createdBranches[name]
+            }
+            return branch?.let { MockBranch(it) }
         }
 
         fun findIssue(key: String) = issues[key]

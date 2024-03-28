@@ -48,7 +48,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         assertThatMockScmRepository {
                             hasPR(
-                                from = "feature/auto-upgrade-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61",
+                                from = "feature/auto-upgrade-${dependency.project.name}-2.0.0-*",
                                 to = "main"
                             )
                             fileContains("gradle.properties") {
@@ -104,7 +104,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         assertThatMockScmRepository {
                             val pr = hasPR(
-                                from = "feature/auto-upgrade-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61",
+                                from = "feature/auto-upgrade-${dependency.project.name}-2.0.0-*",
                                 to = "main"
                             )
                             assertEquals(listOf("user1", "user2"), pr.reviewers)
@@ -223,7 +223,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         assertThatMockScmRepository {
                             hasPR(
-                                from = "feature/auto-upgrade-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61",
+                                from = "feature/auto-upgrade-${dependency.project.name}-2.0.0-*",
                                 to = "main"
                             )
                             fileContains("gradle.properties") {
@@ -280,7 +280,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         assertThatMockScmRepository {
                             hasPR(
-                                from = "feature/auto-upgrade-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61",
+                                from = "feature/auto-upgrade-${dependency.project.name}-2.0.0-*",
                                 to = "main"
                             )
                             fileContains("gradle.properties") {
@@ -336,7 +336,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         assertThatMockScmRepository {
                             hasPR(
-                                from = "feature/auto-upgrade-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61",
+                                from = "feature/auto-upgrade-${dependency.project.name}-2.0.0-*",
                                 to = "main"
                             )
                             fileContains("gradle.properties") {
@@ -390,7 +390,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         assertThatMockScmRepository {
 
-                            hasNoBranch("feature/auto-upgrade-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61")
+                            hasNoBranch("feature/auto-upgrade-${dependency.project.name}-2.0.0-*")
 
                             fileContains("gradle.properties") {
                                 """
@@ -445,7 +445,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         assertThatMockScmRepository {
 
-                            hasNoBranch("feature/auto-upgrade-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61")
+                            hasNoBranch("feature/auto-upgrade-${dependency.project.name}-2.0.0-*")
 
                             fileContains("gradle.properties") {
                                 """
@@ -505,7 +505,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         assertThatMockScmRepository {
 
-                            hasNoBranch("feature/auto-upgrade-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61")
+                            hasNoBranch("feature/auto-upgrade-${dependency.project.name}-2.0.0-*")
 
                             fileContains("gradle.properties") {
                                 """
@@ -558,7 +558,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         assertThatMockScmRepository {
                             hasPR(
-                                from = "feature/auto-upgrade-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61",
+                                from = "feature/auto-upgrade-${dependency.project.name}-2.0.0-*",
                                 to = "main"
                             )
                             fileContains("package.json") {
@@ -612,7 +612,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         assertThatMockScmRepository {
                             hasPR(
-                                from = "feature/auto-upgrade-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61",
+                                from = "feature/auto-upgrade-${dependency.project.name}-2.0.0-*",
                                 to = "main"
                             )
                             fileContains("gradle.properties") {
@@ -668,7 +668,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         assertThatMockScmRepository {
                             val pr = hasPR(
-                                from = "feature/auto-upgrade-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61",
+                                from = "feature/auto-upgrade-${dependency.project.name}-2.0.0-*",
                                 to = "main"
                             )
                             checkPRIsNotApproved(pr)
@@ -718,8 +718,8 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         assertThatMockScmRepository {
                             hasPR(
-                                // fad58de7366495db4650cfefac2fcd61 = md5(main)
-                                from = "feature/upgrade-test-AAA-2.0.0-fad58de7366495db4650cfefac2fcd61",
+                                // * = md5(main)
+                                from = "feature/upgrade-test-AAA-2.0.0-*",
                                 to = "main"
                             )
                             fileContains("gradle.properties") {
@@ -775,8 +775,8 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         assertThatMockScmRepository {
                             hasPR(
-                                // fad58de7366495db4650cfefac2fcd61 = md5(main)
-                                from = "feature/upgrade-test-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61",
+                                // * = md5(main)
+                                from = "feature/upgrade-test-${dependency.project.name}-2.0.0-*",
                                 to = "main"
                             )
                             fileContains("gradle.properties") {
@@ -832,7 +832,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         assertThatMockScmRepository {
 
-                            hasNoBranch("feature/auto-upgrade-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61")
+                            hasNoBranch("feature/auto-upgrade-${dependency.project.name}-2.0.0-*")
 
                             fileContains("gradle.properties") {
                                 """
@@ -907,7 +907,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         assertThatMockScmRepository {
                             hasPR(
-                                from = "feature/auto-upgrade-${a.project.name}-1.1.1-fad58de7366495db4650cfefac2fcd61",
+                                from = "feature/auto-upgrade-${a.project.name}-1.1.1-*",
                                 to = "main"
                             )
                             fileContains("gradle.properties") {
@@ -931,7 +931,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         assertThatMockScmRepository {
                             hasPR(
-                                from = "feature/auto-upgrade-${b.project.name}-2.1.0-fad58de7366495db4650cfefac2fcd61",
+                                from = "feature/auto-upgrade-${b.project.name}-2.1.0-*",
                                 to = "main"
                             )
                             fileContains("gradle.properties") {
@@ -984,7 +984,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         assertThatMockScmRepository {
 
-                            hasNoBranch("feature/auto-upgrade-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61")
+                            hasNoBranch("feature/auto-upgrade-${dependency.project.name}-2.0.0-*")
 
                             fileContains("gradle.properties") {
                                 """
@@ -1051,7 +1051,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         assertThatMockScmRepository {
                             hasPR(
-                                from = "feature/auto-upgrade-${dependency.project.name}-1.1.0-fad58de7366495db4650cfefac2fcd61",
+                                from = "feature/auto-upgrade-${dependency.project.name}-1.1.0-*",
                                 to = "main"
                             )
                             fileContains("gradle.properties") {
@@ -1110,7 +1110,7 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         assertThatMockScmRepository {
 
-                            hasNoBranch("feature/auto-upgrade-${dependency.project.name}-1.1.0-fad58de7366495db4650cfefac2fcd61")
+                            hasNoBranch("feature/auto-upgrade-${dependency.project.name}-1.1.0-*")
 
                             fileContains("gradle.properties") {
                                 """

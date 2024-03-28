@@ -73,7 +73,7 @@ class MockSCMController(
         @RequestParam repository: String,
         @RequestParam scmBranch: String,
     ): MockBranch =
-        mockSCMExtension.repository(repository).getBranch(scmBranch)
+        mockSCMExtension.repository(repository).getBranch(namePattern = scmBranch)
             ?: throw MockSCMBranchNotFoundException(scmBranch)
 
     /**

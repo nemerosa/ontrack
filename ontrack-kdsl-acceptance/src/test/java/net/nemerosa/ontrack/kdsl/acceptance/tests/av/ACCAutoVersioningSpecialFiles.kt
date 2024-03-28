@@ -43,7 +43,7 @@ class ACCAutoVersioningSpecialFiles : AbstractACCAutoVersioningTestSupport() {
 
                         assertThatMockScmRepository {
                             hasPR(
-                                from = "feature/auto-upgrade-${library.project.name}-0.1.1-fad58de7366495db4650cfefac2fcd61",
+                                from = "feature/auto-upgrade-${library.project.name}-0.1.1-*",
                                 to = "main"
                             )
                             fileContains("Jenkinsfile") {

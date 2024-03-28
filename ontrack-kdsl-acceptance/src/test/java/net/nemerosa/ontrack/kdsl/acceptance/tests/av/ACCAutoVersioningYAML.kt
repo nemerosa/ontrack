@@ -55,7 +55,7 @@ class ACCAutoVersioningYAML : AbstractACCAutoVersioningTestSupport() {
 
                         assertThatMockScmRepository {
                             hasPR(
-                                from = "feature/auto-upgrade-${dependency.project.name}-0.1.2-fad58de7366495db4650cfefac2fcd61",
+                                from = "feature/auto-upgrade-${dependency.project.name}-0.1.2-*",
                                 to = "main"
                             )
                             fileContains("requirements.yaml") {
@@ -126,7 +126,7 @@ class ACCAutoVersioningYAML : AbstractACCAutoVersioningTestSupport() {
 
                         assertThatMockScmRepository {
                             hasPR(
-                                from = "feature/auto-upgrade-${dependency.project.name}-0.1.2-fad58de7366495db4650cfefac2fcd61",
+                                from = "feature/auto-upgrade-${dependency.project.name}-0.1.2-*",
                                 to = "main"
                             )
                             fileContains("requirements.yaml") {

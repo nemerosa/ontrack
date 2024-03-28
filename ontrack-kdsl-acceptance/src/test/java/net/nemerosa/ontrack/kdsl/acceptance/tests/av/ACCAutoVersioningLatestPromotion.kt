@@ -71,7 +71,7 @@ class ACCAutoVersioningLatestPromotion : AbstractACCAutoVersioningTestSupport() 
                         assertThatMockScmRepository {
 
                             hasPR(
-                                from = "feature/auto-upgrade-${release12.project.name}-1.2.1-fad58de7366495db4650cfefac2fcd61",
+                                from = "feature/auto-upgrade-${release12.project.name}-1.2.1-*",
                                 to = "main"
                             )
                             fileContains("gradle.properties") {

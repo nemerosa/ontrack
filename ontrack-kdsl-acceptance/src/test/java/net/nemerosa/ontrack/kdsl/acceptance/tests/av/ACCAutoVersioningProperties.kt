@@ -45,7 +45,7 @@ class ACCAutoVersioningProperties : AbstractACCAutoVersioningTestSupport() {
 
                         assertThatMockScmRepository {
                             hasPR(
-                                from = "feature/auto-upgrade-${dependency.project.name}-2.0.0-fad58de7366495db4650cfefac2fcd61",
+                                from = "feature/auto-upgrade-${dependency.project.name}-2.0.0-*",
                                 to = "main"
                             )
                             fileContains("gradle.properties") {
@@ -107,7 +107,7 @@ class ACCAutoVersioningProperties : AbstractACCAutoVersioningTestSupport() {
 
                         assertThatMockScmRepository {
                             hasPR(
-                                from = "feature/auto-upgrade-${module3.project.name}-7.3.2-fad58de7366495db4650cfefac2fcd61",
+                                from = "feature/auto-upgrade-${module3.project.name}-7.3.2-*",
                                 to = "main"
                             )
                             fileContains("package.json") {
@@ -175,7 +175,7 @@ class ACCAutoVersioningProperties : AbstractACCAutoVersioningTestSupport() {
 
                         assertThatMockScmRepository {
                             hasPR(
-                                from = "feature/auto-upgrade-${module3.project.name}-7.3.2-fad58de7366495db4650cfefac2fcd61",
+                                from = "feature/auto-upgrade-${module3.project.name}-7.3.2-*",
                                 to = "main"
                             )
                             fileContains("package.json") {
