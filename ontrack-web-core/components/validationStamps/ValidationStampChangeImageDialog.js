@@ -2,43 +2,43 @@ import {Space} from "antd";
 import {useRestClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
 import {useContext} from "react";
-import {PromotionLevelImage} from "@components/promotionLevels/PromotionLevelImage";
 import {EventsContext} from "@components/common/EventsContext";
 import ChangeImageDialog, {useChangeImageDialog} from "@components/common/ChangeImageDialog";
+import ValidationStampImage from "@components/validationStamps/ValidationStampImage";
 
-export const usePromotionLevelChangeImageDialog = () => {
+export const useValidationStampChangeImageDialog = () => {
 
     const restClient = useRestClient()
     const eventsContext = useContext(EventsContext)
 
     return useChangeImageDialog({
         query: gql`
-            query PromotionLevel($id: Int!) {
-                promotionLevel(id: $id) {
+            query ValidationStamp($id: Int!) {
+                validationStamp(id: $id) {
                     id
                     name
                     image
                 }
             }
         `,
-        queryUserNode: 'promotionLevel',
+        queryUserNode: 'validationStamp',
         imageCallback: (data, id) => {
-            restClient.put(`/rest/structure/promotionLevels/${id}/image`, data).then(() => {
-                eventsContext.fireEvent("promotionLevel.image", {id})
+            restClient.put(`/rest/structure/validationStamps/${id}/image`, data).then(() => {
+                eventsContext.fireEvent("validationStamp.image", {id})
             })
         }
     })
 }
 
-export default function PromotionLevelChangeImageDialog({promotionLevelChangeImageDialog}) {
+export default function ValidationStampChangeImageDialog({validationStampChangeImageDialog}) {
 
-    const renderImage = (promotionLevel) => {
+    const renderImage = (validationStamp) => {
         return (
             <>
                 <Space>
                     {
-                        promotionLevel &&
-                        <PromotionLevelImage promotionLevel={promotionLevel}/>
+                        validationStamp &&
+                        <ValidationStampImage validationStamp={validationStamp}/>
                     }
                     Image
                 </Space>
@@ -49,7 +49,7 @@ export default function PromotionLevelChangeImageDialog({promotionLevelChangeIma
     return (
         <>
             <ChangeImageDialog
-                changeImageDialog={promotionLevelChangeImageDialog}
+                changeImageDialog={validationStampChangeImageDialog}
                 renderer={renderImage}
             />
         </>

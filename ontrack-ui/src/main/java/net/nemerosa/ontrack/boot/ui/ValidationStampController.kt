@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.boot.ui
 import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Form.Companion.nameAndDescription
 import net.nemerosa.ontrack.model.form.ServiceConfigurator
 import net.nemerosa.ontrack.model.form.textField
 import net.nemerosa.ontrack.model.security.SecurityService
@@ -19,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
+import java.util.*
 import java.util.stream.Collectors
 import javax.servlet.http.HttpServletResponse
 import javax.validation.Valid
@@ -38,8 +38,10 @@ class ValidationStampController(
         val (_, _, _, _, project) = structureService.getBranch(branchId)
         return Resources.of(
             structureService.getValidationStampListForBranch(branchId),
-            uri(MvcUriComponentsBuilder.on(ValidationStampController::class.java)
-                .getValidationStampListForBranch(branchId))
+            uri(
+                MvcUriComponentsBuilder.on(ValidationStampController::class.java)
+                    .getValidationStampListForBranch(branchId)
+            )
         ) // Create
             .with(
                 Link.CREATE,
@@ -90,7 +92,8 @@ class ValidationStampController(
                                 ServiceConfigurationSource(
                                     dataType.javaClass.name,
                                     dataType.displayName,
-                                    dataType.getConfigForm(null), emptyMap<String, Any>())
+                                    dataType.getConfigForm(null), emptyMap<String, Any>()
+                                )
                             }
                             .collect(Collectors.toList())
                     )
@@ -124,7 +127,8 @@ class ValidationStampController(
     @GetMapping("validationStamps/{validationStampId}/update")
     fun updateValidationStampForm(@PathVariable validationStampId: ID): Form {
         val (_, name, description, branch, _, _, _, dataType) = structureService.getValidationStamp(
-            validationStampId)
+            validationStampId
+        )
         return newValidationStampForm(branch.id)
             .fill("name", name)
             .fill("description", description)
@@ -163,11 +167,26 @@ class ValidationStampController(
 
     @PostMapping("validationStamps/{validationStampId}/image")
     @ResponseStatus(HttpStatus.ACCEPTED)
+    @Deprecated("Will be removed in V5. Use the PUT method.")
     fun setValidationStampImage(@PathVariable validationStampId: ID, @RequestParam file: MultipartFile) {
-        structureService.setValidationStampImage(validationStampId, Document(
-            file.contentType!!,
-            file.bytes
-        ))
+        structureService.setValidationStampImage(
+            validationStampId, Document(
+                file.contentType!!,
+                file.bytes
+            )
+        )
+    }
+
+    @PutMapping("validationStamps/{validationStampId}/image")
+    @ResponseStatus(HttpStatus.OK)
+    fun putValidationStampImage(@PathVariable validationStampId: ID, @RequestBody imageBase64: String) {
+        structureService.setValidationStampImage(
+            validationStampId,
+            Document(
+                "image/png",
+                Base64.getDecoder().decode(imageBase64)
+            )
+        )
     }
 
     /**

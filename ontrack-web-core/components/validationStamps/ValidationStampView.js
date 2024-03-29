@@ -18,6 +18,10 @@ import ValidationStampHistory from "@components/validationStamps/ValidationStamp
 import StoredGridLayoutResetCommand from "@components/grid/StoredGridLayoutResetCommand";
 import InfoBox from "@components/common/InfoBox";
 import ValidationDataType from "@components/framework/validation-data-type/ValidationDataType";
+import {isAuthorized} from "@components/common/authorizations";
+import PromotionLevelChangeImageCommand from "@components/promotionLevels/PromotionLevelChangeImageCommand";
+import PromotionLevelUpdateCommand from "@components/promotionLevels/PromotionLevelUpdateCommand";
+import ValidationStampChangeImageCommand from "@components/validationStamps/ValidationStampChangeImageCommand";
 
 export default function ValidationStampView({id}) {
 
@@ -38,6 +42,10 @@ export default function ValidationStampView({id}) {
                 setValidationStamp(vs)
 
                 const commands = []
+                if (isAuthorized(vs, 'validation_stamp', 'edit')) {
+                    commands.push(<ValidationStampChangeImageCommand key="change-image" id={id}/>)
+                    // TODO commands.push(<PromotionLevelUpdateCommand key="update" id={id}/>)
+                }
                 commands.push(<StoredGridLayoutResetCommand key="reset"/>)
                 commands.push(<CloseCommand key="close" href={branchUri(vs.branch)}/>)
                 setCommands(commands)
