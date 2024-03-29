@@ -50,6 +50,10 @@ data class AutoVersioningSourceConfig(
     @APIDescription("List of reviewers to always set on the pull request created by the auto versioning")
     @ListRef
     val reviewers: List<String>?,
+    @APIDescription("Template for the title of the pull request (optional)")
+    val prTitleTemplate: String? = null,
+    @APIDescription("Template for the body of the pull request (optional)")
+    val prBodyTemplate: String? = null,
 ) : AutoVersioningTargetConfig {
 
     /**

@@ -79,7 +79,7 @@ interface SCM {
      * @param from Origin branch
      * @param to Target branch
      * @param title Title for the pull request
-     * @param description Description for the pull request
+     * @param description Description (body) for the pull request
      * @param autoApproval Must the created pull request be auto-approved?
      * @param remoteAutoMerge If the SCM allows this, sets the PR in auto merge mode
      * @param message Commit message to set on auto merge

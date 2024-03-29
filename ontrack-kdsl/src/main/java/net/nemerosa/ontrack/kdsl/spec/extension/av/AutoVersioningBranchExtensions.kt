@@ -54,6 +54,8 @@ fun Branch.setAutoVersioningConfig(
                                 .build()
                         }
                     )
+                    .prTitleTemplate(it.prTitleTemplate)
+                    .prBodyTemplate(it.prBodyTemplate)
                     .build()
             }
         )

@@ -1037,6 +1037,18 @@
               "deprecationReason": null
             },
             {
+              "name": "upgradeBranch",
+              "description": "Actual SCM branch being used",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "routing",
               "description": "Queue routing key used for this order",
               "args": [],
@@ -1687,6 +1699,18 @@
               "deprecationReason": null
             },
             {
+              "name": "sourcePromotion",
+              "description": "Source promotion for the processing order",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "branch",
               "description": "Target branch for the processing order",
               "args": [],
@@ -1997,6 +2021,30 @@
               "deprecationReason": null
             },
             {
+              "name": "prBodyTemplate",
+              "description": "Template for the body of the pull request (optional)",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "prTitleTemplate",
+              "description": "Template for the title of the pull request (optional)",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "qualifier",
               "description": "Qualifier for the build link to create (when links are created)",
               "args": [],
@@ -2262,6 +2310,26 @@
               "type": {
                 "kind": "SCALAR",
                 "name": "JSON",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "prBodyTemplate",
+              "description": "Template for the body of the pull request (optional)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "prTitleTemplate",
+              "description": "Template for the title of the pull request (optional)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
                 "ofType": null
               },
               "defaultValue": null

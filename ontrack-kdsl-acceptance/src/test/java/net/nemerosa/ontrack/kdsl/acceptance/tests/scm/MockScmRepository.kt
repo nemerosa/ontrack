@@ -86,7 +86,7 @@ class MockScmRepositoryContext(
     /**
      * Registering a commit in the repository and declaring it for the current build.
      */
-    fun Build.withRepositoryCommit(message: String, property: Boolean = true) {
+    fun Build.withRepositoryCommit(message: String, property: Boolean = true): Build {
         // Declaring the commit first
         val commitId = repositoryCommit(message)
         // Setting the Git commit property for this build
@@ -94,6 +94,8 @@ class MockScmRepositoryContext(
             // We're using the MOCK SCM, so a MOCK SCM Commit property must be set instead
             mockScmBuildCommitProperty = commitId
         }
+        // OK
+        return this
     }
 
     fun Project.configuredForMockScm() {
@@ -225,6 +227,7 @@ $actualContent
         val to: String,
         val id: Int,
         val title: String,
+        val body: String,
         val approved: Boolean,
         val merged: Boolean,
         val reviewers: List<String>,

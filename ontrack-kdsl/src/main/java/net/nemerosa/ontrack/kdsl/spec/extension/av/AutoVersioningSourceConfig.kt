@@ -22,4 +22,6 @@ data class AutoVersioningSourceConfig(
     val versionSource: String? = null,
     val buildLinkCreation: Boolean? = null,
     val reviewers: List<String> = emptyList(),
+    val prTitleTemplate: String? = null,
+    val prBodyTemplate: String? = null,
 )
