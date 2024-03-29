@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {Skeleton, Space, Table, Typography} from "antd";
+import {Button, Popover, Skeleton, Space, Spin, Table, Typography} from "antd";
 import {gql} from "graphql-request";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import BuildLink from "@components/builds/BuildLink";
@@ -11,15 +11,19 @@ import ValidationRunData from "@components/framework/validation-run-data/Validat
 import RunInfo from "@components/common/RunInfo";
 import TimestampText from "@components/common/TimestampText";
 import TableColumnFilterDropdown from "@components/common/TableColumnFilterDropdown";
-import SelectAutoVersioningAuditRunningState
-    from "@components/extension/auto-versioning/SelectAutoVersioningAuditRunningState";
 import SelectValidationRunPassedState from "@components/validationStamps/SelectValidationRunPassedState";
+import {FaExchangeAlt, FaSearch} from "react-icons/fa";
+import useRangeSelection from "@components/common/RangeSelection";
+import {scmChangeLogUri} from "@components/common/Links";
+import {useRouter} from "next/router";
+import RangeSelector from "@components/common/RangeSelector";
 
 const {Column} = Table
 
 export default function ValidationStampHistory({validationStamp}) {
 
     const client = useGraphQLClient()
+    const router = useRouter()
 
     const [loading, setLoading] = useState(true)
     const [runs, setRuns] = useState([])
@@ -132,10 +136,29 @@ export default function ValidationStampHistory({validationStamp}) {
         }
     }, [client, validationStamp, pagination, filter]);
 
+    const onLoadMore = () => {
+        if (pageInfo.nextPage) {
+            setPagination(pageInfo.nextPage)
+        }
+    }
+
     const onTableChange = (_, filters) => {
         setFilter({
             passed: filters.status && filters.status[0],
         })
+    }
+
+    const rangeSelection = useRangeSelection()
+
+    const onChangeLog = () => {
+        if (scmChangeLogEnabled && rangeSelection.isComplete()) {
+            const [runIdFrom, runIdTo] = rangeSelection.selection
+            const runFrom = runs.find(it => it.id === runIdFrom)
+            const runTo = runs.find(it => it.id === runIdTo)
+            if (runFrom && runTo) {
+                router.push(scmChangeLogUri(runFrom.build.id, runTo.build.id))
+            }
+        }
     }
 
     return (
@@ -145,7 +168,65 @@ export default function ValidationStampHistory({validationStamp}) {
                     dataSource={runs}
                     pagination={false}
                     onChange={onTableChange}
+                    footer={() => (
+                        <>
+                            <Space>
+                                <Popover
+                                    content={
+                                        (pageInfo && pageInfo.nextPage) ?
+                                            "There are more validations to be loaded" :
+                                            "There are no more validations to be loaded"
+                                    }
+                                >
+                                    <Button
+                                        onClick={onLoadMore}
+                                        disabled={loading || !pageInfo || !pageInfo.nextPage}
+                                    >
+                                        <Space>
+                                            {
+                                                loading && pagination.offset && <Spin size="small"/>
+                                            }
+                                            {
+                                                !loading && <FaSearch/>
+                                            }
+                                            <Typography.Text>Load more...</Typography.Text>
+                                        </Space>
+                                    </Button>
+                                </Popover>
+                                {
+                                    scmChangeLogEnabled &&
+                                    <Popover
+                                        content="Change between two selected validations."
+                                    >
+                                        <Button
+                                            disabled={!rangeSelection || !rangeSelection.isComplete()}
+                                            onClick={onChangeLog}
+                                        >
+                                            <Space>
+                                                <FaExchangeAlt/>
+                                                <Typography.Text>Change log</Typography.Text>
+                                            </Space>
+                                        </Button>
+                                    </Popover>
+                                }
+                            </Space>
+                        </>
+                    )}
                 >
+                    {
+                        scmChangeLogEnabled &&
+                        <Column
+                            key="range"
+                            width={32}
+                            render={(_, run) =>
+                                <RangeSelector
+                                    id={run.id}
+                                    title="Select this run as a boundary for a change log."
+                                    rangeSelection={rangeSelection}
+                                />
+                            }
+                        />
+                    }
 
                     <Column
                         title="Build"
