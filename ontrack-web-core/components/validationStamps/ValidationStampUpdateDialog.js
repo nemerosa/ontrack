@@ -1,6 +1,6 @@
 import FormDialog, {useFormDialog} from "@components/form/FormDialog";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
-import {getPromotionLevelById, getValidationStampById, gqlPromotionLevelFragment} from "@components/services/fragments";
+import {getValidationStampById, gqlValidationStampFragment} from "@components/services/fragments";
 import {Form, Input} from "antd";
 import {gql} from "graphql-request";
 import {EventsContext} from "@components/common/EventsContext";
@@ -27,8 +27,7 @@ export const useValidationStampUpdateDialog = () => {
                 $name: String!,
                 $description: String!,
             ) {
-                # TODO updateValidationStampById              
-                updatePromotionLevelById(input: {
+                updateValidationStampById(input: {
                     id: $id,
                     name: $name,
                     description: $description,
@@ -36,24 +35,24 @@ export const useValidationStampUpdateDialog = () => {
                     errors {
                         message
                     }
-                    promotionLevel {
-                        ...PromotionLevelData
+                    validationStamp {
+                        ...ValidationStampData
                     }
                 }
             }
-            ${gqlPromotionLevelFragment}
+            ${gqlValidationStampFragment}
         `,
-        userNode: 'updatePromotionLevelById',
-        onSuccess: (updatePromotionLevelById) => {
-            eventsContext.fireEvent("promotionLevel.updated", {...updatePromotionLevelById.promotionLevel})
+        userNode: 'updateValidationStampById',
+        onSuccess: (updateValidationStampById) => {
+            eventsContext.fireEvent("validationStamp.updated", {...updateValidationStampById.validationStamp})
         }
     })
 }
 
-export default function PromotionLevelUpdateDialog({promotionLevelUpdateDialog}) {
+export default function ValidationStampUpdateDialog({validationStampUpdateDialog}) {
     return (
         <>
-            <FormDialog dialog={promotionLevelUpdateDialog}>
+            <FormDialog dialog={validationStampUpdateDialog}>
                 <Form.Item
                     name="name"
                     label="Name"

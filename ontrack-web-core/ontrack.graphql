@@ -831,6 +831,12 @@ type BulkUpdatePromotionLevelByIdPayload implements Payload {
     errors: [UserError]
 }
 
+"Output type for the bulkUpdateValidationStampById mutation."
+type BulkUpdateValidationStampByIdPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
 "Configuration as code information"
 type CasC {
     "Renders the current settings as JSON"
@@ -1582,6 +1588,12 @@ type DeleteValidationRunMetaInfoPropertyPayload implements Payload {
     errors: [UserError]
     "Validation run updated"
     validationRun: ValidationRun
+}
+
+"Output type for the deleteValidationStampById mutation."
+type DeleteValidationStampByIdPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
 }
 
 "Output type for the deleteValidationStampMessagePropertyById mutation."
@@ -2842,6 +2854,11 @@ type Mutation {
         "Input for the mutation"
         input: BulkUpdatePromotionLevelByIdInput
     ): BulkUpdatePromotionLevelByIdPayload
+    "Bulk update of a validation stamp"
+    bulkUpdateValidationStampById(
+        "Input for the mutation"
+        input: BulkUpdateValidationStampByIdInput
+    ): BulkUpdateValidationStampByIdPayload
     "Changing the password of the current user"
     changePassword(input: ChangePasswordInput!): ChangePasswordPayload
     "Change the status of a validation run"
@@ -3251,6 +3268,11 @@ type Mutation {
         "Input for the mutation"
         input: DeleteValidationRunMetaInfoPropertyByIdInput
     ): DeleteValidationRunMetaInfoPropertyByIdPayload
+    "Deletes an existing validation stamp"
+    deleteValidationStampById(
+        "Input for the mutation"
+        input: DeleteValidationStampByIdInput
+    ): DeleteValidationStampByIdPayload
     "Deletes the message property on a validation stamp identified by name."
     deleteValidationStampMessageProperty(
         "Input for the mutation"
@@ -3929,6 +3951,11 @@ type Mutation {
         "Input for the mutation"
         input: UpdatePromotionLevelByIdInput
     ): UpdatePromotionLevelByIdPayload
+    "Updates an existing validation stamp"
+    updateValidationStampById(
+        "Input for the mutation"
+        input: UpdateValidationStampByIdInput
+    ): UpdateValidationStampByIdPayload
     "Updates a validation stamp filter"
     updateValidationStampFilter(
         "Input for the mutation"
@@ -6393,6 +6420,14 @@ type UpdatePromotionLevelByIdPayload implements Payload {
     promotionLevel: PromotionLevel
 }
 
+"Output type for the updateValidationStampById mutation."
+type UpdateValidationStampByIdPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Updated validation stamp"
+    validationStamp: ValidationStamp
+}
+
 "Output type for the updateValidationStampFilter mutation."
 type UpdateValidationStampFilterPayload implements Payload {
     "List of errors"
@@ -6662,11 +6697,13 @@ type ValidationRunStatusLinks {
     _comment: String
 }
 
-type ValidationStamp implements ProjectEntity {
+type ValidationStamp implements Authorizable & ProjectEntity {
     "Link to the image"
     _image: String
     "Description with links."
     annotatedDescription: String
+    "Authorizations for this context"
+    authorizations: [Authorization!]!
     "Reference to branch"
     branch: Branch
     "List of charts exposed by the validation stamp"
@@ -7172,6 +7209,12 @@ input BuildSearchForm {
 "Input type for the bulkUpdatePromotionLevelById mutation."
 input BulkUpdatePromotionLevelByIdInput {
     "Promotion level ID"
+    id: Int!
+}
+
+"Input type for the bulkUpdateValidationStampById mutation."
+input BulkUpdateValidationStampByIdInput {
+    "Validation stamp ID"
     id: Int!
 }
 
@@ -7909,6 +7952,12 @@ input DeleteValidationRunMetaInfoPropertyInput {
     run: String!
     "Validation name"
     validation: String!
+}
+
+"Input type for the deleteValidationStampById mutation."
+input DeleteValidationStampByIdInput {
+    "Validation stamp ID"
+    id: Int!
 }
 
 "Input type for the deleteValidationStampMessagePropertyById mutation."
@@ -9780,6 +9829,20 @@ input UpdatePromotionLevelByIdInput {
     id: Int!
     "Promotion level name"
     name: String!
+}
+
+"Input type for the updateValidationStampById mutation."
+input UpdateValidationStampByIdInput {
+    "FQCN of the data type"
+    dataType: String
+    "Configuration of the data type"
+    dataTypeConfig: JSON
+    "Validation stamp description"
+    description: String
+    "Validation stamp ID"
+    id: Int!
+    "Validation stamp name"
+    name: String
 }
 
 "Input type for the updateValidationStampFilter mutation."

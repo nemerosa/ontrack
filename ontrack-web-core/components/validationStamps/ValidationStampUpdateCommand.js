@@ -1,6 +1,8 @@
 import {Command} from "@components/common/Commands";
 import {FaPencilAlt} from "react-icons/fa";
-import PromotionLevelUpdateDialog, {usePromotionLevelUpdateDialog} from "@components/promotionLevels/PromotionLevelUpdateDialog";
+import ValidationStampUpdateDialog, {
+    useValidationStampUpdateDialog
+} from "@components/validationStamps/ValidationStampUpdateDialog";
 
 export default function ValidationStampUpdateCommand({id}) {
 
