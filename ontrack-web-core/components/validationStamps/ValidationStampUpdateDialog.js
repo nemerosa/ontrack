@@ -4,21 +4,36 @@ import {getValidationStampById, gqlValidationStampFragment} from "@components/se
 import {Form, Input} from "antd";
 import {gql} from "graphql-request";
 import {EventsContext} from "@components/common/EventsContext";
-import {useContext} from "react";
+import {useContext, useState} from "react";
+import SelectValidationDataType from "@components/validationStamps/SelectValidationDataType";
+import Well from "@components/common/Well";
+import ValidationDataTypeForm from "@components/framework/validation-data-type-form/ValidationDataTypeForm";
 
 export const useValidationStampUpdateDialog = () => {
 
     const client = useGraphQLClient()
     const eventsContext = useContext(EventsContext)
 
+    const [dataType, setDataType] = useState()
+
     return useFormDialog({
+        dataType, setDataType,
         init: (form, {id}) => {
-            getValidationStampById(client, id).then(pl => form.setFieldsValue(pl))
+            getValidationStampById(client, id).then(vs => {
+                setDataType(vs.dataType)
+                return form.setFieldsValue({
+                    ...vs,
+                    dataType: vs.dataType.descriptor.id,
+                });
+            })
         },
         prepareValues: (values, {id}) => {
+            console.log({values, id, dataType})
             return {
                 ...values,
                 id,
+                dataTypeId: values.dataType,
+                dataTypeConfig: values.config,
             }
         },
         query: gql`
@@ -26,11 +41,15 @@ export const useValidationStampUpdateDialog = () => {
                 $id: Int!,
                 $name: String!,
                 $description: String!,
+                $dataTypeId: String,
+                $dataTypeConfig: JSON,
             ) {
                 updateValidationStampById(input: {
                     id: $id,
                     name: $name,
                     description: $description,
+                    dataType: $dataTypeId,
+                    dataTypeConfig: $dataTypeConfig,
                 }) {
                     errors {
                         message
@@ -50,6 +69,16 @@ export const useValidationStampUpdateDialog = () => {
 }
 
 export default function ValidationStampUpdateDialog({validationStampUpdateDialog}) {
+
+    const onValidationDataTypeSelected = (dataTypeId) => {
+        validationStampUpdateDialog.setDataType(previous => ({
+            ...previous,
+            descriptor: {
+                id: dataTypeId,
+            }
+        }))
+    }
+
     return (
         <>
             <FormDialog dialog={validationStampUpdateDialog}>
@@ -66,6 +95,26 @@ export default function ValidationStampUpdateDialog({validationStampUpdateDialog
                 >
                     <Input/>
                 </Form.Item>
+                <Form.Item
+                    name="dataType"
+                    label="Data type"
+                >
+                    <SelectValidationDataType onValidationDataTypeSelected={onValidationDataTypeSelected}/>
+                </Form.Item>
+                {/* Validation data config (depends on the selected data type) */}
+                {
+                    validationStampUpdateDialog.dataType &&
+                    <Form.Item
+                        label="Validation data"
+                    >
+                        <Well>
+                            <ValidationDataTypeForm
+                                prefix="config"
+                                dataType={validationStampUpdateDialog.dataType}
+                            />
+                        </Well>
+                    </Form.Item>
+                }
             </FormDialog>
         </>
     )

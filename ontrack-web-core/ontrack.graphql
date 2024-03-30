@@ -5135,6 +5135,8 @@ type Query {
     userDashboards: [Dashboard!]!
     "List of user menu items"
     userMenuItems: [UserMenuGroup!]!
+    "List of all available validation data types"
+    validationDataTypes: [ValidationDataTypeDescriptor!]!
     "List of validation run statuses"
     validationRunStatusIDList: [ValidationRunStatusID!]!
     validationRuns(
