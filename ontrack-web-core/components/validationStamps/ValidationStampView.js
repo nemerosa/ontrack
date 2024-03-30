@@ -22,6 +22,7 @@ import {isAuthorized} from "@components/common/authorizations";
 import PromotionLevelChangeImageCommand from "@components/promotionLevels/PromotionLevelChangeImageCommand";
 import PromotionLevelUpdateCommand from "@components/promotionLevels/PromotionLevelUpdateCommand";
 import ValidationStampChangeImageCommand from "@components/validationStamps/ValidationStampChangeImageCommand";
+import ValidationStampUpdateCommand from "@components/validationStamps/ValidationStampUpdateCommand";
 
 export default function ValidationStampView({id}) {
 
@@ -44,7 +45,7 @@ export default function ValidationStampView({id}) {
                 const commands = []
                 if (isAuthorized(vs, 'validation_stamp', 'edit')) {
                     commands.push(<ValidationStampChangeImageCommand key="change-image" id={id}/>)
-                    // TODO commands.push(<PromotionLevelUpdateCommand key="update" id={id}/>)
+                    commands.push(<ValidationStampUpdateCommand key="update" id={id}/>)
                 }
                 commands.push(<StoredGridLayoutResetCommand key="reset"/>)
                 commands.push(<CloseCommand key="close" href={branchUri(vs.branch)}/>)

@@ -65,6 +65,15 @@ class ValidationStampMutations(
             ) { input ->
                 updateValidationStamp(input)
             },
+            /**
+             * Deleting an existing validation stamp
+             */
+            unitMutation<DeleteValidationStampByIdInput>(
+                "deleteValidationStampById",
+                "Deletes an existing validation stamp"
+            ) { input ->
+                structureService.deleteValidationStamp(ID.of(input.id))
+            },
         )
 
     private fun setupValidationStamp(input: SetupValidationStampInput): ValidationStamp {
@@ -196,4 +205,9 @@ data class UpdateValidationStampByIdInput(
     val dataType: String?,
     @APIDescription("Configuration of the data type")
     val dataTypeConfig: JsonNode?,
+)
+
+data class DeleteValidationStampByIdInput(
+    @APIDescription("Validation stamp ID")
+    val id: Int,
 )

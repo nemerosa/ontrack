@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.PredefinedValidationStamp
 import net.nemerosa.ontrack.model.structure.config
 import net.nemerosa.ontrack.test.TestUtils.uid
+import net.nemerosa.ontrack.test.assertNotPresent
 import net.nemerosa.ontrack.test.assertPresent
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -125,6 +126,33 @@ class ValidationStampGraphQLIT : AbstractQLKTITSupport() {
                             assertEquals(vs.name, it.name)
                             assertEquals("New description", it.description)
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Deleting a validation stamp`() {
+        asAdmin {
+            project {
+                branch {
+                    val vs = validationStamp()
+                    run(
+                        """
+                        mutation {
+                            deleteValidationStampById(input: {
+                                id: ${vs.id}
+                            }) {
+                                errors {
+                                    message
+                                }
+                            }
+                        }
+                    """
+                    ).let { data ->
+                        assertNoUserError(data, "deleteValidationStampById")
+                        assertNotPresent(structureService.findValidationStampByName(project.name, name, vs.name))
                     }
                 }
             }
