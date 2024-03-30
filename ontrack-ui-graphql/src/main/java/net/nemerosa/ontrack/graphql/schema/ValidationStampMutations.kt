@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.exceptions.BranchNotFoundException
+import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 import javax.validation.constraints.NotNull
@@ -14,6 +15,7 @@ import javax.validation.constraints.Pattern
 class ValidationStampMutations(
     private val structureService: StructureService,
     private val validationDataTypeService: ValidationDataTypeService,
+    private val securityService: SecurityService,
 ) : TypedMutationProvider() {
 
     override val mutations: List<Mutation>
@@ -49,6 +51,19 @@ class ValidationStampMutations(
                     dataType = input.dataType,
                     dataTypeConfig = input.dataTypeConfig,
                 )
+            },
+            /**
+             * Updating an existing validation stamp
+             */
+            simpleMutation(
+                "updateValidationStampById",
+                "Updates an existing validation stamp",
+                UpdateValidationStampByIdInput::class,
+                "validationStamp",
+                "Updated validation stamp",
+                ValidationStamp::class
+            ) { input ->
+                updateValidationStamp(input)
             },
         )
 
@@ -109,6 +124,33 @@ class ValidationStampMutations(
         return structureService.newValidationStamp(validationStamp)
     }
 
+    private fun updateValidationStamp(
+        input: UpdateValidationStampByIdInput,
+    ): ValidationStamp {
+        val vs = structureService.getValidationStamp(ID.of(input.id))
+        val actualDataTypeConfig = if (input.dataType.isNullOrBlank()) {
+            vs.dataType
+        } else {
+            validationDataTypeService.validateValidationDataTypeConfig<Any>(
+                input.dataType,
+                input.dataTypeConfig
+            )
+        }
+        structureService.saveValidationStamp(
+            ValidationStamp(
+                id = vs.id,
+                name = input.name?.takeIf { it.isNotBlank() } ?: vs.name,
+                description = input.description ?: vs.description,
+                branch = vs.branch,
+                isImage = vs.isImage,
+                signature = securityService.currentSignature,
+                owner = vs.owner,
+                dataType = actualDataTypeConfig,
+            )
+        )
+        return structureService.getValidationStamp(ID.of(input.id))
+    }
+
 }
 
 /**
@@ -135,6 +177,21 @@ data class CreateValidationStampByIdInput(
     val name: String,
     @APIDescription("Validation stamp description")
     val description: String,
+    @APIDescription("FQCN of the data type")
+    val dataType: String?,
+    @APIDescription("Configuration of the data type")
+    val dataTypeConfig: JsonNode?,
+)
+
+
+data class UpdateValidationStampByIdInput(
+    @APIDescription("Validation stamp ID")
+    val id: Int,
+    @get:Pattern(regexp = NameDescription.NAME, message = "The name ${NameDescription.NAME_MESSAGE_SUFFIX}")
+    @APIDescription("Validation stamp name")
+    val name: String?,
+    @APIDescription("Validation stamp description")
+    val description: String?,
     @APIDescription("FQCN of the data type")
     val dataType: String?,
     @APIDescription("Configuration of the data type")

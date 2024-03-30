@@ -96,6 +96,42 @@ class ValidationStampGraphQLIT : AbstractQLKTITSupport() {
     }
 
     @Test
+    fun `Updating a validation stamp using the update mutation`() {
+        asAdmin {
+            project {
+                branch {
+                    val vs = validationStamp()
+                    run(
+                        """
+                        mutation {
+                            updateValidationStampById(input: {
+                                id: ${vs.id},
+                                description: "New description"
+                            }) {
+                                validationStamp {
+                                    id
+                                }
+                                errors {
+                                    message
+                                }
+                            }
+                        }
+                    """
+                    ).let { data ->
+                        val node = assertNoUserError(data, "updateValidationStampById")
+                        assertEquals(vs.id(), node.path("validationStamp").path("id").asInt(), "VS updated")
+
+                        assertPresent(structureService.findValidationStampByName(project.name, name, vs.name)) {
+                            assertEquals(vs.name, it.name)
+                            assertEquals("New description", it.description)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Update a validation stamp after it has been provisioned from a predefined stamp`() {
         asAdmin {
             val vsName = uid("vs_")
