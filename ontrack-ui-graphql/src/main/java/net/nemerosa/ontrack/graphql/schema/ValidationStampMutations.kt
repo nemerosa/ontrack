@@ -74,6 +74,15 @@ class ValidationStampMutations(
             ) { input ->
                 structureService.deleteValidationStamp(ID.of(input.id))
             },
+            /**
+             * Bulk update of a validation stamp
+             */
+            unitMutation<BulkUpdateValidationStampByIdInput>(
+                "bulkUpdateValidationStampById",
+                "Bulk update of a validation stamp"
+            ) { input ->
+                structureService.bulkUpdateValidationStamps(ID.of(input.id))
+            },
         )
 
     private fun setupValidationStamp(input: SetupValidationStampInput): ValidationStamp {
@@ -208,6 +217,11 @@ data class UpdateValidationStampByIdInput(
 )
 
 data class DeleteValidationStampByIdInput(
+    @APIDescription("Validation stamp ID")
+    val id: Int,
+)
+
+data class BulkUpdateValidationStampByIdInput(
     @APIDescription("Validation stamp ID")
     val id: Int,
 )

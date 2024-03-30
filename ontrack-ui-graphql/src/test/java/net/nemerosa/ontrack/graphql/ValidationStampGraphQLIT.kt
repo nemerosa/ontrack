@@ -160,6 +160,60 @@ class ValidationStampGraphQLIT : AbstractQLKTITSupport() {
     }
 
     @Test
+    fun `Bulk update of a validation stamp`() {
+        asAdmin {
+            project {
+                val vsName = uid("vs-")
+                val otherBranch = branch {
+                    validationStamp(name = vsName)
+                }
+                branch {
+                    val vs = validationStamp(
+                        name = vsName,
+                        description = "New version",
+                        validationDataTypeConfig = chmlValidationDataType.config(
+                            CHMLValidationDataTypeConfig(
+                                warningLevel = CHMLLevel(CHML.HIGH, 10),
+                                failedLevel = CHMLLevel(CHML.CRITICAL, 1)
+                            )
+                        ),
+                    )
+                    run(
+                        """
+                            mutation {
+                                bulkUpdateValidationStampById(input: {
+                                    id: ${vs.id}
+                                }) {
+                                    errors {
+                                        message
+                                    }
+                                }
+                            }
+                        """
+                    ).let { data ->
+                        assertNoUserError(data, "bulkUpdateValidationStampById")
+                        assertPresent(structureService.findValidationStampByName(project.name, otherBranch.name, vsName)) {
+                            assertEquals(vs.name, it.name)
+                            assertEquals(vs.description, it.description)
+                            assertEquals(
+                                "net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataType",
+                                it.dataType?.descriptor?.id
+                            )
+                            assertEquals(
+                                CHMLValidationDataTypeConfig(
+                                    warningLevel = CHMLLevel(CHML.HIGH, 10),
+                                    failedLevel = CHMLLevel(CHML.CRITICAL, 1)
+                                ),
+                                it.dataType?.config
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Update a validation stamp after it has been provisioned from a predefined stamp`() {
         asAdmin {
             val vsName = uid("vs_")
