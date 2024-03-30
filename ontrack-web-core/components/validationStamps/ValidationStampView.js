@@ -22,6 +22,8 @@ import {isAuthorized} from "@components/common/authorizations";
 import ValidationStampChangeImageCommand from "@components/validationStamps/ValidationStampChangeImageCommand";
 import ValidationStampUpdateCommand from "@components/validationStamps/ValidationStampUpdateCommand";
 import ValidationStampDeleteCommand from "@components/validationStamps/ValidationStampDeleteCommand";
+import PromotionLevelBulkUpdateCommand from "@components/promotionLevels/PromotionLevelBulkUpdateCommand";
+import ValidationStampBulkUpdateCommand from "@components/validationStamps/ValidationStampBulkUpdateCommand";
 
 export default function ValidationStampView({id}) {
 
@@ -48,6 +50,9 @@ export default function ValidationStampView({id}) {
                 }
                 if (isAuthorized(vs, 'validation_stamp', 'delete')) {
                     commands.push(<ValidationStampDeleteCommand key="delete" id={id}/>)
+                }
+                if (user.authorizations?.validation_stamp?.bulkUpdate) {
+                    commands.push(<ValidationStampBulkUpdateCommand key="bulk-update" id={id}/>)
                 }
                 commands.push(<StoredGridLayoutResetCommand key="reset"/>)
                 commands.push(<CloseCommand key="close" href={branchUri(vs.branch)}/>)
