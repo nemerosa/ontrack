@@ -96,6 +96,17 @@ export const getValidationStampById = (client, id) => {
     ).then(data => data.validationStamp)
 }
 
+export const useValidationStamp = (id) => {
+    const client = useGraphQLClient()
+    const [validationStamp, setValidationStamp] = useState()
+    useEffect(() => {
+        if (client && id) {
+            getValidationStampById(client, id).then(vs => setValidationStamp(vs))
+        }
+    }, [client, id]);
+    return validationStamp
+}
+
 export const gqlDecorationFragment = gql`
     fragment decorationContent on Decoration {
         decorationType

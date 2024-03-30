@@ -19,10 +19,9 @@ import StoredGridLayoutResetCommand from "@components/grid/StoredGridLayoutReset
 import InfoBox from "@components/common/InfoBox";
 import ValidationDataType from "@components/framework/validation-data-type/ValidationDataType";
 import {isAuthorized} from "@components/common/authorizations";
-import PromotionLevelChangeImageCommand from "@components/promotionLevels/PromotionLevelChangeImageCommand";
-import PromotionLevelUpdateCommand from "@components/promotionLevels/PromotionLevelUpdateCommand";
 import ValidationStampChangeImageCommand from "@components/validationStamps/ValidationStampChangeImageCommand";
 import ValidationStampUpdateCommand from "@components/validationStamps/ValidationStampUpdateCommand";
+import ValidationStampDeleteCommand from "@components/validationStamps/ValidationStampDeleteCommand";
 
 export default function ValidationStampView({id}) {
 
@@ -46,6 +45,9 @@ export default function ValidationStampView({id}) {
                 if (isAuthorized(vs, 'validation_stamp', 'edit')) {
                     commands.push(<ValidationStampChangeImageCommand key="change-image" id={id}/>)
                     commands.push(<ValidationStampUpdateCommand key="update" id={id}/>)
+                }
+                if (isAuthorized(vs, 'validation_stamp', 'delete')) {
+                    commands.push(<ValidationStampDeleteCommand key="delete" id={id}/>)
                 }
                 commands.push(<StoredGridLayoutResetCommand key="reset"/>)
                 commands.push(<CloseCommand key="close" href={branchUri(vs.branch)}/>)
