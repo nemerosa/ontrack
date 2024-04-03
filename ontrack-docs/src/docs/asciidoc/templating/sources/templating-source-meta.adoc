@@ -1,0 +1,31 @@
+[[templating-source-meta]]
+===== meta
+
+Gets some meta information from a project entity.
+
+Applicable for:
+
+* project
+* branch
+* promotion level
+* validation stamp
+* build
+* promotion run
+* validation run
+
+Configuration:
+
+* **category** - Category of the key of the meta information to get
+
+* **error** - If true, an error is raised when meta information is not found
+
+* **link** - If true, the link of the meta information is rendered instead of the value
+
+* **name** - Name of the key of the meta information to get
+
+Example:
+
+[source]
+----
+${build.release}
+----
