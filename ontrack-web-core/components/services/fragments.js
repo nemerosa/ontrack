@@ -69,6 +69,13 @@ export const gqlValidationStampFragment = gql`
             action
             authorized
         }
+        charts {
+            id
+            title
+            type
+            config
+            parameters
+        }
         branch {
             id
             name
