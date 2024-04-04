@@ -26,6 +26,7 @@ import ValidationStampBulkUpdateCommand from "@components/validationStamps/Valid
 import {useChartOptionsCommand} from "@components/charts/ChartOptionsDialog";
 import ValidationStampLeadTimeChart from "@components/validationStamps/ValidationStampLeadTimeChart";
 import ValidationStampFrequencyChart from "@components/validationStamps/ValidationStampFrequencyChart";
+import ValidationStampStabilityChart from "@components/validationStamps/ValidationStampStabilityChart";
 
 export default function ValidationStampView({id}) {
 
@@ -68,6 +69,7 @@ export default function ValidationStampView({id}) {
 
     const chartLeadTime = "chart-lead-time"
     const chartFrequency = "chart-frequency"
+    const chartStability = "chart-stability"
     const sectionHistory = "section-history"
 
     const defaultLayout = [
@@ -76,6 +78,7 @@ export default function ValidationStampView({id}) {
         // Charts
         {i: chartLeadTime, x: 0, y: 12, w: 6, h: 12},
         {i: chartFrequency, x: 6, y: 12, w: 6, h: 12},
+        {i: chartStability, x: 6, y: 24, w: 6, h: 12},
     ]
 
     const {command, interval, period} = useChartOptionsCommand()
@@ -114,6 +117,20 @@ export default function ValidationStampView({id}) {
                 extra={command}
             >
                 <ValidationStampFrequencyChart
+                    validationStamp={validationStamp}
+                    interval={interval}
+                    period={period}
+                />
+            </GridCell>,
+        },
+        {
+            id: chartStability,
+            content: <GridCell
+                id={chartStability}
+                title="Stability of validation"
+                extra={command}
+            >
+                <ValidationStampStabilityChart
                     validationStamp={validationStamp}
                     interval={interval}
                     period={period}
