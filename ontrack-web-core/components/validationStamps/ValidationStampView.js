@@ -28,6 +28,7 @@ import ValidationStampLeadTimeChart from "@components/validationStamps/Validatio
 import ValidationStampFrequencyChart from "@components/validationStamps/ValidationStampFrequencyChart";
 import ValidationStampStabilityChart from "@components/validationStamps/ValidationStampStabilityChart";
 import ValidationStampMetricsChart from "@components/validationStamps/ValidationStampMetricsChart";
+import ValidationStampViewDrawer from "@components/validationStamps/ValidationStampViewDrawer";
 
 export default function ValidationStampView({id}) {
 
@@ -210,7 +211,7 @@ export default function ValidationStampView({id}) {
                             items={items}
                             rowHeight={30}
                         />
-                        {/* TODO Validation stamps properties */}
+                        <ValidationStampViewDrawer validationStamp={validationStamp} loading={loading}/>
                     </Skeleton>
                 </MainPage>
             </StoredGridLayoutContextProvider>

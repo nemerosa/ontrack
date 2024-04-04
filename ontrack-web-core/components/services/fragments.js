@@ -87,15 +87,6 @@ export const gqlValidationStampFragment = gql`
     }
 `
 
-export const gqlValidationStampByIdQuery = gql`
-    query ValidationStampById($id: Int!) {
-        validationStamp(id: $id) {
-            ...ValidationStampData
-        }
-    }
-    ${gqlValidationStampFragment}
-`
-
 export const getValidationStampById = (client, id) => {
     return client.request(
         gqlValidationStampByIdQuery,
@@ -170,4 +161,21 @@ export const gqlBranchCommonFragment = gql`
     }
     
     ${gqlProjectCommonFragment}
+`
+
+export const gqlValidationStampByIdQuery = gql`
+    query ValidationStampById($id: Int!) {
+        validationStamp(id: $id) {
+            ...ValidationStampData
+            properties {
+                ...propertiesFragment
+            }
+            information {
+                ...informationFragment
+            }
+        }
+    }
+    ${gqlValidationStampFragment}
+    ${gqlPropertiesFragment}
+    ${gqlInformationFragment}
 `
