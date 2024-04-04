@@ -22,8 +22,9 @@ import {isAuthorized} from "@components/common/authorizations";
 import ValidationStampChangeImageCommand from "@components/validationStamps/ValidationStampChangeImageCommand";
 import ValidationStampUpdateCommand from "@components/validationStamps/ValidationStampUpdateCommand";
 import ValidationStampDeleteCommand from "@components/validationStamps/ValidationStampDeleteCommand";
-import PromotionLevelBulkUpdateCommand from "@components/promotionLevels/PromotionLevelBulkUpdateCommand";
 import ValidationStampBulkUpdateCommand from "@components/validationStamps/ValidationStampBulkUpdateCommand";
+import {useChartOptionsCommand} from "@components/charts/ChartOptionsDialog";
+import ValidationStampLeadTimeChart from "@components/validationStamps/ValidationStampLeadTimeChart";
 
 export default function ValidationStampView({id}) {
 
@@ -64,12 +65,17 @@ export default function ValidationStampView({id}) {
         }
     }, [client, id, refreshCount, user]);
 
+    const chartLeadTime = "chart-lead-time"
     const sectionHistory = "section-history"
 
     const defaultLayout = [
         // History - table
         {i: sectionHistory, x: 0, y: 0, w: 12, h: 12},
+        // Chart - duration
+        {i: chartLeadTime, x: 0, y: 12, w: 6, h: 12},
     ]
+
+    const {command, interval, period} = useChartOptionsCommand()
 
     const items = [
         {
@@ -80,6 +86,20 @@ export default function ValidationStampView({id}) {
             >
                 <ValidationStampHistory
                     validationStamp={validationStamp}
+                />
+            </GridCell>,
+        },
+        {
+            id: chartLeadTime,
+            content: <GridCell
+                id={chartLeadTime}
+                title="Lead time to validation"
+                extra={command}
+            >
+                <ValidationStampLeadTimeChart
+                    validationStamp={validationStamp}
+                    interval={interval}
+                    period={period}
                 />
             </GridCell>,
         },
