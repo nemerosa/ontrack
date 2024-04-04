@@ -25,6 +25,7 @@ import ValidationStampDeleteCommand from "@components/validationStamps/Validatio
 import ValidationStampBulkUpdateCommand from "@components/validationStamps/ValidationStampBulkUpdateCommand";
 import {useChartOptionsCommand} from "@components/charts/ChartOptionsDialog";
 import ValidationStampLeadTimeChart from "@components/validationStamps/ValidationStampLeadTimeChart";
+import ValidationStampFrequencyChart from "@components/validationStamps/ValidationStampFrequencyChart";
 
 export default function ValidationStampView({id}) {
 
@@ -66,13 +67,15 @@ export default function ValidationStampView({id}) {
     }, [client, id, refreshCount, user]);
 
     const chartLeadTime = "chart-lead-time"
+    const chartFrequency = "chart-frequency"
     const sectionHistory = "section-history"
 
     const defaultLayout = [
         // History - table
         {i: sectionHistory, x: 0, y: 0, w: 12, h: 12},
-        // Chart - duration
+        // Charts
         {i: chartLeadTime, x: 0, y: 12, w: 6, h: 12},
+        {i: chartFrequency, x: 6, y: 12, w: 6, h: 12},
     ]
 
     const {command, interval, period} = useChartOptionsCommand()
@@ -97,6 +100,20 @@ export default function ValidationStampView({id}) {
                 extra={command}
             >
                 <ValidationStampLeadTimeChart
+                    validationStamp={validationStamp}
+                    interval={interval}
+                    period={period}
+                />
+            </GridCell>,
+        },
+        {
+            id: chartFrequency,
+            content: <GridCell
+                id={chartFrequency}
+                title="Frequency to validation"
+                extra={command}
+            >
+                <ValidationStampFrequencyChart
                     validationStamp={validationStamp}
                     interval={interval}
                     period={period}
