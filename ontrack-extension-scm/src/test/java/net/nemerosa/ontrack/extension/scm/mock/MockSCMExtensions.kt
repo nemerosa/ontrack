@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.scm.mock
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.structure.Branch
 
-@Deprecated("Use methods in MockSCMUtils")
+@Deprecated("Use methods in MockSCMTester")
 fun AbstractDSLTestSupport.mockScm(
     branch: Branch,
     scmBranch: String = "main",

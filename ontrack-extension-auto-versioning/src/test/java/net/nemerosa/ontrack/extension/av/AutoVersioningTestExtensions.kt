@@ -79,6 +79,8 @@ class AutoVersioningConfigSetup {
         qualifier = qualifier,
         reviewers = null,
         versionSource = versionSource,
+        prTitleTemplate = null,
+        prBodyTemplate = null,
     )
 
 }

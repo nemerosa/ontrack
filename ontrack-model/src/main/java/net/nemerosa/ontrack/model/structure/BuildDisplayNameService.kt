@@ -23,4 +23,15 @@ interface BuildDisplayNameService {
         defaultValue: (Build) -> String? = { it.name },
     ): String?
 
+    /**
+     * Inside a given [project], tries to find a build by using its display name or its name.
+     *
+     * If [onlyDisplayName] is `true`, only the display name will be used.
+     */
+    fun findBuildByDisplayName(
+        project: Project,
+        name: String,
+        onlyDisplayName: Boolean,
+    ): Build?
+
 }

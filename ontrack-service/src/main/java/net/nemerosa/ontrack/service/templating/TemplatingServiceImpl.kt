@@ -60,7 +60,7 @@ class TemplatingServiceImpl(
     ): String {
         try {
             val m = regexToken.matchEntire(expression)
-            return if (m != null) {
+            if (m != null) {
                 val contextKey = m.groupValues[1]
                 val field = m.groupValues.getOrNull(2)
                 val config = m.groupValues.getOrNull(3)
@@ -119,11 +119,7 @@ class TemplatingServiceImpl(
         val function = functionsById[functionId]
             ?: throw TemplatingFunctionNotFoundException(functionId)
         // Configuration
-        val configMap: Map<String, String> = if (config.isNullOrBlank()) {
-            emptyMap()
-        } else {
-            parseTemplatingConfig(config)
-        }
+        val configMap: Map<String, String> = parseConfigMap(config)
         // Callback
         val expressionResolver: (String) -> String = { expression: String ->
             renderExpression(expression, context, renderer)
@@ -151,6 +147,11 @@ class TemplatingServiceImpl(
                 config = config,
                 renderer = renderer
             )
+        }
+        // Renderable
+        else if (contextValue is TemplatingRenderable) {
+            val configMap = parseConfigMap(config)
+            contextValue.render(field, configMap, renderer)
         }
         // Else, we render as a string (if no field, config)
         else if (field.isNullOrBlank() && config.isNullOrBlank()) {
@@ -185,11 +186,7 @@ class TemplatingServiceImpl(
                     throw TemplatingMultipleFieldSourcesException(field)
                 } else {
                     val source = sources.first()
-                    val configMap: Map<String, String> = if (config.isNullOrBlank()) {
-                        emptyMap()
-                    } else {
-                        parseTemplatingConfig(config)
-                    }
+                    val configMap: Map<String, String> = parseConfigMap(config)
                     source.render(entity, configMap, renderer)
                 }
             } else {
@@ -197,5 +194,14 @@ class TemplatingServiceImpl(
                 throw TemplatingNoFieldSourceException(field)
             }
         }
+
+    private fun parseConfigMap(config: String?): Map<String, String> {
+        val configMap: Map<String, String> = if (config.isNullOrBlank()) {
+            emptyMap()
+        } else {
+            parseTemplatingConfig(config)
+        }
+        return configMap
+    }
 
 }

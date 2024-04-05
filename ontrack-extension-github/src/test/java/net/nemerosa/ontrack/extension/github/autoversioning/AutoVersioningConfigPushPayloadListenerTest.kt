@@ -175,6 +175,8 @@ internal class AutoVersioningConfigPushPayloadListenerTest {
                     autoApprovalMode = AutoApprovalMode.CLIENT,
                     qualifier = null,
                     reviewers = null,
+                    prTitleTemplate = null,
+                    prBodyTemplate = null,
                 )
             )
         )

@@ -31,6 +31,7 @@ class AutoVersioningProcessingServiceImpl(
     private val metrics: AutoVersioningMetricsService,
     private val autoVersioningEventService: AutoVersioningEventService,
     private val autoVersioningCompletionListeners: List<AutoVersioningCompletionListener>,
+    private val autoVersioningTemplatingService: AutoVersioningTemplatingService,
 ) : AutoVersioningProcessingService {
 
     private val logger: Logger = LoggerFactory.getLogger(AutoVersioningProcessingServiceImpl::class.java)
@@ -77,6 +78,8 @@ class AutoVersioningProcessingServiceImpl(
                     throw e
                 }
             }
+            // Map of current versions per path
+            val currentVersions = mutableMapOf<String,String>()
             // For each target path
             val targetPathUpdated: List<Boolean> = try {
                 order.targetPaths.map { targetPath ->
@@ -90,6 +93,8 @@ class AutoVersioningProcessingServiceImpl(
                         ?: throw AutoVersioningVersionNotFoundException(targetPath)
                     // If different version
                     if (currentVersion != order.targetVersion) {
+                        // Storing the version
+                        currentVersions[targetPath] = currentVersion
                         // Changes the version
                         val updatedLines = order.replaceVersion(lines)
                         // Pushes the change to the branch
@@ -151,23 +156,23 @@ class AutoVersioningProcessingServiceImpl(
                     logger.debug("Processing auto versioning order creating PR: {}", order)
                     // Audit
                     autoVersioningAuditService.onPRCreating(order, upgradeBranch)
-                    // Common message to all operations
-                    val message = order.getCommitMessage()
+                    // PR title & message
+                    val (prTitle, prBody) = autoVersioningTemplatingService.generatePRInfo(order, currentVersions)
                     // PR creation
                     val pr = scm.createPR(
                         from = upgradeBranch,
                         to = scmBranch,
-                        title = message,
+                        title = prTitle,
                         // Change log as description?
-                        description = message,
+                        description = prBody,
                         // Auto approval
                         autoApproval = order.autoApproval,
                         // Remote auto merge?
                         remoteAutoMerge = (order.autoApprovalMode == AutoApprovalMode.SCM),
                         // Commit message to use on merge
-                        message = message,
+                        message = order.getCommitMessage(),
                         // List of reviewers
-                        reviewers = order.reviewers ?: emptyList(),
+                        reviewers = order.reviewers,
                     )
                     // If auto approval mode = CLIENT and PR is not merged, we had a timeout
                     logger.debug("Processing auto versioning order end of PR process: {}", order)

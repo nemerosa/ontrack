@@ -28,6 +28,8 @@ data class AutoVersioningOrder(
     val validationStamp: String?,
     val autoApprovalMode: AutoApprovalMode,
     val reviewers: List<String>,
+    val prTitleTemplate: String?,
+    val prBodyTemplate: String?,
 ) : AutoVersioningTargetConfig {
     /**
      * Gets a meaningful commit message for this order

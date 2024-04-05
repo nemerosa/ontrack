@@ -51,9 +51,9 @@ data class AutoVersioningSourceConfig(
     @ListRef
     val reviewers: List<String>?,
     @APIDescription("Template for the title of the pull request (optional)")
-    val prTitleTemplate: String? = null,
+    val prTitleTemplate: String?,
     @APIDescription("Template for the body of the pull request (optional)")
-    val prBodyTemplate: String? = null,
+    val prBodyTemplate: String?,
 ) : AutoVersioningTargetConfig {
 
     /**
@@ -155,6 +155,8 @@ data class AutoVersioningSourceConfig(
             backValidation = backValidation,
             versionSource = versionSource,
             reviewers = reviewers,
+            prTitleTemplate = prTitleTemplate,
+            prBodyTemplate = prBodyTemplate,
         )
 
 }

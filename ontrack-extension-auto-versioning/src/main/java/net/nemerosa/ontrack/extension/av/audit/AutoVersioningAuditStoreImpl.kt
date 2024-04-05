@@ -99,6 +99,8 @@ class AutoVersioningAuditStoreImpl(
                     routing = routing,
                     queue = null,
                     reviewers = reviewers,
+                    prTitleTemplate = prTitleTemplate,
+                    prBodyTemplate = prBodyTemplate,
                 )
             }
         )
@@ -150,6 +152,8 @@ class AutoVersioningAuditStoreImpl(
                         routing = routing,
                         queue = actualQueue,
                         reviewers = reviewers,
+                        prTitleTemplate = prTitleTemplate,
+                        prBodyTemplate = prBodyTemplate,
                     )
                 }
             }
@@ -218,6 +222,8 @@ class AutoVersioningAuditStoreImpl(
                     validationStamp = validationStamp,
                     autoApprovalMode = autoApprovalMode,
                     reviewers = reviewers ?: emptyList(),
+                    prTitleTemplate = prTitleTemplate,
+                    prBodyTemplate = prBodyTemplate,
                 ),
                 audit = states,
                 routing = routing,

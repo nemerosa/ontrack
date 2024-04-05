@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.model.templating
 
 import net.nemerosa.ontrack.model.exceptions.InputException
 
-abstract class TemplatingException(message: String): InputException(message)
+abstract class TemplatingException(message: String) : InputException(message)
 
 class TemplatingNoContextFoundException(contextKey: String) : TemplatingException(
     """Templating key not found in context: $contextKey"""
@@ -46,4 +46,12 @@ class TemplatingConfigFormatException(expression: String) : TemplatingException(
 
 class TemplatingFilterNotFoundException(filter: String) : TemplatingException(
     """Templating filter not found: $filter"""
+)
+
+class TemplatingRenderableFieldNotFoundException(field: String) : TemplatingException(
+    """Templating field not managed: $field"""
+)
+
+class TemplatingRenderableFieldRequiredException : TemplatingException(
+    """Templating field is required"""
 )

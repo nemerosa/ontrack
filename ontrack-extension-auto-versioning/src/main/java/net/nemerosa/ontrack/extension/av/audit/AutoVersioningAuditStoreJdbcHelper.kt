@@ -71,6 +71,8 @@ class AutoVersioningAuditStoreJdbcHelper(
                     validationStamp = data.validationStamp,
                     autoApprovalMode = data.autoApprovalMode,
                     reviewers = data.reviewers ?: emptyList(),
+                    prTitleTemplate = data.prTitleTemplate,
+                    prBodyTemplate = data.prBodyTemplate,
                 ),
                 audit = data.states,
                 routing = data.routing,

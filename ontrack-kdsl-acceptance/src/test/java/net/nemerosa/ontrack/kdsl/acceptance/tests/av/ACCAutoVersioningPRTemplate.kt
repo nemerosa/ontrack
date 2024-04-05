@@ -115,7 +115,7 @@ class ACCAutoVersioningPRTemplate : AbstractACCAutoVersioningTestSupport() {
                                     prBodyTemplate = """
                                         The version of ${"$"}{sourceProject} in ${"$"}{PATH} has been upgraded to ${"$"}{VERSION}.
                                         
-                                        ${'$'}{av.changeLog}
+                                        ${'$'}{av.changelog?title=true}
                                     """.trimIndent(),
                                 )
                             )
@@ -140,7 +140,7 @@ class ACCAutoVersioningPRTemplate : AbstractACCAutoVersioningTestSupport() {
                                 """
                                     The version of ${dependency.project.name} in gradle.properties has been upgraded to 2.0.0.
                                     
-                                    Change log of ${dependency.project.name} from 1.0.0 to 2.0.0
+                                    Change log for ${dependency.project.name} from 1.0.0 to 2.0.0
                                     
                                     * ISS-21 Some new feature
                                     * ISS-22 Some fixes are needed

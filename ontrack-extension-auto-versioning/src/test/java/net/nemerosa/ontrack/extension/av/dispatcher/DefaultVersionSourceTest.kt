@@ -21,7 +21,7 @@ class DefaultVersionSourceTest {
     fun init() {
         buildDisplayNameService = mockk()
         structureService = mockk()
-        source = DefaultVersionSource(buildDisplayNameService, structureService)
+        source = DefaultVersionSource(buildDisplayNameService)
     }
 
     @Test

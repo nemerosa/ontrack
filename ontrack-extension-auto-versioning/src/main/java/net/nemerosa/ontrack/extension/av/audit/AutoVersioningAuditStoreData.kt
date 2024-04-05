@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.av.config.AutoApprovalMode
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-internal data class AutoVersioningAuditStoreData(
+data class AutoVersioningAuditStoreData(
     val sourceProject: String,
     val sourceBuildId: Int?, // Nullable for backward compatibility
     val sourcePromotion: String?, // Nullable for backward compatibility
@@ -27,6 +27,8 @@ internal data class AutoVersioningAuditStoreData(
     val routing: String,
     val queue: String?,
     val reviewers: List<String>?, // Nullable for backward compatibility
+    val prTitleTemplate: String?,
+    val prBodyTemplate: String?,
 ) {
     val mostRecentState
         get() = states.first().state
@@ -56,5 +58,7 @@ internal data class AutoVersioningAuditStoreData(
         routing = routing,
         queue = queue,
         reviewers = reviewers,
+        prTitleTemplate = prTitleTemplate,
+        prBodyTemplate = prBodyTemplate,
     )
 }

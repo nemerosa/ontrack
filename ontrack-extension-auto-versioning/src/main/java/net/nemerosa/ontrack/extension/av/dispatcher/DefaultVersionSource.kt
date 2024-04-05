@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.av.dispatcher
 
-import net.nemerosa.ontrack.extension.general.ReleasePropertyType
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Component
 @Component
 class DefaultVersionSource(
     private val buildDisplayNameService: BuildDisplayNameService,
-    private val structureService: StructureService,
 ) : VersionSource {
 
     companion object {
@@ -31,23 +29,10 @@ class DefaultVersionSource(
         )
 
     override fun getBuildFromVersion(sourceProject: Project, config: String?, version: String): Build? =
-        // Looking first with release property
-        structureService.buildSearch(
-            projectId = sourceProject.id,
-            form = BuildSearchForm(
-                maximumCount = 1,
-                property = ReleasePropertyType::class.java.name,
-                propertyValue = version,
-            )
-        ).firstOrNull()
-        // ... then by name
-            ?: structureService.buildSearch(
-                projectId = sourceProject.id,
-                form = BuildSearchForm(
-                    maximumCount = 1,
-                    buildName = version,
-                    buildExactMatch = true,
-                )
-            ).firstOrNull()
+        buildDisplayNameService.findBuildByDisplayName(
+            project = sourceProject,
+            name = version,
+            onlyDisplayName = false,
+        )
 
 }

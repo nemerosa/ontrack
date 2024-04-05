@@ -37,6 +37,8 @@ object AutoVersioningTestFixtures {
         validationStamp = null,
         autoApprovalMode = AutoApprovalMode.SCM,
         reviewers = emptyList(),
+        prTitleTemplate = null,
+        prBodyTemplate = null,
     )
 
     fun Branch.createOrder(
@@ -45,11 +47,13 @@ object AutoVersioningTestFixtures {
         targetPaths: List<String> = listOf("gradle.properties"),
         sourceBuildId: Int? = null,
         sourceBackValidation: String? = null,
+        prTitleTemplate: String? = null,
+        prBodyTemplate: String? = null,
     ) = AutoVersioningOrder(
         uuid = UUID.randomUUID().toString(),
         sourceProject = sourceProject,
         sourceBuildId = sourceBuildId,
-        sourcePromotion = null,
+        sourcePromotion = "GOLD",
         sourceBackValidation = sourceBackValidation,
         branch = this,
         targetPaths = targetPaths,
@@ -65,6 +69,8 @@ object AutoVersioningTestFixtures {
         validationStamp = null,
         autoApprovalMode = AutoApprovalMode.SCM,
         reviewers = emptyList(),
+        prTitleTemplate = prTitleTemplate,
+        prBodyTemplate = prBodyTemplate,
     )
 
     fun sampleConfig() = AutoVersioningConfig(
@@ -104,6 +110,8 @@ object AutoVersioningTestFixtures {
         notifications = notifications,
         qualifier = null,
         reviewers = null,
+        prTitleTemplate = null,
+        prBodyTemplate = null,
     )
 
 }
