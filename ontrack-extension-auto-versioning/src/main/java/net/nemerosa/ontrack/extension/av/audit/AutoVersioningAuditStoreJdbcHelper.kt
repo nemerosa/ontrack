@@ -73,6 +73,7 @@ class AutoVersioningAuditStoreJdbcHelper(
                     reviewers = data.reviewers ?: emptyList(),
                     prTitleTemplate = data.prTitleTemplate,
                     prBodyTemplate = data.prBodyTemplate,
+                    prBodyTemplateFormat = data.prBodyTemplateFormat,
                 ),
                 audit = data.states,
                 routing = data.routing,

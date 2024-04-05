@@ -81,6 +81,7 @@ class AutoVersioningConfigSetup {
         versionSource = versionSource,
         prTitleTemplate = null,
         prBodyTemplate = null,
+        prBodyTemplateFormat = null,
     )
 
 }

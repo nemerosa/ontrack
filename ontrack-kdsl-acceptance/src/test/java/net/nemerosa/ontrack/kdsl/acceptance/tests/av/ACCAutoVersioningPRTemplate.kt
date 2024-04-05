@@ -67,6 +67,64 @@ class ACCAutoVersioningPRTemplate : AbstractACCAutoVersioningTestSupport() {
     }
 
     @Test
+    fun `Configuration of the PR title and body using HTML`() {
+        withMockScmRepository(ontrack) {
+            withAutoVersioning {
+                repositoryFile("gradle.properties") {
+                    "some-version = 1.0.0"
+                }
+                val dependency = branchWithPromotion(promotion = "IRON")
+                project {
+                    branch {
+                        configuredForMockRepository()
+                        setAutoVersioningConfig(
+                            listOf(
+                                AutoVersioningSourceConfig(
+                                    sourceProject = dependency.project.name,
+                                    sourceBranch = dependency.name,
+                                    sourcePromotion = "IRON",
+                                    targetPath = "gradle.properties",
+                                    targetProperty = "some-version",
+                                    prTitleTemplate = "Version of \${sourceProject} upgraded to \${VERSION}",
+                                    prBodyTemplate = "The version of \${sourceProject} in \${PATH} has been upgraded to \${VERSION}.",
+                                    prBodyTemplateFormat = "html",
+                                )
+                            )
+                        )
+
+                        dependency.apply {
+                            build(name = "2.0.0") {
+                                promote("IRON")
+                            }
+                        }
+
+                        waitForAutoVersioningCompletion()
+
+                        assertThatMockScmRepository {
+                            val pr = hasPR(
+                                from = "feature/auto-upgrade-${dependency.project.name}-2.0.0-*",
+                                to = "main"
+                            )
+                            assertEquals(
+                                "Version of ${dependency.project.name} upgraded to 2.0.0",
+                                pr.title
+                            )
+                            assertEquals(
+                                """The version of <a href="http://localhost:8080/#/project/${dependency.project.id}">${dependency.project.name}</a> in gradle.properties has been upgraded to 2.0.0.""",
+                                pr.body
+                            )
+                            fileContains("gradle.properties") {
+                                "some-version = 2.0.0"
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Configuration of the PR title and body with a change log`() {
         withMockScmRepository(ontrack) {
             withAutoVersioning {

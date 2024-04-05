@@ -24,4 +24,5 @@ data class AutoVersioningSourceConfig(
     val reviewers: List<String> = emptyList(),
     val prTitleTemplate: String? = null,
     val prBodyTemplate: String? = null,
+    val prBodyTemplateFormat: String? = null,
 )

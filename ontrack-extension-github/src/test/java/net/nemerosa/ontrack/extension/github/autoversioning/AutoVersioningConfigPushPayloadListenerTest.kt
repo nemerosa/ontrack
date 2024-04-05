@@ -177,6 +177,7 @@ internal class AutoVersioningConfigPushPayloadListenerTest {
                     reviewers = null,
                     prTitleTemplate = null,
                     prBodyTemplate = null,
+                    prBodyTemplateFormat = null,
                 )
             )
         )

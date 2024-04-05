@@ -101,6 +101,7 @@ class AutoVersioningAuditStoreImpl(
                     reviewers = reviewers,
                     prTitleTemplate = prTitleTemplate,
                     prBodyTemplate = prBodyTemplate,
+                    prBodyTemplateFormat = prBodyTemplateFormat,
                 )
             }
         )
@@ -154,6 +155,7 @@ class AutoVersioningAuditStoreImpl(
                         reviewers = reviewers,
                         prTitleTemplate = prTitleTemplate,
                         prBodyTemplate = prBodyTemplate,
+                        prBodyTemplateFormat = prBodyTemplateFormat,
                     )
                 }
             }
@@ -224,6 +226,7 @@ class AutoVersioningAuditStoreImpl(
                     reviewers = reviewers ?: emptyList(),
                     prTitleTemplate = prTitleTemplate,
                     prBodyTemplate = prBodyTemplate,
+                    prBodyTemplateFormat = prBodyTemplateFormat,
                 ),
                 audit = states,
                 routing = routing,

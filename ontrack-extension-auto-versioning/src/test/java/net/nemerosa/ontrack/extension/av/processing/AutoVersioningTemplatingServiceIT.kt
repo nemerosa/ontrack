@@ -105,6 +105,47 @@ class AutoVersioningTemplatingServiceIT : AbstractAutoVersioningTestSupport() {
     }
 
     @Test
+    fun `Generating a custom PR title and body using HTML`() {
+        asAdmin {
+            project {
+                branch {
+                    build {
+                        releaseProperty(this, "2.0.0")
+                        val source = this
+                        project {
+                            branch {
+                                val order = createOrder(
+                                    sourceProject = source.project.name,
+                                    sourceBuildId = source.id(),
+                                    targetVersion = "2.0.0",
+                                    prTitleTemplate = "Version of \${sourceProject} upgraded to \${VERSION}",
+                                    prBodyTemplate = "The version of \${sourceProject} in \${PATH} has been upgraded to \${VERSION}.",
+                                    prBodyTemplateFormat = "html",
+                                )
+
+                                val (title, body) = autoVersioningTemplatingService.generatePRInfo(
+                                    order = order,
+                                    currentVersions = mapOf("gradle.properties" to "1.0.0")
+                                )
+
+                                assertEquals(
+                                    "Version of ${source.project.name} upgraded to 2.0.0",
+                                    title
+                                )
+
+                                assertEquals(
+                                    """The version of <a href="http://localhost:8080/#/project/${source.project.id}">${source.project.name}</a> in gradle.properties has been upgraded to 2.0.0.""",
+                                    body
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Generating a PR body with a change log`() {
         asAdmin {
             mockSCMTester.withMockSCMRepository {

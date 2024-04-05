@@ -54,6 +54,8 @@ data class AutoVersioningSourceConfig(
     val prTitleTemplate: String?,
     @APIDescription("Template for the body of the pull request (optional)")
     val prBodyTemplate: String?,
+    @APIDescription("Template format for the body of the pull request (plain by default, html, markdown as possible values)")
+    val prBodyTemplateFormat: String?,
 ) : AutoVersioningTargetConfig {
 
     /**
@@ -157,6 +159,7 @@ data class AutoVersioningSourceConfig(
             reviewers = reviewers,
             prTitleTemplate = prTitleTemplate,
             prBodyTemplate = prBodyTemplate,
+            prBodyTemplateFormat = prBodyTemplateFormat,
         )
 
 }

@@ -56,6 +56,7 @@ fun Branch.setAutoVersioningConfig(
                     )
                     .prTitleTemplate(it.prTitleTemplate)
                     .prBodyTemplate(it.prBodyTemplate)
+                    .prBodyTemplateFormat(it.prBodyTemplateFormat)
                     .build()
             }
         )
@@ -95,5 +96,8 @@ fun Branch.getAutoVersioningConfig(): List<AutoVersioningSourceConfig> =
                     notificationTemplate = n.notificationTemplate(),
                 )
             },
+            prTitleTemplate = it.prTitleTemplate(),
+            prBodyTemplate = it.prBodyTemplate(),
+            prBodyTemplateFormat = it.prBodyTemplateFormat(),
         )
     } ?: emptyList()

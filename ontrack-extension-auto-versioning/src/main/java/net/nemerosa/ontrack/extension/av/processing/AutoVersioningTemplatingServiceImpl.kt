@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
 import net.nemerosa.ontrack.extension.scm.changelog.ChangeLogTemplatingService
 import net.nemerosa.ontrack.extension.scm.changelog.ChangeLogTemplatingServiceConfig
 import net.nemerosa.ontrack.model.events.EventRenderer
+import net.nemerosa.ontrack.model.events.EventRendererRegistry
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.exceptions.ProjectNotFoundException
 import net.nemerosa.ontrack.model.structure.*
@@ -20,6 +21,7 @@ class AutoVersioningTemplatingServiceImpl(
     private val structureService: StructureService,
     private val buildDisplayNameService: BuildDisplayNameService,
     private val changeLogTemplatingService: ChangeLogTemplatingService,
+    private val eventRendererRegistry: EventRendererRegistry,
 ) : AutoVersioningTemplatingService {
 
     override fun generatePRInfo(
@@ -55,13 +57,18 @@ class AutoVersioningTemplatingServiceImpl(
                 renderer = PlainEventRenderer.INSTANCE,
             )
         }
+
+        val renderer = order.prBodyTemplateFormat?.let {
+            eventRendererRegistry.findEventRendererById(it)
+        } ?: PlainEventRenderer.INSTANCE
+
         val body = if (order.prBodyTemplate.isNullOrBlank()) {
             order.getCommitMessage()
         } else {
             templatingService.render(
                 template = order.prBodyTemplate,
                 context = context,
-                renderer = PlainEventRenderer.INSTANCE,
+                renderer = renderer,
             )
         }
         return AutoVersioningPRInfo(title, body)

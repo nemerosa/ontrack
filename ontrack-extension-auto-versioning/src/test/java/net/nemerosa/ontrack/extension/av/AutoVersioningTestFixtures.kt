@@ -39,6 +39,7 @@ object AutoVersioningTestFixtures {
         reviewers = emptyList(),
         prTitleTemplate = null,
         prBodyTemplate = null,
+        prBodyTemplateFormat = null,
     )
 
     fun Branch.createOrder(
@@ -49,6 +50,7 @@ object AutoVersioningTestFixtures {
         sourceBackValidation: String? = null,
         prTitleTemplate: String? = null,
         prBodyTemplate: String? = null,
+        prBodyTemplateFormat: String? = null,
     ) = AutoVersioningOrder(
         uuid = UUID.randomUUID().toString(),
         sourceProject = sourceProject,
@@ -71,6 +73,7 @@ object AutoVersioningTestFixtures {
         reviewers = emptyList(),
         prTitleTemplate = prTitleTemplate,
         prBodyTemplate = prBodyTemplate,
+        prBodyTemplateFormat = prBodyTemplateFormat,
     )
 
     fun sampleConfig() = AutoVersioningConfig(
@@ -112,6 +115,7 @@ object AutoVersioningTestFixtures {
         reviewers = null,
         prTitleTemplate = null,
         prBodyTemplate = null,
+        prBodyTemplateFormat = null,
     )
 
 }

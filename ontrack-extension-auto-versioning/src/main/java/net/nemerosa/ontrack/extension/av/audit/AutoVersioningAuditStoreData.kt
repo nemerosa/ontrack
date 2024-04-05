@@ -29,6 +29,7 @@ data class AutoVersioningAuditStoreData(
     val reviewers: List<String>?, // Nullable for backward compatibility
     val prTitleTemplate: String?,
     val prBodyTemplate: String?,
+    val prBodyTemplateFormat: String?,
 ) {
     val mostRecentState
         get() = states.first().state
@@ -60,5 +61,6 @@ data class AutoVersioningAuditStoreData(
         reviewers = reviewers,
         prTitleTemplate = prTitleTemplate,
         prBodyTemplate = prBodyTemplate,
+        prBodyTemplateFormat = prBodyTemplateFormat,
     )
 }

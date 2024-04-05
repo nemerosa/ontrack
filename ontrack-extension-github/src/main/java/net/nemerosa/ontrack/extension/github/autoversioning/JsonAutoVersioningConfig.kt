@@ -36,6 +36,7 @@ data class JsonAutoVersioningConfig(
     val reviewers: List<String>? = null,
     val prTitleTemplate: String? = null,
     val prBodyTemplate: String? = null,
+    val prBodyTemplateFormat: String? = null,
 ) {
     fun toConfig() = AutoVersioningSourceConfig(
         sourceProject = project,
@@ -57,5 +58,6 @@ data class JsonAutoVersioningConfig(
         reviewers = reviewers,
         prTitleTemplate = prTitleTemplate,
         prBodyTemplate = prBodyTemplate,
+        prBodyTemplateFormat = prBodyTemplateFormat,
     )
 }

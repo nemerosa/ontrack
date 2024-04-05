@@ -67,6 +67,7 @@ class AutoVersioningDispatcherImpl(
                 reviewers = config.reviewers ?: emptyList(),
                 prTitleTemplate = config.prTitleTemplate,
                 prBodyTemplate = config.prBodyTemplate,
+                prBodyTemplateFormat = config.prBodyTemplateFormat,
             )
         } catch (ex: Exception) {
             // Logging the event

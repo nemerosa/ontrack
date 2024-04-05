@@ -30,6 +30,7 @@ data class AutoVersioningOrder(
     val reviewers: List<String>,
     val prTitleTemplate: String?,
     val prBodyTemplate: String?,
+    val prBodyTemplateFormat: String?,
 ) : AutoVersioningTargetConfig {
     /**
      * Gets a meaningful commit message for this order

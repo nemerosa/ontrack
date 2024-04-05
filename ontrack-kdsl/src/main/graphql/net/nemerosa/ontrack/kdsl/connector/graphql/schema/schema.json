@@ -822,6 +822,11 @@
             },
             {
               "kind": "OBJECT",
+              "name": "ValidationStamp",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
               "name": "ValidationStampFilter",
               "ofType": null
             }
@@ -2033,6 +2038,18 @@
               "deprecationReason": null
             },
             {
+              "name": "prBodyTemplateFormat",
+              "description": "Template format for the body of the pull request (plain by default, html, markdown as possible values)",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "prTitleTemplate",
               "description": "Template for the title of the pull request (optional)",
               "args": [],
@@ -2317,6 +2334,16 @@
             {
               "name": "prBodyTemplate",
               "description": "Template for the body of the pull request (optional)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "prBodyTemplateFormat",
+              "description": "Template format for the body of the pull request (plain by default, html, markdown as possible values)",
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
@@ -6128,6 +6155,64 @@
           "kind": "OBJECT",
           "name": "BulkUpdatePromotionLevelByIdPayload",
           "description": "Output type for the bulkUpdatePromotionLevelById mutation.",
+          "fields": [
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "BulkUpdateValidationStampByIdInput",
+          "description": "Input type for the bulkUpdateValidationStampById mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "id",
+              "description": "Validation stamp ID",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "BulkUpdateValidationStampByIdPayload",
+          "description": "Output type for the bulkUpdateValidationStampById mutation.",
           "fields": [
             {
               "name": "errors",
@@ -14053,6 +14138,64 @@
               "isDeprecated": false,
               "deprecationReason": null
             },
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "DeleteValidationStampByIdInput",
+          "description": "Input type for the deleteValidationStampById mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "id",
+              "description": "Validation stamp ID",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "DeleteValidationStampByIdPayload",
+          "description": "Output type for the deleteValidationStampById mutation.",
+          "fields": [
             {
               "name": "errors",
               "description": "List of errors",
@@ -27311,6 +27454,75 @@
               "deprecationReason": null
             },
             {
+              "name": "updateValidationStampById",
+              "description": "Updates an existing validation stamp",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "UpdateValidationStampByIdInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "UpdateValidationStampByIdPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "deleteValidationStampById",
+              "description": "Deletes an existing validation stamp",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "DeleteValidationStampByIdInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "DeleteValidationStampByIdPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "bulkUpdateValidationStampById",
+              "description": "Bulk update of a validation stamp",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "BulkUpdateValidationStampByIdInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "BulkUpdateValidationStampByIdPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "testConfiguration",
               "description": "Tests a configuration",
               "args": [
@@ -29191,6 +29403,11 @@
             },
             {
               "kind": "OBJECT",
+              "name": "BulkUpdateValidationStampByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
               "name": "ChangeValidationRunStatusCommentPayload",
               "ofType": null
             },
@@ -29592,6 +29809,11 @@
             {
               "kind": "OBJECT",
               "name": "DeleteValidationRunMetaInfoPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteValidationStampByIdPayload",
               "ofType": null
             },
             {
@@ -30272,6 +30494,11 @@
             {
               "kind": "OBJECT",
               "name": "UpdatePromotionLevelByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "UpdateValidationStampByIdPayload",
               "ofType": null
             },
             {
@@ -35881,6 +36108,29 @@
                 "kind": "OBJECT",
                 "name": "User",
                 "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "validationDataTypes",
+              "description": "List of all available validation data types",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "ValidationDataTypeDescriptor"
+                    }
+                  }
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -52078,6 +52328,116 @@
         },
         {
           "kind": "INPUT_OBJECT",
+          "name": "UpdateValidationStampByIdInput",
+          "description": "Input type for the updateValidationStampById mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "dataType",
+              "description": "FQCN of the data type",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "dataTypeConfig",
+              "description": "Configuration of the data type",
+              "type": {
+                "kind": "SCALAR",
+                "name": "JSON",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "description",
+              "description": "Validation stamp description",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id",
+              "description": "Validation stamp ID",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name",
+              "description": "Validation stamp name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "UpdateValidationStampByIdPayload",
+          "description": "Output type for the updateValidationStampById mutation.",
+          "fields": [
+            {
+              "name": "validationStamp",
+              "description": "Updated validation stamp",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ValidationStamp",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
           "name": "UpdateValidationStampFilterInput",
           "description": "Input type for the updateValidationStampFilter mutation.",
           "fields": null,
@@ -54997,6 +55357,29 @@
               "deprecationReason": null
             },
             {
+              "name": "authorizations",
+              "description": "Authorizations for this context",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "Authorization"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "image",
               "description": "Flag to indicate if an image is associated",
               "args": [],
@@ -55125,6 +55508,11 @@
             {
               "kind": "INTERFACE",
               "name": "ProjectEntity",
+              "ofType": null
+            },
+            {
+              "kind": "INTERFACE",
+              "name": "Authorizable",
               "ofType": null
             }
           ],
