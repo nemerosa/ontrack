@@ -96,7 +96,13 @@ export default function SubscriptionDialog({subscriptionDialog}) {
                         </Well>
                     </Form.Item>
                 }
-                {/*  TODO Content template  */}
+                {/*  Content template  */}
+                <Form.Item
+                    name="contentTemplate"
+                    label="Custom template"
+                >
+                    <Input.TextArea rows={5}/>
+                </Form.Item>
             </FormDialog>
         </>
     )
