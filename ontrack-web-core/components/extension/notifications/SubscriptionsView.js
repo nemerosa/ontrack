@@ -1,7 +1,6 @@
 import Head from "next/head";
 import {useEffect, useMemo, useState} from "react";
 import MainPage from "@components/layouts/MainPage";
-import {homeBreadcrumbs} from "@components/common/Breadcrumbs";
 import {List, Skeleton, Space, Tag, Typography} from "antd";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
@@ -9,8 +8,9 @@ import {FaRegPaperPlane} from "react-icons/fa";
 import SubscriptionContentTemplate from "@components/extension/notifications/SubscriptionContentTemplate";
 import {pageTitle} from "@components/common/Titles";
 import {CloseCommand} from "@components/common/Commands";
+import InlineConfirmCommand from "@components/common/InlineConfirmCommand";
 
-export default function SubscriptionsView({title, breadcrumbs = [], closeUri = '', additionalFilter = {}}) {
+export default function SubscriptionsView({title, breadcrumbs = [], closeUri = '', managePermission = false, additionalFilter = {}}) {
 
     const client = useGraphQLClient()
 
@@ -21,6 +21,11 @@ export default function SubscriptionsView({title, breadcrumbs = [], closeUri = '
     }), [additionalFilter])
 
     const [items, setItems] = useState([])
+    const [refresh, setRefresh] = useState(0)
+
+    const reload = () => {
+        setRefresh(it => it + 1)
+    }
 
     useEffect(() => {
         if (client) {
@@ -67,7 +72,33 @@ export default function SubscriptionsView({title, breadcrumbs = [], closeUri = '
                 setLoading(false)
             })
         }
-    }, [client, filter]);
+    }, [client, filter, refresh]);
+
+    const onDeleteSubscription = (item) => {
+        return () => {
+            client.request(
+                gql`
+                    mutation DeleteSubscription(
+                        $id: String!,
+                        $projectEntity: ProjectEntityIDInput,
+                    ) {
+                        deleteSubscription(input: {
+                            id: $id,
+                            projectEntity: $projectEntity,
+                        }) {
+                            errors {
+                                message
+                            }
+                        }
+                    }
+                `,
+                {
+                    id: item.id,
+                    projectEntity: additionalFilter.entity,
+                }
+            ).then(reload)
+        }
+    }
 
     const getActions = (item) => {
         const actions = []
@@ -78,7 +109,16 @@ export default function SubscriptionsView({title, breadcrumbs = [], closeUri = '
             )
         }
 
-        // TODO Delete a subscription
+        // Delete a subscription
+        if (managePermission) {
+            actions.push(
+                <InlineConfirmCommand
+                    title="Deletes the subscription"
+                    confirm="Do you really want to delete this subscription?"
+                    onConfirm={onDeleteSubscription(item)}
+                />
+            )
+        }
 
         return actions
     }

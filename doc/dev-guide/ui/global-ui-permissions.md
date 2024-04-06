@@ -1,11 +1,10 @@
-`ADR-NXUI-0002-global-ui-permissions` - Global UI permissions
-=============================================================
+# Global UI permissions
 
-# Context
+## Context
 
 In order to enable some features at client side (UI), we need to know which permissions are granted to the current user.
 
-# Chosen option
+## Chosen option
 
 The [`UserContextProvider`](components/providers/UserProvider.js) is injected at [top-level](pages/_app.js) and stores the results of the `rest/user` REST call into a `user.authorizations` context.
 
@@ -14,7 +13,7 @@ The `user.authorizations` is a map:
 * key: domain name, for example: `project`
 * value: map of action x boolean, for example: `create` ==> `true`
 
-# Usage
+## Usage
 
 Inject the context:
 
@@ -30,13 +29,13 @@ if (user.authorizations.project?.create) {
 }
 ```
 
-# Implementation notes
+## Implementation notes
 
 The authorizations are filled in at server side using the
 `AuthorizationContributor` server and in particular its extensible
 variant `ExtensionAuthorizationContributor` through the
 `AuthorizationContributorExtension` extension points.
 
-# See also
+## See also
 
-* [ADR-NXUI-0005-fine-entity-ui-permissions](ADR-NXUI-0005-entity-ui-permissions.md)
+* [Entity UI permissions](entity-ui-permissions.md)

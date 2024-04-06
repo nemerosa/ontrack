@@ -1,7 +1,5 @@
 package net.nemerosa.ontrack.model.structure
 
-import java.util.*
-
 
 /**
  * Name suitable for generating a code variable.

@@ -11,6 +11,7 @@ export const useProjectEntityPageInfo = (type, id) => {
     const [title, setTitle] = useState('')
     const [breadcrumbs, setBreadcrumbs] = useState([])
     const [closeUri, setCloseUri] = useState('')
+    const [entity, setEntity] = useState({})
 
     useEffect(() => {
         if (client && type && id) {
@@ -32,6 +33,11 @@ export const useProjectEntityPageInfo = (type, id) => {
                                             name
                                         }
                                     }
+                                    authorizations {
+                                        name
+                                        action
+                                        authorized
+                                    }
                                 }
                             }
                         `, {id}
@@ -49,6 +55,8 @@ export const useProjectEntityPageInfo = (type, id) => {
                         setBreadcrumbs(breadcrumbs)
 
                         setCloseUri(promotionLevelUri(data.promotionLevel))
+
+                        setEntity(data.promotionLevel)
                     })
                 }
             }
@@ -59,5 +67,6 @@ export const useProjectEntityPageInfo = (type, id) => {
         title,
         breadcrumbs,
         closeUri,
+        entity,
     }
 }
