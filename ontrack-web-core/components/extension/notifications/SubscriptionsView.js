@@ -4,13 +4,20 @@ import MainPage from "@components/layouts/MainPage";
 import {List, Skeleton, Space, Tag, Typography} from "antd";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
-import {FaRegPaperPlane} from "react-icons/fa";
+import {FaPlus, FaRegPaperPlane} from "react-icons/fa";
 import SubscriptionContentTemplate from "@components/extension/notifications/SubscriptionContentTemplate";
 import {pageTitle} from "@components/common/Titles";
-import {CloseCommand} from "@components/common/Commands";
+import {CloseCommand, Command} from "@components/common/Commands";
 import InlineConfirmCommand from "@components/common/InlineConfirmCommand";
+import SubscriptionDialog, {useSubscriptionDialog} from "@components/extension/notifications/SubscriptionDialog";
 
-export default function SubscriptionsView({title, breadcrumbs = [], closeUri = '', managePermission = false, additionalFilter = {}}) {
+export default function SubscriptionsView({
+                                              title,
+                                              breadcrumbs = [],
+                                              closeUri = '',
+                                              managePermission = false,
+                                              additionalFilter = {}
+                                          }) {
 
     const client = useGraphQLClient()
 
@@ -123,6 +130,31 @@ export default function SubscriptionsView({title, breadcrumbs = [], closeUri = '
         return actions
     }
 
+    const subscriptionDialog = useSubscriptionDialog({
+        onSuccess: reload,
+        projectEntity: additionalFilter.entity,
+    })
+
+    const onCreateSubscription = () => {
+        subscriptionDialog.start()
+    }
+
+    const [commands, setCommands] = useState([])
+
+    useEffect(() => {
+        const commands = []
+
+        if (managePermission) {
+            commands.push(
+                <Command key="create" icon={<FaPlus/>} action={onCreateSubscription} text="Create subscription"/>
+            )
+        }
+
+        commands.push(<CloseCommand key="close" href={closeUri}/>)
+
+        setCommands(commands)
+    }, [managePermission, closeUri]);
+
     return (
         <>
             <Head>
@@ -131,9 +163,7 @@ export default function SubscriptionsView({title, breadcrumbs = [], closeUri = '
             <MainPage
                 title="Subscriptions"
                 breadcrumbs={breadcrumbs}
-                commands={[
-                    <CloseCommand key="close" href={closeUri}/>,
-                ]}
+                commands={commands}
             >
                 <Skeleton active loading={loading}>
                     <List
@@ -185,6 +215,7 @@ export default function SubscriptionsView({title, breadcrumbs = [], closeUri = '
                     </List>
                 </Skeleton>
             </MainPage>
+            <SubscriptionDialog subscriptionDialog={subscriptionDialog}/>
         </>
     )
 }

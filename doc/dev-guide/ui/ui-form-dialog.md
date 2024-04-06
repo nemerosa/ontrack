@@ -1,13 +1,12 @@
-`ADR-NXUI-0009-ui-form-dialog` - Using modal form dialogs
-=========================================================
+# Using modal form dialogs
 
-# Context
+## Context
 
 Modal form dialogs are used to ask the user for information and input in a blocking way.
 
-# Usage
+## Usage
 
-## Define the dialog
+### Define the dialog
 
 Preferably in a separate file than the client one, define:
 
@@ -35,7 +34,7 @@ export default function MyDialog({myDialog}) {
 }
 ```
 
-## Declare the dialog
+### Declare the dialog
 
 In the client component:
 
@@ -62,7 +61,7 @@ return (
 myDialog.start({/* Context */})
 ```
 
-# Configuration
+## Configuration
 
 The `useFormDialog` has the following configuration parameters.
 
@@ -73,7 +72,7 @@ The `useFormDialog` has the following configuration parameters.
 | onSuccess     | (values, context) => {} | _None_  | Validations of the values.                                        |
 
 
-# Context
+## Context
 
 The _context_ is an object which is passed to the dialog by the client, typically used to initialize the content of the form.
 
@@ -134,7 +133,7 @@ export default function MyDialog({myDialog}) {
 
 ```
 
-# GraphQL integration
+## GraphQL integration
 
 In some cases, the whole dialog is just about orchestrating some GraphQL calls.
 

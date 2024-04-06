@@ -7,5 +7,6 @@ with the API to its pure client aspects.
 
 * [Entity UI permissions](entity-ui-permissions.md)
 * [Global UI permissions](global-ui-permissions.md)
-* [Local page events](local-events.md) - _how to deal with local events in a page_
-* [Page tools](page-tools.md) - _how to declare a tool menu entry in a page_
+* [Local page events](local-events.md)
+* [Page tools](page-tools.md)
+* [UI form dialogs](ui-form-dialog.md)

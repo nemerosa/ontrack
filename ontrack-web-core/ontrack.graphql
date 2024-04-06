@@ -263,6 +263,12 @@ type AutoVersioningSourceConfig {
     postProcessing: String
     "Configuration of the post processing"
     postProcessingConfig: JSON
+    "Template for the body of the pull request (optional)"
+    prBodyTemplate: String
+    "Template format for the body of the pull request (plain by default, html, markdown as possible values)"
+    prBodyTemplateFormat: String
+    "Template for the title of the pull request (optional)"
+    prTitleTemplate: String
     "Qualifier for the build link to create (when links are created)"
     qualifier: String
     "List of reviewers to always set on the pull request created by the auto versioning"
@@ -1730,6 +1736,14 @@ type EventSubscriptionPayloadPaginated {
     pageItems: [EventSubscriptionPayload!]!
     "Can the user create subscriptions in the current context"
     writeSubscriptionGranted: Boolean!
+}
+
+"EventType"
+type EventType {
+    "description field"
+    description: String!
+    "id field"
+    id: String!
 }
 
 "Definition of an export format for the issues."
@@ -4011,6 +4025,14 @@ type NameValue {
     value: String!
 }
 
+"Notification channel"
+type NotificationChannel {
+    "enabled field"
+    enabled: Boolean
+    "type field"
+    type: String!
+}
+
 "Notification record"
 type NotificationRecord {
     "Channel type"
@@ -4869,6 +4891,8 @@ type Query {
         "Size of the page"
         size: Int = 20
     ): EventSubscriptionPayloadPaginated
+    "List of all event types"
+    eventTypes: [EventType!]!
     "Getting data for a chart"
     getChart(
         "Parameters for getting the chart"
@@ -4982,6 +5006,8 @@ type Query {
         "Maximum number of projects to return"
         count: Int = 10
     ): [Project!]!
+    "List of all notification channels"
+    notificationChannels: [NotificationChannel!]!
     "Access to the notification recordings"
     notificationRecords(
         "Offset for the page"
@@ -7156,6 +7182,12 @@ input AutoVersioningSourceConfigInput {
     postProcessing: String
     "Configuration of the post processing"
     postProcessingConfig: JSON
+    "Template for the body of the pull request (optional)"
+    prBodyTemplate: String
+    "Template format for the body of the pull request (plain by default, html, markdown as possible values)"
+    prBodyTemplateFormat: String
+    "Template for the title of the pull request (optional)"
+    prTitleTemplate: String
     "Qualifier for the build link to create (when links are created)"
     qualifier: String
     "List of reviewers to always set on the pull request created by the auto versioning"
