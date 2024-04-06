@@ -2,6 +2,15 @@ import {gql} from "graphql-request";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {useEffect, useState} from "react";
 
+export const gqlUserMenuActionFragment = gql`
+    fragment userMenuActionFragment on UserMenuAction {
+        groupId
+        extension
+        id
+        name
+    }
+`
+
 export const gqlPromotionLevelFragment = gql`
     fragment PromotionLevelData on PromotionLevel {
         id
@@ -13,6 +22,9 @@ export const gqlPromotionLevelFragment = gql`
             action
             authorized
         }
+        userMenuActions {
+            ...userMenuActionFragment
+        }
         branch {
             id
             name
@@ -22,6 +34,7 @@ export const gqlPromotionLevelFragment = gql`
             }
         }
     }
+    ${gqlUserMenuActionFragment}
 `
 
 export const gqlPromotionLevelByIdQuery = gql`
@@ -132,15 +145,6 @@ export const gqlInformationFragment = gql`
         type
         title
         data
-    }
-`
-
-export const gqlUserMenuActionFragment = gql`
-    fragment userMenuActionFragment on UserMenuAction {
-        groupId
-        extension
-        id
-        name
     }
 `
 

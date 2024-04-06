@@ -25,6 +25,7 @@ import PromotionLevelBulkUpdateCommand from "@components/promotionLevels/Promoti
 import PromotionLevelFrequencyChart from "@components/promotionLevels/PromotionLevelFrequencyChart";
 import PromotionLevelStabilityChart from "@components/promotionLevels/PromotionLevelStabilityChart";
 import PromotionLevelHistory from "@components/promotionLevels/PromotionLevelHistory";
+import UserMenuActions from "@components/entities/UserMenuActions";
 
 export default function PromotionLevelView({id}) {
 
@@ -49,7 +50,9 @@ export default function PromotionLevelView({id}) {
             setLoadingPromotionLevel(true)
             getPromotionLevelById(client, id).then(pl => {
                 setPromotionLevel(pl)
-                const commands = []
+                const commands = [
+                    <UserMenuActions key="userMenuActions" actions={pl.userMenuActions}/>
+                ]
                 if (isAuthorized(pl, 'promotion_level', 'edit')) {
                     commands.push(<PromotionLevelChangeImageCommand key="change-image" id={id}/>)
                     commands.push(<PromotionLevelUpdateCommand key="update" id={id}/>)
