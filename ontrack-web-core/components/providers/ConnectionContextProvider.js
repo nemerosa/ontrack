@@ -54,6 +54,14 @@ export const useRestClient = () => {
         if (connection.config) {
             const config = connection.config
             setClient({
+                fetch: async (uri) => {
+                    return fetch(
+                        `${config.url}${uri}`,
+                        {
+                            headers: config.headers,
+                        }
+                    )
+                },
                 get: async (uri) => {
                     const response = await fetch(
                         `${config.url}${uri}`,

@@ -1,7 +1,7 @@
-import {legacyPromotionLevelImageUri} from "@components/common/Links";
-import LegacyImage from "@components/common/LegacyImage";
+import {restPromotionLevelImageUri} from "@components/common/Links";
 import {useContext, useState} from "react";
 import {EventsContext} from "@components/common/EventsContext";
+import ProxyImage from "@components/common/ProxyImage";
 
 export const PromotionLevelImage = ({promotionLevel, size = 16}) => {
 
@@ -15,10 +15,10 @@ export const PromotionLevelImage = ({promotionLevel, size = 16}) => {
 
     return (
         promotionLevel.image ?
-            <LegacyImage href={`${legacyPromotionLevelImageUri(promotionLevel)}?key=${refresh}`}
-                         alt={promotionLevel.name}
-                         width={size}
-                         height={size}
+            <ProxyImage restUri={`${restPromotionLevelImageUri(promotionLevel)}?key=${refresh}`}
+                        alt={promotionLevel.name}
+                        width={size}
+                        height={size}
             /> : undefined
     )
 }

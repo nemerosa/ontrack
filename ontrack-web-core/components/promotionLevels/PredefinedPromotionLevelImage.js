@@ -2,9 +2,10 @@ import {useEffect, useState} from "react";
 import {Space, Typography} from "antd";
 import {gql} from "graphql-request";
 import Image from "next/image";
-import {legacyPredefinedPromotionLevelImageUri} from "@components/common/Links";
+import {restPredefinedPromotionLevelImageUri} from "@components/common/Links";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import LegacyImage from "@components/common/LegacyImage";
+import ProxyImage from "@components/common/ProxyImage";
 
 export default function PredefinedPromotionLevelImage({name, displayName = true, size = 24}) {
 
@@ -27,8 +28,8 @@ export default function PredefinedPromotionLevelImage({name, displayName = true,
                 const ppl = data.predefinedPromotionLevelByName
                 if (ppl && ppl.isImage) {
                     setImage(
-                        <LegacyImage
-                            href={legacyPredefinedPromotionLevelImageUri(ppl)}
+                        <ProxyImage
+                            restUri={restPredefinedPromotionLevelImageUri(ppl)}
                             alt={`Predefined promotion level ${name}`}
                             width={size}
                             height={size}
