@@ -26,6 +26,7 @@ import PromotionLevelFrequencyChart from "@components/promotionLevels/PromotionL
 import PromotionLevelStabilityChart from "@components/promotionLevels/PromotionLevelStabilityChart";
 import PromotionLevelHistory from "@components/promotionLevels/PromotionLevelHistory";
 import UserMenuActions from "@components/entities/UserMenuActions";
+import PromotionLevelViewTitle from "@components/promotionLevels/PromotionLevelViewTitle";
 
 export default function PromotionLevelView({id}) {
 
@@ -148,7 +149,7 @@ export default function PromotionLevelView({id}) {
             >
                 <PromotionLevelHistory
                     promotionLevel={promotionLevel}
-                    />
+                />
             </GridCell>,
         },
     ]
@@ -161,10 +162,7 @@ export default function PromotionLevelView({id}) {
             <StoredGridLayoutContextProvider>
                 <MainPage
                     title={
-                        <Space>
-                            <PromotionLevelImage promotionLevel={promotionLevel}/>
-                            {promotionLevel.name}
-                        </Space>
+                        <PromotionLevelViewTitle promotionLevel={promotionLevel}/>
                     }
                     breadcrumbs={promotionLevelBreadcrumbs(promotionLevel)}
                     commands={commands}

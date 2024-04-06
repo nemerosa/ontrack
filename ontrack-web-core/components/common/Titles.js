@@ -6,8 +6,12 @@ export function branchTitle(branch) {
     return title(branch ? `${branch.name} / ${branch.project.name}` : undefined)
 }
 
+export function subBranchTitleName(branch, what) {
+    return what ? (branch ? `${what} | ${branch.name} / ${branch.project.name}` : undefined) : ''
+}
+
 export function subBranchTitle(branch, what) {
-    return what ? title(branch ? `${what} | ${branch.name} / ${branch.project.name}` : undefined) : title('')
+    return title(subBranchTitleName(branch, what))
 }
 
 export function subBuildTitle(build, what) {
@@ -30,8 +34,13 @@ export function buildTitle(build) {
     return subBranchTitle(build.branch, buildKnownName(build))
 }
 
+export function promotionLevelTitleName(promotionLevel, what) {
+    const name = subBranchTitleName(promotionLevel.branch, promotionLevel.name)
+    return what ? `${name} | ${what}` : name
+}
+
 export function promotionLevelTitle(promotionLevel) {
-    return subBranchTitle(promotionLevel.branch, promotionLevel.name)
+    return title(promotionLevelTitleName(promotionLevel))
 }
 
 export function validationStampTitle(validationStamp) {
