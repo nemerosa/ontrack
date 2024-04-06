@@ -1,9 +1,10 @@
 Ontrack Next UI Architecture Decisions Records
 ==============================================
 
+> These articles are being moved into the [developer's guide](../dev-guide/README.md).
+
 # UI side
 
-* [ADR-NXUI-0001-ui-local-events](ADR-NXUI-0001-ui-local-events.md) - how are events passed within the page
 * [ADR-NXUI-0002-global-ui-permissions](ADR-NXUI-0002-global-ui-permissions.md) - how are global UI permissions accessed
 * [ADR-NXUI-0003-ui-preferences](ADR-NXUI-0003-ui-preferences.md) - how to get and set user preferences in the UI
 * [ADR-NXUI-0004-ui-permalinks](ADR-NXUI-0004-ui-permalink.md) - how to use permalinks in pages
