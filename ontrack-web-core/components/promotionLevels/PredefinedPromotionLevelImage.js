@@ -1,10 +1,8 @@
 import {useEffect, useState} from "react";
 import {Space, Typography} from "antd";
 import {gql} from "graphql-request";
-import Image from "next/image";
 import {restPredefinedPromotionLevelImageUri} from "@components/common/Links";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
-import LegacyImage from "@components/common/LegacyImage";
 import ProxyImage from "@components/common/ProxyImage";
 
 export default function PredefinedPromotionLevelImage({name, displayName = true, size = 24}) {

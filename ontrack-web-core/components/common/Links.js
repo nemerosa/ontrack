@@ -68,11 +68,11 @@ export function restPredefinedPromotionLevelImageUri(predefinedPromotionLevel) {
     return `/rest/admin/predefinedPromotionLevels/${predefinedPromotionLevel.id}/image`
 }
 
-export function legacyPredefinedValidationStampImageUri(predefinedValidationStamp) {
+export function restPredefinedValidationStampImageUri(predefinedValidationStamp) {
     return `/rest/admin/predefinedValidationStamps/${predefinedValidationStamp.id}/image`
 }
 
-export function legacyValidationStampImageUri(validationStamp) {
+export function restValidationStampImageUri(validationStamp) {
     return `/rest/structure/validationStamps/${validationStamp.id}/image`
 }
 

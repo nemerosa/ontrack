@@ -1,8 +1,9 @@
-import {legacyValidationStampImageUri} from "@components/common/Links";
+import {restValidationStampImageUri} from "@components/common/Links";
 import {FaWrench} from "react-icons/fa";
 import LegacyImage from "@components/common/LegacyImage";
 import {EventsContext} from "@components/common/EventsContext";
 import {useContext, useState} from "react";
+import ProxyImage from "@components/common/ProxyImage";
 
 export default function ValidationStampImage({validationStamp, size = 16}) {
 
@@ -16,8 +17,8 @@ export default function ValidationStampImage({validationStamp, size = 16}) {
 
     return (
         validationStamp.image ?
-            <LegacyImage
-                href={`${legacyValidationStampImageUri(validationStamp)}?key=${refresh}`}
+            <ProxyImage
+                restUri={`${restValidationStampImageUri(validationStamp)}?key=${refresh}`}
                 alt={validationStamp.name}
                 width={size}
                 height={size}
