@@ -7,6 +7,7 @@ export default function SlackNotificationChannelForm({prefix}) {
             <Form.Item
                 name={[prefix, "channel"]}
                 label="Slack channel"
+                rules={[{required: true, message: 'Slack channel is required.'}]}
             >
                 <Input placeholder="#"/>
             </Form.Item>
