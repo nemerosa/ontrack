@@ -1,5 +1,9 @@
+export function projectTitleName(project, what) {
+    return project ? (what ? `${project.name} | ${what}` : project.name) : undefined
+}
+
 export function projectTitle(project) {
-    return title(project ? project.name : undefined)
+    return title(projectTitleName(project))
 }
 
 export function branchTitle(branch) {

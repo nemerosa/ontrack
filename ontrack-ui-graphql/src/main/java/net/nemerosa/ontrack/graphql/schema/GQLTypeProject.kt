@@ -10,6 +10,7 @@ import graphql.schema.GraphQLObjectType.newObject
 import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.graphql.schema.actions.UIActionsGraphQLService
 import net.nemerosa.ontrack.graphql.schema.actions.actions
+import net.nemerosa.ontrack.graphql.schema.authorizations.GQLInterfaceAuthorizableService
 import net.nemerosa.ontrack.graphql.support.disabledField
 import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
@@ -36,6 +37,7 @@ class GQLTypeProject(
     private val validationRunSearchService: ValidationRunSearchService,
     freeTextAnnotatorContributors: List<FreeTextAnnotatorContributor>,
     extensionManager: ExtensionManager,
+    private val gqlInterfaceAuthorizableService: GQLInterfaceAuthorizableService,
 ) : AbstractGQLProjectEntity<Project>(
         Project::class.java,
         ProjectEntityType.PROJECT,
@@ -57,6 +59,10 @@ class GQLTypeProject(
                 .field(disabledField())
                 // Actions
                 .actions(uiActionsGraphQLService, Project::class)
+                // Authorizations
+                .apply {
+                    gqlInterfaceAuthorizableService.apply(this, PromotionLevel::class)
+                }
                 // Is this project a favourite?
                 .field {
                     it.name("favourite")

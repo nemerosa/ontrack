@@ -1,10 +1,11 @@
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
 import {useEffect, useState} from "react";
-import {promotionLevelTitleName} from "@components/common/Titles";
-import {promotionLevelBreadcrumbs} from "@components/common/Breadcrumbs";
+import {projectTitleName, promotionLevelTitleName} from "@components/common/Titles";
+import {projectBreadcrumbs, promotionLevelBreadcrumbs} from "@components/common/Breadcrumbs";
 import PromotionLevelViewTitle from "@components/promotionLevels/PromotionLevelViewTitle";
-import {promotionLevelUri} from "@components/common/Links";
+import {projectUri, promotionLevelUri} from "@components/common/Links";
+import ProjectLink from "@components/projects/ProjectLink";
 
 export const useProjectEntityPageInfo = (type, id) => {
     const client = useGraphQLClient()
@@ -16,6 +17,36 @@ export const useProjectEntityPageInfo = (type, id) => {
     useEffect(() => {
         if (client && type && id) {
             switch (type) {
+                case 'PROJECT': {
+                    client.request(
+                        gql`
+                            query EntityInformation( $id: Int!, ) {
+                                project(id: $id) {
+                                    id
+                                    name
+                                    authorizations {
+                                        name
+                                        action
+                                        authorized
+                                    }
+                                }
+                            }
+                        `, {id}
+                    ).then(data => {
+                        setTitle(projectTitleName(data.project, 'Subscriptions'))
+
+                        const breadcrumbs = projectBreadcrumbs()
+                        breadcrumbs.push(
+                            <ProjectLink project={data.project}/>
+                        )
+                        setBreadcrumbs(breadcrumbs)
+
+                        setCloseUri(projectUri(data.project))
+
+                        setEntity(data.project)
+                    })
+                    break
+                }
                 case 'PROMOTION_LEVEL': {
                     client.request(
                         gql`
@@ -58,6 +89,7 @@ export const useProjectEntityPageInfo = (type, id) => {
 
                         setEntity(data.promotionLevel)
                     })
+                    break
                 }
             }
         }

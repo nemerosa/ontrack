@@ -4166,11 +4166,13 @@ type Preferences {
     selectedBranchViewKey: String
 }
 
-type Project implements ProjectEntity {
+type Project implements Authorizable & ProjectEntity {
     "Actions for a Project"
     actions: ProjectActions @deprecated(reason: "Will be removed in V5. User `userMenuActions` instead.")
     "Description with links."
     annotatedDescription: String
+    "Authorizations for this context"
+    authorizations: [Authorization!]!
     "If set, this property allows promotion levels to be created automatically from predefined promotion levels"
     autoPromotionLevelProperty: Property
     "If set, this property allows validation stamps to be created automatically from predefined validation stamps"
@@ -5033,6 +5035,10 @@ type Query {
     ): PredefinedValidationStamp
     "Gets the preferences of the current user"
     preferences: Preferences!
+    project(
+        "ID of the project to look for (required)"
+        id: Int!
+    ): Project
     projects(
         "Favourite projects only"
         favourites: Boolean,
