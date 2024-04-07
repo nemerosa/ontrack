@@ -11,4 +11,6 @@ type JenkinsConfiguration {
 extend type Query {
     """List of Jenkins configurations"""
     jenkinsConfigurations: [JenkinsConfiguration!]!
+    """Getting a Jenkins configuration by name"""
+    jenkinsConfiguration(name: String!): JenkinsConfiguration
 }

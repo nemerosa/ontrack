@@ -24,6 +24,10 @@ const refDataSignature = {
         list: [],
     },
     /**
+     * List of existing event types (id, description)
+     */
+    eventTypes: [],
+    /**
      * Version of Ontrack
      */
     version: ''
@@ -82,11 +86,16 @@ export default function RefDataContextProvider({children}) {
                                 display
                             }
                         }
+                        eventTypes {
+                            id
+                            description
+                        }
                     }
                 `
             ).then(data => {
                 setRefData({
                     validationRunStatuses: validationRunStatuses(data.validationRunStatusIDList),
+                    eventTypes: data.eventTypes,
                     version: data.info.version.display,
                 })
             })

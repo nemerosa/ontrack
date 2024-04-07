@@ -10,3 +10,4 @@ with the API to its pure client aspects.
 * [Local page events](local-events.md)
 * [Page tools](page-tools.md)
 * [UI form dialogs](ui-form-dialog.md)
+* [UI reference data](ui-ref-data.md)

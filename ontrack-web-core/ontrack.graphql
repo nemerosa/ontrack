@@ -4994,6 +4994,8 @@ type Query {
     info: Info
     "List of available export formats"
     issueExportFormats: [IssueExportFormat!]! @deprecated(reason: "Use the templating service")
+    "Getting a Jenkins configuration by name"
+    jenkinsConfiguration(name: String!): JenkinsConfiguration
     "List of Jenkins configurations"
     jenkinsConfigurations: [JenkinsConfiguration!]!
     "List of all labels"

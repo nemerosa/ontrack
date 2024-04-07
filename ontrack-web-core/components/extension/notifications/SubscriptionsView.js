@@ -1,7 +1,7 @@
 import Head from "next/head";
 import {useEffect, useMemo, useState} from "react";
 import MainPage from "@components/layouts/MainPage";
-import {List, Skeleton, Space, Tag, Typography} from "antd";
+import {Card, List, Skeleton, Space, Tag, Typography} from "antd";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
 import {FaPlus, FaRegPaperPlane} from "react-icons/fa";
@@ -10,6 +10,8 @@ import {pageTitle} from "@components/common/Titles";
 import {CloseCommand, Command} from "@components/common/Commands";
 import InlineConfirmCommand from "@components/common/InlineConfirmCommand";
 import SubscriptionDialog, {useSubscriptionDialog} from "@components/extension/notifications/SubscriptionDialog";
+import EventList from "@components/core/model/EventList";
+import NotificationChannelConfig from "@components/extension/notifications/NotificationChannelConfig";
 
 export default function SubscriptionsView({
                                               title,
@@ -59,7 +61,6 @@ export default function SubscriptionsView({
                                 id
                                 channel
                                 channelConfig
-                                channelConfigText
                                 disabled
                                 events
                                 keywords
@@ -167,47 +168,38 @@ export default function SubscriptionsView({
             >
                 <Skeleton active loading={loading}>
                     <List
+                        grid={{
+                            gutter: 16,
+                            column: 2,
+                        }}
                         dataSource={items}
                         itemLayout="horizontal"
                         renderItem={(item) => (
-                            <List.Item
-                                actions={getActions(item)}
-                            >
-                                <List.Item.Meta
-                                    title={
-                                        <Space>
-                                            <Tag color="processing">
-                                                <Space>
-                                                    <FaRegPaperPlane/>
-                                                    {item.channel}
-                                                </Space>
-                                            </Tag>
-                                            {
-                                                item.channelConfigText &&
-                                                <>
-                                                    to
-                                                    <Tag>
-                                                        {item.channelConfigText}
-                                                    </Tag>
-                                                </>
-                                            }
-                                            <Typography.Text>on</Typography.Text>
-                                            {
-                                                item.events.map((event, index) => (
-                                                    <Tag key={index} color="success">{event}</Tag>
-                                                ))
-                                            }
-                                            {
-                                                item.keywords &&
-                                                <>
-                                                    <Typography.Text>with keywords</Typography.Text>
-                                                    <Tag>{item.keywords}</Tag>
-                                                </>
-                                            }
-                                        </Space>
+                            <List.Item>
+                                <Card
+                                    title={<Tag color="blue">{item.channel}</Tag>}
+                                    extra={getActions(item)}
+                                >
+                                    <Card.Grid style={{width: '100%'}} hoverable={false}>
+                                        <EventList events={item.events}/>
+                                    </Card.Grid>
+                                    {
+                                        item.keywords &&
+                                        <Card.Grid style={{width: '100%'}} hoverable={false}>
+                                            Keywords: <Tag>{item.keywords}</Tag>
+                                        </Card.Grid>
                                     }
-                                    description={<SubscriptionContentTemplate template={item.contentTemplate}/>}
-                                />
+                                    <Card.Grid style={{width: '100%'}} hoverable={false}>
+                                        <NotificationChannelConfig channel={item.channel} config={item.channelConfig}/>
+                                    </Card.Grid>
+                                    {
+                                        item.contentTemplate &&
+                                        <Card.Grid style={{width: '100%'}} hoverable={false}>
+                                            <p>Custom template:</p>
+                                            <SubscriptionContentTemplate template={item.contentTemplate}/>
+                                        </Card.Grid>
+                                    }
+                                </Card>
                             </List.Item>
                         )}
                     >

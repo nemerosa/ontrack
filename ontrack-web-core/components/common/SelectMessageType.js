@@ -1,38 +1,12 @@
-import {Select, Space} from "antd";
-import MessageTypeIcon from "@components/common/MessageTypeIcon";
+import {Select} from "antd";
+import MessageType, {messageTypes} from "@components/common/MessageType";
 
 export default function SelectMessageType({value, onChange}) {
 
-    const options = [
-        {
-            value: 'SUCCESS',
-            label: <Space>
-                <MessageTypeIcon type="SUCCESS"/>
-                Success
-            </Space>,
-        },
-        {
-            value: 'INFO',
-            label: <Space>
-                <MessageTypeIcon type="INFO"/>
-                Information
-            </Space>,
-        },
-        {
-            value: 'WARNING',
-            label: <Space>
-                <MessageTypeIcon type="WARNING"/>
-                Warning
-            </Space>,
-        },
-        {
-            value: 'ERROR',
-            label: <Space>
-                <MessageTypeIcon type="ERROR"/>
-                Error
-            </Space>,
-        },
-    ]
+    const options = messageTypes.map(name => ({
+        value: name,
+        label: <MessageType value={name}/>,
+    }))
 
     return (
         <>
