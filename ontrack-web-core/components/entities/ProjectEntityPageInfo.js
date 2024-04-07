@@ -1,10 +1,10 @@
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
 import {useEffect, useState} from "react";
-import {projectTitleName, promotionLevelTitleName} from "@components/common/Titles";
-import {projectBreadcrumbs, promotionLevelBreadcrumbs} from "@components/common/Breadcrumbs";
+import {branchTitleName, projectTitleName, promotionLevelTitleName} from "@components/common/Titles";
+import {downToBranchBreadcrumbs, projectBreadcrumbs, promotionLevelBreadcrumbs} from "@components/common/Breadcrumbs";
 import PromotionLevelViewTitle from "@components/promotionLevels/PromotionLevelViewTitle";
-import {projectUri, promotionLevelUri} from "@components/common/Links";
+import {branchUri, projectUri, promotionLevelUri} from "@components/common/Links";
 import ProjectLink from "@components/projects/ProjectLink";
 
 export const useProjectEntityPageInfo = (type, id) => {
@@ -44,6 +44,33 @@ export const useProjectEntityPageInfo = (type, id) => {
                         setCloseUri(projectUri(data.project))
 
                         setEntity(data.project)
+                    })
+                    break
+                }
+                case 'BRANCH': {
+                    client.request(
+                        gql`
+                            query EntityInformation( $id: Int!, ) {
+                                branch(id: $id) {
+                                    id
+                                    name
+                                    project {
+                                        id
+                                        name
+                                    }
+                                    authorizations {
+                                        name
+                                        action
+                                        authorized
+                                    }
+                                }
+                            }
+                        `, {id}
+                    ).then(data => {
+                        setTitle(branchTitleName(data.branch, 'Subscriptions'))
+                        setBreadcrumbs(downToBranchBreadcrumbs(data))
+                        setCloseUri(branchUri(data.branch))
+                        setEntity(data.branch)
                     })
                     break
                 }

@@ -6,8 +6,14 @@ export function projectTitle(project) {
     return title(projectTitleName(project))
 }
 
+export function branchTitleName(branch, what) {
+    if (!branch) return undefined
+    const name = `${branch.name} / ${branch.project.name}`
+    return what ? `${name} | ${what}` : name
+}
+
 export function branchTitle(branch) {
-    return title(branch ? `${branch.name} / ${branch.project.name}` : undefined)
+    return title(branchTitleName(branch))
 }
 
 export function subBranchTitleName(branch, what) {
