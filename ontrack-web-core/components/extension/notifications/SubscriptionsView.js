@@ -178,12 +178,9 @@ export default function SubscriptionsView({
                         renderItem={(item) => (
                             <List.Item>
                                 <Card
-                                    title={<Tag color="blue">{item.channel}</Tag>}
+                                    title={<EventList events={item.events}/>}
                                     extra={getActions(item)}
                                 >
-                                    <Card.Grid style={{width: '100%'}} hoverable={false}>
-                                        <EventList events={item.events}/>
-                                    </Card.Grid>
                                     {
                                         item.keywords &&
                                         <Card.Grid style={{width: '100%'}} hoverable={false}>
@@ -191,6 +188,7 @@ export default function SubscriptionsView({
                                         </Card.Grid>
                                     }
                                     <Card.Grid style={{width: '100%'}} hoverable={false}>
+                                        <Tag color="blue">{item.channel}</Tag>
                                         <NotificationChannelConfig channel={item.channel} config={item.channelConfig}/>
                                     </Card.Grid>
                                     {
