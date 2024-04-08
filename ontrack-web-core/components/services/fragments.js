@@ -177,9 +177,13 @@ export const gqlValidationStampByIdQuery = gql`
             information {
                 ...informationFragment
             }
+            userMenuActions {
+                ...userMenuActionFragment
+            }
         }
     }
     ${gqlValidationStampFragment}
     ${gqlPropertiesFragment}
     ${gqlInformationFragment}
+    ${gqlUserMenuActionFragment}
 `

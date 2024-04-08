@@ -29,6 +29,8 @@ import ValidationStampFrequencyChart from "@components/validationStamps/Validati
 import ValidationStampStabilityChart from "@components/validationStamps/ValidationStampStabilityChart";
 import ValidationStampMetricsChart from "@components/validationStamps/ValidationStampMetricsChart";
 import ValidationStampViewDrawer from "@components/validationStamps/ValidationStampViewDrawer";
+import UserMenuActions from "@components/entities/UserMenuActions";
+import ValidationStampViewTitle from "@components/validationStamps/ValidationStampViewTitle";
 
 export default function ValidationStampView({id}) {
 
@@ -57,7 +59,9 @@ export default function ValidationStampView({id}) {
             getValidationStampById(client, id).then(vs => {
                 setValidationStamp(vs)
 
-                const commands = []
+                const commands = [
+                    <UserMenuActions key="userMenuActions" actions={vs.userMenuActions}/>
+                ]
                 if (isAuthorized(vs, 'validation_stamp', 'edit')) {
                     commands.push(<ValidationStampChangeImageCommand key="change-image" id={id}/>)
                     commands.push(<ValidationStampUpdateCommand key="update" id={id}/>)
@@ -183,12 +187,7 @@ export default function ValidationStampView({id}) {
             </Head>
             <StoredGridLayoutContextProvider>
                 <MainPage
-                    title={
-                        <Space>
-                            <ValidationStampImage validationStamp={validationStamp}/>
-                            {validationStamp.name}
-                        </Space>
-                    }
+                    title={<ValidationStampViewTitle validationStamp={validationStamp}/>}
                     breadcrumbs={validationStampBreadcrumbs(validationStamp)}
                     commands={commands}
                     description={

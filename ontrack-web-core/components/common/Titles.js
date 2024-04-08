@@ -53,8 +53,13 @@ export function promotionLevelTitle(promotionLevel) {
     return title(promotionLevelTitleName(promotionLevel))
 }
 
+export function validationStampTitleName(validationStamp, what) {
+    const name = subBranchTitleName(validationStamp.branch, validationStamp.name)
+    return what ? `${name} | ${what}` : name
+}
+
 export function validationStampTitle(validationStamp) {
-    return subBranchTitle(validationStamp.branch, validationStamp.name)
+    return title(validationStampTitleName(validationStamp))
 }
 
 export function title(text) {
