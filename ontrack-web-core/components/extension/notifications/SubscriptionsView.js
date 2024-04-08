@@ -18,6 +18,7 @@ export default function SubscriptionsView({
                                               breadcrumbs = [],
                                               closeUri = '',
                                               managePermission = false,
+                                              viewTitle = "Subscriptions",
                                               additionalFilter = {}
                                           }) {
 
@@ -162,7 +163,7 @@ export default function SubscriptionsView({
                 {pageTitle(title)}
             </Head>
             <MainPage
-                title="Subscriptions"
+                title={viewTitle}
                 breadcrumbs={breadcrumbs}
                 commands={commands}
             >
