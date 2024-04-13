@@ -67,17 +67,16 @@ class DefaultNotificationRecordingService(
     }
 
     override fun record(record: NotificationRecord): String {
-        val id = UUID.randomUUID().toString()
         storageService.store(
             STORE,
-            id,
+            record.id,
             record,
         )
-        return id
+        return record.id
     }
 
     companion object {
-        private val STORE = NotificationRecord::class.java.name
+        internal val STORE = NotificationRecord::class.java.name
     }
 
 }

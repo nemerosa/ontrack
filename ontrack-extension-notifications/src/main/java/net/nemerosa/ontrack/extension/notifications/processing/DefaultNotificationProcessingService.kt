@@ -16,6 +16,7 @@ import net.nemerosa.ontrack.model.events.Event
 import org.apache.commons.lang3.exception.ExceptionUtils
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.util.UUID
 
 @Service
 @Transactional
@@ -80,6 +81,7 @@ class DefaultNotificationProcessingService(
     ) {
         notificationRecordingService.record(
             NotificationRecord(
+                id = UUID.randomUUID().toString(),
                 timestamp = Time.now(),
                 channel = channel,
                 channelConfig = channelConfig.asJson(),
@@ -97,6 +99,7 @@ class DefaultNotificationProcessingService(
     ) {
         notificationRecordingService.record(
             NotificationRecord(
+                id = UUID.randomUUID().toString(),
                 timestamp = Time.now(),
                 channel = channel,
                 channelConfig = channelConfig.asJson(),
@@ -113,6 +116,7 @@ class DefaultNotificationProcessingService(
     ) {
         notificationRecordingService.record(
             NotificationRecord(
+                id = UUID.randomUUID().toString(),
                 timestamp = Time.now(),
                 channel = channel,
                 channelConfig = invalidChannelConfig,

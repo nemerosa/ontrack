@@ -14,9 +14,62 @@ import {
     validationStampBreadcrumbs
 } from "@components/common/Breadcrumbs";
 import PromotionLevelViewTitle from "@components/promotionLevels/PromotionLevelViewTitle";
-import {branchUri, projectUri, promotionLevelUri, validationStampUri} from "@components/common/Links";
+import {branchUri, buildUri, projectUri, promotionLevelUri, validationStampUri} from "@components/common/Links";
 import ProjectLink from "@components/projects/ProjectLink";
 import ValidationStampViewTitle from "@components/validationStamps/ValidationStampViewTitle";
+
+export const extractProjectEntityInfo = (type, entity) => {
+    switch (type) {
+        case 'PROJECT': {
+            return {
+                type: 'Project',
+                name: entity.name,
+                compositeName: entity.name,
+                href: projectUri(entity),
+            }
+        }
+        case 'BRANCH': {
+            return {
+                type: 'Branch',
+                name: entity.name,
+                compositeName: `${entity.project.name}/${entity.name}`,
+                href: branchUri(entity),
+            }
+        }
+        case 'PROMOTION_LEVEL': {
+            return {
+                type: 'Promotion level',
+                name: entity.name,
+                compositeName: `${entity.branch.project.name}/${entity.branch.name}/${entity.name}`,
+                href: promotionLevelUri(entity),
+            }
+        }
+        case 'VALIDATION_STAMP': {
+            return {
+                type: 'Validation stamp',
+                name: entity.name,
+                compositeName: `${entity.branch.project.name}/${entity.branch.name}/${entity.name}`,
+                href: validationStampUri(entity),
+            }
+        }
+        case 'BUILD': {
+            return {
+                type: 'Build',
+                name: entity.name,
+                compositeName: `${entity.branch.project.name}/${entity.branch.name}/${entity.name}`,
+                href: buildUri(entity),
+            }
+        }
+        case 'VALIDATION_RUN': {
+            // TODO
+            break
+        }
+        case 'PROMOTION_RUN': {
+            // No information available for this type of entity
+            break
+        }
+    }
+}
 
 export const useProjectEntityPageInfo = (type, id) => {
     const client = useGraphQLClient()

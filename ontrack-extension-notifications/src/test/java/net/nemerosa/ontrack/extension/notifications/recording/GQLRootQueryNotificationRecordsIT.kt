@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.test.assertJsonNotNull
 import net.nemerosa.ontrack.test.assertJsonNull
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.util.*
 import kotlin.test.assertEquals
 
 internal class GQLRootQueryNotificationRecordsIT : AbstractNotificationTestSupport() {
@@ -29,6 +30,7 @@ internal class GQLRootQueryNotificationRecordsIT : AbstractNotificationTestSuppo
             // Records a notification
             notificationRecordingService.record(
                 NotificationRecord(
+                    id = UUID.randomUUID().toString(),
                     timestamp = Time.now(),
                     channel = "mock",
                     channelConfig = MockNotificationChannelConfig("#target").asJson(),
@@ -74,6 +76,7 @@ internal class GQLRootQueryNotificationRecordsIT : AbstractNotificationTestSuppo
             // Records a OK notification
             notificationRecordingService.record(
                 NotificationRecord(
+                    id = UUID.randomUUID().toString(),
                     timestamp = Time.now(),
                     channel = "mock",
                     channelConfig = MockNotificationChannelConfig("#target").asJson(),
@@ -84,6 +87,7 @@ internal class GQLRootQueryNotificationRecordsIT : AbstractNotificationTestSuppo
             // Records a misconfigured notification
             notificationRecordingService.record(
                 NotificationRecord(
+                    id = UUID.randomUUID().toString(),
                     timestamp = Time.now(),
                     channel = "mock",
                     channelConfig = MockNotificationChannelConfig("not-valid").asJson(),

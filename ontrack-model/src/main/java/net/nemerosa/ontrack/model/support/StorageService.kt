@@ -174,6 +174,17 @@ interface StorageService {
     )
 
     /**
+     * Looping over all items in a store and updating them.
+     *
+     * @param code Returns a non-null item which will be saved back (if null, nothing is done)
+     */
+    fun <T : Any> updateAll(
+        store: String,
+        type: KClass<T>,
+        code: (key: String, item: T) -> T?,
+    )
+
+    /**
      * Gets items in a store matching some criteria.
      */
     fun <T : Any> filterRecords(

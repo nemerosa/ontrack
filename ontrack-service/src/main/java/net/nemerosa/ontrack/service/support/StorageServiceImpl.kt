@@ -146,6 +146,16 @@ class StorageServiceImpl(
         }
     }
 
+    override fun <T : Any> updateAll(store: String, type: KClass<T>, code: (key: String, item: T) -> T?) {
+        repository.forEach(store) { key, node ->
+            val item = node.parseInto(type)
+            val newVersion = code(key, item)
+            if (newVersion != null) {
+                store(store, key, newVersion)
+            }
+        }
+    }
+
     override fun deleteWithFilter(store: String, query: String?, queryVariables: Map<String, *>?): Int =
         repository.deleteWithFilter(store, query, queryVariables)
 }

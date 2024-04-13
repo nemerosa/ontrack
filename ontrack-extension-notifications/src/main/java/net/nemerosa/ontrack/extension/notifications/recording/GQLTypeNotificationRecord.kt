@@ -23,6 +23,7 @@ class GQLTypeNotificationRecord(
         GraphQLObjectType.newObject()
             .name(typeName)
             .description("Notification record")
+            .stringField(NotificationRecord::id)
             .dateField(
                 NotificationRecord::timestamp.name,
                 getPropertyDescription(NotificationRecord::timestamp)

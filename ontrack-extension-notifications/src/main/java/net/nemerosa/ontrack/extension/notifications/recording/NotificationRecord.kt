@@ -6,6 +6,8 @@ import net.nemerosa.ontrack.model.annotations.APIDescription
 import java.time.LocalDateTime
 
 data class NotificationRecord(
+    @APIDescription("Record unique ID")
+    val id: String,
     @APIDescription("Record timestamp")
     val timestamp: LocalDateTime,
     @APIDescription("Channel type")
