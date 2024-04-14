@@ -12,6 +12,7 @@ import Timestamp from "@components/common/Timestamp";
 import NotificationResultType from "@components/extension/notifications/NotificationResultType";
 import NotificationChannelConfig from "@components/extension/notifications/NotificationChannelConfig";
 import NotificationRecordDetails from "@components/extension/notifications/NotificationRecordDetails";
+import TablePaginationFooter from "@components/common/TablePaginationFooter";
 
 const {Column} = Table
 
@@ -22,13 +23,26 @@ export default function NotificationRecordingsView() {
     const [loading, setLoading] = useState(true)
     const [records, setRecords] = useState([])
 
+    const [pagination, setPagination] = useState({
+        offset: 0,
+        size: 10,
+    })
+
+    const [pageInfo, setPageInfo] = useState({})
+
     useEffect(() => {
         if (client) {
             setLoading(true)
             client.request(
                 gql`
-                    query NotificationRecords {
-                        notificationRecords {
+                    query NotificationRecords(
+                        $offset: Int!,
+                        $size: Int!,
+                    ) {
+                        notificationRecords(
+                            offset: $offset,
+                            size: $size,
+                        ) {
                             pageInfo {
                                 nextPage {
                                     offset
@@ -49,14 +63,23 @@ export default function NotificationRecordingsView() {
                             }
                         }
                     }
-                `
+                `,
+                {
+                    offset: pagination.offset,
+                    size: pagination.size,
+                }
             ).then(data => {
-                setRecords(data.notificationRecords.pageItems)
+                setPageInfo(data.notificationRecords.pageInfo)
+                if (pagination.offset > 0) {
+                    setRecords((entries) => [...entries, ...data.notificationRecords.pageItems])
+                } else {
+                    setRecords(data.notificationRecords.pageItems)
+                }
             }).finally(() => {
                 setLoading(false)
             })
         }
-    }, [client]);
+    }, [client, pagination]);
 
     return (
         <>
@@ -81,6 +104,12 @@ export default function NotificationRecordingsView() {
                                 </>
                             )
                         }}
+                        footer={() =>
+                            <TablePaginationFooter
+                                pageInfo={pageInfo}
+                                setPagination={setPagination}
+                            />
+                        }
                     >
 
                         <Column
