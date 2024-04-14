@@ -50,7 +50,7 @@ class GQLTypeEventSubscriptionPayload(
         .stringField(EventSubscriptionPayload::contentTemplate)
         .build()
 
-    private fun <C> channelConfigText(channel: NotificationChannel<C>, channelConfig: JsonNode): String {
+    private fun <C, R> channelConfigText(channel: NotificationChannel<C, R>, channelConfig: JsonNode): String {
         val config = channel.validate(channelConfig)
         return config.config?.run { channel.toText(this) } ?: ""
     }

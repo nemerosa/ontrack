@@ -40,10 +40,10 @@ class DefaultNotificationDispatcher(
         }
     }
 
-    private fun <C> dispatchEventToChannel(
+    private fun <C, R> dispatchEventToChannel(
         event: Event,
         eventSubscription: EventSubscription,
-        channel: NotificationChannel<C>,
+        channel: NotificationChannel<C, R>,
     ): Boolean {
         val channelConfig = channel.validate(eventSubscription.channelConfig)
         return if (channelConfig.isOk()) {

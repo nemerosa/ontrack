@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.notifications.recording
 
 import graphql.schema.GraphQLObjectType
-import net.nemerosa.ontrack.extension.notifications.channels.GQLTypeNotificationResult
+import net.nemerosa.ontrack.extension.notifications.channels.GQLTypeNotificationRecordResult
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.GQLScalarJSON
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class GQLTypeNotificationRecord(
-    private val gqlTypeNotificationResult: GQLTypeNotificationResult,
+    private val gqlTypeNotificationRecordResult: GQLTypeNotificationRecordResult,
 ) : GQLType {
 
     override fun getTypeName(): String = NotificationRecord::class.java.simpleName
@@ -48,7 +48,7 @@ class GQLTypeNotificationRecord(
             .field {
                 it.name(NotificationRecord::result.name)
                     .description(getPropertyDescription(NotificationRecord::result))
-                    .type(gqlTypeNotificationResult.typeRef.toNotNull())
+                    .type(gqlTypeNotificationRecordResult.typeRef.toNotNull())
             }
             .build()
 }

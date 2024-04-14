@@ -11,12 +11,13 @@ import net.nemerosa.ontrack.extension.notifications.metrics.incrementForProcessi
 import net.nemerosa.ontrack.extension.notifications.model.Notification
 import net.nemerosa.ontrack.extension.notifications.recording.NotificationRecord
 import net.nemerosa.ontrack.extension.notifications.recording.NotificationRecordingService
+import net.nemerosa.ontrack.extension.notifications.recording.toNotificationRecordResult
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.Event
 import org.apache.commons.lang3.exception.ExceptionUtils
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.UUID
+import java.util.*
 
 @Service
 @Transactional
@@ -37,7 +38,7 @@ class DefaultNotificationProcessingService(
         }
     }
 
-    private fun <C> process(channel: NotificationChannel<C>, item: Notification) {
+    private fun <C, R> process(channel: NotificationChannel<C, R>, item: Notification) {
         val validatedConfig = channel.validate(item.channelConfig)
         if (validatedConfig.config != null) {
             try {
@@ -77,7 +78,7 @@ class DefaultNotificationProcessingService(
         channel: String,
         channelConfig: Any,
         event: Event,
-        result: NotificationResult,
+        result: NotificationResult<*>,
     ) {
         notificationRecordingService.record(
             NotificationRecord(
@@ -86,7 +87,7 @@ class DefaultNotificationProcessingService(
                 channel = channel,
                 channelConfig = channelConfig.asJson(),
                 event = event.asJson(),
-                result = result,
+                result = result.toNotificationRecordResult(),
             )
         )
     }
@@ -104,7 +105,7 @@ class DefaultNotificationProcessingService(
                 channel = channel,
                 channelConfig = channelConfig.asJson(),
                 event = event.asJson(),
-                result = NotificationResult.error(ExceptionUtils.getStackTrace(error)),
+                result = NotificationResult.error<Any>(ExceptionUtils.getStackTrace(error)).toNotificationRecordResult(),
             )
         )
     }
@@ -121,7 +122,7 @@ class DefaultNotificationProcessingService(
                 channel = channel,
                 channelConfig = invalidChannelConfig,
                 event = event.asJson(),
-                result = NotificationResult.invalidConfiguration(),
+                result = NotificationResult.invalidConfiguration<Any>().toNotificationRecordResult(),
             )
         )
     }

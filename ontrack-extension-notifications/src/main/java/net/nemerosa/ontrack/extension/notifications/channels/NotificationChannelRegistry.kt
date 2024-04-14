@@ -8,8 +8,8 @@ interface NotificationChannelRegistry {
     /**
      * Gets the list of available channels
      */
-    val channels: List<NotificationChannel<*>>
+    val channels: List<NotificationChannel<*, *>>
 
-    fun findChannel(type: String): NotificationChannel<*>?
+    fun findChannel(type: String): NotificationChannel<*, *>?
 
 }

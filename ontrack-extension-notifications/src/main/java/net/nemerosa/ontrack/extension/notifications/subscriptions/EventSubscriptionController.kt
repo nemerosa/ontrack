@@ -122,7 +122,7 @@ class EventSubscriptionController(
                 .value(subscription?.contentTemplate)
         )
 
-    private fun <C> channelConfigForm(channel: NotificationChannel<C>): Form =
+    private fun <C, R> channelConfigForm(channel: NotificationChannel<C, R>): Form =
         channel.getForm(null)
 
 

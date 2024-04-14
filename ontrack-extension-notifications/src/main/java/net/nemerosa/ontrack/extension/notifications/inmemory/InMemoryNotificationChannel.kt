@@ -28,7 +28,9 @@ import org.springframework.stereotype.Component
 class InMemoryNotificationChannel(
     private val eventTemplatingService: EventTemplatingService,
 ) :
-    AbstractNotificationChannel<InMemoryNotificationChannelConfig>(InMemoryNotificationChannelConfig::class) {
+    AbstractNotificationChannel<InMemoryNotificationChannelConfig, InMemoryNotificationChannelOutput>(
+        InMemoryNotificationChannelConfig::class
+    ) {
 
     private val messages = mutableMapOf<String, MutableList<String>>()
 
@@ -38,14 +40,14 @@ class InMemoryNotificationChannel(
         config: InMemoryNotificationChannelConfig,
         event: Event,
         template: String?
-    ): NotificationResult {
+    ): NotificationResult<InMemoryNotificationChannelOutput> {
         val text = eventTemplatingService.renderEvent(
             event,
             template,
             PlainEventRenderer()
         )
         messages.getOrPut(config.group) { mutableListOf() }.add(text)
-        return NotificationResult.ok()
+        return NotificationResult.ok(InMemoryNotificationChannelOutput(sent = true))
     }
 
     override fun toSearchCriteria(text: String): JsonNode = InMemoryNotificationChannelConfig(text).asJson()

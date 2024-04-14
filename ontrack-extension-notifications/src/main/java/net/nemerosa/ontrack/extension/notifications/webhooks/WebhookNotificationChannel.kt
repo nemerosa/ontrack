@@ -17,13 +17,15 @@ class WebhookNotificationChannel(
     private val webhookExecutionService: WebhookExecutionService,
     private val cachedSettingsService: CachedSettingsService,
     private val securityService: SecurityService,
-) : AbstractNotificationChannel<WebhookNotificationChannelConfig>(WebhookNotificationChannelConfig::class) {
+) : AbstractNotificationChannel<WebhookNotificationChannelConfig, WebhookNotificationChannelOutput>(
+    WebhookNotificationChannelConfig::class
+) {
 
     override fun publish(
         config: WebhookNotificationChannelConfig,
         event: Event,
         template: String?,
-    ): NotificationResult {
+    ): NotificationResult<WebhookNotificationChannelOutput> {
         // Gets the webhook
         val webhook = webhookAdminService.findWebhookByName(config.name)
             ?: return NotificationResult.notConfigured("Webhook [${config.name}] is not configured.")
@@ -36,9 +38,14 @@ class WebhookNotificationChannel(
         // Runs the webhook
         return try {
             webhookExecutionService.send(webhook, payload)
-            NotificationResult.ok(payload.uuid.toString())
+            NotificationResult.ok(
+                output = WebhookNotificationChannelOutput(payload = payload)
+            )
         } catch (ex: Exception) {
-            NotificationResult.error("Webhook failed: ${ex.message}", id = payload.uuid.toString())
+            NotificationResult.error(
+                "Webhook failed: ${ex.message}",
+                output = WebhookNotificationChannelOutput(payload = payload)
+            )
         }
     }
 

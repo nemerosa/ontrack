@@ -22,7 +22,7 @@ class MailNotificationChannel(
     private val mailService: MailService,
     private val htmlNotificationEventRenderer: HtmlNotificationEventRenderer,
     private val eventTemplatingService: EventTemplatingService,
-) : AbstractNotificationChannel<MailNotificationChannelConfig>(MailNotificationChannelConfig::class) {
+) : AbstractNotificationChannel<MailNotificationChannelConfig, MailNotificationChannelOutput>(MailNotificationChannelConfig::class) {
 
     private val logger: Logger = LoggerFactory.getLogger(MailNotificationChannel::class.java)
 
@@ -46,7 +46,7 @@ class MailNotificationChannel(
 
     override fun toText(config: MailNotificationChannelConfig): String = config.subject
 
-    override fun publish(config: MailNotificationChannelConfig, event: Event, template: String?): NotificationResult {
+    override fun publish(config: MailNotificationChannelConfig, event: Event, template: String?): NotificationResult<MailNotificationChannelOutput> {
         // Subject as a template
         val subject = eventTemplatingService.render(
             template = config.subject,
@@ -68,7 +68,14 @@ class MailNotificationChannel(
         )
         // Result
         return if (sent) {
-            NotificationResult.ok()
+            NotificationResult.ok(
+                MailNotificationChannelOutput(
+                    to = config.to,
+                    cc = config.cc,
+                    subject = subject,
+                    body = message,
+                )
+            )
         } else {
             NotificationResult.error("Mail could not be sent. Check the operational logs.")
         }

@@ -4044,7 +4044,7 @@ type NotificationRecord {
     "Record unique ID"
     id: String!
     "Result of the notification"
-    result: NotificationResult!
+    result: NotificationRecordResult!
     "Record timestamp"
     timestamp: LocalDateTime
 }
@@ -4057,11 +4057,11 @@ type NotificationRecordPaginated {
 }
 
 "Result for a notification"
-type NotificationResult {
-    "Optional ID for the message into the channel"
-    id: String
+type NotificationRecordResult {
     "Result message"
     message: String
+    "Output of the channel"
+    output: JSON
     "Type of result"
     type: NotificationResultType!
 }

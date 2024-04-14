@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.notifications.AbstractNotificationTestSupport
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.notifications.mock.MockNotificationChannelConfig
+import net.nemerosa.ontrack.extension.notifications.mock.MockNotificationChannelOutput
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getRequiredIntField
 import net.nemerosa.ontrack.json.getRequiredTextField
@@ -35,7 +36,9 @@ internal class GQLRootQueryNotificationRecordsIT : AbstractNotificationTestSuppo
                     channel = "mock",
                     channelConfig = MockNotificationChannelConfig("#target").asJson(),
                     event = event.asJson(),
-                    result = NotificationResult.ok(),
+                    result = NotificationResult.ok(
+                        output = MockNotificationChannelOutput(text = "The actual text")
+                    ).toNotificationRecordResult(),
                 )
             )
             // Getting this notification
@@ -81,7 +84,9 @@ internal class GQLRootQueryNotificationRecordsIT : AbstractNotificationTestSuppo
                     channel = "mock",
                     channelConfig = MockNotificationChannelConfig("#target").asJson(),
                     event = event.asJson(),
-                    result = NotificationResult.ok(),
+                    result = NotificationResult.ok(
+                        output = MockNotificationChannelOutput(text = "The actual text")
+                    ).toNotificationRecordResult(),
                 )
             )
             // Records a misconfigured notification
@@ -92,7 +97,7 @@ internal class GQLRootQueryNotificationRecordsIT : AbstractNotificationTestSuppo
                     channel = "mock",
                     channelConfig = MockNotificationChannelConfig("not-valid").asJson(),
                     event = event.asJson(),
-                    result = NotificationResult.invalidConfiguration()
+                    result = NotificationResult.invalidConfiguration<MockNotificationChannelOutput>().toNotificationRecordResult()
                 )
             )
             // Getting this notification

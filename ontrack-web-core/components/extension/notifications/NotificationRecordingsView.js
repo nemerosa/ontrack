@@ -41,9 +41,9 @@ export default function NotificationRecordingsView() {
                                 channelConfig
                                 event
                                 result {
-                                    id
                                     type
                                     message
+                                    output
                                 }
                                 timestamp
                             }

@@ -2,22 +2,29 @@ package net.nemerosa.ontrack.extension.notifications.channels
 
 import net.nemerosa.ontrack.model.annotations.APIDescription
 
-/**
- * @param id ID returned by the channel
- */
-data class NotificationResult(
+data class NotificationResult<R>(
     @APIDescription("Type of result")
     val type: NotificationResultType,
-    @APIDescription("Optional ID for the message into the channel")
-    val id: String?,
     @APIDescription("Result message")
     val message: String?,
+    @APIDescription("Output of the channel")
+    val output: R?,
 ) {
     companion object {
-        fun ok(id: String? = null) = NotificationResult(NotificationResultType.OK, id, null)
-        fun notConfigured(message: String) = NotificationResult(NotificationResultType.NOT_CONFIGURED, null, message)
-        fun invalidConfiguration(message: String? = null) = NotificationResult(NotificationResultType.INVALID_CONFIGURATION, null, message ?: "Invalid configuration")
-        fun error(message: String, id: String? = null) = NotificationResult(NotificationResultType.ERROR, id, message)
-        fun disabled(message: String) = NotificationResult(NotificationResultType.DISABLED, null, message)
+        fun <R> ok(output: R) = NotificationResult(NotificationResultType.OK, null, output = output)
+        fun <R> notConfigured(message: String) =
+            NotificationResult<R>(NotificationResultType.NOT_CONFIGURED, message, output = null)
+
+        fun <R> invalidConfiguration(message: String? = null) =
+            NotificationResult<R>(
+                NotificationResultType.INVALID_CONFIGURATION,
+                message ?: "Invalid configuration",
+                output = null
+            )
+
+        fun <R> error(message: String, output: R? = null) =
+            NotificationResult<R>(NotificationResultType.ERROR, message, output = output)
+
+        fun <R> disabled(message: String) = NotificationResult<R>(NotificationResultType.DISABLED, message, null)
     }
 }

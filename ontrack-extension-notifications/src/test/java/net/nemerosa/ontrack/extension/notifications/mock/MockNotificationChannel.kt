@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component
 class MockNotificationChannel(
     private val eventTemplatingService: EventTemplatingService,
 ) :
-    AbstractNotificationChannel<MockNotificationChannelConfig>(MockNotificationChannelConfig::class) {
+    AbstractNotificationChannel<MockNotificationChannelConfig, MockNotificationChannelOutput>(MockNotificationChannelConfig::class) {
 
     /**
      * List of messages received, indexed by target.
@@ -26,14 +26,16 @@ class MockNotificationChannel(
         config: MockNotificationChannelConfig,
         event: Event,
         template: String?,
-    ): NotificationResult {
+    ): NotificationResult<MockNotificationChannelOutput> {
         val text = eventTemplatingService.renderEvent(
             event,
             template,
             PlainEventRenderer.INSTANCE,
         )
         messages.getOrPut(config.target) { mutableListOf() }.add(text)
-        return NotificationResult.ok()
+        return NotificationResult.ok(
+            output = MockNotificationChannelOutput(text = text)
+        )
     }
 
     override fun toSearchCriteria(text: String): JsonNode =
@@ -41,6 +43,7 @@ class MockNotificationChannel(
 
     override fun toText(config: MockNotificationChannelConfig): String = config.target
 
+    @Deprecated("Will be removed in V5. Only Next UI is used.")
     override fun getForm(c: MockNotificationChannelConfig?): Form = Form.create()
         .with(
             Text.of(MockNotificationChannelConfig::target.name)

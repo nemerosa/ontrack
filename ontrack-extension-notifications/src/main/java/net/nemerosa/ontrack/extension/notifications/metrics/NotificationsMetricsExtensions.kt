@@ -29,7 +29,7 @@ fun MeterRegistry.incrementForDispatching(
 fun MeterRegistry.incrementForProcessing(
     name: String,
     notification: Notification,
-    result: NotificationResult? = null,
+    result: NotificationResult<*>? = null,
 ) = if (result != null) {
     increment(
         name,

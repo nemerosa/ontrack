@@ -13,8 +13,8 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity
  * @param projectEntity Entity to subscribe to (or null if a global event)
  * @param eventTypes List of event types to subscribe to
  */
-fun <C> EventSubscriptionService.subscribe(
-    channel: NotificationChannel<C>,
+fun <C, R> EventSubscriptionService.subscribe(
+    channel: NotificationChannel<C, R>,
     channelConfig: C,
     projectEntity: ProjectEntity?,
     keywords: String?,

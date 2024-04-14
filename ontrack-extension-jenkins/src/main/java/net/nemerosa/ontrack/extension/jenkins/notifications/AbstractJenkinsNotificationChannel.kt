@@ -15,14 +15,14 @@ import net.nemerosa.ontrack.model.form.*
 abstract class AbstractJenkinsNotificationChannel(
     private val jenkinsConfigurationService: JenkinsConfigurationService,
     private val eventTemplatingService: EventTemplatingService,
-) : AbstractNotificationChannel<JenkinsNotificationChannelConfig>(
+) : AbstractNotificationChannel<JenkinsNotificationChannelConfig, JenkinsNotificationChannelOutput>(
     JenkinsNotificationChannelConfig::class
 ) {
     override fun publish(
         config: JenkinsNotificationChannelConfig,
         event: Event,
         template: String?
-    ): NotificationResult {
+    ): NotificationResult<JenkinsNotificationChannelOutput> {
         // Gets the Jenkins configuration
         val jenkinsConfig = jenkinsConfigurationService.findConfiguration(config.config)
             ?: return NotificationResult.invalidConfiguration("Jenkins configuration cannot be found: ${config.config}")
@@ -45,14 +45,22 @@ abstract class AbstractJenkinsNotificationChannel(
             JenkinsNotificationChannelConfigCallMode.ASYNC -> launchAsync(jenkinsClient, job, parameters)
             JenkinsNotificationChannelConfigCallMode.SYNC -> launchSync(jenkinsClient, job, config.timeout, parameters)
         }
-        // In case of error
+        // Output
         val jobUrl = jenkinsClient.getJob(job).url
+        val output = JenkinsNotificationChannelOutput(
+            jobUrl = jobUrl,
+            parameters = parameters.map { (name, value) -> JenkinsNotificationChannelConfigParam(name, value) }
+        )
+        // In case of error
         return if (error != null) {
-            NotificationResult.error(error, id = jobUrl)
+            NotificationResult.error(
+                message = error,
+                output = output,
+            )
         }
         // OK
         else {
-            NotificationResult.ok(id = jobUrl)
+            NotificationResult.ok(output = output)
         }
     }
 
@@ -102,6 +110,7 @@ abstract class AbstractJenkinsNotificationChannel(
 
     override val enabled: Boolean = true
 
+    @Deprecated("Will be removed in V5. Only Next UI is used.")
     override fun getForm(c: JenkinsNotificationChannelConfig?): Form = Form.create()
         // Selection of configuration
         .selectionOfString(
@@ -132,6 +141,7 @@ abstract class AbstractJenkinsNotificationChannel(
             min = 1,
         )
 
+    @Deprecated("Will be removed in V5. Only Next UI is used.")
     override fun toText(config: JenkinsNotificationChannelConfig): String {
         val jenkinsConfig = jenkinsConfigurationService.findConfiguration(config.config)
         return if (jenkinsConfig != null) {

@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.notifications.recording
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import java.time.LocalDateTime
 
@@ -17,5 +16,5 @@ data class NotificationRecord(
     @APIDescription("Event being notified")
     val event: JsonNode,
     @APIDescription("Result of the notification")
-    val result: NotificationResult,
+    val result: NotificationRecordResult,
 )

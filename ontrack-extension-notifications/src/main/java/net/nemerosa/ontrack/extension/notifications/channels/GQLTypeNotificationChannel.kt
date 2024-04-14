@@ -16,7 +16,7 @@ class GQLTypeNotificationChannel : GQLType {
         GraphQLObjectType.newObject()
             .name(typeName)
             .description("Notification channel")
-            .stringField(NotificationChannel<Any>::type)
-            .booleanField(NotificationChannel<Any>::enabled)
+            .stringField(NotificationChannel<Any, Any>::type)
+            .booleanField(NotificationChannel<Any, Any>::enabled)
             .build()
 }

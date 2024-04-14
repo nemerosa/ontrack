@@ -20,22 +20,29 @@ class SlackNotificationChannel(
     private val cachedSettingsService: CachedSettingsService,
     private val slackNotificationEventRenderer: SlackNotificationEventRenderer,
     private val eventTemplatingService: EventTemplatingService,
-) : AbstractNotificationChannel<SlackNotificationChannelConfig>(SlackNotificationChannelConfig::class) {
+) : AbstractNotificationChannel<SlackNotificationChannelConfig, SlackNotificationChannelOutput>(
+    SlackNotificationChannelConfig::class
+) {
 
     override fun publish(
         config: SlackNotificationChannelConfig,
         event: Event,
         template: String?
-    ): NotificationResult {
+    ): NotificationResult<SlackNotificationChannelOutput> {
         // Formatting the message
         val message = format(event, template)
         // Sending the message
         val sent = slackService.sendNotification(config.channel, message, config.type)
         // Result
         return if (sent) {
-            NotificationResult.ok()
+            NotificationResult.ok(
+                output = SlackNotificationChannelOutput(message = message)
+            )
         } else {
-            NotificationResult.error("Slack message could not be sent. Check the operational logs.")
+            NotificationResult.error(
+                message = "Slack message could not be sent. Check the operational logs.",
+                output = SlackNotificationChannelOutput(message = message),
+            )
         }
     }
 
@@ -50,6 +57,7 @@ class SlackNotificationChannel(
 
     override fun toText(config: SlackNotificationChannelConfig): String = config.channel
 
+    @Deprecated("Will be removed in V5. Only Next UI is used.")
     override fun getForm(c: SlackNotificationChannelConfig?): Form = Form.create()
         .textField(SlackNotificationChannelConfig::channel, c?.channel)
         .enumField(SlackNotificationChannelConfig::type, c?.type)
