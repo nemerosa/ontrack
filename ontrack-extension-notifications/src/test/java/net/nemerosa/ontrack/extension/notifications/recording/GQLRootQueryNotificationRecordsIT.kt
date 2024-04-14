@@ -51,7 +51,6 @@ internal class GQLRootQueryNotificationRecordsIT : AbstractNotificationTestSuppo
                         event
                         result {
                             type
-                            id
                             message
                         }
                     }
@@ -62,7 +61,6 @@ internal class GQLRootQueryNotificationRecordsIT : AbstractNotificationTestSuppo
                     assertEquals("#target", path("channelConfig").getRequiredTextField("target"))
                     assertEquals(project.id(), path("event").path("entities").path("PROJECT").getRequiredIntField("id"))
                     assertEquals("OK", path("result").getRequiredTextField("type"))
-                    assertJsonNull(path("result").path("id"))
                     assertJsonNull(path("result").path("message"))
                 }
             }
@@ -112,7 +110,6 @@ internal class GQLRootQueryNotificationRecordsIT : AbstractNotificationTestSuppo
                         event
                         result {
                             type
-                            id
                             message
                         }
                     }
@@ -123,7 +120,6 @@ internal class GQLRootQueryNotificationRecordsIT : AbstractNotificationTestSuppo
                     assertEquals("not-valid", path("channelConfig").getRequiredTextField("target"))
                     assertEquals(project.id(), path("event").path("entities").path("PROJECT").getRequiredIntField("id"))
                     assertEquals("INVALID_CONFIGURATION", path("result").getRequiredTextField("type"))
-                    assertJsonNull(path("result").path("id"))
                     assertEquals("Invalid configuration", path("result").getTextField("message"))
                 }
             }
