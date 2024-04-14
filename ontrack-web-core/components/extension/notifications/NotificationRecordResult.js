@@ -1,5 +1,6 @@
 import {Descriptions, Typography} from "antd";
 import NotificationResultType from "@components/extension/notifications/NotificationResultType";
+import NotificationRecordOutput from "@components/extension/notifications/NotificationRecordOutput";
 
 export default function NotificationRecordResult({channel, result}) {
 
@@ -19,8 +20,12 @@ export default function NotificationRecordResult({channel, result}) {
         {
             key: 'output',
             label: 'Output',
-            // TODO Rendering according to the channel
-            children: JSON.stringify(result.output),
+            children: <>
+                {
+                    result.output &&
+                    <NotificationRecordOutput channel={channel} output={result.output}/>
+                }
+            </>,
             span: 12,
         },
     ]

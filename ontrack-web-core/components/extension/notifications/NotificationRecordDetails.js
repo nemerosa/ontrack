@@ -8,18 +8,20 @@ export default function NotificationRecordDetails({record}) {
         {
             key: 'event',
             label: 'Event',
-            children: <EventDetails event={record.event}/>
+            children: <EventDetails event={record.event}/>,
+            span: 12,
         },
         {
             key: 'result',
             label: 'Result',
-            children: <NotificationRecordResult channel={record.channel} result={record.result}/>
+            children: <NotificationRecordResult channel={record.channel} result={record.result}/>,
+            span: 12,
         },
     ]
 
     return (
         <>
-            <Descriptions items={items}/>
+            <Descriptions items={items} column={12}/>
         </>
     )
 }
