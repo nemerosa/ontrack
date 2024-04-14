@@ -20,6 +20,7 @@ interface Connector {
      */
     fun get(
         path: String,
+        query: Map<String, String> = emptyMap(),
         headers: Map<String, String> = emptyMap(),
         noAuth: Boolean = false,
     ): ConnectorResponse
@@ -56,7 +57,7 @@ interface Connector {
     fun uploadFile(
         path: String,
         headers: Map<String, String> = emptyMap(),
-        file: Pair<String,ByteArray>,
+        file: Pair<String, ByteArray>,
     )
 
 }

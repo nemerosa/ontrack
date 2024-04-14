@@ -1,11 +1,13 @@
 package net.nemerosa.ontrack.extension.notifications.mail
 
+import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.notifications.NotificationsConfigProperties
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry
 import net.nemerosa.ontrack.model.support.ApplicationLogService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.context.annotation.Profile
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMessagePreparator
 import org.springframework.stereotype.Component
@@ -14,6 +16,7 @@ import javax.mail.internet.InternetAddress
 
 
 @Component
+@Profile("!${RunProfile.ACC}")
 class DefaultMailService(
     private val javaMailSender: JavaMailSender?,
     private val applicationLogService: ApplicationLogService,

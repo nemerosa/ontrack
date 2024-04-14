@@ -13,6 +13,8 @@ import org.springframework.util.MultiValueMap
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.getForEntity
 import org.springframework.web.client.postForEntity
+import org.springframework.web.util.UriComponentsBuilder
+import java.net.URLEncoder
 import java.nio.charset.Charset
 
 
@@ -28,12 +30,26 @@ class DefaultConnector(
     override val token: String?
         get() = defaultHeaders[X_ONTRACK_TOKEN]
 
+    @Suppress("VulnerableCodeUsages")
     override fun get(
         path: String,
+        query: Map<String, String>,
         headers: Map<String, String>,
         noAuth: Boolean,
     ): ConnectorResponse {
-        val response = restTemplate(headers, noAuth).getForEntity<ByteArray>(path)
+        val uri = if (query.isNotEmpty()) {
+            UriComponentsBuilder.fromPath(path)
+                .apply {
+                    query.forEach { (name, value) ->
+                        queryParam(name, value)
+                    }
+                }
+                .build()
+                .toUriString()
+        } else {
+            path
+        }
+        val response = restTemplate(headers, noAuth).getForEntity<ByteArray>(uri)
         return RestTemplateConnectorResponse(response)
     }
 
@@ -44,9 +60,10 @@ class DefaultConnector(
             get() = response.statusCodeValue
         override val body: ConnectorResponseBody = object : ConnectorResponseBody {
             override fun asTextOrNull(charset: Charset): String? =
-                    response.body?.toString(charset)
+                response.body?.toString(charset)
+
             override fun asText(charset: Charset): String =
-                    asTextOrNull(charset) ?: ""
+                asTextOrNull(charset) ?: ""
         }
     }
 
