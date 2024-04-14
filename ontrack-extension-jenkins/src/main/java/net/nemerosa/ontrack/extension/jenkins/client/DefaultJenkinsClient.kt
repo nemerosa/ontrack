@@ -15,9 +15,11 @@ import java.net.URI
 import java.time.Duration
 
 class DefaultJenkinsClient(
-    private val url: String,
+    url: String,
     private val client: RestTemplate,
-) : JenkinsClient {
+) : AbstractJenkinsClient(
+    url
+) {
 
     private val logger: Logger = LoggerFactory.getLogger(DefaultJenkinsClient::class.java)
 
@@ -27,16 +29,6 @@ class DefaultJenkinsClient(
                 client.getForObject("/crumbIssuer/api/json", JenkinsCrumbs::class.java)
             }
         }
-    }
-
-    override fun getJob(job: String): JenkinsJob {
-        val jobPath = getJobPath(job)
-        val jobUrl = "$url$jobPath"
-        val jobName = jobPath.substringAfterLast("/")
-        return JenkinsJob(
-            jobName,
-            jobUrl
-        )
     }
 
     override val info: JenkinsInfo
@@ -50,7 +42,7 @@ class DefaultJenkinsClient(
 
     private fun launchJob(path: String, parameters: Map<String, String>): URI? {
         return runBlocking {
-            logger.debug("run,path=$path,parameters=$parameters")
+            logger.debug("run,path={},parameters={}", path, parameters)
 
             // Build without parameters
             if (parameters.isEmpty()) {
@@ -108,21 +100,16 @@ class DefaultJenkinsClient(
                 // Until `cancelled` is true, or `executable` contains a valid link
                 val executable: JenkinsBuildId =
                     untilTimeout("Waiting for $queueItemURI to be scheduled", retries, retriesDelay) {
-                        logger.debug("queued=$queueItemURI,job=$job,path=$path,parameters=$parameters")
+                        logger.debug("queued={},job={},path={},parameters={}", queueItemURI, job, path, parameters)
                         getQueueStatus(queueItemURI)
                     }
                 // Waits for its completion
                 untilTimeout("Waiting for build completion at ${executable.url(path)}", retries, retriesDelay) {
-                    logger.debug("build=${executable.number},job=$job,path=$path,parameters=$parameters")
+                    logger.debug("build={},job={},path={},parameters={}", executable.number, job, path, parameters)
                     getBuildStatus(path, executable)
                 }
             }
         }
-    }
-
-    private fun getJobPath(job: String): String {
-        val path = job.replace("/job/".toRegex(), "/").replace("/".toRegex(), "/job/")
-        return "/job/$path"
     }
 
     private fun createCSRFHeaders(): HttpHeaders {

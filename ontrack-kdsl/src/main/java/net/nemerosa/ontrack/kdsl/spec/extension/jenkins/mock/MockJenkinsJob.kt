@@ -10,20 +10,22 @@ class MockJenkinsJob(
     val path: String,
 ) : Connected(connector) {
 
-    val wasCalled: Boolean
-        get() {
-            val job = connector.get("/extension/jenkins/mock/job?path=$path").body.parseOrNull<JenkinsJob>()
-            return job != null && job.builds.isNotEmpty()
-        }
+    val jenkinsJob: JenkinsJob?
+        get() =
+            connector.get("/extension/jenkins/mock/job?path=$path").body.parseOrNull<JenkinsJob>()
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    private data class JenkinsJob(
+    data class JenkinsJob(
         val builds: List<JenkinsBuild>,
-    )
+    ) {
+        val wasCalled: Boolean = builds.isNotEmpty()
+        val lastBuild: JenkinsBuild = builds.first()
+    }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    private data class JenkinsBuild(
+    data class JenkinsBuild(
         val number: Int,
+        val parameters: Map<String, String>,
     )
 
 }

@@ -1,4 +1,4 @@
-import {Space, Tag, Tooltip, Typography} from "antd";
+import {Space, Typography} from "antd";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {useEffect, useState} from "react";
 import {gql} from "graphql-request";
