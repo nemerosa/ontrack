@@ -40,6 +40,11 @@ class DefaultNotificationRecordingService(
         val queries = mutableListOf<String>()
         val queryVariables = mutableMapOf<String, String>()
 
+        if (!filter.channel.isNullOrBlank()) {
+            queries += "data::jsonb->>'channel' = :channel"
+            queryVariables["channel"] = filter.channel
+        }
+
         if (filter.resultType != null) {
             queries += "data::jsonb->'result'->>'type' = :resultType"
             queryVariables["resultType"] = filter.resultType.name

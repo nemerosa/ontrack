@@ -5,5 +5,6 @@ import net.nemerosa.ontrack.extension.notifications.channels.NotificationResultT
 data class NotificationRecordFilter(
     val offset: Int = 0,
     val size: Int = 10,
+    val channel: String? = null,
     val resultType: NotificationResultType? = null,
 )

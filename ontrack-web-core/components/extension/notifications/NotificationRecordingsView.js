@@ -13,6 +13,10 @@ import NotificationResultType from "@components/extension/notifications/Notifica
 import NotificationChannelConfig from "@components/extension/notifications/NotificationChannelConfig";
 import NotificationRecordDetails from "@components/extension/notifications/NotificationRecordDetails";
 import TablePaginationFooter from "@components/common/TablePaginationFooter";
+import TableColumnFilterDropdownInput from "@components/common/TableColumnFilterDropdownInput";
+import TableColumnFilterDropdown from "@components/common/TableColumnFilterDropdown";
+import SelectNotificationResultType from "@components/extension/notifications/SelectNotificationResultType";
+import SelectNotificationChannel from "@components/extension/notifications/SelectNotificationChannel";
 
 const {Column} = Table
 
@@ -30,6 +34,11 @@ export default function NotificationRecordingsView() {
 
     const [pageInfo, setPageInfo] = useState({})
 
+    const [filter, setFilter] = useState({
+        channel: null,
+        resultType: null,
+    })
+
     useEffect(() => {
         if (client) {
             setLoading(true)
@@ -38,10 +47,14 @@ export default function NotificationRecordingsView() {
                     query NotificationRecords(
                         $offset: Int!,
                         $size: Int!,
+                        $channel: String,
+                        $resultType: NotificationResultType,
                     ) {
                         notificationRecords(
                             offset: $offset,
                             size: $size,
+                            channel: $channel,
+                            resultType: $resultType,
                         ) {
                             pageInfo {
                                 nextPage {
@@ -67,6 +80,7 @@ export default function NotificationRecordingsView() {
                 {
                     offset: pagination.offset,
                     size: pagination.size,
+                    ...filter,
                 }
             ).then(data => {
                 setPageInfo(data.notificationRecords.pageInfo)
@@ -79,7 +93,14 @@ export default function NotificationRecordingsView() {
                 setLoading(false)
             })
         }
-    }, [client, pagination]);
+    }, [client, pagination, filter]);
+
+    const onTableChange = (_, filters) => {
+        setFilter({
+            channel: filters.channel && filters.channel[0],
+            resultType: filters.result && filters.result[0],
+        })
+    }
 
     return (
         <>
@@ -110,6 +131,7 @@ export default function NotificationRecordingsView() {
                                 setPagination={setPagination}
                             />
                         }
+                        onChange={onTableChange}
                     >
 
                         <Column
@@ -125,6 +147,22 @@ export default function NotificationRecordingsView() {
                             key="channel"
                             title="Channel"
                             render={(_, record) => record.channel}
+                            filterDropdown={({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
+                                <TableColumnFilterDropdown
+                                    confirm={confirm}
+                                    clearFilters={clearFilters}
+                                >
+                                    <SelectNotificationChannel
+                                        value={selectedKeys}
+                                        onChange={value => setSelectedKeys([value])}
+                                        style={{
+                                            width: '15em',
+                                        }}
+                                        allowClear={true}
+                                    />
+                                </TableColumnFilterDropdown>
+                            }
+                            filteredValue={filter.channel}
                         />
 
                         <Column
@@ -144,6 +182,18 @@ export default function NotificationRecordingsView() {
                             key="result"
                             title="Result"
                             render={(_, record) => <NotificationResultType type={record.result.type}/>}
+                            filterDropdown={({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
+                                <TableColumnFilterDropdown
+                                    confirm={confirm}
+                                    clearFilters={clearFilters}
+                                >
+                                    <SelectNotificationResultType
+                                        value={selectedKeys}
+                                        onChange={value => setSelectedKeys([value])}
+                                    />
+                                </TableColumnFilterDropdown>
+                            }
+                            filteredValue={filter.resultType}
                         />
 
                         <Column

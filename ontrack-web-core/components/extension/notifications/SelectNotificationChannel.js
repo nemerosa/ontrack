@@ -3,7 +3,7 @@ import {useGraphQLClient} from "@components/providers/ConnectionContextProvider"
 import {gql} from "graphql-request";
 import {Select, Space, Tag, Typography} from "antd";
 
-export default function SelectNotificationChannel({value, onChange, onSelectedNotificationChannel}) {
+export default function SelectNotificationChannel({value, onChange, onSelectedNotificationChannel, style, allowClear}) {
 
     const client = useGraphQLClient()
 
@@ -53,6 +53,8 @@ export default function SelectNotificationChannel({value, onChange, onSelectedNo
                 loading={loading}
                 value={value}
                 onChange={onLocalChange}
+                style={style}
+                allowClear={allowClear}
             />
         </>
     )

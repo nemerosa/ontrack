@@ -1,29 +1,51 @@
 import {Space} from "antd";
 import {FaCheck, FaExclamationTriangle, FaTimesCircle} from "react-icons/fa";
 
+export const notificationResultTypes = [
+    {
+        key: 'OK',
+        name: 'OK',
+        color: 'green',
+        icon: <FaCheck color="green"/>,
+    },
+    {
+        key: 'NOT_CONFIGURED',
+        name: 'Not configured',
+        color: 'orange',
+        icon: <FaExclamationTriangle color="orange"/>,
+    },
+    {
+        key: 'INVALID_CONFIGURATION',
+        name: 'Invalid configuration',
+        color: 'orange',
+        icon: <FaExclamationTriangle color="orange"/>,
+    },
+    {
+        key: 'DISABLED',
+        name: 'Disabled',
+        color: 'orange',
+        icon: <FaExclamationTriangle color="orange"/>,
+    },
+    {
+        key: 'ERROR',
+        name: 'Error',
+        color: 'red',
+        icon: <FaTimesCircle color="red"/>,
+    },
+]
+
 export default function NotificationResultType({type}) {
+
+    const typeObject = notificationResultTypes.find(it => it.key === type)
+
     return (
         <>
-            {type === 'OK' && <Space>
-                <FaCheck color="green"/>
-                OK
-            </Space>}
-            {type === 'NOT_CONFIGURED' && <Space>
-                <FaExclamationTriangle color="orange"/>
-                Not configured
-            </Space>}
-            {type === 'INVALID_CONFIGURATION' && <Space>
-                <FaExclamationTriangle color="orange"/>
-                Invalid configuration
-            </Space>}
-            {type === 'DISABLED' && <Space>
-                <FaExclamationTriangle color="orange"/>
-                Disabled
-            </Space>}
-            {type === 'ERROR' && <Space>
-                <FaTimesCircle color="red"/>
-                Error
-            </Space>}
+            {
+                typeObject && <Space>
+                    {typeObject.icon}
+                    {typeObject.name}
+                </Space>
+            }
         </>
     )
 }

@@ -5016,6 +5016,8 @@ type Query {
     notificationChannels: [NotificationChannel!]!
     "Access to the notification recordings"
     notificationRecords(
+        "Filtering on the channel"
+        channel: String,
         "Offset for the page"
         offset: Int = 0,
         "Filtering on the result type"
