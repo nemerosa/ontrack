@@ -10,8 +10,8 @@ import AutoVersioningAuditEntryQueuing from "@components/extension/auto-versioni
 import TimestampText from "@components/common/TimestampText";
 import Duration from "@components/common/Duration";
 import Link from "next/link";
-import TableColumnFilterDropdown from "@components/common/TableColumnFilterDropdown";
-import TableColumnFilterDropdownInput from "@components/common/TableColumnFilterDropdownInput";
+import TableColumnFilterDropdown from "@components/common/table/TableColumnFilterDropdown";
+import TableColumnFilterDropdownInput from "@components/common/table/TableColumnFilterDropdownInput";
 import SelectAutoVersioningAuditState from "@components/extension/auto-versioning/SelectAutoVersioningAuditState";
 import SelectAutoVersioningAuditRunningState
     from "@components/extension/auto-versioning/SelectAutoVersioningAuditRunningState";

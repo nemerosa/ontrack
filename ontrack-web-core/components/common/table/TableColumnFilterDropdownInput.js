@@ -1,5 +1,5 @@
 import {Input} from "antd";
-import TableColumnFilterDropdown from "@components/common/TableColumnFilterDropdown";
+import TableColumnFilterDropdown from "@components/common/table/TableColumnFilterDropdown";
 
 export default function TableColumnFilterDropdownInput({
                                                            setSelectedKeys,

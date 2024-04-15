@@ -2764,6 +2764,28 @@ type JenkinsConfiguration {
     user: String
 }
 
+type JobActionResult {
+    "Error message"
+    error: String
+    "Result"
+    ok: Boolean!
+}
+
+"JobCategory"
+type JobCategory {
+    "key field"
+    key: String!
+    "name field"
+    name: String!
+    "All job types for this category"
+    types: [JobType!]!
+}
+
+type JobExecutionStatus {
+    "All jobs are paused"
+    paused: Boolean!
+}
+
 "JobIngestionConfigValidation"
 type JobIngestionConfigValidation {
     "Description for the validation stamp"
@@ -2772,6 +2794,107 @@ type JobIngestionConfigValidation {
     name: String!
     "Name of the validation stamp to use (instead of a generated one)"
     validation: String
+}
+
+"JobKey"
+type JobKey {
+    "id field"
+    id: String!
+    "type field"
+    type: JobType!
+}
+
+"JobRunProgress"
+type JobRunProgress {
+    "message field"
+    message: String!
+    "percentage field"
+    percentage: Int
+    "text field"
+    text: String!
+}
+
+"Job state information"
+type JobStateInfo {
+    "description field"
+    description: String!
+    "displayName field"
+    displayName: String!
+    "Name of the state"
+    name: String!
+}
+
+"JobStatus"
+type JobStatus {
+    "actualSchedule field"
+    actualSchedule: Schedule!
+    "Checks if the job can be deleted"
+    canBeDeleted: Boolean!
+    "Checks if the job can be stopped"
+    canBeStopped: Boolean!
+    "Checks if the job can be paused"
+    canPause: Boolean!
+    "Checks if the job can be resumed"
+    canResume: Boolean!
+    "Checks if the job can be run"
+    canRun: Boolean!
+    "description field"
+    description: String!
+    "id field"
+    id: Int
+    "isDisabled field"
+    isDisabled: Boolean
+    "isError field"
+    isError: Boolean
+    "isPaused field"
+    isPaused: Boolean
+    "isRunning field"
+    isRunning: Boolean
+    "isTimeout field"
+    isTimeout: Boolean
+    "isValid field"
+    isValid: Boolean
+    "key field"
+    key: JobKey!
+    "lastError field"
+    lastError: String
+    "lastErrorCount field"
+    lastErrorCount: Int
+    "lastRunDate field"
+    lastRunDate: LocalDateTime
+    "lastRunDurationMs field"
+    lastRunDurationMs: Int
+    "lastTimeoutCount field"
+    lastTimeoutCount: Int
+    "nextRunDate field"
+    nextRunDate: LocalDateTime
+    "progress field"
+    progress: JobRunProgress
+    "progressText field"
+    progressText: String!
+    "runCount field"
+    runCount: Int
+    "schedule field"
+    schedule: Schedule!
+    "state field"
+    state: JobState!
+}
+
+type JobStatusPaginated {
+    "Information about the current page"
+    pageInfo: PageInfo
+    "Items in the current page"
+    pageItems: [JobStatus!]!
+}
+
+"JobType"
+type JobType {
+    "category field"
+    category: JobCategory!
+    "key field"
+    key: String!
+    "name field"
+    name: String!
 }
 
 "Label"
@@ -3077,6 +3200,8 @@ type Mutation {
         "Input for the mutation"
         input: DeleteJenkinsConfigurationInput
     ): DeleteJenkinsConfigurationPayload
+    "Deletes a job"
+    deleteJob(id: Int!): JobActionResult!
     "Deleting notification records"
     deleteNotificationRecords(
         "Input for the mutation"
@@ -3402,6 +3527,8 @@ type Mutation {
         "Input for the mutation"
         input: GitHubIngestionValidateDataByRunIdInput
     ): GitHubIngestionValidateDataByRunIdPayload
+    "Launches a job"
+    launchJob(id: Int!): JobActionResult!
     "Link two builds using their names"
     linkBuild(
         "Input for the mutation"
@@ -3422,6 +3549,10 @@ type Mutation {
         "Input for the mutation"
         input: LockAccountInput
     ): LockAccountPayload
+    "Pausing the execution of all jobs"
+    pauseAllJobs: JobActionResult!
+    "Pauses a job"
+    pauseJob(id: Int!): JobActionResult!
     "Basic test service"
     ping: String
     "Post a message on a queue"
@@ -3435,6 +3566,10 @@ type Mutation {
     purgeQueueRecordings: PurgeQueueRecordingsPayload
     "Reload the configuration from the CasC files"
     reloadCasc: ReloadCascPayload
+    "Resuming the execution of all jobs"
+    resumeAllJobs: JobActionResult!
+    "Resumes a job"
+    resumeJob(id: Int!): JobActionResult!
     "Revoke all tokens of the given account"
     revokeAccountTokens(
         "Input for the mutation"
@@ -3870,6 +4005,8 @@ type Mutation {
         "Input for the mutation"
         input: ShareSCMFileChangeFilterInput
     ): ShareSCMFileChangeFilterPayload
+    "Stops a job"
+    stopJob(id: Int!): JobActionResult!
     "Set a list of subscriptions on a branch identified by name."
     subscribeBranchToEvents(
         "Input for the mutation"
@@ -5000,6 +5137,31 @@ type Query {
     jenkinsConfiguration(name: String!): JenkinsConfiguration
     "List of Jenkins configurations"
     jenkinsConfigurations: [JenkinsConfiguration!]!
+    "List of all job categories and their types (at any given time)"
+    jobCategories: [JobCategory!]!
+    "Overall status of the execution of the jobs"
+    jobExecutionStatus: JobExecutionStatus
+    "List of job states"
+    jobStateInfos: [JobStateInfo!]!
+    "List of background jobs"
+    jobs(
+        "Category key"
+        category: String,
+        "Part of the description of the job"
+        description: String,
+        "Jobs on error"
+        error: Boolean,
+        "Offset for the page"
+        offset: Int = 0,
+        "Size of the page"
+        size: Int = 20,
+        "State of the job"
+        state: JobState,
+        "Jobs with timeout"
+        timeout: Boolean,
+        "Type key"
+        type: String
+    ): JobStatusPaginated
     "List of all labels"
     labels(
         "Category to look for"
@@ -5516,6 +5678,20 @@ type SaveDashboardPayload implements PayloadInterface {
 type SaveSettingsPayload implements PayloadInterface {
     "List of errors"
     errors: [PayloadUserError]
+}
+
+"Schedule"
+type Schedule {
+    "cron field"
+    cron: String
+    "initialPeriod field"
+    initialPeriod: Int
+    "period field"
+    period: Int
+    "periodText field"
+    periodText: String!
+    "unit field"
+    unit: String
 }
 
 "Search result"
@@ -7054,6 +7230,15 @@ enum IngestionHookPayloadStatus {
     ERRORED
     PROCESSING
     SCHEDULED
+}
+
+"Global state of a job"
+enum JobState {
+    DISABLED
+    IDLE
+    INVALID
+    PAUSED
+    RUNNING
 }
 
 "List of types of messages"

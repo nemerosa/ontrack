@@ -15,14 +15,17 @@ export default function TimestampText({
                                           format = "YYYY MMM DD, HH:mm",
                                       }) {
 
-    const localDateTime = dayjs.utc(value).local()
+    if (value) {
+        const localDateTime = dayjs.utc(value).local()
+        return (
+            <>
 
-    return (
-        <>
-
-            {prefix && `${prefix} `}
-            {localDateTime.format(format)}
-            {suffix && ` ${suffix}`}
-        </>
-    )
+                {prefix && `${prefix} `}
+                {localDateTime.format(format)}
+                {suffix && ` ${suffix}`}
+            </>
+        )
+    } else {
+        return ''
+    }
 }

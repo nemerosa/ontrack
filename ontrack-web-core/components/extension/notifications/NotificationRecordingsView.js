@@ -12,9 +12,8 @@ import Timestamp from "@components/common/Timestamp";
 import NotificationResultType from "@components/extension/notifications/NotificationResultType";
 import NotificationChannelConfig from "@components/extension/notifications/NotificationChannelConfig";
 import NotificationRecordDetails from "@components/extension/notifications/NotificationRecordDetails";
-import TablePaginationFooter from "@components/common/TablePaginationFooter";
-import TableColumnFilterDropdownInput from "@components/common/TableColumnFilterDropdownInput";
-import TableColumnFilterDropdown from "@components/common/TableColumnFilterDropdown";
+import TablePaginationFooter from "@components/common/table/TablePaginationFooter";
+import TableColumnFilterDropdown from "@components/common/table/TableColumnFilterDropdown";
 import SelectNotificationResultType from "@components/extension/notifications/SelectNotificationResultType";
 import SelectNotificationChannel from "@components/extension/notifications/SelectNotificationChannel";
 

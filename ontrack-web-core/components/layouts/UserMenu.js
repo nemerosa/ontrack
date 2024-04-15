@@ -4,7 +4,7 @@ import {UserContext} from "@components/providers/UserProvider";
 import {legacyGraphiQLUri} from "@components/common/Links";
 import {
     FaCode,
-    FaCog,
+    FaCog, FaCogs,
     FaDoorOpen,
     FaExpandArrowsAlt,
     FaGithub,
@@ -13,7 +13,7 @@ import {
     FaList,
     FaMagic, FaMailBulk, FaPaperPlane,
     FaSignOutAlt, FaTag,
-    FaUser
+    FaUser, FaWrench
 } from "react-icons/fa";
 import {MainLayoutContext} from "@components/layouts/MainLayout";
 import {useLogout} from "@components/providers/ConnectionContextProvider";
@@ -53,6 +53,8 @@ export default function UserMenu({userMenu}) {
     }
 
     const itemIcons = {
+        'core/admin/jobs': <FaCogs/>,
+        'core/admin/settings': <FaWrench/>,
         'extension/jenkins/configurations': <FaJenkins/>,
         'extension/github/configurations': <FaGithub/>,
         'extension/jira/configurations': <FaJira/>,

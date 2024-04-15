@@ -10,7 +10,7 @@ import AnnotatedDescription from "@components/common/AnnotatedDescription";
 import ValidationRunData from "@components/framework/validation-run-data/ValidationRunData";
 import RunInfo from "@components/common/RunInfo";
 import TimestampText from "@components/common/TimestampText";
-import TableColumnFilterDropdown from "@components/common/TableColumnFilterDropdown";
+import TableColumnFilterDropdown from "@components/common/table/TableColumnFilterDropdown";
 import SelectValidationRunPassedState from "@components/validationStamps/SelectValidationRunPassedState";
 import {FaExchangeAlt, FaSearch} from "react-icons/fa";
 import useRangeSelection from "@components/common/RangeSelection";

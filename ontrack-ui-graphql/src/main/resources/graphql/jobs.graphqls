@@ -1,0 +1,33 @@
+extend type Mutation {
+    """Launches a job"""
+    launchJob(id: Int!): JobActionResult!
+    """Pauses a job"""
+    pauseJob(id: Int!): JobActionResult!
+    """Resumes a job"""
+    resumeJob(id: Int!): JobActionResult!
+    """Stops a job"""
+    stopJob(id: Int!): JobActionResult!
+    """Deletes a job"""
+    deleteJob(id: Int!): JobActionResult!
+    """Pausing the execution of all jobs"""
+    pauseAllJobs: JobActionResult!
+    """Resuming the execution of all jobs"""
+    resumeAllJobs: JobActionResult!
+}
+
+type JobActionResult {
+    """Result"""
+    ok: Boolean!
+    """Error message"""
+    error: String
+}
+
+extend type Query {
+    """Overall status of the execution of the jobs"""
+    jobExecutionStatus: JobExecutionStatus
+}
+
+type JobExecutionStatus {
+    """All jobs are paused"""
+    paused: Boolean!
+}

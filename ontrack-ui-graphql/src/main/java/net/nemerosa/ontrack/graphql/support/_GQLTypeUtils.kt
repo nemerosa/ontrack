@@ -6,15 +6,13 @@ import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLOutputType
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.graphql.schema.GQLType
-import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.getPropertyDescription
 import net.nemerosa.ontrack.model.annotations.getPropertyName
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.support.NameValue
 import net.nemerosa.ontrack.model.support.toNameValues
-import kotlin.reflect.KClass
+import java.time.LocalDateTime
 import kotlin.reflect.KProperty
-import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.jvm.javaType
 
 typealias TypeBuilder = GraphQLObjectType.Builder
@@ -22,10 +20,28 @@ typealias TypeBuilder = GraphQLObjectType.Builder
 fun TypeBuilder.booleanField(name: String, description: String): GraphQLObjectType.Builder =
     field { it.name(name).description(description).type(GraphQLBoolean) }
 
+fun <T> TypeBuilder.booleanFieldFunction(
+    name: String,
+    description: String,
+    fn: (source: T) -> Boolean,
+): GraphQLObjectType.Builder =
+    field {
+        it.name(name)
+            .description(description)
+            .type(GraphQLBoolean.toNotNull())
+            .dataFetcher { env ->
+                val source: T = env.getSource()
+                fn(source)
+            }
+    }
+
 fun TypeBuilder.intField(name: String, description: String): GraphQLObjectType.Builder =
     field { it.name(name).description(description).type(GraphQLInt) }
 
 fun TypeBuilder.intField(property: KProperty<Int>, description: String? = null): GraphQLObjectType.Builder =
+    field { it.name(property.name).description(getPropertyDescription(property, description)).type(GraphQLInt) }
+
+fun TypeBuilder.longField(property: KProperty<Long>, description: String? = null): GraphQLObjectType.Builder =
     field { it.name(property.name).description(getPropertyDescription(property, description)).type(GraphQLInt) }
 
 fun TypeBuilder.stringField(name: String, description: String): GraphQLObjectType.Builder =
@@ -60,6 +76,16 @@ fun TypeBuilder.dateField(name: String, description: String, nullable: Boolean =
         it.name(name)
             .description(description)
             .type(nullableOutputType(GQLScalarLocalDateTime.INSTANCE, nullable))
+    }
+
+fun TypeBuilder.localDateTimeField(
+    property: KProperty<LocalDateTime?>,
+    description: String? = null,
+): GraphQLObjectType.Builder =
+    field {
+        it.name(getPropertyName(property))
+            .description(getPropertyDescription(property, description))
+            .type(nullableOutputType(GQLScalarLocalDateTime.INSTANCE, property.returnType.isMarkedNullable))
     }
 
 fun TypeBuilder.jsonField(

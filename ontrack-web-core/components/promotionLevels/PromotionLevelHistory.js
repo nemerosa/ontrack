@@ -8,7 +8,7 @@ import Decorations from "@components/framework/decorations/Decorations";
 import TimestampText from "@components/common/TimestampText";
 import AnnotatedDescription from "@components/common/AnnotatedDescription";
 import {FaExchangeAlt, FaSearch} from "react-icons/fa";
-import TableColumnFilterDropdown from "@components/common/TableColumnFilterDropdown";
+import TableColumnFilterDropdown from "@components/common/table/TableColumnFilterDropdown";
 import useRangeSelection from "@components/common/RangeSelection";
 import RangeSelector from "@components/common/RangeSelector";
 import {useRouter} from "next/router";

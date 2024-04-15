@@ -35,6 +35,12 @@ class CoreUserMenuItemExtension(
                     id = "settings",
                     name = "Settings",
                 )
+                items += UserMenuItem(
+                    groupId = CoreUserMenuGroups.SYSTEM,
+                    extension = "core/admin",
+                    id = "jobs",
+                    name = "Background jobs",
+                )
             }
 
             return items

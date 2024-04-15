@@ -9,11 +9,11 @@ public interface JobRunListener {
     void progress(JobRunProgress value);
 
     default Consumer<String> logger() {
-        return s -> progress(JobRunProgress.message(s));
+        return s -> progress(JobRunProgress.messageOnly(s));
     }
 
     default void message(String pattern, Object... parameters) {
-        progress(JobRunProgress.message(pattern, parameters));
+        progress(JobRunProgress.messageOnly(String.format(pattern, parameters)));
     }
 
     static JobRunListener logger(Logger logger) {

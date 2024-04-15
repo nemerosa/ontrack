@@ -12,7 +12,7 @@ open class JobFilterResources(
             .map {
                 NameDescription(
                         it.name,
-                        it.description
+                        it.displayName
                 )
             }
 }

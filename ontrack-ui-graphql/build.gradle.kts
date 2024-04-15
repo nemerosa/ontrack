@@ -8,6 +8,7 @@ dependencies {
     api("com.graphql-java:graphql-java")
     api("org.springframework.graphql:spring-graphql")
 
+    implementation(project(":ontrack-job"))
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-graphql")
     implementation("org.springframework:spring-tx")

@@ -1,6 +1,7 @@
 import {createContext, useContext, useEffect, useState} from "react";
 import {gql} from "graphql-request";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import {useJobStates} from "@components/core/admin/jobs/JobState";
 
 const refDataSignature = {
     /**
@@ -27,6 +28,13 @@ const refDataSignature = {
      * List of existing event types (id, description)
      */
     eventTypes: [],
+    /**
+     * List of jobs states
+     */
+    jobStates: {
+        list: [],
+        index: {},
+    },
     /**
      * Version of Ontrack
      */
@@ -69,6 +77,8 @@ export default function RefDataContextProvider({children}) {
         }
     }
 
+    const jobStates = useJobStates()
+
     useEffect(() => {
         if (client) {
             client.request(
@@ -96,11 +106,12 @@ export default function RefDataContextProvider({children}) {
                 setRefData({
                     validationRunStatuses: validationRunStatuses(data.validationRunStatusIDList),
                     eventTypes: data.eventTypes,
+                    jobStates: jobStates,
                     version: data.info.version.display,
                 })
             })
         }
-    }, [client]);
+    }, [client, jobStates]);
 
     return <RefDataContext.Provider value={refData}>{children}</RefDataContext.Provider>
 
