@@ -1,8 +1,11 @@
 package net.nemerosa.ontrack.extension.support.client
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Component
+import org.springframework.test.web.client.ExpectedCount
 import org.springframework.test.web.client.MockRestServiceServer
+import org.springframework.test.web.client.match.MockRestRequestMatchers.*
 import org.springframework.web.client.RestTemplate
 
 @Component
@@ -46,25 +49,41 @@ class MockRestTemplateProvider : DefaultRestTemplateProvider() {
 
         fun start(template: RestTemplate) {
             mockServer = MockRestServiceServer.createServer(template)
-            TODO("Not yet implemented")
+            mockServer?.let {
+                actions.forEach { action ->
+                    action.register(it)
+                }
+            }
         }
 
         override fun verify() {
-            TODO("Not yet implemented")
+            mockServer?.verify()
         }
 
         override fun close() {
-            TODO("Not yet implemented")
+            mockServer?.reset()
         }
 
     }
 
-    private interface MockRestTemplateAction
+    private interface MockRestTemplateAction {
+        fun register(mockServer: MockRestServiceServer)
+    }
 
     private class MockRestTemplatePostJsonAction(
         private val path: String,
         private val body: Any,
         private val outcome: MockRestTemplateOutcome
-    ) : MockRestTemplateAction
+    ) : MockRestTemplateAction {
+
+        override fun register(mockServer: MockRestServiceServer) {
+            mockServer
+                .expect(ExpectedCount.once(), requestTo(path))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(content().string(JsonBodyMatcher(body)))
+                .andRespond(outcome.responseCreator)
+        }
+
+    }
 
 }
