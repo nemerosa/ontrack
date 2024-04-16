@@ -39,9 +39,9 @@ class MockRestTemplateProvider : DefaultRestTemplateProvider() {
         private val actions = mutableListOf<MockRestTemplateAction>()
         private var mockServer: MockRestServiceServer? = null
 
-        override fun onPostJson(path: String, body: Any, outcome: MockRestTemplateOutcome) {
+        override fun onPostJson(uri: String, body: Any, outcome: MockRestTemplateOutcome) {
             actions += MockRestTemplatePostJsonAction(
-                path = path,
+                path = uri,
                 body = body,
                 outcome = outcome
             )

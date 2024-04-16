@@ -12,6 +12,7 @@ interface JIRAClient : AutoCloseable {
     val projects: List<String>
 
     fun createIssue(
+        configuration: JIRAConfiguration,
         project: String,
         issueType: String,
         labels: List<String>,

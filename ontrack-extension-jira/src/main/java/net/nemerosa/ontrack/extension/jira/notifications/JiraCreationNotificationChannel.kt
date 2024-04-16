@@ -62,6 +62,7 @@ class JiraCreationNotificationChannel(
         val jiraClient = jiraSessionFactory.create(jiraConfig).client
         // Creates the issue
         val jiraIssueStub = jiraClient.createIssue(
+            configuration = jiraConfig,
             project = config.projectName,
             issueType = config.issueType,
             labels = config.labels,

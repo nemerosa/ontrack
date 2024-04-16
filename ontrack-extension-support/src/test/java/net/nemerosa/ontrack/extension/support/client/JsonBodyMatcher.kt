@@ -1,14 +1,18 @@
 package net.nemerosa.ontrack.extension.support.client
 
 import net.nemerosa.ontrack.json.asJson
-import org.hamcrest.CustomMatcher
+import net.nemerosa.ontrack.json.format
+import net.nemerosa.ontrack.json.parseAsJson
+import org.hamcrest.CustomTypeSafeMatcher
 
 class JsonBodyMatcher(
     private val expectedBody: Any,
-) : CustomMatcher<String>("JSON body matcher") {
+) : CustomTypeSafeMatcher<String>(
+    expectedBody.asJson().format()
+) {
 
-    override fun matches(content: Any?): Boolean {
-        val actualJson = content.asJson()
+    override fun matchesSafely(item: String?): Boolean {
+        val actualJson = item?.parseAsJson()
         val expectedJson = expectedBody.asJson()
         return actualJson == expectedJson
     }

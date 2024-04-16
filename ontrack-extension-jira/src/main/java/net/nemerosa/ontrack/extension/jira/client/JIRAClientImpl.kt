@@ -49,6 +49,7 @@ class JIRAClientImpl(
     }
 
     override fun createIssue(
+        configuration: JIRAConfiguration,
         project: String,
         issueType: String,
         labels: List<String>,
@@ -58,7 +59,52 @@ class JIRAClientImpl(
         customFields: Map<String, JsonNode>,
         body: String
     ): JIRAIssueStub {
-        TODO("Not yet implemented")
+        val fields = mutableMapOf(
+            "project" to mapOf(
+                "name" to project,
+            ),
+            "summary" to title,
+            "issuetype" to mapOf(
+                "name" to issueType
+            ),
+            "labels" to labels,
+            "description" to body,
+        )
+
+        if (!assignee.isNullOrBlank()) {
+            fields["assignee"] = mapOf(
+                "name" to assignee
+            )
+        }
+
+        if (!fixVersion.isNullOrBlank()) {
+            fields["fixVersions"] = listOf(
+                mapOf(
+                    "name" to fixVersion
+                )
+            )
+        }
+
+        customFields.forEach { (name, json) ->
+            fields[name] = json
+        }
+
+        val payload = mapOf(
+            "fields" to fields,
+        )
+
+        val node = restTemplate.postForObject(
+            "/rest/api/2/issue",
+            payload,
+            JsonNode::class.java
+        ) ?: error("Could not create the issue (no answer)")
+
+        val key = node.getRequiredTextField("key")
+
+        return JIRAIssueStub(
+            key = key,
+            url = configuration.getIssueURL(key),
+        )
     }
 
     override val projects: List<String>

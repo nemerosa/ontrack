@@ -17,6 +17,7 @@ class MockJIRAClient(
         instance.getIssue(key)
 
     override fun createIssue(
+        configuration: JIRAConfiguration,
         project: String,
         issueType: String,
         labels: List<String>,

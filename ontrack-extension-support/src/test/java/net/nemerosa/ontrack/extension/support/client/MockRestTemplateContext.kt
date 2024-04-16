@@ -6,7 +6,7 @@ interface MockRestTemplateContext {
      * Posting JSON
      */
     fun onPostJson(
-        path: String,
+        uri: String,
         body: Any,
         outcome: MockRestTemplateOutcome,
     )
