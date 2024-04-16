@@ -55,3 +55,5 @@ class TemplatingRenderableFieldNotFoundException(field: String) : TemplatingExce
 class TemplatingRenderableFieldRequiredException : TemplatingException(
     """Templating field is required"""
 )
+
+class TemplatingGeneralException(message: String) : TemplatingException(message)
