@@ -1,6 +1,8 @@
 [[appendix-templating-functions-index]]
 ==== List of templating functions
 
+* <<templating-function-datetime,datetime>>
 * <<templating-function-link,link>>
 
+include::templating-function-datetime.adoc[]
 include::templating-function-link.adoc[]

@@ -10,7 +10,7 @@ import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
 import java.util.*
 
-object Time {
+object Time: TimeServer {
 
     private val TIME_STORAGE_FORMAT: DateTimeFormatter = DateTimeFormatterBuilder()
             .appendValue(ChronoField.HOUR_OF_DAY, 2)
@@ -44,6 +44,8 @@ object Time {
 
     @JvmStatic
     fun now(): LocalDateTime = LocalDateTime.now(ZoneOffset.UTC)
+
+    override val now: LocalDateTime get() = now()
 
     fun toLocalDateTime(zonedDateTime: ZonedDateTime): LocalDateTime =
             zonedDateTime.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime()

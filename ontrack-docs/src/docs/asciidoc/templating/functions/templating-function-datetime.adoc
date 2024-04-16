@@ -1,0 +1,29 @@
+[[templating-function-datetime]]
+===== datetime
+
+Displays the current time
+
+Configuration:
+
+* **days** - days field
+
+* **format** - format field
+
+* **hours** - hours field
+
+* **minutes** - minutes field
+
+* **months** - months field
+
+* **seconds** - seconds field
+
+* **timezone** - timezone field
+
+* **years** - years field
+
+Example:
+
+[source]
+----
+#.datetime?format=yyyy-MM-dd&timezone=Europe/Brussels&days=1
+----
