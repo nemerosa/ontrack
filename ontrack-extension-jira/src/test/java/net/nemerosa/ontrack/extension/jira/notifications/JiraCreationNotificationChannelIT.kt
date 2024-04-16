@@ -4,11 +4,14 @@ import com.fasterxml.jackson.databind.node.TextNode
 import net.nemerosa.ontrack.extension.jira.JIRAConfigurationService
 import net.nemerosa.ontrack.extension.jira.JIRAFixtures
 import net.nemerosa.ontrack.extension.notifications.AbstractNotificationTestSupport
+import net.nemerosa.ontrack.extension.notifications.recording.NotificationRecordFilter
+import net.nemerosa.ontrack.extension.notifications.recording.NotificationRecordingService
 import net.nemerosa.ontrack.extension.notifications.subscriptions.subscribe
 import net.nemerosa.ontrack.extension.support.client.MockRestTemplateContext
 import net.nemerosa.ontrack.extension.support.client.MockRestTemplateProvider
 import net.nemerosa.ontrack.extension.support.client.success
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.AfterEach
@@ -16,6 +19,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.TestPropertySource
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 @TestPropertySource(
     properties = [
@@ -34,9 +39,15 @@ class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
     private lateinit var mockRestTemplateProvider: MockRestTemplateProvider
     private lateinit var mockRestTemplateContext: MockRestTemplateContext
 
+    @Autowired
+    private lateinit var notificationRecordingService: NotificationRecordingService
+
     @BeforeEach
     fun init() {
         mockRestTemplateContext = mockRestTemplateProvider.createSession()
+        asAdmin {
+            notificationRecordingService.clearAll()
+        }
     }
 
     @AfterEach
@@ -134,7 +145,22 @@ class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
                     // Checks that the call has been done
                     mockRestTemplateContext.verify()
 
-                    TODO("Checks the output of the notification (key + url)")
+                    // Checks the output of the notification (key + url)
+                    assertNotNull(
+                        notificationRecordingService.filter(
+                            filter = NotificationRecordFilter(
+                                channel = "jira-creation"
+                            )
+                        ).pageItems.firstOrNull()
+                    ) { record ->
+                        assertNotNull(record.result.output) { output ->
+                            val key = output.getRequiredTextField("key")
+                            assertEquals(
+                                "http://jira/browse/$key",
+                                output.getRequiredTextField("url")
+                            )
+                        }
+                    }
                 }
             }
         }
