@@ -67,6 +67,8 @@ class MockJIRAInstance {
         return issue
     }
 
+    fun getProjectIssues(projectName: String): Map<String, JIRAIssue> = projects[projectName]?.issues ?: emptyMap()
+
     fun getIssue(key: String): JIRAIssue? {
         val projectName = key.substringBefore("-")
         return projects[projectName]?.issues?.get(key)

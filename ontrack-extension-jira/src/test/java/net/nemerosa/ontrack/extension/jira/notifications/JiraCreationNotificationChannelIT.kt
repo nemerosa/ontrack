@@ -5,19 +5,23 @@ import net.nemerosa.ontrack.extension.jira.JIRAConfigurationService
 import net.nemerosa.ontrack.extension.jira.JIRAFixtures
 import net.nemerosa.ontrack.extension.jira.mock.MockJIRAInstance
 import net.nemerosa.ontrack.extension.notifications.AbstractNotificationTestSupport
-import net.nemerosa.ontrack.extension.notifications.mail.AbstractMailTestSupport
-import net.nemerosa.ontrack.extension.notifications.mail.MailNotificationChannelConfig
 import net.nemerosa.ontrack.extension.notifications.subscriptions.subscribe
+import net.nemerosa.ontrack.extension.support.client.MockRestTemplateContext
+import net.nemerosa.ontrack.extension.support.client.MockRestTemplateProvider
+import net.nemerosa.ontrack.extension.support.client.success
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.test.TestUtils.uid
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.TestPropertySource
+import kotlin.test.assertEquals
 
 @TestPropertySource(
     properties = [
-        "ontrack.config.extension.jira.mock.enabled=true",
+        "ontrack.config.extension.support.client.resttemplate=mock",
     ]
 )
 class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
@@ -26,10 +30,21 @@ class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
     private lateinit var jiraCreationNotificationChannel: JiraCreationNotificationChannel
 
     @Autowired
-    private lateinit var mockJIRAInstance: MockJIRAInstance
+    private lateinit var jiraConfigurationService: JIRAConfigurationService
 
     @Autowired
-    private lateinit var jiraConfigurationService: JIRAConfigurationService
+    private lateinit var mockRestTemplateProvider: MockRestTemplateProvider
+    private lateinit var mockRestTemplateContext: MockRestTemplateContext
+
+    @BeforeEach
+    fun init() {
+        mockRestTemplateContext = mockRestTemplateProvider.createSession()
+    }
+
+    @AfterEach
+    fun close() {
+        mockRestTemplateContext.close()
+    }
 
     @Test
     fun `Creating a Jira ticket on a new promotion`() {
@@ -72,14 +87,55 @@ class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
                         projectEntity = pl,
                         keywords = null,
                         origin = "test",
-                        contentTemplate = "Build \${build} has been promoted to \${pl.name}.",
+                        contentTemplate = "<p>Build \${build} has been promoted to \${pl.name}.</p>",
                         EventFactory.NEW_PROMOTION_RUN,
+                    )
+
+                    // Mocking the call to Jira
+                    mockRestTemplateContext.onPostJson(
+                        path = "/rest/api/2/issue",
+                        body = mapOf(
+                            "fields" to listOf(
+                                "project" to mapOf(
+                                    "name" to jiraProjectName,
+                                ),
+                                "summary" to "Build $name has been promoted to ${pl.name}",
+                                "issuetype" to mapOf(
+                                    "name" to "Test"
+                                ),
+                                "assignee" to mapOf(
+                                    "name" to "dcoraboeuf"
+                                ),
+                                "labels" to listOf("test"),
+                                "description" to """
+                                    <p>Build <a href="http://localhost:8080/#/build/${id}">$name</a> has been promoted to <a href="http://localhost:8080/#/promotionLevel/${pl.id}">${pl.name}</a></p>
+                                """.trimIndent(),
+                                "duedate" to "2024-04-16",
+                                "fixVersions" to listOf(
+                                    mapOf(
+                                        "name" to "v1"
+                                    )
+                                ),
+                                "customfield_11000" to "Some direct value",
+                                "customfield_12000" to mapOf(
+                                    "value" to "Some map value"
+                                ),
+                            )
+                        ),
+                        outcome = success(
+                            mapOf(
+                                "key" to "$jiraProjectName-123",
+                            )
+                        )
                     )
 
                     build {
                         promote(pl)
 
-                        // TODO Checking the Jira mock client
+                        // Checks that the call has been done
+                        mockRestTemplateContext.verify()
+
+                        TODO("Checks the output of the notification (key + url)")
                     }
                 }
             }

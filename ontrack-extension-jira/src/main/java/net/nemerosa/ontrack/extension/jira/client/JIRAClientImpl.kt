@@ -48,6 +48,19 @@ class JIRAClientImpl(
 
     }
 
+    override fun createIssue(
+        project: String,
+        issueType: String,
+        labels: List<String>,
+        fixVersion: String?,
+        assignee: String?,
+        title: String,
+        customFields: Map<String, JsonNode>,
+        body: String
+    ): JIRAIssueStub {
+        TODO("Not yet implemented")
+    }
+
     override val projects: List<String>
         get() {
             val node = restTemplate.getForObject<JsonNode>("/rest/api/2/project")
