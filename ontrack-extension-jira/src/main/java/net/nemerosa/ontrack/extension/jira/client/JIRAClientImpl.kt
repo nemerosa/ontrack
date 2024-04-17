@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.jira.client
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.jira.JIRAConfiguration
 import net.nemerosa.ontrack.extension.jira.model.*
+import net.nemerosa.ontrack.extension.jira.notifications.JiraCustomField
 import net.nemerosa.ontrack.json.getRequiredTextField
 import org.apache.commons.lang3.StringUtils
 import org.springframework.web.client.HttpClientErrorException.Forbidden
@@ -56,7 +57,7 @@ class JIRAClientImpl(
         fixVersion: String?,
         assignee: String?,
         title: String,
-        customFields: Map<String, JsonNode>,
+        customFields: List<JiraCustomField>,
         body: String
     ): JIRAIssueStub {
         val fields = mutableMapOf(

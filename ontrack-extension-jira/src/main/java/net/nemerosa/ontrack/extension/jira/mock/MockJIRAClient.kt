@@ -1,10 +1,10 @@
 package net.nemerosa.ontrack.extension.jira.mock
 
-import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.jira.JIRAConfiguration
 import net.nemerosa.ontrack.extension.jira.client.JIRAClient
 import net.nemerosa.ontrack.extension.jira.model.JIRAIssue
 import net.nemerosa.ontrack.extension.jira.model.JIRAIssueStub
+import net.nemerosa.ontrack.extension.jira.notifications.JiraCustomField
 
 class MockJIRAClient(
     private val instance: MockJIRAInstance,
@@ -24,7 +24,7 @@ class MockJIRAClient(
         fixVersion: String?,
         assignee: String?,
         title: String,
-        customFields: Map<String, JsonNode>,
+        customFields: List<JiraCustomField>,
         body: String
     ): JIRAIssueStub {
         TODO("Not yet implemented")

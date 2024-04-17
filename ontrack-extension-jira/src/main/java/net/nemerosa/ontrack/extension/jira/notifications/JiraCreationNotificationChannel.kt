@@ -50,14 +50,14 @@ class JiraCreationNotificationChannel(
         )
 
         // Custom fields
-        val customFields = config.customFields.mapValues { (_, json) ->
-            json.transform { text ->
+        val customFields = config.customFields.map { (name, value) ->
+            JiraCustomField(name, value.transform { text ->
                 eventTemplatingService.renderEvent(
                     event = event,
                     template = text,
                     renderer = PlainEventRenderer.INSTANCE
                 )
-            }
+            })
         }
 
         // Body

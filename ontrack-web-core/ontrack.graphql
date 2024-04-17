@@ -2764,6 +2764,20 @@ type JenkinsConfiguration {
     user: String
 }
 
+"Jira configuration"
+type JiraConfiguration {
+    "List of projects to exclude"
+    exclude: [String!]!
+    "List of projects to include"
+    include: [String!]!
+    "Name of the configuration"
+    name: String!
+    "URL of Jira"
+    url: String!
+    "Username used to connect"
+    user: String
+}
+
 type JobActionResult {
     "Error message"
     error: String
@@ -5137,6 +5151,10 @@ type Query {
     jenkinsConfiguration(name: String!): JenkinsConfiguration
     "List of Jenkins configurations"
     jenkinsConfigurations: [JenkinsConfiguration!]!
+    "Getting a Jira configuration by name"
+    jiraConfiguration(name: String!): JiraConfiguration
+    "List of Jira configurations"
+    jiraConfigurations: [JiraConfiguration!]!
     "List of all job categories and their types (at any given time)"
     jobCategories: [JobCategory!]!
     "Overall status of the execution of the jobs"

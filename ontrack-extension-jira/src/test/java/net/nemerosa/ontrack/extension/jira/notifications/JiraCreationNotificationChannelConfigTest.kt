@@ -25,7 +25,7 @@ class JiraCreationNotificationChannelConfigTest {
                 fixVersion = null,
                 assignee = null,
                 titleTemplate = "Summary test",
-                customFields = emptyMap(),
+                customFields = emptyList(),
             ),
             json.parse()
         )
@@ -38,13 +38,22 @@ class JiraCreationNotificationChannelConfigTest {
             "projectName" to "ONTRACK",
             "issueType" to "Test",
             "titleTemplate" to "Summary test",
-            "customFields" to mapOf(
-                "duedate" to "2024-04-16",
-                "customfield_11000" to "Some direct value",
-                "customfield_12000" to mapOf(
-                    "value" to "Some map value"
+            "customFields" to listOf(
+                mapOf(
+                    "name" to "duedate",
+                    "value" to "2024-04-16",
                 ),
-            )
+                mapOf(
+                    "name" to "customfield_11000",
+                    "value" to "Some direct value",
+                ),
+                mapOf(
+                    "name" to "customfield_12000",
+                    "value" to mapOf(
+                        "value" to "Some map value"
+                    ),
+                ),
+            ),
         ).asJson()
         assertEquals(
             JiraCreationNotificationChannelConfig(
@@ -55,13 +64,15 @@ class JiraCreationNotificationChannelConfigTest {
                 fixVersion = null,
                 assignee = null,
                 titleTemplate = "Summary test",
-                customFields = mapOf(
-                    "duedate" to TextNode("2024-04-16"),
-                    "customfield_11000" to TextNode("Some direct value"),
-                    "customfield_12000" to mapOf(
-                        "value" to "Some map value"
-                    ).asJson(),
-                )
+                customFields = listOf(
+                    JiraCustomField("duedate", TextNode("2024-04-16")),
+                    JiraCustomField("customfield_11000", TextNode("Some direct value")),
+                    JiraCustomField(
+                        "customfield_12000", mapOf(
+                            "value" to "Some map value"
+                        ).asJson()
+                    ),
+                ),
             ),
             json.parse()
         )

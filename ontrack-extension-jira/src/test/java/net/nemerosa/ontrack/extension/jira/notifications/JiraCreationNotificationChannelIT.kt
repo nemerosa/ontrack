@@ -85,13 +85,22 @@ class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
                             fixVersion = "v\${build}",
                             assignee = "dcoraboeuf",
                             titleTemplate = "Build \${build} has been promoted to \${promotionLevel}",
-                            customFields = mapOf(
-                                "duedate" to TextNode("2024-04-16"),
-                                "customfield_11000" to TextNode("Some direct value"),
-                                "customfield_12000" to mapOf(
-                                    "value" to "Promotion level name \${promotionLevel}",
-                                ).asJson(),
-                            )
+                            customFields = listOf(
+                                JiraCustomField(
+                                    "duedate",
+                                    TextNode("2024-04-16")
+                                ),
+                                JiraCustomField(
+                                    "customfield_11000",
+                                    TextNode("Some direct value")
+                                ),
+                                JiraCustomField(
+                                    "customfield_12000",
+                                    mapOf(
+                                        "value" to "Promotion level name \${promotionLevel}",
+                                    ).asJson()
+                                ),
+                            ),
                         ),
                         projectEntity = pl,
                         keywords = null,

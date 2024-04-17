@@ -1,7 +1,5 @@
 package net.nemerosa.ontrack.extension.jira.notifications
 
-import com.fasterxml.jackson.databind.JsonNode
-
 data class JiraCreationNotificationChannelConfig(
     val configName: String,
     val projectName: String,
@@ -10,5 +8,5 @@ data class JiraCreationNotificationChannelConfig(
     val fixVersion: String? = null,
     val assignee: String? = null,
     val titleTemplate: String,
-    val customFields: Map<String, JsonNode> = emptyMap(),
+    val customFields: List<JiraCustomField> = emptyList(),
 )

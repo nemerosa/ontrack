@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.jira.JIRAConfiguration
 import net.nemerosa.ontrack.extension.jira.model.JIRAIssue
 import net.nemerosa.ontrack.extension.jira.model.JIRAIssueStub
+import net.nemerosa.ontrack.extension.jira.notifications.JiraCustomField
 
 interface JIRAClient : AutoCloseable {
 
@@ -19,7 +20,7 @@ interface JIRAClient : AutoCloseable {
         fixVersion: String?,
         assignee: String?,
         title: String,
-        customFields: Map<String, JsonNode>,
+        customFields: List<JiraCustomField>,
         body: String,
     ): JIRAIssueStub
 
