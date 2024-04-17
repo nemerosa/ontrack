@@ -24,6 +24,10 @@ export function branchLinksUri(branch) {
     return `/branch/${branch.id}/links`
 }
 
+export function branchPromotionLevelsUri(branch) {
+    return `/branch/${branch.id}/promotionLevels`
+}
+
 export function branchLegacyUri(branch) {
     return `#/branch/${branch.id}`
 }

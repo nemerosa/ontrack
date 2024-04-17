@@ -1,6 +1,12 @@
 import {useEffect, useState} from "react";
 import {CloseCommand, Command, LegacyLinkCommand} from "@components/common/Commands";
-import {branchLegacyUri, branchLinksUri, branchUri, projectUri} from "@components/common/Links";
+import {
+    branchLegacyUri,
+    branchLinksUri,
+    branchPromotionLevelsUri,
+    branchUri,
+    projectUri
+} from "@components/common/Links";
 import Head from "next/head";
 import {branchTitle} from "@components/common/Titles";
 import MainPage from "@components/layouts/MainPage";
@@ -13,7 +19,7 @@ import {getBranchViews} from "@components/branches/views/branchViews";
 import {usePreferences} from "@components/providers/PreferencesProvider";
 import {useRouter} from "next/router";
 import JumpToBranch from "@components/branches/JumpToBranch";
-import {FaProjectDiagram} from "react-icons/fa";
+import {FaMedal, FaProjectDiagram} from "react-icons/fa";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gqlGetBranch} from "@components/services/branches";
 import UserMenuActions from "@components/entities/UserMenuActions";
@@ -84,6 +90,13 @@ export default function BranchPageView({id}) {
                     //     initialSelectedViewKey={initialSelectedViewKey}
                     //     onBranchViewSelected={onBranchViewSelected}
                     // />,
+                    <Command
+                        key="promotionLevels"
+                        icon={<FaMedal/>}
+                        href={branchPromotionLevelsUri(branch)}
+                        text="Promotions"
+                        title="Management of the promotion levels for this branch"
+                    />,
                     <UserMenuActions key="userMenuActions" actions={branch.userMenuActions}/>,
                     <JumpToBranch key="branch" projectName={branch.project.name}/>,
                     <Command
