@@ -82,7 +82,7 @@ class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
                             projectName = jiraProjectName,
                             issueType = "Test",
                             labels = listOf("test"),
-                            fixVersion = "v1",
+                            fixVersion = "v\${build}",
                             assignee = "dcoraboeuf",
                             titleTemplate = "Build \${build} has been promoted to \${promotionLevel}",
                             customFields = mapOf(
@@ -123,7 +123,7 @@ class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
                                 ),
                                 "fixVersions" to listOf(
                                     mapOf(
-                                        "name" to "v1"
+                                        "name" to "v${build.name}"
                                     )
                                 ),
                                 "duedate" to "2024-04-16",

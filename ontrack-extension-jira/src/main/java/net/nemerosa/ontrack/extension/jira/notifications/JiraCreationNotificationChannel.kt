@@ -40,6 +40,13 @@ class JiraCreationNotificationChannel(
             renderer = PlainEventRenderer.INSTANCE
         )
 
+        // Fix version
+        val fixVersion = eventTemplatingService.renderEvent(
+            event = event,
+            template = config.fixVersion,
+            renderer = PlainEventRenderer.INSTANCE
+        )
+
         // Custom fields
         val customFields = config.customFields.mapValues { (_, json) ->
             json.transform { text ->
@@ -66,7 +73,7 @@ class JiraCreationNotificationChannel(
             project = config.projectName,
             issueType = config.issueType,
             labels = config.labels,
-            fixVersion = config.fixVersion,
+            fixVersion = fixVersion,
             assignee = config.assignee,
             title = title,
             customFields = customFields,
