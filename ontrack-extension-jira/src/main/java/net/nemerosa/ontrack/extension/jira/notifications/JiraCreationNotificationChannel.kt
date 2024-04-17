@@ -6,13 +6,15 @@ import net.nemerosa.ontrack.extension.jira.JIRAConfigurationService
 import net.nemerosa.ontrack.extension.jira.tx.JIRASessionFactory
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.transform
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.HtmlNotificationEventRenderer
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.templating.TemplatingService
+import net.nemerosa.ontrack.model.form.multiStrings
+import net.nemerosa.ontrack.model.form.textField
 import org.springframework.stereotype.Component
 
 @Component
@@ -88,22 +90,28 @@ class JiraCreationNotificationChannel(
         )
     }
 
-    override fun toSearchCriteria(text: String): JsonNode {
-        TODO("Not yet implemented")
-    }
+    override fun toSearchCriteria(text: String): JsonNode =
+        mapOf(
+            JiraCreationNotificationChannelConfig::titleTemplate.name to text
+        ).asJson()
 
     override val type: String = "jira-creation"
 
     override val enabled: Boolean = true
 
     @Deprecated("Will be removed in V5. Only Next UI is used.")
-    override fun getForm(c: JiraCreationNotificationChannelConfig?): Form {
-        TODO("Not yet implemented")
-    }
+    override fun getForm(c: JiraCreationNotificationChannelConfig?): Form =
+        Form.create()
+            .textField(JiraCreationNotificationChannelConfig::configName, c?.configName)
+            .textField(JiraCreationNotificationChannelConfig::projectName, c?.projectName)
+            .textField(JiraCreationNotificationChannelConfig::issueType, c?.issueType)
+            .multiStrings(JiraCreationNotificationChannelConfig::labels, c?.labels)
+            .textField(JiraCreationNotificationChannelConfig::fixVersion, c?.fixVersion)
+            .textField(JiraCreationNotificationChannelConfig::assignee, c?.assignee)
+            .textField(JiraCreationNotificationChannelConfig::titleTemplate, c?.titleTemplate)
 
     @Deprecated("Will be removed in V5. Only Next UI is used.")
-    override fun toText(config: JiraCreationNotificationChannelConfig): String {
-        TODO("Not yet implemented")
-    }
+    override fun toText(config: JiraCreationNotificationChannelConfig): String =
+        config.titleTemplate
 
 }
