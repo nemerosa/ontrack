@@ -89,7 +89,7 @@ class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
                                 "duedate" to TextNode("2024-04-16"),
                                 "customfield_11000" to TextNode("Some direct value"),
                                 "customfield_12000" to mapOf(
-                                    "value" to "Some map value"
+                                    "value" to "Promotion level name \${promotionLevel}",
                                 ).asJson(),
                             )
                         ),
@@ -129,7 +129,7 @@ class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
                                 "duedate" to "2024-04-16",
                                 "customfield_11000" to "Some direct value",
                                 "customfield_12000" to mapOf(
-                                    "value" to "Some map value"
+                                    "value" to "Promotion level name ${pl.name}"
                                 ),
                             )
                         ),
