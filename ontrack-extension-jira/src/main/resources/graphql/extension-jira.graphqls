@@ -1,0 +1,20 @@
+"""Jira configuration"""
+type JiraConfiguration {
+    """Name of the configuration"""
+    name: String!
+    """URL of Jira"""
+    url: String!
+    """Username used to connect"""
+    user: String
+    """List of projects to include"""
+    include: [String!]!
+    """List of projects to exclude"""
+    exclude: [String!]!
+}
+
+extend type Query {
+    """List of Jira configurations"""
+    jiraConfigurations: [JiraConfiguration!]!
+    """Getting a Jira configuration by name"""
+    jiraConfiguration(name: String!): JiraConfiguration
+}
