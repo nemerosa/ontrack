@@ -74,7 +74,7 @@ export default function FormDialog({dialog, onValuesChange, children, hasOk = tr
         try {
             let values = await form.validateFields()
             if (dialog.prepareValues) {
-                values = dialog.prepareValues(values, dialog.context)
+                values = await dialog.prepareValues(values, dialog.context)
             }
             let result
             let errors

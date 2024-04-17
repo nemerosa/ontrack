@@ -6,19 +6,31 @@ import {useState} from "react";
 import Well from "@components/common/Well";
 import NotificationChannelConfigForm from "@components/extension/notifications/NotificationChannelConfigForm";
 import {gql} from "graphql-request";
+import {callDynamicFunction} from "@components/common/DynamicFunction";
 
 export const useSubscriptionDialog = ({onSuccess, projectEntity}) => {
 
     const [channelType, setChannelType] = useState('')
 
+    const customPreparation = async (channelType, channelConfig) => {
+        const newConfig = await callDynamicFunction(
+            `framework/notification-channel-form-prepare/${channelType}`,
+            channelConfig,
+        )
+        return newConfig ?? channelConfig
+    }
+
     return useFormDialog({
         onSuccess,
         channelType, setChannelType,
-        prepareValues: (values) => {
-            console.log({values})
+        prepareValues: async (values) => {
+            // Custom preparation of values for the configuration
+            const channelConfig = await customPreparation(channelType, values.channelConfig)
+            // OK
             return {
                 ...values,
                 channel: channelType,
+                channelConfig: channelConfig,
                 projectEntity,
             }
         },

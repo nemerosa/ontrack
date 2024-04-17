@@ -64,7 +64,7 @@ export default function JiraCreationNotificationChannelConfig({
         {
             key: 'labels',
             label: 'Labels',
-            children: labels.map(label => (<Tag key={label}>{label}</Tag>)),
+            children: labels && labels.map(label => (<Tag key={label}>{label}</Tag>)),
             span: 12,
         },
         {
