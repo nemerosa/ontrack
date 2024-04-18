@@ -3,14 +3,14 @@ import {useGraphQLClient} from "@components/providers/ConnectionContextProvider"
 import {useEffect, useState} from "react";
 import {gql} from "graphql-request";
 import Link from "next/link";
-import {FaArrowRight} from "react-icons/fa";
-import Duration from "@components/common/Duration";
+import YesNo from "@components/common/YesNo";
 
 export default function JiraCreationNotificationChannelConfig({
                                                                   configName,
                                                                   projectName,
                                                                   issueType,
                                                                   labels,
+                                                                  useExisting,
                                                                   fixVersion,
                                                                   assignee,
                                                                   titleTemplate,
@@ -68,6 +68,12 @@ export default function JiraCreationNotificationChannelConfig({
             span: 12,
         },
         {
+            key: 'useExisting',
+            label: 'Using existing issue',
+            children: <YesNo value={useExisting}/>,
+            span: 6,
+        },
+        {
             key: 'fixVersion',
             label: 'Fix version',
             children: <Typography.Text code>{fixVersion}</Typography.Text>,
@@ -88,17 +94,19 @@ export default function JiraCreationNotificationChannelConfig({
         {
             key: 'customFields',
             label: 'Custom fields',
-            children: <Descriptions
-                column={12}
-                items={
-                    customFields.map(({name, value}) => ({
-                        key: name,
-                        label: name,
-                        children: <Typography.Text code>{JSON.stringify(value, null, 2)}</Typography.Text>,
-                        span: 12,
-                    }))
-                }
-            />,
+            children: customFields && customFields.length > 0 ?
+                <Descriptions
+                    column={12}
+                    items={
+                        customFields.map(({name, value}) => ({
+                            key: name,
+                            label: name,
+                            children: <Typography.Text code>{JSON.stringify(value, null, 2)}</Typography.Text>,
+                            span: 12,
+                        }))
+                    }
+                /> :
+                <Typography.Text type="secondary">None</Typography.Text>,
             span: 12,
         },
     ]

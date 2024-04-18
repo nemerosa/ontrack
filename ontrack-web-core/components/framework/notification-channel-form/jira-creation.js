@@ -1,4 +1,4 @@
-import {Button, Form, Input, Select, Space, Typography} from "antd";
+import {Button, Form, Input, Select, Space, Switch, Typography} from "antd";
 import {FaExclamationTriangle, FaPlus} from "react-icons/fa";
 
 export default function JiraCreationNotificationChannelForm({prefix}) {
@@ -38,6 +38,23 @@ export default function JiraCreationNotificationChannelForm({prefix}) {
                     style={{width: '100%'}}
                     placeholder="List of labels"
                 />
+            </Form.Item>
+            <Form.Item
+                name={[prefix, "useExisting"]}
+                label="Use existing"
+                extra={
+                    <>
+                        <p>If checked, Ontrack will look for an existing issue before creating one.</p>
+                        <p>The existing issue is identified by:</p>
+                        <ul>
+                            <li>the project name</li>
+                            <li>the issue type</li>
+                            <li><i>all</i> the labels</li>
+                        </ul>
+                    </>
+                }
+            >
+                <Switch/>
             </Form.Item>
             <Form.Item
                 name={[prefix, "fixVersion"]}
