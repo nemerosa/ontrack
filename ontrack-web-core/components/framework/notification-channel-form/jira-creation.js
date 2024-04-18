@@ -1,5 +1,5 @@
 import {Button, Form, Input, Select, Space, Switch, Typography} from "antd";
-import {FaExclamationTriangle, FaPlus} from "react-icons/fa";
+import {FaExclamationTriangle, FaPlus, FaTrash} from "react-icons/fa";
 
 export default function JiraCreationNotificationChannelForm({prefix}) {
     return (
@@ -103,6 +103,7 @@ export default function JiraCreationNotificationChannelForm({prefix}) {
                                         <Form.Item
                                             {...restField}
                                             name={[name, 'name']}
+                                            label={<FaTrash onClick={() => remove(name)}/>}
                                             rules={[
                                                 {
                                                     required: true,
