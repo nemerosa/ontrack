@@ -22,7 +22,7 @@ class JiraCreationNotificationChannel(
     private val jiraConfigurationService: JIRAConfigurationService,
     private val jiraSessionFactory: JIRASessionFactory,
     private val eventTemplatingService: EventTemplatingService,
-    private val htmlNotificationEventRenderer: HtmlNotificationEventRenderer,
+    private val jiraNotificationEventRenderer: JiraNotificationEventRenderer,
 ) : AbstractNotificationChannel<JiraCreationNotificationChannelConfig, JiraCreationNotificationChannelOuput>(
     JiraCreationNotificationChannelConfig::class
 ) {
@@ -73,7 +73,7 @@ class JiraCreationNotificationChannel(
         val body = eventTemplatingService.renderEvent(
             event = event,
             template = template,
-            renderer = htmlNotificationEventRenderer,
+            renderer = jiraNotificationEventRenderer,
         )
 
         // Gets the Jira client

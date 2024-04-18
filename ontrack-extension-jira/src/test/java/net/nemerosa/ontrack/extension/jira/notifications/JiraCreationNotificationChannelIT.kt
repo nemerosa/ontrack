@@ -105,7 +105,7 @@ class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
                         projectEntity = pl,
                         keywords = null,
                         origin = "test",
-                        contentTemplate = "<p>Build \${build} has been promoted to \${promotionLevel}.</p>",
+                        contentTemplate = "Build \${build} has been promoted to \${promotionLevel}.",
                         EventFactory.NEW_PROMOTION_RUN,
                     )
 
@@ -125,7 +125,7 @@ class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
                                 ),
                                 "labels" to listOf("test", "v${build.name}"),
                                 "description" to """
-                                    <p>Build <a href="http://localhost:8080/#/build/${build.id}">${build.name}</a> has been promoted to <a href="http://localhost:8080/#/promotionLevel/${pl.id}">${pl.name}</a>.</p>
+                                    Build [${build.name}|http://localhost:8080/#/build/${build.id}] has been promoted to [${pl.name}|http://localhost:8080/#/promotionLevel/${pl.id}].
                                 """.trimIndent(),
                                 "assignee" to mapOf(
                                     "name" to "dcoraboeuf"
