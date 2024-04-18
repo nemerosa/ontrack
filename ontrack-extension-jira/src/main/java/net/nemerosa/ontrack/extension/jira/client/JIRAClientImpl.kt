@@ -62,7 +62,7 @@ class JIRAClientImpl(
     ): JIRAIssueStub {
         val fields = mutableMapOf(
             "project" to mapOf(
-                "name" to project,
+                "key" to project,
             ),
             "summary" to title,
             "issuetype" to mapOf(
