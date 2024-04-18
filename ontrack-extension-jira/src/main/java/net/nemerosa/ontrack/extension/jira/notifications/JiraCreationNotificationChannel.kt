@@ -15,6 +15,7 @@ import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.multiStrings
 import net.nemerosa.ontrack.model.form.textField
+import net.nemerosa.ontrack.model.form.yesNoField
 import org.springframework.stereotype.Component
 
 @Component
@@ -112,6 +113,7 @@ class JiraCreationNotificationChannel(
     override fun getForm(c: JiraCreationNotificationChannelConfig?): Form =
         Form.create()
             .textField(JiraCreationNotificationChannelConfig::configName, c?.configName)
+            .yesNoField(JiraCreationNotificationChannelConfig::useExisting, c?.useExisting)
             .textField(JiraCreationNotificationChannelConfig::projectName, c?.projectName)
             .textField(JiraCreationNotificationChannelConfig::issueType, c?.issueType)
             .multiStrings(JiraCreationNotificationChannelConfig::labels, c?.labels)

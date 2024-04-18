@@ -79,6 +79,7 @@ class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
                         channel = jiraCreationNotificationChannel,
                         channelConfig = JiraCreationNotificationChannelConfig(
                             configName = configuration.name,
+                            useExisting = false,
                             projectName = jiraProjectName,
                             issueType = "Test",
                             labels = listOf("test", "v\${build}"),
@@ -170,6 +171,99 @@ class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
                             )
                         }
                     }
+                }
+            }
+        }
+    }
+
+    // TODO Not checking a Jira ticket existence on a new promotion by default
+
+    @Test
+    fun `Checking a Jira ticket existence on a new promotion`() {
+        asAdmin {
+
+            // Jira project name
+            val jiraProjectName = uid("J")
+
+            // Jira configuration
+            val configuration = JIRAFixtures.jiraConfiguration()
+            withDisabledConfigurationTest {
+                jiraConfigurationService.newConfiguration(
+                    configuration
+                )
+            }
+
+            project {
+                branch {
+                    val pl = promotionLevel()
+
+                    // Setting up the Jira notification
+                    eventSubscriptionService.subscribe(
+                        channel = jiraCreationNotificationChannel,
+                        channelConfig = JiraCreationNotificationChannelConfig(
+                            useExisting = true,
+                            configName = configuration.name,
+                            projectName = jiraProjectName, // <-- used for identification of the ticket
+                            issueType = "Test", // <-- used for identification of the ticket
+                            labels = listOf("test", "v\${build}"), // <-- used for identification of the ticket
+                            titleTemplate = "Build \${build} has been promoted to \${promotionLevel}",
+                            customFields = emptyList(),
+                        ),
+                        projectEntity = pl,
+                        keywords = null,
+                        origin = "test",
+                        contentTemplate = "Build \${build} has been promoted to \${promotionLevel}.",
+                        EventFactory.NEW_PROMOTION_RUN,
+                    )
+
+                    val build = build()
+
+                    // Mocking the call to Jira
+                    mockRestTemplateContext.onPostJson(
+                        uri = "http://jira/rest/api/2/issue",
+                        body = mapOf(
+                            "fields" to mapOf(
+                                "project" to mapOf(
+                                    "key" to jiraProjectName,
+                                ),
+                                "summary" to "Build ${build.name} has been promoted to ${pl.name}",
+                                "issuetype" to mapOf(
+                                    "name" to "Test"
+                                ),
+                                "labels" to listOf("test", "v${build.name}"),
+                                "description" to """
+                                    Build [${build.name}|http://localhost:8080/#/build/${build.id}] has been promoted to [${pl.name}|http://localhost:8080/#/promotionLevel/${pl.id}].
+                                """.trimIndent(),
+                            )
+                        ),
+                        outcome = success(
+                            mapOf(
+                                "key" to "$jiraProjectName-234",
+                            )
+                        )
+                    )
+
+                    build.promote(pl)
+                    // Promoting a second time, this should not trigger the creation of the ticket
+                    build.promote(pl)
+
+                    // We expect the ticket to have been created
+                    mockRestTemplateContext.verify()
+
+                    // Checks the outputs of the notification (key + url)
+                    assertEquals(
+                        listOf(
+                            "$jiraProjectName-234",
+                            "$jiraProjectName-234", // Returned the same key
+                        ),
+                        notificationRecordingService.filter(
+                            filter = NotificationRecordFilter(
+                                channel = "jira-creation"
+                            )
+                        ).pageItems.map {
+                            it.result.output?.getRequiredTextField("key")
+                        }
+                    )
                 }
             }
         }

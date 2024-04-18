@@ -19,6 +19,7 @@ class JiraCreationNotificationChannelConfigTest {
         assertEquals(
             JiraCreationNotificationChannelConfig(
                 configName = "JIRA",
+                useExisting = false,
                 projectName = "ONTRACK",
                 issueType = "Test",
                 labels = emptyList(),
@@ -35,6 +36,7 @@ class JiraCreationNotificationChannelConfigTest {
     fun `JSON with custom fields`() {
         val json = mapOf(
             "configName" to "JIRA",
+            "useExisting" to true,
             "projectName" to "ONTRACK",
             "issueType" to "Test",
             "titleTemplate" to "Summary test",
@@ -58,6 +60,7 @@ class JiraCreationNotificationChannelConfigTest {
         assertEquals(
             JiraCreationNotificationChannelConfig(
                 configName = "JIRA",
+                useExisting = true,
                 projectName = "ONTRACK",
                 issueType = "Test",
                 labels = emptyList(),

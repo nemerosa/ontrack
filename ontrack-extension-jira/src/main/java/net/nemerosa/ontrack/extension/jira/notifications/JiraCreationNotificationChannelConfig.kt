@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.jira.notifications
 
 data class JiraCreationNotificationChannelConfig(
     val configName: String,
+    val useExisting: Boolean,
     val projectName: String,
     val issueType: String,
     val labels: List<String> = emptyList(),
