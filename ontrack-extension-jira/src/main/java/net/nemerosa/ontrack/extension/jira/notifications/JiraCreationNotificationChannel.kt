@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.jira.notifications
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.jira.JIRAConfiguration
 import net.nemerosa.ontrack.extension.jira.JIRAConfigurationService
+import net.nemerosa.ontrack.extension.jira.model.JIRAIssueStub
 import net.nemerosa.ontrack.extension.jira.tx.JIRASessionFactory
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
@@ -36,6 +37,30 @@ class JiraCreationNotificationChannel(
         // Getting the Jira configuration
         val jiraConfig: JIRAConfiguration = jiraConfigurationService.getConfiguration(config.configName)
 
+        // Expanded labels
+        val expandedLabels = config.labels.map {
+            eventTemplatingService.renderEvent(
+                event = event,
+                template = it,
+                renderer = PlainEventRenderer.INSTANCE,
+            )
+        }
+
+        // Gets the Jira client
+        val jiraClient = jiraSessionFactory.create(jiraConfig).client
+
+        // Checking for the existence of the ticket
+        if (config.useExisting) {
+            var jql = "project = ${config.projectName} AND issuetype = ${config.issueType}"
+            expandedLabels.forEach { label ->
+                jql += """ AND labels = "$label""""
+            }
+            val existingStub = jiraClient.searchIssueStubs(jiraConfig, jql).firstOrNull()
+            if (existingStub != null) {
+                return existingStub.toNotificationResult()
+            }
+        }
+
         // Title
         val title = eventTemplatingService.renderEvent(
             event = event,
@@ -49,15 +74,6 @@ class JiraCreationNotificationChannel(
             template = config.fixVersion,
             renderer = PlainEventRenderer.INSTANCE
         )
-
-        // Expanded labels
-        val expandedLabels = config.labels.map {
-            eventTemplatingService.renderEvent(
-                event = event,
-                template = it,
-                renderer = PlainEventRenderer.INSTANCE,
-            )
-        }
 
         // Custom fields
         val customFields = config.customFields.map { (name, value) ->
@@ -77,8 +93,6 @@ class JiraCreationNotificationChannel(
             renderer = jiraNotificationEventRenderer,
         )
 
-        // Gets the Jira client
-        val jiraClient = jiraSessionFactory.create(jiraConfig).client
         // Creates the issue
         val jiraIssueStub = jiraClient.createIssue(
             configuration = jiraConfig,
@@ -92,13 +106,15 @@ class JiraCreationNotificationChannel(
             body = body,
         )
         // OK
-        return NotificationResult.ok(
-            JiraCreationNotificationChannelOuput(
-                key = jiraIssueStub.key,
-                url = jiraIssueStub.url,
-            )
-        )
+        return jiraIssueStub.toNotificationResult()
     }
+
+    private fun JIRAIssueStub.toNotificationResult() = NotificationResult.ok(
+        JiraCreationNotificationChannelOuput(
+            key = key,
+            url = url,
+        )
+    )
 
     override fun toSearchCriteria(text: String): JsonNode =
         mapOf(

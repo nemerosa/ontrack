@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.jira.client
 import com.fasterxml.jackson.databind.node.TextNode
 import net.nemerosa.ontrack.extension.jira.notifications.JiraCustomField
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
@@ -53,6 +54,39 @@ class JiraClientRealIT : AbstractDSLTestSupport() {
                 assertNotNull(client.getIssue(key, config)) { issue ->
                     assertEquals("Sample title", issue.summary)
                 }
+            }
+        }
+    }
+
+    @Test
+    fun `Looking for an issue`() {
+        asAdmin {
+            jiraClientTestSupport.withRealJiraClient { client, config ->
+                // Unique label
+                val label = uid("test-")
+                // Creating the issue
+                val (key, _) = client.createIssue(
+                    configuration = config,
+                    project = jiraClientEnv.project,
+                    issueType = jiraClientEnv.issueType,
+                    labels = listOf(label),
+                    fixVersion = null,
+                    assignee = null,
+                    title = "Sample title",
+                    body = """
+                        Sample description
+                    """.trimIndent(),
+                    customFields = emptyList(),
+                )
+
+                // JQL
+                val jql =
+                    """project = ${jiraClientEnv.project} AND issuetype = ${jiraClientEnv.issueType} AND labels ="$label""""
+                val keys = client.searchIssueStubs(config, jql).map { it.key }
+                assertEquals(
+                    listOf(key),
+                    keys
+                )
             }
         }
     }

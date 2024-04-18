@@ -30,6 +30,10 @@ class MockJIRAClient(
         TODO("Not yet implemented")
     }
 
+    override fun searchIssueStubs(jiraConfiguration: JIRAConfiguration, jql: String): List<JIRAIssueStub> {
+        TODO("Not yet implemented")
+    }
+
     override val projects: List<String>
         get() = instance.projectNames
 

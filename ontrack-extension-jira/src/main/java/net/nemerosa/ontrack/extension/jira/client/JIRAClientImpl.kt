@@ -49,6 +49,25 @@ class JIRAClientImpl(
 
     }
 
+    override fun searchIssueStubs(jiraConfiguration: JIRAConfiguration, jql: String): List<JIRAIssueStub> =
+        try {
+            val node = restTemplate.getForObject<JsonNode>("/rest/api/2/search?jql=$jql")
+            node.path("issues").map {
+                it.getRequiredTextField("key")
+            }.map { key ->
+                JIRAIssueStub(
+                    key = key,
+                    url = jiraConfiguration.getIssueURL(key),
+                )
+            }
+        } catch (ex: Forbidden) {
+            // The issues cannot be accessed
+            // For the moment, ignoring silently
+            emptyList()
+        } catch (ex: NotFound) {
+            emptyList()
+        }
+
     override fun createIssue(
         configuration: JIRAConfiguration,
         project: String,

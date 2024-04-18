@@ -7,6 +7,8 @@ import org.springframework.test.web.client.ExpectedCount
 import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.client.match.MockRestRequestMatchers.*
 import org.springframework.web.client.RestTemplate
+import org.springframework.web.util.UriComponentsBuilder
+import java.net.URLEncoder
 
 @Component
 @ConditionalOnProperty(
@@ -47,6 +49,14 @@ class MockRestTemplateProvider : DefaultRestTemplateProvider() {
             )
         }
 
+        override fun onGetJson(uri: String, parameters: Map<String, String>, outcome: MockRestTemplateOutcome) {
+            actions += MockRestTemplateGetJsonAction(
+                path = uri,
+                parameters = parameters,
+                outcome = outcome
+            )
+        }
+
         fun start(template: RestTemplate) {
             mockServer = MockRestServiceServer.createServer(template)
             mockServer?.let {
@@ -81,6 +91,33 @@ class MockRestTemplateProvider : DefaultRestTemplateProvider() {
                 .expect(ExpectedCount.once(), requestTo(path))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().string(JsonBodyMatcher(body)))
+                .andRespond(outcome.responseCreator)
+        }
+
+    }
+
+    private class MockRestTemplateGetJsonAction(
+        private val path: String,
+        private val parameters: Map<String, String>,
+        private val outcome: MockRestTemplateOutcome
+    ) : MockRestTemplateAction {
+
+        override fun register(mockServer: MockRestServiceServer) {
+            @Suppress("VulnerableCodeUsages")
+            val completePath = UriComponentsBuilder.fromUriString(path)
+                .apply {
+                    parameters.forEach { (name, value) ->
+                        queryParam(
+                            name, URLEncoder.encode(value, Charsets.UTF_8)
+                                .replace("+", "%20")
+                        )
+                    }
+                }
+                .build()
+                .toUriString()
+            mockServer
+                .expect(ExpectedCount.once(), requestTo(completePath))
+                .andExpect(method(HttpMethod.GET))
                 .andRespond(outcome.responseCreator)
         }
 

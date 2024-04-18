@@ -176,8 +176,6 @@ class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
         }
     }
 
-    // TODO Not checking a Jira ticket existence on a new promotion by default
-
     @Test
     fun `Checking a Jira ticket existence on a new promotion`() {
         asAdmin {
@@ -218,33 +216,25 @@ class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
 
                     val build = build()
 
-                    // Mocking the call to Jira
-                    mockRestTemplateContext.onPostJson(
-                        uri = "http://jira/rest/api/2/issue",
-                        body = mapOf(
-                            "fields" to mapOf(
-                                "project" to mapOf(
-                                    "key" to jiraProjectName,
-                                ),
-                                "summary" to "Build ${build.name} has been promoted to ${pl.name}",
-                                "issuetype" to mapOf(
-                                    "name" to "Test"
-                                ),
-                                "labels" to listOf("test", "v${build.name}"),
-                                "description" to """
-                                    Build [${build.name}|http://localhost:8080/#/build/${build.id}] has been promoted to [${pl.name}|http://localhost:8080/#/promotionLevel/${pl.id}].
-                                """.trimIndent(),
-                            )
+                    // Mocking the calls to GET the issue, returning one
+                    val jql =
+                        """project = $jiraProjectName AND issuetype = Test AND labels = "test" AND labels = "v${build.name}""""
+                    mockRestTemplateContext.onGetJson(
+                        uri = "http://jira/rest/api/2/search",
+                        parameters = mapOf(
+                            "jql" to jql,
                         ),
                         outcome = success(
                             mapOf(
-                                "key" to "$jiraProjectName-234",
+                                "issues" to listOf(
+                                    mapOf(
+                                        "key" to "$jiraProjectName-234",
+                                    )
+                                )
                             )
                         )
                     )
 
-                    build.promote(pl)
-                    // Promoting a second time, this should not trigger the creation of the ticket
                     build.promote(pl)
 
                     // We expect the ticket to have been created
@@ -253,8 +243,7 @@ class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
                     // Checks the outputs of the notification (key + url)
                     assertEquals(
                         listOf(
-                            "$jiraProjectName-234",
-                            "$jiraProjectName-234", // Returned the same key
+                            "$jiraProjectName-234"
                         ),
                         notificationRecordingService.filter(
                             filter = NotificationRecordFilter(

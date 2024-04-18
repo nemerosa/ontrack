@@ -12,6 +12,15 @@ interface MockRestTemplateContext {
     )
 
     /**
+     * Getting some JSON
+     */
+    fun onGetJson(
+        uri: String,
+        parameters: Map<String, String>,
+        outcome: MockRestTemplateOutcome,
+    )
+
+    /**
      * Checks that all calls have been realized.
      */
     fun verify()
