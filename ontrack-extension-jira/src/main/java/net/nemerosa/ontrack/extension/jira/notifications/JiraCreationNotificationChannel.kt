@@ -49,6 +49,15 @@ class JiraCreationNotificationChannel(
             renderer = PlainEventRenderer.INSTANCE
         )
 
+        // Expanded labels
+        val expandedLabels = config.labels.map {
+            eventTemplatingService.renderEvent(
+                event = event,
+                template = it,
+                renderer = PlainEventRenderer.INSTANCE,
+            )
+        }
+
         // Custom fields
         val customFields = config.customFields.map { (name, value) ->
             JiraCustomField(name, value.transform { text ->
@@ -74,7 +83,7 @@ class JiraCreationNotificationChannel(
             configuration = jiraConfig,
             project = config.projectName,
             issueType = config.issueType,
-            labels = config.labels,
+            labels = expandedLabels,
             fixVersion = fixVersion,
             assignee = config.assignee,
             title = title,

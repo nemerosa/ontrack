@@ -81,7 +81,7 @@ class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
                             configName = configuration.name,
                             projectName = jiraProjectName,
                             issueType = "Test",
-                            labels = listOf("test"),
+                            labels = listOf("test", "v\${build}"),
                             fixVersion = "v\${build}",
                             assignee = "dcoraboeuf",
                             titleTemplate = "Build \${build} has been promoted to \${promotionLevel}",
@@ -117,13 +117,13 @@ class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
                         body = mapOf(
                             "fields" to mapOf(
                                 "project" to mapOf(
-                                    "name" to jiraProjectName,
+                                    "key" to jiraProjectName,
                                 ),
                                 "summary" to "Build ${build.name} has been promoted to ${pl.name}",
                                 "issuetype" to mapOf(
                                     "name" to "Test"
                                 ),
-                                "labels" to listOf("test"),
+                                "labels" to listOf("test", "v${build.name}"),
                                 "description" to """
                                     <p>Build <a href="http://localhost:8080/#/build/${build.id}">${build.name}</a> has been promoted to <a href="http://localhost:8080/#/promotionLevel/${pl.id}">${pl.name}</a>.</p>
                                 """.trimIndent(),
