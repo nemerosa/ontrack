@@ -13,6 +13,7 @@ import {gqlDecorationFragment} from "@components/services/fragments";
 import Decorations from "@components/framework/decorations/Decorations";
 import {isAuthorized} from "@components/common/authorizations";
 import PromotionLevelCreateCommand from "@components/promotionLevels/PromotionLevelCreateCommand";
+import {useEventForRefresh} from "@components/common/EventsContext";
 
 export default function BranchPromotionLevelsView({id}) {
 
@@ -21,6 +22,8 @@ export default function BranchPromotionLevelsView({id}) {
     const [loading, setLoading] = useState(true)
     const [branch, setBranch] = useState({project: {}})
     const [commands, setCommands] = useState([])
+
+    const refreshCount = useEventForRefresh("promotionLevel.created")
 
     useEffect(() => {
         if (client && id) {
@@ -67,7 +70,7 @@ export default function BranchPromotionLevelsView({id}) {
                 const commands = []
                 if (isAuthorized(data.branch, 'promotion_level', 'create')) {
                     commands.push(
-                        <PromotionLevelCreateCommand key="create"/>
+                        <PromotionLevelCreateCommand key="create" branch={data.branch}/>
                     )
                 }
                 commands.push(
@@ -78,7 +81,7 @@ export default function BranchPromotionLevelsView({id}) {
                 setLoading(false)
             })
         }
-    }, [client, id]);
+    }, [client, id, refreshCount]);
 
     return (
         <>

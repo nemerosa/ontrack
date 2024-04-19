@@ -1,35 +1,30 @@
 import FormDialog, {useFormDialog} from "@components/form/FormDialog";
-import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
-import {getPromotionLevelById, gqlPromotionLevelFragment} from "@components/services/fragments";
-import {gql} from "graphql-request";
-import {EventsContext} from "@components/common/EventsContext";
-import {useContext} from "react";
 import PromotionLevelFormItemDescription from "@components/promotionLevels/PromotionLevelFormItemDescription";
 import PromotionLevelFormItemName from "@components/promotionLevels/PromotionLevelFormItemName";
+import {EventsContext} from "@components/common/EventsContext";
+import {gqlPromotionLevelFragment} from "@components/services/fragments";
+import {gql} from "graphql-request";
+import {useContext} from "react";
 
-export const usePromotionLevelUpdateDialog = () => {
+export const usePromotionLevelCreateDialog = () => {
 
-    const client = useGraphQLClient()
     const eventsContext = useContext(EventsContext)
 
     return useFormDialog({
-        init: (form, {id}) => {
-            getPromotionLevelById(client, id).then(pl => form.setFieldsValue(pl))
-        },
-        prepareValues: (values, {id}) => {
+        prepareValues: (values, {branch}) => {
             return {
                 ...values,
-                id,
+                branchId: branch.id,
             }
         },
         query: gql`
-            mutation UpdatePromotionLevel(
-                $id: Int!,
+            mutation CreatePromotionLevel(
+                $branchId: Int!,
                 $name: String!,
                 $description: String!,
             ) {
-                updatePromotionLevelById(input: {
-                    id: $id,
+                createPromotionLevelById(input: {
+                    branchId: $branchId,
                     name: $name,
                     description: $description,
                 }) {
@@ -43,17 +38,17 @@ export const usePromotionLevelUpdateDialog = () => {
             }
             ${gqlPromotionLevelFragment}
         `,
-        userNode: 'updatePromotionLevelById',
-        onSuccess: (updatePromotionLevelById) => {
-            eventsContext.fireEvent("promotionLevel.updated", {...updatePromotionLevelById.promotionLevel})
+        userNode: 'createPromotionLevelById',
+        onSuccess: (createPromotionLevelById) => {
+            eventsContext.fireEvent("promotionLevel.created", {...createPromotionLevelById.promotionLevel})
         }
     })
 }
 
-export default function PromotionLevelUpdateDialog({promotionLevelUpdateDialog}) {
+export default function PromotionLevelCreateDialog({dialog}) {
     return (
         <>
-            <FormDialog dialog={promotionLevelUpdateDialog}>
+            <FormDialog dialog={dialog}>
                 <PromotionLevelFormItemName/>
                 <PromotionLevelFormItemDescription/>
             </FormDialog>
