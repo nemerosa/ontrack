@@ -46,7 +46,12 @@ class MailNotificationChannel(
 
     override fun toText(config: MailNotificationChannelConfig): String = config.subject
 
-    override fun publish(config: MailNotificationChannelConfig, event: Event, template: String?): NotificationResult<MailNotificationChannelOutput> {
+    override fun publish(
+        config: MailNotificationChannelConfig,
+        event: Event,
+        template: String?,
+        outputProgressCallback: (current: MailNotificationChannelOutput) -> MailNotificationChannelOutput
+    ): NotificationResult<MailNotificationChannelOutput> {
         // Subject as a template
         val subject = eventTemplatingService.render(
             template = config.subject,

@@ -39,7 +39,8 @@ class InMemoryNotificationChannel(
     override fun publish(
         config: InMemoryNotificationChannelConfig,
         event: Event,
-        template: String?
+        template: String?,
+        outputProgressCallback: (current: InMemoryNotificationChannelOutput) -> InMemoryNotificationChannelOutput
     ): NotificationResult<InMemoryNotificationChannelOutput> {
         val text = eventTemplatingService.renderEvent(
             event,

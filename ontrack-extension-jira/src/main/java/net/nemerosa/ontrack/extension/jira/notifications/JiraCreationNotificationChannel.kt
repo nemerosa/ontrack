@@ -11,12 +11,13 @@ import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.transform
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
-import net.nemerosa.ontrack.model.events.HtmlNotificationEventRenderer
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.multiStrings
 import net.nemerosa.ontrack.model.form.textField
 import net.nemerosa.ontrack.model.form.yesNoField
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
 @Component
@@ -25,17 +26,23 @@ class JiraCreationNotificationChannel(
     private val jiraSessionFactory: JIRASessionFactory,
     private val eventTemplatingService: EventTemplatingService,
     private val jiraNotificationEventRenderer: JiraNotificationEventRenderer,
-) : AbstractNotificationChannel<JiraCreationNotificationChannelConfig, JiraCreationNotificationChannelOuput>(
+) : AbstractNotificationChannel<JiraCreationNotificationChannelConfig, JiraCreationNotificationChannelOutput>(
     JiraCreationNotificationChannelConfig::class
 ) {
+
+    private val logger: Logger = LoggerFactory.getLogger(JiraCreationNotificationChannel::class.java)
 
     override fun publish(
         config: JiraCreationNotificationChannelConfig,
         event: Event,
-        template: String?
-    ): NotificationResult<JiraCreationNotificationChannelOuput> {
+        template: String?,
+        outputProgressCallback: (current: JiraCreationNotificationChannelOutput) -> JiraCreationNotificationChannelOutput,
+    ): NotificationResult<JiraCreationNotificationChannelOutput> {
         // Getting the Jira configuration
         val jiraConfig: JIRAConfiguration = jiraConfigurationService.getConfiguration(config.configName)
+
+        // Output
+        var output = outputProgressCallback(JiraCreationNotificationChannelOutput())
 
         // Expanded labels
         val expandedLabels = config.labels.map {
@@ -46,6 +53,8 @@ class JiraCreationNotificationChannel(
             )
         }
 
+        output = outputProgressCallback(output.withLabels(expandedLabels))
+
         // Gets the Jira client
         val jiraClient = jiraSessionFactory.create(jiraConfig).client
 
@@ -55,9 +64,12 @@ class JiraCreationNotificationChannel(
             expandedLabels.forEach { label ->
                 jql += """ AND labels = "$label""""
             }
+            output = outputProgressCallback(output.withJql(jql))
             val existingStub = jiraClient.searchIssueStubs(jiraConfig, jql).firstOrNull()
             if (existingStub != null) {
-                return existingStub.toNotificationResult()
+                return NotificationResult.ok(output.withStub(existingStub).withExisting(true))
+            } else {
+                output = outputProgressCallback(output.withExisting(false))
             }
         }
 
@@ -67,6 +79,7 @@ class JiraCreationNotificationChannel(
             template = config.titleTemplate,
             renderer = PlainEventRenderer.INSTANCE
         )
+        output = outputProgressCallback(output.withTitle(title))
 
         // Fix version
         val fixVersion = config.fixVersion
@@ -78,6 +91,7 @@ class JiraCreationNotificationChannel(
                     renderer = PlainEventRenderer.INSTANCE
                 )
             }
+        output = outputProgressCallback(output.withFixVersion(fixVersion))
 
         // Custom fields
         val customFields = config.customFields.map { (name, value) ->
@@ -89,6 +103,7 @@ class JiraCreationNotificationChannel(
                 )
             })
         }
+        output = outputProgressCallback(output.withCustomFields(customFields))
 
         // Body
         val body = eventTemplatingService.renderEvent(
@@ -96,6 +111,7 @@ class JiraCreationNotificationChannel(
             template = template,
             renderer = jiraNotificationEventRenderer,
         )
+        output = outputProgressCallback(output.withBody(body))
 
         // Creates the issue
         val jiraIssueStub = jiraClient.createIssue(
@@ -109,16 +125,10 @@ class JiraCreationNotificationChannel(
             customFields = customFields,
             body = body,
         )
-        // OK
-        return jiraIssueStub.toNotificationResult()
-    }
 
-    private fun JIRAIssueStub.toNotificationResult() = NotificationResult.ok(
-        JiraCreationNotificationChannelOuput(
-            key = key,
-            url = url,
-        )
-    )
+        // OK
+        return NotificationResult.ok(output.withStub(jiraIssueStub))
+    }
 
     override fun toSearchCriteria(text: String): JsonNode =
         mapOf(

@@ -26,6 +26,7 @@ class MockNotificationChannel(
         config: MockNotificationChannelConfig,
         event: Event,
         template: String?,
+        outputProgressCallback: (current: MockNotificationChannelOutput) -> MockNotificationChannelOutput
     ): NotificationResult<MockNotificationChannelOutput> {
         val text = eventTemplatingService.renderEvent(
             event,

@@ -69,7 +69,7 @@ class SlackNotificationChannelTest {
 
         every { slackService.sendNotification(any(), any(), any()) } returns true
         val config = SlackNotificationChannelConfig(channel = "#test", type = SlackNotificationType.SUCCESS)
-        val result = channel.publish(config, event, template = null)
+        val result = channel.publish(config, event, template = null, outputProgressCallback = { it })
         verify {
             slackService.sendNotification(
                 "#test",
@@ -88,7 +88,7 @@ class SlackNotificationChannelTest {
         )
         every { slackService.sendNotification(any(), any(), any()) } returns false // <== returning an error
         val config = SlackNotificationChannelConfig(channel = "#test")
-        val result = channel.publish(config, event, template = null)
+        val result = channel.publish(config, event, template = null, outputProgressCallback = { it })
         assertEquals(NotificationResultType.ERROR, result.type)
         assertEquals("Slack message could not be sent. Check the operational logs.", result.message)
     }

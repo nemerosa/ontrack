@@ -25,6 +25,7 @@ class WebhookNotificationChannel(
         config: WebhookNotificationChannelConfig,
         event: Event,
         template: String?,
+        outputProgressCallback: (current: WebhookNotificationChannelOutput) -> WebhookNotificationChannelOutput
     ): NotificationResult<WebhookNotificationChannelOutput> {
         // Gets the webhook
         val webhook = webhookAdminService.findWebhookByName(config.name)

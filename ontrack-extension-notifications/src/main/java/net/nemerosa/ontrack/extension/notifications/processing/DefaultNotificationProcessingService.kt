@@ -41,12 +41,22 @@ class DefaultNotificationProcessingService(
     private fun <C, R> process(channel: NotificationChannel<C, R>, item: Notification) {
         val validatedConfig = channel.validate(item.channelConfig)
         if (validatedConfig.config != null) {
+
+            // Current output progress
+            var output: R? = null
+            val outputProgressCallback: (R) -> R = { current ->
+                output = current
+                current
+            }
+
             try {
                 meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_publishing, item)
+
                 val result = channel.publish(
                     config = validatedConfig.config,
                     event = item.event,
                     template = item.template,
+                    outputProgressCallback = outputProgressCallback,
                 )
                 meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_result, item, result)
                 record(
@@ -62,6 +72,7 @@ class DefaultNotificationProcessingService(
                     channelConfig = validatedConfig.config,
                     event = item.event,
                     error = any,
+                    output = output, // Using the current output, even for errors
                 )
             }
         } else {
@@ -97,6 +108,7 @@ class DefaultNotificationProcessingService(
         channelConfig: Any,
         event: Event,
         error: Exception,
+        output: Any?,
     ) {
         notificationRecordingService.record(
             NotificationRecord(
@@ -105,7 +117,8 @@ class DefaultNotificationProcessingService(
                 channel = channel,
                 channelConfig = channelConfig.asJson(),
                 event = event.asJson(),
-                result = NotificationResult.error<Any>(ExceptionUtils.getStackTrace(error)).toNotificationRecordResult(),
+                result = NotificationResult.error<Any>(ExceptionUtils.getStackTrace(error), output)
+                    .toNotificationRecordResult(),
             )
         )
     }

@@ -25,7 +25,8 @@ class OtherMockNotificationChannel(
     override fun publish(
         config: MockNotificationChannelConfig,
         event: Event,
-        template: String?
+        template: String?,
+        outputProgressCallback: (current: MockNotificationChannelOutput) -> MockNotificationChannelOutput
     ): NotificationResult<MockNotificationChannelOutput> {
         val text = eventTemplatingService.renderEvent(
             event,

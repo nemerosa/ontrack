@@ -4,6 +4,7 @@ import {useEffect, useState} from "react";
 import {gql} from "graphql-request";
 import Link from "next/link";
 import YesNo from "@components/common/YesNo";
+import JiraCustomFields from "@components/extension/jira/JiraCustomFields";
 
 export default function JiraCreationNotificationChannelConfig({
                                                                   configName,
@@ -94,19 +95,7 @@ export default function JiraCreationNotificationChannelConfig({
         {
             key: 'customFields',
             label: 'Custom fields',
-            children: customFields && customFields.length > 0 ?
-                <Descriptions
-                    column={12}
-                    items={
-                        customFields.map(({name, value}) => ({
-                            key: name,
-                            label: name,
-                            children: <Typography.Text code>{JSON.stringify(value, null, 2)}</Typography.Text>,
-                            span: 12,
-                        }))
-                    }
-                /> :
-                <Typography.Text type="secondary">None</Typography.Text>,
+            children: <JiraCustomFields customFields={customFields}/>,
             span: 12,
         },
     ]

@@ -21,7 +21,8 @@ abstract class AbstractJenkinsNotificationChannel(
     override fun publish(
         config: JenkinsNotificationChannelConfig,
         event: Event,
-        template: String?
+        template: String?,
+        outputProgressCallback: (current: JenkinsNotificationChannelOutput) -> JenkinsNotificationChannelOutput
     ): NotificationResult<JenkinsNotificationChannelOutput> {
         // Gets the Jenkins configuration
         val jenkinsConfig = jenkinsConfigurationService.findConfiguration(config.config)

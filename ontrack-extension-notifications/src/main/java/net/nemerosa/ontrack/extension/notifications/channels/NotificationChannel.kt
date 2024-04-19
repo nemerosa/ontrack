@@ -20,9 +20,15 @@ interface NotificationChannel<C, R> {
      * @param config Configuration for the channel
      * @param event Event to send notification about
      * @param template Alternative template to the default event message
+     * @param outputProgressCallback Gives the opportunity to the channel to register some progress on its output
      * @return Response by the channel
      */
-    fun publish(config: C, event: Event, template: String?): NotificationResult<R>
+    fun publish(
+        config: C,
+        event: Event,
+        template: String?,
+        outputProgressCallback: (current: R) -> R,
+    ): NotificationResult<R>
 
     /**
      * Given a search token, returns a configuration which would match a JSON.

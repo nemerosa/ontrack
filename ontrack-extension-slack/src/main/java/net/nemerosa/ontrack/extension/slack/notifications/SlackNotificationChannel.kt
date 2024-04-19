@@ -27,7 +27,8 @@ class SlackNotificationChannel(
     override fun publish(
         config: SlackNotificationChannelConfig,
         event: Event,
-        template: String?
+        template: String?,
+        outputProgressCallback: (current: SlackNotificationChannelOutput) -> SlackNotificationChannelOutput
     ): NotificationResult<SlackNotificationChannelOutput> {
         // Formatting the message
         val message = format(event, template)
