@@ -1,5 +1,5 @@
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import Head from "next/head";
 import {subBranchTitle} from "@components/common/Titles";
 import {downToBranchBreadcrumbs} from "@components/common/Breadcrumbs";
@@ -13,7 +13,8 @@ import {gqlDecorationFragment} from "@components/services/fragments";
 import Decorations from "@components/framework/decorations/Decorations";
 import {isAuthorized} from "@components/common/authorizations";
 import PromotionLevelCreateCommand from "@components/promotionLevels/PromotionLevelCreateCommand";
-import {useEventForRefresh} from "@components/common/EventsContext";
+import {EventsContext, useEventForRefresh} from "@components/common/EventsContext";
+import SortableList, {SortableItem, SortableKnob} from "react-easy-sort";
 
 export default function BranchPromotionLevelsView({id}) {
 
@@ -23,7 +24,9 @@ export default function BranchPromotionLevelsView({id}) {
     const [branch, setBranch] = useState({project: {}})
     const [commands, setCommands] = useState([])
 
-    const refreshCount = useEventForRefresh("promotionLevel.created")
+    const eventsContext = useContext(EventsContext)
+    const refreshCreationCount = useEventForRefresh("promotionLevel.created")
+    const refreshReorderCount = useEventForRefresh("promotionLevel.reordered")
 
     useEffect(() => {
         if (client && id) {
@@ -81,7 +84,41 @@ export default function BranchPromotionLevelsView({id}) {
                 setLoading(false)
             })
         }
-    }, [client, id, refreshCount]);
+    }, [client, id, refreshCreationCount, refreshReorderCount]);
+
+    const onSortEnd = (oldIndex, newIndex) => {
+        setLoading(true)
+        const oldName = branch.promotionLevels[oldIndex].name
+        const newName = branch.promotionLevels[newIndex].name
+        client.request(
+            gql`
+                mutation ReorderPromotionLevels(
+                    $branchId: Int!,
+                    $oldName: String!,
+                    $newName: String!,
+                ) {
+                    reorderPromotionLevelById(input: {
+                        branchId: $branchId,
+                        oldName: $oldName,
+                        newName: $newName,
+                    }) {
+                        errors {
+                            message
+                        }
+                    }
+                }
+            `,
+            {
+                branchId: branch.id,
+                oldName,
+                newName,
+            }
+        ).then(() => {
+            eventsContext.fireEvent("promotionLevel.reordered")
+        }).finally(() => {
+            setLoading(false)
+        })
+    }
 
     return (
         <>
@@ -94,23 +131,28 @@ export default function BranchPromotionLevelsView({id}) {
                     breadcrumbs={downToBranchBreadcrumbs({branch})}
                     commands={commands}
                 >
-                    <List
-                        itemLayout="horizontal"
-                        dataSource={branch.promotionLevels}
-                        renderItem={(pl) => (
-                            <List.Item>
-                                <List.Item.Meta
-                                    title={
-                                        <Space>
-                                            <PromotionLevelLink promotionLevel={pl}/>
-                                            <Decorations entity={pl}/>
-                                        </Space>
-                                    }
-                                    description={pl.description}
-                                />
-                            </List.Item>
-                        )}
-                    />
+                    <SortableList onSortEnd={onSortEnd} handle=".drag-handle">
+                        <List
+                            itemLayout="horizontal"
+                            dataSource={branch.promotionLevels}
+                            renderItem={(pl, index) => (
+                                <SortableItem key={pl.id} index={index}>
+                                    <List.Item className="no-select">
+                                        <SortableKnob><div style={{ cursor: 'grab', marginRight: 8 }}>☰</div></SortableKnob>
+                                        <List.Item.Meta
+                                            title={
+                                                <Space>
+                                                    <PromotionLevelLink promotionLevel={pl}/>
+                                                    <Decorations entity={pl}/>
+                                                </Space>
+                                            }
+                                            description={pl.description}
+                                        />
+                                    </List.Item>
+                                </SortableItem>
+                            )}
+                        />
+                    </SortableList>
                 </MainPage>
             </Skeleton>
         </>

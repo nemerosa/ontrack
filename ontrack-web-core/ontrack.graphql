@@ -3580,6 +3580,11 @@ type Mutation {
     purgeQueueRecordings: PurgeQueueRecordingsPayload
     "Reload the configuration from the CasC files"
     reloadCasc: ReloadCascPayload
+    "Reordering the promotion levels in a branch"
+    reorderPromotionLevelById(
+        "Input for the mutation"
+        input: ReorderPromotionLevelByIdInput
+    ): ReorderPromotionLevelByIdPayload
     "Resuming the execution of all jobs"
     resumeAllJobs: JobActionResult!
     "Resumes a job"
@@ -5468,6 +5473,12 @@ type RateLimit {
 
 "Output type for the reloadCasc mutation."
 type ReloadCascPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
+"Output type for the reorderPromotionLevelById mutation."
+type ReorderPromotionLevelByIdPayload implements Payload {
     "List of errors"
     errors: [UserError]
 }
@@ -8657,6 +8668,16 @@ input QueueRecordingFilterInput {
     state: QueueRecordState
     "Filtering using some free text in the payload"
     text: String
+}
+
+"Input type for the reorderPromotionLevelById mutation."
+input ReorderPromotionLevelByIdInput {
+    "Branch ID"
+    branchId: Int!
+    "New name to swap"
+    newName: String!
+    "Old name to swap"
+    oldName: String!
 }
 
 "Input type for the revokeAccountTokens mutation."

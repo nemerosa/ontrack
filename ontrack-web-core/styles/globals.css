@@ -1,4 +1,14 @@
 /**
+ * To be set on SortableList/Item to prevent text selection during dragging.
+ */
+.no-select {
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none;    /* Firefox */
+    -ms-user-select: none;     /* IE 10+ and Edge */
+    user-select: none;         /* Standard syntax */
+}
+
+/**
  * For any component which must span 100% of the horizontal space
  */
 .ot-line {

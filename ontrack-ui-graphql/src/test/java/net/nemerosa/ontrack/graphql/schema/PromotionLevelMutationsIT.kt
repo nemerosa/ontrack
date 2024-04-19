@@ -75,4 +75,61 @@ class PromotionLevelMutationsIT : AbstractQLKTITSupport() {
         }
     }
 
+    @Test
+    fun `Reordering the promotion levels`() {
+        asAdmin {
+            project {
+                branch {
+                    promotionLevel("PLATINUM")
+                    promotionLevel("GOLD")
+                    promotionLevel("SILVER")
+                    promotionLevel("BRONZE")
+
+                    fun swap(oldName: String, newName: String) {
+                        run(
+                            """
+                            mutation {
+                                reorderPromotionLevelById(input: {
+                                    branchId: $id,
+                                    oldName: "$oldName",
+                                    newName: "$newName",
+                                }) {
+                                    errors {
+                                        message
+                                    }
+                                }
+                            }
+                        """
+                        ) { data ->
+                            checkGraphQLUserErrors(data, "reorderPromotionLevelById")
+                        }
+                    }
+
+                    swap("BRONZE", "PLATINUM")
+                    assertEquals(
+                        listOf(
+                            "BRONZE",
+                            "GOLD",
+                            "SILVER",
+                            "PLATINUM",
+                        ),
+                        structureService.getPromotionLevelListForBranch(id).map { it.name }
+                    )
+
+                    swap("GOLD", "SILVER")
+                    assertEquals(
+                        listOf(
+                            "BRONZE",
+                            "SILVER",
+                            "GOLD",
+                            "PLATINUM",
+                        ),
+                        structureService.getPromotionLevelListForBranch(id).map { it.name }
+                    )
+
+                }
+            }
+        }
+    }
+
 }

@@ -4,10 +4,7 @@ import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.exceptions.BranchNotFoundException
 import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.model.structure.ID
-import net.nemerosa.ontrack.model.structure.NameDescription
-import net.nemerosa.ontrack.model.structure.PromotionLevel
-import net.nemerosa.ontrack.model.structure.StructureService
+import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
@@ -94,6 +91,32 @@ class PromotionLevelMutations(
             ) { input ->
                 structureService.bulkUpdatePromotionLevels(ID.of(input.id))
             },
+            /**
+             * Reordering promotion levels
+             */
+            unitMutation<ReorderPromotionLevelByIdInput>(
+                name = "reorderPromotionLevelById",
+                description = "Reordering the promotion levels in a branch"
+            ) { input ->
+                val branchId = ID.of(input.branchId)
+                // Loads the current promotion levels
+                val list = structureService.getPromotionLevelListForBranch(branchId).toMutableList()
+                // Gets the indexes
+                val oldIndex = list.indexOfFirst { it.name == input.oldName }
+                val newIndex = list.indexOfFirst { it.name == input.newName }
+                // If indexes are equal of not valid, skip
+                if (oldIndex >= 0 && newIndex >= 0 && oldIndex != newIndex) {
+                    val oldItem = list[oldIndex]
+                    list[oldIndex] = list[newIndex]
+                    list[newIndex] = oldItem
+                    // Collecting the IDs
+                    val ids = list.map { it.id() }
+                    structureService.reorderPromotionLevels(
+                        branchId,
+                        Reordering(ids)
+                    )
+                }
+            }
         )
 
     private fun setupPromotionLevel(input: SetupPromotionLevelInput): PromotionLevel {
@@ -170,5 +193,14 @@ data class DeletePromotionLevelByIdInput(
 data class BulkUpdatePromotionLevelByIdInput(
     @APIDescription("Promotion level ID")
     val id: Int,
+)
+
+data class ReorderPromotionLevelByIdInput(
+    @APIDescription("Branch ID")
+    val branchId: Int,
+    @APIDescription("Old name to swap")
+    val oldName: String,
+    @APIDescription("New name to swap")
+    val newName: String,
 )
 
