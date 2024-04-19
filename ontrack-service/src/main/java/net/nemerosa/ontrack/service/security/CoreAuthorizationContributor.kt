@@ -10,6 +10,7 @@ class CoreAuthorizationContributor : AuthorizationContributor {
         const val GLOBAL = "global"
         const val USER = "user"
         const val PROJECT = "project"
+        const val BRANCH = "branch"
         const val PROMOTION_LEVEL = "promotion_level"
         const val VALIDATION_STAMP = "validation_stamp"
     }

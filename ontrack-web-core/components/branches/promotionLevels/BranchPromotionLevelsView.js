@@ -11,6 +11,8 @@ import {branchUri} from "@components/common/Links";
 import PromotionLevelLink from "@components/promotionLevels/PromotionLevelLink";
 import {gqlDecorationFragment} from "@components/services/fragments";
 import Decorations from "@components/framework/decorations/Decorations";
+import {isAuthorized} from "@components/common/authorizations";
+import PromotionLevelCreateCommand from "@components/promotionLevels/PromotionLevelCreateCommand";
 
 export default function BranchPromotionLevelsView({id}) {
 
@@ -32,6 +34,11 @@ export default function BranchPromotionLevelsView({id}) {
                             project {
                                 id
                                 name
+                            }
+                            authorizations {
+                                name
+                                action
+                                authorized
                             }
                             promotionLevels {
                                 id
@@ -58,8 +65,13 @@ export default function BranchPromotionLevelsView({id}) {
                 setBranch(data.branch)
 
                 const commands = []
+                if (isAuthorized(data.branch, 'promotion_level', 'create')) {
+                    commands.push(
+                        <PromotionLevelCreateCommand key="create"/>
+                    )
+                }
                 commands.push(
-                    <CloseCommand href={branchUri(data.branch)}/>
+                    <CloseCommand key="close" href={branchUri(data.branch)}/>
                 )
                 setCommands(commands)
             }).finally(() => {

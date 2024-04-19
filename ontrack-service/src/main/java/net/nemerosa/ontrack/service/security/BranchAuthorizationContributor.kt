@@ -9,29 +9,30 @@ class BranchAuthorizationContributor(
     private val securityService: SecurityService,
 ) : AuthorizationContributor {
 
-    companion object {
-        const val BRANCH = "branch"
-    }
-
     override fun appliesTo(context: Any): Boolean = context is Branch
 
     override fun getAuthorizations(user: OntrackAuthenticatedUser, context: Any): List<Authorization> =
         (context as Branch).let { branch ->
             listOf(
                 Authorization(
-                    BRANCH,
+                    CoreAuthorizationContributor.BRANCH,
                     "build_filter_manage",
                     securityService.isProjectFunctionGranted<BranchFilterMgt>(branch)
                 ),
                 Authorization(
-                    BRANCH,
+                    CoreAuthorizationContributor.BRANCH,
                     "validation_stamp_filter_create",
                     securityService.isProjectFunctionGranted<ValidationStampFilterCreate>(branch)
                 ),
                 Authorization(
-                    BRANCH,
+                    CoreAuthorizationContributor.BRANCH,
                     "validation_stamp_filter_share",
                     securityService.isProjectFunctionGranted<ValidationStampFilterShare>(branch)
+                ),
+                Authorization(
+                    CoreAuthorizationContributor.PROMOTION_LEVEL,
+                    Authorization.CREATE,
+                    securityService.isProjectFunctionGranted<PromotionLevelCreate>(branch)
                 ),
             )
         }
