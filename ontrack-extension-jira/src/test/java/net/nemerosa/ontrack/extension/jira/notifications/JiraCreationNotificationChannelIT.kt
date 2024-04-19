@@ -56,7 +56,7 @@ class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
     }
 
     @Test
-    fun `Creating a Jira ticket on a new promotion`() {
+    fun `Creating a Jira ticket on a new promotion with a fix version`() {
         asAdmin {
 
             // Jira project name
@@ -135,6 +135,122 @@ class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
                                     mapOf(
                                         "name" to "v${build.name}"
                                     )
+                                ),
+                                "duedate" to "2024-04-16",
+                                "customfield_11000" to "Some direct value",
+                                "customfield_12000" to mapOf(
+                                    "value" to "Promotion level name ${pl.name}"
+                                ),
+                            )
+                        ),
+                        outcome = success(
+                            mapOf(
+                                "key" to "$jiraProjectName-123",
+                            )
+                        )
+                    )
+
+                    build.promote(pl)
+
+                    // Checks that the call has been done
+                    mockRestTemplateContext.verify()
+
+                    // Checks the output of the notification (key + url)
+                    assertNotNull(
+                        notificationRecordingService.filter(
+                            filter = NotificationRecordFilter(
+                                channel = "jira-creation"
+                            )
+                        ).pageItems.firstOrNull()
+                    ) { record ->
+                        assertNotNull(record.result.output) { output ->
+                            val key = output.getRequiredTextField("key")
+                            assertEquals(
+                                "http://jira/browse/$key",
+                                output.getRequiredTextField("url")
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Creating a Jira ticket on a new promotion without a fix version`() {
+        asAdmin {
+
+            // Jira project name
+            val jiraProjectName = uid("J")
+
+            // Jira configuration
+            val configuration = JIRAFixtures.jiraConfiguration()
+            withDisabledConfigurationTest {
+                jiraConfigurationService.newConfiguration(
+                    configuration
+                )
+            }
+
+            project {
+                branch {
+                    val pl = promotionLevel()
+
+                    // Setting up the Jira notification
+                    eventSubscriptionService.subscribe(
+                        channel = jiraCreationNotificationChannel,
+                        channelConfig = JiraCreationNotificationChannelConfig(
+                            configName = configuration.name,
+                            useExisting = false,
+                            projectName = jiraProjectName,
+                            issueType = "Test",
+                            labels = listOf("test", "v\${build}"),
+                            fixVersion = null,
+                            assignee = "dcoraboeuf",
+                            titleTemplate = "Build \${build} has been promoted to \${promotionLevel}",
+                            customFields = listOf(
+                                JiraCustomField(
+                                    "duedate",
+                                    TextNode("2024-04-16")
+                                ),
+                                JiraCustomField(
+                                    "customfield_11000",
+                                    TextNode("Some direct value")
+                                ),
+                                JiraCustomField(
+                                    "customfield_12000",
+                                    mapOf(
+                                        "value" to "Promotion level name \${promotionLevel}",
+                                    ).asJson()
+                                ),
+                            ),
+                        ),
+                        projectEntity = pl,
+                        keywords = null,
+                        origin = "test",
+                        contentTemplate = "Build \${build} has been promoted to \${promotionLevel}.",
+                        EventFactory.NEW_PROMOTION_RUN,
+                    )
+
+                    val build = build()
+
+                    // Mocking the call to Jira
+                    mockRestTemplateContext.onPostJson(
+                        uri = "http://jira/rest/api/2/issue",
+                        body = mapOf(
+                            "fields" to mapOf(
+                                "project" to mapOf(
+                                    "key" to jiraProjectName,
+                                ),
+                                "summary" to "Build ${build.name} has been promoted to ${pl.name}",
+                                "issuetype" to mapOf(
+                                    "name" to "Test"
+                                ),
+                                "labels" to listOf("test", "v${build.name}"),
+                                "description" to """
+                                    Build [${build.name}|http://localhost:8080/#/build/${build.id}] has been promoted to [${pl.name}|http://localhost:8080/#/promotionLevel/${pl.id}].
+                                """.trimIndent(),
+                                "assignee" to mapOf(
+                                    "name" to "dcoraboeuf"
                                 ),
                                 "duedate" to "2024-04-16",
                                 "customfield_11000" to "Some direct value",

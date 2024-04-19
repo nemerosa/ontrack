@@ -69,11 +69,15 @@ class JiraCreationNotificationChannel(
         )
 
         // Fix version
-        val fixVersion = eventTemplatingService.renderEvent(
-            event = event,
-            template = config.fixVersion,
-            renderer = PlainEventRenderer.INSTANCE
-        )
+        val fixVersion = config.fixVersion
+            ?.takeIf { it.isNotBlank() }
+            ?.let {
+                eventTemplatingService.renderEvent(
+                    event = event,
+                    template = it,
+                    renderer = PlainEventRenderer.INSTANCE
+                )
+            }
 
         // Custom fields
         val customFields = config.customFields.map { (name, value) ->
