@@ -4,11 +4,13 @@ import Head from "next/head";
 import {subBranchTitle} from "@components/common/Titles";
 import {downToBranchBreadcrumbs} from "@components/common/Breadcrumbs";
 import MainPage from "@components/layouts/MainPage";
-import {List, Skeleton} from "antd";
+import {List, Skeleton, Space} from "antd";
 import {gql} from "graphql-request";
 import {CloseCommand} from "@components/common/Commands";
 import {branchUri} from "@components/common/Links";
 import PromotionLevelLink from "@components/promotionLevels/PromotionLevelLink";
+import {gqlDecorationFragment} from "@components/services/fragments";
+import Decorations from "@components/framework/decorations/Decorations";
 
 export default function BranchPromotionLevelsView({id}) {
 
@@ -42,9 +44,14 @@ export default function BranchPromotionLevelsView({id}) {
                                     }
                                     value
                                 }
+                                decorations {
+                                    ...decorationContent
+                                }
                             }
                         }
                     }
+
+                    ${gqlDecorationFragment}
                 `,
                 {id}
             ).then(data => {
@@ -78,7 +85,12 @@ export default function BranchPromotionLevelsView({id}) {
                         renderItem={(pl) => (
                             <List.Item>
                                 <List.Item.Meta
-                                    title={<PromotionLevelLink promotionLevel={pl}/>}
+                                    title={
+                                        <Space>
+                                            <PromotionLevelLink promotionLevel={pl}/>
+                                            <Decorations entity={pl}/>
+                                        </Space>
+                                    }
                                     description={pl.description}
                                 />
                             </List.Item>

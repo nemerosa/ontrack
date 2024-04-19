@@ -1,10 +1,12 @@
-import {Typography} from "antd";
+import {Tooltip, Typography} from "antd";
 import {FaBolt} from "react-icons/fa";
 
 export default function AutoPromotionPropertyDecorator({decoration}) {
     return (
-        <Typography.Text>
-            <FaBolt/>
-        </Typography.Text>
+        <Tooltip title="Auto promotion enabled">
+            <Typography.Text>
+                <FaBolt color="#FC0"/>
+            </Typography.Text>
+        </Tooltip>
     )
 }
