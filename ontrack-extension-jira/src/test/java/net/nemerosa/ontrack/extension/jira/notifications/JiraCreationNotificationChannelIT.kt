@@ -164,7 +164,7 @@ class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
                         ).pageItems.firstOrNull()
                     ) { record ->
                         assertNotNull(record.result.output) { output ->
-                            val key = output.getRequiredTextField("key")
+                            val key = output.getRequiredTextField("ticketKey")
                             assertEquals(
                                 "http://jira/browse/$key",
                                 output.getRequiredTextField("url")
@@ -280,7 +280,7 @@ class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
                         ).pageItems.firstOrNull()
                     ) { record ->
                         assertNotNull(record.result.output) { output ->
-                            val key = output.getRequiredTextField("key")
+                            val key = output.getRequiredTextField("ticketKey")
                             assertEquals(
                                 "http://jira/browse/$key",
                                 output.getRequiredTextField("url")
@@ -366,7 +366,7 @@ class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
                                 channel = "jira-creation"
                             )
                         ).pageItems.map {
-                            it.result.output?.getRequiredTextField("key")
+                            it.result.output?.getRequiredTextField("ticketKey")
                         }
                     )
                 }
