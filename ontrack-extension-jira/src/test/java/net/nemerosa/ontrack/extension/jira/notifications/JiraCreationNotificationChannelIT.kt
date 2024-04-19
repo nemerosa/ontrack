@@ -202,7 +202,7 @@ class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
                             useExisting = true,
                             configName = configuration.name,
                             projectName = jiraProjectName, // <-- used for identification of the ticket
-                            issueType = "Test", // <-- used for identification of the ticket
+                            issueType = "Service Issue", // <-- used for identification of the ticket
                             labels = listOf("test", "v\${build}"), // <-- used for identification of the ticket
                             titleTemplate = "Build \${build} has been promoted to \${promotionLevel}",
                             customFields = emptyList(),
@@ -218,7 +218,7 @@ class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
 
                     // Mocking the calls to GET the issue, returning one
                     val jql =
-                        """project = $jiraProjectName AND issuetype = Test AND labels = "test" AND labels = "v${build.name}""""
+                        """project = "$jiraProjectName" AND issuetype = "Service Issue" AND labels = "test" AND labels = "v${build.name}""""
                     mockRestTemplateContext.onGetJson(
                         uri = "http://jira/rest/api/2/search",
                         parameters = mapOf(

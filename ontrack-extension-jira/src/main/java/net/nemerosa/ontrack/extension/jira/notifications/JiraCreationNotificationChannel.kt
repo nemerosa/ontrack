@@ -51,7 +51,7 @@ class JiraCreationNotificationChannel(
 
         // Checking for the existence of the ticket
         if (config.useExisting) {
-            var jql = "project = ${config.projectName} AND issuetype = ${config.issueType}"
+            var jql = """project = "${config.projectName}" AND issuetype = "${config.issueType}""""
             expandedLabels.forEach { label ->
                 jql += """ AND labels = "$label""""
             }
