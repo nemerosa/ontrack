@@ -9,6 +9,7 @@ import AutoVersioningAuditProjectSourceLink
     from "@components/extension/auto-versioning/AutoVersioningAuditProjectSourceLink";
 import {AutoRefreshButton} from "@components/common/AutoRefresh";
 import AutoVersioningAuditEntryPR from "@components/extension/auto-versioning/AutoVersioningAuditEntryPR";
+import AutoVersioningApproval from "@components/extension/auto-versioning/AutoVersioningApproval";
 
 export default function AutoVersioningAuditEntry({entry}) {
 
@@ -66,12 +67,11 @@ export default function AutoVersioningAuditEntry({entry}) {
         {
             key: 'auto-approval',
             label: "Auto approval",
-            children: entry.order.autoApproval,
-        },
-        {
-            key: 'auto-approval-mode',
-            label: "Auto approval mode",
-            children: entry.order.autoApprovalMode,
+            children:
+                <AutoVersioningApproval
+                    autoApproval={entry.order.autoApproval}
+                    autoApprovalMode={entry.order.autoApprovalMode}
+                />,
         },
         {
             key: 'targetPaths',

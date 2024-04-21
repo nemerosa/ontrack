@@ -18,6 +18,7 @@ import SelectAutoVersioningAuditRunningState
 import {AutoVersioningAuditContext} from "@components/extension/auto-versioning/AutoVersioningAuditContext";
 import ProjectLinkByName from "@components/projects/ProjectLinkByName";
 import {AutoRefreshButton, AutoRefreshContextProvider} from "@components/common/AutoRefresh";
+import AutoVersioningApproval from "@components/extension/auto-versioning/AutoVersioningApproval";
 
 const {Column} = Table
 
@@ -346,14 +347,10 @@ export default function AutoVersioningAuditView() {
                             title="Approval"
                             render={(_, entry) =>
                                 <>
-                                    {
-                                        entry.order.autoApproval &&
-                                        <Typography.Text>{entry.order.autoApprovalMode}</Typography.Text>
-                                    }
-                                    {
-                                        !entry.order.autoApproval &&
-                                        <Typography.Text disabled italic>Manual</Typography.Text>
-                                    }
+                                    <AutoVersioningApproval
+                                        autoApproval={entry.order.autoApproval}
+                                        autoApprovalMode={entry.order.autoApprovalMode}
+                                    />
                                 </>
                             }
                         />
