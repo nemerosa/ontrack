@@ -8,6 +8,7 @@ import ProjectLinkByName from "@components/projects/ProjectLinkByName";
 import AutoVersioningAuditProjectSourceLink
     from "@components/extension/auto-versioning/AutoVersioningAuditProjectSourceLink";
 import {AutoRefreshButton} from "@components/common/AutoRefresh";
+import AutoVersioningAuditEntryPR from "@components/extension/auto-versioning/AutoVersioningAuditEntryPR";
 
 export default function AutoVersioningAuditEntry({entry}) {
 
@@ -24,6 +25,11 @@ export default function AutoVersioningAuditEntry({entry}) {
                 <ProjectLinkByName name={entry.order.sourceProject}/>
                 <AutoVersioningAuditProjectSourceLink name={entry.order.sourceProject}/>
             </Space>,
+        },
+        {
+            key: 'pr',
+            label: "Pull request",
+            children: <AutoVersioningAuditEntryPR entry={entry}/>,
         },
         {
             key: 'promotion',
