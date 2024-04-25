@@ -31,6 +31,6 @@ class BitbucketServerSCMCommit(
 
     override val message: String = commit.message
 
-    override val link: String = "$root/projects/${repo.project}/repos/${repo.project}/commits/$id"
+    override val link: String = "$root/projects/${repo.project}/repos/${repo.repository}/commits/$id"
 
 }
