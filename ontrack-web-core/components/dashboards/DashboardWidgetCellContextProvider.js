@@ -1,4 +1,4 @@
-import {createContext, useContext, useEffect, useRef, useState} from "react";
+import {createContext, useCallback, useContext, useEffect, useRef, useState} from "react";
 import {DashboardContext} from "@components/dashboards/DashboardContextProvider";
 import {Form} from "antd";
 
@@ -35,7 +35,7 @@ export default function DashboardWidgetCellContextProvider({widget, children}) {
     const [title, setTitle] = useState("")
     const [extra, setExtra] = useState()
 
-    const dashboardContext = useContext(DashboardContext)
+    const {registerWidget, saveWidget, ...dashboardContext} = useContext(DashboardContext)
 
     const [widgetEdition, setWidgetEdition] = useState(false)
     const [widgetSaving, setWidgetSaving] = useState(false)
@@ -61,7 +61,7 @@ export default function DashboardWidgetCellContextProvider({widget, children}) {
                     // console.log("DashboardWidgetCellContext@saveWidgetEdition@onReceivingValues", !!onReceivingValues.current)
                     const actualValues = onReceivingValues.current ? onReceivingValues.current(values) : values
                     // console.log("DashboardWidgetCellContext@saveWidgetEdition@actualValues", actualValues)
-                    return dashboardContext.saveWidget(widget.uuid, actualValues)
+                    return saveWidget(widget.uuid, actualValues)
                 })
                 .then(() => {
                     cancelWidgetEdition()
@@ -82,6 +82,26 @@ export default function DashboardWidgetCellContextProvider({widget, children}) {
     const deleteWidget = () => {
         dashboardContext.deleteWidget(widget.uuid)
     }
+
+    const widgetEditionCallback = useCallback(() => widgetEdition, [widgetEdition])
+
+    useEffect(() => {
+        const unregister = registerWidget({
+            uuid: widget.uuid,
+            widgetEdition: widgetEditionCallback,
+            validate: async () => {
+                try {
+                    const values = await widgetEditionForm.validateFields()
+                    return onReceivingValues.current ? onReceivingValues.current(values) : values
+                } catch (error) {
+                    return false
+                }
+            },
+        })
+        return () => {
+            unregister()
+        }
+    }, [widgetEditionCallback, widget.uuid, widgetEditionForm, registerWidget]);
 
     const context = {
         title,

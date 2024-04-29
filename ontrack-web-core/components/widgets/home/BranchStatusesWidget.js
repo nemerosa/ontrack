@@ -15,7 +15,7 @@ import {DashboardWidgetCellContext} from "@components/dashboards/DashboardWidget
 import Link from "next/link";
 import BuildLink from "@components/builds/BuildLink";
 
-export default function BranchStatusesWidget({promotions, validations, refreshInterval, branches, title}) {
+export default function BranchStatusesWidget({promotions, validations, refreshInterval, branches = [], title}) {
 
     const client = useGraphQLClient()
 

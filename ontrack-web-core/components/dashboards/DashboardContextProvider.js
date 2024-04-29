@@ -1,4 +1,4 @@
-import {createContext, useContext, useEffect, useState} from "react";
+import {createContext, useCallback, useContext, useEffect, useState} from "react";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
 import {
@@ -83,6 +83,11 @@ export const DashboardContext = createContext({
      * Deleting a widget
      */
     deleteWidget: (uuid) => {
+    },
+    /**
+     * Registering a widget
+     */
+    registerWidget: (widget) => {
     },
 })
 
@@ -226,13 +231,28 @@ export default function DashboardContextProvider({children}) {
         }
     }
 
-    const saveEdition = (layout) => {
+    const saveEdition = async (layout) => {
         if (dashboard && edition) {
             setSaving(true)
+
+            let current = dashboard
+
+            for (let widget of widgets) {
+                if (widget.widgetEdition()) {
+                    const values = await widget.validate()
+                    if (values) {
+                        current = saveWidgetConfigInDashboard(current, widget.uuid, values)
+                    } else {
+                        return
+                    }
+                }
+            }
+
             client.request(
                 saveDashboardQuery,
-                dashboard
+                current
             ).then(() => {
+                setDashboard(current)
                 // OK
                 setEdition(false)
                 // Refresh the view
@@ -257,21 +277,25 @@ export default function DashboardContextProvider({children}) {
         }
     }
 
+    const saveWidgetConfigInDashboard = (dashboard, uuid, config) => {
+        return {
+            ...dashboard,
+            widgets: dashboard.widgets.map(widget => {
+                if (uuid === widget.uuid) {
+                    return {
+                        ...widget,
+                        config,
+                    }
+                } else {
+                    return widget
+                }
+            })
+        }
+    }
+
     const saveWidget = (uuid, config) => {
         if (dashboard && edition) {
-            setDashboard({
-                ...dashboard,
-                widgets: dashboard.widgets.map(widget => {
-                    if (uuid === widget.uuid) {
-                        return {
-                            ...widget,
-                            config,
-                        }
-                    } else {
-                        return widget
-                    }
-                })
-            })
+            setDashboard(prev => saveWidgetConfigInDashboard(prev, uuid, config))
         }
     }
 
@@ -283,6 +307,26 @@ export default function DashboardContextProvider({children}) {
             })
         }
     }
+
+    const [widgets, setWidgets] = useState([])
+
+    const registerWidget = useCallback(({uuid, widgetEdition, validate}) => {
+        const existing = widgets.find(it => it.uuid === uuid)
+        if (existing) {
+            setWidgets(prevWidgets => prevWidgets.map((c) => {
+                if (c.uuid === uuid) {
+                    return {uuid, widgetEdition, validate}
+                } else {
+                    return c
+                }
+            }))
+        } else {
+            setWidgets(prevWidgets => [...prevWidgets, {uuid, widgetEdition, validate}])
+        }
+        return () => {
+            setWidgets(prev => prev.filter(c => c.uuid !== uuid))
+        }
+    }, [])
 
     const context = {
         dashboards,
@@ -300,6 +344,7 @@ export default function DashboardContextProvider({children}) {
         addWidget,
         saveWidget,
         deleteWidget,
+        registerWidget,
     }
 
     return (
