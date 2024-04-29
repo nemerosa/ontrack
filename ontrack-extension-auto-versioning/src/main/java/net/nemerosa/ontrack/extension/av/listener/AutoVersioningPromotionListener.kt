@@ -6,9 +6,8 @@ import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventListener
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
-import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
-import net.nemerosa.ontrack.model.structure.PromotionLevel
+import net.nemerosa.ontrack.model.structure.PromotionRun
 import org.springframework.stereotype.Component
 
 /**
@@ -26,10 +25,9 @@ class AutoVersioningPromotionListener(
             val settings = cachedSettingsService.getCachedSettings(AutoVersioningSettings::class.java)
             if (settings.enabled) {
                 // Gets information about the event
-                val build: Build = event.getEntity(ProjectEntityType.BUILD)
-                val promotion: PromotionLevel = event.getEntity(ProjectEntityType.PROMOTION_LEVEL)
+                val run: PromotionRun = event.getEntity(ProjectEntityType.PROMOTION_RUN)
                 // Gets the list of configured branches
-                val configuredBranches = autoVersioningEventService.getConfiguredBranches(build, promotion)
+                val configuredBranches = autoVersioningEventService.getConfiguredBranches(run)
                 // Dispatching
                 if (configuredBranches != null) {
                     autoVersioningDispatcher.dispatch(configuredBranches)

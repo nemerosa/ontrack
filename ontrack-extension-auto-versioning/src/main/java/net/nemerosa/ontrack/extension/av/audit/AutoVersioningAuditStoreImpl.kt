@@ -74,6 +74,7 @@ class AutoVersioningAuditStoreImpl(
                 AutoVersioningAuditStoreData(
                     sourceProject = sourceProject,
                     sourceBuildId = sourceBuildId,
+                    sourcePromotionRunId = sourcePromotionRunId,
                     sourcePromotion = sourcePromotion,
                     sourceBackValidation = sourceBackValidation,
                     targetPaths = targetPaths,
@@ -134,6 +135,7 @@ class AutoVersioningAuditStoreImpl(
                     AutoVersioningAuditStoreData(
                         sourceProject = sourceProject,
                         sourceBuildId = sourceBuildId,
+                        sourcePromotionRunId = sourcePromotionRunId,
                         sourcePromotion = sourcePromotion,
                         sourceBackValidation = sourceBackValidation,
                         targetPaths = targetPaths,
@@ -209,6 +211,7 @@ class AutoVersioningAuditStoreImpl(
                     branch = this@toEntry.entity as Branch,
                     sourceProject = sourceProject,
                     sourceBuildId = sourceBuildId,
+                    sourcePromotionRunId = sourcePromotionRunId,
                     sourcePromotion = sourcePromotion,
                     sourceBackValidation = sourceBackValidation,
                     targetPaths = targetPaths,

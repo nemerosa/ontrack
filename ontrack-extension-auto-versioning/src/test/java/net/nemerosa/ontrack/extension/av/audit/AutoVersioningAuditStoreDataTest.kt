@@ -56,6 +56,7 @@ class AutoVersioningAuditStoreDataTest {
         val data = AutoVersioningAuditStoreData(
             sourceProject = "test",
             sourceBuildId = null,
+            sourcePromotionRunId = null,
             sourcePromotion = null,
             sourceBackValidation = null,
             targetPaths = listOf("gradle.properties"),
@@ -95,6 +96,7 @@ class AutoVersioningAuditStoreDataTest {
         val data = AutoVersioningAuditStoreData(
             sourceProject = "test",
             sourceBuildId = null,
+            sourcePromotionRunId = null,
             sourcePromotion = null,
             sourceBackValidation = null,
             targetPaths = listOf("gradle.properties"),
@@ -134,6 +136,7 @@ class AutoVersioningAuditStoreDataTest {
         val data = AutoVersioningAuditStoreData(
             sourceProject = "test",
             sourceBuildId = null,
+            sourcePromotionRunId = null,
             sourcePromotion = null,
             sourceBackValidation = null,
             targetPaths = listOf("gradle.properties"),
@@ -174,6 +177,7 @@ class AutoVersioningAuditStoreDataTest {
         val data = AutoVersioningAuditStoreData(
             sourceProject = "test",
             sourceBuildId = null,
+            sourcePromotionRunId = null,
             sourcePromotion = null,
             sourceBackValidation = null,
             targetPaths = listOf("gradle.properties"),

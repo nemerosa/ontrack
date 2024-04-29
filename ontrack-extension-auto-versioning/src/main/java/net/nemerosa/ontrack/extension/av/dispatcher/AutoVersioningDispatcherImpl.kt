@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.av.queue.AutoVersioningQueue
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.NameDescription
+import net.nemerosa.ontrack.model.structure.PromotionRun
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry
 import net.nemerosa.ontrack.model.support.ApplicationLogService
 import org.slf4j.Logger
@@ -27,7 +28,7 @@ class AutoVersioningDispatcherImpl(
             configuredBranches.configuredBranches.forEach { configuredBranch ->
                 val branch = configuredBranch.branch
                 configuredBranch.configurations.forEach { config ->
-                    val order = createAutoVersioningOrder(configuredBranches.promotionEvent, branch, config)
+                    val order = createAutoVersioningOrder(configuredBranches.promotionRun, branch, config)
                     // Posts the event on the queue
                     if (order != null) {
                         queue.queue(order)
@@ -38,17 +39,18 @@ class AutoVersioningDispatcherImpl(
     }
 
     private fun createAutoVersioningOrder(
-        event: PromotionEvent,
+        promotionRun: PromotionRun,
         branch: Branch,
         config: AutoVersioningSourceConfig,
     ): AutoVersioningOrder? {
         try {
-            val version = getBuildSourceVersion(event, config)
+            val version = getBuildSourceVersion(promotionRun, config)
             return AutoVersioningOrder(
                 uuid = UUID.randomUUID().toString(),
-                sourceProject = event.build.project.name,
-                sourceBuildId = event.build.id(),
-                sourcePromotion = event.promotion,
+                sourceProject = promotionRun.build.project.name,
+                sourceBuildId = promotionRun.build.id(),
+                sourcePromotionRunId = promotionRun.id(),
+                sourcePromotion = promotionRun.promotionLevel.name,
                 sourceBackValidation = config.backValidation,
                 branch = branch,
                 targetPaths = config.getTargetPaths(),
@@ -75,12 +77,12 @@ class AutoVersioningDispatcherImpl(
                 ApplicationLogEntry.error(
                     ex,
                     NameDescription.nd("auto-versioning-version-error", "Auto versioning version error"),
-                    "Build ${event.build.id} (${event.build.entityDisplayName}) was promoted, " +
+                    "Build ${promotionRun.build.id} (${promotionRun.build.entityDisplayName}) was promoted, " +
                             "but is not eligible to auto versioning because no version was returned or there " +
                             "was an error. "
                 )
-                    .withDetail("auto-versioning-source-build", event.build.entityDisplayName)
-                    .withDetail("auto-versioning-source-promotion", event.promotion)
+                    .withDetail("auto-versioning-source-build", promotionRun.build.entityDisplayName)
+                    .withDetail("auto-versioning-source-promotion", promotionRun.promotionLevel.name)
                     .withDetail("auto-versioning-target-branch", branch.entityDisplayName)
             )
             // Not going further with the auto versioning request
@@ -88,7 +90,7 @@ class AutoVersioningDispatcherImpl(
         }
     }
 
-    private fun getBuildSourceVersion(event: PromotionEvent, config: AutoVersioningSourceConfig): String {
-        return versionSourceFactory.getBuildVersion(event.build, config)
+    private fun getBuildSourceVersion(promotionRun: PromotionRun, config: AutoVersioningSourceConfig): String {
+        return versionSourceFactory.getBuildVersion(promotionRun.build, config)
     }
 }

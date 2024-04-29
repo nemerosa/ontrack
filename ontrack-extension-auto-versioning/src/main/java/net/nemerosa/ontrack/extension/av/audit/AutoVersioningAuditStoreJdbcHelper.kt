@@ -56,6 +56,7 @@ class AutoVersioningAuditStoreJdbcHelper(
                     branch = branch,
                     sourceProject = data.sourceProject,
                     sourceBuildId = data.sourceBuildId,
+                    sourcePromotionRunId = data.sourcePromotionRunId,
                     sourcePromotion = data.sourcePromotion,
                     sourceBackValidation = data.sourceBackValidation,
                     targetPaths = data.targetPaths,

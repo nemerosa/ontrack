@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.av.config.AutoApprovalMode
 data class AutoVersioningAuditStoreData(
     val sourceProject: String,
     val sourceBuildId: Int?, // Nullable for backward compatibility
+    val sourcePromotionRunId: Int?, // Nullable for backward compatibility
     val sourcePromotion: String?, // Nullable for backward compatibility
     val sourceBackValidation: String?, // Nullable for backward compatibility
     val targetPaths: List<String>,
@@ -39,6 +40,7 @@ data class AutoVersioningAuditStoreData(
     fun addState(newState: AutoVersioningAuditEntryState) = AutoVersioningAuditStoreData(
         sourceProject = sourceProject,
         sourceBuildId = sourceBuildId,
+        sourcePromotionRunId = sourcePromotionRunId,
         sourcePromotion = sourcePromotion,
         sourceBackValidation = sourceBackValidation,
         targetPaths = targetPaths,

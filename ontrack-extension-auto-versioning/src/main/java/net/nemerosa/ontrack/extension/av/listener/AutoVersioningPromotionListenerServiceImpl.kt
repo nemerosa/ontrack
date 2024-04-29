@@ -4,11 +4,9 @@ import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationServi
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfiguredBranch
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.extension.av.model.AutoVersioningConfiguredBranches
-import net.nemerosa.ontrack.extension.av.model.PromotionEvent
 import net.nemerosa.ontrack.extension.scm.service.SCMDetector
 import net.nemerosa.ontrack.model.structure.Branch
-import net.nemerosa.ontrack.model.structure.Build
-import net.nemerosa.ontrack.model.structure.PromotionLevel
+import net.nemerosa.ontrack.model.structure.PromotionRun
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -23,20 +21,16 @@ class AutoVersioningPromotionListenerServiceImpl(
 
     private val logger: Logger = LoggerFactory.getLogger(AutoVersioningPromotionListenerServiceImpl::class.java)
 
-    override fun getConfiguredBranches(build: Build, promotion: PromotionLevel): AutoVersioningConfiguredBranches? {
-        logger.debug("Looking for configured branches: ${build.entityDisplayName} @ ${promotion.name}...")
-        // Creation of the event
-        val promotionEvent = PromotionEvent(build, promotion.name)
+    override fun getConfiguredBranches(promotionRun: PromotionRun): AutoVersioningConfiguredBranches? {
+        logger.debug("Looking for configured branches: ${promotionRun.build.entityDisplayName} @ ${promotionRun.promotionLevel.name}...")
         // Gets all the trigger configurations about this event, based on project & promotion only
-        val branches = autoVersioningConfigurationService.getBranchesConfiguredFor(build.project.name, promotion.name)
-        logger.debug("Raw configured branches for ${build.entityDisplayName} @ ${promotion.name}: ${branches.size}")
-        // Cache for the project last source branches
-        val cache = mutableMapOf<Pair<Int, String>, Branch?>()
+        val branches = autoVersioningConfigurationService.getBranchesConfiguredFor(promotionRun.build.project.name, promotionRun.promotionLevel.name)
+        logger.debug("Raw configured branches for ${promotionRun.build.entityDisplayName} @ ${promotionRun.promotionLevel.name}: ${branches.size}")
         // Filters the branches based on their configuration and the triggering event
         val configuredBranches = branches
             .filter { !it.isDisabled && !it.project.isDisabled }
             .mapNotNull {
-                filterBranch(it, promotionEvent, cache)
+                filterBranch(it, promotionRun)
             }
         // Logging
         if (logger.isDebugEnabled) {
@@ -49,16 +43,15 @@ class AutoVersioningPromotionListenerServiceImpl(
         // OK
         return AutoVersioningConfiguredBranches(
             configuredBranches,
-            promotionEvent
+            promotionRun
         )
     }
 
     private fun filterBranch(
         branch: Branch,
-        promotionEvent: PromotionEvent,
-        cache: MutableMap<Pair<Int, String>, Branch?>,
+        promotionRun: PromotionRun,
     ): AutoVersioningConfiguredBranch? {
-        logger.debug("Filtering branch {} for event {}...", branch.entityDisplayName, promotionEvent)
+        logger.debug("Filtering branch {} for event {}...", branch.entityDisplayName, promotionRun)
         // The project must be configured for a SCM
         if (scmDetector.getSCM(branch.project) != null) {
             // Gets the auto versioning configuration for the branch
@@ -68,7 +61,7 @@ class AutoVersioningPromotionListenerServiceImpl(
                 // If present, gets its configurations
                 val autoVersioningConfigurations = config.configurations
                     // Filters the configurations based on the event
-                    .filter { configuration -> promotionEvent.match(branch, configuration) }
+                    .filter { configuration -> promotionRun.match(branch, configuration) }
                     // Removes any empty setup
                     .takeIf { configurations -> configurations.isNotEmpty() }
                 // Accepting the branch based on having at least one matching configuration
@@ -89,7 +82,7 @@ class AutoVersioningPromotionListenerServiceImpl(
         }
     }
 
-    private fun PromotionEvent.match(
+    private fun PromotionRun.match(
         eligibleTargetBranch: Branch,
         config: AutoVersioningSourceConfig,
     ): Boolean {
@@ -103,7 +96,7 @@ class AutoVersioningPromotionListenerServiceImpl(
             )
         }
         val match = config.sourceProject == build.project.name &&
-                config.sourcePromotion == promotion &&
+                config.sourcePromotion == promotionLevel.name &&
                 sourceBranchMatch(eligibleTargetBranch, config)
         if (logger.isDebugEnabled) {
             logger.debug("Promotion event matching: $match")
@@ -111,7 +104,7 @@ class AutoVersioningPromotionListenerServiceImpl(
         return match
     }
 
-    private fun PromotionEvent.sourceBranchMatch(
+    private fun PromotionRun.sourceBranchMatch(
         eligibleTargetBranch: Branch,
         config: AutoVersioningSourceConfig,
     ): Boolean {
