@@ -35,8 +35,14 @@ class AutoVersioningTemplatingServiceImpl(
                 ?: throw ProjectNotFoundException(order.sourceProject)
         }
 
+        val sourcePromotionRun: PromotionRun? by lazy {
+            order.sourcePromotionRunId?.let {
+                structureService.getPromotionRun(ID.of(it))
+            }
+        }
+
         val context: Map<String, Any> by lazy {
-            mapOf(
+            val tmp = mutableMapOf(
                 "sourceProject" to sourceProject,
                 "targetBranch" to order.branch,
                 "PROMOTION" to order.sourcePromotion!!,
@@ -46,6 +52,10 @@ class AutoVersioningTemplatingServiceImpl(
                 "VERSION" to order.targetVersion,
                 "av" to AutoVersioningOrderTemplatingRenderable(order, currentVersions, sourceProject),
             )
+            if (sourcePromotionRun != null) {
+                tmp["sourcePromotionRun"] = sourcePromotionRun!!
+            }
+            tmp
         }
 
         val title = if (order.prTitleTemplate.isNullOrBlank()) {
