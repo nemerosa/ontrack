@@ -12,9 +12,10 @@ object PromotionRunFixtures {
         build: Build = BuildFixtures.testBuild(
             branch = branch,
         ),
+        description: String? = null,
     ) = PromotionRun(
         id = ID.of(100),
-        description = null,
+        description = description,
         signature = Signature.of("test"),
         build = build,
         promotionLevel = promotionLevel,

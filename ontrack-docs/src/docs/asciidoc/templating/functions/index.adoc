@@ -2,7 +2,9 @@
 ==== List of templating functions
 
 * <<templating-function-datetime,datetime>>
+* <<templating-function-lastPromotion,lastPromotion>>
 * <<templating-function-link,link>>
 
 include::templating-function-datetime.adoc[]
+include::templating-function-lastPromotion.adoc[]
 include::templating-function-link.adoc[]
