@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.jira.JIRAConfiguration
 import net.nemerosa.ontrack.extension.jira.client.JIRAClient
 import net.nemerosa.ontrack.extension.jira.model.*
 import net.nemerosa.ontrack.extension.jira.notifications.JiraCustomField
+import org.springframework.web.client.RestTemplate
 import java.util.concurrent.atomic.AtomicInteger
 
 class MockJIRAClient(
@@ -69,4 +70,6 @@ class MockJIRAClient(
     override val projects: List<String>
         get() = instance.projectNames
 
+    override val restTemplate: RestTemplate
+        get() = TODO("Not supported for the Mock Client")
 }

@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.jira.JIRAConfiguration
 import net.nemerosa.ontrack.extension.jira.model.JIRAIssue
 import net.nemerosa.ontrack.extension.jira.model.JIRAIssueStub
 import net.nemerosa.ontrack.extension.jira.notifications.JiraCustomField
+import org.springframework.web.client.RestTemplate
 
 interface JIRAClient : AutoCloseable {
 
@@ -27,5 +28,10 @@ interface JIRAClient : AutoCloseable {
         jiraConfiguration: JIRAConfiguration,
         jql: String,
     ): List<JIRAIssueStub>
+
+    /**
+     * Underlying REST template to use
+     */
+    val restTemplate: RestTemplate
 
 }
