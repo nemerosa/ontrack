@@ -93,7 +93,7 @@ class ACCAutoVersioningPRTemplate : AbstractACCAutoVersioningTestSupport() {
 
                         dependency.apply {
                             build(name = "2.0.0") {
-                                promote("IRON", description = "Custom promotion")
+                                promote("IRON", description = "Custom description")
                             }
                         }
 
