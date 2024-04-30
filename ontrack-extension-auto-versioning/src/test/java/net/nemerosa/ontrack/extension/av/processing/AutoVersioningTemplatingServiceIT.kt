@@ -105,6 +105,50 @@ class AutoVersioningTemplatingServiceIT : AbstractAutoVersioningTestSupport() {
     }
 
     @Test
+    fun `Generating a custom PR title from the promotion run description`() {
+        asAdmin {
+            project {
+                branch {
+                    val pl = promotionLevel()
+                    build {
+                        releaseProperty(this, "2.0.0")
+                        val source = this
+                        val sourceRun = promote(pl, description = "Custom description")
+                        project {
+                            branch {
+                                val order = createOrder(
+                                    sourceProject = source.project.name,
+                                    sourceBuildId = source.id(),
+                                    sourcePromotionRunId = sourceRun.id(),
+                                    targetVersion = "2.0.0",
+                                    prTitleTemplate = "Description: \${sourcePromotionRun.description}",
+                                    prBodyTemplate = "The version of \${sourceProject} in \${PATH} has been upgraded to \${VERSION}.",
+                                )
+
+
+                                val (title, body) = autoVersioningTemplatingService.generatePRInfo(
+                                    order = order,
+                                    currentVersions = mapOf("gradle.properties" to "1.0.0")
+                                )
+
+                                assertEquals(
+                                    "Description: Custom description",
+                                    title
+                                )
+
+                                assertEquals(
+                                    "The version of ${source.project.name} in gradle.properties has been upgraded to 2.0.0.",
+                                    body
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Generating a custom PR title and body using HTML`() {
         asAdmin {
             project {
