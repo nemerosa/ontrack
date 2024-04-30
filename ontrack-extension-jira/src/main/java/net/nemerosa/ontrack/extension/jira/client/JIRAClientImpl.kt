@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 
 class JIRAClientImpl(
-    private val restTemplate: RestTemplate,
+    override val restTemplate: RestTemplate,
 ) : JIRAClient {
 
     private val issues: ConcurrentMap<Pair<String, String>, JIRAIssue> = ConcurrentHashMap()
