@@ -1,11 +1,16 @@
 package net.nemerosa.ontrack.extension.workflows.graphql
 
+import net.nemerosa.ontrack.extension.workflows.engine.WorkflowEngine
+import net.nemerosa.ontrack.extension.workflows.registry.WorkflowRegistry
 import net.nemerosa.ontrack.graphql.schema.Mutation
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import org.springframework.stereotype.Component
 
 @Component
-class WorkflowsMutations: TypedMutationProvider() {
+class WorkflowsMutations(
+    private val workflowRegistry: WorkflowRegistry,
+    private val workflowEngine: WorkflowEngine,
+) : TypedMutationProvider() {
 
     override val mutations: List<Mutation> = listOf(
         simpleMutation(
@@ -16,7 +21,7 @@ class WorkflowsMutations: TypedMutationProvider() {
             outputDescription = "Saved workflow ID",
             outputType = String::class
         ) { input ->
-            TODO("Validates and saves the workflow, returning an ID")
+            workflowRegistry.saveYamlWorkflow(input.workflow, input.executorId)
         },
         simpleMutation(
             name = "launchWorkflow",
@@ -26,7 +31,15 @@ class WorkflowsMutations: TypedMutationProvider() {
             outputDescription = "Workflow instance ID",
             outputType = String::class
         ) { input ->
-            TODO("Launches the workflow")
+            val workflowRecord = workflowRegistry.findWorkflow(input.workflowId)
+            if (workflowRecord != null) {
+                workflowEngine.startWorkflow(
+                    workflow = workflowRecord.workflow,
+                    workflowNodeExecutor = workflowRecord.nodeExecutor,
+                ).id
+            } else {
+                null
+            }
         },
     )
 }

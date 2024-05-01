@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.extension.workflows.engine
 
-import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.extension.queue.dispatching.QueueDispatcher
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutor
+import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -13,7 +13,7 @@ class WorkflowEngineImpl(
     private val workflowInstanceStore: WorkflowInstanceStore,
     private val queueDispatcher: QueueDispatcher,
     private val workflowQueueProcessor: WorkflowQueueProcessor,
-    private val extensionManager: ExtensionManager,
+    private val workflowNodeExecutorService: WorkflowNodeExecutorService,
 ) : WorkflowEngine {
 
     override fun startWorkflow(workflow: Workflow, workflowNodeExecutor: WorkflowNodeExecutor): WorkflowInstance {
@@ -54,9 +54,7 @@ class WorkflowEngineImpl(
         var instance = getWorkflowInstance(workflowInstanceId)
         val node = instance.workflow.getNode(workflowNodeId)
         // Getting the node executor
-        val executor = extensionManager.getExtensions(WorkflowNodeExecutor::class.java)
-            .find { it.id == instance.executorId }
-            ?: throw WorkflowNodeExecutorNotFoundException(instance.executorId)
+        val executor = workflowNodeExecutorService.getExecutor(instance.executorId)
         // Running the executor
         try {
             val output = executor.execute(instance, node.id)
