@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.workflows.engine
 
+import net.nemerosa.ontrack.extension.workflows.definition.Workflow
+import net.nemerosa.ontrack.model.support.StorageService
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
@@ -13,14 +15,20 @@ import org.springframework.transaction.annotation.Transactional
     matchIfMissing = true,
 )
 @Transactional(propagation = Propagation.REQUIRES_NEW)
-class DatabaseWorkflowInstanceStore : WorkflowInstanceStore {
+class DatabaseWorkflowInstanceStore(
+    private val storageService: StorageService,
+) : WorkflowInstanceStore {
+
+    companion object {
+        private val STORE = Workflow::class.java.name
+    }
 
     override fun store(instance: WorkflowInstance): WorkflowInstance {
-        TODO("Not yet implemented")
+        storageService.store(STORE, instance.id, instance)
+        return instance
     }
 
-    override fun findById(id: String): WorkflowInstance? {
-        TODO("Not yet implemented")
-    }
+    override fun findById(id: String): WorkflowInstance? =
+        storageService.find(STORE, id, WorkflowInstance::class)
 
 }
