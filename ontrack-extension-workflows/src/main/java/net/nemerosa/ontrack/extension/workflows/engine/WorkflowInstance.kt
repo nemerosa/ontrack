@@ -22,25 +22,23 @@ data class WorkflowInstance(
     val status: WorkflowInstanceStatus
         get() {
             val nodes = nodesExecutions.map { it.status }
-            if (nodes.all { it == WorkflowInstanceNodeStatus.IDLE }) {
-                return WorkflowInstanceStatus.STARTED
-            } else if (nodes.any { it == WorkflowInstanceNodeStatus.ERROR }) {
-                return WorkflowInstanceStatus.ERROR
-            } else if (nodes.any { it == WorkflowInstanceNodeStatus.STARTED }) {
-                return WorkflowInstanceStatus.RUNNING
+            return if (nodes.any { it == WorkflowInstanceNodeStatus.ERROR }) {
+                WorkflowInstanceStatus.ERROR
             } else if (nodes.all { it == WorkflowInstanceNodeStatus.SUCCESS }) {
-                return WorkflowInstanceStatus.SUCCESS
+                WorkflowInstanceStatus.SUCCESS
+            } else if (nodes.any { it == WorkflowInstanceNodeStatus.STARTED }) {
+                WorkflowInstanceStatus.RUNNING
             } else {
-                error("Inconsistent state")
+                WorkflowInstanceStatus.STARTED
             }
         }
 
-    fun successNode(id: String, output: JsonNode) = WorkflowInstance(
+    fun successNode(nodeId: String, output: JsonNode) = WorkflowInstance(
         id = id,
         workflow = workflow,
         executorId = executorId,
         nodesExecutions = nodesExecutions.map { node ->
-            if (node.id == id) {
+            if (node.id == nodeId) {
                 node.success(output)
             } else {
                 node
