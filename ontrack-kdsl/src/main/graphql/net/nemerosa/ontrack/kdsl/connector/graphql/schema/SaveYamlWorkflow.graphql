@@ -1,0 +1,12 @@
+mutation SaveYamlWorkflow(
+    $workflow: String!,
+    $executorId: String!,
+) {
+    saveYamlWorkflow(input: {
+        workflow: $workflow,
+        executorId: $executorId
+    }) {
+        ...PayloadUserErrors
+        workflowId
+    }
+}

@@ -1,0 +1,8 @@
+query WorkflowInstance(
+    $workflowInstanceId: String!,
+) {
+    workflowInstance(id: $workflowInstanceId) {
+        status
+        finished
+    }
+}
