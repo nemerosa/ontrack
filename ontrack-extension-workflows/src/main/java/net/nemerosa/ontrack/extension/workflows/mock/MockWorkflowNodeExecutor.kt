@@ -2,13 +2,16 @@ package net.nemerosa.ontrack.extension.workflows.mock
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.TextNode
+import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.extension.workflows.WorkflowsExtensionFeature
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutor
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
 @Component
+@Profile(RunProfile.ACC, RunProfile.UNIT_TEST, RunProfile.DEV)
 class MockWorkflowNodeExecutor(
     workflowsExtensionFeature: WorkflowsExtensionFeature,
 ) : AbstractExtension(workflowsExtensionFeature), WorkflowNodeExecutor {
