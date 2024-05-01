@@ -24,7 +24,10 @@ class WorkflowEngineImpl(
         )
         // Storing the instance
         workflowInstanceStore.store(instance)
-        // TODO Getting the starting nodes
+        // Getting the starting nodes
+        val nodes = instance.workflow.getNextNodes(null)
+        // TODO Special case: no starting node
+        // TODO Scheduling the nodes
         // Returning the instance
         return instance
     }
