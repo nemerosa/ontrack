@@ -84,6 +84,7 @@ dependencies {
     runtimeOnly(project(":ontrack-extension-recordings"))
     runtimeOnly(project(":ontrack-extension-hook"))
     runtimeOnly(project(":ontrack-extension-queue"))
+    runtimeOnly(project(":ontrack-extension-workflows"))
 }
 
 /**
