@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.workflows.engine
 
-import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 import net.nemerosa.ontrack.model.support.StorageService
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
@@ -20,7 +19,7 @@ class DatabaseWorkflowInstanceStore(
 ) : WorkflowInstanceStore {
 
     companion object {
-        private val STORE = Workflow::class.java.name
+        private val STORE = WorkflowInstance::class.java.name
     }
 
     override fun store(instance: WorkflowInstance): WorkflowInstance {

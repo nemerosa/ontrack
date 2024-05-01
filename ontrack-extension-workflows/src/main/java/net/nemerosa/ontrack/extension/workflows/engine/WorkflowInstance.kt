@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.workflows.engine
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 
@@ -19,6 +20,7 @@ data class WorkflowInstance(
     val nodesExecutions: List<WorkflowInstanceNode>,
 ) {
 
+    @get:JsonIgnore
     val status: WorkflowInstanceStatus
         get() {
             val nodes = nodesExecutions.map { it.status }
@@ -48,6 +50,6 @@ data class WorkflowInstance(
 
     fun getNode(nodeId: String) = nodesExecutions.firstOrNull { it.id == nodeId }
         ?: throw WorkflowNodeNotFoundException(nodeId)
-    
+
 }
 
