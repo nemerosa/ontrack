@@ -1,0 +1,63 @@
+@startuml
+
+== Definition ==
+
+actor User
+participant Workflow
+
+create Workflow
+User -> Workflow: defines and stores
+
+== Starting ==
+
+control Event
+participant WorkflowChannel
+
+Event -> WorkflowChannel: publish
+WorkflowChannel -> Workflow: reads
+
+participant WorkflowEngine
+database WorkflowInstance
+
+WorkflowChannel -> WorkflowEngine: start(workflow)
+create WorkflowInstance
+WorkflowEngine -> WorkflowInstance: stores(workflow)
+
+database WorkflowQueue
+
+WorkflowEngine -\ WorkflowQueue: push(start nodes)
+
+== Information ==
+
+User -> WorkflowEngine: gets information
+WorkflowEngine -> WorkflowInstance: gets info
+WorkflowInstance --> WorkflowEngine: info
+WorkflowEngine --> User: info
+
+== Execution ==
+
+WorkflowQueue -\ WorkflowEngine: message
+WorkflowEngine -> WorkflowInstance: gets info
+WorkflowInstance --> WorkflowEngine: node info
+
+WorkflowEngine -> WorkflowChannel: runs node
+note left
+    The workflow channel is accessed through
+    a ""WorkflowNodeExecutor"" interface.
+
+    It must be accessible statically through
+    an ID and the node configuration.
+end note
+WorkflowChannel --> WorkflowEngine: output
+WorkflowEngine -> WorkflowInstance: stores outcome
+WorkflowEngine -> WorkflowInstance: gets next nodes
+WorkflowInstance --> WorkflowEngine: next nodes
+note right
+    The workflow engine, based on the outcomes
+    of all the nodes of the workflow, decides
+    which nodes can be executed next based on
+    the nodes conditions & parents.
+end note
+WorkflowEngine -> WorkflowQueue: push(next nodes)
+
+@enduml
