@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 class DatabaseWorkflowInstanceStore : WorkflowInstanceStore {
 
-    override fun store(instance: WorkflowInstance) {
+    override fun store(instance: WorkflowInstance): WorkflowInstance {
         TODO("Not yet implemented")
     }
 
