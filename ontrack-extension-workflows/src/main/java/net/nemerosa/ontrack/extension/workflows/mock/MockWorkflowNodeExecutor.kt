@@ -1,12 +1,15 @@
 package net.nemerosa.ontrack.extension.workflows.mock
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.TextNode
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.extension.workflows.WorkflowsExtensionFeature
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutor
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parse
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
@@ -24,7 +27,12 @@ class MockWorkflowNodeExecutor(
 
     override fun execute(workflowInstance: WorkflowInstance, workflowNodeId: String): JsonNode {
         // Gets the node & its data
-        val data = workflowInstance.workflow.getNode(workflowNodeId).data.asText()
+        val nodeRawData = workflowInstance.workflow.getNode(workflowNodeId).data
+        val nodeData = if (nodeRawData.isTextual) {
+            MockNodeData(nodeRawData.asText())
+        } else {
+            nodeRawData.parse<MockNodeData>()
+        }
         // Using the context
         val execContext = workflowInstance.context
         val context = if (execContext.has("text")) {
@@ -33,9 +41,19 @@ class MockWorkflowNodeExecutor(
             execContext.asText()
         }
         // Returning some new text
-        val text = "Processed: $data for $context"
+        val text = "Processed: ${nodeData.text} for $context"
+        // Waiting time
+        if (nodeData.waitMs > 0) {
+            runBlocking {
+                delay(nodeData.waitMs)
+            }
+        }
+        // Recording
         val old = texts[workflowInstance.id]
         texts[workflowInstance.id] = if (old != null) old + text else listOf(text)
-        return TextNode(text)
+        // OK
+        return MockNodeOutput(
+            text = text
+        ).asJson()
     }
 }
