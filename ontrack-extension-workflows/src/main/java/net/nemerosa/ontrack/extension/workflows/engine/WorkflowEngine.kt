@@ -17,4 +17,9 @@ interface WorkflowEngine {
      */
     fun startWorkflow(workflow: Workflow, workflowNodeExecutor: WorkflowNodeExecutor): WorkflowInstance
 
+    /**
+     * Given the ID of a [WorkflowInstance], returns this instance or null if not found.
+     */
+    fun findWorkflowInstance(id: String): WorkflowInstance?
+
 }
