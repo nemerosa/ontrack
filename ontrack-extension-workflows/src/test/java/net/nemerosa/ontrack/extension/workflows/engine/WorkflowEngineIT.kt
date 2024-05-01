@@ -1,9 +1,6 @@
 package net.nemerosa.ontrack.extension.workflows.engine
 
-import com.fasterxml.jackson.databind.node.NullNode
-import com.fasterxml.jackson.databind.node.TextNode
-import net.nemerosa.ontrack.extension.workflows.definition.Workflow
-import net.nemerosa.ontrack.extension.workflows.definition.WorkflowNode
+import net.nemerosa.ontrack.extension.workflows.definition.WorkflowFixtures
 import net.nemerosa.ontrack.extension.workflows.mock.MockWorkflowNodeExecutor
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.it.waitUntil
@@ -17,7 +14,7 @@ import kotlin.time.ExperimentalTime
 @TestPropertySource(
     properties = [
         "net.nemerosa.ontrack.extension.workflows.store=memory",
-        "ontrack.extension.queue.general.async=false", // TODO Working with real queuing
+        "ontrack.extension.queue.general.async=false",
     ]
 )
 class WorkflowEngineIT : AbstractDSLTestSupport() {
@@ -31,22 +28,21 @@ class WorkflowEngineIT : AbstractDSLTestSupport() {
     @Test
     fun `Simple linear workflow`() {
         // Defining a workflow
-        val workflow = Workflow(
-            name = "Test workflow",
-            data = NullNode.instance,
-            nodes = listOf(
-                WorkflowNode(
-                    id = "start",
-                    data = TextNode("Start node"),
-                    parents = emptyList(),
-                ),
-                WorkflowNode(
-                    id = "end",
-                    data = TextNode("End node"),
-                    parents = listOf("start"),
-                ),
-            )
-        )
+        val workflow = WorkflowFixtures.simpleLinearWorkflow()
+        // Running the workflow
+        val instance = workflowEngine.startWorkflow(workflow, mockWorkflowNodeExecutor)
+        // Waiting until the workflow is completed (error or success)
+        waitUntil("Waiting until workflow is complete", timeout = 10.seconds) {
+            val workflowInstance = workflowEngine.getWorkflowInstance(instance.id)
+            println("workflowInstance = $workflowInstance")
+            workflowInstance.status.finished
+        }
+    }
+
+    @Test
+    fun `Parallel with join`() {
+        // Defining a workflow
+        val workflow = WorkflowFixtures.twoParallelAndJoin()
         // Running the workflow
         val instance = workflowEngine.startWorkflow(workflow, mockWorkflowNodeExecutor)
         // Waiting until the workflow is completed (error or success)
