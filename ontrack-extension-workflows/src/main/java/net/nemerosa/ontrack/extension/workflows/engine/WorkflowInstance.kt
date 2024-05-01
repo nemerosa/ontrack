@@ -17,6 +17,7 @@ data class WorkflowInstance(
     val id: String,
     val workflow: Workflow,
     val executorId: String,
+    val context: JsonNode,
     val nodesExecutions: List<WorkflowInstanceNode>,
 ) {
 
@@ -39,6 +40,7 @@ data class WorkflowInstance(
         id = id,
         workflow = workflow,
         executorId = executorId,
+        context = context,
         nodesExecutions = nodesExecutions.map { node ->
             if (node.id == nodeId) {
                 node.success(output)

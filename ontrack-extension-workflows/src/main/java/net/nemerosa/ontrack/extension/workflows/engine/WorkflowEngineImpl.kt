@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.workflows.engine
 
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.queue.dispatching.QueueDispatcher
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutor
@@ -16,10 +17,14 @@ class WorkflowEngineImpl(
     private val workflowNodeExecutorService: WorkflowNodeExecutorService,
 ) : WorkflowEngine {
 
-    override fun startWorkflow(workflow: Workflow, workflowNodeExecutor: WorkflowNodeExecutor): WorkflowInstance {
+    override fun startWorkflow(
+        workflow: Workflow,
+        workflowNodeExecutor: WorkflowNodeExecutor,
+        context: JsonNode
+    ): WorkflowInstance {
         // TODO Checks the workflow consistency (cycles, etc.) - use a public method, usable by extensions
         // Creating the instance
-        val instance = createInstance(workflow, workflowNodeExecutor)
+        val instance = createInstance(workflow, workflowNodeExecutor, context)
         // Storing the instance
         workflowInstanceStore.store(instance)
         // Getting the starting nodes

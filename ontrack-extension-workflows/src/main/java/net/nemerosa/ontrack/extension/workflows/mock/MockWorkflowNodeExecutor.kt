@@ -18,10 +18,24 @@ class MockWorkflowNodeExecutor(
 
     override val id: String = "mock"
 
+    private val texts = mutableMapOf<String, List<String>>()
+
+    fun getTextsByInstanceId(instanceId: String): List<String> = texts[instanceId] ?: emptyList()
+
     override fun execute(workflowInstance: WorkflowInstance, workflowNodeId: String): JsonNode {
         // Gets the node & its data
         val data = workflowInstance.workflow.getNode(workflowNodeId).data.asText()
+        // Using the context
+        val execContext = workflowInstance.context
+        val context = if (execContext.has("text")) {
+            execContext.path("text").asText()
+        } else {
+            execContext.asText()
+        }
         // Returning some new text
-        return TextNode("Processed: $data")
+        val text = "Processed: $data for $context"
+        val old = texts[workflowInstance.id]
+        texts[workflowInstance.id] = if (old != null) old + text else listOf(text)
+        return TextNode(text)
     }
 }

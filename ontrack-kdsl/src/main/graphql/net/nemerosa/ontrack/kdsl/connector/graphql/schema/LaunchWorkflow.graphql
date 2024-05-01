@@ -1,8 +1,10 @@
 mutation LaunchWorkflow(
     $workflowId: String!,
+    $context: JSON!,
 ) {
     launchWorkflow(input: {
         workflowId: $workflowId,
+        context: $context,
     }) {
         ...PayloadUserErrors
         workflowInstanceId
