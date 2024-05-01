@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.workflows.definition
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.extension.workflows.engine.WorkflowNodeNotFoundException
 
 /**
  * Definition of a workflow by another extension.
@@ -23,4 +24,7 @@ data class Workflow(
             return nodes.filter { parentId in it.parents }.map { it.id }
         }
     }
+
+    fun getNode(nodeId: String) = nodes.firstOrNull { it.id == nodeId }
+        ?: throw WorkflowNodeNotFoundException(nodeId)
 }

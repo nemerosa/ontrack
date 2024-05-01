@@ -22,4 +22,9 @@ interface WorkflowEngine {
      */
     fun findWorkflowInstance(id: String): WorkflowInstance?
 
+    /**
+     * Processing one node in a workflow
+     */
+    fun processNode(workflowInstanceId: String, workflowNodeId: String)
+
 }

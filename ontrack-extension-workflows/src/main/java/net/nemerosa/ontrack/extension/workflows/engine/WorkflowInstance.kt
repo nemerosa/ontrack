@@ -18,3 +18,4 @@ data class WorkflowInstance(
     val nodesExecutions: List<WorkflowInstanceNode>,
     val status: WorkflowInstanceStatus,
 )
+
