@@ -33,6 +33,8 @@ class MockWorkflowNodeExecutor(
         } else {
             nodeRawData.parse<MockNodeData>()
         }
+        // Gets the parent outputs in an index
+        val parentsData = workflowInstance.getParentsData(workflowNodeId)
         // Using the context
         val execContext = workflowInstance.context
         val context = if (execContext.has("text")) {
@@ -40,8 +42,22 @@ class MockWorkflowNodeExecutor(
         } else {
             execContext.asText()
         }
+        // Initial text
+        val initialText = nodeData.text
+        // Replacements by parents references
+        val replacedText = "#([a-zA-Z][a-zA-Z0-9_-]*)".toRegex().replace(initialText) { m ->
+            val parentId = m.groupValues[1]
+            val parentOutput = parentsData[parentId]
+            if (parentOutput != null) {
+                val output = parentOutput.parse<MockNodeOutput>()
+                output.text
+            } else {
+                // Parent has no data
+                "#none"
+            }
+        }
         // Returning some new text
-        val text = "Processed: ${nodeData.text} for $context"
+        val text = "Processed: $replacedText for $context"
         // Waiting time
         if (nodeData.waitMs > 0) {
             runBlocking {
