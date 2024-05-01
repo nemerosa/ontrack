@@ -51,8 +51,9 @@ class WorkflowEngineImpl(
 
     override fun processNode(workflowInstanceId: String, workflowNodeId: String) {
         // Getting the instance & the node
-        val instance = getWorkflowInstance(workflowInstanceId)
+        var instance = getWorkflowInstance(workflowInstanceId)
         val node = instance.workflow.getNode(workflowNodeId)
+        // TODO Running the node in the instance
         // Getting the node executor
         val executor = extensionManager.getExtensions(WorkflowNodeExecutor::class.java)
             .find { it.id == instance.executorId }
@@ -60,7 +61,8 @@ class WorkflowEngineImpl(
         // Running the executor
         try {
             val output = executor.execute(instance, node.id)
-            // TODO Stores the output back into the instance and progresses the node's status
+            // Stores the output back into the instance and progresses the node's status
+            instance = instance.successNode(node.id, output)
             // TODO Getting the next nodes
             // TODO For each next node, checks if it can be scheduled or not
             // TODO Schedule the node
@@ -74,6 +76,8 @@ class WorkflowEngineImpl(
 
     private fun WorkflowNode.toStartExecution() = WorkflowInstanceNode(
         id = id,
+        status = WorkflowInstanceNodeStatus.IDLE,
+        output = null,
     )
 
 }
