@@ -18,7 +18,11 @@ object WorkflowFixtures {
                 WorkflowNode(
                     id = "end",
                     data = TextNode("End node"),
-                    parents = listOf("start"),
+                    parents = listOf(
+                        WorkflowParentNode(
+                            id = "start"
+                        )
+                    ),
                 ),
             )
         )
@@ -41,7 +45,14 @@ object WorkflowFixtures {
                 WorkflowNode(
                     id = "end",
                     data = TextNode("End node"),
-                    parents = listOf("start-a", "start-b"),
+                    parents = listOf(
+                        WorkflowParentNode(
+                            id = "start-a",
+                        ),
+                        WorkflowParentNode(
+                            id = "start-b",
+                        ),
+                    ),
                 ),
             )
         )

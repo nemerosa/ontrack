@@ -85,8 +85,8 @@ class WorkflowEngineImpl(
         // 1. node must be idle
         return instanceNode.status == WorkflowInstanceNodeStatus.IDLE &&
                 // 2. all its parents must be in SUCCESS state
-                workflowNode.parents.all { parentId ->
-                    val parentNode = instance.getNode(parentId)
+                workflowNode.parents.all { parent ->
+                    val parentNode = instance.getNode(parent.id)
                     parentNode.status == WorkflowInstanceNodeStatus.SUCCESS
                 }
     }

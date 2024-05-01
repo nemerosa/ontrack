@@ -17,13 +17,12 @@ data class Workflow(
     /**
      * Given the ID of a parent, returns the next nodes in the workflow.
      */
-    fun getNextNodes(parentId: String?): List<String> {
+    fun getNextNodes(parentId: String?): List<String> =
         if (parentId.isNullOrBlank()) {
-            return nodes.filter { it.parents.isEmpty() }.map { it.id }
+            nodes.filter { it.parents.isEmpty() }.map { it.id }
         } else {
-            return nodes.filter { parentId in it.parents }.map { it.id }
+            nodes.filter { it.parents.any { ref -> ref.id == parentId } }.map { it.id }
         }
-    }
 
     fun getNode(nodeId: String) = nodes.firstOrNull { it.id == nodeId }
         ?: throw WorkflowNodeNotFoundException(nodeId)
