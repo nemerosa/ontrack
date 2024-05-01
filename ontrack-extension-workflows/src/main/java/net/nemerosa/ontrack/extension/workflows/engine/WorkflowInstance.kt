@@ -45,5 +45,9 @@ data class WorkflowInstance(
             }
         },
     )
+
+    fun getNode(nodeId: String) = nodesExecutions.firstOrNull { it.id == nodeId }
+        ?: throw WorkflowNodeNotFoundException(nodeId)
+    
 }
 
