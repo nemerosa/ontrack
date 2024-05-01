@@ -17,12 +17,17 @@ class WorkflowEngineImpl : WorkflowEngine {
         val instance = WorkflowInstance(
             id = UUID.randomUUID().toString(),
             workflow = workflow,
-            nodesExecutions = workflow.nodes.map { it.toStartExecution() }
+            nodesExecutions = workflow.nodes.map { it.toStartExecution() },
+            status = WorkflowInstanceStatus.STARTED,
         )
         // TODO Storing the instance
         // TODO Getting the starting nodes
         // Returning the instance
         return instance
+    }
+
+    override fun findWorkflowInstance(id: String): WorkflowInstance? {
+        TODO("Not yet implemented")
     }
 
     private fun WorkflowNode.toStartExecution() = WorkflowInstanceNode(
