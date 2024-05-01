@@ -12,6 +12,7 @@ dependencies {
 
     implementation(project(":ontrack-extension-queue"))
     implementation(project(":ontrack-ui-graphql"))
+    implementation("org.springframework:spring-context")
     implementation("org.slf4j:slf4j-api")
     implementation("io.micrometer:micrometer-core")
     implementation("jakarta.annotation:jakarta.annotation-api")

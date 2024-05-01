@@ -6,6 +6,7 @@ target
 .classpath
 .settings
 work*/
+!workflows
 .DS_Store
 build
 .gradle
