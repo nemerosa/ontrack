@@ -23680,6 +23680,20 @@
           "fields": null,
           "inputFields": [
             {
+              "name": "context",
+              "description": "context field",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "JSON",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
               "name": "workflowId",
               "description": "workflowId field",
               "type": {
@@ -38622,6 +38636,40 @@
                 "kind": "OBJECT",
                 "name": "WorkflowInstance",
                 "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "mockWorkflowTexts",
+              "description": "Getting a list of texts generated for a mock workflow",
+              "args": [
+                {
+                  "name": "instanceId",
+                  "description": "ID of the workflow instance",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String"
+                    }
+                  }
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null

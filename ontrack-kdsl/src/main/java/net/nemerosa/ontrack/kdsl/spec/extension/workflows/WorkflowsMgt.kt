@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.kdsl.spec.extension.workflows
 
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.kdsl.connector.Connected
 import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
@@ -17,9 +18,9 @@ class WorkflowsMgt(connector: Connector) : Connected(connector) {
             it?.saveYamlWorkflow()?.fragments()?.payloadUserErrors()?.convert()
         }?.saveYamlWorkflow()?.workflowId()
 
-    fun launchWorkflow(workflowId: String): String? =
+    fun launchWorkflow(workflowId: String, context: JsonNode): String? =
         graphqlConnector.mutate(
-            LaunchWorkflowMutation(workflowId)
+            LaunchWorkflowMutation(workflowId, context)
         ) {
             it?.launchWorkflow()?.fragments()?.payloadUserErrors()?.convert()
         }?.launchWorkflow()?.workflowInstanceId()

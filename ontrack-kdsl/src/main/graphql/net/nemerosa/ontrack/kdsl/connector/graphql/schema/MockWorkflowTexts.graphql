@@ -1,0 +1,3 @@
+query MockWorkflowTexts($instanceId: String!) {
+    mockWorkflowTexts(instanceId: $instanceId)
+}

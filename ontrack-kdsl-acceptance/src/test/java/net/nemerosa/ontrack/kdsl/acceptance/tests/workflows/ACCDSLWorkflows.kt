@@ -1,10 +1,13 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.workflows
 
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.kdsl.acceptance.tests.AbstractACCDSLTestSupport
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
+import net.nemerosa.ontrack.kdsl.spec.extension.workflows.mock.mock
 import net.nemerosa.ontrack.kdsl.spec.extension.workflows.workflows
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
 import kotlin.test.fail
 
 class ACCDSLWorkflows : AbstractACCDSLTestSupport() {
@@ -32,14 +35,22 @@ class ACCDSLWorkflows : AbstractACCDSLTestSupport() {
         // Running the workflow
         val instanceId = ontrack.workflows.launchWorkflow(
             workflowId = workflowId,
-            // TODO Context
+            context = mapOf("text" to "Linear").asJson(),
         ) ?: fail("Error while launching workflow")
         // Waiting for the workflow result
         waitUntil {
             val instance = ontrack.workflows.workflowInstance(instanceId)
             instance != null && instance.finished
         }
-        // TODO Checks the outcome of the workflow run
+        // Checks the outcome of the workflow run
+        val texts = ontrack.workflows.mock.getTexts(instanceId)
+        assertEquals(
+            listOf(
+                "Processed: Start node for Linear",
+                "Processed: End node for Linear",
+            ),
+            texts
+        )
     }
 
     @Test
@@ -68,14 +79,23 @@ class ACCDSLWorkflows : AbstractACCDSLTestSupport() {
         // Running the workflow
         val instanceId = ontrack.workflows.launchWorkflow(
             workflowId = workflowId,
-            // TODO Context
+            context = mapOf("text" to "Parallel / Join").asJson(),
         ) ?: fail("Error while launching workflow")
         // Waiting for the workflow result
         waitUntil {
             val instance = ontrack.workflows.workflowInstance(instanceId)
             instance != null && instance.finished
         }
-        // TODO Checks the outcome of the workflow run
+        // Checks the outcome of the workflow run
+        val texts = ontrack.workflows.mock.getTexts(instanceId)
+        assertEquals(
+            setOf(
+                "Processed: Start node A for Parallel / Join",
+                "Processed: Start node B for Parallel / Join",
+                "Processed: End node for Parallel / Join",
+            ),
+            texts.toSet()
+        )
     }
 
 }
