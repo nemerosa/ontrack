@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.kdsl.acceptance.tests.workflows
 
 import net.nemerosa.ontrack.kdsl.acceptance.tests.AbstractACCDSLTestSupport
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
+import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
 import org.junit.jupiter.api.Test
 
 class ACCDSLWorkflows : AbstractACCDSLTestSupport() {
@@ -21,13 +22,22 @@ class ACCDSLWorkflows : AbstractACCDSLTestSupport() {
                   parents:
                     - id: start
         """.trimIndent()
-        // TODO Saving the workflow
-//        ontrack.workflows.saveYamlWorkflow(
-//            workflow = workflow,
-//            executor = "mock",
-//        )
-        // TODO Running the workflow
-        // TODO Waiting for the workflow result
+        // Saving the workflow
+        val workflowId = ontrack.workflows.saveYamlWorkflow(
+            workflow = workflow,
+            executor = "mock",
+        ).id
+        // Running the workflow
+        val instanceId = ontrack.workflows.launchWorkflow(
+            workflowId = workflowId,
+            // TODO Context
+        )
+        // Waiting for the workflow result
+        waitUntil {
+            val instance = ontrack.workflows.workflowInstance(instanceId)
+            instance != null && instance.finished
+        }
+        // TODO Checks the outcome of the workflow run
     }
 
 }
