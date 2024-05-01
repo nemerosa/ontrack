@@ -26,7 +26,6 @@ class WorkflowEngineImpl(
             workflow = workflow,
             executorId = workflowNodeExecutor.id,
             nodesExecutions = workflow.nodes.map { it.toStartExecution() },
-            status = WorkflowInstanceStatus.STARTED,
         )
         // Storing the instance
         workflowInstanceStore.store(instance)
