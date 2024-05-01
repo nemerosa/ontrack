@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.workflows.engine
 
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 
 /**
@@ -16,6 +17,21 @@ data class WorkflowInstance(
     val workflow: Workflow,
     val executorId: String,
     val nodesExecutions: List<WorkflowInstanceNode>,
+    @Deprecated("Must always be computed")
     val status: WorkflowInstanceStatus,
-)
+) {
+    fun successNode(id: String, output: JsonNode) = WorkflowInstance(
+        id = id,
+        workflow = workflow,
+        executorId = executorId,
+        nodesExecutions = nodesExecutions.map { node ->
+            if (node.id == id) {
+                node.success(output)
+            } else {
+                node
+            }
+        },
+        status = status
+    )
+}
 
