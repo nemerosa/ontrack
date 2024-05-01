@@ -98,4 +98,63 @@ class ACCDSLWorkflows : AbstractACCDSLTestSupport() {
         )
     }
 
+    @Test
+    fun `Complex workflow with waiting times`() {
+        // Defining a workflow
+        val name = uid("w-")
+        val workflow = """
+            name: $name
+            data: ""
+            nodes:
+                - id: start
+                  data:
+                    text: Starting
+                    waitMs: 500
+                - id: parallel-a
+                  data:
+                    text: Parallel A
+                    waitMs: 500
+                  parents:
+                    - id: start
+                - id: parallel-b
+                  data:
+                    text: Parallel B
+                    waitMs: 2000
+                  parents:
+                    - id: start
+                - id: end
+                  data:
+                    text: End
+                  parents:
+                    - id: parallel-a
+                    - id: parallel-b
+        """.trimIndent()
+        // Saving the workflow
+        val workflowId = ontrack.workflows.saveYamlWorkflow(
+            workflow = workflow,
+            executor = "mock",
+        ) ?: fail("Error while saving workflow")
+        // Running the workflow
+        val instanceId = ontrack.workflows.launchWorkflow(
+            workflowId = workflowId,
+            context = mapOf("text" to "Complex").asJson(),
+        ) ?: fail("Error while launching workflow")
+        // Waiting for the workflow result
+        waitUntil {
+            val instance = ontrack.workflows.workflowInstance(instanceId)
+            instance != null && instance.finished
+        }
+        // Checks the outcome of the workflow run
+        val texts = ontrack.workflows.mock.getTexts(instanceId)
+        assertEquals(
+            setOf(
+                "Processed: Starting for Complex",
+                "Processed: Parallel A for Complex",
+                "Processed: Parallel B for Complex",
+                "Processed: End for Complex",
+            ),
+            texts.toSet()
+        )
+    }
+
 }
