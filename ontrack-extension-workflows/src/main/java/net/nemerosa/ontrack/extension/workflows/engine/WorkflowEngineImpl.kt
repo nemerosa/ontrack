@@ -53,7 +53,6 @@ class WorkflowEngineImpl(
         // Getting the instance & the node
         var instance = getWorkflowInstance(workflowInstanceId)
         val node = instance.workflow.getNode(workflowNodeId)
-        // TODO Running the node in the instance
         // Getting the node executor
         val executor = extensionManager.getExtensions(WorkflowNodeExecutor::class.java)
             .find { it.id == instance.executorId }
@@ -66,13 +65,30 @@ class WorkflowEngineImpl(
             // Getting the next nodes
             val nextNodes = instance.workflow.getNextNodes(node.id)
             for (nextNode in nextNodes) {
-                // TODO For each next node, checks if it can be scheduled or not
-                // Schedule the node
-                queueNode(executor, instance, nextNode)
+                // For each next node, checks if it can be scheduled or not
+                if (canRunNode(instance, nextNode)) {
+                    // Schedule the node
+                    queueNode(executor, instance, nextNode)
+                }
             }
         } catch (any: Exception) {
             // TODO Stores the node error status
         }
+    }
+
+    private fun canRunNode(instance: WorkflowInstance, nodeId: String): Boolean {
+        // Getting the instance node state
+        val instanceNode = instance.getNode(nodeId)
+        // Getting the workflow node
+        val workflowNode = instance.workflow.getNode(nodeId)
+        // Running all the checks
+        // 1. node must be idle
+        return instanceNode.status == WorkflowInstanceNodeStatus.IDLE &&
+                // 2. all its parents must be in SUCCESS state
+                workflowNode.parents.all { parentId ->
+                    val parentNode = instance.getNode(parentId)
+                    parentNode.status == WorkflowInstanceNodeStatus.SUCCESS
+                }
     }
 
     override fun findWorkflowInstance(id: String): WorkflowInstance? =
