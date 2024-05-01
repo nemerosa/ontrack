@@ -3,7 +3,9 @@ package net.nemerosa.ontrack.kdsl.acceptance.tests.workflows
 import net.nemerosa.ontrack.kdsl.acceptance.tests.AbstractACCDSLTestSupport
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
+import net.nemerosa.ontrack.kdsl.spec.extension.workflows.workflows
 import org.junit.jupiter.api.Test
+import kotlin.test.fail
 
 class ACCDSLWorkflows : AbstractACCDSLTestSupport() {
 
@@ -26,12 +28,12 @@ class ACCDSLWorkflows : AbstractACCDSLTestSupport() {
         val workflowId = ontrack.workflows.saveYamlWorkflow(
             workflow = workflow,
             executor = "mock",
-        ).id
+        ) ?: fail("Error while saving workflow")
         // Running the workflow
         val instanceId = ontrack.workflows.launchWorkflow(
             workflowId = workflowId,
             // TODO Context
-        )
+        ) ?: fail("Error while launching workflow")
         // Waiting for the workflow result
         waitUntil {
             val instance = ontrack.workflows.workflowInstance(instanceId)

@@ -1,0 +1,10 @@
+mutation LaunchWorkflow(
+    $workflowId: String!,
+) {
+    launchWorkflow(input: {
+        workflowId: $workflowId,
+    }) {
+        ...PayloadUserErrors
+        workflowInstanceId
+    }
+}
