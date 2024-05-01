@@ -17,9 +17,24 @@ data class WorkflowInstance(
     val workflow: Workflow,
     val executorId: String,
     val nodesExecutions: List<WorkflowInstanceNode>,
-    @Deprecated("Must always be computed")
-    val status: WorkflowInstanceStatus,
 ) {
+
+    val status: WorkflowInstanceStatus
+        get() {
+            val nodes = nodesExecutions.map { it.status }
+            if (nodes.all { it == WorkflowInstanceNodeStatus.IDLE }) {
+                return WorkflowInstanceStatus.STARTED
+            } else if (nodes.any { it == WorkflowInstanceNodeStatus.ERROR }) {
+                return WorkflowInstanceStatus.ERROR
+            } else if (nodes.any { it == WorkflowInstanceNodeStatus.STARTED }) {
+                return WorkflowInstanceStatus.RUNNING
+            } else if (nodes.all { it == WorkflowInstanceNodeStatus.SUCCESS }) {
+                return WorkflowInstanceStatus.SUCCESS
+            } else {
+                error("Inconsistent state")
+            }
+        }
+
     fun successNode(id: String, output: JsonNode) = WorkflowInstance(
         id = id,
         workflow = workflow,
@@ -31,7 +46,6 @@ data class WorkflowInstance(
                 node
             }
         },
-        status = status
     )
 }
 
