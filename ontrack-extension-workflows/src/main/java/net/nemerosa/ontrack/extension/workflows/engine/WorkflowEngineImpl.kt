@@ -61,7 +61,7 @@ class WorkflowEngineImpl(
         try {
             val output = executor.execute(instance, node.id)
             // Stores the output back into the instance and progresses the node's status
-            instance = instance.successNode(node.id, output)
+            instance = workflowInstanceStore.store(instance.successNode(node.id, output))
             // TODO Getting the next nodes
             // TODO For each next node, checks if it can be scheduled or not
             // TODO Schedule the node
