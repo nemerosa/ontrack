@@ -9,9 +9,16 @@ import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.it.waitUntil
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.test.context.TestPropertySource
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
+@TestPropertySource(
+    properties = [
+        "net.nemerosa.ontrack.extension.workflows.store=memory",
+    ]
+)
 class WorkflowEngineIT : AbstractDSLTestSupport() {
 
     @Autowired
@@ -42,7 +49,7 @@ class WorkflowEngineIT : AbstractDSLTestSupport() {
         // Running the workflow
         val instance = workflowEngine.startWorkflow(workflow, mockWorkflowNodeExecutor)
         // Waiting until the workflow is completed (error or success)
-        waitUntil("Waiting until workflow is complete") {
+        waitUntil("Waiting until workflow is complete", timeout = 10.seconds) {
             workflowEngine.getWorkflowInstance(instance.id).status.finished
         }
     }

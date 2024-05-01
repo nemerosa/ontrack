@@ -9,7 +9,9 @@ import java.util.UUID
 
 @Service
 @Transactional
-class WorkflowEngineImpl : WorkflowEngine {
+class WorkflowEngineImpl(
+    private val workflowInstanceStore: WorkflowInstanceStore,
+) : WorkflowEngine {
 
     override fun startWorkflow(workflow: Workflow, workflowNodeExecutor: WorkflowNodeExecutor): WorkflowInstance {
         // TODO Checks the workflow consistency (cycles, etc.) - use a public method, usable by extensions
@@ -20,15 +22,15 @@ class WorkflowEngineImpl : WorkflowEngine {
             nodesExecutions = workflow.nodes.map { it.toStartExecution() },
             status = WorkflowInstanceStatus.STARTED,
         )
-        // TODO Storing the instance
+        // Storing the instance
+        workflowInstanceStore.store(instance)
         // TODO Getting the starting nodes
         // Returning the instance
         return instance
     }
 
-    override fun findWorkflowInstance(id: String): WorkflowInstance? {
-        TODO("Not yet implemented")
-    }
+    override fun findWorkflowInstance(id: String): WorkflowInstance? =
+        workflowInstanceStore.findById(id)
 
     private fun WorkflowNode.toStartExecution() = WorkflowInstanceNode(
         id = id,
