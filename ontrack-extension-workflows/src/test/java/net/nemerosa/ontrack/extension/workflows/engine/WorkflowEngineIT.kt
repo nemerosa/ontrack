@@ -51,7 +51,9 @@ class WorkflowEngineIT : AbstractDSLTestSupport() {
         val instance = workflowEngine.startWorkflow(workflow, mockWorkflowNodeExecutor)
         // Waiting until the workflow is completed (error or success)
         waitUntil("Waiting until workflow is complete", timeout = 10.seconds) {
-            workflowEngine.getWorkflowInstance(instance.id).status.finished
+            val workflowInstance = workflowEngine.getWorkflowInstance(instance.id)
+            println("workflowInstance = $workflowInstance")
+            workflowInstance.status.finished
         }
     }
 
