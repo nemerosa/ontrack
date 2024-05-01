@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.av.properties.yaml
+package net.nemerosa.ontrack.yaml
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
@@ -8,7 +8,6 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValues
 import java.io.StringWriter
 
-@Deprecated("Will be removed in V5. Use the Yaml class from the ontrack-json module")
 class Yaml {
 
     private val yamlFactory = YAMLFactory().apply {
