@@ -12,5 +12,5 @@ import com.fasterxml.jackson.databind.JsonNode
 data class WorkflowNode(
     val id: String,
     val data: JsonNode,
-    val parents: List<String>,
+    val parents: List<WorkflowParentNode>,
 )
