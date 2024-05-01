@@ -53,5 +53,25 @@ data class WorkflowInstance(
     fun getNode(nodeId: String) = nodesExecutions.firstOrNull { it.id == nodeId }
         ?: throw WorkflowNodeNotFoundException(nodeId)
 
+    private fun collectParentsData(results: MutableMap<String, JsonNode?>, workflowNodeId: String, depth: Int) {
+        val instanceNode = getNode(workflowNodeId)
+        val workflowNode = workflow.getNode(workflowNodeId)
+        if (depth > 0) {
+            results[workflowNode.id] = instanceNode.output
+        }
+        workflowNode.parents.forEach { parent ->
+            collectParentsData(results, parent.id, depth + 1)
+        }
+    }
+
+    /**
+     * Starting from a node, gets the index of all its parent's data
+     */
+    fun getParentsData(workflowNodeId: String): Map<String, JsonNode?> {
+        val results = mutableMapOf<String, JsonNode?>()
+        collectParentsData(results, workflowNodeId, 0)
+        return results.toMap()
+    }
+
 }
 

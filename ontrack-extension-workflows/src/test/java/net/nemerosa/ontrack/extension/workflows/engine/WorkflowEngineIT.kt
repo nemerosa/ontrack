@@ -134,4 +134,59 @@ class WorkflowEngineIT : AbstractDSLTestSupport() {
         )
     }
 
+    @Test
+    fun `Complex workflow with reusing parent outputs`() {
+        // Defining a workflow using YAML
+        val yaml = """
+            name: Complex workflow with waiting times
+            data: ""
+            nodes:
+                - id: start
+                  data:
+                    text: Starting
+                    waitMs: 500
+                - id: parallel-a
+                  data:
+                    text: Parallel A
+                    waitMs: 500
+                  parents:
+                    - id: start
+                - id: parallel-b
+                  data:
+                    text: Parallel B
+                    waitMs: 2000
+                  parents:
+                    - id: start
+                - id: end
+                  data:
+                    text: End of (#parallel-a) and (#parallel-b)
+                  parents:
+                    - id: parallel-a
+                    - id: parallel-b
+        """.trimIndent()
+        // Registering the workflow
+        val workflowId = workflowRegistry.saveYamlWorkflow(yaml, "mock")
+        // Getting the workflow
+        val record = workflowRegistry.findWorkflow(workflowId) ?: fail("No workflow found for $workflowId")
+        // Launching the workflow
+        val instance = workflowEngine.startWorkflow(record.workflow, record.nodeExecutor, TextNode("Complex"))
+        // Waiting until the workflow is completed (error or success)
+        waitUntil("Waiting until workflow is complete", timeout = 10.seconds) {
+            val workflowInstance = workflowEngine.getWorkflowInstance(instance.id)
+            println("workflowInstance = $workflowInstance")
+            workflowInstance.status.finished
+        }
+        // Checks the results
+        val texts = mockWorkflowNodeExecutor.getTextsByInstanceId(instance.id)
+        assertEquals(
+            setOf(
+                "Processed: Starting for Complex",
+                "Processed: Parallel A for Complex",
+                "Processed: Parallel B for Complex",
+                "Processed: End of (Processed: Parallel A for Complex) and (Processed: Parallel B for Complex) for Complex",
+            ),
+            texts.toSet()
+        )
+    }
+
 }
