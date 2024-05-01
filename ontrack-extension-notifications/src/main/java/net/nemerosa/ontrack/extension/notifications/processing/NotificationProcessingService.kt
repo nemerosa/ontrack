@@ -4,6 +4,10 @@ import net.nemerosa.ontrack.extension.notifications.model.Notification
 
 interface NotificationProcessingService {
 
-    fun process(item: Notification)
+    /**
+     * @param item Notification to process
+     * @return Notification output
+     */
+    fun process(item: Notification): Any?
 
 }

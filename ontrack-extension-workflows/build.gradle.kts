@@ -11,6 +11,7 @@ dependencies {
     api(project(":ontrack-ui-support"))
 
     implementation(project(":ontrack-extension-queue"))
+    implementation(project(":ontrack-extension-notifications"))
     implementation(project(":ontrack-ui-graphql"))
     implementation("org.springframework:spring-context")
     implementation("org.slf4j:slf4j-api")
