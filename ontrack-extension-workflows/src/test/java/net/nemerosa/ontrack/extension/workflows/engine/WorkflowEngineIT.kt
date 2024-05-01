@@ -17,6 +17,7 @@ import kotlin.time.ExperimentalTime
 @TestPropertySource(
     properties = [
         "net.nemerosa.ontrack.extension.workflows.store=memory",
+        "ontrack.extension.queue.general.async=false", // TODO Working with real queuing
     ]
 )
 class WorkflowEngineIT : AbstractDSLTestSupport() {

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.workflows.engine
 
+import net.nemerosa.ontrack.extension.queue.dispatching.QueueDispatcher
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowNode
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutor
@@ -11,6 +12,8 @@ import java.util.UUID
 @Transactional
 class WorkflowEngineImpl(
     private val workflowInstanceStore: WorkflowInstanceStore,
+    private val queueDispatcher: QueueDispatcher,
+    private val workflowQueueProcessor: WorkflowQueueProcessor,
 ) : WorkflowEngine {
 
     override fun startWorkflow(workflow: Workflow, workflowNodeExecutor: WorkflowNodeExecutor): WorkflowInstance {
@@ -19,6 +22,7 @@ class WorkflowEngineImpl(
         val instance = WorkflowInstance(
             id = UUID.randomUUID().toString(),
             workflow = workflow,
+            executorId = workflowNodeExecutor.id,
             nodesExecutions = workflow.nodes.map { it.toStartExecution() },
             status = WorkflowInstanceStatus.STARTED,
         )
@@ -27,7 +31,18 @@ class WorkflowEngineImpl(
         // Getting the starting nodes
         val nodes = instance.workflow.getNextNodes(null)
         // TODO Special case: no starting node
-        // TODO Scheduling the nodes
+        // Scheduling the nodes
+        for (nodeId in nodes) {
+            queueDispatcher.dispatch(
+                queueProcessor = workflowQueueProcessor,
+                payload = WorkflowQueuePayload(
+                    workflowNodeExecutorId = workflowNodeExecutor.id,
+                    workflowInstanceId = instance.id,
+                    workflowNodeId = nodeId,
+                ),
+                source = null, // TODO Setting a custom source
+            )
+        }
         // Returning the instance
         return instance
     }
