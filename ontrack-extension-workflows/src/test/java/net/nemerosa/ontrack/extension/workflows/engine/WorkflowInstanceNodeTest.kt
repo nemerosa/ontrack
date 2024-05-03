@@ -12,6 +12,7 @@ class WorkflowInstanceNodeTest {
             id = "node",
             status = WorkflowInstanceNodeStatus.STARTED,
             output = null,
+            error = null,
         )
         val next = node.success(TextNode("test"))
         assertEquals(node.id, next.id)

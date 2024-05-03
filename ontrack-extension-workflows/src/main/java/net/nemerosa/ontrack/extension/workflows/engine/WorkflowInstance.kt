@@ -9,14 +9,14 @@ import net.nemerosa.ontrack.extension.workflows.definition.Workflow
  *
  * @property id Unique ID for this workflow instance.
  * @property workflow Associated workflow
- * @property executorId ID of the workflow node executor
+ * @property context Mutable index of context objects used by the workflow
  * @property nodesExecutions Information about the node executions
  * @property status Status of the execution of this workflow
  */
 data class WorkflowInstance(
     val id: String,
     val workflow: Workflow,
-    val context: JsonNode,
+    val context: WorkflowContext,
     val nodesExecutions: List<WorkflowInstanceNode>,
 ) {
 
@@ -42,6 +42,19 @@ data class WorkflowInstance(
         nodesExecutions = nodesExecutions.map { node ->
             if (node.id == nodeId) {
                 node.success(output)
+            } else {
+                node
+            }
+        },
+    )
+
+    fun errorNode(nodeId: String, throwable: Throwable) = WorkflowInstance(
+        id = id,
+        workflow = workflow,
+        context = context,
+        nodesExecutions = nodesExecutions.map { node ->
+            if (node.id == nodeId) {
+                node.error(throwable)
             } else {
                 node
             }

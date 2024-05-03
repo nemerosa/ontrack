@@ -37,7 +37,7 @@ class WorkflowEngineIT : AbstractDSLTestSupport() {
         // Defining a workflow
         val workflow = WorkflowFixtures.simpleLinearWorkflow()
         // Running the workflow
-        val instance = workflowEngine.startWorkflow(workflow, TextNode("Linear"))
+        val instance = workflowEngine.startWorkflow(workflow, WorkflowContext("mock", TextNode("Linear")))
         // Waiting until the workflow is completed (error or success)
         waitUntil("Waiting until workflow is complete", timeout = 10.seconds) {
             val workflowInstance = workflowEngine.getWorkflowInstance(instance.id)
@@ -60,7 +60,7 @@ class WorkflowEngineIT : AbstractDSLTestSupport() {
         // Defining a workflow
         val workflow = WorkflowFixtures.twoParallelAndJoin()
         // Running the workflow
-        val instance = workflowEngine.startWorkflow(workflow, TextNode("Parallel / Join"))
+        val instance = workflowEngine.startWorkflow(workflow, WorkflowContext("mock", TextNode("Parallel / Join")))
         // Waiting until the workflow is completed (error or success)
         waitUntil("Waiting until workflow is complete", timeout = 10.seconds) {
             val workflowInstance = workflowEngine.getWorkflowInstance(instance.id)
@@ -117,7 +117,7 @@ class WorkflowEngineIT : AbstractDSLTestSupport() {
         // Getting the workflow
         val record = workflowRegistry.findWorkflow(workflowId) ?: fail("No workflow found for $workflowId")
         // Launching the workflow
-        val instance = workflowEngine.startWorkflow(record.workflow, TextNode("Complex"))
+        val instance = workflowEngine.startWorkflow(record.workflow, WorkflowContext("mock", TextNode("Complex")))
         // Waiting until the workflow is completed (error or success)
         waitUntil("Waiting until workflow is complete", timeout = 10.seconds) {
             val workflowInstance = workflowEngine.getWorkflowInstance(instance.id)
@@ -175,7 +175,7 @@ class WorkflowEngineIT : AbstractDSLTestSupport() {
         // Getting the workflow
         val record = workflowRegistry.findWorkflow(workflowId) ?: fail("No workflow found for $workflowId")
         // Launching the workflow
-        val instance = workflowEngine.startWorkflow(record.workflow, TextNode("Complex"))
+        val instance = workflowEngine.startWorkflow(record.workflow, WorkflowContext("mock", TextNode("Complex")))
         // Waiting until the workflow is completed (error or success)
         waitUntil("Waiting until workflow is complete", timeout = 10.seconds) {
             val workflowInstance = workflowEngine.getWorkflowInstance(instance.id)

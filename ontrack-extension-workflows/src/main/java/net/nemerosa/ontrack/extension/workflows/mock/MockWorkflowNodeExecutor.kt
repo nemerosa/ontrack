@@ -36,7 +36,7 @@ class MockWorkflowNodeExecutor(
         // Gets the parent outputs in an index
         val parentsData = workflowInstance.getParentsData(workflowNodeId)
         // Using the context
-        val execContext = workflowInstance.context
+        val execContext = workflowInstance.context.getValue("mock")
         val context = if (execContext.has("text")) {
             execContext.path("text").asText()
         } else {

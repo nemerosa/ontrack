@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.kdsl.acceptance.tests.AbstractACCDSLTestSupport
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
+import net.nemerosa.ontrack.kdsl.spec.extension.workflows.WorkflowInstanceStatus
 import net.nemerosa.ontrack.kdsl.spec.extension.workflows.mock.mock
 import net.nemerosa.ontrack.kdsl.spec.extension.workflows.workflows
 import org.junit.jupiter.api.Test
@@ -36,13 +37,10 @@ class ACCDSLWorkflows : AbstractACCDSLTestSupport() {
         // Running the workflow
         val instanceId = ontrack.workflows.launchWorkflow(
             workflowId = workflowId,
-            context = mapOf("text" to "Linear").asJson(),
+            context = "mock" to mapOf("text" to "Linear").asJson(),
         ) ?: fail("Error while launching workflow")
         // Waiting for the workflow result
-        waitUntil {
-            val instance = ontrack.workflows.workflowInstance(instanceId)
-            instance != null && instance.finished
-        }
+        waitUntilWorkflowFinished(instanceId)
         // Checks the outcome of the workflow run
         val texts = ontrack.workflows.mock.getTexts(instanceId)
         assertEquals(
@@ -82,13 +80,10 @@ class ACCDSLWorkflows : AbstractACCDSLTestSupport() {
         // Running the workflow
         val instanceId = ontrack.workflows.launchWorkflow(
             workflowId = workflowId,
-            context = mapOf("text" to "Parallel / Join").asJson(),
+            context = "mock" to mapOf("text" to "Parallel / Join").asJson(),
         ) ?: fail("Error while launching workflow")
         // Waiting for the workflow result
-        waitUntil {
-            val instance = ontrack.workflows.workflowInstance(instanceId)
-            instance != null && instance.finished
-        }
+        waitUntilWorkflowFinished(instanceId)
         // Checks the outcome of the workflow run
         val texts = ontrack.workflows.mock.getTexts(instanceId)
         assertEquals(
@@ -143,13 +138,10 @@ class ACCDSLWorkflows : AbstractACCDSLTestSupport() {
         // Running the workflow
         val instanceId = ontrack.workflows.launchWorkflow(
             workflowId = workflowId,
-            context = mapOf("text" to "Complex").asJson(),
+            context = "mock" to mapOf("text" to "Complex").asJson(),
         ) ?: fail("Error while launching workflow")
         // Waiting for the workflow result
-        waitUntil {
-            val instance = ontrack.workflows.workflowInstance(instanceId)
-            instance != null && instance.finished
-        }
+        waitUntilWorkflowFinished(instanceId)
         // Checks the outcome of the workflow run
         val texts = ontrack.workflows.mock.getTexts(instanceId)
         assertEquals(
@@ -161,6 +153,30 @@ class ACCDSLWorkflows : AbstractACCDSLTestSupport() {
             ),
             texts.toSet()
         )
+    }
+
+    private fun waitUntilWorkflowFinished(instanceId: String) {
+        waitUntil(
+            timeout = 30_000L,
+            interval = 500L,
+        ) {
+            val instance = ontrack.workflows.workflowInstance(instanceId)
+            instance != null && instance.finished
+        }
+        // Getting the final errors
+        val instance = ontrack.workflows.workflowInstance(instanceId)
+            ?: fail("Could not get the workflow instance")
+        if (instance.status == WorkflowInstanceStatus.ERROR) {
+            // Displaying the errors
+            instance.nodesExecutions.forEach { node ->
+                println("Node: ${node.id}")
+                println("  Status: ${node.status}")
+                println("  Output: ${node.output}")
+                println("  Error: ${node.error}")
+            }
+            // Failing
+            fail("Workflow failed in error. See errors above.")
+        }
     }
 
 }

@@ -4,5 +4,11 @@ query WorkflowInstance(
     workflowInstance(id: $workflowInstanceId) {
         status
         finished
+        nodesExecutions {
+            id
+            status
+            output
+            error
+        }
     }
 }
