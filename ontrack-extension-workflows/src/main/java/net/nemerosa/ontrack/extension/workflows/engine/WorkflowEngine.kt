@@ -13,11 +13,10 @@ interface WorkflowEngine {
      * Starts the execution of a workflow.
      *
      * @param workflow Workflow to run
-     * @param workflowNodeExecutor Workflow executor to use
      * @param context Execution context
      * @return Initial state of the workflow instance
      */
-    fun startWorkflow(workflow: Workflow, workflowNodeExecutor: WorkflowNodeExecutor, context: JsonNode): WorkflowInstance
+    fun startWorkflow(workflow: Workflow, context: JsonNode): WorkflowInstance
 
     /**
      * Given the ID of a [WorkflowInstance], returns this instance or null if not found.

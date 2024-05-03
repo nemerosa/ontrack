@@ -8,15 +8,16 @@ object WorkflowFixtures {
     fun simpleLinearWorkflow() =
         Workflow(
             name = "Simple linear",
-            data = NullNode.instance,
             nodes = listOf(
                 WorkflowNode(
                     id = "start",
+                    executorId = "mock",
                     data = TextNode("Start node"),
                     parents = emptyList(),
                 ),
                 WorkflowNode(
                     id = "end",
+                    executorId = "mock",
                     data = TextNode("End node"),
                     parents = listOf(
                         WorkflowParentNode(
@@ -30,20 +31,22 @@ object WorkflowFixtures {
     fun twoParallelAndJoin() =
         Workflow(
             name = "Parallel with join",
-            data = NullNode.instance,
             nodes = listOf(
                 WorkflowNode(
                     id = "start-a",
+                    executorId = "mock",
                     data = TextNode("Start node A"),
                     parents = emptyList(),
                 ),
                 WorkflowNode(
                     id = "start-b",
+                    executorId = "mock",
                     data = TextNode("Start node B"),
                     parents = emptyList(),
                 ),
                 WorkflowNode(
                     id = "end",
+                    executorId = "mock",
                     data = TextNode("End node"),
                     parents = listOf(
                         WorkflowParentNode(

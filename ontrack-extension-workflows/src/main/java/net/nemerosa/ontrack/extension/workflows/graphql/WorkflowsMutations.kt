@@ -36,7 +36,6 @@ class WorkflowsMutations(
             if (workflowRecord != null) {
                 workflowEngine.startWorkflow(
                     workflow = workflowRecord.workflow,
-                    workflowNodeExecutor = workflowRecord.nodeExecutor,
                     context = input.context,
                 ).id
             } else {

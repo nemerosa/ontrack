@@ -12,7 +12,6 @@ class WorkflowInstanceTest {
         val next = workflowInstance.successNode("start", TextNode("Processing"))
         assertEquals(workflowInstance.id, next.id)
         assertEquals(workflowInstance.workflow, next.workflow)
-        assertEquals(workflowInstance.executorId, next.executorId)
         val output = next.nodesExecutions.find { it.id == "start" }?.output
         assertEquals("Processing", output?.asText())
     }
