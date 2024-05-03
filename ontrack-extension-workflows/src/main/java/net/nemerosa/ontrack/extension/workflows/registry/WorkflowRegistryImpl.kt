@@ -6,7 +6,7 @@ import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.support.StorageService
 import net.nemerosa.ontrack.yaml.Yaml
 import org.springframework.stereotype.Service
-import java.util.UUID
+import java.util.*
 
 @Service
 class WorkflowRegistryImpl(
@@ -43,7 +43,6 @@ class WorkflowRegistryImpl(
                 WorkflowRecord(
                     id = workflowId,
                     workflow = workflow,
-                    nodeExecutor = workflowNodeExecutorService.getExecutor(executorId),
                 )
             }
 

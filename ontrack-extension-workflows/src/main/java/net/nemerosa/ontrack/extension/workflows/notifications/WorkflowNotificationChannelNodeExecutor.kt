@@ -18,7 +18,11 @@ class WorkflowNotificationChannelNodeExecutor(
     private val notificationProcessingService: NotificationProcessingService,
 ) : AbstractExtension(workflowsExtensionFeature), WorkflowNodeExecutor {
 
-    override val id: String = "workflow-notification"
+    companion object {
+        const val ID: String = "workflow-notification"
+    }
+
+    override val id: String = ID
 
     override fun execute(workflowInstance: WorkflowInstance, workflowNodeId: String): JsonNode {
         // Gets the node's data

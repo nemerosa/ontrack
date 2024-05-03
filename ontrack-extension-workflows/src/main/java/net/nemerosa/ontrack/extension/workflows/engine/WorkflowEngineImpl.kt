@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.workflows.engine
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.queue.dispatching.QueueDispatcher
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
-import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutor
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -19,12 +18,11 @@ class WorkflowEngineImpl(
 
     override fun startWorkflow(
         workflow: Workflow,
-        workflowNodeExecutor: WorkflowNodeExecutor,
         context: JsonNode
     ): WorkflowInstance {
         // TODO Checks the workflow consistency (cycles, etc.) - use a public method, usable by extensions
         // Creating the instance
-        val instance = createInstance(workflow, workflowNodeExecutor, context)
+        val instance = createInstance(workflow, context)
         // Storing the instance
         workflowInstanceStore.store(instance)
         // Getting the starting nodes
@@ -32,23 +30,23 @@ class WorkflowEngineImpl(
         // TODO Special case: no starting node
         // Scheduling the nodes
         for (nodeId in nodes) {
-            queueNode(workflowNodeExecutor, instance, nodeId)
+            queueNode(instance, nodeId)
         }
         // Returning the instance
         return instance
     }
 
     private fun queueNode(
-        workflowNodeExecutor: WorkflowNodeExecutor,
         instance: WorkflowInstance,
         nodeId: String
     ) {
+        val node = instance.workflow.getNode(nodeId)
         queueDispatcher.dispatch(
             queueProcessor = workflowQueueProcessor,
             payload = WorkflowQueuePayload(
-                workflowNodeExecutorId = workflowNodeExecutor.id,
                 workflowInstanceId = instance.id,
-                workflowNodeId = nodeId,
+                workflowNodeId = node.id,
+                workflowNodeExecutorId = node.executorId,
             ),
             source = null, // TODO Setting a custom source
         )
@@ -59,7 +57,7 @@ class WorkflowEngineImpl(
         var instance = getWorkflowInstance(workflowInstanceId)
         val node = instance.workflow.getNode(workflowNodeId)
         // Getting the node executor
-        val executor = workflowNodeExecutorService.getExecutor(instance.executorId)
+        val executor = workflowNodeExecutorService.getExecutor(node.executorId)
         // Running the executor
         try {
             val output = executor.execute(instance, node.id)
@@ -71,7 +69,7 @@ class WorkflowEngineImpl(
                 // For each next node, checks if it can be scheduled or not
                 if (canRunNode(instance, nextNode)) {
                     // Schedule the node
-                    queueNode(executor, instance, nextNode)
+                    queueNode(instance, nextNode)
                 }
             }
         } catch (any: Exception) {

@@ -16,7 +16,6 @@ import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 data class WorkflowInstance(
     val id: String,
     val workflow: Workflow,
-    val executorId: String,
     val context: JsonNode,
     val nodesExecutions: List<WorkflowInstanceNode>,
 ) {
@@ -39,7 +38,6 @@ data class WorkflowInstance(
     fun successNode(nodeId: String, output: JsonNode) = WorkflowInstance(
         id = id,
         workflow = workflow,
-        executorId = executorId,
         context = context,
         nodesExecutions = nodesExecutions.map { node ->
             if (node.id == nodeId) {

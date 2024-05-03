@@ -13,6 +13,6 @@ object WorkflowInstanceFixtures {
 
     fun simpleLinear(): WorkflowInstance {
         val workflow = WorkflowFixtures.simpleLinearWorkflow()
-        return createInstance(workflow, mockWorkflowNodeExecutor, NullNode.instance)
+        return createInstance(workflow, NullNode.instance)
     }
 }

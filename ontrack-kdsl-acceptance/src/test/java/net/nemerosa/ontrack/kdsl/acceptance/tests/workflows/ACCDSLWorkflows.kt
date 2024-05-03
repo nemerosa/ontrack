@@ -18,11 +18,12 @@ class ACCDSLWorkflows : AbstractACCDSLTestSupport() {
         val name = uid("w-")
         val workflow = """
             name: $name
-            data: ""
             nodes:
                 - id: start
+                  executorId: mock
                   data: "Start node"
                 - id: end
+                  executorId: mock
                   data: "End node"
                   parents:
                     - id: start
@@ -59,13 +60,15 @@ class ACCDSLWorkflows : AbstractACCDSLTestSupport() {
         val name = uid("w-")
         val workflow = """
             name: $name
-            data: ""
             nodes:
                 - id: start-a
+                  executorId: mock
                   data: "Start node A"
                 - id: start-b
+                  executorId: mock
                   data: "Start node B"
                 - id: end
+                  executorId: mock
                   data: "End node"
                   parents:
                     - id: start-a
@@ -104,25 +107,28 @@ class ACCDSLWorkflows : AbstractACCDSLTestSupport() {
         val name = uid("w-")
         val workflow = """
             name: $name
-            data: ""
             nodes:
                 - id: start
+                  executorId: mock
                   data:
                     text: Starting
                     waitMs: 500
                 - id: parallel-a
+                  executorId: mock
                   data:
                     text: Parallel A
                     waitMs: 500
                   parents:
                     - id: start
                 - id: parallel-b
+                  executorId: mock
                   data:
                     text: Parallel B
                     waitMs: 2000
                   parents:
                     - id: start
                 - id: end
+                  executorId: mock
                   data:
                     text: End
                   parents:

@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.workflows.notifications
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.NullNode
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Component
 @Component
 class WorkflowNotificationChannel(
     private val workflowEngine: WorkflowEngine,
-    private val workflowNotificationChannelNodeExecutor: WorkflowNotificationChannelNodeExecutor,
 ) : AbstractNotificationChannel<WorkflowNotificationChannelConfig, WorkflowNotificationChannelOutput>(
     WorkflowNotificationChannelConfig::class
 ) {
@@ -29,13 +27,11 @@ class WorkflowNotificationChannel(
         // Converting the config to a workflow
         val workflow = Workflow(
             name = config.name,
-            data = NullNode.instance,
             nodes = config.nodes.map { it.toWorkflowNode() }
         )
         // Launching the workflow (with the event as context, template is not used)
         val instance = workflowEngine.startWorkflow(
             workflow = workflow,
-            workflowNodeExecutor = workflowNotificationChannelNodeExecutor,
             context = event.asJson(),
         )
         // Output contains only the instance ID
@@ -48,6 +44,7 @@ class WorkflowNotificationChannel(
 
     private fun WorkflowNotificationChannelConfigNode.toWorkflowNode() = WorkflowNode(
         id = id,
+        executorId = WorkflowNotificationChannelNodeExecutor.ID,
         data = WorkflowNotificationChannelNodeData(
             channel = channel,
             channelConfig = channelConfig,

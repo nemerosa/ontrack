@@ -7,11 +7,10 @@ import net.nemerosa.ontrack.extension.workflows.engine.WorkflowNodeNotFoundExcep
  * Definition of a workflow by another extension.
  *
  * @property name Display name for the workflow
- * @property data Raw data associated with the workflow, to be passed to the workflow node executor.
+ * @property nodes List of nodes in the workflow
  */
 data class Workflow(
     val name: String,
-    val data: JsonNode,
     val nodes: List<WorkflowNode>,
 ) {
     /**
