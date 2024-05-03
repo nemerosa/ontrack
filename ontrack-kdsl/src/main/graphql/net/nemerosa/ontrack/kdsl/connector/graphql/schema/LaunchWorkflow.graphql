@@ -1,6 +1,6 @@
 mutation LaunchWorkflow(
     $workflowId: String!,
-    $context: JSON!,
+    $context: [LaunchWorkflowInputContext!]!,
 ) {
     launchWorkflow(input: {
         workflowId: $workflowId,

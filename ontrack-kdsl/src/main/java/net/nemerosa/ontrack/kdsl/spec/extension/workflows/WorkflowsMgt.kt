@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.kdsl.connector.graphql.convert
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.LaunchWorkflowMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.SaveYamlWorkflowMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.WorkflowInstanceQuery
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.LaunchWorkflowInputContext
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 
 class WorkflowsMgt(connector: Connector) : Connected(connector) {
@@ -18,12 +19,21 @@ class WorkflowsMgt(connector: Connector) : Connected(connector) {
             it?.saveYamlWorkflow()?.fragments()?.payloadUserErrors()?.convert()
         }?.saveYamlWorkflow()?.workflowId()
 
-    fun launchWorkflow(workflowId: String, context: JsonNode): String? =
-        graphqlConnector.mutate(
-            LaunchWorkflowMutation(workflowId, context)
+    fun launchWorkflow(workflowId: String, context: Pair<String, JsonNode>): String? {
+        val (key, value) = context
+        return graphqlConnector.mutate(
+            LaunchWorkflowMutation(
+                workflowId, listOf(
+                    LaunchWorkflowInputContext.builder()
+                        .key(key)
+                        .value(value)
+                        .build()
+                )
+            )
         ) {
             it?.launchWorkflow()?.fragments()?.payloadUserErrors()?.convert()
         }?.launchWorkflow()?.workflowInstanceId()
+    }
 
     fun workflowInstance(instanceId: String): WorkflowInstance? {
         return graphqlConnector.query(
@@ -34,6 +44,16 @@ class WorkflowsMgt(connector: Connector) : Connected(connector) {
                     WorkflowInstanceStatus.valueOf(toString())
                 },
                 finished = finished(),
+                nodesExecutions = nodesExecutions().map {
+                    WorkflowInstanceNode(
+                        id = it.id(),
+                        status = it.status().run {
+                            WorkflowInstanceNodeStatus.valueOf(toString())
+                        },
+                        output = it.output(),
+                        error = it.error(),
+                    )
+                }
             )
         }
     }

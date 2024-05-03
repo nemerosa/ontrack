@@ -1,9 +1,12 @@
 package net.nemerosa.ontrack.extension.workflows.graphql
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.extension.workflows.engine.WorkflowContext
+import net.nemerosa.ontrack.extension.workflows.engine.WorkflowContextData
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowEngine
 import net.nemerosa.ontrack.extension.workflows.registry.WorkflowRegistry
 import net.nemerosa.ontrack.graphql.schema.Mutation
+import net.nemerosa.ontrack.graphql.support.ListRef
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import org.springframework.stereotype.Component
 
@@ -36,7 +39,11 @@ class WorkflowsMutations(
             if (workflowRecord != null) {
                 workflowEngine.startWorkflow(
                     workflow = workflowRecord.workflow,
-                    context = input.context,
+                    context = WorkflowContext(
+                        input.context.map {
+                            WorkflowContextData(it.key, it.value)
+                        }
+                    ),
                 ).id
             } else {
                 null
@@ -52,5 +59,11 @@ data class SaveYamlWorkflowInput(
 
 data class LaunchWorkflowInput(
     val workflowId: String,
-    val context: JsonNode,
+    @ListRef(embedded = true)
+    val context: List<LaunchWorkflowInputContext>,
+)
+
+data class LaunchWorkflowInputContext(
+    val key: String,
+    val value: JsonNode,
 )

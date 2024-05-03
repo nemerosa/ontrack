@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.av.audit
 
+import net.nemerosa.ontrack.common.reducedStackTrace
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
-import org.apache.commons.lang3.exception.ExceptionUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -10,14 +10,6 @@ abstract class AbstractAutoVersioningAuditService(
 ) : AutoVersioningAuditService {
 
     protected val logger: Logger = LoggerFactory.getLogger(AutoVersioningAuditService::class.java)
-
-    companion object {
-        private const val MAX_STACK_HEIGHT = 20
-        private const val MAX_STACK_LENGTH = 2000
-
-        fun reducedStackTrace(error: Throwable) =
-            ExceptionUtils.getStackFrames(error).take(MAX_STACK_HEIGHT).joinToString("\n").take(MAX_STACK_LENGTH)
-    }
 
     override fun onQueuing(order: AutoVersioningOrder, routing: String, cancelling: Boolean) {
         if (cancelling) {

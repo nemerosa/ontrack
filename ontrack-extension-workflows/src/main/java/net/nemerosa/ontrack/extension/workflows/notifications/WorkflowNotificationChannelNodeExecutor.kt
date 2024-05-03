@@ -28,7 +28,7 @@ class WorkflowNotificationChannelNodeExecutor(
         // Gets the node's data
         val (channel, channelConfig, template) = workflowInstance.workflow.getNode(workflowNodeId).data.parse<WorkflowNotificationChannelNodeData>()
         // Gets the context
-        val event = workflowInstance.context.parse<Event>()
+        val event = workflowInstance.context.parse<Event>("event")
         // Creating the notification item
         val item = Notification(
             channel = channel,

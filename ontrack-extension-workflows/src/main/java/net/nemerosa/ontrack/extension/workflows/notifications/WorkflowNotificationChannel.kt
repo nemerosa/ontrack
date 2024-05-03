@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificatio
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowNode
+import net.nemerosa.ontrack.extension.workflows.engine.WorkflowContext
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowEngine
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.Event
@@ -32,7 +33,7 @@ class WorkflowNotificationChannel(
         // Launching the workflow (with the event as context, template is not used)
         val instance = workflowEngine.startWorkflow(
             workflow = workflow,
-            context = event.asJson(),
+            context = WorkflowContext("event", event.asJson()),
         )
         // Output contains only the instance ID
         return NotificationResult.ok(

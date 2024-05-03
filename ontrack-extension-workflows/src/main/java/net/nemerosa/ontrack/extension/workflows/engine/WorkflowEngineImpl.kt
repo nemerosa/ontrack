@@ -18,7 +18,7 @@ class WorkflowEngineImpl(
 
     override fun startWorkflow(
         workflow: Workflow,
-        context: JsonNode
+        context: WorkflowContext,
     ): WorkflowInstance {
         // TODO Checks the workflow consistency (cycles, etc.) - use a public method, usable by extensions
         // Creating the instance
@@ -72,8 +72,9 @@ class WorkflowEngineImpl(
                     queueNode(instance, nextNode)
                 }
             }
-        } catch (any: Exception) {
-            // TODO Stores the node error status
+        } catch (any: Throwable) {
+            // Stores the node error status
+            workflowInstanceStore.store(instance.errorNode(node.id, any))
         }
     }
 
