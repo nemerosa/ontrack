@@ -155,6 +155,73 @@ class ACCDSLWorkflows : AbstractACCDSLTestSupport() {
         )
     }
 
+    @Test
+    fun `Asymetric workflow`() {
+        // Defining a workflow
+        val name = uid("w-")
+        val workflow = """
+            name: $name
+            nodes:
+                - id: start
+                  executorId: mock
+                  data:
+                    text: Starting
+                    waitMs: 500
+                - id: parallel-a-1
+                  executorId: mock
+                  data:
+                    text: Parallel A1
+                    waitMs: 1000
+                  parents:
+                    - id: start
+                - id: parallel-b
+                  executorId: mock
+                  data:
+                    text: Parallel B
+                    waitMs: 500
+                  parents:
+                    - id: start
+                - id: parallel-a-2
+                  executorId: mock
+                  data:
+                    text: Parallel A2
+                    waitMs: 1000
+                  parents:
+                    - id: parallel-a-1
+                - id: end
+                  executorId: mock
+                  data:
+                    text: End
+                  parents:
+                    - id: parallel-a-2
+                    - id: parallel-b
+        """.trimIndent()
+        // Saving the workflow
+        val workflowId = ontrack.workflows.saveYamlWorkflow(
+            workflow = workflow,
+            executor = "mock",
+        ) ?: fail("Error while saving workflow")
+        // Running the workflow
+        val instanceId = ontrack.workflows.launchWorkflow(
+            workflowId = workflowId,
+            context = "mock" to mapOf("text" to "Complex").asJson(),
+        ) ?: fail("Error while launching workflow")
+        // Waiting for the workflow result
+        waitUntilWorkflowFinished(instanceId)
+        // Checks the outcome of the workflow run
+        val texts = ontrack.workflows.mock.getTexts(instanceId)
+        assertEquals(
+            setOf(
+                "Processed: Starting for Complex",
+                "Processed: Parallel A1 for Complex",
+                "Processed: Parallel A2 for Complex",
+                "Processed: Parallel B for Complex",
+                "Processed: End for Complex",
+            ),
+            texts.toSet()
+        )
+    }
+
     private fun waitUntilWorkflowFinished(instanceId: String) {
         waitUntil(
             timeout = 30_000L,

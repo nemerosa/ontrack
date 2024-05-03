@@ -195,4 +195,70 @@ class WorkflowEngineIT : AbstractDSLTestSupport() {
         )
     }
 
+    @Test
+    fun `Asymetric workflow with reusing parent outputs`() {
+        // Defining a workflow using YAML
+        val yaml = """
+            name: Complex workflow with waiting times
+            nodes:
+                - id: start
+                  executorId: mock
+                  data:
+                    text: Starting
+                    waitMs: 500
+                - id: parallel-a-1
+                  executorId: mock
+                  data:
+                    text: Parallel A1
+                    waitMs: 1000
+                  parents:
+                    - id: start
+                - id: parallel-a-2
+                  executorId: mock
+                  data:
+                    text: Parallel A2
+                    waitMs: 1000
+                  parents:
+                    - id: parallel-a-1
+                - id: parallel-b
+                  executorId: mock
+                  data:
+                    text: Parallel B
+                    waitMs: 500
+                  parents:
+                    - id: start
+                - id: end
+                  executorId: mock
+                  data:
+                    text: End
+                  parents:
+                    - id: parallel-a-2
+                    - id: parallel-b
+        """.trimIndent()
+        // Registering the workflow
+        val workflowId = workflowRegistry.saveYamlWorkflow(yaml, "mock")
+        // Getting the workflow
+        val record = workflowRegistry.findWorkflow(workflowId) ?: fail("No workflow found for $workflowId")
+        // Launching the workflow
+        val instance = workflowEngine.startWorkflow(record.workflow, WorkflowContext("mock", TextNode("Complex")))
+        // Waiting until the workflow is completed (error or success)
+        waitUntil("Waiting until workflow is complete", timeout = 10.seconds) {
+            val workflowInstance = workflowEngine.getWorkflowInstance(instance.id)
+            println("workflowInstance = $workflowInstance")
+            workflowInstance.status.finished
+        }
+        // Checks the results
+        val texts = mockWorkflowNodeExecutor.getTextsByInstanceId(instance.id)
+        assertEquals(
+            setOf(
+                "Processed: Starting for Complex",
+                "Processed: Parallel A1 for Complex",
+                "Processed: Parallel A2 for Complex",
+                "Processed: Parallel B for Complex",
+                "Processed: End for Complex",
+            ),
+            texts.toSet()
+        )
+    }
+
 }
