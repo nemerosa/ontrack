@@ -222,6 +222,55 @@ class ACCDSLWorkflows : AbstractACCDSLTestSupport() {
         )
     }
 
+    @Test
+    fun `SPE workflow`() {
+        // Defining a workflow
+        val name = uid("w-")
+        val workflow = """
+            name: SPE $name workflow
+            nodes:
+                - id: start
+                  executorId: mock
+                  data:
+                    text: Start
+                - id: end
+                  executorId: mock
+                  data:
+                    text: End
+                  parents:
+                    - id: start
+                    - id: parallel
+                - id: parallel
+                  executorId: mock
+                  data:
+                    text: Parallel
+                  parents:
+                    - id: start
+        """.trimIndent()
+        // Saving the workflow
+        val workflowId = ontrack.workflows.saveYamlWorkflow(
+            workflow = workflow,
+            executor = "mock",
+        ) ?: fail("Error while saving workflow")
+        // Running the workflow
+        val instanceId = ontrack.workflows.launchWorkflow(
+            workflowId = workflowId,
+            context = "mock" to mapOf("text" to "SPE").asJson(),
+        ) ?: fail("Error while launching workflow")
+        // Waiting for the workflow result
+        waitUntilWorkflowFinished(instanceId)
+        // Checks the outcome of the workflow run
+        val texts = ontrack.workflows.mock.getTexts(instanceId)
+        assertEquals(
+            setOf(
+                "Processed: Start for SPE",
+                "Processed: Parallel for SPE",
+                "Processed: End for SPE",
+            ),
+            texts.toSet()
+        )
+    }
+
     private fun waitUntilWorkflowFinished(instanceId: String) {
         waitUntil(
             timeout = 30_000L,

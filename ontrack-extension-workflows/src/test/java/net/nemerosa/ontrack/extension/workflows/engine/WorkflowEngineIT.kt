@@ -261,4 +261,63 @@ class WorkflowEngineIT : AbstractDSLTestSupport() {
         )
     }
 
+    /**
+     * Testing a workflow looking like:
+     *
+     * ```
+     * s
+     * |\
+     * | p
+     * |/
+     * e
+     * ```
+     */
+    @Test
+    fun `SPE workflow`() {
+        // Defining a workflow using YAML
+        val yaml = """
+            name: SPE workflow
+            nodes:
+                - id: start
+                  executorId: mock
+                  data:
+                    text: Start
+                - id: parallel
+                  executorId: mock
+                  data:
+                    text: Parallel
+                  parents:
+                    - id: start
+                - id: end
+                  executorId: mock
+                  data:
+                    text: End
+                  parents:
+                    - id: start
+                    - id: parallel
+        """.trimIndent()
+        // Registering the workflow
+        val workflowId = workflowRegistry.saveYamlWorkflow(yaml, "mock")
+        // Getting the workflow
+        val record = workflowRegistry.findWorkflow(workflowId) ?: fail("No workflow found for $workflowId")
+        // Launching the workflow
+        val instance = workflowEngine.startWorkflow(record.workflow, WorkflowContext("mock", TextNode("SPE")))
+        // Waiting until the workflow is completed (error or success)
+        waitUntil("Waiting until workflow is complete", timeout = 10.seconds) {
+            val workflowInstance = workflowEngine.getWorkflowInstance(instance.id)
+            println("workflowInstance = $workflowInstance")
+            workflowInstance.status.finished
+        }
+        // Checks the results
+        val texts = mockWorkflowNodeExecutor.getTextsByInstanceId(instance.id)
+        assertEquals(
+            setOf(
+                "Processed: Start for SPE",
+                "Processed: Parallel for SPE",
+                "Processed: End for SPE",
+            ),
+            texts.toSet()
+        )
+    }
+
 }
