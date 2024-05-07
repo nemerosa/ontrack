@@ -9,15 +9,15 @@ Applicable for:
 
 Configuration:
 
-* **mode** - How to the linked build must be rendered.
+* **mode** - NAME, RELEASE, AUTO - required - How to the linked build must be rendered.
 
 - name: build name only
 - release: build release/version/label (required in this case)
 - auto: build release/version/label if available, build name otherwise
 
-* **project** - Name of the project to get a link to.
+* **project** - String - required - Name of the project to get a link to.
 
-* **qualifier** - Qualifier of the link (optional).
+* **qualifier** - String - optional - Qualifier of the link (optional).
 
 Example:
 

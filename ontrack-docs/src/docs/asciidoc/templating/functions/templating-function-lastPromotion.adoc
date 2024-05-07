@@ -5,15 +5,15 @@ Renders the last build having a given promotion in a project
 
 Configuration:
 
-* **branch** - Restricting the search to this branch
+* **branch** - String - optional - Restricting the search to this branch
 
-* **link** - Renders a link to the build or only the name
+* **link** - Boolean - optional - Renders a link to the build or only the name
 
-* **name** - Using the release name or build name. `auto` for the first available, `release` for a required release name, `name` for only the name
+* **name** - String - optional - Using the release name or build name. `auto` for the first available, `release` for a required release name, `name` for only the name
 
-* **project** - Project where to look for the build
+* **project** - String - required - Project where to look for the build
 
-* **promotion** - Name of the promotion level to look for
+* **promotion** - String - required - Name of the promotion level to look for
 
 Example:
 

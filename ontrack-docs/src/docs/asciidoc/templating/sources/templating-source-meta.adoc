@@ -15,13 +15,13 @@ Applicable for:
 
 Configuration:
 
-* **category** - Category of the key of the meta information to get
+* **category** - String - optional - Category of the key of the meta information to get
 
-* **error** - If true, an error is raised when meta information is not found
+* **error** - Boolean - required - If true, an error is raised when meta information is not found
 
-* **link** - If true, the link of the meta information is rendered instead of the value
+* **link** - Boolean - required - If true, the link of the meta information is rendered instead of the value
 
-* **name** - Name of the key of the meta information to get
+* **name** - String - required - Name of the key of the meta information to get
 
 Example:
 

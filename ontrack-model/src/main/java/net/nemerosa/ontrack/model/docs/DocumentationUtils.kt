@@ -61,6 +61,7 @@ fun getFieldType(property: KProperty1<out Any, *>): String {
     return when (classifier) {
         String::class -> "String"
         Int::class -> "Int"
+        Long::class -> "Long"
         Boolean::class -> "Boolean"
         List::class -> "List"
         JsonNode::class -> "JSON"
@@ -70,10 +71,10 @@ fun getFieldType(property: KProperty1<out Any, *>): String {
                     (classifier.java.enumConstants ?: error("Not an enum")).joinToString(", ")
 
                 property.hasAnnotation<DocumentationField>() -> "Object"
-                else -> "n/a"
+                else -> error("Classifier $classifier for property $property is not supported")
             }
         } else {
-            "n/a"
+            error("Classifier $classifier for property $property is not supported")
         }
     }
 }

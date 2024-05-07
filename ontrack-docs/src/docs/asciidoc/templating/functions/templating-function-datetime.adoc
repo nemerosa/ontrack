@@ -5,21 +5,21 @@ Displays the current time
 
 Configuration:
 
-* **days** - days field
+* **days** - Long - optional - days field
 
-* **format** - format field
+* **format** - String - optional - format field
 
-* **hours** - hours field
+* **hours** - Long - optional - hours field
 
-* **minutes** - minutes field
+* **minutes** - Long - optional - minutes field
 
-* **months** - months field
+* **months** - Long - optional - months field
 
-* **seconds** - seconds field
+* **seconds** - Long - optional - seconds field
 
-* **timezone** - timezone field
+* **timezone** - String - optional - timezone field
 
-* **years** - years field
+* **years** - Long - optional - years field
 
 Example:
 

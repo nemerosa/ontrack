@@ -15,7 +15,7 @@ Applicable for:
 
 Configuration:
 
-* **default** - default field
+* **default** - String - optional - default field
 
 Example:
 
