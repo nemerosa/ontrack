@@ -52,6 +52,9 @@ dependencies {
     testImplementation(project(path = ":ontrack-ui-support", configuration = "tests"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
+    // List of extensions needed for the documentation generation
+    testImplementation(project(":ontrack-extension-notifications"))
+
     // List of extensions to include in core
     runtimeOnly(project(":ontrack-extension-general"))
     runtimeOnly(project(":ontrack-extension-ldap"))
@@ -72,7 +75,6 @@ dependencies {
     runtimeOnly(project(":ontrack-extension-indicators"))
     runtimeOnly(project(":ontrack-extension-casc"))
     runtimeOnly(project(":ontrack-extension-elastic"))
-    runtimeOnly(project(":ontrack-extension-notifications"))
     runtimeOnly(project(":ontrack-extension-slack"))
     runtimeOnly(project(":ontrack-extension-chart"))
     runtimeOnly(project(":ontrack-extension-delivery-metrics"))

@@ -1,0 +1,53 @@
+[[notification-backend-jira-creation]]
+==== Jira ticket creation (`jira-creation`)
+
+Creation of a Jira ticket
+
+Configuration:
+
+* **assignee** - String - optional - Username of the assignee
+
+* **configName** - String - required - Name of the Jira configuration to use for the connection
+
+* **customFields** - List - required - List of custom fields for the ticket
+
+** **name** - String - required - Name of the field
+
+** **value** - JSON - required - Value for the field, as understood by the Jira API
+
+* **fixVersion** - String - optional - Name of the fix version to assign to the ticket
+
+* **issueType** - String - required - Name of the issue type to use for the ticket
+
+* **labels** - List - required - List of labels for the ticket
+
+* **projectName** - String - required - Key of the Jira project where to create the ticket
+
+* **titleTemplate** - String - required - (template) Summary of the ticket
+
+* **useExisting** - Boolean - required - If true, no ticket is created if it exists already
+
+Output:
+
+* **body** - String - optional - Actual body for the ticket
+
+* **customFields** - List - optional - Actual custom fields of the ticket
+
+** **name** - String - required - Name of the field
+
+** **value** - JSON - required - Value for the field, as understood by the Jira API
+
+* **existing** - Boolean - optional - True if the ticket was already existing
+
+* **fixVersion** - String - optional - Actual fix version assigned to the ticket
+
+* **jql** - String - optional - JQL query used to identify the existing ticket
+
+* **labels** - List - optional - Actual labels of the ticket
+
+* **ticketKey** - String - optional - Ticket key
+
+* **title** - String - optional - Actual summary of the ticket
+
+* **url** - String - optional - URL to the ticket page
+

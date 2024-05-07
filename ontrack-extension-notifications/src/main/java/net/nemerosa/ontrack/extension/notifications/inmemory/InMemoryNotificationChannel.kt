@@ -65,5 +65,7 @@ class InMemoryNotificationChannel(
 
     override val type: String = "in-memory"
 
+    override val displayName: String = "In memory"
+
     override val enabled: Boolean = true
 }

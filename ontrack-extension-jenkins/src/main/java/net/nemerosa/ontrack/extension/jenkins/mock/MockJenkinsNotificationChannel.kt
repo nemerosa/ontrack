@@ -22,6 +22,8 @@ class MockJenkinsNotificationChannel(
 
     override val type: String = "mock-jenkins"
 
+    override val displayName: String = "Mock Jenkins"
+
     override fun createJenkinsClient(config: JenkinsConfiguration): JenkinsClient = mockJenkinsClient
 
 }

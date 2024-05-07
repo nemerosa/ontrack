@@ -54,5 +54,8 @@ class MockNotificationChannel(
         )
 
     override val type: String = "mock"
+
+    override val displayName: String = "Mock"
+
     override val enabled: Boolean = true
 }

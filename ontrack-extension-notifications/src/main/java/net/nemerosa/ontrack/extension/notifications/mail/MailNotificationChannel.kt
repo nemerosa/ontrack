@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.HtmlNotificationEventRenderer
@@ -17,6 +19,9 @@ import org.springframework.stereotype.Component
 import javax.annotation.PostConstruct
 
 @Component
+@APIDescription("Sending a message by mail. The notification template is used for the body of the mail.")
+@Documentation(MailNotificationChannelConfig::class)
+@Documentation(MailNotificationChannelOutput::class, section = "output")
 class MailNotificationChannel(
     javaMailSender: JavaMailSender?,
     private val mailService: MailService,
@@ -27,6 +32,7 @@ class MailNotificationChannel(
     private val logger: Logger = LoggerFactory.getLogger(MailNotificationChannel::class.java)
 
     override val type: String = "mail"
+    override val displayName: String = "Mail"
     override val enabled: Boolean = javaMailSender != null
 
     @PostConstruct

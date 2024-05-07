@@ -53,6 +53,11 @@ interface NotificationChannel<C, R> {
     val type: String
 
     /**
+     * Display name for the channel
+     */
+    val displayName: String
+
+    /**
      * Is this channel enabled?
      */
     val enabled: Boolean

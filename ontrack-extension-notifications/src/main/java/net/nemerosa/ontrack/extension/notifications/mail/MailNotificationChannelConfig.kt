@@ -7,6 +7,6 @@ data class MailNotificationChannelConfig(
     val to: String,
     @APIDescription("Comma-separated list of mail targets (cc)")
     val cc: String?,
-    @APIDescription("Mail subject")
+    @APIDescription("(template) Mail subject")
     val subject: String,
 )

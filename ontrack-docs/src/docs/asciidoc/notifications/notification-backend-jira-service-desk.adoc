@@ -1,0 +1,41 @@
+[[notification-backend-jira-service-desk]]
+==== Jira Service Desk (`jira-service-desk`)
+
+This channel is used to create a Jira Service Desk ticket.
+
+Configuration:
+
+* **configName** - String - required - Name of the Jira configuration to use for the connection
+
+* **fields** - List - required - List of fields to set into the service desk ticket
+
+** **name** - String - required - Name of the field
+
+** **value** - JSON - required - Value for the field, as understood by the Jira API
+
+* **requestTypeId** - Int - required - ID of the Request Type of the ticket to create
+
+* **searchTerm** - String - optional - Search token to use to identify any existing ticket. This is a template.
+
+* **serviceDeskId** - Int - required - ID of the Service Desk where to create the ticket
+
+* **useExisting** - Boolean - required - If true, no ticket is created if it exists already
+
+Output:
+
+* **existing** - Boolean - optional - True if the ticket was already existing
+
+* **fields** - List - optional - List of actual fields which have been set
+
+** **name** - String - required - Name of the field
+
+** **value** - JSON - required - Value for the field, as understood by the Jira API
+
+* **requestTypeId** - Int - required - ID of the Request Type of the created ticket
+
+* **serviceDeskId** - Int - required - ID of the Service Desk where the ticket has been created
+
+* **ticketKey** - String - optional - Key of the created ticket
+
+* **url** - String - optional - URL to the created ticket
+

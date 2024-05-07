@@ -1,0 +1,19 @@
+[[notification-backend-webhook]]
+==== Webhook (`webhook`)
+
+Calling an external webhook
+
+Configuration:
+
+* **name** - String - required - Name of the webhook to use
+
+Output:
+
+* **payload** - Object - required - Description of the payload sent to the webhook
+
+** **data** - JSON - required - Webhook actual payload
+
+** **type** - String - required - Webhook type
+
+** **uuid** - String - required - Unique ID for the payload
+

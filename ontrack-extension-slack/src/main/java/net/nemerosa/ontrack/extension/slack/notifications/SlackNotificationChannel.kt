@@ -6,6 +6,9 @@ import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.slack.SlackSettings
 import net.nemerosa.ontrack.extension.slack.service.SlackService
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.docs.Documentation
+import net.nemerosa.ontrack.model.docs.DocumentationLink
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.form.Form
@@ -15,6 +18,10 @@ import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import org.springframework.stereotype.Component
 
 @Component
+@APIDescription("Sending messages to Slack. The notification template is used for the message.")
+@Documentation(SlackNotificationChannelConfig::class)
+@Documentation(SlackNotificationChannelOutput::class, section = "output")
+@DocumentationLink("slack", name = "Slack documentation")
 class SlackNotificationChannel(
     private val slackService: SlackService,
     private val cachedSettingsService: CachedSettingsService,
@@ -65,6 +72,8 @@ class SlackNotificationChannel(
         .enumField(SlackNotificationChannelConfig::type, c?.type)
 
     override val type: String = "slack"
+
+    override val displayName: String = "Slack"
 
     override val enabled: Boolean
         get() =

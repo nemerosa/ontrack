@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.jenkins.notifications
 
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APILabel
+import net.nemerosa.ontrack.model.docs.DocumentationList
 
 /**
  * Configuration for the notification of a Jenkins job.
@@ -15,6 +16,7 @@ data class JenkinsNotificationChannelConfig(
     val job: String,
     @APIDescription("Parameters to send to to the job")
     @APILabel("Parameters")
+    @DocumentationList
     val parameters: List<JenkinsNotificationChannelConfigParam> = emptyList(),
     @APIDescription("""How to call the Jenkins job. ASYNC (the default) means that the job is called in "fire and forget" mode. When set to SYNC, Ontrack will wait for the completion of the job to success, with a given timeout (not recommended).""")
     @APILabel("Call mode")

@@ -1,16 +1,13 @@
 package net.nemerosa.ontrack.model.docs
 
-import kotlin.reflect.KClass
-
 /**
- * Used by a class (or function, or property) to point to a type containing
- * its documentation.
+ * Used by a class (or function, or property) to refer to an existing page of documentation.
  */
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FIELD, AnnotationTarget.PROPERTY, AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
 @MustBeDocumented
 @Repeatable
-annotation class Documentation(
-    val value: KClass<*>,
-    val section: String = "",
+annotation class DocumentationLink(
+    val value: String,
+    val name: String,
 )

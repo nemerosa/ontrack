@@ -10,6 +10,8 @@ import net.nemerosa.ontrack.extension.jira.tx.JIRASessionFactory
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.json.transform
+import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
@@ -20,6 +22,9 @@ import net.nemerosa.ontrack.model.form.yesNoField
 import org.springframework.stereotype.Component
 
 @Component
+@APIDescription("This channel is used to create a Jira Service Desk ticket.")
+@Documentation(JiraServiceDeskNotificationChannelConfig::class)
+@Documentation(JiraServiceDeskNotificationChannelOutput::class, section = "output")
 class JiraServiceDeskNotificationChannel(
     private val jiraConfigurationService: JIRAConfigurationService,
     private val jiraSessionFactory: JIRASessionFactory,
@@ -30,6 +35,8 @@ class JiraServiceDeskNotificationChannel(
 ) {
 
     override val type: String = "jira-service-desk"
+
+    override val displayName: String = "Jira Service Desk"
 
     override val enabled: Boolean = true
 

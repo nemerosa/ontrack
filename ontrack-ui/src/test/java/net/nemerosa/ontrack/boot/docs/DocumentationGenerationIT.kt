@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.boot.docs
 
+import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannel
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.annotations.getAPITypeDescription
-import net.nemerosa.ontrack.model.docs.getDocumentationExampleCode
-import net.nemerosa.ontrack.model.docs.getFieldsDocumentation
+import net.nemerosa.ontrack.model.docs.*
 import net.nemerosa.ontrack.model.events.*
 import net.nemerosa.ontrack.model.templating.TemplatingFilter
 import net.nemerosa.ontrack.model.templating.TemplatingFunction
@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.io.File
+import kotlin.reflect.full.findAnnotations
 
 /**
  * Generation of the documentation
@@ -30,6 +31,66 @@ class DocumentationGenerationIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var eventFactory: EventFactory
+
+    @Autowired
+    private lateinit var notificationChannels: List<NotificationChannel<*, *>>
+
+    @Test
+    fun `Notifications list`() {
+
+        fun getNotificationChannelFileId(channel: NotificationChannel<*, *>): String {
+            return "notification-backend-${channel.type}"
+        }
+
+        fun getNotificationChannelTitle(channel: NotificationChannel<*, *>): String {
+            return "${channel.displayName} (`${channel.type}`)"
+        }
+
+        fun <C, R> generateNotificationChannel(
+            directoryContext: DirectoryContext,
+            channel: NotificationChannel<C, R>
+        ) {
+            val description = getAPITypeDescription(channel::class)
+            val parameters = getFieldsDocumentation(channel::class)
+            val example = getDocumentationExampleCode(channel::class)
+
+            val fileId = getNotificationChannelFileId(channel)
+
+            directoryContext.writeFile(
+                fileId = fileId,
+                level = 4,
+                title = getNotificationChannelTitle(channel),
+                header = description,
+                fields = parameters,
+                example = example,
+                links = channel::class.findAnnotations(),
+                extendedConfig = { s ->
+                    val output = getFieldsDocumentation(channel::class, section = "output")
+                    if (output.isNotEmpty()) {
+                        s.append("Output:\n\n")
+                        directoryContext.writeFields(s, output)
+                    }
+                }
+            )
+        }
+
+        withDirectory("notifications") {
+
+            writeIndex(
+                fileId = "appendix-notifications-backends",
+                level = 4,
+                title = "List of notification backends",
+                items = notificationChannels.associate { channel ->
+                    getNotificationChannelFileId(channel) to getNotificationChannelTitle(channel)
+                }
+            )
+
+            notificationChannels.forEach { channel ->
+                generateNotificationChannel(this, channel)
+            }
+
+        }
+    }
 
     @Test
     fun `Templating functions generation`() {
@@ -177,7 +238,7 @@ class DocumentationGenerationIT : AbstractDSLTestSupport() {
             level = 5,
             title = id,
             header = description,
-            fields = emptyMap(),
+            fields = emptyList(),
             example = example,
         )
     }
@@ -201,13 +262,14 @@ class DocumentationGenerationIT : AbstractDSLTestSupport() {
             header = description,
             fields = parameters,
             example = example,
-        ) { s ->
-            s.append("Applicable for:\n\n")
-            types.forEach { type ->
-                s.append("* ").append(type.displayName).append("\n")
+            extendedHeader = { s ->
+                s.append("Applicable for:\n\n")
+                types.forEach { type ->
+                    s.append("* ").append(type.displayName).append("\n")
+                }
+                s.append("\n")
             }
-            s.append("\n")
-        }
+        )
     }
 
     private fun getTemplatingSourceFileId(templatingSource: TemplatingSource) =
@@ -261,14 +323,35 @@ class DocumentationGenerationIT : AbstractDSLTestSupport() {
             }
         }
 
+        fun writeFields(
+            s: StringBuilder,
+            fields: List<FieldDocumentation>,
+            level: Int = 1,
+        ) {
+            fields.sortedBy { it.name }.forEach { (name, description, type, required, subfields) ->
+                s.append("*".repeat(level)).append(" **").append(name).append("** - ")
+                    .append(type)
+                    .append(" - ")
+                    .append(if (required) "required" else "optional")
+                    .append(" - ")
+                    .append(description?.trimIndent()).append("\n")
+                    .append("\n")
+                if (subfields.isNotEmpty()) {
+                    writeFields(s, subfields, level + 1)
+                }
+            }
+        }
+
         fun writeFile(
             fileId: String,
             level: Int,
             title: String,
             header: String?,
-            fields: Map<String, String>,
+            fields: List<FieldDocumentation>,
             example: String?,
+            links: List<DocumentationLink> = emptyList(),
             extendedHeader: (s: StringBuilder) -> Unit = {},
+            extendedConfig: (s: StringBuilder) -> Unit = {},
         ) {
             writeFile(
                 fileId = fileId,
@@ -282,13 +365,20 @@ class DocumentationGenerationIT : AbstractDSLTestSupport() {
 
                 extendedHeader(s)
 
+                if (links.isNotEmpty()) {
+                    s.append("Links:\n\n")
+                    links.forEach { link ->
+                        s.append("* <<").append(link.value).append(",").append(link.name).append(">>\n")
+                    }
+                    s.append("\n")
+                }
+
                 if (fields.isNotEmpty()) {
                     s.append("Configuration:\n\n")
-                    fields.toSortedMap().forEach { (name, description) ->
-                        s.append("* **").append(name).append("** - ").append(description.trimIndent()).append("\n")
-                            .append("\n")
-                    }
+                    writeFields(s, fields, 1)
                 }
+
+                extendedConfig(s)
 
                 if (!example.isNullOrBlank()) {
                     s.append("Example:").append("\n").append("\n")

@@ -9,6 +9,8 @@ import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificatio
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.transform
+import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
@@ -21,6 +23,9 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
 @Component
+@APIDescription("Creation of a Jira ticket")
+@Documentation(JiraCreationNotificationChannelConfig::class)
+@Documentation(JiraCreationNotificationChannelOutput::class, section = "output")
 class JiraCreationNotificationChannel(
     private val jiraConfigurationService: JIRAConfigurationService,
     private val jiraSessionFactory: JIRASessionFactory,
@@ -136,6 +141,8 @@ class JiraCreationNotificationChannel(
         ).asJson()
 
     override val type: String = "jira-creation"
+
+    override val displayName: String = "Jira ticket creation"
 
     override val enabled: Boolean = true
 

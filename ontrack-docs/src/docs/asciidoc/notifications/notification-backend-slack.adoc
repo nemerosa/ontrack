@@ -1,0 +1,19 @@
+[[notification-backend-slack]]
+==== Slack (`slack`)
+
+Sending messages to Slack. The notification template is used for the message.
+
+Links:
+
+* <<slack,Slack documentation>>
+
+Configuration:
+
+* **Channel** - String - required - Slack channel
+
+* **Notification type** - INFO, SUCCESS, WARNING, ERROR - required - Used for the color of the message
+
+Output:
+
+* **message** - String - required - Actual content of the message
+
