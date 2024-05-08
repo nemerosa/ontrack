@@ -35,31 +35,31 @@ data class WorkflowInstance(
             }
         }
 
-    fun successNode(nodeId: String, output: JsonNode) = WorkflowInstance(
-        id = id,
-        workflow = workflow,
-        context = context,
-        nodesExecutions = nodesExecutions.map { node ->
-            if (node.id == nodeId) {
-                node.success(output)
-            } else {
-                node
-            }
-        },
-    )
+    private fun updateNode(nodeId: String, update: (node: WorkflowInstanceNode) -> WorkflowInstanceNode) =
+        WorkflowInstance(
+            id = id,
+            workflow = workflow,
+            context = context,
+            nodesExecutions = nodesExecutions.map { node ->
+                if (node.id == nodeId) {
+                    update(node)
+                } else {
+                    node
+                }
+            },
+        )
 
-    fun errorNode(nodeId: String, throwable: Throwable) = WorkflowInstance(
-        id = id,
-        workflow = workflow,
-        context = context,
-        nodesExecutions = nodesExecutions.map { node ->
-            if (node.id == nodeId) {
-                node.error(throwable)
-            } else {
-                node
-            }
-        },
-    )
+    fun startNode(nodeId: String) = updateNode(nodeId) { node ->
+        node.start()
+    }
+
+    fun successNode(nodeId: String, output: JsonNode) = updateNode(nodeId) { node ->
+        node.success(output)
+    }
+
+    fun errorNode(nodeId: String, throwable: Throwable) = updateNode(nodeId) { node ->
+        node.error(throwable)
+    }
 
     fun getNode(nodeId: String) = nodesExecutions.firstOrNull { it.id == nodeId }
         ?: throw WorkflowNodeNotFoundException(nodeId)

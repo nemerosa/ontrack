@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.av.audit
 
+import net.nemerosa.ontrack.common.reducedStackTrace
 import net.nemerosa.ontrack.extension.av.AbstractAutoVersioningTestSupport
 import net.nemerosa.ontrack.extension.av.AutoVersioningTestFixtures.createOrder
 import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditTestFixtures.assertAudit
@@ -162,7 +163,7 @@ class AutoVersioningAuditServiceIT : AbstractAutoVersioningTestSupport() {
                         entry,
                         audit(
                             AutoVersioningAuditState.ERROR,
-                            "error" to AbstractAutoVersioningAuditService.reducedStackTrace(error)
+                            "error" to reducedStackTrace(error)
                         ),
                         audit(AutoVersioningAuditState.PR_CREATING, "branch" to "feature/version-2.0.0"),
                         audit(
