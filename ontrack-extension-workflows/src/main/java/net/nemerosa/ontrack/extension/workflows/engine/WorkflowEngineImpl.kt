@@ -55,12 +55,12 @@ class WorkflowEngineImpl(
         // Getting the instance & the node
         var instance = getWorkflowInstance(workflowInstanceId)
         val node = instance.workflow.getNode(workflowNodeId)
-        // Getting the node executor
-        val executor = workflowNodeExecutorService.getExecutor(node.executorId)
-        // Starting the node
-        instance = workflowInstanceStore.store(instance.startNode(node.id))
-        // Running the executor
         try {
+            // Starting the node
+            instance = workflowInstanceStore.store(instance.startNode(node.id))
+            // Getting the node executor
+            val executor = workflowNodeExecutorService.getExecutor(node.executorId)
+            // Running the executor
             val output = executor.execute(instance, node.id)
             // Stores the output back into the instance and progresses the node's status
             instance = workflowInstanceStore.store(instance.successNode(node.id, output))
