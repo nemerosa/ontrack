@@ -196,7 +196,7 @@ class WorkflowEngineIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    fun `Asymetric workflow with reusing parent outputs`() {
+    fun `Asymetric workflow`() {
         // Defining a workflow using YAML
         val yaml = """
             name: Complex workflow with waiting times
