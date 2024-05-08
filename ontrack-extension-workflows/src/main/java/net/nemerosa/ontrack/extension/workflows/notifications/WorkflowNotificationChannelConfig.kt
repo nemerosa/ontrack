@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.workflows.notifications
 
+import net.nemerosa.ontrack.extension.workflows.definition.Workflow
+
 data class WorkflowNotificationChannelConfig(
-    val name: String,
-    val nodes: List<WorkflowNotificationChannelConfigNode>,
+    val workflow: Workflow,
 )

@@ -25,14 +25,9 @@ class WorkflowNotificationChannel(
         template: String?,
         outputProgressCallback: (current: WorkflowNotificationChannelOutput) -> WorkflowNotificationChannelOutput
     ): NotificationResult<WorkflowNotificationChannelOutput> {
-        // Converting the config to a workflow
-        val workflow = Workflow(
-            name = config.name,
-            nodes = config.nodes.map { it.toWorkflowNode() }
-        )
         // Launching the workflow (with the event as context, template is not used)
         val instance = workflowEngine.startWorkflow(
-            workflow = workflow,
+            workflow = config.workflow,
             context = WorkflowContext("event", event.asJson()),
         )
         // Output contains only the instance ID
@@ -42,17 +37,6 @@ class WorkflowNotificationChannel(
             )
         )
     }
-
-    private fun WorkflowNotificationChannelConfigNode.toWorkflowNode() = WorkflowNode(
-        id = id,
-        executorId = WorkflowNotificationChannelNodeExecutor.ID,
-        data = WorkflowNotificationChannelNodeData(
-            channel = channel,
-            channelConfig = channelConfig,
-            template = template,
-        ).asJson(),
-        parents = parents,
-    )
 
     override fun toSearchCriteria(text: String): JsonNode {
         TODO("Not yet implemented")

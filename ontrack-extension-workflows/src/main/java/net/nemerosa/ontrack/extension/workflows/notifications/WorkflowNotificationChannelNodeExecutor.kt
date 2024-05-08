@@ -19,7 +19,7 @@ class WorkflowNotificationChannelNodeExecutor(
 ) : AbstractExtension(workflowsExtensionFeature), WorkflowNodeExecutor {
 
     companion object {
-        const val ID: String = "workflow-notification"
+        const val ID: String = "notification"
     }
 
     override val id: String = ID
