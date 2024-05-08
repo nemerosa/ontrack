@@ -3,35 +3,23 @@ package net.nemerosa.ontrack.extension.workflows.engine
 import com.fasterxml.jackson.databind.node.TextNode
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowFixtures
 import net.nemerosa.ontrack.extension.workflows.mock.MockWorkflowNodeExecutor
-import net.nemerosa.ontrack.extension.workflows.registry.WorkflowRegistry
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.extension.workflows.notifications.AbstractWorkflowTestSupport
 import net.nemerosa.ontrack.it.waitUntil
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.test.context.TestPropertySource
 import kotlin.test.assertEquals
-import kotlin.test.fail
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalTime::class)
-@TestPropertySource(
-    properties = [
-        "net.nemerosa.ontrack.extension.workflows.store=memory",
-        "ontrack.extension.queue.general.async=false",
-    ]
-)
-class WorkflowEngineIT : AbstractDSLTestSupport() {
+class WorkflowEngineIT : AbstractWorkflowTestSupport() {
 
     @Autowired
     private lateinit var workflowEngine: WorkflowEngine
 
     @Autowired
-    private lateinit var workflowRegistry: WorkflowRegistry
-
-    @Autowired
     private lateinit var mockWorkflowNodeExecutor: MockWorkflowNodeExecutor
 
+    @OptIn(ExperimentalTime::class)
     @Test
     fun `Simple linear workflow`() {
         // Defining a workflow
@@ -55,6 +43,7 @@ class WorkflowEngineIT : AbstractDSLTestSupport() {
         )
     }
 
+    @OptIn(ExperimentalTime::class)
     @Test
     fun `Parallel with join`() {
         // Defining a workflow
@@ -112,20 +101,10 @@ class WorkflowEngineIT : AbstractDSLTestSupport() {
                     - id: parallel-a
                     - id: parallel-b
         """.trimIndent()
-        // Registering the workflow
-        val workflowId = workflowRegistry.saveYamlWorkflow(yaml, "mock")
-        // Getting the workflow
-        val record = workflowRegistry.findWorkflow(workflowId) ?: fail("No workflow found for $workflowId")
-        // Launching the workflow
-        val instance = workflowEngine.startWorkflow(record.workflow, WorkflowContext("mock", TextNode("Complex")))
-        // Waiting until the workflow is completed (error or success)
-        waitUntil("Waiting until workflow is complete", timeout = 10.seconds) {
-            val workflowInstance = workflowEngine.getWorkflowInstance(instance.id)
-            println("workflowInstance = $workflowInstance")
-            workflowInstance.status.finished
-        }
+        // Registering the workflow, launching it & waiting for its completion
+        val instanceId = workflowTestSupport.registerLaunchAndWaitForWorkflow(yaml, "Complex")
         // Checks the results
-        val texts = mockWorkflowNodeExecutor.getTextsByInstanceId(instance.id)
+        val texts = mockWorkflowNodeExecutor.getTextsByInstanceId(instanceId)
         assertEquals(
             setOf(
                 "Processed: Starting for Complex",
@@ -170,20 +149,10 @@ class WorkflowEngineIT : AbstractDSLTestSupport() {
                     - id: parallel-a
                     - id: parallel-b
         """.trimIndent()
-        // Registering the workflow
-        val workflowId = workflowRegistry.saveYamlWorkflow(yaml, "mock")
-        // Getting the workflow
-        val record = workflowRegistry.findWorkflow(workflowId) ?: fail("No workflow found for $workflowId")
-        // Launching the workflow
-        val instance = workflowEngine.startWorkflow(record.workflow, WorkflowContext("mock", TextNode("Complex")))
-        // Waiting until the workflow is completed (error or success)
-        waitUntil("Waiting until workflow is complete", timeout = 10.seconds) {
-            val workflowInstance = workflowEngine.getWorkflowInstance(instance.id)
-            println("workflowInstance = $workflowInstance")
-            workflowInstance.status.finished
-        }
+        // Registering the workflow, launching it & waiting for its completion
+        val instanceId = workflowTestSupport.registerLaunchAndWaitForWorkflow(yaml, "Complex")
         // Checks the results
-        val texts = mockWorkflowNodeExecutor.getTextsByInstanceId(instance.id)
+        val texts = mockWorkflowNodeExecutor.getTextsByInstanceId(instanceId)
         assertEquals(
             setOf(
                 "Processed: Starting for Complex",
@@ -235,20 +204,10 @@ class WorkflowEngineIT : AbstractDSLTestSupport() {
                     - id: parallel-a-2
                     - id: parallel-b
         """.trimIndent()
-        // Registering the workflow
-        val workflowId = workflowRegistry.saveYamlWorkflow(yaml, "mock")
-        // Getting the workflow
-        val record = workflowRegistry.findWorkflow(workflowId) ?: fail("No workflow found for $workflowId")
-        // Launching the workflow
-        val instance = workflowEngine.startWorkflow(record.workflow, WorkflowContext("mock", TextNode("Complex")))
-        // Waiting until the workflow is completed (error or success)
-        waitUntil("Waiting until workflow is complete", timeout = 10.seconds) {
-            val workflowInstance = workflowEngine.getWorkflowInstance(instance.id)
-            println("workflowInstance = $workflowInstance")
-            workflowInstance.status.finished
-        }
+        // Registering the workflow, launching it & waiting for its completion
+        val instanceId = workflowTestSupport.registerLaunchAndWaitForWorkflow(yaml, "Complex")
         // Checks the results
-        val texts = mockWorkflowNodeExecutor.getTextsByInstanceId(instance.id)
+        val texts = mockWorkflowNodeExecutor.getTextsByInstanceId(instanceId)
         assertEquals(
             setOf(
                 "Processed: Starting for Complex",
@@ -296,20 +255,10 @@ class WorkflowEngineIT : AbstractDSLTestSupport() {
                     - id: start
                     - id: parallel
         """.trimIndent()
-        // Registering the workflow
-        val workflowId = workflowRegistry.saveYamlWorkflow(yaml, "mock")
-        // Getting the workflow
-        val record = workflowRegistry.findWorkflow(workflowId) ?: fail("No workflow found for $workflowId")
-        // Launching the workflow
-        val instance = workflowEngine.startWorkflow(record.workflow, WorkflowContext("mock", TextNode("SPE")))
-        // Waiting until the workflow is completed (error or success)
-        waitUntil("Waiting until workflow is complete", timeout = 10.seconds) {
-            val workflowInstance = workflowEngine.getWorkflowInstance(instance.id)
-            println("workflowInstance = $workflowInstance")
-            workflowInstance.status.finished
-        }
+        // Registering the workflow, launching it & waiting for its completion
+        val instanceId = workflowTestSupport.registerLaunchAndWaitForWorkflow(yaml, "SPE")
         // Checks the results
-        val texts = mockWorkflowNodeExecutor.getTextsByInstanceId(instance.id)
+        val texts = mockWorkflowNodeExecutor.getTextsByInstanceId(instanceId)
         assertEquals(
             setOf(
                 "Processed: Start for SPE",

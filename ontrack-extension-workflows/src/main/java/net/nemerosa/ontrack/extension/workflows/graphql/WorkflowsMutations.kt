@@ -25,7 +25,7 @@ class WorkflowsMutations(
             outputDescription = "Saved workflow ID",
             outputType = String::class
         ) { input ->
-            workflowRegistry.saveYamlWorkflow(input.workflow, input.executorId)
+            workflowRegistry.saveYamlWorkflow(input.workflow)
         },
         simpleMutation(
             name = "launchWorkflow",
@@ -54,7 +54,6 @@ class WorkflowsMutations(
 
 data class SaveYamlWorkflowInput(
     val workflow: String,
-    val executorId: String,
 )
 
 data class LaunchWorkflowInput(

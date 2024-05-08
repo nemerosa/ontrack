@@ -32,6 +32,7 @@ class ReleasePropertyTemplatingSourceIT : AbstractDSLTestSupport() {
                             eventTemplatingService.render(
                                 template = "Release: ${'$'}{build.release} for ${'$'}{build}",
                                 event = event,
+                                context = emptyMap(),
                                 renderer = PlainEventRenderer.INSTANCE
                             )
                         )
@@ -56,6 +57,7 @@ class ReleasePropertyTemplatingSourceIT : AbstractDSLTestSupport() {
                             eventTemplatingService.render(
                                 template = "Release: ${'$'}{build.release} for ${'$'}{build}",
                                 event = event,
+                                context = emptyMap(),
                                 renderer = PlainEventRenderer.INSTANCE
                             )
                         )

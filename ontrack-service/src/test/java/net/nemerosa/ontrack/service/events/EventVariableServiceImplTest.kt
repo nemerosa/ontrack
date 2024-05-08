@@ -18,7 +18,7 @@ class EventVariableServiceImplTest {
         val run = ValidationRunFixtures.testValidationRun()
         val event = EventFactoryImpl().newValidationRun(run)
         // Gets the templating context
-        val context = eventVariableService.getTemplateContext(event)
+        val context = eventVariableService.getTemplateContext(event, emptyMap())
 
         // Checks all parameters
         assertEquals(
@@ -42,7 +42,7 @@ class EventVariableServiceImplTest {
         val event = Event.of(eventType)
             .withRef(branch)
             .build()
-        val context = eventVariableService.getTemplateContext(event)
+        val context = eventVariableService.getTemplateContext(event, emptyMap())
 
         // Checks all parameters
         assertEquals(
@@ -62,7 +62,7 @@ class EventVariableServiceImplTest {
         val event = Event.of(eventType)
             .withExtra(branch)
             .build()
-        val context = eventVariableService.getTemplateContext(event)
+        val context = eventVariableService.getTemplateContext(event, emptyMap())
 
         // Checks all parameters
         assertEquals(

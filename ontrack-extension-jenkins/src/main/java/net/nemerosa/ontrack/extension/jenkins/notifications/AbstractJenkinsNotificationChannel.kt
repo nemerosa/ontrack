@@ -21,6 +21,7 @@ abstract class AbstractJenkinsNotificationChannel(
     override fun publish(
         config: JenkinsNotificationChannelConfig,
         event: Event,
+        context: Map<String, Any>,
         template: String?,
         outputProgressCallback: (current: JenkinsNotificationChannelOutput) -> JenkinsNotificationChannelOutput
     ): NotificationResult<JenkinsNotificationChannelOutput> {
@@ -33,12 +34,14 @@ abstract class AbstractJenkinsNotificationChannel(
         val job = eventTemplatingService.render(
             template = config.job,
             event = event,
+            context = context,
             renderer = PlainEventRenderer.INSTANCE,
         )
         val parameters = config.parameters.associate {
             it.name to eventTemplatingService.render(
                 template = it.value,
                 event = event,
+                context = context,
                 renderer = PlainEventRenderer.INSTANCE
             )
         }

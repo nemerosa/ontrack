@@ -151,6 +151,7 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
                         val text = eventTemplatingService.render(
                             template = template,
                             event = event,
+                            context = emptyMap(),
                             renderer = PlainEventRenderer.INSTANCE
                         )
 
@@ -196,6 +197,7 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
                         val text = eventTemplatingService.render(
                             template = template,
                             event = event,
+                            context = emptyMap(),
                             renderer = PlainEventRenderer.INSTANCE
                         )
 
@@ -241,6 +243,7 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
                         val text = eventTemplatingService.render(
                             template = template,
                             event = event,
+                            context = emptyMap(),
                             renderer = PlainEventRenderer.INSTANCE
                         )
 
@@ -288,6 +291,7 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
                         val text = eventTemplatingService.render(
                             template = template,
                             event = event,
+                            context = emptyMap(),
                             renderer = PlainEventRenderer.INSTANCE
                         )
 
@@ -333,6 +337,7 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
                         val text = eventTemplatingService.render(
                             template = template,
                             event = event,
+                            context = emptyMap(),
                             renderer = PlainEventRenderer.INSTANCE
                         )
 
@@ -382,6 +387,7 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
                                 val text = eventTemplatingService.render(
                                     template = template,
                                     event = event,
+                                    context = emptyMap(),
                                     renderer = PlainEventRenderer.INSTANCE
                                 )
 
@@ -472,6 +478,7 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
                     val text = eventTemplatingService.render(
                         template = template,
                         event = event,
+                        context = emptyMap(),
                         renderer = PlainEventRenderer.INSTANCE
                     )
 
@@ -526,6 +533,7 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
                     val text = eventTemplatingService.render(
                         template = template,
                         event = event,
+                        context = emptyMap(),
                         renderer = PlainEventRenderer.INSTANCE
                     )
 
@@ -587,6 +595,7 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
                             val text = eventTemplatingService.render(
                                 template = template,
                                 event = event,
+                                context = emptyMap(),
                                 renderer = PlainEventRenderer.INSTANCE
                             )
 
@@ -666,6 +675,7 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
             val text = eventTemplatingService.render(
                 template = template,
                 event = event,
+                context = emptyMap(),
                 renderer = renderer
             )
 

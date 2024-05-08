@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.docs
 
+import net.nemerosa.ontrack.extension.notifications.channels.NoTemplate
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannel
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.annotations.getAPITypeDescription
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.io.File
 import kotlin.reflect.full.findAnnotations
+import kotlin.reflect.full.hasAnnotation
 
 /**
  * Generation of the documentation
@@ -69,6 +71,11 @@ class DocumentationGenerationIT : AbstractDSLTestSupport() {
                     if (output.isNotEmpty()) {
                         s.append("Output:\n\n")
                         directoryContext.writeFields(s, output)
+                    }
+                },
+                extendedHeader = { s ->
+                    if (channel::class.hasAnnotation<NoTemplate>()) {
+                        s.append("\n\n_This channel does not use the custom template._\n\n")
                     }
                 }
             )

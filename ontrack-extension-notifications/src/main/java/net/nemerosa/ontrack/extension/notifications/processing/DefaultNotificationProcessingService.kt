@@ -27,19 +27,19 @@ class DefaultNotificationProcessingService(
     private val meterRegistry: MeterRegistry,
 ) : NotificationProcessingService {
 
-    override fun process(item: Notification): Any? {
+    override fun process(item: Notification, context: Map<String, Any>): Any? {
         meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_started, item)
         val channel = notificationChannelRegistry.findChannel(item.channel)
         if (channel != null) {
             meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_started, item)
-            return process(channel, item)
+            return process(channel, item, context)
         } else {
             meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_unknown, item)
             return null
         }
     }
 
-    private fun <C, R> process(channel: NotificationChannel<C, R>, item: Notification): R? {
+    private fun <C, R> process(channel: NotificationChannel<C, R>, item: Notification, context: Map<String, Any>): R? {
         val validatedConfig = channel.validate(item.channelConfig)
         return if (validatedConfig.config != null) {
 
@@ -56,6 +56,7 @@ class DefaultNotificationProcessingService(
                 val result = channel.publish(
                     config = validatedConfig.config,
                     event = item.event,
+                    context = context,
                     template = item.template,
                     outputProgressCallback = outputProgressCallback,
                 )

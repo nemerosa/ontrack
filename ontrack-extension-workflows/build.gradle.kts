@@ -22,6 +22,7 @@ dependencies {
     testImplementation(project(path = ":ontrack-ui-support", configuration = "tests"))
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
+    testImplementation(project(path = ":ontrack-extension-notifications", configuration = "tests"))
     testImplementation(project(":ontrack-it-utils"))
 
     testRuntimeOnly(project(":ontrack-service"))

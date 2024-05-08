@@ -26,7 +26,7 @@ class EventTemplatingServiceImplTest {
     @BeforeEach
     fun init() {
         eventVariableService = mockk()
-        every { eventVariableService.getTemplateContext(any()) } returns mapOf(
+        every { eventVariableService.getTemplateContext(any(), any()) } returns mapOf(
             "branch" to "release/1.27"
         )
         every { eventVariableService.getTemplateParameters(any(), caseVariants = true) } returns mapOf(
@@ -57,6 +57,7 @@ class EventTemplatingServiceImplTest {
         val event = mockk<Event>()
         val text = eventTemplatingService.renderEvent(
             event = event,
+            context = emptyMap(),
             template = "Legacy {branch} branch",
             renderer = PlainEventRenderer.INSTANCE,
         )
@@ -68,6 +69,7 @@ class EventTemplatingServiceImplTest {
         val event = mockk<Event>()
         val text = eventTemplatingService.renderEvent(
             event = event,
+            context = emptyMap(),
             template = "New templated ${'$'}{branch} branch",
             renderer = PlainEventRenderer.INSTANCE,
         )

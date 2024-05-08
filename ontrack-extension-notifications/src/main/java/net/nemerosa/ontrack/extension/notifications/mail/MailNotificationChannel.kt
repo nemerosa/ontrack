@@ -55,6 +55,7 @@ class MailNotificationChannel(
     override fun publish(
         config: MailNotificationChannelConfig,
         event: Event,
+        context: Map<String, Any>,
         template: String?,
         outputProgressCallback: (current: MailNotificationChannelOutput) -> MailNotificationChannelOutput
     ): NotificationResult<MailNotificationChannelOutput> {
@@ -62,11 +63,13 @@ class MailNotificationChannel(
         val subject = eventTemplatingService.render(
             template = config.subject,
             event = event,
+            context = context,
             renderer = PlainEventRenderer.INSTANCE, // Using plain text for the subject
         )
         // Formatting the message
         val message = eventTemplatingService.renderEvent(
             event = event,
+            context = context,
             template = template,
             renderer = htmlNotificationEventRenderer,
         )

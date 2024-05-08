@@ -35,6 +35,7 @@ class SCMBranchTemplatingSourceIT : AbstractDSLTestSupport() {
                         val text = eventTemplatingService.render(
                             template = "Branch ${'$'}{branch.scmBranch|urlencode} has been promoted to ${'$'}{promotionLevel}",
                             event = event,
+                            context = emptyMap(),
                             renderer = PlainEventRenderer.INSTANCE,
                         )
 

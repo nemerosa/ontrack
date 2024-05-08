@@ -2,6 +2,9 @@ package net.nemerosa.ontrack.extension.workflows.definition
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowNodeNotFoundException
+import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.docs.DocumentationList
+import net.nemerosa.ontrack.model.docs.SelfDocumented
 
 /**
  * Definition of a workflow by another extension.
@@ -9,8 +12,12 @@ import net.nemerosa.ontrack.extension.workflows.engine.WorkflowNodeNotFoundExcep
  * @property name Display name for the workflow
  * @property nodes List of nodes in the workflow
  */
+@SelfDocumented
 data class Workflow(
+    @APIDescription("Display name for the workflow")
     val name: String,
+    @APIDescription("List of nodes in the workflow")
+    @DocumentationList
     val nodes: List<WorkflowNode>,
 ) {
     /**

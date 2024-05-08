@@ -67,7 +67,7 @@ class AsyncNotificationQueueListener(
                     "channel" to notification.channel,
                     "queue" to queue,
                 )
-                notificationProcessingService.process(notification)
+                notificationProcessingService.process(notification, emptyMap())
             }
         } catch (any: Throwable) {
             applicationLogService.log(

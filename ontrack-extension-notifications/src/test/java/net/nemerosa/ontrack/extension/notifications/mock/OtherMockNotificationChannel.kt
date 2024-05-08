@@ -25,17 +25,19 @@ class OtherMockNotificationChannel(
     override fun publish(
         config: MockNotificationChannelConfig,
         event: Event,
+        context: Map<String,Any>,
         template: String?,
         outputProgressCallback: (current: MockNotificationChannelOutput) -> MockNotificationChannelOutput
     ): NotificationResult<MockNotificationChannelOutput> {
         val text = eventTemplatingService.renderEvent(
             event,
+            context,
             template,
             PlainEventRenderer.INSTANCE,
         )
         messages.getOrPut(config.target) { mutableListOf() }.add(text)
         return NotificationResult.ok(
-            output = MockNotificationChannelOutput(text = text)
+            output = MockNotificationChannelOutput(text = text, data = config.data)
         )
     }
 

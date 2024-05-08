@@ -40,6 +40,7 @@ class JiraCreationNotificationChannel(
     override fun publish(
         config: JiraCreationNotificationChannelConfig,
         event: Event,
+        context: Map<String, Any>,
         template: String?,
         outputProgressCallback: (current: JiraCreationNotificationChannelOutput) -> JiraCreationNotificationChannelOutput,
     ): NotificationResult<JiraCreationNotificationChannelOutput> {
@@ -53,6 +54,7 @@ class JiraCreationNotificationChannel(
         val expandedLabels = config.labels.map {
             eventTemplatingService.renderEvent(
                 event = event,
+                context = context,
                 template = it,
                 renderer = PlainEventRenderer.INSTANCE,
             )
@@ -81,6 +83,7 @@ class JiraCreationNotificationChannel(
         // Title
         val title = eventTemplatingService.renderEvent(
             event = event,
+            context = context,
             template = config.titleTemplate,
             renderer = PlainEventRenderer.INSTANCE
         )
@@ -92,6 +95,7 @@ class JiraCreationNotificationChannel(
             ?.let {
                 eventTemplatingService.renderEvent(
                     event = event,
+                    context = context,
                     template = it,
                     renderer = PlainEventRenderer.INSTANCE
                 )
@@ -103,6 +107,7 @@ class JiraCreationNotificationChannel(
             JiraCustomField(name, value.transform { text ->
                 eventTemplatingService.renderEvent(
                     event = event,
+                    context = context,
                     template = text,
                     renderer = PlainEventRenderer.INSTANCE
                 )
@@ -113,6 +118,7 @@ class JiraCreationNotificationChannel(
         // Body
         val body = eventTemplatingService.renderEvent(
             event = event,
+            context = context,
             template = template,
             renderer = jiraNotificationEventRenderer,
         )

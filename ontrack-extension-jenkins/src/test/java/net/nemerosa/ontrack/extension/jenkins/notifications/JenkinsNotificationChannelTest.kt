@@ -71,7 +71,7 @@ class JenkinsNotificationChannelTest {
 
         every { jenkinsClient.fireAndForgetJob(JOB, emptyMap()) } returns URI("uri:queue")
 
-        val result = jenkinsNotificationChannel.publish(config, event, null) { it }
+        val result = jenkinsNotificationChannel.publish(config, event, emptyMap(), null) { it }
 
         assertEquals(NotificationResultType.OK, result.type)
     }
@@ -93,7 +93,7 @@ class JenkinsNotificationChannelTest {
             )
         } returns URI("uri:queue")
 
-        val result = jenkinsNotificationChannel.publish(config, event, null) { it }
+        val result = jenkinsNotificationChannel.publish(config, event, emptyMap(), null) { it }
 
         assertEquals(NotificationResultType.OK, result.type)
     }
@@ -105,7 +105,7 @@ class JenkinsNotificationChannelTest {
 
         every { jenkinsClient.fireAndForgetJob(JOB, emptyMap()) } returns null
 
-        val result = jenkinsNotificationChannel.publish(config, event, null) { it }
+        val result = jenkinsNotificationChannel.publish(config, event, emptyMap(), null) { it }
 
         assertEquals(NotificationResultType.ERROR, result.type)
     }
@@ -126,7 +126,7 @@ class JenkinsNotificationChannelTest {
 
         every { jenkinsClient.runJob(JOB, emptyMap(), any(), any()) } returns jenkinsBuild
 
-        val result = jenkinsNotificationChannel.publish(config, event, null) { it }
+        val result = jenkinsNotificationChannel.publish(config, event, emptyMap(), null) { it }
 
         assertEquals(NotificationResultType.OK, result.type)
     }
@@ -147,7 +147,7 @@ class JenkinsNotificationChannelTest {
 
         every { jenkinsClient.runJob(JOB, emptyMap(), any(), any()) } returns jenkinsBuild
 
-        val result = jenkinsNotificationChannel.publish(config, event, null) { it }
+        val result = jenkinsNotificationChannel.publish(config, event, emptyMap(), null) { it }
 
         assertEquals(NotificationResultType.ERROR, result.type)
     }
@@ -173,7 +173,7 @@ class JenkinsNotificationChannelTest {
         val event = EventFactoryImpl().newPromotionRun(promotionRun)
 
         every {
-            eventTemplatingService.render(any(), any(), any())
+            eventTemplatingService.render(any(), any(), any(), any())
         } answers {
             // Unchanged path
             it.invocation.args.first() as String

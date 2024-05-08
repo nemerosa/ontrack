@@ -19,9 +19,10 @@ class SyncNotificationQueue(
 
     override fun publish(item: Notification): Boolean {
         notificationProcessingService.process(
-            notificationQueueItemConverter.convertFromQueue(
+            item = notificationQueueItemConverter.convertFromQueue(
                 notificationQueueItemConverter.convertForQueue(item)
-            )
+            ),
+            context = emptyMap()
         )
         // OK
         return true
