@@ -27,5 +27,5 @@ class WorkflowQueueProcessor(
         )
     }
 
-    override fun getRoutingIdentifier(payload: WorkflowQueuePayload): String = payload.workflowNodeExecutorId
+    override fun getRoutingIdentifier(payload: WorkflowQueuePayload): String = payload.workflowInstanceId
 }
