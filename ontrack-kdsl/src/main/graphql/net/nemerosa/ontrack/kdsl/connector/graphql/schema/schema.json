@@ -29757,6 +29757,65 @@
               "deprecationReason": null
             },
             {
+              "name": "postQueue",
+              "description": "Post a message on a queue",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "PostQueueInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "PostQueuePayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "purgeHookRecordings",
+              "description": "Purging all records for Hook messages",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "PurgeHookRecordingsPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "purgeQueueRecordings",
+              "description": "Purging all records for Queue messages",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "PurgeQueueRecordingsPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "reloadCasc",
+              "description": "Reload the configuration from the CasC files",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ReloadCascPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "deleteNotificationRecords",
               "description": "Deleting notification records",
               "args": [
@@ -30073,65 +30132,6 @@
               "type": {
                 "kind": "OBJECT",
                 "name": "DeleteWebhookPayload",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "postQueue",
-              "description": "Post a message on a queue",
-              "args": [
-                {
-                  "name": "input",
-                  "description": "Input for the mutation",
-                  "type": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "PostQueueInput",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                }
-              ],
-              "type": {
-                "kind": "OBJECT",
-                "name": "PostQueuePayload",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "purgeHookRecordings",
-              "description": "Purging all records for Hook messages",
-              "args": [],
-              "type": {
-                "kind": "OBJECT",
-                "name": "PurgeHookRecordingsPayload",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "purgeQueueRecordings",
-              "description": "Purging all records for Queue messages",
-              "args": [],
-              "type": {
-                "kind": "OBJECT",
-                "name": "PurgeQueueRecordingsPayload",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "reloadCasc",
-              "description": "Reload the configuration from the CasC files",
-              "args": [],
-              "type": {
-                "kind": "OBJECT",
-                "name": "ReloadCascPayload",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -38495,6 +38495,22 @@
               "deprecationReason": null
             },
             {
+              "name": "hookRecordFilterInfo",
+              "description": "Information for the hook record query filter",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "HookRecordFilterInfo",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "workflowInstance",
               "description": "Gets an existing workflow instance using its ID",
               "args": [
@@ -38512,6 +38528,39 @@
               "type": {
                 "kind": "OBJECT",
                 "name": "WorkflowInstance",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "workflowInstances",
+              "description": "List of workflow instances",
+              "args": [
+                {
+                  "name": "offset",
+                  "description": "Offset for the page",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": "0"
+                },
+                {
+                  "name": "size",
+                  "description": "Size of the page",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": "20"
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "WorkflowInstancePaginated",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -38546,175 +38595,6 @@
                       "name": "String"
                     }
                   }
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "notificationChannels",
-              "description": "List of all notification channels",
-              "args": [],
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "LIST",
-                  "name": null,
-                  "ofType": {
-                    "kind": "NON_NULL",
-                    "name": null,
-                    "ofType": {
-                      "kind": "OBJECT",
-                      "name": "NotificationChannel"
-                    }
-                  }
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "notificationRecords",
-              "description": "Access to the notification recordings",
-              "args": [
-                {
-                  "name": "offset",
-                  "description": "Offset for the page",
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": "0"
-                },
-                {
-                  "name": "size",
-                  "description": "Size of the page",
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": "20"
-                },
-                {
-                  "name": "channel",
-                  "description": "Filtering on the channel",
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "resultType",
-                  "description": "Filtering on the result type",
-                  "type": {
-                    "kind": "ENUM",
-                    "name": "NotificationResultType",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                }
-              ],
-              "type": {
-                "kind": "OBJECT",
-                "name": "NotificationRecordPaginated",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "eventSubscriptions",
-              "description": "List of event subscriptions",
-              "args": [
-                {
-                  "name": "offset",
-                  "description": "Offset for the page",
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": "0"
-                },
-                {
-                  "name": "size",
-                  "description": "Size of the page",
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": "20"
-                },
-                {
-                  "name": "filter",
-                  "description": "Filter for the subscriptions",
-                  "type": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "EventSubscriptionFilter",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                }
-              ],
-              "type": {
-                "kind": "OBJECT",
-                "name": "EventSubscriptionPayloadPaginated",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "webhooks",
-              "description": "List of registred webhooks",
-              "args": [
-                {
-                  "name": "name",
-                  "description": "Name of the webhook",
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                }
-              ],
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "LIST",
-                  "name": null,
-                  "ofType": {
-                    "kind": "NON_NULL",
-                    "name": null,
-                    "ofType": {
-                      "kind": "OBJECT",
-                      "name": "Webhook"
-                    }
-                  }
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "hookRecordFilterInfo",
-              "description": "Information for the hook record query filter",
-              "args": [],
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "OBJECT",
-                  "name": "HookRecordFilterInfo",
-                  "ofType": null
                 }
               },
               "isDeprecated": false,
@@ -38901,6 +38781,159 @@
                 "kind": "SCALAR",
                 "name": "JSON",
                 "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "notificationChannels",
+              "description": "List of all notification channels",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "NotificationChannel"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "notificationRecords",
+              "description": "Access to the notification recordings",
+              "args": [
+                {
+                  "name": "offset",
+                  "description": "Offset for the page",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": "0"
+                },
+                {
+                  "name": "size",
+                  "description": "Size of the page",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": "20"
+                },
+                {
+                  "name": "channel",
+                  "description": "Filtering on the channel",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "resultType",
+                  "description": "Filtering on the result type",
+                  "type": {
+                    "kind": "ENUM",
+                    "name": "NotificationResultType",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "NotificationRecordPaginated",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "eventSubscriptions",
+              "description": "List of event subscriptions",
+              "args": [
+                {
+                  "name": "offset",
+                  "description": "Offset for the page",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": "0"
+                },
+                {
+                  "name": "size",
+                  "description": "Size of the page",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": "20"
+                },
+                {
+                  "name": "filter",
+                  "description": "Filter for the subscriptions",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "EventSubscriptionFilter",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "EventSubscriptionPayloadPaginated",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "webhooks",
+              "description": "List of registred webhooks",
+              "args": [
+                {
+                  "name": "name",
+                  "description": "Name of the webhook",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "Webhook"
+                    }
+                  }
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -41794,20 +41827,6 @@
           "description": "Input type for the saveYamlWorkflow mutation.",
           "fields": null,
           "inputFields": [
-            {
-              "name": "executorId",
-              "description": "executorId field",
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
-              },
-              "defaultValue": null
-            },
             {
               "name": "workflow",
               "description": "workflow field",
@@ -58831,6 +58850,22 @@
           "description": "Running workflow instance",
           "fields": [
             {
+              "name": "id",
+              "description": "id field",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "status",
               "description": "status field",
               "args": [],
@@ -58991,6 +59026,52 @@
               "deprecationReason": null
             }
           ],
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "WorkflowInstancePaginated",
+          "description": null,
+          "fields": [
+            {
+              "name": "pageInfo",
+              "description": "Information about the current page",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "PageInfo",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "pageItems",
+              "description": "Items in the current page",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "WorkflowInstance"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
           "possibleTypes": null
         },
         {

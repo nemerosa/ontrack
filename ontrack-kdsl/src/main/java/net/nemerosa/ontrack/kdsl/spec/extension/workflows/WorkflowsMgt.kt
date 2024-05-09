@@ -12,9 +12,9 @@ import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 
 class WorkflowsMgt(connector: Connector) : Connected(connector) {
 
-    fun saveYamlWorkflow(workflow: String, executor: String): String? =
+    fun saveYamlWorkflow(workflow: String): String? =
         graphqlConnector.mutate(
-            SaveYamlWorkflowMutation(workflow, executor)
+            SaveYamlWorkflowMutation(workflow)
         ) {
             it?.saveYamlWorkflow()?.fragments()?.payloadUserErrors()?.convert()
         }?.saveYamlWorkflow()?.workflowId()

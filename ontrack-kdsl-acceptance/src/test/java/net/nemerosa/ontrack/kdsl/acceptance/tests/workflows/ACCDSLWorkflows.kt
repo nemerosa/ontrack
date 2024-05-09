@@ -32,7 +32,6 @@ class ACCDSLWorkflows : AbstractACCDSLTestSupport() {
         // Saving the workflow
         val workflowId = ontrack.workflows.saveYamlWorkflow(
             workflow = workflow,
-            executor = "mock",
         ) ?: fail("Error while saving workflow")
         // Running the workflow
         val instanceId = ontrack.workflows.launchWorkflow(
@@ -75,7 +74,6 @@ class ACCDSLWorkflows : AbstractACCDSLTestSupport() {
         // Saving the workflow
         val workflowId = ontrack.workflows.saveYamlWorkflow(
             workflow = workflow,
-            executor = "mock",
         ) ?: fail("Error while saving workflow")
         // Running the workflow
         val instanceId = ontrack.workflows.launchWorkflow(
@@ -133,7 +131,6 @@ class ACCDSLWorkflows : AbstractACCDSLTestSupport() {
         // Saving the workflow
         val workflowId = ontrack.workflows.saveYamlWorkflow(
             workflow = workflow,
-            executor = "mock",
         ) ?: fail("Error while saving workflow")
         // Running the workflow
         val instanceId = ontrack.workflows.launchWorkflow(
@@ -199,7 +196,6 @@ class ACCDSLWorkflows : AbstractACCDSLTestSupport() {
         // Saving the workflow
         val workflowId = ontrack.workflows.saveYamlWorkflow(
             workflow = workflow,
-            executor = "mock",
         ) ?: fail("Error while saving workflow")
         // Running the workflow
         val instanceId = ontrack.workflows.launchWorkflow(
@@ -250,7 +246,6 @@ class ACCDSLWorkflows : AbstractACCDSLTestSupport() {
         // Saving the workflow
         val workflowId = ontrack.workflows.saveYamlWorkflow(
             workflow = workflow,
-            executor = "mock",
         ) ?: fail("Error while saving workflow")
         // Running the workflow
         val instanceId = ontrack.workflows.launchWorkflow(

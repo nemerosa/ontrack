@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.workflows.engine
 import com.fasterxml.jackson.databind.node.TextNode
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowFixtures
 import net.nemerosa.ontrack.extension.workflows.mock.MockWorkflowNodeExecutor
-import net.nemerosa.ontrack.extension.workflows.notifications.AbstractWorkflowTestSupport
+import net.nemerosa.ontrack.extension.workflows.AbstractWorkflowTestSupport
 import net.nemerosa.ontrack.it.waitUntil
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

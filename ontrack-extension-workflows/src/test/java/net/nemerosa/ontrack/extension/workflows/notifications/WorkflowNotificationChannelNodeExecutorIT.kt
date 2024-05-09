@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.workflows.notifications
 
 import net.nemerosa.ontrack.extension.notifications.mock.MockNotificationChannel
+import net.nemerosa.ontrack.extension.workflows.AbstractWorkflowTestSupport
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test

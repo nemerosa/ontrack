@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.workflows.engine
 
+import net.nemerosa.ontrack.model.pagination.PaginatedList
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 
@@ -20,4 +21,19 @@ class InMemoryWorkflowInstanceStore : WorkflowInstanceStore {
     }
 
     override fun findById(id: String): WorkflowInstance? = instances[id]
+
+    override fun findByFilter(workflowInstanceFilter: WorkflowInstanceFilter): PaginatedList<WorkflowInstance> {
+        // TODO Sorted by start date desc
+        // TODO Filtering
+        val values = instances.values.toList()
+        return PaginatedList.create(
+            items = values,
+            offset = workflowInstanceFilter.offset,
+            pageSize = workflowInstanceFilter.size,
+        )
+    }
+
+    override fun clearAll() {
+        instances.clear()
+    }
 }

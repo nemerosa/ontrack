@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.booleanFieldFunction
 import net.nemerosa.ontrack.graphql.support.enumField
 import net.nemerosa.ontrack.graphql.support.listType
+import net.nemerosa.ontrack.graphql.support.stringField
 import org.springframework.stereotype.Component
 
 @Component
@@ -20,6 +21,8 @@ class GQLTypeWorkflowInstance(
         GraphQLObjectType.newObject()
             .name(typeName)
             .description("Running workflow instance")
+            // ID
+            .stringField(WorkflowInstance::id)
             // Status
             .enumField(WorkflowInstance::status)
             // Finished (status)

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.workflows.engine
 
+import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.support.StorageService
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
@@ -30,4 +31,18 @@ class DatabaseWorkflowInstanceStore(
     override fun findById(id: String): WorkflowInstance? =
         storageService.find(STORE, id, WorkflowInstance::class)
 
+    override fun findByFilter(workflowInstanceFilter: WorkflowInstanceFilter): PaginatedList<WorkflowInstance> {
+        return storageService.paginatedFilter(
+            store = STORE,
+            type = WorkflowInstance::class,
+            offset = workflowInstanceFilter.offset,
+            size = workflowInstanceFilter.size,
+            // TODO Filters
+            // TODO Order by start date desc
+        )
+    }
+
+    override fun clearAll() {
+        storageService.clear(STORE)
+    }
 }

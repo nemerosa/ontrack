@@ -1,6 +1,5 @@
-package net.nemerosa.ontrack.extension.workflows.notifications
+package net.nemerosa.ontrack.extension.workflows
 
-import net.nemerosa.ontrack.extension.workflows.WorkflowTestSupport
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.TestPropertySource

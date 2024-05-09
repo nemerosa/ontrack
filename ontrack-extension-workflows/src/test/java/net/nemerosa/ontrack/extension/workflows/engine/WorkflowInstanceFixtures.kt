@@ -7,10 +7,6 @@ import net.nemerosa.ontrack.extension.workflows.mock.MockWorkflowNodeExecutor
 
 object WorkflowInstanceFixtures {
 
-    private val mockWorkflowNodeExecutor = MockWorkflowNodeExecutor(
-        WorkflowsExtensionFeature()
-    )
-
     fun simpleLinear(): WorkflowInstance {
         val workflow = WorkflowFixtures.simpleLinearWorkflow()
         return createInstance(workflow, WorkflowContext.noContext())
