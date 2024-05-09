@@ -8,8 +8,8 @@ class WorkflowNodeExecutorServiceImpl(
     private val extensionManager: ExtensionManager,
 ) : WorkflowNodeExecutorService {
 
-    private val executors: Collection<WorkflowNodeExecutor> by lazy {
-        extensionManager.getExtensions(WorkflowNodeExecutor::class.java)
+    override val executors: List<WorkflowNodeExecutor> by lazy {
+        extensionManager.getExtensions(WorkflowNodeExecutor::class.java).sortedBy { it.displayName }
     }
 
     override fun getExecutor(executorId: String): WorkflowNodeExecutor =

@@ -50,7 +50,7 @@ class InMemoryNotificationChannel(
             PlainEventRenderer()
         )
         messages.getOrPut(config.group) { mutableListOf() }.add(text)
-        return NotificationResult.ok(InMemoryNotificationChannelOutput(sent = true))
+        return NotificationResult.ok(InMemoryNotificationChannelOutput(sent = true, data = config.data))
     }
 
     override fun toSearchCriteria(text: String): JsonNode = InMemoryNotificationChannelConfig(text).asJson()

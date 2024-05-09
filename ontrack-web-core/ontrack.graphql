@@ -2947,6 +2947,14 @@ type LabelProviderDescription {
     name: String!
 }
 
+"Output type for the launchWorkflow mutation."
+type LaunchWorkflowPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Workflow instance ID"
+    workflowInstanceId: String
+}
+
 "Output type for the linkBuildById mutation."
 type LinkBuildByIdPayload implements Payload {
     "Build linked from"
@@ -3543,6 +3551,11 @@ type Mutation {
     ): GitHubIngestionValidateDataByRunIdPayload
     "Launches a job"
     launchJob(id: Int!): JobActionResult!
+    "Launches an existing workflow"
+    launchWorkflow(
+        "Input for the mutation"
+        input: LaunchWorkflowInput
+    ): LaunchWorkflowPayload
     "Link two builds using their names"
     linkBuild(
         "Input for the mutation"
@@ -3610,6 +3623,11 @@ type Mutation {
     saveDashboard(input: SaveDashboardInput!): SaveDashboardPayload
     "Saving some generic settings"
     saveSettings(input: SaveSettingsInput!): SaveSettingsPayload
+    "Saves a workflow which is defined as YAML"
+    saveYamlWorkflow(
+        "Input for the mutation"
+        input: SaveYamlWorkflowInput
+    ): SaveYamlWorkflowPayload
     "Selects a dashboard"
     selectDashboard(input: SelectDashboardInput!): SelectDashboardPayload
     "Sets the auto versioning configuration for a branch"
@@ -5197,6 +5215,11 @@ type Query {
         "Maximum number of projects to return"
         count: Int = 10
     ): [Project!]!
+    "Getting a list of texts generated for a mock workflow"
+    mockWorkflowTexts(
+        "ID of the workflow instance"
+        instanceId: String
+    ): [String!]!
     "List of all notification channels"
     notificationChannels: [NotificationChannel!]!
     "Access to the notification recordings"
@@ -5380,6 +5403,20 @@ type Query {
         "Name of the webhook"
         name: String
     ): [Webhook!]!
+    "Gets an existing workflow instance using its ID"
+    workflowInstance(
+        "ID of the workflow instance"
+        id: String
+    ): WorkflowInstance
+    "List of workflow instances"
+    workflowInstances(
+        "Offset for the page"
+        offset: Int = 0,
+        "Size of the page"
+        size: Int = 20
+    ): WorkflowInstancePaginated
+    "List of all workflow node executors"
+    workflowNodeExecutors: [WorkflowNodeExecutor!]!
 }
 
 "QueueDispatchResult"
@@ -5707,6 +5744,14 @@ type SaveDashboardPayload implements PayloadInterface {
 type SaveSettingsPayload implements PayloadInterface {
     "List of errors"
     errors: [PayloadUserError]
+}
+
+"Output type for the saveYamlWorkflow mutation."
+type SaveYamlWorkflowPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Saved workflow ID"
+    workflowId: String
 }
 
 "Schedule"
@@ -7152,6 +7197,101 @@ type WidgetLayout {
     y: Int!
 }
 
+"Workflow"
+type Workflow {
+    "Display name for the workflow"
+    name: String!
+    "List of nodes in the workflow"
+    nodes: [WorkflowNode!]!
+}
+
+"Workflow context, data which is passed to the workflow initially"
+type WorkflowContext {
+    "data field"
+    data: [WorkflowContextData!]!
+}
+
+"Data in a workflow context"
+type WorkflowContextData {
+    "key field"
+    key: String!
+    "value field"
+    value: JSON
+}
+
+"Running workflow instance"
+type WorkflowInstance {
+    "context field"
+    context: WorkflowContext!
+    "durationMs field"
+    durationMs: Int
+    "endTime field"
+    endTime: LocalDateTime
+    "Is the workflow finished?"
+    finished: Boolean!
+    "id field"
+    id: String!
+    "List of node statuses in the workflow"
+    nodesExecutions: [WorkflowInstanceNode!]!
+    "startTime field"
+    startTime: LocalDateTime
+    "status field"
+    status: WorkflowInstanceStatus!
+    "workflow field"
+    workflow: Workflow!
+}
+
+"Status of a node execution in a workflow"
+type WorkflowInstanceNode {
+    "durationMs field"
+    durationMs: Int
+    "endTime field"
+    endTime: LocalDateTime
+    "error field"
+    error: String
+    "id field"
+    id: String!
+    "output field"
+    output: JSON
+    "startTime field"
+    startTime: LocalDateTime
+    "status field"
+    status: WorkflowInstanceNodeStatus!
+}
+
+type WorkflowInstancePaginated {
+    "Information about the current page"
+    pageInfo: PageInfo
+    "Items in the current page"
+    pageItems: [WorkflowInstance!]!
+}
+
+"Workflow node"
+type WorkflowNode {
+    "Raw data associated with the node, to be used by the node executor."
+    data: JSON
+    "ID of the executor to use"
+    executorId: String!
+    "Unique ID of the node in its workflow."
+    id: String!
+    "List of the IDs of the parents for this node"
+    parents: [WorkflowParentNode!]!
+}
+
+"Workflow node executor"
+type WorkflowNodeExecutor {
+    "displayName field"
+    displayName: String!
+    "id field"
+    id: String!
+}
+
+"Workflow parent node"
+type WorkflowParentNode {
+    "ID of the parent node"
+    id: String!
+}
+
 "List of ways the auto approval is managed."
 enum AutoApprovalMode {
     CLIENT
@@ -7346,6 +7486,22 @@ enum ValidationStampFilterScope {
     BRANCH
     GLOBAL
     PROJECT
+}
+
+"Status of a node in a workflow"
+enum WorkflowInstanceNodeStatus {
+    ERROR
+    IDLE
+    STARTED
+    SUCCESS
+}
+
+"Status of a running workflow"
+enum WorkflowInstanceStatus {
+    ERROR
+    RUNNING
+    STARTED
+    SUCCESS
 }
 
 "JSON node"
@@ -8562,6 +8718,21 @@ input IssueChangeLogExportRequest {
     grouping: String
 }
 
+"Input type for the launchWorkflow mutation."
+input LaunchWorkflowInput {
+    "context field"
+    context: [LaunchWorkflowInputContext!]!
+    "workflowId field"
+    workflowId: String!
+}
+
+input LaunchWorkflowInputContext {
+    "key field"
+    key: String!
+    "value field"
+    value: JSON!
+}
+
 "Input type for the linkBuildById mutation."
 input LinkBuildByIdInput {
     "ID of the build from which the link must be created"
@@ -8784,6 +8955,12 @@ input SaveSettingsInput {
     id: String!
     "Values for the settings"
     values: JSON!
+}
+
+"Input type for the saveYamlWorkflow mutation."
+input SaveYamlWorkflowInput {
+    "workflow field"
+    workflow: String!
 }
 
 input SelectDashboardInput {

@@ -14,7 +14,7 @@ export const useSubscriptionDialog = ({onSuccess, projectEntity}) => {
 
     const customPreparation = async (channelType, channelConfig) => {
         const newConfig = await callDynamicFunction(
-            `framework/notification-channel-form-prepare/${channelType}`,
+            `framework/notification-channel/${channelType}/FormPrepare`,
             channelConfig,
         )
         return newConfig ?? channelConfig

@@ -11,7 +11,7 @@ import {
     FaInfo,
     FaJenkins, FaJira,
     FaList,
-    FaMagic, FaMailBulk, FaPaperPlane,
+    FaMagic, FaMailBulk, FaPaperPlane, FaProjectDiagram,
     FaSignOutAlt, FaTag,
     FaUser, FaWrench
 } from "react-icons/fa";
@@ -61,6 +61,7 @@ export default function UserMenu({userMenu}) {
         'extension/auto-versioning/audit/global': <FaMagic/>,
         'extension/notifications/subscriptions/global': <FaPaperPlane/>,
         'extension/notifications/recordings': <FaMailBulk/>,
+        'extension/workflows/audit': <FaProjectDiagram/>,
     }
 
     useEffect(() => {

@@ -4,10 +4,7 @@ import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
-import net.nemerosa.ontrack.graphql.support.booleanFieldFunction
-import net.nemerosa.ontrack.graphql.support.enumField
-import net.nemerosa.ontrack.graphql.support.listType
-import net.nemerosa.ontrack.graphql.support.stringField
+import net.nemerosa.ontrack.graphql.support.*
 import org.springframework.stereotype.Component
 
 @Component
@@ -32,12 +29,20 @@ class GQLTypeWorkflowInstance(
             ) {
                 it.status.finished
             }
+            // Context of the workflow execution
+            .field(WorkflowInstance::context)
             // Node executions
             .field {
                 it.name(WorkflowInstance::nodesExecutions.name)
                     .description("List of node statuses in the workflow")
                     .type(listType(gqlTypeWorkflowInstanceNode.typeRef))
             }
+            // Workflow
+            .field(WorkflowInstance::workflow)
+            // Timing
+            .localDateTimeField(WorkflowInstance::startTime)
+            .localDateTimeField(WorkflowInstance::endTime)
+            .longField(WorkflowInstance::durationMs)
             // OK
             .build()
 }

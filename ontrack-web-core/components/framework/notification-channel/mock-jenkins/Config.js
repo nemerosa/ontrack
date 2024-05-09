@@ -1,4 +1,4 @@
-import JenkinsNotificationChannelConfig from "@components/framework/notification-channel-config/jenkins";
+import JenkinsNotificationChannelConfig from "@components/framework/notification-channel/jenkins/Config";
 
 export default function MockJenkinsNotificationChannelConfig({config, job, parameters, callMode, timeout}) {
     return <JenkinsNotificationChannelConfig

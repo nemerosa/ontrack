@@ -3,6 +3,8 @@ package net.nemerosa.ontrack.extension.workflows.engine
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
+import java.time.Duration
+import java.time.LocalDateTime
 
 /**
  * Information about the execution of a workflow.
@@ -19,6 +21,25 @@ data class WorkflowInstance(
     val context: WorkflowContext,
     val nodesExecutions: List<WorkflowInstanceNode>,
 ) {
+
+    @get:JsonIgnore
+    val startTime: LocalDateTime? by lazy {
+        nodesExecutions.mapNotNull { it.startTime }.minOrNull()
+    }
+
+    @get:JsonIgnore
+    val endTime: LocalDateTime? by lazy {
+        nodesExecutions.mapNotNull { it.endTime }.maxOrNull()
+    }
+
+    @get:JsonIgnore
+    val durationMs: Long by lazy {
+        if (startTime != null && endTime != null) {
+            Duration.between(startTime, endTime).toMillis()
+        } else {
+            0
+        }
+    }
 
     @get:JsonIgnore
     val status: WorkflowInstanceStatus

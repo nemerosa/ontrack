@@ -15,6 +15,11 @@ interface WorkflowNodeExecutor : Extension {
     val id: String
 
     /**
+     * Display name for the executor
+     */
+    val displayName: String
+
+    /**
      * Runs some action for a given workflow node.
      *
      * @param workflowInstance Workflow to run

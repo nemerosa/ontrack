@@ -1,8 +1,10 @@
 package net.nemerosa.ontrack.extension.workflows.engine
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.common.reducedStackTrace
+import java.time.Duration
 import java.time.LocalDateTime
 
 /**
@@ -18,6 +20,15 @@ data class WorkflowInstanceNode(
     val output: JsonNode?,
     val error: String?,
 ) {
+
+    @get:JsonIgnore
+    val durationMs: Long by lazy {
+        if (startTime != null && endTime != null) {
+            Duration.between(startTime, endTime).toMillis()
+        } else {
+            0
+        }
+    }
 
     fun start(time: LocalDateTime = Time.now) = WorkflowInstanceNode(
         id = id,
@@ -43,6 +54,6 @@ data class WorkflowInstanceNode(
         startTime = startTime,
         endTime = time,
         output = null,
-        error = reducedStackTrace(throwable),
+        error = throwable.message ?: "Unknown error in $id node",
     )
 }

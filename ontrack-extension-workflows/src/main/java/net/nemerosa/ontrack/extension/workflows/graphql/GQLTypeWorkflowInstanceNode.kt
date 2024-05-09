@@ -4,9 +4,7 @@ import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceNode
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
-import net.nemerosa.ontrack.graphql.support.enumField
-import net.nemerosa.ontrack.graphql.support.jsonField
-import net.nemerosa.ontrack.graphql.support.stringField
+import net.nemerosa.ontrack.graphql.support.*
 import org.springframework.stereotype.Component
 
 @Component
@@ -22,5 +20,8 @@ class GQLTypeWorkflowInstanceNode : GQLType {
             .enumField(WorkflowInstanceNode::status)
             .jsonField(WorkflowInstanceNode::output)
             .stringField(WorkflowInstanceNode::error)
+            .localDateTimeField(WorkflowInstanceNode::startTime)
+            .localDateTimeField(WorkflowInstanceNode::endTime)
+            .longField(WorkflowInstanceNode::durationMs)
             .build()
 }

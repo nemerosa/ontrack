@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.support.NameValue
 import net.nemerosa.ontrack.model.support.toNameValues
 import java.time.LocalDateTime
+import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 import kotlin.reflect.jvm.javaType
 
@@ -164,6 +165,23 @@ fun <T> TypeBuilder.field(
         it.name(property.name)
             .description(getPropertyDescription(property, description))
             .type(outputType)
+    }
+
+fun <T> TypeBuilder.listField(
+    property: KProperty<List<T>>,
+    description: String? = null,
+): GraphQLObjectType.Builder =
+    field {
+        val itemTypeName = (property.returnType.arguments.firstOrNull()?.type?.classifier as? KClass<*>)?.java?.simpleName
+        if (itemTypeName.isNullOrBlank()) error("Cannot get list item type for $property")
+        it.name(property.name)
+            .description(getPropertyDescription(property, description))
+            .type(
+                listType(
+                    itemTypeName = itemTypeName,
+                    nullable = property.returnType.isMarkedNullable,
+                )
+            )
     }
 
 fun <E : Enum<E>> TypeBuilder.enumAsStringField(

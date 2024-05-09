@@ -28,6 +28,7 @@ class WorkflowNotificationChannelNodeExecutor(
     }
 
     override val id: String = ID
+    override val displayName: String = "Notification"
 
     override fun execute(workflowInstance: WorkflowInstance, workflowNodeId: String): JsonNode {
         // Gets the node's data

@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.kdsl.acceptance.tests.AbstractACCDSLTestSupport
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
+import net.nemerosa.ontrack.kdsl.spec.extension.workflows.WorkflowInstanceNodeStatus
 import net.nemerosa.ontrack.kdsl.spec.extension.workflows.WorkflowInstanceStatus
 import net.nemerosa.ontrack.kdsl.spec.extension.workflows.mock.mock
 import net.nemerosa.ontrack.kdsl.spec.extension.workflows.workflows
@@ -11,7 +12,7 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
 
-class ACCDSLWorkflows : AbstractACCDSLTestSupport() {
+class ACCDSLWorkflows : AbstractACCDSLWorkflowsTestSupport() {
 
     @Test
     fun `Simple linear workflow`() {
@@ -266,28 +267,49 @@ class ACCDSLWorkflows : AbstractACCDSLTestSupport() {
         )
     }
 
-    private fun waitUntilWorkflowFinished(instanceId: String) {
-        waitUntil(
-            timeout = 30_000L,
-            interval = 500L,
-        ) {
-            val instance = ontrack.workflows.workflowInstance(instanceId)
-            instance != null && instance.finished
-        }
-        // Getting the final errors
-        val instance = ontrack.workflows.workflowInstance(instanceId)
-            ?: fail("Could not get the workflow instance")
-        if (instance.status == WorkflowInstanceStatus.ERROR) {
-            // Displaying the errors
-            instance.nodesExecutions.forEach { node ->
-                println("Node: ${node.id}")
-                println("  Status: ${node.status}")
-                println("  Output: ${node.output}")
-                println("  Error: ${node.error}")
-            }
-            // Failing
-            fail("Workflow failed in error. See errors above.")
-        }
+    @Test
+    fun `Error in workflow`() {
+
+        // Defining a workflow
+        val name = uid("w-")
+        val workflow = """
+            name: $name
+            nodes:
+                - id: start
+                  executorId: mock
+                  data:
+                    text: Start
+                - id: end
+                  executorId: mock
+                  data:
+                    text: End
+                    error: true
+                  parents:
+                    - id: start
+        """.trimIndent()
+        // Saving the workflow
+        val workflowId = ontrack.workflows.saveYamlWorkflow(
+            workflow = workflow,
+        ) ?: fail("Error while saving workflow")
+        // Running the workflow
+        val instanceId = ontrack.workflows.launchWorkflow(
+            workflowId = workflowId,
+            context = "mock" to mapOf("text" to "Error test").asJson(),
+        ) ?: fail("Error while launching workflow")
+        // Waiting for the workflow result
+        val instance = waitUntilWorkflowFinished(instanceId, returnInstanceOnError = true)
+        // Checks the errors
+        val nodeInError = instance.nodesExecutions.find { it.id == "end" }
+            ?: fail("Cannot find the end node")
+        // Checking the error
+        assertEquals(
+            WorkflowInstanceNodeStatus.ERROR,
+            nodeInError.status
+        )
+        assertEquals(
+            "Error in end node",
+            nodeInError.error
+        )
     }
 
 }

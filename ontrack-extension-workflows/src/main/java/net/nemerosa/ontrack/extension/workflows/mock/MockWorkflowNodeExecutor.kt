@@ -20,6 +20,7 @@ class MockWorkflowNodeExecutor(
 ) : AbstractExtension(workflowsExtensionFeature), WorkflowNodeExecutor {
 
     override val id: String = "mock"
+    override val displayName: String = "Mock"
 
     private val texts = mutableMapOf<String, List<String>>()
 
@@ -32,6 +33,10 @@ class MockWorkflowNodeExecutor(
             MockNodeData(nodeRawData.asText())
         } else {
             nodeRawData.parse<MockNodeData>()
+        }
+        // Error?
+        if (nodeData.error) {
+            error("Error in $workflowNodeId node")
         }
         // Gets the parent outputs in an index
         val parentsData = workflowInstance.getParentsData(workflowNodeId)
