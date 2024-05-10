@@ -1,11 +1,12 @@
 import {Button, Form, Input, InputNumber, Select, Space, Typography} from "antd";
 import {FaPlus, FaTrash} from "react-icons/fa";
+import {prefixedFormName} from "@components/form/formUtils";
 
 export default function JenkinsNotificationChannelForm({prefix}) {
     return (
         <>
             <Form.Item
-                name={[prefix, "config"]}
+                name={prefixedFormName(prefix, 'config')}
                 label="Config"
                 extra="Name of the Jenkins configuration to use for the connection."
                 rules={[{required: true, message: 'Config name is required.'}]}
@@ -13,7 +14,7 @@ export default function JenkinsNotificationChannelForm({prefix}) {
                 <Input/>
             </Form.Item>
             <Form.Item
-                name={[prefix, "job"]}
+                name={prefixedFormName(prefix, 'job')}
                 label="Job"
                 extra="Path to the Jenkins job to call."
                 rules={[{required: true, message: 'Job path is required.'}]}
@@ -21,7 +22,7 @@ export default function JenkinsNotificationChannelForm({prefix}) {
                 <Input/>
             </Form.Item>
             <Form.List
-                name={[prefix, "parameters"]}
+                name={prefixedFormName(prefix, 'parameters')}
                 label="Parameters"
                 extra="Parameters to send to the job."
             >
@@ -80,7 +81,7 @@ export default function JenkinsNotificationChannelForm({prefix}) {
                 )}
             </Form.List>
             <Form.Item
-                name={[prefix, "callMode"]}
+                name={prefixedFormName(prefix, 'callMode')}
                 label="Call mode"
                 extra="How to call the Jenkins job."
                 initialValue="ASYNC"
@@ -88,7 +89,7 @@ export default function JenkinsNotificationChannelForm({prefix}) {
                 <SelectJenkinsNotificationChannelConfigCallMode/>
             </Form.Item>
             <Form.Item
-                name={[prefix, "timeout"]}
+                name={prefixedFormName(prefix, 'timeout')}
                 label="Timeout"
                 extra="Timeout in seconds"
                 initialValue={30}

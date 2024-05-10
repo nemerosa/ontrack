@@ -1,11 +1,12 @@
 import {Button, Form, Input, InputNumber, Select, Space, Switch, Typography} from "antd";
 import {FaExclamationTriangle, FaPlus, FaTrash} from "react-icons/fa";
+import {prefixedFormName} from "@components/form/formUtils";
 
 export default function JiraServiceDeskNotificationChannelForm({prefix}) {
     return (
         <>
             <Form.Item
-                name={[prefix, "configName"]}
+                name={prefixedFormName(prefix, 'configName')}
                 label="Config"
                 extra="Name of the Jira configuration to use for the connection."
                 rules={[{required: true, message: 'Config name is required.'}]}
@@ -13,7 +14,7 @@ export default function JiraServiceDeskNotificationChannelForm({prefix}) {
                 <Input/>
             </Form.Item>
             <Form.Item
-                name={[prefix, "serviceDeskId"]}
+                name={prefixedFormName(prefix, 'serviceDeskId')}
                 label="Service desk"
                 extra="ID of the Service Desk"
                 rules={[{required: true, message: 'Service desk is required.'}]}
@@ -21,7 +22,7 @@ export default function JiraServiceDeskNotificationChannelForm({prefix}) {
                 <InputNumber/>
             </Form.Item>
             <Form.Item
-                name={[prefix, "requestTypeId"]}
+                name={prefixedFormName(prefix, 'requestTypeId')}
                 label="Request type"
                 extra="ID of the Request Type"
                 rules={[{required: true, message: 'Request type is required.'}]}
@@ -29,7 +30,7 @@ export default function JiraServiceDeskNotificationChannelForm({prefix}) {
                 <InputNumber/>
             </Form.Item>
             <Form.Item
-                name={[prefix, "useExisting"]}
+                name={prefixedFormName(prefix, 'useExisting')}
                 label="Use existing"
                 extra={
                     <>
@@ -41,14 +42,14 @@ export default function JiraServiceDeskNotificationChannelForm({prefix}) {
                 <Switch/>
             </Form.Item>
             <Form.Item
-                name={[prefix, "searchTerm"]}
+                name={prefixedFormName(prefix, 'searchTerm')}
                 label="Search term"
                 extra="Template to use as a search term if existing issues must be reused"
             >
                 <Input/>
             </Form.Item>
             <Form.List
-                name={[prefix, "fields"]}
+                name={prefixedFormName(prefix, 'fields')}
                 label="Fields"
                 extra="List of fields to create in the service desk ticket."
             >

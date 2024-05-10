@@ -1,0 +1,116 @@
+import {Input, Modal, Space} from "antd";
+import {useState} from "react";
+import WorkflowGraph from "@components/extension/workflows/WorkflowGraph";
+import {useEdges, useNodes, useReactFlow} from "reactflow";
+
+export const useEditWorkflowDialog = () => {
+
+    const [open, setOpen] = useState(false)
+    const [workflow, setWorkflow] = useState({name: '', nodes: []})
+
+    return {
+        open,
+        setOpen,
+        workflow,
+        start: (workflow) => {
+            // Deep copy of the workflow or create an empty one
+            let localWorkflow
+            if (workflow) {
+                localWorkflow = workflow // TODO Deep copy
+            } else {
+                localWorkflow = {
+                    name: '',
+                    nodes: [],
+                }
+            }
+            setWorkflow(localWorkflow)
+            setOpen(true)
+        }
+    }
+
+}
+
+export default function EditWorkflowDialog({dialog}) {
+
+    const [loading, setLoading] = useState(false)
+
+    const onCancel = () => {
+        dialog.setOpen(false)
+    }
+
+    // Gets the nodes & edges of the graph
+    const reactFlow = useReactFlow()
+
+    const convertGraphToWorkflow = (nodes, edges) => {
+        // Getting the nodes
+        const wNodes = []
+        const wIndex = {}
+        nodes.forEach(({data}) => {
+            const {id, executorId, data: nodeData} = data
+            const wNode = {
+                id,
+                executorId,
+                data: nodeData,
+                parents: [],
+            };
+            wNodes.push(wNode)
+            wIndex[id] = wNode
+        })
+        // Getting the relationships
+        edges.forEach(({source, target}) => {
+            const parent = wIndex[source]
+            const child = wIndex[target]
+            if (parent && child) {
+                child.parents.push({id: parent.id})
+            }
+        })
+        // Workflow
+        return {
+            name: "TBD", // TODO Missing workflow name
+            nodes: wNodes,
+        }
+    }
+
+    const onSave = async () => {
+        // Loading mode
+        setLoading(true)
+        try {
+            // Gets the workflow graph from the context
+            const nodes = reactFlow.getNodes()
+            const edges = reactFlow.getEdges()
+            console.log({nodes, edges}) // TODO
+            // Converts the graph into a workflow definition
+            const workflow = convertGraphToWorkflow(nodes, edges)
+            console.log({workflow})
+            // TODO Checks the workflow (name, cycle, etc.)
+            // TODO Closes the dialog when all is OK
+            // dialog.setOpen(false)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    return (
+        <>
+            <Modal
+                open={dialog.open}
+                closable={false}
+                onCancel={onCancel}
+                // TODO confirmLoading={loading}
+                onOk={onSave}
+                okText="Save"
+                width={900}
+            >
+                <Space direction="vertical" className="ot-line">
+                    {/* Workflow name */}
+                    <Input placeholder="Workflow name"/>
+                    {/* Workflow nodes in edition mode */}
+                    <WorkflowGraph
+                        workflowNodes={dialog.workflow.nodes}
+                        edition={true}
+                    />
+                </Space>
+            </Modal>
+        </>
+    )
+}

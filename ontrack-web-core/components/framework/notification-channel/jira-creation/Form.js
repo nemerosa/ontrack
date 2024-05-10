@@ -1,11 +1,12 @@
 import {Button, Form, Input, Select, Space, Switch, Typography} from "antd";
 import {FaExclamationTriangle, FaPlus, FaTrash} from "react-icons/fa";
+import {prefixedFormName} from "@components/form/formUtils";
 
 export default function JiraCreationNotificationChannelForm({prefix}) {
     return (
         <>
             <Form.Item
-                name={[prefix, "configName"]}
+                name={prefixedFormName(prefix, 'configName')}
                 label="Config"
                 extra="Name of the Jira configuration to use for the connection."
                 rules={[{required: true, message: 'Config name is required.'}]}
@@ -13,7 +14,7 @@ export default function JiraCreationNotificationChannelForm({prefix}) {
                 <Input/>
             </Form.Item>
             <Form.Item
-                name={[prefix, "projectName"]}
+                name={prefixedFormName(prefix, 'projectName')}
                 label="Project"
                 extra="Name of the Jira project where to create the ticket."
                 rules={[{required: true, message: 'Project name is required.'}]}
@@ -21,7 +22,7 @@ export default function JiraCreationNotificationChannelForm({prefix}) {
                 <Input/>
             </Form.Item>
             <Form.Item
-                name={[prefix, "issueType"]}
+                name={prefixedFormName(prefix, 'issueType')}
                 label="Issue type"
                 extra="Name of the Jira issue type to use for the ticket."
                 rules={[{required: true, message: 'Issue type is required.'}]}
@@ -29,7 +30,7 @@ export default function JiraCreationNotificationChannelForm({prefix}) {
                 <Input/>
             </Form.Item>
             <Form.Item
-                name={[prefix, "labels"]}
+                name={prefixedFormName(prefix, 'labels')}
                 label="Labels"
                 extra="List of labels to set on the ticket"
             >
@@ -40,7 +41,7 @@ export default function JiraCreationNotificationChannelForm({prefix}) {
                 />
             </Form.Item>
             <Form.Item
-                name={[prefix, "useExisting"]}
+                name={prefixedFormName(prefix, 'useExisting')}
                 label="Use existing"
                 extra={
                     <>
@@ -57,21 +58,21 @@ export default function JiraCreationNotificationChannelForm({prefix}) {
                 <Switch/>
             </Form.Item>
             <Form.Item
-                name={[prefix, "fixVersion"]}
+                name={prefixedFormName(prefix, 'fixVersion')}
                 label="Fix version"
                 extra="Name of the fix version to set. Can be a template"
             >
                 <Input/>
             </Form.Item>
             <Form.Item
-                name={[prefix, "assignee"]}
+                name={prefixedFormName(prefix, 'assignee')}
                 label="Assignee"
                 extra="Username of the assignee to the ticket."
             >
                 <Input/>
             </Form.Item>
             <Form.Item
-                name={[prefix, "titleTemplate"]}
+                name={prefixedFormName(prefix, 'titleTemplate')}
                 label="Title"
                 extra="Template for the ticket's summary"
                 rules={[{required: true, message: 'Title is required.'}]}
@@ -79,7 +80,7 @@ export default function JiraCreationNotificationChannelForm({prefix}) {
                 <Input/>
             </Form.Item>
             <Form.List
-                name={[prefix, "customFields"]}
+                name={prefixedFormName(prefix, 'customFields')}
                 label="Custom fields"
                 extra="List of custom fields to create in the ticket."
             >

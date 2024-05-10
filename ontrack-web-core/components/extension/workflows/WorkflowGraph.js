@@ -1,14 +1,11 @@
-import {ReactFlowProvider} from "reactflow";
 import WorkflowGraphFlow from "@components/extension/workflows/WorkflowGraphFlow";
 import WorkflowNodeExecutorContextProvider from "@components/extension/workflows/WorkflowNodeExecutorContext";
 
-export default function WorkflowGraph({workflowNodes}) {
+export default function WorkflowGraph({workflowNodes, edition = false}) {
     return (
         <>
             <WorkflowNodeExecutorContextProvider>
-                <ReactFlowProvider>
-                    <WorkflowGraphFlow workflowNodes={workflowNodes}/>
-                </ReactFlowProvider>
+                <WorkflowGraphFlow workflowNodes={workflowNodes} edition={edition}/>
             </WorkflowNodeExecutorContextProvider>
         </>
     )
