@@ -1,4 +1,4 @@
-import {Button} from "antd";
+import {Button, Space} from "antd";
 import {FaSearch} from "react-icons/fa";
 import ShowWorkflowDialog, {useShowWorkflowDialog} from "@components/extension/workflows/ShowWorkflowDialog";
 
@@ -12,7 +12,10 @@ export default function WorkflowNotificationChannelConfig({workflow}) {
 
     return (
         <>
-            <Button onClick={showWorkflow} icon={<FaSearch/>} size="small">Show workflow</Button>
+            <Space>
+                <Button onClick={showWorkflow} icon={<FaSearch/>} size="small">Show workflow</Button>
+                {workflow?.name}
+            </Space>
             <ShowWorkflowDialog dialog={dialog}/>
         </>
     )

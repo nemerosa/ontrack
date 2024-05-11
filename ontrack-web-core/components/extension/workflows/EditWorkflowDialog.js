@@ -16,6 +16,7 @@ export const useEditWorkflowDialog = ({onSuccess}) => {
         open,
         setOpen,
         workflow,
+        setWorkflow,
         onSuccess,
         start: (workflow) => {
             // Deep copy of the workflow or create an empty one
@@ -46,6 +47,15 @@ export default function EditWorkflowDialog({dialog}) {
         dialog.setOpen(false)
     }
 
+    // Workflow name
+    const onNameChange = (e) => {
+        const name = e.target.value
+        dialog.setWorkflow(old => ({
+            ...old,
+            name,
+        }))
+    }
+
     // Gets the nodes & edges of the graph
     const reactFlow = useReactFlow()
 
@@ -74,7 +84,7 @@ export default function EditWorkflowDialog({dialog}) {
         })
         // Workflow
         return {
-            name: "TBD", // TODO Missing workflow name
+            name: dialog.workflow.name,
             nodes: wNodes,
         }
     }
@@ -136,7 +146,11 @@ export default function EditWorkflowDialog({dialog}) {
                 <Space direction="vertical" className="ot-line">
                     <FormErrors errors={formErrors}/>
                     {/* Workflow name */}
-                    <Input placeholder="Workflow name"/>
+                    <Input
+                        placeholder="Workflow name"
+                        value={dialog.workflow.name}
+                        onChange={onNameChange}
+                    />
                     {/* Workflow nodes in edition mode */}
                     <WorkflowGraph
                         workflowNodes={dialog.workflow.nodes}
