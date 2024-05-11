@@ -1,4 +1,4 @@
-import {Form, Input} from "antd";
+import {Form} from "antd";
 import EditWorkflowButton from "@components/extension/workflows/EditWorkflowButton";
 import {prefixedFormName} from "@components/form/formUtils";
 

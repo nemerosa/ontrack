@@ -7,7 +7,7 @@ import {useGraphQLClient} from "@components/providers/ConnectionContextProvider"
 import {gql} from "graphql-request";
 import {getUserErrors} from "@components/services/graphql-utils";
 
-export const useEditWorkflowDialog = () => {
+export const useEditWorkflowDialog = ({onSuccess}) => {
 
     const [open, setOpen] = useState(false)
     const [workflow, setWorkflow] = useState({name: '', nodes: []})
@@ -16,6 +16,7 @@ export const useEditWorkflowDialog = () => {
         open,
         setOpen,
         workflow,
+        onSuccess,
         start: (workflow) => {
             // Deep copy of the workflow or create an empty one
             let localWorkflow
@@ -86,10 +87,8 @@ export default function EditWorkflowDialog({dialog}) {
             // Gets the workflow graph from the context
             const nodes = reactFlow.getNodes()
             const edges = reactFlow.getEdges()
-            console.log({nodes, edges}) // TODO
             // Converts the graph into a workflow definition
             const workflow = convertGraphToWorkflow(nodes, edges)
-            console.log({workflow})
             // Checks the workflow (name, cycle, etc.)
             const data = await client.request(
                 gql`
@@ -112,14 +111,11 @@ export default function EditWorkflowDialog({dialog}) {
             if (!errors) {
                 errors = userNode.validation.errors
             }
-            if (errors) {
+            if (errors && errors.length > 0) {
                 setFormErrors(errors)
             } else {
-                // TODO dialog.setOpen(false)
-                // TODO onSuccess
-                // if (dialog.onSuccess) {
-                //     dialog.onSuccess(result, dialog.context)
-                // }
+                dialog.setOpen(false)
+                dialog.onSuccess(workflow)
             }
         } finally {
             setLoading(false)
