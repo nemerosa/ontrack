@@ -2,7 +2,7 @@ import {addEdge, applyNodeChanges, Background, ControlButton, Controls, ReactFlo
 import {useCallback, useEffect, useState} from "react";
 import WorkflowGraphNode from "@components/extension/workflows/WorkflowGraphNode";
 import {autoLayout} from "@components/links/GraphUtils";
-import {FaPlusSquare} from "react-icons/fa";
+import {FaPlusSquare, FaProjectDiagram} from "react-icons/fa";
 
 const nodeTypes = {
     workflowNode: WorkflowGraphNode,
@@ -53,6 +53,10 @@ export default function WorkflowGraphFlow({workflowNodes, edition = false}) {
             setNodes,
             setEdges,
         })
+    }
+
+    const relayout = () => {
+        setGraph(nodes, edges)
     }
 
     useEffect(() => {
@@ -129,9 +133,14 @@ export default function WorkflowGraphFlow({workflowNodes, edition = false}) {
                     <Controls>
                         {
                             edition &&
-                            <ControlButton title="Add a new start node" onClick={addNode}>
-                                <FaPlusSquare/>
-                            </ControlButton>
+                            <>
+                                <ControlButton title="Adjust the layout" onClick={relayout}>
+                                    <FaProjectDiagram/>
+                                </ControlButton>
+                                <ControlButton title="Add a new start node" onClick={addNode}>
+                                    <FaPlusSquare/>
+                                </ControlButton>
+                            </>
                         }
                     </Controls>
                 </ReactFlow>
