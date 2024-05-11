@@ -22,7 +22,7 @@ export const useEditWorkflowDialog = ({onSuccess}) => {
             // Deep copy of the workflow or create an empty one
             let localWorkflow
             if (workflow) {
-                localWorkflow = workflow // TODO Deep copy
+                localWorkflow = JSON.parse(JSON.stringify(workflow))
             } else {
                 localWorkflow = {
                     name: '',
