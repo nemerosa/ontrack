@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.workflows.graphql
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.extension.workflows.definition.WorkflowValidation
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowContext
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowContextData
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowEngine
@@ -17,6 +18,16 @@ class WorkflowsMutations(
 ) : TypedMutationProvider() {
 
     override val mutations: List<Mutation> = listOf(
+        simpleMutation(
+            name = "validateJsonWorkflow",
+            description = "Validates a workflow which is defined as JSON",
+            input = ValidateJsonWorkflowInput::class,
+            outputName = "validation",
+            outputDescription = "Result of the validation",
+            outputType = WorkflowValidation::class
+        ) { input ->
+            workflowRegistry.validateJsonWorkflow(input.workflow)
+        },
         simpleMutation(
             name = "saveYamlWorkflow",
             description = "Saves a workflow which is defined as YAML",
@@ -51,6 +62,10 @@ class WorkflowsMutations(
         },
     )
 }
+
+data class ValidateJsonWorkflowInput(
+    val workflow: JsonNode,
+)
 
 data class SaveYamlWorkflowInput(
     val workflow: String,

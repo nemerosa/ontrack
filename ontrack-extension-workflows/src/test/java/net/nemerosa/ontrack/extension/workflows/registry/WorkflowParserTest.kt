@@ -7,7 +7,7 @@ import net.nemerosa.ontrack.json.asJson
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-class WorkflowYamlTest {
+class WorkflowParserTest {
 
     @Test
     fun `Parsing of YAML`() {
@@ -33,7 +33,7 @@ class WorkflowYamlTest {
                     template: |
                         Ticket created: ${'$'}{workflow.ticket-creation?path=data}
         """.trimIndent()
-        val workflow = WorkflowYaml.parseYamlWorkflow(yaml)
+        val workflow = WorkflowParser.parseYamlWorkflow(yaml)
         assertEquals(
             Workflow(
                 name = "Notifications in a workflow can reuse the output of the parent nodes in their templates",
