@@ -1,7 +1,11 @@
 import {Input, Modal, Space} from "antd";
 import {useState} from "react";
 import WorkflowGraph from "@components/extension/workflows/WorkflowGraph";
-import {useEdges, useNodes, useReactFlow} from "reactflow";
+import {useReactFlow} from "reactflow";
+import FormErrors from "@components/form/FormErrors";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import {gql} from "graphql-request";
+import {getUserErrors} from "@components/services/graphql-utils";
 
 export const useEditWorkflowDialog = () => {
 
@@ -32,7 +36,10 @@ export const useEditWorkflowDialog = () => {
 
 export default function EditWorkflowDialog({dialog}) {
 
+    const client = useGraphQLClient()
+
     const [loading, setLoading] = useState(false)
+    const [formErrors, setFormErrors] = useState([])
 
     const onCancel = () => {
         dialog.setOpen(false)
@@ -74,6 +81,7 @@ export default function EditWorkflowDialog({dialog}) {
     const onSave = async () => {
         // Loading mode
         setLoading(true)
+        setFormErrors([])
         try {
             // Gets the workflow graph from the context
             const nodes = reactFlow.getNodes()
@@ -82,9 +90,37 @@ export default function EditWorkflowDialog({dialog}) {
             // Converts the graph into a workflow definition
             const workflow = convertGraphToWorkflow(nodes, edges)
             console.log({workflow})
-            // TODO Checks the workflow (name, cycle, etc.)
-            // TODO Closes the dialog when all is OK
-            // dialog.setOpen(false)
+            // Checks the workflow (name, cycle, etc.)
+            const data = await client.request(
+                gql`
+                    mutation ValidateWorkflow($workflow: JSON!) {
+                        validateJsonWorkflow(input: {workflow: $workflow}) {
+                            errors {
+                                message
+                            }
+                            validation {
+                                errors
+                            }
+                        }
+                    }
+                `,
+                {workflow}
+            )
+            // Error management
+            const userNode = data.validateJsonWorkflow
+            let errors = getUserErrors(userNode)
+            if (!errors) {
+                errors = userNode.validation.errors
+            }
+            if (errors) {
+                setFormErrors(errors)
+            } else {
+                // TODO dialog.setOpen(false)
+                // TODO onSuccess
+                // if (dialog.onSuccess) {
+                //     dialog.onSuccess(result, dialog.context)
+                // }
+            }
         } finally {
             setLoading(false)
         }
@@ -96,12 +132,13 @@ export default function EditWorkflowDialog({dialog}) {
                 open={dialog.open}
                 closable={false}
                 onCancel={onCancel}
-                // TODO confirmLoading={loading}
+                confirmLoading={loading}
                 onOk={onSave}
                 okText="Save"
                 width={900}
             >
                 <Space direction="vertical" className="ot-line">
+                    <FormErrors errors={formErrors}/>
                     {/* Workflow name */}
                     <Input placeholder="Workflow name"/>
                     {/* Workflow nodes in edition mode */}

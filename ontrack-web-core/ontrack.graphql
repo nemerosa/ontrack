@@ -4189,6 +4189,11 @@ type Mutation {
         "Input for the mutation"
         input: ValidateBuildWithTestsInput
     ): ValidateBuildWithTestsPayload
+    "Validates a workflow which is defined as JSON"
+    validateJsonWorkflow(
+        "Input for the mutation"
+        input: ValidateJsonWorkflowInput
+    ): ValidateJsonWorkflowPayload
 }
 
 "Association of a name with a value"
@@ -6830,6 +6835,14 @@ type ValidateBuildWithTestsPayload implements Payload {
     validationRun: ValidationRun
 }
 
+"Output type for the validateJsonWorkflow mutation."
+type ValidateJsonWorkflowPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Result of the validation"
+    validation: WorkflowValidation
+}
+
 type Validation {
     "Associated validation runs"
     validationRuns(
@@ -7290,6 +7303,14 @@ type WorkflowNodeExecutor {
 type WorkflowParentNode {
     "ID of the parent node"
     id: String!
+}
+
+"Workflow validation"
+type WorkflowValidation {
+    "error field"
+    error: Boolean
+    "errors field"
+    errors: [String!]!
 }
 
 "List of ways the auto approval is managed."
@@ -10462,6 +10483,12 @@ input ValidateBuildWithTestsInput {
     status: String
     "Name of the validation stamp"
     validation: String!
+}
+
+"Input type for the validateJsonWorkflow mutation."
+input ValidateJsonWorkflowInput {
+    "workflow field"
+    workflow: JSON!
 }
 
 input WebhookExchangeFilter {
