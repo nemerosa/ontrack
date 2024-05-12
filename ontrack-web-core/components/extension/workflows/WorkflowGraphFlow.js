@@ -8,26 +8,83 @@ const nodeTypes = {
     workflowNode: WorkflowGraphNode,
 }
 
+export const changeNodes = (node, oldNodes) => {
+    // Adjust the node executor & data
+    let newNodes = oldNodes.map(oldNode => {
+        if (oldNode.id === node.oldId) {
+            return {
+                ...oldNode,
+                data: {
+                    ...oldNode.data,
+                    executorId: node.executorId,
+                    data: node.data,
+                }
+            }
+        } else {
+            return oldNode
+        }
+    })
+    // Special case when node ID is renamed (edges must be adjusted)
+    if (node.id !== node.oldId) {
+        newNodes = newNodes.map(oldNode => {
+            if (oldNode.id === node.oldId) {
+                // Changing the ID of this node
+                return {
+                    ...oldNode,
+                    id: node.id,
+                    data: {
+                        ...oldNode.data,
+                        id: node.id,
+                    }
+                }
+            } else {
+                // Changing the parent ID to the new ID
+                return {
+                    ...oldNode,
+                    data: {
+                        ...oldNode.data,
+                        parents: oldNode.data.parents.map(oldParent => {
+                            if (oldParent.id === node.oldId) {
+                                return {id: node.id}
+                            } else {
+                                return oldParent
+                            }
+                        })
+                    }
+                }
+            }
+        })
+    }
+    // OK
+    return newNodes
+}
+
+export const changeEdges = (node, oldEdges) => {
+    let newEdges = oldEdges
+    if (node.id !== node.oldId) {
+        // Adapting the edges
+        newEdges = newEdges.map(oldEdge => {
+            if (oldEdge.source === node.oldId) {
+                return {
+                    ...oldEdge,
+                    id: `${node.id}-${oldEdge.target}`,
+                    source: node.id,
+                }
+            } else {
+                return oldEdge
+            }
+        })
+    }
+    // OK
+    return newEdges
+}
+
 export default function WorkflowGraphFlow({workflowNodes, edition = false}) {
 
     const onGraphNodeChange = ({node}) => {
         if (node) {
-            // TODO Special case when node ID is renamed (edges must be adjusted)
-            // Adjust the node executor & data
-            setNodes(oldNodes => oldNodes.map(oldNode => {
-                if (oldNode.id === node.oldId) {
-                    return {
-                        ...oldNode,
-                        data: {
-                            ...oldNode.data,
-                            executorId: node.executorId,
-                            data: node.data,
-                        }
-                    }
-                } else {
-                    return oldNode
-                }
-            }))
+            setNodes(oldNodes => changeNodes(node, oldNodes))
+            setEdges(oldEdges => changeEdges(node, oldEdges))
         }
     }
 
