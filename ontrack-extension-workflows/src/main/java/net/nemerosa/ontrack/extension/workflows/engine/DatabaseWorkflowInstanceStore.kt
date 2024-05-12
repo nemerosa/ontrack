@@ -37,8 +37,7 @@ class DatabaseWorkflowInstanceStore(
             type = WorkflowInstance::class,
             offset = workflowInstanceFilter.offset,
             size = workflowInstanceFilter.size,
-            // TODO Filters
-            // TODO Order by start date desc
+            orderQuery = "ORDER BY data::jsonb->>'id' DESC",
         )
     }
 
