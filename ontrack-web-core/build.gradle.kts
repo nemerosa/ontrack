@@ -21,8 +21,14 @@ val webBuild by tasks.registering(NpmTask::class) {
     args.set(listOf("run", "build"))
 }
 
+val test by tasks.registering(NpmTask::class) {
+    dependsOn("npmInstall")
+    args.set(listOf("run", "test"))
+}
+
 tasks.named("build") {
     dependsOn(webBuild)
+    dependsOn(test)
 }
 
 // Docker image

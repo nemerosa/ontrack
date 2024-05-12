@@ -219,10 +219,14 @@ pipeline {
             post {
                 always {
                     recordIssues(tools: [kotlin(), javaDoc(), java()])
-                    // Build validation stamp
+                    // Build validation stamps
                     ontrackCliValidateTests(
                         stamp: 'BUILD',
                         pattern: '**/build/test-results/**/*.xml',
+                    )
+                    ontrackCliValidateTests(
+                            stamp: 'UI_UNIT',
+                            pattern: 'ontrack-web-core/reports/*.xml',
                     )
                 }
             }
