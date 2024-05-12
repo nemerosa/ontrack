@@ -1,4 +1,4 @@
-import {addEdge, applyNodeChanges, Background, ControlButton, Controls, ReactFlow} from "reactflow";
+import {addEdge, applyNodeChanges, Background, ControlButton, Controls, MarkerType, ReactFlow} from "reactflow";
 import {useCallback, useEffect, useState} from "react";
 import WorkflowGraphNode from "@components/extension/workflows/WorkflowGraphNode";
 import {autoLayout} from "@components/links/GraphUtils";
@@ -181,12 +181,7 @@ export default function WorkflowGraphFlow({workflowNodes, edition = false}) {
         const edges = []
         workflowNodes.forEach(node => {
             node.parents?.forEach(({id}) => {
-                edges.push({
-                    id: `${id}-${node.id}`,
-                    source: id,
-                    target: node.id,
-                    type: 'smoothstep',
-                })
+                edges.push(createEdge(id, node.id))
             })
         })
 
@@ -228,15 +223,24 @@ export default function WorkflowGraphFlow({workflowNodes, edition = false}) {
         setGraph(nodes.concat(graphNode), edges)
     }
 
+    const createEdge = (source, target) => {
+        return {
+            id: `${source}-${target}`,
+            source: source,
+            target: target,
+            type: 'smoothstep',
+            markerEnd: {
+                type: MarkerType.ArrowClosed,
+                width: 20,
+                height: 20,
+            },
+        }
+    }
+
     const onConnect = useCallback(
         (connection) => {
             if (edition) {
-                const edge = {
-                    id: `${connection.source}-${connection.target}`,
-                    source: connection.source,
-                    target: connection.target,
-                    type: 'smoothstep',
-                }
+                const edge = createEdge(connection.source, connection.target)
                 setEdges((oldEdges) => addEdge(edge, oldEdges))
             }
         },
