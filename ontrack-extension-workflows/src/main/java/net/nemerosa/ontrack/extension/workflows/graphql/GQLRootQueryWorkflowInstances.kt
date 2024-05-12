@@ -21,7 +21,6 @@ class GQLRootQueryWorkflowInstances(
             fieldName = "workflowInstances",
             fieldDescription = "List of workflow instances",
             itemType = gqlTypeWorkflowInstance.typeName,
-            // TODO Filter
             itemPaginatedListProvider = { _, _, offset, size ->
                 workflowInstanceStore.findByFilter(
                     WorkflowInstanceFilter(
