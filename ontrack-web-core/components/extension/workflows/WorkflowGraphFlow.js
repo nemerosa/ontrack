@@ -135,11 +135,6 @@ export default function WorkflowGraphFlow({workflowNodes, edition = false}) {
         }
     }
 
-    const removeEdge = (id) => {
-        setNodes(oldNodes => deleteEdgeInNodes(id, oldNodes, edges))
-        setEdges(oldEdges => deleteEdgeInEdges(id, oldEdges))
-    }
-
     const createGraphNode = useCallback(
         (node) => {
             return {
@@ -152,6 +147,14 @@ export default function WorkflowGraphFlow({workflowNodes, edition = false}) {
 
     const [nodes, setNodes] = useState([])
     const [edges, setEdges] = useState([])
+
+    const removeEdge = useCallback(
+        (id) => {
+            setNodes(oldNodes => deleteEdgeInNodes(id, oldNodes, edges))
+            setEdges(oldEdges => deleteEdgeInEdges(id, oldEdges))
+        },
+        [edges]
+    )
 
     const setGraph = (nodes, edges) => {
         autoLayout({
@@ -208,7 +211,7 @@ export default function WorkflowGraphFlow({workflowNodes, edition = false}) {
                 })
             }
         },
-        [edges]
+        [removeEdge]
     )
 
     const addNode = () => {
