@@ -6,6 +6,14 @@ package net.nemerosa.ontrack.extension.workflows.definition
 data class WorkflowValidation(
     val errors: List<String>,
 ) {
+    fun throwErrorIfAny() {
+        if (errors.isNotEmpty()) {
+            throw WorkflowValidationException(
+                "Validation of the workflow returned the following errors:\n${errors.joinToString("\n") { "* $it" }}"
+            )
+        }
+    }
+
     val error: Boolean = errors.isNotEmpty()
 
     companion object {

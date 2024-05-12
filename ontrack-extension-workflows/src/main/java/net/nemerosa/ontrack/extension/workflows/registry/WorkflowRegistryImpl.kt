@@ -70,7 +70,8 @@ class WorkflowRegistryImpl(
     override fun saveYamlWorkflow(workflow: String): String {
         // Parsing of the workflow
         val workflowObj: Workflow = WorkflowParser.parseYamlWorkflow(workflow)
-        // TODO Validation
+        // Validation
+        validateWorkflow(workflowObj).throwErrorIfAny()
         // Generating an ID
         val id = UUID.randomUUID().toString()
         // Record to save

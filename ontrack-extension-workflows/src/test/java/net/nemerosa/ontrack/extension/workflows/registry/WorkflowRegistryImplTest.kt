@@ -2,11 +2,13 @@ package net.nemerosa.ontrack.extension.workflows.registry
 
 import com.fasterxml.jackson.databind.JsonNode
 import io.mockk.mockk
+import net.nemerosa.ontrack.extension.workflows.definition.WorkflowValidationException
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.support.StorageService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -19,6 +21,32 @@ class WorkflowRegistryImplTest {
     fun setUp() {
         storageService = mockk()
         workflowRegistry = WorkflowRegistryImpl(storageService)
+    }
+
+    @Test
+    fun `Validation on saving a Yaml workflow`() {
+        val yaml = """
+            name: Sample
+            nodes:
+                - id: start
+                  executorId: mock
+                  data:
+                    text: Start
+                  parents:
+                    - id: end
+                - id: end
+                  executorId: mock
+                  data:
+                    text: End
+                  parents:
+                    - id: start
+        """.trimIndent()
+        assertFailsWith<WorkflowValidationException>(
+            message = "Validation of the workflow returned the following errors:\n" +
+                    "* The workflow contains at least one cycle."
+        ) {
+            workflowRegistry.saveYamlWorkflow(yaml)
+        }
     }
 
     @Test
