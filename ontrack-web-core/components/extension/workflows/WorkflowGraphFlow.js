@@ -97,6 +97,27 @@ export const deleteNodeInEdges = (node, oldEdges) => {
     return oldEdges.filter(oldEdge => oldEdge.source !== node.oldId && oldEdge.target !== node.oldId)
 }
 
+export const deleteEdgeInNodes = (id, oldNodes, oldEdges) => {
+    const oldEdge = oldEdges.find(oldEdge => oldEdge.id === id)
+    if (oldEdge) {
+        return oldNodes.map(oldNode => {
+            return {
+                ...oldNode,
+                data: {
+                    ...oldNode.data,
+                    parents: oldNode.data.parents?.filter(oldParent => oldParent.id !== oldEdge.source) ?? []
+                }
+            }
+        })
+    } else {
+        return oldNodes
+    }
+}
+
+export const deleteEdgeInEdges = (id, oldEdges) => {
+    return oldEdges.filter(oldEdge => oldEdge.id !== id)
+}
+
 export default function WorkflowGraphFlow({workflowNodes, edition = false}) {
 
     const onGraphNodeChange = ({node}) => {
@@ -112,6 +133,11 @@ export default function WorkflowGraphFlow({workflowNodes, edition = false}) {
                 setEdges(oldEdges => deleteNodeInEdges(node, oldEdges))
             }
         }
+    }
+
+    const removeEdge = (id) => {
+        setNodes(oldNodes => deleteEdgeInNodes(id, oldNodes, edges))
+        setEdges(oldEdges => deleteEdgeInEdges(id, oldEdges))
     }
 
     const createGraphNode = useCallback(
@@ -172,6 +198,19 @@ export default function WorkflowGraphFlow({workflowNodes, edition = false}) {
         [],
     );
 
+    const onEdgesChange = useCallback(
+        (changes) => {
+            // Keeping only the "remove" events
+            const removals = changes.filter(change => change.type === 'remove')
+            if (removals.length > 0) {
+                removals.forEach(({id}) => {
+                    removeEdge(id)
+                })
+            }
+        },
+        [edges]
+    )
+
     const addNode = () => {
         const nodeNextNumber = nodes.length + 1
         const nodeId = `n${nodeNextNumber}`
@@ -208,6 +247,7 @@ export default function WorkflowGraphFlow({workflowNodes, edition = false}) {
                     nodes={nodes}
                     edges={edges}
                     onNodesChange={onNodesChange}
+                    onEdgesChange={onEdgesChange}
                     onConnect={onConnect}
                     fitView={true}
                     nodeTypes={nodeTypes}

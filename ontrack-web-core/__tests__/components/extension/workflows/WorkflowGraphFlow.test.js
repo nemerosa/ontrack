@@ -1,6 +1,8 @@
 import {
     changeEdges,
     changeNodes,
+    deleteEdgeInEdges,
+    deleteEdgeInNodes,
     deleteNodeInEdges,
     deleteNodeInNodes
 } from "@components/extension/workflows/WorkflowGraphFlow";
@@ -133,6 +135,40 @@ describe('WorkflowGraphFlow', () => {
         const newEdges = deleteNodeInEdges(node, edges)
 
         expect(newNodes).toStrictEqual([
+            {
+                id: 'n2',
+                data: {
+                    id: 'n2',
+                    executorId: '',
+                    data: null,
+                    parents: []
+                }
+            },
+        ])
+
+        expect(newEdges).toStrictEqual([])
+
+    });
+
+    it('deletes an edge and adjust the parents of the child', () => {
+
+        const {nodes, edges} = graphFixture()
+
+        const newNodes = deleteEdgeInNodes('n1-n2', nodes, edges)
+        const newEdges = deleteEdgeInEdges('n1-n2', edges)
+
+        expect(newNodes).toStrictEqual([
+            {
+                id: 'n1',
+                data: {
+                    id: 'n1',
+                    executorId: 'mock',
+                    data: {
+                        text: "N1",
+                    },
+                    parents: []
+                }
+            },
             {
                 id: 'n2',
                 data: {
