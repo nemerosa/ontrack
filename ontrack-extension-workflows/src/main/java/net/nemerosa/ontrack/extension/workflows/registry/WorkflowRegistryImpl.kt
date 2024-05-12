@@ -1,9 +1,11 @@
 package net.nemerosa.ontrack.extension.workflows.registry
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.extension.workflows.acl.WorkflowRegistration
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowNode
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowValidation
+import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.StorageService
 import org.springframework.stereotype.Service
 import java.util.*
@@ -11,6 +13,7 @@ import java.util.*
 @Service
 class WorkflowRegistryImpl(
     private val storageService: StorageService,
+    private val securityService: SecurityService,
 ) : WorkflowRegistry {
 
     companion object {
@@ -68,6 +71,8 @@ class WorkflowRegistryImpl(
     }
 
     override fun saveYamlWorkflow(workflow: String): String {
+        // Checking the access right
+        securityService.checkGlobalFunction(WorkflowRegistration::class.java)
         // Parsing of the workflow
         val workflowObj: Workflow = WorkflowParser.parseYamlWorkflow(workflow)
         // Validation
@@ -84,14 +89,16 @@ class WorkflowRegistryImpl(
         return id
     }
 
-    override fun findWorkflow(workflowId: String): WorkflowRecord? =
-        storageService.find(STORE, workflowId, InternalRecord::class)
+    override fun findWorkflow(workflowId: String): WorkflowRecord? {
+        securityService.checkGlobalFunction(WorkflowRegistration::class.java)
+        return storageService.find(STORE, workflowId, InternalRecord::class)
             ?.run {
                 WorkflowRecord(
                     id = workflowId,
                     workflow = workflow,
                 )
             }
+    }
 
     private data class InternalRecord(
         val workflow: Workflow,

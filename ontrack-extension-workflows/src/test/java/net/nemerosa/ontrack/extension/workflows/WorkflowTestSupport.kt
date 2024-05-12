@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.extension.workflows.registry.WorkflowRegistry
 import net.nemerosa.ontrack.it.waitUntil
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.Event
+import net.nemerosa.ontrack.model.security.SecurityService
 import org.springframework.stereotype.Component
 import java.util.concurrent.TimeoutException
 import kotlin.test.fail
@@ -22,6 +23,7 @@ class WorkflowTestSupport(
     private val workflowEngine: WorkflowEngine,
     private val workflowRegistry: WorkflowRegistry,
     private val workflowNotificationItemConverter: WorkflowNotificationItemConverter,
+    private val securityService: SecurityService,
 ) {
 
     private fun displayInstance(instanceId: String) {
@@ -43,41 +45,43 @@ class WorkflowTestSupport(
         event: Event? = null,
         display: Boolean = false,
     ): String {
-        val workflowId = workflowRegistry.saveYamlWorkflow(yaml)
-        // Getting the workflow
-        val record = workflowRegistry.findWorkflow(workflowId) ?: fail("No workflow found for $workflowId")
+        return securityService.asAdmin {
+            val workflowId = workflowRegistry.saveYamlWorkflow(yaml)
+            // Getting the workflow
+            val record = workflowRegistry.findWorkflow(workflowId) ?: fail("No workflow found for $workflowId")
 
-        // Context
-        val contextData = mutableListOf<WorkflowContextData>()
-        if (!workflowContextName.isNullOrBlank()) {
-            contextData += WorkflowContextData("mock", TextNode(workflowContextName))
-        }
-        if (event != null) {
-            val item = workflowNotificationItemConverter.convertForQueue(event)
-            contextData += WorkflowContextData(WorkflowNotificationChannelNodeExecutor.CONTEXT_EVENT, item.asJson())
-        }
-        val context = WorkflowContext(contextData)
-
-        // Launching the workflow
-        val instance = workflowEngine.startWorkflow(record.workflow, context)
-        // Waiting until the workflow is completed (error or success)
-        try {
-            waitUntil("Waiting until workflow is complete", timeout = 10.seconds) {
-                val workflowInstance = workflowEngine.getWorkflowInstance(instance.id)
-                println("workflowInstance = $workflowInstance")
-                workflowInstance.status.finished
+            // Context
+            val contextData = mutableListOf<WorkflowContextData>()
+            if (!workflowContextName.isNullOrBlank()) {
+                contextData += WorkflowContextData("mock", TextNode(workflowContextName))
             }
-        } catch (any: TimeoutException) {
-            // Displaying the state of the instance
-            displayInstance(instance.id)
-            // Going on with the error
-            throw any
+            if (event != null) {
+                val item = workflowNotificationItemConverter.convertForQueue(event)
+                contextData += WorkflowContextData(WorkflowNotificationChannelNodeExecutor.CONTEXT_EVENT, item.asJson())
+            }
+            val context = WorkflowContext(contextData)
+
+            // Launching the workflow
+            val instance = workflowEngine.startWorkflow(record.workflow, context)
+            // Waiting until the workflow is completed (error or success)
+            try {
+                waitUntil("Waiting until workflow is complete", timeout = 10.seconds) {
+                    val workflowInstance = workflowEngine.getWorkflowInstance(instance.id)
+                    println("workflowInstance = $workflowInstance")
+                    workflowInstance.status.finished
+                }
+            } catch (any: TimeoutException) {
+                // Displaying the state of the instance
+                displayInstance(instance.id)
+                // Going on with the error
+                throw any
+            }
+            // Displaying
+            if (display) {
+                displayInstance(instance.id)
+            }
+            // OK
+            instance.id
         }
-        // Displaying
-        if (display) {
-            displayInstance(instance.id)
-        }
-        // OK
-        return instance.id
     }
 }

@@ -11,6 +11,7 @@ class WorkflowRoleContributor : RoleContributor {
     override fun getGlobalFunctionContributionsForGlobalRoles(): Map<String, List<Class<out GlobalFunction>>> =
         mapOf(
             Roles.GLOBAL_ADMINISTRATOR to listOf(
+                WorkflowRegistration::class.java,
                 WorkflowAudit::class.java,
             ),
         )

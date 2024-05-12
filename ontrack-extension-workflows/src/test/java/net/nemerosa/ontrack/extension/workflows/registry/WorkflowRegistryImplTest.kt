@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.workflows.registry
 import com.fasterxml.jackson.databind.JsonNode
 import io.mockk.mockk
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowValidationException
+import net.nemerosa.ontrack.it.MockSecurityService
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.support.StorageService
 import org.junit.jupiter.api.BeforeEach
@@ -20,7 +21,8 @@ class WorkflowRegistryImplTest {
     @BeforeEach
     fun setUp() {
         storageService = mockk()
-        workflowRegistry = WorkflowRegistryImpl(storageService)
+        val securityService = MockSecurityService()
+        workflowRegistry = WorkflowRegistryImpl(storageService, securityService)
     }
 
     @Test
