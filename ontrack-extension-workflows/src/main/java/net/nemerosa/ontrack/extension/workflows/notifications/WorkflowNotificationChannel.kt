@@ -64,21 +64,19 @@ class WorkflowNotificationChannel(
         )
     }
 
-    override fun toSearchCriteria(text: String): JsonNode {
-        TODO("Not yet implemented")
-    }
+    override fun toSearchCriteria(text: String): JsonNode = mapOf(
+        "workflow" to mapOf(
+            "name" to text
+        )
+    ).asJson()
 
     override val type: String = "workflow"
     override val displayName: String = "Workflow"
     override val enabled: Boolean = true
 
     @Deprecated("Will be removed in V5. Only Next UI is used.")
-    override fun getForm(c: WorkflowNotificationChannelConfig?): Form {
-        TODO("Not yet implemented")
-    }
+    override fun getForm(c: WorkflowNotificationChannelConfig?): Form = Form.create()
 
     @Deprecated("Will be removed in V5. Only Next UI is used.")
-    override fun toText(config: WorkflowNotificationChannelConfig): String {
-        TODO("Not yet implemented")
-    }
+    override fun toText(config: WorkflowNotificationChannelConfig): String = config.workflow.name
 }
