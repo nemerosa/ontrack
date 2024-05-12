@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.workflows.engine
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import net.nemerosa.ontrack.extension.queue.dispatching.QueueDispatcher
+import net.nemerosa.ontrack.extension.queue.source.createQueueSource
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowValidation
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorService
@@ -17,6 +18,7 @@ class WorkflowEngineImpl(
     private val queueDispatcher: QueueDispatcher,
     private val workflowQueueProcessor: WorkflowQueueProcessor,
     private val workflowNodeExecutorService: WorkflowNodeExecutorService,
+    private val workflowQueueSourceExtension: WorkflowQueueSourceExtension,
 ) : WorkflowEngine {
 
     override fun startWorkflow(
@@ -51,7 +53,13 @@ class WorkflowEngineImpl(
                 workflowNodeId = node.id,
                 workflowNodeExecutorId = node.executorId,
             ),
-            source = null, // TODO Setting a custom source
+            source = workflowQueueSourceExtension.createQueueSource(
+                WorkflowQueueSourceData(
+                    workflowInstanceId = instance.id,
+                    workflowNodeId = node.id,
+                    workflowNodeExecutorId = node.executorId,
+                )
+            )
         )
     }
 
