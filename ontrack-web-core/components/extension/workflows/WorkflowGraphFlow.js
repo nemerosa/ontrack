@@ -79,12 +79,38 @@ export const changeEdges = (node, oldEdges) => {
     return newEdges
 }
 
+export const deleteNodeInNodes = (node, oldNodes) => {
+    return oldNodes
+        // Removing the node
+        .filter(oldNode => oldNode.id !== node.oldId)
+        // Changing parent references
+        .map(oldNode => ({
+            ...oldNode,
+            data: {
+                ...oldNode.data,
+                parents: oldNode.data.parents.filter(oldParent => oldParent.id !== node.oldId)
+            }
+        }))
+}
+
+export const deleteNodeInEdges = (node, oldEdges) => {
+    return oldEdges.filter(oldEdge => oldEdge.source !== node.oldId && oldEdge.target !== node.oldId)
+}
+
 export default function WorkflowGraphFlow({workflowNodes, edition = false}) {
 
     const onGraphNodeChange = ({node}) => {
         if (node) {
-            setNodes(oldNodes => changeNodes(node, oldNodes))
-            setEdges(oldEdges => changeEdges(node, oldEdges))
+            // Change
+            if (node.oldId && node.id) {
+                setNodes(oldNodes => changeNodes(node, oldNodes))
+                setEdges(oldEdges => changeEdges(node, oldEdges))
+            }
+            // Deletion
+            else if (node.oldId && !node.id) {
+                setNodes(oldNodes => deleteNodeInNodes(node, oldNodes))
+                setEdges(oldEdges => deleteNodeInEdges(node, oldEdges))
+            }
         }
     }
 

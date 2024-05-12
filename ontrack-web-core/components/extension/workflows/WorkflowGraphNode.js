@@ -1,7 +1,7 @@
 import {Handle, Position} from "reactflow";
-import {Card, Space, Typography} from "antd";
+import {Card, Popconfirm, Space, Typography} from "antd";
 import {useWorkflowNodeExecutor} from "@components/extension/workflows/WorkflowNodeExecutorContext";
-import {FaCog, FaPencilAlt, FaWrench} from "react-icons/fa";
+import {FaCog, FaPencilAlt, FaTrashAlt, FaWrench} from "react-icons/fa";
 import WorkflowNodeExecutorShortConfigWithHelp
     from "@components/extension/workflows/WorkflowNodeExecutorShortConfigWithHelp";
 import ConfigureWorkflowNodeDialog, {
@@ -36,6 +36,18 @@ export default function WorkflowGraphNode({data}) {
         nodeDialog.start({...data})
     }
 
+    const deleteNode = () => {
+        const oldId = data.id
+        if (onGraphNodeChange) {
+            onGraphNodeChange({
+                node: {
+                    oldId,
+                    id: null,
+                }
+            })
+        }
+    }
+
     return (
         <>
             <Handle type="target" position={Position.Left}/>
@@ -51,14 +63,25 @@ export default function WorkflowGraphNode({data}) {
                     <>
                         {
                             edition &&
-                            <>
+                            <Space>
                                 <FaPencilAlt
                                     className="ot-action"
                                     title="Configure this node"
                                     onClick={configureNode}
                                 />
                                 <ConfigureWorkflowNodeDialog dialog={nodeDialog}/>
-                            </>
+                                <Popconfirm
+                                    title="Delete node"
+                                    description="Are you sure to delete this node and all the links to and from this node?"
+                                    onConfirm={deleteNode}
+                                >
+                                    <FaTrashAlt
+                                        className="ot-action"
+                                        color="red"
+                                        title="Delete this node"
+                                    />
+                                </Popconfirm>
+                            </Space>
                         }
                     </>
                 }
