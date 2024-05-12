@@ -4,10 +4,12 @@ import com.fasterxml.jackson.databind.node.TextNode
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowFixtures
 import net.nemerosa.ontrack.extension.workflows.mock.MockWorkflowNodeExecutor
 import net.nemerosa.ontrack.extension.workflows.AbstractWorkflowTestSupport
+import net.nemerosa.ontrack.extension.workflows.definition.WorkflowValidationException
 import net.nemerosa.ontrack.it.waitUntil
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
@@ -41,6 +43,16 @@ class WorkflowEngineIT : AbstractWorkflowTestSupport() {
             ),
             texts
         )
+    }
+
+    @Test
+    fun `Launching a workflow with an error`() {
+        // Defining a workflow
+        val workflow = WorkflowFixtures.cyclicWorkflow()
+        // Running the workflow
+        assertFailsWith<WorkflowValidationException> {
+            workflowEngine.startWorkflow(workflow, WorkflowContext("mock", TextNode("Cyclic")))
+        }
     }
 
     @OptIn(ExperimentalTime::class)

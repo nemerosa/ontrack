@@ -28,6 +28,33 @@ object WorkflowFixtures {
             )
         )
 
+    fun cyclicWorkflow() =
+        Workflow(
+            name = "Simple cyclic",
+            nodes = listOf(
+                WorkflowNode(
+                    id = "start",
+                    executorId = "mock",
+                    data = TextNode("Start node"),
+                    parents = listOf(
+                        WorkflowParentNode(
+                            id = "end",
+                        )
+                    ),
+                ),
+                WorkflowNode(
+                    id = "end",
+                    executorId = "mock",
+                    data = TextNode("End node"),
+                    parents = listOf(
+                        WorkflowParentNode(
+                            id = "start"
+                        )
+                    ),
+                ),
+            )
+        )
+
     fun twoParallelAndJoin() =
         Workflow(
             name = "Parallel with join",

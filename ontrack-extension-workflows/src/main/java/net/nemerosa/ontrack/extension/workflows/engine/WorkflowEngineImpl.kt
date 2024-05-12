@@ -4,6 +4,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import net.nemerosa.ontrack.extension.queue.dispatching.QueueDispatcher
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
+import net.nemerosa.ontrack.extension.workflows.definition.WorkflowValidation
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -22,14 +23,14 @@ class WorkflowEngineImpl(
         workflow: Workflow,
         context: WorkflowContext,
     ): WorkflowInstance {
-        // TODO Checks the workflow consistency (cycles, etc.) - use a public method, usable by extensions
+        // Checks the workflow consistency (cycles, etc.) - use a public method, usable by extensions
+        WorkflowValidation.validateWorkflow(workflow).throwErrorIfAny()
         // Creating the instance
         val instance = createInstance(workflow, context)
         // Storing the instance
         workflowInstanceStore.store(instance)
         // Getting the starting nodes
         val nodes = instance.workflow.getNextNodes(null)
-        // TODO Special case: no starting node
         // Scheduling the nodes
         for (nodeId in nodes) {
             queueNode(instance, nodeId)
