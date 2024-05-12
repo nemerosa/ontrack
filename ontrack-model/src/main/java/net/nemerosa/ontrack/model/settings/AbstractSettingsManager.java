@@ -36,6 +36,10 @@ public abstract class AbstractSettingsManager<T> implements SettingsManager<T> {
 
     protected abstract void doSaveSettings(T settings);
 
+    /**
+     * @deprecated Will be removed in V5. Settings form are managed in Next UI.
+     */
+    @Deprecated
     protected abstract Form getSettingsForm(T settings);
 
     @Override
