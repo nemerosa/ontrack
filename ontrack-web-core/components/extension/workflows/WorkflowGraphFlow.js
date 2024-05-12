@@ -261,12 +261,12 @@ export default function WorkflowGraphFlow({workflowNodes, edition = false}) {
                 >
                     <Background/>
                     <Controls>
+                        <ControlButton title="Adjust the layout" onClick={relayout}>
+                            <FaProjectDiagram/>
+                        </ControlButton>
                         {
                             edition &&
                             <>
-                                <ControlButton title="Adjust the layout" onClick={relayout}>
-                                    <FaProjectDiagram/>
-                                </ControlButton>
                                 <ControlButton title="Add a new start node" onClick={addNode}>
                                     <FaPlusSquare/>
                                 </ControlButton>
