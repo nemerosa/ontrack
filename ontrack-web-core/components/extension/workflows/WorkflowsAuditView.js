@@ -28,6 +28,7 @@ export default function WorkflowsAuditView() {
                 pageItems {
                     key: id
                     id
+                    timestamp
                     status
                     finished
                     startTime
@@ -83,6 +84,11 @@ export default function WorkflowsAuditView() {
                             key: 'duration',
                             title: 'Duration',
                             render: (_, instance) => <DurationMs ms={instance.durationMs}/>,
+                        },
+                        {
+                            key: 'timestamp',
+                            title: 'Last update',
+                            render: (_, instance) => <TimestampText value={instance.timestamp} format="YYYY MMM DD, HH:mm:ss"/>,
                         },
                     ]}
                 />

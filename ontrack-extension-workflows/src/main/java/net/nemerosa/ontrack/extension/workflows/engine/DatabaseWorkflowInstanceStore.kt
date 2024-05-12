@@ -1,11 +1,16 @@
 package net.nemerosa.ontrack.extension.workflows.engine
 
+import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.extension.workflows.mgt.WorkflowSettings
 import net.nemerosa.ontrack.model.pagination.PaginatedList
+import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.support.StorageService
+import net.nemerosa.ontrack.model.tx.TransactionHelper
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
-import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
+import java.time.Duration
+import java.time.temporal.ChronoUnit
 
 @Component
 @ConditionalOnProperty(
@@ -14,18 +19,31 @@ import org.springframework.transaction.annotation.Transactional
     havingValue = "database",
     matchIfMissing = true,
 )
-@Transactional(propagation = Propagation.REQUIRES_NEW)
+@Transactional
 class DatabaseWorkflowInstanceStore(
     private val storageService: StorageService,
+    private val cachedSettingsService: CachedSettingsService,
+    private val transactionHelper: TransactionHelper,
 ) : WorkflowInstanceStore {
 
     companion object {
         private val STORE = WorkflowInstance::class.java.name
     }
 
-    override fun store(instance: WorkflowInstance): WorkflowInstance {
-        storageService.store(STORE, instance.id, instance)
-        return instance
+    override fun store(instance: WorkflowInstance): WorkflowInstance =
+        transactionHelper.inNewTransaction {
+            storageService.store(STORE, instance.id, instance)
+            instance
+        }
+
+    override fun cleanup() {
+        val settings = cachedSettingsService.getCachedSettings(WorkflowSettings::class.java)
+        val time = Time.now - Duration.of(settings.retentionDuration, ChronoUnit.MILLIS)
+        storageService.deleteWithFilter(
+            store = STORE,
+            query = "data->>'timestamp' < :timestamp",
+            queryVariables = mapOf("timestamp" to Time.store(time))
+        )
     }
 
     override fun findById(id: String): WorkflowInstance? =

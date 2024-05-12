@@ -8,8 +8,12 @@ interface WorkflowInstanceStore {
 
     fun findById(id: String): WorkflowInstance?
 
-    fun findByFilter(workflowInstanceFilter: WorkflowInstanceFilter): PaginatedList<WorkflowInstance>
+    fun findByFilter(
+        workflowInstanceFilter: WorkflowInstanceFilter = WorkflowInstanceFilter(),
+    ): PaginatedList<WorkflowInstance>
 
     fun clearAll()
+
+    fun cleanup()
 
 }

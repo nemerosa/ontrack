@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.workflows.engine
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 import java.time.Duration
 import java.time.LocalDateTime
@@ -10,6 +11,7 @@ import java.time.LocalDateTime
  * Information about the execution of a workflow.
  *
  * @property id Unique ID for this workflow instance.
+ * @property timestamp Last time the instance was updated.
  * @property workflow Associated workflow
  * @property context Mutable index of context objects used by the workflow
  * @property nodesExecutions Information about the node executions
@@ -17,6 +19,7 @@ import java.time.LocalDateTime
  */
 data class WorkflowInstance(
     val id: String,
+    val timestamp: LocalDateTime,
     val workflow: Workflow,
     val context: WorkflowContext,
     val nodesExecutions: List<WorkflowInstanceNode>,
@@ -59,6 +62,7 @@ data class WorkflowInstance(
     private fun updateNode(nodeId: String, update: (node: WorkflowInstanceNode) -> WorkflowInstanceNode) =
         WorkflowInstance(
             id = id,
+            timestamp = Time.now,
             workflow = workflow,
             context = context,
             nodesExecutions = nodesExecutions.map { node ->

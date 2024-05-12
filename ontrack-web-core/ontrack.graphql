@@ -7250,6 +7250,8 @@ type WorkflowInstance {
     startTime: LocalDateTime
     "status field"
     status: WorkflowInstanceStatus!
+    "timestamp field"
+    timestamp: LocalDateTime!
     "workflow field"
     workflow: Workflow!
 }

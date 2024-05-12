@@ -20,6 +20,8 @@ class GQLTypeWorkflowInstance(
             .description("Running workflow instance")
             // ID
             .stringField(WorkflowInstance::id)
+            // Timestamp
+            .localDateTimeField(WorkflowInstance::timestamp)
             // Status
             .enumField(WorkflowInstance::status)
             // Finished (status)

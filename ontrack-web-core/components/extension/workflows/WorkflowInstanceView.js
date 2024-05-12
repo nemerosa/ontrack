@@ -38,6 +38,7 @@ export default function WorkflowInstanceView({id}) {
                     query WorkflowInstance($id: String!) {
                         workflowInstance(id: $id) {
                             id
+                            timestamp
                             status
                             finished
                             startTime
@@ -99,19 +100,25 @@ export default function WorkflowInstanceView({id}) {
                     {
                         key: 'startTime',
                         label: 'Start time',
-                        children: <TimestampText value={instance.startTime}/>,
+                        children: <TimestampText value={instance.startTime} format="YYYY MMM DD, HH:mm:ss"/>,
                         span: 4,
                     },
                     {
                         key: 'endTime',
                         label: 'End time',
-                        children: <TimestampText value={instance.endTime}/>,
+                        children: <TimestampText value={instance.endTime} format="YYYY MMM DD, HH:mm:ss"/>,
                         span: 4,
                     },
                     {
                         key: 'duration',
                         label: 'Duration',
                         children: <DurationMs ms={instance.durationMs}/>,
+                        span: 4,
+                    },
+                    {
+                        key: 'timestamp',
+                        label: 'Last update',
+                        children: <TimestampText value={instance.timestamp} format="YYYY MMM DD, HH:mm:ss"/>,
                         span: 4,
                     },
                     {

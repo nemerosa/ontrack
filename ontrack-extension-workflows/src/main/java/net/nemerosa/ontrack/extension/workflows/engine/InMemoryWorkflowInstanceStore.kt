@@ -31,6 +31,10 @@ class InMemoryWorkflowInstanceStore : WorkflowInstanceStore {
         )
     }
 
+    override fun cleanup() {
+        instances.clear()
+    }
+
     override fun clearAll() {
         instances.clear()
     }
