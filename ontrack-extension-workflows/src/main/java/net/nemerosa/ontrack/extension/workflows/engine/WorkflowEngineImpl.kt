@@ -1,10 +1,13 @@
 package net.nemerosa.ontrack.extension.workflows.engine
 
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeoutOrNull
 import net.nemerosa.ontrack.extension.queue.dispatching.QueueDispatcher
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Duration
 
 @Service
 @Transactional
@@ -60,8 +63,18 @@ class WorkflowEngineImpl(
             instance = workflowInstanceStore.store(instance.startNode(node.id))
             // Getting the node executor
             val executor = workflowNodeExecutorService.getExecutor(node.executorId)
+            // Timeout (hard-coded for now, can be set at node level)
+            val timeout = Duration.ofMinutes(5)
             // Running the executor
-            val output = executor.execute(instance, node.id)
+            val output = runBlocking {
+                withTimeoutOrNull(timeout.toMillis()) {
+                    executor.execute(instance, node.id)
+                }
+            }
+            // Timeout?
+            if (output == null) {
+                throw WorkflowExecutionTimeoutException(timeout)
+            }
             // Stores the output back into the instance and progresses the node's status
             instance = workflowInstanceStore.store(instance.successNode(node.id, output))
             // Getting the next nodes
