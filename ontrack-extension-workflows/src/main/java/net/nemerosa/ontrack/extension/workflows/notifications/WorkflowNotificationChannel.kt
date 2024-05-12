@@ -15,6 +15,8 @@ import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
+import net.nemerosa.ontrack.model.events.EventTemplatingService
+import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.form.Form
 import org.springframework.stereotype.Component
 
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Component
 class WorkflowNotificationChannel(
     private val workflowEngine: WorkflowEngine,
     private val workflowNotificationItemConverter: WorkflowNotificationItemConverter,
+    private val eventTemplatingService: EventTemplatingService,
 ) : AbstractNotificationChannel<WorkflowNotificationChannelConfig, WorkflowNotificationChannelOutput>(
     WorkflowNotificationChannelConfig::class
 ) {
@@ -39,9 +42,18 @@ class WorkflowNotificationChannel(
     ): NotificationResult<WorkflowNotificationChannelOutput> {
         // Converting the event to a suitable format
         val item = workflowNotificationItemConverter.convertForQueue(event)
+        // Templating for the workflow name
+        val workflow = config.workflow.rename {
+            eventTemplatingService.renderEvent(
+                event = event,
+                context = context,
+                template = it,
+                renderer = PlainEventRenderer.INSTANCE,
+            )
+        }
         // Launching the workflow (with the event as context, template is not used)
         val instance = workflowEngine.startWorkflow(
-            workflow = config.workflow,
+            workflow = workflow,
             context = WorkflowContext(WorkflowNotificationChannelNodeExecutor.CONTEXT_EVENT, item.asJson()),
         )
         // Output contains only the instance ID

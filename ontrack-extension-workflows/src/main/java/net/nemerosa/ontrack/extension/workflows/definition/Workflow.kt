@@ -30,6 +30,14 @@ data class Workflow(
             nodes.filter { it.parents.any { ref -> ref.id == parentId } }.map { it.id }
         }
 
+    /**
+     * Rename the template
+     */
+    fun rename(code: (name: String) -> String) = Workflow(
+        name = code(name),
+        nodes = nodes,
+    )
+
     fun getNode(nodeId: String) = nodes.firstOrNull { it.id == nodeId }
         ?: throw WorkflowNodeNotFoundException(nodeId)
 }
