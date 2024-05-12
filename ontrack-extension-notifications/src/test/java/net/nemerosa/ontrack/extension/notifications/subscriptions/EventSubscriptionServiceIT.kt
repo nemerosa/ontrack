@@ -118,7 +118,10 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                         subscription.channel
                     )
                     assertEquals(
-                        mapOf("target" to targetBranch).asJson(),
+                        mapOf(
+                            "target" to targetBranch,
+                            "data" to null,
+                        ).asJson(),
                         subscription.channelConfig
                     )
                     assertEquals(setOf("new_promotion_run"), subscription.events)
@@ -131,7 +134,10 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                         subscription.channel
                     )
                     assertEquals(
-                        mapOf("target" to targetProject).asJson(),
+                        mapOf(
+                            "target" to targetProject,
+                            "data" to null,
+                        ).asJson(),
                         subscription.channelConfig
                     )
                     assertEquals(setOf("new_promotion_run"), subscription.events)
