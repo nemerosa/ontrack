@@ -65,9 +65,9 @@ pipeline {
             }
             environment {
                 // Bitbucket Cloud system tests
-                ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_WORKSPACE = credentials('ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_WORKSPACE')
-                ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_USER = credentials('ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_USER')
-                ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_TOKEN = credentials('ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_TOKEN')
+                ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_WORKSPACE = credentials('ontrack-test-extension-bitbucket-cloud-workspace')
+                ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_USER = credentials('ontrack-test-extension-bitbucket-cloud-user')
+                ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_TOKEN = credentials('ontrack-test-extension-bitbucket-cloud-token')
                 ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_EXPECTED_PROJECT = 'ONTRACK'
                 ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_EXPECTED_REPOSITORY = 'ontrack-pipeline-bitbucket-cloud'
                 // GitHub system tests
