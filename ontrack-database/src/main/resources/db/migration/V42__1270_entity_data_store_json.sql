@@ -1,0 +1,4 @@
+-- 42. Using JSONB instead of plain text for the stored JSON
+
+ALTER TABLE ENTITY_DATA_STORE
+    ALTER COLUMN JSON TYPE JSONB USING JSON::JSONB;

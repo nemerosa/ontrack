@@ -31,7 +31,7 @@ class EntityDataStoreJdbcRepository(
         data: JsonNode,
     ): EntityDataStoreRecord {
         val id = dbCreate(String.format(
-            "INSERT INTO ENTITY_DATA_STORE(%s, CATEGORY, NAME, GROUPID, JSON, CREATION, CREATOR) VALUES (:entityId, :category, :name, :groupId, :json, :creation, :creator)",
+            "INSERT INTO ENTITY_DATA_STORE(%s, CATEGORY, NAME, GROUPID, JSON, CREATION, CREATOR) VALUES (:entityId, :category, :name, :groupId, CAST(:json AS JSONB), :creation, :creator)",
             entity.projectEntityType.name
         ),
             params("entityId", entity.id())
@@ -84,7 +84,7 @@ class EntityDataStoreJdbcRepository(
                 "UPDATE ENTITY_DATA_STORE SET " +
                         "CREATION = :creation, " +
                         "CREATOR = :creator, " +
-                        "JSON = :json, " +
+                        "JSON = CAST(:json AS JSONB), " +
                         "GROUPID = :groupId " +
                         "WHERE ID = :id",
                 params("id", id)
