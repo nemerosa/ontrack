@@ -71,8 +71,8 @@ pipeline {
                 ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_EXPECTED_PROJECT = 'ONTRACK'
                 ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_EXPECTED_REPOSITORY = 'ontrack-pipeline-bitbucket-cloud'
                 // GitHub system tests
-                ONTRACK_TEST_EXTENSION_GITHUB_USER = credentials('ONTRACK_TEST_EXTENSION_GITHUB_USER')
-                ONTRACK_TEST_EXTENSION_GITHUB_TOKEN = credentials('ONTRACK_TEST_EXTENSION_GITHUB_TOKEN')
+                ONTRACK_TEST_EXTENSION_GITHUB_USER = credentials('ontrack-test-extension-github-user')
+                ONTRACK_TEST_EXTENSION_GITHUB_TOKEN = credentials('ontrack-test-extension-github-token')
                 ONTRACK_TEST_EXTENSION_GITHUB_ORGANIZATION = 'nemerosa'
                 ONTRACK_TEST_EXTENSION_GITHUB_REPOSITORY = 'ontrack-github-integration-test'
                 ONTRACK_TEST_EXTENSION_GITHUB_BRANCH = 'v1'
@@ -80,7 +80,7 @@ pipeline {
                 ONTRACK_TEST_EXTENSION_GITHUB_PR = '3'
                 ONTRACK_TEST_EXTENSION_GITHUB_TEAM = 'ontrack-integration-tests'
                 ONTRACK_TEST_EXTENSION_GITHUB_APP_ID = '143291'
-                ONTRACK_TEST_EXTENSION_GITHUB_APP_PEM = credentials('ONTRACK_TEST_EXTENSION_GITHUB_APP_PEM')
+                ONTRACK_TEST_EXTENSION_GITHUB_APP_PEM = credentials('ontrack-test-extension-github-app-pem')
                 ONTRACK_TEST_EXTENSION_GITHUB_APP_INSTALLATION = 'nemerosa'
                 ONTRACK_TEST_EXTENSION_GITHUB_PATHS_IMAGES_PROMOTION = 'images/iron.png'
                 ONTRACK_TEST_EXTENSION_GITHUB_PATHS_IMAGES_VALIDATION = 'images/site.png'
