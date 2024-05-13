@@ -4,10 +4,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.model.security.ApplicationManagement
 import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.model.support.ApplicationLogEntry
-import net.nemerosa.ontrack.model.support.ApplicationLogEntryFilter
-import net.nemerosa.ontrack.model.support.ApplicationLogService
-import net.nemerosa.ontrack.model.support.Page
+import net.nemerosa.ontrack.model.support.*
 import net.nemerosa.ontrack.repository.ApplicationLogEntriesRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -19,7 +16,8 @@ import org.springframework.transaction.annotation.Transactional
 class ApplicationLogServiceImpl(
         private val securityService: SecurityService,
         private val entriesRepository: ApplicationLogEntriesRepository,
-        private val meterRegistry: MeterRegistry
+        private val meterRegistry: MeterRegistry,
+        private val ontrackConfigProperties: OntrackConfigProperties,
 ) : ApplicationLogService {
 
     private val logger = LoggerFactory.getLogger(ApplicationLogService::class.java)
@@ -55,7 +53,9 @@ class ApplicationLogServiceImpl(
                 )
         )
         // Storing in database
-        entriesRepository.log(entry)
+        if (ontrackConfigProperties.applicationLogEnabled) {
+            entriesRepository.log(entry)
+        }
         // Metrics
         meterRegistry.counter(
                 "ontrack_error",

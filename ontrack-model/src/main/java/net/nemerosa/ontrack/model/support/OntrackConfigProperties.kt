@@ -37,6 +37,11 @@ class OntrackConfigProperties {
     var applicationLogRetentionDays = 7
 
     /**
+     * Disabling the collection of log entries in the application.
+     */
+    var applicationLogEnabled = true
+
+    /**
      * Number of fatal errors to notify into the GUI.
      *
      * @see ApplicationLogEntryLevel.FATAL
