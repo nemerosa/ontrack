@@ -23,7 +23,8 @@ interface EventVariableService {
      * Gets a map containing all the entities and values for this event.
      *
      * @param event Event for which to get the parameters
+     * @param context Initial context
      */
-    fun getTemplateContext(event: Event): Map<String, Any>
+    fun getTemplateContext(event: Event, context: Map<String, Any>): Map<String, Any>
 
 }

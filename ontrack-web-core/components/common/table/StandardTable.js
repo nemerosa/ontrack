@@ -9,11 +9,11 @@ export default function StandardTable({
                                           variables = {},
                                           reloadCount = 0,
                                           columns = [],
-                                          expandable,
+                                          expandable = false,
                                           size = 10,
                                           filter = {},
-                                          onFilterChange,
-                                          footerExtra,
+                                          onFilterChange = (_) => {},
+                                          footerExtra = '',
                                       }) {
 
     const client = useGraphQLClient()

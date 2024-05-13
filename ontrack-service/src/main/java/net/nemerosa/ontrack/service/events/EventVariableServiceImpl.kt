@@ -18,8 +18,8 @@ class EventVariableServiceImpl(
         extensionManager.getExtensions(EventParameterExtension::class.java)
     }
 
-    override fun getTemplateContext(event: Event): Map<String, Any> {
-        val result = mutableMapOf<String, Any>()
+    override fun getTemplateContext(event: Event, context: Map<String, Any>): Map<String, Any> {
+        val result = context.toMutableMap()
         // Entities
         event.entities.forEach { (type, entity) ->
             result[type.varName] = entity

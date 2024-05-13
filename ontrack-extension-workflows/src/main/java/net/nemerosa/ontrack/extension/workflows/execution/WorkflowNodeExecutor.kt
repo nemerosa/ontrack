@@ -1,0 +1,34 @@
+package net.nemerosa.ontrack.extension.workflows.execution
+
+import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
+import net.nemerosa.ontrack.model.extension.Extension
+
+/**
+ * Registerable workflow callback for the execution of the nodes.
+ */
+interface WorkflowNodeExecutor : Extension {
+
+    /**
+     * ID of the executor
+     */
+    val id: String
+
+    /**
+     * Display name for the executor
+     */
+    val displayName: String
+
+    /**
+     * Runs some action for a given workflow node.
+     *
+     * @param workflowInstance Workflow to run
+     * @param workflowNodeId Workflow node
+     * @return Outcome for the node execution
+     */
+    fun execute(
+        workflowInstance: WorkflowInstance,
+        workflowNodeId: String,
+    ): JsonNode
+
+}

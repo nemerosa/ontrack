@@ -39,16 +39,18 @@ class InMemoryNotificationChannel(
     override fun publish(
         config: InMemoryNotificationChannelConfig,
         event: Event,
+        context: Map<String, Any>,
         template: String?,
         outputProgressCallback: (current: InMemoryNotificationChannelOutput) -> InMemoryNotificationChannelOutput
     ): NotificationResult<InMemoryNotificationChannelOutput> {
         val text = eventTemplatingService.renderEvent(
             event,
+            context,
             template,
             PlainEventRenderer()
         )
         messages.getOrPut(config.group) { mutableListOf() }.add(text)
-        return NotificationResult.ok(InMemoryNotificationChannelOutput(sent = true))
+        return NotificationResult.ok(InMemoryNotificationChannelOutput(sent = true, data = config.data))
     }
 
     override fun toSearchCriteria(text: String): JsonNode = InMemoryNotificationChannelConfig(text).asJson()

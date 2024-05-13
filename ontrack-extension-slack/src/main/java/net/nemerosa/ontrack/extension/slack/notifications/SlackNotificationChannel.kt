@@ -34,11 +34,12 @@ class SlackNotificationChannel(
     override fun publish(
         config: SlackNotificationChannelConfig,
         event: Event,
+        context: Map<String, Any>,
         template: String?,
         outputProgressCallback: (current: SlackNotificationChannelOutput) -> SlackNotificationChannelOutput
     ): NotificationResult<SlackNotificationChannelOutput> {
         // Formatting the message
-        val message = format(event, template)
+        val message = format(event, context, template)
         // Sending the message
         val sent = slackService.sendNotification(config.channel, message, config.type)
         // Result
@@ -54,10 +55,11 @@ class SlackNotificationChannel(
         }
     }
 
-    private fun format(event: Event, template: String?): String = eventTemplatingService.renderEvent(
-        event,
-        template,
-        slackNotificationEventRenderer,
+    private fun format(event: Event, context: Map<String, Any>, template: String?): String = eventTemplatingService.renderEvent(
+        event = event,
+        context = context,
+        template = template,
+        renderer = slackNotificationEventRenderer,
     )
 
     override fun toSearchCriteria(text: String): JsonNode =

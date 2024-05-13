@@ -1,0 +1,14 @@
+query WorkflowInstance(
+    $workflowInstanceId: String!,
+) {
+    workflowInstance(id: $workflowInstanceId) {
+        status
+        finished
+        nodesExecutions {
+            id
+            status
+            output
+            error
+        }
+    }
+}

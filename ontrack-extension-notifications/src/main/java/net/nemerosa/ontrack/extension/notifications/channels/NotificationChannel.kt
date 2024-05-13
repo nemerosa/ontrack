@@ -19,6 +19,7 @@ interface NotificationChannel<C, R> {
      *
      * @param config Configuration for the channel
      * @param event Event to send notification about
+     * @param context Notification template context
      * @param template Alternative template to the default event message
      * @param outputProgressCallback Gives the opportunity to the channel to register some progress on its output
      * @return Response by the channel
@@ -26,6 +27,7 @@ interface NotificationChannel<C, R> {
     fun publish(
         config: C,
         event: Event,
+        context: Map<String, Any>,
         template: String?,
         outputProgressCallback: (current: R) -> R,
     ): NotificationResult<R>

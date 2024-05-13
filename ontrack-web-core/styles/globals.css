@@ -166,3 +166,13 @@ button.ot-validation-stamp-filter-edition {
     border-radius: 4px;
     padding: 2px;
 }
+
+/**
+ * Workflows
+ */
+
+.ot-workflow-node-info-title {
+    display: block;
+    margin-top: 1em;
+    border-top: solid 1px lightgray;
+}

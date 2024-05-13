@@ -37,7 +37,7 @@ internal class GQLRootQueryNotificationRecordsIT : AbstractNotificationTestSuppo
                     channelConfig = MockNotificationChannelConfig("#target").asJson(),
                     event = event.asJson(),
                     result = NotificationResult.ok(
-                        output = MockNotificationChannelOutput(text = "The actual text")
+                        output = MockNotificationChannelOutput(text = "The actual text", data = null)
                     ).toNotificationRecordResult(),
                 )
             )
@@ -83,7 +83,7 @@ internal class GQLRootQueryNotificationRecordsIT : AbstractNotificationTestSuppo
                     channelConfig = MockNotificationChannelConfig("#target").asJson(),
                     event = event.asJson(),
                     result = NotificationResult.ok(
-                        output = MockNotificationChannelOutput(text = "The actual text")
+                        output = MockNotificationChannelOutput(text = "The actual text", data = null)
                     ).toNotificationRecordResult(),
                 )
             )

@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.boot.docs
 
+import net.nemerosa.ontrack.extension.notifications.channels.NoTemplate
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannel
+import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutor
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.annotations.getAPITypeDescription
 import net.nemerosa.ontrack.model.docs.*
@@ -13,6 +15,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.io.File
 import kotlin.reflect.full.findAnnotations
+import kotlin.reflect.full.hasAnnotation
 
 /**
  * Generation of the documentation
@@ -34,6 +37,61 @@ class DocumentationGenerationIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var notificationChannels: List<NotificationChannel<*, *>>
+
+    @Autowired
+    private lateinit var workflowNodeExecutors: List<WorkflowNodeExecutor>
+
+    @Test
+    fun `Workflow node executors`() {
+
+        fun getWNXFileId(wnx: WorkflowNodeExecutor): String =
+            "workflow-node-executor-${wnx.id}"
+
+        fun getWNXTitle(wnx: WorkflowNodeExecutor): String =
+            "${wnx.displayName} (${wnx.id})"
+
+        fun generateWNX(directoryContext: DirectoryContext, wnx: WorkflowNodeExecutor) {
+            val description = getAPITypeDescription(wnx::class)
+            val parameters = getFieldsDocumentation(wnx::class)
+            val example = getDocumentationExampleCode(wnx::class)
+
+            val fileId = getWNXFileId(wnx)
+
+            directoryContext.writeFile(
+                fileId = fileId,
+                level = 4,
+                title = getWNXTitle(wnx),
+                header = description,
+                fields = parameters,
+                example = example,
+                links = wnx::class.findAnnotations(),
+                extendedConfig = { s ->
+                    val output = getFieldsDocumentation(wnx::class, section = "output")
+                    if (output.isNotEmpty()) {
+                        s.append("Output:\n\n")
+                        directoryContext.writeFields(s, output)
+                    }
+                },
+            )
+        }
+
+        withDirectory("workflow-node-executors") {
+
+            writeIndex(
+                fileId = "appendix-workflow-node-executors-index",
+                level = 4,
+                title = "List of workflow node executors",
+                items = workflowNodeExecutors.associate { workflowNodeExecutor ->
+                    getWNXFileId(workflowNodeExecutor) to getWNXTitle(workflowNodeExecutor)
+                }
+            )
+
+            workflowNodeExecutors.forEach { wnx ->
+                generateWNX(this, wnx)
+            }
+
+        }
+    }
 
     @Test
     fun `Notifications list`() {
@@ -69,6 +127,11 @@ class DocumentationGenerationIT : AbstractDSLTestSupport() {
                     if (output.isNotEmpty()) {
                         s.append("Output:\n\n")
                         directoryContext.writeFields(s, output)
+                    }
+                },
+                extendedHeader = { s ->
+                    if (channel::class.hasAnnotation<NoTemplate>()) {
+                        s.append("\n\n_This channel does not use the custom template._\n\n")
                     }
                 }
             )

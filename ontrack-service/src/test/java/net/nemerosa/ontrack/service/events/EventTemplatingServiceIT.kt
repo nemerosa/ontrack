@@ -38,6 +38,7 @@ class EventTemplatingServiceIT : AbstractDSLTestSupport() {
                                 ${'$'}{promotionLevel|uppercase}.
                             """.trimIndent(),
                             event = event,
+                            context = emptyMap(),
                             renderer = PlainEventRenderer()
                         )
 
@@ -78,6 +79,7 @@ class EventTemplatingServiceIT : AbstractDSLTestSupport() {
                                 {Promotion|uppercase}.
                             """.trimIndent(),
                             event = event,
+                            context = emptyMap(),
                             renderer = PlainEventRenderer()
                         )
 

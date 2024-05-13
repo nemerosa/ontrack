@@ -7,6 +7,7 @@
 * <<notification-backend-mail,Mail (`mail`)>>
 * <<notification-backend-slack,Slack (`slack`)>>
 * <<notification-backend-webhook,Webhook (`webhook`)>>
+* <<notification-backend-workflow,Workflow (`workflow`)>>
 
 include::notification-backend-jenkins.adoc[]
 include::notification-backend-jira-creation.adoc[]
@@ -14,3 +15,4 @@ include::notification-backend-jira-service-desk.adoc[]
 include::notification-backend-mail.adoc[]
 include::notification-backend-slack.adoc[]
 include::notification-backend-webhook.adoc[]
+include::notification-backend-workflow.adoc[]

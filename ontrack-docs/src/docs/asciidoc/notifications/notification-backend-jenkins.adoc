@@ -3,6 +3,10 @@
 
 This channel is used to trigger remote Jenkins jobs with some parameters.
 
+
+
+_This channel does not use the custom template._
+
 Links:
 
 * <<integration-jenkins-notifications,Jenkins notifications>>

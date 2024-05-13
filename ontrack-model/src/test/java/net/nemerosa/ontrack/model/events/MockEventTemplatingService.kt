@@ -5,11 +5,11 @@ package net.nemerosa.ontrack.model.events
  */
 class MockEventTemplatingService : EventTemplatingService {
 
-    override fun render(template: String, event: Event, renderer: EventRenderer): String {
+    override fun render(template: String, event: Event, context: Map<String, Any>, renderer: EventRenderer): String {
         TODO("Not yet implemented")
     }
 
-    override fun renderEvent(event: Event, template: String?, renderer: EventRenderer): String =
+    override fun renderEvent(event: Event, context: Map<String, Any>, template: String?, renderer: EventRenderer): String =
         if (template.isNullOrBlank()) {
             event.eventType.template // Not rendering the template
         } else {

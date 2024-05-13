@@ -43,6 +43,7 @@ class BitbucketServerSCMExtensionIT : AbstractDSLTestSupport() {
                                 val path = eventTemplatingService.renderEvent(
                                     event = event,
                                     template = "/my/path/{ScmBranch|urlencode}",
+                                    context = emptyMap(),
                                     renderer = PlainEventRenderer.INSTANCE,
                                 )
                                 // Check
@@ -76,6 +77,7 @@ class BitbucketServerSCMExtensionIT : AbstractDSLTestSupport() {
                                 // Rendering
                                 val path = eventTemplatingService.renderEvent(
                                     event = event,
+                                    context = emptyMap(),
                                     template = "/my/path/${'$'}{branch.scmBranch|urlencode}",
                                     renderer = PlainEventRenderer.INSTANCE,
                                 )

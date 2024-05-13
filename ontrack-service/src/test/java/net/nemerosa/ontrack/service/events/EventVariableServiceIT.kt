@@ -29,7 +29,7 @@ class EventVariableServiceIT : AbstractDSLTestSupport() {
                         val event = eventFactory.newPromotionRun(run)
 
                         // Gets the templating context
-                        val context = eventVariableService.getTemplateContext(event)
+                        val context = eventVariableService.getTemplateContext(event, emptyMap())
 
                         // Checks all parameters
                         assertEquals(
@@ -62,7 +62,7 @@ class EventVariableServiceIT : AbstractDSLTestSupport() {
                         val event = eventFactory.newValidationRun(run)
 
                         // Gets the templating context
-                        val context = eventVariableService.getTemplateContext(event)
+                        val context = eventVariableService.getTemplateContext(event, emptyMap())
 
                         // Checks all parameters
                         assertEquals(

@@ -3,6 +3,10 @@
 
 Calling an external webhook
 
+
+
+_This channel does not use the custom template._
+
 Configuration:
 
 * **name** - String - required - Name of the webhook to use

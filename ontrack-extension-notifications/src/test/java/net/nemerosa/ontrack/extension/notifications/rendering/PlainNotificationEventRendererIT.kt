@@ -32,6 +32,7 @@ class PlainNotificationEventRendererIT : AbstractDSLTestSupport() {
                     template = """
                         Project ${'$'}{projectx} has been created.
                     """.trimIndent(),
+                    context = emptyMap(),
                     renderer = plainEventRenderer,
                 )
 
@@ -63,6 +64,7 @@ class PlainNotificationEventRendererIT : AbstractDSLTestSupport() {
                                 Build ${'$'}{build.release} for ${'$'}{branch} at ${'$'}{project}
                                 has been promoted to ${'$'}{promotionLevel}.
                             """.trimIndent(),
+                            context = emptyMap(),
                             renderer = plainEventRenderer,
                         )
 

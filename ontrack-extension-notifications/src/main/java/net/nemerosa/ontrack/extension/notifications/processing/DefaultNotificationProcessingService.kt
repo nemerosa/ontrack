@@ -27,20 +27,21 @@ class DefaultNotificationProcessingService(
     private val meterRegistry: MeterRegistry,
 ) : NotificationProcessingService {
 
-    override fun process(item: Notification) {
+    override fun process(item: Notification, context: Map<String, Any>): Any? {
         meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_started, item)
         val channel = notificationChannelRegistry.findChannel(item.channel)
         if (channel != null) {
             meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_started, item)
-            process(channel, item)
+            return process(channel, item, context)
         } else {
             meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_unknown, item)
+            return null
         }
     }
 
-    private fun <C, R> process(channel: NotificationChannel<C, R>, item: Notification) {
+    private fun <C, R> process(channel: NotificationChannel<C, R>, item: Notification, context: Map<String, Any>): R? {
         val validatedConfig = channel.validate(item.channelConfig)
-        if (validatedConfig.config != null) {
+        return if (validatedConfig.config != null) {
 
             // Current output progress
             var output: R? = null
@@ -55,6 +56,7 @@ class DefaultNotificationProcessingService(
                 val result = channel.publish(
                     config = validatedConfig.config,
                     event = item.event,
+                    context = context,
                     template = item.template,
                     outputProgressCallback = outputProgressCallback,
                 )
@@ -65,6 +67,7 @@ class DefaultNotificationProcessingService(
                     event = item.event,
                     result = result,
                 )
+                result.output
             } catch (any: Exception) {
                 meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_error, item)
                 record(
@@ -74,6 +77,7 @@ class DefaultNotificationProcessingService(
                     error = any,
                     output = output, // Using the current output, even for errors
                 )
+                output
             }
         } else {
             meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_invalid, item)
@@ -82,6 +86,7 @@ class DefaultNotificationProcessingService(
                 invalidChannelConfig = item.channelConfig,
                 event = item.event,
             )
+            null
         }
     }
 

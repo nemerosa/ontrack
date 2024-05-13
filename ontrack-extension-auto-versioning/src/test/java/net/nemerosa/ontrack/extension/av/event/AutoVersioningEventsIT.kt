@@ -38,7 +38,11 @@ internal class AutoVersioningEventsIT : AbstractDSLTestSupport() {
                             link = "https://job.link",
                         )
                     )
-                    val text = eventTemplatingService.renderEvent(event, renderer = htmlNotificationEventRenderer)
+                    val text = eventTemplatingService.renderEvent(
+                        event,
+                        context = emptyMap(),
+                        renderer = htmlNotificationEventRenderer
+                    )
                     assertEquals(
                         """
                             Auto versioning post-processing of <a href="http://localhost:8080/#/project/${target.project.id}">${target.project.name}</a>/<a href="http://localhost:8080/#/branch/${target.id}">${target.name}</a> for dependency <a href="http://localhost:8080/#/project/${project.id}">${project.name}</a> version "1.1.0" has failed.
@@ -72,7 +76,11 @@ internal class AutoVersioningEventsIT : AbstractDSLTestSupport() {
                             merged = true,
                         )
                     )
-                    val text = eventTemplatingService.renderEvent(event, renderer = htmlNotificationEventRenderer)
+                    val text = eventTemplatingService.renderEvent(
+                        event,
+                        context = emptyMap(),
+                        renderer = htmlNotificationEventRenderer
+                    )
                     assertEquals(
                         """
                             Auto versioning of <a href="http://localhost:8080/#/project/${target.project.id}">${target.project.name}</a>/<a href="http://localhost:8080/#/branch/${target.id}">${target.name}</a> for dependency <a href="http://localhost:8080/#/project/${project.id}">${project.name}</a> version "1.1.0" has been done.
@@ -103,7 +111,11 @@ internal class AutoVersioningEventsIT : AbstractDSLTestSupport() {
                         message = "Processing failed.",
                         error = RuntimeException("Processing failed because of this error.")
                     )
-                    val text = eventTemplatingService.renderEvent(event, renderer = htmlNotificationEventRenderer)
+                    val text = eventTemplatingService.renderEvent(
+                        event,
+                        context = emptyMap(),
+                        renderer = htmlNotificationEventRenderer
+                    )
                     assertEquals(
                         """
                             Auto versioning of <a href="http://localhost:8080/#/project/${target.project.id}">${target.project.name}</a>/<a href="http://localhost:8080/#/branch/${target.id}">${target.name}</a> for dependency <a href="http://localhost:8080/#/project/${project.id}">${project.name}</a> version "1.1.0" has failed.
@@ -138,7 +150,11 @@ internal class AutoVersioningEventsIT : AbstractDSLTestSupport() {
                             merged = true,
                         )
                     )
-                    val text = eventTemplatingService.renderEvent(event, renderer = htmlNotificationEventRenderer)
+                    val text = eventTemplatingService.renderEvent(
+                        event,
+                        context = emptyMap(),
+                        renderer = htmlNotificationEventRenderer
+                    )
                     assertEquals(
                         """
                             Auto versioning of <a href="http://localhost:8080/#/project/${target.project.id}">${target.project.name}</a>/<a href="http://localhost:8080/#/branch/${target.id}">${target.name}</a> for dependency <a href="http://localhost:8080/#/project/${project.id}">${project.name}</a> version "1.1.0" has failed.

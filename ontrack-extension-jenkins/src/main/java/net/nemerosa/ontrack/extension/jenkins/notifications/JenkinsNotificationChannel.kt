@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.jenkins.JenkinsConfiguration
 import net.nemerosa.ontrack.extension.jenkins.JenkinsConfigurationService
 import net.nemerosa.ontrack.extension.jenkins.client.JenkinsClient
 import net.nemerosa.ontrack.extension.jenkins.client.JenkinsClientFactory
+import net.nemerosa.ontrack.extension.notifications.channels.NoTemplate
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.docs.DocumentationLink
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component
 @Documentation(JenkinsNotificationChannelConfig::class)
 @Documentation(JenkinsNotificationChannelOutput::class, section = "output")
 @DocumentationLink(value = "integration-jenkins-notifications", name = "Jenkins notifications")
+@NoTemplate
 @Component
 class JenkinsNotificationChannel(
     jenkinsConfigurationService: JenkinsConfigurationService,

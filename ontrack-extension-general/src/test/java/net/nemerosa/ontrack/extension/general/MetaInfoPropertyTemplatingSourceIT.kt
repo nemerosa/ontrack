@@ -41,6 +41,7 @@ class MetaInfoPropertyTemplatingSourceIT : AbstractDSLTestSupport() {
                             eventTemplatingService.render(
                                 template = "Link to ticket: ${'$'}{build.meta?name=meta-key&category=my-cat&link=true}",
                                 event = event,
+                                context = emptyMap(),
                                 renderer = HtmlNotificationEventRenderer(OntrackConfigProperties())
                             )
                         )

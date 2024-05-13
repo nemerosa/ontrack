@@ -1,0 +1,13 @@
+query NotificationRecordsOutputs(
+    $channel: String,
+) {
+    notificationRecords(channel: $channel) {
+        pageItems {
+            result {
+                type
+                message
+                output
+            }
+        }
+    }
+}

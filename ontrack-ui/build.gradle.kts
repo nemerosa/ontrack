@@ -54,6 +54,7 @@ dependencies {
 
     // List of extensions needed for the documentation generation
     testImplementation(project(":ontrack-extension-notifications"))
+    testImplementation(project(":ontrack-extension-workflows"))
 
     // List of extensions to include in core
     runtimeOnly(project(":ontrack-extension-general"))
@@ -82,8 +83,10 @@ dependencies {
     runtimeOnly(project(":ontrack-extension-license"))
     runtimeOnly(project(":ontrack-extension-tfc"))
     runtimeOnly(project(":ontrack-extension-recordings"))
+    runtimeOnly(project(":ontrack-extension-notifications"))
     runtimeOnly(project(":ontrack-extension-hook"))
     runtimeOnly(project(":ontrack-extension-queue"))
+    runtimeOnly(project(":ontrack-extension-workflows"))
 }
 
 /**

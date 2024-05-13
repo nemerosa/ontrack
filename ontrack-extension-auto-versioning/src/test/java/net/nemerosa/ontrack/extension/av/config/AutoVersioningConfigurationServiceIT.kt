@@ -643,6 +643,7 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                                 channel = "mock",
                                 channelConfig = mapOf(
                                     "target" to target,
+                                    "data" to null,
                                 ).asJson(),
                                 disabled = false,
                                 origin = "test",

@@ -39,6 +39,7 @@ class HtmlNotificationEventRendererIT : AbstractDSLTestSupport() {
                                 Build ${'$'}{build.release} for ${'$'}{branch} at ${'$'}{project}
                                 has been promoted to ${'$'}{promotionLevel}.
                             """.trimIndent(),
+                            context = emptyMap(),
                             renderer = htmlNotificationEventRenderer,
                         )
 

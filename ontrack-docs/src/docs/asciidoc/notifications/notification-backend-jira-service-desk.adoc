@@ -3,6 +3,10 @@
 
 This channel is used to create a Jira Service Desk ticket.
 
+
+
+_This channel does not use the custom template._
+
 Configuration:
 
 * **configName** - String - required - Name of the Jira configuration to use for the connection

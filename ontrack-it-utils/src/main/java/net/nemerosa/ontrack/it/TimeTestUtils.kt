@@ -4,6 +4,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.common.seconds
 import org.slf4j.LoggerFactory
+import java.util.concurrent.TimeoutException
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
@@ -76,7 +77,7 @@ class TimeTestUtils {
                 }
             }
             // Timeout
-            throw IllegalStateException("$message: Timeout exceeded after $timeout")
+            throw TimeoutException("$message: Timeout exceeded after $timeout")
         }
     }
 

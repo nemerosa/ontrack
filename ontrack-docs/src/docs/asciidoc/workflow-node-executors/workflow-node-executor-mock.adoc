@@ -1,0 +1,27 @@
+[[workflow-node-executor-mock]]
+==== Mock (mock)
+
+Executor used to mock some actions for the nodes. Mostly used for testing.
+
+Configuration:
+
+* **error** - Boolean - required - Raising an error during the execution of the node
+
+* **text** - String - required - Text associated with the node
+
+* **waitMs** - Long - required - Time to wait for the execution of the node
+
+Output:
+
+* **text** - String - required - text field
+
+Example:
+
+[source]
+----
+executorId: mock
+data:
+    text: Some text to store
+    waitMs: 500
+    error: false
+----

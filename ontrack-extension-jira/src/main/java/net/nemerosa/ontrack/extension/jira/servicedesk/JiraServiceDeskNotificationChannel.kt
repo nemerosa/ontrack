@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.jira.notifications.JiraCustomField
 import net.nemerosa.ontrack.extension.jira.notifications.JiraNotificationEventRenderer
 import net.nemerosa.ontrack.extension.jira.tx.JIRASessionFactory
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
+import net.nemerosa.ontrack.extension.notifications.channels.NoTemplate
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.json.transform
 import net.nemerosa.ontrack.model.annotations.APIDescription
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Component
 @APIDescription("This channel is used to create a Jira Service Desk ticket.")
 @Documentation(JiraServiceDeskNotificationChannelConfig::class)
 @Documentation(JiraServiceDeskNotificationChannelOutput::class, section = "output")
+@NoTemplate
 class JiraServiceDeskNotificationChannel(
     private val jiraConfigurationService: JIRAConfigurationService,
     private val jiraSessionFactory: JIRASessionFactory,
@@ -43,6 +45,7 @@ class JiraServiceDeskNotificationChannel(
     override fun publish(
         config: JiraServiceDeskNotificationChannelConfig,
         event: Event,
+        context: Map<String, Any>,
         template: String?,
         outputProgressCallback: (current: JiraServiceDeskNotificationChannelOutput) -> JiraServiceDeskNotificationChannelOutput
     ): NotificationResult<JiraServiceDeskNotificationChannelOutput> {
@@ -67,6 +70,7 @@ class JiraServiceDeskNotificationChannel(
             // Rendering the search term
             val searchTerm = eventTemplatingService.renderEvent(
                 event = event,
+                context = context,
                 template = config.searchTerm,
                 renderer = PlainEventRenderer.INSTANCE,
             )
@@ -101,6 +105,7 @@ class JiraServiceDeskNotificationChannel(
             JiraCustomField(name, value.transform { text ->
                 eventTemplatingService.renderEvent(
                     event = event,
+                    context = context,
                     template = text,
                     renderer = renderer,
                 )

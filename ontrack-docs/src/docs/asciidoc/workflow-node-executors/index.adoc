@@ -1,0 +1,8 @@
+[[appendix-workflow-node-executors-index]]
+==== List of workflow node executors
+
+* <<workflow-node-executor-mock,Mock (mock)>>
+* <<workflow-node-executor-notification,Notification (notification)>>
+
+include::workflow-node-executor-mock.adoc[]
+include::workflow-node-executor-notification.adoc[]
