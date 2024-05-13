@@ -27,5 +27,5 @@ Configuration:
 
 Output:
 
-* **workflowInstanceId** - String - required - workflowInstanceId field
+* **workflowInstanceId** - String - required - ID of the workflow instance. Can be used to track the progress and outcome of the workflow.
 

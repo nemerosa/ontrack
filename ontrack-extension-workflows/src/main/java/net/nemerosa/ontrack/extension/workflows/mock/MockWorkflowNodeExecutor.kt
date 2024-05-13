@@ -10,11 +10,24 @@ import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutor
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.docs.Documentation
+import net.nemerosa.ontrack.model.docs.DocumentationExampleCode
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
 @Component
 @Profile(RunProfile.ACC, RunProfile.UNIT_TEST, RunProfile.DEV)
+@APIDescription("Executor used to mock some actions for the nodes. Mostly used for testing.")
+@Documentation(MockNodeData::class)
+@Documentation(MockNodeOutput::class, section = "output")
+@DocumentationExampleCode("""
+    executorId: mock
+    data:
+        text: Some text to store
+        waitMs: 500
+        error: false
+""")
 class MockWorkflowNodeExecutor(
     workflowsExtensionFeature: WorkflowsExtensionFeature,
 ) : AbstractExtension(workflowsExtensionFeature), WorkflowNodeExecutor {

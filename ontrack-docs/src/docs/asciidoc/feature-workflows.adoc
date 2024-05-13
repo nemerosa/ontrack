@@ -1,0 +1,158 @@
+[[workflows]]
+=== Workflows
+
+Workflows allow the execution of several actions orchestrated in a DAG (directed acyclic graph).
+
+[NOTE]
+====
+As of version 4.8, workflows can only be triggered using the <<notifications>>.
+
+There is already some partial and undocumented support through API calls to run some standalone workflows but this is very experimental.
+====
+
+[[workflow-definitions]]
+==== Workflows definitions
+
+To run a workflow, you can define a notification whose channel is `workflow`.
+
+This can be done through the UI or as code.
+
+[NOTE]
+====
+Workflows definitions in the UI is only supported in the Next UI of Ontrack and won't be supported in the legacy UI.
+====
+
+A workflow:
+
+* has a name, used for information and display purposes
+* has a list of nodes
+
+Each node:
+
+* has an ID which must be unique inside the workflow
+* an executor ID that points to a _workflow node executor_
+* some data for the _workflow node executor_
+* a list of parent nodes
+
+The list of parent nodes is what defines the workflow DAG.
+
+[NOTE]
+====
+When defining or running workflows, graph cycles are automatically detected.
+====
+
+Workflows notifications can be defined as code, like all other <<notifications,notifications>>.
+
+For example:
+
+[source,yaml]
+----
+channel: workflow
+channelConfig:
+  workflow:
+    name: My workflow
+    nodes:
+      - id: ticket
+        executorId: notification
+        data:
+          channel: jira-creation
+          channelConfig:
+            # Configuration for the ticket creation
+      - id: mail
+        executorId: notification
+        parents:
+          - id: ticket
+        data:
+          channel: mail
+          channelConfig:
+            # Configuration for the mail
+          template: |
+            Link to ticket: ${workflow.ticket?path=url}
+----
+
+[[workflow-executors]]
+==== Workflows nodes executors
+
+A _workflow node executor_ is a component which is responsible to "run a node".
+
+See <<appendix-workflow-node-executors>> for a list of all existing workflow node executors.
+
+[[workflow-templates]]
+==== Workflow templating
+
+Many elements in the workflow definition are subject to <<appendix-templating,templating>>.
+
+The workflow name is itself considered as a template when being run as a notification (which is the default in 4.8).
+
+When using <<workflow-node-executor-notification,notifications as node executors>>, the configuration elements are templates as usual.
+
+Note that for a workflow notification, the event is passed as a context element and all template functions and sources are available.
+
+Additionally, when a notification is run as part of a workflow, a new templating function is available: `workflow`.
+
+This function allows the access to the output data of any successful node in the workflow.
+
+For example, let's take a workflow which:
+
+* creates a ticket in Jira
+* then send a link to this ticket with an email
+
+
+
+[source,yaml]
+----
+channel: workflow
+channelConfig:
+  workflow:
+    name: My workflow
+    nodes:
+      - id: ticket
+        executorId: notification
+        data:
+          channel: jira-creation
+          channelConfig:
+            # Configuration for the ticket creation
+      - id: mail
+        executorId: notification
+        parents:
+          - id: ticket
+        data:
+          channel: mail
+          channelConfig:
+            # Configuration for the mail
+          template: |
+            Link to ticket: ${workflow.ticket?path=url}
+----
+
+The `ticket` node runs and set some information in its output (see <<notification-backend-jira-creation>> for the full details), including a `url` property.
+
+Then, the `mail` node is run and is using the `notification` _workflow node executor_ again, with the <<notification-backend-mail,`mail` channel>> being configured to send a mail.
+
+This channel can use the `template` for the mail's body and is using the `workflow` function to get the output of the `ticket` node and the `url` property of its output.
+
+[[workflow-management]]
+==== Workflows management
+
+The progress of running workflows can be accessed in _Information > Workflow audit_.
+
+Clicking on a workflow displays more details about its current status, node per node.
+
+When using the _workflow notification channel_, the workflow status link is also accessible from the _Information > Notification recordings_, when selecting the notification.
+
+[[workflow-settings]]
+==== Workflows settings
+
+Workflow statuses are saved by default for 14 days.
+
+To change this value, you can go to _System > Settings > Workflows_.
+
+This can also be defined as code using <<casc,CasC>>:
+
+[source,yaml]
+----
+ontrack:
+  config:
+    settings:
+      workflows:
+        retentionDuration: 1209600000 # 14 days in ms
+----
