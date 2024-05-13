@@ -3,11 +3,8 @@
 pipeline {
 
     environment {
-        ONTRACK = credentials("ONTRACK_SERVICE_ACCOUNT")
-        DOCKER_REGISTRY_CREDENTIALS = credentials("DOCKER_NEMEROSA")
-        CODECOV_TOKEN = credentials("CODECOV_TOKEN")
-        GPG_KEY = credentials("GPG_KEY")
-        GPG_KEY_RING = credentials("GPG_KEY_RING")
+        ONTRACK = credentials("ontrack-service-account")
+        DOCKER_REGISTRY_CREDENTIALS = credentials("docker-hub")
     }
 
     parameters {
@@ -110,9 +107,6 @@ pipeline {
                         javadocPackage \\
                         -Pdocumentation \\
                         -PbowerOptions='--allow-root' \\
-                        -Psigning.keyId=${GPG_KEY_USR} \\
-                        -Psigning.password=${GPG_KEY_PSW} \\
-                        -Psigning.secretKeyRingFile=${GPG_KEY_RING} \\
                         -Dorg.gradle.jvmargs=-Xmx6144m \\
                         --stacktrace \\
                         --parallel \\
@@ -414,36 +408,6 @@ pipeline {
                         always {
                             ontrackCliValidate(
                                     stamp: 'DOCKER.HUB'
-                            )
-                        }
-                    }
-                }
-                stage('Maven Central') {
-                    environment {
-                        OSSRH = credentials("OSSRH")
-                    }
-                    steps {
-                        sh '''
-                            git status
-                            ./gradlew \\
-                                publishToSonatype \\
-                                closeAndReleaseSonatypeStagingRepository \\
-                                -Pdocumentation \\
-                                -PbowerOptions='--allow-root' \\
-                                -Psigning.keyId=${GPG_KEY_USR} \\
-                                -Psigning.password=${GPG_KEY_PSW} \\
-                                -Psigning.secretKeyRingFile=${GPG_KEY_RING} \\
-                                -PossrhUsername=${OSSRH_USR} \\
-                                -PossrhPassword=${OSSRH_PSW} \\
-                                --info \\
-                                --console plain \\
-                                --stacktrace
-                        '''
-                    }
-                    post {
-                        always {
-                            ontrackCliValidate(
-                                    stamp: 'MAVEN.CENTRAL'
                             )
                         }
                     }
