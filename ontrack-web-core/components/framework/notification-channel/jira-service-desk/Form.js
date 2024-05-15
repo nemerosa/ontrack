@@ -1,6 +1,7 @@
 import {Button, Form, Input, InputNumber, Select, Space, Switch, Typography} from "antd";
 import {FaExclamationTriangle, FaPlus, FaTrash} from "react-icons/fa";
 import {prefixedFormName} from "@components/form/formUtils";
+import SelectJiraServiceDeskRequestStatus from "@components/extension/jira/SelectJiraServiceDeskRequestStatus";
 
 export default function JiraServiceDeskNotificationChannelForm({prefix}) {
     return (
@@ -40,6 +41,13 @@ export default function JiraServiceDeskNotificationChannelForm({prefix}) {
                 }
             >
                 <Switch/>
+            </Form.Item>
+            <Form.Item
+                name={prefixedFormName(prefix, 'requestStatus')}
+                label="Request status"
+                extra={"If looking for existing tickets, which type of requests to look for (all by default)."}
+            >
+                <SelectJiraServiceDeskRequestStatus/>
             </Form.Item>
             <Form.Item
                 name={prefixedFormName(prefix, 'searchTerm')}

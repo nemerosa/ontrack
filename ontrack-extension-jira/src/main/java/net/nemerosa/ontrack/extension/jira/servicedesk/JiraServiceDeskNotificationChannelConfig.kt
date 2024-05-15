@@ -9,6 +9,8 @@ data class JiraServiceDeskNotificationChannelConfig(
     val configName: String,
     @APIDescription("If true, no ticket is created if it exists already")
     val useExisting: Boolean,
+    @APIDescription("If looking for existing tickets, which type of requests to look for (ALL by default)")
+    val requestStatus: JiraServiceDeskRequestStatus? = null,
     @APIDescription("ID of the Service Desk where to create the ticket")
     val serviceDeskId: Int,
     @APIDescription("ID of the Request Type of the ticket to create")

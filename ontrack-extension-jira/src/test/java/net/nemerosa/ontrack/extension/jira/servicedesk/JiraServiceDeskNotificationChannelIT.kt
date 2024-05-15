@@ -242,7 +242,7 @@ class JiraServiceDeskNotificationChannelIT : AbstractNotificationTestSupport() {
                         parameters = mapOf(
                             "serviceDeskId" to serviceDeskId.toString(),
                             "requestTypeId" to requestTypeId.toString(),
-                            "requestStatus" to "OPEN_REQUESTS",
+                            "requestStatus" to "ALL_REQUESTS",
                             "searchTerm" to "Build ${build.name} has been promoted to ${pl.name}",
                         ),
                         outcome = success(

@@ -13,10 +13,18 @@ class JiraServiceDeskImpl(
     private val restTemplate: RestTemplate,
 ) : JiraServiceDesk {
 
-    override fun searchRequest(serviceDeskId: Int, requestTypeId: Int, searchTerm: String): List<JIRAIssueStub> =
+    /**
+     * See https://docs.atlassian.com/jira-servicedesk/REST/5.15.1/
+     */
+    override fun searchRequest(
+        serviceDeskId: Int,
+        requestTypeId: Int,
+        searchTerm: String,
+        requestStatus: JiraServiceDeskRequestStatus,
+    ): List<JIRAIssueStub> =
         try {
             val node =
-                restTemplate.getForObject<JsonNode>("/rest/servicedeskapi/request?serviceDeskId=$serviceDeskId&requestTypeId=$requestTypeId&requestStatus=OPEN_REQUESTS&searchTerm=$searchTerm")
+                restTemplate.getForObject<JsonNode>("/rest/servicedeskapi/request?serviceDeskId=$serviceDeskId&requestTypeId=$requestTypeId&requestStatus=${requestStatus.requestStatus}&searchTerm=$searchTerm")
             node.path("values").map {
                 JIRAIssueStub(
                     key = it.getRequiredTextField("issueKey"),

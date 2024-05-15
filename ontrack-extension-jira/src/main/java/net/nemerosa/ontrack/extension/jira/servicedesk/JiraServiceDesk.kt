@@ -9,6 +9,7 @@ interface JiraServiceDesk {
         serviceDeskId: Int,
         requestTypeId: Int,
         searchTerm: String,
+        requestStatus: JiraServiceDeskRequestStatus,
     ): List<JIRAIssueStub>
 
     fun createRequest(

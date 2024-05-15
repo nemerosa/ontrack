@@ -78,7 +78,8 @@ class JiraServiceDeskNotificationChannel(
             val existingStubs = serviceDesk.searchRequest(
                 serviceDeskId = config.serviceDeskId,
                 requestTypeId = config.requestTypeId,
-                searchTerm = searchTerm
+                searchTerm = searchTerm,
+                requestStatus = config.requestStatus ?: JiraServiceDeskRequestStatus.ALL,
             )
             // If more than 1 result, we fail - too ambiguous to carry on
             if (existingStubs.size > 1) {

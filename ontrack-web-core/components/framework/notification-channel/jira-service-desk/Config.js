@@ -5,12 +5,14 @@ import {gql} from "graphql-request";
 import Link from "next/link";
 import YesNo from "@components/common/YesNo";
 import JiraCustomFields from "@components/extension/jira/JiraCustomFields";
+import JiraServiceDeskRequestStatus from "@components/extension/jira/JiraServiceDeskRequestStatus";
 
 export default function JiraServiceDeskNotificationChannelConfig({
                                                                      configName,
                                                                      serviceDeskId,
                                                                      requestTypeId,
                                                                      useExisting,
+                                                                     requestStatus,
                                                                      searchTerm,
                                                                      fields,
                                                                  }) {
@@ -63,6 +65,12 @@ export default function JiraServiceDeskNotificationChannelConfig({
             key: 'useExisting',
             label: 'Using existing issue',
             children: <YesNo value={useExisting}/>,
+            span: 6,
+        },
+        {
+            key: 'requestStatus',
+            label: 'Request status for existing',
+            children: <JiraServiceDeskRequestStatus status={requestStatus}/>,
             span: 6,
         },
         {

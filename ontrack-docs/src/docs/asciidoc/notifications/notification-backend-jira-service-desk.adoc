@@ -17,6 +17,8 @@ Configuration:
 
 ** **value** - JSON - required - Value for the field, as understood by the Jira API
 
+* **requestStatus** - CLOSED, OPEN, ALL - optional - If looking for existing tickets, which type of requests to look for (ALL by default)
+
 * **requestTypeId** - Int - required - ID of the Request Type of the ticket to create
 
 * **searchTerm** - String - optional - Search token to use to identify any existing ticket. This is a template.
