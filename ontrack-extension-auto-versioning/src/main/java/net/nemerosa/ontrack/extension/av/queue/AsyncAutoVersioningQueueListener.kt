@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.av.queue
 
+import com.rabbitmq.client.Channel
 import net.nemerosa.ontrack.extension.av.AutoVersioningConfigProperties
 import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditQueryService
 import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditService
@@ -17,13 +18,15 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.amqp.core.AmqpAdmin
 import org.springframework.amqp.core.Message
-import org.springframework.amqp.core.MessageListener
 import org.springframework.amqp.rabbit.annotation.RabbitListenerConfigurer
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerEndpoint
 import org.springframework.amqp.rabbit.listener.RabbitListenerEndpoint
 import org.springframework.amqp.rabbit.listener.RabbitListenerEndpointRegistrar
+import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener
 import org.springframework.stereotype.Component
+import java.io.IOException
 import java.util.*
+
 
 @Component
 class AsyncAutoVersioningQueueListener(
@@ -38,8 +41,6 @@ class AsyncAutoVersioningQueueListener(
 ) : RabbitListenerConfigurer, AutoVersioningQueueStats {
 
     private val logger: Logger = LoggerFactory.getLogger(AsyncAutoVersioningQueueListener::class.java)
-
-    private val listener = MessageListener(::onMessage)
 
     override val pendingOrders: Int
         get() =
@@ -90,16 +91,71 @@ class AsyncAutoVersioningQueueListener(
         id = queue
         setQueueNames(queue)
         concurrency = "1-1" // No concurrency, we want the events to be processed in turn
-        messageListener = listener
+        messageListener = AVMessageListener()
         return this
     }
 
-    private fun onMessage(message: Message) {
-        val body = message.body.toString(Charsets.UTF_8)
-        var order: AutoVersioningOrder? = null
-        try {
-            order = body.parseAsJson().parse<AutoVersioningOrder>()
+    private inner class AVMessageListener : ChannelAwareMessageListener {
 
+        override fun onMessage(message: Message, channel: Channel?) {
+            var order: AutoVersioningOrder? = null
+            try {
+                order = parseMessage(message)
+                process(order, message)
+            } catch (e: Exception) {
+                onError(e, order)
+            } finally {
+                onEndMessage(message, channel)
+            }
+        }
+
+        private fun onError(any: Exception, order: AutoVersioningOrder?) {
+            metrics.onProcessingError()
+            val root = ExceptionUtils.getRootCause(any)
+            try {
+                // Audit in the order
+                order?.let {
+                    autoVersioningAuditService.onError(it, root)
+                }
+            } finally {
+                applicationLogService.log(
+                    ApplicationLogEntry.error(
+                        any,
+                        NameDescription.nd("auto-versioning-error", "Auto versioning processing error"),
+                        "Auto versioning could not be processed"
+                    ).withDetail("message", any.message)
+                )
+            }
+        }
+
+        private fun onEndMessage(message: Message, channel: Channel?) {
+            if (channel != null) {
+                // Always acknowledge the message to prevent re-delivery
+                try {
+                    channel.basicAck(message.messageProperties.deliveryTag, false)
+                } catch (e: IOException) {
+                    // Log failing to acknowledge the message
+                    logAckError(e)
+                }
+            }
+        }
+
+        private fun logAckError(e: IOException) {
+            applicationLogService.log(
+                ApplicationLogEntry.error(
+                    e,
+                    NameDescription.nd("auto-versioning-error", "Auto versioning message could not be acked."),
+                    "Auto versioning could not be processed: ${e.message}"
+                ).withDetail("message", e.message)
+            )
+        }
+
+        private fun parseMessage(message: Message): AutoVersioningOrder {
+            val body = message.body.toString(Charsets.UTF_8)
+            return body.parseAsJson().parse<AutoVersioningOrder>()
+        }
+
+        private fun process(order: AutoVersioningOrder, message: Message) {
             // Gets the current state of the order
             val entry = autoVersioningAuditQueryService.findByUUID(order.branch, order.uuid)
             if (entry == null) {
@@ -117,23 +173,6 @@ class AsyncAutoVersioningQueueListener(
                     autoVersioningProcessingService.process(order)
                 }
                 metrics.onProcessingCompleted(order, outcome)
-            }
-        } catch (any: Throwable) {
-            metrics.onProcessingError()
-            val root = ExceptionUtils.getRootCause(any)
-            try {
-                // Audit in the order
-                order?.let {
-                    autoVersioningAuditService.onError(it, root)
-                }
-            } finally {
-                applicationLogService.log(
-                    ApplicationLogEntry.error(
-                        any,
-                        NameDescription.nd("auto-versioning-error", "Auto versioning processing error"),
-                        "Auto versioning could not be processed: $body"
-                    ).withDetail("message", any.message)
-                )
             }
         }
     }
