@@ -37,15 +37,6 @@ export const gqlPromotionLevelFragment = gql`
     ${gqlUserMenuActionFragment}
 `
 
-export const gqlPromotionLevelByIdQuery = gql`
-    query PromotionLevelById($id: Int!) {
-        promotionLevel(id: $id) {
-            ...PromotionLevelData
-        }
-    }
-    ${gqlPromotionLevelFragment}
-`
-
 export const getPromotionLevelById = (client, id) => {
     return client.request(
         gqlPromotionLevelByIdQuery,
@@ -186,4 +177,21 @@ export const gqlValidationStampByIdQuery = gql`
     ${gqlPropertiesFragment}
     ${gqlInformationFragment}
     ${gqlUserMenuActionFragment}
+`
+
+export const gqlPromotionLevelByIdQuery = gql`
+    query PromotionLevelById($id: Int!) {
+        promotionLevel(id: $id) {
+            ...PromotionLevelData
+            properties {
+                ...propertiesFragment
+            }
+            information {
+                ...informationFragment
+            }
+        }
+    }
+    ${gqlPromotionLevelFragment}
+    ${gqlPropertiesFragment}
+    ${gqlInformationFragment}
 `

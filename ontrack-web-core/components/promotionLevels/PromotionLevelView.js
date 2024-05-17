@@ -4,10 +4,8 @@ import Head from "next/head";
 import {promotionLevelTitle} from "@components/common/Titles";
 import StoredGridLayoutContextProvider from "@components/grid/StoredGridLayoutContext";
 import MainPage from "@components/layouts/MainPage";
-import {Space} from "antd";
+import {Skeleton} from "antd";
 import {promotionLevelBreadcrumbs} from "@components/common/Breadcrumbs";
-import {PromotionLevelImage} from "@components/promotionLevels/PromotionLevelImage";
-import LoadingContainer from "@components/common/LoadingContainer";
 import StoredGridLayout from "@components/grid/StoredGridLayout";
 import PromotionLevelLeadTimeChart from "@components/promotionLevels/PromotionLevelLeadTimeChart";
 import GridCell from "@components/grid/GridCell";
@@ -27,6 +25,7 @@ import PromotionLevelStabilityChart from "@components/promotionLevels/PromotionL
 import PromotionLevelHistory from "@components/promotionLevels/PromotionLevelHistory";
 import UserMenuActions from "@components/entities/UserMenuActions";
 import PromotionLevelViewTitle from "@components/promotionLevels/PromotionLevelViewTitle";
+import PromotionLevelViewDrawer from "@components/promotionLevels/PromotionLevelViewDrawer";
 
 export default function PromotionLevelView({id}) {
 
@@ -168,15 +167,15 @@ export default function PromotionLevelView({id}) {
                     commands={commands}
                     description={promotionLevel.description}
                 >
-                    <LoadingContainer loading={loadingPromotionLevel} tip="Loading promotion level">
+                    <Skeleton loading={loadingPromotionLevel} active>
                         <StoredGridLayout
                             id="page-promotion-level-layout"
                             defaultLayout={defaultLayout}
                             items={items}
                             rowHeight={30}
                         />
-                        {/* TODO Promotion levels properties */}
-                    </LoadingContainer>
+                        <PromotionLevelViewDrawer promotionLevel={promotionLevel} loading={loadingPromotionLevel}/>
+                    </Skeleton>
                 </MainPage>
             </StoredGridLayoutContextProvider>
         </>
