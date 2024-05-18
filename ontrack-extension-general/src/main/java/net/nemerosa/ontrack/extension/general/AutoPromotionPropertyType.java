@@ -35,7 +35,7 @@ public class AutoPromotionPropertyType extends AbstractPropertyType<AutoPromotio
 
     @Override
     public String getDescription() {
-        return "Allows a promotion level to be granted on a build as soon as a list of validation stamps has been passed";
+        return "Allows a promotion level to be granted on a build as soon as a list of validation stamps and/or other promotions has been passed";
     }
 
     @Override

@@ -1,27 +1,20 @@
 package net.nemerosa.ontrack.extension.general
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.structure.PromotionLevel
 import net.nemerosa.ontrack.model.structure.ValidationStamp
 import java.util.regex.Pattern
 
 data class AutoPromotionProperty(
-        /**
-         * List of needed validation stamps
-         */
-        val validationStamps: List<ValidationStamp>,
-        /**
-         * Regular expression to include validation stamps by name
-         */
-        val include: String,
-        /**
-         * Regular expression to exclude validation stamps by name
-         */
-        val exclude: String,
-        /**
-         * List of needed promotion levels
-         */
-        val promotionLevels: List<PromotionLevel>
+    @APIDescription("List of needed validation stamps")
+    val validationStamps: List<ValidationStamp>,
+    @APIDescription("Regular expression to include validation stamps by name")
+    val include: String,
+    @APIDescription("Regular expression to exclude validation stamps by name")
+    val exclude: String,
+    @APIDescription("List of needed promotion levels")
+    val promotionLevels: List<PromotionLevel>
 ) {
 
     /**

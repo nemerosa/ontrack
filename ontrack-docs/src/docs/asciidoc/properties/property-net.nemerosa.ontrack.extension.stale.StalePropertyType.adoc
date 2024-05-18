@@ -1,0 +1,23 @@
+[[property-net.nemerosa.ontrack.extension.stale.StalePropertyType]]
+==== Stale branches
+
+ID: `net.nemerosa.ontrack.extension.stale.StalePropertyType`
+
+Allows to disable or delete stale branches
+
+Scope:
+
+* project
+
+Configuration:
+
+* **deletingDuration** - Int - optional - Number of days of inactivity after a branch has been disabled after which the branch is deleted. If 0, the branches are never deleted.
+
+* **disablingDuration** - Int - required - Number of days of inactivity after which the branch is disabled
+
+* **excludes** - String - optional - Can define a regular expression for exceptions to the includes rule
+
+* **includes** - String - optional - Regular expression to identify branches which will never be disabled not deleted
+
+* **promotionsToKeep** - List - optional - List of promotions to always keep. If a branch has at least one build having one of these promotions, the branch will never be disabled not deleted.
+

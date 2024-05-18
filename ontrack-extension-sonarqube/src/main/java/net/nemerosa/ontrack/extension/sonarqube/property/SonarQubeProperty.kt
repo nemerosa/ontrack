@@ -4,10 +4,12 @@ import net.nemerosa.ontrack.extension.sonarqube.SonarQubeMeasuresList
 import net.nemerosa.ontrack.extension.sonarqube.configuration.SonarQubeConfiguration
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APILabel
+import net.nemerosa.ontrack.model.docs.DocumentationType
 import net.nemerosa.ontrack.model.support.ConfigurationProperty
 import java.net.URLEncoder
 
 class SonarQubeProperty(
+    @DocumentationType("String", "Name of the SonarQube configuration")
     override val configuration: SonarQubeConfiguration,
     val key: String,
     val validationStamp: String,

@@ -1,0 +1,17 @@
+[[property-net.nemerosa.ontrack.extension.jira.JIRAFollowLinksPropertyType]]
+==== JIRA Links to follow
+
+Deprecated: Will be removed in V5. Not used any longer.
+
+ID: `net.nemerosa.ontrack.extension.jira.JIRAFollowLinksPropertyType`
+
+List of links to follow when displaying information about an issue.
+
+Scope:
+
+* project
+
+Configuration:
+
+* **linkNames** - List - required - List of links to follow when displaying information about an issue.
+

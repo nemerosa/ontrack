@@ -11,6 +11,8 @@ include::appendix-notifications.adoc[]
 
 include::appendix-workflow-node-executors.adoc[]
 
+include::properties/index.adoc[]
+
 // include::appendix-deprecations.adoc[]
 
 // include::appendix-roadmap.adoc[]

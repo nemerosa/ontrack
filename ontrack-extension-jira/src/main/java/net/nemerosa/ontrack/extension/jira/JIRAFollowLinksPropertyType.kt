@@ -17,6 +17,7 @@ import java.util.function.Function
 import java.util.stream.Collectors
 
 @Component
+@Deprecated("Will be removed in V5. Not used any longer.")
 class JIRAFollowLinksPropertyType(
     extensionFeature: JIRAExtensionFeature
 ) : AbstractPropertyType<JIRAFollowLinksProperty>(extensionFeature) {

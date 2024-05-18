@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.jenkins
 
+import net.nemerosa.ontrack.model.docs.DocumentationType
 import net.nemerosa.ontrack.model.support.ConfigurationProperty
 
 /**
@@ -8,5 +9,6 @@ import net.nemerosa.ontrack.model.support.ConfigurationProperty
  * @property configuration Reference to the Jenkins configuration.
  */
 abstract class AbstractJenkinsProperty(
+    @DocumentationType("String", "Name of the Jenkins configuration")
     override val configuration: JenkinsConfiguration
 ) : ConfigurationProperty<JenkinsConfiguration>

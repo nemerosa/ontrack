@@ -1,0 +1,15 @@
+[[property-net.nemerosa.ontrack.extension.general.BuildLinkDisplayPropertyType]]
+==== Build link display options
+
+ID: `net.nemerosa.ontrack.extension.general.BuildLinkDisplayPropertyType`
+
+Configuration of display options for the build links towards this project.
+
+Scope:
+
+* project
+
+Configuration:
+
+* **useLabel** - Boolean - required - useLabel field
+

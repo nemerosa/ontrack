@@ -1,0 +1,21 @@
+[[property-net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType]]
+==== GitHub configuration
+
+ID: `net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType`
+
+Associates the project with a GitHub repository
+
+Scope:
+
+* project
+
+Configuration:
+
+* **configuration** - String - required - Name of the configuration
+
+* **indexationInterval** - Int - required - How often to index the repository, in minutes. Use 0 to disable indexation.
+
+* **issueServiceConfigurationIdentifier** - String - optional - Identifier for the issue service
+
+* **repository** - String - required - GitHub repository, ie. org/name
+

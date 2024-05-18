@@ -17,7 +17,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
+/**
+ * No longer used.
+ */
 @Component
+@Deprecated
 public class AutoPromotionLevelPropertyType extends AbstractPropertyType<AutoPromotionLevelProperty>
         implements PromotionLevelPropertyType<AutoPromotionLevelProperty> {
 

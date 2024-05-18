@@ -8,4 +8,5 @@ package net.nemerosa.ontrack.model.docs
 @MustBeDocumented
 annotation class DocumentationType(
     val value: String,
+    val description: String = "",
 )

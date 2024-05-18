@@ -1,0 +1,21 @@
+[[property-net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType]]
+==== Auto promotion
+
+ID: `net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType`
+
+Allows a promotion level to be granted on a build as soon as a list of validation stamps and/or other promotions has been passed
+
+Scope:
+
+* promotion level
+
+Configuration:
+
+* **exclude** - String - required - Regular expression to exclude validation stamps by name
+
+* **include** - String - required - Regular expression to include validation stamps by name
+
+* **promotionLevels** - List - required - List of needed promotion levels
+
+* **validationStamps** - List - required - List of needed validation stamps
+

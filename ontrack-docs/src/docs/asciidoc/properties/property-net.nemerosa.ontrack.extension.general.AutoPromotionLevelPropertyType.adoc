@@ -1,0 +1,15 @@
+[[property-net.nemerosa.ontrack.extension.general.AutoPromotionLevelPropertyType]]
+==== Auto promotion levels
+
+ID: `net.nemerosa.ontrack.extension.general.AutoPromotionLevelPropertyType`
+
+If set, this property allows promotion levels to be created automatically from predefined promotion levels
+
+Scope:
+
+* project
+
+Configuration:
+
+* **isAutoCreate** - Boolean - required - isAutoCreate field
+

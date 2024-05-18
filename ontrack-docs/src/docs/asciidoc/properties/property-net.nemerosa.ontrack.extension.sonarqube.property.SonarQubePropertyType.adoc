@@ -1,0 +1,31 @@
+[[property-net.nemerosa.ontrack.extension.sonarqube.property.SonarQubePropertyType]]
+==== SonarQube
+
+ID: `net.nemerosa.ontrack.extension.sonarqube.property.SonarQubePropertyType`
+
+Association with a SonarQube project.
+
+Scope:
+
+* project
+
+Configuration:
+
+* **branchModel** - Boolean - required - branchModel field
+
+* **branchPattern** - String - optional - branchPattern field
+
+* **configuration** - String - required - Name of the SonarQube configuration
+
+* **key** - String - required - key field
+
+* **measures** - List - required - measures field
+
+* **override** - Boolean - required - override field
+
+* **projectUrl** - String - required - projectUrl field
+
+* **validationMetrics** - Boolean - required - If checked, collected SQ measures will be attached as metrics to the validation.
+
+* **validationStamp** - String - required - validationStamp field
+

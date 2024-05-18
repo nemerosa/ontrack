@@ -1,0 +1,21 @@
+[[property-net.nemerosa.ontrack.extension.jenkins.JenkinsBuildPropertyType]]
+==== Jenkins Build
+
+ID: `net.nemerosa.ontrack.extension.jenkins.JenkinsBuildPropertyType`
+
+Link to a Jenkins Build
+
+Scope:
+
+* build
+* promotion run
+* validation run
+
+Configuration:
+
+* **build** - Int - required - Number of the build
+
+* **configuration** - String - required - Name of the Jenkins configuration
+
+* **job** - String - required - Path to the Jenkins job, relative to root. It may or may not include `/job` URL separators.
+

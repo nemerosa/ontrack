@@ -1,0 +1,15 @@
+[[property-net.nemerosa.ontrack.extension.general.ReleasePropertyType]]
+==== Release
+
+ID: `net.nemerosa.ontrack.extension.general.ReleasePropertyType`
+
+Release indicator on the build.
+
+Scope:
+
+* build
+
+Configuration:
+
+* **name** - String - required - name field
+

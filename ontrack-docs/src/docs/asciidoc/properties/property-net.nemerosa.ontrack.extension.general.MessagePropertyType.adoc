@@ -1,0 +1,23 @@
+[[property-net.nemerosa.ontrack.extension.general.MessagePropertyType]]
+==== Message
+
+ID: `net.nemerosa.ontrack.extension.general.MessagePropertyType`
+
+Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI.
+
+Scope:
+
+* project
+* branch
+* promotion level
+* validation stamp
+* build
+* promotion run
+* validation run
+
+Configuration:
+
+* **text** - String - required - Content of the message
+
+* **type** - ERROR, WARNING, INFO - required - Type of message
+

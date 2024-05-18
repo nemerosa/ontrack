@@ -1,0 +1,25 @@
+[[property-net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType]]
+==== Git branch
+
+ID: `net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType`
+
+Git branch
+
+Scope:
+
+* branch
+
+Configuration:
+
+* **branch** - String - required - branch field
+
+* **buildCommitLink** - Object - optional - buildCommitLink field
+
+** **data** - JSON - optional - Configuration of the service
+
+** **id** - String - required - ID of the service
+
+* **buildTagInterval** - Int - required - buildTagInterval field
+
+* **isOverride** - Boolean - required - isOverride field
+

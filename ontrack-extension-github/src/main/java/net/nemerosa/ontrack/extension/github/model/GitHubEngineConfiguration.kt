@@ -2,6 +2,9 @@ package net.nemerosa.ontrack.extension.github.model
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import net.nemerosa.ontrack.extension.github.app.GitHubApp
+import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.docs.DocumentationIgnore
+import net.nemerosa.ontrack.model.docs.SelfDocumented
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Memo
 import net.nemerosa.ontrack.model.form.Password
@@ -23,6 +26,7 @@ import net.nemerosa.ontrack.model.support.CredentialsConfiguration
  * @property autoMergeToken Token for an account used to approve pull requests for auto approval processes
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@SelfDocumented
 open class GitHubEngineConfiguration(
     override val name: String,
     url: String?,
@@ -38,6 +42,7 @@ open class GitHubEngineConfiguration(
     /**
      * Authentication type
      */
+    @DocumentationIgnore
     val authenticationType: GitHubAuthenticationType
         get() = when {
             !appId.isNullOrBlank() -> GitHubAuthenticationType.APP
@@ -53,8 +58,10 @@ open class GitHubEngineConfiguration(
     /**
      * End point
      */
+    @DocumentationIgnore
     val url: String = if (url.isNullOrBlank()) GITHUB_COM else url
 
+    @DocumentationIgnore
     override val descriptor: ConfigurationDescriptor
         get() = ConfigurationDescriptor(
             name,

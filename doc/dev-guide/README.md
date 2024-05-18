@@ -2,5 +2,9 @@
 
 > WORK IN PROGRESS. JUST GETTING STARTED.
 
-* [Backend](backend/README.md)
-* [UI](ui/README.md)
+* General
+  * [Backend](backend/README.md)
+  * [UI](ui/README.md)
+* Components
+  * [Model](components/core/README.md) - core model of Ontrack
+  * [Properties](components/properties/README.md)

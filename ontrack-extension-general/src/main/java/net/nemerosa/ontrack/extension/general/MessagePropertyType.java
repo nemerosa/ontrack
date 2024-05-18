@@ -38,7 +38,7 @@ public class MessagePropertyType extends AbstractPropertyType<MessageProperty> {
 
     @Override
     public String getDescription() {
-        return "Message.";
+        return "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI.";
     }
 
     @Override

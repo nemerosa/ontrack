@@ -1,0 +1,15 @@
+[[property-net.nemerosa.ontrack.extension.git.branching.BranchingModelPropertyType]]
+==== Branching Model
+
+ID: `net.nemerosa.ontrack.extension.git.branching.BranchingModelPropertyType`
+
+Defines the branching model used by a project
+
+Scope:
+
+* project
+
+Configuration:
+
+* **patterns** - List - required - patterns field
+

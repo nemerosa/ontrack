@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.git.property
 
+import net.nemerosa.ontrack.model.docs.DocumentationField
 import net.nemerosa.ontrack.model.structure.ServiceConfiguration
 
 class GitBranchConfigurationProperty(
@@ -12,6 +13,7 @@ class GitBranchConfigurationProperty(
         /**
          * Build link
          */
+        @DocumentationField
         val buildCommitLink: ServiceConfiguration?,
 
         /**

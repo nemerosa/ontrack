@@ -1,0 +1,60 @@
+[[appendix-properties-index]]
+=== List of properties
+
+* <<property-net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncPropertyType,Artifactory promotion sync>>
+* <<property-net.nemerosa.ontrack.extension.bitbucket.cloud.property.BitbucketCloudProjectConfigurationPropertyType,Bitbucket Cloud configuration>>
+* <<property-net.nemerosa.ontrack.extension.general.AutoPromotionLevelPropertyType,Auto promotion levels>>
+* <<property-net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType,Auto promotion>>
+* <<property-net.nemerosa.ontrack.extension.general.AutoValidationStampPropertyType,Auto validation stamps>>
+* <<property-net.nemerosa.ontrack.extension.general.BuildLinkDisplayPropertyType,Build link display options>>
+* <<property-net.nemerosa.ontrack.extension.general.LinkPropertyType,Links>>
+* <<property-net.nemerosa.ontrack.extension.general.MainBuildLinksProjectPropertyType,Main build links>>
+* <<property-net.nemerosa.ontrack.extension.general.MessagePropertyType,Message>>
+* <<property-net.nemerosa.ontrack.extension.general.MetaInfoPropertyType,Meta information>>
+* <<property-net.nemerosa.ontrack.extension.general.PreviousPromotionConditionPropertyType,Previous promotion condition>>
+* <<property-net.nemerosa.ontrack.extension.general.PromotionDependenciesPropertyType,Promotion dependencies>>
+* <<property-net.nemerosa.ontrack.extension.general.ReleasePropertyType,Release>>
+* <<property-net.nemerosa.ontrack.extension.general.ReleaseValidationPropertyType,Validation on release/label>>
+* <<property-net.nemerosa.ontrack.extension.git.branching.BranchingModelPropertyType,Branching Model>>
+* <<property-net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType,Git branch>>
+* <<property-net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType,Git commit>>
+* <<property-net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationPropertyType,Git configuration>>
+* <<property-net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType,GitHub configuration>>
+* <<property-net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType,GitHub Workflow Run>>
+* <<property-net.nemerosa.ontrack.extension.github.workflow.ValidationRunGitHubWorkflowJobPropertyType,GitHub Workflow Job>>
+* <<property-net.nemerosa.ontrack.extension.gitlab.property.GitLabProjectConfigurationPropertyType,GitLab configuration>>
+* <<property-net.nemerosa.ontrack.extension.jenkins.JenkinsBuildPropertyType,Jenkins Build>>
+* <<property-net.nemerosa.ontrack.extension.jenkins.JenkinsJobPropertyType,Jenkins Job>>
+* <<property-net.nemerosa.ontrack.extension.jira.JIRAFollowLinksPropertyType,JIRA Links to follow>>
+* <<property-net.nemerosa.ontrack.extension.sonarqube.property.SonarQubePropertyType,SonarQube>>
+* <<property-net.nemerosa.ontrack.extension.stale.StalePropertyType,Stale branches>>
+* <<property-net.nemerosa.ontrack.extension.stash.property.StashProjectConfigurationPropertyType,Bitbucket Server configuration>>
+
+include::property-net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncPropertyType.adoc[]
+include::property-net.nemerosa.ontrack.extension.bitbucket.cloud.property.BitbucketCloudProjectConfigurationPropertyType.adoc[]
+include::property-net.nemerosa.ontrack.extension.general.AutoPromotionLevelPropertyType.adoc[]
+include::property-net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType.adoc[]
+include::property-net.nemerosa.ontrack.extension.general.AutoValidationStampPropertyType.adoc[]
+include::property-net.nemerosa.ontrack.extension.general.BuildLinkDisplayPropertyType.adoc[]
+include::property-net.nemerosa.ontrack.extension.general.LinkPropertyType.adoc[]
+include::property-net.nemerosa.ontrack.extension.general.MainBuildLinksProjectPropertyType.adoc[]
+include::property-net.nemerosa.ontrack.extension.general.MessagePropertyType.adoc[]
+include::property-net.nemerosa.ontrack.extension.general.MetaInfoPropertyType.adoc[]
+include::property-net.nemerosa.ontrack.extension.general.PreviousPromotionConditionPropertyType.adoc[]
+include::property-net.nemerosa.ontrack.extension.general.PromotionDependenciesPropertyType.adoc[]
+include::property-net.nemerosa.ontrack.extension.general.ReleasePropertyType.adoc[]
+include::property-net.nemerosa.ontrack.extension.general.ReleaseValidationPropertyType.adoc[]
+include::property-net.nemerosa.ontrack.extension.git.branching.BranchingModelPropertyType.adoc[]
+include::property-net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType.adoc[]
+include::property-net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType.adoc[]
+include::property-net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationPropertyType.adoc[]
+include::property-net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType.adoc[]
+include::property-net.nemerosa.ontrack.extension.github.workflow.BuildGitHubWorkflowRunPropertyType.adoc[]
+include::property-net.nemerosa.ontrack.extension.github.workflow.ValidationRunGitHubWorkflowJobPropertyType.adoc[]
+include::property-net.nemerosa.ontrack.extension.gitlab.property.GitLabProjectConfigurationPropertyType.adoc[]
+include::property-net.nemerosa.ontrack.extension.jenkins.JenkinsBuildPropertyType.adoc[]
+include::property-net.nemerosa.ontrack.extension.jenkins.JenkinsJobPropertyType.adoc[]
+include::property-net.nemerosa.ontrack.extension.jira.JIRAFollowLinksPropertyType.adoc[]
+include::property-net.nemerosa.ontrack.extension.sonarqube.property.SonarQubePropertyType.adoc[]
+include::property-net.nemerosa.ontrack.extension.stale.StalePropertyType.adoc[]
+include::property-net.nemerosa.ontrack.extension.stash.property.StashProjectConfigurationPropertyType.adoc[]

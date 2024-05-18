@@ -1,0 +1,17 @@
+[[property-net.nemerosa.ontrack.extension.general.AutoValidationStampPropertyType]]
+==== Auto validation stamps
+
+ID: `net.nemerosa.ontrack.extension.general.AutoValidationStampPropertyType`
+
+If set, this property allows validation stamps to be created automatically from predefined validation stamps
+
+Scope:
+
+* project
+
+Configuration:
+
+* **autoCreate** - Boolean - required - If true, creates validations from predefined ones
+
+* **autoCreateIfNotPredefined** - Boolean - required - If true, creates validations even if not predefined
+
