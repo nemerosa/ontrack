@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.scm.service
 
+import net.nemerosa.ontrack.extension.scm.changelog.ChangeLogTemplatingCommitsOption
 import net.nemerosa.ontrack.extension.scm.changelog.PromotionChangeLogTemplatingServiceConfig
 
 class PromotionRunChangeLogTemplatingSourceConfig(
@@ -8,12 +9,14 @@ class PromotionRunChangeLogTemplatingSourceConfig(
     title: Boolean = false,
     allQualifiers: Boolean = false,
     defaultQualifierFallback: Boolean = false,
-    acrossBranches: Boolean = true
+    commitsOption: ChangeLogTemplatingCommitsOption = ChangeLogTemplatingCommitsOption.NONE,
+    acrossBranches: Boolean = true,
 ) : PromotionChangeLogTemplatingServiceConfig(
     empty,
     dependencies,
     title,
     allQualifiers,
     defaultQualifierFallback,
-    acrossBranches
+    commitsOption,
+    acrossBranches,
 )

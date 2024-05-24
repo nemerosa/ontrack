@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.scm.mock
 
 import net.nemerosa.ontrack.common.RunProfile
-import net.nemerosa.ontrack.common.generateRandomString
 import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest
 import net.nemerosa.ontrack.extension.issues.IssueServiceExtension
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
@@ -20,9 +19,10 @@ import net.nemerosa.ontrack.extension.scm.service.SCMPullRequest
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.extension.ExtensionFeature
 import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.support.LegacyRegexMessageAnnotator
 import net.nemerosa.ontrack.model.support.MessageAnnotation.Companion.of
 import net.nemerosa.ontrack.model.support.MessageAnnotator
-import net.nemerosa.ontrack.model.support.LegacyRegexMessageAnnotator
+import org.apache.commons.codec.digest.DigestUtils
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 import java.util.concurrent.atomic.AtomicLong
@@ -82,6 +82,12 @@ class MockSCMExtension(
             issues[key] = MockIssue(name, key, message, types = types.toSet())
         }
 
+        /**
+         * Registers a commit.
+         *
+         * @param scmBranch Branch where to generate the commit
+         * @param message Commit message
+         */
         fun registerCommit(scmBranch: String, message: String): String {
             val branch = branches.find { it.name == scmBranch } ?: branches.run {
                 val newBranch = MockBranch(scmBranch)
@@ -94,8 +100,8 @@ class MockSCMExtension(
                 "-"
             )
             val prefix = "$normalizedBranchName-$indexOnBranch"
-            val randomPart = generateRandomString(7)
-            val id = "$prefix-$randomPart"
+            val digest = DigestUtils.sha1Hex(prefix).take(7)
+            val id = "$prefix-$digest"
             branch.commits += MockCommit(
                 repository = name,
                 revision = revisionCount.incrementAndGet(),

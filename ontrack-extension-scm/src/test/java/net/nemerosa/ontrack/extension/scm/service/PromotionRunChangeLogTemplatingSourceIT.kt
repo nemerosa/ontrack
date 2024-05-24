@@ -61,6 +61,53 @@ class PromotionRunChangeLogTemplatingSourceIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    fun `Getting a plain text change log in a template with optional commits`() {
+        doTestRendering(
+            renderer = PlainEventRenderer.INSTANCE,
+            template = """
+                Version ${'$'}{project} ${'$'}{build} has been released.
+                
+                ${'$'}{promotionRun.changelog?commitsOption=OPTIONAL}
+            """.trimIndent(),
+        ) { _, run, _ ->
+            """
+                Version ${run.project.name} ${run.build.name} has been released.
+                
+                * ISS-21 Some new feature
+                * ISS-22 Some fixes are needed
+                * ISS-23 Some nicer UI
+            """.trimIndent()
+        }
+    }
+
+    @Test
+    fun `Getting a plain text change log in a template with always commits`() {
+        doTestRendering(
+            renderer = PlainEventRenderer.INSTANCE,
+            template = """
+                Version ${'$'}{project} ${'$'}{build} has been released.
+                
+                ${'$'}{promotionRun.changelog?commitsOption=ALWAYS}
+            """.trimIndent(),
+        ) { _, run, _ ->
+            """
+                Version ${run.project.name} ${run.build.name} has been released.
+                
+                * ISS-21 Some new feature
+                * ISS-22 Some fixes are needed
+                * ISS-23 Some nicer UI
+                
+                Commits:
+                
+                * main-5-543d857 ISS-23 Fixing some CSS
+                * main-4-dacf415 ISS-22 Fixing some bugs
+                * main-3-a847748 ISS-21 Some fixes for a feature
+                * main-2-dfbccd9 ISS-21 Some commits for a feature
+            """.trimIndent()
+        }
+    }
+
+    @Test
     fun `Getting a HTML change log in a template`() {
         doTestRendering(
             renderer = htmlNotificationEventRenderer,

@@ -13,6 +13,8 @@ open class ChangeLogTemplatingServiceConfig(
     val allQualifiers: Boolean = false,
     @APIDescription("If a qualifier has no previous link, uses the default qualifier (empty) qualifier.")
     val defaultQualifierFallback: Boolean = false,
+    @APIDescription("Defines how to render commits for a change log")
+    val commitsOption: ChangeLogTemplatingCommitsOption = ChangeLogTemplatingCommitsOption.NONE,
 ) {
     companion object {
         fun emptyValue(configMap: Map<String, String>) =

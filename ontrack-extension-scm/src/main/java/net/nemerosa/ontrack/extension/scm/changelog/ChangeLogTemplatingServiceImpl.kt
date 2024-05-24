@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.scm.changelog
 
 import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.model.events.EventRenderer
+import net.nemerosa.ontrack.model.events.renderWithSpace
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.EntityDisplayNameService
 import net.nemerosa.ontrack.model.structure.StructureService
@@ -39,19 +40,33 @@ class ChangeLogTemplatingServiceImpl(
             false
         )
 
+        val commitsOption = configMap[ChangeLogTemplatingServiceConfig::commitsOption.name]
+            ?.let { ChangeLogTemplatingCommitsOption.valueOf(it) }
+            ?: ChangeLogTemplatingCommitsOption.NONE
+
         return if (allQualifiers && dependencies.isNotEmpty()) {
             renderAllQualifiers(
-                fromBuild,
-                toBuild,
-                dependencies,
-                defaultQualifierFallback,
-                renderer,
-                empty,
-                title
+                fromBuild = fromBuild,
+                toBuild = toBuild,
+                dependencies = dependencies,
+                defaultQualifierFallback = defaultQualifierFallback,
+                renderer = renderer,
+                empty = empty,
+                title = title,
+                commitsOption = commitsOption
             )
         } else {
             // Single change log
-            renderChangeLog(fromBuild, toBuild, dependencies, defaultQualifierFallback, renderer, empty, title)
+            renderChangeLog(
+                fromBuild = fromBuild,
+                toBuild = toBuild,
+                dependencies = dependencies,
+                defaultQualifierFallback = defaultQualifierFallback,
+                renderer = renderer,
+                empty = empty,
+                title = title,
+                commitsOption = commitsOption,
+            )
         }
     }
 
@@ -63,6 +78,7 @@ class ChangeLogTemplatingServiceImpl(
         renderer: EventRenderer,
         empty: String,
         title: Boolean,
+        commitsOption: ChangeLogTemplatingCommitsOption,
     ): String {
         // Gets the change log boundaries but for the last dependency
         val parsedDependencies = dependencies.map { DependencyLink.parse(it) }
@@ -116,7 +132,8 @@ class ChangeLogTemplatingServiceImpl(
                         ""
                     } else {
                         " [$qualifier]"
-                    }
+                    },
+                    commitsOption = commitsOption,
                 )
             }
     }
@@ -144,7 +161,8 @@ class ChangeLogTemplatingServiceImpl(
         defaultQualifierFallback: Boolean,
         renderer: EventRenderer,
         empty: String,
-        title: Boolean
+        title: Boolean,
+        commitsOption: ChangeLogTemplatingCommitsOption,
     ): String {
         // ... getting the change log, recursively or not
         val changeLog = runBlocking {
@@ -155,7 +173,7 @@ class ChangeLogTemplatingServiceImpl(
                 defaultQualifierFallback,
             )
         }
-        return renderChangeLog(changeLog, renderer, empty, title)
+        return renderChangeLog(changeLog, renderer, empty, title, commitsOption = commitsOption)
     }
 
     private fun renderChangeLog(
@@ -164,13 +182,15 @@ class ChangeLogTemplatingServiceImpl(
         empty: String,
         title: Boolean,
         projectNameSuffix: String = "",
+        commitsOption: ChangeLogTemplatingCommitsOption,
     ): String {
         // Rendered change log
         val renderedChangeLog = changeLog
             ?.takeIf { it.from.id() != it.to.id() }
             ?.let { scmChangeLog ->
-                renderChangeLog(
+                renderChangeLogItems(
                     changeLog = scmChangeLog,
+                    commitsOption = commitsOption,
                     renderer = renderer
                 )
             } ?: empty
@@ -207,17 +227,76 @@ class ChangeLogTemplatingServiceImpl(
         }
     }
 
-    private fun renderChangeLog(changeLog: SCMChangeLog, renderer: EventRenderer): String {
-        return renderer.renderList(
-            changeLog.issues?.issues?.map { issue ->
-                val link = renderer.renderLink(
-                    text = issue.displayKey,
-                    href = issue.url,
-                )
-                val text = issue.summary
-                "$link $text"
-            } ?: emptyList()
-        )
+    private fun renderChangeLogItems(
+        changeLog: SCMChangeLog,
+        commitsOption: ChangeLogTemplatingCommitsOption,
+        renderer: EventRenderer,
+    ): String {
+        // Issues
+        val hasIssues = changeLog.issues?.issues != null && changeLog.issues.issues.isNotEmpty()
+        val issues: String by lazy { renderChangeLogIssues(renderer, changeLog) }
+        // Commits
+        val hasCommits = changeLog.commits.isNotEmpty()
+        val commits: String by lazy { renderChangeLogCommits(changeLog, commitsOption, renderer) }
+        // Everything together
+        return if (hasIssues) {
+            if (hasCommits) {
+                renderer.renderWithSpace(issues, "Commits:", commits)
+            } else {
+                issues
+            }
+        } else if (hasCommits) {
+            commits
+        } else {
+            ""
+        }
     }
+
+    private fun renderChangeLogCommits(
+        changeLog: SCMChangeLog,
+        commitsOption: ChangeLogTemplatingCommitsOption,
+        renderer: EventRenderer
+    ): String =
+        when (commitsOption) {
+            ChangeLogTemplatingCommitsOption.NONE -> ""
+            ChangeLogTemplatingCommitsOption.OPTIONAL -> if (changeLog.issues?.issues?.isEmpty() == true) {
+                renderChangeLogCommits(changeLog, renderer)
+            } else {
+                ""
+            }
+
+            ChangeLogTemplatingCommitsOption.ALWAYS -> renderChangeLogCommits(changeLog, renderer)
+        }
+
+    private fun renderChangeLogCommits(
+        changeLog: SCMChangeLog,
+        renderer: EventRenderer
+    ): String = renderer.renderList(
+        changeLog.commits.map { commit ->
+            renderChangeLogCommit(commit.commit, renderer)
+        }
+    )
+
+    private fun renderChangeLogCommit(commit: SCMCommit, renderer: EventRenderer): String {
+        val link = renderer.renderLink(
+            text = commit.shortId,
+            href = commit.link,
+        )
+        return "$link ${commit.message}"
+    }
+
+    private fun renderChangeLogIssues(
+        renderer: EventRenderer,
+        changeLog: SCMChangeLog
+    ) = renderer.renderList(
+        changeLog.issues?.issues?.map { issue ->
+            val link = renderer.renderLink(
+                text = issue.displayKey,
+                href = issue.url,
+            )
+            val text = issue.summary
+            "$link $text"
+        } ?: emptyList()
+    )
 
 }
