@@ -222,7 +222,7 @@ class PropertiesGraphQLIT : AbstractQLKTITJUnit4Support() {
                         "net.nemerosa.ontrack.extension.general.MessagePropertyType",
                         property.path("typeName").asText())
                     assertEquals("Message", property.path("name").asText())
-                    assertEquals("Message.", property.path("description").asText())
+                    assertEquals("Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI.", property.path("description").asText())
                     assertEquals(
                         ProjectEntityType.values().map { it.name }.toSet(),
                         property.path("supportedEntityTypes").map { it.asText() }.toSet()
@@ -272,7 +272,7 @@ class PropertiesGraphQLIT : AbstractQLKTITJUnit4Support() {
                     "net.nemerosa.ontrack.extension.general.MessagePropertyType",
                     property.path("typeName").asText())
                 assertEquals("Message", property.path("name").asText())
-                assertEquals("Message.", property.path("description").asText())
+                assertEquals("Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI.", property.path("description").asText())
                 assertEquals(
                     ProjectEntityType.values().map { it.name }.toSet(),
                     property.path("supportedEntityTypes").map { it.asText() }.toSet()
