@@ -234,39 +234,22 @@ class ChangeLogTemplatingServiceImpl(
     ): String {
         // Issues
         val hasIssues = changeLog.issues?.issues != null && changeLog.issues.issues.isNotEmpty()
-        val issues: String by lazy { renderChangeLogIssues(renderer, changeLog) }
+        val issues = renderChangeLogIssues(renderer, changeLog)
         // Commits
-        val hasCommits = changeLog.commits.isNotEmpty()
-        val commits: String by lazy { renderChangeLogCommits(changeLog, commitsOption, renderer) }
+        val commits: String by lazy { renderChangeLogCommits(changeLog, renderer) }
         // Everything together
-        return if (hasIssues) {
-            if (hasCommits) {
-                renderer.renderWithSpace(issues, "Commits:", commits)
-            } else {
+        return when (commitsOption) {
+            ChangeLogTemplatingCommitsOption.NONE -> issues
+            ChangeLogTemplatingCommitsOption.OPTIONAL -> if (hasIssues) {
                 issues
+            } else {
+                commits
             }
-        } else if (hasCommits) {
-            commits
-        } else {
-            ""
+
+            ChangeLogTemplatingCommitsOption.ALWAYS ->
+                renderer.renderWithSpace(issues, "Commits:", commits)
         }
     }
-
-    private fun renderChangeLogCommits(
-        changeLog: SCMChangeLog,
-        commitsOption: ChangeLogTemplatingCommitsOption,
-        renderer: EventRenderer
-    ): String =
-        when (commitsOption) {
-            ChangeLogTemplatingCommitsOption.NONE -> ""
-            ChangeLogTemplatingCommitsOption.OPTIONAL -> if (changeLog.issues?.issues?.isEmpty() == true) {
-                renderChangeLogCommits(changeLog, renderer)
-            } else {
-                ""
-            }
-
-            ChangeLogTemplatingCommitsOption.ALWAYS -> renderChangeLogCommits(changeLog, renderer)
-        }
 
     private fun renderChangeLogCommits(
         changeLog: SCMChangeLog,
