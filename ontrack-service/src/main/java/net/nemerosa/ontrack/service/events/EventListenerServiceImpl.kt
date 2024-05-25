@@ -1,28 +1,23 @@
-package net.nemerosa.ontrack.service.events;
+package net.nemerosa.ontrack.service.events
 
-import net.nemerosa.ontrack.model.events.Event;
-import net.nemerosa.ontrack.model.events.EventListener;
-import net.nemerosa.ontrack.model.events.EventListenerService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Service;
-
-import java.util.Collection;
+import net.nemerosa.ontrack.model.events.Event
+import net.nemerosa.ontrack.model.events.EventListener
+import net.nemerosa.ontrack.model.events.EventListenerService
+import org.springframework.context.ApplicationContext
+import org.springframework.stereotype.Service
 
 @Service
-public class EventListenerServiceImpl implements EventListenerService {
+class EventListenerServiceImpl(
+    private val context: ApplicationContext,
+) : EventListenerService {
 
-    private final ApplicationContext context;
-
-    @Autowired
-    public EventListenerServiceImpl(ApplicationContext context) {
-        this.context = context;
+    private val listeners: Collection<EventListener> by lazy {
+        context.getBeansOfType(
+            EventListener::class.java
+        ).values
     }
 
-    @Override
-    public void onEvent(Event event) {
-        Collection<EventListener> listeners = context.getBeansOfType(EventListener.class).values();
-        listeners.forEach(listener -> listener.onEvent(event));
+    override fun onEvent(event: Event) {
+        listeners.forEach { it.onEvent(event) }
     }
-
 }
