@@ -106,6 +106,10 @@ Connector metrics have the following tags:
 * `type` - type of connector (like `jenkins`, `jira`, ...)
 ====
 
+Information about the execution times of event listeners:
+
+* `ontrack_event_listener_time` (timer) - duration for the synchronous processing of an event on the backend. The `eventListener` tag contains the FQCN of the event listener service.
+
 Information about the connectivity of remote Git operations:
 
 * `ontrack_git_connect_retries` - Number of retries on connection errors
