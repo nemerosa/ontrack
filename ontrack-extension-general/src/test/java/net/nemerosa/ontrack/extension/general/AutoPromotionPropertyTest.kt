@@ -6,8 +6,8 @@ import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.ValidationStamp
 import net.nemerosa.ontrack.model.structure.*
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -15,7 +15,7 @@ class AutoPromotionPropertyTest {
 
     private lateinit var branch: Branch
 
-    @Before
+    @BeforeEach
     fun setup() {
         branch = Branch.of(
                 Project.of(nd("P", "")).withId(ID.of(1)),

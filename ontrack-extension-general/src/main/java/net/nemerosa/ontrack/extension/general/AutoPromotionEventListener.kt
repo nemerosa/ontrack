@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component
 @Component
 class AutoPromotionEventListener(
     private val structureService: StructureService,
+    private val promotionRunService: PromotionRunService,
     private val propertyService: PropertyService,
     private val securityService: SecurityService
 ) : EventListener {
@@ -146,24 +147,21 @@ class AutoPromotionEventListener(
         promotionLevels: List<PromotionLevel>,
         validationStamps: List<ValidationStamp>
     ) {
-        val oProperty = propertyService.getProperty(promotionLevel, AutoPromotionPropertyType::class.java).option()
-        if (oProperty.isPresent) {
-            val property = oProperty.get()
+        val property = propertyService.getPropertyValue(promotionLevel, AutoPromotionPropertyType::class.java)
+        if (property != null) {
             // Checks if the property is eligible
             if (property.isEmpty()) {
                 return
             }
             // Check to be done only if the promotion level is not attributed yet
-            val runs = structureService.getPromotionRunsForBuildAndPromotionLevel(build, promotionLevel)
-            if (runs.isEmpty()) {
+            val isPromoted = promotionRunService.isBuildPromoted(build, promotionLevel)
+            if (!isPromoted) {
                 // Checks the status of each validation stamp
                 val allVSPassed =
-                    validationStamps // Keeps only the ones selectable for the autopromotion property
-                        .filter { vs: ValidationStamp? ->
-                            property.contains(
-                                vs!!
-                            )
-                        } // They must all pass
+                    validationStamps
+                        // Keeps only the ones selectable for the autopromotion property
+                        .filter { vs -> property.contains(vs) }
+                        // They must all pass
                         .all { validationStamp: ValidationStamp ->
                             isValidationStampPassed(
                                 build,
@@ -172,13 +170,11 @@ class AutoPromotionEventListener(
                         }
                 // Checks that all needed promotions are granted
                 val allPLPassed =
-                    promotionLevels // Keeps only the ones selectable for the autopromotion property
-                        .filter { pl: PromotionLevel? ->
-                            property.contains(
-                                pl!!
-                            )
-                        } // They must all be granted
-                        .all { pl: PromotionLevel -> isPromotionLevelGranted(build, pl) }
+                    promotionLevels
+                        // Keeps only the ones selectable for the autopromotion property
+                        .filter { pl -> property.contains(pl) }
+                        // They must all be granted
+                        .all { pl: PromotionLevel -> promotionRunService.isBuildPromoted(build, pl) }
                 // Promotion is needed
                 if (allVSPassed && allPLPassed) {
                     // Promotes
@@ -217,8 +213,4 @@ class AutoPromotionEventListener(
         }
     }
 
-    private fun isPromotionLevelGranted(build: Build, promotionLevel: PromotionLevel): Boolean {
-        val runs = structureService.getPromotionRunsForBuildAndPromotionLevel(build, promotionLevel)
-        return !runs.isEmpty()
-    }
 }

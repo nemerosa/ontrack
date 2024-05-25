@@ -5,9 +5,7 @@ import net.nemerosa.ontrack.model.structure.PromotionRunService
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
+import kotlin.test.*
 
 class PromotionRunServiceIT : AbstractDSLTestSupport() {
 
@@ -73,6 +71,22 @@ class PromotionRunServiceIT : AbstractDSLTestSupport() {
                         )
                     }
                 }
+            }
+        }
+    }
+
+    @Test
+    fun `Checking if a build is promoted`() {
+        project {
+            branch {
+                val pl = promotionLevel()
+                val build1 = build()
+                val build2 = build {
+                    promote(pl)
+                }
+
+                assertFalse(promotionRunService.isBuildPromoted(build1, pl), "Build is not promoted")
+                assertTrue(promotionRunService.isBuildPromoted(build2, pl), "Build is promoted")
             }
         }
     }

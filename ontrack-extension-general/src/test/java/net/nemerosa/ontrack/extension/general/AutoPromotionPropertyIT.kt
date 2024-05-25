@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.general
 
-import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.form.MultiSelection
 import net.nemerosa.ontrack.model.security.ProjectEdit
@@ -9,13 +9,13 @@ import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.CopyService
 import net.nemerosa.ontrack.model.structure.PromotionLevel
 import net.nemerosa.ontrack.test.TestUtils
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-class AutoPromotionPropertyIT : AbstractDSLTestJUnit4Support() {
+class AutoPromotionPropertyIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var copyService: CopyService

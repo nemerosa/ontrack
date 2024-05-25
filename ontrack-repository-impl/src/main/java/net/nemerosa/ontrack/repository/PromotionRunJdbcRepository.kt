@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.repository
 
+import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.Project
+import net.nemerosa.ontrack.model.structure.PromotionLevel
 import net.nemerosa.ontrack.model.structure.PromotionRun
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.springframework.stereotype.Repository
@@ -47,4 +49,20 @@ class PromotionRunJdbcRepository(
         ) { rs: ResultSet, _ ->
             toPromotionRun(rs)
         }.firstOrNull()
+
+    override fun isBuildPromoted(build: Build, promotionLevel: PromotionLevel): Boolean {
+        return namedParameterJdbcTemplate!!.queryForList(
+            """
+                SELECT ID
+                FROM PROMOTION_RUNS
+                WHERE BUILDID = :buildId
+                AND PROMOTIONLEVELID = :promotionLevelId
+            """,
+            mapOf(
+                "buildId" to build.id(),
+                "promotionLevelId" to promotionLevel.id(),
+            ),
+            Int::class.java
+        ).isNotEmpty()
+    }
 }

@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.extension.general
 
-import net.nemerosa.ontrack.graphql.AbstractQLKTITJUnit4Support
-import org.junit.Test
+import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class AutoPromotionPropertyMutationProviderIT : AbstractQLKTITJUnit4Support() {
+class AutoPromotionPropertyMutationProviderIT : AbstractQLKTITSupport() {
 
     @Test
     fun `Setting auto promotion by ID`() {

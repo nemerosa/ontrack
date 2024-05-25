@@ -8,5 +8,10 @@ interface PromotionRunService {
      */
     fun getLastPromotionRunForProject(project: Project, promotionName: String): PromotionRun?
 
+    /**
+     * Checks if the given [build] is promoted or not to the given [promotion level][promotionLevel].
+     */
+    fun isBuildPromoted(build: Build, promotionLevel: PromotionLevel): Boolean
+
 
 }
