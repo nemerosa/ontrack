@@ -207,8 +207,10 @@ class BitbucketServerSCMExtension(
                 entityType = ProjectEntityType.BUILD,
                 propertyType = GitCommitPropertyType::class,
                 searchArguments = GitCommitPropertyType.getGitCommitSearchArguments(id)
-            ).firstOrNull()?.let { buildId ->
+            ).map { buildId ->
                 structureService.getBuild(buildId)
+            }.firstOrNull { build ->
+                build.project.id == project.id
             }
 
         private fun waitAndMerge(prId: Int, from: String, message: String): Boolean {

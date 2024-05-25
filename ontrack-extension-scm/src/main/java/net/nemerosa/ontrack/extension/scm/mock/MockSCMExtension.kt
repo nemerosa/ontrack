@@ -346,8 +346,10 @@ class MockSCMExtension(
                 entityType = ProjectEntityType.BUILD,
                 propertyType = MockSCMBuildCommitPropertyType::class,
                 searchArguments = MockSCMBuildCommitProperty.getSearchArguments(id)
-            ).firstOrNull()?.let { buildId ->
+            ).map { buildId ->
                 structureService.getBuild(buildId)
+            }.firstOrNull { build ->
+                build.project.id == project.id
             }
     }
 
