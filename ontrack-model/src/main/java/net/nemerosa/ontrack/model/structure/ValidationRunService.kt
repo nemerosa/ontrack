@@ -16,4 +16,12 @@ interface ValidationRunService {
         data: ValidationRunData<*>?,
     ): ValidationRun
 
+    /**
+     * Checks if the last run for the given [build] and [validation stamp][validationStamp], if
+     * it exists, is passed or not.
+     *
+     * If there was no run at all or the last one is not passed, the function returns `false`.
+     */
+    fun isValidationRunPassed(build: Build, validationStamp: ValidationStamp): Boolean
+
 }

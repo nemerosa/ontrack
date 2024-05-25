@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component
 class AutoPromotionEventListener(
     private val structureService: StructureService,
     private val promotionRunService: PromotionRunService,
+    private val validationRunService: ValidationRunService,
     private val propertyService: PropertyService,
     private val securityService: SecurityService
 ) : EventListener {
@@ -196,21 +197,7 @@ class AutoPromotionEventListener(
         }
     }
 
-    private fun isValidationStampPassed(build: Build, validationStamp: ValidationStamp): Boolean {
-        val runs = structureService.getValidationRunsForBuildAndValidationStamp(
-            build.id,
-            validationStamp.id,
-            0,
-            1,
-            null,
-            null
-        )
-        if (runs.isEmpty()) {
-            return false
-        } else {
-            val run = runs[0]
-            return run.lastStatus.statusID == ValidationRunStatusID.STATUS_PASSED
-        }
-    }
+    private fun isValidationStampPassed(build: Build, validationStamp: ValidationStamp): Boolean =
+        validationRunService.isValidationRunPassed(build, validationStamp)
 
 }

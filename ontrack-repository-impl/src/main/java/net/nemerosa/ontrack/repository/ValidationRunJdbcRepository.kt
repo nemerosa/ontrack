@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.repository
 
-import net.nemerosa.ontrack.model.structure.ValidationRun
-import net.nemerosa.ontrack.model.structure.ValidationRunData
+import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.springframework.stereotype.Repository
 import javax.sql.DataSource
@@ -33,6 +32,25 @@ class ValidationRunJdbcRepository(
             )
         }
         return run.withData(data)
+    }
+
+    override fun isValidationRunPassed(build: Build, validationStamp: ValidationStamp): Boolean {
+        return namedParameterJdbcTemplate!!.queryForList(
+            """
+                    SELECT VRS.VALIDATIONRUNSTATUSID
+                    FROM VALIDATION_RUNS VR
+                    INNER JOIN VALIDATION_RUN_STATUSES VRS ON VRS.ID = (SELECT VRST.ID FROM VALIDATION_RUN_STATUSES VRST WHERE VRST.VALIDATIONRUNID = VR.ID ORDER BY VRST.ID DESC LIMIT 1) 
+                    WHERE VR.BUILDID = :buildId
+                    AND VR.VALIDATIONSTAMPID = :validationStampId
+                    ORDER BY VR.ID DESC
+                    LIMIT 1
+            """,
+            mapOf(
+                "buildId" to build.id(),
+                "validationStampId" to validationStamp.id(),
+            ),
+            String::class.java
+        ).firstOrNull() == ValidationRunStatusID.PASSED
     }
 
 }
