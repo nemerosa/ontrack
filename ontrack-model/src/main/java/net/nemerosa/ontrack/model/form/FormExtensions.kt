@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.model.form
 
 import net.nemerosa.ontrack.model.annotations.getPropertyDescription
 import net.nemerosa.ontrack.model.annotations.getPropertyLabel
+import java.time.LocalDateTime
 import kotlin.reflect.KProperty1
 
 fun <T> Form.textField(
@@ -96,6 +97,18 @@ fun Form.multiStrings(
 ): Form =
     with(
         MultiStrings.of(property.name)
+            .label(getPropertyLabel(property))
+            .help(getPropertyDescription(property))
+            .optional(property.returnType.isMarkedNullable)
+            .value(value)
+    )
+
+/**
+ * Date/time field
+ */
+fun Form.dateTime(property: KProperty1<*, LocalDateTime?>, value: LocalDateTime?): Form =
+    with(
+        DateTime.of(property.name)
             .label(getPropertyLabel(property))
             .help(getPropertyDescription(property))
             .optional(property.returnType.isMarkedNullable)

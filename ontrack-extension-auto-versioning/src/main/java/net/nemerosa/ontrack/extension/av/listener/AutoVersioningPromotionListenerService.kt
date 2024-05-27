@@ -1,8 +1,7 @@
 package net.nemerosa.ontrack.extension.av.listener
 
 import net.nemerosa.ontrack.extension.av.model.AutoVersioningConfiguredBranches
-import net.nemerosa.ontrack.model.structure.Build
-import net.nemerosa.ontrack.model.structure.PromotionLevel
+import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.PromotionRun
 
 /**
@@ -15,4 +14,9 @@ interface AutoVersioningPromotionListenerService {
      * @return Null if no auto versioning can be performed
      */
     fun getConfiguredBranches(promotionRun: PromotionRun): AutoVersioningConfiguredBranches?
+
+    /**
+     * Checks if a branch auto-versioning is valid according to its project's rules
+     */
+    fun acceptBranchWithProjectAVRules(branch: Branch): Boolean
 }

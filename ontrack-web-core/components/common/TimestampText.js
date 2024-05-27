@@ -13,6 +13,7 @@ export default function TimestampText({
                                           prefix = '',
                                           suffix = '',
                                           format = "YYYY MMM DD, HH:mm",
+                                          empty = '',
                                       }) {
 
     if (value) {
@@ -26,6 +27,6 @@ export default function TimestampText({
             </>
         )
     } else {
-        return ''
+        return empty
     }
 }
