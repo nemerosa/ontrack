@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.common
 
+import org.slf4j.Logger
 import java.util.*
 import kotlin.reflect.KCallable
 
@@ -47,4 +48,18 @@ fun <T> T.runIf(condition: Boolean, code: T.() -> T) = if (condition) {
     code(this)
 } else {
     this
+}
+
+/**
+ * Debugging times
+ */
+fun <T> Logger.logTime(
+    message: String,
+    code: () -> T
+): T {
+    val start = System.currentTimeMillis()
+    val result = code()
+    val timeMs = System.currentTimeMillis() - start
+    debug("{}: {}ms", message, timeMs)
+    return result
 }
