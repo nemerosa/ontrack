@@ -25,10 +25,12 @@ class RegexBranchSource(
         return structureService.getBranchesForProject(project.id)
             // ... filters them by regex, using their path
             .filter { sourceBranch ->
-                // Path of the branch
-                val sourcePath = branchDisplayNameService.getBranchDisplayName(sourceBranch)
-                // Match check
-                sourceRegex.matches(sourcePath) || sourceRegex.matches(sourceBranch.name)
+                // First on the technical build name, then on the SCM branch name (more costly)
+                sourceRegex.matches(sourceBranch.name) || sourceRegex.matches(
+                    branchDisplayNameService.getBranchDisplayName(
+                        sourceBranch
+                    )
+                )
             }
             // ... order them by version
             .minWithOrNull(versionComparator)
