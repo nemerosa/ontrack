@@ -5,20 +5,22 @@ import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationServi
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfiguredBranch
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.extension.av.model.AutoVersioningConfiguredBranches
+import net.nemerosa.ontrack.extension.av.project.AutoVersioningProjectPropertyType
 import net.nemerosa.ontrack.extension.scm.service.SCMDetector
-import net.nemerosa.ontrack.model.structure.Branch
-import net.nemerosa.ontrack.model.structure.Project
-import net.nemerosa.ontrack.model.structure.PromotionRun
+import net.nemerosa.ontrack.model.structure.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import kotlin.jvm.optionals.getOrNull
 
 @Service
 @Transactional
 class AutoVersioningPromotionListenerServiceImpl(
     private val autoVersioningConfigurationService: AutoVersioningConfigurationService,
     private val scmDetector: SCMDetector,
+    private val propertyService: PropertyService,
+    private val structureService: StructureService,
 ) : AutoVersioningPromotionListenerService {
 
     private val logger: Logger = LoggerFactory.getLogger(AutoVersioningPromotionListenerServiceImpl::class.java)
@@ -54,15 +56,21 @@ class AutoVersioningPromotionListenerServiceImpl(
             // Gets the auto versioning configuration for the branch
             val config = autoVersioningConfigurationService.getAutoVersioning(branch)
             if (config != null) {
-                // If present, gets its configurations
-                val autoVersioningConfigurations = config.configurations
-                    // Filters the configurations based on the event
-                    .filter { configuration -> promotionRun.match(branch, configuration, cache) }
-                    // Removes any empty setup
-                    .takeIf { configurations -> configurations.isNotEmpty() }
-                // Accepting the branch based on having at least one matching configuration
-                return autoVersioningConfigurations?.let { list ->
-                    AutoVersioningConfiguredBranch(branch, list)
+                // Target branch configured for auto-versioning, we still need to check the rules at the project level
+                if (acceptBranchWithProjectAVRules(branch)) {
+                    // If present, gets its configurations
+                    val autoVersioningConfigurations = config.configurations
+                        // Filters the configurations based on the event
+                        .filter { configuration -> promotionRun.match(branch, configuration, cache) }
+                        // Removes any empty setup
+                        .takeIf { configurations -> configurations.isNotEmpty() }
+                    // Accepting the branch based on having at least one matching configuration
+                    return autoVersioningConfigurations?.let { list ->
+                        AutoVersioningConfiguredBranch(branch, list)
+                    }
+                } else {
+                    // Not accepted by the project
+                    return null
                 }
             }
             // No auto versioning property for this branch
@@ -76,6 +84,33 @@ class AutoVersioningPromotionListenerServiceImpl(
             // No supported SCM configured at project level
             return null
         }
+    }
+
+    override fun acceptBranchWithProjectAVRules(branch: Branch): Boolean {
+        // Gets the auto-versioning property at project level
+        val property = propertyService.getPropertyValue(branch.project, AutoVersioningProjectPropertyType::class.java)
+            ?: return true // No rules ==> accepting by default
+        // Branch inclusions
+        val includes = property.branchIncludes.isNullOrEmpty() || property.branchIncludes.any { pattern ->
+            branch.name.matches(pattern.toRegex())
+        }
+        if (!includes) return false // Rejected by the inclusion rule
+        // Branch exclusions
+        val excludes = !property.branchExcludes.isNullOrEmpty() && property.branchExcludes.any { pattern ->
+            branch.name.matches(pattern.toRegex())
+        }
+        if (excludes) return false // Rejected by the exclusion rule
+        // Last activity date rule
+        if (property.lastActivityDate != null) {
+            // Gets the last activity of the branch
+            val lastBranchActivityDate = structureService.getLastBuild(branch.id).getOrNull()?.signature?.time
+            if (lastBranchActivityDate != null) {
+                // To be valid for AV, the branch activity date must be posterior to the threshold date
+                return lastBranchActivityDate > property.lastActivityDate
+            }
+        }
+        // OK, no rule matching
+        return true
     }
 
     private fun PromotionRun.match(

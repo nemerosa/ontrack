@@ -143,23 +143,24 @@ angular.module('ot.service.form', [
          * Prepares a form before being submitted
          */
         self.prepareForSubmit = function (form, data) {
-            var date;
             // Processing before submit
             angular.forEach(form.fields, function (field) {
                 // Date-time handling
-                if (field.type == 'dateTime') {
-                    date = data.dates[field.name];
-                    var time = data.times[field.name];
-                    var dateTime = date;
-                    dateTime.setHours(time.getHours());
-                    dateTime.setMinutes(time.getMinutes());
-                    dateTime.setSeconds(0);
-                    dateTime.setMilliseconds(0);
+                if (field.type === 'dateTime') {
+                    const date = data.dates[field.name];
+                    const time = data.times[field.name];
+                    const dateTime = date;
+                    if (dateTime) {
+                        dateTime.setHours(time.getHours());
+                        dateTime.setMinutes(time.getMinutes());
+                        dateTime.setSeconds(0);
+                        dateTime.setMilliseconds(0);
+                    }
                     data[field.name] = dateTime;
                 }
                 // Date handling
-                else if (field.type == 'date') {
-                    date = data.dates[field.name];
+                else if (field.type === 'date') {
+                    const date = data.dates[field.name];
                     if (date) {
                         data[field.name] = $filter('date')(date, 'yyyy-MM-dd');
                     } else {
@@ -167,7 +168,7 @@ angular.module('ot.service.form', [
                     }
                 }
                 // Multi-selection
-                else if (field.type == 'multi-selection') {
+                else if (field.type === 'multi-selection') {
                     data[field.name] = field.items
                         .filter(function (item) {
                             return item.selected;

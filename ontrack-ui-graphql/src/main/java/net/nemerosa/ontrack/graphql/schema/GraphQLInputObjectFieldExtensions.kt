@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode
 import graphql.Scalars.*
 import graphql.schema.*
 import net.nemerosa.ontrack.graphql.support.GQLScalarJSON
+import net.nemerosa.ontrack.graphql.support.GQLScalarLocalDateTime
 import net.nemerosa.ontrack.graphql.support.nullableInputType
 import net.nemerosa.ontrack.model.annotations.getPropertyDescription
+import java.time.LocalDateTime
 import kotlin.reflect.KProperty
 
 fun requiredStringInputField(
@@ -136,6 +138,13 @@ fun booleanInputField(
     nullable: Boolean? = null
 ): GraphQLInputObjectField =
     inputField(property, GraphQLBoolean, description, nullable)
+
+fun dateTimeInputField(
+    property: KProperty<LocalDateTime?>,
+    description: String? = null,
+    nullable: Boolean? = null
+): GraphQLInputObjectField =
+    inputField(property, GQLScalarLocalDateTime.INSTANCE, description, nullable)
 
 fun intInputField(
     property: KProperty<Int?>,

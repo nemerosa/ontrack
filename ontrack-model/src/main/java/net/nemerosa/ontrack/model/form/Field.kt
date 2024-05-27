@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.model.form
 /**
  * Definition of a [Form] field.
  */
+@Deprecated("Will be removed in V5. Use Next UI only.")
 interface Field {
 
     /**

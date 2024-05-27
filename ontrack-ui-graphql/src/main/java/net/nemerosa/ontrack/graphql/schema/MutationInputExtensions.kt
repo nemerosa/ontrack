@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.graphql.schema
 
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
+import java.time.LocalDateTime
 import kotlin.reflect.KProperty
 
 inline fun <reified T> MutationInput.getInputObject(name: String): T? =
@@ -24,6 +25,12 @@ fun MutationInput.getRequiredInt(property: KProperty<Int>): Int =
  */
 fun MutationInput.getInt(property: KProperty<Int?>): Int? =
     getInput<Int>(property.name)
+
+/**
+ * Gets an optional date/time from a property
+ */
+fun MutationInput.getDateTime(property: KProperty<LocalDateTime?>): LocalDateTime? =
+    getInput<LocalDateTime>(property.name)
 
 /**
  * Gets an optional string list from a property
