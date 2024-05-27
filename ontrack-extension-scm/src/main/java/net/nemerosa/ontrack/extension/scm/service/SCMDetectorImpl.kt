@@ -9,8 +9,12 @@ class SCMDetectorImpl(
     private val extensionManager: ExtensionManager,
 ) : SCMDetector {
 
+    private val extensions: Collection<SCMExtension> by lazy {
+        extensionManager.getExtensions(SCMExtension::class.java)
+    }
+
     override fun getSCM(project: Project): SCM? =
-        extensionManager.getExtensions(SCMExtension::class.java).firstNotNullOfOrNull {
+        extensions.firstNotNullOfOrNull {
             it.getSCM(project)
         }
 
