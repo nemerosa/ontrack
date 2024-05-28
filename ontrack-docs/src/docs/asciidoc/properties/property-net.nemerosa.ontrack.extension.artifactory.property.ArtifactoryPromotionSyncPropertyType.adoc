@@ -11,11 +11,11 @@ Scope:
 
 Configuration:
 
-* **buildName** - String - required - buildName field
+* **buildName** - String - required - Artifactory build name
 
-* **buildNameFilter** - String - required - buildNameFilter field
+* **buildNameFilter** - String - required - Artifactory build name filter
 
 * **configuration** - String - required - Name of the Artifactory configuration
 
-* **interval** - Int - required - interval field
+* **interval** - Int - required - Interval between each synchronisation in minutes.
 

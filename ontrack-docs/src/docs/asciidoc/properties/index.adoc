@@ -2,6 +2,7 @@
 === List of properties
 
 * <<property-net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncPropertyType,Artifactory promotion sync>>
+* <<property-net.nemerosa.ontrack.extension.av.project.AutoVersioningProjectPropertyType,Auto-versioning>>
 * <<property-net.nemerosa.ontrack.extension.bitbucket.cloud.property.BitbucketCloudProjectConfigurationPropertyType,Bitbucket Cloud configuration>>
 * <<property-net.nemerosa.ontrack.extension.general.AutoPromotionLevelPropertyType,Auto promotion levels>>
 * <<property-net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType,Auto promotion>>
@@ -31,6 +32,7 @@
 * <<property-net.nemerosa.ontrack.extension.stash.property.StashProjectConfigurationPropertyType,Bitbucket Server configuration>>
 
 include::property-net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncPropertyType.adoc[]
+include::property-net.nemerosa.ontrack.extension.av.project.AutoVersioningProjectPropertyType.adoc[]
 include::property-net.nemerosa.ontrack.extension.bitbucket.cloud.property.BitbucketCloudProjectConfigurationPropertyType.adoc[]
 include::property-net.nemerosa.ontrack.extension.general.AutoPromotionLevelPropertyType.adoc[]
 include::property-net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType.adoc[]
