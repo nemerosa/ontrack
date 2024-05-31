@@ -11,5 +11,5 @@ Scope:
 
 Configuration:
 
-* **commit** - String - required - commit field
+* **commit** - String - required - Commit hash
 

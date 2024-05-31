@@ -11,5 +11,5 @@ Scope:
 
 Configuration:
 
-* **patterns** - List - required - patterns field
+* **patterns** - List - required - List of branch patterns (name & value). The name is the category of branch and the value is a regular expression on the SCM branch.
 

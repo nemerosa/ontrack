@@ -14,12 +14,18 @@ import net.nemerosa.ontrack.model.annotations.APIDescription
  * @property event Event having led to the creation of this validation
  */
 class ValidationRunGitHubWorkflowJobProperty(
+    @APIDescription("ID of the run")
     val runId: Long,
+    @APIDescription("Link to the GitHub Workflow run")
     val url: String,
+    @APIDescription("Name of the workflow")
     val name: String,
+    @APIDescription("Number of the run")
     val runNumber: Int,
-    val job: String,
+    @APIDescription("True if the run is still flagged as running")
     val running: Boolean,
     @APIDescription("Event having led to the creation of this validation")
     val event: String?,
+    @APIDescription("Name of the workflow job which created this validation")
+    val job: String,
 )

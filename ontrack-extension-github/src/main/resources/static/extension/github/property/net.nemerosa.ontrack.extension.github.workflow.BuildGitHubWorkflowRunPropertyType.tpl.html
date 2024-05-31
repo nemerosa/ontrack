@@ -1,2 +1,4 @@
-<a href="{{property.value.url}}">{{ property.value.name }}#{{ property.value.runNumber }}</a> <code>{{ property.value.event }}</code>
-<span ng-if="property.value.running"><em>(running)</em></span>
+<p ng-repeat="workflow in property.value.workflows">
+    <a href="{{workflow.url}}">{{ workflow.name }}#{{ workflow.runNumber }}</a> <code>{{ workflow.event }}</code>
+    <span ng-if="workflow.running"><em>(running)</em></span>
+</p>

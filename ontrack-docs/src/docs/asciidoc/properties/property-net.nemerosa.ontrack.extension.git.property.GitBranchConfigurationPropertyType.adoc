@@ -11,15 +11,15 @@ Scope:
 
 Configuration:
 
-* **branch** - String - required - branch field
+* **branch** - String - required - Git branch or pull request ID
 
-* **buildCommitLink** - Object - optional - buildCommitLink field
+* **buildCommitLink** - Object - optional - How builds are linked to their Git commit
 
 ** **data** - JSON - optional - Configuration of the service
 
 ** **id** - String - required - ID of the service
 
-* **buildTagInterval** - Int - required - buildTagInterval field
+* **buildTagInterval** - Int - required - Interval in minutes for build/tag synchronization
 
-* **isOverride** - Boolean - required - isOverride field
+* **isOverride** - Boolean - required - Build overriding policy when synchronizing
 

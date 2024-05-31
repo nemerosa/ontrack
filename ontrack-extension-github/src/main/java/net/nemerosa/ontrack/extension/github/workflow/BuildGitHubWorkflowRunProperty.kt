@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.github.workflow
 
 import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.docs.DocumentationList
 
 /**
  * Links between GitHub Workflow runs and an Ontrack build.
@@ -9,6 +10,7 @@ import net.nemerosa.ontrack.model.annotations.APIDescription
  */
 data class BuildGitHubWorkflowRunProperty(
     @APIDescription("All workflows associated to a build.")
+    @DocumentationList
     val workflows: List<BuildGitHubWorkflowRun>,
 ) {
     /**

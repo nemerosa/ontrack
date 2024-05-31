@@ -13,3 +13,15 @@ Configuration:
 
 * **workflows** - List - required - All workflows associated to a build.
 
+** **event** - String - optional - Event having led to the creation of this build
+
+** **name** - String - required - Name of the workflow
+
+** **runId** - Long - required - ID of the run
+
+** **runNumber** - Int - required - Number of the run
+
+** **running** - Boolean - required - True if the run is still flagged as running
+
+** **url** - String - required - Link to the GitHub Workflow run
+

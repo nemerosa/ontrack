@@ -62,12 +62,7 @@ fun getFieldsForDocumentationClass(documentationClass: KClass<*>): List<FieldDoc
 
 fun getFieldsDocumentation(type: KClass<*>, section: String = ""): List<FieldDocumentation> {
     val documentationAnnotation = type.findAnnotations<Documentation>().firstOrNull { it.section == section }
-    val documentationClass = documentationAnnotation?.value
-        ?: if (type.hasAnnotation<SelfDocumented>()) {
-            type
-        } else {
-            return emptyList()
-        }
+    val documentationClass = documentationAnnotation?.value ?: type
     return getFieldsForDocumentationClass(documentationClass)
 }
 
