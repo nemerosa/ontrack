@@ -11,8 +11,8 @@ export default function ValidationStampViewDrawer({validationStamp, loading}) {
                 width="33%"
             >
                 <PropertiesSection
-                    entity={validationStamp}
-                    loading={loading}
+                    entityType="VALIDATION_STAMP"
+                    entityId={validationStamp.id}
                 />
                 <InformationSection
                     entity={validationStamp}

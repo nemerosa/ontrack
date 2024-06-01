@@ -11,8 +11,8 @@ export default function BranchInfoViewDrawer({branch, loadingBranch}) {
                 width="40%"
             >
                 <PropertiesSection
-                    entity={branch}
-                    loading={loadingBranch}
+                    entityType="BRANCH"
+                    entityId={branch.id}
                 />
                 <InformationSection
                     entity={branch}

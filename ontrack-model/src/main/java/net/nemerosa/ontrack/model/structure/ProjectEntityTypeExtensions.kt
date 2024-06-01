@@ -15,3 +15,10 @@ val ProjectEntityType.varName: String
  */
 val ProjectEntityType.typeName: String
     get() = varName.replaceFirstChar { it.titlecase() }
+
+/**
+ * Given an entity type & ID, looks for it.
+ */
+@Suppress("UNCHECKED_CAST")
+fun <E : ProjectEntity> StructureService.findEntity(type: ProjectEntityType, id: Int): E? =
+    type.getFindEntityFn(this).apply(ID.of(id)) as? E?

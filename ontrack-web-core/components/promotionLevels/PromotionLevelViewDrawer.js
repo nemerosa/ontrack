@@ -11,8 +11,8 @@ export default function PromotionLevelViewDrawer({promotionLevel, loading}) {
                 width="33%"
             >
                 <PropertiesSection
-                    entity={promotionLevel}
-                    loading={loading}
+                    entityType="PROMOTION_LEVEL"
+                    entityId={promotionLevel.id}
                 />
                 <InformationSection
                     entity={promotionLevel}

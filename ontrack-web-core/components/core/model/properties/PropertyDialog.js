@@ -1,0 +1,135 @@
+import FormDialog, {useFormDialog} from "@components/form/FormDialog";
+import {useContext, useState} from "react";
+import {Alert, Empty, Form, Select, Space, Typography} from "antd";
+import PropertyIcon from "@components/framework/properties/PropertyIcon";
+import {FaAsterisk, FaPencilAlt} from "react-icons/fa";
+import PropertyComponent from "@components/framework/properties/PropertyComponent";
+import PropertyForm from "@components/framework/properties/PropertyForm";
+import {gql} from "graphql-request";
+import {EventsContext} from "@components/common/EventsContext";
+
+export const usePropertyDialog = () => {
+
+    const eventsContext = useContext(EventsContext)
+
+    const [options, setOptions] = useState([])
+    const [selectedProperty, setSelectedProperty] = useState()
+
+    const [entity, setEntity] = useState({})
+
+    return useFormDialog({
+        init: (form, {entityType, entityId, propertyList}) => {
+            // TODO form.setFieldValue("propertyType", null)
+            setEntity({entityType, entityId})
+            setSelectedProperty(null)
+            setOptions(
+                propertyList.map(property => (
+                    {
+                        value: property.type.typeName,
+                        label: <>
+                            <Space>
+                                <PropertyIcon property={property}/>
+                                <Typography.Text>{property.type.name}</Typography.Text>
+                                {
+                                    property.value && <FaAsterisk title="Value set" color="green"/>
+                                }
+                                {
+                                    property.editable && <FaPencilAlt title="Value editable" color="blue"/>
+                                }
+                            </Space>
+                        </>
+                    }
+                ))
+            )
+        },
+        options,
+        selectedProperty,
+        setSelectedProperty,
+        query: gql`
+            mutation SaveProperty(
+                $entityType: ProjectEntityType!,
+                $entityId: Int!,
+                $type: String!,
+                $value: JSON!,
+            ) {
+                setGenericProperty(input: {
+                    entityType: $entityType,
+                    entityId: $entityId,
+                    type: $type,
+                    value: $value,
+                }) {
+                    errors {
+                        message
+                    }
+                }
+            }
+        `,
+        userNode: 'setGenericProperty',
+        prepareValues: (values, {entityType, entityId}) => {
+            return {
+                entityType,
+                entityId,
+                type: selectedProperty?.type?.typeName,
+                value: values.value,
+            }
+        },
+        onSuccess: () => {
+            eventsContext.fireEvent("entity.properties.changed", {entity})
+        },
+    })
+}
+
+export default function PropertyDialog({dialog}) {
+
+    const onChangeProperty = (propertyType) => {
+        const property = dialog.context.propertyList.find(it => it.type.typeName === propertyType)
+        if (property) {
+            dialog.form.setFieldValue("value", property.value)
+        } else {
+            dialog.form.setFieldValue("value", {})
+        }
+        dialog.setSelectedProperty(property)
+    }
+
+    return (
+        <>
+            <FormDialog dialog={dialog} width={800}>
+                <Form.Item
+                    name="propertyType"
+                    label="Property"
+                >
+                    <Select
+                        options={dialog.options}
+                        onChange={onChangeProperty}
+                        rules={[{required: true, message: 'Property is required.'}]}
+                    />
+                </Form.Item>
+                {
+                    dialog.selectedProperty && <>
+                        <Form.Item>
+                            <Typography.Text code>{dialog.selectedProperty.type.typeName}</Typography.Text>
+                        </Form.Item>
+                        {
+                            !dialog.selectedProperty.editable && <>
+                                <Space direction="vertical" className="ot-line">
+                                    <Alert type="info" message="Non editable. Read only."/>
+                                    {
+                                        !dialog.selectedProperty.value && <Empty description="No value"/>
+                                    }
+                                    {
+                                        dialog.selectedProperty.value && <PropertyComponent property={dialog.selectedProperty}/>
+                                    }
+                                </Space>
+                            </>
+                        }
+                        {
+                            dialog.selectedProperty.editable && <>
+                                <PropertyForm property={dialog.selectedProperty} prefix="value"/>
+                            </>
+                        }
+                    </>
+                }
+            </FormDialog>
+        </>
+    )
+}

@@ -1,27 +1,68 @@
 import ListSection from "@components/common/ListSection";
 import {FaWrench} from "react-icons/fa";
-import {Dynamic} from "@components/common/Dynamic";
+import PropertyAddButton from "@components/core/model/properties/PropertyAddButton";
+import PropertyIcon from "@components/framework/properties/PropertyIcon";
+import PropertyComponent from "@components/framework/properties/PropertyComponent";
+import {useEffect, useState} from "react";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import {gql} from "graphql-request";
+import {useEventForRefresh} from "@components/common/EventsContext";
 
-export default function PropertiesSection({loading, entity}) {
+export default function PropertiesSection({entityType, entityId}) {
+
+    const client = useGraphQLClient()
+    const [propertyList, setPropertyList] = useState([])
+
+    const refreshCount = useEventForRefresh("entity.properties.changed")
+
+    useEffect(() => {
+        if (client) {
+            client.request(
+                gql`
+                    query EntityProperties(
+                        $type: ProjectEntityType!,
+                        $id: Int!,
+                    ) {
+                        entity(type: $type, id: $id) {
+                            properties {
+                                editable
+                                type {
+                                    typeName
+                                    name
+                                    description
+                                }
+                                value
+                            }
+                        }
+                    }
+                `,
+                {
+                    type: entityType,
+                    id: entityId,
+                }
+            ).then(data => {
+                setPropertyList(data.entity.properties)
+            })
+        }
+    }, [client, entityType, entityId, refreshCount])
+
     return (
         <ListSection
             icon={<FaWrench/>}
             title="Properties"
-            loading={loading}
+            extraTitle={
+                <>
+                    <PropertyAddButton entityType={entityType} entityId={entityId} propertyList={propertyList}/>
+                </>
+            }
             items={
-                entity.properties
+                propertyList
                     .filter(it => it.value)
-                    .map(({type, value}) => {
-                        const shortTypeName = type.typeName.slice("net.nemerosa.ontrack.extension.".length)
+                    .map(property => {
                         return {
-                            title: type.name,
-                            icon: <Dynamic path={`framework/properties/${shortTypeName}/Icon`}/>,
-                            content: <Dynamic path={`framework/properties/${shortTypeName}/Display`} props={{
-                                property: {
-                                    type,
-                                    value,
-                                }
-                            }}/>,
+                            title: property.type.name,
+                            icon: <PropertyIcon property={property}/>,
+                            content: <PropertyComponent property={property}/>,
                         }
                     })
             }

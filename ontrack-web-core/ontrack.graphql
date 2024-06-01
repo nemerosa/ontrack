@@ -384,7 +384,7 @@ type Branch implements Authorizable & ProjectEntity {
     linkProperty: Property
     "Links"
     links: BranchLinks @deprecated(reason: "Use the `actions` field instead.")
-    "Message."
+    "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI."
     messageProperty: Property
     "List of meta information properties"
     metaInfoProperty: Property
@@ -597,7 +597,7 @@ type Build implements Authorizable & ProjectEntity {
     linkProperty: Property
     "Links"
     links: BuildLinks @deprecated(reason: "Use the `actions` field instead.")
-    "Message."
+    "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI."
     messageProperty: Property
     "List of meta information properties"
     metaInfoProperty: Property
@@ -1310,6 +1310,22 @@ type DeleteProjectAutoValidationStampPropertyByIdPayload implements Payload {
 
 "Output type for the deleteProjectAutoValidationStampProperty mutation."
 type DeleteProjectAutoValidationStampPropertyPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Project updated"
+    project: Project
+}
+
+"Output type for the deleteProjectAutoVersioningProjectPropertyById mutation."
+type DeleteProjectAutoVersioningProjectPropertyByIdPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Project updated"
+    project: Project
+}
+
+"Output type for the deleteProjectAutoVersioningProjectProperty mutation."
+type DeleteProjectAutoVersioningProjectPropertyPayload implements Payload {
     "List of errors"
     errors: [UserError]
     "Project updated"
@@ -3254,6 +3270,16 @@ type Mutation {
         "Input for the mutation"
         input: DeleteProjectAutoValidationStampPropertyByIdInput
     ): DeleteProjectAutoValidationStampPropertyByIdPayload
+    "Deletes the auto-versioning property on a project identified by name."
+    deleteProjectAutoVersioningProjectProperty(
+        "Input for the mutation"
+        input: DeleteProjectAutoVersioningProjectPropertyInput
+    ): DeleteProjectAutoVersioningProjectPropertyPayload
+    "Deletes the auto-versioning property on a project."
+    deleteProjectAutoVersioningProjectPropertyById(
+        "Input for the mutation"
+        input: DeleteProjectAutoVersioningProjectPropertyByIdInput
+    ): DeleteProjectAutoVersioningProjectPropertyByIdPayload
     "Deletes the bitbucket Cloud configuration property on a project identified by name."
     deleteProjectBitbucketCloudConfigurationProperty(
         "Input for the mutation"
@@ -3745,6 +3771,11 @@ type Mutation {
         "Input for the mutation"
         input: SetBuildReleasePropertyByIdInput
     ): SetBuildReleasePropertyByIdPayload
+    "Generic update for a property and an entity"
+    setGenericProperty(
+        "Input for the mutation"
+        input: SetGenericPropertyInput
+    ): SetGenericPropertyPayload
     "Setting the preferences of the current user"
     setPreferences(
         "Input for the mutation"
@@ -3770,6 +3801,16 @@ type Mutation {
         "Input for the mutation"
         input: SetProjectAutoValidationStampPropertyByIdInput
     ): SetProjectAutoValidationStampPropertyByIdPayload
+    "Set the auto-versioning property on a project identified by name."
+    setProjectAutoVersioningProjectProperty(
+        "Input for the mutation"
+        input: SetProjectAutoVersioningProjectPropertyInput
+    ): SetProjectAutoVersioningProjectPropertyPayload
+    "Set the auto-versioning property on a project."
+    setProjectAutoVersioningProjectPropertyById(
+        "Input for the mutation"
+        input: SetProjectAutoVersioningProjectPropertyByIdInput
+    ): SetProjectAutoVersioningProjectPropertyByIdPayload
     "Set the bitbucket Cloud configuration property on a project identified by name."
     setProjectBitbucketCloudConfigurationProperty(
         "Input for the mutation"
@@ -4198,9 +4239,9 @@ type Mutation {
 
 "Association of a name with a value"
 type NameValue {
-    "Name of the pair"
+    "Name"
     name: String!
-    "Value of the pair"
+    "Value"
     value: String!
 }
 
@@ -4358,6 +4399,8 @@ type Project implements Authorizable & ProjectEntity {
     autoPromotionLevelProperty: Property
     "If set, this property allows validation stamps to be created automatically from predefined validation stamps"
     autoValidationStampProperty: Property
+    "Auto-versioning rules at project level"
+    autoVersioningProjectProperty: Property
     "Associates the project with a Bitbucket Cloud repository"
     bitbucketCloudProjectConfigurationProperty: Property
     branches(
@@ -4436,7 +4479,7 @@ type Project implements Authorizable & ProjectEntity {
     to display in a build links decoration.
     """
     mainBuildLinksProjectProperty: Property
-    "Message."
+    "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI."
     messageProperty: Property
     "List of meta information properties"
     metaInfoProperty: Property
@@ -4775,7 +4818,7 @@ type PromotionLevel implements Authorizable & ProjectEntity {
     annotatedDescription: String
     "Authorizations for this context"
     authorizations: [Authorization!]!
-    "Allows a promotion level to be granted on a build as soon as a list of validation stamps has been passed"
+    "Allows a promotion level to be granted on a build as soon as a list of validation stamps and/or other promotions has been passed"
     autoPromotionProperty: Property
     "Reference to branch"
     branch: Branch
@@ -4797,7 +4840,7 @@ type PromotionLevel implements Authorizable & ProjectEntity {
     linkProperty: Property
     "Links"
     links: PromotionLevelLinks @deprecated(reason: "Use the `actions` field instead.")
-    "Message."
+    "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI."
     messageProperty: Property
     "List of meta information properties"
     metaInfoProperty: Property
@@ -4879,7 +4922,7 @@ type PromotionRun implements Authorizable & ProjectEntity {
     linkProperty: Property
     "Links"
     links: PromotionRunLinks @deprecated(reason: "Use the `actions` field instead.")
-    "Message."
+    "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI."
     messageProperty: Property
     "List of meta information properties"
     metaInfoProperty: Property
@@ -6005,6 +6048,14 @@ type SetBuildReleasePropertyPayload implements Payload {
     errors: [UserError]
 }
 
+"Output type for the setGenericProperty mutation."
+type SetGenericPropertyPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Updated property"
+    property: Property
+}
+
 "Output type for the setPreferences mutation."
 type SetPreferencesPayload implements Payload {
     "List of errors"
@@ -6039,6 +6090,22 @@ type SetProjectAutoValidationStampPropertyByIdPayload implements Payload {
 
 "Output type for the setProjectAutoValidationStampProperty mutation."
 type SetProjectAutoValidationStampPropertyPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Project updated"
+    project: Project
+}
+
+"Output type for the setProjectAutoVersioningProjectPropertyById mutation."
+type SetProjectAutoVersioningProjectPropertyByIdPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Project updated"
+    project: Project
+}
+
+"Output type for the setProjectAutoVersioningProjectProperty mutation."
+type SetProjectAutoVersioningProjectPropertyPayload implements Payload {
     "List of errors"
     errors: [UserError]
     "Project updated"
@@ -6906,7 +6973,7 @@ type ValidationRun implements Authorizable & ProjectEntity {
     linkProperty: Property
     "Links"
     links: ValidationRunLinks @deprecated(reason: "Use the `actions` field instead.")
-    "Message."
+    "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI."
     messageProperty: Property
     "List of meta information properties"
     metaInfoProperty: Property
@@ -7031,7 +7098,7 @@ type ValidationStamp implements Authorizable & ProjectEntity {
     linkProperty: Property
     "Links"
     links: ValidationStampLinks @deprecated(reason: "Use the `actions` field instead.")
-    "Message."
+    "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI."
     messageProperty: Property
     "List of meta information properties"
     metaInfoProperty: Property
@@ -8135,6 +8202,18 @@ input DeleteProjectAutoValidationStampPropertyInput {
     project: String!
 }
 
+"Input type for the deleteProjectAutoVersioningProjectPropertyById mutation."
+input DeleteProjectAutoVersioningProjectPropertyByIdInput {
+    "ID of the project"
+    id: Int!
+}
+
+"Input type for the deleteProjectAutoVersioningProjectProperty mutation."
+input DeleteProjectAutoVersioningProjectPropertyInput {
+    "Project name"
+    project: String!
+}
+
 "Input type for the deleteProjectBitbucketCloudConfigurationPropertyById mutation."
 input DeleteProjectBitbucketCloudConfigurationPropertyByIdInput {
     "ID of the project"
@@ -9231,6 +9310,18 @@ input SetBuildReleasePropertyInput {
     release: String!
 }
 
+"Input type for the setGenericProperty mutation."
+input SetGenericPropertyInput {
+    "entityId field"
+    entityId: Int!
+    "entityType field"
+    entityType: ProjectEntityType!
+    "type field"
+    type: String!
+    "value field"
+    value: JSON!
+}
+
 "Input type for the setPreferences mutation."
 input SetPreferencesInput {
     "branchViewVsGroups field"
@@ -9275,6 +9366,30 @@ input SetProjectAutoValidationStampPropertyInput {
     isAutoCreate: Boolean
     "If validation stamps must be created even if predefined validation stamp is not available"
     isAutoCreateIfNotPredefined: Boolean
+    "Project name"
+    project: String!
+}
+
+"Input type for the setProjectAutoVersioningProjectPropertyById mutation."
+input SetProjectAutoVersioningProjectPropertyByIdInput {
+    "List of regular expressions. AV requests match if no regular expression is matched by the target branch name. If empty, the target branch is considered matching."
+    branchExcludes: [String!]
+    "List of regular expressions. AV requests match if at least one regular expression is matched by the target branch name. If empty, all target branches match (the default)."
+    branchIncludes: [String!]
+    "ID of the project"
+    id: Int!
+    "If defined, any target branch whose last activity (last build creation) is before this date will be ignored by the auto-versioning"
+    lastActivityDate: LocalDateTime
+}
+
+"Input type for the setProjectAutoVersioningProjectProperty mutation."
+input SetProjectAutoVersioningProjectPropertyInput {
+    "List of regular expressions. AV requests match if no regular expression is matched by the target branch name. If empty, the target branch is considered matching."
+    branchExcludes: [String!]
+    "List of regular expressions. AV requests match if at least one regular expression is matched by the target branch name. If empty, all target branches match (the default)."
+    branchIncludes: [String!]
+    "If defined, any target branch whose last activity (last build creation) is before this date will be ignored by the auto-versioning"
+    lastActivityDate: LocalDateTime
     "Project name"
     project: String!
 }

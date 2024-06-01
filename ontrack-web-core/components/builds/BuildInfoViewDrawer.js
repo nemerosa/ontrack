@@ -11,8 +11,8 @@ export default function BuildInfoViewDrawer({build, loading}) {
                 width="33%"
             >
                 <PropertiesSection
-                    entity={build}
-                    loading={loading}
+                    entityType="BUILD"
+                    entityId={build.id}
                 />
                 <InformationSection
                     entity={build}

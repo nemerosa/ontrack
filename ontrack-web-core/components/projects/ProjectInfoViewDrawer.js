@@ -11,8 +11,8 @@ export default function ProjectInfoViewDrawer({project, loadingProject}) {
                 width="40%"
             >
                 <PropertiesSection
-                    loading={loadingProject}
-                    entity={project}
+                    entityType="PROJECT"
+                    entityId={project.id}
                 />
                 <InformationSection
                     loading={loadingProject}

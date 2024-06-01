@@ -1,7 +1,6 @@
 import {List, Skeleton, Space, Typography} from "antd";
-import {FaCog} from "react-icons/fa";
 
-export default function ListSection({title, icon, loading, items, renderItem}) {
+export default function ListSection({title, extraTitle, icon, loading, items}) {
     return (
         <>
             <Space direction="vertical" className="ot-line">
@@ -9,6 +8,7 @@ export default function ListSection({title, icon, loading, items, renderItem}) {
                     <Space>
                         {icon}
                         {title}
+                        {extraTitle}
                     </Space>
                 </Typography.Title>
                 <Skeleton active loading={loading}>
