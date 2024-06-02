@@ -4,6 +4,7 @@ import TimestampText from "@components/common/TimestampText";
 export default function Display({property}) {
     return (
         <Descriptions
+            column={12}
             items={[
                 {
                     key: 'branchIncludes',
@@ -13,6 +14,7 @@ export default function Display({property}) {
                             <Tag key={pattern}>{pattern}</Tag>
                         </>
                     )),
+                    span: 12,
                 },
                 {
                     key: 'branchExcludes',
@@ -22,6 +24,7 @@ export default function Display({property}) {
                             <Tag key={pattern}>{pattern}</Tag>
                         </>
                     )),
+                    span: 12,
                 },
                 {
                     key: 'lastActivityDate',
@@ -32,6 +35,7 @@ export default function Display({property}) {
                             <Typography.Text type="secondary" italic>None</Typography.Text>
                         }
                     />,
+                    span: 12,
                 },
             ]}
         />
