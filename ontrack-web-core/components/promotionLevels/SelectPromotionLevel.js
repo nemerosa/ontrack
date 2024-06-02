@@ -12,6 +12,7 @@ export default function SelectPromotionLevel({
                                                  allowClear = false,
                                                  disabled = false,
                                                  placeholder = "Promotion level",
+                                                 multiple = false,
                                              }) {
 
     const client = useGraphQLClient()
@@ -54,12 +55,10 @@ export default function SelectPromotionLevel({
             disabled={disabled}
             placeholder={placeholder}
             options={options}
-            style={{
-                width: '10em',
-            }}
             value={value}
             onChange={onChange}
             allowClear={allowClear}
+            mode={multiple ? "multiple" : undefined}
         />
     )
 }

@@ -8,6 +8,8 @@ import {useGraphQLClient} from "@components/providers/ConnectionContextProvider"
 import {gql} from "graphql-request";
 import {useEventForRefresh} from "@components/common/EventsContext";
 import PropertyTitle from "@components/framework/properties/PropertyTitle";
+import {callDynamicFunction} from "@components/common/DynamicFunction";
+import {getExtensionShortName} from "@components/common/ExtensionUtils";
 
 export default function PropertiesSection({entityType, entityId}) {
 
@@ -17,8 +19,9 @@ export default function PropertiesSection({entityType, entityId}) {
     const refreshCount = useEventForRefresh("entity.properties.changed")
 
     useEffect(() => {
-        if (client) {
-            client.request(
+
+        const fetchPropertyList = async () => {
+            const data = await client.request(
                 gql`
                     query EntityProperties(
                         $type: ProjectEntityType!,
@@ -41,9 +44,34 @@ export default function PropertiesSection({entityType, entityId}) {
                     type: entityType,
                     id: entityId,
                 }
-            ).then(data => {
-                setPropertyList(data.entity.properties)
-            })
+            )
+
+            const initialProperties = data.entity.properties
+
+            const transformedProperties = await Promise.all(
+                initialProperties.map(async (property) => {
+                    if (property.value) {
+                        const shortName = getExtensionShortName(property.type.typeName)
+                        const newValue = await callDynamicFunction(
+                            `framework/properties/${shortName}/Prepare`,
+                            property.value
+                        ) ?? property.value
+                        return {
+                            ...property,
+                            clientValue: newValue,
+                        }
+                    } else {
+                        return property
+                    }
+                })
+            )
+
+            setPropertyList(transformedProperties)
+        }
+
+        if (client) {
+            // noinspection JSIgnoredPromiseFromCall
+            fetchPropertyList()
         }
     }, [client, entityType, entityId, refreshCount])
 

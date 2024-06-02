@@ -1,7 +1,7 @@
 import {Button, Form, Input, Space} from "antd";
 import {useContext} from "react";
 import SelectMultiplePromotionLevelNames from "@components/promotionLevels/SelectMultiplePromotionLevelNames";
-import SelectMultipleValidationStampNames from "@components/validationStamps/SelectMultipleValidationStampNames";
+import SelectMultipleValidationStampsNames from "@components/validationStamps/SelectMultipleValidationStampsNames";
 import {FaPlus, FaTrash} from "react-icons/fa";
 import SelectProjectBranch from "@components/branches/SelectProjectBranch";
 import SelectInterval from "@components/common/SelectInterval";
@@ -42,7 +42,7 @@ export default function BranchStatusesWidgetForm({promotions, validations, refre
                     label="List of validations to display"
                     initialValue={validations}
                 >
-                    <SelectMultipleValidationStampNames/>
+                    <SelectMultipleValidationStampsNames/>
                 </Form.Item>
                 <Form.List name="branches" initialValue={branches}>
                     {(fields, {add, remove}) => (

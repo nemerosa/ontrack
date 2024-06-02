@@ -20,7 +20,7 @@ export const usePropertyDialog = () => {
     return useFormDialog({
         init: (form, {entityType, entityId, propertyList, initialProperty}) => {
             form.setFieldValue("propertyType", initialProperty?.type?.typeName)
-            form.setFieldValue("value", initialProperty?.value)
+            form.setFieldValue("value", initialProperty?.clientValue)
             setEntity({entityType, entityId})
             setSelectedProperty(initialProperty)
             setOptions(
@@ -46,6 +46,7 @@ export const usePropertyDialog = () => {
         options,
         selectedProperty,
         setSelectedProperty,
+        entity,
         query: gql`
             mutation SaveProperty(
                 $entityType: ProjectEntityType!,
@@ -128,7 +129,7 @@ export default function PropertyDialog({dialog}) {
                         }
                         {
                             dialog.selectedProperty.editable && <>
-                                <PropertyForm property={dialog.selectedProperty} prefix="value"/>
+                                <PropertyForm property={dialog.selectedProperty} entity={dialog.entity} prefix="value"/>
                             </>
                         }
                     </>
