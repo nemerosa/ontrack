@@ -18,10 +18,11 @@ export const usePropertyDialog = () => {
     const [entity, setEntity] = useState({})
 
     return useFormDialog({
-        init: (form, {entityType, entityId, propertyList}) => {
-            // TODO form.setFieldValue("propertyType", null)
+        init: (form, {entityType, entityId, propertyList, initialProperty}) => {
+            form.setFieldValue("propertyType", initialProperty?.type?.typeName)
+            form.setFieldValue("value", initialProperty?.value)
             setEntity({entityType, entityId})
-            setSelectedProperty(null)
+            setSelectedProperty(initialProperty)
             setOptions(
                 propertyList.map(property => (
                     {
@@ -108,6 +109,9 @@ export default function PropertyDialog({dialog}) {
                     dialog.selectedProperty && <>
                         <Form.Item>
                             <Typography.Text code>{dialog.selectedProperty.type.typeName}</Typography.Text>
+                        </Form.Item>
+                        <Form.Item>
+                            <Typography.Text type="secondary">{dialog.selectedProperty.type.description}</Typography.Text>
                         </Form.Item>
                         {
                             !dialog.selectedProperty.editable && <>

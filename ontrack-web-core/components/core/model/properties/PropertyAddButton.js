@@ -1,6 +1,6 @@
-import {Button} from "antd";
 import {FaPlus} from "react-icons/fa";
 import PropertyDialog, {usePropertyDialog} from "@components/core/model/properties/PropertyDialog";
+import InlineCommand from "@components/common/InlineCommand";
 
 export default function PropertyAddButton({entityType, entityId, propertyList}) {
 
@@ -12,7 +12,11 @@ export default function PropertyAddButton({entityType, entityId, propertyList}) 
 
     return (
         <>
-            <Button size="small" icon={<FaPlus/>} title="Add a property" onClick={startDialog}/>
+            <InlineCommand
+                icon={<FaPlus/>}
+                title="Add a property"
+                onClick={startDialog}
+            />
             <PropertyDialog dialog={dialog}/>
         </>
     )

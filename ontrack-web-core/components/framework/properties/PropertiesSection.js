@@ -7,6 +7,7 @@ import {useEffect, useState} from "react";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
 import {useEventForRefresh} from "@components/common/EventsContext";
+import PropertyTitle from "@components/framework/properties/PropertyTitle";
 
 export default function PropertiesSection({entityType, entityId}) {
 
@@ -60,7 +61,7 @@ export default function PropertiesSection({entityType, entityId}) {
                     .filter(it => it.value)
                     .map(property => {
                         return {
-                            title: property.type.name,
+                            title: <PropertyTitle entityType={entityType} entityId={entityId} property={property}/>,
                             icon: <PropertyIcon property={property}/>,
                             content: <PropertyComponent property={property}/>,
                         }
