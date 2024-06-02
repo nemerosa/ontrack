@@ -42,7 +42,7 @@ class PropertiesMutations(
         }
 
     override val mutations: List<Mutation>
-        get() = listOf(genericMutation) + genericMutations + specificMutations
+        get() = listOf(genericMutation, genericDeleteMutation) + genericMutations + specificMutations
 
     private val genericMutation: Mutation
         get() = simpleMutation(
@@ -64,6 +64,22 @@ class PropertiesMutations(
             )
             // Returning the property
             propertyService.getProperty<Any>(
+                entity = entity,
+                propertyTypeName = input.type,
+            )
+        }
+
+    private val genericDeleteMutation: Mutation
+        get() = unitMutation(
+            name = "deleteGenericProperty",
+            description = "Generic deletion for a property and an entity",
+            input = DeleteGenericPropertyInput::class,
+        ) { input ->
+            // Gets the entity
+            val entity = structureService.findEntity<ProjectEntity>(input.entityType, input.entityId)
+                ?: throw EntityNotFoundByIdException(input.entityType, input.entityId)
+            // Deleting the property
+            propertyService.deleteProperty(
                 entity = entity,
                 propertyTypeName = input.type,
             )
@@ -136,7 +152,7 @@ class PropertiesMutations(
         return object : Mutation {
             override val name: String = "set${type.typeName}${provider.mutationNameFragment}PropertyById"
             override val description: String =
-                "Set the ${propertyType.name.decapitalize()} property on a ${type.displayName}."
+                "Set the ${propertyType.name.replaceFirstChar { it.lowercase() }} property on a ${type.displayName}."
 
             override fun inputFields(dictionary: MutableSet<GraphQLType>): List<GraphQLInputObjectField> = listOf(
                 id(type)
@@ -170,7 +186,7 @@ class PropertiesMutations(
         return object : Mutation {
             override val name: String = "set${type.typeName}${provider.mutationNameFragment}Property"
             override val description: String =
-                "Set the ${propertyType.name.decapitalize()} property on a ${type.displayName} identified by name."
+                "Set the ${propertyType.name.replaceFirstChar { it.lowercase() }} property on a ${type.displayName} identified by name."
 
             override fun inputFields(dictionary: MutableSet<GraphQLType>): List<GraphQLInputObjectField> =
                 type.names.map {
@@ -208,7 +224,7 @@ class PropertiesMutations(
         return object : Mutation {
             override val name: String = "delete${type.typeName}${provider.mutationNameFragment}Property"
             override val description: String =
-                "Deletes the ${propertyType.name.decapitalize()} property on a ${type.displayName} identified by name."
+                "Deletes the ${propertyType.name.replaceFirstChar { it.lowercase() }} property on a ${type.displayName} identified by name."
 
             override fun inputFields(dictionary: MutableSet<GraphQLType>): List<GraphQLInputObjectField> =
                 type.names.map {
@@ -244,7 +260,7 @@ class PropertiesMutations(
         return object : Mutation {
             override val name: String = "delete${type.typeName}${provider.mutationNameFragment}PropertyById"
             override val description: String =
-                "Deletes the ${propertyType.name.decapitalize()} property on a ${type.displayName}."
+                "Deletes the ${propertyType.name.replaceFirstChar { it.lowercase() }} property on a ${type.displayName}."
 
             // Only the ID is needed
             override fun inputFields(dictionary: MutableSet<GraphQLType>): List<GraphQLInputObjectField> = listOf(
@@ -323,7 +339,7 @@ class PropertiesMutations(
 
     private fun name(name: String): GraphQLInputObjectField = GraphQLInputObjectField.newInputObjectField()
         .name(name)
-        .description("${name.capitalize()} name")
+        .description("${name.replaceFirstChar { it.uppercase() }} name")
         .type(GraphQLNonNull(GraphQLString))
         .build()
 
@@ -348,7 +364,7 @@ class PropertiesMutations(
     private fun projectEntityTypeField(type: ProjectEntityType): GraphQLFieldDefinition =
         GraphQLFieldDefinition.newFieldDefinition()
             .name(type.varName)
-            .description("${type.displayName.capitalize()} updated")
+            .description("${type.displayName.replaceFirstChar { it.uppercase() }} updated")
             .type(GraphQLTypeReference(type.typeName))
             .build()
 
@@ -357,6 +373,12 @@ class PropertiesMutations(
         val entityId: Int,
         val type: String,
         val value: JsonNode,
+    )
+
+    data class DeleteGenericPropertyInput(
+        val entityType: ProjectEntityType,
+        val entityId: Int,
+        val type: String,
     )
 
     companion object {
