@@ -10,7 +10,7 @@ import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
 
 class AutoPromotionPropertyTypeTest {
 
@@ -67,14 +67,13 @@ class AutoPromotionPropertyTypeTest {
     }
 
     @Test
-    fun `From client - parsing error`() {
-        assertFailsWith<AutoPromotionPropertyCannotParseException> {
-            type.fromClient(
-                mapOf(
-                    "validationStamps" to "VS1"
-                ).asJson()
-            )
-        }
+    fun `From client - parsing error returns an empty list`() {
+        val property = type.fromClient(
+            mapOf(
+                "validationStamps" to "VS1"
+            ).asJson()
+        )
+        assertTrue(property.validationStamps.isEmpty(), "Empty list")
     }
 
     @Test
