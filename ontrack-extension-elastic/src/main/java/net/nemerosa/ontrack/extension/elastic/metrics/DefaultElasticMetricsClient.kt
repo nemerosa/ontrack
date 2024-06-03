@@ -221,8 +221,8 @@ class DefaultElasticMetricsClient(
                             val response = client.bulk(request)
                             if (response.errors()) {
                                 val errorMessage = response.items()
-                                        .mapNotNull { it.error() }
-                                        .joinToString("\n") { it.reason() }
+                                        .mapNotNull { it.error()?.reason() }
+                                        .joinToString("\n")
                                 logger.error("Errors while exporting metrics to ElasticSearch. $errorMessage")
                                 registry?.increment(ElasticMetricsClientMetrics.errors)
                             }
