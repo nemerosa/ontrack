@@ -108,6 +108,9 @@ class WorkflowRunIngestionEventProcessor(
             else {
                 when (payload.action) {
                     WorkflowRunAction.requested -> startBuild(payload, configuration, ingestionConfig)
+                    WorkflowRunAction.in_progress -> IngestionEventProcessingResultDetails.ignored(
+                        "Waiting for the end of the workflow to register it."
+                    )
                     WorkflowRunAction.completed -> endBuild(payload, configuration, ingestionConfig)
                 }
             }
@@ -296,7 +299,8 @@ class WorkflowRunPayload(
 @Suppress("EnumEntryName")
 enum class WorkflowRunAction {
     requested,
-    completed
+    completed,
+    in_progress,
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)

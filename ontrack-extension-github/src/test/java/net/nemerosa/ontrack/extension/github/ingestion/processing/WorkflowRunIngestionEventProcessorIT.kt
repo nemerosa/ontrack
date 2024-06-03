@@ -207,12 +207,29 @@ class WorkflowRunIngestionEventProcessorIT : AbstractIngestionTestSupport() {
         }
     }
 
+    @Test
+    fun `No processing of the workflow run when in progress`() {
+        // Only one GitHub configuration
+        onlyOneGitHubConfig()
+        // Starting the run
+        asAdmin {
+            withGitHubIngestionSettings {
+                ConfigLoaderServiceITMockConfig.customIngestionConfig(
+                    configLoaderService, IngestionConfig()
+                )
+                workflowRunValidationTest(action = WorkflowRunAction.in_progress, expectProject = false)
+            }
+        }
+    }
+
     private fun workflowRunValidationTest(
+        action: WorkflowRunAction = WorkflowRunAction.completed,
         expectProject: Boolean = true,
         expectValidation: Boolean = true,
         pullRequests: List<WorkflowRunPullRequest> = emptyList(),
     ) {
         val payload = payload(
+            action = action,
             status = WorkflowJobStepStatus.completed,
             conclusion = WorkflowJobStepConclusion.success,
             pullRequests = pullRequests,
