@@ -234,6 +234,8 @@ class DefaultElasticMetricsClient(
                 } else {
                     debug("Nothing to flush")
                 }
+            } catch (any: Throwable) {
+                logger.error("Uncaught error on flushing events", any)
             } finally {
                 bufferLock.unlock()
                 debug("Unlocking the buffer")
