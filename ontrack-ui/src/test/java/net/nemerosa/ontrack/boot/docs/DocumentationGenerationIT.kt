@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.io.File
 import kotlin.reflect.full.findAnnotations
 import kotlin.reflect.full.hasAnnotation
+import kotlin.test.fail
 
 /**
  * Generation of the documentation
@@ -312,7 +313,18 @@ class DocumentationGenerationIT : AbstractDocumentationGenerationTestSupport() {
     private fun generateTemplatingSource(directoryContext: DirectoryContext, templatingSource: TemplatingSource) {
         val field = templatingSource.field
         val description = getAPITypeDescription(templatingSource::class)
-        val parameters = getFieldsDocumentation(templatingSource::class)
+        val parameters = if (templatingSource::class.hasAnnotation<DocumentationIgnore>()) {
+            emptyList()
+        } else {
+            try {
+                getFieldsDocumentation(templatingSource::class)
+            } catch (any: Exception) {
+                fail(
+                    message = "Error getting parameters for templating source: ${templatingSource::class.java.name}",
+                    cause = any,
+                )
+            }
+        }
         val example = getDocumentationExampleCode(templatingSource::class)
         val types = templatingSource.types
 

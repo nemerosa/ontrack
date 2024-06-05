@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.scm.service
 
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.DocumentationExampleCode
+import net.nemerosa.ontrack.model.docs.DocumentationIgnore
 import net.nemerosa.ontrack.model.events.EventRenderer
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.ProjectEntity
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component
 @Component
 @APIDescription("Gets the SCM branch associated with a branch. Renders an empty string if there is none.")
 @DocumentationExampleCode("${'$'}{branch.scmBranch}")
+@DocumentationIgnore
 class SCMBranchTemplatingSource(
     private val scmDetector: SCMDetector,
 ) : AbstractTemplatingSource(

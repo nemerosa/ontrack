@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service.templating
 
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.DocumentationExampleCode
+import net.nemerosa.ontrack.model.docs.DocumentationIgnore
 import net.nemerosa.ontrack.model.events.EventRenderer
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component
 @Component
 @APIDescription("Getting the qualified long name for an entity. For a branch, it'd look like `branch project/main`.")
 @DocumentationExampleCode("${'$'}{branch.qualifiedLongName}")
+@DocumentationIgnore
 class EntityQualifiedLongNameTemplatingSource : TemplatingSource {
 
     override val types: Set<ProjectEntityType> = ProjectEntityType.values().toSet()
