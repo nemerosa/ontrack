@@ -60,8 +60,9 @@ fun getFieldsForDocumentationClass(documentationClass: KClass<*>): List<FieldDoc
     return fields
 }
 
-fun getFieldsDocumentation(type: KClass<*>, section: String = ""): List<FieldDocumentation> {
+fun getFieldsDocumentation(type: KClass<*>, section: String = "", required: Boolean = true): List<FieldDocumentation> {
     val documentationAnnotation = type.findAnnotations<Documentation>().firstOrNull { it.section == section }
+    if (documentationAnnotation == null && !required) return emptyList()
     val documentationClass = documentationAnnotation?.value ?: type
     return getFieldsForDocumentationClass(documentationClass)
 }

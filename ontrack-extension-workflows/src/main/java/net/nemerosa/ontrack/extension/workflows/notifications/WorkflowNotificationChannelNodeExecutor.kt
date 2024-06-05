@@ -18,21 +18,25 @@ import net.nemerosa.ontrack.model.events.Event
 import org.springframework.stereotype.Component
 
 @Component
-@APIDescription("""
+@APIDescription(
+    """
     Wraps a notification in a workflow node.
     
     The output of this execution is exactly the output
     of the notification channel.
-""")
-@DocumentationExampleCode("""
-    executorId: notification
-    data:
-        channel: slack
-        channelConfig:
-            channel: "#my-channel"
-        template: |
-            Message template
-""")
+"""
+)
+@DocumentationExampleCode(
+    """
+        executorId: notification
+        data:
+            channel: slack
+            channelConfig:
+                channel: "#my-channel"
+            template: |
+                Message template
+    """
+)
 @Documentation(WorkflowNotificationChannelNodeData::class)
 class WorkflowNotificationChannelNodeExecutor(
     workflowsExtensionFeature: WorkflowsExtensionFeature,

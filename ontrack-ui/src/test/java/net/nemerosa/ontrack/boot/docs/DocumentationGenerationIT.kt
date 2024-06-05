@@ -58,6 +58,12 @@ class DocumentationGenerationIT : AbstractDocumentationGenerationTestSupport() {
 
             val fileId = getWNXFileId(wnx)
 
+            val outputFieldsDocumentation = try {
+                getFieldsDocumentation(wnx::class, section = "output", required = false)
+            } catch (any: Exception) {
+                fail("Failed to get output fields documentation for ${wnx::class.simpleName}", any)
+            }
+
             directoryContext.writeFile(
                 fileId = fileId,
                 level = 4,
@@ -67,7 +73,7 @@ class DocumentationGenerationIT : AbstractDocumentationGenerationTestSupport() {
                 example = example,
                 links = wnx::class.findAnnotations(),
                 extendedConfig = { s ->
-                    val output = getFieldsDocumentation(wnx::class, section = "output")
+                    val output = outputFieldsDocumentation
                     if (output.isNotEmpty()) {
                         s.append("Output:\n\n")
                         directoryContext.writeFields(s, output)
