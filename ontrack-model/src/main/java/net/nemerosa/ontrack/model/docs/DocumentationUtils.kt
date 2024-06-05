@@ -11,7 +11,7 @@ import kotlin.reflect.full.*
 
 fun getFieldsForDocumentationClass(documentationClass: KClass<*>): List<FieldDocumentation> {
     val fields = mutableListOf<FieldDocumentation>()
-    documentationClass.declaredMemberProperties.forEach { property ->
+    documentationClass.memberProperties.forEach { property ->
         if (!property.hasAnnotation<DocumentationIgnore>()) {
 
             val name = getPropertyName(property)

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component
 @Component
 @APIDescription("Gets the release/version/label associated to a build or renders an empty string is there is none.")
 @DocumentationExampleCode("${'$'}{build.release}")
+@DocumentationIgnore
 class ReleasePropertyTemplatingSource(
     @DocumentationIgnore
     private val propertyService: PropertyService,
