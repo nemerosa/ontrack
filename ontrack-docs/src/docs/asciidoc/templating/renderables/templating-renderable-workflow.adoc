@@ -1,0 +1,13 @@
+[[templating-renderable-workflow]]
+==== Information about the workflow (workflow)
+
+The `workflow` context is used to access information about the nodes of the workflow, in notifications or other templates rendered in the context of the workflow execution.
+
+Context: Workflow
+
+Available fields:
+
+* `<node id>`: Getting information about a node in the current workflow
+
+** **path** - String - required - JSON path to the data to render
+

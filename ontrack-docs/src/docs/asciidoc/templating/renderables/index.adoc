@@ -1,0 +1,8 @@
+[[appendix-templating-renderable-index]]
+==== List of special templating objects
+
+* <<templating-renderable-av,Auto-versioning context (av)>>
+* <<templating-renderable-workflow,Information about the workflow (workflow)>>
+
+include::templating-renderable-av.adoc[]
+include::templating-renderable-workflow.adoc[]

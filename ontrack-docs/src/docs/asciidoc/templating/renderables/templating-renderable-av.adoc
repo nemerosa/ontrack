@@ -1,0 +1,23 @@
+[[templating-renderable-av]]
+==== Auto-versioning context (av)
+
+The `av` context can be used in templates in the PR title & body templates, in order to access information about the auto-versioning request.
+
+Context: Auto-versioning
+
+Available fields:
+
+* `changelog`: Changelog for the project & version being updated
+
+** **allQualifiers** - Boolean - required - Loop over all qualifiers for the last level of `dependencies`, including the default one. Qualifiers at `dependencies` take precedence.
+
+** **commitsOption** - NONE, OPTIONAL, ALWAYS - required - Defines how to render commits for a change log
+
+** **defaultQualifierFallback** - Boolean - required - If a qualifier has no previous link, uses the default qualifier (empty) qualifier.
+
+** **dependencies** - List - required - Comma-separated list of project links to follow one by one for a get deep change log. Each item in the list is either a project name, or a project name and qualifier separated by a colon (:).
+
+** **empty** - String - required - String to use to render an empty or non existent change log
+
+** **title** - Boolean - required - Include a title for the change log
+
