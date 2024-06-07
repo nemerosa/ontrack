@@ -1,9 +1,6 @@
 package net.nemerosa.ontrack.repository
 
-import net.nemerosa.ontrack.model.structure.Build
-import net.nemerosa.ontrack.model.structure.Project
-import net.nemerosa.ontrack.model.structure.PromotionLevel
-import net.nemerosa.ontrack.model.structure.PromotionRun
+import net.nemerosa.ontrack.model.structure.*
 
 interface PromotionRunRepository {
 
@@ -12,6 +9,11 @@ interface PromotionRunRepository {
      * project for a given promotion mentioned by name.
      */
     fun getLastPromotionRunForProject(project: Project, promotionName: String): PromotionRun?
+
+    /**
+     * For a [branch], returns the last promotion run having occurred for a given promotion mentioned by name.
+     */
+    fun getLastPromotionRunForBranch(branch: Branch, promotionName: String): PromotionRun?
 
     /**
      * Checks if the given [build] is promoted or not to the given [promotion level][promotionLevel].

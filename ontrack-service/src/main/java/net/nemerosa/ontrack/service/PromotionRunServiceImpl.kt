@@ -14,4 +14,7 @@ class PromotionRunServiceImpl(
 
     override fun isBuildPromoted(build: Build, promotionLevel: PromotionLevel): Boolean =
         promotionRunRepository.isBuildPromoted(build, promotionLevel)
+
+    override fun getLastPromotionRunForBranch(branch: Branch, promotionName: String): PromotionRun? =
+        promotionRunRepository.getLastPromotionRunForBranch(branch, promotionName)
 }

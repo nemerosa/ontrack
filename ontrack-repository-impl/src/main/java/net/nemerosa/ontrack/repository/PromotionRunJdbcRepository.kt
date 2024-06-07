@@ -1,9 +1,6 @@
 package net.nemerosa.ontrack.repository
 
-import net.nemerosa.ontrack.model.structure.Build
-import net.nemerosa.ontrack.model.structure.Project
-import net.nemerosa.ontrack.model.structure.PromotionLevel
-import net.nemerosa.ontrack.model.structure.PromotionRun
+import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
@@ -44,6 +41,25 @@ class PromotionRunJdbcRepository(
             """,
             mapOf(
                 "projectId" to project.id(),
+                "promotionName" to promotionName,
+            )
+        ) { rs: ResultSet, _ ->
+            toPromotionRun(rs)
+        }.firstOrNull()
+
+    override fun getLastPromotionRunForBranch(branch: Branch, promotionName: String) =
+        namedParameterJdbcTemplate!!.query(
+            """
+                SELECT PR.*
+                 FROM PROMOTION_RUNS PR
+                 INNER JOIN PROMOTION_LEVELS P ON P.ID = PR.PROMOTIONLEVELID
+                 WHERE P.BRANCHID = :branchId
+                 AND P.NAME = :promotionName
+                 ORDER BY PR.ID DESC
+                 LIMIT 1
+            """,
+            mapOf(
+                "branchId" to branch.id(),
                 "promotionName" to promotionName,
             )
         ) { rs: ResultSet, _ ->

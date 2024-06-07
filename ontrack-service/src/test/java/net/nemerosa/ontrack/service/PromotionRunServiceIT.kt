@@ -76,6 +76,40 @@ class PromotionRunServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    fun `Getting last promotion run for a promotion in a branch`() {
+        project {
+            branch {
+                val pl = promotionLevel()
+                build()
+                val build = build {
+                    promote(pl)
+                }
+                build()
+                assertNotNull(promotionRunService.getLastPromotionRunForBranch(this, pl.name)) { run ->
+                    assertEquals(pl, run.promotionLevel)
+                    assertEquals(build, run.build)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Not getting any last promotion run for a promotion in a branch`() {
+        project {
+            branch {
+                val pl = promotionLevel()
+                val plx = promotionLevel()
+                build()
+                val build = build {
+                    promote(pl)
+                }
+                build()
+                assertNull(promotionRunService.getLastPromotionRunForBranch(this, plx.name))
+            }
+        }
+    }
+
+    @Test
     fun `Checking if a build is promoted`() {
         project {
             branch {

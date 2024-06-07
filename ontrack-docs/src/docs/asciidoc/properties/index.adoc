@@ -28,6 +28,7 @@
 * <<property-net.nemerosa.ontrack.extension.jenkins.JenkinsJobPropertyType,Jenkins Job>>
 * <<property-net.nemerosa.ontrack.extension.jira.JIRAFollowLinksPropertyType,JIRA Links to follow>>
 * <<property-net.nemerosa.ontrack.extension.sonarqube.property.SonarQubePropertyType,SonarQube>>
+* <<property-net.nemerosa.ontrack.extension.stale.AutoDisablingBranchPatternsPropertyType,Auto-disabling of branches based on patterns>>
 * <<property-net.nemerosa.ontrack.extension.stale.StalePropertyType,Stale branches>>
 * <<property-net.nemerosa.ontrack.extension.stash.property.StashProjectConfigurationPropertyType,Bitbucket Server configuration>>
 
@@ -58,5 +59,6 @@ include::property-net.nemerosa.ontrack.extension.jenkins.JenkinsBuildPropertyTyp
 include::property-net.nemerosa.ontrack.extension.jenkins.JenkinsJobPropertyType.adoc[]
 include::property-net.nemerosa.ontrack.extension.jira.JIRAFollowLinksPropertyType.adoc[]
 include::property-net.nemerosa.ontrack.extension.sonarqube.property.SonarQubePropertyType.adoc[]
+include::property-net.nemerosa.ontrack.extension.stale.AutoDisablingBranchPatternsPropertyType.adoc[]
 include::property-net.nemerosa.ontrack.extension.stale.StalePropertyType.adoc[]
 include::property-net.nemerosa.ontrack.extension.stash.property.StashProjectConfigurationPropertyType.adoc[]

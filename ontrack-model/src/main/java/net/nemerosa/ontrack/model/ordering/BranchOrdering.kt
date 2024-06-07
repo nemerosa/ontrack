@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.structure.Branch
 /**
  * Defines a way to order branches.
  */
+@Deprecated("Will be removed in V5. Consider using built-in orderings.")
 interface BranchOrdering {
 
     /**

@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.av.config
+package net.nemerosa.ontrack.model.ordering
 
 import net.nemerosa.ontrack.common.Version
 

@@ -11,5 +11,8 @@ Scope:
 
 Configuration:
 
-* **useLabel** - Boolean - required - useLabel field
+* **useLabel** - Boolean - required - Configuration at project label to specify that a
+            build link decoration should use the release/label
+            of a build when available. By default, it displays
+            the release name if available, and then the build name as a default.
 

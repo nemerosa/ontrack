@@ -28,53 +28,6 @@ class OptionalVersionBranchOrderingTest {
     }
 
     @Test
-    fun `toVersion returns a version`() {
-        val o = ordering.toVersion("1.0")
-        assertNotNull(o) {
-            assertNotNull(it.version) { v ->
-                assertEquals(1, v.major)
-                assertEquals(0, v.minor)
-                assertEquals(0, v.patch)
-            }
-        }
-    }
-
-    @Test
-    fun `toVersion does not return a version`() {
-        val o = ordering.toVersion("v1.0")
-        assertNull(o)
-    }
-
-    @Test
-    fun `Get version on a path with no match returns null`() {
-        assertNull(ordering.getVersion("release/.*".toRegex(), "release-1.0"))
-    }
-
-    @Test
-    fun `Get version on a path with one matched group returns a version`() {
-        assertNotNull(ordering.getVersion("release/(.*)".toRegex(), "release/1.0")) {
-            assertEquals("1.0.0", it.version?.toString())
-        }
-    }
-
-    @Test
-    fun `Get version on a path with one separator returns a version`() {
-        assertNotNull(ordering.getVersion("release/.*".toRegex(), "release/1.0")) {
-            assertEquals("1.0.0", it.version?.toString())
-        }
-    }
-
-    @Test
-    fun `Get version on a path with one separator but no version`() {
-        assertNull(ordering.getVersion("release/.*".toRegex(), "release/v1.0"))
-    }
-
-    @Test
-    fun `Get version on a matching path with no group and no separator`() {
-        assertNull(ordering.getVersion("master".toRegex(), "master"))
-    }
-
-    @Test
     fun `Match on branch path first`() {
         every { branchDisplayNameService.getBranchDisplayName(branch) } returns "release/1.0"
         assertEquals(

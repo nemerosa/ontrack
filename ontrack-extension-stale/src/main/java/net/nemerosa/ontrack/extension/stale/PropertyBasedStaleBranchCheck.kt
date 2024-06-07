@@ -7,7 +7,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
-import java.util.*
 
 /**
  * This [StaleBranchCheck] checks the staleness of a branch based on last activity (last build)
@@ -15,23 +14,27 @@ import java.util.*
  */
 @Component
 class PropertyBasedStaleBranchCheck(
-        extensionFeature: StaleExtensionFeature,
-        private val propertyService: PropertyService,
-        private val structureService: StructureService
+    extensionFeature: StaleExtensionFeature,
+    private val propertyService: PropertyService,
+    private val promotionRunService: PromotionRunService,
 ) : AbstractExtension(extensionFeature), StaleBranchCheck {
 
     private val logger: Logger = LoggerFactory.getLogger(PropertyBasedStaleBranchCheck::class.java)
 
     override fun isProjectEligible(project: Project): Boolean =
-            propertyService.hasProperty(project, StalePropertyType::class.java)
+        propertyService.hasProperty(project, StalePropertyType::class.java)
 
     override fun isBranchEligible(branch: Branch): Boolean = true
 
-    override fun getBranchStaleness(branch: Branch, lastBuild: Build?): StaleBranchStatus? {
+    override fun getBranchStaleness(
+        context: StaleBranchCheckContext,
+        branch: Branch,
+        lastBuild: Build?
+    ): StaleBranchStatus? {
         // Gets the project property
         val property: StaleProperty = propertyService.getProperty(branch.project, StalePropertyType::class.java).value
         // If no property, returns
-                ?: return null
+            ?: return null
         // Disabling and deletion times
         val disablingDuration = property.disablingDuration
         val deletionDuration = property.deletingDuration
@@ -47,22 +50,17 @@ class PropertyBasedStaleBranchCheck(
             // Disabling time
             val disablingTime: LocalDateTime = now.minusDays(disablingDuration.toLong())
             // Deletion time
-            val deletionTime: LocalDateTime? = if (deletionDuration != null && deletionDuration > 0) disablingTime.minusDays(deletionDuration.toLong()) else null
+            val deletionTime: LocalDateTime? =
+                if (deletionDuration != null && deletionDuration > 0) disablingTime.minusDays(deletionDuration.toLong()) else null
             // Logging
             logger.debug("[{}] Disabling time: {}", branch.entityDisplayName, disablingTime)
             logger.debug("[{}] Deletion time: {}", branch.entityDisplayName, deletionTime)
             // Indexation of promotion levels to protect
-            val promotionsToProtect: Set<String> = if (promotionsToKeep != null) {
-                HashSet(promotionsToKeep)
-            } else {
-                emptySet()
-            }
+            val promotionsToProtect = promotionsToKeep?.toSet() ?: emptySet()
             // Gets the last promotions for this branch
             if (promotionsToProtect.isNotEmpty()) {
-                val lastPromotions: List<PromotionView> = structureService.getBranchStatusView(branch).promotions
-                val isProtected = lastPromotions.any { promotionView: PromotionView ->
-                    (promotionView.promotionRun != null
-                            && promotionsToProtect.contains(promotionView.promotionLevel.name))
+                val isProtected = promotionsToProtect.any { promotionName ->
+                    promotionRunService.getLastPromotionRunForBranch(branch, promotionName) != null
                 }
                 if (isProtected) {
                     logger.debug("[{}] Branch is promoted and is not eligible for staleness", branch.entityDisplayName)
