@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.kdsl.connector.graphql.schema.CreateProjectMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.FindBranchByNameQuery
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.FindByBuildByNameQuery
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.FindProjectByNameQuery
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.ProjectListQuery
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 
 class Ontrack(connector: Connector) : Connected(connector) {
@@ -69,5 +70,15 @@ class Ontrack(connector: Connector) : Connected(connector) {
         FindByBuildByNameQuery(project, branch, build)
     )?.builds()?.firstOrNull()
         ?.fragments()?.buildFragment()?.toBuild(this@Ontrack)
+
+    /**
+     * Getting a list of the last projects
+     */
+    fun projects(): List<Project> =
+        graphqlConnector.query(
+            ProjectListQuery()
+        )?.projects()?.map {
+            it.fragments().projectFragment().toProject(this)
+        } ?: emptyList()
 
 }

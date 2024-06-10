@@ -1,0 +1,9 @@
+query BranchList(
+    $projectId: Int!,
+) {
+    project(id: $projectId) {
+        branches {
+            ...BranchFragment
+        }
+    }
+}

@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.GraphQLMissingDataException
 import net.nemerosa.ontrack.kdsl.connector.graphql.checkData
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.BranchListQuery
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.CreateBranchMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.DeleteProjectByIdMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.ProjectEntityType
@@ -56,5 +57,16 @@ class Project(
             ?.checkData { it.createBranch()?.branch() }
             ?.fragments()?.branchFragment()?.toBranch(this)
             ?: throw GraphQLMissingDataException("Did not get back the created branch")
+
+
+    /**
+     * Gets a list of branches for this project.
+     */
+    fun branchList(): List<Branch> =
+        graphqlConnector.query(
+            BranchListQuery(id.toInt())
+        )?.project()?.branches()?.map {
+            it.fragments().branchFragment().toBranch(this)
+        } ?: emptyList()
 
 }

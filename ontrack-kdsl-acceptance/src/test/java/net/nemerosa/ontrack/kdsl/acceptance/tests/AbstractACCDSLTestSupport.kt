@@ -6,6 +6,9 @@ import net.nemerosa.ontrack.kdsl.spec.Branch
 import net.nemerosa.ontrack.kdsl.spec.Build
 import net.nemerosa.ontrack.kdsl.spec.Project
 import net.nemerosa.ontrack.kdsl.spec.admin.admin
+import net.nemerosa.ontrack.kdsl.spec.extension.tfc.tfc
+import net.nemerosa.ontrack.kdsl.spec.settings.security
+import net.nemerosa.ontrack.kdsl.spec.settings.settings
 
 abstract class AbstractACCDSLTestSupport : AbstractACCTestSupport() {
 
@@ -102,6 +105,26 @@ abstract class AbstractACCDSLTestSupport : AbstractACCTestSupport() {
                 }
             } != null
         }
+    }
+
+    /**
+     * For the duration of call, sets Ontrack to that authorization to see ALL projects is withdrawn.
+     */
+    protected fun withNotGrantProjectViewToAll(code: () -> Unit) {
+        ontrack.settings.security.with(
+            update = { it.withGrantProjectViewToAll(false) },
+            code = code,
+        )
+    }
+
+    /**
+     * For the duration of the call, Ontrack will be run with a newly generated user with no specific right.
+     */
+    protected fun withUser(code: () -> Unit) {
+        // TODO Creating a new user
+        // TODO Setting the user as connection
+        // TODO Running the code
+        TODO()
     }
 
 }

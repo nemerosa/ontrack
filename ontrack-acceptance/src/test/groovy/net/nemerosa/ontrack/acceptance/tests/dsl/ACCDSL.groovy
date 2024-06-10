@@ -7,10 +7,7 @@ import net.nemerosa.ontrack.acceptance.support.AcceptanceTestSuite
 import net.nemerosa.ontrack.dsl.v4.Branch
 import net.nemerosa.ontrack.dsl.v4.MetaInfo
 import net.nemerosa.ontrack.dsl.v4.ObjectAlreadyExistsException
-import net.nemerosa.ontrack.dsl.v4.Ontrack
 import net.nemerosa.ontrack.dsl.v4.http.OTForbiddenClientException
-import net.nemerosa.ontrack.dsl.v4.http.OTNotFoundException
-import org.junit.Assert
 import org.junit.Test
 
 import static net.nemerosa.ontrack.test.TestUtils.uid
@@ -23,69 +20,6 @@ import static org.junit.Assert.assertTrue
 @AcceptanceTestSuite
 @AcceptanceTest([AcceptanceTestContext.SMOKE, AcceptanceTestContext.VAULT])
 class ACCDSL extends AbstractACCDSL {
-
-    @Test
-    void 'Branch not found before not authorised'() {
-        // Creating a branch
-        def testBranch = doCreateBranch()
-        def projectName = testBranch.project.name.asText()
-        def branchName = testBranch.name.asText()
-        // Removes 'grant view to all'
-        withNotGrantProjectViewToAll {
-            // Not authorised client
-            Ontrack ontrack = ontrackAsAnyUser
-            // Branch cannot be found
-            try {
-                ontrack.branch(projectName, branchName)
-                Assert.fail "Branch access should have been forbidden"
-            } catch (OTNotFoundException ex) {
-                assert ex.message == "Branch not found: ${projectName}/${branchName}" as String
-            }
-        }
-    }
-
-    @Test
-    void 'Project default description is empty'() {
-        def name = uid('P')
-        ontrack.project(name) {
-            config {
-                autoValidationStamp()
-            }
-            branch('template', "Template for all branches", true)
-        }
-        // Checks the project description
-        assert ontrack.project(name).description == ''
-        // Checks the branch description
-        assert ontrack.branch(name, 'template').description == 'Template for all branches'
-    }
-
-    @Test
-    void 'List of projects'() {
-        def name = uid('P')
-        ontrack.project(name)
-        assert ontrack.projects.find { it.name == name } != null
-    }
-
-    @Test
-    void 'Finding a project by name'() {
-        def name = uid('P')
-        def name2 = uid('P')
-        ontrack.project(name)
-        assert ontrack.findProject(name) != null
-        assert ontrack.findProject(name2) == null
-    }
-
-    @Test
-    @AcceptanceTest(AcceptanceTestContext.SMOKE)
-    void 'Project branches'() {
-        // Project and two branches
-        def name = uid('P')
-        ontrack.project(name) {
-            (1..5).each { branch("B${it}") }
-        }
-        // Checks the branches
-        assert ontrack.project(name).branches*.name == (5..1).collect { "B${it}" }
-    }
 
     @Test
     void 'Getting last promoted build'() {

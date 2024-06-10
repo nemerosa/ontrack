@@ -5,9 +5,67 @@ import net.nemerosa.ontrack.kdsl.connector.graphql.GraphQLClientException
 import net.nemerosa.ontrack.kdsl.spec.extension.general.promotionDependencies
 import org.junit.jupiter.api.Test
 import org.springframework.web.client.HttpClientErrorException.BadRequest
+import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNull
 
 class ACCDSLPromotionDependencies : AbstractACCDSLTestSupport() {
+
+    @Test
+    fun `Promotion dependency property set to null when not defined`() {
+        project {
+            branch {
+                val pl = promotion()
+                assertNull(pl.promotionDependencies)
+            }
+        }
+    }
+
+    @Test
+    fun `Promotion dependency property`() {
+        project {
+            branch {
+                val pl = promotion()
+                pl.promotionDependencies = listOf("SILVER", "GOLD")
+                assertEquals(listOf("SILVER", "GOLD"), pl.promotionDependencies)
+            }
+        }
+    }
+
+    @Test
+    fun `Promotion dependency missing`() {
+        project {
+            branch {
+                promotion("BRONZE")
+                promotion("SILVER")
+                promotion("GOLD")
+                promotion("PLATINUM").promotionDependencies = listOf("SILVER", "GOLD")
+                build {
+                    promote("SILVER")
+                    assertFailsWith<GraphQLClientException> {
+                        promote("PLATINUM")
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Promotion dependency check OK`() {
+        project {
+            branch {
+                promotion("BRONZE")
+                promotion("SILVER")
+                promotion("GOLD")
+                promotion("PLATINUM").promotionDependencies = listOf("SILVER", "GOLD")
+                build {
+                    promote("SILVER")
+                    promote("GOLD")
+                    promote("PLATINUM")
+                }
+            }
+        }
+    }
 
     @Test
     fun `Previous promotion condition check failure must be an input exception`() {
