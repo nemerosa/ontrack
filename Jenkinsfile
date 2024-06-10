@@ -306,7 +306,7 @@ pipeline {
                         sh 'mv ontrack-kdsl-acceptance/build/logs ontrack-kdsl-acceptance/build/logs-ui'
                     }
                     archiveArtifacts(artifacts: "ontrack-kdsl-acceptance/build/logs-ui/**", allowEmptyArchive: true)
-                    archiveArtifacts(artifacts: "ontrack-web-tests/reports/html/index.html", allowEmptyArchive: true)
+                    archiveArtifacts(artifacts: "ontrack-web-tests/reports/html/**", allowEmptyArchive: true)
                 }
             }
         }
