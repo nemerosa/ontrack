@@ -1,1 +1,1 @@
-// Placeholder
+angular.module('ontrack.extension.stale', []);
