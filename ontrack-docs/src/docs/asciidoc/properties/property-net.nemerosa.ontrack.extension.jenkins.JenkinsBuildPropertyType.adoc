@@ -17,5 +17,11 @@ Configuration:
 
 * **configuration** - String - required - Name of the Jenkins configuration
 
+* **configuration** - String - required - Name of the Jenkins configuration
+
+* **configuration** - String - required - Name of the Jenkins configuration
+
+* **job** - String - required - Path to the Jenkins job, relative to root. It may or may not include `/job` URL separators.
+
 * **job** - String - required - Path to the Jenkins job, relative to root. It may or may not include `/job` URL separators.
 

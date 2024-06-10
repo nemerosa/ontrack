@@ -2,16 +2,17 @@ package net.nemerosa.ontrack.extension.git
 
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.git.mocking.GitMockingConfigurator
+import net.nemerosa.ontrack.extension.stale.DefaultStaleBranchCheckContext
 import net.nemerosa.ontrack.extension.stale.StaleBranchStatus
 import net.nemerosa.ontrack.model.structure.Signature.Companion.of
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class PullRequestStaleBranchCheckIT : AbstractGitTestJUnit4Support() {
+class PullRequestStaleBranchCheckIT : AbstractGitTestSupport() {
 
     @Autowired
     private lateinit var check: PullRequestStaleBranchCheck
@@ -19,7 +20,7 @@ class PullRequestStaleBranchCheckIT : AbstractGitTestJUnit4Support() {
     @Autowired
     private lateinit var gitMockingConfigurator: GitMockingConfigurator
 
-    @Before
+    @BeforeEach
     fun init() {
         gitMockingConfigurator.clearPullRequests()
     }
@@ -39,9 +40,15 @@ class PullRequestStaleBranchCheckIT : AbstractGitTestJUnit4Support() {
             project {
                 prGitProject(repo)
                 withPRDisabled {
-                    assertFalse(check.isProjectEligible(this), "Project is not eligible for PR branch check because PR are not enabled")
+                    assertFalse(
+                        check.isProjectEligible(this),
+                        "Project is not eligible for PR branch check because PR are not enabled"
+                    )
                 }
-                assertTrue(check.isProjectEligible(this), "Project is eligible for PR branch check because PR are enabled")
+                assertTrue(
+                    check.isProjectEligible(this),
+                    "Project is eligible for PR branch check because PR are enabled"
+                )
             }
         }
     }
@@ -54,9 +61,15 @@ class PullRequestStaleBranchCheckIT : AbstractGitTestJUnit4Support() {
             project {
                 prGitProject(repo)
                 withPRCleanupDisabled {
-                    assertFalse(check.isProjectEligible(this), "Project is not eligible for PR branch check because PR cleanup is not enabled")
+                    assertFalse(
+                        check.isProjectEligible(this),
+                        "Project is not eligible for PR branch check because PR cleanup is not enabled"
+                    )
                 }
-                assertTrue(check.isProjectEligible(this), "Project is eligible for PR branch check because PR cleanup is enabled")
+                assertTrue(
+                    check.isProjectEligible(this),
+                    "Project is eligible for PR branch check because PR cleanup is enabled"
+                )
             }
         }
     }
@@ -69,7 +82,10 @@ class PullRequestStaleBranchCheckIT : AbstractGitTestJUnit4Support() {
             project {
                 prGitProject(repo)
                 branch {
-                    assertFalse(check.isBranchEligible(this), "Branch is not eligible for PR branch check because not on Git")
+                    assertFalse(
+                        check.isBranchEligible(this),
+                        "Branch is not eligible for PR branch check because not on Git"
+                    )
                 }
             }
         }
@@ -84,7 +100,10 @@ class PullRequestStaleBranchCheckIT : AbstractGitTestJUnit4Support() {
                 prGitProject(repo)
                 branch {
                     gitBranch("main")
-                    assertFalse(check.isBranchEligible(this), "Branch is not eligible for PR branch check because not a PR")
+                    assertFalse(
+                        check.isBranchEligible(this),
+                        "Branch is not eligible for PR branch check because not a PR"
+                    )
                 }
             }
         }
@@ -100,9 +119,15 @@ class PullRequestStaleBranchCheckIT : AbstractGitTestJUnit4Support() {
                 branch {
                     gitBranch("PR-1")
                     withPRDisabled {
-                        assertFalse(check.isBranchEligible(this), "Branch is not eligible for PR branch check because PR are not enabled")
+                        assertFalse(
+                            check.isBranchEligible(this),
+                            "Branch is not eligible for PR branch check because PR are not enabled"
+                        )
                     }
-                    assertTrue(check.isBranchEligible(this), "Branch is eligible for PR branch check because PR are enabled")
+                    assertTrue(
+                        check.isBranchEligible(this),
+                        "Branch is eligible for PR branch check because PR are enabled"
+                    )
                 }
             }
         }
@@ -118,9 +143,15 @@ class PullRequestStaleBranchCheckIT : AbstractGitTestJUnit4Support() {
                 branch {
                     gitBranch("PR-1")
                     withPRCleanupDisabled {
-                        assertFalse(check.isBranchEligible(this), "Branch is not eligible for PR branch check because PR cleanup is not enabled")
+                        assertFalse(
+                            check.isBranchEligible(this),
+                            "Branch is not eligible for PR branch check because PR cleanup is not enabled"
+                        )
                     }
-                    assertTrue(check.isBranchEligible(this), "Branch is eligible for PR branch check because PR cleanup is enabled")
+                    assertTrue(
+                        check.isBranchEligible(this),
+                        "Branch is eligible for PR branch check because PR cleanup is enabled"
+                    )
                 }
             }
         }
@@ -139,7 +170,11 @@ class PullRequestStaleBranchCheckIT : AbstractGitTestJUnit4Support() {
                         commitAsProperty()
                     }
                     val build = build()
-                    assertEquals(null, check.getBranchStaleness(this, build), "No decision, keeping the branch")
+                    assertEquals(
+                        null,
+                        check.getBranchStaleness(DefaultStaleBranchCheckContext(), this, build),
+                        "No decision, keeping the branch"
+                    )
                 }
             }
         }
@@ -158,7 +193,11 @@ class PullRequestStaleBranchCheckIT : AbstractGitTestJUnit4Support() {
                         commitAsProperty()
                     }
                     val build = build().withSignature(of(Time.now().minusDays(10), "test"))
-                    assertEquals(null, check.getBranchStaleness(this, build), "No decision, keeping the branch")
+                    assertEquals(
+                        null,
+                        check.getBranchStaleness(DefaultStaleBranchCheckContext(), this, build),
+                        "No decision, keeping the branch"
+                    )
                 }
             }
         }
@@ -177,7 +216,11 @@ class PullRequestStaleBranchCheckIT : AbstractGitTestJUnit4Support() {
                         commitAsProperty()
                     }
                     val build = build()
-                    assertEquals(null, check.getBranchStaleness(this, build), "No decision, keeping the branch")
+                    assertEquals(
+                        null,
+                        check.getBranchStaleness(DefaultStaleBranchCheckContext(), this, build),
+                        "No decision, keeping the branch"
+                    )
                 }
             }
         }
@@ -196,7 +239,11 @@ class PullRequestStaleBranchCheckIT : AbstractGitTestJUnit4Support() {
                         commitAsProperty()
                     }
                     val build = build().withSignature(of(Time.now().minusDays(6), "test"))
-                    assertEquals(StaleBranchStatus.DISABLE, check.getBranchStaleness(this, build), "Branch must be disabled")
+                    assertEquals(
+                        StaleBranchStatus.DISABLE,
+                        check.getBranchStaleness(DefaultStaleBranchCheckContext(), this, build),
+                        "Branch must be disabled"
+                    )
                 }
             }
         }
@@ -215,7 +262,11 @@ class PullRequestStaleBranchCheckIT : AbstractGitTestJUnit4Support() {
                         commitAsProperty()
                     }
                     val build = build().withSignature(of(Time.now().minusDays(10), "test"))
-                    assertEquals(StaleBranchStatus.DELETE, check.getBranchStaleness(this, build), "Branch must be deleted")
+                    assertEquals(
+                        StaleBranchStatus.DELETE,
+                        check.getBranchStaleness(DefaultStaleBranchCheckContext(), this, build),
+                        "Branch must be deleted"
+                    )
                 }
             }
         }
@@ -234,7 +285,11 @@ class PullRequestStaleBranchCheckIT : AbstractGitTestJUnit4Support() {
                         commitAsProperty()
                     }
                     val build = build()
-                    assertEquals(null, check.getBranchStaleness(this, build), "No decision, keeping the branch")
+                    assertEquals(
+                        null,
+                        check.getBranchStaleness(DefaultStaleBranchCheckContext(), this, build),
+                        "No decision, keeping the branch"
+                    )
                 }
             }
         }
@@ -253,7 +308,11 @@ class PullRequestStaleBranchCheckIT : AbstractGitTestJUnit4Support() {
                         commitAsProperty()
                     }
                     val build = build().withSignature(of(Time.now().minusDays(6), "test"))
-                    assertEquals(StaleBranchStatus.DISABLE, check.getBranchStaleness(this, build), "Branch must be disabled")
+                    assertEquals(
+                        StaleBranchStatus.DISABLE,
+                        check.getBranchStaleness(DefaultStaleBranchCheckContext(), this, build),
+                        "Branch must be disabled"
+                    )
                 }
             }
         }
@@ -272,7 +331,11 @@ class PullRequestStaleBranchCheckIT : AbstractGitTestJUnit4Support() {
                         commitAsProperty()
                     }
                     val build = build().withSignature(of(Time.now().minusDays(10), "test"))
-                    assertEquals(StaleBranchStatus.DELETE, check.getBranchStaleness(this, build), "Branch must be deleted")
+                    assertEquals(
+                        StaleBranchStatus.DELETE,
+                        check.getBranchStaleness(DefaultStaleBranchCheckContext(), this, build),
+                        "Branch must be deleted"
+                    )
                 }
             }
         }

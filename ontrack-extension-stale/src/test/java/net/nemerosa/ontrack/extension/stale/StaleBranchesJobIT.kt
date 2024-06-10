@@ -1,25 +1,31 @@
 package net.nemerosa.ontrack.extension.stale
 
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.job.JobRunListener
-import net.nemerosa.ontrack.model.structure.Project
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class StaleBranchesJobIT : AbstractDSLTestJUnit4Support() {
+class StaleBranchesJobIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var staleJobService: StaleJobService
 
+    @Autowired
+    private lateinit var staleTestSupport: StaleTestSupport
+
     @Test
     fun `Deleting a branch using last build time`() {
         project {
-            staleBranches(disabling = 5, deleting = 10)
+            staleTestSupport.staleBranches(
+                project = project,
+                disabling = 5,
+                deleting = 10
+            )
             branch {
                 build {
                     updateBuildSignature(time = Time.now().minusDays(16))
@@ -33,7 +39,11 @@ class StaleBranchesJobIT : AbstractDSLTestJUnit4Support() {
     @Test
     fun `Disabling only a branch using last build time when deletion time is not set`() {
         project {
-            staleBranches(disabling = 5, deleting = null)
+            staleTestSupport.staleBranches(
+                project = project,
+                disabling = 5,
+                deleting = null
+            )
             branch {
                 build {
                     updateBuildSignature(time = Time.now().minusDays(11))
@@ -49,7 +59,11 @@ class StaleBranchesJobIT : AbstractDSLTestJUnit4Support() {
     @Test
     fun `Disabling a branch using last build time`() {
         project {
-            staleBranches(disabling = 5, deleting = 10)
+            staleTestSupport.staleBranches(
+                project = project,
+                disabling = 5,
+                deleting = 10
+            )
             branch {
                 build {
                     updateBuildSignature(time = Time.now().minusDays(6))
@@ -65,7 +79,11 @@ class StaleBranchesJobIT : AbstractDSLTestJUnit4Support() {
     @Test
     fun `Not touching a branch using last build time`() {
         project {
-            staleBranches(disabling = 5, deleting = 10)
+            staleTestSupport.staleBranches(
+                project = project,
+                disabling = 5,
+                deleting = 10
+            )
             branch {
                 build {
                     updateBuildSignature(time = Time.now().minusDays(4))
@@ -81,7 +99,11 @@ class StaleBranchesJobIT : AbstractDSLTestJUnit4Support() {
     @Test
     fun `Deleting a branch using branch creation time`() {
         project {
-            staleBranches(disabling = 5, deleting = 10)
+            staleTestSupport.staleBranches(
+                project = project,
+                disabling = 5,
+                deleting = 10
+            )
             branch {
                 updateBranchSignature(time = Time.now().minusDays(16))
                 staleJobService.detectAndManageStaleBranches(JobRunListener.out(), project)
@@ -93,7 +115,11 @@ class StaleBranchesJobIT : AbstractDSLTestJUnit4Support() {
     @Test
     fun `Disabling a branch using branch creation time`() {
         project {
-            staleBranches(disabling = 5, deleting = 10)
+            staleTestSupport.staleBranches(
+                project = project,
+                disabling = 5,
+                deleting = 10
+            )
             branch {
                 updateBranchSignature(time = Time.now().minusDays(6))
                 staleJobService.detectAndManageStaleBranches(JobRunListener.out(), project)
@@ -110,7 +136,12 @@ class StaleBranchesJobIT : AbstractDSLTestJUnit4Support() {
             branch {
                 updateBranchSignature(time = Time.now().minusDays(7))
                 val pl = promotionLevel()
-                staleBranches(disabling = 5, deleting = 10, promotionsToKeep = listOf(pl.name))
+                staleTestSupport.staleBranches(
+                    project = this@project.project,
+                    disabling = 5,
+                    deleting = 10,
+                    promotionsToKeep = listOf<String>(pl.name)
+                )
                 build {
                     promote(pl)
                     updateBuildSignature(time = Time.now().minusDays(6))
@@ -129,7 +160,12 @@ class StaleBranchesJobIT : AbstractDSLTestJUnit4Support() {
             branch {
                 updateBranchSignature(time = Time.now().minusDays(7))
                 val pl = promotionLevel()
-                staleBranches(disabling = 5, deleting = 10, promotionsToKeep = null)
+                staleTestSupport.staleBranches(
+                    project = this@project.project,
+                    disabling = 5,
+                    deleting = 10,
+                    promotionsToKeep = null
+                )
                 build {
                     promote(pl)
                     updateBuildSignature(time = Time.now().minusDays(6))
@@ -148,7 +184,12 @@ class StaleBranchesJobIT : AbstractDSLTestJUnit4Support() {
             branch {
                 updateBranchSignature(time = Time.now().minusDays(12))
                 val pl = promotionLevel()
-                staleBranches(disabling = 5, deleting = 10, promotionsToKeep = listOf(pl.name))
+                staleTestSupport.staleBranches(
+                    project = this@project.project,
+                    disabling = 5,
+                    deleting = 10,
+                    promotionsToKeep = listOf<String>(pl.name)
+                )
                 build {
                     promote(pl)
                     updateBuildSignature(time = Time.now().minusDays(11))
@@ -167,7 +208,12 @@ class StaleBranchesJobIT : AbstractDSLTestJUnit4Support() {
             branch("release-1.0") {
                 updateBranchSignature(time = Time.now().minusDays(20))
                 val pl = promotionLevel()
-                staleBranches(disabling = 5, deleting = 10, includes = "release-.*")
+                staleTestSupport.staleBranches(
+                    project = this@project.project,
+                    disabling = 5,
+                    deleting = 10,
+                    includes = "release-.*"
+                )
                 build {
                     promote(pl)
                     updateBuildSignature(time = Time.now().minusDays(18))
@@ -186,7 +232,13 @@ class StaleBranchesJobIT : AbstractDSLTestJUnit4Support() {
             branch("release-2.0") {
                 updateBranchSignature(time = Time.now().minusDays(20))
                 val pl = promotionLevel()
-                staleBranches(disabling = 5, deleting = 10, includes = "release-.*", excludes = "release-1.*")
+                staleTestSupport.staleBranches(
+                    project = this@project.project,
+                    disabling = 5,
+                    deleting = 10,
+                    includes = "release-.*",
+                    excludes = "release-1.*"
+                )
                 build {
                     promote(pl)
                     updateBuildSignature(time = Time.now().minusDays(18))
@@ -205,7 +257,13 @@ class StaleBranchesJobIT : AbstractDSLTestJUnit4Support() {
             branch("release-1.0") {
                 updateBranchSignature(time = Time.now().minusDays(20))
                 val pl = promotionLevel()
-                staleBranches(disabling = 5, deleting = 10, includes = "release-.*", excludes = "release-1.*")
+                staleTestSupport.staleBranches(
+                    project = this@project.project,
+                    disabling = 5,
+                    deleting = 10,
+                    includes = "release-.*",
+                    excludes = "release-1.*"
+                )
                 build {
                     promote(pl)
                     updateBuildSignature(time = Time.now().minusDays(18))
@@ -222,7 +280,12 @@ class StaleBranchesJobIT : AbstractDSLTestJUnit4Support() {
             branch {
                 updateBranchSignature(time = Time.now().minusDays(6))
                 val pl = promotionLevel()
-                staleBranches(disabling = 5, deleting = 10, promotionsToKeep = null)
+                staleTestSupport.staleBranches(
+                    project = this@project.project,
+                    disabling = 5,
+                    deleting = 10,
+                    promotionsToKeep = null
+                )
                 build {
                     promote(pl)
                     updateBuildSignature(time = Time.now().minusDays(16))
@@ -236,7 +299,11 @@ class StaleBranchesJobIT : AbstractDSLTestJUnit4Support() {
     @Test
     fun `Not touching a branch using branch creation time`() {
         project {
-            staleBranches(disabling = 5, deleting = 10)
+            staleTestSupport.staleBranches(
+                project = project,
+                disabling = 5,
+                deleting = 10
+            )
             branch {
                 updateBranchSignature(time = Time.now().minusDays(4))
                 staleJobService.detectAndManageStaleBranches(JobRunListener.out(), project)
@@ -245,22 +312,6 @@ class StaleBranchesJobIT : AbstractDSLTestJUnit4Support() {
                 }
             }
         }
-    }
-
-    private fun Project.staleBranches(
-        disabling: Int = 0,
-        deleting: Int? = null,
-        promotionsToKeep: List<String>? = null,
-        includes: String? = null,
-        excludes: String? = null,
-    ) {
-        setProperty(project, StalePropertyType::class.java, StaleProperty(
-            disablingDuration = disabling,
-            deletingDuration = deleting,
-            promotionsToKeep = promotionsToKeep,
-            includes = includes,
-            excludes = excludes,
-        ))
     }
 
 }

@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.git
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.extension.stale.StaleBranchCheck
+import net.nemerosa.ontrack.extension.stale.StaleBranchCheckContext
 import net.nemerosa.ontrack.extension.stale.StaleBranchStatus
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.structure.Branch
@@ -17,25 +18,31 @@ import java.time.LocalDateTime
  */
 @Component
 class PullRequestStaleBranchCheck(
-        extensionFeature: GitExtensionFeature,
-        private val gitService: GitService,
-        private val gitConfigProperties: GitConfigProperties
+    extensionFeature: GitExtensionFeature,
+    private val gitService: GitService,
+    private val gitConfigProperties: GitConfigProperties
 ) : AbstractExtension(extensionFeature), StaleBranchCheck {
 
     /**
      * Porject must be scanned if it is linked to a Git repository
      */
     override fun isProjectEligible(project: Project): Boolean =
-            gitConfigProperties.pullRequests.enabled && gitConfigProperties.pullRequests.cleanup.enabled && gitService.isProjectConfiguredForGit(project)
+        gitConfigProperties.pullRequests.enabled && gitConfigProperties.pullRequests.cleanup.enabled && gitService.isProjectConfiguredForGit(
+            project
+        )
 
     /**
      * Branch is eligible if it is a PR.
      */
     override fun isBranchEligible(branch: Branch): Boolean =
-            gitConfigProperties.pullRequests.enabled && gitConfigProperties.pullRequests.cleanup.enabled &&
-                    gitService.isBranchConfiguredForGit(branch) && gitService.isBranchAPullRequest(branch)
+        gitConfigProperties.pullRequests.enabled && gitConfigProperties.pullRequests.cleanup.enabled &&
+                gitService.isBranchConfiguredForGit(branch) && gitService.isBranchAPullRequest(branch)
 
-    override fun getBranchStaleness(branch: Branch, lastBuild: Build?): StaleBranchStatus? {
+    override fun getBranchStaleness(
+        context: StaleBranchCheckContext,
+        branch: Branch,
+        lastBuild: Build?
+    ): StaleBranchStatus? {
         return if (gitConfigProperties.pullRequests.enabled && gitConfigProperties.pullRequests.cleanup.enabled) {
             if (gitService.isBranchAPullRequest(branch)) {
                 val pr = gitService.getBranchAsPullRequest(branch)
@@ -44,9 +51,11 @@ class PullRequestStaleBranchCheck(
                     // Current time
                     val now = Time.now()
                     // Disabling time
-                    val disablingTime: LocalDateTime = now.minusDays(gitConfigProperties.pullRequests.cleanup.disabling.toLong())
+                    val disablingTime: LocalDateTime =
+                        now.minusDays(gitConfigProperties.pullRequests.cleanup.disabling.toLong())
                     // Deletion time
-                    val deletionTime: LocalDateTime = disablingTime.minusDays(gitConfigProperties.pullRequests.cleanup.deleting.toLong())
+                    val deletionTime: LocalDateTime =
+                        disablingTime.minusDays(gitConfigProperties.pullRequests.cleanup.deleting.toLong())
                     // Check
                     when {
                         lastTime < deletionTime -> StaleBranchStatus.DELETE

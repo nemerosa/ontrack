@@ -13,15 +13,15 @@ Configuration:
 
 * **event** - String - optional - Event having led to the creation of this validation
 
-* **job** - String - required - job field
+* **job** - String - required - Name of the workflow job which created this validation
 
-* **name** - String - required - name field
+* **name** - String - required - Name of the workflow
 
-* **runId** - Long - required - runId field
+* **runId** - Long - required - ID of the run
 
-* **runNumber** - Int - required - runNumber field
+* **runNumber** - Int - required - Number of the run
 
-* **running** - Boolean - required - running field
+* **running** - Boolean - required - True if the run is still flagged as running
 
-* **url** - String - required - url field
+* **url** - String - required - Link to the GitHub Workflow run
 

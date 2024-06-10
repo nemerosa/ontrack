@@ -7,8 +7,14 @@ package net.nemerosa.ontrack.model.structure
 interface BranchDisplayNameService {
 
     /**
-     * Gets the display name for this branch
+     * Gets the display name for this branch, using a default naming policy
      */
+    @Deprecated("Will be removed in V5. Use the method with the branch name policy.")
     fun getBranchDisplayName(branch: Branch): String
+
+    /**
+     * Gets the display name for this branch, using a given branch name policy
+     */
+    fun getBranchDisplayName(branch: Branch, policy: BranchNamePolicy): String
 
 }
