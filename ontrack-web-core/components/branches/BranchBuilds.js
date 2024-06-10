@@ -98,10 +98,12 @@ export default function BranchBuilds({
                                 >
                                     <Button
                                         onClick={onLoadMore}
-                                        disabled={!pageInfo || !pageInfo.nextPage}
+                                        disabled={!pageInfo || !pageInfo.nextPage || loadingBuilds}
                                     >
                                         <Space>
-                                            <FaSearch/>
+                                            {
+                                                loadingBuilds ? <Spin size="small"/> : <FaSearch/>
+                                            }
                                             <Typography.Text>Load more...</Typography.Text>
                                         </Space>
                                     </Button>
