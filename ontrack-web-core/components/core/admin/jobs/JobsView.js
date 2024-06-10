@@ -126,7 +126,7 @@ export default function JobsView() {
                     <CloseCommand key="close" href={homeUri()}/>
                 ]}
             >
-                <Space direction="vertical">
+                <Space direction="vertical" className="ot-line">
                     <JobExecutionStatus/>
                     <JobCategoriesContextProvider>
                         <AutoRefreshContextProvider onRefresh={refresh}>
