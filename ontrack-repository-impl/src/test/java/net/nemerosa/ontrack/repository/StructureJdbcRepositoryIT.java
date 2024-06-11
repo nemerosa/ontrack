@@ -7,7 +7,7 @@ import org.junit.Test;
 import static net.nemerosa.ontrack.test.TestUtils.uid;
 import static org.junit.Assert.*;
 
-public class StructureJdbcRepositoryIT extends AbstractRepositoryTestSupport {
+public class StructureJdbcRepositoryIT extends AbstractRepositoryJUnit4TestSupport {
 
     @Test(expected = IllegalStateException.class)
     public void create_branch_project_not_defined() {

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode
  * This service allows to store and retrieve arbitrary data with some
  * [project entities][net.nemerosa.ontrack.model.structure.ProjectEntity].
  */
+@Deprecated("Will be removed in V5. Use the simpler EntityStore service.")
 interface EntityDataService {
 
     /**

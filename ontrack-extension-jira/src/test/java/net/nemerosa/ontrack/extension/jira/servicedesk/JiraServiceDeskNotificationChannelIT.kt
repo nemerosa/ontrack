@@ -78,6 +78,7 @@ class JiraServiceDeskNotificationChannelIT : AbstractNotificationTestSupport() {
 
                     // Setting up the Jira service desk notification
                     eventSubscriptionService.subscribe(
+                        name = "test",
                         channel = jiraServiceDeskNotificationChannel,
                         channelConfig = JiraServiceDeskNotificationChannelConfig(
                             configName = configuration.name,
@@ -195,6 +196,7 @@ class JiraServiceDeskNotificationChannelIT : AbstractNotificationTestSupport() {
 
                     // Setting up the Jira service desk notification
                     eventSubscriptionService.subscribe(
+                        name = "test",
                         channel = jiraServiceDeskNotificationChannel,
                         channelConfig = JiraServiceDeskNotificationChannelConfig(
                             configName = configuration.name,

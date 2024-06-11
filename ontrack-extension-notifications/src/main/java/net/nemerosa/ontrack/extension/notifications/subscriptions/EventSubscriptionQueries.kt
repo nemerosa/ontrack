@@ -70,14 +70,14 @@ class GQLRootQueryEventSubscriptions(
                 // Getting the list
                 eventSubscriptionService.filterSubscriptions(filter).map {
                     EventSubscriptionPayload(
-                        id = it.id,
-                        channel = it.data.channel,
-                        channelConfig = it.data.channelConfig,
-                        events = it.data.events.toList(),
-                        keywords = it.data.keywords,
-                        disabled = it.data.disabled,
-                        origin = it.data.origin,
-                        contentTemplate = it.data.contentTemplate,
+                        name = it.name,
+                        channel = it.channel,
+                        channelConfig = it.channelConfig,
+                        events = it.events.toList(),
+                        keywords = it.keywords,
+                        disabled = it.disabled,
+                        origin = it.origin,
+                        contentTemplate = it.contentTemplate,
                     )
                 }
             }

@@ -10,7 +10,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-class ValidationStampStructureRepositoryIT : AbstractRepositoryTestSupport() {
+class ValidationStampStructureRepositoryIT : AbstractRepositoryJUnit4TestSupport() {
 
     @Autowired
     private lateinit var nopValidationDataType: NOPValidationDataType

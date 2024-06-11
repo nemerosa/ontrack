@@ -1,136 +1,41 @@
 package net.nemerosa.ontrack.extension.notifications.subscriptions
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.ObjectNode
-import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannelRegistry
-import net.nemerosa.ontrack.extension.notifications.channels.getChannel
-import net.nemerosa.ontrack.json.*
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.pagination.spanningPaginatedList
 import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.model.support.StorageService
-import net.nemerosa.ontrack.repository.support.store.EntityDataStore
-import net.nemerosa.ontrack.repository.support.store.EntityDataStoreFilter
-import net.nemerosa.ontrack.repository.support.store.EntityDataStoreRecord
 import org.springframework.stereotype.Service
-import java.util.*
-import kotlin.jvm.optionals.getOrNull
 
 @Service
 class DefaultEventSubscriptionService(
-    private val storageService: StorageService,
-    private val entityDataStore: EntityDataStore,
+    private val globalSubscriptionStore: GlobalSubscriptionStore,
+    private val entitySubscriptionStore: EntitySubscriptionStore,
     private val securityService: SecurityService,
     private val structureService: StructureService,
-    private val notificationChannelRegistry: NotificationChannelRegistry,
 ) : EventSubscriptionService {
 
-    companion object {
-        private val ENTITY_STORE = EventSubscription::class.java.name
-        private val GLOBAL_STORE = EventSubscription::class.java.name
-    }
-
-    override fun subscribe(subscription: EventSubscription): SavedEventSubscription {
+    override fun subscribe(subscription: EventSubscription) {
         // Record to save
         val record = subscription.toSubscriptionRecord()
         if (subscription.projectEntity != null) {
             // Checking the ACL
             securityService.checkProjectFunction(subscription.projectEntity, ProjectSubscriptionsWrite::class.java)
-            // For the filtering we must not take into account volatile parts like a custom template
-            val recordId = record.asJson() as ObjectNode
-            recordId.remove(SubscriptionRecord::contentTemplate.name)
-            // Tries to find any matching subscription
-            val filter = EntityDataStoreFilter(
+            // Saving the subscription
+            entitySubscriptionStore.save(
                 entity = subscription.projectEntity,
-                category = ENTITY_STORE,
-                jsonFilter = "json::jsonb @> CAST(:json AS JSONB)",
-                jsonFilterCriterias = mapOf("json" to recordId.asJsonString()),
+                record = record,
             )
-            val records = entityDataStore.getByFilter(
-                filter
-            )
-            // One existing record
-            val existingRecord = records.firstOrNull()
-            if (existingRecord != null) {
-                // If this is STRICTLY the same, returns it
-                if (existingRecord.data.parse<SubscriptionRecord>() == record) {
-                    return SavedEventSubscription(
-                        id = existingRecord.name,
-                        signature = existingRecord.signature,
-                        data = subscription,
-                    )
-                }
-            }
-            // If more than 1 record, or 1 record by different, replacing the subscription
-            entityDataStore.deleteByFilter(filter)
-            // New ID
-            val id = UUID.randomUUID().toString()
-            // Saves the subscription
-            val newRecord = entityDataStore.replaceOrAddObject(
-                subscription.projectEntity,
-                ENTITY_STORE,
-                id,
-                securityService.currentSignature,
-                null,
-                record
-            )
-            // OK
-            return SavedEventSubscription(id, newRecord.signature, subscription)
         } else {
             securityService.checkGlobalFunction(GlobalSubscriptionsManage::class.java)
-            // Gets any existing subscription
-            // For the filtering we must not take into account volatile parts like a custom template
-            val recordId = record.asJson() as ObjectNode
-            recordId.remove(SubscriptionRecord::contentTemplate.name)
-            val existingRecords = storageService.filterRecords(
-                store = GLOBAL_STORE,
-                type = SignedSubscriptionRecord::class,
-                query = """data::jsonb @> '${recordId.format()}'"""
-            )
-            // One existing record
-            if (existingRecords.size == 1) {
-                val (id, existingRecord) = existingRecords.toList().first()
-                // If this is STRICTLY the same, returns it
-                if (existingRecord.contentTemplate == record.contentTemplate) {
-                    return SavedEventSubscription(
-                        id = id,
-                        signature = existingRecord.signature,
-                        data = subscription,
-                    )
-                }
-            }
-            // If more than 1 record, or 1 record by different, replacing the subscription
-            existingRecords.forEach { (id, _) ->
-                storageService.delete(GLOBAL_STORE, id)
-            }
-            // New ID
-            val id = UUID.randomUUID().toString()
-            // Saves the subscription
-            val storedRecord = SignedSubscriptionRecord(
-                signature = securityService.currentSignature,
-                channel = subscription.channel,
-                channelConfig = subscription.channelConfig,
-                events = subscription.events,
-                keywords = subscription.keywords,
-                disabled = subscription.disabled,
-                origin = subscription.origin,
-                contentTemplate = subscription.contentTemplate,
-            )
-            storageService.store(
-                GLOBAL_STORE,
-                id,
-                storedRecord
-            )
-            // OK
-            return SavedEventSubscription(id, storedRecord.signature, subscription)
+            // Saving the subscription
+            globalSubscriptionStore.save(record)
         }
     }
 
     private fun EventSubscription.toSubscriptionRecord() = SubscriptionRecord(
+        name = name,
         channel = channel,
         channelConfig = channelConfig,
         events = events,
@@ -140,7 +45,7 @@ class DefaultEventSubscriptionService(
         contentTemplate = contentTemplate,
     )
 
-    override fun findSubscriptionById(projectEntity: ProjectEntity?, id: String): EventSubscription? =
+    override fun findSubscriptionByName(projectEntity: ProjectEntity?, name: String): EventSubscription? =
         if (projectEntity != null) {
             if (securityService.isProjectFunctionGranted(
                     projectEntity,
@@ -150,98 +55,74 @@ class DefaultEventSubscriptionService(
                     ProjectSubscriptionsRead::class.java
                 )
             ) {
-                entityDataStore.findLastByCategoryAndName(projectEntity, ENTITY_STORE, id, null)
-                    .getOrNull()
-                    ?.let { record ->
-                        fromRecord(projectEntity, record)?.data
-                    }
+                entitySubscriptionStore.findByName(projectEntity, name)?.let { record ->
+                    entitySubscriptionRecordToSubscription(projectEntity, record)
+                }
             } else {
                 null
             }
         } else if (!securityService.isGlobalFunctionGranted(GlobalSubscriptionsManage::class.java)) {
             null
         } else {
-            storageService.find(GLOBAL_STORE, id, SignedSubscriptionRecord::class)?.toEventSubscription()
+            globalSubscriptionStore.find(name)?.let {
+                subscriptionRecordToGlobalSubscription(it)
+            }
         }
 
-    private fun SignedSubscriptionRecord.toEventSubscription() = EventSubscription(
-        channel = channel,
-        channelConfig = channelConfig,
-        projectEntity = null,
-        events = events.toSet(),
-        keywords = keywords,
-        disabled = disabled,
-        origin = origin,
-        contentTemplate = contentTemplate,
-    )
-
-    override fun deleteSubscriptionById(projectEntity: ProjectEntity?, id: String) {
+    override fun deleteSubscriptionByName(projectEntity: ProjectEntity?, name: String) {
         if (projectEntity != null) {
             securityService.checkProjectFunction(projectEntity, ProjectView::class.java)
             securityService.checkProjectFunction(projectEntity, ProjectSubscriptionsWrite::class.java)
-            entityDataStore.deleteByName(projectEntity, ENTITY_STORE, id)
+            entitySubscriptionStore.deleteByName(projectEntity, name)
         } else {
             securityService.checkGlobalFunction(GlobalSubscriptionsManage::class.java)
-            storageService.delete(GLOBAL_STORE, id)
+            globalSubscriptionStore.delete(name)
         }
     }
 
     override fun deleteSubscriptionsByEntity(projectEntity: ProjectEntity) {
         securityService.checkProjectFunction(projectEntity, ProjectView::class.java)
         securityService.checkProjectFunction(projectEntity, ProjectSubscriptionsWrite::class.java)
-        entityDataStore.deleteByFilter(
-            EntityDataStoreFilter(
-                entity = projectEntity,
-                category = ENTITY_STORE,
-            )
-        )
+        entitySubscriptionStore.deleteAll(projectEntity)
     }
 
-    override fun disableSubscriptionById(projectEntity: ProjectEntity?, id: String): SavedEventSubscription =
-        disableSubscriptionById(projectEntity, id, disabled = true)
+    override fun deleteSubscriptionsByEntityAndOrigin(projectEntity: ProjectEntity, origin: String) {
+        securityService.checkProjectFunction(projectEntity, ProjectView::class.java)
+        securityService.checkProjectFunction(projectEntity, ProjectSubscriptionsWrite::class.java)
+        entitySubscriptionStore.deleteByOrigin(projectEntity, origin)
+    }
 
-    override fun enableSubscriptionById(projectEntity: ProjectEntity?, id: String): SavedEventSubscription =
-        disableSubscriptionById(projectEntity, id, disabled = false)
+    override fun disableSubscriptionByName(projectEntity: ProjectEntity?, name: String) =
+        disableSubscriptionByName(projectEntity, name, disabled = true)
 
-    private fun disableSubscriptionById(
+    override fun enableSubscriptionByName(projectEntity: ProjectEntity?, name: String) =
+        disableSubscriptionByName(projectEntity, name, disabled = false)
+
+    private fun disableSubscriptionByName(
         projectEntity: ProjectEntity?,
-        id: String,
+        name: String,
         disabled: Boolean,
-    ): SavedEventSubscription =
+    ) {
         if (projectEntity != null) {
             securityService.checkProjectFunction(projectEntity, ProjectView::class.java)
             securityService.checkProjectFunction(projectEntity, ProjectSubscriptionsWrite::class.java)
-            val record = findSubscriptionById(projectEntity, id)
+            val record = findSubscriptionByName(projectEntity, name)
                 ?.disabled(disabled)
-                ?: throw EventSubscriptionIdNotFoundException(null, id)
-            val signature = securityService.currentSignature
-            entityDataStore.replaceOrAddObject(
-                projectEntity,
-                ENTITY_STORE,
-                id,
-                signature,
-                null,
-                record.toSubscriptionRecord()
-            )
-            SavedEventSubscription(
-                id,
-                signature,
-                record
-            )
+                ?.toSubscriptionRecord()
+                ?: throw EventSubscriptionNameNotFoundException(null, name)
+            entitySubscriptionStore.save(projectEntity, record)
         } else {
             securityService.checkGlobalFunction(GlobalSubscriptionsManage::class.java)
-            val record = storageService.find(GLOBAL_STORE, id, SignedSubscriptionRecord::class)
+            val record = globalSubscriptionStore.find(name)
+                ?.let { subscriptionRecordToGlobalSubscription(it) }
                 ?.disabled(disabled)
-                ?: throw EventSubscriptionIdNotFoundException(null, id)
-            storageService.store(GLOBAL_STORE, id, record)
-            SavedEventSubscription(
-                id,
-                record.signature,
-                record.toEventSubscription()
-            )
+                ?.toSubscriptionRecord()
+                ?: throw EventSubscriptionNameNotFoundException(null, name)
+            globalSubscriptionStore.save(record)
         }
+    }
 
-    override fun filterSubscriptions(filter: EventSubscriptionFilter): PaginatedList<SavedEventSubscription> =
+    override fun filterSubscriptions(filter: EventSubscriptionFilter): PaginatedList<EventSubscription> =
         if (filter.entity == null) {
             filterGlobalSubscriptions(filter)
         } else {
@@ -250,7 +131,7 @@ class DefaultEventSubscriptionService(
 
     private fun filterGlobalSubscriptions(
         filter: EventSubscriptionFilter,
-    ): PaginatedList<SavedEventSubscription> {
+    ): PaginatedList<EventSubscription> {
         securityService.checkGlobalFunction(GlobalSubscriptionsManage::class.java)
         val (total, items) = filterGlobal(filter)(filter.offset, filter.size)
         return PaginatedList.create(items, filter.offset, filter.size, total)
@@ -259,7 +140,7 @@ class DefaultEventSubscriptionService(
     private fun filterEntitySubscriptions(
         projectEntityID: ProjectEntityID,
         filter: EventSubscriptionFilter,
-    ): PaginatedList<SavedEventSubscription> {
+    ): PaginatedList<EventSubscription> {
         // Loads the target entity
         val projectEntity = projectEntityID.type.getEntityFn(structureService).apply(ID.of(projectEntityID.id))
         // Checking the rights
@@ -289,151 +170,17 @@ class DefaultEventSubscriptionService(
 
     private fun filterGlobal(
         filter: EventSubscriptionFilter,
-    ): (Int, Int) -> Pair<Int, List<SavedEventSubscription>> = { offset: Int, size: Int ->
-        // Query contexts & criteria
-        val contextList = mutableListOf<String>()
-        val jsonFilters = mutableListOf<String>()
-        val jsonCriteria = mutableMapOf<String, String>()
-
-        // Filter: channel
-        if (!filter.channel.isNullOrBlank()) {
-            jsonFilters += """data::jsonb->>'channel' = :channel"""
-            jsonCriteria["channel"] = filter.channel
-            // Filter: channel config
-            if (!filter.channelConfig.isNullOrBlank()) {
-                val channel = notificationChannelRegistry.getChannel(filter.channel)
-                val criteria = channel.toSearchCriteria(filter.channelConfig).format()
-                jsonFilters += """data::jsonb->'channelConfig' @> '$criteria'"""
-            }
-        }
-        // Filter: origin
-        if (!filter.origin.isNullOrBlank()) {
-            jsonFilters += """data::jsonb->>'origin' = :origin"""
-            jsonCriteria["origin"] = filter.origin
-        }
-        // Filter: event type
-        if (!filter.eventType.isNullOrBlank()) {
-            contextList += "left join jsonb_array_elements_text(data::jsonb->'events') as events on true"
-            jsonFilters += """events = :eventType"""
-            jsonCriteria["eventType"] = filter.eventType
-        }
-        // Filter: created before
-        if (filter.createdBefore != null) {
-            jsonFilters += """data::jsonb->'signature'->>'time' <= :time"""
-            jsonCriteria["time"] = Time.store(filter.createdBefore)
-        }
-        // Filter: creator
-        if (filter.creator != null) {
-            jsonFilters += """data::jsonb->'signature'->'user'->>'name' = :creator"""
-            jsonCriteria["creator"] = filter.creator
-        }
-
-        // Final context & criteria
-        val context = contextList.joinToString(" ")
-        val jsonFilter = jsonFilters.joinToString(" AND ") { "( $it )" }
-
-        // Counts the total
-        val total = storageService.count(
-            store = GLOBAL_STORE,
-            context = context,
-            query = jsonFilter,
-            queryVariables = jsonCriteria,
-        )
-        // Gets the items
-        val items = storageService.filterRecords(
-            store = GLOBAL_STORE,
-            type = SignedSubscriptionRecord::class,
-            context = context,
-            query = jsonFilter,
-            queryVariables = jsonCriteria,
-            offset = offset,
-            size = size,
-        ).map { (id, record) ->
-            SavedEventSubscription(
-                id = id,
-                signature = record.signature,
-                data = EventSubscription(
-                    channel = record.channel,
-                    channelConfig = record.channelConfig,
-                    projectEntity = null,
-                    events = record.events.toSet(),
-                    keywords = record.keywords,
-                    disabled = record.disabled,
-                    origin = record.origin,
-                    contentTemplate = record.contentTemplate,
-                )
-            )
-        }
-        // OK
-        total to items
+    ): (Int, Int) -> Pair<Int, List<EventSubscription>> = { offset: Int, size: Int ->
+        val (total, records) = globalSubscriptionStore.filter(filter, offset, size)
+        total to records.map { subscriptionRecordToGlobalSubscription(it) }
     }
 
     private fun filterEntity(
         entity: ProjectEntity,
         filter: EventSubscriptionFilter,
-    ): (Int, Int) -> Pair<Int, List<SavedEventSubscription>> = { offset: Int, size: Int ->
-        // Creating the store filter
-        var storeFilter = EntityDataStoreFilter(
-            entity = entity,
-            category = ENTITY_STORE,
-            offset = offset,
-            count = size,
-        )
-        // All JSON context
-        var jsonContextEvents = false
-        val jsonFilters = mutableListOf<String>()
-        val jsonCriteria = mutableMapOf<String, String>()
-        // Filter: channel
-        if (!filter.channel.isNullOrBlank()) {
-            jsonFilters += """json::jsonb->>'channel' = :channel"""
-            jsonCriteria["channel"] = filter.channel
-            // Filter: channel config
-            if (!filter.channelConfig.isNullOrBlank()) {
-                val channel = notificationChannelRegistry.getChannel(filter.channel)
-                val criteria = channel.toSearchCriteria(filter.channelConfig).format()
-                jsonFilters += """json::jsonb->'channelConfig' @> '$criteria'::jsonb"""
-            }
-        }
-        // Filter: origin
-        if (!filter.origin.isNullOrBlank()) {
-            jsonFilters += """json::jsonb->>'origin' = :origin"""
-            jsonCriteria["origin"] = filter.origin
-        }
-        // Filter: event type
-        if (!filter.eventType.isNullOrBlank()) {
-            jsonContextEvents = true
-            jsonFilters += """events = :eventType"""
-            jsonCriteria["eventType"] = filter.eventType
-        }
-        // Filter: created before
-        if (filter.createdBefore != null) {
-            storeFilter = storeFilter.withBeforeTime(filter.createdBefore)
-        }
-        // Filter: creator
-        if (!filter.creator.isNullOrBlank()) {
-            storeFilter = storeFilter.withCreator(filter.creator)
-        }
-        // Json context
-        val jsonContextList = mutableListOf<String>()
-        if (jsonContextEvents) {
-            jsonContextList += "left join jsonb_array_elements_text(json::jsonb->'events') as events on true"
-        }
-        if (jsonContextList.isNotEmpty()) {
-            storeFilter = storeFilter.withJsonContext(jsonContextList.joinToString(" "))
-        }
-        // Json filter
-        storeFilter = storeFilter.withJsonFilter(
-            jsonFilters.joinToString(" AND ") { "( $it )" },
-            *jsonCriteria.toList().toTypedArray()
-        )
-        // Total count for THIS entity
-        val count = entityDataStore.getCountByFilter(storeFilter)
-        // Loading & converting the records
-        val items = entityDataStore.getByFilter(storeFilter).mapNotNull { record ->
-            fromRecord(entity, record)
-        }
-        // OK
-        count to items
+    ): (Int, Int) -> Pair<Int, List<EventSubscription>> = { offset: Int, size: Int ->
+        val (count, records) = entitySubscriptionStore.findByFilter(entity, offset, size, filter)
+        count to records.map { entitySubscriptionRecordToSubscription(entity, it) }
     }
 
     override fun forEveryMatchingSubscription(event: Event, code: (subscription: EventSubscription) -> Unit) {
@@ -443,19 +190,14 @@ class DefaultEventSubscriptionService(
         ) {
             if (entities.isNotEmpty()) {
                 entities.values.forEach { projectEntity ->
-                    val filter = EntityDataStoreFilter(
-                        entity = projectEntity,
-                        category = ENTITY_STORE,
-                        jsonContext = "left join jsonb_array_elements_text(json::jsonb->'events') as events on true",
-                        jsonFilter = "events = :event",
-                        jsonFilterCriterias = mapOf(
-                            "event" to event.eventType.id
-                        )
-                    )
-                    entityDataStore.forEachByFilter(filter) { storeRecord ->
-                        val subscription = fromRecord(projectEntity, storeRecord)
-                        if (subscription != null && event.matchesKeywords(subscription.data.keywords)) {
-                            code(subscription.data)
+
+                    entitySubscriptionStore.forEachByEvent(
+                        projectEntity,
+                        event,
+                    ) { record ->
+                        val subscription = entitySubscriptionRecordToSubscription(projectEntity, record)
+                        if (event.matchesKeywords(subscription.keywords)) {
+                            code(subscription)
                         }
                     }
                 }
@@ -468,95 +210,53 @@ class DefaultEventSubscriptionService(
         matching(event.extraEntities)
 
         // Getting the global subscriptions
-        storageService.forEach(
-            store = GLOBAL_STORE,
-            type = SignedSubscriptionRecord::class,
+        globalSubscriptionStore.forEachRecord(
             context = "left join jsonb_array_elements_text(data::jsonb->'events') as events on true",
             query = "events = :event",
             queryVariables = mapOf("event" to event.eventType.id)
-        ) { key, record ->
-            val subscription = SavedEventSubscription(
-                id = key,
-                signature = record.signature,
-                data = EventSubscription(
-                    channel = record.channel,
-                    channelConfig = record.channelConfig,
-                    projectEntity = null,
-                    events = record.events.toSet(),
-                    keywords = record.keywords,
-                    disabled = record.disabled,
-                    origin = record.origin,
-                    contentTemplate = record.contentTemplate,
-                )
-            )
-            if (event.matchesKeywords(subscription.data.keywords)) {
-                code(subscription.data)
+        ) { record ->
+            val subscription = subscriptionRecordToGlobalSubscription(record)
+            if (event.matchesKeywords(subscription.keywords)) {
+                code(subscription)
             }
         }
     }
 
     override fun removeAllGlobal() {
         securityService.checkGlobalFunction(GlobalSubscriptionsManage::class.java)
-        storageService.deleteWithFilter(GLOBAL_STORE)
+        globalSubscriptionStore.deleteAll()
     }
 
-    private fun fromRecord(
-        projectEntity: ProjectEntity?,
-        record: EntityDataStoreRecord,
-    ) = record.data.parseOrNull<SubscriptionRecord>()?.let {
-        SavedEventSubscription(
-            id = record.name,
-            signature = record.signature,
-            data = EventSubscription(
-                channel = it.channel,
-                channelConfig = it.channelConfig,
-                projectEntity = projectEntity,
-                events = it.events.toSet(),
-                keywords = it.keywords,
-                disabled = it.disabled,
-                origin = it.origin,
-                contentTemplate = it.contentTemplate,
-            )
+    private fun subscriptionRecordToGlobalSubscription(
+        subscriptionRecord: SubscriptionRecord
+    ) = subscriptionRecord.let {
+        EventSubscription(
+            projectEntity = null,
+            name = it.name,
+            channel = it.channel,
+            channelConfig = it.channelConfig,
+            events = it.events.toSet(),
+            keywords = it.keywords,
+            disabled = it.disabled,
+            origin = it.origin,
+            contentTemplate = it.contentTemplate,
         )
     }
 
-    /**
-     * Subscription record
-     */
-    data class SubscriptionRecord(
-        val channel: String,
-        val channelConfig: JsonNode,
-        val events: Set<String>,
-        val keywords: String?,
-        val disabled: Boolean,
-        val origin: String,
-        val contentTemplate: String?,
-    )
-
-    /**
-     * Signed subscription record (for global storage)
-     */
-    data class SignedSubscriptionRecord(
-        val signature: Signature,
-        val channel: String,
-        val channelConfig: JsonNode,
-        val events: Set<String>,
-        val keywords: String?,
-        val disabled: Boolean,
-        val origin: String = EventSubscriptionOrigins.UNKNOWN,
-        val contentTemplate: String?,
-    ) {
-        fun disabled(disabled: Boolean) =
-            SignedSubscriptionRecord(
-                signature = signature,
-                channel = channel,
-                channelConfig = channelConfig,
-                events = events,
-                keywords = keywords,
-                disabled = disabled,
-                origin = origin,
-                contentTemplate = contentTemplate,
-            )
-    }
+    private fun entitySubscriptionRecordToSubscription(
+        projectEntity: ProjectEntity?,
+        record: SubscriptionRecord,
+    ) =
+        EventSubscription(
+            projectEntity = projectEntity,
+            name = record.name,
+            channel = record.channel,
+            channelConfig = record.channelConfig,
+            events = record.events.toSet(),
+            keywords = record.keywords,
+            disabled = record.disabled,
+            origin = record.origin,
+            contentTemplate = record.contentTemplate,
+        )
 
 }

@@ -184,10 +184,11 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                         entity = toProjectEntityID(),
                         origin = "auto-versioning",
                     )
-                ).pageItems.map { it.data }
+                ).pageItems
                 assertEquals(
                     listOf(
                         EventSubscription(
+                            name = "test",
                             projectEntity = this,
                             events = setOf(
                                 "auto-versioning-error",
@@ -265,11 +266,12 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                             entity = toProjectEntityID(),
                             origin = "auto-versioning",
                         )
-                    ).pageItems.map { it.data }
+                    ).pageItems
                     assertEquals(
                         listOf(
                             EventSubscription(
                                 projectEntity = this,
+                                name = "...",
                                 events = setOf(
                                     "auto-versioning-success",
                                 ),
@@ -284,6 +286,7 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                             ),
                             EventSubscription(
                                 projectEntity = this,
+                                name = "...",
                                 events = setOf(
                                     "auto-versioning-error",
                                     "auto-versioning-post-processing-error",
@@ -363,11 +366,12 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                             entity = toProjectEntityID(),
                             origin = "auto-versioning",
                         )
-                    ).pageItems.map { it.data }
+                    ).pageItems
                     assertEquals(
                         listOf(
                             EventSubscription(
                                 projectEntity = this,
+                                name = "...",
                                 events = setOf(
                                     "auto-versioning-success",
                                 ),
@@ -382,6 +386,7 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                             ),
                             EventSubscription(
                                 projectEntity = this,
+                                name = "...",
                                 events = setOf(
                                     "auto-versioning-error",
                                     "auto-versioning-post-processing-error",
@@ -397,6 +402,7 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                             ),
                             EventSubscription(
                                 projectEntity = this,
+                                name = "...",
                                 events = setOf(
                                     "auto-versioning-pr-merge-timeout-error",
                                 ),
@@ -452,11 +458,12 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                             entity = toProjectEntityID(),
                             origin = "auto-versioning",
                         )
-                    ).pageItems.map { it.data }
+                    ).pageItems
                     assertEquals(
                         listOf(
                             EventSubscription(
                                 projectEntity = this,
+                                name = "...",
                                 events = setOf(
                                     "auto-versioning-error",
                                     "auto-versioning-success",
@@ -485,7 +492,7 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                             entity = toProjectEntityID(),
                             origin = "auto-versioning",
                         )
-                    ).pageItems.map { it.data }
+                    ).pageItems
                     assertTrue(newSubscriptions.isEmpty(), "Subscriptions are gone")
                 }
             }
@@ -531,11 +538,12 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                             entity = toProjectEntityID(),
                             channel = "mock",
                         )
-                    ).pageItems.map { it.data }
+                    ).pageItems
                     assertEquals(
                         listOf(
                             EventSubscription(
                                 projectEntity = this,
+                                name = "...",
                                 events = setOf(
                                     "auto-versioning-success",
                                 ),
@@ -567,6 +575,7 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                 branch {
                     // Setting non AV subscriptions
                     eventSubscriptionService.subscribe(
+                        name = "non-av",
                         channel = mockNotificationChannel,
                         channelConfig = MockNotificationChannelConfig(target = target),
                         projectEntity = this,
@@ -601,11 +610,12 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                             entity = toProjectEntityID(),
                             origin = "auto-versioning",
                         )
-                    ).pageItems.map { it.data }
+                    ).pageItems
                     assertEquals(
                         listOf(
                             EventSubscription(
                                 projectEntity = this,
+                                name = "...",
                                 events = setOf(
                                     "auto-versioning-error",
                                     "auto-versioning-success",
@@ -631,11 +641,12 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                             entity = toProjectEntityID(),
                             origin = "test",
                         )
-                    ).pageItems.map { it.data }
+                    ).pageItems
                     assertEquals(
                         listOf(
                             EventSubscription(
                                 projectEntity = this,
+                                name = "non-av",
                                 events = setOf(
                                     "auto-versioning-error",
                                 ),

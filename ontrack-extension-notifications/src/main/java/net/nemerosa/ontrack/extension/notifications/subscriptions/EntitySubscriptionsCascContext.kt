@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.notifications.subscriptions
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.common.syncForward
 import net.nemerosa.ontrack.extension.casc.context.AbstractCascContext
 import net.nemerosa.ontrack.extension.casc.schema.*
@@ -20,6 +19,7 @@ import net.nemerosa.ontrack.model.support.StorageService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import kotlin.jvm.optionals.getOrNull
 
 @Component
 class EntitySubscriptionsCascContext(
@@ -51,6 +51,7 @@ class EntitySubscriptionsCascContext(
                             type = cascArray("List of event types", cascString)
                         ),
                         cascField(SubscriptionsCascContextData::keywords),
+                        cascField(SubscriptionsCascContextData::name),
                         cascField(SubscriptionsCascContextData::channel),
                         cascField(SubscriptionsCascContextData::channelConfig),
                         cascField(SubscriptionsCascContextData::disabled),
@@ -104,7 +105,7 @@ class EntitySubscriptionsCascContext(
                 createSubscriptions(item)
             }
             onModification { item, existing ->
-                modifySubscriptions(item, existing)
+                modifySubscriptions(item, TODO())
             }
             onDeletion { existing ->
                 deleteSubscriptions(existing)
@@ -133,53 +134,44 @@ class EntitySubscriptionsCascContext(
 
     private fun modifySubscriptions(
         item: EntitySubscriptionCascContextData,
-        existing: EntitySubscriptionCascContextData,
+        entity: ProjectEntity,
     ) {
-        val entity = findEntity(existing.entity)
-        if (entity != null) {
-            logger.debug("Modifying subscriptions for entity {}", existing.entity)
-            // Gets the existing subscriptions for this entity
-            val entitySubscriptions = eventSubscriptionService.filterSubscriptions(
-                EventSubscriptionFilter(
-                    size = Int.MAX_VALUE,
-                    entity = entity.toProjectEntityID(),
-                    recursive = false,
-                    origin = EventSubscriptionOrigins.CASC,
-                )
-            ).pageItems.associate {
-                SubscriptionsCascContextData(
-                    events = it.data.events.toList().sorted(),
-                    keywords = it.data.keywords,
-                    channel = it.data.channel,
-                    channelConfig = it.data.channelConfig,
-                    disabled = it.data.disabled,
-                    contentTemplate = it.data.contentTemplate,
-                ) to it.id
+        logger.debug("Modifying subscriptions for entity {}", entity)
+        // Gets the existing subscriptions for this entity
+        val entitySubscriptions = eventSubscriptionService.filterSubscriptions(
+            EventSubscriptionFilter(
+                size = Int.MAX_VALUE,
+                entity = entity.toProjectEntityID(),
+                recursive = false,
+                origin = EventSubscriptionOrigins.CASC,
+            )
+        ).pageItems.map {
+            SubscriptionsCascContextData(
+                name = it.name,
+                events = it.events.toList().sorted(),
+                keywords = it.keywords,
+                channel = it.channel,
+                channelConfig = it.channelConfig,
+                disabled = it.disabled,
+                contentTemplate = it.contentTemplate,
+            )
+        }
+        syncForward(
+            from = item.subscriptions,
+            to = entitySubscriptions
+        ) {
+            onCreation { item ->
+                subscribe(entity, item)
             }
-            syncForward(
-                from = item.subscriptions,
-                to = existing.subscriptions
-            ) {
-                onCreation { item ->
-                    logger.info("Subscribing to ${existing.entity}: $item")
-                    subscribe(entity, item)
-                }
-                onModification { item, _ ->
-                    // Resubscribing is enough
-                    logger.info("Subscribing to ${existing.entity}: $item")
-                    subscribe(entity, item)
-                }
-                onDeletion { cached ->
-                    val existingId = entitySubscriptions[cached.normalized()]
-                    if (existingId != null) {
-                        eventSubscriptionService.deleteSubscriptionById(entity, existingId)
-                    } else {
-                        logger.info("Cannot find a subscription for ${item.entity}: not deleting it.")
-                    }
+            onModification { item, _ ->
+                // Resubscribing is enough
+                subscribe(entity, item)
+            }
+            onDeletion { cached ->
+                if (cached.name != null) {
+                    eventSubscriptionService.deleteSubscriptionByName(entity, cached.name)
                 }
             }
-        } else {
-            logger.info("Cannot find entity ${item.entity}. Not modifying its subscriptions.")
         }
     }
 
@@ -203,6 +195,7 @@ class EntitySubscriptionsCascContext(
         eventSubscriptionService.subscribe(
             EventSubscription(
                 projectEntity = entity,
+                name = subscription.name ?: subscription.computeName(),
                 events = subscription.events.toSet(),
                 keywords = subscription.keywords,
                 channel = subscription.channel,

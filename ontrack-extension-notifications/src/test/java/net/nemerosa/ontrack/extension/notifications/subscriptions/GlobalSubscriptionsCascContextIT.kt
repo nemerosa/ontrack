@@ -15,12 +15,14 @@ class GlobalSubscriptionsCascContextIT : AbstractCascTestSupport() {
     @Test
     fun `Creates a global subscription as code`() {
         val target = uid("t")
+        val name = uid("g")
         casc("""
             ontrack:
                 extensions:
                     notifications:
                         global-subscriptions:
-                            - events:
+                            - name: $name
+                              events:
                                 - new_promotion_run
                               keywords: "GOLD main"
                               channel: mock
@@ -38,24 +40,28 @@ class GlobalSubscriptionsCascContextIT : AbstractCascTestSupport() {
             assertEquals(1, subscriptions.pageItems.size)
             val subscription = subscriptions.pageItems.first()
             assertEquals(
+                name,
+                subscription.name
+            )
+            assertEquals(
                 setOf("new_promotion_run"),
-                subscription.data.events
+                subscription.events
             )
             assertEquals(
                 "GOLD main",
-                subscription.data.keywords
+                subscription.keywords
             )
             assertEquals(
                 "mock",
-                subscription.data.channel
+                subscription.channel
             )
             assertEquals(
                 mapOf("target" to "#$target").asJson(),
-                subscription.data.channelConfig
+                subscription.channelConfig
             )
             assertEquals(
                 false,
-                subscription.data.disabled
+                subscription.disabled
             )
         }
     }
@@ -63,12 +69,14 @@ class GlobalSubscriptionsCascContextIT : AbstractCascTestSupport() {
     @Test
     fun `Creates a global subscription as code with a content template`() {
         val target = uid("t")
+        val name = uid("g")
         casc("""
             ontrack:
                 extensions:
                     notifications:
                         global-subscriptions:
-                            - events:
+                            - name: $name
+                              events:
                                 - new_promotion_run
                               keywords: "GOLD main"
                               channel: mock
@@ -91,23 +99,23 @@ class GlobalSubscriptionsCascContextIT : AbstractCascTestSupport() {
             val subscription = subscriptions.pageItems.first()
             assertEquals(
                 setOf("new_promotion_run"),
-                subscription.data.events
+                subscription.events
             )
             assertEquals(
                 "GOLD main",
-                subscription.data.keywords
+                subscription.keywords
             )
             assertEquals(
                 "mock",
-                subscription.data.channel
+                subscription.channel
             )
             assertEquals(
                 mapOf("target" to "#$target").asJson(),
-                subscription.data.channelConfig
+                subscription.channelConfig
             )
             assertEquals(
                 false,
-                subscription.data.disabled
+                subscription.disabled
             )
             assertEquals(
                 """
@@ -115,7 +123,7 @@ class GlobalSubscriptionsCascContextIT : AbstractCascTestSupport() {
                     for a ${'$'}{branch} name and
                     a ${'$'}{changelog?format=html}.
                 """.trimIndent(),
-                subscription.data.contentTemplate
+                subscription.contentTemplate
             )
         }
     }

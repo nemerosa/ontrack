@@ -5,7 +5,11 @@ import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.Project;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public abstract class AbstractRepositoryTestSupport extends AbstractITTestJUnit4Support {
+/**
+ * @deprecated Will be removed in V5. Using JUnit 5.
+ */
+@Deprecated
+public abstract class AbstractRepositoryJUnit4TestSupport extends AbstractITTestJUnit4Support {
 
     @Autowired
     protected StructureRepository structureRepository;

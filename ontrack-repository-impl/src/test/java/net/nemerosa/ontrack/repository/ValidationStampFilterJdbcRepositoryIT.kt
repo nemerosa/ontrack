@@ -12,13 +12,11 @@ import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 
 import java.util.Arrays
-import java.util.Collections
-import java.util.stream.Collectors
 
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.Assert.*
 
-class ValidationStampFilterJdbcRepositoryIT : AbstractRepositoryTestSupport() {
+class ValidationStampFilterJdbcRepositoryIT : AbstractRepositoryJUnit4TestSupport() {
 
     @Autowired
     private lateinit var filterRepository: ValidationStampFilterRepository

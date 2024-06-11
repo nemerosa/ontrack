@@ -76,6 +76,7 @@ class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
 
                     // Setting up the Jira notification
                     eventSubscriptionService.subscribe(
+                        name = "test",
                         channel = jiraCreationNotificationChannel,
                         channelConfig = JiraCreationNotificationChannelConfig(
                             configName = configuration.name,
@@ -197,6 +198,7 @@ class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
 
                     // Setting up the Jira notification
                     eventSubscriptionService.subscribe(
+                        name = "test",
                         channel = jiraCreationNotificationChannel,
                         channelConfig = JiraCreationNotificationChannelConfig(
                             configName = configuration.name,
@@ -313,6 +315,7 @@ class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
 
                     // Setting up the Jira notification
                     eventSubscriptionService.subscribe(
+                        name = "test",
                         channel = jiraCreationNotificationChannel,
                         channelConfig = JiraCreationNotificationChannelConfig(
                             useExisting = true,

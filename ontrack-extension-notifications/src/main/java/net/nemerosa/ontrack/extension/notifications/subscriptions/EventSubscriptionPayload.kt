@@ -5,8 +5,8 @@ import net.nemerosa.ontrack.model.annotations.APIDescription
 
 @APIDescription("Event subscription record")
 data class EventSubscriptionPayload(
-    @APIDescription("Unique ID for this subscription")
-    val id: String,
+    @APIDescription("Unique name for this subscription")
+    val name: String,
     @APIDescription("Channel to send this event to")
     val channel: String,
     @APIDescription("Channel configuration")

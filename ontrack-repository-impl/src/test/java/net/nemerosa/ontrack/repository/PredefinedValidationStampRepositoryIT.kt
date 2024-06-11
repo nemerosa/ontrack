@@ -7,7 +7,7 @@ import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
-class PredefinedValidationStampRepositoryIT : AbstractRepositoryTestSupport() {
+class PredefinedValidationStampRepositoryIT : AbstractRepositoryJUnit4TestSupport() {
 
     @Autowired
     private lateinit var repository: PredefinedValidationStampRepository

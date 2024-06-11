@@ -14,7 +14,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 @Transactional
-public class PropertyJdbcRepositoryIT extends AbstractRepositoryTestSupport {
+public class PropertyJdbcRepositoryIT extends AbstractRepositoryJUnit4TestSupport {
 
     @Autowired
     private PropertyRepository repository;

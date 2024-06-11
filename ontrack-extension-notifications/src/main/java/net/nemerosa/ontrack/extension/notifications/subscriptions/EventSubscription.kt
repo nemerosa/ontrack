@@ -1,11 +1,14 @@
 package net.nemerosa.ontrack.extension.notifications.subscriptions
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.format
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.structure.ProjectEntity
+import org.apache.commons.codec.digest.DigestUtils
 
 /**
- * Subscrition to an event.
+ * Subscription to an event.
  *
  * @property projectEntity Project entity to subscribe to (`null` for global events)
  * @property events List of events types to subscribe to
@@ -17,7 +20,10 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity
  * @property contentTemplate Optional template to use for the message
  */
 data class EventSubscription(
+    @APIDescription("Entity to subscribe to. Null for global subscriptions.")
     val projectEntity: ProjectEntity?,
+    @APIDescription("Unique name of the subscription in its scope.")
+    val name: String,
     @APIDescription("List of events types to subscribe to")
     val events: Set<String>,
     @APIDescription("Optional space-separated list of tokens to look for in the events")
@@ -34,6 +40,7 @@ data class EventSubscription(
 ) {
     fun disabled(disabled: Boolean) = EventSubscription(
         projectEntity = projectEntity,
+        name = name,
         events = events,
         keywords = keywords,
         channel = channel,
@@ -42,4 +49,23 @@ data class EventSubscription(
         origin = origin,
         contentTemplate = contentTemplate,
     )
+
+    companion object {
+        fun computeName(
+            events: List<String>,
+            keywords: String?,
+            channel: String,
+            channelConfig: JsonNode,
+            contentTemplate: String?
+        ): String =
+            mapOf(
+                "events" to events.sorted(),
+                "keywords" to keywords,
+                "channel" to channel,
+                "channelConfig" to channelConfig,
+                "contentTemplate" to contentTemplate,
+            ).asJson().format().let {
+                DigestUtils.md5Hex(it)
+            }
+    }
 }

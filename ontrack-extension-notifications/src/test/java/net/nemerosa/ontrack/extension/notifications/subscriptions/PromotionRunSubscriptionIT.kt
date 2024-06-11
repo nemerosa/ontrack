@@ -21,13 +21,14 @@ class PromotionRunSubscriptionIT : AbstractNotificationTestSupport() {
                     // Subscribing at branch level for the bronze promotion
                     val target = uid("t_")
                     eventSubscriptionService.subscribe(
-                            channel = mockNotificationChannel,
-                            channelConfig = MockNotificationChannelConfig(target),
-                            projectEntity = this, // The branch
-                            keywords = silver.name, // Promotion level name
-                            origin = "test",
+                        name = uid("p"),
+                        channel = mockNotificationChannel,
+                        channelConfig = MockNotificationChannelConfig(target),
+                        projectEntity = this, // The branch
+                        keywords = silver.name, // Promotion level name
+                        origin = "test",
                         contentTemplate = null,
-                            EventFactory.NEW_PROMOTION_RUN
+                        EventFactory.NEW_PROMOTION_RUN
                     )
                     build {
                         // Bronze promotion --> no message
@@ -38,8 +39,8 @@ class PromotionRunSubscriptionIT : AbstractNotificationTestSupport() {
                         assertNotNull(mockNotificationChannel.messages[target], "Message received") { messages ->
                             assertEquals(1, messages.size, "One message received")
                             assertEquals(
-                                    "Build $name has been promoted to ${silver.name} for branch ${branch.name} in ${project.name}.",
-                                    messages.first()
+                                "Build $name has been promoted to ${silver.name} for branch ${branch.name} in ${project.name}.",
+                                messages.first()
                             )
                         }
                     }

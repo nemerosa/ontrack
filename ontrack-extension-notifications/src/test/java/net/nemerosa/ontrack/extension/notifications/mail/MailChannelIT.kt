@@ -25,6 +25,7 @@ class MailChannelIT : AbstractMailTestSupport() {
                     val pl = promotionLevel()
                     // Listening to events on this promotion
                     eventSubscriptionService.subscribe(
+                        name = uid("n-"),
                         channel = mailNotificationChannel,
                         channelConfig = MailNotificationChannelConfig(
                             to = DEFAULT_ADDRESS,
@@ -73,6 +74,7 @@ class MailChannelIT : AbstractMailTestSupport() {
                     val pl = promotionLevel()
                     // Listening to events on this promotion
                     eventSubscriptionService.subscribe(
+                        name = uid("n-"),
                         channel = mailNotificationChannel,
                         channelConfig = MailNotificationChannelConfig(
                             to = DEFAULT_ADDRESS,

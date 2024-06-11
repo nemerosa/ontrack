@@ -12,47 +12,55 @@ interface EventSubscriptionService {
     /**
      * Registering a subscription
      */
-    fun subscribe(subscription: EventSubscription): SavedEventSubscription
+    fun subscribe(subscription: EventSubscription)
 
     /**
-     * Looks for a subscription using its ID
+     * Looks for a subscription using its name
      *
      * @param projectEntity Entity to look for
-     * @param id ID of the subscription
+     * @param name Name of the subscription
      * @return Subscription or null if not found
      */
-    fun findSubscriptionById(projectEntity: ProjectEntity?, id: String): EventSubscription?
+    fun findSubscriptionByName(projectEntity: ProjectEntity?, name: String): EventSubscription?
 
     /**
-     * Deleting a subscription using its ID
+     * Deleting a subscription using its name
      *
      * @param projectEntity Entity to look for
-     * @param id ID of the subscription
+     * @param name Name of the subscription
      */
-    fun deleteSubscriptionById(projectEntity: ProjectEntity?, id: String)
+    fun deleteSubscriptionByName(projectEntity: ProjectEntity?, name: String)
 
     /**
      * Deletes all subscriptions for a given entity
      *
-     * @param entity Entity to delete the subscriptions for
+     * @param projectEntity Entity to delete the subscriptions for
      */
     fun deleteSubscriptionsByEntity(projectEntity: ProjectEntity)
 
     /**
-     * Disables a subscription using its ID
+     * Deletes all subscriptions for a given entity and origin
      *
-     * @param projectEntity Entity to look for
-     * @param id ID of the subscription
+     * @param projectEntity Entity to delete the subscriptions for
+     * @param origin Origin to delete the subscriptions for
      */
-    fun disableSubscriptionById(projectEntity: ProjectEntity?, id: String): SavedEventSubscription
+    fun deleteSubscriptionsByEntityAndOrigin(projectEntity: ProjectEntity, origin: String)
 
     /**
-     * Enables a subscription using its ID
+     * Disables a subscription using its name
      *
      * @param projectEntity Entity to look for
-     * @param id ID of the subscription
+     * @param name Name of the subscription
      */
-    fun enableSubscriptionById(projectEntity: ProjectEntity?, id: String): SavedEventSubscription
+    fun disableSubscriptionByName(projectEntity: ProjectEntity?, name: String)
+
+    /**
+     * Enables a subscription using its name
+     *
+     * @param projectEntity Entity to look for
+     * @param name ID of the subscription
+     */
+    fun enableSubscriptionByName(projectEntity: ProjectEntity?, name: String)
 
     /**
      * Getting a paginated list of subscriptions which match against the given [filter].
@@ -65,7 +73,7 @@ interface EventSubscriptionService {
      * @param filter Subscription filter
      * @return Paginated list of subscriptions
      */
-    fun filterSubscriptions(filter: EventSubscriptionFilter): PaginatedList<SavedEventSubscription>
+    fun filterSubscriptions(filter: EventSubscriptionFilter): PaginatedList<EventSubscription>
 
     /**
      * Looping over all matching subscriptions for a given event.

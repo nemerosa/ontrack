@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.util.unit.DataSize
 import kotlin.test.*
 
-class DocumentsJdbcRepositoryIT : AbstractRepositoryTestSupport() {
+class DocumentsJdbcRepositoryIT : AbstractRepositoryJUnit4TestSupport() {
 
     @Autowired
     private lateinit var repository: DocumentsRepository

@@ -26,8 +26,10 @@ data class EventSubscriptionFilter(
     @APIDescription("Filter against the channel configuration (channel is required)")
     val channelConfig: String? = null,
     @APIDescription("Subscriptions created before or on this date")
+    @Deprecated("Will be removed in V5.")
     val createdBefore: LocalDateTime? = null,
     @APIDescription("Name of the user who created this subscription")
+    @Deprecated("Will be removed in V5.")
     val creator: String? = null,
     @APIDescription("Event type")
     val eventType: String? = null,

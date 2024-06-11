@@ -8,10 +8,9 @@ import net.nemerosa.ontrack.repository.support.store.EntityDataStore
 import net.nemerosa.ontrack.repository.support.store.EntityDataStoreFilter
 import net.nemerosa.ontrack.repository.support.store.EntityDataStoreRecordAuditType
 import net.nemerosa.ontrack.test.TestUtils
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import kotlin.test.assertEquals
+import kotlin.test.*
 
 /**
  * Integration tests for [EntityDataStore].
@@ -29,22 +28,21 @@ class EntityDataStoreIT : AbstractRepositoryTestSupport() {
         val name = TestUtils.uid("T")
         val record = store.add(branch, CATEGORY, name, Signature.of(TEST_USER), null, IntNode(15))
         // Checks
-        Assert.assertNotNull(record)
-        Assert.assertTrue(record.id > 0)
-        Assert.assertEquals(CATEGORY, record.category)
-        Assert.assertNotNull(record.signature)
-        Assert.assertEquals(name, record.name)
-        Assert.assertNull(record.groupName)
-        Assert.assertEquals(branch.projectEntityType, record.entity.projectEntityType)
-        Assert.assertEquals(branch.id, record.entity.id)
-        TestUtils.assertJsonEquals(
-                IntNode(15),
-                record.data
+        assertNotNull(record)
+        assertTrue(record.id > 0)
+        assertEquals(CATEGORY, record.category)
+        assertNotNull(record.signature)
+        assertEquals(name, record.name)
+        assertNull(record.groupName)
+        assertEquals(branch.projectEntityType, record.entity.projectEntityType)
+        assertEquals(branch.id, record.entity.id)
+        assertEquals(
+            IntNode(15),
+            record.data
         )
     }
 
     @Test
-    @Throws(JsonProcessingException::class)
     fun replaceOrAdd() {
         // Entity
         val branch = do_create_branch()
@@ -52,48 +50,46 @@ class EntityDataStoreIT : AbstractRepositoryTestSupport() {
         val name = TestUtils.uid("T")
         val record = store.add(branch, CATEGORY, name, Signature.of(TEST_USER), null, IntNode(15))
         // Checks
-        Assert.assertTrue(record.id > 0)
-        Assert.assertEquals(CATEGORY, record.category)
-        TestUtils.assertJsonEquals(
-                IntNode(15),
-                record.data
+        assertTrue(record.id > 0)
+        assertEquals(CATEGORY, record.category)
+        assertEquals(
+            IntNode(15),
+            record.data
         )
         // Updates the same name
         val secondRecord = store.replaceOrAdd(branch, CATEGORY, name, Signature.of(TEST_USER), null, IntNode(16))
         // Checks
-        Assert.assertEquals(record.id.toLong(), secondRecord.id.toLong())
-        TestUtils.assertJsonEquals(
-                IntNode(16),
-                secondRecord.data
+        assertEquals(record.id.toLong(), secondRecord.id.toLong())
+        assertEquals(
+            IntNode(16),
+            secondRecord.data
         )
     }
 
     @Test
-    @Throws(JsonProcessingException::class)
-    fun replaveOrAddForNewRecord() { // Entity
+    fun replaceOrAddForNewRecord() { // Entity
         val branch = do_create_branch()
         // Adds some data
         val name = TestUtils.uid("T")
         val record = store.add(branch, CATEGORY, name, Signature.of(TEST_USER), null, IntNode(15))
         // Checks
-        Assert.assertTrue(record.id > 0)
-        Assert.assertEquals(CATEGORY, record.category)
-        TestUtils.assertJsonEquals(
-                IntNode(15),
-                record.data
+        assertTrue(record.id > 0)
+        assertEquals(CATEGORY, record.category)
+        assertEquals(
+            IntNode(15),
+            record.data
         )
         // Updates with a different same name
         val secondRecord = store.replaceOrAdd(branch, CATEGORY, name + "2", Signature.of(TEST_USER), null, IntNode(16))
         // Checks
-        Assert.assertNotEquals(record.id.toLong(), secondRecord.id.toLong())
-        TestUtils.assertJsonEquals(
-                IntNode(16),
-                secondRecord.data
+        assertNotEquals(record.id.toLong(), secondRecord.id.toLong())
+        assertEquals(
+            IntNode(16),
+            secondRecord.data
         )
     }
 
     @Test
-    @Throws(JsonProcessingException::class)
     fun audit() { // Entity
         val branch = do_create_branch()
         // Adds some data
@@ -101,18 +97,18 @@ class EntityDataStoreIT : AbstractRepositoryTestSupport() {
         val record = store.add(branch, CATEGORY, name, Signature.of(TEST_USER), null, IntNode(15))
         // Gets the audit
         var audit = store.getRecordAudit(record.id)
-        Assert.assertEquals(1, audit.size.toLong())
-        Assert.assertEquals(EntityDataStoreRecordAuditType.CREATED, audit[0].type)
-        Assert.assertEquals(TEST_USER, audit[0].signature.user.name)
+        assertEquals(1, audit.size.toLong())
+        assertEquals(EntityDataStoreRecordAuditType.CREATED, audit[0].type)
+        assertEquals(TEST_USER, audit[0].signature.user.name)
         // Updates the same name
         store.replaceOrAdd(branch, CATEGORY, name, Signature.of("other"), null, IntNode(16))
         // Checks
         audit = store.getRecordAudit(record.id)
-        Assert.assertEquals(2, audit.size.toLong())
-        Assert.assertEquals(EntityDataStoreRecordAuditType.UPDATED, audit[0].type)
-        Assert.assertEquals("other", audit[0].signature.user.name)
-        Assert.assertEquals(EntityDataStoreRecordAuditType.CREATED, audit[1].type)
-        Assert.assertEquals(TEST_USER, audit[1].signature.user.name)
+        assertEquals(2, audit.size.toLong())
+        assertEquals(EntityDataStoreRecordAuditType.UPDATED, audit[0].type)
+        assertEquals("other", audit[0].signature.user.name)
+        assertEquals(EntityDataStoreRecordAuditType.CREATED, audit[1].type)
+        assertEquals(TEST_USER, audit[1].signature.user.name)
     }
 
     @Test
@@ -122,11 +118,11 @@ class EntityDataStoreIT : AbstractRepositoryTestSupport() {
         val name = TestUtils.uid("T")
         val id = store.add(branch, CATEGORY, name, Signature.of(TEST_USER), null, IntNode(15)).id
         // Gets by ID
-        Assert.assertTrue(store.getById(branch, id).isPresent)
+        assertNotNull(store.getById(branch, id))
         // Deletes by name
         store.deleteByName(branch, CATEGORY, name)
         // Gets by ID ot possible any longer
-        Assert.assertFalse(store.getById(branch, id).isPresent)
+        assertNull(store.getById(branch, id))
     }
 
     @Test
@@ -138,13 +134,13 @@ class EntityDataStoreIT : AbstractRepositoryTestSupport() {
         val id1 = store.add(branch, CATEGORY, name + 1, Signature.of(TEST_USER), group, IntNode(10)).id
         val id2 = store.add(branch, CATEGORY, name + 2, Signature.of(TEST_USER), group, IntNode(10)).id
         // Gets by ID
-        Assert.assertTrue(store.getById(branch, id1).isPresent)
-        Assert.assertTrue(store.getById(branch, id2).isPresent)
+        assertNotNull(store.getById(branch, id1))
+        assertNotNull(store.getById(branch, id2))
         // Deletes by group
         store.deleteByGroup(branch, CATEGORY, group)
         // Gets by ID ot possible any longer
-        Assert.assertFalse(store.getById(branch, id1).isPresent)
-        Assert.assertFalse(store.getById(branch, id2).isPresent)
+        assertNull(store.getById(branch, id1))
+        assertNull(store.getById(branch, id2))
     }
 
     @Test
@@ -156,17 +152,16 @@ class EntityDataStoreIT : AbstractRepositoryTestSupport() {
         val id1 = store.add(branch1, CATEGORY, name, Signature.of(TEST_USER), null, IntNode(10)).id
         val id2 = store.add(branch2, CATEGORY, name, Signature.of(TEST_USER), null, IntNode(10)).id
         // Gets by ID
-        Assert.assertTrue(store.getById(branch1, id1).isPresent)
-        Assert.assertTrue(store.getById(branch2, id2).isPresent)
+        assertNotNull(store.getById(branch1, id1))
+        assertNotNull(store.getById(branch2, id2))
         // Deletes by category
         store.deleteByCategoryBefore(CATEGORY, Time.now())
         // Gets by ID ot possible any longer
-        Assert.assertFalse(store.getById(branch1, id1).isPresent)
-        Assert.assertFalse(store.getById(branch2, id2).isPresent)
+        assertNull(store.getById(branch1, id1))
+        assertNull(store.getById(branch2, id2))
     }
 
     @Test
-    @Throws(JsonProcessingException::class)
     fun last_by_category_and_name() { // Entity
         val branch = do_create_branch()
         // Adds some data, twice, for the same name
@@ -174,18 +169,17 @@ class EntityDataStoreIT : AbstractRepositoryTestSupport() {
         store.add(branch, CATEGORY, name, Signature.of(TEST_USER), null, IntNode(15)).id
         val id2 = store.add(branch, CATEGORY, name, Signature.of(TEST_USER), null, IntNode(16)).id
         // Gets last by category / name
-        val record = store.findLastByCategoryAndName(branch, CATEGORY, name, Time.now()).orElse(null)
+        val record = store.findLastByCategoryAndName(branch, CATEGORY, name, Time.now())
         // Checks
-        Assert.assertNotNull(record)
-        Assert.assertEquals(record.id.toLong(), id2.toLong())
-        TestUtils.assertJsonEquals(
-                IntNode(16),
-                record.data
+        assertNotNull(record)
+        assertEquals(record.id.toLong(), id2.toLong())
+        assertEquals(
+            IntNode(16),
+            record.data
         )
     }
 
     @Test
-    @Throws(JsonProcessingException::class)
     fun last_by_category_and_group_and_name() { // Entity
         val branch = do_create_branch()
         // Adds some data, twice, for the same name, and several names, but for a same group
@@ -197,18 +191,17 @@ class EntityDataStoreIT : AbstractRepositoryTestSupport() {
         store.add(branch, CATEGORY, name2, Signature.of(TEST_USER), group, IntNode(21)).id
         store.add(branch, CATEGORY, name2, Signature.of(TEST_USER), group, IntNode(22)).id
         // Gets last by category / name / group
-        val record = store.findLastByCategoryAndGroupAndName(branch, CATEGORY, group, name1).orElse(null)
+        val record = store.findLastByCategoryAndGroupAndName(branch, CATEGORY, group, name1)
         // Checks
-        Assert.assertNotNull(record)
-        Assert.assertEquals(record.id.toLong(), id12.toLong())
-        TestUtils.assertJsonEquals(
-                IntNode(12),
-                record.data
+        assertNotNull(record)
+        assertEquals(record.id.toLong(), id12.toLong())
+        assertEquals(
+            IntNode(12),
+            record.data
         )
     }
 
     @Test
-    @Throws(JsonProcessingException::class)
     fun last_by_category() { // Entity
         val branch = do_create_branch()
         // Adds some data, twice, for the same name, and several names, but for a same group
@@ -224,11 +217,11 @@ class EntityDataStoreIT : AbstractRepositoryTestSupport() {
         val id33 = store.add(branch, CATEGORY, name3, Signature.of(TEST_USER), null, IntNode(33)).id
         // Gets last by name in category
         val records = store.findLastRecordsByNameInCategory(branch, CATEGORY)
-        Assert.assertEquals(3, records.size.toLong())
+        assertEquals(3, records.size.toLong())
         // Checks
-        Assert.assertEquals(id33.toLong(), records[0].id.toLong())
-        Assert.assertEquals(id22.toLong(), records[1].id.toLong())
-        Assert.assertEquals(id12.toLong(), records[2].id.toLong())
+        assertEquals(id33.toLong(), records[0].id.toLong())
+        assertEquals(id22.toLong(), records[1].id.toLong())
+        assertEquals(id12.toLong(), records[2].id.toLong())
     }
 
     @Test
@@ -239,17 +232,17 @@ class EntityDataStoreIT : AbstractRepositoryTestSupport() {
         val name = TestUtils.uid("T")
         val record = store.addObject(branch, CATEGORY, name, Signature.of(TEST_USER), null, 15)
         // Checks
-        Assert.assertNotNull(record)
-        Assert.assertTrue(record.id > 0)
-        Assert.assertEquals(CATEGORY, record.category)
-        Assert.assertNotNull(record.signature)
-        Assert.assertEquals(name, record.name)
-        Assert.assertNull(record.groupName)
-        Assert.assertEquals(branch.projectEntityType, record.entity.projectEntityType)
-        Assert.assertEquals(branch.id, record.entity.id)
-        TestUtils.assertJsonEquals(
-                IntNode(15),
-                record.data
+        assertNotNull(record)
+        assertTrue(record.id > 0)
+        assertEquals(CATEGORY, record.category)
+        assertNotNull(record.signature)
+        assertEquals(name, record.name)
+        assertNull(record.groupName)
+        assertEquals(branch.projectEntityType, record.entity.projectEntityType)
+        assertEquals(branch.id, record.entity.id)
+        assertEquals(
+            IntNode(15),
+            record.data
         )
     }
 
@@ -261,19 +254,19 @@ class EntityDataStoreIT : AbstractRepositoryTestSupport() {
         val name = TestUtils.uid("T")
         val record = store.addObject(branch, CATEGORY, name, Signature.of(TEST_USER), null, 15)
         // Checks
-        Assert.assertTrue(record.id > 0)
-        Assert.assertEquals(CATEGORY, record.category)
-        TestUtils.assertJsonEquals(
-                IntNode(15),
-                record.data
+        assertTrue(record.id > 0)
+        assertEquals(CATEGORY, record.category)
+        assertEquals(
+            IntNode(15),
+            record.data
         )
         // Updates the same name
         val secondRecord = store.replaceOrAddObject(branch, CATEGORY, name, Signature.of(TEST_USER), null, 16)
         // Checks
-        Assert.assertEquals(record.id.toLong(), secondRecord.id.toLong())
-        TestUtils.assertJsonEquals(
-                IntNode(16),
-                secondRecord.data
+        assertEquals(record.id.toLong(), secondRecord.id.toLong())
+        assertEquals(
+            IntNode(16),
+            secondRecord.data
         )
     }
 
@@ -292,10 +285,10 @@ class EntityDataStoreIT : AbstractRepositoryTestSupport() {
         // Query with pagination
         val records = store.getByCategoryAndName(branch, "C1", "N1", 2, 1)
         // Checks the results
-        Assert.assertEquals(1, records.size.toLong())
-        Assert.assertEquals(2, records[0].data.asInt().toLong())
+        assertEquals(1, records.size.toLong())
+        assertEquals(2, records[0].data.asInt().toLong())
         // Count
-        Assert.assertEquals(4, store.getCountByCategoryAndName(branch, "C1", "N1").toLong())
+        assertEquals(4, store.getCountByCategoryAndName(branch, "C1", "N1").toLong())
     }
 
     // Entity
@@ -313,10 +306,10 @@ class EntityDataStoreIT : AbstractRepositoryTestSupport() {
         // Query with pagination
         val records = store.getByCategory(branch, "C1", 2, 1)
         // Checks the results
-        Assert.assertEquals(1, records.size.toLong())
-        Assert.assertEquals(3, records[0].data.asInt().toLong())
+        assertEquals(1, records.size.toLong())
+        assertEquals(3, records[0].data.asInt().toLong())
         // Count
-        Assert.assertEquals(5, store.getCountByCategory(branch, "C1").toLong())
+        assertEquals(5, store.getCountByCategory(branch, "C1").toLong())
     }
 
     // Entities
@@ -336,18 +329,24 @@ class EntityDataStoreIT : AbstractRepositoryTestSupport() {
         store.addObject(branch2, "C1", "N2", Signature.of(TEST_USER), null, 8)
         store.addObject(branch2, "C2", "N3", Signature.of(TEST_USER), null, 9)
         // Checks
-        Assert.assertEquals(6, store.getByFilter(
+        assertEquals(
+            6, store.getByFilter(
                 EntityDataStoreFilter(branch1)
-        ).size.toLong())
-        Assert.assertEquals(5, store.getByFilter(
+            ).size.toLong()
+        )
+        assertEquals(
+            5, store.getByFilter(
                 EntityDataStoreFilter(branch1)
-                        .withCategory("C1")
-        ).size.toLong())
-        Assert.assertEquals(4, store.getByFilter(
+                    .withCategory("C1")
+            ).size.toLong()
+        )
+        assertEquals(
+            4, store.getByFilter(
                 EntityDataStoreFilter(branch1)
-                        .withCategory("C1")
-                        .withName("N1")
-        ).size.toLong())
+                    .withCategory("C1")
+                    .withName("N1")
+            ).size.toLong()
+        )
     }
 
     @Test
@@ -366,33 +365,45 @@ class EntityDataStoreIT : AbstractRepositoryTestSupport() {
         store.addObject(branch2, "C1", "N2", Signature.of(TEST_USER), null, 8)
         store.addObject(branch2, "C2", "N3", Signature.of(TEST_USER), null, 9)
         // Checks
-        Assert.assertEquals(9, store.getCountByFilter(
+        assertEquals(
+            9, store.getCountByFilter(
                 EntityDataStoreFilter()
-        ).toLong())
-        Assert.assertEquals(6, store.getCountByFilter(
+            ).toLong()
+        )
+        assertEquals(
+            6, store.getCountByFilter(
                 EntityDataStoreFilter()
-                        .withEntity(branch1)
-        ).toLong())
-        Assert.assertEquals(5, store.getCountByFilter(
+                    .withEntity(branch1)
+            ).toLong()
+        )
+        assertEquals(
+            5, store.getCountByFilter(
                 EntityDataStoreFilter()
-                        .withEntity(branch1)
-                        .withCategory("C1")
-        ).toLong())
-        Assert.assertEquals(4, store.getCountByFilter(
+                    .withEntity(branch1)
+                    .withCategory("C1")
+            ).toLong()
+        )
+        assertEquals(
+            4, store.getCountByFilter(
                 EntityDataStoreFilter()
-                        .withEntity(branch1)
-                        .withCategory("C1")
-                        .withName("N1")
-        ).toLong())
+                    .withEntity(branch1)
+                    .withCategory("C1")
+                    .withName("N1")
+            ).toLong()
+        )
         // Combinations
-        Assert.assertEquals(7, store.getCountByFilter(
+        assertEquals(
+            7, store.getCountByFilter(
                 EntityDataStoreFilter()
-                        .withCategory("C1")
-        ).toLong())
-        Assert.assertEquals(2, store.getCountByFilter(
+                    .withCategory("C1")
+            ).toLong()
+        )
+        assertEquals(
+            2, store.getCountByFilter(
                 EntityDataStoreFilter()
-                        .withName("N3")
-        ).toLong())
+                    .withName("N3")
+            ).toLong()
+        )
     }
 
     @Test
@@ -414,9 +425,11 @@ class EntityDataStoreIT : AbstractRepositoryTestSupport() {
         store.addObject(branch2, "C2", "N3", Signature.of(TEST_USER), null, 11)
         store.addObject(branch2, "C2", "N3", Signature.of(TEST_USER), null, 12)
         // Checks
-        Assert.assertEquals(12, store.deleteByFilter(
+        assertEquals(
+            12, store.deleteByFilter(
                 EntityDataStoreFilter()
-        ).toLong())
+            ).toLong()
+        )
     }
 
     @Test
@@ -434,18 +447,20 @@ class EntityDataStoreIT : AbstractRepositoryTestSupport() {
         store.addObject(branch, "C1", "N2", Signature.of(TEST_USER), null, 8)
         store.addObject(branch, "C2", "N3", Signature.of(TEST_USER), null, 9)
         // Checks
-        Assert.assertEquals(3, store.deleteRangeByFilter(
+        assertEquals(
+            3, store.deleteRangeByFilter(
                 EntityDataStoreFilter()
-                        .withOffset(3)
-                        .withCount(3)
-        ).toLong())
+                    .withOffset(3)
+                    .withCount(3)
+            ).toLong()
+        )
         // Checks end & start records are still there
         val list = store.getByFilter(EntityDataStoreFilter(entity = branch)).map {
             it.data.asInt()
         }
         assertEquals(
-                listOf(9, 8, 7, 3, 2, 1), // 6, 5 & 4 have been deleted
-                list
+            listOf(9, 8, 7, 3, 2, 1), // 6, 5 & 4 have been deleted
+            list
         )
     }
 
@@ -465,10 +480,12 @@ class EntityDataStoreIT : AbstractRepositoryTestSupport() {
         store.addObject(branch2, "C1", "N2", Signature.of(TEST_USER), null, 8)
         store.addObject(branch2, "C2", "N3", Signature.of(TEST_USER), null, 9)
         // Checks
-        Assert.assertEquals(6, store.deleteByFilter(
+        assertEquals(
+            6, store.deleteByFilter(
                 EntityDataStoreFilter()
-                        .withEntity(branch1)
-        ).toLong())
+                    .withEntity(branch1)
+            ).toLong()
+        )
     }
 
     @Test
@@ -487,11 +504,13 @@ class EntityDataStoreIT : AbstractRepositoryTestSupport() {
         store.addObject(branch2, "C1", "N2", Signature.of(TEST_USER), null, 8)
         store.addObject(branch2, "C2", "N3", Signature.of(TEST_USER), null, 9)
         // Checks
-        Assert.assertEquals(5, store.deleteByFilter(
+        assertEquals(
+            5, store.deleteByFilter(
                 EntityDataStoreFilter()
-                        .withEntity(branch1)
-                        .withCategory("C1")
-        ).toLong())
+                    .withEntity(branch1)
+                    .withCategory("C1")
+            ).toLong()
+        )
     }
 
     companion object {

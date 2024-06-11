@@ -13,7 +13,7 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 @Transactional
-class EntityDataJdbcRepositoryIT : AbstractRepositoryTestSupport() {
+class EntityDataJdbcRepositoryIT : AbstractRepositoryJUnit4TestSupport() {
 
     @Autowired
     private lateinit var repository: EntityDataRepository

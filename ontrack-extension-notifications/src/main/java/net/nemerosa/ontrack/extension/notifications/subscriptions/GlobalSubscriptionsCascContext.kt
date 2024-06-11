@@ -22,6 +22,7 @@ class GlobalSubscriptionsCascContext(
             "Global subscription",
             cascField(SubscriptionsCascContextData::events, type = cascArray("List of event types", cascString)),
             cascField(SubscriptionsCascContextData::keywords),
+            cascField(SubscriptionsCascContextData::name),
             cascField(SubscriptionsCascContextData::channel),
             cascField(SubscriptionsCascContextData::channelConfig),
             cascField(SubscriptionsCascContextData::disabled),
@@ -43,6 +44,7 @@ class GlobalSubscriptionsCascContext(
         items.forEach { subscription ->
             eventSubscriptionService.subscribe(
                 EventSubscription(
+                    name = subscription.name ?: subscription.computeName(),
                     projectEntity = null,
                     events = subscription.events.toSet(),
                     keywords = subscription.keywords,
@@ -63,12 +65,13 @@ class GlobalSubscriptionsCascContext(
             )
         ).pageItems.map {
             SubscriptionsCascContextData(
-                events = it.data.events.toList(),
-                keywords = it.data.keywords,
-                channel = it.data.channel,
-                channelConfig = it.data.channelConfig,
-                disabled = it.data.disabled,
-                contentTemplate = it.data.contentTemplate,
+                name = it.name,
+                events = it.events.toList(),
+                keywords = it.keywords,
+                channel = it.channel,
+                channelConfig = it.channelConfig,
+                disabled = it.disabled,
+                contentTemplate = it.contentTemplate,
             )
         }.asJson()
 

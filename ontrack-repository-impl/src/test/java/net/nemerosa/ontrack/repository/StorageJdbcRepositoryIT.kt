@@ -12,7 +12,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 @Transactional
-class StorageJdbcRepositoryIT : AbstractRepositoryTestSupport() {
+class StorageJdbcRepositoryIT : AbstractRepositoryJUnit4TestSupport() {
 
     @Autowired
     private lateinit var repository: StorageRepository

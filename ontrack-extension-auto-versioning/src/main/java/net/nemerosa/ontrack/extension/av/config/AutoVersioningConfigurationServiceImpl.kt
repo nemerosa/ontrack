@@ -36,63 +36,24 @@ class AutoVersioningConfigurationServiceImpl(
         }
     }
 
-    private data class AVConfigSubscription(
-        val source: AutoVersioningSourceConfig,
-        val notification: AutoVersioningNotification,
-    ) {
-        fun toEventSubscription(branch: Branch) = EventSubscription(
-            projectEntity = branch,
-            events = AutoVersioningNotificationScope.toEvents(notification.scope),
-            keywords = "${source.sourceProject} ${branch.project.name} ${branch.name}",
-            channel = notification.channel,
-            channelConfig = notification.config,
-            disabled = false,
-            contentTemplate = notification.notificationTemplate,
-            origin = AutoVersioningNotification.ORIGIN,
-        )
-    }
-
     private fun setupNotifications(branch: Branch, config: AutoVersioningConfig?) {
-        if (config == null) {
-            eventSubscriptionService.deleteSubscriptionsByEntity(branch)
-        } else {
-            // Existing subscriptions
-            val existingSubscriptions = eventSubscriptionService.filterSubscriptions(
-                EventSubscriptionFilter(
-                    size = Int.MAX_VALUE,
-                    entity = branch.toProjectEntityID(),
-                    origin = AutoVersioningNotification.ORIGIN,
+        eventSubscriptionService.deleteSubscriptionsByEntityAndOrigin(branch, AutoVersioningNotification.ORIGIN)
+        var index = 1
+        config?.configurations?.forEach { source ->
+            source.notifications?.forEach { notification ->
+                eventSubscriptionService.subscribe(
+                    EventSubscription(
+                        projectEntity = branch,
+                        name = "Auto versioning ${index++}",
+                        events = AutoVersioningNotificationScope.toEvents(notification.scope),
+                        keywords = "${source.sourceProject} ${branch.project.name} ${branch.name}",
+                        channel = notification.channel,
+                        channelConfig = notification.config,
+                        disabled = false,
+                        contentTemplate = notification.notificationTemplate,
+                        origin = AutoVersioningNotification.ORIGIN,
+                    )
                 )
-            ).pageItems
-            // New subscriptions
-            val newSubscriptions = config.configurations.flatMap { source ->
-                source.notifications?.map { notification ->
-                    AVConfigSubscription(source, notification)
-                } ?: emptyList()
-            }
-
-            // Subscription
-            fun subscribe(item: AVConfigSubscription) {
-                eventSubscriptionService.subscribe(item.toEventSubscription(branch))
-            }
-
-            // Sync between current subscriptions & configured subscriptions
-            syncForward(
-                from = newSubscriptions,
-                to = existingSubscriptions,
-            ) {
-                equality { item, existing ->
-                    item.toEventSubscription(branch) == existing.data
-                }
-                onCreation { item ->
-                    subscribe(item)
-                }
-                onModification { item, _ ->
-                    subscribe(item)
-                }
-                onDeletion { existing ->
-                    eventSubscriptionService.deleteSubscriptionById(branch, existing.id)
-                }
             }
         }
     }

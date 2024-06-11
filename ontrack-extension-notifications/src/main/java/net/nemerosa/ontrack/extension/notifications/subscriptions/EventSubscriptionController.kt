@@ -39,8 +39,8 @@ class EventSubscriptionController(
      */
     @GetMapping("global/{id}/update")
     fun updateGlobal(@PathVariable("id") id: String): Form = form(
-        eventSubscriptionService.findSubscriptionById(null, id)
-            ?: throw EventSubscriptionIdNotFoundException(null, id)
+        eventSubscriptionService.findSubscriptionByName(null, id)
+            ?: throw EventSubscriptionNameNotFoundException(null, id)
     )
 
     /**
@@ -54,8 +54,8 @@ class EventSubscriptionController(
     ): Form =
         entityType.getEntityFn(structureService).apply(ID.of(entityId)).let { entity ->
             form(
-                eventSubscriptionService.findSubscriptionById(entity, id)
-                    ?: throw EventSubscriptionIdNotFoundException(entity, id)
+                eventSubscriptionService.findSubscriptionByName(entity, id)
+                    ?: throw EventSubscriptionNameNotFoundException(entity, id)
             )
         }
 

@@ -19,6 +19,7 @@ class MockNotificationIT : AbstractNotificationTestSupport() {
             // Subscription to the creation of branches for this project
             val target = uid("t")
             eventSubscriptionService.subscribe(
+                name = uid("m-"),
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig(target),
                 projectEntity = this,

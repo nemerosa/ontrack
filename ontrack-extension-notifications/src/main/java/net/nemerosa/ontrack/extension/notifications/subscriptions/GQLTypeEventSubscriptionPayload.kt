@@ -21,7 +21,16 @@ class GQLTypeEventSubscriptionPayload(
     override fun createType(cache: GQLTypeCache): GraphQLObjectType = GraphQLObjectType.newObject()
         .name(typeName)
         .description(getAPITypeName(EventSubscriptionPayload::class))
-        .stringField(EventSubscriptionPayload::id)
+        .field {
+            it.name("id")
+                .description("Name of the subscription")
+                .deprecate("Will be removed in V5. Use `name` instead.")
+                .type(GraphQLString)
+                .dataFetcher { env ->
+                    env.getSource<EventSubscriptionPayload>().name
+                }
+        }
+        .stringField(EventSubscriptionPayload::name)
         .stringField(EventSubscriptionPayload::channel)
         .field {
             it.name(EventSubscriptionPayload::channelConfig.name)

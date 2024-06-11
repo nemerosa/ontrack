@@ -83,6 +83,15 @@ public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSuppor
         }
     }
 
+    protected <T> T getFirstItem(String sql, Map<String,?> criteria, RowMapper<T> rowMapper) {
+        List<T> items = getNamedParameterJdbcTemplate().query(sql, criteria, rowMapper);
+        if (items.isEmpty()) {
+            return null;
+        } else {
+            return items.get(0);
+        }
+    }
+
     protected <T> Optional<T> getOptional(String sql, MapSqlParameterSource criteria, RowMapper<T> rowMapper) {
         return Optional.ofNullable(getFirstItem(sql, criteria, rowMapper));
     }

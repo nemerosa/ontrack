@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.model.support.ApplicationLogEntry;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class ApplicationLogEntriesJdbcRepositoryIT extends AbstractRepositoryTestSupport {
+public class ApplicationLogEntriesJdbcRepositoryIT extends AbstractRepositoryJUnit4TestSupport {
 
     @Autowired
     private ApplicationLogEntriesRepository repository;

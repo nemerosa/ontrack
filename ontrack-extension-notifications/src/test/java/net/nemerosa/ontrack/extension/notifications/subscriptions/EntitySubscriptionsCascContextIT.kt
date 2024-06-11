@@ -35,7 +35,8 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                                     - entity:
                                         project: $name
                                       subscriptions:
-                                        - events:
+                                        - name: test
+                                          events:
                                             - new_promotion_run
                                           keywords: ""
                                           channel: mock
@@ -116,7 +117,8 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                                                 promotion: PL
                                                 validation: VS
                                               subscriptions:
-                                                - events:
+                                                - name: test
+                                                  events:
                                                     - new_promotion_run
                                                   keywords: ""
                                                   channel: mock
@@ -145,7 +147,8 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                                                 project: ${project.name}
                                                 promotion: PL
                                               subscriptions:
-                                                - events:
+                                                - name: test
+                                                  events:
                                                     - new_promotion_run
                                                   keywords: ""
                                                   channel: mock
@@ -174,7 +177,8 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                                                 project: ${project.name}
                                                 validation: VS
                                               subscriptions:
-                                                - events:
+                                                - name: test
+                                                  events:
                                                     - new_promotion_run
                                                   keywords: ""
                                                   channel: mock
@@ -200,7 +204,8 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                                     - entity:
                                         project: $name
                                       subscriptions:
-                                        - events:
+                                        - name: test
+                                          events:
                                             - new_promotion_run
                                           keywords: "SILVER"
                                           channel: mock
@@ -267,7 +272,8 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                                     - entity:
                                         project: $name
                                       subscriptions:
-                                        - events:
+                                        - name: test
+                                          events:
                                             - new_promotion_run
                                           keywords: "SILVER"
                                           channel: mock
@@ -321,13 +327,15 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                                     - entity:
                                         project: $name
                                       subscriptions:
-                                        - events:
+                                        - name: test-1
+                                          events:
                                             - new_promotion_run
                                           keywords: "GOLD"
                                           channel: mock
                                           channel-config:
                                             target: "$target"
-                                        - events:
+                                        - name: test-2
+                                          events:
                                             - new_promotion_run
                                           keywords: "SILVER"
                                           channel: mock
@@ -342,7 +350,7 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                         entity = this.toProjectEntityID(),
                         origin = "casc",
                     )
-                ).pageItems.map { it.data.keywords }
+                ).pageItems.map { it.keywords }
                 assertEquals(
                     setOf("GOLD", "SILVER"),
                     subscriptions.toSet()
@@ -358,13 +366,15 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                                     - entity:
                                         project: $name
                                       subscriptions:
-                                        - events:
+                                        - name: test-1
+                                          events:
                                             - new_promotion_run
                                           keywords: "PLATINUM"
                                           channel: mock
                                           channel-config:
                                             target: "$target"
-                                        - events:
+                                        - name: test-2
+                                          events:
                                             - new_promotion_run
                                           keywords: "SILVER"
                                           channel: mock
@@ -379,7 +389,7 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                         entity = this.toProjectEntityID(),
                         origin = "casc",
                     )
-                ).pageItems.map { it.data.keywords }
+                ).pageItems.map { it.keywords }
                 assertEquals(
                     setOf("PLATINUM", "SILVER"),
                     subscriptions.toSet()
@@ -402,13 +412,15 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                                     - entity:
                                         project: $name
                                       subscriptions:
-                                        - events:
+                                        - name: test-1
+                                          events:
                                             - new_promotion_run
                                           keywords: "GOLD"
                                           channel: mock
                                           channel-config:
                                             target: "$target"
-                                        - events:
+                                        - name: test-2
+                                          events:
                                             - new_promotion_run
                                           keywords: "SILVER"
                                           channel: mock
@@ -423,7 +435,7 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                         entity = this.toProjectEntityID(),
                         origin = "casc",
                     )
-                ).pageItems.map { it.data.keywords }
+                ).pageItems.map { it.keywords }
                 assertEquals(
                     setOf("GOLD", "SILVER"),
                     subscriptions.toSet()
@@ -469,7 +481,8 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                                             project: ${project.name}
                                             branch: $name
                                           subscriptions:
-                                            - events:
+                                            - name: test-1
+                                              events:
                                                 - new_promotion_run
                                               keywords: ""
                                               channel: mock
@@ -521,7 +534,8 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                                             branch: $name
                                             validation: ${vs.name}
                                           subscriptions:
-                                            - events:
+                                            - name: test
+                                              events:
                                                 - new_validation_run
                                               keywords: ""
                                               channel: mock
@@ -572,7 +586,8 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                                             branch: $name
                                             validation: ${vs.name}
                                           subscriptions:
-                                            - events:
+                                            - name: test
+                                              events:
                                                 - new_validation_run
                                               keywords: "failed"
                                               channel: mock
@@ -629,7 +644,8 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                                 - entity:
                                     project: $projectName
                                   subscriptions:
-                                    - events:
+                                    - name: test
+                                      events:
                                         - new_promotion_run
                                       keywords: ""
                                       channel: mock
@@ -659,7 +675,8 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                                     - entity:
                                         project: $name
                                       subscriptions:
-                                        - events:
+                                        - name: test
+                                          events:
                                             - new_promotion_run
                                           keywords: ""
                                           channel: mock
@@ -712,7 +729,8 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                                             branch: ${pl.branch.name}
                                             promotion: ${pl.name}
                                           subscriptions:
-                                            - events:
+                                            - name: test
+                                              events:
                                                 - new_promotion_run
                                               keywords: ""
                                               channel: mock
@@ -732,23 +750,23 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                     val subscription = subscriptions.pageItems.first()
                     assertEquals(
                         setOf("new_promotion_run"),
-                        subscription.data.events
+                        subscription.events
                     )
                     assertEquals(
                         "",
-                        subscription.data.keywords
+                        subscription.keywords
                     )
                     assertEquals(
                         "mock",
-                        subscription.data.channel
+                        subscription.channel
                     )
                     assertEquals(
                         mapOf("target" to target).asJson(),
-                        subscription.data.channelConfig
+                        subscription.channelConfig
                     )
                     assertEquals(
                         false,
-                        subscription.data.disabled
+                        subscription.disabled
                     )
                 }
                 // Checking the subscription
@@ -784,7 +802,8 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                                             branch: ${pl.branch.name}
                                             promotion: ${pl.name}
                                           subscriptions:
-                                            - events:
+                                            - name: test
+                                              events:
                                                 - new_promotion_run
                                               keywords: ""
                                               channel: mock
@@ -810,23 +829,23 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                     val subscription = subscriptions.pageItems.first()
                     assertEquals(
                         setOf("new_promotion_run"),
-                        subscription.data.events
+                        subscription.events
                     )
                     assertEquals(
                         "",
-                        subscription.data.keywords
+                        subscription.keywords
                     )
                     assertEquals(
                         "mock",
-                        subscription.data.channel
+                        subscription.channel
                     )
                     assertEquals(
                         mapOf("target" to target).asJson(),
-                        subscription.data.channelConfig
+                        subscription.channelConfig
                     )
                     assertEquals(
                         false,
-                        subscription.data.disabled
+                        subscription.disabled
                     )
                     assertEquals(
                         """
@@ -836,7 +855,7 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                             
                             ${'$'}{changelog?format=text&project=dep-01}
                         """.trimIndent(),
-                        subscription.data.contentTemplate
+                        subscription.contentTemplate
                     )
                 }
             }
@@ -857,7 +876,8 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                                     - entity:
                                         project: $name
                                       subscriptions:
-                                        - events:
+                                        - name: test
+                                          events:
                                             - new_promotion_run
                                           keywords: ""
                                           channel: mock
@@ -866,7 +886,8 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                                     - entity:
                                         project: $name
                                       subscriptions:
-                                        - events:
+                                        - name: test
+                                          events:
                                             - new_promotion_run
                                           keywords: "GOLD"
                                           channel: mock
@@ -899,7 +920,8 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                                     - entity:
                                         project: $name
                                       subscriptions:
-                                        - events:
+                                        - name: test
+                                          events:
                                             - new_promotion_run
                                           keywords: ""
                                           channel: mock
@@ -914,7 +936,7 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                         entity = this.toProjectEntityID(),
                         origin = "casc",
                     )
-                ).pageItems.map { it.data.channelConfig.getRequiredTextField("target") }
+                ).pageItems.map { it.channelConfig.getRequiredTextField("target") }
                 assertEquals(listOf(target), subscriptions)
             }
             // Changing only the target channel
@@ -927,7 +949,8 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                                     - entity:
                                         project: $name
                                       subscriptions:
-                                        - events:
+                                        - name: test
+                                          events:
                                             - new_promotion_run
                                           keywords: ""
                                           channel: mock
@@ -942,7 +965,7 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                         entity = this.toProjectEntityID(),
                         origin = "casc",
                     )
-                ).pageItems.map { it.data.channelConfig.getRequiredTextField("target") }
+                ).pageItems.map { it.channelConfig.getRequiredTextField("target") }
                 assertEquals(listOf(newTarget), subscriptions)
             }
         }

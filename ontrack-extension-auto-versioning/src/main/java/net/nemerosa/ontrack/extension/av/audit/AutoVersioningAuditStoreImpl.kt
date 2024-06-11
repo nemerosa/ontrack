@@ -118,7 +118,7 @@ class AutoVersioningAuditStoreImpl(
         vararg data: Pair<String, String>,
     ) {
         val record =
-            entityDataStore.findLastByCategoryAndName(targetBranch, STORE_CATEGORY, uuid, Time.now()).getOrNull()
+            entityDataStore.findLastByCategoryAndName(targetBranch, STORE_CATEGORY, uuid, Time.now())
         if (record != null) {
             var initialData: AutoVersioningAuditStoreData = record.data.parse()
             val signature = signature()

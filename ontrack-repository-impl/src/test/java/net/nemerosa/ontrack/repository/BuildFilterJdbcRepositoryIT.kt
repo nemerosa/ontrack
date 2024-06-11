@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 @Transactional
-class BuildFilterJdbcRepositoryIT : AbstractRepositoryTestSupport() {
+class BuildFilterJdbcRepositoryIT : AbstractRepositoryJUnit4TestSupport() {
     @Autowired
     private lateinit var accountRepository: AccountRepository
     @Autowired

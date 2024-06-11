@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.json.getRequiredJsonField
 import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.structure.toProjectEntityID
+import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import kotlin.test.*
 
@@ -24,6 +25,7 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                             subscribeBranchToEvents(input: {
                                 project: "${project.name}",
                                 branch: "$name",
+                                name: "test",
                                 channel: "mock",
                                 channelConfig: {
                                     target: "#test"
@@ -38,6 +40,7 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                                 }
                                 subscription {
                                     id
+                                    name
                                 }
                             }
                         }
@@ -45,7 +48,10 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                     ) { data ->
                         checkGraphQLUserErrors(data, "subscribeBranchToEvents") { payload ->
                             val id = payload.getRequiredJsonField("subscription").getRequiredTextField("id")
-                            val subscription: EventSubscription = eventSubscriptionService.getSubscriptionById(this, id)
+                            val name = payload.getRequiredJsonField("subscription").getRequiredTextField("name")
+                            assertEquals(name, id)
+                            val subscription: EventSubscription =
+                                eventSubscriptionService.getSubscriptionByName(this, name)
                             assertEquals(
                                 setOf(
                                     "new_promotion_run"
@@ -82,6 +88,7 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                                 project: "${project.name}",
                                 branch: "$name",
                                 promotion: "GOLD",
+                                name: "test",
                                 channel: "mock",
                                 channelConfig: {
                                     target: "#test"
@@ -94,15 +101,16 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                                     message
                                 }
                                 subscription {
-                                    id
+                                    name
                                 }
                             }
                         }
                     """
                     ) { data ->
                         checkGraphQLUserErrors(data, "subscribePromotionLevelToEvents") { payload ->
-                            val id = payload.getRequiredJsonField("subscription").getRequiredTextField("id")
-                            val subscription: EventSubscription = eventSubscriptionService.getSubscriptionById(pl, id)
+                            val name = payload.getRequiredJsonField("subscription").getRequiredTextField("name")
+                            val subscription: EventSubscription =
+                                eventSubscriptionService.getSubscriptionByName(pl, name)
                             assertEquals(
                                 setOf(
                                     "new_promotion_run"
@@ -141,6 +149,7 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                                 project: "${project.name}",
                                 branch: "$name",
                                 promotion: "GOLD",
+                                name: "test",
                                 channel: "mock",
                                 channelConfig: {
                                     target: "#test"
@@ -154,7 +163,7 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                                     message
                                 }
                                 subscription {
-                                    id
+                                    name
                                 }
                             }
                         }
@@ -164,8 +173,9 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                         )
                     ) { data ->
                         checkGraphQLUserErrors(data, "subscribePromotionLevelToEvents") { payload ->
-                            val id = payload.getRequiredJsonField("subscription").getRequiredTextField("id")
-                            val subscription: EventSubscription = eventSubscriptionService.getSubscriptionById(pl, id)
+                            val name = payload.getRequiredJsonField("subscription").getRequiredTextField("name")
+                            val subscription: EventSubscription =
+                                eventSubscriptionService.getSubscriptionByName(pl, name)
                             assertEquals(
                                 setOf(
                                     "new_promotion_run"
@@ -209,6 +219,7 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                                 project: "${project.name}",
                                 branch: "$name",
                                 promotion: "GOLD",
+                                name: "test",
                                 channel: "mock",
                                 channelConfig: {
                                     target: "#test"
@@ -222,7 +233,7 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                                     message
                                 }
                                 subscription {
-                                    id
+                                    name
                                 }
                             }
                         }
@@ -241,6 +252,7 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                                 project: "${project.name}",
                                 branch: "$name",
                                 promotion: "GOLD",
+                                name: "test",
                                 channel: "mock",
                                 channelConfig: {
                                     target: "#test"
@@ -254,7 +266,7 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                                     message
                                 }
                                 subscription {
-                                    id
+                                    name
                                 }
                             }
                         }
@@ -271,7 +283,7 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                     val subscription = subscriptions.first()
                     assertEquals(
                         "Change log for this promotion with a link ${'$'}{promotionLevel}!",
-                        subscription.data.contentTemplate
+                        subscription.contentTemplate
                     )
                 }
             }
@@ -282,7 +294,8 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
     fun `Disabling and enabling a subscription for an entity`() {
         asAdmin {
             project {
-                val record = eventSubscriptionService.subscribe(
+                eventSubscriptionService.subscribe(
+                    name = "test",
                     channel = mockNotificationChannel,
                     channelConfig = MockNotificationChannelConfig("#target"),
                     projectEntity = this,
@@ -300,13 +313,13 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                                 type: PROJECT,
                                 id: $id
                             },
-                            id: "${record.id}"
+                            name: "test"
                         }) {
                             errors {
                                 message
                             }
                             subscription {
-                                id
+                                name
                                 disabled
                             }
                         }
@@ -314,9 +327,9 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                 """
                 ) { data ->
                     checkGraphQLUserErrors(data, "disableSubscription") { payload ->
-                        assertEquals(record.id, payload.path("subscription").getRequiredTextField("id"))
+                        assertEquals("test", payload.path("subscription").getRequiredTextField("name"))
                         assertEquals(true, payload.path("subscription").getRequiredBooleanField("disabled"))
-                        assertNotNull(eventSubscriptionService.findSubscriptionById(this, record.id)) {
+                        assertNotNull(eventSubscriptionService.findSubscriptionByName(this, "test")) {
                             assertTrue(it.disabled, "Subscription is disabled")
                         }
                     }
@@ -330,13 +343,14 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                                 type: PROJECT,
                                 id: $id
                             },
-                            id: "${record.id}"
+                            name: "test"
                         }) {
                             errors {
                                 message
                             }
                             subscription {
                                 id
+                                name
                                 disabled
                             }
                         }
@@ -344,9 +358,10 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                 """
                 ) { data ->
                     checkGraphQLUserErrors(data, "enableSubscription") { payload ->
-                        assertEquals(record.id, payload.path("subscription").getRequiredTextField("id"))
+                        assertEquals("test", payload.path("subscription").getRequiredTextField("id"))
+                        assertEquals("test", payload.path("subscription").getRequiredTextField("name"))
                         assertEquals(false, payload.path("subscription").getRequiredBooleanField("disabled"))
-                        assertNotNull(eventSubscriptionService.findSubscriptionById(this, record.id)) {
+                        assertNotNull(eventSubscriptionService.findSubscriptionByName(this, "test")) {
                             assertFalse(it.disabled, "Subscription is enabled")
                         }
                     }
@@ -358,8 +373,10 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
     @Test
     fun `Disabling and enabling a global subscription`() {
         asAdmin {
+            val name = uid("g-")
             eventSubscriptionService.removeAllGlobal()
-            val record = eventSubscriptionService.subscribe(
+            eventSubscriptionService.subscribe(
+                name = name,
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#target"),
                 projectEntity = null,
@@ -373,13 +390,13 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                 """
                     mutation {
                         disableSubscription(input: {
-                            id: "${record.id}"
+                            id: "$name"
                         }) {
                             errors {
                                 message
                             }
                             subscription {
-                                id
+                                name
                                 disabled
                             }
                         }
@@ -387,9 +404,9 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                 """
             ) { data ->
                 checkGraphQLUserErrors(data, "disableSubscription") { payload ->
-                    assertEquals(record.id, payload.path("subscription").getRequiredTextField("id"))
+                    assertEquals(name, payload.path("subscription").getRequiredTextField("name"))
                     assertEquals(true, payload.path("subscription").getRequiredBooleanField("disabled"))
-                    assertNotNull(eventSubscriptionService.findSubscriptionById(null, record.id)) {
+                    assertNotNull(eventSubscriptionService.findSubscriptionByName(null, name)) {
                         assertTrue(it.disabled, "Subscription is disabled")
                     }
                 }
@@ -399,13 +416,13 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                 """
                     mutation {
                         enableSubscription(input: {
-                            id: "${record.id}"
+                            id: "$name"
                         }) {
                             errors {
                                 message
                             }
                             subscription {
-                                id
+                                name
                                 disabled
                             }
                         }
@@ -413,9 +430,9 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                 """
             ) { data ->
                 checkGraphQLUserErrors(data, "enableSubscription") { payload ->
-                    assertEquals(record.id, payload.path("subscription").getRequiredTextField("id"))
+                    assertEquals(name, payload.path("subscription").getRequiredTextField("name"))
                     assertEquals(false, payload.path("subscription").getRequiredBooleanField("disabled"))
-                    assertNotNull(eventSubscriptionService.findSubscriptionById(null, record.id)) {
+                    assertNotNull(eventSubscriptionService.findSubscriptionByName(null, name)) {
                         assertFalse(it.disabled, "Subscription is enabled")
                     }
                 }
@@ -434,6 +451,7 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                             type: PROJECT,
                             id: $id
                         },
+                        name: "test",
                         channel: "mock",
                         channelConfig: {
                             target: "#test"
@@ -448,15 +466,15 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                             message
                         }
                         subscription {
-                            id
+                            name
                         }
                     }
                 }
             """
             ) { data ->
                 checkGraphQLUserErrors(data, "subscribeToEvents") { payload ->
-                    val id = payload.getRequiredJsonField("subscription").getRequiredTextField("id")
-                    val subscription: EventSubscription = eventSubscriptionService.getSubscriptionById(this, id)
+                    val name = payload.getRequiredJsonField("subscription").getRequiredTextField("name")
+                    val subscription: EventSubscription = eventSubscriptionService.getSubscriptionByName(this, name)
                     assertEquals(
                         setOf(
                             "new_branch",
@@ -494,6 +512,7 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                             type: PROJECT,
                             id: $id
                         },
+                        name: "test",
                         channel: "mock",
                         channelConfig: {
                             target: "#test"
@@ -509,15 +528,15 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                             message
                         }
                         subscription {
-                            id
+                            name
                         }
                     }
                 }
             """
             ) { data ->
                 checkGraphQLUserErrors(data, "subscribeToEvents") { payload ->
-                    val id = payload.getRequiredJsonField("subscription").getRequiredTextField("id")
-                    val subscription: EventSubscription = eventSubscriptionService.getSubscriptionById(this, id)
+                    val name = payload.getRequiredJsonField("subscription").getRequiredTextField("name")
+                    val subscription: EventSubscription = eventSubscriptionService.getSubscriptionByName(this, name)
                     assertEquals(
                         setOf(
                             "new_branch",
@@ -547,7 +566,9 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
     @Test
     fun `Deleting a global subscription`() {
         asAdmin {
-            val subscription = eventSubscriptionService.subscribe(
+            val name = uid("g-")
+            eventSubscriptionService.subscribe(
+                name = name,
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#main"),
                 projectEntity = null,
@@ -559,7 +580,7 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
             run(
                 """
                     mutation {
-                        deleteSubscription(input:{id: "${subscription.id}"}) {
+                        deleteSubscription(input:{id: "$name"}) {
                             errors {
                                 message
                             }
@@ -569,7 +590,7 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
             ) { data ->
                 checkGraphQLUserErrors(data, "deleteSubscription")
                 assertNull(
-                    eventSubscriptionService.findSubscriptionById(null, subscription.id),
+                    eventSubscriptionService.findSubscriptionByName(null, name),
                     "Subscription has been deleted"
                 )
             }
@@ -580,20 +601,21 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
     fun `Deleting an entity subscription`() {
         asAdmin {
             project {
-                val subscription = eventSubscriptionService.subscribe(
+                eventSubscriptionService.subscribe(
+                    projectEntity = this,
+                    name = "test",
                     channel = mockNotificationChannel,
                     channelConfig = MockNotificationChannelConfig("#main"),
-                    projectEntity = this,
                     keywords = null,
                     origin = "test",
                     contentTemplate = null,
-                    EventFactory.NEW_PROMOTION_RUN,
+                    eventTypes = arrayOf(EventFactory.NEW_PROMOTION_RUN),
                 )
                 run(
                     """
                     mutation {
                         deleteSubscription(input:{
-                            id: "${subscription.id}",
+                            id: "test",
                             projectEntity: {
                                 type: PROJECT,
                                 id: $id
@@ -608,7 +630,7 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                 ) { data ->
                     checkGraphQLUserErrors(data, "deleteSubscription")
                     assertNull(
-                        eventSubscriptionService.findSubscriptionById(this, subscription.id),
+                        eventSubscriptionService.findSubscriptionByName(this, "test"),
                         "Subscription has been deleted"
                     )
                 }

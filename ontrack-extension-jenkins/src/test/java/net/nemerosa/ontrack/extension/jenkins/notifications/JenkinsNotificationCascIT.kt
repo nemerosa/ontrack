@@ -8,14 +8,12 @@ import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscript
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.structure.toProjectEntityID
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-@Disabled("flaky")
-class JenkinsNotificationCascIT: AbstractCascTestSupport() {
+class JenkinsNotificationCascIT : AbstractCascTestSupport() {
 
     @Autowired
     private lateinit var jenkinsConfigurationService: JenkinsConfigurationService
@@ -37,7 +35,8 @@ class JenkinsNotificationCascIT: AbstractCascTestSupport() {
                 project {
                     branch {
                         val pl = promotionLevel()
-                        casc("""
+                        casc(
+                            """
                             ontrack:
                               extensions:
                                 notifications:
@@ -56,7 +55,8 @@ class JenkinsNotificationCascIT: AbstractCascTestSupport() {
                                                 value: "{Promotion_level}"
                                           events:
                                             - new_promotion_run
-                        """.trimIndent())
+                        """.trimIndent()
+                        )
                         // Gets the subscription
                         val subscriptions = eventSubscriptionService.filterSubscriptions(
                             EventSubscriptionFilter(
@@ -64,9 +64,12 @@ class JenkinsNotificationCascIT: AbstractCascTestSupport() {
                                 origin = "casc",
                             )
                         )
-                        assertNotNull(subscriptions.pageItems.firstOrNull(), "Subscription has been created") { subscription ->
-                            assertEquals("jenkins", subscription.data.channel)
-                            val nc = subscription.data.channelConfig.parse<JenkinsNotificationChannelConfig>()
+                        assertNotNull(
+                            subscriptions.pageItems.firstOrNull(),
+                            "Subscription has been created"
+                        ) { subscription ->
+                            assertEquals("jenkins", subscription.channel)
+                            val nc = subscription.channelConfig.parse<JenkinsNotificationChannelConfig>()
                             assertEquals(config.name, nc.config)
                             assertEquals("path/to/pipeline", nc.job)
                             assertEquals(
@@ -97,8 +100,9 @@ class JenkinsNotificationCascIT: AbstractCascTestSupport() {
                 jenkinsConfigurationService.newConfiguration(config)
                 project {
                     branch {
-                        val pl = promotionLevel()
-                        casc("""
+                        promotionLevel()
+                        casc(
+                            """
                             ontrack:
                               extensions:
                                 notifications:
@@ -107,7 +111,8 @@ class JenkinsNotificationCascIT: AbstractCascTestSupport() {
                                         project: ${project.name}
                                         branch: $name
                                       subscriptions:
-                                        - channel: jenkins
+                                        - name: test
+                                          channel: jenkins
                                           channel-config:
                                             config: ${config.name}
                                             job: path/to/pipeline
@@ -116,7 +121,8 @@ class JenkinsNotificationCascIT: AbstractCascTestSupport() {
                                                 value: "{Promotion}"
                                           events:
                                             - new_promotion_run
-                        """.trimIndent())
+                        """.trimIndent()
+                        )
                         // Gets the subscription
                         val subscriptions = eventSubscriptionService.filterSubscriptions(
                             EventSubscriptionFilter(
@@ -124,9 +130,12 @@ class JenkinsNotificationCascIT: AbstractCascTestSupport() {
                                 origin = "casc",
                             )
                         )
-                        assertNotNull(subscriptions.pageItems.firstOrNull(), "Subscription has been created") { subscription ->
-                            assertEquals("jenkins", subscription.data.channel)
-                            val nc = subscription.data.channelConfig.parse<JenkinsNotificationChannelConfig>()
+                        assertNotNull(
+                            subscriptions.pageItems.firstOrNull(),
+                            "Subscription has been created"
+                        ) { subscription ->
+                            assertEquals("jenkins", subscription.channel)
+                            val nc = subscription.channelConfig.parse<JenkinsNotificationChannelConfig>()
                             assertEquals(config.name, nc.config)
                             assertEquals("path/to/pipeline", nc.job)
                             assertEquals(

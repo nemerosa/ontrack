@@ -165,7 +165,7 @@ class EntityDataStoreJdbcRepository(
         category: String,
         name: String,
         beforeTime: LocalDateTime?,
-    ): Optional<EntityDataStoreRecord> { // SQL & parameters
+    ): EntityDataStoreRecord? { // SQL & parameters
         var sql = String.format(
             "SELECT * FROM ENTITY_DATA_STORE " +
                     "WHERE %s = :entityId AND CATEGORY = :category AND NAME = :name ",
@@ -182,7 +182,7 @@ class EntityDataStoreJdbcRepository(
         // Ordering
         sql += "ORDER BY CREATION DESC, ID DESC LIMIT 1"
         // Performs the query
-        return getOptional(
+        return getFirstItem(
             sql,
             params
         ) { rs: ResultSet, _: Int -> toEntityDataStoreRecord(entity, rs) }
@@ -193,7 +193,7 @@ class EntityDataStoreJdbcRepository(
         category: String,
         groupName: String,
         name: String,
-    ): Optional<EntityDataStoreRecord> {
+    ): EntityDataStoreRecord? {
         return getLastByName(
             namedParameterJdbcTemplate!!.query(String.format(
                 "SELECT * FROM ENTITY_DATA_STORE " +
@@ -208,7 +208,7 @@ class EntityDataStoreJdbcRepository(
                     .addValue("groupId", groupName)
                     .addValue("name", name)
             ) { rs: ResultSet, _: Int -> toEntityDataStoreRecord(entity, rs) }
-        ).stream().findFirst()
+        ).firstOrNull()
     }
 
     override fun findLastRecordsByNameInCategory(entity: ProjectEntity, category: String): List<EntityDataStoreRecord> {
@@ -290,8 +290,8 @@ class EntityDataStoreJdbcRepository(
         )
     }
 
-    override fun getById(entity: ProjectEntity, id: Int): Optional<EntityDataStoreRecord> {
-        return getOptional(String.format(
+    override fun getById(entity: ProjectEntity, id: Int): EntityDataStoreRecord? {
+        return getFirstItem(String.format(
             "SELECT * FROM ENTITY_DATA_STORE " +
                     "WHERE %s = :entityId " +
                     "AND ID = :id",
@@ -406,7 +406,7 @@ class EntityDataStoreJdbcRepository(
 
     override fun forEachByFilter(
         entityDataStoreFilter: EntityDataStoreFilter,
-        consumer: Consumer<EntityDataStoreRecord>,
+        consumer: (EntityDataStoreRecord) -> Unit,
     ) {
         // Checks the entity
         requireNotNull(entityDataStoreFilter.entity) { "The filter `entity` parameter is required." }
@@ -430,7 +430,7 @@ class EntityDataStoreJdbcRepository(
                 .addValue("page", entityDataStoreFilter.count)
         ) { rs: ResultSet, _: Int ->
             val record = toEntityDataStoreRecord(entityDataStoreFilter.entity, rs)
-            consumer.accept(record)
+            consumer(record)
         }
     }
 

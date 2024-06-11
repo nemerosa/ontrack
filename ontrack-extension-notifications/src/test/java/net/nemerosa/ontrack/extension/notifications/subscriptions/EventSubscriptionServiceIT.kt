@@ -21,11 +21,13 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
 
     @Test
     fun `Getting the global subscriptions for an event`() {
+        val name = uid("g")
         val targetGlobal = uid("t")
         val targetProject = uid("t")
         asAdmin {
             // Register globally
             eventSubscriptionService.subscribe(
+                name = name,
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig(targetGlobal),
                 projectEntity = null,
@@ -37,6 +39,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             // Project level
             val project = project {
                 eventSubscriptionService.subscribe(
+                    name = "test",
                     channel = mockNotificationChannel,
                     channelConfig = MockNotificationChannelConfig(targetProject),
                     projectEntity = this,
@@ -72,6 +75,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             branch {
                 // Subscription at branch level
                 eventSubscriptionService.subscribe(
+                    name = "test",
                     channel = mockNotificationChannel,
                     channelConfig = MockNotificationChannelConfig(targetBranch),
                     projectEntity = this, // Branch
@@ -82,6 +86,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 )
                 // Subscription at project level
                 eventSubscriptionService.subscribe(
+                    name = "test",
                     channel = mockNotificationChannel,
                     channelConfig = MockNotificationChannelConfig(targetProject),
                     projectEntity = project,
@@ -156,6 +161,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 // Registering a subscription for new promotion runs at project level
                 // but only for GOLD promotions
                 eventSubscriptionService.subscribe(
+                    name = "test",
                     channel = mockNotificationChannel,
                     channelConfig = MockNotificationChannelConfig(target),
                     projectEntity = project,
@@ -194,6 +200,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             // Registering a subscription for new promotion runs at project level
             // but only for GOLD promotions on the main branch
             eventSubscriptionService.subscribe(
+                name = "test",
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig(target),
                 projectEntity = this,
@@ -228,7 +235,9 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
     @Test
     fun `Saving a global subscription`() {
         asAdmin {
-            val record = eventSubscriptionService.subscribe(
+            val name = uid("g")
+            eventSubscriptionService.subscribe(
+                name = name,
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#target"),
                 projectEntity = null,
@@ -237,8 +246,21 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 contentTemplate = null,
                 EventFactory.NEW_PROMOTION_RUN
             )
-            assertNotNull(eventSubscriptionService.findSubscriptionById(null, record.id)) {
-                assertEquals(record.data, it)
+            assertNotNull(eventSubscriptionService.findSubscriptionByName(null, name)) {
+                assertEquals(
+                    EventSubscription(
+                        name = name,
+                        channel = mockNotificationChannel.type,
+                        channelConfig = MockNotificationChannelConfig("#target").asJson(),
+                        projectEntity = null,
+                        keywords = null,
+                        origin = "test",
+                        contentTemplate = null,
+                        disabled = false,
+                        events = setOf(EventFactory.NEW_PROMOTION_RUN.id),
+                    ),
+                    it
+                )
             }
         }
     }
@@ -254,6 +276,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
         project {
             // Subscribe for events on this project
             eventSubscriptionService.subscribe(
+                name = "test",
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig(targetProject),
                 projectEntity = this,
@@ -265,6 +288,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             branch {
                 // Subscribe for events on this branch
                 eventSubscriptionService.subscribe(
+                    name = "test",
                     channel = mockNotificationChannel,
                     channelConfig = MockNotificationChannelConfig(targetBranch),
                     projectEntity = this,
@@ -276,6 +300,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 promotionLevel {
                     // Subscribe for events on this promotion
                     eventSubscriptionService.subscribe(
+                        name = "test",
                         channel = mockNotificationChannel,
                         channelConfig = MockNotificationChannelConfig(targetPromotionLevel),
                         projectEntity = this,
@@ -291,7 +316,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                     assertEquals(3, page.pageInfo.totalSize)
                     assertEquals(3, page.pageItems.size)
                     val targets =
-                        page.pageItems.map { it.data.channelConfig.getRequiredTextField("target") }
+                        page.pageItems.map { it.channelConfig.getRequiredTextField("target") }
                     assertEquals(
                         setOf(
                             targetProject,
@@ -308,8 +333,10 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
     @Test
     fun `Getting the global subscriptions`() {
         asAdmin {
+            val name = uid("g")
             val target = uid("t")
             eventSubscriptionService.subscribe(
+                name = name,
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig(target),
                 projectEntity = null,
@@ -322,7 +349,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 EventSubscriptionFilter(size = 1000)
             ).pageItems
             assertNotNull(
-                subscriptions.find { it.data.channelConfig.getTextField("target") == target },
+                subscriptions.find { it.channelConfig.getTextField("target") == target },
                 "Finding the global subscription"
             )
         }
@@ -332,8 +359,10 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
     fun `Getting the global subscriptions with recursivity`() {
         asAdmin {
             eventSubscriptionService.removeAllGlobal()
+            val name = uid("g")
             val target = uid("t")
             eventSubscriptionService.subscribe(
+                name = name,
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig(target),
                 projectEntity = null,
@@ -344,6 +373,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             )
             val project = project {
                 eventSubscriptionService.subscribe(
+                    name = "test",
                     channel = mockNotificationChannel,
                     channelConfig = MockNotificationChannelConfig(target),
                     projectEntity = this,
@@ -357,8 +387,8 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 EventSubscriptionFilter(size = 1000, entity = project.toProjectEntityID(), recursive = true)
             ).pageItems
             assertEquals(2, subscriptions.size)
-            assertEquals(project, subscriptions[0].data.projectEntity)
-            assertNull(subscriptions[1].data.projectEntity)
+            assertEquals(project, subscriptions[0].projectEntity)
+            assertNull(subscriptions[1].projectEntity)
         }
     }
 
@@ -367,6 +397,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
         asAdmin {
             eventSubscriptionService.removeAllGlobal()
             eventSubscriptionService.subscribe(
+                name = uid("g"),
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#mock"),
                 projectEntity = null,
@@ -376,6 +407,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 EventFactory.NEW_PROMOTION_RUN
             )
             eventSubscriptionService.subscribe(
+                name = uid("g"),
                 channel = otherMockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#other"),
                 projectEntity = null,
@@ -391,7 +423,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             assertEquals(1, page.pageItems.size)
             assertEquals(
                 "other-mock",
-                page.pageItems.first().data.channel
+                page.pageItems.first().channel
             )
         }
     }
@@ -401,6 +433,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
         asAdmin {
             eventSubscriptionService.removeAllGlobal()
             eventSubscriptionService.subscribe(
+                name = uid("g"),
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#main"),
                 projectEntity = null,
@@ -410,6 +443,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 EventFactory.NEW_PROMOTION_RUN
             )
             eventSubscriptionService.subscribe(
+                name = uid("g"),
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#test"),
                 projectEntity = null,
@@ -425,11 +459,11 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             assertEquals(1, page.pageItems.size)
             assertEquals(
                 "mock",
-                page.pageItems.first().data.channel
+                page.pageItems.first().channel
             )
             assertEquals(
                 "#main",
-                page.pageItems.first().data.channelConfig.getRequiredTextField("target")
+                page.pageItems.first().channelConfig.getRequiredTextField("target")
             )
         }
     }
@@ -439,6 +473,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
         asAdmin {
             eventSubscriptionService.removeAllGlobal()
             eventSubscriptionService.subscribe(
+                name = uid("g"),
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#one"),
                 projectEntity = null,
@@ -448,6 +483,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 EventFactory.NEW_PROMOTION_RUN
             )
             eventSubscriptionService.subscribe(
+                name = uid("g"),
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#two"),
                 projectEntity = null,
@@ -465,105 +501,15 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             val subscription = page.pageItems.first()
             assertEquals(
                 "mock",
-                subscription.data.channel
+                subscription.channel
             )
             assertEquals(
                 "#one",
-                subscription.data.channelConfig.getRequiredTextField("target")
+                subscription.channelConfig.getRequiredTextField("target")
             )
             assertEquals(
                 setOf("new_promotion_run"),
-                subscription.data.events
-            )
-        }
-    }
-
-    @Test
-    fun `Filtering the global subscriptions using creation date`() {
-        asAdmin {
-            eventSubscriptionService.removeAllGlobal()
-            eventSubscriptionService.subscribe(
-                channel = mockNotificationChannel,
-                channelConfig = MockNotificationChannelConfig("#one"),
-                projectEntity = null,
-                keywords = null,
-                origin = "test",
-                contentTemplate = null,
-                EventFactory.NEW_PROMOTION_RUN
-            )
-            runBlocking {
-                delay(2_000L)
-            }
-            eventSubscriptionService.subscribe(
-                channel = mockNotificationChannel,
-                channelConfig = MockNotificationChannelConfig("#two"),
-                projectEntity = null,
-                keywords = null,
-                origin = "test",
-                contentTemplate = null,
-                EventFactory.NEW_PROMOTION_RUN
-            )
-            val page = eventSubscriptionService.filterSubscriptions(
-                EventSubscriptionFilter(createdBefore = Time.now().minusSeconds(1))
-            )
-            assertEquals(1, page.pageInfo.totalSize)
-            assertEquals(1, page.pageItems.size)
-            assertEquals(
-                "mock",
-                page.pageItems.first().data.channel
-            )
-            assertEquals(
-                "#one",
-                page.pageItems.first().data.channelConfig.getRequiredTextField("target")
-            )
-        }
-    }
-
-    @Test
-    fun `Filtering the global subscriptions using creator`() {
-        asAdmin {
-            eventSubscriptionService.removeAllGlobal()
-            val user1 = asUser().with(GlobalSubscriptionsManage::class.java).call {
-                eventSubscriptionService.subscribe(
-                    channel = mockNotificationChannel,
-                    channelConfig = MockNotificationChannelConfig("#one"),
-                    projectEntity = null,
-                    keywords = null,
-                    origin = "test",
-                    contentTemplate = null,
-                    EventFactory.NEW_PROMOTION_RUN
-                )
-                securityService.currentSignature
-            }
-            asUser().with(GlobalSubscriptionsManage::class.java).call {
-                eventSubscriptionService.subscribe(
-                    channel = mockNotificationChannel,
-                    channelConfig = MockNotificationChannelConfig("#two"),
-                    projectEntity = null,
-                    keywords = null,
-                    origin = "test",
-                    contentTemplate = null,
-                    EventFactory.NEW_VALIDATION_RUN
-                )
-            }
-            //
-            val page = eventSubscriptionService.filterSubscriptions(
-                EventSubscriptionFilter(creator = user1.user.name)
-            )
-            assertEquals(1, page.pageInfo.totalSize)
-            assertEquals(1, page.pageItems.size)
-            val subscription = page.pageItems.first()
-            assertEquals(
-                "mock",
-                subscription.data.channel
-            )
-            assertEquals(
-                "#one",
-                subscription.data.channelConfig.getRequiredTextField("target")
-            )
-            assertEquals(
-                setOf("new_promotion_run"),
-                subscription.data.events
+                subscription.events
             )
         }
     }
@@ -576,6 +522,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
         project {
             // Subscribe for events on this project
             eventSubscriptionService.subscribe(
+                name = uid("p"),
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig(targetProject),
                 projectEntity = this,
@@ -587,6 +534,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             branch {
                 // Subscribe for events on this branch
                 eventSubscriptionService.subscribe(
+                    name = uid("b"),
                     channel = mockNotificationChannel,
                     channelConfig = MockNotificationChannelConfig(targetBranch),
                     projectEntity = this,
@@ -598,6 +546,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 promotionLevel {
                     // Subscribe for events on this promotion
                     eventSubscriptionService.subscribe(
+                        name = uid("pl"),
                         channel = mockNotificationChannel,
                         channelConfig = MockNotificationChannelConfig(targetPromotionLevel),
                         projectEntity = this,
@@ -613,7 +562,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                     assertEquals(1, page.pageInfo.totalSize)
                     assertEquals(1, page.pageItems.size)
                     val targets =
-                        page.pageItems.map { it.data.channelConfig.getRequiredTextField("target") }
+                        page.pageItems.map { it.channelConfig.getRequiredTextField("target") }
                     assertEquals(
                         setOf(
                             targetPromotionLevel,
@@ -630,6 +579,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
         project {
             // Subscribe for events on this project for the two different channels
             eventSubscriptionService.subscribe(
+                name = uid("p"),
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#mock"),
                 projectEntity = this,
@@ -639,6 +589,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 EventFactory.NEW_PROMOTION_RUN
             )
             eventSubscriptionService.subscribe(
+                name = uid("p"),
                 channel = otherMockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#other"),
                 projectEntity = this,
@@ -655,7 +606,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             assertEquals(1, page.pageItems.size)
             assertEquals(
                 "other-mock",
-                page.pageItems.first().data.channel
+                page.pageItems.first().channel
             )
         }
     }
@@ -665,6 +616,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
         project {
             // Subscribe for events on this project for the two different channels configurations
             eventSubscriptionService.subscribe(
+                name = uid("p"),
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#one"),
                 projectEntity = this,
@@ -674,6 +626,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 EventFactory.NEW_PROMOTION_RUN
             )
             eventSubscriptionService.subscribe(
+                name = uid("p"),
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#two"),
                 projectEntity = this,
@@ -690,11 +643,11 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             assertEquals(1, page.pageItems.size)
             assertEquals(
                 "mock",
-                page.pageItems.first().data.channel
+                page.pageItems.first().channel
             )
             assertEquals(
                 "#one",
-                page.pageItems.first().data.channelConfig.getRequiredTextField("target")
+                page.pageItems.first().channelConfig.getRequiredTextField("target")
             )
         }
     }
@@ -704,6 +657,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
         project {
             // Subscribe for events on this project for the two different dates
             eventSubscriptionService.subscribe(
+                name = uid("p"),
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#one"),
                 projectEntity = this,
@@ -716,6 +670,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 delay(2_000L)
             }
             eventSubscriptionService.subscribe(
+                name = uid("p"),
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#two"),
                 projectEntity = this,
@@ -732,62 +687,11 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             assertEquals(1, page.pageItems.size)
             assertEquals(
                 "mock",
-                page.pageItems.first().data.channel
+                page.pageItems.first().channel
             )
             assertEquals(
                 "#one",
-                page.pageItems.first().data.channelConfig.getRequiredTextField("target")
-            )
-        }
-    }
-
-    @Test
-    fun `Filtering the subscriptions for an entity using creator`() {
-        project {
-            // Subscribe for events on this project for the two different creators
-            val user1 = asUser().withProjectFunction(this, ProjectSubscriptionsWrite::class.java).call {
-                eventSubscriptionService.subscribe(
-                    channel = mockNotificationChannel,
-                    channelConfig = MockNotificationChannelConfig("#one"),
-                    projectEntity = this,
-                    keywords = null,
-                    origin = "test",
-                    contentTemplate = null,
-                    EventFactory.NEW_PROMOTION_RUN
-                )
-                securityService.currentSignature
-            }
-            val user2 = asUser().withProjectFunction(this, ProjectSubscriptionsWrite::class.java).call {
-                eventSubscriptionService.subscribe(
-                    channel = mockNotificationChannel,
-                    channelConfig = MockNotificationChannelConfig("#two"),
-                    projectEntity = this,
-                    keywords = null,
-                    origin = "test",
-                    contentTemplate = null,
-                    EventFactory.NEW_PROMOTION_RUN
-                )
-                securityService.currentSignature
-            }
-            assertTrue(user1.user.name != user2.user.name, "Two different users")
-            //
-            val page = eventSubscriptionService.filterSubscriptions(
-                EventSubscriptionFilter(entity = toProjectEntityID(), creator = user1.user.name)
-            )
-            assertEquals(1, page.pageInfo.totalSize)
-            assertEquals(1, page.pageItems.size)
-            val subscription = page.pageItems.first()
-            assertEquals(
-                "mock",
-                subscription.data.channel
-            )
-            assertEquals(
-                "#one",
-                subscription.data.channelConfig.getRequiredTextField("target")
-            )
-            assertEquals(
-                user1.user.name,
-                subscription.signature.user.name
+                page.pageItems.first().channelConfig.getRequiredTextField("target")
             )
         }
     }
@@ -797,6 +701,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
         project {
             // Subscribe for events on this project for the two different event types
             eventSubscriptionService.subscribe(
+                name = uid("p"),
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#one"),
                 projectEntity = this,
@@ -806,6 +711,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
                 EventFactory.NEW_PROMOTION_RUN
             )
             eventSubscriptionService.subscribe(
+                name = uid("p"),
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#two"),
                 projectEntity = this,
@@ -823,15 +729,15 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             val subscription = page.pageItems.first()
             assertEquals(
                 "mock",
-                subscription.data.channel
+                subscription.channel
             )
             assertEquals(
                 "#one",
-                subscription.data.channelConfig.getRequiredTextField("target")
+                subscription.channelConfig.getRequiredTextField("target")
             )
             assertEquals(
                 setOf("new_promotion_run"),
-                subscription.data.events
+                subscription.events
             )
         }
     }
@@ -841,6 +747,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
         project {
             // Initial subscription with a first template
             eventSubscriptionService.subscribe(
+                name = "test",
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#one"),
                 projectEntity = this,
@@ -851,6 +758,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             )
             // Second subscription with a different template
             eventSubscriptionService.subscribe(
+                name = "test",
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#one"),
                 projectEntity = this,
@@ -868,7 +776,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             val subscription = subscriptions.first()
             assertEquals(
                 "This is the second template",
-                subscription.data.contentTemplate
+                subscription.contentTemplate
             )
         }
     }
@@ -879,6 +787,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             eventSubscriptionService.removeAllGlobal()
             // Initial subscription with a first template
             eventSubscriptionService.subscribe(
+                name = "test",
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#one"),
                 projectEntity = null,
@@ -889,6 +798,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             )
             // Second subscription with a different template
             eventSubscriptionService.subscribe(
+                name = "test",
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#one"),
                 projectEntity = null,
@@ -906,7 +816,7 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
             val subscription = subscriptions.first()
             assertEquals(
                 "This is the second template",
-                subscription.data.contentTemplate
+                subscription.contentTemplate
             )
         }
     }

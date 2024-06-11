@@ -130,7 +130,7 @@ Postgresql database.
 For commodity, those tests will inherit from the `AbstractITTestJUnit4Support` class,
 and more specifically:
 
-* from `AbstractRepositoryTestSupport` for JDBC repository integration tests
+* from `AbstractRepositoryJUnit4TestSupport` for JDBC repository integration tests
 * from `AbstractServiceTestJUnit4Support` for service integration tests
 
 Configuration for the integration tests is done in the `ITConfig` class.

@@ -34,6 +34,7 @@ class EventSubscriptionMutations(
                 type.names.map {
                     name(it)
                 } + listOf(
+                    stringInputField(SubscribeToEventsInput::name),
                     stringInputField(SubscribeToEventsInput::channel),
                     jsonInputField(SubscribeToEventsInput::channelConfig),
                     stringListInputField(SubscribeToEventsInput::events),
@@ -59,6 +60,7 @@ class EventSubscriptionMutations(
                 // Creates the payload
                 val payload = createEventSubscriptionPayload(
                     projectEntity = entity,
+                    name = getRequiredMutationInputField(env, SubscribeToEventsInput::name.name),
                     channel = getRequiredMutationInputField(env, SubscribeToEventsInput::channel.name),
                     channelConfig = getRequiredMutationInputField(env, SubscribeToEventsInput::channelConfig.name),
                     events = getRequiredMutationInputField(env, SubscribeToEventsInput::events.name),
@@ -86,6 +88,7 @@ class EventSubscriptionMutations(
                 }
                 createEventSubscriptionPayload(
                     projectEntity = projectEntity,
+                    name = input.name,
                     channel = input.channel,
                     channelConfig = input.channelConfig,
                     events = input.events,
@@ -101,7 +104,7 @@ class EventSubscriptionMutations(
                 val projectEntity = input.projectEntity?.run {
                     type.getEntityFn(structureService).apply(ID.of(id))
                 }
-                eventSubscriptionService.deleteSubscriptionById(projectEntity, input.id)
+                eventSubscriptionService.deleteSubscriptionByName(projectEntity, input.id)
             },
 
             simpleMutation(
@@ -115,17 +118,23 @@ class EventSubscriptionMutations(
                 val projectEntity = input.projectEntity?.run {
                     type.getEntityFn(structureService).apply(ID.of(id))
                 }
-                val record = eventSubscriptionService.disableSubscriptionById(projectEntity, input.id)
-                EventSubscriptionPayload(
-                    id = record.id,
-                    channel = record.data.channel,
-                    channelConfig = record.data.channelConfig,
-                    events = record.data.events.toList(),
-                    keywords = record.data.keywords,
-                    disabled = record.data.disabled,
-                    origin = record.data.origin,
-                    contentTemplate = record.data.contentTemplate,
-                )
+                val name = input.name ?: input.id ?: error("`name` must be specified")
+                eventSubscriptionService.findSubscriptionByName(
+                    projectEntity = projectEntity,
+                    name = name,
+                )?.let { subscription ->
+                    eventSubscriptionService.disableSubscriptionByName(projectEntity, name)
+                    EventSubscriptionPayload(
+                        name = subscription.name,
+                        channel = subscription.channel,
+                        channelConfig = subscription.channelConfig,
+                        events = subscription.events.toList(),
+                        keywords = subscription.keywords,
+                        disabled = true,
+                        origin = subscription.origin,
+                        contentTemplate = subscription.contentTemplate,
+                    )
+                }
             },
 
             simpleMutation(
@@ -139,30 +148,38 @@ class EventSubscriptionMutations(
                 val projectEntity = input.projectEntity?.run {
                     type.getEntityFn(structureService).apply(ID.of(id))
                 }
-                val record = eventSubscriptionService.enableSubscriptionById(projectEntity, input.id)
-                EventSubscriptionPayload(
-                    id = record.id,
-                    channel = record.data.channel,
-                    channelConfig = record.data.channelConfig,
-                    events = record.data.events.toList(),
-                    keywords = record.data.keywords,
-                    disabled = record.data.disabled,
-                    origin = record.data.origin,
-                    contentTemplate = record.data.contentTemplate,
-                )
+                val name = input.name ?: input.id ?: error("`name` must be specified")
+                eventSubscriptionService.findSubscriptionByName(
+                    projectEntity = projectEntity,
+                    name = name,
+                )?.let { subscription ->
+                    eventSubscriptionService.enableSubscriptionByName(projectEntity, name)
+                    EventSubscriptionPayload(
+                        name = subscription.name,
+                        channel = subscription.channel,
+                        channelConfig = subscription.channelConfig,
+                        events = subscription.events.toList(),
+                        keywords = subscription.keywords,
+                        disabled = false,
+                        origin = subscription.origin,
+                        contentTemplate = subscription.contentTemplate,
+                    )
+                }
             },
         )
 
     private fun createEventSubscriptionPayload(
         projectEntity: ProjectEntity?,
+        name: String,
         channel: String,
         channelConfig: JsonNode,
         events: List<String>,
         keywords: String?,
         contentTemplate: String?,
     ): EventSubscriptionPayload {
-        val record = eventSubscriptionService.subscribe(
+        eventSubscriptionService.subscribe(
             EventSubscription(
+                name = name,
                 channel = channel,
                 channelConfig = channelConfig,
                 events = events.toSet(),
@@ -174,14 +191,14 @@ class EventSubscriptionMutations(
             )
         )
         return EventSubscriptionPayload(
-            id = record.id,
-            channel = record.data.channel,
-            channelConfig = record.data.channelConfig,
-            events = record.data.events.toList(),
-            keywords = record.data.keywords,
-            disabled = record.data.disabled,
-            origin = record.data.origin,
-            contentTemplate = record.data.contentTemplate,
+            name = name,
+            channel = channel,
+            channelConfig = channelConfig,
+            events = events,
+            keywords = keywords,
+            disabled = false,
+            origin = EventSubscriptionOrigins.API,
+            contentTemplate = contentTemplate,
         )
     }
 
@@ -207,7 +224,10 @@ data class DisableSubscriptionInput(
     @TypeRef(embedded = true, suffix = "Input")
     val projectEntity: ProjectEntityID?,
     @APIDescription("ID of the subscription to disable")
-    val id: String,
+    @Deprecated("Will be removed in V5. Use name instead")
+    val id: String?,
+    @APIDescription("Name of the subscription to disable")
+    val name: String?,
 )
 
 @APIDescription("Subscription enabling")
@@ -216,7 +236,10 @@ data class EnableSubscriptionInput(
     @TypeRef(embedded = true, suffix = "Input")
     val projectEntity: ProjectEntityID?,
     @APIDescription("ID of the subscription to enable")
-    val id: String,
+    @Deprecated("Will be removed in V5. Use name instead")
+    val id: String?,
+    @APIDescription("Name of the subscription to enable")
+    val name: String?,
 )
 
 @APIDescription("Subscription to events")
@@ -224,6 +247,8 @@ data class SubscribeToEventsInput(
     @APIDescription("Target project entity (null for global events)")
     @TypeRef(embedded = true, suffix = "Input")
     val projectEntity: ProjectEntityID?,
+    @APIDescription("Unique name of the channel in its scope")
+    val name: String,
     @APIDescription("Channel to send this event to")
     val channel: String,
     @APIDescription("Channel configuration")

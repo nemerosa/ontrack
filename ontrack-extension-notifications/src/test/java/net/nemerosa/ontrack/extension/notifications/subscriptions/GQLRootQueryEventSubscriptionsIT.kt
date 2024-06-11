@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getRequiredBooleanField
 import net.nemerosa.ontrack.json.getRequiredJsonField
 import net.nemerosa.ontrack.model.events.EventFactory
+import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -18,6 +19,7 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
         project {
             // Subscribe for events on this project for the two different event types
             eventSubscriptionService.subscribe(
+                name = "test",
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#one"),
                 projectEntity = this,
@@ -27,7 +29,7 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                 EventFactory.NEW_PROMOTION_RUN
             )
             // Query
-            asUser().with(this, ProjectSubscriptionsRead::class.java).call {
+            asUser().withProjectFunction(this, ProjectSubscriptionsRead::class.java).call {
                 run(
                     """
                     query {
@@ -49,7 +51,7 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                 }
             }
             // Query
-            asUser().with(this, ProjectSubscriptionsRead::class.java).with(this, ProjectSubscriptionsWrite::class.java)
+            asUser().withProjectFunction(this, ProjectSubscriptionsRead::class.java).withProjectFunction(this, ProjectSubscriptionsWrite::class.java)
                 .call {
                     run(
                         """
@@ -79,6 +81,7 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
         project {
             // Subscribe for events on this project for the two different event types
             eventSubscriptionService.subscribe(
+                name = uid("p"),
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#one"),
                 projectEntity = this,
@@ -88,6 +91,7 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                 EventFactory.NEW_PROMOTION_RUN
             )
             eventSubscriptionService.subscribe(
+                name = uid("p"),
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#two"),
                 projectEntity = this,
@@ -143,6 +147,7 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
     fun `Getting the subscriptions for an entity with a content template`() {
         project {
             eventSubscriptionService.subscribe(
+                name = uid("p"),
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#one"),
                 projectEntity = this,
@@ -189,6 +194,7 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
         asAdmin {
             eventSubscriptionService.removeAllGlobal()
             eventSubscriptionService.subscribe(
+                name = uid("p"),
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#one"),
                 projectEntity = null,
@@ -230,6 +236,7 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
             eventSubscriptionService.removeAllGlobal()
             // Subscribe for events on this project for the two different event types
             eventSubscriptionService.subscribe(
+                name = uid("p"),
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#one"),
                 projectEntity = null,
@@ -239,6 +246,7 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                 EventFactory.NEW_PROMOTION_RUN
             )
             eventSubscriptionService.subscribe(
+                name = uid("p"),
                 channel = mockNotificationChannel,
                 channelConfig = MockNotificationChannelConfig("#two"),
                 projectEntity = null,
