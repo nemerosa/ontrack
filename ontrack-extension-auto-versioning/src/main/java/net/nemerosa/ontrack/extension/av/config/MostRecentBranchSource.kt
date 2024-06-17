@@ -12,12 +12,15 @@ class MostRecentBranchSource(
 
     private val ordering = OptionalVersionBranchOrdering(branchDisplayNameService)
 
-    override fun getLatestBranch(config: String?, project: Project, targetBranch: Branch, promotion: String): Branch? {
+    override fun getLatestBranch(config: String?, project: Project, targetBranch: Branch, promotion: String, includeDisabled: Boolean): Branch? {
         val sourceRegex = config?.toRegex() ?: throw BranchSourceMissingConfigurationException(id)
         // Version-based ordering
         val versionComparator = ordering.getComparator(config)
         // Gets the list of branches for the source project matching the regex
         val branches = structureService.getBranchesForProject(project.id)
+            .filter { sourceBranch ->
+                includeDisabled || !sourceBranch.isDisabled
+            }
             // ... filters them by regex, using their path
             .filter { sourceBranch ->
                 // Path of the branch

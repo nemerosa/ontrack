@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.ordering.VersionOrName
 import net.nemerosa.ontrack.model.ordering.VersionUtils
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.BranchDisplayNameService
+import net.nemerosa.ontrack.model.structure.BranchNamePolicy
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 
@@ -37,10 +38,9 @@ class OptionalVersionBranchOrdering(
 
     internal fun getVersion(branch: Branch, regex: Regex): VersionOrName {
         // Path to use for the branch
-        val path: String = branchDisplayNameService.getBranchDisplayName(branch)
+        val path: String = branchDisplayNameService.getBranchDisplayName(branch, BranchNamePolicy.DISPLAY_NAME_OR_NAME)
         // Path first, then name, then version = name
-        return VersionUtils.getVersion(regex, path) ?: VersionUtils.getVersion(regex, branch.name)
-        ?: VersionOrName(path)
+        return VersionUtils.getVersion(regex, path) ?: VersionOrName(path)
     }
 
     companion object {
