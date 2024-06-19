@@ -5,6 +5,6 @@ import net.nemerosa.ontrack.kdsl.connector.Connector
 
 class JenkinsMockMgt(connector: Connector) : Connected(connector) {
 
-    fun job(path: String): MockJenkinsJob = MockJenkinsJob(connector, path)
+    fun job(config: String, path: String): MockJenkinsJob = MockJenkinsJob(connector, config, path)
 
 }

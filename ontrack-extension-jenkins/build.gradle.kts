@@ -20,10 +20,12 @@ dependencies {
     testImplementation(project(":ontrack-test-utils"))
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(project(":ontrack-extension-git"))
+    testImplementation(project(path = ":ontrack-model", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-git", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-issues", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))
+    testImplementation(project(path = ":ontrack-extension-auto-versioning", configuration = "tests"))
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
 
     testRuntimeOnly(project(":ontrack-service"))

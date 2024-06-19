@@ -14,7 +14,7 @@ import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import org.springframework.stereotype.Component
 
 /**
- * Upgrade post processing based on a generic job in Jenkins.
+ * Upgrade post-processing based on a generic job in Jenkins.
  */
 @Component
 class JenkinsPostProcessing(
@@ -22,7 +22,6 @@ class JenkinsPostProcessing(
     private val cachedSettingsService: CachedSettingsService,
     private val jenkinsConfigurationService: JenkinsConfigurationService,
     private val jenkinsClientFactory: JenkinsClientFactory,
-    // private val autoVersioningNotificationService: AutoVersioningNotificationService
 ) : AbstractExtension(extensionFeature), PostProcessing<JenkinsPostProcessingConfig> {
 
     override val id: String = "jenkins"
@@ -61,18 +60,24 @@ class JenkinsPostProcessing(
         // Gets a Jenkins client for this configuration
         val jenkinsClient = jenkinsClientFactory.getClient(jenkinsConfig)
 
+        // Parameters to send to the job
+        val parameters = mutableMapOf(
+            "DOCKER_IMAGE" to config.dockerImage,
+            "DOCKER_COMMAND" to config.dockerCommand,
+            "COMMIT_MESSAGE" to (config.commitMessage ?: autoVersioningOrder.defaultCommitMessage),
+            "REPOSITORY_URI" to repositoryURI,
+            "UPGRADE_BRANCH" to upgradeBranch,
+            "VERSION" to autoVersioningOrder.targetVersion,
+            "CREDENTIALS" to (config.credentials?.renderParameter() ?: ""),
+        )
+
+        // Extra parameters
+        parameters.putAll(config.parameters.associate { it.name to it.value })
+
         // Launches the job and waits for its completion
         val jenkinsBuild = jenkinsClient.runJob(
             jenkinsJobPath,
-            mapOf(
-                "DOCKER_IMAGE" to config.dockerImage,
-                "DOCKER_COMMAND" to config.dockerCommand,
-                "COMMIT_MESSAGE" to (config.commitMessage ?: autoVersioningOrder.defaultCommitMessage),
-                "REPOSITORY_URI" to repositoryURI,
-                "UPGRADE_BRANCH" to upgradeBranch,
-                "VERSION" to autoVersioningOrder.targetVersion,
-                "CREDENTIALS" to (config.credentials?.renderParameter() ?: ""),
-            ),
+            parameters,
             settings.retries,
             settings.retriesDelaySeconds
         )

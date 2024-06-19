@@ -48,7 +48,7 @@ class ACCJenkinsNotifications : AbstractACCDSLNotificationsTestSupport() {
                         timeout = 10_000,
                         interval = 500L,
                     ) {
-                        val jenkinsJob = ontrack.jenkins.mock.job("/mock/${job}").jenkinsJob
+                        val jenkinsJob = ontrack.jenkins.mock.job(jenkinsConfName, "/mock/${job}").jenkinsJob
                         jenkinsJob != null && jenkinsJob.wasCalled
                     }
                 }
@@ -99,7 +99,7 @@ class ACCJenkinsNotifications : AbstractACCDSLNotificationsTestSupport() {
                         timeout = 10_000,
                         interval = 500L,
                     ) {
-                        val jenkinsJob = ontrack.jenkins.mock.job("/mock/${job}").jenkinsJob
+                        val jenkinsJob = ontrack.jenkins.mock.job(jenkinsConfName, "/mock/${job}").jenkinsJob
                         jenkinsJob != null && jenkinsJob.wasCalled && jenkinsJob.lastBuild.parameters == mapOf(
                             "PROMOTION" to pl.name,
                         )

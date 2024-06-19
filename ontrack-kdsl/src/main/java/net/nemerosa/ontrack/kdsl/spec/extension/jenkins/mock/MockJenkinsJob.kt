@@ -7,12 +7,13 @@ import net.nemerosa.ontrack.kdsl.connector.parseOrNull
 
 class MockJenkinsJob(
     connector: Connector,
+    val config: String,
     val path: String,
 ) : Connected(connector) {
 
     val jenkinsJob: JenkinsJob?
         get() =
-            connector.get("/extension/jenkins/mock/job?path=$path").body.parseOrNull<JenkinsJob>()
+            connector.get("/extension/jenkins/mock/${config}/job?path=$path").body.parseOrNull<JenkinsJob>()
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class JenkinsJob(

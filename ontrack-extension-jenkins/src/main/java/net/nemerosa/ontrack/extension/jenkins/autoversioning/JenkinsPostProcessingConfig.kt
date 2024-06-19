@@ -13,6 +13,7 @@ import net.nemerosa.ontrack.json.parse
  * @property commitMessage Commit message for the post processed files. If not defined, a default message will be provided
  * @property config Jenkins configuration to use for the connection (optional, using defaults if not specified)
  * @property job Path to the job to launch for the post processing (optional, using defaults if not specified)
+ * @property parameters List of extra parameters to pass to the job (optional, none by default)
  * @property credentials List of credentials to inject in the command
  */
 data class JenkinsPostProcessingConfig(
@@ -21,6 +22,7 @@ data class JenkinsPostProcessingConfig(
     val commitMessage: String? = null,
     val config: String? = null,
     val job: String? = null,
+    val parameters: List<JenkinsPostProcessingConfigParam> = emptyList(),
     val credentials: List<JenkinsPostProcessingConfigCredentials>? = null,
 ) {
 
