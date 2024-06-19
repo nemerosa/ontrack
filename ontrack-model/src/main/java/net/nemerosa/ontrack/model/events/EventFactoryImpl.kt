@@ -222,7 +222,7 @@ class EventFactoryImpl : EventFactory {
         return of(DELETE_PROMOTION_RUN)
             .withBranch(promotionRun.build.branch)
             .with(promotionRun.build)
-            .with(promotionRun)
+            .with("PROMOTION_RUN_ID", promotionRun.id.toString())
             .with(promotionRun.promotionLevel)
             .build()
     }
