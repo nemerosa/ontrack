@@ -19,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.net.URI
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 class JenkinsNotificationChannelTest {
 
@@ -129,6 +130,10 @@ class JenkinsNotificationChannelTest {
         val result = jenkinsNotificationChannel.publish(config, event, emptyMap(), null) { it }
 
         assertEquals(NotificationResultType.OK, result.type)
+        assertNotNull(result.output) { output ->
+            assertEquals("https://jenkins/folder/job", output.jobUrl)
+            assertEquals("uri:build", output.buildUrl)
+        }
     }
 
     @Test
@@ -150,6 +155,10 @@ class JenkinsNotificationChannelTest {
         val result = jenkinsNotificationChannel.publish(config, event, emptyMap(), null) { it }
 
         assertEquals(NotificationResultType.ERROR, result.type)
+        assertNotNull(result.output) { output ->
+            assertEquals("https://jenkins/folder/job", output.jobUrl)
+            assertEquals("uri:build", output.buildUrl)
+        }
     }
 
     private fun newJenkinsNotificationConfig(

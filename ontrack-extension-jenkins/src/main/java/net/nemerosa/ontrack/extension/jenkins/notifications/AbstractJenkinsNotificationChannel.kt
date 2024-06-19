@@ -45,7 +45,7 @@ abstract class AbstractJenkinsNotificationChannel(
                 renderer = PlainEventRenderer.INSTANCE
             )
         }
-        val error = when (config.callMode) {
+        val (error, buildUrl) = when (config.callMode) {
             JenkinsNotificationChannelConfigCallMode.ASYNC -> launchAsync(jenkinsClient, job, parameters)
             JenkinsNotificationChannelConfigCallMode.SYNC -> launchSync(jenkinsClient, job, config.timeout, parameters)
         }
@@ -53,6 +53,7 @@ abstract class AbstractJenkinsNotificationChannel(
         val jobUrl = jenkinsClient.getJob(job).url
         val output = JenkinsNotificationChannelOutput(
             jobUrl = jobUrl,
+            buildUrl = buildUrl,
             parameters = parameters.map { (name, value) -> JenkinsNotificationChannelConfigParam(name, value) }
         )
         // In case of error
@@ -75,7 +76,7 @@ abstract class AbstractJenkinsNotificationChannel(
         job: String,
         timeout: Int,
         parameters: Map<String, String>
-    ): String? {
+    ): JobLaunchResult {
         val interval = 30 // seconds
         val retries = timeout / interval
         val build = jenkinsClient.runJob(
@@ -85,9 +86,15 @@ abstract class AbstractJenkinsNotificationChannel(
             retriesDelaySeconds = interval,
         )
         return if (build.successful) {
-            null // No error
+            JobLaunchResult(
+                error = null,
+                buildUrl = build.url,
+            )
         } else {
-            "Jenkins build at ${build.url} was not reported successful."
+            JobLaunchResult(
+                error = "Jenkins build at ${build.url} was not reported successful.",
+                buildUrl = build.url,
+            )
         }
     }
 
@@ -95,15 +102,21 @@ abstract class AbstractJenkinsNotificationChannel(
         jenkinsClient: JenkinsClient,
         job: String,
         parameters: Map<String, String>
-    ): String? {
+    ): JobLaunchResult {
         val queueURI = jenkinsClient.fireAndForgetJob(
             job = job,
             parameters = parameters,
         )
         return if (queueURI != null) {
-            null // No error
+            JobLaunchResult(
+                error = null,
+                buildUrl = null,
+            )
         } else {
-            "Could not find job at $job"
+            JobLaunchResult(
+                error = "Could not find job at $job",
+                buildUrl = null,
+            )
         }
     }
 
@@ -154,5 +167,10 @@ abstract class AbstractJenkinsNotificationChannel(
             "n/a"
         }
     }
+
+    data class JobLaunchResult(
+        val error: String?,
+        val buildUrl: String?,
+    )
 
 }
