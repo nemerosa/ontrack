@@ -15,42 +15,20 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
 
     @Test
     fun `Filtering the project subscriptions and getting the access rights`() {
-        project {
-            // Subscribe for events on this project for the two different event types
-            eventSubscriptionService.subscribe(
-                channel = mockNotificationChannel,
-                channelConfig = MockNotificationChannelConfig("#one"),
-                projectEntity = this,
-                keywords = null,
-                origin = "test",
-                contentTemplate = null,
-                EventFactory.NEW_PROMOTION_RUN
-            )
-            // Query
-            asUser().with(this, ProjectSubscriptionsRead::class.java).call {
-                run(
-                    """
-                    query {
-                        eventSubscriptions(filter: {
-                            entity: {
-                                type: PROJECT,
-                                id: $id
-                            }
-                        }) {
-                            writeSubscriptionGranted
-                        }
-                    }
-                """
-                ) { data ->
-                    assertFalse(
-                        data.getRequiredJsonField("eventSubscriptions")
-                            .getRequiredBooleanField("writeSubscriptionGranted")
-                    )
-                }
-            }
-            // Query
-            asUser().with(this, ProjectSubscriptionsRead::class.java).with(this, ProjectSubscriptionsWrite::class.java)
-                .call {
+        asAdmin {
+            project {
+                // Subscribe for events on this project for the two different event types
+                eventSubscriptionService.subscribe(
+                    channel = mockNotificationChannel,
+                    channelConfig = MockNotificationChannelConfig("#one"),
+                    projectEntity = this,
+                    keywords = null,
+                    origin = "test",
+                    contentTemplate = null,
+                    EventFactory.NEW_PROMOTION_RUN
+                )
+                // Query
+                asUser().with(this, ProjectSubscriptionsRead::class.java).call {
                     run(
                         """
                     query {
@@ -65,40 +43,66 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                     }
                 """
                     ) { data ->
-                        assertTrue(
+                        assertFalse(
                             data.getRequiredJsonField("eventSubscriptions")
                                 .getRequiredBooleanField("writeSubscriptionGranted")
                         )
                     }
                 }
+                // Query
+                asUser().with(this, ProjectSubscriptionsRead::class.java)
+                    .with(this, ProjectSubscriptionsWrite::class.java)
+                    .call {
+                        run(
+                            """
+                    query {
+                        eventSubscriptions(filter: {
+                            entity: {
+                                type: PROJECT,
+                                id: $id
+                            }
+                        }) {
+                            writeSubscriptionGranted
+                        }
+                    }
+                """
+                        ) { data ->
+                            assertTrue(
+                                data.getRequiredJsonField("eventSubscriptions")
+                                    .getRequiredBooleanField("writeSubscriptionGranted")
+                            )
+                        }
+                    }
+            }
         }
     }
 
     @Test
     fun `Filtering the subscriptions for an entity using event type`() {
-        project {
-            // Subscribe for events on this project for the two different event types
-            eventSubscriptionService.subscribe(
-                channel = mockNotificationChannel,
-                channelConfig = MockNotificationChannelConfig("#one"),
-                projectEntity = this,
-                keywords = null,
-                origin = "test",
-                contentTemplate = null,
-                EventFactory.NEW_PROMOTION_RUN
-            )
-            eventSubscriptionService.subscribe(
-                channel = mockNotificationChannel,
-                channelConfig = MockNotificationChannelConfig("#two"),
-                projectEntity = this,
-                keywords = null,
-                origin = "test",
-                contentTemplate = null,
-                EventFactory.NEW_VALIDATION_RUN
-            )
-            // Query
-            run(
-                """
+        asAdmin {
+            project {
+                // Subscribe for events on this project for the two different event types
+                eventSubscriptionService.subscribe(
+                    channel = mockNotificationChannel,
+                    channelConfig = MockNotificationChannelConfig("#one"),
+                    projectEntity = this,
+                    keywords = null,
+                    origin = "test",
+                    contentTemplate = null,
+                    EventFactory.NEW_PROMOTION_RUN
+                )
+                eventSubscriptionService.subscribe(
+                    channel = mockNotificationChannel,
+                    channelConfig = MockNotificationChannelConfig("#two"),
+                    projectEntity = this,
+                    keywords = null,
+                    origin = "test",
+                    contentTemplate = null,
+                    EventFactory.NEW_VALIDATION_RUN
+                )
+                // Query
+                run(
+                    """
                     query {
                         eventSubscriptions(filter: {
                             entity: {
@@ -115,45 +119,47 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                         }
                     }
             """
-            ) { data ->
-                assertEquals(
-                    mapOf(
-                        "eventSubscriptions" to mapOf(
-                            "pageItems" to listOf(
-                                mapOf(
-                                    "channel" to "mock",
-                                    "channelConfig" to mapOf(
-                                        "target" to "#one",
-                                        "data" to null,
-                                    ),
-                                    "events" to listOf(
-                                        "new_promotion_run"
+                ) { data ->
+                    assertEquals(
+                        mapOf(
+                            "eventSubscriptions" to mapOf(
+                                "pageItems" to listOf(
+                                    mapOf(
+                                        "channel" to "mock",
+                                        "channelConfig" to mapOf(
+                                            "target" to "#one",
+                                            "data" to null,
+                                        ),
+                                        "events" to listOf(
+                                            "new_promotion_run"
+                                        )
                                     )
                                 )
                             )
-                        )
-                    ).asJson(),
-                    data
-                )
+                        ).asJson(),
+                        data
+                    )
+                }
             }
         }
     }
 
     @Test
     fun `Getting the subscriptions for an entity with a content template`() {
-        project {
-            eventSubscriptionService.subscribe(
-                channel = mockNotificationChannel,
-                channelConfig = MockNotificationChannelConfig("#one"),
-                projectEntity = this,
-                keywords = null,
-                origin = "test",
-                contentTemplate = "Some template.",
-                EventFactory.NEW_PROMOTION_RUN
-            )
-            // Query
-            run(
-                """
+        asAdmin {
+            project {
+                eventSubscriptionService.subscribe(
+                    channel = mockNotificationChannel,
+                    channelConfig = MockNotificationChannelConfig("#one"),
+                    projectEntity = this,
+                    keywords = null,
+                    origin = "test",
+                    contentTemplate = "Some template.",
+                    EventFactory.NEW_PROMOTION_RUN
+                )
+                // Query
+                run(
+                    """
                     query {
                         eventSubscriptions(filter: {
                             entity: {
@@ -167,19 +173,20 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                         }
                     }
             """
-            ) { data ->
-                assertEquals(
-                    mapOf(
-                        "eventSubscriptions" to mapOf(
-                            "pageItems" to listOf(
-                                mapOf(
-                                    "contentTemplate" to "Some template.",
+                ) { data ->
+                    assertEquals(
+                        mapOf(
+                            "eventSubscriptions" to mapOf(
+                                "pageItems" to listOf(
+                                    mapOf(
+                                        "contentTemplate" to "Some template.",
+                                    )
                                 )
                             )
-                        )
-                    ).asJson(),
-                    data
-                )
+                        ).asJson(),
+                        data
+                    )
+                }
             }
         }
     }

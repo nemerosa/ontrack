@@ -12,6 +12,7 @@ data class NotificationResult<R>(
 ) {
     companion object {
         fun <R> ok(output: R) = NotificationResult(NotificationResultType.OK, null, output = output)
+        fun <R> ongoing(output: R) = NotificationResult(NotificationResultType.ONGOING, null, output = output)
         fun <R> notConfigured(message: String) =
             NotificationResult<R>(NotificationResultType.NOT_CONFIGURED, message, output = null)
 

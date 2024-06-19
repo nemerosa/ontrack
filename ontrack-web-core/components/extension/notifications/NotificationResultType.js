@@ -1,4 +1,4 @@
-import {Space} from "antd";
+import {Space, Spin} from "antd";
 import {FaCheck, FaExclamationTriangle, FaTimesCircle} from "react-icons/fa";
 
 export const notificationResultTypes = [
@@ -7,6 +7,12 @@ export const notificationResultTypes = [
         name: 'OK',
         color: 'green',
         icon: <FaCheck color="green"/>,
+    },
+    {
+        key: 'ONGOING',
+        name: 'Ongoing',
+        color: 'green',
+        icon: <Spin size="small"/>,
     },
     {
         key: 'NOT_CONFIGURED',

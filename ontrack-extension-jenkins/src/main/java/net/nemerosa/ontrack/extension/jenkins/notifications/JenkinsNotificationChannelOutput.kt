@@ -11,4 +11,10 @@ data class JenkinsNotificationChannelOutput(
     @APIDescription("Parameters sent to the job")
     @DocumentationList
     val parameters: List<JenkinsNotificationChannelConfigParam>,
-)
+) {
+    fun withBuildUrl(buildUrl: String?) = JenkinsNotificationChannelOutput(
+        jobUrl = jobUrl,
+        buildUrl = buildUrl,
+        parameters = parameters
+    )
+}

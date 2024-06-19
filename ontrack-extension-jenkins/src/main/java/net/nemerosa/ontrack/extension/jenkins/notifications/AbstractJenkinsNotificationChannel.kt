@@ -30,7 +30,7 @@ abstract class AbstractJenkinsNotificationChannel(
             ?: return NotificationResult.invalidConfiguration("Jenkins configuration cannot be found: ${config.config}")
         // Gets the Jenkins client
         val jenkinsClient = createJenkinsClient(jenkinsConfig)
-        // Running the job
+        // Getting the job parameters
         val job = eventTemplatingService.render(
             template = config.job,
             event = event,
@@ -45,16 +45,23 @@ abstract class AbstractJenkinsNotificationChannel(
                 renderer = PlainEventRenderer.INSTANCE
             )
         }
+        // Filling the output
+        val jobUrl = jenkinsClient.getJob(job).url
+        var output = outputProgressCallback(
+            JenkinsNotificationChannelOutput(
+                jobUrl = jobUrl,
+                buildUrl = null,
+                parameters = parameters.map { (name, value) -> JenkinsNotificationChannelConfigParam(name, value) },
+            )
+        )
+        // Running the job
         val (error, buildUrl) = when (config.callMode) {
             JenkinsNotificationChannelConfigCallMode.ASYNC -> launchAsync(jenkinsClient, job, parameters)
             JenkinsNotificationChannelConfigCallMode.SYNC -> launchSync(jenkinsClient, job, config.timeout, parameters)
         }
         // Output
-        val jobUrl = jenkinsClient.getJob(job).url
-        val output = JenkinsNotificationChannelOutput(
-            jobUrl = jobUrl,
-            buildUrl = buildUrl,
-            parameters = parameters.map { (name, value) -> JenkinsNotificationChannelConfigParam(name, value) }
+        output = outputProgressCallback(
+            output.withBuildUrl(buildUrl)
         )
         // In case of error
         return if (error != null) {
