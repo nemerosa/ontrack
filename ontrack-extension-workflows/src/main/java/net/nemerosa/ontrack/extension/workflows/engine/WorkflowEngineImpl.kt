@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.workflows.engine
 
+import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import net.nemerosa.ontrack.extension.queue.dispatching.QueueDispatcher
@@ -97,7 +98,10 @@ class WorkflowEngineImpl(
                 // Running the executor
                 val output = runBlocking {
                     withTimeoutOrNull(timeout.toMillis()) {
-                        executor.execute(instance, node.id)
+                        val deferred = async {
+                            executor.execute(instance, node.id)
+                        }
+                        deferred.await()
                     }
                 }
                 // Timeout?

@@ -313,6 +313,51 @@ class ACCDSLWorkflows : AbstractACCDSLWorkflowsTestSupport() {
     }
 
     @Test
+    fun `Workflow stopped in case of timeout`() {
+        val name = uid("w-")
+        val workflow = """
+            name: $name
+            nodes:
+                - id: ticket
+                  executorId: mock
+                  data:
+                    text: Ticket
+                - id: jenkins
+                  parents:
+                    - id: ticket
+                  executorId: mock
+                  data:
+                    text: Jenkins
+                    waitMs: 2000
+                  timeout: 1
+                - id: mail
+                  executorId: mock
+                  data:
+                    text: Mail
+                    waitMs: 500
+                  parents:
+                    - id: jenkins
+        """.trimIndent()
+        // Saving the workflow
+        val workflowId = ontrack.workflows.saveYamlWorkflow(
+            workflow = workflow,
+        ) ?: fail("Error while saving workflow")
+        // Running the workflow
+        val instanceId = ontrack.workflows.launchWorkflow(
+            workflowId = workflowId,
+            context = "mock" to mapOf("text" to "Error test").asJson(),
+        ) ?: fail("Error while launching workflow")
+        // Waiting for the workflow result
+        val instance = waitUntilWorkflowFinished(instanceId, returnInstanceOnError = true)
+        assertEquals(WorkflowInstanceStatus.ERROR, instance.status)
+        // Checks the node statuses
+        val nodeStatuses = instance.nodesExecutions.associate { it.id to it.status }
+        assertEquals(WorkflowInstanceNodeStatus.SUCCESS, nodeStatuses["ticket"])
+        assertEquals(WorkflowInstanceNodeStatus.ERROR, nodeStatuses["jenkins"])
+        assertEquals(WorkflowInstanceNodeStatus.STOPPED, nodeStatuses["mail"])
+    }
+
+    @Test
     fun `Error in workflow`() {
 
         // Defining a workflow
