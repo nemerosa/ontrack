@@ -57,6 +57,7 @@ export default function WorkflowInstanceView({id}) {
                                 nodes {
                                     id
                                     executorId
+                                    timeout
                                     data
                                     parents {
                                         id

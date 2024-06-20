@@ -7382,6 +7382,8 @@ type WorkflowNode {
     id: String!
     "List of the IDs of the parents for this node"
     parents: [WorkflowParentNode!]!
+    "Timeout in seconds (5 minutes by default)"
+    timeout: Int
 }
 
 "Workflow node executor"

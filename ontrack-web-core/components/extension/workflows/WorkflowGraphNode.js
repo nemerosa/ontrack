@@ -1,12 +1,13 @@
 import {Handle, Position} from "reactflow";
 import {Card, Popconfirm, Space, Typography} from "antd";
 import {useWorkflowNodeExecutor} from "@components/extension/workflows/WorkflowNodeExecutorContext";
-import {FaCog, FaPencilAlt, FaTrashAlt, FaWrench} from "react-icons/fa";
+import {FaClock, FaCog, FaPencilAlt, FaTrashAlt, FaWrench} from "react-icons/fa";
 import WorkflowNodeExecutorShortConfigWithHelp
     from "@components/extension/workflows/WorkflowNodeExecutorShortConfigWithHelp";
 import ConfigureWorkflowNodeDialog, {
     useConfigureWorkflowNodeDialog,
 } from "@components/extension/workflows/ConfigureWorkflowNodeDialog";
+import Duration from "@components/common/Duration";
 
 export default function WorkflowGraphNode({data}) {
 
@@ -14,7 +15,7 @@ export default function WorkflowGraphNode({data}) {
     const executor = useWorkflowNodeExecutor(data.executorId, [data.executorId])
 
     const onSuccess = (values /*, context */) => {
-        const {id, executorId, data: nodeData} = values
+        const {id, executorId, timeout, data: nodeData} = values
         const oldId = data.id
         if (onGraphNodeChange) {
             onGraphNodeChange({
@@ -22,6 +23,7 @@ export default function WorkflowGraphNode({data}) {
                     oldId,
                     id,
                     executorId,
+                    timeout,
                     data: nodeData,
                 },
             })
@@ -99,6 +101,10 @@ export default function WorkflowGraphNode({data}) {
                                 data.executorId && executor &&
                                 <Typography.Text>{executor?.displayName}</Typography.Text>
                             }
+                        </Space>
+                        <Space>
+                            <FaClock title="Timeout"/>
+                            <Duration seconds={data.timeout}/>
                         </Space>
                         <Space>
                             <FaWrench/>

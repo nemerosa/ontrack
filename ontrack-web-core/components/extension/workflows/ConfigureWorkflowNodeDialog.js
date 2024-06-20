@@ -1,5 +1,5 @@
 import FormDialog, {useFormDialog} from "@components/form/FormDialog";
-import {Form, Input} from "antd";
+import {Form, Input, InputNumber} from "antd";
 import SelectWorkflowNodeExecutor from "@components/extension/workflows/SelectWorkflowNodeExecutor";
 import {useState} from "react";
 import Well from "@components/common/Well";
@@ -14,6 +14,7 @@ export const useConfigureWorkflowNodeDialog = ({onSuccess}) => {
             setCurrentValues({...context})
             form.setFieldValue('id', context.id)
             form.setFieldValue('executorId', context.executorId)
+            form.setFieldValue('timeout', context.timeout)
             form.setFieldValue('data', context.data)
         },
         currentValues,
@@ -52,6 +53,15 @@ export default function ConfigureWorkflowNodeDialog({dialog}) {
                     rules={[{required: true, message: 'Executor is required',},]}
                 >
                     <SelectWorkflowNodeExecutor/>
+                </Form.Item>
+                <Form.Item
+                    name="timeout"
+                    label="Timeout (s)"
+                    extra="Timeout (in seconds) for the execution of this node"
+                    rules={[{required: true, message: 'Timeout is required',},]}
+                    initialValue={300}
+                >
+                    <InputNumber min={1}/>
                 </Form.Item>
                 {
                     dialog.currentValues.executorId &&

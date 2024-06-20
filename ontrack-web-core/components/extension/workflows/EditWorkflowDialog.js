@@ -64,10 +64,11 @@ export default function EditWorkflowDialog({dialog}) {
         const wNodes = []
         const wIndex = {}
         nodes.forEach(({data}) => {
-            const {id, executorId, data: nodeData} = data
+            const {id, executorId, timeout, data: nodeData} = data
             const wNode = {
                 id,
                 executorId,
+                timeout,
                 data: nodeData,
                 parents: [],
             };

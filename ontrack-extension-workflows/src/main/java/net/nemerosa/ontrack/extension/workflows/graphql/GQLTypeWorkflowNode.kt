@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.jsonField
 import net.nemerosa.ontrack.graphql.support.listField
+import net.nemerosa.ontrack.graphql.support.longField
 import net.nemerosa.ontrack.graphql.support.stringField
 import org.springframework.stereotype.Component
 
@@ -20,6 +21,7 @@ class GQLTypeWorkflowNode : GQLType {
             .description("Workflow node")
             .stringField(WorkflowNode::id)
             .stringField(WorkflowNode::executorId)
+            .longField(WorkflowNode::timeout)
             .jsonField(WorkflowNode::data)
             .listField(WorkflowNode::parents)
             .build()
