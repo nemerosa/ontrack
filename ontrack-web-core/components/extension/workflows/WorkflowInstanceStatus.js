@@ -1,5 +1,5 @@
 import {Space} from "antd";
-import {FaCheckCircle, FaSpinner, FaTimesCircle} from "react-icons/fa";
+import {FaCheckCircle, FaSpinner, FaStop, FaTimesCircle} from "react-icons/fa";
 
 export default function WorkflowInstanceStatus({status}) {
     return (
@@ -16,6 +16,13 @@ export default function WorkflowInstanceStatus({status}) {
                 <Space>
                     <FaSpinner color="blue"/>
                     Running
+                </Space>
+            }
+            {
+                status === 'STOPPED' &&
+                <Space>
+                    <FaStop color="red"/>
+                    Stopped
                 </Space>
             }
             {
