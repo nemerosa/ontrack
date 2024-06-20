@@ -39,6 +39,15 @@ data class WorkflowInstanceNode(
         error = error,
     )
 
+    fun stop(time: LocalDateTime = Time.now) = WorkflowInstanceNode(
+        id = id,
+        status = WorkflowInstanceNodeStatus.STOPPED,
+        startTime = time,
+        endTime = endTime,
+        output = output,
+        error = error,
+    )
+
     fun success(output: JsonNode, time: LocalDateTime = Time.now) = WorkflowInstanceNode(
         id = id,
         status = WorkflowInstanceNodeStatus.SUCCESS,

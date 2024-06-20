@@ -10,6 +10,9 @@ enum class WorkflowInstanceStatus(
     RUNNING(
         finished = false,
     ),
+    STOPPED(
+        finished = true,
+    ),
     ERROR(
         finished = true,
     ),

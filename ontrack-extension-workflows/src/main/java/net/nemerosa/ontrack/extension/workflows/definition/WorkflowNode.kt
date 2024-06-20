@@ -24,4 +24,6 @@ data class WorkflowNode(
     @APIDescription("List of the IDs of the parents for this node")
     @DocumentationList
     val parents: List<WorkflowParentNode> = emptyList(),
+    @APIDescription("Timeout in seconds (5 minutes by default)")
+    val timeout: Long = 5 * 60,
 )

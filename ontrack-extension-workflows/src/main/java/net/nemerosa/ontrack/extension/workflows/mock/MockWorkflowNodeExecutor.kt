@@ -39,7 +39,7 @@ class MockWorkflowNodeExecutor(
 
     fun getTextsByInstanceId(instanceId: String): List<String> = texts[instanceId] ?: emptyList()
 
-    override fun execute(workflowInstance: WorkflowInstance, workflowNodeId: String): JsonNode {
+    override suspend fun execute(workflowInstance: WorkflowInstance, workflowNodeId: String): JsonNode {
         // Gets the node & its data
         val nodeRawData = workflowInstance.workflow.getNode(workflowNodeId).data
         val nodeData = if (nodeRawData.isTextual) {
@@ -50,6 +50,12 @@ class MockWorkflowNodeExecutor(
         // Error?
         if (nodeData.error) {
             error("Error in $workflowNodeId node")
+        }
+        // Waiting time
+        if (nodeData.waitMs > 0) {
+            runBlocking {
+                delay(nodeData.waitMs)
+            }
         }
         // Gets the parent outputs in an index
         val parentsData = workflowInstance.getParentsData(workflowNodeId)
@@ -76,12 +82,6 @@ class MockWorkflowNodeExecutor(
         }
         // Returning some new text
         val text = "Processed: $replacedText for $context"
-        // Waiting time
-        if (nodeData.waitMs > 0) {
-            runBlocking {
-                delay(nodeData.waitMs)
-            }
-        }
         // Recording
         val old = texts[workflowInstance.id]
         texts[workflowInstance.id] = if (old != null) old + text else listOf(text)

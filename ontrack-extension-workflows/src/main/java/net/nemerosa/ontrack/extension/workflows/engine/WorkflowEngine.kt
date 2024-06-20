@@ -28,4 +28,9 @@ interface WorkflowEngine {
      */
     fun processNode(workflowInstanceId: String, workflowNodeId: String)
 
+    /**
+     * Stops a workflow and all its nodes
+     */
+    fun stopWorkflow(workflowInstanceId: String)
+
 }

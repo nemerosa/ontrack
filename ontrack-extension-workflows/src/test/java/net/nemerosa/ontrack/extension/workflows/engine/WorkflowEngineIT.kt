@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
@@ -53,6 +54,51 @@ class WorkflowEngineIT : AbstractWorkflowTestSupport() {
         assertFailsWith<WorkflowValidationException> {
             workflowEngine.startWorkflow(workflow, WorkflowContext("mock", TextNode("Cyclic")))
         }
+    }
+
+    @Test
+    fun `Workflow stopped when node in error`() {
+        // Defining a workflow using YAML
+        val yaml = """
+            name: Workflow in error
+            nodes:
+                - id: ticket
+                  executorId: mock
+                  data:
+                    text: Ticket
+                - id: jenkins
+                  parents:
+                    - id: ticket
+                  executorId: mock
+                  data:
+                    text: Jenkins
+                    waitMs: 2000
+                    error: true
+                - id: mail
+                  executorId: mock
+                  data:
+                    text: Mail
+                    waitMs: 500
+                  parents:
+                    - id: jenkins
+        """.trimIndent()
+        // Registering the workflow, launching it & waiting for its completion
+        val instanceId = workflowTestSupport.registerLaunchAndWaitForWorkflow(yaml, "NodeErrorTest")
+        // Checks the results
+        val texts = mockWorkflowNodeExecutor.getTextsByInstanceId(instanceId)
+        assertEquals(
+            setOf(
+                "Processed: Ticket for NodeErrorTest",
+            ),
+            texts.toSet()
+        )
+        // Checking the status of the workflow
+        val instance = workflowEngine.getWorkflowInstance(instanceId)
+        assertEquals(WorkflowInstanceStatus.ERROR, instance.status)
+        // Checking all nodes
+        assertEquals(WorkflowInstanceNodeStatus.SUCCESS, instance.getNode("ticket").status)
+        assertEquals(WorkflowInstanceNodeStatus.ERROR, instance.getNode("jenkins").status)
+        assertEquals(WorkflowInstanceNodeStatus.STOPPED, instance.getNode("mail").status)
     }
 
     @OptIn(ExperimentalTime::class)

@@ -4,6 +4,7 @@ enum class WorkflowInstanceNodeStatus {
 
     IDLE,
     STARTED,
+    STOPPED,
     ERROR,
     SUCCESS,
 

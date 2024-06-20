@@ -2987,7 +2987,7 @@
             },
             {
               "name": "messageProperty",
-              "description": "Message.",
+              "description": "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI.",
               "args": [],
               "type": {
                 "kind": "OBJECT",
@@ -4622,7 +4622,7 @@
             },
             {
               "name": "messageProperty",
-              "description": "Message.",
+              "description": "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI.",
               "args": [],
               "type": {
                 "kind": "OBJECT",
@@ -11019,6 +11019,92 @@
         },
         {
           "kind": "INPUT_OBJECT",
+          "name": "DeleteGenericPropertyInput",
+          "description": "Input type for the deleteGenericProperty mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "entityId",
+              "description": "entityId field",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "entityType",
+              "description": "entityType field",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "ENUM",
+                  "name": "ProjectEntityType",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "type",
+              "description": "type field",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "DeleteGenericPropertyPayload",
+          "description": "Output type for the deleteGenericProperty mutation.",
+          "fields": [
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
           "name": "DeleteJenkinsConfigurationInput",
           "description": "Input type for the deleteJenkinsConfiguration mutation.",
           "fields": null,
@@ -11368,6 +11454,146 @@
           "kind": "OBJECT",
           "name": "DeleteProjectAutoValidationStampPropertyPayload",
           "description": "Output type for the deleteProjectAutoValidationStampProperty mutation.",
+          "fields": [
+            {
+              "name": "project",
+              "description": "Project updated",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "Project",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "DeleteProjectAutoVersioningProjectPropertyByIdInput",
+          "description": "Input type for the deleteProjectAutoVersioningProjectPropertyById mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "id",
+              "description": "ID of the project",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "DeleteProjectAutoVersioningProjectPropertyByIdPayload",
+          "description": "Output type for the deleteProjectAutoVersioningProjectPropertyById mutation.",
+          "fields": [
+            {
+              "name": "project",
+              "description": "Project updated",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "Project",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "DeleteProjectAutoVersioningProjectPropertyInput",
+          "description": "Input type for the deleteProjectAutoVersioningProjectProperty mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "project",
+              "description": "Project name",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "DeleteProjectAutoVersioningProjectPropertyPayload",
+          "description": "Output type for the deleteProjectAutoVersioningProjectProperty mutation.",
           "fields": [
             {
               "name": "project",
@@ -25582,6 +25808,52 @@
               "deprecationReason": null
             },
             {
+              "name": "setGenericProperty",
+              "description": "Generic update for a property and an entity",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "SetGenericPropertyInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "SetGenericPropertyPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "deleteGenericProperty",
+              "description": "Generic deletion for a property and an entity",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "DeleteGenericPropertyInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "DeleteGenericPropertyPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "setProjectPropertyById",
               "description": "Sets a property on a project identified by ID",
               "args": [
@@ -26082,6 +26354,98 @@
               "type": {
                 "kind": "OBJECT",
                 "name": "DeleteProjectSonarQubePropertyPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "setProjectAutoVersioningProjectPropertyById",
+              "description": "Set the auto-versioning property on a project.",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "SetProjectAutoVersioningProjectPropertyByIdInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "SetProjectAutoVersioningProjectPropertyByIdPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "setProjectAutoVersioningProjectProperty",
+              "description": "Set the auto-versioning property on a project identified by name.",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "SetProjectAutoVersioningProjectPropertyInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "SetProjectAutoVersioningProjectPropertyPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "deleteProjectAutoVersioningProjectPropertyById",
+              "description": "Deletes the auto-versioning property on a project.",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "DeleteProjectAutoVersioningProjectPropertyByIdInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "DeleteProjectAutoVersioningProjectPropertyByIdPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "deleteProjectAutoVersioningProjectProperty",
+              "description": "Deletes the auto-versioning property on a project identified by name.",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "DeleteProjectAutoVersioningProjectPropertyInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "DeleteProjectAutoVersioningProjectPropertyPayload",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -29711,6 +30075,29 @@
               "deprecationReason": null
             },
             {
+              "name": "validateJsonWorkflow",
+              "description": "Validates a workflow which is defined as JSON",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ValidateJsonWorkflowInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ValidateJsonWorkflowPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "saveYamlWorkflow",
               "description": "Saves a workflow which is defined as YAML",
               "args": [
@@ -29798,18 +30185,6 @@
               "type": {
                 "kind": "OBJECT",
                 "name": "PurgeQueueRecordingsPayload",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "reloadCasc",
-              "description": "Reload the configuration from the CasC files",
-              "args": [],
-              "type": {
-                "kind": "OBJECT",
-                "name": "ReloadCascPayload",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -30138,6 +30513,18 @@
               "deprecationReason": null
             },
             {
+              "name": "reloadCasc",
+              "description": "Reload the configuration from the CasC files",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ReloadCascPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "shareSCMFileChangeFilter",
               "description": "Shares or updates a filter at project level",
               "args": [
@@ -30196,7 +30583,7 @@
           "fields": [
             {
               "name": "name",
-              "description": "Name of the pair",
+              "description": "Name",
               "args": [],
               "type": {
                 "kind": "NON_NULL",
@@ -30212,7 +30599,7 @@
             },
             {
               "name": "value",
-              "description": "Value of the pair",
+              "description": "Value",
               "args": [],
               "type": {
                 "kind": "NON_NULL",
@@ -30481,6 +30868,12 @@
           "enumValues": [
             {
               "name": "OK",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "ONGOING",
               "description": null,
               "isDeprecated": false,
               "deprecationReason": null
@@ -30995,6 +31388,11 @@
             },
             {
               "kind": "OBJECT",
+              "name": "DeleteGenericPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
               "name": "DeleteJenkinsConfigurationPayload",
               "ofType": null
             },
@@ -31021,6 +31419,16 @@
             {
               "kind": "OBJECT",
               "name": "DeleteProjectAutoValidationStampPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteProjectAutoVersioningProjectPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteProjectAutoVersioningProjectPropertyPayload",
               "ofType": null
             },
             {
@@ -31515,6 +31923,11 @@
             },
             {
               "kind": "OBJECT",
+              "name": "SetGenericPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
               "name": "SetPreferencesPayload",
               "ofType": null
             },
@@ -31536,6 +31949,16 @@
             {
               "kind": "OBJECT",
               "name": "SetProjectAutoValidationStampPropertyPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetProjectAutoVersioningProjectPropertyByIdPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SetProjectAutoVersioningProjectPropertyPayload",
               "ofType": null
             },
             {
@@ -31951,6 +32374,11 @@
             {
               "kind": "OBJECT",
               "name": "ValidateBuildWithTestsPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "ValidateJsonWorkflowPayload",
               "ofType": null
             }
           ]
@@ -32542,6 +32970,18 @@
               "deprecationReason": null
             },
             {
+              "name": "autoVersioningProjectProperty",
+              "description": "Auto-versioning rules at project level",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "Property",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "autoPromotionLevelProperty",
               "description": "If set, this property allows promotion levels to be created automatically from predefined promotion levels",
               "args": [],
@@ -32603,7 +33043,7 @@
             },
             {
               "name": "messageProperty",
-              "description": "Message.",
+              "description": "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI.",
               "args": [],
               "type": {
                 "kind": "OBJECT",
@@ -32700,6 +33140,18 @@
             {
               "name": "jIRAFollowLinksProperty",
               "description": "List of links to follow when displaying information about an issue.",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "Property",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "autoDisablingBranchPatternsProperty",
+              "description": "Given a list of patterns and their behaviour, allows the disabling of branches based on their Ontrack names.",
               "args": [],
               "type": {
                 "kind": "OBJECT",
@@ -35250,7 +35702,7 @@
             },
             {
               "name": "autoPromotionProperty",
-              "description": "Allows a promotion level to be granted on a build as soon as a list of validation stamps has been passed",
+              "description": "Allows a promotion level to be granted on a build as soon as a list of validation stamps and/or other promotions has been passed",
               "args": [],
               "type": {
                 "kind": "OBJECT",
@@ -35274,7 +35726,7 @@
             },
             {
               "name": "messageProperty",
-              "description": "Message.",
+              "description": "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI.",
               "args": [],
               "type": {
                 "kind": "OBJECT",
@@ -35843,7 +36295,7 @@
             },
             {
               "name": "messageProperty",
-              "description": "Message.",
+              "description": "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI.",
               "args": [],
               "type": {
                 "kind": "OBJECT",
@@ -38567,6 +39019,29 @@
               "deprecationReason": null
             },
             {
+              "name": "workflowNodeExecutors",
+              "description": "List of all workflow node executors",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "WorkflowNodeExecutor"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "mockWorkflowTexts",
               "description": "Getting a list of texts generated for a mock workflow",
               "args": [
@@ -38611,6 +39086,159 @@
                   "kind": "OBJECT",
                   "name": "QueueRecordFilterInfo",
                   "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "notificationChannels",
+              "description": "List of all notification channels",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "NotificationChannel"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "notificationRecords",
+              "description": "Access to the notification recordings",
+              "args": [
+                {
+                  "name": "offset",
+                  "description": "Offset for the page",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": "0"
+                },
+                {
+                  "name": "size",
+                  "description": "Size of the page",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": "20"
+                },
+                {
+                  "name": "channel",
+                  "description": "Filtering on the channel",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "resultType",
+                  "description": "Filtering on the result type",
+                  "type": {
+                    "kind": "ENUM",
+                    "name": "NotificationResultType",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "NotificationRecordPaginated",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "eventSubscriptions",
+              "description": "List of event subscriptions",
+              "args": [
+                {
+                  "name": "offset",
+                  "description": "Offset for the page",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": "0"
+                },
+                {
+                  "name": "size",
+                  "description": "Size of the page",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": "20"
+                },
+                {
+                  "name": "filter",
+                  "description": "Filter for the subscriptions",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "EventSubscriptionFilter",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "EventSubscriptionPayloadPaginated",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "webhooks",
+              "description": "List of registred webhooks",
+              "args": [
+                {
+                  "name": "name",
+                  "description": "Name of the webhook",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "Webhook"
+                    }
+                  }
                 }
               },
               "isDeprecated": false,
@@ -38781,159 +39409,6 @@
                 "kind": "SCALAR",
                 "name": "JSON",
                 "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "notificationChannels",
-              "description": "List of all notification channels",
-              "args": [],
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "LIST",
-                  "name": null,
-                  "ofType": {
-                    "kind": "NON_NULL",
-                    "name": null,
-                    "ofType": {
-                      "kind": "OBJECT",
-                      "name": "NotificationChannel"
-                    }
-                  }
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "notificationRecords",
-              "description": "Access to the notification recordings",
-              "args": [
-                {
-                  "name": "offset",
-                  "description": "Offset for the page",
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": "0"
-                },
-                {
-                  "name": "size",
-                  "description": "Size of the page",
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": "20"
-                },
-                {
-                  "name": "channel",
-                  "description": "Filtering on the channel",
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                },
-                {
-                  "name": "resultType",
-                  "description": "Filtering on the result type",
-                  "type": {
-                    "kind": "ENUM",
-                    "name": "NotificationResultType",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                }
-              ],
-              "type": {
-                "kind": "OBJECT",
-                "name": "NotificationRecordPaginated",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "eventSubscriptions",
-              "description": "List of event subscriptions",
-              "args": [
-                {
-                  "name": "offset",
-                  "description": "Offset for the page",
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": "0"
-                },
-                {
-                  "name": "size",
-                  "description": "Size of the page",
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  },
-                  "defaultValue": "20"
-                },
-                {
-                  "name": "filter",
-                  "description": "Filter for the subscriptions",
-                  "type": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "EventSubscriptionFilter",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                }
-              ],
-              "type": {
-                "kind": "OBJECT",
-                "name": "EventSubscriptionPayloadPaginated",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "webhooks",
-              "description": "List of registred webhooks",
-              "args": [
-                {
-                  "name": "name",
-                  "description": "Name of the webhook",
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  },
-                  "defaultValue": null
-                }
-              ],
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "LIST",
-                  "name": null,
-                  "ofType": {
-                    "kind": "NON_NULL",
-                    "name": null,
-                    "ofType": {
-                      "kind": "OBJECT",
-                      "name": "Webhook"
-                    }
-                  }
-                }
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -44583,6 +45058,118 @@
         },
         {
           "kind": "INPUT_OBJECT",
+          "name": "SetGenericPropertyInput",
+          "description": "Input type for the setGenericProperty mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "entityId",
+              "description": "entityId field",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "entityType",
+              "description": "entityType field",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "ENUM",
+                  "name": "ProjectEntityType",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "type",
+              "description": "type field",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "value",
+              "description": "value field",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "JSON",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "SetGenericPropertyPayload",
+          "description": "Output type for the setGenericProperty mutation.",
+          "fields": [
+            {
+              "name": "property",
+              "description": "Updated property",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "Property",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
           "name": "SetPreferencesInput",
           "description": "Input type for the setPreferences mutation.",
           "fields": null,
@@ -44976,6 +45563,238 @@
           "kind": "OBJECT",
           "name": "SetProjectAutoValidationStampPropertyPayload",
           "description": "Output type for the setProjectAutoValidationStampProperty mutation.",
+          "fields": [
+            {
+              "name": "project",
+              "description": "Project updated",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "Project",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "SetProjectAutoVersioningProjectPropertyByIdInput",
+          "description": "Input type for the setProjectAutoVersioningProjectPropertyById mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "id",
+              "description": "ID of the project",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "branchIncludes",
+              "description": "List of regular expressions. AV requests match if at least one regular expression is matched by the target branch name. If empty, all target branches match (the default).",
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "branchExcludes",
+              "description": "List of regular expressions. AV requests match if no regular expression is matched by the target branch name. If empty, the target branch is considered matching.",
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "lastActivityDate",
+              "description": "If defined, any target branch whose last activity (last build creation) is before this date will be ignored by the auto-versioning",
+              "type": {
+                "kind": "SCALAR",
+                "name": "LocalDateTime",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "SetProjectAutoVersioningProjectPropertyByIdPayload",
+          "description": "Output type for the setProjectAutoVersioningProjectPropertyById mutation.",
+          "fields": [
+            {
+              "name": "project",
+              "description": "Project updated",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "Project",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "SetProjectAutoVersioningProjectPropertyInput",
+          "description": "Input type for the setProjectAutoVersioningProjectProperty mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "project",
+              "description": "Project name",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "branchIncludes",
+              "description": "List of regular expressions. AV requests match if at least one regular expression is matched by the target branch name. If empty, all target branches match (the default).",
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "branchExcludes",
+              "description": "List of regular expressions. AV requests match if no regular expression is matched by the target branch name. If empty, the target branch is considered matching.",
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "lastActivityDate",
+              "description": "If defined, any target branch whose last activity (last build creation) is before this date will be ignored by the auto-versioning",
+              "type": {
+                "kind": "SCALAR",
+                "name": "LocalDateTime",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "SetProjectAutoVersioningProjectPropertyPayload",
+          "description": "Output type for the setProjectAutoVersioningProjectProperty mutation.",
           "fields": [
             {
               "name": "project",
@@ -56072,6 +56891,76 @@
           "possibleTypes": null
         },
         {
+          "kind": "INPUT_OBJECT",
+          "name": "ValidateJsonWorkflowInput",
+          "description": "Input type for the validateJsonWorkflow mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "workflow",
+              "description": "workflow field",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "JSON",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "ValidateJsonWorkflowPayload",
+          "description": "Output type for the validateJsonWorkflow mutation.",
+          "fields": [
+            {
+              "name": "validation",
+              "description": "Result of the validation",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "WorkflowValidation",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
           "kind": "OBJECT",
           "name": "Validation",
           "description": null,
@@ -56420,7 +57309,7 @@
             },
             {
               "name": "messageProperty",
-              "description": "Message.",
+              "description": "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI.",
               "args": [],
               "type": {
                 "kind": "OBJECT",
@@ -57311,7 +58200,7 @@
             },
             {
               "name": "messageProperty",
-              "description": "Message.",
+              "description": "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI.",
               "args": [],
               "type": {
                 "kind": "OBJECT",
@@ -58846,6 +59735,129 @@
         },
         {
           "kind": "OBJECT",
+          "name": "Workflow",
+          "description": "Workflow",
+          "fields": [
+            {
+              "name": "name",
+              "description": "Display name for the workflow",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "nodes",
+              "description": "List of nodes in the workflow",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "WorkflowNode"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "WorkflowContext",
+          "description": "Workflow context, data which is passed to the workflow initially",
+          "fields": [
+            {
+              "name": "data",
+              "description": "data field",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "WorkflowContextData"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "WorkflowContextData",
+          "description": "Data in a workflow context",
+          "fields": [
+            {
+              "name": "key",
+              "description": "key field",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "value",
+              "description": "value field",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "JSON",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
           "name": "WorkflowInstance",
           "description": "Running workflow instance",
           "fields": [
@@ -58859,6 +59871,22 @@
                 "ofType": {
                   "kind": "SCALAR",
                   "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "timestamp",
+              "description": "timestamp field",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "LocalDateTime",
                   "ofType": null
                 }
               },
@@ -58898,6 +59926,22 @@
               "deprecationReason": null
             },
             {
+              "name": "context",
+              "description": "context field",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "WorkflowContext",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "nodesExecutions",
               "description": "List of node statuses in the workflow",
               "args": [],
@@ -58916,6 +59960,58 @@
                     }
                   }
                 }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "workflow",
+              "description": "workflow field",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "Workflow",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "startTime",
+              "description": "startTime field",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "LocalDateTime",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "endTime",
+              "description": "endTime field",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "LocalDateTime",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "durationMs",
+              "description": "durationMs field",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -58986,6 +60082,42 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "startTime",
+              "description": "startTime field",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "LocalDateTime",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "endTime",
+              "description": "endTime field",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "LocalDateTime",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "durationMs",
+              "description": "durationMs field",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "inputFields": null,
@@ -59009,6 +60141,12 @@
             },
             {
               "name": "STARTED",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "STOPPED",
               "description": null,
               "isDeprecated": false,
               "deprecationReason": null
@@ -59095,6 +60233,12 @@
               "deprecationReason": null
             },
             {
+              "name": "STOPPED",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "ERROR",
               "description": null,
               "isDeprecated": false,
@@ -59107,6 +60251,200 @@
               "deprecationReason": null
             }
           ],
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "WorkflowNode",
+          "description": "Workflow node",
+          "fields": [
+            {
+              "name": "id",
+              "description": "Unique ID of the node in its workflow.",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "executorId",
+              "description": "ID of the executor to use",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "data",
+              "description": "Raw data associated with the node, to be used by the node executor.",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "JSON",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "parents",
+              "description": "List of the IDs of the parents for this node",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "WorkflowParentNode"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "WorkflowNodeExecutor",
+          "description": "Workflow node executor",
+          "fields": [
+            {
+              "name": "id",
+              "description": "id field",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "displayName",
+              "description": "displayName field",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "WorkflowParentNode",
+          "description": "Workflow parent node",
+          "fields": [
+            {
+              "name": "id",
+              "description": "ID of the parent node",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "WorkflowValidation",
+          "description": "Workflow validation",
+          "fields": [
+            {
+              "name": "errors",
+              "description": "errors field",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "error",
+              "description": "error field",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
           "possibleTypes": null
         },
         {

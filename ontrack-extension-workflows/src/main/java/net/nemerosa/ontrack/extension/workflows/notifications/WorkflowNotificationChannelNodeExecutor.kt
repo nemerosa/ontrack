@@ -53,7 +53,7 @@ class WorkflowNotificationChannelNodeExecutor(
     override val id: String = ID
     override val displayName: String = "Notification"
 
-    override fun execute(workflowInstance: WorkflowInstance, workflowNodeId: String): JsonNode {
+    override suspend fun execute(workflowInstance: WorkflowInstance, workflowNodeId: String): JsonNode {
         // Gets the node's data
         val (channel, channelConfig, template) = workflowInstance.workflow.getNode(workflowNodeId).data.parse<WorkflowNotificationChannelNodeData>()
         // Gets the context

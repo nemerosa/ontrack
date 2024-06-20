@@ -50,6 +50,8 @@ data class WorkflowInstance(
             val nodes = nodesExecutions.map { it.status }
             return if (nodes.any { it == WorkflowInstanceNodeStatus.ERROR }) {
                 WorkflowInstanceStatus.ERROR
+            } else if (nodes.any { it == WorkflowInstanceNodeStatus.STOPPED }) {
+                WorkflowInstanceStatus.STOPPED
             } else if (nodes.all { it == WorkflowInstanceNodeStatus.SUCCESS }) {
                 WorkflowInstanceStatus.SUCCESS
             } else if (nodes.any { it == WorkflowInstanceNodeStatus.STARTED }) {
@@ -76,6 +78,10 @@ data class WorkflowInstance(
 
     fun startNode(nodeId: String) = updateNode(nodeId) { node ->
         node.start()
+    }
+
+    fun stopNode(nodeId: String) = updateNode(nodeId) { node ->
+        node.stop()
     }
 
     fun successNode(nodeId: String, output: JsonNode) = updateNode(nodeId) { node ->
