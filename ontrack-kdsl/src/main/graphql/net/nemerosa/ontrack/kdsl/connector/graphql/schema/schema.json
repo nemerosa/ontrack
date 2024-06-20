@@ -30144,6 +30144,29 @@
               "deprecationReason": null
             },
             {
+              "name": "stopWorkflow",
+              "description": "Stopping a running workflow. Does not do anything if already stopped.",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "StopWorkflowInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "StopWorkflowPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "postQueue",
               "description": "Post a message on a queue",
               "args": [
@@ -32229,6 +32252,11 @@
             {
               "kind": "OBJECT",
               "name": "ShareSCMFileChangeFilterPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "StopWorkflowPayload",
               "ofType": null
             },
             {
@@ -52693,6 +52721,64 @@
           ],
           "inputFields": null,
           "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "StopWorkflowInput",
+          "description": "Input type for the stopWorkflow mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "workflowInstanceId",
+              "description": "workflowInstanceId field",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "StopWorkflowPayload",
+          "description": "Output type for the stopWorkflow mutation.",
+          "fields": [
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },

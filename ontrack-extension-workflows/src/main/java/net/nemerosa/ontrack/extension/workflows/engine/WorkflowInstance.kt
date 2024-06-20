@@ -80,10 +80,6 @@ data class WorkflowInstance(
         node.start()
     }
 
-    fun stopNode(nodeId: String) = updateNode(nodeId) { node ->
-        node.stop()
-    }
-
     fun successNode(nodeId: String, output: JsonNode) = updateNode(nodeId) { node ->
         node.success(output)
     }
@@ -114,6 +110,21 @@ data class WorkflowInstance(
         collectParentsData(results, workflowNodeId, 0)
         return results.toMap()
     }
+
+    fun stopNodes(): WorkflowInstance =
+        WorkflowInstance(
+            id = id,
+            timestamp = timestamp,
+            workflow = workflow,
+            context = context,
+            nodesExecutions = nodesExecutions.map { nx ->
+                if (nx.status.finished) {
+                    nx
+                } else {
+                    nx.stop()
+                }
+            }
+        )
 
 }
 

@@ -50,12 +50,7 @@ class WorkflowEngineImpl(
         // Getting the instance
         val instance = getWorkflowInstance(workflowInstanceId)
         // Stopping all unfinished nodes
-        instance.nodesExecutions.forEach { nodeExecution ->
-            val nodeId = nodeExecution.id
-            if (!nodeExecution.status.finished) {
-                workflowInstanceStore.store(instance.stopNode(nodeId))
-            }
-        }
+        workflowInstanceStore.store(instance.stopNodes())
     }
 
     private fun queueNode(
@@ -109,7 +104,9 @@ class WorkflowEngineImpl(
                     throw WorkflowExecutionTimeoutException(timeout)
                 }
                 // Stores the output back into the instance and progresses the node's status
-                instance = workflowInstanceStore.store(instance.successNode(node.id, output))
+                workflowInstanceStore.store(instance.successNode(node.id, output))
+                // Loads the current state of the instance
+                instance = getWorkflowInstance(workflowInstanceId)
                 // Getting the next nodes
                 val nextNodes = instance.workflow.getNextNodes(node.id)
                 for (nextNode in nextNodes) {
