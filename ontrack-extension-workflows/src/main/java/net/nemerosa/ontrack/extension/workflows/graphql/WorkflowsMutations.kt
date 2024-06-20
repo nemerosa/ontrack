@@ -60,6 +60,13 @@ class WorkflowsMutations(
                 null
             }
         },
+        unitMutation(
+            name = "stopWorkflow",
+            description = "Stopping a running workflow. Does not do anything if already stopped.",
+            input = StopWorkflowInput::class,
+        ) { input ->
+            workflowEngine.stopWorkflow(input.workflowInstanceId)
+        }
     )
 }
 
@@ -80,4 +87,8 @@ data class LaunchWorkflowInput(
 data class LaunchWorkflowInputContext(
     val key: String,
     val value: JsonNode,
+)
+
+data class StopWorkflowInput(
+    val workflowInstanceId: String,
 )
