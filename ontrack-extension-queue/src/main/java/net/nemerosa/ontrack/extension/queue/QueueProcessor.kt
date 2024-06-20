@@ -45,8 +45,8 @@ interface QueueProcessor<T : Any> {
      * @param declarables List of AMQP declarables to complete.
      */
     fun specificConfiguration(
-            exchange: DirectExchange,
-            declarables: MutableList<Declarable>,
+        exchange: DirectExchange,
+        declarables: MutableList<Declarable>,
     ) {
     }
 
@@ -62,5 +62,10 @@ interface QueueProcessor<T : Any> {
      * Type of the payload
      */
     val payloadType: KClass<T>
+
+    /**
+     * Ack mode
+     */
+    val ackMode: QueueAckMode get() = QueueAckMode.AUTO
 
 }

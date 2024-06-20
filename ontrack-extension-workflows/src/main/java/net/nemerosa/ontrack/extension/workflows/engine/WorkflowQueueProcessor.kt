@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.workflows.engine
 
+import net.nemerosa.ontrack.extension.queue.QueueAckMode
 import net.nemerosa.ontrack.extension.queue.QueueProcessor
 import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Component
@@ -28,4 +29,7 @@ class WorkflowQueueProcessor(
     }
 
     override fun getRoutingIdentifier(payload: WorkflowQueuePayload): String = payload.workflowInstanceId
+
+    override val ackMode: QueueAckMode = QueueAckMode.IMMEDIATE
+
 }

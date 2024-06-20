@@ -1,14 +1,12 @@
 package net.nemerosa.ontrack.extension.queue.config
 
+import com.rabbitmq.client.Channel
 import io.micrometer.core.instrument.MeterRegistry
-import net.nemerosa.ontrack.extension.queue.QueueConfigProperties
-import net.nemerosa.ontrack.extension.queue.QueuePayload
-import net.nemerosa.ontrack.extension.queue.QueueProcessor
+import net.nemerosa.ontrack.extension.queue.*
 import net.nemerosa.ontrack.extension.queue.metrics.queueMessageReceived
 import net.nemerosa.ontrack.extension.queue.metrics.queueProcessCompleted
 import net.nemerosa.ontrack.extension.queue.metrics.queueProcessErrored
 import net.nemerosa.ontrack.extension.queue.metrics.queueProcessTime
-import net.nemerosa.ontrack.extension.queue.queueNamePrefix
 import net.nemerosa.ontrack.extension.queue.record.QueueRecordService
 import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.model.security.SecurityService
@@ -21,16 +19,18 @@ import org.springframework.amqp.rabbit.annotation.RabbitListenerConfigurer
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerEndpoint
 import org.springframework.amqp.rabbit.listener.RabbitListenerEndpoint
 import org.springframework.amqp.rabbit.listener.RabbitListenerEndpointRegistrar
+import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener
 import org.springframework.stereotype.Component
+import java.io.IOException
 
 @Component
 class QueueListener(
-        private val queueConfigProperties: QueueConfigProperties,
-        private val queueProcessors: List<QueueProcessor<*>>,
-        private val securityService: SecurityService,
-        private val applicationLogService: ApplicationLogService,
-        private val queueRecordService: QueueRecordService,
-        private val meterRegistry: MeterRegistry,
+    private val queueConfigProperties: QueueConfigProperties,
+    private val queueProcessors: List<QueueProcessor<*>>,
+    private val securityService: SecurityService,
+    private val applicationLogService: ApplicationLogService,
+    private val queueRecordService: QueueRecordService,
+    private val meterRegistry: MeterRegistry,
 ) : RabbitListenerConfigurer {
 
     override fun configureRabbitListeners(registrar: RabbitListenerEndpointRegistrar) {
@@ -40,29 +40,29 @@ class QueueListener(
     }
 
     private fun configureListener(
-            registrar: RabbitListenerEndpointRegistrar,
-            queueProcessor: QueueProcessor<*>
+        registrar: RabbitListenerEndpointRegistrar,
+        queueProcessor: QueueProcessor<*>
     ) {
         // Default listeners
         val scale = queueConfigProperties.specific[queueProcessor.id]?.scale ?: 1
         (0 until scale).forEach { index ->
             registrar.registerEndpoint(
-                    createDefaultListener(queueProcessor, index)
+                createDefaultListener(queueProcessor, index)
             )
         }
     }
 
     private fun createDefaultListener(
-            queueProcessor: QueueProcessor<*>,
-            index: Int,
+        queueProcessor: QueueProcessor<*>,
+        index: Int,
     ): RabbitListenerEndpoint {
         val queue = "${queueProcessor.queueNamePrefix}.$index"
         return SimpleRabbitListenerEndpoint().configure(queue, queueProcessor)
     }
 
     private fun SimpleRabbitListenerEndpoint.configure(
-            queue: String,
-            queueProcessor: QueueProcessor<*>
+        queue: String,
+        queueProcessor: QueueProcessor<*>
     ): SimpleRabbitListenerEndpoint {
         id = queue
         setQueueNames(queue)
@@ -72,12 +72,18 @@ class QueueListener(
     }
 
     private fun <T : Any> createMessageListener(queueProcessor: QueueProcessor<T>) =
-            QPMessageListener<T>(queueProcessor)
+        QPMessageListener<T>(queueProcessor)
 
     private inner class QPMessageListener<T : Any>(
-            private val queueProcessor: QueueProcessor<T>
-    ) : MessageListener {
-        override fun onMessage(message: Message) {
+        private val queueProcessor: QueueProcessor<T>
+    ) : ChannelAwareMessageListener {
+
+        override fun onMessage(message: Message, channel: Channel?) {
+
+            if (queueProcessor.ackMode == QueueAckMode.IMMEDIATE) {
+                ackMessage(message, channel)
+            }
+
             try {
                 val queue = message.messageProperties.consumerQueue
                 val body = message.body.toString(Charsets.UTF_8).parseAsJson()
@@ -118,16 +124,43 @@ class QueueListener(
                 }
             } catch (any: Throwable) {
                 applicationLogService.log(
-                        ApplicationLogEntry.error(
-                                any,
-                                NameDescription.nd(
-                                        "queue-error",
-                                        "Catch-all error in queue processing"
-                                ),
-                                "Uncaught error during the queue processing"
-                        ).withDetail("id", queueProcessor.id)
+                    ApplicationLogEntry.error(
+                        any,
+                        NameDescription.nd(
+                            "queue-error",
+                            "Catch-all error in queue processing"
+                        ),
+                        "Uncaught error during the queue processing"
+                    ).withDetail("id", queueProcessor.id)
                 )
+            } finally {
+                if (queueProcessor.ackMode == QueueAckMode.END) {
+                    ackMessage(message, channel)
+                }
             }
+        }
+
+        private fun ackMessage(message: Message, channel: Channel?) {
+            if (channel != null) {
+                // Always acknowledge the message to prevent re-delivery
+                try {
+                    channel.basicAck(message.messageProperties.deliveryTag, false)
+                } catch (e: IOException) {
+                    // Log failing to acknowledge the message
+                    logAckError(e)
+                }
+            }
+        }
+
+        private fun logAckError(e: IOException) {
+            applicationLogService.log(
+                ApplicationLogEntry.error(
+                    e,
+                    NameDescription.nd("queue-ack-error", "Message could not be acked."),
+                    "Message could not be acked: ${e.message}"
+                ).withDetail("message", e.message)
+                    .withDetail("queue.processor", queueProcessor.id)
+            )
         }
 
     }
