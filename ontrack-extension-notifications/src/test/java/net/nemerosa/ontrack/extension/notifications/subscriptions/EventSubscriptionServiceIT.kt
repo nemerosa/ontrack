@@ -1,8 +1,5 @@
 package net.nemerosa.ontrack.extension.notifications.subscriptions
 
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
-import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.notifications.AbstractNotificationTestSupport
 import net.nemerosa.ontrack.extension.notifications.mock.MockNotificationChannelConfig
 import net.nemerosa.ontrack.json.asJson
@@ -15,7 +12,6 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
 internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
 

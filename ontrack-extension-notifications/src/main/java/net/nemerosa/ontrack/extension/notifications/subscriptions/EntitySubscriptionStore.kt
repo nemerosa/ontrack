@@ -54,18 +54,18 @@ class EntitySubscriptionStore(
         val jsonCriteria = mutableMapOf<String, String>()
         // Filter: channel
         if (!filter.channel.isNullOrBlank()) {
-            jsonFilters += """json::jsonb->>'channel' = :channel"""
+            jsonFilters += """data::jsonb->>'channel' = :channel"""
             jsonCriteria["channel"] = filter.channel
             // Filter: channel config
             if (!filter.channelConfig.isNullOrBlank()) {
                 val channel = notificationChannelRegistry.getChannel(filter.channel)
                 val criteria = channel.toSearchCriteria(filter.channelConfig).format()
-                jsonFilters += """json::jsonb->'channelConfig' @> '$criteria'::jsonb"""
+                jsonFilters += """data::jsonb->'channelConfig' @> '$criteria'::jsonb"""
             }
         }
         // Filter: origin
         if (!filter.origin.isNullOrBlank()) {
-            jsonFilters += """json::jsonb->>'origin' = :origin"""
+            jsonFilters += """data::jsonb->>'origin' = :origin"""
             jsonCriteria["origin"] = filter.origin
         }
         // Filter: event type
