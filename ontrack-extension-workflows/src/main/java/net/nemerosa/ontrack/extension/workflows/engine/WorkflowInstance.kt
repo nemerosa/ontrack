@@ -84,8 +84,8 @@ data class WorkflowInstance(
         node.success(output)
     }
 
-    fun errorNode(nodeId: String, throwable: Throwable) = updateNode(nodeId) { node ->
-        node.error(throwable)
+    fun errorNode(nodeId: String, throwable: Throwable?, message: String?) = updateNode(nodeId) { node ->
+        node.error(throwable, message)
     }
 
     fun getNode(nodeId: String) = nodesExecutions.firstOrNull { it.id == nodeId }

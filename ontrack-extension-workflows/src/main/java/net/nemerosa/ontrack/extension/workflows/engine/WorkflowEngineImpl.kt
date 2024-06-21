@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.queue.dispatching.QueueDispatcher
 import net.nemerosa.ontrack.extension.queue.source.createQueueSource
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowValidation
+import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorResultType
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -91,7 +92,7 @@ class WorkflowEngineImpl(
                 // Timeout
                 val timeout = Duration.ofSeconds(node.timeout)
                 // Running the executor
-                val output = runBlocking {
+                val result = runBlocking {
                     withTimeoutOrNull(timeout.toMillis()) {
                         val deferred = async {
                             executor.execute(instance, node.id)
@@ -100,25 +101,46 @@ class WorkflowEngineImpl(
                     }
                 }
                 // Timeout?
-                if (output == null) {
+                if (result == null) {
                     throw WorkflowExecutionTimeoutException(timeout)
                 }
-                // Stores the output back into the instance and progresses the node's status
-                workflowInstanceStore.store(instance.successNode(node.id, output))
-                // Loads the current state of the instance
-                instance = getWorkflowInstance(workflowInstanceId)
-                // Getting the next nodes
-                val nextNodes = instance.workflow.getNextNodes(node.id)
-                for (nextNode in nextNodes) {
-                    // For each next node, checks if it can be scheduled or not
-                    if (canRunNode(instance, nextNode)) {
-                        // Schedule the node
-                        queueNode(instance, nextNode)
+                // Progressing the instance or stopping it in case of error
+                when (result.type) {
+                    WorkflowNodeExecutorResultType.ERROR -> {
+                        workflowInstanceStore.store(
+                            instance.errorNode(
+                                node.id,
+                                throwable = null,
+                                message = result.message
+                            )
+                        )
+                        stopWorkflow(workflowInstanceId)
+                    }
+
+                    WorkflowNodeExecutorResultType.SUCCESS -> {
+                        // Stores the output back into the instance and progresses the node's status
+                        workflowInstanceStore.store(
+                            instance.successNode(
+                                node.id,
+                                result.output ?: error("Missing notification output")
+                            )
+                        )
+                        // Loads the current state of the instance
+                        instance = getWorkflowInstance(workflowInstanceId)
+                        // Getting the next nodes
+                        val nextNodes = instance.workflow.getNextNodes(node.id)
+                        for (nextNode in nextNodes) {
+                            // For each next node, checks if it can be scheduled or not
+                            if (canRunNode(instance, nextNode)) {
+                                // Schedule the node
+                                queueNode(instance, nextNode)
+                            }
+                        }
                     }
                 }
             } catch (any: Throwable) {
                 // Stores the node error status
-                workflowInstanceStore.store(instance.errorNode(node.id, any))
+                workflowInstanceStore.store(instance.errorNode(node.id, throwable = any, message = null))
                 // Stopping the workflow
                 stopWorkflow(workflowInstanceId)
             }
