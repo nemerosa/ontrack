@@ -6,10 +6,12 @@ data class MockJenkinsJob(
 
     val builds = mutableListOf<MockJenkinsBuild>()
 
-    fun build(parameters: Map<String, String>) {
-        builds += MockJenkinsBuild(
+    fun build(parameters: Map<String, String>): MockJenkinsBuild {
+        val build = MockJenkinsBuild(
             number = builds.size + 1,
             parameters = parameters,
         )
+        builds += build
+        return build
     }
 }

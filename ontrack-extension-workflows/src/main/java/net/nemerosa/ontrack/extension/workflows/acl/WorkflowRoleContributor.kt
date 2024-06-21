@@ -13,6 +13,7 @@ class WorkflowRoleContributor : RoleContributor {
             Roles.GLOBAL_ADMINISTRATOR to listOf(
                 WorkflowRegistration::class.java,
                 WorkflowAudit::class.java,
+                WorkflowStop::class.java,
             ),
         )
 

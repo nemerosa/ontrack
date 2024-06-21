@@ -24,11 +24,11 @@ interface WorkflowNodeExecutor : Extension {
      *
      * @param workflowInstance Workflow to run
      * @param workflowNodeId Workflow node
-     * @return Outcome for the node execution
+     * @return Result for the node execution
      */
-    fun execute(
+    suspend fun execute(
         workflowInstance: WorkflowInstance,
         workflowNodeId: String,
-    ): JsonNode
+    ): WorkflowNodeExecutorResult
 
 }

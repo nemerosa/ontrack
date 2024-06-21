@@ -1,0 +1,9 @@
+mutation StopWorkflow(
+    $instanceId: String!,
+) {
+    stopWorkflow(input: {
+        workflowInstanceId: $instanceId
+    }) {
+        ...PayloadUserErrors
+    }
+}

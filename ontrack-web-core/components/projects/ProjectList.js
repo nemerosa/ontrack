@@ -1,5 +1,4 @@
 import {Space} from "antd";
-import BranchRow from "@components/branches/BranchRow";
 import ProjectRow from "@components/projects/ProjectRow";
 
 export default function ProjectList({projects}) {

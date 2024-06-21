@@ -29,6 +29,8 @@ Configuration:
 
 Output:
 
+* **buildUrl** - String - optional - URL to the build (only available when call mode is SYNC)
+
 * **jobUrl** - String - required - URL to the job
 
 * **parameters** - List - required - Parameters sent to the job

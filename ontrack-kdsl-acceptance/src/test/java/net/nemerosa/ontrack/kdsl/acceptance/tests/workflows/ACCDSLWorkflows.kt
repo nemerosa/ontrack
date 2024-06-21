@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.workflows
 
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.kdsl.acceptance.tests.AbstractACCDSLTestSupport
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
@@ -265,6 +267,146 @@ class ACCDSLWorkflows : AbstractACCDSLWorkflowsTestSupport() {
             ),
             texts.toSet()
         )
+    }
+
+    @Test
+    fun `Workflow stopped in case of error`() {
+        val name = uid("w-")
+        val workflow = """
+            name: $name
+            nodes:
+                - id: ticket
+                  executorId: mock
+                  data:
+                    text: Ticket
+                - id: jenkins
+                  parents:
+                    - id: ticket
+                  executorId: mock
+                  data:
+                    text: Jenkins
+                    waitMs: 2000
+                    error: true
+                - id: mail
+                  executorId: mock
+                  data:
+                    text: Mail
+                    waitMs: 500
+                  parents:
+                    - id: jenkins
+        """.trimIndent()
+        // Saving the workflow
+        val workflowId = ontrack.workflows.saveYamlWorkflow(
+            workflow = workflow,
+        ) ?: fail("Error while saving workflow")
+        // Running the workflow
+        val instanceId = ontrack.workflows.launchWorkflow(
+            workflowId = workflowId,
+            context = "mock" to mapOf("text" to "Error test").asJson(),
+        ) ?: fail("Error while launching workflow")
+        // Waiting for the workflow result
+        val instance = waitUntilWorkflowFinished(instanceId, returnInstanceOnError = true)
+        assertEquals(WorkflowInstanceStatus.ERROR, instance.status)
+        // Checks the node statuses
+        val nodeStatuses = instance.nodesExecutions.associate { it.id to it.status }
+        assertEquals(WorkflowInstanceNodeStatus.SUCCESS, nodeStatuses["ticket"])
+        assertEquals(WorkflowInstanceNodeStatus.ERROR, nodeStatuses["jenkins"])
+        assertEquals(WorkflowInstanceNodeStatus.STOPPED, nodeStatuses["mail"])
+    }
+
+    @Test
+    fun `Workflow stopped in case of timeout`() {
+        val name = uid("w-")
+        val workflow = """
+            name: $name
+            nodes:
+                - id: ticket
+                  executorId: mock
+                  data:
+                    text: Ticket
+                - id: jenkins
+                  parents:
+                    - id: ticket
+                  executorId: mock
+                  data:
+                    text: Jenkins
+                    waitMs: 2000
+                  timeout: 1
+                - id: mail
+                  executorId: mock
+                  data:
+                    text: Mail
+                    waitMs: 500
+                  parents:
+                    - id: jenkins
+        """.trimIndent()
+        // Saving the workflow
+        val workflowId = ontrack.workflows.saveYamlWorkflow(
+            workflow = workflow,
+        ) ?: fail("Error while saving workflow")
+        // Running the workflow
+        val instanceId = ontrack.workflows.launchWorkflow(
+            workflowId = workflowId,
+            context = "mock" to mapOf("text" to "Error test").asJson(),
+        ) ?: fail("Error while launching workflow")
+        // Waiting for the workflow result
+        val instance = waitUntilWorkflowFinished(instanceId, returnInstanceOnError = true)
+        assertEquals(WorkflowInstanceStatus.ERROR, instance.status)
+        // Checks the node statuses
+        val nodeStatuses = instance.nodesExecutions.associate { it.id to it.status }
+        assertEquals(WorkflowInstanceNodeStatus.SUCCESS, nodeStatuses["ticket"])
+        assertEquals(WorkflowInstanceNodeStatus.ERROR, nodeStatuses["jenkins"])
+        assertEquals(WorkflowInstanceNodeStatus.STOPPED, nodeStatuses["mail"])
+    }
+
+    @Test
+    fun `Stopping a workflow`() {
+        val name = uid("w-")
+        val workflow = """
+            name: $name
+            nodes:
+                - id: ticket
+                  executorId: mock
+                  data:
+                    text: Ticket
+                - id: jenkins
+                  parents:
+                    - id: ticket
+                  executorId: mock
+                  data:
+                    text: Jenkins
+                    waitMs: 2000
+                  timeout: 1
+                - id: mail
+                  executorId: mock
+                  data:
+                    text: Mail
+                    waitMs: 500
+                  parents:
+                    - id: jenkins
+        """.trimIndent()
+        // Saving the workflow
+        val workflowId = ontrack.workflows.saveYamlWorkflow(
+            workflow = workflow,
+        ) ?: fail("Error while saving workflow")
+        // Running the workflow
+        val instanceId = ontrack.workflows.launchWorkflow(
+            workflowId = workflowId,
+            context = "mock" to mapOf("text" to "Error test").asJson(),
+        ) ?: fail("Error while launching workflow")
+        // Stopping the workflow
+        runBlocking {
+            delay(500)
+            ontrack.workflows.stopWorkflow(instanceId)
+        }
+        // Waiting for the workflow result
+        val instance = waitUntilWorkflowFinished(instanceId, returnInstanceOnError = true)
+        assertEquals(WorkflowInstanceStatus.STOPPED, instance.status)
+        // Checks the node statuses
+        val nodeStatuses = instance.nodesExecutions.associate { it.id to it.status }
+        assertEquals(WorkflowInstanceNodeStatus.SUCCESS, nodeStatuses["ticket"])
+        assertEquals(WorkflowInstanceNodeStatus.STOPPED, nodeStatuses["jenkins"])
+        assertEquals(WorkflowInstanceNodeStatus.STOPPED, nodeStatuses["mail"])
     }
 
     @Test

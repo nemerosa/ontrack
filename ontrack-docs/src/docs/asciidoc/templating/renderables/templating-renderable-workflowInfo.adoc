@@ -1,0 +1,11 @@
+[[templating-renderable-workflowInfo]]
+==== Global information about the workflow (workflowInfo)
+
+The `workflowInfo` context is used to access information about the workflow itself, in notifications or other templates rendered in the context of the workflow execution.
+
+Context: Workflow
+
+Available fields:
+
+* `start`: Starting time of the workflow
+

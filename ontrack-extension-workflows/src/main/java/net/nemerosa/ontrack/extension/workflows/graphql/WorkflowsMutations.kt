@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.workflows.graphql
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.extension.workflows.acl.WorkflowStop
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowValidation
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowContext
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowContextData
@@ -9,12 +10,14 @@ import net.nemerosa.ontrack.extension.workflows.registry.WorkflowRegistry
 import net.nemerosa.ontrack.graphql.schema.Mutation
 import net.nemerosa.ontrack.graphql.support.ListRef
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
+import net.nemerosa.ontrack.model.security.SecurityService
 import org.springframework.stereotype.Component
 
 @Component
 class WorkflowsMutations(
     private val workflowRegistry: WorkflowRegistry,
     private val workflowEngine: WorkflowEngine,
+    private val securityService: SecurityService,
 ) : TypedMutationProvider() {
 
     override val mutations: List<Mutation> = listOf(
@@ -60,6 +63,14 @@ class WorkflowsMutations(
                 null
             }
         },
+        unitMutation(
+            name = "stopWorkflow",
+            description = "Stopping a running workflow. Does not do anything if already stopped.",
+            input = StopWorkflowInput::class,
+        ) { input ->
+            securityService.checkGlobalFunction(WorkflowStop::class.java)
+            workflowEngine.stopWorkflow(input.workflowInstanceId)
+        }
     )
 }
 
@@ -80,4 +91,8 @@ data class LaunchWorkflowInput(
 data class LaunchWorkflowInputContext(
     val key: String,
     val value: JsonNode,
+)
+
+data class StopWorkflowInput(
+    val workflowInstanceId: String,
 )

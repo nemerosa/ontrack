@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component
 class MockJenkinsNotificationChannel(
     jenkinsConfigurationService: JenkinsConfigurationService,
     eventTemplatingService: EventTemplatingService,
-    private val mockJenkinsClient: MockJenkinsClient,
+    private val mockJenkinsClientFactory: MockJenkinsClientFactory,
 ) : AbstractJenkinsNotificationChannel(
     jenkinsConfigurationService,
     eventTemplatingService,
@@ -24,6 +24,7 @@ class MockJenkinsNotificationChannel(
 
     override val displayName: String = "Mock Jenkins"
 
-    override fun createJenkinsClient(config: JenkinsConfiguration): JenkinsClient = mockJenkinsClient
+    override fun createJenkinsClient(config: JenkinsConfiguration): JenkinsClient =
+        mockJenkinsClientFactory.getClient(config)
 
 }

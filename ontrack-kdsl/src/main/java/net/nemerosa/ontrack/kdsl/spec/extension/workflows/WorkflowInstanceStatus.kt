@@ -4,6 +4,7 @@ enum class WorkflowInstanceStatus {
 
     STARTED,
     RUNNING,
+    STOPPED,
     ERROR,
     SUCCESS,
 

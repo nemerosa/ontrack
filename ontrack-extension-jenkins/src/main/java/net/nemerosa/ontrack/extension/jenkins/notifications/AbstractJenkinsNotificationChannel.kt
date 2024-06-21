@@ -30,7 +30,7 @@ abstract class AbstractJenkinsNotificationChannel(
             ?: return NotificationResult.invalidConfiguration("Jenkins configuration cannot be found: ${config.config}")
         // Gets the Jenkins client
         val jenkinsClient = createJenkinsClient(jenkinsConfig)
-        // Running the job
+        // Getting the job parameters
         val job = eventTemplatingService.render(
             template = config.job,
             event = event,
@@ -45,15 +45,23 @@ abstract class AbstractJenkinsNotificationChannel(
                 renderer = PlainEventRenderer.INSTANCE
             )
         }
-        val error = when (config.callMode) {
+        // Filling the output
+        val jobUrl = jenkinsClient.getJob(job).url
+        var output = outputProgressCallback(
+            JenkinsNotificationChannelOutput(
+                jobUrl = jobUrl,
+                buildUrl = null,
+                parameters = parameters.map { (name, value) -> JenkinsNotificationChannelConfigParam(name, value) },
+            )
+        )
+        // Running the job
+        val (error, buildUrl) = when (config.callMode) {
             JenkinsNotificationChannelConfigCallMode.ASYNC -> launchAsync(jenkinsClient, job, parameters)
             JenkinsNotificationChannelConfigCallMode.SYNC -> launchSync(jenkinsClient, job, config.timeout, parameters)
         }
         // Output
-        val jobUrl = jenkinsClient.getJob(job).url
-        val output = JenkinsNotificationChannelOutput(
-            jobUrl = jobUrl,
-            parameters = parameters.map { (name, value) -> JenkinsNotificationChannelConfigParam(name, value) }
+        output = outputProgressCallback(
+            output.withBuildUrl(buildUrl)
         )
         // In case of error
         return if (error != null) {
@@ -75,7 +83,7 @@ abstract class AbstractJenkinsNotificationChannel(
         job: String,
         timeout: Int,
         parameters: Map<String, String>
-    ): String? {
+    ): JobLaunchResult {
         val interval = 30 // seconds
         val retries = timeout / interval
         val build = jenkinsClient.runJob(
@@ -85,9 +93,15 @@ abstract class AbstractJenkinsNotificationChannel(
             retriesDelaySeconds = interval,
         )
         return if (build.successful) {
-            null // No error
+            JobLaunchResult(
+                error = null,
+                buildUrl = build.url,
+            )
         } else {
-            "Jenkins build at ${build.url} was not reported successful."
+            JobLaunchResult(
+                error = "Jenkins build at ${build.url} was not reported successful.",
+                buildUrl = build.url,
+            )
         }
     }
 
@@ -95,15 +109,21 @@ abstract class AbstractJenkinsNotificationChannel(
         jenkinsClient: JenkinsClient,
         job: String,
         parameters: Map<String, String>
-    ): String? {
+    ): JobLaunchResult {
         val queueURI = jenkinsClient.fireAndForgetJob(
             job = job,
             parameters = parameters,
         )
         return if (queueURI != null) {
-            null // No error
+            JobLaunchResult(
+                error = null,
+                buildUrl = null,
+            )
         } else {
-            "Could not find job at $job"
+            JobLaunchResult(
+                error = "Could not find job at $job",
+                buildUrl = null,
+            )
         }
     }
 
@@ -154,5 +174,10 @@ abstract class AbstractJenkinsNotificationChannel(
             "n/a"
         }
     }
+
+    data class JobLaunchResult(
+        val error: String?,
+        val buildUrl: String?,
+    )
 
 }

@@ -1,17 +1,15 @@
 package net.nemerosa.ontrack.extension.jenkins.mock
 
-import net.nemerosa.ontrack.common.RunProfile
+import net.nemerosa.ontrack.extension.jenkins.JenkinsConfiguration
 import net.nemerosa.ontrack.extension.jenkins.client.AbstractJenkinsClient
 import net.nemerosa.ontrack.extension.jenkins.client.JenkinsBuild
 import net.nemerosa.ontrack.extension.jenkins.client.JenkinsInfo
-import org.springframework.context.annotation.Profile
-import org.springframework.stereotype.Component
 import java.net.URI
 
-@Component
-@Profile(RunProfile.ACC)
-class MockJenkinsClient : AbstractJenkinsClient(
-    url = "https://jenkins.mock"
+class MockJenkinsClient(
+    configuration: JenkinsConfiguration,
+) : AbstractJenkinsClient(
+    url = configuration.url,
 ) {
 
     val jobs = mutableMapOf<String, MockJenkinsJob>()
@@ -25,7 +23,14 @@ class MockJenkinsClient : AbstractJenkinsClient(
         retries: Int,
         retriesDelaySeconds: Int
     ): JenkinsBuild {
-        TODO("Not yet implemented")
+        val build = jobs.getOrPut(job) { MockJenkinsJob(job) }.build(parameters)
+        val result = parameters[PARAM_RESULT] ?: "SUCCESS"
+        return JenkinsBuild(
+            id = build.number.toString(),
+            building = false,
+            url = "$url/$job/${build.number}",
+            result = result,
+        )
     }
 
     override fun fireAndForgetJob(job: String, parameters: Map<String, String>): URI? {
@@ -33,7 +38,11 @@ class MockJenkinsClient : AbstractJenkinsClient(
             return null
         } else {
             jobs.getOrPut(job) { MockJenkinsJob(job) }.build(parameters)
-            return URI("/queue/$job")
+            return URI("$url/queue/$job")
         }
+    }
+
+    companion object {
+        private const val PARAM_RESULT = "result"
     }
 }

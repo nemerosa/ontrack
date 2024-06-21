@@ -7,6 +7,8 @@ export default function SelectProject({
                                           value, onChange,
                                           placeholder = "Project name",
                                           idAsValue = false,
+                                          multiple = false,
+                                          width = '16em',
                                       }) {
 
     const client = useGraphQLClient()
@@ -66,8 +68,9 @@ export default function SelectProject({
                     label: d.name,
                 }))}
                 style={{
-                    width: '16em',
+                    width: width,
                 }}
+                mode={multiple ? "multiple" : undefined}
             />
         </>
     )

@@ -5,7 +5,7 @@ import {CloseCommand} from "@components/common/Commands";
 import MainPage from "@components/layouts/MainPage";
 import Link from "next/link";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import {Descriptions, Skeleton, Space} from "antd";
 import {gql} from "graphql-request";
 import TimestampText from "@components/common/TimestampText";
@@ -15,18 +15,26 @@ import WorkflowInstanceGraph from "@components/extension/workflows/WorkflowInsta
 import PageSection from "@components/common/PageSection";
 import WorkflowNodeExecutorContextProvider from "@components/extension/workflows/WorkflowNodeExecutorContext";
 import WorkflowInstanceContext from "@components/extension/workflows/WorkflowInstanceContext";
+import {UserContext} from "@components/providers/UserProvider";
+import WorkflowInstanceStopButton from "@components/extension/workflows/WorkflowInstanceStopButton";
 
 export default function WorkflowInstanceView({id}) {
 
     const client = useGraphQLClient()
+    const user = useContext(UserContext)
 
     const [loading, setLoading] = useState(true)
+    const [loadingCount, setLoadingCount] = useState(0)
     const [instance, setInstance] = useState({
         id: '',
         workflow: {
             name: ''
         }
     })
+
+    const reload = () => {
+        setLoadingCount(count => count + 1)
+    }
 
     const [items, setItems] = useState([])
 
@@ -49,6 +57,7 @@ export default function WorkflowInstanceView({id}) {
                                 nodes {
                                     id
                                     executorId
+                                    timeout
                                     data
                                     parents {
                                         id
@@ -94,32 +103,39 @@ export default function WorkflowInstanceView({id}) {
                     {
                         key: 'status',
                         label: 'Status',
-                        children: <WorkflowInstanceStatus status={instance.status}/>,
+                        children: <Space>
+                            <WorkflowInstanceStatus status={instance.status}/>
+                            {
+                                user.authorizations.workflow?.stop &&
+                                (instance.status === 'STARTED' || instance.status === 'RUNNING') &&
+                                <WorkflowInstanceStopButton id={instance.id} onStopped={reload}/>
+                            }
+                        </Space>,
                         span: 4,
                     },
                     {
                         key: 'startTime',
                         label: 'Start time',
                         children: <TimestampText value={instance.startTime} format="YYYY MMM DD, HH:mm:ss"/>,
-                        span: 4,
+                        span: 3,
                     },
                     {
                         key: 'endTime',
                         label: 'End time',
                         children: <TimestampText value={instance.endTime} format="YYYY MMM DD, HH:mm:ss"/>,
-                        span: 4,
+                        span: 3,
                     },
                     {
                         key: 'duration',
                         label: 'Duration',
                         children: <DurationMs ms={instance.durationMs}/>,
-                        span: 4,
+                        span: 3,
                     },
                     {
                         key: 'timestamp',
                         label: 'Last update',
                         children: <TimestampText value={instance.timestamp} format="YYYY MMM DD, HH:mm:ss"/>,
-                        span: 4,
+                        span: 3,
                     },
                     {
                         key: 'context',
@@ -132,7 +148,7 @@ export default function WorkflowInstanceView({id}) {
                 setLoading(false)
             })
         }
-    }, [client, id]);
+    }, [client, id, loadingCount]);
 
     return (
         <>

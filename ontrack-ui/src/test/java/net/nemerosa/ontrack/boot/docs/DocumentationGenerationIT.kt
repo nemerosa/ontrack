@@ -76,8 +76,10 @@ class DocumentationGenerationIT : AbstractDocumentationGenerationTestSupport() {
                     s.append("Available fields:\n\n")
                     trd.fields.forEach { field ->
                         s.append("* `${field.name}`: ${field.description}\n\n")
-                        val list = getFieldsDocumentation(field.config)
-                        directoryContext.writeFields(s, list, level = 2)
+                        field.config?.let {
+                            val list = getFieldsDocumentation(it)
+                            directoryContext.writeFields(s, list, level = 2)
+                        }
                     }
                 },
             )

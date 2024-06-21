@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.extension.workflows.WorkflowsExtensionFeature
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutor
+import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorResult
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.annotations.APIDescription
@@ -21,13 +22,15 @@ import org.springframework.stereotype.Component
 @APIDescription("Executor used to mock some actions for the nodes. Mostly used for testing.")
 @Documentation(MockNodeData::class)
 @Documentation(MockNodeOutput::class, section = "output")
-@DocumentationExampleCode("""
+@DocumentationExampleCode(
+    """
     executorId: mock
     data:
         text: Some text to store
         waitMs: 500
         error: false
-""")
+"""
+)
 class MockWorkflowNodeExecutor(
     workflowsExtensionFeature: WorkflowsExtensionFeature,
 ) : AbstractExtension(workflowsExtensionFeature), WorkflowNodeExecutor {
@@ -39,7 +42,10 @@ class MockWorkflowNodeExecutor(
 
     fun getTextsByInstanceId(instanceId: String): List<String> = texts[instanceId] ?: emptyList()
 
-    override fun execute(workflowInstance: WorkflowInstance, workflowNodeId: String): JsonNode {
+    override suspend fun execute(
+        workflowInstance: WorkflowInstance,
+        workflowNodeId: String
+    ): WorkflowNodeExecutorResult {
         // Gets the node & its data
         val nodeRawData = workflowInstance.workflow.getNode(workflowNodeId).data
         val nodeData = if (nodeRawData.isTextual) {
@@ -51,17 +57,27 @@ class MockWorkflowNodeExecutor(
         if (nodeData.error) {
             error("Error in $workflowNodeId node")
         }
+        // Waiting time
+        if (nodeData.waitMs > 0) {
+            runBlocking {
+                delay(nodeData.waitMs)
+            }
+        }
         // Gets the parent outputs in an index
         val parentsData = workflowInstance.getParentsData(workflowNodeId)
         // Using the context
-        val execContext = workflowInstance.context.getValue("mock")
-        val context = if (execContext.has("text")) {
+        val execContext = workflowInstance.context.findValue("mock")
+        val context = if (execContext == null) {
+            ""
+        } else if (execContext.has("text")) {
             execContext.path("text").asText()
         } else {
             execContext.asText()
         }
+
         // Initial text
         val initialText = nodeData.text
+
         // Replacements by parents references
         val replacedText = "#([a-zA-Z][a-zA-Z0-9_-]*)".toRegex().replace(initialText) { m ->
             val parentId = m.groupValues[1]
@@ -74,20 +90,18 @@ class MockWorkflowNodeExecutor(
                 "#none"
             }
         }
+
         // Returning some new text
         val text = "Processed: $replacedText for $context"
-        // Waiting time
-        if (nodeData.waitMs > 0) {
-            runBlocking {
-                delay(nodeData.waitMs)
-            }
-        }
+
         // Recording
         val old = texts[workflowInstance.id]
         texts[workflowInstance.id] = if (old != null) old + text else listOf(text)
         // OK
-        return MockNodeOutput(
-            text = text
-        ).asJson()
+        return WorkflowNodeExecutorResult.success(
+            MockNodeOutput(
+                text = text
+            ).asJson()
+        )
     }
 }

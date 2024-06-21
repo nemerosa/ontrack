@@ -4096,6 +4096,11 @@ type Mutation {
     ): ShareSCMFileChangeFilterPayload
     "Stops a job"
     stopJob(id: Int!): JobActionResult!
+    "Stopping a running workflow. Does not do anything if already stopped."
+    stopWorkflow(
+        "Input for the mutation"
+        input: StopWorkflowInput
+    ): StopWorkflowPayload
     "Set a list of subscriptions on a branch identified by name."
     subscribeBranchToEvents(
         "Input for the mutation"
@@ -4406,6 +4411,8 @@ type Project implements Authorizable & ProjectEntity {
     annotatedDescription: String
     "Authorizations for this context"
     authorizations: [Authorization!]!
+    "Given a list of patterns and their behaviour, allows the disabling of branches based on their Ontrack names."
+    autoDisablingBranchPatternsProperty: Property
     "If set, this property allows promotion levels to be created automatically from predefined promotion levels"
     autoPromotionLevelProperty: Property
     "If set, this property allows validation stamps to be created automatically from predefined validation stamps"
@@ -6600,6 +6607,12 @@ type StepIngestionConfigValidation {
     validationPrefix: Boolean
 }
 
+"Output type for the stopWorkflow mutation."
+type StopWorkflowPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
 "Output type for the subscribeBranchToEvents mutation."
 type SubscribeBranchToEventsPayload implements Payload {
     "List of errors"
@@ -7369,6 +7382,8 @@ type WorkflowNode {
     id: String!
     "List of the IDs of the parents for this node"
     parents: [WorkflowParentNode!]!
+    "Timeout in seconds (5 minutes by default)"
+    timeout: Int
 }
 
 "Workflow node executor"
@@ -7526,6 +7541,7 @@ enum NotificationResultType {
     INVALID_CONFIGURATION
     NOT_CONFIGURED
     OK
+    ONGOING
 }
 
 "Project entity type"
@@ -7594,6 +7610,7 @@ enum WorkflowInstanceNodeStatus {
     ERROR
     IDLE
     STARTED
+    STOPPED
     SUCCESS
 }
 
@@ -7602,6 +7619,7 @@ enum WorkflowInstanceStatus {
     ERROR
     RUNNING
     STARTED
+    STOPPED
     SUCCESS
 }
 
@@ -10179,6 +10197,12 @@ input StandardBuildFilter {
     withValidationStamp: String
     "... with status"
     withValidationStampStatus: String
+}
+
+"Input type for the stopWorkflow mutation."
+input StopWorkflowInput {
+    "workflowInstanceId field"
+    workflowInstanceId: String!
 }
 
 "Input type for the subscribeBranchToEvents mutation."

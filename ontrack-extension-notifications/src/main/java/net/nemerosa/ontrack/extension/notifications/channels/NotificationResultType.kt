@@ -4,6 +4,8 @@ enum class NotificationResultType {
 
     OK,
 
+    ONGOING,
+
     NOT_CONFIGURED,
 
     INVALID_CONFIGURATION,

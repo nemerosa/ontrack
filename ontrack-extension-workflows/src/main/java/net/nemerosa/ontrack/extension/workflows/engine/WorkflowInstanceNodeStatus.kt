@@ -1,10 +1,13 @@
 package net.nemerosa.ontrack.extension.workflows.engine
 
-enum class WorkflowInstanceNodeStatus {
+enum class WorkflowInstanceNodeStatus(
+    val finished: Boolean,
+) {
 
-    IDLE,
-    STARTED,
-    ERROR,
-    SUCCESS,
+    IDLE(finished = false),
+    STARTED(finished = false),
+    STOPPED(finished = true),
+    ERROR(finished = true),
+    SUCCESS(finished = true),
 
 }

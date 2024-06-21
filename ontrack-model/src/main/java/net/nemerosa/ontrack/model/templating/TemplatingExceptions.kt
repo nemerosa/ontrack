@@ -40,6 +40,10 @@ class TemplatingMissingConfigParam(key: String) : TemplatingException(
     """Missing required templating config param: $key"""
 )
 
+class TemplatingMisconfiguredConfigParamException(key: String, text: String) : TemplatingException(
+    """Misconfigured templating config param: $key. $text"""
+)
+
 class TemplatingConfigFormatException(expression: String) : TemplatingException(
     """Misconfigured configuration: $expression"""
 )

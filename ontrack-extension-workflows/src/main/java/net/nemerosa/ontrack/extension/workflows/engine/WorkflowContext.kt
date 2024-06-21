@@ -24,7 +24,7 @@ data class WorkflowContext(
         return findValue(key) ?: throw WorkflowContextKeyNotFoundException(key)
     }
 
-    private fun findValue(key: String): JsonNode? = index[key]
+    fun findValue(key: String): JsonNode? = index[key]
 
     companion object {
         fun noContext() = WorkflowContext(emptyList())

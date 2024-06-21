@@ -39,6 +39,15 @@ data class WorkflowInstanceNode(
         error = error,
     )
 
+    fun stop(time: LocalDateTime = Time.now) = WorkflowInstanceNode(
+        id = id,
+        status = WorkflowInstanceNodeStatus.STOPPED,
+        startTime = time,
+        endTime = endTime,
+        output = output,
+        error = error,
+    )
+
     fun success(output: JsonNode, time: LocalDateTime = Time.now) = WorkflowInstanceNode(
         id = id,
         status = WorkflowInstanceNodeStatus.SUCCESS,
@@ -48,12 +57,12 @@ data class WorkflowInstanceNode(
         error = null,
     )
 
-    fun error(throwable: Throwable, time: LocalDateTime = Time.now) = WorkflowInstanceNode(
+    fun error(throwable: Throwable?, message: String?, time: LocalDateTime = Time.now) = WorkflowInstanceNode(
         id = id,
         status = WorkflowInstanceNodeStatus.ERROR,
         startTime = startTime,
         endTime = time,
         output = null,
-        error = throwable.message ?: "Unknown error in $id node",
+        error = message ?: throwable?.message ?: "Unknown error in $id node",
     )
 }

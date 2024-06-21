@@ -17,6 +17,7 @@ describe('WorkflowGraphFlow', () => {
                     data: {
                         id: 'n1',
                         executorId: 'mock',
+                        timeout: 300,
                         data: {
                             text: "N1",
                         }
@@ -27,6 +28,7 @@ describe('WorkflowGraphFlow', () => {
                     data: {
                         id: 'n2',
                         executorId: '',
+                        timeout: 300,
                         data: null,
                         parents: [
                             {id: 'n1'}
@@ -50,6 +52,7 @@ describe('WorkflowGraphFlow', () => {
             oldId: 'n2',
             id: 'n2',
             executorId: 'mock',
+            timeout: 300,
             data: {
                 text: "N2",
             }
@@ -63,6 +66,7 @@ describe('WorkflowGraphFlow', () => {
             data: {
                 id: 'n2',
                 executorId: 'mock',
+                timeout: 300,
                 data: {
                     text: "N2",
                 },
@@ -81,6 +85,7 @@ describe('WorkflowGraphFlow', () => {
             oldId: 'n1',
             id: 'start',
             executorId: 'mock',
+            timeout: 300,
             data: {
                 text: "N1",
             }
@@ -94,6 +99,7 @@ describe('WorkflowGraphFlow', () => {
             data: {
                 id: 'start',
                 executorId: 'mock',
+                timeout: 300,
                 data: {
                     text: "N1",
                 }
@@ -105,6 +111,7 @@ describe('WorkflowGraphFlow', () => {
             data: {
                 id: 'n2',
                 executorId: '',
+                timeout: 300,
                 data: null,
                 parents: [
                     {id: 'start'}
@@ -140,6 +147,7 @@ describe('WorkflowGraphFlow', () => {
                 data: {
                     id: 'n2',
                     executorId: '',
+                    timeout: 300,
                     data: null,
                     parents: []
                 }
@@ -163,6 +171,7 @@ describe('WorkflowGraphFlow', () => {
                 data: {
                     id: 'n1',
                     executorId: 'mock',
+                    timeout: 300,
                     data: {
                         text: "N1",
                     },
@@ -174,6 +183,7 @@ describe('WorkflowGraphFlow', () => {
                 data: {
                     id: 'n2',
                     executorId: '',
+                    timeout: 300,
                     data: null,
                     parents: []
                 }

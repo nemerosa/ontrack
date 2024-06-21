@@ -51,7 +51,8 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                 }
             }
             // Query
-            asUser().withProjectFunction(this, ProjectSubscriptionsRead::class.java).withProjectFunction(this, ProjectSubscriptionsWrite::class.java)
+            asUser().withProjectFunction(this, ProjectSubscriptionsRead::class.java)
+                .withProjectFunction(this, ProjectSubscriptionsWrite::class.java)
                 .call {
                     run(
                         """
@@ -66,13 +67,14 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                         }
                     }
                 """
-                    ) { data ->
-                        assertTrue(
-                            data.getRequiredJsonField("eventSubscriptions")
-                                .getRequiredBooleanField("writeSubscriptionGranted")
-                        )
+                        ) { data ->
+                            assertTrue(
+                                data.getRequiredJsonField("eventSubscriptions")
+                                    .getRequiredBooleanField("writeSubscriptionGranted")
+                            )
+                        }
                     }
-                }
+            }
         }
     }
 
@@ -119,26 +121,27 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                         }
                     }
             """
-            ) { data ->
-                assertEquals(
-                    mapOf(
-                        "eventSubscriptions" to mapOf(
-                            "pageItems" to listOf(
-                                mapOf(
-                                    "channel" to "mock",
-                                    "channelConfig" to mapOf(
-                                        "target" to "#one",
-                                        "data" to null,
-                                    ),
-                                    "events" to listOf(
-                                        "new_promotion_run"
+                ) { data ->
+                    assertEquals(
+                        mapOf(
+                            "eventSubscriptions" to mapOf(
+                                "pageItems" to listOf(
+                                    mapOf(
+                                        "channel" to "mock",
+                                        "channelConfig" to mapOf(
+                                            "target" to "#one",
+                                            "data" to null,
+                                        ),
+                                        "events" to listOf(
+                                            "new_promotion_run"
+                                        )
                                     )
                                 )
                             )
-                        )
-                    ).asJson(),
-                    data
-                )
+                        ).asJson(),
+                        data
+                    )
+                }
             }
         }
     }
@@ -172,19 +175,20 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                         }
                     }
             """
-            ) { data ->
-                assertEquals(
-                    mapOf(
-                        "eventSubscriptions" to mapOf(
-                            "pageItems" to listOf(
-                                mapOf(
-                                    "contentTemplate" to "Some template.",
+                ) { data ->
+                    assertEquals(
+                        mapOf(
+                            "eventSubscriptions" to mapOf(
+                                "pageItems" to listOf(
+                                    mapOf(
+                                        "contentTemplate" to "Some template.",
+                                    )
                                 )
                             )
-                        )
-                    ).asJson(),
-                    data
-                )
+                        ).asJson(),
+                        data
+                    )
+                }
             }
         }
     }

@@ -50,6 +50,8 @@ data class WorkflowInstance(
             val nodes = nodesExecutions.map { it.status }
             return if (nodes.any { it == WorkflowInstanceNodeStatus.ERROR }) {
                 WorkflowInstanceStatus.ERROR
+            } else if (nodes.any { it == WorkflowInstanceNodeStatus.STOPPED }) {
+                WorkflowInstanceStatus.STOPPED
             } else if (nodes.all { it == WorkflowInstanceNodeStatus.SUCCESS }) {
                 WorkflowInstanceStatus.SUCCESS
             } else if (nodes.any { it == WorkflowInstanceNodeStatus.STARTED }) {
@@ -74,16 +76,16 @@ data class WorkflowInstance(
             },
         )
 
-    fun startNode(nodeId: String) = updateNode(nodeId) { node ->
-        node.start()
+    fun startNode(nodeId: String, time: LocalDateTime = Time.now) = updateNode(nodeId) { node ->
+        node.start(time)
     }
 
     fun successNode(nodeId: String, output: JsonNode) = updateNode(nodeId) { node ->
         node.success(output)
     }
 
-    fun errorNode(nodeId: String, throwable: Throwable) = updateNode(nodeId) { node ->
-        node.error(throwable)
+    fun errorNode(nodeId: String, throwable: Throwable?, message: String?) = updateNode(nodeId) { node ->
+        node.error(throwable, message)
     }
 
     fun getNode(nodeId: String) = nodesExecutions.firstOrNull { it.id == nodeId }
@@ -108,6 +110,21 @@ data class WorkflowInstance(
         collectParentsData(results, workflowNodeId, 0)
         return results.toMap()
     }
+
+    fun stopNodes(): WorkflowInstance =
+        WorkflowInstance(
+            id = id,
+            timestamp = timestamp,
+            workflow = workflow,
+            context = context,
+            nodesExecutions = nodesExecutions.map { nx ->
+                if (nx.status.finished) {
+                    nx
+                } else {
+                    nx.stop()
+                }
+            }
+        )
 
 }
 

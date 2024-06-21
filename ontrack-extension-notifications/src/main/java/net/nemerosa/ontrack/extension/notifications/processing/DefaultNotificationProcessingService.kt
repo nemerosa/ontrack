@@ -14,6 +14,7 @@ import net.nemerosa.ontrack.extension.notifications.recording.NotificationRecord
 import net.nemerosa.ontrack.extension.notifications.recording.toNotificationRecordResult
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.Event
+import net.nemerosa.ontrack.model.tx.TransactionHelper
 import org.apache.commons.lang3.exception.ExceptionUtils
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -25,9 +26,10 @@ class DefaultNotificationProcessingService(
     private val notificationChannelRegistry: NotificationChannelRegistry,
     private val notificationRecordingService: NotificationRecordingService,
     private val meterRegistry: MeterRegistry,
+    private val transactionHelper: TransactionHelper,
 ) : NotificationProcessingService {
 
-    override fun process(item: Notification, context: Map<String, Any>): Any? {
+    override fun process(item: Notification, context: Map<String, Any>): NotificationResult<*>? {
         meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_started, item)
         val channel = notificationChannelRegistry.findChannel(item.channel)
         if (channel != null) {
@@ -39,14 +41,30 @@ class DefaultNotificationProcessingService(
         }
     }
 
-    private fun <C, R> process(channel: NotificationChannel<C, R>, item: Notification, context: Map<String, Any>): R? {
+    private fun <C, R> process(
+        channel: NotificationChannel<C, R>,
+        item: Notification,
+        context: Map<String, Any>
+    ): NotificationResult<R>? {
+
+        // Unique ID for the record
+        val recordId = UUID.randomUUID().toString()
+
         val validatedConfig = channel.validate(item.channelConfig)
         return if (validatedConfig.config != null) {
-
             // Current output progress
             var output: R? = null
             val outputProgressCallback: (R) -> R = { current ->
                 output = current
+                // Saving the current state of the record
+                recordResult(
+                    recordId = recordId,
+                    channel = channel.type,
+                    channelConfig = validatedConfig.config,
+                    event = item.event,
+                    result = NotificationResult.ongoing(output),
+                )
+                // OK, returning the new value
                 current
             }
 
@@ -61,27 +79,30 @@ class DefaultNotificationProcessingService(
                     outputProgressCallback = outputProgressCallback,
                 )
                 meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_result, item, result)
-                record(
+                recordResult(
+                    recordId = recordId,
                     channel = channel.type,
                     channelConfig = validatedConfig.config,
                     event = item.event,
                     result = result,
                 )
-                result.output
+                result
             } catch (any: Exception) {
                 meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_error, item)
-                record(
+                recordError(
+                    recordId = recordId,
                     channel = channel.type,
                     channelConfig = validatedConfig.config,
                     event = item.event,
                     error = any,
                     output = output, // Using the current output, even for errors
                 )
-                output
+                NotificationResult.error(any.message ?: any::class.java.name, output)
             }
         } else {
             meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_invalid, item)
-            record(
+            recordInvalidConfig(
+                recordId = recordId,
                 channel = channel.type,
                 invalidChannelConfig = item.channelConfig,
                 event = item.event,
@@ -91,14 +112,23 @@ class DefaultNotificationProcessingService(
     }
 
     private fun record(
+        record: NotificationRecord,
+    ) {
+        transactionHelper.inNewTransaction {
+            notificationRecordingService.record(record)
+        }
+    }
+
+    private fun recordResult(
+        recordId: String,
         channel: String,
         channelConfig: Any,
         event: Event,
         result: NotificationResult<*>,
     ) {
-        notificationRecordingService.record(
+        record(
             NotificationRecord(
-                id = UUID.randomUUID().toString(),
+                id = recordId,
                 timestamp = Time.now(),
                 channel = channel,
                 channelConfig = channelConfig.asJson(),
@@ -108,16 +138,17 @@ class DefaultNotificationProcessingService(
         )
     }
 
-    private fun record(
+    private fun recordError(
+        recordId: String,
         channel: String,
         channelConfig: Any,
         event: Event,
         error: Exception,
         output: Any?,
     ) {
-        notificationRecordingService.record(
+        record(
             NotificationRecord(
-                id = UUID.randomUUID().toString(),
+                id = recordId,
                 timestamp = Time.now(),
                 channel = channel,
                 channelConfig = channelConfig.asJson(),
@@ -128,14 +159,15 @@ class DefaultNotificationProcessingService(
         )
     }
 
-    private fun record(
+    private fun recordInvalidConfig(
+        recordId: String,
         channel: String,
         invalidChannelConfig: JsonNode,
         event: Event,
     ) {
-        notificationRecordingService.record(
+        record(
             NotificationRecord(
-                id = UUID.randomUUID().toString(),
+                id = recordId,
                 timestamp = Time.now(),
                 channel = channel,
                 channelConfig = invalidChannelConfig,

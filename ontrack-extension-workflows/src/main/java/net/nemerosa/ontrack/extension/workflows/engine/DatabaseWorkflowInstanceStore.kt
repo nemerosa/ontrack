@@ -33,7 +33,8 @@ class DatabaseWorkflowInstanceStore(
     override fun store(instance: WorkflowInstance): WorkflowInstance =
         transactionHelper.inNewTransaction {
             storageService.store(STORE, instance.id, instance)
-            instance
+            storageService.find(STORE, instance.id, WorkflowInstance::class)
+                ?: throw WorkflowInstanceNotFoundException(instance.id)
         }
 
     override fun cleanup() {
@@ -47,7 +48,9 @@ class DatabaseWorkflowInstanceStore(
     }
 
     override fun findById(id: String): WorkflowInstance? =
-        storageService.find(STORE, id, WorkflowInstance::class)
+        transactionHelper.inNewTransaction {
+            storageService.find(STORE, id, WorkflowInstance::class)
+        }
 
     override fun findByFilter(workflowInstanceFilter: WorkflowInstanceFilter): PaginatedList<WorkflowInstance> {
         return storageService.paginatedFilter(

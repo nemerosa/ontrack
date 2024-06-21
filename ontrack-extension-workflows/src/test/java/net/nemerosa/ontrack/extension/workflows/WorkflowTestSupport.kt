@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.extension.workflows
 
 import com.fasterxml.jackson.databind.node.TextNode
-import net.nemerosa.ontrack.extension.workflows.engine.WorkflowContext
-import net.nemerosa.ontrack.extension.workflows.engine.WorkflowContextData
-import net.nemerosa.ontrack.extension.workflows.engine.WorkflowEngine
-import net.nemerosa.ontrack.extension.workflows.engine.getWorkflowInstance
+import net.nemerosa.ontrack.extension.workflows.engine.*
 import net.nemerosa.ontrack.extension.workflows.notifications.WorkflowNotificationChannelNodeExecutor
 import net.nemerosa.ontrack.extension.workflows.notifications.WorkflowNotificationItemConverter
 import net.nemerosa.ontrack.extension.workflows.registry.WorkflowRegistry
@@ -15,6 +12,7 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import org.springframework.stereotype.Component
 import java.util.concurrent.TimeoutException
 import kotlin.test.fail
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
@@ -44,6 +42,7 @@ class WorkflowTestSupport(
         workflowContextName: String? = null,
         event: Event? = null,
         display: Boolean = false,
+        wait: Boolean = true,
     ): String {
         return securityService.asAdmin {
             val workflowId = workflowRegistry.saveYamlWorkflow(yaml)
@@ -64,17 +63,8 @@ class WorkflowTestSupport(
             // Launching the workflow
             val instance = workflowEngine.startWorkflow(record.workflow, context)
             // Waiting until the workflow is completed (error or success)
-            try {
-                waitUntil("Waiting until workflow is complete", timeout = 10.seconds) {
-                    val workflowInstance = workflowEngine.getWorkflowInstance(instance.id)
-                    println("workflowInstance = $workflowInstance")
-                    workflowInstance.status.finished
-                }
-            } catch (any: TimeoutException) {
-                // Displaying the state of the instance
-                displayInstance(instance.id)
-                // Going on with the error
-                throw any
+            if (wait) {
+                waitForWorkflowInstance(instance.id)
             }
             // Displaying
             if (display) {
@@ -82,6 +72,22 @@ class WorkflowTestSupport(
             }
             // OK
             instance.id
+        }
+    }
+
+    @OptIn(ExperimentalTime::class)
+    fun waitForWorkflowInstance(instanceId: String, timeout: Duration = 10.seconds) {
+        try {
+            waitUntil("Waiting until workflow is complete", timeout = timeout) {
+                val workflowInstance = workflowEngine.getWorkflowInstance(instanceId)
+                println("workflowInstance = $workflowInstance")
+                workflowInstance.status.finished
+            }
+        } catch (any: TimeoutException) {
+            // Displaying the state of the instance
+            displayInstance(instanceId)
+            // Going on with the error
+            throw any
         }
     }
 }

@@ -1,7 +1,7 @@
 import {Descriptions, Typography} from "antd";
 import Link from "next/link";
 
-export default function JenkinsNotificationChannelOutput({jobUrl, parameters = []}) {
+export default function JenkinsNotificationChannelOutput({jobUrl, buildUrl, parameters = []}) {
     return (
         <>
             <Descriptions
@@ -11,6 +11,16 @@ export default function JenkinsNotificationChannelOutput({jobUrl, parameters = [
                         key: 'jobUrl',
                         label: 'Job',
                         children: <Link href={jobUrl}>{jobUrl}</Link>,
+                        span: 12,
+                    },
+                    {
+                        key: 'buildUrl',
+                        label: 'Build',
+                        children: <>
+                            {
+                                buildUrl && <Link href={buildUrl}>{buildUrl}</Link>
+                            }
+                        </>,
                         span: 12,
                     },
                     {

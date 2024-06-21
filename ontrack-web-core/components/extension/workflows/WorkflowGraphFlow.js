@@ -17,6 +17,7 @@ export const changeNodes = (node, oldNodes) => {
                 data: {
                     ...oldNode.data,
                     executorId: node.executorId,
+                    timeout: node.timeout,
                     data: node.data,
                 }
             }
@@ -214,6 +215,7 @@ export default function WorkflowGraphFlow({workflowNodes, edition = false}) {
         const nodeId = `n${nodeNextNumber}`
         const node = {
             id: nodeId,
+            timeout: 300,
             executorId: null,
             data: {},
             parents: [],
