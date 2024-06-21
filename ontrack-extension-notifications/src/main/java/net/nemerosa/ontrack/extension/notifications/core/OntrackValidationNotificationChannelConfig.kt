@@ -11,4 +11,6 @@ data class OntrackValidationNotificationChannelConfig(
     val build: String? = null,
     @APIDescription("Name of the validation stamp to use.")
     val validation: String,
+    @APIDescription("Run time. Can be a template must be rendered as a number of seconds.")
+    val runTime: String? = null,
 )

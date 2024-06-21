@@ -26,6 +26,7 @@ class OntrackValidationNotificationChannel(
     private val eventTemplatingService: EventTemplatingService,
     private val structureService: StructureService,
     private val securityService: SecurityService,
+    private val runInfoService: RunInfoService,
 ) : AbstractNotificationChannel<OntrackValidationNotificationChannelConfig, OntrackValidationNotificationChannelOutput>(
     OntrackValidationNotificationChannelConfig::class
 ) {
@@ -52,11 +53,34 @@ class OntrackValidationNotificationChannel(
             )
         }
 
+        if (!config.runTime.isNullOrBlank()) {
+            // Evaluates the run time as a template
+            val runTime: Int? = renderRunTime(config.runTime, event, context)
+            // Setting the run info
+            securityService.asAdmin {
+                runInfoService.setRunInfo(
+                    entity = run,
+                    input = RunInfoInput(
+                        sourceType = "ontrack-validation",
+                        triggerType = "notification",
+                        runTime = runTime,
+                    )
+                )
+            }
+        }
+
         return NotificationResult.ok(
             OntrackValidationNotificationChannelOutput(
                 runId = run.id(),
             )
         )
+    }
+
+    private fun renderRunTime(runTime: String, event: Event, context: Map<String, Any>): Int? {
+        // Basic rendering
+        val rendered = eventTemplatingService.renderEvent(event, context, template = runTime)
+        // If not blank and a number
+        return rendered.takeIf { it.isNotBlank() }?.toIntOrNull()
     }
 
     internal fun getTargetBuild(

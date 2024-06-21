@@ -11,6 +11,8 @@ Configuration:
 
 * **project** - String - optional - [template] Name of the project to validate. If not provided, looks for the event's project if available.
 
+* **runTime** - String - optional - Run time. Can be a template must be rendered as a number of seconds.
+
 * **validation** - String - required - Name of the validation stamp to use.
 
 Output:

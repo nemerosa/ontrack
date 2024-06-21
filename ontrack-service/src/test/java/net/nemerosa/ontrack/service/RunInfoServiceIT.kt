@@ -1,26 +1,18 @@
 package net.nemerosa.ontrack.service
 
-import net.nemerosa.ontrack.it.AbstractServiceTestJUnit4Support
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.security.BuildCreate
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.security.ValidationRunCreate
 import net.nemerosa.ontrack.model.structure.RunInfo
 import net.nemerosa.ontrack.model.structure.RunInfoInput
-import net.nemerosa.ontrack.model.structure.RunInfoService
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
-import org.junit.Test
-import org.springframework.beans.factory.annotation.Autowired
+import org.junit.jupiter.api.Test
 import org.springframework.security.access.AccessDeniedException
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
-class RunInfoServiceIT : AbstractServiceTestJUnit4Support() {
-
-    @Autowired
-    private lateinit var runInfoService: RunInfoService
+class RunInfoServiceIT : AbstractDSLTestSupport() {
 
     @Test
     fun `Needs authorization to add run info to a build`() {
@@ -30,7 +22,7 @@ class RunInfoServiceIT : AbstractServiceTestJUnit4Support() {
                 runInfoService.setRunInfo(build, RunInfoInput(runTime = 30))
             }
         }
-        val info: RunInfo = asUser().with(build, BuildCreate::class.java).call {
+        val info: RunInfo = asUser().withProjectFunction(build, BuildCreate::class.java).call {
             runInfoService.setRunInfo(build, RunInfoInput(runTime = 30))
         }
         assertEquals(30, info.runTime)
@@ -40,7 +32,7 @@ class RunInfoServiceIT : AbstractServiceTestJUnit4Support() {
                 runInfoService.deleteRunInfo(build)
             }
         }
-        val ack: Ack = asUser().with(build, ProjectEdit::class.java).call {
+        val ack: Ack = asUser().withProjectFunction(build, ProjectEdit::class.java).call {
             runInfoService.deleteRunInfo(build)
         }
         assertTrue(ack.isSuccess)
@@ -56,7 +48,7 @@ class RunInfoServiceIT : AbstractServiceTestJUnit4Support() {
                 runInfoService.setRunInfo(run, RunInfoInput(runTime = 30))
             }
         }
-        val info: RunInfo = asUser().with(run, ValidationRunCreate::class.java).call {
+        val info: RunInfo = asUser().withProjectFunction(run, ValidationRunCreate::class.java).call {
             runInfoService.setRunInfo(run, RunInfoInput(runTime = 30))
         }
         assertEquals(30, info.runTime)
@@ -72,16 +64,16 @@ class RunInfoServiceIT : AbstractServiceTestJUnit4Support() {
     @Test
     fun `Sets and gets the run info for a build`() {
         val build = doCreateBuild()
-        val info = asUser().with(build, BuildCreate::class.java).call {
+        val info = asUser().withProjectFunction(build, BuildCreate::class.java).call {
             runInfoService.setRunInfo(
-                    build,
-                    RunInfoInput(
-                            sourceType = "jenkins",
-                            sourceUri = "http://jenkins/job/build/1",
-                            triggerType = "scm",
-                            triggerData = "1234cde",
-                            runTime = 26
-                    )
+                build,
+                RunInfoInput(
+                    sourceType = "jenkins",
+                    sourceUri = "http://jenkins/job/build/1",
+                    triggerType = "scm",
+                    triggerData = "1234cde",
+                    runTime = 26
+                )
             )
         }
         assertTrue(info.id != 0)
@@ -95,24 +87,53 @@ class RunInfoServiceIT : AbstractServiceTestJUnit4Support() {
     @Test
     fun `Sets and deletes the run info for a build`() {
         val build = doCreateBuild()
-        asUser().with(build, BuildCreate::class.java).call {
+        asUser().withProjectFunction(build, BuildCreate::class.java).call {
             runInfoService.setRunInfo(
-                    build,
-                    RunInfoInput(
+                build,
+                RunInfoInput(
+                    sourceType = "jenkins",
+                    sourceUri = "http://jenkins/job/build/1",
+                    triggerType = "scm",
+                    triggerData = "1234cde",
+                    runTime = 26
+                )
+            )
+        }
+        // Deletion
+        asUser().withProjectFunction(build, ProjectEdit::class.java).execute {
+            runInfoService.deleteRunInfo(build)
+        }
+        val newInfo = asUserWithView(build).call { runInfoService.getRunInfo(build) }
+        assertNull(newInfo, "No run info")
+    }
+
+    @Test
+    fun `Sets and deletes the run info for a validation run`() {
+        project {
+            branch {
+                val vs = validationStamp()
+                build {
+                    val run = validate(vs)
+                    runInfoService.setRunInfo(
+                        run,
+                        RunInfoInput(
                             sourceType = "jenkins",
                             sourceUri = "http://jenkins/job/build/1",
                             triggerType = "scm",
                             triggerData = "1234cde",
                             runTime = 26
+                        )
                     )
-            )
+                    assertNotNull(runInfoService.getRunInfo(run), "Validatio run run info set") {
+                        assertEquals("jenkins", it.sourceType)
+                        assertEquals("http://jenkins/job/build/1", it.sourceUri)
+                        assertEquals("scm", it.triggerType)
+                        assertEquals("1234cde", it.triggerData)
+                        assertEquals(26, it.runTime)
+                    }
+                }
+            }
         }
-        // Deletion
-        asUser().with(build, ProjectEdit::class.java).execute {
-            runInfoService.deleteRunInfo(build)
-        }
-        val newInfo = asUserWithView(build).call { runInfoService.getRunInfo(build) }
-        assertNull(newInfo, "No run info")
     }
 
 }

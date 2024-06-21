@@ -7,10 +7,10 @@ import kotlin.reflect.KClass
  *
  * @property name Name of the field
  * @property description Description of the field
- * @property config Class of the field (for the documentation)
+ * @property config Class of the field (for the documentation) - null if no parameter for this field
  */
 data class TemplatingRenderableDocField(
     val name: String,
     val description: String,
-    val config: KClass<*>,
+    val config: KClass<*>?,
 )

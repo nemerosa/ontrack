@@ -1,0 +1,16 @@
+query ValidationRunRunInfo($validationRunId: Int!) {
+    validationRuns(id: $validationRunId) {
+        runInfo {
+            id
+            creation {
+                user
+                time
+            }
+            sourceType
+            sourceUri
+            triggerType
+            triggerData
+            runTime
+        }
+    }
+}

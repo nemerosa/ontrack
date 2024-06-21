@@ -76,8 +76,8 @@ data class WorkflowInstance(
             },
         )
 
-    fun startNode(nodeId: String) = updateNode(nodeId) { node ->
-        node.start()
+    fun startNode(nodeId: String, time: LocalDateTime = Time.now) = updateNode(nodeId) { node ->
+        node.start(time)
     }
 
     fun successNode(nodeId: String, output: JsonNode) = updateNode(nodeId) { node ->

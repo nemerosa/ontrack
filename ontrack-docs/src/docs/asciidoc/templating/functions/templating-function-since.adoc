@@ -1,0 +1,19 @@
+[[templating-function-since]]
+===== since
+
+Renders a period of time
+
+Configuration:
+
+* **format** - String - optional - How to render the period. Supported values are: seconds, millis. Defaults to seconds.
+
+* **from** - String - required - Origin time. Expression which must be rendered as a date/time
+
+* **ref** - String - optional - Last time. Expression which is must be rendered as a date/time. Defaults to current time
+
+Example:
+
+[source]
+----
+#.since?from=workflowInfo.start
+----

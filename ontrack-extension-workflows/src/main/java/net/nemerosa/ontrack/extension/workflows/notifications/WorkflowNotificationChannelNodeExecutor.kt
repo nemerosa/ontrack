@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.extension.workflows.WorkflowsExtensionFeature
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutor
+import net.nemerosa.ontrack.extension.workflows.templating.WorkflowInfoTemplatingRenderable
 import net.nemerosa.ontrack.extension.workflows.templating.WorkflowTemplatingRenderable
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
@@ -68,6 +69,7 @@ class WorkflowNotificationChannelNodeExecutor(
         // Enriches the context
         val context = mapOf(
             "workflow" to WorkflowTemplatingRenderable(workflowInstance),
+            "workflowInfo" to WorkflowInfoTemplatingRenderable(workflowInstance),
         )
         // Processing
         val output = notificationProcessingService.process(notification, context)

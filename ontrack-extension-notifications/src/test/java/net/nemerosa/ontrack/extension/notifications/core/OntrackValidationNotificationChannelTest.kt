@@ -36,6 +36,7 @@ class OntrackValidationNotificationChannelTest {
             eventTemplatingService = eventTemplatingService,
             structureService = structureService,
             securityService = MockSecurityService(),
+            runInfoService = mockk(),
         )
     }
 

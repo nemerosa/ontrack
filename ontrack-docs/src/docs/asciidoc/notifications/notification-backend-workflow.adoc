@@ -25,6 +25,8 @@ Configuration:
 
 **** **id** - String - required - ID of the parent node
 
+*** **timeout** - Long - required - Timeout in seconds (5 minutes by default)
+
 Output:
 
 * **workflowInstanceId** - String - required - ID of the workflow instance. Can be used to track the progress and outcome of the workflow.
