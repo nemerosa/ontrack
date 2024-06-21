@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.extension.workflows.notifications
 
-import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResultType
-import net.nemerosa.ontrack.extension.notifications.model.Notification
 import net.nemerosa.ontrack.extension.notifications.processing.NotificationProcessingService
 import net.nemerosa.ontrack.extension.notifications.queue.NotificationQueueItem
 import net.nemerosa.ontrack.extension.support.AbstractExtension
