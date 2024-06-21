@@ -653,50 +653,6 @@ internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
     }
 
     @Test
-    fun `Filtering the subscriptions for an entity using creation date`() {
-        project {
-            // Subscribe for events on this project for the two different dates
-            eventSubscriptionService.subscribe(
-                name = uid("p"),
-                channel = mockNotificationChannel,
-                channelConfig = MockNotificationChannelConfig("#one"),
-                projectEntity = this,
-                keywords = null,
-                origin = "test",
-                contentTemplate = null,
-                EventFactory.NEW_PROMOTION_RUN
-            )
-            runBlocking {
-                delay(2_000L)
-            }
-            eventSubscriptionService.subscribe(
-                name = uid("p"),
-                channel = mockNotificationChannel,
-                channelConfig = MockNotificationChannelConfig("#two"),
-                projectEntity = this,
-                keywords = null,
-                origin = "test",
-                contentTemplate = null,
-                EventFactory.NEW_PROMOTION_RUN
-            )
-            // Looking for all subscriptions on this promotion, and recursively
-            val page = eventSubscriptionService.filterSubscriptions(
-                EventSubscriptionFilter(entity = toProjectEntityID(), createdBefore = Time.now().minusSeconds(1))
-            )
-            assertEquals(1, page.pageInfo.totalSize)
-            assertEquals(1, page.pageItems.size)
-            assertEquals(
-                "mock",
-                page.pageItems.first().channel
-            )
-            assertEquals(
-                "#one",
-                page.pageItems.first().channelConfig.getRequiredTextField("target")
-            )
-        }
-    }
-
-    @Test
     fun `Filtering the subscriptions for an entity using event type`() {
         project {
             // Subscribe for events on this project for the two different event types

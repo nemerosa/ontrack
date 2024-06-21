@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.notifications.AbstractNotificationTestSupp
 import net.nemerosa.ontrack.extension.notifications.subscriptions.subscribe
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
+import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
@@ -23,6 +24,7 @@ class OntrackValidationNotificationChannelIT : AbstractNotificationTestSupport()
                     val pl = promotionLevel()
 
                     eventSubscriptionService.subscribe(
+                        name = uid("p"),
                         projectEntity = pl,
                         channel = ontrackValidationNotificationChannel,
                         channelConfig = OntrackValidationNotificationChannelConfig(
@@ -68,6 +70,7 @@ class OntrackValidationNotificationChannelIT : AbstractNotificationTestSupport()
                     val pl = promotionLevel()
 
                     eventSubscriptionService.subscribe(
+                        name = uid("p"),
                         projectEntity = pl,
                         channel = ontrackValidationNotificationChannel,
                         channelConfig = OntrackValidationNotificationChannelConfig(
@@ -110,6 +113,7 @@ class OntrackValidationNotificationChannelIT : AbstractNotificationTestSupport()
                     val pl = promotionLevel()
 
                     eventSubscriptionService.subscribe(
+                        name = uid("p"),
                         projectEntity = pl,
                         channel = ontrackValidationNotificationChannel,
                         channelConfig = OntrackValidationNotificationChannelConfig(
