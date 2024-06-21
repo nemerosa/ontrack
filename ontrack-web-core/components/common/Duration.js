@@ -1,10 +1,10 @@
 import {Popover, Typography} from "antd";
 import dayjs from "dayjs";
-import * as duration from 'dayjs/plugin/duration';
-import * as relativeTime from 'dayjs/plugin/relativeTime';
+import duration from 'dayjs/plugin/duration';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
-dayjs.extend(duration);
-dayjs.extend(relativeTime);
+dayjs.extend(duration)
+dayjs.extend(relativeTime)
 
 export const formatSeconds = (seconds, nanValue = "-") => {
     if (typeof seconds === 'number' && !isNaN(seconds)) {
