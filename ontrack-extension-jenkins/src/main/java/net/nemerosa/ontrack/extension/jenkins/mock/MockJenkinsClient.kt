@@ -24,11 +24,12 @@ class MockJenkinsClient(
         retriesDelaySeconds: Int
     ): JenkinsBuild {
         val build = jobs.getOrPut(job) { MockJenkinsJob(job) }.build(parameters)
+        val result = parameters[PARAM_RESULT] ?: "SUCCESS"
         return JenkinsBuild(
             id = build.number.toString(),
             building = false,
             url = "$url/$job/${build.number}",
-            result = "SUCCESS",
+            result = result,
         )
     }
 
@@ -39,5 +40,9 @@ class MockJenkinsClient(
             jobs.getOrPut(job) { MockJenkinsJob(job) }.build(parameters)
             return URI("$url/queue/$job")
         }
+    }
+
+    companion object {
+        private const val PARAM_RESULT = "result"
     }
 }

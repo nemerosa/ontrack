@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.workflows.notifications
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.extension.notifications.channels.NotificationResultType
 import net.nemerosa.ontrack.extension.notifications.model.Notification
 import net.nemerosa.ontrack.extension.notifications.processing.NotificationProcessingService
 import net.nemerosa.ontrack.extension.notifications.queue.NotificationQueueItem
@@ -8,6 +9,7 @@ import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.extension.workflows.WorkflowsExtensionFeature
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutor
+import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorResult
 import net.nemerosa.ontrack.extension.workflows.templating.WorkflowTemplatingRenderable
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
@@ -53,7 +55,10 @@ class WorkflowNotificationChannelNodeExecutor(
     override val id: String = ID
     override val displayName: String = "Notification"
 
-    override suspend fun execute(workflowInstance: WorkflowInstance, workflowNodeId: String): JsonNode {
+    override suspend fun execute(
+        workflowInstance: WorkflowInstance,
+        workflowNodeId: String
+    ): WorkflowNodeExecutorResult {
         // Gets the node's data
         val (channel, channelConfig, template) = workflowInstance.workflow.getNode(workflowNodeId).data.parse<WorkflowNotificationChannelNodeData>()
         // Gets the context
@@ -70,8 +75,19 @@ class WorkflowNotificationChannelNodeExecutor(
             "workflow" to WorkflowTemplatingRenderable(workflowInstance),
         )
         // Processing
-        val output = notificationProcessingService.process(notification, context)
-        // Returning the output
-        return output.asJson()
+        val result = notificationProcessingService.process(notification, context)
+        // Result of the execution
+        return if (result != null) {
+            when (result.type) {
+                NotificationResultType.OK -> WorkflowNodeExecutorResult.success(result.output?.asJson())
+                NotificationResultType.ONGOING -> WorkflowNodeExecutorResult.error("Notification is still ongoing")
+                NotificationResultType.NOT_CONFIGURED -> WorkflowNodeExecutorResult.error("Notification is not configured")
+                NotificationResultType.INVALID_CONFIGURATION -> WorkflowNodeExecutorResult.error("Notification configuration is invalid")
+                NotificationResultType.DISABLED -> WorkflowNodeExecutorResult.error("Notification is disabled")
+                NotificationResultType.ERROR -> WorkflowNodeExecutorResult.error(result.message ?: "Unknown error")
+            }
+        } else {
+            WorkflowNodeExecutorResult.error("Notification did not return any result")
+        }
     }
 }

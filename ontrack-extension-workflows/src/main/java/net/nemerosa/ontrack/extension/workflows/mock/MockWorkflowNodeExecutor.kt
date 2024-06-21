@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.extension.workflows.WorkflowsExtensionFeature
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutor
+import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorResult
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.annotations.APIDescription
@@ -41,7 +42,10 @@ class MockWorkflowNodeExecutor(
 
     fun getTextsByInstanceId(instanceId: String): List<String> = texts[instanceId] ?: emptyList()
 
-    override suspend fun execute(workflowInstance: WorkflowInstance, workflowNodeId: String): JsonNode {
+    override suspend fun execute(
+        workflowInstance: WorkflowInstance,
+        workflowNodeId: String
+    ): WorkflowNodeExecutorResult {
         // Gets the node & its data
         val nodeRawData = workflowInstance.workflow.getNode(workflowNodeId).data
         val nodeData = if (nodeRawData.isTextual) {
@@ -94,8 +98,10 @@ class MockWorkflowNodeExecutor(
         val old = texts[workflowInstance.id]
         texts[workflowInstance.id] = if (old != null) old + text else listOf(text)
         // OK
-        return MockNodeOutput(
-            text = text
-        ).asJson()
+        return WorkflowNodeExecutorResult.success(
+            MockNodeOutput(
+                text = text
+            ).asJson()
+        )
     }
 }

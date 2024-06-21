@@ -70,6 +70,8 @@ services:
       # ... auto versioning
       ONTRACK_EXTENSION_AUTOVERSIONING_QUEUE_PROJECTS: "test-av-routing"
       ONTRACK_EXTENSION_AUTOVERSIONING_QUEUE_SCALE: 10
+      # ... workflows
+      ONTRACK_EXTENSION_QUEUE_SPECIFIC_WORKFLOWS_SCALE: 10
       # ... TFC hook signature check disabled
       ONTRACK_EXTENSION_TFC_HOOK_SIGNATURE_DISABLED: "true"
       # ... JIRA mock server

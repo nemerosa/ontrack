@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.notifications.processing
 
+import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.notifications.model.Notification
 
 interface NotificationProcessingService {
@@ -9,6 +10,6 @@ interface NotificationProcessingService {
      * @param context Extra context to pass for the templating
      * @return Notification output
      */
-    fun process(item: Notification, context: Map<String, Any>,): Any?
+    fun process(item: Notification, context: Map<String, Any>): NotificationResult<*>?
 
 }

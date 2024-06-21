@@ -29,7 +29,7 @@ class DefaultNotificationProcessingService(
     private val transactionHelper: TransactionHelper,
 ) : NotificationProcessingService {
 
-    override fun process(item: Notification, context: Map<String, Any>): Any? {
+    override fun process(item: Notification, context: Map<String, Any>): NotificationResult<*>? {
         meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_started, item)
         val channel = notificationChannelRegistry.findChannel(item.channel)
         if (channel != null) {
@@ -41,7 +41,11 @@ class DefaultNotificationProcessingService(
         }
     }
 
-    private fun <C, R> process(channel: NotificationChannel<C, R>, item: Notification, context: Map<String, Any>): R? {
+    private fun <C, R> process(
+        channel: NotificationChannel<C, R>,
+        item: Notification,
+        context: Map<String, Any>
+    ): NotificationResult<R>? {
 
         // Unique ID for the record
         val recordId = UUID.randomUUID().toString()
@@ -82,7 +86,7 @@ class DefaultNotificationProcessingService(
                     event = item.event,
                     result = result,
                 )
-                result.output
+                result
             } catch (any: Exception) {
                 meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_error, item)
                 recordError(
@@ -93,7 +97,7 @@ class DefaultNotificationProcessingService(
                     error = any,
                     output = output, // Using the current output, even for errors
                 )
-                output
+                NotificationResult.error(any.message ?: any::class.java.name, output)
             }
         } else {
             meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_invalid, item)
