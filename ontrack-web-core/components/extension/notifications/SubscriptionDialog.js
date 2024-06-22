@@ -36,6 +36,7 @@ export const useSubscriptionDialog = ({onSuccess, projectEntity}) => {
         },
         query: gql`
             mutation CreateSubscription(
+                $name: String!,
                 $projectEntity: ProjectEntityIDInput,
                 $events: [String!]!,
                 $keywords: String,
@@ -44,6 +45,7 @@ export const useSubscriptionDialog = ({onSuccess, projectEntity}) => {
                 $contentTemplate: String,
             ) {
                 subscribeToEvents(input: {
+                    name: $name,
                     projectEntity: $projectEntity,
                     events: $events,
                     keywords: $keywords,
@@ -70,6 +72,15 @@ export default function SubscriptionDialog({subscriptionDialog}) {
     return (
         <>
             <FormDialog dialog={subscriptionDialog}>
+                {/*  Name  */}
+                <Form.Item
+                    name="name"
+                    label="Name"
+                    extra="Unique name for this subscription"
+                    rules={[{required: true, message: 'Subscription name is required'}]}
+                >
+                    <Input/>
+                </Form.Item>
                 {/*  Event  */}
                 <Form.Item
                     name="events"
