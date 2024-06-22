@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.NotificationRecordsOutputsQuery
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.SubscribeToEntityEventsMutation
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.SubscriptionsByEntityQuery
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 import net.nemerosa.ontrack.kdsl.spec.ProjectEntity
 
@@ -54,6 +55,26 @@ class NotificationsMgt(connector: Connector) : Connected(connector) {
             TODO("Global subscriptions not supported yet")
         }
     }
+
+    fun subscriptions(projectEntity: ProjectEntity, offset: Int = 0, size: Int = 10): List<Subscription> =
+        graphqlConnector.query(
+            SubscriptionsByEntityQuery(
+                projectEntity.type,
+                projectEntity.id.toInt(),
+                offset,
+                size
+            )
+        )?.eventSubscriptions()?.pageItems()?.map {
+            Subscription(
+                name = it.name(),
+                channel = it.channel(),
+                channelConfig = it.channelConfig(),
+                events = it.events(),
+                keywords = it.keywords(),
+                disabled = it.disabled() ?: false,
+                contentTemplate = it.contentTemplate(),
+            )
+        } ?: emptyList()
 
     /**
      * Access to the in-memory notification channel.

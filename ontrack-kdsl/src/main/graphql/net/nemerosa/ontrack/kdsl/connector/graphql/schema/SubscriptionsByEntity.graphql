@@ -1,0 +1,27 @@
+query SubscriptionsByEntity(
+    $entityType: ProjectEntityType!,
+    $entityId: Int!,
+    $offset: Int! = 0,
+    $size: Int! = 10,
+) {
+    eventSubscriptions(
+        offset: $offset,
+        size: $size,
+        filter: {
+            entity: {
+                type: $entityType,
+                id: $entityId,
+            }
+        }
+    ) {
+        pageItems {
+            name
+            channel
+            channelConfig
+            contentTemplate
+            disabled
+            events
+            keywords
+        }
+    }
+}

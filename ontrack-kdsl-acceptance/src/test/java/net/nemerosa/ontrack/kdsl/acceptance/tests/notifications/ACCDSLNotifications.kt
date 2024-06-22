@@ -4,9 +4,59 @@ import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
 import net.nemerosa.ontrack.kdsl.spec.extension.notifications.notifications
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class ACCDSLNotifications : AbstractACCDSLNotificationsTestSupport() {
+
+    @Test
+    fun `Notifications are synchronized on name`() {
+        project {
+            branch {
+                val pl = promotion()
+                // Subscription using a given group
+                pl.subscribe(
+                    name = "My subscription",
+                    channel = "in-memory",
+                    channelConfig = mapOf("group" to "group-1"),
+                    keywords = null,
+                    events = listOf(
+                        "new_promotion_run",
+                    ),
+                )
+                // Checking the subscriptions for this promotion
+                val oldList = pl.subscriptions()
+                assertEquals(
+                    listOf("My subscription"),
+                    oldList.map { it.name },
+                )
+                assertEquals(
+                    listOf("group-1"),
+                    oldList.map { it.channelConfig.path("group").asText() }
+                )
+                // Changing the configuration, not the name
+                pl.subscribe(
+                    name = "My subscription",
+                    channel = "in-memory",
+                    channelConfig = mapOf("group" to "group-2"),
+                    keywords = null,
+                    events = listOf(
+                        "new_promotion_run",
+                    ),
+                )
+                // Checking the subscriptions for this promotion
+                val newList = pl.subscriptions()
+                assertEquals(
+                    listOf("My subscription"),
+                    newList.map { it.name },
+                )
+                assertEquals(
+                    listOf("group-2"),
+                    newList.map { it.channelConfig.path("group").asText() }
+                )
+            }
+        }
+    }
 
     @Test
     fun `Notifications for new promotions at promotion level`() {
