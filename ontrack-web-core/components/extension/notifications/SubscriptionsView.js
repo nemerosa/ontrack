@@ -1,17 +1,15 @@
 import Head from "next/head";
 import {useEffect, useMemo, useState} from "react";
 import MainPage from "@components/layouts/MainPage";
-import {Card, List, Skeleton, Space, Tag, Typography} from "antd";
+import {List, Skeleton, Typography} from "antd";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
-import {FaPlus, FaRegPaperPlane} from "react-icons/fa";
-import SubscriptionContentTemplate from "@components/extension/notifications/SubscriptionContentTemplate";
+import {FaPlus} from "react-icons/fa";
 import {pageTitle} from "@components/common/Titles";
 import {CloseCommand, Command} from "@components/common/Commands";
 import InlineConfirmCommand from "@components/common/InlineConfirmCommand";
 import SubscriptionDialog, {useSubscriptionDialog} from "@components/extension/notifications/SubscriptionDialog";
-import EventList from "@components/core/model/EventList";
-import NotificationChannelConfig from "@components/extension/notifications/NotificationChannelConfig";
+import SubscriptionCard from "@components/extension/notifications/SubscriptionCard";
 
 export default function SubscriptionsView({
                                               title,
@@ -177,31 +175,11 @@ export default function SubscriptionsView({
                         itemLayout="horizontal"
                         renderItem={(item) => (
                             <List.Item>
-                                <Card
-                                    title={item.name}
-                                    extra={getActions(item)}
-                                >
-                                    <Card.Grid style={{width: '100%'}} hoverable={false}>
-                                        <EventList events={item.events}/>
-                                    </Card.Grid>
-                                    {
-                                        item.keywords &&
-                                        <Card.Grid style={{width: '100%'}} hoverable={false}>
-                                            Keywords: <Tag>{item.keywords}</Tag>
-                                        </Card.Grid>
-                                    }
-                                    <Card.Grid style={{width: '100%'}} hoverable={false}>
-                                        <Tag color="blue">{item.channel}</Tag>
-                                        <NotificationChannelConfig channel={item.channel} config={item.channelConfig}/>
-                                    </Card.Grid>
-                                    {
-                                        item.contentTemplate &&
-                                        <Card.Grid style={{width: '100%'}} hoverable={false}>
-                                            <p>Custom template:</p>
-                                            <SubscriptionContentTemplate template={item.contentTemplate}/>
-                                        </Card.Grid>
-                                    }
-                                </Card>
+                                <SubscriptionCard
+                                    subscription={item}
+                                    entity={additionalFilter.entity}
+                                    actions={getActions(item)}
+                                />
                             </List.Item>
                         )}
                     >

@@ -5,14 +5,101 @@ import net.nemerosa.ontrack.extension.notifications.mock.MockNotificationChannel
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getRequiredBooleanField
 import net.nemerosa.ontrack.json.getRequiredJsonField
+import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSupport() {
+
+    @Test
+    fun `Filtering entity subscriptions using its name`() {
+        asAdmin {
+            project {
+                branch {
+                    val pl = promotionLevel()
+                    val name = uid("sub-")
+                    eventSubscriptionService.subscribe(
+                        name = name,
+                        channel = mockNotificationChannel,
+                        channelConfig = MockNotificationChannelConfig("#one"),
+                        projectEntity = pl,
+                        keywords = null,
+                        origin = "test",
+                        contentTemplate = null,
+                        EventFactory.NEW_PROMOTION_RUN
+                    )
+
+                    // Query
+                    run(
+                        """
+                            query {
+                                eventSubscriptions(filter: {
+                                    entity: {
+                                        type: PROMOTION_LEVEL,
+                                        id: $id
+                                    },
+                                    name: "$name"
+                                }) {
+                                    pageItems {
+                                        name
+                                    }
+                                }
+                            }
+                        """
+                    ) { data ->
+                        val sub = data.path("eventSubscriptions")
+                            .path("pageItems").firstOrNull()
+                        assertNotNull(sub, "Subscription found") {
+                            assertEquals(name, it.getRequiredTextField("name"))
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Filtering global subscriptions using its name`() {
+        asAdmin {
+            val name = uid("sub-")
+            eventSubscriptionService.subscribe(
+                name = name,
+                channel = mockNotificationChannel,
+                channelConfig = MockNotificationChannelConfig("#one"),
+                projectEntity = null,
+                keywords = null,
+                origin = "test",
+                contentTemplate = null,
+                EventFactory.NEW_PROMOTION_RUN
+            )
+
+            // Query
+            run(
+                """
+                    query {
+                        eventSubscriptions(filter: {
+                            name: "$name"
+                        }) {
+                            pageItems {
+                                name
+                            }
+                        }
+                    }
+                """
+            ) { data ->
+                val sub = data.path("eventSubscriptions")
+                    .path("pageItems").firstOrNull()
+                assertNotNull(sub, "Subscription found") {
+                    assertEquals(name, it.getRequiredTextField("name"))
+                }
+            }
+        }
+    }
 
     @Test
     fun `Filtering the project subscriptions and getting the access rights`() {

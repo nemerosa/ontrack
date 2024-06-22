@@ -16,6 +16,8 @@ data class EventSubscriptionFilter(
     @APIDescription("Number of items to return")
     @IgnoreRef
     val size: Int = 20,
+    @APIDescription("Name of the subscription")
+    val name: String? = null,
     @APIDescription("Entity subscribed to.")
     @TypeRef(suffix = "Input")
     val entity: ProjectEntityID? = null,
@@ -39,6 +41,7 @@ data class EventSubscriptionFilter(
     fun withPage(offset: Int, size: Int) = EventSubscriptionFilter(
         offset = offset,
         size = size,
+        name = name,
         entity = entity,
         recursive = recursive,
         channel = channel,

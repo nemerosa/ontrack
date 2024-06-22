@@ -53,6 +53,11 @@ class EntitySubscriptionStore(
         val jsonFilters = mutableListOf<String>()
         val jsonCriteria = mutableMapOf<String, String>()
         // Filter: channel
+        if (!filter.name.isNullOrBlank()) {
+            jsonFilters += """data::jsonb->>'name' = :name"""
+            jsonCriteria["name"] = filter.name
+        }
+        // Filter: channel
         if (!filter.channel.isNullOrBlank()) {
             jsonFilters += """data::jsonb->>'channel' = :channel"""
             jsonCriteria["channel"] = filter.channel

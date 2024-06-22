@@ -8624,6 +8624,8 @@ input EventSubscriptionFilter {
     entity: ProjectEntityIDInput
     "Event type"
     eventType: String
+    "Name of the subscription"
+    name: String
     "Origin"
     origin: String
     "Scope of the search (if true, includes the entity and the levels above."
