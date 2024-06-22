@@ -32,7 +32,7 @@ internal class GQLRootQueryNotificationRecordsIT : AbstractNotificationTestSuppo
             notificationRecordingService.record(
                 NotificationRecord(
                     id = UUID.randomUUID().toString(),
-                    source = null,
+                    source = mockSource(),
                     timestamp = Time.now(),
                     channel = "mock",
                     channelConfig = MockNotificationChannelConfig("#target").asJson(),
@@ -43,10 +43,15 @@ internal class GQLRootQueryNotificationRecordsIT : AbstractNotificationTestSuppo
                 )
             )
             // Getting this notification
-            run("""{
+            run(
+                """{
                 notificationRecords {
                     pageItems {
                         timestamp
+                        source {
+                            id
+                            data
+                        }
                         channel
                         channelConfig
                         event
@@ -56,13 +61,16 @@ internal class GQLRootQueryNotificationRecordsIT : AbstractNotificationTestSuppo
                         }
                     }
                 }
-            }""") { data ->
+            }"""
+            ) { data ->
                 assertJsonNotNull(data.path("notificationRecords").path("pageItems").path(0)) {
                     assertEquals("mock", getRequiredTextField("channel"))
                     assertEquals("#target", path("channelConfig").getRequiredTextField("target"))
                     assertEquals(project.id(), path("event").path("entities").path("PROJECT").getRequiredIntField("id"))
                     assertEquals("OK", path("result").getRequiredTextField("type"))
                     assertJsonNull(path("result").path("message"))
+                    assertEquals("mock", path("source").path("id").asText())
+                    assertEquals("test", path("source").path("data").path("text").asText())
                 }
             }
         }
@@ -98,11 +106,13 @@ internal class GQLRootQueryNotificationRecordsIT : AbstractNotificationTestSuppo
                     channel = "mock",
                     channelConfig = MockNotificationChannelConfig("not-valid").asJson(),
                     event = event.asJson(),
-                    result = NotificationResult.invalidConfiguration<MockNotificationChannelOutput>().toNotificationRecordResult()
+                    result = NotificationResult.invalidConfiguration<MockNotificationChannelOutput>()
+                        .toNotificationRecordResult()
                 )
             )
             // Getting this notification
-            run("""{
+            run(
+                """{
                 notificationRecords(
                     resultType: INVALID_CONFIGURATION
                 ) {
@@ -117,7 +127,8 @@ internal class GQLRootQueryNotificationRecordsIT : AbstractNotificationTestSuppo
                         }
                     }
                 }
-            }""") { data ->
+            }"""
+            ) { data ->
                 assertJsonNotNull(data.path("notificationRecords").path("pageItems").path(0)) {
                     assertEquals("mock", getRequiredTextField("channel"))
                     assertEquals("not-valid", path("channelConfig").getRequiredTextField("target"))
