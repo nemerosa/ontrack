@@ -4,11 +4,7 @@ import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannelRegistry
 import net.nemerosa.ontrack.model.annotations.getPropertyDescription
 import net.nemerosa.ontrack.model.events.EventFactory
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Memo
-import net.nemerosa.ontrack.model.form.MultiSelection
-import net.nemerosa.ontrack.model.form.ServiceConfigurator
-import net.nemerosa.ontrack.model.form.Text
+import net.nemerosa.ontrack.model.form.*
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.SelectableItem
 import org.springframework.web.bind.annotation.GetMapping
@@ -60,6 +56,8 @@ class EventSubscriptionController(
         }
 
     private fun form(subscription: EventSubscription?): Form = Form.create()
+        // name
+        .textField(EventSubscription::name, subscription?.name)
         // events
         .with(
             MultiSelection.of(EventSubscription::events.name)

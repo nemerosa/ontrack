@@ -135,6 +135,7 @@ angular.module('ontrack.extension.notifications', [
             mutation(
                 $type: ProjectEntityType!,
                 $id: Int!,
+                $name: String!,
                 $channel: String!,
                 $channelConfig: JSON!,
                 $events: [String!]!,
@@ -142,6 +143,7 @@ angular.module('ontrack.extension.notifications', [
                 $contentTemplate: String,
             ) {
               subscribeToEvents(input: {
+                name: $name,
                 projectEntity: {
                     type: $type,
                     id: $id
@@ -157,6 +159,7 @@ angular.module('ontrack.extension.notifications', [
                 }
                 subscription {
                   id
+                  name
                   channel
                   channelConfig
                   channelConfigText
@@ -202,6 +205,7 @@ angular.module('ontrack.extension.notifications', [
             const newSubscriptionQueryVariables = {
                 type: type,
                 id: id,
+                name: form.name,
                 channel: form.channel.id,
                 channelConfig: form.channel.data,
                 events: form.events,
@@ -345,6 +349,7 @@ angular.module('ontrack.extension.notifications', [
 
         const newSubscriptionQuery = `
             mutation(
+                $name: String!,
                 $channel: String!,
                 $channelConfig: JSON!,
                 $events: [String!]!,
@@ -352,6 +357,7 @@ angular.module('ontrack.extension.notifications', [
                 $contentTemplate: String,
             ) {
               subscribeToEvents(input: {
+                name: $name,
                 channel: $channel,
                 channelConfig: $channelConfig,
                 events: $events,
@@ -363,6 +369,7 @@ angular.module('ontrack.extension.notifications', [
                 }
                 subscription {
                   id
+                  name
                   channel
                   channelConfig
                   channelConfigText
@@ -400,6 +407,7 @@ angular.module('ontrack.extension.notifications', [
 
         const newSubscription = (form) => {
             const newSubscriptionQueryVariables = {
+                name: form.name,
                 channel: form.channel.id,
                 channelConfig: form.channel.data,
                 events: form.events,
