@@ -1745,10 +1745,12 @@ type EventSubscriptionPayload {
     disabled: Boolean
     "List of events types to subscribe to"
     events: [String!]!
-    "Unique ID for this subscription"
-    id: String!
+    "Name of the subscription"
+    id: String @deprecated(reason: "Will be removed in V5. Use `name` instead.")
     "Optional space-separated list of tokens to look for in the events"
     keywords: String
+    "Unique name for this subscription"
+    name: String!
 }
 
 type EventSubscriptionPayloadPaginated {
@@ -4281,6 +4283,8 @@ type NotificationRecord {
     id: String!
     "Result of the notification"
     result: NotificationRecordResult!
+    "Source of the notification"
+    source: NotificationSourceData
     "Record timestamp"
     timestamp: LocalDateTime
 }
@@ -4306,6 +4310,14 @@ type NotificationRecordResult {
 type NotificationSettings {
     "Are the notifications enabled for this Ontrack instance?"
     enabled: Boolean!
+}
+
+"Data linking to the source of a notification"
+type NotificationSourceData {
+    "Data allowing the identification of the notification source"
+    data: JSON!
+    "ID of the notification source"
+    id: String!
 }
 
 "Information about a commit"
@@ -8570,7 +8582,9 @@ input DisableProjectInput {
 "Input type for the disableSubscription mutation."
 input DisableSubscriptionInput {
     "ID of the subscription to disable"
-    id: String!
+    id: String
+    "Name of the subscription to disable"
+    name: String
     "Target project entity (null for global events)"
     projectEntity: ProjectEntityIDInput
 }
@@ -8590,7 +8604,9 @@ input EnableProjectInput {
 "Input type for the enableSubscription mutation."
 input EnableSubscriptionInput {
     "ID of the subscription to enable"
-    id: String!
+    id: String
+    "Name of the subscription to enable"
+    name: String
     "Target project entity (null for global events)"
     projectEntity: ProjectEntityIDInput
 }
@@ -10219,6 +10235,8 @@ input SubscribeBranchToEventsInput {
     events: [String!]!
     "Optional space-separated list of tokens to look for in the events"
     keywords: String
+    "Unique name of the channel in its scope (null for backward compatibility, will be required in V5)"
+    name: String
     "Project name"
     project: String!
 }
@@ -10239,6 +10257,8 @@ input SubscribeBuildToEventsInput {
     events: [String!]!
     "Optional space-separated list of tokens to look for in the events"
     keywords: String
+    "Unique name of the channel in its scope (null for backward compatibility, will be required in V5)"
+    name: String
     "Project name"
     project: String!
 }
@@ -10255,6 +10275,8 @@ input SubscribeProjectToEventsInput {
     events: [String!]!
     "Optional space-separated list of tokens to look for in the events"
     keywords: String
+    "Unique name of the channel in its scope (null for backward compatibility, will be required in V5)"
+    name: String
     "Project name"
     project: String!
 }
@@ -10273,6 +10295,8 @@ input SubscribePromotionLevelToEventsInput {
     events: [String!]!
     "Optional space-separated list of tokens to look for in the events"
     keywords: String
+    "Unique name of the channel in its scope (null for backward compatibility, will be required in V5)"
+    name: String
     "Project name"
     project: String!
     "Promotion name"
@@ -10295,6 +10319,8 @@ input SubscribePromotionRunToEventsInput {
     events: [String!]!
     "Optional space-separated list of tokens to look for in the events"
     keywords: String
+    "Unique name of the channel in its scope (null for backward compatibility, will be required in V5)"
+    name: String
     "Project name"
     project: String!
     "Promotion name"
@@ -10313,6 +10339,8 @@ input SubscribeToEventsInput {
     events: [String!]!
     "Optional space-separated list of tokens to look for in the events"
     keywords: String
+    "Unique name of the channel in its scope (null for backward compatibility, will be required in V5)"
+    name: String
     "Target project entity (null for global events)"
     projectEntity: ProjectEntityIDInput
 }
@@ -10333,6 +10361,8 @@ input SubscribeValidationRunToEventsInput {
     events: [String!]!
     "Optional space-separated list of tokens to look for in the events"
     keywords: String
+    "Unique name of the channel in its scope (null for backward compatibility, will be required in V5)"
+    name: String
     "Project name"
     project: String!
     "Run name"
@@ -10355,6 +10385,8 @@ input SubscribeValidationStampToEventsInput {
     events: [String!]!
     "Optional space-separated list of tokens to look for in the events"
     keywords: String
+    "Unique name of the channel in its scope (null for backward compatibility, will be required in V5)"
+    name: String
     "Project name"
     project: String!
     "Validation name"

@@ -59,7 +59,7 @@ export default function SubscriptionsView({
                                 }
                             }
                             pageItems {
-                                id
+                                name
                                 channel
                                 channelConfig
                                 disabled
@@ -102,7 +102,7 @@ export default function SubscriptionsView({
                     }
                 `,
                 {
-                    id: item.id,
+                    id: item.name,
                     projectEntity: additionalFilter.entity,
                 }
             ).then(reload)
@@ -178,9 +178,12 @@ export default function SubscriptionsView({
                         renderItem={(item) => (
                             <List.Item>
                                 <Card
-                                    title={<EventList events={item.events}/>}
+                                    title={item.name}
                                     extra={getActions(item)}
                                 >
+                                    <Card.Grid style={{width: '100%'}} hoverable={false}>
+                                        <EventList events={item.events}/>
+                                    </Card.Grid>
                                     {
                                         item.keywords &&
                                         <Card.Grid style={{width: '100%'}} hoverable={false}>
