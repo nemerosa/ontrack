@@ -59,6 +59,7 @@ angular.module('ontrack.extension.notifications', [
                 writeSubscriptionGranted
                 pageItems {
                     id
+                    name
                     channel
                     channelConfig
                     channelConfigText
@@ -288,6 +289,7 @@ angular.module('ontrack.extension.notifications', [
                 writeSubscriptionGranted
                 pageItems {
                     id
+                    name
                     channel
                     channelConfig
                     channelConfigText
@@ -502,8 +504,8 @@ angular.module('ontrack.extension.notifications', [
                         event
                         result {
                             type
-                            id
                             message
+                            output
                         }
                     }
                 }

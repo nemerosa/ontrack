@@ -14,6 +14,7 @@
     <table class="table table-bordered">
         <thead>
         <tr>
+            <th>Name</th>
             <th>Events</th>
             <th>Keywords</th>
             <th>Channel</th>
@@ -28,6 +29,9 @@
             </td>
         </tr>
         <tr ng-repeat="subscription in subscriptions">
+            <td>
+                {{subscription.name}}
+            </td>
             <td>
                 <span class="ot-label-suite">
                     <span class="label label-info" ng-repeat="event in subscription.events">{{ event }}</span>

@@ -17,7 +17,6 @@
             <th>Timestamp</th>
             <th>Channel</th>
             <th>Result</th>
-            <th>Channel ID</th>
         </tr>
         </thead>
         <tbody>
@@ -29,7 +28,6 @@
             </td>
             <td><code>{{ record.channel }}</code></td>
             <td><code>{{ record.result.type }}</code></td>
-            <td><code ng-if="record.result.id">{{ record.result.id }}</code></td>
         </tr>
         <tr ng-repeat-end ng-if="record.details">
             <td colspan="4">
@@ -45,6 +43,10 @@
                     <dt ng-if="record.result.message">Message</dt>
                     <dd ng-if="record.result.message">
                         <code>{{ record.result.message }}</code>
+                    </dd>
+                    <dt ng-if="record.result.output">Output</dt>
+                    <dd ng-if="record.result.output">
+                        <code>{{ record.result.output }}</code>
                     </dd>
                 </dl>
             </td>
