@@ -22,6 +22,7 @@ class ACCAutoVersioningNotifications : AbstractACCAutoVersioningTestSupport() {
                 // Subscribing at source level
                 val dependencyGroup = uid("dep-g-")
                 ontrack.notifications.subscribe(
+                    name = "Test",
                     channel = "in-memory",
                     channelConfig = mapOf("group" to dependencyGroup),
                     keywords = null,
@@ -34,6 +35,7 @@ class ACCAutoVersioningNotifications : AbstractACCAutoVersioningTestSupport() {
                     // Subscribing at target level
                     val projectGroup = uid("tar-g-")
                     ontrack.notifications.subscribe(
+                        name = "Test",
                         channel = "in-memory",
                         channelConfig = mapOf("group" to projectGroup),
                         keywords = null,
@@ -106,6 +108,7 @@ class ACCAutoVersioningNotifications : AbstractACCAutoVersioningTestSupport() {
                 // Subscribing at source level
                 val dependencyGroup = uid("dep-g-")
                 ontrack.notifications.subscribe(
+                    name = "Test",
                     channel = "in-memory",
                     channelConfig = mapOf("group" to dependencyGroup),
                     keywords = null,
@@ -122,6 +125,7 @@ class ACCAutoVersioningNotifications : AbstractACCAutoVersioningTestSupport() {
                     // Subscribing at target level
                     val projectGroup = uid("tar-g-")
                     ontrack.notifications.subscribe(
+                        name = "Test",
                         channel = "in-memory",
                         channelConfig = mapOf("group" to projectGroup),
                         keywords = null,

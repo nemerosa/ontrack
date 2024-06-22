@@ -20,6 +20,7 @@ class ACCChangeLogNotifications : AbstractACCDSLNotificationsTestSupport() {
                     val pl = promotion()
                     // Subscribe to this promotion
                     pl.subscribe(
+                        name = "Test",
                         channel = "in-memory",
                         channelConfig = mapOf("group" to group),
                         keywords = null,

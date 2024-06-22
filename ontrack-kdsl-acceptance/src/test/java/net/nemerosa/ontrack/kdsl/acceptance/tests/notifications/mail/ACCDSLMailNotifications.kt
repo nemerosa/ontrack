@@ -17,6 +17,7 @@ class ACCDSLMailNotifications : AbstractACCDSLNotificationsTestSupport() {
                 val pl = promotion()
                 // Subscribe to this promotion
                 pl.subscribe(
+                    name = "Test",
                     channel = "mail",
                     channelConfig = mapOf(
                         "to" to "info@nemerosa.com",

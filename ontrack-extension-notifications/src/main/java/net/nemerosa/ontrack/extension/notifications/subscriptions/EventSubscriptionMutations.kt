@@ -88,7 +88,13 @@ class EventSubscriptionMutations(
                 }
                 createEventSubscriptionPayload(
                     projectEntity = projectEntity,
-                    name = input.name,
+                    name = input.name ?: EventSubscription.computeName(
+                        events = input.events,
+                        keywords = input.keywords,
+                        channel = input.channel,
+                        channelConfig = input.channelConfig,
+                        contentTemplate = input.contentTemplate,
+                    ),
                     channel = input.channel,
                     channelConfig = input.channelConfig,
                     events = input.events,
@@ -247,8 +253,8 @@ data class SubscribeToEventsInput(
     @APIDescription("Target project entity (null for global events)")
     @TypeRef(embedded = true, suffix = "Input")
     val projectEntity: ProjectEntityID?,
-    @APIDescription("Unique name of the channel in its scope")
-    val name: String,
+    @APIDescription("Unique name of the channel in its scope (null for backward compatibility, will be required in V5)")
+    val name: String?,
     @APIDescription("Channel to send this event to")
     val channel: String,
     @APIDescription("Channel configuration")

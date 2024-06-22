@@ -90,6 +90,7 @@ class ACCDSLWebhooks : AbstractACCDSLNotificationsTestSupport() {
                 // Subscribe for events on this project,
                 // sending the events to the webhook
                 subscribe(
+                    name = "Test",
                     channel = "webhook",
                     channelConfig = mapOf(
                         "name" to webhookName

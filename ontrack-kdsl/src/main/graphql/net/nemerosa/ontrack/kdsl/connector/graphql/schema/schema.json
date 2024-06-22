@@ -15032,13 +15032,19 @@
               "name": "id",
               "description": "ID of the subscription to disable",
               "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name",
+              "description": "Name of the subscription to disable",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
               },
               "defaultValue": null
             },
@@ -15252,13 +15258,19 @@
               "name": "id",
               "description": "ID of the subscription to enable",
               "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name",
+              "description": "Name of the subscription to enable",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
               },
               "defaultValue": null
             },
@@ -15501,8 +15513,8 @@
           "description": "EventSubscriptionPayload",
           "fields": [
             {
-              "name": "id",
-              "description": "Unique ID for this subscription",
+              "name": "name",
+              "description": "Unique name for this subscription",
               "args": [],
               "type": {
                 "kind": "NON_NULL",
@@ -30703,6 +30715,18 @@
               "deprecationReason": null
             },
             {
+              "name": "source",
+              "description": "Source of the notification",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "NotificationSourceData",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "timestamp",
               "description": "Record timestamp",
               "args": [],
@@ -30943,6 +30967,49 @@
                 "ofType": {
                   "kind": "SCALAR",
                   "name": "Boolean",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "NotificationSourceData",
+          "description": "Data linking to the source of a notification",
+          "fields": [
+            {
+              "name": "data",
+              "description": "Data allowing the identification of the notification source",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "JSON",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "id",
+              "description": "ID of the notification source",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
                   "ofType": null
                 }
               },
@@ -52827,6 +52894,16 @@
               "defaultValue": null
             },
             {
+              "name": "name",
+              "description": "Unique name of the channel in its scope (null for backward compatibility, will be required in V5)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
               "name": "channel",
               "description": "Channel to send this event to",
               "type": {
@@ -52994,6 +53071,16 @@
               "defaultValue": null
             },
             {
+              "name": "name",
+              "description": "Unique name of the channel in its scope (null for backward compatibility, will be required in V5)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
               "name": "channel",
               "description": "Channel to send this event to",
               "type": {
@@ -53129,6 +53216,16 @@
                   "name": "String",
                   "ofType": null
                 }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name",
+              "description": "Unique name of the channel in its scope (null for backward compatibility, will be required in V5)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
               },
               "defaultValue": null
             },
@@ -53296,6 +53393,16 @@
                   "name": "String",
                   "ofType": null
                 }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name",
+              "description": "Unique name of the channel in its scope (null for backward compatibility, will be required in V5)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
               },
               "defaultValue": null
             },
@@ -53477,6 +53584,16 @@
                   "name": "String",
                   "ofType": null
                 }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name",
+              "description": "Unique name of the channel in its scope (null for backward compatibility, will be required in V5)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
               },
               "defaultValue": null
             },
@@ -53675,6 +53792,16 @@
               "defaultValue": null
             },
             {
+              "name": "name",
+              "description": "Unique name of the channel in its scope (null for backward compatibility, will be required in V5)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
               "name": "projectEntity",
               "description": "Target project entity (null for global events)",
               "type": {
@@ -53807,6 +53934,16 @@
                   "name": "String",
                   "ofType": null
                 }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name",
+              "description": "Unique name of the channel in its scope (null for backward compatibility, will be required in V5)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
               },
               "defaultValue": null
             },
@@ -53974,6 +54111,16 @@
                   "name": "String",
                   "ofType": null
                 }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name",
+              "description": "Unique name of the channel in its scope (null for backward compatibility, will be required in V5)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
               },
               "defaultValue": null
             },
@@ -60372,6 +60519,18 @@
                   "name": "String",
                   "ofType": null
                 }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "timeout",
+              "description": "Timeout in seconds (5 minutes by default)",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null

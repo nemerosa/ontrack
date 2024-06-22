@@ -36,6 +36,7 @@ class ACCDSLWorkflowOntrackValidation : AbstractACCDSLWorkflowsTestSupport() {
 
                 val pl = promotion()
                 pl.subscribe(
+                    name = "Test",
                     channel = "workflow",
                     channelConfig = mapOf(
                         "workflow" to WorkflowTestSupport.yamlWorkflowToJson(workflow)

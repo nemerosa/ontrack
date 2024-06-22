@@ -30,6 +30,7 @@ class ACCJenkinsNotifications : AbstractACCDSLNotificationsTestSupport() {
             branch {
                 val pl = promotion()
                 pl.subscribe(
+                    name = "Test",
                     channel = "mock-jenkins",
                     channelConfig = mapOf(
                         "config" to jenkinsConfName,
@@ -75,6 +76,7 @@ class ACCJenkinsNotifications : AbstractACCDSLNotificationsTestSupport() {
             branch {
                 val pl = promotion()
                 pl.subscribe(
+                    name = "Test",
                     channel = "mock-jenkins",
                     channelConfig = mapOf(
                         "config" to jenkinsConfName,

@@ -1,4 +1,5 @@
 mutation SubscribeToEntityEvents(
+    $name: String,
     $entityType: ProjectEntityType!,
     $entityId: Int!,
     $channel: String!,
@@ -8,6 +9,7 @@ mutation SubscribeToEntityEvents(
     $contentTemplate: String,
 ) {
     subscribeToEvents(input: {
+        name: $name,
         projectEntity: {
             type: $entityType,
             id: $entityId

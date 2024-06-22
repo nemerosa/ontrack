@@ -18,6 +18,7 @@ class NotificationsMgt(connector: Connector) : Connected(connector) {
     /**
      * Subscribes for notifications.
      *
+     * @param name Subscription name (can be null for backward compatibility, but will be required in V5)
      * @param channel Channel to send the notifications to
      * @param channelConfig Configuration of the channel
      * @param keywords Space-separated list of keywords to filter the events
@@ -26,6 +27,7 @@ class NotificationsMgt(connector: Connector) : Connected(connector) {
      * @param contentTemplate Custom template for the event
      */
     fun subscribe(
+        name: String? = null,
         channel: String,
         channelConfig: Any,
         keywords: String?,
@@ -36,6 +38,7 @@ class NotificationsMgt(connector: Connector) : Connected(connector) {
         if (projectEntity != null) {
             graphqlConnector.mutate(
                 SubscribeToEntityEventsMutation(
+                    Input.optional(name),
                     projectEntity.type,
                     projectEntity.id.toInt(),
                     channel,

@@ -10,6 +10,7 @@ abstract class AbstractACCDSLNotificationsTestSupport : AbstractACCDSLTestSuppor
      * Subscription for a project entity.
      */
     protected fun ProjectEntity.subscribe(
+        name: String? = null,
         channel: String,
         channelConfig: Any,
         keywords: String?,
@@ -17,6 +18,7 @@ abstract class AbstractACCDSLNotificationsTestSupport : AbstractACCDSLTestSuppor
         contentTemplate: String? = null,
     ) {
         ontrack.notifications.subscribe(
+            name,
             channel,
             channelConfig,
             keywords,

@@ -16,6 +16,40 @@ class ACCDSLNotifications : AbstractACCDSLNotificationsTestSupport() {
                 val pl = promotion()
                 // Subscribe to this promotion
                 pl.subscribe(
+                    name = "Mock notification on promotion",
+                    channel = "in-memory",
+                    channelConfig = mapOf("group" to group),
+                    keywords = null,
+                    events = listOf(
+                        "new_promotion_run",
+                    ),
+                )
+                // Build to promote
+                build {
+                    // Promotion
+                    promote(pl.name)
+                    // Checks that a notification was received
+                    waitUntil(
+                        timeout = 30_000,
+                        interval = 500L,
+                    ) {
+                        ontrack.notifications.inMemory.group(group).firstOrNull() ==
+                                "Build $name has been promoted to ${pl.name} for branch ${branch.name} in ${project.name}."
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Notifications for new promotions at promotion level - no subscriptio name, testing backward compatibility`() {
+        val group = uid("g_")
+        project {
+            branch {
+                val pl = promotion()
+                // Subscribe to this promotion
+                pl.subscribe(
+                    name = "Test",
                     channel = "in-memory",
                     channelConfig = mapOf("group" to group),
                     keywords = null,
@@ -50,6 +84,7 @@ class ACCDSLNotifications : AbstractACCDSLNotificationsTestSupport() {
             // For new promotion runs
             // For GOLD & main only
             subscribe(
+                name = "Test",
                 channel = "in-memory",
                 channelConfig = mapOf("group" to group),
                 keywords = "GOLD main",

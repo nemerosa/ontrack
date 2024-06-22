@@ -45,6 +45,7 @@ class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
         project {
             // Subscribe to new branches
             subscribe(
+                name = "Test",
                 channel = "workflow",
                 channelConfig = mapOf(
                     "workflow" to WorkflowTestSupport.yamlWorkflowToJson(yaml)
@@ -141,6 +142,7 @@ class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
             branch {
                 val pl = promotion().apply {
                     subscribe(
+                        name = "Test",
                         channel = "workflow",
                         channelConfig = mapOf(
                             "workflow" to WorkflowTestSupport.yamlWorkflowToJson(yaml)

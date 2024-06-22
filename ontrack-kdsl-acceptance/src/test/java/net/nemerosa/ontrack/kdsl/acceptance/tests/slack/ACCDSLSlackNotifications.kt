@@ -27,6 +27,7 @@ class ACCDSLSlackNotifications : AbstractACCDSLNotificationsTestSupport() {
             branch {
                 val pl = promotion()
                 pl.subscribe(
+                    name = "Test",
                     channel = "slack",
                     channelConfig = mapOf(
                         "channel" to channel,
