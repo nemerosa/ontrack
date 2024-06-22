@@ -30,11 +30,12 @@ class WorkflowEngineImpl(
     override fun startWorkflow(
         workflow: Workflow,
         context: WorkflowContext,
+        contextContribution: (context: WorkflowContext, instanceId: String) -> WorkflowContext,
     ): WorkflowInstance {
         // Checks the workflow consistency (cycles, etc.) - use a public method, usable by extensions
         WorkflowValidation.validateWorkflow(workflow).throwErrorIfAny()
         // Creating the instance
-        val instance = createInstance(workflow, context)
+        val instance = createInstance(workflow, context, contextContribution = contextContribution)
         // Storing the instance
         workflowInstanceStore.store(instance)
         // Getting the starting nodes

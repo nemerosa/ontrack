@@ -63,6 +63,7 @@ class WorkflowNotificationChannelNodeExecutor(
         val queueItem = workflowInstance.context.parse<NotificationQueueItem>(CONTEXT_EVENT)
         // Creating the notification item
         val notification = workflowNotificationItemConverter.convertFromQueue(
+            instanceId = workflowInstance.id,
             channel = channel,
             channelConfig = channelConfig,
             template = template,

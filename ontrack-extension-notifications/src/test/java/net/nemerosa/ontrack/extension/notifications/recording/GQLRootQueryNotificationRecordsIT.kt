@@ -32,6 +32,7 @@ internal class GQLRootQueryNotificationRecordsIT : AbstractNotificationTestSuppo
             notificationRecordingService.record(
                 NotificationRecord(
                     id = UUID.randomUUID().toString(),
+                    source = null,
                     timestamp = Time.now(),
                     channel = "mock",
                     channelConfig = MockNotificationChannelConfig("#target").asJson(),
@@ -78,6 +79,7 @@ internal class GQLRootQueryNotificationRecordsIT : AbstractNotificationTestSuppo
             notificationRecordingService.record(
                 NotificationRecord(
                     id = UUID.randomUUID().toString(),
+                    source = null,
                     timestamp = Time.now(),
                     channel = "mock",
                     channelConfig = MockNotificationChannelConfig("#target").asJson(),
@@ -91,6 +93,7 @@ internal class GQLRootQueryNotificationRecordsIT : AbstractNotificationTestSuppo
             notificationRecordingService.record(
                 NotificationRecord(
                     id = UUID.randomUUID().toString(),
+                    source = null,
                     timestamp = Time.now(),
                     channel = "mock",
                     channelConfig = MockNotificationChannelConfig("not-valid").asJson(),

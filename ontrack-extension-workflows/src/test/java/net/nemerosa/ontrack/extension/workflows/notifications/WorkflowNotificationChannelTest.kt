@@ -13,6 +13,7 @@ import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
+import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 
 class WorkflowNotificationChannelTest {
@@ -32,6 +33,7 @@ class WorkflowNotificationChannelTest {
 
         val event = mockk<Event>()
         val notificationQueueItem = NotificationQueueItem(
+            source = null,
             channel = "workflow",
             channelConfig = NullNode.instance,
             eventType = "test",
@@ -43,8 +45,10 @@ class WorkflowNotificationChannelTest {
             template = null,
         )
 
+        val instanceId = uid("wi-")
+
         every {
-            workflowNotificationItemConverter.convertForQueue(event)
+            workflowNotificationItemConverter.convertForQueue(event, instanceId)
         } returns notificationQueueItem
 
         every {
@@ -58,7 +62,7 @@ class WorkflowNotificationChannelTest {
         } returns "1"
 
         every {
-            workflowEngine.startWorkflow(any(), any())
+            workflowEngine.startWorkflow(any(), any(), any())
         } returns instance
 
         channel.publish(
@@ -94,7 +98,8 @@ class WorkflowNotificationChannelTest {
                         )
                     )
                 ),
-                context = any()
+                context = any(),
+                contextContribution = any(),
             )
         }
     }

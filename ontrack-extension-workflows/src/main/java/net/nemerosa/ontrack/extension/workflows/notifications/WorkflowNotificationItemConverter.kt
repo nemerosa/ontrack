@@ -7,9 +7,10 @@ import net.nemerosa.ontrack.model.events.Event
 
 interface WorkflowNotificationItemConverter {
 
-    fun convertForQueue(event: Event): NotificationQueueItem
+    fun convertForQueue(event: Event, instanceId: String): NotificationQueueItem
 
     fun convertFromQueue(
+        instanceId: String,
         channel: String,
         channelConfig: JsonNode,
         template: String?,

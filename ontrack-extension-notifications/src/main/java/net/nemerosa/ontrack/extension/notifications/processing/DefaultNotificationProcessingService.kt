@@ -13,7 +13,6 @@ import net.nemerosa.ontrack.extension.notifications.recording.NotificationRecord
 import net.nemerosa.ontrack.extension.notifications.recording.NotificationRecordingService
 import net.nemerosa.ontrack.extension.notifications.recording.toNotificationRecordResult
 import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.tx.TransactionHelper
 import org.apache.commons.lang3.exception.ExceptionUtils
 import org.springframework.stereotype.Service
@@ -59,9 +58,8 @@ class DefaultNotificationProcessingService(
                 // Saving the current state of the record
                 recordResult(
                     recordId = recordId,
-                    channel = channel.type,
-                    channelConfig = validatedConfig.config,
-                    event = item.event,
+                    item = item,
+                    validatedConfig = validatedConfig.config.asJson(),
                     result = NotificationResult.ongoing(output),
                 )
                 // OK, returning the new value
@@ -81,9 +79,8 @@ class DefaultNotificationProcessingService(
                 meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_result, item, result)
                 recordResult(
                     recordId = recordId,
-                    channel = channel.type,
-                    channelConfig = validatedConfig.config,
-                    event = item.event,
+                    item = item,
+                    validatedConfig = validatedConfig.config.asJson(),
                     result = result,
                 )
                 result
@@ -91,9 +88,8 @@ class DefaultNotificationProcessingService(
                 meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_error, item)
                 recordError(
                     recordId = recordId,
-                    channel = channel.type,
-                    channelConfig = validatedConfig.config,
-                    event = item.event,
+                    item = item,
+                    validatedConfig = validatedConfig.config.asJson(),
                     error = any,
                     output = output, // Using the current output, even for errors
                 )
@@ -103,9 +99,8 @@ class DefaultNotificationProcessingService(
             meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_invalid, item)
             recordInvalidConfig(
                 recordId = recordId,
-                channel = channel.type,
+                item = item,
                 invalidChannelConfig = item.channelConfig,
-                event = item.event,
             )
             null
         }
@@ -121,18 +116,18 @@ class DefaultNotificationProcessingService(
 
     private fun recordResult(
         recordId: String,
-        channel: String,
-        channelConfig: Any,
-        event: Event,
+        item: Notification,
+        validatedConfig: JsonNode,
         result: NotificationResult<*>,
     ) {
         record(
             NotificationRecord(
                 id = recordId,
+                source = item.source,
                 timestamp = Time.now(),
-                channel = channel,
-                channelConfig = channelConfig.asJson(),
-                event = event.asJson(),
+                channel = item.channel,
+                channelConfig = validatedConfig,
+                event = item.event.asJson(),
                 result = result.toNotificationRecordResult(),
             )
         )
@@ -140,19 +135,19 @@ class DefaultNotificationProcessingService(
 
     private fun recordError(
         recordId: String,
-        channel: String,
-        channelConfig: Any,
-        event: Event,
+        item: Notification,
+        validatedConfig: JsonNode,
         error: Exception,
         output: Any?,
     ) {
         record(
             NotificationRecord(
                 id = recordId,
+                source = item.source,
                 timestamp = Time.now(),
-                channel = channel,
-                channelConfig = channelConfig.asJson(),
-                event = event.asJson(),
+                channel = item.channel,
+                channelConfig = validatedConfig,
+                event = item.event.asJson(),
                 result = NotificationResult.error<Any>(ExceptionUtils.getStackTrace(error), output)
                     .toNotificationRecordResult(),
             )
@@ -161,17 +156,17 @@ class DefaultNotificationProcessingService(
 
     private fun recordInvalidConfig(
         recordId: String,
-        channel: String,
+        item: Notification,
         invalidChannelConfig: JsonNode,
-        event: Event,
     ) {
         record(
             NotificationRecord(
                 id = recordId,
+                source = item.source,
                 timestamp = Time.now(),
-                channel = channel,
+                channel = item.channel,
                 channelConfig = invalidChannelConfig,
-                event = event.asJson(),
+                event = item.event.asJson(),
                 result = NotificationResult.invalidConfiguration<Any>().toNotificationRecordResult(),
             )
         )

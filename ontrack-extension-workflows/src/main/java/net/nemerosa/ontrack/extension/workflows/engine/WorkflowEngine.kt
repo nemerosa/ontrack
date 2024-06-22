@@ -14,9 +14,14 @@ interface WorkflowEngine {
      *
      * @param workflow Workflow to run
      * @param context Execution context
+     * @param contextContribution Optional adjustment of the context just before the creation of the instance
      * @return Initial state of the workflow instance
      */
-    fun startWorkflow(workflow: Workflow, context: WorkflowContext): WorkflowInstance
+    fun startWorkflow(
+        workflow: Workflow,
+        context: WorkflowContext,
+        contextContribution: (context: WorkflowContext, instanceId: String) -> WorkflowContext = { ctx, _ -> ctx },
+    ): WorkflowInstance
 
     /**
      * Given the ID of a [WorkflowInstance], returns this instance or null if not found.

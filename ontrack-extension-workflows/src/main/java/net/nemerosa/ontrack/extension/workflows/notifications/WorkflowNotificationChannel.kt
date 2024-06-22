@@ -40,8 +40,6 @@ class WorkflowNotificationChannel(
         template: String?, // Not used for this notification channel
         outputProgressCallback: (current: WorkflowNotificationChannelOutput) -> WorkflowNotificationChannelOutput
     ): NotificationResult<WorkflowNotificationChannelOutput> {
-        // Converting the event to a suitable format
-        val item = workflowNotificationItemConverter.convertForQueue(event)
         // Templating for the workflow name
         val workflow = config.workflow.rename {
             eventTemplatingService.renderEvent(
@@ -54,8 +52,16 @@ class WorkflowNotificationChannel(
         // Launching the workflow (with the event as context, template is not used)
         val instance = workflowEngine.startWorkflow(
             workflow = workflow,
-            context = WorkflowContext(WorkflowNotificationChannelNodeExecutor.CONTEXT_EVENT, item.asJson()),
-        )
+            context = WorkflowContext.noContext(),
+        ) { ctx, instanceId ->
+            // Converting the event to a suitable format
+            val item = workflowNotificationItemConverter.convertForQueue(event, instanceId)
+            // Adding to the context
+            ctx.withData(
+                WorkflowNotificationChannelNodeExecutor.CONTEXT_EVENT,
+                item.asJson()
+            )
+        }
         // Output contains only the instance ID
         return NotificationResult.ok(
             WorkflowNotificationChannelOutput(

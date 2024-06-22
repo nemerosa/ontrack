@@ -19,13 +19,17 @@ fun createInstance(
     workflow: Workflow,
     context: WorkflowContext,
     timestamp: LocalDateTime = Time.now(),
-) = WorkflowInstance(
-    id = createInstanceId(timestamp),
-    timestamp = timestamp,
-    workflow = workflow,
-    context = context,
-    nodesExecutions = workflow.nodes.map { it.toStartExecution() },
-)
+    contextContribution: (context: WorkflowContext, instanceId: String) -> WorkflowContext = { ctx, _ -> ctx },
+): WorkflowInstance {
+    val instanceId = createInstanceId(timestamp)
+    return WorkflowInstance(
+        id = instanceId,
+        timestamp = timestamp,
+        workflow = workflow,
+        context = contextContribution(context, instanceId),
+        nodesExecutions = workflow.nodes.map { it.toStartExecution() },
+    )
+}
 
 private fun WorkflowNode.toStartExecution() = WorkflowInstanceNode(
     id = id,

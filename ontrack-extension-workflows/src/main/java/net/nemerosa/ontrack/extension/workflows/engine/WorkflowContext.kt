@@ -26,6 +26,10 @@ data class WorkflowContext(
 
     fun findValue(key: String): JsonNode? = index[key]
 
+    fun withData(key: String, value: JsonNode) = WorkflowContext(
+        data = data + WorkflowContextData(key, value)
+    )
+
     companion object {
         fun noContext() = WorkflowContext(emptyList())
     }

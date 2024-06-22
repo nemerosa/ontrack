@@ -14,6 +14,7 @@ class DefaultNotificationQueueItemConverter(
 ) : NotificationQueueItemConverter {
 
     override fun convertForQueue(item: Notification) = NotificationQueueItem(
+        source = item.source,
         channel = item.channel,
         channelConfig = item.channelConfig,
         eventType = item.event.eventType.id,
@@ -26,6 +27,7 @@ class DefaultNotificationQueueItemConverter(
     )
 
     override fun convertFromQueue(item: NotificationQueueItem) = Notification(
+        source = item.source,
         channel = item.channel,
         channelConfig = item.channelConfig,
         event = Event(

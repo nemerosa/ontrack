@@ -3,7 +3,13 @@ package net.nemerosa.ontrack.extension.notifications.dispatching
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannelRegistry
 import net.nemerosa.ontrack.extension.notifications.model.Notification
+import net.nemerosa.ontrack.extension.notifications.model.NotificationSourceData
+import net.nemerosa.ontrack.extension.notifications.model.createData
 import net.nemerosa.ontrack.extension.notifications.queue.NotificationQueue
+import net.nemerosa.ontrack.extension.notifications.sources.EntitySubscriptionNotificationSource
+import net.nemerosa.ontrack.extension.notifications.sources.EntitySubscriptionNotificationSourceDataType
+import net.nemerosa.ontrack.extension.notifications.sources.GlobalSubscriptionNotificationSource
+import net.nemerosa.ontrack.extension.notifications.sources.GlobalSubscriptionNotificationSourceDataType
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscription
 import net.nemerosa.ontrack.json.JsonParseException
 import net.nemerosa.ontrack.model.events.Event
@@ -17,6 +23,8 @@ class DefaultNotificationDispatcher(
     private val notificationChannelRegistry: NotificationChannelRegistry,
     private val notificationQueue: NotificationQueue,
     private val applicationLogService: ApplicationLogService,
+    private val entitySubscriptionNotificationSource: EntitySubscriptionNotificationSource,
+    private val globalSubscriptionNotificationSource: GlobalSubscriptionNotificationSource,
 ) : NotificationDispatcher {
 
     override fun dispatchEvent(event: Event, eventSubscription: EventSubscription): NotificationDispatchingResult {
@@ -48,6 +56,7 @@ class DefaultNotificationDispatcher(
         val channelConfig = channel.validate(eventSubscription.channelConfig)
         return if (channelConfig.isOk()) {
             val item = Notification(
+                source = getNotificationSourceData(eventSubscription),
                 channel = eventSubscription.channel,
                 channelConfig = eventSubscription.channelConfig,
                 event = event,
@@ -60,7 +69,10 @@ class DefaultNotificationDispatcher(
             applicationLogService.log(
                 ApplicationLogEntry.error(
                     channelConfig.exception,
-                    NameDescription.nd("notification-channel-config-invalid", "Notification channel configuration invalid"),
+                    NameDescription.nd(
+                        "notification-channel-config-invalid",
+                        "Notification channel configuration invalid"
+                    ),
                     "Cannot validate the configuration for a channel"
                 ).withDetail(
                     "channelConfig", eventSubscription.channelConfig.toPrettyString()
@@ -70,6 +82,24 @@ class DefaultNotificationDispatcher(
             )
             // Not processed
             false
+        }
+    }
+
+    private fun getNotificationSourceData(eventSubscription: EventSubscription): NotificationSourceData {
+        return if (eventSubscription.projectEntity != null) {
+            entitySubscriptionNotificationSource.createData(
+                EntitySubscriptionNotificationSourceDataType(
+                    entityType = eventSubscription.projectEntity.projectEntityType,
+                    entityId = eventSubscription.projectEntity.id(),
+                    subscriptionName = eventSubscription.name,
+                )
+            )
+        } else {
+            globalSubscriptionNotificationSource.createData(
+                GlobalSubscriptionNotificationSourceDataType(
+                    subscriptionName = eventSubscription.name,
+                )
+            )
         }
     }
 

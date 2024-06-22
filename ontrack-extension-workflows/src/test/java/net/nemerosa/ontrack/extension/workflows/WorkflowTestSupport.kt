@@ -36,7 +36,6 @@ class WorkflowTestSupport(
         }
     }
 
-    @OptIn(ExperimentalTime::class)
     fun registerLaunchAndWaitForWorkflow(
         yaml: String,
         workflowContextName: String? = null,
@@ -49,19 +48,21 @@ class WorkflowTestSupport(
             // Getting the workflow
             val record = workflowRegistry.findWorkflow(workflowId) ?: fail("No workflow found for $workflowId")
 
-            // Context
-            val contextData = mutableListOf<WorkflowContextData>()
-            if (!workflowContextName.isNullOrBlank()) {
-                contextData += WorkflowContextData("mock", TextNode(workflowContextName))
-            }
-            if (event != null) {
-                val item = workflowNotificationItemConverter.convertForQueue(event)
-                contextData += WorkflowContextData(WorkflowNotificationChannelNodeExecutor.CONTEXT_EVENT, item.asJson())
-            }
-            val context = WorkflowContext(contextData)
-
             // Launching the workflow
-            val instance = workflowEngine.startWorkflow(record.workflow, context)
+            val instance =
+                workflowEngine.startWorkflow(record.workflow, WorkflowContext.noContext()) { ctx, instanceId ->
+                    var result = ctx
+                    if (!workflowContextName.isNullOrBlank()) {
+                        result = result.withData("mock", TextNode(workflowContextName))
+                    }
+                    if (event != null) {
+                        val item = workflowNotificationItemConverter.convertForQueue(event, instanceId)
+                        result = result.withData(
+                            WorkflowNotificationChannelNodeExecutor.CONTEXT_EVENT, item.asJson()
+                        )
+                    }
+                    result
+                }
             // Waiting until the workflow is completed (error or success)
             if (wait) {
                 waitForWorkflowInstance(instance.id)
