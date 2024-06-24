@@ -12,6 +12,7 @@ import {getLocallySelectedDependencyLinksMode, setLocallySelectedDependencyLinks
 import {FaProjectDiagram, FaStream} from "react-icons/fa";
 import DependencyLinksModeButton from "@components/links/DependencyLinksModeButton";
 import BuildLinksGraph from "@components/links/BuildLinksGraph";
+import BuildLinksTree from "@components/links/BuildLinksTree";
 
 export default function BuildLinksView({id}) {
 
@@ -96,6 +97,9 @@ export default function BuildLinksView({id}) {
                 <Skeleton active loading={loading}>
                     {
                         dependencyLinksMode === 'graph' && <BuildLinksGraph build={build}/>
+                    }
+                    {
+                        dependencyLinksMode === 'tree' && <BuildLinksTree build={build}/>
                     }
                 </Skeleton>
             </MainPage>
