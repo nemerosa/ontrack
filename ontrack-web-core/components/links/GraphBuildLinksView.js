@@ -1,35 +1,27 @@
 import {useEffect, useState} from "react";
-import {CloseCommand, Command} from "@components/common/Commands";
+import {CloseCommand} from "@components/common/Commands";
 import {buildUri} from "@components/common/Links";
 import Head from "next/head";
 import {subBuildTitle} from "@components/common/Titles";
 import MainPage from "@components/layouts/MainPage";
 import {downToBuildBreadcrumbs} from "@components/common/Breadcrumbs";
+import LoadingContainer from "@components/common/LoadingContainer";
 import {gql} from "graphql-request";
+import PageSection from "@components/common/PageSection";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
-import {Skeleton} from "antd";
-import {getLocallySelectedDependencyLinksMode, setLocallySelectedDependencyLinksMode} from "@components/storage/local";
-import {FaProjectDiagram, FaStream} from "react-icons/fa";
-import DependencyLinksModeButton from "@components/links/DependencyLinksModeButton";
+import BuildLinksGraph from "@components/links/BuildLinksGraph";
 
-export default function BuildLinksView({id}) {
+export default function GraphBuildLinksView({id}) {
 
     const client = useGraphQLClient()
 
-    const [loading, setLoading] = useState(true)
+    const [loadingBuild, setLoadingBuild] = useState(true)
     const [build, setBuild] = useState({branch: {project: ''}})
     const [commands, setCommands] = useState([])
 
-    const [dependencyLinksMode, setDependencyLinksMode] = useState('')
-
-    const changeDependencyLinksMode = (mode) => {
-        setDependencyLinksMode(mode)
-        setLocallySelectedDependencyLinksMode(mode)
-    }
-
     useEffect(() => {
         if (id && client) {
-            setLoading(true)
+            setLoadingBuild(true)
             client.request(
                 gql`
                     query GetBuild($id: Int!) {
@@ -54,14 +46,11 @@ export default function BuildLinksView({id}) {
             ).then(data => {
                 const build = data.build
                 setBuild(build)
-
                 setCommands([
                     <CloseCommand key="close" href={buildUri(build)}/>,
                 ])
-
-                setDependencyLinksMode(getLocallySelectedDependencyLinksMode() ?? 'graph')
             }).finally(() => {
-                setLoading(false)
+                setLoadingBuild(false)
             })
         }
     }, [id, client])
@@ -76,25 +65,13 @@ export default function BuildLinksView({id}) {
                 breadcrumbs={downToBuildBreadcrumbs({build: build})}
                 commands={commands}
             >
-                <DependencyLinksModeButton
-                    key="graph"
-                    icon={<FaProjectDiagram/>}
-                    selectedMode={dependencyLinksMode}
-                    mode="graph"
-                    action={changeDependencyLinksMode}
-                    title="Displays the dependencies as a graph"
-                />
-                <DependencyLinksModeButton
-                    key="tree"
-                    icon={<FaStream/>}
-                    selectedMode={dependencyLinksMode}
-                    mode="tree"
-                    action={changeDependencyLinksMode}
-                    title="Displays the dependencies as a tree"
-                />
-                <Skeleton active loading={loading}>
-
-                </Skeleton>
+                <LoadingContainer loading={loadingBuild} tip="Loading build">
+                    <PageSection title={undefined}
+                                 padding={false}
+                    >
+                        <BuildLinksGraph build={build}/>
+                    </PageSection>
+                </LoadingContainer>
             </MainPage>
         </>
     )

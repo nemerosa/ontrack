@@ -1,11 +1,6 @@
-`ADR-NXUI-0003-ui-preferences` - UI preferences
-===============================================
-
-# Context
+# UI preferences
 
 One user may select some options in the UI which are then saved in their preferences, to be reused in a later session.
-
-# Chosen option
 
 Preferences are accessed using the `preferences` GraphQL query:
 
@@ -31,7 +26,7 @@ mutation SetPreferences {
 }
 ```
 
-# Convenience method
+## Convenience method
 
 Instead of calling the GraphQL API directly, one component can use the `usePreferences` method:
 
@@ -50,10 +45,10 @@ preferences.setPreferences({
 })
 ```
 
-# Exceptions
+## Exceptions
 
 * [ ] Selected dashboard on the home page is set using the `selectDashboard` mutation - this should be replaced by the `setPreferences` mutation
 
-# See also
+## See also
 
-* [`ADR-NXUI-0007-ui-local-preferences`](ADR-NXUI-0007-ui-local-preferences.md) - for browser/local preferences
+* [UI local preferences](ui-local-preferences.md)
