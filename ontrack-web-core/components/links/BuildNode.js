@@ -8,7 +8,6 @@ import ProjectLink from "@components/projects/ProjectLink";
 import Link from "next/link";
 import {branchLinksUri} from "@components/common/Links";
 import {FaProjectDiagram} from "react-icons/fa";
-import {truncate} from "@components/common/ShortenedName";
 
 export default function BuildNode({data}) {
 

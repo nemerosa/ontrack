@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {CloseCommand, Command} from "@components/common/Commands";
+import {CloseCommand} from "@components/common/Commands";
 import {buildUri} from "@components/common/Links";
 import Head from "next/head";
 import {subBuildTitle} from "@components/common/Titles";
