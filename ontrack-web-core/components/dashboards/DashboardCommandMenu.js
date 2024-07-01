@@ -24,8 +24,6 @@ export default function DashboardCommandMenu() {
 
     const user = useContext(UserContext)
 
-    const [messageApi, contextHolder] = message.useMessage()
-
     const router = useRouter()
     const {environment} = useConnection()
     const context = useContext(DashboardContext)
@@ -165,12 +163,14 @@ export default function DashboardCommandMenu() {
         }
 
         // Cloning current
-        menu.push({
-            key: 'clone',
-            icon: <FaCopy/>,
-            label: "Clone current dashboard",
-            onClick: cloneDashboard,
-        })
+        if (user.authorizations.dashboard?.edit) {
+            menu.push({
+                key: 'clone',
+                icon: <FaCopy/>,
+                label: "Clone current dashboard",
+                onClick: cloneDashboard,
+            })
+        }
 
         // Deleting current
         if (context?.dashboard && context.dashboard.authorizations?.delete) {
@@ -183,16 +183,16 @@ export default function DashboardCommandMenu() {
             })
         }
 
-        // Separator
-        menu.push({type: 'divider'})
-
         // New dashboard
-        menu.push({
-            key: 'new',
-            icon: <FaPlus/>,
-            label: "Create a new dashboard",
-            onClick: createDashboard,
-        })
+        if (user.authorizations.dashboard?.edit) {
+            menu.push({type: 'divider'})
+            menu.push({
+                key: 'new',
+                icon: <FaPlus/>,
+                label: "Create a new dashboard",
+                onClick: createDashboard,
+            })
+        }
 
         // OK
         setItems(menu)
@@ -201,7 +201,6 @@ export default function DashboardCommandMenu() {
 
     return (
         <>
-            {contextHolder}
             <Dropdown menu={{items}}>
                 <Button
                     type="text"

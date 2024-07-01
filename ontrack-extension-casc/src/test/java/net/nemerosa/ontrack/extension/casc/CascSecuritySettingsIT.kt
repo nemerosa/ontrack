@@ -18,14 +18,16 @@ class CascSecuritySettingsIT : AbstractCascTestSupport() {
     fun `Security settings`() {
         withSettings<SecuritySettings> {
             withNoGrantViewToAll {
-                casc("""
+                casc(
+                    """
                     ontrack:
                         config:
                             settings:
                                 security:
                                     grantProjectViewToAll: true
                                     grantProjectParticipationToAll: true
-                """.trimIndent())
+                """.trimIndent()
+                )
 
                 // Checks the new settings
                 val settings = cachedSettingsService.getCachedSettings(SecuritySettings::class.java)
@@ -33,6 +35,32 @@ class CascSecuritySettingsIT : AbstractCascTestSupport() {
                 assertTrue(settings.isGrantProjectParticipationToAll)
                 assertTrue(settings.builtInAuthenticationEnabled)
             }
+        }
+    }
+
+    @Test
+    fun `Disabling dashboard rights`() {
+        withCleanSettings<SecuritySettings> {
+
+            val defaults = cachedSettingsService.getCachedSettings(SecuritySettings::class.java)
+            assertEquals(true, defaults.grantDashboardEditionToAll)
+            assertEquals(true, defaults.grantDashboardSharingToAll)
+
+            casc(
+                """
+                    ontrack:
+                        config:
+                            settings:
+                                security:
+                                    grantDashboardEditionToAll: false
+                                    grantDashboardSharingToAll: false
+                """.trimIndent()
+            )
+
+            // Checks the new settings
+            val settings = cachedSettingsService.getCachedSettings(SecuritySettings::class.java)
+            assertEquals(false, settings.grantDashboardEditionToAll)
+            assertEquals(false, settings.grantDashboardSharingToAll)
         }
     }
 
@@ -52,6 +80,8 @@ class CascSecuritySettingsIT : AbstractCascTestSupport() {
                         "grantProjectViewToAll" to true,
                         "grantProjectParticipationToAll" to true,
                         "builtInAuthenticationEnabled" to true,
+                        "grantDashboardEditionToAll" to true,
+                        "grantDashboardSharingToAll" to true,
                     ).asJson(),
                     json
                 )
@@ -72,13 +102,15 @@ class CascSecuritySettingsIT : AbstractCascTestSupport() {
                         builtInAuthenticationEnabled = true,
                     )
                 )
-                casc("""
+                casc(
+                    """
                     ontrack:
                         config:
                             settings:
                                 security:
                                     builtInAuthenticationEnabled: false
-                """.trimIndent())
+                """.trimIndent()
+                )
 
                 // Checks the new settings
                 val settings = cachedSettingsService.getCachedSettings(SecuritySettings::class.java)

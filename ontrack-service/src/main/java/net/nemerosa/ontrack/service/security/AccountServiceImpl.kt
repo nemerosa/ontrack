@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.service.security
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.exceptions.AccountDefaultAdminCannotDeleteException
 import net.nemerosa.ontrack.model.exceptions.AccountDefaultAdminCannotUpdateNameException
@@ -18,6 +17,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
 import java.util.stream.Collectors
+import kotlin.jvm.optionals.getOrNull
 
 @Service
 @Transactional
@@ -39,6 +39,7 @@ class AccountServiceImpl(
         // Direct account authorisations
         val authorisations = Authorisations()
             .withProjectFunctions(securityService.autoProjectFunctions)
+            .withGlobalFunctions(securityService.autoGlobalFunctions)
             .withGlobalRole(roleRepository.findGlobalRoleByAccount(raw.accountId).getOrNull()
                 ?.let { id: String -> rolesService.getGlobalRole(id).getOrNull() })
             .withProjectRoles(roleRepository.findProjectRoleAssociationsByAccount(raw.accountId) { project: Int, roleId: String ->

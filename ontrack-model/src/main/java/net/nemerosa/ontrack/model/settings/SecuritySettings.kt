@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.YesNo
+import net.nemerosa.ontrack.model.form.yesNoField
 
 /**
  * General security settings.
@@ -21,10 +22,16 @@ class SecuritySettings(
     val isGrantProjectParticipationToAll: Boolean,
     @APIDescription("Enabling the built-in authentication")
     val builtInAuthenticationEnabled: Boolean = DEFAULT_BUILTIN_AUTHENTICATION_ENABLED,
+    @APIDescription("Grants dashboard creation rights to all")
+    val grantDashboardEditionToAll: Boolean = DEFAULT_GRANT_DASHBOARD_EDITION,
+    @APIDescription("Grants dashboard sharing rights to all")
+    val grantDashboardSharingToAll: Boolean = DEFAULT_GRANT_DASHBOARD_SHARING,
 ) {
 
     companion object {
         const val DEFAULT_BUILTIN_AUTHENTICATION_ENABLED = true
+        const val DEFAULT_GRANT_DASHBOARD_EDITION = true
+        const val DEFAULT_GRANT_DASHBOARD_SHARING = true
     }
 
     fun form(): Form =
@@ -47,5 +54,13 @@ class SecuritySettings(
                     .label("Built-in authentication")
                     .help("Enabling the built-in authentication")
                     .value(builtInAuthenticationEnabled)
+            )
+            .yesNoField(
+                SecuritySettings::grantDashboardEditionToAll,
+                grantDashboardEditionToAll
+            )
+            .yesNoField(
+                SecuritySettings::grantDashboardSharingToAll,
+                grantDashboardSharingToAll
             )
 }
