@@ -54,31 +54,6 @@ const gqlBuildNodeInfo = gql`
                 ...BuildInfo
             }
         }
-        previousBuild {
-            ...BuildInfo
-        }
-        nextBuild {
-            ...BuildInfo
-        }
-        autoVersioning(buildId: $buildId, direction: DOWN) {
-            lastEligibleBuild {
-                ...BuildInfo
-            }
-            status {
-                order {
-                    targetVersion
-                }
-                running
-                mostRecentState {
-                    state
-                    running
-                    processing
-                    creation {
-                        time
-                    }
-                }
-            }
-        }
     }
 `
 
