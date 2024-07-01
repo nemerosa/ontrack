@@ -10,5 +10,7 @@ with the API to its pure client aspects.
 * [Local page events](local-events.md)
 * [Page tools](page-tools.md)
 * [UI form dialogs](ui-form-dialog.md)
+* [UI local preferences](ui-local-preferences.md)
 * [UI reference data](ui-ref-data.md)
+* [UI user preferences](ui-user-preferences.md)
 * [User menu](user-menu.md)

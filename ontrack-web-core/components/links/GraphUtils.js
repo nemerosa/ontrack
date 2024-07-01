@@ -13,7 +13,9 @@ export function autoLayout({
     const elkOptions = {
         'elk.algorithm': 'layered',
         'elk.layered.spacing.nodeNodeBetweenLayers': '100',
-        'elk.spacing.nodeNode': '80',
+        'elk.spacing.nodeNode': '30',
+        'elk.spacing.edgeEdge': '25',
+        'elk.spacing.edgeNode': '25',
     }
 
     const getWidth = (node) => {

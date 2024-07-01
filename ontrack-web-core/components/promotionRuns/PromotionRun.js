@@ -4,7 +4,8 @@ import Timestamp from "@components/common/Timestamp";
 export default function PromotionRun({
                                          promotionRun, size = 16,
                                          displayDetails = true,
-                                         displayPromotionLevelName = false
+                                         displayPromotionLevelName = false,
+                                         displayPromotionLevelDescription = false,
                                      }) {
     return (
         <>
@@ -13,6 +14,7 @@ export default function PromotionRun({
                 size={size}
                 displayTooltip={displayDetails}
                 displayText={displayPromotionLevelName}
+                displayDescription={displayPromotionLevelDescription}
                 details={
                     displayDetails ?
                         <Timestamp prefix="Promoted on " value={promotionRun.creation.time}/> : undefined
