@@ -27,6 +27,20 @@ class PromotionLevelJdbcRepository(
             toPromotionLevel(rs, branch)
         }
 
+    override fun findNamesByToken(token: String?): List<String> =
+        if (token.isNullOrBlank()) {
+            jdbcTemplate!!.queryForList(
+                """SELECT DISTINCT(NAME) FROM PROMOTION_LEVELS ORDER BY NAME""",
+                String::class.java
+            )
+        } else {
+            namedParameterJdbcTemplate!!.queryForList(
+                """SELECT DISTINCT(NAME) FROM PROMOTION_LEVELS WHERE NAME ILIKE :name ORDER BY NAME""",
+                mapOf("name" to "%$token%"),
+                String::class.java
+            )
+        }
+
     override fun findByToken(token: String?): List<PromotionLevel> =
         if (token.isNullOrBlank()) {
             jdbcTemplate!!.query(

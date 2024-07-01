@@ -6,4 +6,6 @@ interface PromotionLevelRepository {
 
     fun findByToken(token: String?): List<PromotionLevel>
 
+    fun findNamesByToken(token: String?): List<String>
+
 }
