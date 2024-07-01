@@ -99,7 +99,8 @@ export default function BuildLinksView({id}) {
                         dependencyLinksMode === 'graph' && <BuildLinksGraph build={build}/>
                     }
                     {
-                        dependencyLinksMode === 'tree' && <BuildLinksTree build={build}/>
+                        dependencyLinksMode === 'tree' &&
+                        <BuildLinksTree build={build} changeDependencyLinksMode={changeDependencyLinksMode}/>
                     }
                 </Skeleton>
             </MainPage>
