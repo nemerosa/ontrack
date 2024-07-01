@@ -214,8 +214,8 @@ function BuildLinksFlow({build}) {
                 autoLayout({
                     nodes,
                     edges,
-                    nodeWidth: (node) => node.type === 'group' ? 250 : 180,
-                    nodeHeight: (node) => node.type === 'group' ? 400 : 120,
+                    nodeWidth: (node) => node.type === 'group' ? 250 : 200,
+                    nodeHeight: (node) => node.type === 'group' ? 400 : 60,
                     setNodes,
                     setEdges,
                 })
