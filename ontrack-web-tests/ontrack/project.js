@@ -2,6 +2,7 @@ import {generate} from "@ontrack/utils";
 import {graphQLCall, graphQLCallMutation} from "@ontrack/graphql";
 import {gql} from "graphql-request";
 import {createBranch} from "@ontrack/branch";
+import {registerNotificationExtensions} from "@ontrack/extensions/notifications/notifications";
 
 const gqlProjectData = gql`
     fragment ProjectData on Project {
@@ -59,10 +60,14 @@ export const createProject = async (ontrack, name) => {
 const projectInstance = (ontrack, data) => {
     const project = {
         ontrack,
+        type: 'PROJECT',
         ...data,
     }
 
     project.createBranch = async (name) => createBranch(project, name)
+
+    // Notifications methods
+    registerNotificationExtensions(project)
 
     return project
 }
