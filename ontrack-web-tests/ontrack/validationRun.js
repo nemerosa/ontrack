@@ -24,6 +24,7 @@ export const createValidationRun = async (build, validationStamp, params) => {
 
     const validationStampName = validationStamp.name
     const validationRunStatus = params?.status ?? "PASSED"
+    const description = params?.description
 
     const data = await graphQLCallMutation(
         build.ontrack.connection,
@@ -33,11 +34,13 @@ export const createValidationRun = async (build, validationStamp, params) => {
                 $buildId: Int!,
                 $validationStamp: String!,
                 $validationRunStatus: String,
+                $description: String,
             ) {
                 createValidationRunById(input: {
                     buildId: $buildId,
                     validationStamp: $validationStamp,
                     validationRunStatus: $validationRunStatus,
+                    description: $description,
                 }) {
                     validationRun {
                         ...ValidationRunData
@@ -54,6 +57,7 @@ export const createValidationRun = async (build, validationStamp, params) => {
             buildId: build.id,
             validationStamp: validationStampName,
             validationRunStatus: validationRunStatus,
+            description,
         }
     )
 
