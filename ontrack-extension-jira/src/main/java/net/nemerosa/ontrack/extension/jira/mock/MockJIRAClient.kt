@@ -13,7 +13,6 @@ class MockJIRAClient(
 ) : JIRAClient {
 
     private val counter = AtomicInteger(0)
-    private val issues = mutableListOf<JIRAIssue>()
 
     override fun close() {
     }
@@ -56,19 +55,59 @@ class MockJIRAClient(
             issueType = issueType,
             links = emptyList(),
         )
-        issues += issue
+        instance.registerIssue(issue)
         return JIRAIssueStub(
             key = key,
             url = url,
         )
     }
 
-    override fun createLink(sourceTicket: String, targetTicket: String, linkName: String) {
-        TODO("Not supported for the Mock Client")
+    override fun createLink(
+        jiraConfiguration: JIRAConfiguration,
+        sourceTicket: String,
+        targetTicket: String,
+        linkName: String
+    ) {
+        val source = instance.getIssue(sourceTicket) ?: error("Source ticket not found")
+        val target = instance.getIssue(sourceTicket) ?: error("Target ticket not found")
+        val linkedSource = source.withLinks(
+            listOf(
+                JIRALink(
+                    source.key,
+                    source.url,
+                    JIRAStatus("Open", "${jiraConfiguration.url}/images/icons/statuses/open.png"),
+                    linkName,
+                    linkName
+                )
+            )
+        )
+        val linkedTarget = target.withLinks(
+            listOf(
+                JIRALink(
+                    target.key,
+                    target.url,
+                    JIRAStatus("Open", "${jiraConfiguration.url}/images/icons/statuses/open.png"),
+                    linkName,
+                    "$linkName-inverse"
+                )
+            )
+        )
+        instance.registerIssue(linkedSource)
+        instance.registerIssue(linkedTarget)
     }
 
+    private val jqlRegex = """key\s*=\s*(.*)""".toRegex()
+
     override fun searchIssueStubs(jiraConfiguration: JIRAConfiguration, jql: String): List<JIRAIssueStub> {
-        return emptyList()
+        val m = jqlRegex.matchEntire(jql)
+        return if (m != null) {
+            val key = m.groupValues[1]
+            listOfNotNull(
+                instance.getIssue(key)?.toStub()
+            )
+        } else {
+            emptyList()
+        }
     }
 
     override val projects: List<String>

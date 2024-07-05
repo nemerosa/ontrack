@@ -39036,6 +39036,16 @@
                     "ofType": null
                   },
                   "defaultValue": "20"
+                },
+                {
+                  "name": "name",
+                  "description": "Name of a workflow",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
                 }
               ],
               "type": {
@@ -60372,6 +60382,18 @@
                   "name": "String",
                   "ofType": null
                 }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "timeout",
+              "description": "Timeout in seconds (5 minutes by default)",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null

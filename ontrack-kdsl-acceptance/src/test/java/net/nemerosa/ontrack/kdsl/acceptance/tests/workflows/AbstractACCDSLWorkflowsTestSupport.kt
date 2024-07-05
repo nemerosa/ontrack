@@ -9,6 +9,23 @@ import kotlin.test.fail
 
 abstract class AbstractACCDSLWorkflowsTestSupport : AbstractACCDSLNotificationsTestSupport() {
 
+    protected fun waitUntilWorkflowByNameFinished(
+        name: String,
+        returnInstanceOnError: Boolean = false,
+    ): WorkflowInstance {
+        waitUntil(
+            timeout = 30_000L,
+            interval = 500L,
+        ) {
+            val instance = ontrack.workflows.workflowInstancesByName(name).firstOrNull()
+            instance != null && instance.finished
+        }
+        // Getting the final errors
+        val instance = ontrack.workflows.workflowInstancesByName(name).firstOrNull()
+            ?: fail("Could not get the workflow instance")
+        return checkWorkflowInstance(returnInstanceOnError, instance)
+    }
+
     protected fun waitUntilWorkflowFinished(
         instanceId: String,
         returnInstanceOnError: Boolean = false,
@@ -23,6 +40,13 @@ abstract class AbstractACCDSLWorkflowsTestSupport : AbstractACCDSLNotificationsT
         // Getting the final errors
         val instance = ontrack.workflows.workflowInstance(instanceId)
             ?: fail("Could not get the workflow instance")
+        return checkWorkflowInstance(returnInstanceOnError, instance)
+    }
+
+    private fun checkWorkflowInstance(
+        returnInstanceOnError: Boolean,
+        instance: WorkflowInstance
+    ): WorkflowInstance {
         if (!returnInstanceOnError && instance.status == WorkflowInstanceStatus.ERROR) {
             // Displaying the errors
             instance.nodesExecutions.forEach { node ->

@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import net.nemerosa.ontrack.extension.jira.JIRAConfigurationProperties
 import net.nemerosa.ontrack.extension.jira.model.JIRAIssue
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @ConditionalOnProperty(
@@ -32,6 +29,13 @@ class MockJIRAController(
             type = input.type,
             linkedKey = input.linkedKey,
         )
+
+    /**
+     * Getting an issue by key
+     */
+    @GetMapping("/issue/{key}")
+    fun getIssue(@PathVariable key: String): JIRAIssue? =
+        instance.getIssue(key)
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class MockIssueInput(

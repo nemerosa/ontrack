@@ -53,11 +53,22 @@ class DatabaseWorkflowInstanceStore(
         }
 
     override fun findByFilter(workflowInstanceFilter: WorkflowInstanceFilter): PaginatedList<WorkflowInstance> {
+
+        val query = mutableListOf<String>()
+        val queryVariables = mutableMapOf<String, Any?>()
+
+        if (!workflowInstanceFilter.name.isNullOrBlank()) {
+            query += "data->'workflow'->>'name' = :name"
+            queryVariables["name"] = workflowInstanceFilter.name
+        }
+
         return storageService.paginatedFilter(
             store = STORE,
             type = WorkflowInstance::class,
             offset = workflowInstanceFilter.offset,
             size = workflowInstanceFilter.size,
+            query = query.joinToString(" AND ") { "( $it )" },
+            queryVariables = queryVariables,
             orderQuery = "ORDER BY data::jsonb->>'id' DESC",
         )
     }

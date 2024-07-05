@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.workflows.definition.WorkflowFixtures
 import net.nemerosa.ontrack.extension.workflows.mgt.WorkflowSettings
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.Duration
@@ -31,6 +32,30 @@ class DatabaseWorkflowInstanceStoreIT : AbstractDSLTestSupport() {
         assertNotNull(databaseWorkflowInstanceStore.findById(instance.id)) { saved ->
             assertEquals(instance.asJson(), saved.asJson())
         }
+    }
+
+    @Test
+    fun `Filtering workflows by name`() {
+        val instances = (1..2).map {
+            createInstance(
+                workflow = WorkflowFixtures.simpleLinearWorkflow(
+                    name = uid("w-")
+                ),
+                context = WorkflowContext(
+                    key = "mock",
+                    value = mapOf("text" to "Some text").asJson()
+                )
+            ).apply {
+                databaseWorkflowInstanceStore.store(this)
+            }
+        }
+
+        val found = databaseWorkflowInstanceStore.findByFilter(
+            WorkflowInstanceFilter(name = instances[1].workflow.name)
+        ).pageItems
+
+        assertEquals(1, found.size)
+        assertEquals(instances[1].id, found.first().id)
     }
 
     @Test

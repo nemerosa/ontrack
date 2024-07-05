@@ -127,7 +127,7 @@ class JIRAClientImpl(
         )
     }
 
-    override fun createLink(sourceTicket: String, targetTicket: String, linkName: String) {
+    override fun createLink(jiraConfiguration: JIRAConfiguration, sourceTicket: String, targetTicket: String, linkName: String) {
         restTemplate.postForObject(
             "/rest/api/2/issueLink",
             mapOf(

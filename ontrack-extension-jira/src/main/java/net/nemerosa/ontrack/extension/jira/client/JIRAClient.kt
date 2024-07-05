@@ -32,11 +32,17 @@ interface JIRAClient : AutoCloseable {
     /**
      * Creates a link between two tickets
      *
+     * @param jiraConfiguration Jira configuration
      * @param sourceTicket Key of the source ticket
      * @param targetTicket Key of the target ticket
      * @param linkName Name of the link
      */
-    fun createLink(sourceTicket: String, targetTicket: String, linkName: String)
+    fun createLink(
+        jiraConfiguration: JIRAConfiguration,
+        sourceTicket: String,
+        targetTicket: String,
+        linkName: String,
+    )
 
     /**
      * Underlying REST template to use

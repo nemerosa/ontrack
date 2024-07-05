@@ -91,7 +91,7 @@ class JiraLinkNotificationChannel(
         }
 
         // Creating the link
-        jiraClient.createLink(sourceTicket, targetTicket, config.linkName)
+        jiraClient.createLink(jiraConfig, sourceTicket, targetTicket, config.linkName)
 
         // OK
         return NotificationResult.ok(
