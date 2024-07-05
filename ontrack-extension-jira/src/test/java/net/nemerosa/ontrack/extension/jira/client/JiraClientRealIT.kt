@@ -59,6 +59,41 @@ class JiraClientRealIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    fun `Linking issues`() {
+        asAdmin {
+            jiraClientTestSupport.withRealJiraClient { client, config ->
+                val (key1) = client.createIssue(
+                    configuration = config,
+                    project = jiraClientEnv.project,
+                    issueType = jiraClientEnv.issueType,
+                    title = "Issue 1",
+                    body = "Description 1",
+                )
+                val (key2) = client.createIssue(
+                    configuration = config,
+                    project = jiraClientEnv.project,
+                    issueType = jiraClientEnv.issueType,
+                    title = "Issue 2",
+                    body = "Description 2",
+                )
+                client.createLink(
+                    sourceTicket = key1,
+                    targetTicket = key2,
+                    linkName = "Relates",
+                )
+
+                // Checking the links
+                assertNotNull(client.getIssue(key1, config)) { issue ->
+                    assertEquals(
+                        listOf(key2),
+                        issue.links.map { it.key }
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Looking for an issue`() {
         asAdmin {
             jiraClientTestSupport.withRealJiraClient { client, config ->

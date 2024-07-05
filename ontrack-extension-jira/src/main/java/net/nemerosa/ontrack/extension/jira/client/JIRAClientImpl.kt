@@ -127,6 +127,24 @@ class JIRAClientImpl(
         )
     }
 
+    override fun createLink(sourceTicket: String, targetTicket: String, linkName: String) {
+        restTemplate.postForObject(
+            "/rest/api/2/issueLink",
+            mapOf(
+                "type" to mapOf(
+                    "name" to linkName,
+                ),
+                "inwardIssue" to mapOf(
+                    "key" to sourceTicket,
+                ),
+                "outwardIssue" to mapOf(
+                    "key" to targetTicket,
+                ),
+            ),
+            JsonNode::class.java
+        )
+    }
+
     override val projects: List<String>
         get() {
             val node = restTemplate.getForObject<JsonNode>("/rest/api/2/project")

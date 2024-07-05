@@ -63,6 +63,10 @@ class MockJIRAClient(
         )
     }
 
+    override fun createLink(sourceTicket: String, targetTicket: String, linkName: String) {
+        TODO("Not supported for the Mock Client")
+    }
+
     override fun searchIssueStubs(jiraConfiguration: JIRAConfiguration, jql: String): List<JIRAIssueStub> {
         return emptyList()
     }
