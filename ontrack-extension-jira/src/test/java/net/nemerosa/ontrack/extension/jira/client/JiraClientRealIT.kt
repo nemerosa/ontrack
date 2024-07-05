@@ -77,6 +77,7 @@ class JiraClientRealIT : AbstractDSLTestSupport() {
                     body = "Description 2",
                 )
                 client.createLink(
+                    jiraConfiguration = config,
                     sourceTicket = key1,
                     targetTicket = key2,
                     linkName = "Relates",
