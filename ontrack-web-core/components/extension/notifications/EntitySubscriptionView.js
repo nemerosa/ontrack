@@ -3,7 +3,7 @@ import {useProjectEntityPageInfo} from "@components/entities/ProjectEntityPageIn
 
 export default function EntitySubscriptionView({type, id, name}) {
 
-    const {title, breadcrumbs, closeUri, entity} = useProjectEntityPageInfo(type, id)
+    const {title, breadcrumbs, entity} = useProjectEntityPageInfo(type, id, 'Subscriptions')
 
     return (
         <>

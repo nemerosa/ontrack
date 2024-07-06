@@ -1,7 +1,12 @@
+import {Dynamic} from "@components/common/Dynamic";
+
 export default function NotificationSourceData({source}) {
     return (
         <>
-            {JSON.stringify(source, null, 2)}
+            <Dynamic
+                path={`framework/notification-source/${source.id}/Display`}
+                props={{...source.data}}
+            />
         </>
     )
 }

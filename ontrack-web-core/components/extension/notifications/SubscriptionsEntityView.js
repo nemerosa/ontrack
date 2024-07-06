@@ -4,14 +4,14 @@ import {isAuthorized} from "@components/common/authorizations";
 
 export default function SubscriptionsEntityView({type, id}) {
 
-    const {title, breadcrumbs, closeUri, entity} = useProjectEntityPageInfo(type, id)
+    const {title, breadcrumbs, uri, entity} = useProjectEntityPageInfo(type, id, 'Subscriptions')
 
     return (
         <>
             <SubscriptionsView
                 title={title}
                 breadcrumbs={breadcrumbs}
-                closeUri={closeUri}
+                closeUri={uri}
                 managePermission={isAuthorized(entity, 'subscriptions', 'edit')}
                 additionalFilter={{
                     entity: {

@@ -71,11 +71,11 @@ export const extractProjectEntityInfo = (type, entity) => {
     }
 }
 
-export const useProjectEntityPageInfo = (type, id) => {
+export const useProjectEntityPageInfo = (type, id, what) => {
     const client = useGraphQLClient()
     const [title, setTitle] = useState('')
     const [breadcrumbs, setBreadcrumbs] = useState([])
-    const [closeUri, setCloseUri] = useState('')
+    const [uri, setUri] = useState('')
     const [entity, setEntity] = useState({})
 
     useEffect(() => {
@@ -97,7 +97,7 @@ export const useProjectEntityPageInfo = (type, id) => {
                             }
                         `, {id}
                     ).then(data => {
-                        setTitle(projectTitleName(data.project, 'Subscriptions'))
+                        setTitle(projectTitleName(data.project, what))
 
                         const breadcrumbs = projectBreadcrumbs()
                         breadcrumbs.push(
@@ -105,7 +105,7 @@ export const useProjectEntityPageInfo = (type, id) => {
                         )
                         setBreadcrumbs(breadcrumbs)
 
-                        setCloseUri(projectUri(data.project))
+                        setUri(projectUri(data.project))
 
                         setEntity(data.project)
                     })
@@ -131,9 +131,9 @@ export const useProjectEntityPageInfo = (type, id) => {
                             }
                         `, {id}
                     ).then(data => {
-                        setTitle(branchTitleName(data.branch, 'Subscriptions'))
+                        setTitle(branchTitleName(data.branch, what))
                         setBreadcrumbs(downToBranchBreadcrumbs(data))
-                        setCloseUri(branchUri(data.branch))
+                        setUri(branchUri(data.branch))
                         setEntity(data.branch)
                     })
                     break
@@ -164,7 +164,7 @@ export const useProjectEntityPageInfo = (type, id) => {
                             }
                         `, {id}
                     ).then(data => {
-                        setTitle(promotionLevelTitleName(data.promotionLevel, 'Subscriptions'))
+                        setTitle(promotionLevelTitleName(data.promotionLevel, what))
 
                         const breadcrumbs = promotionLevelBreadcrumbs(data.promotionLevel)
                         breadcrumbs.push(
@@ -176,7 +176,7 @@ export const useProjectEntityPageInfo = (type, id) => {
                         )
                         setBreadcrumbs(breadcrumbs)
 
-                        setCloseUri(promotionLevelUri(data.promotionLevel))
+                        setUri(promotionLevelUri(data.promotionLevel))
 
                         setEntity(data.promotionLevel)
                     })
@@ -208,7 +208,7 @@ export const useProjectEntityPageInfo = (type, id) => {
                             }
                         `, {id}
                     ).then(data => {
-                        setTitle(validationStampTitleName(data.validationStamp, 'Subscriptions'))
+                        setTitle(validationStampTitleName(data.validationStamp, what))
 
                         const breadcrumbs = validationStampBreadcrumbs(data.validationStamp)
                         breadcrumbs.push(
@@ -220,7 +220,7 @@ export const useProjectEntityPageInfo = (type, id) => {
                         )
                         setBreadcrumbs(breadcrumbs)
 
-                        setCloseUri(validationStampUri(data.validationStamp))
+                        setUri(validationStampUri(data.validationStamp))
 
                         setEntity(data.validationStamp)
                     })
@@ -233,7 +233,11 @@ export const useProjectEntityPageInfo = (type, id) => {
     return {
         title,
         breadcrumbs,
-        closeUri,
+        /**
+         * @deprecated Use `uri` instead
+         */
+        closeUri: uri,
+        uri,
         entity,
     }
 }
