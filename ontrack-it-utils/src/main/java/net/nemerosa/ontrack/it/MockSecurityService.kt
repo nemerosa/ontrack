@@ -22,6 +22,9 @@ class MockSecurityService : SecurityService {
     override val autoProjectFunctions: Set<KClass<out ProjectFunction>>
         get() = error("Not available in mock")
 
+    override val autoGlobalFunctions: Set<KClass<out GlobalFunction>>
+        get() = error("Not available in mock")
+
     override val currentAccount: OntrackAuthenticatedUser?
         get() = error("Not available in mock")
 

@@ -21,7 +21,7 @@ class DashboardStorageServiceImpl(
             store = STORE,
             type = StoredDashboard::class,
             size = MAX_DASHBOARDS,
-            query = "CAST(data->>'userId' as int) = :userId",
+            query = "CAST(data->>'userId' as int) = :userId AND data->'dashboard'->>'userScope' = 'PRIVATE'",
             queryVariables = mapOf("userId" to id.value)
         ).map { it.dashboard }
 
@@ -30,20 +30,18 @@ class DashboardStorageServiceImpl(
             store = STORE,
             type = StoredDashboard::class,
             size = MAX_DASHBOARDS,
-            query = "data->>'userId' IS NULL",
+            query = "data->'dashboard'->>'userScope' = 'SHARED'",
         ).map { it.dashboard }
 
     override fun saveDashboard(dashboard: Dashboard): Dashboard {
-        val userId = if (dashboard.userScope == DashboardContextUserScope.PRIVATE) {
-            securityService.currentAccount?.id()
-        } else {
-            null
+        if (dashboard.userScope == DashboardContextUserScope.BUILT_IN) {
+            error("Cannot save built-in dashboards")
         }
         storageService.store(
             STORE,
             dashboard.uuid,
             StoredDashboard(
-                userId = userId,
+                userId = securityService.currentAccount?.id(),
                 dashboard = dashboard,
             )
         )
@@ -59,6 +57,12 @@ class DashboardStorageServiceImpl(
         storageService.delete(STORE, uuid)
     }
 
+    /**
+     * Stored dashboard
+     *
+     * @property userId Creator of the dashboard (null for backward compatibility)
+     * @property dashboard Dashboard definition
+     */
     private data class StoredDashboard(
         val userId: Int?,
         val dashboard: Dashboard,

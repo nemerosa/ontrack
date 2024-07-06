@@ -16,11 +16,11 @@ interface JIRAClient : AutoCloseable {
         configuration: JIRAConfiguration,
         project: String,
         issueType: String,
-        labels: List<String>,
-        fixVersion: String?,
-        assignee: String?,
+        labels: List<String> = emptyList(),
+        fixVersion: String? = null,
+        assignee: String? = null,
         title: String,
-        customFields: List<JiraCustomField>,
+        customFields: List<JiraCustomField> = emptyList(),
         body: String,
     ): JIRAIssueStub
 
@@ -28,6 +28,21 @@ interface JIRAClient : AutoCloseable {
         jiraConfiguration: JIRAConfiguration,
         jql: String,
     ): List<JIRAIssueStub>
+
+    /**
+     * Creates a link between two tickets
+     *
+     * @param jiraConfiguration Jira configuration
+     * @param sourceTicket Key of the source ticket
+     * @param targetTicket Key of the target ticket
+     * @param linkName Name of the link
+     */
+    fun createLink(
+        jiraConfiguration: JIRAConfiguration,
+        sourceTicket: String,
+        targetTicket: String,
+        linkName: String,
+    )
 
     /**
      * Underlying REST template to use

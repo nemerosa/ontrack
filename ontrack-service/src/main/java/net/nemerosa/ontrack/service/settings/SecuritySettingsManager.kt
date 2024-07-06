@@ -21,6 +21,8 @@ class SecuritySettingsManager(
         settingsRepository.setBoolean(SecuritySettings::class.java, "grantProjectViewToAll", settings.isGrantProjectViewToAll)
         settingsRepository.setBoolean(SecuritySettings::class.java, "grantProjectParticipationToAll", settings.isGrantProjectParticipationToAll)
         settingsRepository.setBoolean(SecuritySettings::class.java, SecuritySettings::builtInAuthenticationEnabled.name, settings.builtInAuthenticationEnabled)
+        settingsRepository.setBoolean(SecuritySettings::class.java, SecuritySettings::grantDashboardEditionToAll.name, settings.grantDashboardEditionToAll)
+        settingsRepository.setBoolean(SecuritySettings::class.java, SecuritySettings::grantDashboardSharingToAll.name, settings.grantDashboardSharingToAll)
     }
 
     override fun getId(): String = "general-security"

@@ -30,7 +30,7 @@ export default function JenkinsNotificationChannelConfig({config, job, parameter
 
     return (
         <>
-            <p>
+            <Space direction="vertical">
                 <Space size={4}>
                     <Typography.Text>Triggering job at</Typography.Text>
                     {
@@ -39,45 +39,39 @@ export default function JenkinsNotificationChannelConfig({config, job, parameter
                     (<Typography.Text code>{config}</Typography.Text>)
                     <Typography.Text code>{job}</Typography.Text>
                 </Space>
-            </p>
-            {
-                parameters && parameters.length > 0 &&
-                <>
-                    <p>
-                        Parameters:
-                    </p>
-                    <ul>
-                        {
-                            parameters.map(({name, value}) => (
-                                <li key={name}>
-                                    <Space>
-                                        <Typography.Text code>{name}</Typography.Text>
-                                        <FaArrowRight/>
-                                        <Typography.Text code>{value}</Typography.Text>
-                                    </Space>
-                                </li>
-                            ))
-                        }
-                    </ul>
-                </>
-            }
-            <p>
+                {
+                    parameters && parameters.length > 0 &&
+                    <>
+                        <Typography.Text>Parameters:</Typography.Text>
+                        <ul>
+                            {
+                                parameters.map(({name, value}) => (
+                                    <li key={name}>
+                                        <Space>
+                                            <Typography.Text code>{name}</Typography.Text>
+                                            <FaArrowRight/>
+                                            <Typography.Text code>{value}</Typography.Text>
+                                        </Space>
+                                    </li>
+                                ))
+                            }
+                        </ul>
+                    </>
+                }
                 <Space>
-                Call mode:
-                {
-                    callMode === 'ASYNC' && 'Asynchronous (fire and forget)'
-                }
-                {
-                    callMode === 'SYNC' && 'Synchronous (waits for completion)'
-                }
+                    Call mode:
+                    {
+                        callMode === 'ASYNC' && 'Asynchronous (fire and forget)'
+                    }
+                    {
+                        callMode === 'SYNC' && 'Synchronous (waits for completion)'
+                    }
                 </Space>
-            </p>
-            <p>
                 <Space>
                     <Typography.Text>Timeout:</Typography.Text>
-                    <Duration seconds={timeout} displaySecondsInTooltip={true}/>
+                    <Duration seconds={timeout} displaySecondsInTooltip={true} defaultText="Default"/>
                 </Space>
-            </p>
+            </Space>
         </>
     )
 }

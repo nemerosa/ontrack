@@ -1,10 +1,8 @@
 import {Descriptions, Space, Tag, Typography} from "antd";
-import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
-import {useEffect, useState} from "react";
-import {gql} from "graphql-request";
 import Link from "next/link";
 import YesNo from "@components/common/YesNo";
 import JiraCustomFields from "@components/extension/jira/JiraCustomFields";
+import {useJiraConfigurationUrl} from "@components/extension/jira/Utils";
 
 export default function JiraCreationNotificationChannelConfig({
                                                                   configName,
@@ -18,25 +16,7 @@ export default function JiraCreationNotificationChannelConfig({
                                                                   customFields,
                                                               }) {
 
-    const client = useGraphQLClient()
-    const [url, setUrl] = useState('')
-
-    useEffect(() => {
-        if (client && configName) {
-            client.request(
-                gql`
-                    query GetJiraConfiguration($config: String!) {
-                        jiraConfiguration(name: $config) {
-                            url
-                        }
-                    }
-                `,
-                {config: configName}
-            ).then(data => {
-                setUrl(data.jiraConfiguration?.url)
-            })
-        }
-    }, [client, configName]);
+    const url = useJiraConfigurationUrl(configName)
 
     const items = [
         {

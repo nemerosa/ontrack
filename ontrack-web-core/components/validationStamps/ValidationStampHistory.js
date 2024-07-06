@@ -77,6 +77,8 @@ export default function ValidationStampHistory({validationStamp}) {
                                             name
                                             passed
                                         }
+                                        description
+                                        annotatedDescription
                                     }
                                     build {
                                         id
@@ -279,7 +281,7 @@ export default function ValidationStampHistory({validationStamp}) {
                         key="description"
                         render={(_, run) =>
                             <AnnotatedDescription
-                                entity={run}
+                                entity={run.lastStatus}
                                 disabled={false}
                             />
                         }

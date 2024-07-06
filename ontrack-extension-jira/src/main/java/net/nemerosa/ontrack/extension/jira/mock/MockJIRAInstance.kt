@@ -29,9 +29,6 @@ class MockJIRAInstance {
 
     fun registerIssue(key: String, summary: String, type: String?, linkedKey: String? = null): JIRAIssue {
         val projectName = key.substringBefore("-")
-        val project = projects.getOrPut(projectName) {
-            JIRAProject(projectName)
-        }
         val openStatus = JIRAStatus("Open", "https://mock/status/Open")
         val issue = JIRAIssue(
             url = "mock://jira/$projectName/$key",
@@ -63,8 +60,17 @@ class MockJIRAInstance {
                 )
             },
         )
-        project.issues[key] = issue
+        registerIssue(issue)
         return issue
+    }
+
+    fun registerIssue(issue: JIRAIssue) {
+        val key = issue.key
+        val projectName = key.substringBefore("-")
+        val project = projects.getOrPut(projectName) {
+            JIRAProject(projectName)
+        }
+        project.issues[key] = issue
     }
 
     fun getProjectIssues(projectName: String): Map<String, JIRAIssue> = projects[projectName]?.issues ?: emptyMap()

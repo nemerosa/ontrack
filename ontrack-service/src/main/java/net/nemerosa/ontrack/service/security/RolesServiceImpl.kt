@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service.security
 
 import net.nemerosa.ontrack.model.dashboards.DashboardEdition
+import net.nemerosa.ontrack.model.dashboards.DashboardSharing
 import net.nemerosa.ontrack.model.labels.LabelManagement
 import net.nemerosa.ontrack.model.labels.ProjectLabelManagement
 import net.nemerosa.ontrack.model.security.*
@@ -285,7 +286,8 @@ class RolesServiceImpl(
         registerGlobalRole(Roles.GLOBAL_PARTICIPANT, "Participant",
                 "This role grants a read-only access to all projects and the right to comment on validation runs.",
                 RolesService.readOnlyGlobalFunctions
-                        + DashboardEdition::class.java,
+                        + DashboardEdition::class.java
+                        + DashboardSharing::class.java,
                 RolesService.readOnlyProjectFunctions
                         + ValidationRunStatusChange::class.java
                         + ValidationRunStatusCommentEditOwn::class.java

@@ -31,6 +31,11 @@ interface SecurityService {
     val autoProjectFunctions: Set<KClass<out ProjectFunction>>
 
     /**
+     * List of [global functions][GlobalFunction] which are automatically assigned to authenticated users.
+     */
+    val autoGlobalFunctions: Set<KClass<out GlobalFunction>>
+
+    /**
      * Returns the current logged account or `null` if none is logged.
      */
     val currentAccount: OntrackAuthenticatedUser?

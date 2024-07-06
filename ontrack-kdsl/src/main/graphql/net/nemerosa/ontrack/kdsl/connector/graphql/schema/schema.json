@@ -39103,6 +39103,16 @@
                     "ofType": null
                   },
                   "defaultValue": "20"
+                },
+                {
+                  "name": "name",
+                  "description": "Name of a workflow",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
                 }
               ],
               "type": {

@@ -26,9 +26,10 @@ export default function Duration({
                                      seconds,
                                      displaySeconds = true,
                                      displaySecondsInTooltip = true,
+                                     defaultText = ''
                                  }) {
     if (!seconds && seconds !== 0) {
-        return ''
+        return defaultText
     } else {
         const inner = formatSeconds(seconds)
         if (displaySeconds) {

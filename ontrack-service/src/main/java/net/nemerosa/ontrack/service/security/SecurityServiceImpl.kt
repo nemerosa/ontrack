@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.service.security
 
+import net.nemerosa.ontrack.model.dashboards.DashboardEdition
+import net.nemerosa.ontrack.model.dashboards.DashboardSharing
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.settings.SecuritySettings
@@ -58,16 +60,29 @@ class SecurityServiceImpl : SecurityService {
             return if (settings.isGrantProjectViewToAll) {
                 if (settings.isGrantProjectParticipationToAll) {
                     setOf(
-                            ProjectView::class,
-                            ValidationRunStatusChange::class,
-                            ValidationRunStatusCommentEditOwn::class
+                        ProjectView::class,
+                        ValidationRunStatusChange::class,
+                        ValidationRunStatusCommentEditOwn::class
                     )
-                }  else {
+                } else {
                     setOf(ProjectView::class)
                 }
             } else {
                 emptySet()
             }
+        }
+
+    override val autoGlobalFunctions: Set<KClass<out GlobalFunction>>
+        get() {
+            val settings = cachedSettingsService.getCachedSettings(SecuritySettings::class.java)
+            val functions = mutableSetOf<KClass<out GlobalFunction>>()
+            if (settings.grantDashboardEditionToAll) {
+                functions += DashboardEdition::class
+                if (settings.grantDashboardSharingToAll) {
+                    functions += DashboardSharing::class
+                }
+            }
+            return functions.toSet()
         }
 
     override val currentAccount: OntrackAuthenticatedUser?

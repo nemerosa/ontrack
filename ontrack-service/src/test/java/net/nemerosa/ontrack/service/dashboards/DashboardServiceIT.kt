@@ -8,11 +8,15 @@ import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class DashboardServiceIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var dashboardService: DashboardService
+
+    @Autowired
+    private lateinit var dashboardStorageService: DashboardStorageService
 
     @Test
     fun `Default dashboard`() {
@@ -89,6 +93,102 @@ class DashboardServiceIT : AbstractDSLTestSupport() {
                     selectedDashboard
                 )
             }
+        }
+    }
+
+    @Test
+    fun `By default, any user can create and delete a private dashboard`() {
+        val name = uid("dash_")
+        asUser {
+            val dashboard = dashboardService.saveDashboard(
+                SaveDashboardInput(
+                    uuid = null,
+                    name = name,
+                    userScope = DashboardContextUserScope.PRIVATE,
+                    widgets = listOf(
+                        WidgetInstanceInput(
+                            uuid = null,
+                            key = "home/LastActiveProjects",
+                            config = mapOf("count" to 10).asJson(),
+                            layout = WidgetLayout(x = 0, y = 0, w = 12, h = 1),
+                        )
+                    ),
+                    select = true,
+                )
+            )
+            val selectedDashboard = dashboardService.userDashboard()
+            assertEquals(
+                dashboard,
+                selectedDashboard
+            )
+            // Deleting this dashboard
+            dashboardService.deleteDashboard(dashboard.uuid)
+            assertEquals(
+                DashboardContextUserScope.BUILT_IN,
+                dashboardService.userDashboard().userScope
+            )
+        }
+    }
+
+    @Test
+    fun `By default, any user can delete a shared dashboard if owned by them`() {
+        val name = uid("dash_")
+        asUser {
+            val dashboard = dashboardService.saveDashboard(
+                SaveDashboardInput(
+                    uuid = null,
+                    name = name,
+                    userScope = DashboardContextUserScope.SHARED,
+                    widgets = listOf(
+                        WidgetInstanceInput(
+                            uuid = null,
+                            key = "home/LastActiveProjects",
+                            config = mapOf("count" to 10).asJson(),
+                            layout = WidgetLayout(x = 0, y = 0, w = 12, h = 1),
+                        )
+                    ),
+                    select = true,
+                )
+            )
+            // Deleting this dashboard
+            dashboardService.deleteDashboard(dashboard.uuid)
+            // Dashboard has been deleted
+            assertNull(
+                dashboardStorageService.findDashboardByUuid(dashboard.uuid),
+                "Dashboard has been deleted"
+            )
+        }
+    }
+
+    @Test
+    fun `Administrators can delete any dashboard`() {
+        val name = uid("dash_")
+        asUser {
+            val dashboard = dashboardService.saveDashboard(
+                SaveDashboardInput(
+                    uuid = null,
+                    name = name,
+                    userScope = DashboardContextUserScope.SHARED,
+                    widgets = listOf(
+                        WidgetInstanceInput(
+                            uuid = null,
+                            key = "home/LastActiveProjects",
+                            config = mapOf("count" to 10).asJson(),
+                            layout = WidgetLayout(x = 0, y = 0, w = 12, h = 1),
+                        )
+                    ),
+                    select = true,
+                )
+            )
+            // Deleting this dashboard with an administrator account
+            asAccountWithGlobalRole(Roles.GLOBAL_ADMINISTRATOR) {
+                dashboardService.deleteDashboard(dashboard.uuid)
+            }
+            // Dashboard has been deleted
+            assertNull(
+                dashboardStorageService.findDashboardByUuid(dashboard.uuid),
+                "Dashboard has been deleted"
+            )
         }
     }
 

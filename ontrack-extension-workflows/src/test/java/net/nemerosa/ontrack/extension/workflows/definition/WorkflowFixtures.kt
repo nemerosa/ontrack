@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.node.TextNode
 
 object WorkflowFixtures {
 
-    fun simpleLinearWorkflow() =
+    fun simpleLinearWorkflow(
+        name: String = "Simple linear"
+    ) =
         Workflow(
-            name = "Simple linear",
+            name = name,
             nodes = listOf(
                 WorkflowNode(
                     id = "start",

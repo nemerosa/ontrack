@@ -1,0 +1,16 @@
+query WorkflowInstancesByName(
+    $workflowName: String!,
+) {
+    workflowInstances(name: $workflowName) {
+        pageItems {
+            status
+            finished
+            nodesExecutions {
+                id
+                status
+                output
+                error
+            }
+        }
+    }
+}

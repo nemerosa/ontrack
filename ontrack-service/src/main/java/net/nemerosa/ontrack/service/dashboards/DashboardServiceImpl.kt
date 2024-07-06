@@ -105,26 +105,45 @@ class DashboardServiceImpl(
         return dashboard
     }
 
+    /**
+     * Deletion of an existing dashboard.
+     *
+     * A built-in dashboard can never be deleted.
+     *
+     * A shared dashboard can be deleted if:
+     *
+     * * the user is granted the [DashboardGlobal] function
+     * * or the user owns this dashboard
+     *
+     * A private dashboard can be deleted if:
+     *
+     * * the user owns this dashboard
+     */
     override fun deleteDashboard(uuid: String) {
         val existing = dashboardStorageService.findDashboardByUuid(uuid)
             ?: throw DashboardUuidNotFoundException(uuid)
 
-        when (existing.userScope) {
-            DashboardContextUserScope.BUILT_IN -> throw DashboardCannotDeleteBuiltInException()
-            DashboardContextUserScope.SHARED -> securityService.checkGlobalFunction(DashboardSharing::class.java)
-            DashboardContextUserScope.PRIVATE -> securityService.checkGlobalFunction(DashboardEdition::class.java)
-        }
-
         val account = securityService.currentAccount?.account
-        if (account != null) {
-            val prefs = preferencesService.getPreferences(account)
-            if (prefs.dashboardUuid == uuid) {
-                prefs.dashboardUuid = null
-                preferencesService.setPreferences(account, prefs)
-            }
+        val ownsDashboard = account != null && dashboardStorageService.ownDashboard(uuid, account.id)
+
+        val okToDelete: Boolean = when (existing.userScope) {
+            DashboardContextUserScope.BUILT_IN -> throw DashboardCannotDeleteBuiltInException()
+            DashboardContextUserScope.SHARED -> ownsDashboard || securityService.isGlobalFunctionGranted<DashboardGlobal>()
+            DashboardContextUserScope.PRIVATE -> ownsDashboard
         }
 
-        dashboardStorageService.deleteDashboard(uuid)
+        if (okToDelete) {
+
+            if (account != null) {
+                val prefs = preferencesService.getPreferences(account)
+                if (prefs.dashboardUuid == uuid) {
+                    prefs.dashboardUuid = null
+                    preferencesService.setPreferences(account, prefs)
+                }
+            }
+
+            dashboardStorageService.deleteDashboard(uuid)
+        }
     }
 
     override fun selectDashboard(uuid: String) {

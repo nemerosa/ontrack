@@ -5,7 +5,8 @@ import PromotionLevelLink from "@components/promotionLevels/PromotionLevelLink";
 
 export default function PromotionLevel({
                                            promotionLevel, details, size = 16,
-                                           displayTooltip = true, displayText = false
+                                           displayTooltip = true, displayText = false,
+                                           displayDescription = true,
                                        }) {
 
     return (
@@ -18,7 +19,10 @@ export default function PromotionLevel({
                         }
                         content={
                             <Space direction="vertical">
-                                <AnnotatedDescription entity={promotionLevel}/>
+                                {
+                                    displayDescription &&
+                                    <AnnotatedDescription entity={promotionLevel}/>
+                                }
                                 {
                                     details
                                 }

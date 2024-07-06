@@ -23,7 +23,9 @@ class InMemoryWorkflowInstanceStore : WorkflowInstanceStore {
     override fun findById(id: String): WorkflowInstance? = instances[id]
 
     override fun findByFilter(workflowInstanceFilter: WorkflowInstanceFilter): PaginatedList<WorkflowInstance> {
-        val values = instances.values.sortedByDescending { it.startTime }
+        val values = instances.values
+            .filter { workflowInstanceFilter.name.isNullOrBlank() || workflowInstanceFilter.name == it.workflow.name }
+            .sortedByDescending { it.startTime }
         return PaginatedList.create(
             items = values,
             offset = workflowInstanceFilter.offset,

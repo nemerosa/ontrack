@@ -30,6 +30,20 @@ export default function GeneralSecurityForm({id, ...values}) {
                 >
                     <Switch/>
                 </Form.Item>
+                <Form.Item
+                    name="grantDashboardEditionToAll"
+                    label="Grants dashboard creation rights to all"
+                    extra="Any logged user will have the right to create dashboards."
+                >
+                    <Switch/>
+                </Form.Item>
+                <Form.Item
+                    name="grantDashboardSharingToAll"
+                    label="Grants dashboard sharing rights to all"
+                    extra="Any logged user will have the right to shared their dashboards."
+                >
+                    <Switch/>
+                </Form.Item>
             </SettingsForm>
         </>
     )

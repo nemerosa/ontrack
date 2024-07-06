@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.kdsl.connector.graphql.schema.LaunchWorkflowMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.SaveYamlWorkflowMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.StopWorkflowMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.WorkflowInstanceQuery
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.WorkflowInstancesByNameQuery
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.LaunchWorkflowInputContext
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 
@@ -42,6 +43,29 @@ class WorkflowsMgt(connector: Connector) : Connected(connector) {
         ) {
             it?.stopWorkflow()?.fragments()?.payloadUserErrors()?.convert()
         }
+    }
+
+    fun workflowInstancesByName(name: String): List<WorkflowInstance> {
+        return graphqlConnector.query(
+            WorkflowInstancesByNameQuery(name)
+        )?.workflowInstances()?.pageItems()?.map { item ->
+            WorkflowInstance(
+                status = item.status().run {
+                    WorkflowInstanceStatus.valueOf(toString())
+                },
+                finished = item.finished(),
+                nodesExecutions = item.nodesExecutions().map {
+                    WorkflowInstanceNode(
+                        id = it.id(),
+                        status = it.status().run {
+                            WorkflowInstanceNodeStatus.valueOf(toString())
+                        },
+                        output = it.output(),
+                        error = it.error(),
+                    )
+                }
+            )
+        } ?: emptyList()
     }
 
     fun workflowInstance(instanceId: String): WorkflowInstance? {
