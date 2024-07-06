@@ -180,19 +180,6 @@ export default function NotificationRecordingsView() {
                         />
 
                         <Column
-                            key="channelConfig"
-                            title="Channel config"
-                            render={(_, record) => (
-                                <>
-                                    <NotificationChannelConfig
-                                        channel={record.channel}
-                                        config={record.channelConfig}
-                                    />
-                                </>
-                            )}
-                        />
-
-                        <Column
                             key="result"
                             title="Result"
                             render={(_, record) => <NotificationResultType type={record.result.type}/>}
