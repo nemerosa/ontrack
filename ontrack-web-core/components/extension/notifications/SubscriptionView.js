@@ -9,6 +9,8 @@ import {gql} from "graphql-request";
 import NotificationRecordDetails from "@components/extension/notifications/NotificationRecordDetails";
 import Timestamp from "@components/common/Timestamp";
 import NotificationResultType from "@components/extension/notifications/NotificationResultType";
+import {CloseCommand} from "@components/common/Commands";
+import {subscriptionsLink} from "@components/extension/notifications/SubscriptionsLink";
 
 const {Column} = Table
 
@@ -108,7 +110,9 @@ export default function SubscriptionView({title, breadcrumbs, entity, name}) {
             <MainPage
                 title={`Subscription: ${name}`}
                 breadcrumbs={breadcrumbs}
-                commands={[]}
+                commands={[
+                    <CloseCommand key="close" href={subscriptionsLink(entity)}/>
+                ]}
             >
                 <Skeleton active loading={loading}>
                     <Space direction="vertical" className="ot-line">

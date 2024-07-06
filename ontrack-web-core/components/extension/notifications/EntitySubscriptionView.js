@@ -1,5 +1,6 @@
 import SubscriptionView from "@components/extension/notifications/SubscriptionView";
 import {useProjectEntityPageInfo} from "@components/entities/ProjectEntityPageInfo";
+import SubscriptionsLink from "@components/extension/notifications/SubscriptionsLink";
 
 export default function EntitySubscriptionView({type, id, name}) {
 
@@ -9,7 +10,7 @@ export default function EntitySubscriptionView({type, id, name}) {
         <>
             <SubscriptionView
                 title={title}
-                breadcrumbs={breadcrumbs}
+                breadcrumbs={breadcrumbs.concat(<SubscriptionsLink entity={{type, id}}/>)}
                 entity={{type, id}}
                 name={name}
             />
