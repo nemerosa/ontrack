@@ -76,6 +76,7 @@ class JiraLinkNotificationChannelIT : AbstractNotificationTestSupport() {
 
                     // Setting up the Jira notification
                     eventSubscriptionService.subscribe(
+                        name = "Test",
                         channel = jiraLinkNotificationChannel,
                         channelConfig = JiraLinkNotificationChannelConfig(
                             configName = configuration.name,
@@ -204,6 +205,7 @@ class JiraLinkNotificationChannelIT : AbstractNotificationTestSupport() {
 
                     // Setting up the Jira notification
                     eventSubscriptionService.subscribe(
+                        name = "Test",
                         channel = jiraLinkNotificationChannel,
                         channelConfig = JiraLinkNotificationChannelConfig(
                             configName = configuration.name,
@@ -283,6 +285,7 @@ class JiraLinkNotificationChannelIT : AbstractNotificationTestSupport() {
 
                     // Setting up the Jira notification
                     eventSubscriptionService.subscribe(
+                        name = "Test",
                         channel = jiraLinkNotificationChannel,
                         channelConfig = JiraLinkNotificationChannelConfig(
                             configName = configuration.name,
