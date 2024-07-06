@@ -5,10 +5,12 @@ import net.nemerosa.ontrack.extension.notifications.AbstractNotificationTestSupp
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.notifications.mock.MockNotificationChannelConfig
 import net.nemerosa.ontrack.extension.notifications.mock.MockNotificationChannelOutput
+import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscription
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getRequiredIntField
 import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.json.getTextField
+import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.test.assertJsonNotNull
 import net.nemerosa.ontrack.test.assertJsonNull
 import org.junit.jupiter.api.Test
@@ -135,6 +137,120 @@ internal class GQLRootQueryNotificationRecordsIT : AbstractNotificationTestSuppo
                     assertEquals(project.id(), path("event").path("entities").path("PROJECT").getRequiredIntField("id"))
                     assertEquals("INVALID_CONFIGURATION", path("result").getRequiredTextField("type"))
                     assertEquals("Invalid configuration", path("result").getTextField("message"))
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Getting the list of notifications filtered by entity subscription`() {
+        asAdmin {
+            notificationRecordingService.clearAll()
+            project {
+                branch {
+                    val silver = promotionLevel()
+                    eventSubscriptionService.subscribe(
+                        EventSubscription(
+                            projectEntity = silver,
+                            name = "Mail",
+                            events = setOf(EventFactory.NEW_PROMOTION_RUN.id),
+                            keywords = null,
+                            channel = "mock",
+                            channelConfig = MockNotificationChannelConfig("mail-silver").asJson(),
+                            disabled = false,
+                            origin = "test",
+                            contentTemplate = null,
+                        )
+                    )
+
+                    val pl = promotionLevel()
+                    eventSubscriptionService.subscribe(
+                        EventSubscription(
+                            projectEntity = pl,
+                            name = "Mail",
+                            events = setOf(EventFactory.NEW_PROMOTION_RUN.id),
+                            keywords = null,
+                            channel = "mock",
+                            channelConfig = MockNotificationChannelConfig("mail").asJson(),
+                            disabled = false,
+                            origin = "test",
+                            contentTemplate = null,
+                        )
+                    )
+                    eventSubscriptionService.subscribe(
+                        EventSubscription(
+                            projectEntity = pl,
+                            name = "Slack",
+                            events = setOf(EventFactory.NEW_PROMOTION_RUN.id),
+                            keywords = null,
+                            channel = "mock",
+                            channelConfig = MockNotificationChannelConfig("slack").asJson(),
+                            disabled = false,
+                            origin = "test",
+                            contentTemplate = null,
+                        )
+                    )
+
+                    build {
+                        // Triggering three notifications
+                        promote(pl)
+                        promote(silver)
+
+                        // Filtering on this entity
+                        run(
+                            """{
+                                notificationRecords(
+                                    sourceId: "entity-subscription",
+                                    sourceData: {
+                                        entityType: "PROMOTION_LEVEL",
+                                        entityId: ${pl.id}
+                                    }
+                                ) {
+                                    pageItems {
+                                        channelConfig
+                                    }
+                                }
+                            }"""
+                        ) { data ->
+                            val targets = data.path("notificationRecords").path("pageItems")
+                                .map { record ->
+                                    record.path("channelConfig").path("target").asText()
+                                }
+                            assertEquals(
+                                setOf("mail", "slack"),
+                                targets.toSet()
+                            )
+                        }
+
+                        // Filtering on one exact subscription
+                        run(
+                            """{
+                                notificationRecords(
+                                    sourceId: "entity-subscription",
+                                    sourceData: {
+                                        entityType: "PROMOTION_LEVEL",
+                                        entityId: ${pl.id},
+                                        subscriptionName: "Mail"
+                                    }
+                                ) {
+                                    pageItems {
+                                        channelConfig
+                                    }
+                                }
+                            }"""
+                        ) { data ->
+                            val targets = data.path("notificationRecords").path("pageItems")
+                                .map { record ->
+                                    record.path("channelConfig").path("target").asText()
+                                }
+                            assertEquals(
+                                setOf("mail"),
+                                targets.toSet()
+                            )
+                        }
+
+                    }
+
                 }
             }
         }

@@ -5309,7 +5309,11 @@ type Query {
         "Filtering on the result type"
         resultType: NotificationResultType,
         "Size of the page"
-        size: Int = 20
+        size: Int = 20,
+        "Filtering on the source data"
+        sourceData: JSON,
+        "Filtering on the source type"
+        sourceId: String
     ): NotificationRecordPaginated
     "Notification settings"
     notificationSettings: NotificationSettings

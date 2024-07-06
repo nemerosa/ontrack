@@ -1,14 +1,13 @@
 package net.nemerosa.ontrack.extension.notifications.recording
 
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.format
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.StorageService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Duration
-import java.util.*
 
 @Service
 @Transactional
@@ -38,7 +37,7 @@ class DefaultNotificationRecordingService(
         securityService.checkGlobalFunction(NotificationRecordingAccess::class.java)
 
         val queries = mutableListOf<String>()
-        val queryVariables = mutableMapOf<String, String>()
+        val queryVariables = mutableMapOf<String, Any>()
 
         if (!filter.channel.isNullOrBlank()) {
             queries += "data::jsonb->>'channel' = :channel"
@@ -48,6 +47,15 @@ class DefaultNotificationRecordingService(
         if (filter.resultType != null) {
             queries += "data::jsonb->'result'->>'type' = :resultType"
             queryVariables["resultType"] = filter.resultType.name
+        }
+
+        if (!filter.sourceId.isNullOrBlank()) {
+            queries += "data::jsonb->'source'->>'id' = :sourceId"
+            queryVariables["sourceId"] = filter.sourceId
+            if (filter.sourceData != null) {
+            queries += "data::jsonb->'source'->'data' @> CAST(:sourceData AS JSONB)"
+                queryVariables["sourceData"] = filter.sourceData.format()
+            }
         }
 
         val query = queries.joinToString(" AND ") { "( $it )" }
