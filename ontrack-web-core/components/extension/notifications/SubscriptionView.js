@@ -3,24 +3,36 @@ import {pageTitle} from "@components/common/Titles";
 import MainPage from "@components/layouts/MainPage";
 import SubscriptionCard from "@components/extension/notifications/SubscriptionCard";
 import {useEffect, useState} from "react";
-import {Skeleton, Space, Table, Typography} from "antd";
+import {Popconfirm, Skeleton, Space, Table, Typography} from "antd";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
 import NotificationRecordDetails from "@components/extension/notifications/NotificationRecordDetails";
 import Timestamp from "@components/common/Timestamp";
 import NotificationResultType from "@components/extension/notifications/NotificationResultType";
-import {CloseCommand} from "@components/common/Commands";
+import {CloseCommand, Command} from "@components/common/Commands";
 import {subscriptionsLink} from "@components/extension/notifications/SubscriptionsLink";
+import {FaTrash} from "react-icons/fa";
+import {useDeleteSubscription} from "@components/extension/notifications/DeleteSubscription";
+import {useRouter} from "next/router";
 
 const {Column} = Table
 
 export default function SubscriptionView({title, breadcrumbs, entity, name}) {
 
     const client = useGraphQLClient()
+    const router = useRouter()
+
+    const {deleteSubscription} = useDeleteSubscription()
+    const onDeleteSubscription = async () => {
+        await deleteSubscription({entity, name})
+        await router.push(subscriptionsLink(entity))
+    }
+
 
     const [loading, setLoading] = useState(true)
     const [subscription, setSubscription] = useState()
     const [recordings, setRecordings] = useState([])
+    const [commands, setCommands] = useState([])
 
     useEffect(() => {
         if (client) {
@@ -92,6 +104,21 @@ export default function SubscriptionView({title, breadcrumbs, entity, name}) {
                         }
                     )
                     setRecordings(dataRecordings.notificationRecords.pageItems)
+                    setCommands([
+                        <Popconfirm
+                            key="delete"
+                            title="Do you really want to delete this subscription?"
+                            onConfirm={onDeleteSubscription}
+                        >
+                            <div>
+                                <Command
+                                    text="Delete subscription"
+                                    icon={<FaTrash/>}
+                                />
+                            </div>
+                        </Popconfirm>,
+                        <CloseCommand key="close" href={subscriptionsLink(entity)}/>,
+                    ])
                 } finally {
                     setLoading(false)
                 }
@@ -110,9 +137,7 @@ export default function SubscriptionView({title, breadcrumbs, entity, name}) {
             <MainPage
                 title={`Subscription: ${name}`}
                 breadcrumbs={breadcrumbs}
-                commands={[
-                    <CloseCommand key="close" href={subscriptionsLink(entity)}/>
-                ]}
+                commands={commands}
             >
                 <Skeleton active loading={loading}>
                     <Space direction="vertical" className="ot-line">

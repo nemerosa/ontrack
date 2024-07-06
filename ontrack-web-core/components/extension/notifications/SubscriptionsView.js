@@ -10,6 +10,7 @@ import {CloseCommand, Command} from "@components/common/Commands";
 import InlineConfirmCommand from "@components/common/InlineConfirmCommand";
 import SubscriptionDialog, {useSubscriptionDialog} from "@components/extension/notifications/SubscriptionDialog";
 import SubscriptionCard from "@components/extension/notifications/SubscriptionCard";
+import {useDeleteSubscription} from "@components/extension/notifications/DeleteSubscription";
 
 export default function SubscriptionsView({
                                               title,
@@ -81,29 +82,15 @@ export default function SubscriptionsView({
         }
     }, [client, filter, refresh]);
 
+    const {deleteSubscription} = useDeleteSubscription()
+
     const onDeleteSubscription = (item) => {
-        return () => {
-            client.request(
-                gql`
-                    mutation DeleteSubscription(
-                        $id: String!,
-                        $projectEntity: ProjectEntityIDInput,
-                    ) {
-                        deleteSubscription(input: {
-                            id: $id,
-                            projectEntity: $projectEntity,
-                        }) {
-                            errors {
-                                message
-                            }
-                        }
-                    }
-                `,
-                {
-                    id: item.name,
-                    projectEntity: additionalFilter.entity,
-                }
-            ).then(reload)
+        return async () => {
+            await deleteSubscription({
+                name: item.name,
+                entity: additionalFilter.entity,
+            })
+            reload()
         }
     }
 
