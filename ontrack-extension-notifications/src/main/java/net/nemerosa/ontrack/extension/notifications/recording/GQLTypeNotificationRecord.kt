@@ -23,6 +23,7 @@ class GQLTypeNotificationRecord(
             .description("Notification record")
             .stringField(NotificationRecord::id)
             .field(NotificationRecord::source)
+            .field(NotificationRecord::source)
             .dateField(
                 NotificationRecord::timestamp.name,
                 getPropertyDescription(NotificationRecord::timestamp)

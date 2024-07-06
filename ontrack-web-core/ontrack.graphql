@@ -5488,6 +5488,8 @@ type Query {
     ): WorkflowInstance
     "List of workflow instances"
     workflowInstances(
+        "Name of a workflow"
+        name: String,
         "Offset for the page"
         offset: Int = 0,
         "Size of the page"

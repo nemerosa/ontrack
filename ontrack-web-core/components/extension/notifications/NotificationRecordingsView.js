@@ -5,7 +5,7 @@ import {homeBreadcrumbs} from "@components/common/Breadcrumbs";
 import {CloseCommand} from "@components/common/Commands";
 import {homeUri} from "@components/common/Links";
 import {useEffect, useState} from "react";
-import {Skeleton, Table} from "antd";
+import {Col, Skeleton, Table} from "antd";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
 import Timestamp from "@components/common/Timestamp";
@@ -16,6 +16,7 @@ import TablePaginationFooter from "@components/common/table/TablePaginationFoote
 import TableColumnFilterDropdown from "@components/common/table/TableColumnFilterDropdown";
 import SelectNotificationResultType from "@components/extension/notifications/SelectNotificationResultType";
 import SelectNotificationChannel from "@components/extension/notifications/SelectNotificationChannel";
+import NotificationSourceData from "@components/extension/notifications/NotificationSourceData";
 
 const {Column} = Table
 
@@ -63,6 +64,10 @@ export default function NotificationRecordingsView() {
                             }
                             pageItems {
                                 key: id
+                                source {
+                                    id
+                                    data
+                                }
                                 channel
                                 channelConfig
                                 event
@@ -162,6 +167,16 @@ export default function NotificationRecordingsView() {
                                 </TableColumnFilterDropdown>
                             }
                             filteredValue={filter.channel}
+                        />
+
+                        <Column
+                            key="source"
+                            title="Source"
+                            render={(_, record) => (
+                                <>
+                                    <NotificationSourceData source={record.source}/>
+                                </>
+                            )}
                         />
 
                         <Column
