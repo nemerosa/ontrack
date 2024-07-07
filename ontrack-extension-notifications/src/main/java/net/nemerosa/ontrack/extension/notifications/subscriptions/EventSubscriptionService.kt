@@ -88,4 +88,14 @@ interface EventSubscriptionService {
      */
     fun removeAllGlobal()
 
+    /**
+     * Renames a subscription.
+     *
+     * @param projectEntity Entity holding the subscription, `null` for a global subscription
+     * @param name Name of the subscription
+     * @param newName Name to set
+     * @return Renamed subscription (`null` if not found)
+     */
+    fun renameSubscription(projectEntity: ProjectEntity?, name: String, newName: String): EventSubscription?
+
 }

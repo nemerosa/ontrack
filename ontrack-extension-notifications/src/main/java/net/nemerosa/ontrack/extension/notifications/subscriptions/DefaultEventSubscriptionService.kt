@@ -34,6 +34,36 @@ class DefaultEventSubscriptionService(
         }
     }
 
+    override fun renameSubscription(projectEntity: ProjectEntity?, name: String, newName: String): EventSubscription? {
+        return if (projectEntity != null) {
+            securityService.checkProjectFunction(projectEntity, ProjectSubscriptionsWrite::class.java)
+            val subscription = entitySubscriptionStore.findByName(projectEntity, name)
+            val record = if (subscription != null) {
+                entitySubscriptionStore.deleteByName(projectEntity, name)
+                entitySubscriptionStore.save(projectEntity, subscription.withName(newName))
+                entitySubscriptionStore.findByName(projectEntity, newName)
+            } else {
+                null
+            }
+            record?.let {
+                entitySubscriptionRecordToSubscription(projectEntity, it)
+            }
+        } else {
+            securityService.checkGlobalFunction(GlobalSubscriptionsManage::class.java)
+            val subscription = globalSubscriptionStore.find(name)
+            val record = if (subscription != null) {
+                globalSubscriptionStore.delete(name)
+                globalSubscriptionStore.save(subscription.withName(newName))
+                globalSubscriptionStore.find(newName)
+            } else {
+                null
+            }
+            record?.let {
+                subscriptionRecordToGlobalSubscription(it)
+            }
+        }
+    }
+
     private fun EventSubscription.toSubscriptionRecord() = SubscriptionRecord(
         name = name,
         channel = channel,

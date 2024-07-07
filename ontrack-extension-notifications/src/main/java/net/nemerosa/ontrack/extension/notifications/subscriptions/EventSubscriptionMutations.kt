@@ -172,6 +172,36 @@ class EventSubscriptionMutations(
                     )
                 }
             },
+
+            simpleMutation(
+                name = "renameSubscription",
+                description = "Renames an existing subscription",
+                input = RenameSubscriptionInput::class,
+                outputName = "subscription",
+                outputDescription = "Renamed subscription",
+                outputType = EventSubscriptionPayload::class,
+            ) { input ->
+                val projectEntity = input.projectEntity?.run {
+                    type.getEntityFn(structureService).apply(ID.of(id))
+                }
+                eventSubscriptionService.findSubscriptionByName(
+                    projectEntity = projectEntity,
+                    name = input.name,
+                )?.let { subscription ->
+                    eventSubscriptionService.renameSubscription(projectEntity, input.name, input.newName)?.run {
+                        EventSubscriptionPayload(
+                            name = name,
+                            channel = channel,
+                            channelConfig = channelConfig,
+                            events = events.toList(),
+                            keywords = keywords,
+                            disabled = disabled,
+                            origin = origin,
+                            contentTemplate = contentTemplate,
+                        )
+                    }
+                }
+            },
         )
 
     private fun createEventSubscriptionPayload(
@@ -246,6 +276,17 @@ data class EnableSubscriptionInput(
     val id: String?,
     @APIDescription("Name of the subscription to enable")
     val name: String?,
+)
+
+@APIDescription("Renaming a subscription")
+data class RenameSubscriptionInput(
+    @APIDescription("Target project entity (null for global events)")
+    @TypeRef(embedded = true, suffix = "Input")
+    val projectEntity: ProjectEntityID?,
+    @APIDescription("Name of the subscription to rename")
+    val name: String,
+    @APIDescription("New name to set")
+    val newName: String,
 )
 
 @APIDescription("Subscription to events")

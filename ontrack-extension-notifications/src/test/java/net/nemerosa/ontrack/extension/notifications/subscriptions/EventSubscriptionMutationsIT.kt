@@ -15,6 +15,52 @@ import kotlin.test.*
 class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
 
     @Test
+    fun `Renaming a subscription for an entity`() {
+        asAdmin {
+            project {
+                eventSubscriptionService.subscribe(
+                    EventSubscription(
+                        projectEntity = this,
+                        name = "Old name",
+                        events = setOf(EventFactory.NEW_BRANCH.id),
+                        keywords = null,
+                        channel = "mock",
+                        channelConfig = mapOf("target" to "group").asJson(),
+                        disabled = false,
+                        origin = "test",
+                        contentTemplate = null,
+                    )
+                )
+                // Finding this initial subscription by name
+                assertNotNull(eventSubscriptionService.findSubscriptionByName(this, "Old name"))
+                // Renaming the subscription
+                run("""
+                    mutation {
+                        renameSubscription(input: {
+                            projectEntity: {
+                                type: PROJECT,
+                                id: $id
+                            },
+                            name: "Old name",
+                            newName: "New name",
+                        }) {
+                            errors {
+                                message
+                            }
+                        }
+                    }
+                """) { data ->
+                    checkGraphQLUserErrors(data, "renameSubscription")
+                }
+                // Initial subscription name is not found
+                assertNull(eventSubscriptionService.findSubscriptionByName(this, "Old name"))
+                // New name is found
+                assertNotNull(eventSubscriptionService.findSubscriptionByName(this, "New name"))
+            }
+        }
+    }
+
+    @Test
     fun `Settings subscriptions using the branch mutation`() {
         asAdmin {
             project {
