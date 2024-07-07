@@ -137,6 +137,7 @@ export default function SubscriptionsView({
                                     entity={additionalFilter.entity}
                                     actions={getActions(item)}
                                     managePermission={managePermission}
+                                    onRenamed={reload}
                                 />
                             </List.Item>
                         )}

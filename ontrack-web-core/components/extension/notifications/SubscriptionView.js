@@ -2,7 +2,7 @@ import Head from "next/head";
 import {pageTitle} from "@components/common/Titles";
 import MainPage from "@components/layouts/MainPage";
 import SubscriptionCard from "@components/extension/notifications/SubscriptionCard";
-import {useContext, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import {Popconfirm, Skeleton, Space, Table, Typography} from "antd";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
@@ -11,15 +11,13 @@ import Timestamp from "@components/common/Timestamp";
 import NotificationResultType from "@components/extension/notifications/NotificationResultType";
 import {CloseCommand, Command} from "@components/common/Commands";
 import {subscriptionsLink} from "@components/extension/notifications/SubscriptionsLink";
-import {FaPencilAlt, FaTrash} from "react-icons/fa";
+import {FaTrash} from "react-icons/fa";
 import {useDeleteSubscription} from "@components/extension/notifications/DeleteSubscription";
 import {useRouter} from "next/router";
-import {isAuthorized} from "@components/common/authorizations";
-import {UserContext} from "@components/providers/UserProvider";
 
 const {Column} = Table
 
-export default function SubscriptionView({title, breadcrumbs, entity, name, managePermission}) {
+export default function SubscriptionView({title, breadcrumbs, entity, name, managePermission, onRenamed}) {
 
     const client = useGraphQLClient()
     const router = useRouter()
@@ -153,6 +151,7 @@ export default function SubscriptionView({title, breadcrumbs, entity, name, mana
                             actions={[]}
                             subscription={subscription}
                             managePermission={managePermission}
+                            onRenamed={onRenamed}
                         />
 
                         <Typography.Title level={5} type="secondary">Recordings</Typography.Title>

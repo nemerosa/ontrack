@@ -3,7 +3,7 @@ import {useProjectEntityPageInfo} from "@components/entities/ProjectEntityPageIn
 import SubscriptionsLink from "@components/extension/notifications/SubscriptionsLink";
 import {isAuthorized} from "@components/common/authorizations";
 
-export default function EntitySubscriptionView({type, id, name}) {
+export default function EntitySubscriptionView({type, id, name, onRenamed}) {
 
     const {title, breadcrumbs, entity} = useProjectEntityPageInfo(type, id, 'Subscriptions')
 
@@ -15,6 +15,7 @@ export default function EntitySubscriptionView({type, id, name}) {
                 entity={{type, id}}
                 managePermission={isAuthorized(entity, 'subscriptions', 'edit')}
                 name={name}
+                onRenamed={onRenamed}
             />
         </>
     )

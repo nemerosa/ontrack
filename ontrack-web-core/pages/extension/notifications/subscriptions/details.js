@@ -7,17 +7,35 @@ export default function SubscriptionDetailsPage() {
     const router = useRouter()
     const {type, id, name} = router.query
 
+    const onRenamed = async (value) => {
+        let url = `/extension/notifications/subscriptions/details?name=${value}`
+        if (type && id) {
+            url += `&type=${type}&id=${id}`
+        }
+        await router.push(url)
+    }
+
     return (
         <>
             <main>
                 <MainLayout>
                     {
                         type && id &&
-                        <EntitySubscriptionView type={type} id={id} name={name}/>
+                        <EntitySubscriptionView
+                            key={router.asPath}
+                            type={type}
+                            id={id}
+                            name={name}
+                            onRenamed={onRenamed}
+                        />
                     }
                     {
                         (!type || !id) &&
-                        <GlobalSubscriptionView name={name}/>
+                        <GlobalSubscriptionView
+                            key={router.asPath}
+                            name={name}
+                            onRenamed={onRenamed}
+                        />
                     }
                 </MainLayout>
             </main>

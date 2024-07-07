@@ -3632,6 +3632,11 @@ type Mutation {
     purgeQueueRecordings: PurgeQueueRecordingsPayload
     "Reload the configuration from the CasC files"
     reloadCasc: ReloadCascPayload
+    "Renames an existing subscription"
+    renameSubscription(
+        "Input for the mutation"
+        input: RenameSubscriptionInput
+    ): RenameSubscriptionPayload
     "Reordering the promotion levels in a branch"
     reorderPromotionLevelById(
         "Input for the mutation"
@@ -5596,6 +5601,14 @@ type RateLimit {
 type ReloadCascPayload implements Payload {
     "List of errors"
     errors: [UserError]
+}
+
+"Output type for the renameSubscription mutation."
+type RenameSubscriptionPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Renamed subscription"
+    subscription: EventSubscriptionPayload
 }
 
 "Output type for the reorderPromotionLevelById mutation."
@@ -9004,6 +9017,16 @@ input QueueRecordingFilterInput {
     state: QueueRecordState
     "Filtering using some free text in the payload"
     text: String
+}
+
+"Input type for the renameSubscription mutation."
+input RenameSubscriptionInput {
+    "Name of the subscription to rename"
+    name: String!
+    "New name to set"
+    newName: String!
+    "Target project entity (null for global events)"
+    projectEntity: ProjectEntityIDInput
 }
 
 "Input type for the reorderPromotionLevelById mutation."

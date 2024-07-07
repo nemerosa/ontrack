@@ -4,12 +4,14 @@ import EventList from "@components/core/model/EventList";
 import NotificationChannelConfig from "@components/extension/notifications/NotificationChannelConfig";
 import SubscriptionContentTemplate from "@components/extension/notifications/SubscriptionContentTemplate";
 
-export default function SubscriptionCard({subscription, entity, actions, managePermission}) {
+export default function SubscriptionCard({subscription, entity, actions, managePermission, onRenamed}) {
     return (
         <>
             <Card
                 title={<SubscriptionLink subscription={subscription} entity={entity}
-                                         managePermission={managePermission}/>}
+                                         managePermission={managePermission}
+                                         onRenamed={onRenamed}
+                />}
                 extra={actions}
             >
                 <Card.Grid style={{width: '100%'}} hoverable={false}>

@@ -4,7 +4,7 @@ import SubscriptionsLink from "@components/extension/notifications/Subscriptions
 import {useContext} from "react";
 import {UserContext} from "@components/providers/UserProvider";
 
-export default function GlobalSubscriptionView({name}) {
+export default function GlobalSubscriptionView({name, onRenamed}) {
 
     const user = useContext(UserContext)
 
@@ -15,6 +15,7 @@ export default function GlobalSubscriptionView({name}) {
                 breadcrumbs={homeBreadcrumbs().concat(<SubscriptionsLink/>)}
                 name={name}
                 managePermission={user.authorizations.subscriptions?.edit}
+                onRenamed={onRenamed}
             />
         </>
     )
