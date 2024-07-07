@@ -8,12 +8,10 @@ import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import net.nemerosa.ontrack.model.structure.toProjectEntityID
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
 
-@Disabled("Flaky")
 class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
 
     @Autowired
@@ -192,11 +190,10 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
     }
 
     @Test
-    fun `Rendering without a template`() {
+    fun `Generated names for backward compatibility`() {
         val target = uid("t")
         project {
-            casc(
-                """
+            val cascYaml = """
                     ontrack:
                         extensions:
                             notifications:
@@ -218,44 +215,65 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                                           channel-config:
                                             target: "$target-gold"
                 """
+            // First generation
+            casc(
+                cascYaml
+            )
+            // Computing the actual name of the unnamed subscription
+            val generatedName = EventSubscription.computeName(
+                events = listOf("new_promotion_run"),
+                keywords = "GOLD",
+                channel = "mock",
+                channelConfig = mapOf("target" to "$target-gold").asJson(),
+                contentTemplate = null,
             )
             // Rendering
-            val json = entitySubscriptionsCascContext.render()
-            assertEquals(
-                listOf(
-                    mapOf(
-                        "entity" to mapOf(
-                            "project" to name,
-                            "branch" to null,
-                            "promotion" to null,
-                            "validation" to null,
-                        ),
-                        "subscriptions" to listOf(
-                            mapOf(
-                                "events" to listOf("new_promotion_run"),
-                                "keywords" to "SILVER",
-                                "channel" to "mock",
-                                "channel-config" to mapOf(
-                                    "target" to "$target-silver"
-                                ),
-                                "disabled" to null,
-                                "contentTemplate" to null,
+            fun checkRendering() {
+                val json = entitySubscriptionsCascContext.render()
+                assertEquals(
+                    listOf(
+                        mapOf(
+                            "entity" to mapOf(
+                                "project" to project.name,
+                                "branch" to null,
+                                "promotion" to null,
+                                "validation" to null,
                             ),
-                            mapOf(
-                                "events" to listOf("new_promotion_run"),
-                                "keywords" to "GOLD",
-                                "channel" to "mock",
-                                "channel-config" to mapOf(
-                                    "target" to "$target-gold"
+                            "subscriptions" to listOf(
+                                mapOf(
+                                    "name" to "test",
+                                    "events" to listOf("new_promotion_run"),
+                                    "keywords" to "SILVER",
+                                    "channel" to "mock",
+                                    "channel-config" to mapOf(
+                                        "target" to "$target-silver"
+                                    ),
+                                    "disabled" to false,
+                                    "contentTemplate" to null,
                                 ),
-                                "disabled" to null,
-                                "contentTemplate" to null,
-                            ),
+                                mapOf(
+                                    "name" to generatedName,
+                                    "events" to listOf("new_promotion_run"),
+                                    "keywords" to "GOLD",
+                                    "channel" to "mock",
+                                    "channel-config" to mapOf(
+                                        "target" to "$target-gold"
+                                    ),
+                                    "disabled" to false,
+                                    "contentTemplate" to null,
+                                ),
+                            )
                         )
-                    )
-                ).asJson(),
-                json
+                    ).asJson(),
+                    json
+                )
+            }
+            checkRendering()
+            // Second generation, still unnamed
+            casc(
+                cascYaml
             )
+            checkRendering()
         }
     }
 
@@ -296,13 +314,14 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                         ),
                         "subscriptions" to listOf(
                             mapOf(
+                                "name" to "test",
                                 "events" to listOf("new_promotion_run"),
                                 "keywords" to "SILVER",
                                 "channel" to "mock",
                                 "channel-config" to mapOf(
                                     "target" to "$target-silver"
                                 ),
-                                "disabled" to null,
+                                "disabled" to false,
                                 "contentTemplate" to "This is my template.",
                             ),
                         )
@@ -560,7 +579,7 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                     // Checking the notification
                     assertNotNull(mockNotificationChannel.messages[target], "Received notification on promotion") {
                         assertEquals(
-                            "Build $name has run for ${vs.name} with status Passed in branch ${branch.name} in ${project.name}.",
+                            "Build $name has run for the ${vs.name} with status Passed in branch ${branch.name} in ${project.name}.",
                             it.first()
                         )
                     }
@@ -622,7 +641,7 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                         "Received notification on failed notification"
                     ) {
                         assertEquals(
-                            "Build $name has run for ${vs.name} with status Failed in branch ${branch.name} in ${project.name}.",
+                            "Build $name has run for the ${vs.name} with status Failed in branch ${branch.name} in ${project.name}.",
                             it.first()
                         )
                     }

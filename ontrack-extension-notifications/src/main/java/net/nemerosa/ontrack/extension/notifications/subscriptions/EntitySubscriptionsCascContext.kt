@@ -65,7 +65,7 @@ class EntitySubscriptionsCascContext(
     override fun run(node: JsonNode, paths: List<String>) {
         val items = node.mapIndexed { index, child ->
             try {
-                child.parse<EntitySubscriptionCascContextData>()
+                child.parse<EntitySubscriptionCascContextData>().normalized()
             } catch (ex: JsonParseException) {
                 throw IllegalStateException(
                     "Cannot parse into ${EntitySubscriptionCascContextData::class.qualifiedName}: ${path(paths + index.toString())}",
@@ -105,7 +105,12 @@ class EntitySubscriptionsCascContext(
                 createSubscriptions(item)
             }
             onModification { item, existing ->
-                modifySubscriptions(item, TODO())
+                val entity = findEntity(item.entity)
+                if (entity != null) {
+                    modifySubscriptions(item, entity)
+                } else {
+                    logger.info("Cannot find entity ${item.entity}. Not updating its subscriptions.")
+                }
             }
             onDeletion { existing ->
                 deleteSubscriptions(existing)
@@ -160,6 +165,9 @@ class EntitySubscriptionsCascContext(
             from = item.subscriptions,
             to = entitySubscriptions
         ) {
+            equality { a, b ->
+                a.actualName() == b.actualName()
+            }
             onCreation { item ->
                 subscribe(entity, item)
             }
@@ -195,7 +203,7 @@ class EntitySubscriptionsCascContext(
         eventSubscriptionService.subscribe(
             EventSubscription(
                 projectEntity = entity,
-                name = subscription.name ?: subscription.computeName(),
+                name = subscription.actualName(),
                 events = subscription.events.toSet(),
                 keywords = subscription.keywords,
                 channel = subscription.channel,
@@ -236,7 +244,12 @@ class EntitySubscriptionsCascContext(
         val entity: EntitySubscriptionData,
         @APIDescription("List of subscriptions for this entity")
         val subscriptions: List<SubscriptionsCascContextData>,
-    )
+    ) {
+        fun normalized() = EntitySubscriptionCascContextData(
+            entity = entity,
+            subscriptions = subscriptions.map { it.normalized() }
+        )
+    }
 
     data class EntitySubscriptionData(
         @APIDescription("Project name")

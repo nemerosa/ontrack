@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.model.annotations.APIDescription
 
 data class SubscriptionsCascContextData(
     @APIDescription("Name of the subscription. Will be required in V5.")
-    @Deprecated("Will be removed in V5. Will be set not null.")
     val name: String?,
     @APIDescription("List of events to listen to")
     val events: List<String>,
@@ -23,7 +22,7 @@ data class SubscriptionsCascContextData(
     val contentTemplate: String?,
 ) {
     fun normalized() = SubscriptionsCascContextData(
-        name = name,
+        name = actualName(),
         events = events.sorted(),
         keywords = keywords,
         channel = channel,
@@ -31,6 +30,8 @@ data class SubscriptionsCascContextData(
         disabled = disabled ?: false,
         contentTemplate = contentTemplate,
     )
+
+    fun actualName(): String = name ?: computeName()
 
     fun computeName(): String =
         EventSubscription.computeName(
