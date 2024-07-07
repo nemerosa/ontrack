@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.notifications.subscriptions
 
+import net.nemerosa.ontrack.extension.notifications.subscriptions.GlobalSubscriptionsAuthorizationContributor.Companion.SUBSCRIPTIONS
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
@@ -24,12 +25,12 @@ class ProjectEntitySubscriptionsAuthorizationContributor(
         val entity = context as ProjectEntity
         return listOf(
             Authorization(
-                "subscriptions",
+                SUBSCRIPTIONS,
                 Authorization.VIEW,
                 securityService.isProjectFunctionGranted<ProjectSubscriptionsRead>(entity)
             ),
             Authorization(
-                "subscriptions",
+                SUBSCRIPTIONS,
                 Authorization.EDIT,
                 securityService.isProjectFunctionGranted<ProjectSubscriptionsWrite>(entity)
             ),

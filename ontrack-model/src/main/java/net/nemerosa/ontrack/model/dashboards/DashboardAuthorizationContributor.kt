@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 class DashboardAuthorizationContributor : AuthorizationContributor {
 
     companion object {
-        const val DASHBOARD = "dashboard"
+        private const val DASHBOARD = "dashboard"
     }
 
     override fun appliesTo(context: Any): Boolean = context is GlobalAuthorizationContext

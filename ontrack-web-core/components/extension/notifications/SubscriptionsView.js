@@ -1,16 +1,15 @@
 import Head from "next/head";
 import {useEffect, useMemo, useState} from "react";
 import MainPage from "@components/layouts/MainPage";
-import {List, Skeleton, Typography} from "antd";
+import {List, Skeleton} from "antd";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
 import {FaPlus} from "react-icons/fa";
 import {pageTitle} from "@components/common/Titles";
 import {CloseCommand, Command} from "@components/common/Commands";
-import InlineConfirmCommand from "@components/common/InlineConfirmCommand";
 import SubscriptionDialog, {useSubscriptionDialog} from "@components/extension/notifications/SubscriptionDialog";
 import SubscriptionCard from "@components/extension/notifications/SubscriptionCard";
-import {useDeleteSubscription} from "@components/extension/notifications/DeleteSubscription";
+import {useSubscriptionActions} from "@components/extension/notifications/SubscriptionActions";
 
 export default function SubscriptionsView({
                                               title,
@@ -82,40 +81,11 @@ export default function SubscriptionsView({
         }
     }, [client, filter, refresh]);
 
-    const {deleteSubscription} = useDeleteSubscription()
-
-    const onDeleteSubscription = (item) => {
-        return async () => {
-            await deleteSubscription({
-                name: item.name,
-                entity: additionalFilter.entity,
-            })
-            reload()
-        }
-    }
-
-    const getActions = (item) => {
-        const actions = []
-
-        if (item.disabled) {
-            actions.push(
-                <Typography.Text type="secondary">Disabled</Typography.Text>
-            )
-        }
-
-        // Delete a subscription
-        if (managePermission) {
-            actions.push(
-                <InlineConfirmCommand
-                    title="Deletes the subscription"
-                    confirm="Do you really want to delete this subscription?"
-                    onConfirm={onDeleteSubscription(item)}
-                />
-            )
-        }
-
-        return actions
-    }
+    const {getActions} = useSubscriptionActions(
+        additionalFilter.entity,
+        managePermission,
+        reload
+    )
 
     const subscriptionDialog = useSubscriptionDialog({
         onSuccess: reload,
@@ -166,6 +136,7 @@ export default function SubscriptionsView({
                                     subscription={item}
                                     entity={additionalFilter.entity}
                                     actions={getActions(item)}
+                                    managePermission={managePermission}
                                 />
                             </List.Item>
                         )}
