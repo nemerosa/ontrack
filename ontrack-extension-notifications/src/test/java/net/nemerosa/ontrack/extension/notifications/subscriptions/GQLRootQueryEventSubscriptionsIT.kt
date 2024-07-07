@@ -41,7 +41,7 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                                 eventSubscriptions(filter: {
                                     entity: {
                                         type: PROMOTION_LEVEL,
-                                        id: $id
+                                        id: ${pl.id}
                                     },
                                     name: "$name"
                                 }) {

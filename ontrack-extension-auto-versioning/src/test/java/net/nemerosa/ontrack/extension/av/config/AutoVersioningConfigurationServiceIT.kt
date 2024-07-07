@@ -188,7 +188,7 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                 assertEquals(
                     listOf(
                         EventSubscription(
-                            name = "test",
+                            name = "Auto versioning 1",
                             projectEntity = this,
                             events = setOf(
                                 "auto-versioning-error",
@@ -271,7 +271,7 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                         listOf(
                             EventSubscription(
                                 projectEntity = this,
-                                name = "...",
+                                name = "Auto versioning 1",
                                 events = setOf(
                                     "auto-versioning-success",
                                 ),
@@ -286,7 +286,7 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                             ),
                             EventSubscription(
                                 projectEntity = this,
-                                name = "...",
+                                name = "Auto versioning 2",
                                 events = setOf(
                                     "auto-versioning-error",
                                     "auto-versioning-post-processing-error",
@@ -371,7 +371,7 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                         listOf(
                             EventSubscription(
                                 projectEntity = this,
-                                name = "...",
+                                name = "Auto versioning 1",
                                 events = setOf(
                                     "auto-versioning-success",
                                 ),
@@ -386,7 +386,7 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                             ),
                             EventSubscription(
                                 projectEntity = this,
-                                name = "...",
+                                name = "Auto versioning 2",
                                 events = setOf(
                                     "auto-versioning-error",
                                     "auto-versioning-post-processing-error",
@@ -402,7 +402,7 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                             ),
                             EventSubscription(
                                 projectEntity = this,
-                                name = "...",
+                                name = "Auto versioning 3",
                                 events = setOf(
                                     "auto-versioning-pr-merge-timeout-error",
                                 ),
@@ -463,7 +463,7 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                         listOf(
                             EventSubscription(
                                 projectEntity = this,
-                                name = "...",
+                                name = "Auto versioning 1",
                                 events = setOf(
                                     "auto-versioning-error",
                                     "auto-versioning-success",
@@ -543,7 +543,7 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                         listOf(
                             EventSubscription(
                                 projectEntity = this,
-                                name = "...",
+                                name = "Auto versioning 1",
                                 events = setOf(
                                     "auto-versioning-success",
                                 ),
@@ -615,7 +615,7 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                         listOf(
                             EventSubscription(
                                 projectEntity = this,
-                                name = "...",
+                                name = "Auto versioning 1",
                                 events = setOf(
                                     "auto-versioning-error",
                                     "auto-versioning-success",
