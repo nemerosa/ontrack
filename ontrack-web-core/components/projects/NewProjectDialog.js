@@ -16,7 +16,7 @@ export function useNewProjectDialog({onSuccess}) {
             mutation CreateProject(
                 $name: String!,
                 $description: String,
-                $disabled: Boolean!,
+                $disabled: Boolean,
             ) {
                 createProject(input: {
                     name: $name,
