@@ -46,6 +46,7 @@ export default function SearchView({q}) {
                                 description
                                 data
                                 accuracy
+                                page
                             }
                         }
                     }
