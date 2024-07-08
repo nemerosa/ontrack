@@ -57,10 +57,10 @@ class GitCommitSearchExtension(
         +GitCommitSearchItem::projectId to id { index = false }
         +GitCommitSearchItem::gitType to keyword { index = false }
         +GitCommitSearchItem::gitName to keyword { index = false }
-        +GitCommitSearchItem::commit to keyword { scoreBoost = 3.0 }
-        +GitCommitSearchItem::commitShort to keyword { scoreBoost = 2.0 }
-        +GitCommitSearchItem::commitAuthor to keyword()
-        +GitCommitSearchItem::commitMessage to text()
+        +GitCommitSearchItem::commit to keyword { scoreBoost = 2.0 }
+        +GitCommitSearchItem::commitShort to keyword { scoreBoost = 1.0 }
+        +GitCommitSearchItem::commitAuthor to keyword { scoreBoost = 0.5 }
+        +GitCommitSearchItem::commitMessage to text {scoreBoost = 0.1 }
     }
 
     override fun indexAll(processor: (GitCommitSearchItem) -> Unit) {
