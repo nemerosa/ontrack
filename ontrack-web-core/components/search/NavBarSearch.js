@@ -11,6 +11,7 @@ export default function NavBarSearch({style}) {
                 style={style}
                 placeholder="Search..."
                 onSearch={search}
+                allowClear={true}
             />
         </>
     )
