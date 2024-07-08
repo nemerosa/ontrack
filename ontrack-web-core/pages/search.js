@@ -20,7 +20,7 @@ export default function SearchPage() {
         <>
             <main>
                 <MainLayout>
-                    <SearchView q={q}/>
+                    <SearchView q={q} key={router.asPath}/>
                 </MainLayout>
             </main>
         </>
