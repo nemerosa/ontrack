@@ -5869,16 +5869,18 @@ type Schedule {
 type SearchResult {
     "Score for the search"
     accuracy: Float
+    "Meta-data associated with the result"
+    data: JSON
     "Description linked to the item being found"
     description: String
     "Web access point"
-    page: String
+    page: String @deprecated(reason: "Will be removed in V5. Use the generic type & data")
     "Short title"
     title: String
     "Type of result"
     type: SearchResultType
     "API access point"
-    uri: String
+    uri: String @deprecated(reason: "Will be removed in V5. Use the generic type & data")
 }
 
 type SearchResultPaginated {

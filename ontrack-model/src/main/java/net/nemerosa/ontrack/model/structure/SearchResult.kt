@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.model.structure
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import net.nemerosa.ontrack.model.annotations.APIDescription
 import java.net.URI
 
 /**
@@ -36,6 +37,7 @@ constructor(
         /**
          * Meta-data which can be used internally
          */
+        @APIDescription("Meta-data associated with the result")
         @get:JsonIgnore
         val data: Map<String, *>? = null
 ) {
