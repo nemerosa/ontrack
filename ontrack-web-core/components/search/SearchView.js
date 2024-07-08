@@ -6,7 +6,6 @@ import {homeUri} from "@components/common/Links";
 import {CloseCommand} from "@components/common/Commands";
 import {homeBreadcrumbs} from "@components/common/Breadcrumbs";
 import MainPage from "@components/layouts/MainPage";
-import {useEffect, useState} from "react";
 import {Space} from "antd";
 import SearchTypeSection from "@components/search/SearchTypeSection";
 

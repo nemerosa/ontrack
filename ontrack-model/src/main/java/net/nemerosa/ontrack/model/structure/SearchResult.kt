@@ -43,5 +43,6 @@ constructor(
 ) {
     companion object {
         const val SEARCH_RESULT_ITEM = "item"
+        const val SEARCH_RESULT_PROJECT = "project"
     }
 }

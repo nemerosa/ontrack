@@ -1,8 +1,9 @@
 import SearchResultComponent from "@components/framework/search/SearchResultComponent";
+import ProjectLink from "@components/projects/ProjectLink";
 
 export default function Result({data}) {
     return <SearchResultComponent
-        title={data.item.commitShort}
-        description={data.item.commitMessage}
+        title={<ProjectLink project={data.project}/>}
+        description=""
     />
 }

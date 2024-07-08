@@ -2,7 +2,7 @@ import SearchResultComponent from "@components/framework/search/SearchResultComp
 
 export default function Result({data}) {
     return <SearchResultComponent
-        title={data.item.commitShort}
-        description={data.item.commitMessage}
+        title="TODO"
+        description={JSON.stringify(data)}
     />
 }

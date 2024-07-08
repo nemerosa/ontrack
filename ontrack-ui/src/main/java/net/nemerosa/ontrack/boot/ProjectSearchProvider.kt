@@ -35,10 +35,10 @@ class ProjectSearchProvider(
 ) : SearchIndexer<ProjectSearchItem>, EventListener {
 
     override val searchResultType = SearchResultType(
-            feature = CoreExtensionFeature.INSTANCE.featureDescription,
-            id = PROJECT_SEARCH_RESULT_TYPE,
-            name = "Project",
-            description = "Project name in Ontrack"
+        feature = CoreExtensionFeature.INSTANCE.featureDescription,
+        id = PROJECT_SEARCH_RESULT_TYPE,
+        name = "Project",
+        description = "Project name in Ontrack"
     )
 
     override val indexerName: String = "Projects"
@@ -59,12 +59,15 @@ class ProjectSearchProvider(
     override fun toSearchResult(id: String, score: Double, source: JsonNode): SearchResult? {
         return structureService.findProjectByID(ID.of(id.toInt()))?.run {
             SearchResult(
-                    title = entityDisplayName,
-                    description = description ?: "",
-                    uri = uriBuilder.getEntityURI(this),
-                    page = uriBuilder.getEntityPage(this),
-                    accuracy = score,
-                    type = searchResultType
+                title = entityDisplayName,
+                description = description ?: "",
+                uri = uriBuilder.getEntityURI(this),
+                page = uriBuilder.getEntityPage(this),
+                accuracy = score,
+                type = searchResultType,
+                data = mapOf(
+                    SearchResult.SEARCH_RESULT_PROJECT to this,
+                )
             )
         }
     }
@@ -75,10 +78,12 @@ class ProjectSearchProvider(
                 val project = event.getEntity<Project>(ProjectEntityType.PROJECT)
                 searchIndexService.createSearchIndex(this, project.asSearchItem())
             }
+
             EventFactory.UPDATE_PROJECT -> {
                 val project = event.getEntity<Project>(ProjectEntityType.PROJECT)
                 searchIndexService.updateSearchIndex(this, project.asSearchItem())
             }
+
             EventFactory.DELETE_PROJECT -> {
                 val projectId = event.getIntValue("PROJECT_ID")
                 searchIndexService.deleteSearchIndex(this, projectId)
@@ -91,19 +96,19 @@ class ProjectSearchProvider(
 }
 
 class ProjectSearchItem(
-        override val id: String,
-        val name: String,
-        val description: String
+    override val id: String,
+    val name: String,
+    val description: String
 ) : SearchItem {
     constructor(project: Project) : this(
-            id = project.id.toString(),
-            name = project.name,
-            description = project.description ?: ""
+        id = project.id.toString(),
+        name = project.name,
+        description = project.description ?: ""
     )
 
     override val fields: Map<String, Any> = mapOf(
-            "name" to name,
-            "description" to description
+        "name" to name,
+        "description" to description
     )
 
 }
