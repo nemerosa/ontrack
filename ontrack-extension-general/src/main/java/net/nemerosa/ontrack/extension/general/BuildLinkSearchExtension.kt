@@ -40,7 +40,7 @@ class BuildLinkSearchExtension(
         +BuildLinkSearchItem::targetBuildId to id { index = false }
         +BuildLinkSearchItem::targetProject to keyword()
         +BuildLinkSearchItem::targetBuild to keyword()
-        +BuildLinkSearchItem::targetKey to text { scoreBoost = 3.0 }
+        +BuildLinkSearchItem::targetKey to text { scoreBoost = 1.0 }
     }
 
     override fun indexAll(processor: (BuildLinkSearchItem) -> Unit) {
