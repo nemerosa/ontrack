@@ -6,11 +6,55 @@ import {homeUri} from "@components/common/Links";
 import {CloseCommand} from "@components/common/Commands";
 import {homeBreadcrumbs} from "@components/common/Breadcrumbs";
 import MainPage from "@components/layouts/MainPage";
-import {Space} from "antd";
-import SearchTypeSection from "@components/search/SearchTypeSection";
+import {Skeleton} from "antd";
+import {useEffect, useState} from "react";
+import {gql} from "graphql-request";
+import SearchResultList from "@components/search/SearchResultList";
 
 export default function SearchView({q}) {
-    const {searchResultTypes} = useRefData()
+
+    const client = useGraphQLClient()
+    const [searching, setSearching] = useState(true)
+    const [results, setResults] = useState([])
+
+    useEffect(() => {
+        if (client && q) {
+            setSearching(true)
+            client.request(
+                gql`
+                    query SearchWithType($q: String!) {
+                        search(offset: 0, size: 10, token: $q) {
+                            pageInfo {
+                                totalSize
+                                nextPage {
+                                    offset
+                                    size
+                                }
+                            }
+                            pageItems {
+                                type {
+                                    id
+                                    name
+                                    description
+                                }
+                                title
+                                description
+                                data
+                                accuracy
+                            }
+                        }
+                    }
+                `,
+                {
+                    q: q,
+                }
+            ).then(data => {
+                setResults(data.search.pageItems)
+            }).finally(() => {
+                setSearching(false)
+            })
+        }
+    }, [client, q])
 
     return (
         <>
@@ -24,15 +68,9 @@ export default function SearchView({q}) {
                     <CloseCommand key="close" href={homeUri()}/>,
                 ]}
             >
-                <Space direction="vertical" className="ot-line">
-                    {
-                        searchResultTypes.map(type => (
-                            <>
-                                <SearchTypeSection key={type.name} type={type} q={q}/>
-                            </>
-                        ))
-                    }
-                </Space>
+                <Skeleton active loading={searching}>
+                    <SearchResultList results={results}/>
+                </Skeleton>
             </MainPage>
         </>
     )

@@ -1,14 +1,17 @@
-import {Space, Typography} from "antd";
+import {Popover, Typography} from "antd";
 import SearchResultTypeIcon from "@components/search/SearchResultTypeIcon";
 
 export default function SearchResultType({type}) {
     return (
         <>
-            <Space>
-                <SearchResultTypeIcon type={type}/>
-                {type.name}
-                <Typography.Text type="secondary" italic>{type.description}</Typography.Text>
-            </Space>
+            <Popover
+                title={type.name}
+                content={<Typography.Text type="secondary">{type.description}</Typography.Text>}
+            >
+                <div>
+                    <SearchResultTypeIcon type={type}/>
+                </div>
+            </Popover>
         </>
     )
 }
