@@ -8,6 +8,6 @@ export const subscriptionsLink = (entity) => {
     }
 }
 
-export default function SubscriptionsLink({entity}) {
-    return <Link href={subscriptionsLink(entity)}>Subscriptions</Link>
+export default function SubscriptionsLink({entity, text = 'Subscriptions'}) {
+    return <Link title="List of all subscriptions" href={subscriptionsLink(entity)}>{text}</Link>
 }

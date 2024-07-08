@@ -9,9 +9,11 @@ inline fun <reified T : Any> EntityStore.findByName(entity: ProjectEntity, entit
 inline fun <reified T : Any> EntityStore.getByFilter(
     entity: ProjectEntity,
     store: String,
+    offset: Int = 0,
+    size: Int = 10,
     jsonFilter: EntityStoreFilter
 ): List<T> =
-    getByFilter(entity, store, jsonFilter, T::class)
+    getByFilter(entity, store, offset, size, jsonFilter, T::class)
 
 inline fun <reified T : Any> EntityStore.forEachByFilter(
     entity: ProjectEntity,

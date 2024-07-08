@@ -88,7 +88,7 @@ class EntityStoreJdbcRepositoryIT : AbstractRepositoryTestSupport() {
 
         assertEquals(
             listOf(r1),
-            repository.getByFilter(branch, STORE, filter)
+            repository.getByFilter(branch, STORE, jsonFilter = filter)
         )
     }
 
