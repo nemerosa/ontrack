@@ -1,20 +1,16 @@
 import {Input} from "antd";
-import {useRouter} from "next/router";
+import {useSearch} from "@/pages/search";
 
 export default function NavBarSearch({style}) {
 
-    const router = useRouter()
-
-    const onSearch = async (value) => {
-        await router.push(`/search?q=${encodeURIComponent(value)}`)
-    }
+    const search = useSearch()
 
     return (
         <>
             <Input.Search
                 style={style}
                 placeholder="Search..."
-                onSearch={onSearch}
+                onSearch={search}
             />
         </>
     )
