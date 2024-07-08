@@ -16,10 +16,10 @@ class BranchSearchProvider(
 ) : SearchIndexer<BranchSearchItem>, EventListener {
 
     override val searchResultType = SearchResultType(
-            feature = CoreExtensionFeature.INSTANCE.featureDescription,
-            id = BRANCH_SEARCH_RESULT_TYPE,
-            name = "Branch",
-            description = "Branch name in Ontrack"
+        feature = CoreExtensionFeature.INSTANCE.featureDescription,
+        id = BRANCH_SEARCH_RESULT_TYPE,
+        name = "Branch",
+        description = "Branch name in Ontrack"
     )
 
     override val indexerName: String = "Branches"
@@ -41,16 +41,19 @@ class BranchSearchProvider(
     }
 
     override fun toSearchResult(id: String, score: Double, source: JsonNode): SearchResult? =
-            structureService.findBranchByID(ID.of(id.toInt()))?.run {
-                SearchResult(
-                        title = entityDisplayName,
-                        description = description ?: "",
-                        uri = uriBuilder.getEntityURI(this),
-                        page = uriBuilder.getEntityPage(this),
-                        accuracy = score,
-                        type = searchResultType
+        structureService.findBranchByID(ID.of(id.toInt()))?.run {
+            SearchResult(
+                title = entityDisplayName,
+                description = description ?: "",
+                uri = uriBuilder.getEntityURI(this),
+                page = uriBuilder.getEntityPage(this),
+                accuracy = score,
+                type = searchResultType,
+                data = mapOf(
+                    SearchResult.SEARCH_RESULT_BRANCH to this
                 )
-            }
+            )
+        }
 
     override fun onEvent(event: Event) {
         when (event.eventType) {
@@ -58,10 +61,12 @@ class BranchSearchProvider(
                 val branch = event.getEntity<Branch>(ProjectEntityType.BRANCH)
                 searchIndexService.createSearchIndex(this, branch.asSearchItem())
             }
+
             EventFactory.UPDATE_BRANCH -> {
                 val branch = event.getEntity<Branch>(ProjectEntityType.BRANCH)
                 searchIndexService.updateSearchIndex(this, branch.asSearchItem())
             }
+
             EventFactory.DELETE_BRANCH -> {
                 val branchId = event.getIntValue("BRANCH_ID")
                 searchIndexService.deleteSearchIndex(this, branchId)
@@ -83,22 +88,22 @@ const val BRANCH_SEARCH_INDEX = "branches"
 const val BRANCH_SEARCH_RESULT_TYPE = "branch"
 
 class BranchSearchItem(
-        override val id: String,
-        val name: String,
-        val description: String,
-        val project: String
+    override val id: String,
+    val name: String,
+    val description: String,
+    val project: String
 ) : SearchItem {
 
     constructor(branch: Branch) : this(
-            id = branch.id.toString(),
-            name = branch.name,
-            description = branch.description ?: "",
-            project = branch.project.name
+        id = branch.id.toString(),
+        name = branch.name,
+        description = branch.description ?: "",
+        project = branch.project.name
     )
 
     override val fields: Map<String, Any> = mapOf(
-            "name" to name,
-            "description" to description,
-            "project" to project
+        "name" to name,
+        "description" to description,
+        "project" to project
     )
 }
