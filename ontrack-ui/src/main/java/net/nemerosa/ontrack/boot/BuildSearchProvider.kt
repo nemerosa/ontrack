@@ -16,10 +16,10 @@ class BuildSearchProvider(
 ) : SearchIndexer<BuildSearchItem>, EventListener {
 
     override val searchResultType = SearchResultType(
-            feature = CoreExtensionFeature.INSTANCE.featureDescription,
-            id = BUILD_SEARCH_RESULT_TYPE,
-            name = "Build",
-            description = "Build name in Ontrack"
+        feature = CoreExtensionFeature.INSTANCE.featureDescription,
+        id = BUILD_SEARCH_RESULT_TYPE,
+        name = "Build",
+        description = "Build name in Ontrack"
     )
 
     override val indexerName: String = "Builds"
@@ -42,16 +42,19 @@ class BuildSearchProvider(
     }
 
     override fun toSearchResult(id: String, score: Double, source: JsonNode): SearchResult? =
-            structureService.findBuildByID(ID.of(id.toInt()))?.run {
-                SearchResult(
-                        title = entityDisplayName,
-                        description = description ?: "",
-                        uri = uriBuilder.getEntityURI(this),
-                        page = uriBuilder.getEntityPage(this),
-                        accuracy = score,
-                        type = searchResultType
-                )
-            }
+        structureService.findBuildByID(ID.of(id.toInt()))?.run {
+            SearchResult(
+                title = entityDisplayName,
+                description = description ?: "",
+                uri = uriBuilder.getEntityURI(this),
+                page = uriBuilder.getEntityPage(this),
+                accuracy = score,
+                type = searchResultType,
+                data = mapOf(
+                    SearchResult.SEARCH_RESULT_BUILD to this,
+                ),
+            )
+        }
 
     override fun onEvent(event: Event) {
         when (event.eventType) {
@@ -59,10 +62,12 @@ class BuildSearchProvider(
                 val build = event.getEntity<Build>(ProjectEntityType.BUILD)
                 searchIndexService.createSearchIndex(this, BuildSearchItem(build))
             }
+
             EventFactory.UPDATE_BUILD -> {
                 val build = event.getEntity<Build>(ProjectEntityType.BUILD)
                 searchIndexService.updateSearchIndex(this, BuildSearchItem(build))
             }
+
             EventFactory.DELETE_BUILD -> {
                 val buildId = event.getIntValue("BUILD_ID")
                 searchIndexService.deleteSearchIndex(this, buildId)
@@ -82,19 +87,19 @@ const val BUILD_SEARCH_INDEX = "builds"
 const val BUILD_SEARCH_RESULT_TYPE = "build"
 
 data class BuildSearchItem(
-        override val id: String,
-        val name: String,
-        val description: String
+    override val id: String,
+    val name: String,
+    val description: String
 ) : SearchItem {
     constructor(build: Build) : this(
-            id = build.id().toString(),
-            name = build.name,
-            description = build.description ?: ""
+        id = build.id().toString(),
+        name = build.name,
+        description = build.description ?: ""
     )
 
     override val fields: Map<String, Any?> = mapOf(
-            "name" to name,
-            "description" to description
+        "name" to name,
+        "description" to description
     )
 
 }
