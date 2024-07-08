@@ -86,8 +86,8 @@ class BuildLinkSearchExtension(
     private fun process(from: Build, to: Build, qualifier: String, processor: (BuildLinkSearchItem) -> Unit) {
         processor(BuildLinkSearchItem(from, to, qualifier = qualifier))
         // Alternative name
-        val otherName = buildDisplayNameService.getBuildDisplayName(to)
-        if (otherName != to.name) {
+        val otherName = buildDisplayNameService.getFirstBuildDisplayName(to)
+        if (otherName != null) {
             processor(BuildLinkSearchItem(from, to, otherName))
         }
     }
