@@ -1,5 +1,5 @@
-import {Button, Popover, Space, Typography} from "antd";
-import {FaSearch} from "react-icons/fa";
+import {Space} from "antd";
+import LoadMoreButton from "@components/common/LoadMoreButton";
 
 export default function TablePaginationFooter({pageInfo, setPagination, extra}) {
 
@@ -12,23 +12,12 @@ export default function TablePaginationFooter({pageInfo, setPagination, extra}) 
     return (
         <>
             <Space>
-                <Popover
-                    content={
-                        (pageInfo && pageInfo.nextPage) ?
-                            "There are more entries to be loaded" :
-                            "There are no more entries to be loaded"
-                    }
-                >
-                    <Button
-                        onClick={onLoadMore}
-                        disabled={!pageInfo || !pageInfo.nextPage}
-                    >
-                        <Space>
-                            <FaSearch/>
-                            <Typography.Text>Load more...</Typography.Text>
-                        </Space>
-                    </Button>
-                </Popover>
+                <LoadMoreButton
+                    pageInfo={pageInfo}
+                    moreText="There are more entries to be loaded"
+                    noMoreText="There are no more entries to be loaded"
+                    onLoadMore={onLoadMore}
+                />
                 {extra}
             </Space>
         </>

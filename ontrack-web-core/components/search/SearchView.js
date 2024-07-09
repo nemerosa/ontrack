@@ -6,13 +6,15 @@ import {homeUri} from "@components/common/Links";
 import {CloseCommand} from "@components/common/Commands";
 import {homeBreadcrumbs} from "@components/common/Breadcrumbs";
 import MainPage from "@components/layouts/MainPage";
-import {Button, Popover, Skeleton, Space} from "antd";
+import {Button, Popover, Skeleton, Space, Typography} from "antd";
 import {useEffect, useState} from "react";
 import {gql} from "graphql-request";
 import SearchResultList from "@components/search/SearchResultList";
 import SearchResultType from "@components/search/SearchResultType";
 import {FaBan} from "react-icons/fa";
 import {useRouter} from "next/router";
+import {conditionalPlural} from "@components/common/TextUtils";
+import LoadMoreButton from "@components/common/LoadMoreButton";
 
 export default function SearchView() {
 
@@ -26,13 +28,26 @@ export default function SearchView() {
 
     const {searchResultTypes} = useRefData()
 
+    const [pagination, setPagination] = useState({
+        offset: 0,
+        size: 10,
+    })
+
+    const [pageInfo, setPageInfo] = useState({})
+
+    const onLoadMore = () => {
+        if (pageInfo.nextPage) {
+            setPagination(pageInfo.nextPage)
+        }
+    }
+
     useEffect(() => {
         if (client && q) {
             setSearching(true)
             client.request(
                 gql`
-                    query SearchWithType($type: String, $q: String!) {
-                        search(offset: 0, size: 10, type: $type, token: $q) {
+                    query SearchWithType($type: String, $q: String!, $offset: Int!, $size: Int!) {
+                        search(offset: $offset, size: $size, type: $type, token: $q) {
                             pageInfo {
                                 totalSize
                                 nextPage {
@@ -58,14 +73,20 @@ export default function SearchView() {
                 {
                     q: q,
                     type: selectedType,
+                    ...pagination,
                 }
             ).then(data => {
-                setResults(data.search.pageItems)
+                setPageInfo(data.search.pageInfo)
+                if (pagination.offset > 0) {
+                    setResults((results) => [...results, ...data.search.pageItems])
+                } else {
+                    setResults(data.search.pageItems)
+                }
             }).finally(() => {
                 setSearching(false)
             })
         }
-    }, [client, q, selectedType])
+    }, [client, q, selectedType, pagination])
 
     const selectType = (type) => {
         setSelectedType(type)
@@ -121,7 +142,16 @@ export default function SearchView() {
                                 ))
                             }
                         </Space>
+                        <Typography.Title level={4} type="secondary">
+                            {results.length} {conditionalPlural(results.length, "result")}
+                        </Typography.Title>
                         <SearchResultList results={results}/>
+                        <LoadMoreButton
+                            pageInfo={pageInfo}
+                            moreText="There are more search results..."
+                            noMoreText="There are no more search results."
+                            onLoadMore={onLoadMore}
+                        />
                     </Space>
                 </Skeleton>
             </MainPage>
