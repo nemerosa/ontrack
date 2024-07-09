@@ -1,13 +1,11 @@
 import SearchResultComponent from "@components/framework/search/SearchResultComponent";
-import BranchLink from "@components/branches/BranchLink";
-import {Space, Typography} from "antd";
-import ProjectLink from "@components/projects/ProjectLink";
-import BuildLink from "@components/builds/BuildLink";
+import {Space} from "antd";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {useEffect, useState} from "react";
 import {gql} from "graphql-request";
 import {gqlDecorationFragment} from "@components/services/fragments";
 import Decorations from "@components/framework/decorations/Decorations";
+import FQBuildLink from "@components/builds/FQBuildLink";
 
 export default function Result({data}) {
 
@@ -36,11 +34,7 @@ export default function Result({data}) {
         title={
             <>
                 <Space>
-                    <ProjectLink project={data.build.branch.project}/>
-                    <Typography.Text type="secondary">/</Typography.Text>
-                    <BranchLink branch={data.build.branch}/>
-                    <Typography.Text type="secondary">/</Typography.Text>
-                    <BuildLink build={data.build}/>
+                    <FQBuildLink build={data.build}/>
                     <Decorations entity={{build}}/>
                 </Space>
             </>

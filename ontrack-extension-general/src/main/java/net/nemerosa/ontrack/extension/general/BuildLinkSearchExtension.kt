@@ -51,24 +51,26 @@ class BuildLinkSearchExtension(
 
     override fun toSearchResult(id: String, score: Double, source: JsonNode): SearchResult? {
         // Parsing
-        val item = source.parseOrNull<BuildLinkSearchItem>()
-        // Loading
-        return item?.run {
-            // Loads the source build
-            structureService.findBuildByID(ID.of(item.fromBuildId))
-        }?.takeIf {
-            // The target build must still exist
-            structureService.findBuildByID(ID.of(item.targetBuildId)) != null
-        }?.run {
-            SearchResult(
-                entityDisplayName,
-                "Linked to ${item.targetProject}:${item.targetBuild}",
-                uriBuilder.getEntityURI(this),
-                uriBuilder.getEntityPage(this),
-                score,
-                searchResultType
-            )
-        }
+        val item = source.parseOrNull<BuildLinkSearchItem>() ?: return null
+        // Source and target build for the link
+        val sourceBuild = structureService.findBuildByID(ID.of(item.fromBuildId)) ?: return null
+        val targetBuild = structureService.findBuildByID(ID.of(item.targetBuildId)) ?: return null
+        val qualifier = item.qualifier
+        // Result
+        return SearchResult(
+            title = sourceBuild.entityDisplayName,
+            description = "Linked to ${item.targetProject}:${item.targetBuild}",
+            uri = uriBuilder.getEntityURI(sourceBuild),
+            page = uriBuilder.getEntityPage(sourceBuild),
+            accuracy = score,
+            type = searchResultType,
+            // Puts source & linked build, and qualifier
+            data = mapOf(
+                "sourceBuild" to sourceBuild,
+                "targetBuild" to targetBuild,
+                "qualifier" to qualifier,
+            ),
+        )
     }
 
     override fun onBuildLinkAdded(from: Build, to: Build, qualifier: String) {
@@ -106,7 +108,12 @@ class BuildLinkSearchItem(
     val qualifier: String,
 ) : SearchItem {
 
-    constructor(from: Build, to: Build, targetBuildName: String = to.name, qualifier: String = BuildLink.DEFAULT) : this(
+    constructor(
+        from: Build,
+        to: Build,
+        targetBuildName: String = to.name,
+        qualifier: String = BuildLink.DEFAULT
+    ) : this(
         fromBuildId = from.id(),
         targetBuildId = to.id(),
         targetProject = to.project.name,
