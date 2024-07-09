@@ -18,10 +18,11 @@ class ReleaseSearchExtension(
 ), SearchIndexer<ReleaseSearchItem> {
 
     override val searchResultType = SearchResultType(
-        extensionFeature.featureDescription,
-        "build-release",
-        "Build with Release",
-        "Release, label or version attached to a build"
+        feature = extensionFeature.featureDescription,
+        id = "build-release",
+        name = "Build with Release",
+        description = "Release, label or version attached to a build",
+        order = SearchResultType.ORDER_PROPERTIES + 10,
     )
 
     override val indexerName: String = "Release property"

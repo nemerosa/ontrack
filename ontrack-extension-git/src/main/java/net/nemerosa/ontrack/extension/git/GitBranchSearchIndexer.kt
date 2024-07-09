@@ -21,7 +21,8 @@ class GitBranchSearchIndexer(
         feature = extensionFeature.featureDescription,
         id = "git-branch",
         name = "Git Branch",
-        description = "Git branch associated to an Ontrack branch"
+        description = "Git branch associated to an Ontrack branch",
+        order = SearchResultType.ORDER_PROPERTIES + 50,
     )
 
     override val indexerName: String = "Git Branches"

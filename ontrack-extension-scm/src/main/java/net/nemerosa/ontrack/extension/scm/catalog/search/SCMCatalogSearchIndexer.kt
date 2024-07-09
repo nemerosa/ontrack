@@ -30,7 +30,8 @@ class SCMCatalogSearchIndexer(
         feature = extensionFeature.featureDescription,
         id = "scm-catalog",
         name = "SCM Catalog",
-        description = "Indexed SCM repository, which might be associated or not with an Ontrack project"
+        description = "Indexed SCM repository, which might be associated or not with an Ontrack project",
+        order = SearchResultType.ORDER_PROPERTIES + 100,
     )
 
     override fun indexAll(processor: (SCMCatalogSearchItem) -> Unit) {

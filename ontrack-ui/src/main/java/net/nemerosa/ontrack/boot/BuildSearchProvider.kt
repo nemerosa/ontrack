@@ -19,7 +19,8 @@ class BuildSearchProvider(
         feature = CoreExtensionFeature.INSTANCE.featureDescription,
         id = BUILD_SEARCH_RESULT_TYPE,
         name = "Build",
-        description = "Build name in Ontrack"
+        description = "Build name in Ontrack",
+        order = SearchResultType.ORDER_PROJECT + 2,
     )
 
     override val indexerName: String = "Builds"

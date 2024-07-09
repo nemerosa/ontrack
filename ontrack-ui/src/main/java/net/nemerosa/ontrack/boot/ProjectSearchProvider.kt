@@ -38,7 +38,8 @@ class ProjectSearchProvider(
         feature = CoreExtensionFeature.INSTANCE.featureDescription,
         id = PROJECT_SEARCH_RESULT_TYPE,
         name = "Project",
-        description = "Project name in Ontrack"
+        description = "Project name in Ontrack",
+        order = SearchResultType.ORDER_PROJECT,
     )
 
     override val indexerName: String = "Projects"

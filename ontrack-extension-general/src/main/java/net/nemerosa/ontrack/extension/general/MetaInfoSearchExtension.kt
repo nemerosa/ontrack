@@ -17,10 +17,11 @@ class MetaInfoSearchExtension(
 ) : AbstractExtension(extensionFeature), SearchIndexer<MetaInfoSearchItem> {
 
     override val searchResultType = SearchResultType(
-        extensionFeature.featureDescription,
-        "build-meta-info",
-        "Build with Meta Info",
-        "Meta information pair using format name:[value] or value"
+        feature = extensionFeature.featureDescription,
+        id = "build-meta-info",
+        name = "Build with Meta Info",
+        description = "Meta information pair using format name:[value] or value",
+        order = SearchResultType.ORDER_PROPERTIES + 20,
     )
 
     override val indexerName: String = "Meta info properties"

@@ -32,7 +32,8 @@ class BuildLinkSearchExtension(
         feature = extensionFeature.featureDescription,
         id = "build-link",
         name = "Linked Build",
-        description = "Reference to a linked project and build, using format project:[build] where the target build is optional"
+        description = "Reference to a linked project and build, using format project:[build] where the target build is optional",
+        order = SearchResultType.ORDER_PROPERTIES + 30,
     )
 
     override val indexMapping: SearchIndexMapping? = indexMappings<BuildLinkSearchItem> {

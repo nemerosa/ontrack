@@ -15,9 +15,9 @@ typealias ESSearchRequest = org.elasticsearch.action.search.SearchRequest
 @Service
 @Transactional
 class ElasticSearchServiceImpl(
-        private val client: RestHighLevelClient,
-        private val searchIndexers: List<SearchIndexer<*>>,
-        private val searchIndexService: SearchIndexService
+    private val client: RestHighLevelClient,
+    private val searchIndexers: List<SearchIndexer<*>>,
+    private val searchIndexService: SearchIndexService
 ) : SearchService {
 
     val indexers: Map<String, SearchIndexer<*>> by lazy {
@@ -29,35 +29,35 @@ class ElasticSearchServiceImpl(
     }
 
     override fun paginatedSearch(request: SearchRequest): SearchResults = rawSearch(
-            token = request.token,
-            indexName = request.type?.let { type ->
-                indexerByResultType[type]?.indexName
-            },
-            offset = request.offset,
-            size = request.size,
+        token = request.token,
+        indexName = request.type?.let { type ->
+            indexerByResultType[type]?.indexName
+        },
+        offset = request.offset,
+        size = request.size,
     ).run {
         SearchResults(
-                items = items.mapNotNull { toResult(it) },
-                offset = offset,
-                total = total,
-                message = message,
+            items = items.mapNotNull { toResult(it) },
+            offset = offset,
+            total = total,
+            message = message,
         )
     }
 
     override fun rawSearch(
-            token: String,
-            indexName: String?,
-            offset: Int,
-            size: Int,
+        token: String,
+        indexName: String?,
+        offset: Int,
+        size: Int,
     ): SearchNodeResults {
         val esRequest = ESSearchRequest().source(
-                SearchSourceBuilder().query(
-                        MultiMatchQueryBuilder(token).type(MultiMatchQueryBuilder.Type.BEST_FIELDS)
-                ).from(
-                        offset
-                ).size(
-                        size
-                )
+            SearchSourceBuilder().query(
+                MultiMatchQueryBuilder(token).type(MultiMatchQueryBuilder.Type.BEST_FIELDS)
+            ).from(
+                offset
+            ).size(
+                size
+            )
         ).run {
             indexName?.let {
                 indices(indexName)
@@ -74,30 +74,30 @@ class ElasticSearchServiceImpl(
         // Hits as JSON nodes
         val hits = responseHits.hits.map {
             SearchResultNode(
-                    it.index,
-                    it.id,
-                    it.score.toDouble(),
-                    it.sourceAsMap
+                it.index,
+                it.id,
+                it.score.toDouble(),
+                it.sourceAsMap
             )
         }
 
         // Transforming into search results
         return SearchNodeResults(
-                items = hits,
-                offset = offset,
-                total = totalHits.toInt(),
-                message = when {
-                    totalHits <= 0 -> "The number of total matches is not known and pagination is not possible."
-                    else -> null
-                }
+            items = hits,
+            offset = offset,
+            total = totalHits.toInt(),
+            message = when {
+                totalHits <= 0 -> "The number of total matches is not known and pagination is not possible."
+                else -> null
+            }
         )
     }
 
     override val searchResultTypes: List<SearchResultType>
         get() =
             indexers
-                    .mapNotNull { (_, indexer) -> indexer.searchResultType }
-                    .sortedBy { it.name }
+                .mapNotNull { (_, indexer) -> indexer.searchResultType }
+                .sortedBy { it.order }
 
     override fun indexReset(reindex: Boolean): Ack {
         val ok = indexers.all { (_, indexer) ->
@@ -118,10 +118,10 @@ class ElasticSearchServiceImpl(
     }
 
     private fun <T : SearchItem> toResult(hitNode: SearchResultNode, indexer: SearchIndexer<T>): SearchResult? =
-            indexer.toSearchResult(
-                    hitNode.id,
-                    hitNode.score,
-                    hitNode.source.asJson()
-            )
+        indexer.toSearchResult(
+            hitNode.id,
+            hitNode.score,
+            hitNode.source.asJson()
+        )
 
 }

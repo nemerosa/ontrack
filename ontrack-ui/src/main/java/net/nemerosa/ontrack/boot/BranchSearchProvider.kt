@@ -19,7 +19,8 @@ class BranchSearchProvider(
         feature = CoreExtensionFeature.INSTANCE.featureDescription,
         id = BRANCH_SEARCH_RESULT_TYPE,
         name = "Branch",
-        description = "Branch name in Ontrack"
+        description = "Branch name in Ontrack",
+        order = SearchResultType.ORDER_PROJECT + 1,
     )
 
     override val indexerName: String = "Branches"
