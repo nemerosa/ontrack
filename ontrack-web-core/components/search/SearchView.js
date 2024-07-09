@@ -12,12 +12,16 @@ import {gql} from "graphql-request";
 import SearchResultList from "@components/search/SearchResultList";
 import SearchResultType from "@components/search/SearchResultType";
 import {FaBan} from "react-icons/fa";
+import {useRouter} from "next/router";
 
-export default function SearchView({q}) {
+export default function SearchView() {
+
+    const router = useRouter()
+    const {q, type} = router.query
 
     const client = useGraphQLClient()
     const [searching, setSearching] = useState(true)
-    const [selectedType, setSelectedType] = useState('')
+    const [selectedType, setSelectedType] = useState(type)
     const [results, setResults] = useState([])
 
     const {searchResultTypes} = useRefData()
@@ -63,6 +67,18 @@ export default function SearchView({q}) {
         }
     }, [client, q, selectedType])
 
+    const selectType = (type) => {
+        setSelectedType(type)
+        const query = {q}
+        if (type) {
+            query.type = type
+        }
+        router.replace({
+            pathname: '/search',
+            query: query
+        }, undefined, {shallow: true})
+    }
+
     return (
         <>
             <Head>
@@ -80,7 +96,7 @@ export default function SearchView({q}) {
                         <Space direction="horizontal" wrap className="ot-line">
                             <Button
                                 style={{height: 48}}
-                                onClick={() => setSelectedType('')}
+                                onClick={() => selectType('')}
                                 icon={<FaBan/>}
                                 type={selectedType === '' ? "primary" : "default"}
                             >
@@ -95,7 +111,7 @@ export default function SearchView({q}) {
                                         >
                                             <Button
                                                 style={{height: 48}}
-                                                onClick={() => setSelectedType(type.id)}
+                                                onClick={() => selectType(type.id)}
                                                 type={selectedType === type.id ? "primary" : "default"}
                                             >
                                                 <SearchResultType type={type} displayName={true} popover={false}/>

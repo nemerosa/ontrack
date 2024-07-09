@@ -13,14 +13,14 @@ export const useSearch = () => {
 }
 
 export default function SearchPage() {
+
     const router = useRouter()
-    const {q} = router.query
 
     return (
         <>
             <main>
                 <MainLayout>
-                    <SearchView q={q} key={router.asPath}/>
+                    <SearchView key={router.asPath}/>
                 </MainLayout>
             </main>
         </>
