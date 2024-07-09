@@ -7,7 +7,7 @@ export default function Result({data}) {
     return <SearchResultComponent
         title={
             <>
-                <Space>
+                <Space size={4}>
                     <ProjectLink project={data.branch.project}/>
                     <Typography.Text type="secondary">/</Typography.Text>
                     <BranchLink branch={data.branch}/>
