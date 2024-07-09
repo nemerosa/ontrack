@@ -7,8 +7,10 @@ with the API to its pure client aspects.
 
 * [Entity UI permissions](entity-ui-permissions.md)
 * [Global UI permissions](global-ui-permissions.md)
+* [GraphQL calls](ui-graphql-call.md)
 * [Local page events](local-events.md)
 * [Page tools](page-tools.md)
+* [Permalinks](ui-permalink.md)
 * [UI form dialogs](ui-form-dialog.md)
 * [UI local preferences](ui-local-preferences.md)
 * [UI reference data](ui-ref-data.md)

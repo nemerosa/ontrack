@@ -1,11 +1,6 @@
-`ADR-NXUI-0004-ui-permalink` - UI permalink
-===========================================
-
-# Context
+# UI permalink
 
 The browser URL can be used to store temporary data in order to create _permalinks_ which can be shared between users to quickly activate some preferences or settings.
-
-# Chosen option
 
 The [Next JS router](https://nextjs.org/docs/pages/api-reference/functions/use-router) can be used to access its `query` variables:
 
