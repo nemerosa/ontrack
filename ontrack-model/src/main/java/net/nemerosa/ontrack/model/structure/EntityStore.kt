@@ -44,6 +44,8 @@ interface EntityStore {
     fun <T : Any> getByFilter(
         entity: ProjectEntity,
         store: String,
+        offset: Int = 0,
+        size: Int = 10,
         filter: EntityStoreFilter,
         type: KClass<T>
     ): List<T>

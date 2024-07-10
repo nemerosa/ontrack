@@ -4,7 +4,7 @@ import Head from "next/head";
 import {subBranchTitle} from "@components/common/Titles";
 import {downToBranchBreadcrumbs} from "@components/common/Breadcrumbs";
 import MainPage from "@components/layouts/MainPage";
-import {List, Skeleton, Space} from "antd";
+import {List, Skeleton, Space, Typography} from "antd";
 import {gql} from "graphql-request";
 import {CloseCommand} from "@components/common/Commands";
 import {branchUri} from "@components/common/Links";
@@ -15,6 +15,7 @@ import {isAuthorized} from "@components/common/authorizations";
 import PromotionLevelCreateCommand from "@components/promotionLevels/PromotionLevelCreateCommand";
 import {EventsContext, useEventForRefresh} from "@components/common/EventsContext";
 import SortableList, {SortableItem, SortableKnob} from "react-easy-sort";
+import EntitySubscriptions from "@components/extension/notifications/EntitySubscriptions";
 
 export default function BranchPromotionLevelsView({id}) {
 
@@ -148,6 +149,9 @@ export default function BranchPromotionLevelsView({id}) {
                                             }
                                             description={pl.description}
                                         />
+                                        <div style={{width: '50%'}}>
+                                            <EntitySubscriptions type="PROMOTION_LEVEL" id={pl.id}/>
+                                        </div>
                                     </List.Item>
                                 </SortableItem>
                             )}

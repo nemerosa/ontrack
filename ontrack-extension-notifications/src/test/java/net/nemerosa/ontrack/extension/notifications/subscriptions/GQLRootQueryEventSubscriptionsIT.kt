@@ -116,7 +116,7 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                 EventFactory.NEW_PROMOTION_RUN
             )
             // Query
-            asUser().withProjectFunction(this, ProjectSubscriptionsRead::class.java).call {
+            asUser().withView(this).withProjectFunction(this, ProjectSubscriptionsRead::class.java).call {
                 run(
                     """
                     query {
@@ -138,7 +138,7 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                 }
             }
             // Query
-            asUser().withProjectFunction(this, ProjectSubscriptionsRead::class.java)
+            asUser().withView(this).withProjectFunction(this, ProjectSubscriptionsRead::class.java)
                 .withProjectFunction(this, ProjectSubscriptionsWrite::class.java)
                 .call {
                     run(
@@ -273,6 +273,53 @@ internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSuppor
                     ).asJson(),
                     data
                 )
+            }
+        }
+    }
+
+    @Test
+    fun `Getting the first subscriptions for an entity`() {
+        project {
+            // Creating 10 subscriptions
+            (1..10).forEach {
+                eventSubscriptionService.subscribe(
+                    name = uid("p"),
+                    channel = mockNotificationChannel,
+                    channelConfig = MockNotificationChannelConfig("#channel-$it"),
+                    projectEntity = this,
+                    keywords = null,
+                    origin = "test",
+                    contentTemplate = "Subscription #$it",
+                    EventFactory.NEW_PROMOTION_RUN
+                )
+            }
+            // Query
+            run(
+                """
+                    query {
+                        eventSubscriptions(
+                            size: 2,
+                            filter: {
+                                entity: {
+                                    type: PROJECT,
+                                    id: $id
+                                }
+                            }
+                        ) {
+                            pageInfo {
+                                totalSize
+                            }
+                            pageItems {
+                                contentTemplate
+                            }
+                        }
+                    }
+            """
+            ) { data ->
+                val eventSubscriptions = data.path("eventSubscriptions")
+                assertEquals(10, eventSubscriptions.path("pageInfo").path("totalSize").asInt())
+                val items = eventSubscriptions.path("pageItems")
+                assertEquals(2, items.size())
             }
         }
     }

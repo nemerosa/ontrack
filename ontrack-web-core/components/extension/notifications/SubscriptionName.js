@@ -48,11 +48,10 @@ export default function SubscriptionName({subscription, entity, managePermission
         <>
             {contextHolder}
             <Typography.Text
-                editable={{
-                    editable: managePermission,
+                editable={managePermission ? {
                     onChange: onChange,
                     icon: changing ? <Spin size="small"/> : <FaPencilAlt size={12}/>,
-                }}
+                } : false}
             >
                 {subscription.name}
             </Typography.Text>

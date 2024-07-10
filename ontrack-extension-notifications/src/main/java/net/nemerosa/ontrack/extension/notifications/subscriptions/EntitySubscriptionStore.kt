@@ -98,7 +98,13 @@ class EntitySubscriptionStore(
         // Total count for THIS entity
         val count = entityStore.getCountByFilter(entity, ENTITY_STORE, jsonFilter)
         // Loading & converting the records
-        val items = entityStore.getByFilter<SubscriptionRecord>(entity, ENTITY_STORE, jsonFilter)
+        val items = entityStore.getByFilter<SubscriptionRecord>(
+            entity = entity,
+            store = ENTITY_STORE,
+            offset = offset,
+            size = size,
+            jsonFilter = jsonFilter
+        )
         // OK
         return count to items
     }

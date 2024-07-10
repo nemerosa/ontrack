@@ -108,6 +108,8 @@ class EntityStoreJdbcRepository(dataSource: DataSource) : AbstractJdbcRepository
     override fun <T : Any> getByFilter(
         entity: ProjectEntity,
         store: String,
+        offset: Int,
+        size: Int,
         filter: EntityStoreFilter,
         type: KClass<T>
     ): List<T> {
@@ -115,10 +117,12 @@ class EntityStoreJdbcRepository(dataSource: DataSource) : AbstractJdbcRepository
         val criteria = StringBuilder()
         val params = mutableMapOf<String, Any?>()
         buildCriteria(entity, store, filter, context, criteria, params)
+        params["offset"] = offset
+        params["size"] = size
         // Runs the query
         @Suppress("SqlSourceToSinkFlow")
         return namedParameterJdbcTemplate!!.query(
-            "SELECT DATA FROM ENTITY_STORE $context WHERE $criteria",
+            "SELECT DATA FROM ENTITY_STORE $context WHERE $criteria ORDER BY ID DESC OFFSET :offset LIMIT :size",
             params
         ) { rs: ResultSet, _ ->
             readJson(rs, "DATA").parseInto(type)
