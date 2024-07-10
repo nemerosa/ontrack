@@ -8,6 +8,7 @@
 * <<templating-source-qualifiedLongName,qualifiedLongName>>
 * <<templating-source-release,release>>
 * <<templating-source-scmBranch,scmBranch>>
+* <<templating-source-version,version>>
 
 include::templating-source-changelog.adoc[]
 include::templating-source-description.adoc[]
@@ -16,3 +17,4 @@ include::templating-source-meta.adoc[]
 include::templating-source-qualifiedLongName.adoc[]
 include::templating-source-release.adoc[]
 include::templating-source-scmBranch.adoc[]
+include::templating-source-version.adoc[]

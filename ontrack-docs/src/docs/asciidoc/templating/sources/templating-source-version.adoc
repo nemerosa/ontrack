@@ -1,0 +1,21 @@
+[[templating-source-version]]
+===== version
+
+Extract a version string from a branch name
+
+Applicable for:
+
+* branch
+
+Configuration:
+
+* **default** - String - required - Default value to use
+
+* **policy** - NAME_ONLY, DISPLAY_NAME_OR_NAME, DISPLAY_NAME_ONLY - required - Which branch name to use
+
+Example:
+
+[source]
+----
+${branch.version}
+----

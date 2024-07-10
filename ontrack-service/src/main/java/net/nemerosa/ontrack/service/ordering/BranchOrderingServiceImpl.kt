@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.service.ordering
 import net.nemerosa.ontrack.model.ordering.BranchOrdering
 import net.nemerosa.ontrack.model.ordering.BranchOrderingService
 import net.nemerosa.ontrack.model.ordering.VersionUtils
+import net.nemerosa.ontrack.model.ordering.VersionUtils.semVerSuffixRegex
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.BranchDisplayNameService
 import net.nemerosa.ontrack.model.structure.BranchNamePolicy
@@ -27,9 +28,5 @@ class BranchOrderingServiceImpl(
             val name = branchDisplayNameService.getBranchDisplayName(branch, branchNamePolicy)
             VersionUtils.getVersion(semVerSuffixRegex, name)
         }
-    }
-
-    companion object {
-        private val semVerSuffixRegex = "(\\d+(\\.\\d+)+)$".toRegex()
     }
 }
