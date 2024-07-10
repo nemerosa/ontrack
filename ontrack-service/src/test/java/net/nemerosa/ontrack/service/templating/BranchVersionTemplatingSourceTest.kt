@@ -39,6 +39,20 @@ class BranchVersionTemplatingSourceTest {
     }
 
     @Test
+    fun `Getting the branch version with default parameters and match using branch name with several digits`() {
+        val branch = BranchFixtures.testBranch()
+        every {
+            branchDisplayNameService.getBranchDisplayName(branch, BranchNamePolicy.DISPLAY_NAME_OR_NAME)
+        } returns "release/99999.51"
+        val text = source.render(
+            entity = branch,
+            configMap = emptyMap(),
+            renderer = PlainEventRenderer.INSTANCE,
+        )
+        assertEquals("99999.51", text)
+    }
+
+    @Test
     fun `Getting the branch version with default parameters and no match`() {
         val branch = BranchFixtures.testBranch()
         every {
