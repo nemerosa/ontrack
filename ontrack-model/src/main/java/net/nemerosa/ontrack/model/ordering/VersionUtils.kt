@@ -7,10 +7,10 @@ object VersionUtils {
     /**
      * Regex used to get a version from the end of a name.
      */
-    val semVerSuffixRegex = ".*(\\d+(\\.\\d+)+)$".toRegex()
+    val semVerSuffixRegex = "(\\d+(\\.\\d+)+)\$".toRegex()
 
     fun getVersionText(regex: Regex, path: String): String? {
-        val matcher = regex.matchEntire(path)
+        val matcher = regex.find(path)
         return if (matcher != null) {
             // There is at least one capturing group, we can use it
             if (matcher.groupValues.size >= 2) {

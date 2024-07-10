@@ -54,4 +54,12 @@ class VersionUtilsTest {
         assertNull(VersionUtils.getVersion("master".toRegex(), "master"))
     }
 
+    @Test
+    fun `Terminal sem ver`() {
+        assertEquals("99999.51.8", VersionUtils.getVersionText(VersionUtils.semVerSuffixRegex, "release/99999.51.8"))
+        assertEquals("99999.51", VersionUtils.getVersionText(VersionUtils.semVerSuffixRegex, "release/99999.51"))
+        assertEquals("1.51", VersionUtils.getVersionText(VersionUtils.semVerSuffixRegex, "release/1.51"))
+        assertEquals("1.51.89", VersionUtils.getVersionText(VersionUtils.semVerSuffixRegex, "release/1.51.89"))
+    }
+
 }
