@@ -122,6 +122,67 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
     }
 
     @Test
+    fun `Subscription name is not required yet and can be omitted`() {
+        asAdmin {
+            project {
+                branch {
+                    run(
+                        """
+                        mutation {
+                            subscribeBranchToEvents(input: {
+                                project: "${project.name}",
+                                branch: "$name",
+                                channel: "mock",
+                                channelConfig: {
+                                    target: "#test"
+                                },
+                                events: [
+                                    "new_promotion_run"
+                                ],
+                                keywords: "GOLD",
+                            }) {
+                                errors {
+                                    message
+                                    exception
+                                }
+                                subscription {
+                                    id
+                                    name
+                                }
+                            }
+                        }
+                    """
+                    ) { data ->
+                        checkGraphQLUserErrors(data, "subscribeBranchToEvents") { payload ->
+                            val id = payload.getRequiredJsonField("subscription").getRequiredTextField("id")
+                            val name = payload.getRequiredJsonField("subscription").getRequiredTextField("name")
+                            assertEquals(name, id)
+                            val subscription: EventSubscription =
+                                eventSubscriptionService.getSubscriptionByName(this, name)
+                            assertEquals(
+                                setOf(
+                                    "new_promotion_run"
+                                ),
+                                subscription.events
+                            )
+                            assertEquals(this, subscription.projectEntity)
+                            assertEquals("GOLD", subscription.keywords)
+                            assertEquals(
+                                "mock",
+                                subscription.channel
+                            )
+                            assertEquals(
+                                mapOf("target" to "#test").asJson(),
+                                subscription.channelConfig
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Settings subscriptions using the promotion level mutation`() {
         asAdmin {
             project {

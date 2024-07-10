@@ -57,15 +57,30 @@ class EventSubscriptionMutations(
                 }
                 val entity: ProjectEntity = type.loadByNames(structureService, names)
                     ?: throw EntityNotFoundByNameException(type, names)
+                // Extracting the fields
+
                 // Creates the payload
+                val name = getMutationInputField<String>(env, SubscribeToEventsInput::name.name)
+                val channel = getRequiredMutationInputField<String>(env, SubscribeToEventsInput::channel.name)
+                val channelConfig =
+                    getRequiredMutationInputField<JsonNode>(env, SubscribeToEventsInput::channelConfig.name)
+                val events = getRequiredMutationInputField<List<String>>(env, SubscribeToEventsInput::events.name)
+                val keywords = getMutationInputField<String?>(env, SubscribeToEventsInput::keywords.name)
+                val contentTemplate = getMutationInputField<String?>(env, SubscribeToEventsInput::contentTemplate.name)
                 val payload = createEventSubscriptionPayload(
                     projectEntity = entity,
-                    name = getRequiredMutationInputField(env, SubscribeToEventsInput::name.name),
-                    channel = getRequiredMutationInputField(env, SubscribeToEventsInput::channel.name),
-                    channelConfig = getRequiredMutationInputField(env, SubscribeToEventsInput::channelConfig.name),
-                    events = getRequiredMutationInputField(env, SubscribeToEventsInput::events.name),
-                    keywords = getMutationInputField(env, SubscribeToEventsInput::keywords.name),
-                    contentTemplate = getMutationInputField(env, SubscribeToEventsInput::contentTemplate.name),
+                    name = name ?: EventSubscription.computeName(
+                        events = events,
+                        keywords = keywords,
+                        channel = channel,
+                        channelConfig = channelConfig,
+                        contentTemplate = contentTemplate,
+                    ),
+                    channel = channel,
+                    channelConfig = channelConfig,
+                    events = events,
+                    keywords = keywords,
+                    contentTemplate = contentTemplate,
                 )
                 // OK
                 return mapOf("subscription" to payload)
@@ -295,7 +310,7 @@ data class SubscribeToEventsInput(
     @TypeRef(embedded = true, suffix = "Input")
     val projectEntity: ProjectEntityID?,
     @APIDescription("Unique name of the channel in its scope (null for backward compatibility, will be required in V5)")
-    val name: String?,
+    val name: String? = null,
     @APIDescription("Channel to send this event to")
     val channel: String,
     @APIDescription("Channel configuration")
