@@ -1,14 +1,14 @@
 import {createContext, useState} from "react";
 
-export const SearchContext = createContext({q: ''})
+export const SearchContext = createContext({active: false})
 
 export default function SearchContextProvider({children}) {
 
-    const [q, setQ] = useState('')
+    const [active, setActive] = useState(false)
 
     const context = {
-        q,
-        setQ,
+        active,
+        setActive,
     }
 
     return <SearchContext.Provider value={context}>{children}</SearchContext.Provider>

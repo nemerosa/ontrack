@@ -6,8 +6,8 @@ import {homeUri} from "@components/common/Links";
 import {CloseCommand} from "@components/common/Commands";
 import {homeBreadcrumbs} from "@components/common/Breadcrumbs";
 import MainPage from "@components/layouts/MainPage";
-import {Button, Popover, Skeleton, Space, Typography} from "antd";
-import {useEffect, useState} from "react";
+import {Button, Input, Popover, Skeleton, Space, Typography} from "antd";
+import {useContext, useEffect, useState} from "react";
 import {gql} from "graphql-request";
 import SearchResultList from "@components/search/SearchResultList";
 import SearchResultType from "@components/search/SearchResultType";
@@ -15,11 +15,22 @@ import {FaBan} from "react-icons/fa";
 import {useRouter} from "next/router";
 import {conditionalPlural} from "@components/common/TextUtils";
 import LoadMoreButton from "@components/common/LoadMoreButton";
+import {SearchContext} from "@components/search/SearchContext";
+import {useSearch} from "@/pages/search";
+import SearchInput from "@components/search/SearchInput";
 
 export default function SearchView() {
 
     const router = useRouter()
     const {q, type} = router.query
+
+    const {setActive} = useContext(SearchContext)
+    useEffect(() => {
+        setActive(true)
+        return () => {
+            setActive(false)
+        }
+    }, [])
 
     const client = useGraphQLClient()
     const [searching, setSearching] = useState(true)
@@ -114,6 +125,10 @@ export default function SearchView() {
             >
                 <Skeleton active loading={searching}>
                     <Space direction="vertical" className="ot-line">
+                        <SearchInput
+                            searching={searching}
+                            q={q}
+                        />
                         <Space direction="horizontal" wrap className="ot-line">
                             <Button
                                 style={{height: 48}}
