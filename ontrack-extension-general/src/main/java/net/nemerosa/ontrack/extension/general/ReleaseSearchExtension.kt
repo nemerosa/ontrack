@@ -14,14 +14,15 @@ class ReleaseSearchExtension(
     private val propertyService: PropertyService,
     private val structureService: StructureService
 ) : AbstractExtension(
-        extensionFeature
+    extensionFeature
 ), SearchIndexer<ReleaseSearchItem> {
 
     override val searchResultType = SearchResultType(
-            extensionFeature.featureDescription,
-            "build-release",
-            "Build with Release",
-            "Release, label or version attached to a build"
+        feature = extensionFeature.featureDescription,
+        id = "build-release",
+        name = "Build with Release",
+        description = "Release, label or version attached to a build",
+        order = SearchResultType.ORDER_PROPERTIES + 10,
     )
 
     override val indexerName: String = "Release property"
@@ -37,11 +38,11 @@ class ReleaseSearchExtension(
     override fun indexAll(processor: (ReleaseSearchItem) -> Unit) {
         propertyService.forEachEntityWithProperty<ReleasePropertyType, ReleaseProperty> { entityId, property ->
             processor(
-                    ReleaseSearchItem(
-                            release = property.name,
-                            entityType = entityId.type,
-                            entityId = entityId.id
-                    )
+                ReleaseSearchItem(
+                    release = property.name,
+                    entityType = entityId.type,
+                    entityId = entityId.id
+                )
             )
         }
     }
@@ -59,15 +60,24 @@ class ReleaseSearchExtension(
         // Conversion
         return entity?.let {
             SearchResult(
-                    title = entity.entityDisplayName,
-                    description = "${entity.entityDisplayName} having version/label/release ${item.release}",
-                    uri = uriBuilder.getEntityURI(entity),
-                    page = uriBuilder.getEntityPage(entity),
-                    accuracy = score,
-                    type = searchResultType
+                title = entity.entityDisplayName,
+                description = "${entity.entityDisplayName} having version/label/release ${item.release}",
+                uri = uriBuilder.getEntityURI(entity),
+                page = uriBuilder.getEntityPage(entity),
+                accuracy = score,
+                type = searchResultType,
+                data = mapOf(
+                    SearchResult.SEARCH_RESULT_BUILD to entity,
+                    SEARCH_RESULT_RELEASE to item.release,
+                )
             )
         }
     }
+
+    companion object {
+        const val SEARCH_RESULT_RELEASE = "release"
+    }
+
 }
 
 /**
@@ -76,21 +86,21 @@ class ReleaseSearchExtension(
 const val RELEASE_SEARCH_INDEX = "releases"
 
 data class ReleaseSearchItem(
-        val release: String,
-        val entityType: ProjectEntityType,
-        val entityId: Int
+    val release: String,
+    val entityType: ProjectEntityType,
+    val entityId: Int
 ) : SearchItem {
 
     constructor(entity: ProjectEntity, property: ReleaseProperty) : this(
-            release = property.name,
-            entityType = entity.projectEntityType,
-            entityId = entity.id()
+        release = property.name,
+        entityType = entity.projectEntityType,
+        entityId = entity.id()
     )
 
     override val id: String = "$entityType::$entityId"
     override val fields: Map<String, Any?> = mapOf(
-            "release" to release,
-            "entityType" to entityType,
-            "entityId" to entityId
+        "release" to release,
+        "entityType" to entityType,
+        "entityId" to entityId
     )
 }

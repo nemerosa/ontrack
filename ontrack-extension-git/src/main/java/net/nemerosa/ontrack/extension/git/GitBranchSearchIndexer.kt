@@ -11,17 +11,18 @@ import java.util.function.BiConsumer
 
 @Component
 class GitBranchSearchIndexer(
-        extensionFeature: GitExtensionFeature,
-        private val gitService: GitService,
-        private val structureService: StructureService,
-        private val uriBuilder: EntityURIBuilder
+    extensionFeature: GitExtensionFeature,
+    private val gitService: GitService,
+    private val structureService: StructureService,
+    private val uriBuilder: EntityURIBuilder
 ) : SearchIndexer<GitBranchSearchItem> {
 
     override val searchResultType = SearchResultType(
-            feature = extensionFeature.featureDescription,
-            id = "git-branch",
-            name = "Git Branch",
-            description = "Git branch associated to an Ontrack branch"
+        feature = extensionFeature.featureDescription,
+        id = "git-branch",
+        name = "Git Branch",
+        description = "Git branch associated to an Ontrack branch",
+        order = SearchResultType.ORDER_PROPERTIES + 50,
     )
 
     override val indexerName: String = "Git Branches"
@@ -36,7 +37,7 @@ class GitBranchSearchIndexer(
     override fun indexAll(processor: (GitBranchSearchItem) -> Unit) {
         gitService.forEachConfiguredBranch(BiConsumer { branch, branchConfig ->
             processor(
-                    GitBranchSearchItem(branch, branchConfig)
+                GitBranchSearchItem(branch, branchConfig)
             )
         })
     }
@@ -47,32 +48,40 @@ class GitBranchSearchIndexer(
         val branchConfig = branch?.let { gitService.getBranchConfiguration(branch) }
         return if (branch != null && branchConfig != null) {
             SearchResult(
-                    title = branch.entityDisplayName,
-                    description = "Git branch ${branchConfig.branch}",
-                    uri = uriBuilder.getEntityURI(branch),
-                    page = uriBuilder.getEntityPage(branch),
-                    accuracy = score,
-                    type = searchResultType
+                title = branch.entityDisplayName,
+                description = "Git branch ${branchConfig.branch}",
+                uri = uriBuilder.getEntityURI(branch),
+                page = uriBuilder.getEntityPage(branch),
+                accuracy = score,
+                type = searchResultType,
+                data = mapOf(
+                    SearchResult.SEARCH_RESULT_BRANCH to branch,
+                    SEARCH_RESULT_GIT_BRANCH to branchConfig.branch,
+                ),
             )
         } else null
+    }
+
+    companion object {
+        const val SEARCH_RESULT_GIT_BRANCH = "gitBranch"
     }
 }
 
 const val GIT_BRANCH_SEARCH_INDEX = "git-branch"
 
 class GitBranchSearchItem(
-        val branchId: Int,
-        val gitBranch: String
+    val branchId: Int,
+    val gitBranch: String
 ) : SearchItem {
 
     constructor(branch: Branch, branchConfig: GitBranchConfiguration) : this(
-            branchId = branch.id(),
-            gitBranch = branchConfig.branch
+        branchId = branch.id(),
+        gitBranch = branchConfig.branch
     )
 
     override val id: String = branchId.toString()
 
     override val fields: Map<String, Any?> = asMap(
-            this::gitBranch
+        this::gitBranch
     )
 }

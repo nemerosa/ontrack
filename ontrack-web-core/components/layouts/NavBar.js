@@ -4,6 +4,7 @@ import {useContext} from "react";
 import {UserContext} from "@components/providers/UserProvider";
 import {FaRegUser} from "react-icons/fa";
 import HomeLink from "@components/common/HomeLink";
+import NavBarSearch from "@components/search/NavBarSearch";
 
 const {Text} = Typography;
 
@@ -27,6 +28,7 @@ export default function NavBar() {
             <div style={{
                 display: 'flex',
                 justifyContent: 'space-between',
+                alignItems: 'center'
             }}>
                 <Space direction="horizontal" size={16}>
                     <HomeLink
@@ -50,8 +52,9 @@ export default function NavBar() {
                     />
                 </Space>
                 <Space direction="horizontal" size={8}>
-                    {/* TODO <NavBarText text="Search component"/>*/}
-                    {/* TODO <NavBarText text="App messages"/>*/}
+                    <NavBarSearch
+                        style={{ display: 'flex', alignItems: 'center' }}
+                    />
                     <NavBarText text={user?.account?.fullName}/>
                     <Avatar icon={<FaRegUser id="user-menu"/>}
                             onClick={openUserMenu}

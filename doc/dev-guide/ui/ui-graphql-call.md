@@ -1,11 +1,6 @@
-`ADR-NXUI-0008-ui-graphql-call` - Calling the GraphQL API
-=========================================================
-
-# Context
+# Calling the GraphQL API
 
 Components need to call the Ontrack GraphQL API.
-
-# Chosen option
 
 Always use the `useGraphQLClient` hook:
 

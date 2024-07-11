@@ -32,7 +32,8 @@ class BuildLinkSearchExtension(
         feature = extensionFeature.featureDescription,
         id = "build-link",
         name = "Linked Build",
-        description = "Reference to a linked project and build, using format project:[build] where the target build is optional"
+        description = "Reference to a linked project and build, using format project:[build] where the target build is optional",
+        order = SearchResultType.ORDER_PROPERTIES + 30,
     )
 
     override val indexMapping: SearchIndexMapping? = indexMappings<BuildLinkSearchItem> {
@@ -40,7 +41,7 @@ class BuildLinkSearchExtension(
         +BuildLinkSearchItem::targetBuildId to id { index = false }
         +BuildLinkSearchItem::targetProject to keyword()
         +BuildLinkSearchItem::targetBuild to keyword()
-        +BuildLinkSearchItem::targetKey to text { scoreBoost = 3.0 }
+        +BuildLinkSearchItem::targetKey to text { scoreBoost = 1.0 }
     }
 
     override fun indexAll(processor: (BuildLinkSearchItem) -> Unit) {
@@ -51,24 +52,26 @@ class BuildLinkSearchExtension(
 
     override fun toSearchResult(id: String, score: Double, source: JsonNode): SearchResult? {
         // Parsing
-        val item = source.parseOrNull<BuildLinkSearchItem>()
-        // Loading
-        return item?.run {
-            // Loads the source build
-            structureService.findBuildByID(ID.of(item.fromBuildId))
-        }?.takeIf {
-            // The target build must still exist
-            structureService.findBuildByID(ID.of(item.targetBuildId)) != null
-        }?.run {
-            SearchResult(
-                entityDisplayName,
-                "Linked to ${item.targetProject}:${item.targetBuild}",
-                uriBuilder.getEntityURI(this),
-                uriBuilder.getEntityPage(this),
-                score,
-                searchResultType
-            )
-        }
+        val item = source.parseOrNull<BuildLinkSearchItem>() ?: return null
+        // Source and target build for the link
+        val sourceBuild = structureService.findBuildByID(ID.of(item.fromBuildId)) ?: return null
+        val targetBuild = structureService.findBuildByID(ID.of(item.targetBuildId)) ?: return null
+        val qualifier = item.qualifier
+        // Result
+        return SearchResult(
+            title = sourceBuild.entityDisplayName,
+            description = "Linked to ${item.targetProject}:${item.targetBuild}",
+            uri = uriBuilder.getEntityURI(sourceBuild),
+            page = uriBuilder.getEntityPage(sourceBuild),
+            accuracy = score,
+            type = searchResultType,
+            // Puts source & linked build, and qualifier
+            data = mapOf(
+                "sourceBuild" to sourceBuild,
+                "targetBuild" to targetBuild,
+                "qualifier" to qualifier,
+            ),
+        )
     }
 
     override fun onBuildLinkAdded(from: Build, to: Build, qualifier: String) {
@@ -86,8 +89,8 @@ class BuildLinkSearchExtension(
     private fun process(from: Build, to: Build, qualifier: String, processor: (BuildLinkSearchItem) -> Unit) {
         processor(BuildLinkSearchItem(from, to, qualifier = qualifier))
         // Alternative name
-        val otherName = buildDisplayNameService.getBuildDisplayName(to)
-        if (otherName != to.name) {
+        val otherName = buildDisplayNameService.getFirstBuildDisplayName(to)
+        if (otherName != null) {
             processor(BuildLinkSearchItem(from, to, otherName))
         }
     }
@@ -106,7 +109,12 @@ class BuildLinkSearchItem(
     val qualifier: String,
 ) : SearchItem {
 
-    constructor(from: Build, to: Build, targetBuildName: String = to.name, qualifier: String = BuildLink.DEFAULT) : this(
+    constructor(
+        from: Build,
+        to: Build,
+        targetBuildName: String = to.name,
+        qualifier: String = BuildLink.DEFAULT
+    ) : this(
         fromBuildId = from.id(),
         targetBuildId = to.id(),
         targetProject = to.project.name,

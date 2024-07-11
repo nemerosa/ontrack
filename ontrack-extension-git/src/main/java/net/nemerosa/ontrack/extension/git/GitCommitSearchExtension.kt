@@ -41,10 +41,11 @@ class GitCommitSearchExtension(
     private val logger: Logger = LoggerFactory.getLogger(GitCommitSearchExtension::class.java)
 
     override val searchResultType = SearchResultType(
-            extensionFeature.featureDescription,
-            GIT_COMMIT_SEARCH_RESULT_TYPE,
-            "Git Commit",
-            "Commit hash (abbreviated or not)"
+        feature = extensionFeature.featureDescription,
+        id = GIT_COMMIT_SEARCH_RESULT_TYPE,
+        name = "Git Commit",
+        description = "Commit hash (abbreviated or not)",
+        order = SearchResultType.ORDER_PROPERTIES + 60,
     )
 
     override val indexerName: String = "Git commits"
@@ -57,10 +58,10 @@ class GitCommitSearchExtension(
         +GitCommitSearchItem::projectId to id { index = false }
         +GitCommitSearchItem::gitType to keyword { index = false }
         +GitCommitSearchItem::gitName to keyword { index = false }
-        +GitCommitSearchItem::commit to keyword { scoreBoost = 3.0 }
-        +GitCommitSearchItem::commitShort to keyword { scoreBoost = 2.0 }
-        +GitCommitSearchItem::commitAuthor to keyword()
-        +GitCommitSearchItem::commitMessage to text()
+        +GitCommitSearchItem::commit to keyword { scoreBoost = 2.0 }
+        +GitCommitSearchItem::commitShort to keyword { scoreBoost = 1.0 }
+        +GitCommitSearchItem::commitAuthor to keyword { scoreBoost = 0.5 }
+        +GitCommitSearchItem::commitMessage to text {scoreBoost = 0.1 }
     }
 
     override fun indexAll(processor: (GitCommitSearchItem) -> Unit) {

@@ -17,10 +17,11 @@ class MetaInfoSearchExtension(
 ) : AbstractExtension(extensionFeature), SearchIndexer<MetaInfoSearchItem> {
 
     override val searchResultType = SearchResultType(
-            extensionFeature.featureDescription,
-            "build-meta-info",
-            "Build with Meta Info",
-            "Meta information pair using format name:[value] or value"
+        feature = extensionFeature.featureDescription,
+        id = "build-meta-info",
+        name = "Build with Meta Info",
+        description = "Meta information pair using format name:[value] or value",
+        order = SearchResultType.ORDER_PROPERTIES + 20,
     )
 
     override val indexerName: String = "Meta info properties"
@@ -37,10 +38,10 @@ class MetaInfoSearchExtension(
     override fun indexAll(processor: (MetaInfoSearchItem) -> Unit) {
         propertyService.forEachEntityWithProperty<MetaInfoPropertyType, MetaInfoProperty> { entityId, property ->
             processor(
-                    MetaInfoSearchItem(
-                            entityId = entityId,
-                            property = property
-                    )
+                MetaInfoSearchItem(
+                    entityId = entityId,
+                    property = property
+                )
             )
         }
     }
@@ -58,14 +59,24 @@ class MetaInfoSearchExtension(
         // Conversion (using legacy code)
         return entity?.let {
             SearchResult(
-                    title = entity.entityDisplayName,
-                    description = item.items.map { (name, value) -> "$name -> $value" }.sorted().joinToString(", "),
-                    uri = uriBuilder.getEntityURI(entity),
-                    page = uriBuilder.getEntityPage(entity),
-                    accuracy = score,
-                    type = searchResultType
+                title = entity.entityDisplayName,
+                description = item.items.map { (name, value) -> "$name -> $value" }.sorted().joinToString(", "),
+                uri = uriBuilder.getEntityURI(entity),
+                page = uriBuilder.getEntityPage(entity),
+                accuracy = score,
+                type = searchResultType,
+                data = mapOf(
+                    SearchResult.SEARCH_RESULT_ENTITY to entity,
+                    SearchResult.SEARCH_RESULT_ENTITY_TYPE to entity.projectEntityType,
+                    SearchResult.SEARCH_RESULT_ENTITY_ID to entity.id(),
+                    SEARCH_RESULT_META_INFO_ITEMS to item.items,
+                )
             )
         }
+    }
+
+    companion object {
+        const val SEARCH_RESULT_META_INFO_ITEMS = "metaInfoItems"
     }
 
 }
@@ -82,22 +93,22 @@ const val META_INFO_SEARCH_INDEX = "meta-info-properties"
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class MetaInfoSearchItem(
-        val items: Map<String, String>,
-        val entityType: ProjectEntityType,
-        val entityId: Int
+    val items: Map<String, String>,
+    val entityType: ProjectEntityType,
+    val entityId: Int
 ) : SearchItem {
 
     constructor(entity: ProjectEntity, property: MetaInfoProperty) : this(
-            entityId = ProjectEntityID(entity.projectEntityType, entity.id()),
-            property = property
+        entityId = ProjectEntityID(entity.projectEntityType, entity.id()),
+        property = property
     )
 
     constructor(entityId: ProjectEntityID, property: MetaInfoProperty) : this(
-            items = property.items.map {
-                it.name to (it.value ?: "")
-            }.associate { it },
-            entityType = entityId.type,
-            entityId = entityId.id
+        items = property.items.map {
+            it.name to (it.value ?: "")
+        }.associate { it },
+        entityType = entityId.type,
+        entityId = entityId.id
     )
 
     val keys = items.map { (name, value) -> "$name$META_INFO_SEPARATOR$value" }
@@ -105,10 +116,10 @@ class MetaInfoSearchItem(
     override val id: String = "$entityType::$entityId"
 
     override val fields: Map<String, Any?> = mapOf(
-            "keys" to items.map { (name, value) -> "$name$META_INFO_SEPARATOR$value" },
-            "items" to items,
-            "entityType" to entityType,
-            "entityId" to entityId
+        "keys" to items.map { (name, value) -> "$name$META_INFO_SEPARATOR$value" },
+        "items" to items,
+        "entityType" to entityType,
+        "entityId" to entityId
     )
 
 }

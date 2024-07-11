@@ -10,7 +10,6 @@ import {useGraphQLClient} from "@components/providers/ConnectionContextProvider"
 import {gql} from "graphql-request";
 import Timestamp from "@components/common/Timestamp";
 import NotificationResultType from "@components/extension/notifications/NotificationResultType";
-import NotificationChannelConfig from "@components/extension/notifications/NotificationChannelConfig";
 import NotificationRecordDetails from "@components/extension/notifications/NotificationRecordDetails";
 import TablePaginationFooter from "@components/common/table/TablePaginationFooter";
 import TableColumnFilterDropdown from "@components/common/table/TableColumnFilterDropdown";

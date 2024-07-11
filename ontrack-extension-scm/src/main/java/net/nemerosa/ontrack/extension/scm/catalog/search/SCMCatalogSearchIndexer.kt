@@ -16,10 +16,10 @@ import java.net.URI
 
 @Component
 class SCMCatalogSearchIndexer(
-        extensionFeature: SCMExtensionFeature,
-        private val scmCatalog: SCMCatalog,
-        private val catalogLinkService: CatalogLinkService,
-        private val uriBuilder: EntityURIBuilder
+    extensionFeature: SCMExtensionFeature,
+    private val scmCatalog: SCMCatalog,
+    private val catalogLinkService: CatalogLinkService,
+    private val uriBuilder: EntityURIBuilder
 ) : SearchIndexer<SCMCatalogSearchItem> {
 
     override val indexerName: String = "SCM Catalog"
@@ -27,10 +27,11 @@ class SCMCatalogSearchIndexer(
     override val indexName: String = "scm-catalog"
 
     override val searchResultType = SearchResultType(
-            feature = extensionFeature.featureDescription,
-            id = "scm-catalog",
-            name = "SCM Catalog",
-            description = "Indexed SCM repository, which might be associated or not with an Ontrack project"
+        feature = extensionFeature.featureDescription,
+        id = "scm-catalog",
+        name = "SCM Catalog",
+        description = "Indexed SCM repository, which might be associated or not with an Ontrack project",
+        order = SearchResultType.ORDER_PROPERTIES + 100,
     )
 
     override fun indexAll(processor: (SCMCatalogSearchItem) -> Unit) {
@@ -54,7 +55,8 @@ class SCMCatalogSearchIndexer(
             val page: URI
             if (project != null) {
                 title = "${project.name} (${entry.repository})"
-                description = "Project ${project.name} associated with SCM ${entry.repository} (${entry.scm} @ ${entry.config})"
+                description =
+                    "Project ${project.name} associated with SCM ${entry.repository} (${entry.scm} @ ${entry.config})"
                 uri = uriBuilder.getEntityURI(project)
                 page = uriBuilder.getEntityPage(project)
             } else {
@@ -65,14 +67,22 @@ class SCMCatalogSearchIndexer(
             }
             // Result
             SearchResult(
-                    title = title,
-                    description = description,
-                    uri = uri,
-                    page = page,
-                    accuracy = score,
-                    type = searchResultType
+                title = title,
+                description = description,
+                uri = uri,
+                page = page,
+                accuracy = score,
+                type = searchResultType,
+                data = mapOf(
+                    SEARCH_RESULT_SCM_CATALOG_ENTRY to entry,
+                    SearchResult.SEARCH_RESULT_PROJECT to project,
+                )
             )
         }
+    }
+
+    companion object {
+        const val SEARCH_RESULT_SCM_CATALOG_ENTRY = "scmCatalogEntry"
     }
 
     override val isIndexationDisabled: Boolean = false
@@ -87,23 +97,23 @@ class SCMCatalogSearchIndexer(
 }
 
 data class SCMCatalogSearchItem(
-        override val id: String,
-        val scm: String,
-        val config: String,
-        val repository: String
+    override val id: String,
+    val scm: String,
+    val config: String,
+    val repository: String
 ) : SearchItem {
 
     constructor(entry: SCMCatalogEntry) : this(
-            id = entry.key,
-            scm = entry.scm,
-            config = entry.config,
-            repository = entry.repository
+        id = entry.key,
+        scm = entry.scm,
+        config = entry.config,
+        repository = entry.repository
     )
 
     override val fields: Map<String, Any?> = asMap(
-            this::scm,
-            this::config,
-            this::repository
+        this::scm,
+        this::config,
+        this::repository
     )
 
 }

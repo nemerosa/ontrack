@@ -36,6 +36,10 @@ const refDataSignature = {
         index: {},
     },
     /**
+     * List of search result types
+     */
+    searchResultTypes: [],
+    /**
      * Version of Ontrack
      */
     version: ''
@@ -100,6 +104,14 @@ export default function RefDataContextProvider({children}) {
                             id
                             description
                         }
+                        searchResultTypes {
+                            feature {
+                                id
+                            }
+                            id
+                            name
+                            description
+                        }
                     }
                 `
             ).then(data => {
@@ -108,6 +120,7 @@ export default function RefDataContextProvider({children}) {
                     eventTypes: data.eventTypes,
                     jobStates: jobStates,
                     version: data.info.version.display,
+                    searchResultTypes: data.searchResultTypes,
                 })
             })
         }

@@ -11,6 +11,7 @@ import ConnectionContextProvider from "@components/providers/ConnectionContextPr
 import Head from "next/head";
 import {useRouter} from "next/router";
 import {isConnectionLoggingEnabled, isConnectionTracingEnabled, ontrackUiUrl, ontrackUrl} from "@/connection";
+import SearchContextProvider from "@components/search/SearchContext";
 
 export async function getServerSideProps() {
     console.log("[init] Environment ", ontrack)
@@ -53,9 +54,11 @@ export default function App({Component, environment, pageProps}) {
                 <UserContextProvider>
                     <PreferencesContextProvider>
                         <RefDataContextProvider>
-                            <EventsContextProvider>
-                                <Component {...pageProps} />
-                            </EventsContextProvider>
+                            <SearchContextProvider>
+                                <EventsContextProvider>
+                                    <Component {...pageProps} />
+                                </EventsContextProvider>
+                            </SearchContextProvider>
                         </RefDataContextProvider>
                     </PreferencesContextProvider>
                 </UserContextProvider>
