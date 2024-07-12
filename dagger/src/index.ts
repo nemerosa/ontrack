@@ -57,6 +57,14 @@ class Dagger {
             .from("azul/zulu-openjdk:17.0.6")
             .withDirectory("/src", source)
             .withWorkdir("/src")
+            .withMountedCache(
+                "/src/.gradle",
+                dag.cacheVolume("gradle-app"),
+            )
+            .withMountedCache(
+                "/root/.gradle",
+                dag.cacheVolume("gradle-global")
+            )
     }
 
 }
