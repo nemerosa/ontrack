@@ -19,6 +19,25 @@ import {dag, Container, Directory, object, func} from "@dagger.io/dagger"
 class Dagger {
 
     /**
+     * Building the application
+     */
+    @func()
+    async build(source: Directory) {
+        // Building the Spring Boot application
+        return this.buildEnv(source)
+            .withExec([
+                "./gradlew",
+                "assemble", // TODO Replaces with build
+                "-PbowerOptions='--allow-root'",
+                "-Dorg.gradle.jvmargs=-Xmx6144m",
+                "--stacktrace",
+                "--parallel",
+                "--no-daemon"
+            ])
+            .directory("./")
+    }
+
+    /**
      * Getting the version of the application
      */
     @func()
