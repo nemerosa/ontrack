@@ -10,12 +10,12 @@ class SearchIT : AbstractSearchTestSupport() {
         val types = searchService.searchResultTypes
         val names = types.map { it.name }
         assertEquals(
-            sortedSetOf(
+            listOf(
                 "Project", "Branch", "Build",
                 "Build with Release", "Build with Meta Info", "Linked Build",
                 "Git Branch", "Git Commit", "Git Issue",
                 "SCM Catalog"
-            ).toList(),
+            ),
             names
         )
     }
