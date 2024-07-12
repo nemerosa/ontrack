@@ -19,6 +19,16 @@ import {dag, Container, Directory, object, func} from "@dagger.io/dagger"
 class Dagger {
 
     /**
+     * Getting the version of the application
+     */
+    @func()
+    async version(source: Directory): Promise<string> {
+        return this.buildEnv(source)
+            .withExec(["./gradlew", "versionDisplay", "versionFile", "--no-daemon"])
+            .stdout()
+    }
+
+    /**
      * Build environment
      */
     @func()
