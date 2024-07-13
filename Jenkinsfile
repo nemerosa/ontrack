@@ -21,6 +21,7 @@ pipeline {
         stage("Build") {
             steps {
                 sh '''
+                    export PATH="$HOME/.local/bin"
                     dagger call build --source=.
                 '''
             }
