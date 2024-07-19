@@ -29,9 +29,7 @@ class AutoVersioningPromotionListener(
                 // Gets the list of configured branches
                 val configuredBranches = autoVersioningEventService.getConfiguredBranches(run)
                 // Dispatching
-                if (configuredBranches != null) {
-                    autoVersioningDispatcher.dispatch(configuredBranches)
-                }
+                autoVersioningDispatcher.dispatch(configuredBranches)
             }
         }
     }

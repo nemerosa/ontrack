@@ -25,30 +25,27 @@ class AutoVersioningPromotionListenerServiceImpl(
 
     private val logger: Logger = LoggerFactory.getLogger(AutoVersioningPromotionListenerServiceImpl::class.java)
 
-    override fun getConfiguredBranches(promotionRun: PromotionRun): AutoVersioningConfiguredBranches? {
+    override fun getConfiguredBranches(promotionLevel: PromotionLevel): List<AutoVersioningConfiguredBranch> {
         // Gets all the trigger configurations about this event, based on project & promotion only
         val branches = autoVersioningConfigurationService.getBranchesConfiguredFor(
-            promotionRun.build.project.name,
-            promotionRun.promotionLevel.name
+            promotionLevel.project.name,
+            promotionLevel.name
         )
         // Filters the branches based on their configuration and the triggering event
         val cache = mutableMapOf<LatestSourceBranchCacheKey, LatestSourceBranchCacheValue>()
         val configuredBranches = branches
             .filter { !it.isDisabled && !it.project.isDisabled }
             .mapNotNull {
-                filterBranch(it, promotionRun, cache)
+                filterBranch(it, promotionLevel, cache)
             }
         logger.debug("Cache: {}", cache.keys)
         // OK
-        return AutoVersioningConfiguredBranches(
-            configuredBranches,
-            promotionRun
-        )
+        return configuredBranches
     }
 
     private fun filterBranch(
         branch: Branch,
-        promotionRun: PromotionRun,
+        promotionLevel: PromotionLevel,
         cache: MutableMap<LatestSourceBranchCacheKey, LatestSourceBranchCacheValue>,
     ): AutoVersioningConfiguredBranch? {
         // The project must be configured for a SCM
@@ -61,7 +58,7 @@ class AutoVersioningPromotionListenerServiceImpl(
                     // If present, gets its configurations
                     val autoVersioningConfigurations = config.configurations
                         // Filters the configurations based on the event
-                        .filter { configuration -> promotionRun.match(branch, configuration, cache) }
+                        .filter { configuration -> match(promotionLevel, branch, configuration, cache) }
                         // Removes any empty setup
                         .takeIf { configurations -> configurations.isNotEmpty() }
                     // Accepting the branch based on having at least one matching configuration
@@ -113,32 +110,34 @@ class AutoVersioningPromotionListenerServiceImpl(
         return true
     }
 
-    private fun PromotionRun.match(
+    private fun match(
+        sourcePromotion: PromotionLevel,
         eligibleTargetBranch: Branch,
         config: AutoVersioningSourceConfig,
         cache: MutableMap<LatestSourceBranchCacheKey, LatestSourceBranchCacheValue>,
     ): Boolean {
-        val match = config.sourceProject == build.project.name &&
-                config.sourcePromotion == promotionLevel.name &&
+        val match = config.sourceProject == sourcePromotion.project.name &&
+                config.sourcePromotion == sourcePromotion.name &&
                 logger.logTime("AV Source Branch match") {
-                    sourceBranchMatch(eligibleTargetBranch, config, cache)
+                    sourceBranchMatch(sourcePromotion.branch, eligibleTargetBranch, config, cache)
                 }
         return match
     }
 
-    private fun PromotionRun.sourceBranchMatch(
+    private fun sourceBranchMatch(
+        sourceBranch: Branch,
         eligibleTargetBranch: Branch,
         config: AutoVersioningSourceConfig,
         cache: MutableMap<LatestSourceBranchCacheKey, LatestSourceBranchCacheValue>,
     ): Boolean {
-        val cacheKey = LatestSourceBranchCacheKey(eligibleTargetBranch, build.project, config)
+        val cacheKey = LatestSourceBranchCacheKey(eligibleTargetBranch, sourceBranch.project, config)
         val latestSourceBranch = cache.getOrPut(cacheKey) {
             LatestSourceBranchCacheValue(
-                autoVersioningConfigurationService.getLatestBranch(eligibleTargetBranch, build.project, config)
+                autoVersioningConfigurationService.getLatestBranch(eligibleTargetBranch, sourceBranch.project, config)
             )
         }.branch
         // We want the promoted build to be on the latest source branch
-        return latestSourceBranch != null && latestSourceBranch.id() == build.branch.id()
+        return latestSourceBranch != null && latestSourceBranch.id() == sourceBranch.id()
     }
 
     private data class LatestSourceBranchCacheKey(
