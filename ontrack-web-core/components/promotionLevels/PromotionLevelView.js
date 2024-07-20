@@ -26,6 +26,8 @@ import PromotionLevelHistory from "@components/promotionLevels/PromotionLevelHis
 import UserMenuActions from "@components/entities/UserMenuActions";
 import PromotionLevelViewTitle from "@components/promotionLevels/PromotionLevelViewTitle";
 import PromotionLevelViewDrawer from "@components/promotionLevels/PromotionLevelViewDrawer";
+import {CloseCommand} from "@components/common/Commands";
+import {branchPromotionLevelsUri} from "@components/common/Links";
 
 export default function PromotionLevelView({id}) {
 
@@ -64,6 +66,7 @@ export default function PromotionLevelView({id}) {
                     commands.push(<PromotionLevelBulkUpdateCommand key="bulk-update" id={id}/>)
                 }
                 commands.push(<StoredGridLayoutResetCommand key="reset"/>)
+                commands.push(<CloseCommand href={branchPromotionLevelsUri(pl.branch)}/>)
                 setCommands(commands)
             }).finally(() => {
                 setLoadingPromotionLevel(false)
