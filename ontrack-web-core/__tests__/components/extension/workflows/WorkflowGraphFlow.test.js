@@ -51,6 +51,7 @@ describe('WorkflowGraphFlow', () => {
         const node = {
             oldId: 'n2',
             id: 'n2',
+            description: 'Some description',
             executorId: 'mock',
             timeout: 300,
             data: {
@@ -65,6 +66,7 @@ describe('WorkflowGraphFlow', () => {
             id: 'n2',
             data: {
                 id: 'n2',
+                description: 'Some description',
                 executorId: 'mock',
                 timeout: 300,
                 data: {
@@ -84,6 +86,7 @@ describe('WorkflowGraphFlow', () => {
         const node = {
             oldId: 'n1',
             id: 'start',
+            description: 'Some description',
             executorId: 'mock',
             timeout: 300,
             data: {
@@ -98,6 +101,7 @@ describe('WorkflowGraphFlow', () => {
             id: 'start',
             data: {
                 id: 'start',
+                description: 'Some description',
                 executorId: 'mock',
                 timeout: 300,
                 data: {
