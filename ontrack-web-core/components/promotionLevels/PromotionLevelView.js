@@ -4,7 +4,7 @@ import Head from "next/head";
 import {promotionLevelTitle} from "@components/common/Titles";
 import StoredGridLayoutContextProvider from "@components/grid/StoredGridLayoutContext";
 import MainPage from "@components/layouts/MainPage";
-import {Skeleton} from "antd";
+import {Skeleton, Space, Typography} from "antd";
 import {promotionLevelBreadcrumbs} from "@components/common/Breadcrumbs";
 import StoredGridLayout from "@components/grid/StoredGridLayout";
 import PromotionLevelLeadTimeChart from "@components/promotionLevels/PromotionLevelLeadTimeChart";
@@ -26,6 +26,7 @@ import PromotionLevelHistory from "@components/promotionLevels/PromotionLevelHis
 import UserMenuActions from "@components/entities/UserMenuActions";
 import PromotionLevelViewTitle from "@components/promotionLevels/PromotionLevelViewTitle";
 import PromotionLevelViewDrawer from "@components/promotionLevels/PromotionLevelViewDrawer";
+import PromotionLevelAutoVersioningTargets from "@components/promotionLevels/PromotionLevelAutoVersioningTargets";
 
 export default function PromotionLevelView({id}) {
 
@@ -34,6 +35,7 @@ export default function PromotionLevelView({id}) {
     const chartFrequency = "chart-frequency"
     const chartStability = "chart-stability"
     const sectionHistory = "section-history"
+    const sectionAutoVersioning = "section-auto-versioning"
 
     const client = useGraphQLClient()
 
@@ -79,6 +81,8 @@ export default function PromotionLevelView({id}) {
         {i: chartStability, x: 6, y: 12, w: 6, h: 12},
         // History - table
         {i: sectionHistory, x: 0, y: 18, w: 12, h: 12},
+        // Auto-versioning - table
+        {i: sectionAutoVersioning, x: 0, y: 30, w: 12, h: 12},
     ]
 
     const {command, interval, period} = useChartOptionsCommand()
@@ -149,6 +153,23 @@ export default function PromotionLevelView({id}) {
                 <PromotionLevelHistory
                     promotionLevel={promotionLevel}
                 />
+            </GridCell>,
+        },
+        {
+            id: sectionAutoVersioning,
+            content: <GridCell
+                id={sectionAutoVersioning}
+                title="Auto-versioning"
+            >
+                <Space className="ot-line" direction="vertical">
+                    <Typography.Text type="secondary" style={{padding: 8, display: "block"}}>
+                        Lists all branches which are eligible for auto-versioning
+                        from this promotion.
+                    </Typography.Text>
+                    <PromotionLevelAutoVersioningTargets
+                        promotionLevel={promotionLevel}
+                    />
+                </Space>
             </GridCell>,
         },
     ]
