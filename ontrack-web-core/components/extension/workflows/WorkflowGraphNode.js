@@ -1,13 +1,13 @@
 import {Handle, Position} from "reactflow";
 import {Card, Popconfirm, Space, Typography} from "antd";
 import {useWorkflowNodeExecutor} from "@components/extension/workflows/WorkflowNodeExecutorContext";
-import {FaClock, FaCog, FaPencilAlt, FaTrashAlt, FaWrench} from "react-icons/fa";
+import {FaCog, FaPencilAlt, FaTrashAlt, FaWrench} from "react-icons/fa";
 import WorkflowNodeExecutorShortConfigWithHelp
     from "@components/extension/workflows/WorkflowNodeExecutorShortConfigWithHelp";
 import ConfigureWorkflowNodeDialog, {
     useConfigureWorkflowNodeDialog,
 } from "@components/extension/workflows/ConfigureWorkflowNodeDialog";
-import Duration from "@components/common/Duration";
+import WorkflowNodeTitle from "@components/extension/workflows/WorkflowNodeTitle";
 
 export default function WorkflowGraphNode({data}) {
 
@@ -15,13 +15,15 @@ export default function WorkflowGraphNode({data}) {
     const executor = useWorkflowNodeExecutor(data.executorId, [data.executorId])
 
     const onSuccess = (values /*, context */) => {
-        const {id, executorId, timeout, data: nodeData} = values
+        const {id, description, executorId, timeout, data: nodeData} = values
+        console.log("onSuccess", values);
         const oldId = data.id
         if (onGraphNodeChange) {
             onGraphNodeChange({
                 node: {
                     oldId,
                     id,
+                    description,
                     executorId,
                     timeout,
                     data: nodeData,
@@ -56,7 +58,11 @@ export default function WorkflowGraphNode({data}) {
             <Handle type="source" position={Position.Right}/>
 
             <Card
-                title={data.id}
+                title={
+                    <>
+                        <WorkflowNodeTitle node={data}/>
+                    </>
+                }
                 size="small"
                 bodyStyle={{
                     overflow: 'hidden'
@@ -101,10 +107,6 @@ export default function WorkflowGraphNode({data}) {
                                 data.executorId && executor &&
                                 <Typography.Text>{executor?.displayName}</Typography.Text>
                             }
-                        </Space>
-                        <Space>
-                            <FaClock title="Timeout"/>
-                            <Duration seconds={data.timeout}/>
                         </Space>
                         <Space>
                             <FaWrench/>

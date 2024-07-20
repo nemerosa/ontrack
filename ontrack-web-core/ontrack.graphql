@@ -7409,6 +7409,8 @@ type WorkflowInstancePaginated {
 type WorkflowNode {
     "Raw data associated with the node, to be used by the node executor."
     data: JSON
+    "Description of the node in its workflow."
+    description: String
     "ID of the executor to use"
     executorId: String!
     "Unique ID of the node in its workflow."
