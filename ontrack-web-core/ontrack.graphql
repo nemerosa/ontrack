@@ -195,6 +195,14 @@ type AutoVersioningConfig {
     configurations: [AutoVersioningSourceConfig!]!
 }
 
+"Association of a branch with its auto versioning configuration"
+type AutoVersioningConfiguredBranch {
+    "Target branch for the auto-versioning"
+    branch: Branch!
+    "List of target auto-versioning configurations on the target branch"
+    configurations: [AutoVersioningSourceConfig!]!
+}
+
 "AutoVersioningNotification"
 type AutoVersioningNotification {
     "channel field"
@@ -313,8 +321,6 @@ type Branch implements Authorizable & ProjectEntity {
         "Downstream or upstream dependencies (down by default)."
         direction: AutoVersioningDirection
     ): BuildAutoVersioning
-    "Auto versioning configuration"
-    autoVersioningConfig: AutoVersioningConfig
     "Actions to get a diff on builds of the branch"
     buildDiffActions: [Action!]!
     "List of forms for the build filters (for the creation of new filters)"
@@ -4855,6 +4861,8 @@ type PromotionLevel implements Authorizable & ProjectEntity {
     authorizations: [Authorization!]!
     "Allows a promotion level to be granted on a build as soon as a list of validation stamps and/or other promotions has been passed"
     autoPromotionProperty: Property
+    "List of branches targeted for auto-versioning based on this promotion level"
+    autoVersioningTargets: [AutoVersioningConfiguredBranch!]!
     "Reference to branch"
     branch: Branch
     creation: Signature

@@ -3,7 +3,7 @@ import {Tooltip, Typography} from "antd";
 export default function AutoVersioningApproval({autoApproval, autoApprovalMode}) {
 
     // Auto approval is the default
-    const actualAutoApproval = autoApproval !== undefined ? autoApproval : true
+    const actualAutoApproval = autoApproval !== undefined && autoApproval !== null ? autoApproval : true
     // CLIENT auto approval is the default
     const actualAutoApprovalMode = autoApprovalMode ?? 'CLIENT'
 

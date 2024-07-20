@@ -14,12 +14,12 @@ class MockSCMTester(
     private val propertyService: PropertyService,
 ) {
 
-    fun withMockSCMRepository(
+    fun <T> withMockSCMRepository(
         name: String = uid(""),
-        code: MockSCMRepositoryContext.() -> Unit,
-    ) {
+        code: MockSCMRepositoryContext.() -> T,
+    ): T {
         val context = MockSCMRepositoryContext(name)
-        context.code()
+        return context.code()
     }
 
     inner class MockSCMRepositoryContext(
