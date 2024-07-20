@@ -13,6 +13,7 @@ export const useConfigureWorkflowNodeDialog = ({onSuccess}) => {
         init: (form, context) => {
             setCurrentValues({...context})
             form.setFieldValue('id', context.id)
+            form.setFieldValue('description', context.description)
             form.setFieldValue('executorId', context.executorId)
             form.setFieldValue('timeout', context.timeout)
             form.setFieldValue('data', context.data)
@@ -43,6 +44,13 @@ export default function ConfigureWorkflowNodeDialog({dialog}) {
                     label="ID"
                     extra="Unique ID of this node in the workflow"
                     rules={[{required: true, message: 'Node ID is required',},]}
+                >
+                    <Input/>
+                </Form.Item>
+                <Form.Item
+                    name="description"
+                    label="Description"
+                    extra="Description of this node in the workflow"
                 >
                     <Input/>
                 </Form.Item>
