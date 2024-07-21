@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.av.processing
 import net.nemerosa.ontrack.extension.av.AbstractAutoVersioningTestSupport
 import net.nemerosa.ontrack.extension.av.AutoVersioningTestFixtures.createOrder
 import net.nemerosa.ontrack.extension.general.releaseProperty
-import net.nemerosa.ontrack.extension.scm.mock.MockSCMTester
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -12,9 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
 class AutoVersioningTemplatingServiceIT : AbstractAutoVersioningTestSupport() {
-
-    @Autowired
-    private lateinit var mockSCMTester: MockSCMTester
 
     @Autowired
     private lateinit var autoVersioningTemplatingService: AutoVersioningTemplatingService

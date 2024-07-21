@@ -24,7 +24,7 @@ data class AutoVersioningSettings(
         /**
          * Is the auto versioning enabled by default?
          */
-        const val DEFAULT_ENABLED = false
+        const val DEFAULT_ENABLED = true
 
         /**
          * Default value for [AutoVersioningSettings.auditRetentionDuration]

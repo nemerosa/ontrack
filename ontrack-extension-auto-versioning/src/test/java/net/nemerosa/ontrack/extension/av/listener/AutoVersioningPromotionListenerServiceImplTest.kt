@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationService
 import net.nemerosa.ontrack.extension.av.project.AutoVersioningProjectProperty
 import net.nemerosa.ontrack.extension.av.project.AutoVersioningProjectPropertyType
+import net.nemerosa.ontrack.extension.av.tracking.AutoVersioningTracking
 import net.nemerosa.ontrack.extension.scm.service.SCMDetector
 import net.nemerosa.ontrack.model.structure.*
 import org.junit.jupiter.api.BeforeEach
@@ -21,6 +22,7 @@ class AutoVersioningPromotionListenerServiceImplTest {
     private lateinit var scmDetector: SCMDetector
     private lateinit var propertyService: PropertyService
     private lateinit var structureService: StructureService
+    private lateinit var autoVersioningTracking: AutoVersioningTracking
     private lateinit var autoVersioningPromotionListenerService: AutoVersioningPromotionListenerService
 
     @BeforeEach
@@ -31,6 +33,7 @@ class AutoVersioningPromotionListenerServiceImplTest {
         scmDetector = mockk()
         propertyService = mockk()
         structureService = mockk()
+        autoVersioningTracking = mockk(relaxed = true)
 
         autoVersioningPromotionListenerService = AutoVersioningPromotionListenerServiceImpl(
             autoVersioningConfigurationService = autoVersioningConfigurationService,
@@ -53,7 +56,7 @@ class AutoVersioningPromotionListenerServiceImplTest {
             autoVersioningConfigurationService.getBranchesConfiguredFor(build.project.name, promotion.name)
         } returns listOf(branch)
 
-        val avBranches = autoVersioningPromotionListenerService.getConfiguredBranches(run)
+        val avBranches = autoVersioningPromotionListenerService.getConfiguredBranches(run, autoVersioningTracking)
 
         assertNotNull(avBranches) {
             assertTrue(
@@ -77,7 +80,7 @@ class AutoVersioningPromotionListenerServiceImplTest {
             autoVersioningConfigurationService.getBranchesConfiguredFor(build.project.name, promotion.name)
         } returns listOf(branch)
 
-        val avBranches = autoVersioningPromotionListenerService.getConfiguredBranches(run)
+        val avBranches = autoVersioningPromotionListenerService.getConfiguredBranches(run, autoVersioningTracking)
 
         assertNotNull(avBranches) {
             assertTrue(

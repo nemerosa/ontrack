@@ -4,8 +4,11 @@ import net.nemerosa.ontrack.common.logTime
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationService
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfiguredBranch
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
-import net.nemerosa.ontrack.extension.av.model.AutoVersioningConfiguredBranches
 import net.nemerosa.ontrack.extension.av.project.AutoVersioningProjectPropertyType
+import net.nemerosa.ontrack.extension.av.tracking.AutoVersioningTracking
+import net.nemerosa.ontrack.extension.av.tracking.withDisabledBranch
+import net.nemerosa.ontrack.extension.av.tracking.withNotLatestBranch
+import net.nemerosa.ontrack.extension.av.tracking.withRejectedBranch
 import net.nemerosa.ontrack.extension.scm.service.SCMDetector
 import net.nemerosa.ontrack.model.structure.*
 import org.slf4j.Logger
@@ -25,18 +28,31 @@ class AutoVersioningPromotionListenerServiceImpl(
 
     private val logger: Logger = LoggerFactory.getLogger(AutoVersioningPromotionListenerServiceImpl::class.java)
 
-    override fun getConfiguredBranches(promotionLevel: PromotionLevel): List<AutoVersioningConfiguredBranch> {
+    override fun getConfiguredBranches(
+        promotionLevel: PromotionLevel,
+        tracking: AutoVersioningTracking,
+    ): List<AutoVersioningConfiguredBranch> {
         // Gets all the trigger configurations about this event, based on project & promotion only
         val branches = autoVersioningConfigurationService.getBranchesConfiguredFor(
             promotionLevel.project.name,
             promotionLevel.name
         )
+        // Tracking: list of branches
+        tracking.withTrail {
+            it.withPotentialTargetBranches(branches)
+        }
         // Filters the branches based on their configuration and the triggering event
         val cache = mutableMapOf<LatestSourceBranchCacheKey, LatestSourceBranchCacheValue>()
         val configuredBranches = branches
-            .filter { !it.isDisabled && !it.project.isDisabled }
+            .filter {
+                val disabled = it.isDisabled || it.project.isDisabled
+                if (disabled) {
+                    tracking.withDisabledBranch(it)
+                }
+                !disabled
+            }
             .mapNotNull {
-                filterBranch(it, promotionLevel, cache)
+                filterBranch(it, promotionLevel, cache, tracking)
             }
         logger.debug("Cache: {}", cache.keys)
         // OK
@@ -47,6 +63,7 @@ class AutoVersioningPromotionListenerServiceImpl(
         branch: Branch,
         promotionLevel: PromotionLevel,
         cache: MutableMap<LatestSourceBranchCacheKey, LatestSourceBranchCacheValue>,
+        tracking: AutoVersioningTracking,
     ): AutoVersioningConfiguredBranch? {
         // The project must be configured for a SCM
         if (scmDetector.getSCM(branch.project) != null) {
@@ -58,7 +75,7 @@ class AutoVersioningPromotionListenerServiceImpl(
                     // If present, gets its configurations
                     val autoVersioningConfigurations = config.configurations
                         // Filters the configurations based on the event
-                        .filter { configuration -> match(promotionLevel, branch, configuration, cache) }
+                        .filter { configuration -> match(promotionLevel, branch, configuration, cache, tracking) }
                         // Removes any empty setup
                         .takeIf { configurations -> configurations.isNotEmpty() }
                     // Accepting the branch based on having at least one matching configuration
@@ -66,19 +83,19 @@ class AutoVersioningPromotionListenerServiceImpl(
                         AutoVersioningConfiguredBranch(branch, list)
                     }
                 } else {
-                    // Not accepted by the project
+                    tracking.withRejectedBranch(branch, "Not accepted by the project auto-versioning rules")
                     return null
                 }
             }
             // No auto versioning property for this branch
             else {
-                // No auto versioning configuration at branch level
+                tracking.withRejectedBranch(branch, "No auto versioning configuration at branch level")
                 return null
             }
         }
         // No SCM configuration
         else {
-            // No supported SCM configured at project level
+            tracking.withRejectedBranch(branch, "No supported SCM configured at project level")
             return null
         }
     }
@@ -115,13 +132,19 @@ class AutoVersioningPromotionListenerServiceImpl(
         eligibleTargetBranch: Branch,
         config: AutoVersioningSourceConfig,
         cache: MutableMap<LatestSourceBranchCacheKey, LatestSourceBranchCacheValue>,
+        tracking: AutoVersioningTracking,
     ): Boolean {
-        val match = config.sourceProject == sourcePromotion.project.name &&
-                config.sourcePromotion == sourcePromotion.name &&
-                logger.logTime("AV Source Branch match") {
-                    sourceBranchMatch(sourcePromotion.branch, eligibleTargetBranch, config, cache)
-                }
-        return match
+        if (config.sourceProject == sourcePromotion.project.name &&
+            config.sourcePromotion == sourcePromotion.name
+        ) {
+            val match = logger.logTime("AV Source Branch match") {
+                sourceBranchMatch(sourcePromotion.branch, eligibleTargetBranch, config, cache, tracking)
+            }
+            return match
+        } else {
+            tracking.withRejectedBranch(eligibleTargetBranch, "Project & promotion names not matching")
+            return false
+        }
     }
 
     private fun sourceBranchMatch(
@@ -129,6 +152,7 @@ class AutoVersioningPromotionListenerServiceImpl(
         eligibleTargetBranch: Branch,
         config: AutoVersioningSourceConfig,
         cache: MutableMap<LatestSourceBranchCacheKey, LatestSourceBranchCacheValue>,
+        tracking: AutoVersioningTracking,
     ): Boolean {
         val cacheKey = LatestSourceBranchCacheKey(eligibleTargetBranch, sourceBranch.project, config)
         val latestSourceBranch = cache.getOrPut(cacheKey) {
@@ -137,7 +161,11 @@ class AutoVersioningPromotionListenerServiceImpl(
             )
         }.branch
         // We want the promoted build to be on the latest source branch
-        return latestSourceBranch != null && latestSourceBranch.id() == sourceBranch.id()
+        val branchMatching = latestSourceBranch != null && latestSourceBranch.id() == sourceBranch.id()
+        if (!branchMatching) {
+            tracking.withNotLatestBranch(eligibleTargetBranch, latestSourceBranch)
+        }
+        return branchMatching
     }
 
     private data class LatestSourceBranchCacheKey(
