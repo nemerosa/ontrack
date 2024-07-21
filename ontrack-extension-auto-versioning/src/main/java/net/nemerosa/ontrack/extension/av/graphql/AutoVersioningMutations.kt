@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.av.graphql
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfig
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationService
 import net.nemerosa.ontrack.extension.av.validation.AutoVersioningValidationService
@@ -11,6 +10,7 @@ import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
+import kotlin.jvm.optionals.getOrNull
 
 @Component
 class AutoVersioningMutations(
@@ -71,8 +71,17 @@ class AutoVersioningMutations(
             if (build != null) {
                 autoVersioningValidationService.checkAndValidate(build)
             }
-        }
+        },
 
-    )
+        unitMutation(
+            name = "deleteAutoVersioningConfig",
+            description = "Deletes the auto-versioning configuration from a branch",
+            input = DeleteAutoVersioningConfigInput::class,
+        ) { input ->
+            val branch = structureService.getBranch(ID.of(input.branchId))
+            autoVersioningConfigurationService.setupAutoVersioning(branch, null)
+        },
+
+        )
 }
 

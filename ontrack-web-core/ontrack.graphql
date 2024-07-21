@@ -321,6 +321,8 @@ type Branch implements Authorizable & ProjectEntity {
         "Downstream or upstream dependencies (down by default)."
         direction: AutoVersioningDirection
     ): BuildAutoVersioning
+    "Auto versioning configuration"
+    autoVersioningConfig: AutoVersioningConfig
     "Actions to get a diff on builds of the branch"
     buildDiffActions: [Action!]!
     "List of forms for the build filters (for the creation of new filters)"
@@ -1136,6 +1138,12 @@ type Decoration {
     error: String
     "Extension feature"
     feature: ExtensionFeatureDescription
+}
+
+"Output type for the deleteAutoVersioningConfig mutation."
+type DeleteAutoVersioningConfigPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
 }
 
 "Output type for the deleteBranchGitConfigPropertyById mutation."
@@ -3155,6 +3163,11 @@ type Mutation {
         "Input for the mutation"
         input: CreateWebhookInput
     ): CreateWebhookPayload
+    "Deletes the auto-versioning configuration from a branch"
+    deleteAutoVersioningConfig(
+        "Input for the mutation"
+        input: DeleteAutoVersioningConfigInput
+    ): DeleteAutoVersioningConfigPayload
     "Deletes the git branch property on a branch identified by name."
     deleteBranchGitConfigProperty(
         "Input for the mutation"
@@ -8095,6 +8108,12 @@ input CreateWebhookInput {
     timeoutSeconds: Long!
     "url field"
     url: String!
+}
+
+"Input type for the deleteAutoVersioningConfig mutation."
+input DeleteAutoVersioningConfigInput {
+    "ID of the branch to clean"
+    branchId: Int!
 }
 
 "Input type for the deleteBranchGitConfigPropertyById mutation."

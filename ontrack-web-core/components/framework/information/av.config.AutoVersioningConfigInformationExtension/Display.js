@@ -1,5 +1,6 @@
-import Yaml from "@components/common/Yaml";
+import Link from "next/link";
+import {branchAutoVersioningUri} from "@components/common/Links";
 
-export default function AutoVersioningConfigInformationExtension({info}) {
-    return <Yaml yaml={info.data.yaml}/>
+export default function AutoVersioningConfigInformationExtension({entity}) {
+    return <Link href={branchAutoVersioningUri(entity)}>Configuration</Link>
 }

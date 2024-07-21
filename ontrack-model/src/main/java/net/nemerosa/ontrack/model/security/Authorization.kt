@@ -30,6 +30,11 @@ data class Authorization(
         const val EDIT = "edit"
 
         /**
+         * Common actions: configuring
+         */
+        const val CONFIG = "config"
+
+        /**
          * Common actions: deleting
          */
         const val DELETE = "delete"

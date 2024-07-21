@@ -28,6 +28,10 @@ export function branchPromotionLevelsUri(branch) {
     return `/branch/${branch.id}/promotionLevels`
 }
 
+export function branchAutoVersioningUri(branch) {
+    return `/extension/auto-versioning/config/${branch.id}`
+}
+
 export function branchLegacyUri(branch) {
     return `#/branch/${branch.id}`
 }

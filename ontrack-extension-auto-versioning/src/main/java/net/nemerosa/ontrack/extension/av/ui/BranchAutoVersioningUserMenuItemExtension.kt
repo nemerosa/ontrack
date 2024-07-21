@@ -23,6 +23,12 @@ class BranchAutoVersioningUserMenuItemExtension(
                     id = "audit-branch-target/${projectEntity.id}",
                     name = "Auto versioning audit",
                 ),
+                UserMenuItem(
+                    groupId = CoreUserMenuGroups.INFORMATION,
+                    extension = autoVersioningExtensionFeature,
+                    id = "config/${projectEntity.id}",
+                    name = "Auto versioning configuration",
+                ),
             )
         } else {
             emptyList()

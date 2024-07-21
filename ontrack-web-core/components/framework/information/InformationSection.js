@@ -18,7 +18,7 @@ export default function InformationSection({entity, loading}) {
                                     return {
                                         title: info.title,
                                         icon: <Dynamic path={`framework/information/${shortTypeName}/Icon`}/>,
-                                        content: <Dynamic path={`framework/information/${shortTypeName}/Display`} props={{info}}/>,
+                                        content: <Dynamic path={`framework/information/${shortTypeName}/Display`} props={{info, entity}}/>,
                                     }
                                 }
                             )
