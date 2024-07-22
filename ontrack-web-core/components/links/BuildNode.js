@@ -14,6 +14,7 @@ export default function BuildNode({data}) {
         <>
             <Handle type="target" position={Position.Left}/>
             <Card
+                data-testid={`ot-build-link-node-${build.id}`}
                 title={undefined}
                 size="small"
                 style={

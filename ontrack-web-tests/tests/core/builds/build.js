@@ -1,3 +1,5 @@
+import {BuildLinksPage} from "./buildLinks";
+
 const {ui} = require("@ontrack/connection");
 const {expect} = require("@playwright/test");
 
@@ -16,6 +18,11 @@ export class BuildPage {
         await expect(this.page.getByText("Validations")).toBeVisible()
         await expect(this.page.getByText("Downstream links")).toBeVisible()
         await expect(this.page.getByText("Upstream links")).toBeVisible()
+    }
+
+    async goToLinks() {
+        await this.page.getByRole("button", {name: "Links"}).click()
+        return new BuildLinksPage(this.page)
     }
 
 }

@@ -7,6 +7,8 @@ export default function DependencyLinksModeButton({icon, selectedMode, mode, act
             {
                 selectedMode && selectedMode !== mode &&
                 <FloatButton
+                    className="ot-build-links-mode-button"
+                    data-testid={`build-links-mode-${mode}`}
                     icon={icon}
                     onClick={() => action(mode)}
                     tooltip={title}

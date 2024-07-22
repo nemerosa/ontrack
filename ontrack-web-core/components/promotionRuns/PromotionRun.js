@@ -9,17 +9,20 @@ export default function PromotionRun({
                                      }) {
     return (
         <>
-            <PromotionLevel
-                promotionLevel={promotionRun.promotionLevel}
-                size={size}
-                displayTooltip={displayDetails}
-                displayText={displayPromotionLevelName}
-                displayDescription={displayPromotionLevelDescription}
-                details={
-                    displayDetails ?
-                        <Timestamp prefix="Promoted on " value={promotionRun.creation.time}/> : undefined
-                }
-            />
+            {
+                promotionRun &&
+                <PromotionLevel
+                    promotionLevel={promotionRun.promotionLevel}
+                    size={size}
+                    displayTooltip={displayDetails}
+                    displayText={displayPromotionLevelName}
+                    displayDescription={displayPromotionLevelDescription}
+                    details={
+                        displayDetails ?
+                            <Timestamp prefix="Promoted on " value={promotionRun.creation.time}/> : undefined
+                    }
+                />
+            }
         </>
     )
 }
