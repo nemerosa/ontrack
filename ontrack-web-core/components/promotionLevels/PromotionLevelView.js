@@ -166,7 +166,7 @@ export default function PromotionLevelView({id}) {
             >
                 <Space className="ot-line" direction="vertical">
                     <Typography.Text type="secondary" style={{padding: 8, display: "block"}}>
-                        Lists all branches which are eligible for auto-versioning
+                        Lists all branches which are targets for auto-versioning
                         from this promotion.
                     </Typography.Text>
                     <PromotionLevelAutoVersioningTargets

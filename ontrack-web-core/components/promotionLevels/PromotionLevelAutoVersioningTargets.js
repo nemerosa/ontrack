@@ -8,6 +8,7 @@ import AutoVersioningApproval from "@components/extension/auto-versioning/AutoVe
 import Link from "next/link";
 import {branchAutoVersioningUri} from "@components/common/Links";
 import {FaCog} from "react-icons/fa";
+import CheckStatus from "@components/common/CheckStatus";
 
 const {Column} = Table
 
@@ -34,28 +35,19 @@ export default function PromotionLevelAutoVersioningTargets({promotionLevel}) {
                                         id
                                         name
                                     }
+                                    autoVersioningConfig {
+                                        configurations {
+                                            autoApproval
+                                            autoApprovalMode
+                                            targetPath
+                                        }
+                                    }
                                 }
                                 rejectedTargetBranches {
                                     branch {
                                         id
                                     }
                                     reason
-                                }
-                            }
-                            autoVersioningTargets {
-                                branch {
-                                    id
-                                    name
-                                    displayName
-                                    project {
-                                        id
-                                        name
-                                    }
-                                }
-                                configurations {
-                                    autoApproval
-                                    autoApprovalMode
-                                    targetPath
                                 }
                             }
                         }
@@ -67,13 +59,21 @@ export default function PromotionLevelAutoVersioningTargets({promotionLevel}) {
             ).then(data => {
                 // Flattening the list to the configuration level
                 const targets = []
-                data.promotionLevel.autoVersioningTargets.forEach(target => {
-                    target.configurations.forEach(config => {
-                        targets.push({
-                            branch: target.branch,
-                            config,
+                const trail = data.promotionLevel.autoVersioningTrail
+                const rejectionReasons = {}
+                trail.rejectedTargetBranches.forEach(rejectedBranch => {
+                    rejectionReasons[rejectedBranch.branch.id] = rejectedBranch.reason
+                })
+                trail.potentialTargetBranches.forEach(potentialTargetBranch => {
+                    potentialTargetBranch.rejectionReason = rejectionReasons[potentialTargetBranch.id]
+                    if (potentialTargetBranch.autoVersioningConfig.configurations) {
+                        potentialTargetBranch.autoVersioningConfig.configurations.forEach(config => {
+                            targets.push({
+                                branch: potentialTargetBranch,
+                                config,
+                            })
                         })
-                    })
+                    }
                 })
                 setTargets(targets)
             }).finally(() => {
@@ -97,13 +97,34 @@ export default function PromotionLevelAutoVersioningTargets({promotionLevel}) {
                         <>
                             {
                                 target.branch && <Space>
-                                    <>
-                                        <ProjectLink project={target.branch.project}/>/<BranchLink branch={target.branch}/>
-                                    </>
-                                    <Link href={branchAutoVersioningUri(target.branch)}
-                                          title="Auto-versioning config"><FaCog/></Link>
+                                    <ProjectLink project={target.branch.project}/>/<BranchLink branch={target.branch}/>
+                                    {
+                                        target.config &&
+                                        <Link href={branchAutoVersioningUri(target.branch)}
+                                              title="Auto-versioning config"><FaCog/></Link>
+                                    }
                                 </Space>
                             }
+                        </>
+                    )}
+                />
+
+                <Column
+                    key="state"
+                    title="State"
+                    render={(_, target) => (
+                        <>
+                            <Space direction="vertical">
+                                <CheckStatus
+                                    value={!target.branch.rejectionReason}
+                                    text="Eligible"
+                                    noText="Not eligible"
+                                />
+                                {
+                                    target.branch.rejectionReason &&
+                                    <Typography.Text type="secondary">{target.branch.rejectionReason}</Typography.Text>
+                                }
+                            </Space>
                         </>
                     )}
                 />
@@ -113,10 +134,13 @@ export default function PromotionLevelAutoVersioningTargets({promotionLevel}) {
                     title="Approval"
                     render={(_, {config}) =>
                         <>
-                            <AutoVersioningApproval
-                                autoApproval={config.autoApproval}
-                                autoApprovalMode={config.autoApprovalMode}
-                            />
+                            {
+                                config &&
+                                <AutoVersioningApproval
+                                    autoApproval={config.autoApproval}
+                                    autoApprovalMode={config.autoApprovalMode}
+                                />
+                            }
                         </>
                     }
                 />
@@ -126,7 +150,10 @@ export default function PromotionLevelAutoVersioningTargets({promotionLevel}) {
                     title="Target path"
                     render={(_, {config}) =>
                         <>
-                            <Typography.Text code>{config.targetPath}</Typography.Text>
+                            {
+                                config &&
+                                <Typography.Text code>{config.targetPath}</Typography.Text>
+                            }
                         </>
                     }
                 />
