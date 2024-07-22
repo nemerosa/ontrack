@@ -37,7 +37,8 @@ abstract class AbstractAutoVersioningTrackingService(
         code: (trail: AutoVersioningTrail) -> AutoVersioningTrail
     ) {
         // Gets the stored version
-        val trail = entityStore.findByName<AutoVersioningTrail>(run, STORE, STORE_KEY)
+        val trail = entityStore.findByName<StoredAutoVersioningTrail>(run, STORE, STORE_KEY)
+            ?.toModel()
             ?: AutoVersioningTrail.init()
         // Updates the trail
         val updatedTrail = code(trail)

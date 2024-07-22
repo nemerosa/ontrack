@@ -48,7 +48,7 @@ class AutoVersioningPromotionListenerServiceIT : AbstractAutoVersioningTestSuppo
             ) { trail ->
                 assertEquals(
                     listOf(
-                        app2,
+                        app2.withDisabled(true),
                         app1,
                     ),
                     trail.potentialTargetBranches
@@ -56,7 +56,7 @@ class AutoVersioningPromotionListenerServiceIT : AbstractAutoVersioningTestSuppo
                 assertEquals(
                     listOf(
                         RejectedBranch(
-                            branch = app2,
+                            branch = app2.withDisabled(true),
                             reason = "Branch is disabled"
                         )
                     ),
