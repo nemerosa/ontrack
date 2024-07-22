@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.kdsl.spec.extension.av
 import net.nemerosa.ontrack.kdsl.connector.Connected
 import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.AutoVersioningAuditEntriesQuery
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.AutoVersioningAuditEntryByIdQuery
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 
 /**
@@ -10,6 +11,15 @@ import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
  */
 class AutoVersioningAuditMgt(connector: Connector) : Connected(connector) {
 
+    /**
+     * Gets an entry by ID
+     */
+    fun findEntryById(uuid: String): AutoVersioningAuditEntry? =
+        graphqlConnector.query(
+            AutoVersioningAuditEntryByIdQuery(uuid)
+        )?.autoVersioningAuditEntries()?.pageItems()?.firstOrNull()
+            ?.fragments()?.autoVersioningAuditEntryFragment()
+            ?.toAutoVersioningAuditEntry()
 
     /**
      * Gets the list of auto versioning audit entries
@@ -32,24 +42,7 @@ class AutoVersioningAuditMgt(connector: Connector) : Connected(connector) {
                 .version(version)
                 .build()
         )?.autoVersioningAuditEntries()?.pageItems()?.map { item ->
-            AutoVersioningAuditEntry(
-                order = AutoVersioningOrder(
-                    uuid = item.order().uuid(),
-                ),
-                running = item.running() ?: false,
-                mostRecentState = AutoVersioningAuditEntryState(
-                    state = item.mostRecentState().state().name,
-                    data = item.mostRecentState().data(),
-                ),
-                audit = item.audit().map { auditEntry ->
-                    AutoVersioningAuditEntryState(
-                        state = auditEntry.state().name,
-                        data = auditEntry.data(),
-                    )
-                },
-                routing = item.routing(),
-                queue = item.queue(),
-            )
+            item.fragments().autoVersioningAuditEntryFragment().toAutoVersioningAuditEntry()
         } ?: emptyList()
 
 }

@@ -20,20 +20,7 @@ query AutoVersioningAuditEntries(
             ...PageInfoContent
         }
         pageItems {
-            order {
-                uuid
-            }
-            running
-            mostRecentState {
-                data
-                state
-            }
-            audit {
-                data
-                state
-            }
-            routing
-            queue
+            ...AutoVersioningAuditEntryFragment
         }
     }
 }

@@ -67,37 +67,5 @@ fun Branch.getAutoVersioningConfig(): List<AutoVersioningSourceConfig> =
     graphqlConnector.query(
         GetBranchAutoVersioningConfigQuery(id.toInt())
     )?.branches()?.firstOrNull()?.autoVersioningConfig()?.configurations()?.map {
-        AutoVersioningSourceConfig(
-            sourceProject = it.sourceProject(),
-            sourceBranch = it.sourceBranch(),
-            sourcePromotion = it.sourcePromotion(),
-            targetPath = it.targetPath(),
-            targetRegex = it.targetRegex(),
-            targetProperty = it.targetProperty(),
-            targetPropertyRegex = it.targetPropertyRegex(),
-            targetPropertyType = it.targetPropertyType(),
-            autoApproval = it.autoApproval(),
-            upgradeBranchPattern = it.upgradeBranchPattern(),
-            postProcessing = it.postProcessing(),
-            postProcessingConfig = it.postProcessingConfig(),
-            validationStamp = it.validationStamp(),
-            autoApprovalMode = when (it.autoApprovalMode()) {
-                net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.AutoApprovalMode.CLIENT -> AutoApprovalMode.CLIENT
-                net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.AutoApprovalMode.SCM -> AutoApprovalMode.SCM
-                else -> null
-            },
-            notifications = it.notifications()?.map { n ->
-                AutoVersioningNotification(
-                    channel = n.channel(),
-                    config = n.config(),
-                    scope = n.scope().map { s ->
-                        AutoVersioningNotificationScope.valueOf(s.name)
-                    },
-                    notificationTemplate = n.notificationTemplate(),
-                )
-            },
-            prTitleTemplate = it.prTitleTemplate(),
-            prBodyTemplate = it.prBodyTemplate(),
-            prBodyTemplateFormat = it.prBodyTemplateFormat(),
-        )
+        it.fragments().autoVersioningSourceConfigFragment().toAutoVersioningSourceConfig()
     } ?: emptyList()

@@ -1433,6 +1433,101 @@
         },
         {
           "kind": "OBJECT",
+          "name": "AutoVersioningBranchTrail",
+          "description": "AV trail for a specific branch",
+          "fields": [
+            {
+              "name": "id",
+              "description": "Unique ID for this trail",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "branch",
+              "description": "Targeted branch",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "Branch",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "configuration",
+              "description": "Associated configuration",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "AutoVersioningSourceConfig",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "rejectionReason",
+              "description": "Rejection reason",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "orderId",
+              "description": "AV order ID when actually scheduled",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "audit",
+              "description": "Associated auto-versioning audit entry if any",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "AutoVersioningAuditEntry",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
           "name": "AutoVersioningConfig",
           "description": "Configuration of the auto versioning on a branch.",
           "fields": [
@@ -1454,6 +1549,49 @@
                       "name": "AutoVersioningSourceConfig"
                     }
                   }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "AutoVersioningConfiguredBranch",
+          "description": "Association of a branch with its auto versioning configuration",
+          "fields": [
+            {
+              "name": "branch",
+              "description": "Target branch for the auto-versioning",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "Branch",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "configuration",
+              "description": "Target auto-versioning configurations on the target branch",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "AutoVersioningSourceConfig",
+                  "ofType": null
                 }
               },
               "isDeprecated": false,
@@ -2522,6 +2660,40 @@
             }
           ],
           "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "AutoVersioningTrail",
+          "description": "Describes the history of an auto-versioning decision process",
+          "fields": [
+            {
+              "name": "branches",
+              "description": "Trails per branch",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "AutoVersioningBranchTrail"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -9562,6 +9734,64 @@
         },
         {
           "kind": "INPUT_OBJECT",
+          "name": "DeleteAutoVersioningConfigInput",
+          "description": "Input type for the deleteAutoVersioningConfig mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "branchId",
+              "description": "ID of the branch to clean",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "DeleteAutoVersioningConfigPayload",
+          "description": "Output type for the deleteAutoVersioningConfig mutation.",
+          "fields": [
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
           "name": "DeleteBranchGitConfigPropertyByIdInput",
           "description": "Input type for the deleteBranchGitConfigPropertyById mutation.",
           "fields": null,
@@ -15475,6 +15705,16 @@
             {
               "name": "eventType",
               "description": "Event type",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name",
+              "description": "Name of the subscription",
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
@@ -29811,6 +30051,29 @@
               "deprecationReason": null
             },
             {
+              "name": "deleteAutoVersioningConfig",
+              "description": "Deletes the auto-versioning configuration from a branch",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "DeleteAutoVersioningConfigInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "DeleteAutoVersioningConfigPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "setupCHMLValidationStamp",
               "description": "Creates or updates a CHML validation stamp",
               "args": [
@@ -30335,6 +30598,29 @@
               "type": {
                 "kind": "OBJECT",
                 "name": "EnableSubscriptionPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "renameSubscription",
+              "description": "Renames an existing subscription",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "RenameSubscriptionInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "RenameSubscriptionPayload",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -31388,6 +31674,11 @@
             },
             {
               "kind": "OBJECT",
+              "name": "DeleteAutoVersioningConfigPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
               "name": "DeleteBranchGitConfigPropertyByIdPayload",
               "ofType": null
             },
@@ -31864,6 +32155,11 @@
             {
               "kind": "OBJECT",
               "name": "ReloadCascPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "RenameSubscriptionPayload",
               "ofType": null
             },
             {
@@ -35935,6 +36231,41 @@
               "deprecationReason": null
             },
             {
+              "name": "autoVersioningTargets",
+              "description": "List of branches targeted for auto-versioning based on this promotion level",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "AutoVersioningConfiguredBranch"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "autoVersioningTrail",
+              "description": "List of branches targeted for auto-versioning based on this promotion level or with their reason for rejection",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "AutoVersioningTrail",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "authorizations",
               "description": "Authorizations for this context",
               "args": [],
@@ -36475,6 +36806,18 @@
                     }
                   }
                 }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "autoVersioningTrail",
+              "description": "List of branches targeted for auto-versioning based on this promotion run or with their reason for rejection",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "AutoVersioningTrail",
+                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -39262,6 +39605,26 @@
                     "ofType": null
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "sourceId",
+                  "description": "Filtering on the source type",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "sourceData",
+                  "description": "Filtering on the source data",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "JSON",
+                    "ofType": null
+                  },
+                  "defaultValue": null
                 }
               ],
               "type": {
@@ -40570,6 +40933,100 @@
           "name": "ReloadCascPayload",
           "description": "Output type for the reloadCasc mutation.",
           "fields": [
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "RenameSubscriptionInput",
+          "description": "Input type for the renameSubscription mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "name",
+              "description": "Name of the subscription to rename",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "newName",
+              "description": "New name to set",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "projectEntity",
+              "description": "Target project entity (null for global events)",
+              "type": {
+                "kind": "INPUT_OBJECT",
+                "name": "ProjectEntityIDInput",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "RenameSubscriptionPayload",
+          "description": "Output type for the renameSubscription mutation.",
+          "fields": [
+            {
+              "name": "subscription",
+              "description": "Renamed subscription",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "EventSubscriptionPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
             {
               "name": "errors",
               "description": "List of errors",
@@ -42576,30 +43033,6 @@
               "deprecationReason": null
             },
             {
-              "name": "uri",
-              "description": "API access point",
-              "args": [],
-              "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "page",
-              "description": "Web access point",
-              "args": [],
-              "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
               "name": "accuracy",
               "description": "Score for the search",
               "args": [],
@@ -42618,6 +43051,18 @@
               "type": {
                 "kind": "OBJECT",
                 "name": "SearchResultType",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "data",
+              "description": "Meta-data associated with the result",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "JSON",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -60513,6 +60958,18 @@
                   "name": "String",
                   "ofType": null
                 }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "description",
+              "description": "Description of the node in its workflow.",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
