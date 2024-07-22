@@ -103,32 +103,34 @@ export default function PromotionRunView({id}) {
                 breadcrumbs={downToBuildBreadcrumbs(run)}
             >
                 <Skeleton loading={loading} active>
-                    <Card>
-                        <Space direction="vertical">
-                            <Typography.Paragraph>
-                                Build <BuildLink build={run.build}/> has been promoted to <PromotionLevelLink
-                                promotionLevel={run.promotionLevel}/>.
-                            </Typography.Paragraph>
-                            {
-                                run.description &&
+                    <Space direction="vertical" className="ot-line">
+                        <Card>
+                            <Space direction="vertical">
                                 <Typography.Paragraph>
-                                    <AnnotatedDescription entity={run}/>
+                                    Build <BuildLink build={run.build}/> has been promoted to <PromotionLevelLink
+                                    promotionLevel={run.promotionLevel}/>.
                                 </Typography.Paragraph>
-                            }
-                            {
-                                run.creation &&
-                                <Typography.Paragraph>
-                                    <Space>
-                                        <Typography.Text type="secondary">Timestamp:</Typography.Text>
-                                        <TimestampText value={run.creation.time}/>
-                                        <Typography.Text disabled>
-                                            ({run.creation.user})
-                                        </Typography.Text>
-                                    </Space>
-                                </Typography.Paragraph>
-                            }
-                        </Space>
-                    </Card>
+                                {
+                                    run.description &&
+                                    <Typography.Paragraph>
+                                        <AnnotatedDescription entity={run}/>
+                                    </Typography.Paragraph>
+                                }
+                                {
+                                    run.creation &&
+                                    <Typography.Paragraph>
+                                        <Space>
+                                            <Typography.Text type="secondary">Timestamp:</Typography.Text>
+                                            <TimestampText value={run.creation.time}/>
+                                            <Typography.Text disabled>
+                                                ({run.creation.user})
+                                            </Typography.Text>
+                                        </Space>
+                                    </Typography.Paragraph>
+                                }
+                            </Space>
+                        </Card>
+                    </Space>
                 </Skeleton>
             </MainPage>
         </>

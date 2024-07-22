@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.av.listener
 import net.nemerosa.ontrack.extension.av.AbstractAutoVersioningTestSupport
 import net.nemerosa.ontrack.extension.av.tracking.AutoVersioningTrackingService
 import net.nemerosa.ontrack.extension.av.tracking.RejectedBranch
-import net.nemerosa.ontrack.model.structure.PromotionLevel
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
@@ -65,7 +64,5 @@ class AutoVersioningPromotionListenerServiceIT : AbstractAutoVersioningTestSuppo
             }
         }
     }
-
-    private fun PromotionLevel.run() = branch.build().promote(this)
 
 }
