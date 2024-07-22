@@ -2,23 +2,26 @@ package net.nemerosa.ontrack.extension.av.tracking
 
 import net.nemerosa.ontrack.model.structure.Branch
 
-fun AutoVersioningTracking.withRejectedBranch(branch: Branch, reason: String) {
+fun AutoVersioningTracking.withDisabledBranch(branchTrail: AutoVersioningBranchTrail) {
     withTrail {
-        it.withRejectedBranch(branch, reason)
+        it.withBranchTrail(
+            branchTrail.disabled()
+        )
     }
 }
 
-fun AutoVersioningTracking.withDisabledBranch(branch: Branch) {
-    withRejectedBranch(branch, "Branch is disabled")
+fun AutoVersioningTracking.reject(branchTrail: AutoVersioningBranchTrail, reason: String) {
+    withTrail {
+        it.withBranchTrail(
+            branchTrail.reject(reason)
+        )
+    }
 }
 
-fun AutoVersioningTracking.withNotLatestBranch(eligibleTargetBranch: Branch, latestSourceBranch: Branch?) {
+fun AutoVersioningTracking.withNotLatestBranch(branchTrail: AutoVersioningBranchTrail, latestSourceBranch: Branch?) {
     if (latestSourceBranch != null) {
-        withRejectedBranch(
-            eligibleTargetBranch,
-            "Branch should be the latest branch at ${latestSourceBranch.entityDisplayName}"
-        )
+        reject(branchTrail, "Branch should be the latest branch at ${latestSourceBranch.entityDisplayName}")
     } else {
-        withRejectedBranch(eligibleTargetBranch, "There is no latest source branch existing")
+        reject(branchTrail, "There is no latest source branch existing")
     }
 }

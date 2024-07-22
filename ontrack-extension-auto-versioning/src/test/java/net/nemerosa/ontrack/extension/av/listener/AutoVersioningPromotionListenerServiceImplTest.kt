@@ -13,7 +13,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.*
 import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class AutoVersioningPromotionListenerServiceImplTest {
@@ -56,14 +55,16 @@ class AutoVersioningPromotionListenerServiceImplTest {
             autoVersioningConfigurationService.getBranchesConfiguredFor(build.project.name, promotion.name)
         } returns listOf(branch)
 
+        every {
+            autoVersioningConfigurationService.getAutoVersioning(any())
+        } returns mockk(relaxed = true)
+
         val avBranches = autoVersioningPromotionListenerService.getConfiguredBranches(run, autoVersioningTracking)
 
-        assertNotNull(avBranches) {
-            assertTrue(
-                it.configuredBranches.isEmpty(),
-                "No targeted branch"
-            )
-        }
+        assertTrue(
+            avBranches.isEmpty(),
+            "No targeted branch"
+        )
     }
 
     @Test
@@ -80,14 +81,16 @@ class AutoVersioningPromotionListenerServiceImplTest {
             autoVersioningConfigurationService.getBranchesConfiguredFor(build.project.name, promotion.name)
         } returns listOf(branch)
 
+        every {
+            autoVersioningConfigurationService.getAutoVersioning(any())
+        } returns mockk(relaxed = true)
+
         val avBranches = autoVersioningPromotionListenerService.getConfiguredBranches(run, autoVersioningTracking)
 
-        assertNotNull(avBranches) {
-            assertTrue(
-                it.configuredBranches.isEmpty(),
-                "No targeted branch"
-            )
-        }
+        assertTrue(
+            avBranches.isEmpty(),
+            "No targeted branch"
+        )
     }
 
     @Test

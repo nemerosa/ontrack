@@ -31,7 +31,6 @@ data class AutoVersioningAuditStoreData(
     val prTitleTemplate: String?,
     val prBodyTemplate: String?,
     val prBodyTemplateFormat: String?,
-    val trailId: String?,
 ) {
     val mostRecentState
         get() = states.first().state
@@ -65,6 +64,5 @@ data class AutoVersioningAuditStoreData(
         prTitleTemplate = prTitleTemplate,
         prBodyTemplate = prBodyTemplate,
         prBodyTemplateFormat = prBodyTemplateFormat,
-        trailId = trailId,
     )
 }

@@ -2,11 +2,11 @@ package net.nemerosa.ontrack.extension.av.listener
 
 import net.nemerosa.ontrack.extension.av.AbstractAutoVersioningTestSupport
 import net.nemerosa.ontrack.extension.av.tracking.AutoVersioningTrackingService
-import net.nemerosa.ontrack.extension.av.tracking.RejectedBranch
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class AutoVersioningPromotionListenerServiceIT : AbstractAutoVersioningTestSupport() {
 
@@ -26,11 +26,11 @@ class AutoVersioningPromotionListenerServiceIT : AbstractAutoVersioningTestSuppo
                         app2,
                         app1,
                     ),
-                    trail.potentialTargetBranches
+                    trail.branches.map { it.branch }
                 )
                 assertEquals(
                     emptyList(),
-                    trail.rejectedTargetBranches,
+                    trail.branches.filter { !it.rejectionReason.isNullOrBlank() },
                 )
             }
         }
@@ -50,17 +50,14 @@ class AutoVersioningPromotionListenerServiceIT : AbstractAutoVersioningTestSuppo
                         app2.withDisabled(true),
                         app1,
                     ),
-                    trail.potentialTargetBranches
+                    trail.branches.map { it.branch }
                 )
-                assertEquals(
-                    listOf(
-                        RejectedBranch(
-                            branch = app2.withDisabled(true),
-                            reason = "Branch is disabled"
-                        )
-                    ),
-                    trail.rejectedTargetBranches,
-                )
+                assertNotNull(trail.branches.find { it.branch.id == app1.id }, "App 1 trail") {
+                    assertNull(it.rejectionReason, "Not rejected")
+                }
+                assertNotNull(trail.branches.find { it.branch.id == app2.id }, "App 2 trail") {
+                    assertEquals("Branch is disabled", it.rejectionReason)
+                }
             }
         }
     }

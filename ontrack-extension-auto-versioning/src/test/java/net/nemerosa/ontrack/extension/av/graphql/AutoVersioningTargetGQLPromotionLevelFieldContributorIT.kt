@@ -18,7 +18,7 @@ class AutoVersioningTargetGQLPromotionLevelFieldContributorIT : AbstractAutoVers
                                 branch {
                                     id
                                 }
-                                configurations {
+                                configuration {
                                     targetPath
                                 }
                             }
@@ -34,20 +34,16 @@ class AutoVersioningTargetGQLPromotionLevelFieldContributorIT : AbstractAutoVers
                                     "branch" to mapOf(
                                         "id" to app2.id(),
                                     ),
-                                    "configurations" to listOf(
-                                        mapOf(
-                                            "targetPath" to "app2.properties",
-                                        )
+                                    "configuration" to mapOf(
+                                        "targetPath" to "app2.properties",
                                     )
                                 ),
                                 mapOf(
                                     "branch" to mapOf(
                                         "id" to app1.id(),
                                     ),
-                                    "configurations" to listOf(
-                                        mapOf(
-                                            "targetPath" to "app1.properties",
-                                        )
+                                    "configuration" to mapOf(
+                                        "targetPath" to "app1.properties",
                                     )
                                 ),
                             )
@@ -71,7 +67,7 @@ class AutoVersioningTargetGQLPromotionLevelFieldContributorIT : AbstractAutoVers
                                     branch {
                                         id
                                     }
-                                    configurations {
+                                    configuration {
                                         targetPath
                                     }
                                 }
@@ -89,10 +85,8 @@ class AutoVersioningTargetGQLPromotionLevelFieldContributorIT : AbstractAutoVers
                                     "branch" to mapOf(
                                         "id" to app1.id(),
                                     ),
-                                    "configurations" to listOf(
-                                        mapOf(
-                                            "targetPath" to "app1.properties",
-                                        )
+                                    "configuration" to mapOf(
+                                        "targetPath" to "app1.properties",
                                     )
                                 ),
                             )

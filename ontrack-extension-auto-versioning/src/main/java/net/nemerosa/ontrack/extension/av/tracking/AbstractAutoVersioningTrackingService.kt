@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.av.tracking
 
+import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfiguredBranch
+import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.model.structure.*
 import kotlin.jvm.optionals.getOrNull
 
@@ -8,12 +10,21 @@ abstract class AbstractAutoVersioningTrackingService(
     private val structureService: StructureService,
 ) : AutoVersioningTrackingService {
 
+    private abstract class AbstractAutoVersioningTracking: AutoVersioningTracking {
+
+        override fun init(configuredBranches: List<AutoVersioningConfiguredBranch>): List<AutoVersioningBranchTrail> =
+            withTrail {
+                it.init(configuredBranches)
+            }.branches
+
+    }
+
     override fun start(run: PromotionRun): AutoVersioningTracking {
         // Returning a callback
-        return object : AutoVersioningTracking {
-            override fun withTrail(code: (trail: AutoVersioningTrail) -> AutoVersioningTrail) {
+        return object : AbstractAutoVersioningTracking() {
+
+            override fun withTrail(code: (trail: AutoVersioningTrail) -> AutoVersioningTrail): AutoVersioningTrail =
                 withTrail(run, code)
-            }
 
             override val trail: AutoVersioningTrail?
                 get() = getTrail(run)
@@ -22,9 +33,12 @@ abstract class AbstractAutoVersioningTrackingService(
 
     override fun startInMemoryTrail(): AutoVersioningTracking {
         var trail: AutoVersioningTrail? = null
-        return object : AutoVersioningTracking {
-            override fun withTrail(code: (trail: AutoVersioningTrail) -> AutoVersioningTrail) {
-                trail = code(trail ?: AutoVersioningTrail.init())
+        return object : AbstractAutoVersioningTracking() {
+
+            override fun withTrail(code: (trail: AutoVersioningTrail) -> AutoVersioningTrail): AutoVersioningTrail {
+                val updatedTrail = code(trail ?: AutoVersioningTrail.empty())
+                trail = updatedTrail
+                return updatedTrail
             }
 
             override val trail: AutoVersioningTrail?
@@ -35,15 +49,17 @@ abstract class AbstractAutoVersioningTrackingService(
     override fun withTrail(
         run: PromotionRun,
         code: (trail: AutoVersioningTrail) -> AutoVersioningTrail
-    ) {
+    ): AutoVersioningTrail {
         // Gets the stored version
         val trail = entityStore.findByName<StoredAutoVersioningTrail>(run, STORE, STORE_KEY)
             ?.toModel()
-            ?: AutoVersioningTrail.init()
+            ?: AutoVersioningTrail.empty()
         // Updates the trail
         val updatedTrail = code(trail)
         // Saves the new trail
         entityStore.store(run, STORE, STORE_KEY, updatedTrail.toStore())
+        // OK
+        return updatedTrail
     }
 
     override fun getTrail(run: PromotionRun): AutoVersioningTrail? {
@@ -51,45 +67,37 @@ abstract class AbstractAutoVersioningTrackingService(
             ?.toModel()
     }
 
-    private fun AutoVersioningTrail.toStore() = StoredAutoVersioningTrail(
+    private fun AutoVersioningBranchTrail.toStore() = StoredBranchTrail(
         id = id,
-        potentialTargetBranches = potentialTargetBranches.map {
-            StoredBranch(
-                project = it.project.name,
-                branch = it.name,
-            )
-        },
-        rejectedTargetBranches = rejectedTargetBranches.map {
-            StoredRejectedBranch(
-                branch = StoredBranch(
-                    project = it.branch.project.name,
-                    branch = it.branch.name,
-                ),
-                reason = it.reason,
-            )
+        project = branch.project.name,
+        branch = branch.name,
+        configuration = configuration,
+        rejectionReason = rejectionReason,
+        orderId = orderId,
+    )
+
+    private fun AutoVersioningTrail.toStore() = StoredAutoVersioningTrail(
+        branches = branches.map {
+            it.toStore()
         }
     )
+
+    private fun StoredBranchTrail.toModel(): AutoVersioningBranchTrail? =
+        structureService.findBranchByName(project, branch).getOrNull()?.let { branch ->
+            AutoVersioningBranchTrail(
+                id = id,
+                branch = branch,
+                configuration = configuration,
+                rejectionReason = rejectionReason,
+                orderId = orderId,
+            )
+        }
 
     private fun StoredAutoVersioningTrail.toModel() = AutoVersioningTrail(
-        id = id,
-        potentialTargetBranches = potentialTargetBranches.mapNotNull {
+        branches = branches.mapNotNull {
             it.toModel()
-        },
-        rejectedTargetBranches = rejectedTargetBranches.mapNotNull {
-            it.toModel()
-        },
-    )
-
-    private fun StoredBranch.toModel(): Branch? =
-        structureService.findBranchByName(project, branch).getOrNull()
-
-    private fun StoredRejectedBranch.toModel(): RejectedBranch? =
-        branch.toModel()?.let {
-            RejectedBranch(
-                branch = it,
-                reason = reason,
-            )
         }
+    )
 
     companion object {
         private const val STORE = "AutoVersioningTracking"
@@ -97,18 +105,16 @@ abstract class AbstractAutoVersioningTrackingService(
     }
 
     data class StoredAutoVersioningTrail(
-        val id: String,
-        val potentialTargetBranches: List<StoredBranch>,
-        val rejectedTargetBranches: List<StoredRejectedBranch>,
+        val branches: List<StoredBranchTrail>,
     )
 
-    data class StoredBranch(
+    data class StoredBranchTrail(
+        val id: String,
         val project: String,
         val branch: String,
+        val configuration: AutoVersioningSourceConfig,
+        val rejectionReason: String?,
+        val orderId: String?,
     )
 
-    data class StoredRejectedBranch(
-        val branch: StoredBranch,
-        val reason: String,
-    )
 }

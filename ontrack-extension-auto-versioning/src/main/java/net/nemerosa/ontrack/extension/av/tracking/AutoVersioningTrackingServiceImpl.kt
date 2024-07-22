@@ -28,9 +28,11 @@ class AutoVersioningTrackingServiceImpl(
     }
 
     @Suppress("RedundantOverride")
-    override fun withTrail(run: PromotionRun, code: (trail: AutoVersioningTrail) -> AutoVersioningTrail) {
+    override fun withTrail(
+        run: PromotionRun,
+        code: (trail: AutoVersioningTrail) -> AutoVersioningTrail
+    ): AutoVersioningTrail =
         super.withTrail(run, code)
-    }
 
     @Suppress("RedundantOverride")
     override fun getTrail(run: PromotionRun): AutoVersioningTrail? {

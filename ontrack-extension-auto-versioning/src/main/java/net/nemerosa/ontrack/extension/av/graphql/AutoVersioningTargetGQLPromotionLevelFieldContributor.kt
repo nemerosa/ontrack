@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.av.graphql
 
 import graphql.schema.GraphQLFieldDefinition
+import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfiguredBranch
 import net.nemerosa.ontrack.extension.av.listener.AutoVersioningPromotionListenerService
 import net.nemerosa.ontrack.extension.av.tracking.AutoVersioningTrackingService
 import net.nemerosa.ontrack.graphql.schema.GQLProjectEntityFieldContributor
@@ -28,7 +29,12 @@ class AutoVersioningTargetGQLPromotionLevelFieldContributor(
                 .dataFetcher { env ->
                     val pl: PromotionLevel = env.getSource()
                     val tracking = autoVersioningTrackingService.startInMemoryTrail()
-                    autoVersioningPromotionListenerService.getConfiguredBranches(pl, tracking)
+                    autoVersioningPromotionListenerService.getConfiguredBranches(pl, tracking).map {
+                        AutoVersioningConfiguredBranch(
+                            branch = it.branch,
+                            configuration = it.configuration,
+                        )
+                    }
                 }
                 .build(),
         )

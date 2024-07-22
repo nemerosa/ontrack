@@ -1,47 +1,46 @@
 package net.nemerosa.ontrack.extension.av.tracking
 
+import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfiguredBranch
+import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
 import net.nemerosa.ontrack.model.annotations.APIDescription
-import net.nemerosa.ontrack.model.structure.Branch
-import java.util.UUID
 
 @APIDescription("Describes the history of an auto-versioning decision process")
 data class AutoVersioningTrail(
-    @APIDescription("Unique ID for this trail, to store in actual auto-versioning audit")
-    val id: String,
-    @APIDescription("List of branches configured for auto-versioning for the project and promotion")
-    val potentialTargetBranches: List<Branch>,
-    @APIDescription("List of branches being rejected and why")
-    val rejectedTargetBranches: List<RejectedBranch>,
+    @APIDescription("Trails per branch")
+    val branches: List<AutoVersioningBranchTrail>,
 ) {
-    fun withPotentialTargetBranches(branches: List<Branch>) = AutoVersioningTrail(
-        id = id,
-        potentialTargetBranches = branches,
-        rejectedTargetBranches = rejectedTargetBranches,
+
+    fun init(configuredBranches: List<AutoVersioningConfiguredBranch>) =
+        AutoVersioningTrail(
+            branches = configuredBranches.map {
+                AutoVersioningBranchTrail(
+                    branch = it.branch,
+                    configuration = it.configuration,
+                )
+            }
+        )
+
+    fun withOrder(
+        branchTrail: AutoVersioningBranchTrail,
+        order: AutoVersioningOrder,
+    ) = withBranchTrail(
+        branchTrail.order(order.uuid)
     )
 
-    fun withRejectedBranch(branch: Branch, reason: String) = AutoVersioningTrail(
-        id = id,
-        potentialTargetBranches = potentialTargetBranches,
-        rejectedTargetBranches = rejectedTargetBranches + RejectedBranch(
-            branch = branch,
-            reason = reason,
-        )
+    fun withBranchTrail(branchTrail: AutoVersioningBranchTrail) = AutoVersioningTrail(
+        branches = branches.map {
+            if (it.id == branchTrail.id) {
+                branchTrail
+            } else {
+                it
+            }
+        }
     )
 
     companion object {
-        fun init() = AutoVersioningTrail(
-            id = UUID.randomUUID().toString(),
-            potentialTargetBranches = emptyList(),
-            rejectedTargetBranches = emptyList(),
+        fun empty() = AutoVersioningTrail(
+            branches = emptyList(),
         )
     }
+
 }
-
-@APIDescription("Reason why a branch is rejected for auto-versioning")
-data class RejectedBranch(
-    @APIDescription("Branch being rejected")
-    val branch: Branch,
-    @APIDescription("Rejection reason")
-    val reason: String,
-)
-

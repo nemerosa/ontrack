@@ -13,56 +13,50 @@ class AutoVersioningTrailGQLPromotionRunFieldContributorIT : AbstractAutoVersion
             val run = pl.run()
             run(
                 """
-                    {
-                        promotionRuns(id: ${run.id}) {
-                            autoVersioningTrail {
-                                potentialTargetBranches {
-                                    id
-                                    autoVersioningConfig {
-                                        configurations {
+                        {
+                            promotionRuns(id: ${run.id}) {
+                                autoVersioningTrail {
+                                    branches {
+                                        branch {
+                                            id
+                                        }
+                                        configuration {
                                             targetPath
                                         }
+                                        rejectionReason
                                     }
-                                }
-                                rejectedTargetBranches {
-                                    branch {
-                                        id
-                                    }
-                                    reason
                                 }
                             }
                         }
-                    }
-                """
+                    """, mapOf(
+
+                )
             ) { data ->
                 assertEquals(
                     mapOf(
                         "promotionRuns" to listOf(
                             mapOf(
                                 "autoVersioningTrail" to mapOf(
-                                    "potentialTargetBranches" to listOf(
+                                    "branches" to listOf(
                                         mapOf(
-                                            "id" to app2.id(),
-                                            "autoVersioningConfig" to mapOf(
-                                                "configurations" to listOf(
-                                                    mapOf(
-                                                        "targetPath" to "app2.properties"
-                                                    )
-                                                )
-                                            )
+                                            "branch" to mapOf(
+                                                "id" to app2.id(),
+                                            ),
+                                            "configuration" to mapOf(
+                                                "targetPath" to "app2.properties"
+                                            ),
+                                            "rejectionReason" to null,
                                         ),
                                         mapOf(
-                                            "id" to app1.id(),
-                                            "autoVersioningConfig" to mapOf(
-                                                "configurations" to listOf(
-                                                    mapOf(
-                                                        "targetPath" to "app1.properties"
-                                                    )
-                                                )
-                                            )
+                                            "branch" to mapOf(
+                                                "id" to app1.id(),
+                                            ),
+                                            "configuration" to mapOf(
+                                                "targetPath" to "app1.properties"
+                                            ),
+                                            "rejectionReason" to null,
                                         ),
-                                    ),
-                                    "rejectedTargetBranches" to emptyList()
+                                    )
                                 )
                             )
                         )
@@ -83,19 +77,14 @@ class AutoVersioningTrailGQLPromotionRunFieldContributorIT : AbstractAutoVersion
                         {
                             promotionRuns(id: ${run.id}) {
                                 autoVersioningTrail {
-                                    potentialTargetBranches {
-                                        id
-                                        autoVersioningConfig {
-                                            configurations {
-                                                targetPath
-                                            }
-                                        }
-                                    }
-                                    rejectedTargetBranches {
+                                    branches {
                                         branch {
                                             id
                                         }
-                                        reason
+                                        configuration {
+                                            targetPath
+                                        }
+                                        rejectionReason
                                     }
                                 }
                             }
@@ -109,35 +98,25 @@ class AutoVersioningTrailGQLPromotionRunFieldContributorIT : AbstractAutoVersion
                         "promotionRuns" to listOf(
                             mapOf(
                                 "autoVersioningTrail" to mapOf(
-                                    "potentialTargetBranches" to listOf(
-                                        mapOf(
-                                            "id" to app2.id(),
-                                            "autoVersioningConfig" to mapOf(
-                                                "configurations" to listOf(
-                                                    mapOf(
-                                                        "targetPath" to "app2.properties"
-                                                    )
-                                                )
-                                            )
-                                        ),
-                                        mapOf(
-                                            "id" to app1.id(),
-                                            "autoVersioningConfig" to mapOf(
-                                                "configurations" to listOf(
-                                                    mapOf(
-                                                        "targetPath" to "app1.properties"
-                                                    )
-                                                )
-                                            )
-                                        ),
-                                    ),
-                                    "rejectedTargetBranches" to listOf(
+                                    "branches" to listOf(
                                         mapOf(
                                             "branch" to mapOf(
                                                 "id" to app2.id(),
                                             ),
-                                            "reason" to "Branch is disabled"
-                                        )
+                                            "configuration" to mapOf(
+                                                "targetPath" to "app2.properties"
+                                            ),
+                                            "rejectionReason" to "Branch is disabled",
+                                        ),
+                                        mapOf(
+                                            "branch" to mapOf(
+                                                "id" to app1.id(),
+                                            ),
+                                            "configuration" to mapOf(
+                                                "targetPath" to "app1.properties"
+                                            ),
+                                            "rejectionReason" to null,
+                                        ),
                                     )
                                 )
                             )

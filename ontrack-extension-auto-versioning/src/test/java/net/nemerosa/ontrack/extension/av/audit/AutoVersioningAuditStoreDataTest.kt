@@ -82,7 +82,6 @@ class AutoVersioningAuditStoreDataTest {
             prTitleTemplate = null,
             prBodyTemplate = null,
             prBodyTemplateFormat = null,
-            trailId = null,
         )
         assertEquals(AutoVersioningAuditState.RECEIVED, data.mostRecentState)
         val json = data.asJson()
@@ -123,7 +122,6 @@ class AutoVersioningAuditStoreDataTest {
             prTitleTemplate = null,
             prBodyTemplate = null,
             prBodyTemplateFormat = null,
-            trailId = null,
         )
         assertEquals(AutoVersioningAuditState.RECEIVED, data.mostRecentState)
         val json = data.asJson()
@@ -165,7 +163,6 @@ class AutoVersioningAuditStoreDataTest {
             prTitleTemplate = null,
             prBodyTemplate = null,
             prBodyTemplateFormat = null,
-            trailId = null,
         )
         assertEquals(AutoVersioningAuditState.ERROR, data.mostRecentState)
         val json = data.asJson()
@@ -206,7 +203,6 @@ class AutoVersioningAuditStoreDataTest {
             prTitleTemplate = null,
             prBodyTemplate = null,
             prBodyTemplateFormat = null,
-            trailId = null,
         )
         assertEquals(AutoVersioningAuditState.RECEIVED, data.mostRecentState)
         val json = data.asJson()

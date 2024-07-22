@@ -19,6 +19,6 @@ class GQLTypeAutoVersioningConfiguredBranch : GQLType {
             .name(typeName)
             .description(getTypeDescription(AutoVersioningConfiguredBranch::class))
             .field(AutoVersioningConfiguredBranch::branch)
-            .listField(AutoVersioningConfiguredBranch::configurations)
+            .field(AutoVersioningConfiguredBranch::configuration)
             .build()
 }

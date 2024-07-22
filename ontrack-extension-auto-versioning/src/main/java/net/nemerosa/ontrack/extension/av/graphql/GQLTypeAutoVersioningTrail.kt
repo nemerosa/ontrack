@@ -17,7 +17,6 @@ class GQLTypeAutoVersioningTrail : GQLType {
         GraphQLObjectType.newObject()
             .name(typeName)
             .description(getTypeDescription(AutoVersioningTrail::class))
-            .listField(AutoVersioningTrail::potentialTargetBranches)
-            .listField(AutoVersioningTrail::rejectedTargetBranches)
+            .listField(AutoVersioningTrail::branches)
             .build()
 }

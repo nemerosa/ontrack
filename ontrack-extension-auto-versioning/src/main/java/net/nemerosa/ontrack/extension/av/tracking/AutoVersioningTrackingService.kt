@@ -21,7 +21,7 @@ interface AutoVersioningTrackingService {
     fun withTrail(
         run: PromotionRun,
         code: (trail: AutoVersioningTrail) -> AutoVersioningTrail
-    )
+    ): AutoVersioningTrail
 
     /**
      * Gets the trail for a promotion run
