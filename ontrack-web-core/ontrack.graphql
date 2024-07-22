@@ -305,6 +305,14 @@ type AutoVersioningSourceConfig {
     versionSource: String
 }
 
+"Describes the history of an auto-versioning decision process"
+type AutoVersioningTrail {
+    "List of branches configured for auto-versioning for the project and promotion"
+    potentialTargetBranches: [Branch!]!
+    "List of branches being rejected and why"
+    rejectedTargetBranches: [RejectedBranch!]!
+}
+
 type Branch implements Authorizable & ProjectEntity {
     "Description with links."
     annotatedDescription: String
@@ -4876,6 +4884,8 @@ type PromotionLevel implements Authorizable & ProjectEntity {
     autoPromotionProperty: Property
     "List of branches targeted for auto-versioning based on this promotion level"
     autoVersioningTargets: [AutoVersioningConfiguredBranch!]!
+    "List of branches targeted for auto-versioning based on this promotion level or with their reason for rejection"
+    autoVersioningTrail: AutoVersioningTrail
     "Reference to branch"
     branch: Branch
     creation: Signature
@@ -5616,6 +5626,14 @@ type RateLimit {
     remaining: Int
     "Used calls"
     used: Int
+}
+
+"Reason why a branch is rejected for auto-versioning"
+type RejectedBranch {
+    "Branch being rejected"
+    branch: Branch!
+    "Rejection reason"
+    reason: String!
 }
 
 "Output type for the reloadCasc mutation."
