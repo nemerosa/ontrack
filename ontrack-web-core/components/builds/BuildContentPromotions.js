@@ -9,6 +9,8 @@ import {isAuthorized} from "@components/common/authorizations";
 import PromotionRunDeleteAction from "@components/promotionRuns/PromotionRunDeleteAction";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import GridCell from "@components/grid/GridCell";
+import PromotionRunLink from "@components/promotionRuns/PromotionRunLink";
+import {FaCog} from "react-icons/fa";
 
 export default function BuildContentPromotions({build}) {
 
@@ -104,6 +106,14 @@ export default function BuildContentPromotions({build}) {
                                                 tooltip={`Promotes the build again to ${promotionLevel.name}`}
                                                 onPromotion={reload}
                                             /> : undefined
+                                    }
+                                    {/* Link to the promotion run */}
+                                    {
+                                        run &&
+                                        <PromotionRunLink
+                                            promotionRun={run}
+                                            text={<FaCog/>}
+                                        />
                                     }
                                     {/* Deleting the promotion */}
                                     {

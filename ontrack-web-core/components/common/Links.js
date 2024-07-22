@@ -64,6 +64,10 @@ export function promotionLevelUri(promotionLevel) {
     return `/promotionLevel/${promotionLevel.id}`
 }
 
+export function promotionRunUri(promotionRun) {
+    return `/promotionRun/${promotionRun.id}`
+}
+
 export function validationStampUri(validationStamp) {
     return `/validationStamp/${validationStamp.id}`
 }
