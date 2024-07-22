@@ -75,6 +75,7 @@ class AutoVersioningAuditStoreJdbcHelper(
                     prTitleTemplate = data.prTitleTemplate,
                     prBodyTemplate = data.prBodyTemplate,
                     prBodyTemplateFormat = data.prBodyTemplateFormat,
+                    trailId = data.trailId,
                 ),
                 audit = data.states,
                 routing = data.routing,

@@ -103,6 +103,7 @@ class AutoVersioningAuditStoreImpl(
                     prTitleTemplate = prTitleTemplate,
                     prBodyTemplate = prBodyTemplate,
                     prBodyTemplateFormat = prBodyTemplateFormat,
+                    trailId = trailId,
                 )
             }
         )
@@ -158,6 +159,7 @@ class AutoVersioningAuditStoreImpl(
                         prTitleTemplate = prTitleTemplate,
                         prBodyTemplate = prBodyTemplate,
                         prBodyTemplateFormat = prBodyTemplateFormat,
+                        trailId = trailId,
                     )
                 }
             }
@@ -230,6 +232,7 @@ class AutoVersioningAuditStoreImpl(
                     prTitleTemplate = prTitleTemplate,
                     prBodyTemplate = prBodyTemplate,
                     prBodyTemplateFormat = prBodyTemplateFormat,
+                    trailId = trailId,
                 ),
                 audit = states,
                 routing = routing,

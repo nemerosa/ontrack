@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.extension.av.model.AutoVersioningConfiguredBranches
 import net.nemerosa.ontrack.extension.av.model.PromotionEvent
 import net.nemerosa.ontrack.extension.av.queue.AutoVersioningQueue
+import net.nemerosa.ontrack.extension.av.tracking.AutoVersioningTrail
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.NameDescription
@@ -23,12 +24,12 @@ class AutoVersioningDispatcherImpl(
     private val applicationLogService: ApplicationLogService,
 ) : AutoVersioningDispatcher {
 
-    override fun dispatch(configuredBranches: AutoVersioningConfiguredBranches) {
+    override fun dispatch(configuredBranches: AutoVersioningConfiguredBranches, trail: AutoVersioningTrail?) {
         securityService.asAdmin {
             configuredBranches.configuredBranches.forEach { configuredBranch ->
                 val branch = configuredBranch.branch
                 configuredBranch.configurations.forEach { config ->
-                    val order = createAutoVersioningOrder(configuredBranches.promotionRun, branch, config)
+                    val order = createAutoVersioningOrder(configuredBranches.promotionRun, branch, config, trail)
                     // Posts the event on the queue
                     if (order != null) {
                         queue.queue(order)
@@ -42,6 +43,7 @@ class AutoVersioningDispatcherImpl(
         promotionRun: PromotionRun,
         branch: Branch,
         config: AutoVersioningSourceConfig,
+        trail: AutoVersioningTrail?,
     ): AutoVersioningOrder? {
         try {
             val version = getBuildSourceVersion(promotionRun, config)
@@ -70,6 +72,7 @@ class AutoVersioningDispatcherImpl(
                 prTitleTemplate = config.prTitleTemplate,
                 prBodyTemplate = config.prBodyTemplate,
                 prBodyTemplateFormat = config.prBodyTemplateFormat,
+                trailId = trail?.id,
             )
         } catch (ex: Exception) {
             // Logging the event

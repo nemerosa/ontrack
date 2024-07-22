@@ -52,6 +52,7 @@ abstract class AbstractAutoVersioningTrackingService(
     }
 
     private fun AutoVersioningTrail.toStore() = StoredAutoVersioningTrail(
+        id = id,
         potentialTargetBranches = potentialTargetBranches.map {
             StoredBranch(
                 project = it.project.name,
@@ -70,6 +71,7 @@ abstract class AbstractAutoVersioningTrackingService(
     )
 
     private fun StoredAutoVersioningTrail.toModel() = AutoVersioningTrail(
+        id = id,
         potentialTargetBranches = potentialTargetBranches.mapNotNull {
             it.toModel()
         },
@@ -95,6 +97,7 @@ abstract class AbstractAutoVersioningTrackingService(
     }
 
     data class StoredAutoVersioningTrail(
+        val id: String,
         val potentialTargetBranches: List<StoredBranch>,
         val rejectedTargetBranches: List<StoredRejectedBranch>,
     )

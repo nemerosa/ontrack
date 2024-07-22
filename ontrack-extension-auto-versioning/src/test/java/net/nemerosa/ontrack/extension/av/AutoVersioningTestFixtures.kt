@@ -41,6 +41,7 @@ object AutoVersioningTestFixtures {
         prTitleTemplate = null,
         prBodyTemplate = null,
         prBodyTemplateFormat = null,
+        trailId = null,
     )
 
     fun Branch.createOrder(
@@ -77,6 +78,7 @@ object AutoVersioningTestFixtures {
         prTitleTemplate = prTitleTemplate,
         prBodyTemplate = prBodyTemplate,
         prBodyTemplateFormat = prBodyTemplateFormat,
+        trailId = null,
     )
 
     fun sampleConfig() = AutoVersioningConfig(

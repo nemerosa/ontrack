@@ -32,6 +32,8 @@ data class AutoVersioningOrder(
     val prTitleTemplate: String?,
     val prBodyTemplate: String?,
     val prBodyTemplateFormat: String?,
+    // Trail information
+    val trailId: String?,
 ) : AutoVersioningTargetConfig {
     /**
      * Gets a meaningful commit message for this order
