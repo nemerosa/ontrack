@@ -76,6 +76,7 @@ export default function BuildContentPromotions({build}) {
                 // For each promotion levels, associate the list of corresponding runs
                 promotionLevels.forEach(promotionLevel => {
                     promotionLevel.runs = runs.filter(run => run.promotionLevel.id === promotionLevel.id)
+                        .sort((a, b) => a.creation.time.localeCompare(b.creation.time))
                 })
 
                 // Converting the list of promotion levels and their runs into a timeline
