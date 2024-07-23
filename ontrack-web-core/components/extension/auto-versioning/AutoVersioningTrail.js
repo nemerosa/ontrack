@@ -11,7 +11,7 @@ import AutoVersioningAuditEntryPR from "@components/extension/auto-versioning/Au
 
 const {Column} = Table
 
-export default function AutoVersioningTrail({trail}) {
+export default function AutoVersioningTrail({trail, displayAudit = true}) {
     return (
         <>
             <Table
@@ -86,43 +86,46 @@ export default function AutoVersioningTrail({trail}) {
                     }
                 />
 
-                <Column
-                    key="audit"
-                    title="Audit"
-                    render={(_, branchTrail) => (
-                        <>
-                            {
-                                !branchTrail.orderId && <Space>
-                                    <FaBan/>
-                                    No AV process was scheduled
-                                </Space>
-                            }
-                            {
-                                branchTrail.orderId && <Space>
-                                    <Link href={autoVersioningAuditEntryUri(branchTrail.orderId)}>
-                                        <Space>
-                                            <FaMagic/>
-                                            Audit
-                                        </Space>
-                                    </Link>
-                                    {
-                                        branchTrail.audit?.mostRecentState &&
-                                        <>
-                                            <Divider type="vertical"/>
-                                            <AutoVersioningAuditEntryPR
-                                                entry={branchTrail.audit}
-                                            />
-                                            <Divider type="vertical"/>
-                                            <AutoVersioningAuditEntryState
-                                                status={branchTrail.audit.mostRecentState}
-                                            />
-                                        </>
-                                    }
-                                </Space>
-                            }
-                        </>
-                    )}
-                />
+                {
+                    displayAudit &&
+                    <Column
+                        key="audit"
+                        title="Audit"
+                        render={(_, branchTrail) => (
+                            <>
+                                {
+                                    !branchTrail.orderId && <Space>
+                                        <FaBan/>
+                                        No AV process was scheduled
+                                    </Space>
+                                }
+                                {
+                                    branchTrail.orderId && <Space>
+                                        <Link href={autoVersioningAuditEntryUri(branchTrail.orderId)}>
+                                            <Space>
+                                                <FaMagic/>
+                                                Audit
+                                            </Space>
+                                        </Link>
+                                        {
+                                            branchTrail.audit?.mostRecentState &&
+                                            <>
+                                                <Divider type="vertical"/>
+                                                <AutoVersioningAuditEntryPR
+                                                    entry={branchTrail.audit}
+                                                />
+                                                <Divider type="vertical"/>
+                                                <AutoVersioningAuditEntryState
+                                                    status={branchTrail.audit.mostRecentState}
+                                                />
+                                            </>
+                                        }
+                                    </Space>
+                                }
+                            </>
+                        )}
+                    />
+                }
 
             </Table>
         </>

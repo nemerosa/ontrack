@@ -14,6 +14,7 @@ import TimestampText from "@components/common/TimestampText";
 import AnnotatedDescription from "@components/common/AnnotatedDescription";
 import PageSection from "@components/common/PageSection";
 import AutoVersioningTrail from "@components/extension/auto-versioning/AutoVersioningTrail";
+import {gqlAutoVersioningTrailContent} from "@components/extension/auto-versioning/AutoVersioningGraphQLFragments";
 
 export default function PromotionRunView({id}) {
 
@@ -66,33 +67,12 @@ export default function PromotionRunView({id}) {
                                 }
                             }
                             autoVersioningTrail {
-                                branches {
-                                    branch {
-                                        id
-                                        name
-                                        displayName
-                                        project {
-                                            id
-                                            name
-                                        }
-                                    }
-                                    configuration {
-                                        autoApproval
-                                        autoApprovalMode
-                                        targetPath
-                                    }
-                                    rejectionReason
-                                    orderId
-                                    audit {
-                                        mostRecentState {
-                                            state
-                                            data
-                                        }
-                                    }
-                                }
+                                ...AutoVersioningTrailContent
                             }
                         }
                     }
+                    
+                    ${gqlAutoVersioningTrailContent}
                 `,
                 {id}
             ).then(data => {
