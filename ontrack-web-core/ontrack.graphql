@@ -189,6 +189,22 @@ type AutoVersioningAuditEntryState {
     state: AutoVersioningAuditState!
 }
 
+"AV trail for a specific branch"
+type AutoVersioningBranchTrail {
+    "Associated auto-versioning audit entry if any"
+    audit: AutoVersioningAuditEntry
+    "Targeted branch"
+    branch: Branch!
+    "Associated configuration"
+    configuration: AutoVersioningSourceConfig!
+    "Unique ID for this trail"
+    id: String!
+    "AV order ID when actually scheduled"
+    orderId: String
+    "Rejection reason"
+    rejectionReason: String
+}
+
 "Configuration of the auto versioning on a branch."
 type AutoVersioningConfig {
     "List of configurations"
@@ -199,8 +215,8 @@ type AutoVersioningConfig {
 type AutoVersioningConfiguredBranch {
     "Target branch for the auto-versioning"
     branch: Branch!
-    "List of target auto-versioning configurations on the target branch"
-    configurations: [AutoVersioningSourceConfig!]!
+    "Target auto-versioning configurations on the target branch"
+    configuration: AutoVersioningSourceConfig!
 }
 
 "AutoVersioningNotification"
@@ -307,10 +323,8 @@ type AutoVersioningSourceConfig {
 
 "Describes the history of an auto-versioning decision process"
 type AutoVersioningTrail {
-    "List of branches configured for auto-versioning for the project and promotion"
-    potentialTargetBranches: [Branch!]!
-    "List of branches being rejected and why"
-    rejectedTargetBranches: [RejectedBranch!]!
+    "Trails per branch"
+    branches: [AutoVersioningBranchTrail!]!
 }
 
 type Branch implements Authorizable & ProjectEntity {
@@ -4970,6 +4984,8 @@ type PromotionRun implements Authorizable & ProjectEntity {
     annotatedDescription: String
     "Authorizations for this context"
     authorizations: [Authorization!]!
+    "List of branches targeted for auto-versioning based on this promotion run or with their reason for rejection"
+    autoVersioningTrail: AutoVersioningTrail
     "Associated build"
     build: Build!
     creation: Signature
@@ -5626,14 +5642,6 @@ type RateLimit {
     remaining: Int
     "Used calls"
     used: Int
-}
-
-"Reason why a branch is rejected for auto-versioning"
-type RejectedBranch {
-    "Branch being rejected"
-    branch: Branch!
-    "Rejection reason"
-    reason: String!
 }
 
 "Output type for the reloadCasc mutation."

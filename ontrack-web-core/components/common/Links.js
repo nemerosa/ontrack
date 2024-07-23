@@ -52,6 +52,10 @@ export function scmChangeLogUri(from, to) {
     return `/extension/scm/changelog?from=${from}&to=${to}`
 }
 
+export function autoVersioningAuditEntryUri(uuid) {
+    return `/extension/auto-versioning/audit/detail/${uuid}`
+}
+
 // TODO As a component
 export function buildLink(build, text) {
     return <Link

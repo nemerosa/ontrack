@@ -12,6 +12,8 @@ import {buildUri} from "@components/common/Links";
 import BuildLink from "@components/builds/BuildLink";
 import TimestampText from "@components/common/TimestampText";
 import AnnotatedDescription from "@components/common/AnnotatedDescription";
+import PageSection from "@components/common/PageSection";
+import AutoVersioningTrail from "@components/extension/auto-versioning/AutoVersioningTrail";
 
 export default function PromotionRunView({id}) {
 
@@ -60,6 +62,32 @@ export default function PromotionRunView({id}) {
                                     project {
                                         id
                                         name
+                                    }
+                                }
+                            }
+                            autoVersioningTrail {
+                                branches {
+                                    branch {
+                                        id
+                                        name
+                                        displayName
+                                        project {
+                                            id
+                                            name
+                                        }
+                                    }
+                                    configuration {
+                                        autoApproval
+                                        autoApprovalMode
+                                        targetPath
+                                    }
+                                    rejectionReason
+                                    orderId
+                                    audit {
+                                        mostRecentState {
+                                            state
+                                            data
+                                        }
                                     }
                                 }
                             }
@@ -130,6 +158,14 @@ export default function PromotionRunView({id}) {
                                 }
                             </Space>
                         </Card>
+                        {
+                            run?.autoVersioningTrail &&
+                            <PageSection
+                                title="Auto-versioning trail"
+                            >
+                                <AutoVersioningTrail trail={run.autoVersioningTrail}/>
+                            </PageSection>
+                        }
                     </Space>
                 </Skeleton>
             </MainPage>
