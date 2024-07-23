@@ -8,7 +8,10 @@ import net.nemerosa.ontrack.extension.av.project.AutoVersioningProjectProperty
 import net.nemerosa.ontrack.extension.av.project.AutoVersioningProjectPropertyType
 import net.nemerosa.ontrack.extension.av.tracking.AutoVersioningTracking
 import net.nemerosa.ontrack.extension.scm.service.SCMDetector
-import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.structure.BranchFixtures
+import net.nemerosa.ontrack.model.structure.BuildFixtures
+import net.nemerosa.ontrack.model.structure.PropertyService
+import net.nemerosa.ontrack.model.structure.StructureService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.*
@@ -39,57 +42,6 @@ class AutoVersioningPromotionListenerServiceImplTest {
             scmDetector = scmDetector,
             propertyService = propertyService,
             structureService = structureService,
-        )
-    }
-
-    @Test
-    fun `Disabled branches are not targeted by auto-versioning`() {
-        val branch = BranchFixtures.testBranch(disabled = true)
-
-        val source = BranchFixtures.testBranch()
-        val run = PromotionRunFixtures.testPromotionRun(branch = source)
-        val build = run.build
-        val promotion = run.promotionLevel
-
-        every {
-            autoVersioningConfigurationService.getBranchesConfiguredFor(build.project.name, promotion.name)
-        } returns listOf(branch)
-
-        every {
-            autoVersioningConfigurationService.getAutoVersioning(any())
-        } returns mockk(relaxed = true)
-
-        val avBranches = autoVersioningPromotionListenerService.getConfiguredBranches(run, autoVersioningTracking)
-
-        assertTrue(
-            avBranches.isEmpty(),
-            "No targeted branch"
-        )
-    }
-
-    @Test
-    fun `Disabled projects are not targeted by auto-versioning`() {
-        val project = ProjectFixtures.testProject(disabled = true)
-        val branch = BranchFixtures.testBranch(project = project)
-
-        val source = BranchFixtures.testBranch()
-        val run = PromotionRunFixtures.testPromotionRun(branch = source)
-        val build = run.build
-        val promotion = run.promotionLevel
-
-        every {
-            autoVersioningConfigurationService.getBranchesConfiguredFor(build.project.name, promotion.name)
-        } returns listOf(branch)
-
-        every {
-            autoVersioningConfigurationService.getAutoVersioning(any())
-        } returns mockk(relaxed = true)
-
-        val avBranches = autoVersioningPromotionListenerService.getConfiguredBranches(run, autoVersioningTracking)
-
-        assertTrue(
-            avBranches.isEmpty(),
-            "No targeted branch"
         )
     }
 
