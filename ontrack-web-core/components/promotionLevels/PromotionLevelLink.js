@@ -1,5 +1,4 @@
 import {Space} from "antd";
-import LegacyLink from "@components/common/LegacyLink";
 import {promotionLevelUri} from "@components/common/Links";
 import {PromotionLevelImage} from "@components/promotionLevels/PromotionLevelImage";
 import Link from "next/link";
