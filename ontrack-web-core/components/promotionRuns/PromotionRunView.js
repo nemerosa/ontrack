@@ -15,14 +15,23 @@ import AnnotatedDescription from "@components/common/AnnotatedDescription";
 import PageSection from "@components/common/PageSection";
 import AutoVersioningTrail from "@components/extension/auto-versioning/AutoVersioningTrail";
 import {gqlAutoVersioningTrailContent} from "@components/extension/auto-versioning/AutoVersioningGraphQLFragments";
+import {isAuthorized} from "@components/common/authorizations";
+import ConfirmCommand from "@components/common/ConfirmCommand";
+import {FaTrash} from "react-icons/fa";
+import {useRouter} from "next/router";
 
 export default function PromotionRunView({id}) {
 
     const client = useGraphQLClient()
+    const router = useRouter()
 
     const [loading, setLoading] = useState(true)
     const [run, setRun] = useState({})
     const [commands, setCommands] = useState([])
+
+    const goToBuild = async () => {
+        await router.push(buildUri(run.build))
+    }
 
     useEffect(() => {
         if (client && id) {
@@ -37,6 +46,11 @@ export default function PromotionRunView({id}) {
                             creation {
                                 user
                                 time
+                            }
+                            authorizations {
+                                name
+                                action
+                                authorized
                             }
                             build {
                                 id
@@ -71,7 +85,7 @@ export default function PromotionRunView({id}) {
                             }
                         }
                     }
-                    
+
                     ${gqlAutoVersioningTrailContent}
                 `,
                 {id}
@@ -80,6 +94,32 @@ export default function PromotionRunView({id}) {
                 setRun(promotionRun)
 
                 const commands = []
+                if (isAuthorized(promotionRun, 'promotion_run', 'delete')) {
+                    commands.push(
+                        <ConfirmCommand
+                            key="delete"
+                            icon={<FaTrash/>}
+                            text="Delete"
+                            confirmTitle="Removing this promotion run"
+                            confirmText="Do you really want to remove this promotion run?"
+                            confirmOkText="Confirm deletion"
+                            gqlQuery={
+                                gql`
+                                    mutation DeletePromotionRun($id: Int!) {
+                                        deletePromotionRun(input: {promotionRunId: $id}) {
+                                            errors {
+                                                message                                            
+                                            }
+                                        }
+                                    }
+                                `
+                            }
+                            gqlVariables={{id: promotionRun.id}}
+                            gqlUserNode="deletePromotionRun"
+                            onSuccess={goToBuild}
+                        />
+                    )
+                }
                 commands.push(
                     <CloseCommand key="close" href={buildUri(promotionRun.build)}/>
                 )
