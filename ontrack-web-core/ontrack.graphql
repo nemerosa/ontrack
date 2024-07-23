@@ -159,6 +159,8 @@ type AutoVersioningAuditEntry {
     mostRecentState: AutoVersioningAuditEntryState!
     "Associated auto versioning order"
     order: AutoVersioningOrder!
+    "Promotion which triggered the auto-versioning"
+    promotionRun: PromotionRun
     "Actual queue where the order was posted"
     queue: String
     "Queue routing key used for this order"

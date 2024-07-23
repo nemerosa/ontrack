@@ -4,11 +4,9 @@ import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfig
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationService
 import net.nemerosa.ontrack.extension.scm.mock.MockSCMTester
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
-import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.PromotionLevel
 import org.springframework.beans.factory.annotation.Autowired
-import kotlin.test.assertEquals
 
 abstract class AbstractAutoVersioningTestSupport : AbstractQLKTITSupport() {
 
@@ -83,6 +81,47 @@ abstract class AbstractAutoVersioningTestSupport : AbstractQLKTITSupport() {
                         }
 
                     code(pl, app1, app2)
+                }
+            }
+        }
+    }
+
+    protected fun withSimpleSetup(
+        code: (
+            pl: PromotionLevel,
+            target: Branch,
+        ) -> Unit,
+    ) {
+        asAdmin {
+            project {
+                val sourceProject = this
+                branch {
+                    val sourceBranch = this
+                    val pl = promotionLevel()
+
+                    val target =
+                        mockSCMTester.withMockSCMRepository {
+                            project<Branch> {
+                                branch {
+                                    configureMockSCMBranch()
+                                    autoVersioningConfigurationService.setupAutoVersioning(
+                                        this,
+                                        AutoVersioningConfig(
+                                            configurations = listOf(
+                                                AutoVersioningTestFixtures.sourceConfig(
+                                                    sourceProject = sourceProject.name,
+                                                    sourceBranch = sourceBranch.name,
+                                                    sourcePromotion = pl.name,
+                                                    targetPath = "target.properties",
+                                                )
+                                            )
+                                        )
+                                    )
+                                }
+                            }
+                        }
+
+                    code(pl, target)
                 }
             }
         }

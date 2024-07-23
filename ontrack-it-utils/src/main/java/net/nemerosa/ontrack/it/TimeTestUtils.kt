@@ -85,3 +85,71 @@ class TimeTestUtils {
         logger.info("$message: $info")
     }
 }
+
+/**
+ * Same than `waitUntil` but with a syntax allowing to get a result
+ */
+@OptIn(ExperimentalTime::class)
+fun <T> waitFor(
+    message: String,
+    initial: Duration? = null,
+    interval: Duration = 5.seconds,
+    timeout: Duration = 60.seconds,
+    code: () -> T?
+): Waiting<T> = Waiting(
+    message = message,
+    initial = initial,
+    interval = interval,
+    timeout = timeout,
+    access = code,
+)
+
+@OptIn(ExperimentalTime::class)
+class Waiting<T>(
+    private val message: String,
+    private val initial: Duration? = null,
+    private val interval: Duration = 5.seconds,
+    private val timeout: Duration = 60.seconds,
+    private val access: () -> T?
+) {
+
+    private val logger = LoggerFactory.getLogger(Waiting::class.java)
+
+    infix fun until(check: (t: T) -> Boolean): T {
+        return runBlocking {
+            val timeoutMs = timeout.inWholeMilliseconds
+            val start = System.currentTimeMillis()
+            // Logging
+            log(message, "Starting...")
+            // Waiting some initial time
+            if (initial != null) {
+                log(message, "Initial delay ($initial")
+                delay(initial.inWholeMilliseconds)
+            }
+            // Checks
+            while ((System.currentTimeMillis() - start) < timeoutMs) {
+                // Check
+                log(message, "Checking...")
+                // Getting the input
+                val t = access()
+                if (t != null) {
+                    val ok = check(t)
+                    if (ok) {
+                        // OK
+                        log(message, "OK.")
+                        return@runBlocking t
+                    }
+                }
+                log(message, "Interval delay ($interval")
+                delay(interval.inWholeMilliseconds)
+            }
+            // Timeout
+            throw TimeoutException("$message: Timeout exceeded after $timeout")
+        }
+    }
+
+    private fun log(message: String, info: String) {
+        logger.info("$message: $info")
+    }
+
+}

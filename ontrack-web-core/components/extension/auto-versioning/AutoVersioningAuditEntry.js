@@ -10,6 +10,8 @@ import AutoVersioningAuditProjectSourceLink
 import {AutoRefreshButton} from "@components/common/AutoRefresh";
 import AutoVersioningAuditEntryPR from "@components/extension/auto-versioning/AutoVersioningAuditEntryPR";
 import AutoVersioningApproval from "@components/extension/auto-versioning/AutoVersioningApproval";
+import Link from "next/link";
+import DefaultPromotionRunLink from "@components/promotionRuns/DefaultPromotionRunLink";
 
 export default function AutoVersioningAuditEntry({entry}) {
 
@@ -144,6 +146,24 @@ export default function AutoVersioningAuditEntry({entry}) {
             </Space>,
         }
     ))
+
+    // Trail
+    if (entry.promotionRun) {
+        history.push({
+            children: <Space>
+                <Popover
+                    content="Promotion which led to the auto-versioning"
+                >
+                    <FaInfoCircle
+                        color="lightblue"
+                        className="ot-action"
+                    />
+                </Popover>
+                <Link href={'/'}>Promotion</Link>
+            </Space>,
+            label: <DefaultPromotionRunLink promotionRun={entry.promotionRun}/>
+        })
+    }
 
     return (
         <>
