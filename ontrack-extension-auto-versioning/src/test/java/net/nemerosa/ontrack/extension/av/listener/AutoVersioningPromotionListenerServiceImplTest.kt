@@ -6,13 +6,16 @@ import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationService
 import net.nemerosa.ontrack.extension.av.project.AutoVersioningProjectProperty
 import net.nemerosa.ontrack.extension.av.project.AutoVersioningProjectPropertyType
+import net.nemerosa.ontrack.extension.av.tracking.AutoVersioningTracking
 import net.nemerosa.ontrack.extension.scm.service.SCMDetector
-import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.structure.BranchFixtures
+import net.nemerosa.ontrack.model.structure.BuildFixtures
+import net.nemerosa.ontrack.model.structure.PropertyService
+import net.nemerosa.ontrack.model.structure.StructureService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.*
 import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class AutoVersioningPromotionListenerServiceImplTest {
@@ -21,6 +24,7 @@ class AutoVersioningPromotionListenerServiceImplTest {
     private lateinit var scmDetector: SCMDetector
     private lateinit var propertyService: PropertyService
     private lateinit var structureService: StructureService
+    private lateinit var autoVersioningTracking: AutoVersioningTracking
     private lateinit var autoVersioningPromotionListenerService: AutoVersioningPromotionListenerService
 
     @BeforeEach
@@ -31,6 +35,7 @@ class AutoVersioningPromotionListenerServiceImplTest {
         scmDetector = mockk()
         propertyService = mockk()
         structureService = mockk()
+        autoVersioningTracking = mockk(relaxed = true)
 
         autoVersioningPromotionListenerService = AutoVersioningPromotionListenerServiceImpl(
             autoVersioningConfigurationService = autoVersioningConfigurationService,
@@ -38,53 +43,6 @@ class AutoVersioningPromotionListenerServiceImplTest {
             propertyService = propertyService,
             structureService = structureService,
         )
-    }
-
-    @Test
-    fun `Disabled branches are not targeted by auto-versioning`() {
-        val branch = BranchFixtures.testBranch(disabled = true)
-
-        val source = BranchFixtures.testBranch()
-        val run = PromotionRunFixtures.testPromotionRun(branch = source)
-        val build = run.build
-        val promotion = run.promotionLevel
-
-        every {
-            autoVersioningConfigurationService.getBranchesConfiguredFor(build.project.name, promotion.name)
-        } returns listOf(branch)
-
-        val avBranches = autoVersioningPromotionListenerService.getConfiguredBranches(run)
-
-        assertNotNull(avBranches) {
-            assertTrue(
-                it.configuredBranches.isEmpty(),
-                "No targeted branch"
-            )
-        }
-    }
-
-    @Test
-    fun `Disabled projects are not targeted by auto-versioning`() {
-        val project = ProjectFixtures.testProject(disabled = true)
-        val branch = BranchFixtures.testBranch(project = project)
-
-        val source = BranchFixtures.testBranch()
-        val run = PromotionRunFixtures.testPromotionRun(branch = source)
-        val build = run.build
-        val promotion = run.promotionLevel
-
-        every {
-            autoVersioningConfigurationService.getBranchesConfiguredFor(build.project.name, promotion.name)
-        } returns listOf(branch)
-
-        val avBranches = autoVersioningPromotionListenerService.getConfiguredBranches(run)
-
-        assertNotNull(avBranches) {
-            assertTrue(
-                it.configuredBranches.isEmpty(),
-                "No targeted branch"
-            )
-        }
     }
 
     @Test

@@ -9,6 +9,7 @@ import AutoVersioningAuditEntry from "@components/extension/auto-versioning/Auto
 import {AutoVersioningAuditContext} from "@components/extension/auto-versioning/AutoVersioningAuditContext";
 import {homeBreadcrumbs} from "@components/common/Breadcrumbs";
 import {AutoRefreshContextProvider} from "@components/common/AutoRefresh";
+import {gqlPromotionRunContentFragment} from "@components/promotionRuns/PromotionRunGraphQLFragments";
 
 export default function AutoVersioningAuditEntryView({uuid}) {
 
@@ -58,6 +59,9 @@ export default function AutoVersioningAuditEntryView({uuid}) {
                                 routing
                                 queue
                                 upgradeBranch
+                                promotionRun {
+                                    ...PromotionRunContent
+                                }
                                 order {
                                     uuid
                                     sourceProject
@@ -87,6 +91,7 @@ export default function AutoVersioningAuditEntryView({uuid}) {
                             }
                         }
                     }
+                    ${gqlPromotionRunContentFragment}
                 `,
                 {uuid}
             ).then(data => {

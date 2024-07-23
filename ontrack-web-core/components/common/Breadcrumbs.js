@@ -42,12 +42,17 @@ export function buildBreadcrumbs(build) {
 }
 
 export function downToBuildBreadcrumbs({build}) {
-    return [
-        <HomeLink key="home"/>,
-        <ProjectLink project={build.branch.project} key="project"/>,
-        <BranchLink branch={build.branch} key="branch"/>,
-        <BuildLink build={build} key="build"/>
+    const crumbs = [
+        <HomeLink key="home"/>
     ]
+    if (build) {
+        crumbs.push(
+            <ProjectLink project={build.branch.project} key="project"/>,
+            <BranchLink branch={build.branch} key="branch"/>,
+            <BuildLink build={build} key="build"/>
+        )
+    }
+    return crumbs
 }
 
 export function promotionLevelBreadcrumbs(promotionLevel) {

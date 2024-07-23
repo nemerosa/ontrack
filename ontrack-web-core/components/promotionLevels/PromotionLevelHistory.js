@@ -7,12 +7,13 @@ import BuildLink from "@components/builds/BuildLink";
 import Decorations from "@components/framework/decorations/Decorations";
 import TimestampText from "@components/common/TimestampText";
 import AnnotatedDescription from "@components/common/AnnotatedDescription";
-import {FaExchangeAlt, FaSearch} from "react-icons/fa";
+import {FaCog, FaExchangeAlt, FaSearch} from "react-icons/fa";
 import TableColumnFilterDropdown from "@components/common/table/TableColumnFilterDropdown";
 import useRangeSelection from "@components/common/RangeSelection";
 import RangeSelector from "@components/common/RangeSelector";
 import {useRouter} from "next/router";
 import {scmChangeLogUri} from "@components/common/Links";
+import PromotionRunLink from "@components/promotionRuns/PromotionRunLink";
 
 const {Column} = Table
 
@@ -226,6 +227,10 @@ export default function PromotionLevelHistory({promotionLevel}) {
                                     build={run.build}
                                 />
                                 <Decorations entity={run.build}/>
+                                <PromotionRunLink
+                                    promotionRun={run}
+                                    text={<FaCog title="Promotion run details"/>}
+                                />
                             </Space>
                         }
                         filterDropdown={({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>

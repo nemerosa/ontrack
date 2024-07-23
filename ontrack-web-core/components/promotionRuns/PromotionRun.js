@@ -1,5 +1,7 @@
 import PromotionLevel from "@components/promotionLevels/PromotionLevel";
 import Timestamp from "@components/common/Timestamp";
+import {promotionRunUri} from "@components/common/Links";
+import Link from "next/link";
 
 export default function PromotionRun({
                                          promotionRun, size = 16,
@@ -9,8 +11,8 @@ export default function PromotionRun({
                                      }) {
     return (
         <>
-            {
-                promotionRun &&
+            promotionRun &&
+            <Link href={promotionRunUri(promotionRun)}>
                 <PromotionLevel
                     promotionLevel={promotionRun.promotionLevel}
                     size={size}
@@ -22,7 +24,7 @@ export default function PromotionRun({
                             <Timestamp prefix="Promoted on " value={promotionRun.creation.time}/> : undefined
                     }
                 />
-            }
+            </Link>
         </>
     )
 }

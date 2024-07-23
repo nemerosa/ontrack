@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.extension.av.graphql
 
 import graphql.schema.GraphQLFieldDefinition
-import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationService
+import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfiguredBranch
 import net.nemerosa.ontrack.extension.av.listener.AutoVersioningPromotionListenerService
+import net.nemerosa.ontrack.extension.av.tracking.AutoVersioningTrackingService
 import net.nemerosa.ontrack.graphql.schema.GQLProjectEntityFieldContributor
 import net.nemerosa.ontrack.graphql.support.listType
-import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.structure.PromotionLevel
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component
 class AutoVersioningTargetGQLPromotionLevelFieldContributor(
     private val gqlTypeAutoVersioningConfiguredBranch: GQLTypeAutoVersioningConfiguredBranch,
     private val autoVersioningPromotionListenerService: AutoVersioningPromotionListenerService,
+    private val autoVersioningTrackingService: AutoVersioningTrackingService,
 ) : GQLProjectEntityFieldContributor {
     override fun getFields(
         projectEntityClass: Class<out ProjectEntity>,
@@ -27,7 +28,16 @@ class AutoVersioningTargetGQLPromotionLevelFieldContributor(
                 .type(listType(gqlTypeAutoVersioningConfiguredBranch.typeName))
                 .dataFetcher { env ->
                     val pl: PromotionLevel = env.getSource()
-                    autoVersioningPromotionListenerService.getConfiguredBranches(pl)
+                    val tracking = autoVersioningTrackingService.startInMemoryTrail()
+                    autoVersioningPromotionListenerService.getConfiguredBranches(pl, tracking)
+                    tracking.trail?.branches
+                        ?.filter { it.isEligible() }
+                        ?.map {
+                            AutoVersioningConfiguredBranch(
+                                branch = it.branch,
+                                configuration = it.configuration,
+                            )
+                        } ?: emptyList<AutoVersioningConfiguredBranch>()
                 }
                 .build(),
         )

@@ -1,0 +1,17 @@
+query PromotionRunAutoVersioningTrail($id: Int!) {
+    promotionRuns(id: $id) {
+        autoVersioningTrail {
+            branches {
+                id
+                branch {
+                    ...BranchFragment
+                }
+                configuration {
+                    ...AutoVersioningSourceConfigFragment
+                }
+                rejectionReason
+                orderId
+            }
+        }
+    }
+}

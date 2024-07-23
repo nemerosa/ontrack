@@ -52,6 +52,10 @@ export function scmChangeLogUri(from, to) {
     return `/extension/scm/changelog?from=${from}&to=${to}`
 }
 
+export function autoVersioningAuditEntryUri(uuid) {
+    return `/extension/auto-versioning/audit/detail/${uuid}`
+}
+
 // TODO As a component
 export function buildLink(build, text) {
     return <Link
@@ -62,6 +66,10 @@ export function buildLink(build, text) {
 
 export function promotionLevelUri(promotionLevel) {
     return `/promotionLevel/${promotionLevel.id}`
+}
+
+export function promotionRunUri(promotionRun) {
+    return `/promotionRun/${promotionRun.id}`
 }
 
 export function validationStampUri(validationStamp) {

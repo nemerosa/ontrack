@@ -19,6 +19,7 @@ import {AutoVersioningAuditContext} from "@components/extension/auto-versioning/
 import ProjectLinkByName from "@components/projects/ProjectLinkByName";
 import {AutoRefreshButton, AutoRefreshContextProvider} from "@components/common/AutoRefresh";
 import AutoVersioningApproval from "@components/extension/auto-versioning/AutoVersioningApproval";
+import {autoVersioningAuditEntryUri} from "@components/common/Links";
 
 const {Column} = Table
 
@@ -244,7 +245,7 @@ export default function AutoVersioningAuditView() {
                             render={(_, entry) =>
                                 <Tooltip title="Displays the details of this entry into a separate page.">
                                     <Link
-                                        href={`/extension/auto-versioning/audit/detail/${entry.order.uuid}`}>{entry.order.uuid}</Link>
+                                        href={autoVersioningAuditEntryUri(entry.order.uuid)}>{entry.order.uuid}</Link>
                                 </Tooltip>
                             }
                         />

@@ -7,6 +7,6 @@ import net.nemerosa.ontrack.model.structure.Branch
 data class AutoVersioningConfiguredBranch(
     @APIDescription("Target branch for the auto-versioning")
     val branch: Branch,
-    @APIDescription("List of target auto-versioning configurations on the target branch")
-    val configurations: List<AutoVersioningSourceConfig>,
+    @APIDescription("Target auto-versioning configurations on the target branch")
+    val configuration: AutoVersioningSourceConfig,
 )

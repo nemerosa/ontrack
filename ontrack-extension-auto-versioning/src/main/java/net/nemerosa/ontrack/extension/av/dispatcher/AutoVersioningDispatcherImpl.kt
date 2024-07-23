@@ -1,16 +1,14 @@
 package net.nemerosa.ontrack.extension.av.dispatcher
 
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
-import net.nemerosa.ontrack.extension.av.model.AutoVersioningConfiguredBranches
-import net.nemerosa.ontrack.extension.av.model.PromotionEvent
 import net.nemerosa.ontrack.extension.av.queue.AutoVersioningQueue
+import net.nemerosa.ontrack.extension.av.tracking.AutoVersioningTracking
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.PromotionRun
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry
 import net.nemerosa.ontrack.model.support.ApplicationLogService
-import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.util.*
@@ -23,17 +21,33 @@ class AutoVersioningDispatcherImpl(
     private val applicationLogService: ApplicationLogService,
 ) : AutoVersioningDispatcher {
 
-    override fun dispatch(configuredBranches: AutoVersioningConfiguredBranches) {
+    private val logger = LoggerFactory.getLogger(AutoVersioningDispatcherImpl::class.java)
+
+    override fun dispatch(
+        promotionRun: PromotionRun,
+        tracking: AutoVersioningTracking,
+    ) {
         securityService.asAdmin {
-            configuredBranches.configuredBranches.forEach { configuredBranch ->
-                val branch = configuredBranch.branch
-                configuredBranch.configurations.forEach { config ->
-                    val order = createAutoVersioningOrder(configuredBranches.promotionRun, branch, config)
-                    // Posts the event on the queue
-                    if (order != null) {
-                        queue.queue(order)
+            val trail = tracking.trail
+            if (trail != null) {
+                trail.branches.forEach { branchTrail ->
+                    if (branchTrail.isEligible()) {
+                        val order = createAutoVersioningOrder(
+                            promotionRun = promotionRun,
+                            branch = branchTrail.branch,
+                            config = branchTrail.configuration,
+                        )
+                        // Posts the event on the queue
+                        if (order != null) {
+                            tracking.withTrail {
+                                it.withOrder(branchTrail, order)
+                            }
+                            queue.queue(order)
+                        }
                     }
                 }
+            } else {
+                logger.error("Dispatching not possible because no trail was created (auto-versioning may not be enabled after all)")
             }
         }
     }

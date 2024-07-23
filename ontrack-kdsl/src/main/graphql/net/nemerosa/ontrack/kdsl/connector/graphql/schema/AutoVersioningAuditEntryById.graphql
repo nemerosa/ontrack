@@ -1,0 +1,13 @@
+query AutoVersioningAuditEntryById(
+    $uuid: String!,
+) {
+    autoVersioningAuditEntries(
+        filter: {
+            uuid: $uuid
+        }
+    ) {
+        pageItems {
+            ...AutoVersioningAuditEntryFragment
+        }
+    }
+}

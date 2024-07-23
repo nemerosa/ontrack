@@ -159,6 +159,8 @@ type AutoVersioningAuditEntry {
     mostRecentState: AutoVersioningAuditEntryState!
     "Associated auto versioning order"
     order: AutoVersioningOrder!
+    "Promotion which triggered the auto-versioning"
+    promotionRun: PromotionRun
     "Actual queue where the order was posted"
     queue: String
     "Queue routing key used for this order"
@@ -189,6 +191,22 @@ type AutoVersioningAuditEntryState {
     state: AutoVersioningAuditState!
 }
 
+"AV trail for a specific branch"
+type AutoVersioningBranchTrail {
+    "Associated auto-versioning audit entry if any"
+    audit: AutoVersioningAuditEntry
+    "Targeted branch"
+    branch: Branch!
+    "Associated configuration"
+    configuration: AutoVersioningSourceConfig!
+    "Unique ID for this trail"
+    id: String!
+    "AV order ID when actually scheduled"
+    orderId: String
+    "Rejection reason"
+    rejectionReason: String
+}
+
 "Configuration of the auto versioning on a branch."
 type AutoVersioningConfig {
     "List of configurations"
@@ -199,8 +217,8 @@ type AutoVersioningConfig {
 type AutoVersioningConfiguredBranch {
     "Target branch for the auto-versioning"
     branch: Branch!
-    "List of target auto-versioning configurations on the target branch"
-    configurations: [AutoVersioningSourceConfig!]!
+    "Target auto-versioning configurations on the target branch"
+    configuration: AutoVersioningSourceConfig!
 }
 
 "AutoVersioningNotification"
@@ -303,6 +321,12 @@ type AutoVersioningSourceConfig {
     validationStamp: String
     "Source of the version for the build. By default, uses the build label is the source project is configured so, or the build name itself. This allows the customization of this behavior."
     versionSource: String
+}
+
+"Describes the history of an auto-versioning decision process"
+type AutoVersioningTrail {
+    "Trails per branch"
+    branches: [AutoVersioningBranchTrail!]!
 }
 
 type Branch implements Authorizable & ProjectEntity {
@@ -4876,6 +4900,8 @@ type PromotionLevel implements Authorizable & ProjectEntity {
     autoPromotionProperty: Property
     "List of branches targeted for auto-versioning based on this promotion level"
     autoVersioningTargets: [AutoVersioningConfiguredBranch!]!
+    "List of branches targeted for auto-versioning based on this promotion level or with their reason for rejection"
+    autoVersioningTrail: AutoVersioningTrail
     "Reference to branch"
     branch: Branch
     creation: Signature
@@ -4960,6 +4986,8 @@ type PromotionRun implements Authorizable & ProjectEntity {
     annotatedDescription: String
     "Authorizations for this context"
     authorizations: [Authorization!]!
+    "List of branches targeted for auto-versioning based on this promotion run or with their reason for rejection"
+    autoVersioningTrail: AutoVersioningTrail
     "Associated build"
     build: Build!
     creation: Signature
