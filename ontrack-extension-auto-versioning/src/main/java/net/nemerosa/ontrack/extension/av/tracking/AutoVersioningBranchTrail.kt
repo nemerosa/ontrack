@@ -19,6 +19,11 @@ data class AutoVersioningBranchTrail(
     val orderId: String? = null,
 ) {
 
+    /**
+     * Checks if the branch is eligible for an actual auto-versioning process to start
+     */
+    fun isEligible() = rejectionReason.isNullOrBlank()
+
     fun order(orderId: String) = AutoVersioningBranchTrail(
         id = id,
         branch = branch,

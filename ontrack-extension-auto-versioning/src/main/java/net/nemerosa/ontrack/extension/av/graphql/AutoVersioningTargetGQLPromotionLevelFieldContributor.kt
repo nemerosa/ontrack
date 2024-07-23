@@ -29,12 +29,15 @@ class AutoVersioningTargetGQLPromotionLevelFieldContributor(
                 .dataFetcher { env ->
                     val pl: PromotionLevel = env.getSource()
                     val tracking = autoVersioningTrackingService.startInMemoryTrail()
-                    autoVersioningPromotionListenerService.getConfiguredBranches(pl, tracking).map {
-                        AutoVersioningConfiguredBranch(
-                            branch = it.branch,
-                            configuration = it.configuration,
-                        )
-                    }
+                    autoVersioningPromotionListenerService.getConfiguredBranches(pl, tracking)
+                    tracking.trail?.branches
+                        ?.filter { it.isEligible() }
+                        ?.map {
+                            AutoVersioningConfiguredBranch(
+                                branch = it.branch,
+                                configuration = it.configuration,
+                            )
+                        } ?: emptyList<AutoVersioningConfiguredBranch>()
                 }
                 .build(),
         )

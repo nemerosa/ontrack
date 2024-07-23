@@ -28,7 +28,7 @@ class AutoVersioningPromotionListenerServiceImpl(
     override fun getConfiguredBranches(
         promotionLevel: PromotionLevel,
         tracking: AutoVersioningTracking,
-    ): List<AutoVersioningBranchTrail> {
+    ) {
         // Gets all the trigger configurations about this event, based on project & promotion only
         val branches = autoVersioningConfigurationService.getBranchesConfiguredFor(
             promotionLevel.project.name,
@@ -36,7 +36,7 @@ class AutoVersioningPromotionListenerServiceImpl(
         )
         // Filters the branches based on their configuration and the triggering event
         val cache = mutableMapOf<LatestSourceBranchCacheKey, LatestSourceBranchCacheValue>()
-        return branches
+        val configuredBranches = branches
             .flatMap { branch ->
                 autoVersioningConfigurationService.getAutoVersioning(branch)
                     ?.configurations
@@ -48,29 +48,23 @@ class AutoVersioningPromotionListenerServiceImpl(
                     }
                     ?: emptyList()
             }
-            // Initializing the tracking
-            .run {
-                tracking.init(this)
-            }
-            // Filtering the branches based on their disabled/enabled state
-            .filter { branchTrail ->
-                val disabled = branchTrail.branch.isDisabled || branchTrail.branch.project.isDisabled
-                if (disabled) {
-                    tracking.withDisabledBranch(branchTrail)
-                }
-                !disabled
-            }
-            // Filtering on project rules
-            .filter { branchTrail ->
+        // Initializing the tracking
+        val branchTrails = tracking.init(configuredBranches)
+        branchTrails.forEach { branchTrail ->
+            val disabled = branchTrail.branch.isDisabled || branchTrail.branch.project.isDisabled
+            if (disabled) {
+                tracking.withDisabledBranch(branchTrail)
+            } else {
+                // Filtering on project rules
                 val accepted = acceptBranchWithProjectAVRules(branchTrail.branch)
                 if (!accepted) {
                     tracking.reject(branchTrail, "Not accepted by the project auto-versioning rules")
+                } else {
+                    // Filtering on configuration
+                    filterBranch(branchTrail, promotionLevel, cache, tracking)
                 }
-                accepted
             }
-            .filter { branchTrail ->
-                filterBranch(branchTrail, promotionLevel, cache, tracking)
-            }
+        }
     }
 
     private fun filterBranch(

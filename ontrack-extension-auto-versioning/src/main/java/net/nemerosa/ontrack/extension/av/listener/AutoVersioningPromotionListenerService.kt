@@ -1,8 +1,5 @@
 package net.nemerosa.ontrack.extension.av.listener
 
-import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfiguredBranch
-import net.nemerosa.ontrack.extension.av.model.AutoVersioningConfiguredBranches
-import net.nemerosa.ontrack.extension.av.tracking.AutoVersioningBranchTrail
 import net.nemerosa.ontrack.extension.av.tracking.AutoVersioningTracking
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.PromotionLevel
@@ -19,7 +16,7 @@ interface AutoVersioningPromotionListenerService {
     fun getConfiguredBranches(
         promotionRun: PromotionRun,
         tracking: AutoVersioningTracking,
-    ): List<AutoVersioningBranchTrail> =
+    ) =
         getConfiguredBranches(
             promotionLevel = promotionRun.promotionLevel,
             tracking = tracking,
@@ -31,7 +28,7 @@ interface AutoVersioningPromotionListenerService {
     fun getConfiguredBranches(
         promotionLevel: PromotionLevel,
         tracking: AutoVersioningTracking,
-    ): List<AutoVersioningBranchTrail>
+    )
 
     /**
      * Checks if a branch auto-versioning is valid according to its project's rules

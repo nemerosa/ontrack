@@ -1,10 +1,8 @@
 package net.nemerosa.ontrack.extension.av.dispatcher
 
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
-import net.nemerosa.ontrack.extension.av.model.AutoVersioningConfiguredBranches
 import net.nemerosa.ontrack.extension.av.queue.AutoVersioningQueue
 import net.nemerosa.ontrack.extension.av.tracking.AutoVersioningTracking
-import net.nemerosa.ontrack.extension.av.tracking.AutoVersioningTrail
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.NameDescription
@@ -33,17 +31,19 @@ class AutoVersioningDispatcherImpl(
             val trail = tracking.trail
             if (trail != null) {
                 trail.branches.forEach { branchTrail ->
-                    val order = createAutoVersioningOrder(
-                        promotionRun = promotionRun,
-                        branch = branchTrail.branch,
-                        config = branchTrail.configuration,
-                    )
-                    // Posts the event on the queue
-                    if (order != null) {
-                        tracking.withTrail {
-                            it.withOrder(branchTrail, order)
+                    if (branchTrail.isEligible()) {
+                        val order = createAutoVersioningOrder(
+                            promotionRun = promotionRun,
+                            branch = branchTrail.branch,
+                            config = branchTrail.configuration,
+                        )
+                        // Posts the event on the queue
+                        if (order != null) {
+                            tracking.withTrail {
+                                it.withOrder(branchTrail, order)
+                            }
+                            queue.queue(order)
                         }
-                        queue.queue(order)
                     }
                 }
             } else {
