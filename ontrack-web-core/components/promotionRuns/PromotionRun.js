@@ -11,20 +11,22 @@ export default function PromotionRun({
                                      }) {
     return (
         <>
-            promotionRun &&
-            <Link href={promotionRunUri(promotionRun)}>
-                <PromotionLevel
-                    promotionLevel={promotionRun.promotionLevel}
-                    size={size}
-                    displayTooltip={displayDetails}
-                    displayText={displayPromotionLevelName}
-                    displayDescription={displayPromotionLevelDescription}
-                    details={
-                        displayDetails ?
-                            <Timestamp prefix="Promoted on " value={promotionRun.creation.time}/> : undefined
-                    }
-                />
-            </Link>
+            {
+                promotionRun &&
+                <Link href={promotionRunUri(promotionRun)}>
+                    <PromotionLevel
+                        promotionLevel={promotionRun.promotionLevel}
+                        size={size}
+                        displayTooltip={displayDetails}
+                        displayText={displayPromotionLevelName}
+                        displayDescription={displayPromotionLevelDescription}
+                        details={
+                            displayDetails ?
+                                <Timestamp prefix="Promoted on " value={promotionRun.creation.time}/> : undefined
+                        }
+                    />
+                </Link>
+            }
         </>
     )
 }
