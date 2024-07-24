@@ -53,9 +53,14 @@ class DefaultNotificationRecordingService(
             queries += "data::jsonb->'source'->>'id' = :sourceId"
             queryVariables["sourceId"] = filter.sourceId
             if (filter.sourceData != null) {
-            queries += "data::jsonb->'source'->'data' @> CAST(:sourceData AS JSONB)"
+                queries += "data::jsonb->'source'->'data' @> CAST(:sourceData AS JSONB)"
                 queryVariables["sourceData"] = filter.sourceData.format()
             }
+        }
+
+        if (filter.eventEntityId != null) {
+            queries += "(data::jsonb->'event'->'entities'->'${filter.eventEntityId.type.name}'->>'id')::int = :eventEntityId"
+            queryVariables["eventEntityId"] = filter.eventEntityId.id
         }
 
         val query = queries.joinToString(" AND ") { "( $it )" }

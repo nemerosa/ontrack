@@ -1,7 +1,6 @@
 import EventDisplay from "@components/core/model/EventDisplay";
 import {Space} from "antd";
 import {extractProjectEntityInfo} from "@components/entities/ProjectEntityPageInfo";
-import Link from "next/link";
 
 export default function EventDetails({event}) {
     return (
@@ -17,7 +16,7 @@ export default function EventDetails({event}) {
                                 <>
                                     <Space>
                                         {info.type}
-                                        <Link href={info.href}>{info.name}</Link>
+                                        {info.component}
                                     </Space>
                                 </>
                             )

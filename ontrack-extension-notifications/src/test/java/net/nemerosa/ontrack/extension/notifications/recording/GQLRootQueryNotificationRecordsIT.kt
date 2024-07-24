@@ -6,11 +6,14 @@ import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.notifications.mock.MockNotificationChannelConfig
 import net.nemerosa.ontrack.extension.notifications.mock.MockNotificationChannelOutput
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscription
+import net.nemerosa.ontrack.extension.notifications.subscriptions.subscribe
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getRequiredIntField
 import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.json.getTextField
 import net.nemerosa.ontrack.model.events.EventFactory
+import net.nemerosa.ontrack.model.structure.toProjectEntityID
+import net.nemerosa.ontrack.test.TestUtils.uid
 import net.nemerosa.ontrack.test.assertJsonNotNull
 import net.nemerosa.ontrack.test.assertJsonNull
 import org.junit.jupiter.api.Test
@@ -251,6 +254,66 @@ internal class GQLRootQueryNotificationRecordsIT : AbstractNotificationTestSuppo
 
                     }
 
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Getting the notifications linked to a promotion run`() {
+        asAdmin {
+            project {
+                branch {
+                    val pl = promotionLevel()
+                    // Subscription at promotion level
+                    val target = uid("pl-")
+                    val subscriptionName = uid("pl-sub-")
+                    eventSubscriptionService.subscribe(
+                        name = subscriptionName,
+                        channel = mockNotificationChannel,
+                        channelConfig = MockNotificationChannelConfig(target),
+                        projectEntity = pl,
+                        keywords = null,
+                        origin = "test",
+                        contentTemplate = null,
+                        EventFactory.NEW_PROMOTION_RUN
+                    )
+                    // Creating a separate promotion
+                    build {
+                        promote(pl)
+                    }
+                    // Tracking a specific promotion
+                    build {
+                        val run = promote(pl)
+                        // Looking at the records for THIS run to get its ID
+                        val records = notificationRecordingService.filter(
+                            filter = NotificationRecordFilter(
+                                eventEntityId = run.toProjectEntityID(),
+                            )
+                        ).pageItems
+                        assertEquals(1, records.size)
+                        val recordId = records.first().id
+                        // Looking at the records for THIS run
+                        run(
+                            """{
+                                notificationRecords(
+                                    eventEntityType: PROMOTION_RUN,
+                                    eventEntityId: ${run.id},
+                                ) {
+                                    pageItems {
+                                        id
+                                    }
+                                }
+                            }"""
+                        ) { data ->
+                            val record = data.path("notificationRecords").path("pageItems")
+                                .path(0)
+                            assertEquals(
+                                recordId,
+                                record.path("id").asText()
+                            )
+                        }
+                    }
                 }
             }
         }

@@ -19,6 +19,7 @@ import {isAuthorized} from "@components/common/authorizations";
 import ConfirmCommand from "@components/common/ConfirmCommand";
 import {FaTrash} from "react-icons/fa";
 import {useRouter} from "next/router";
+import NotificationRecordingsTable from "@components/extension/notifications/NotificationRecordingsTable";
 
 export default function PromotionRunView({id}) {
 
@@ -186,6 +187,20 @@ export default function PromotionRunView({id}) {
                                 <AutoVersioningTrail trail={run.autoVersioningTrail}/>
                             </PageSection>
                         }
+                        <PageSection
+                            id="promotion-run-notifications"
+                            title="Notifications"
+                        >
+                            <Typography.Paragraph type="secondary" style={{padding: 8}}>
+                                List of notifications sent for this promotion.
+                            </Typography.Paragraph>
+                            <NotificationRecordingsTable
+                                entity={{
+                                    type: 'PROMOTION_RUN',
+                                    id: run.id,
+                                }}
+                            />
+                        </PageSection>
                     </Space>
                 </Skeleton>
             </MainPage>

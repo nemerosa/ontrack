@@ -14,9 +14,21 @@ import {
     validationStampBreadcrumbs
 } from "@components/common/Breadcrumbs";
 import PromotionLevelViewTitle from "@components/promotionLevels/PromotionLevelViewTitle";
-import {branchUri, buildUri, projectUri, promotionLevelUri, validationStampUri} from "@components/common/Links";
+import {
+    branchUri,
+    buildUri,
+    projectUri,
+    promotionLevelUri,
+    promotionRunUri,
+    validationStampUri
+} from "@components/common/Links";
 import ProjectLink from "@components/projects/ProjectLink";
 import ValidationStampViewTitle from "@components/validationStamps/ValidationStampViewTitle";
+import BranchLink from "@components/branches/BranchLink";
+import PromotionLevelLink from "@components/promotionLevels/PromotionLevelLink";
+import ValidationStampLink from "@components/validationStamps/ValidationStampLink";
+import BuildLink from "@components/builds/BuildLink";
+import PromotionRunLink from "@components/promotionRuns/PromotionRunLink";
 
 export const extractProjectEntityInfo = (type, entity) => {
     switch (type) {
@@ -26,6 +38,7 @@ export const extractProjectEntityInfo = (type, entity) => {
                 name: entity.name,
                 compositeName: entity.name,
                 href: projectUri(entity),
+                component: <ProjectLink project={entity}/>,
             }
         }
         case 'BRANCH': {
@@ -34,6 +47,7 @@ export const extractProjectEntityInfo = (type, entity) => {
                 name: entity.name,
                 compositeName: `${entity.project.name}/${entity.name}`,
                 href: branchUri(entity),
+                component: <BranchLink branch={entity}/>,
             }
         }
         case 'PROMOTION_LEVEL': {
@@ -42,6 +56,7 @@ export const extractProjectEntityInfo = (type, entity) => {
                 name: entity.name,
                 compositeName: `${entity.branch.project.name}/${entity.branch.name}/${entity.name}`,
                 href: promotionLevelUri(entity),
+                component: <PromotionLevelLink promotionLevel={entity}/>,
             }
         }
         case 'VALIDATION_STAMP': {
@@ -50,6 +65,7 @@ export const extractProjectEntityInfo = (type, entity) => {
                 name: entity.name,
                 compositeName: `${entity.branch.project.name}/${entity.branch.name}/${entity.name}`,
                 href: validationStampUri(entity),
+                component: <ValidationStampLink validationStamp={entity}/>,
             }
         }
         case 'BUILD': {
@@ -58,6 +74,7 @@ export const extractProjectEntityInfo = (type, entity) => {
                 name: entity.name,
                 compositeName: `${entity.branch.project.name}/${entity.branch.name}/${entity.name}`,
                 href: buildUri(entity),
+                component: <BuildLink build={entity}/>,
             }
         }
         case 'VALIDATION_RUN': {
@@ -65,8 +82,13 @@ export const extractProjectEntityInfo = (type, entity) => {
             break
         }
         case 'PROMOTION_RUN': {
-            // No information available for this type of entity
-            break
+            return {
+                type: 'Promotion run',
+                name: `${entity.build.name} x ${entity.promotionLevel.name}`,
+                compositeName: `${entity.build.branch.project.name}/${entity.build.branch.name}/${entity.promotionLevel.name}/${entity.build.name}`,
+                href: promotionRunUri(entity),
+                component: <PromotionRunLink promotionRun={entity}/>,
+            }
         }
     }
 }

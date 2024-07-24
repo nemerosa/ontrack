@@ -9,8 +9,12 @@ import net.nemerosa.ontrack.extension.notifications.channels.NotificationResultT
 import net.nemerosa.ontrack.graphql.schema.GQLRootQuery
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.GQLScalarJSON
+import net.nemerosa.ontrack.graphql.support.enumArgument
+import net.nemerosa.ontrack.graphql.support.intArgument
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
 import net.nemerosa.ontrack.graphql.support.stringArgument
+import net.nemerosa.ontrack.model.structure.ProjectEntityID
+import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import org.springframework.stereotype.Component
 
 @Component
@@ -43,6 +47,14 @@ class GQLRootQueryNotificationRecords(
                     .description("Filtering on the source data")
                     .type(GQLScalarJSON.INSTANCE)
                     .build(),
+                enumArgument<ProjectEntityType>(
+                    ARG_FILTER_EVENT_ENTITY_TYPE,
+                    "Filtering on the entity type targeted by the event (${ARG_FILTER_EVENT_ENTITY_ID} must be provided as well)"
+                ),
+                intArgument(
+                    ARG_FILTER_EVENT_ENTITY_ID,
+                    "Filtering on the entity ID targeted by the event (${ARG_FILTER_EVENT_ENTITY_TYPE} must be provided as well)"
+                ),
             ),
             itemPaginatedListProvider = { env, _, offset, size ->
                 val resultType = env.getArgument<String?>(ARG_FILTER_RESULT_TYPE)?.let {
@@ -51,6 +63,17 @@ class GQLRootQueryNotificationRecords(
                 val channel: String? = env.getArgument(ARG_FILTER_CHANNEL)
                 val sourceId: String? = env.getArgument(ARG_FILTER_SOURCE_ID)
                 val sourceData: JsonNode? = env.getArgument(ARG_FILTER_SOURCE_DATA)
+
+                val eventEntityType = env.getArgument<String?>(ARG_FILTER_EVENT_ENTITY_TYPE)
+                    ?.takeIf { it.isNotBlank() }
+                    ?.let { ProjectEntityType.valueOf(it) }
+                val eventEntityNumericId: Int? = env.getArgument(ARG_FILTER_EVENT_ENTITY_ID)
+                val eventEntityId: ProjectEntityID? = if (eventEntityType != null && eventEntityNumericId != null) {
+                    ProjectEntityID(eventEntityType, eventEntityNumericId)
+                } else {
+                    null
+                }
+
                 val filter = NotificationRecordFilter(
                     offset = offset,
                     size = size,
@@ -58,6 +81,7 @@ class GQLRootQueryNotificationRecords(
                     resultType = resultType,
                     sourceId = sourceId,
                     sourceData = sourceData,
+                    eventEntityId = eventEntityId,
                 )
                 notificationRecordingService.filter(filter)
             }
@@ -68,5 +92,7 @@ class GQLRootQueryNotificationRecords(
         private const val ARG_FILTER_RESULT_TYPE = "resultType"
         private const val ARG_FILTER_SOURCE_ID = "sourceId"
         private const val ARG_FILTER_SOURCE_DATA = "sourceData"
+        private const val ARG_FILTER_EVENT_ENTITY_TYPE = "eventEntityType"
+        private const val ARG_FILTER_EVENT_ENTITY_ID = "eventEntityId"
     }
 }

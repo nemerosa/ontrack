@@ -3,6 +3,7 @@ import {graphQLCallMutation} from "@ontrack/graphql";
 import {gql} from "graphql-request";
 import {createValidationStamp} from "@ontrack/validationStamp";
 import {createBuild} from "@ontrack/build";
+import {createPromotionLevel} from "@ontrack/promotionLevel";
 
 export const createBranch = async (project, name) => {
     const actualName = name ?? generate('bch_')
@@ -45,6 +46,7 @@ const branchInstance = (ontrack, data, project) => {
         project,
     }
 
+    branch.createPromotionLevel = async (name) => createPromotionLevel(branch, name)
     branch.createValidationStamp = async (name) => createValidationStamp(branch, name)
     branch.createBuild = async (name) => createBuild(branch, name)
 

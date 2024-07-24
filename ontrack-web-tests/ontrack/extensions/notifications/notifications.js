@@ -2,12 +2,13 @@ import {graphQLCallMutation} from "@ontrack/graphql";
 import {gql} from "graphql-request";
 
 export const registerNotificationExtensions = (projectEntity) => {
-    projectEntity.subscribe = async ({events, keywords, channel, channelConfig, contentTemplate}) => {
+    projectEntity.subscribe = async ({name, events, keywords, channel, channelConfig, contentTemplate}) => {
         await graphQLCallMutation(
             projectEntity.ontrack.connection,
             'subscribeToEvents',
             gql`
                 mutation CreateSubscription(
+                    $name: String,
                     $entityType: ProjectEntityType!,
                     $entityId: Int!,
                     $events: [String!]!,
@@ -17,6 +18,7 @@ export const registerNotificationExtensions = (projectEntity) => {
                     $contentTemplate: String,
                 ) {
                     subscribeToEvents(input: {
+                        name: $name,
                         projectEntity: {
                             type: $entityType,
                             id: $entityId,
@@ -34,6 +36,7 @@ export const registerNotificationExtensions = (projectEntity) => {
                 }
             `,
             {
+                name,
                 entityType: projectEntity.type,
                 entityId: projectEntity.id,
                 events,

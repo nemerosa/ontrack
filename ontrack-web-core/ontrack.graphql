@@ -5358,6 +5358,10 @@ type Query {
     notificationRecords(
         "Filtering on the channel"
         channel: String,
+        "Filtering on the entity ID targeted by the event (eventEntityType must be provided as well)"
+        eventEntityId: Int,
+        "Filtering on the entity type targeted by the event (eventEntityId must be provided as well)"
+        eventEntityType: ProjectEntityType,
         "Offset for the page"
         offset: Int = 0,
         "Filtering on the result type"
