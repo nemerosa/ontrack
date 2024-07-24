@@ -5,7 +5,7 @@ import {homeBreadcrumbs} from "@components/common/Breadcrumbs";
 import {CloseCommand} from "@components/common/Commands";
 import {homeUri} from "@components/common/Links";
 import {useEffect, useState} from "react";
-import {Col, Skeleton, Table} from "antd";
+import {Skeleton, Table} from "antd";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
 import Timestamp from "@components/common/Timestamp";
@@ -16,6 +16,7 @@ import TableColumnFilterDropdown from "@components/common/table/TableColumnFilte
 import SelectNotificationResultType from "@components/extension/notifications/SelectNotificationResultType";
 import SelectNotificationChannel from "@components/extension/notifications/SelectNotificationChannel";
 import NotificationSourceData from "@components/extension/notifications/NotificationSourceData";
+import {gqlNotificationRecordContent} from "@components/extension/notifications/NotificationRecordsGraphQLFragments";
 
 const {Column} = Table
 
@@ -62,23 +63,11 @@ export default function NotificationRecordingsView() {
                                 }
                             }
                             pageItems {
-                                key: id
-                                source {
-                                    id
-                                    data
-                                }
-                                channel
-                                channelConfig
-                                event
-                                result {
-                                    type
-                                    message
-                                    output
-                                }
-                                timestamp
+                                ...NotificationRecordContent
                             }
                         }
                     }
+                    ${gqlNotificationRecordContent}
                 `,
                 {
                     offset: pagination.offset,
