@@ -7,9 +7,15 @@ export const formFieldArraySwap = (form, fieldName, oldIndex, newIndex) => {
 }
 
 export const prefixedFormName = (prefix, name) => {
-    if (typeof prefix === 'string') {
-        return [prefix, name]
+    let values
+    if (typeof name === 'string') {
+        values = [name]
     } else {
-        return [...prefix, name]
+        values = [...name]
+    }
+    if (typeof prefix === 'string') {
+        return [prefix, ...values]
+    } else {
+        return [...prefix, ...values]
     }
 }

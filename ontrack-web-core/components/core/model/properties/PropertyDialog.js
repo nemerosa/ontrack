@@ -7,6 +7,8 @@ import PropertyComponent from "@components/framework/properties/PropertyComponen
 import PropertyForm from "@components/framework/properties/PropertyForm";
 import {gql} from "graphql-request";
 import {EventsContext} from "@components/common/EventsContext";
+import {callDynamicFunction} from "@components/common/DynamicFunction";
+import {getExtensionShortName} from "@components/common/ExtensionUtils";
 
 export const usePropertyDialog = () => {
 
@@ -16,6 +18,15 @@ export const usePropertyDialog = () => {
     const [selectedProperty, setSelectedProperty] = useState()
 
     const [entity, setEntity] = useState({})
+
+    const customPreparation = async (type, values) => {
+        const shortName = getExtensionShortName(type)
+        const newValues = await callDynamicFunction(
+            `framework/properties/${shortName}/FormPrepare`,
+            values,
+        )
+        return newValues ?? values
+    }
 
     return useFormDialog({
         init: (form, {entityType, entityId, propertyList, initialProperty}) => {
@@ -67,12 +78,17 @@ export const usePropertyDialog = () => {
             }
         `,
         userNode: 'setGenericProperty',
-        prepareValues: (values, {entityType, entityId}) => {
+        prepareValues: async (values, {entityType, entityId}) => {
+
+            const type = selectedProperty?.type?.typeName
+
+            const preparedValues = await customPreparation(type, values.value)
+
             return {
                 entityType,
                 entityId,
-                type: selectedProperty?.type?.typeName,
-                value: values.value,
+                type: type,
+                value: preparedValues,
             }
         },
         onSuccess: () => {
