@@ -143,6 +143,17 @@ button.ot-validation-stamp-filter-edition {
 }
 
 /**
+ * Text style for a disabled item like a project or branch
+ */
+.ot-entity-disabled {
+    color: darkgrey;
+    /*text-decoration-line: line-through;*/
+    /*text-decoration-color: darkgrey;*/
+    /*text-decoration-style: wavy;*/
+    /*text-decoration-thickness: 2px;*/
+}
+
+/**
  * Git plot
  */
 

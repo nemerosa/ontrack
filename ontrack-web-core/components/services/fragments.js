@@ -139,6 +139,9 @@ export const gqlInformationFragment = gql`
     }
 `
 
+/**
+ * @deprecated Use gqlProjectContentFragment
+ */
 export const gqlProjectCommonFragment = gql`
     fragment projectCommonFragment on Project {
         id

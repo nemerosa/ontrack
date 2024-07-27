@@ -6,6 +6,7 @@ import {gqlDecorationFragment} from "@components/services/fragments";
 import {DashboardWidgetCellContext} from "@components/dashboards/DashboardWidgetCellContextProvider";
 import PaddedContent from "@components/common/PaddedContent";
 import SimpleProjectList from "@components/projects/SimpleProjectList";
+import {gqlProjectContentFragment} from "@components/projects/ProjectGraphQLFragments";
 
 export default function LastActiveProjectsWidget({count}) {
 
@@ -22,8 +23,7 @@ export default function LastActiveProjectsWidget({count}) {
                 gql`
                     query LastActiveProjects($count: Int! = 10) {
                         lastActiveProjects(count: $count) {
-                            id
-                            name
+                            ...ProjectContent
                             favourite
                             decorations {
                                 ...decorationContent
@@ -31,6 +31,7 @@ export default function LastActiveProjectsWidget({count}) {
                         }
                     }
 
+                    ${gqlProjectContentFragment}
                     ${gqlDecorationFragment}
                 `,
                 {count}
