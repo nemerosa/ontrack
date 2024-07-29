@@ -4,10 +4,20 @@ import AutoVersioningApproval from "@components/extension/auto-versioning/AutoVe
 import AutoVersioningConfigDetails from "@components/extension/auto-versioning/AutoVersioningConfigDetails";
 import {isAuthorized} from "@components/common/authorizations";
 import InlineConfirmCommand from "@components/common/InlineConfirmCommand";
+import {useEffect, useState} from "react";
 
 const {Column} = Table
 
 export default function AutoVersioningConfig({branch, config, onDeleteConfig}) {
+
+    const [items, setItems] = useState([])
+    useEffect(() => {
+        setItems(config.configurations.map((config, index) => ({
+            ...config,
+            key: index,
+        })))
+    }, [config])
+
     return (
         <>
             {
@@ -15,7 +25,7 @@ export default function AutoVersioningConfig({branch, config, onDeleteConfig}) {
             }
             {
                 config && <Table
-                    dataSource={config.configurations}
+                    dataSource={items}
                     pagination={false}
                     expandable={{
                         expandedRowRender: (source) => (
