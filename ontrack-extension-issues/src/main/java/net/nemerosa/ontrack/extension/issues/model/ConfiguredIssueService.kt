@@ -1,56 +1,47 @@
-package net.nemerosa.ontrack.extension.issues.model;
+package net.nemerosa.ontrack.extension.issues.model
 
-import lombok.Data;
-import net.nemerosa.ontrack.extension.issues.IssueServiceExtension;
-import net.nemerosa.ontrack.model.structure.Project;
-import net.nemerosa.ontrack.model.support.MessageAnnotationUtils;
-import net.nemerosa.ontrack.model.support.MessageAnnotator;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
+import net.nemerosa.ontrack.extension.issues.IssueServiceExtension
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation.Companion.of
+import net.nemerosa.ontrack.model.support.MessageAnnotationUtils
+import net.nemerosa.ontrack.model.support.MessageAnnotator
 
 /**
- * Association between an {@link net.nemerosa.ontrack.extension.issues.IssueServiceExtension} and
- * one of its {@link net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration configuration}s.
+ * Association between an [net.nemerosa.ontrack.extension.issues.IssueServiceExtension] and
+ * one of its [configuration][net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration]s.
  */
-@Data
-public class ConfiguredIssueService {
+data class ConfiguredIssueService(
+    val issueServiceExtension: IssueServiceExtension,
+    val issueServiceConfiguration: IssueServiceConfiguration,
+) {
 
-    private final IssueServiceExtension issueServiceExtension;
-    private final IssueServiceConfiguration issueServiceConfiguration;
-
-    public String formatIssuesInMessage(String message) {
-        MessageAnnotator messageAnnotator = issueServiceExtension.getMessageAnnotator(issueServiceConfiguration);
-        if (messageAnnotator != null) {
-            return MessageAnnotationUtils.annotate(message, Collections.singletonList(messageAnnotator));
+    fun formatIssuesInMessage(message: String?): String {
+        val messageAnnotator = issueServiceExtension.getMessageAnnotator(issueServiceConfiguration)
+        return if (messageAnnotator != null) {
+            MessageAnnotationUtils.annotate(message, listOf(messageAnnotator))
         } else {
-            return "";
+            ""
         }
     }
 
-    @Nullable
-    public Issue getIssue(String issueKey) {
-        return issueServiceExtension.getIssue(issueServiceConfiguration, issueKey);
+    fun getIssue(issueKey: String): Issue? {
+        return issueServiceExtension.getIssue(issueServiceConfiguration, issueKey)
     }
 
-    public IssueServiceConfigurationRepresentation getIssueServiceConfigurationRepresentation() {
-        return IssueServiceConfigurationRepresentation.Companion.of(
-                issueServiceExtension,
-                issueServiceConfiguration
-        );
+    val issueServiceConfigurationRepresentation: IssueServiceConfigurationRepresentation
+        get() = of(
+            issueServiceExtension,
+            issueServiceConfiguration
+        )
+
+    val messageAnnotator: MessageAnnotator?
+        get() = issueServiceExtension.getMessageAnnotator(issueServiceConfiguration)
+
+    fun extractIssueKeysFromMessage(message: String): Set<String> {
+        return issueServiceExtension.extractIssueKeysFromMessage(issueServiceConfiguration, message)
     }
 
-    public MessageAnnotator getMessageAnnotator() {
-        return issueServiceExtension.getMessageAnnotator(issueServiceConfiguration);
-    }
-
-    public Set<String> extractIssueKeysFromMessage(String message) {
-        return issueServiceExtension.extractIssueKeysFromMessage(issueServiceConfiguration, message);
-    }
-
-    public @Nullable String getIssueId(@NotNull String token) {
-        return issueServiceExtension.getIssueId(issueServiceConfiguration, token);
+    fun getIssueId(token: String): String? {
+        return issueServiceExtension.getIssueId(issueServiceConfiguration, token)
     }
 
     /**
@@ -59,12 +50,11 @@ public class ConfiguredIssueService {
      * @param key Key ID
      * @return Display key
      */
-    public String getDisplayKey(String key) {
-        return issueServiceExtension.getDisplayKey(issueServiceConfiguration, key);
+    fun getDisplayKey(key: String): String {
+        return issueServiceExtension.getDisplayKey(issueServiceConfiguration, key)
     }
 
-    @NotNull
-    public String getMessageRegex(@NotNull Issue issue) {
-        return issueServiceExtension.getMessageRegex(issueServiceConfiguration, issue);
+    fun getMessageRegex(issue: Issue): String {
+        return issueServiceExtension.getMessageRegex(issueServiceConfiguration, issue)
     }
 }

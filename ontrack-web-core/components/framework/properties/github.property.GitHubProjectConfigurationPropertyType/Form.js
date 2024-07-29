@@ -1,5 +1,6 @@
 import {Form, Input, InputNumber} from "antd";
 import {prefixedFormName} from "@components/form/formUtils";
+import SelectIssueService from "@components/extension/issues/SelectIssueService";
 
 export default function PropertyForm({prefix}) {
     return (
@@ -30,7 +31,9 @@ export default function PropertyForm({prefix}) {
                 extra="Identifier for the issue service"
                 name={prefixedFormName(prefix, 'issueServiceConfigurationIdentifier')}
             >
-                <Input/>
+                <SelectIssueService
+                    self="GitHub issues"
+                />
             </Form.Item>
         </>
     )

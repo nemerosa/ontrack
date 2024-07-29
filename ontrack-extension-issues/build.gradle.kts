@@ -13,6 +13,13 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation("org.apache.commons:commons-text")
     implementation("org.slf4j:slf4j-api")
+
+    testImplementation(project(":ontrack-test-utils"))
+    testImplementation(project(":ontrack-it-utils"))
+    testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
+
+    testRuntimeOnly(project(":ontrack-service"))
+    testRuntimeOnly(project(":ontrack-repository-impl"))
 }
 
 val testJar by tasks.registering(Jar::class) {

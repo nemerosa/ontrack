@@ -1,77 +1,63 @@
-package net.nemerosa.ontrack.extension.issues.support;
+package net.nemerosa.ontrack.extension.issues.support
 
-import net.nemerosa.ontrack.extension.api.ExtensionManager;
-import net.nemerosa.ontrack.extension.issues.IssueServiceExtension;
-import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry;
-import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
-import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
-import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationIdentifier;
-import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.*;
-import java.util.stream.Collectors;
+import net.nemerosa.ontrack.extension.api.ExtensionManager
+import net.nemerosa.ontrack.extension.issues.IssueServiceExtension
+import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
+import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationIdentifier.Companion.parse
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation.Companion.of
+import org.springframework.stereotype.Service
 
 @Service
-public class IssueServiceRegistryImpl implements IssueServiceRegistry {
+class IssueServiceRegistryImpl(
+    private val extensionManager: ExtensionManager
+) : IssueServiceRegistry {
 
-    private final ExtensionManager extensionManager;
-
-    @Autowired
-    public IssueServiceRegistryImpl(ExtensionManager extensionManager) {
-        this.extensionManager = extensionManager;
+    private val issueServiceExtensionMap: Map<String, IssueServiceExtension> by lazy {
+        extensionManager.getExtensions(IssueServiceExtension::class.java).associateBy { it.id }
     }
 
-    protected Map<String, IssueServiceExtension> getIssueServiceExtensionMap() {
-        return extensionManager.getExtensions(IssueServiceExtension.class).stream()
-                .collect(Collectors.toMap(
-                        IssueServiceExtension::getId,
-                        x -> x
+    override val issueServices: Collection<IssueServiceExtension>
+        get() {
+            return issueServiceExtensionMap.values
+        }
+
+    override fun findIssueServiceById(id: String): IssueServiceExtension? = issueServiceExtensionMap[id]
+
+    override val availableIssueServiceConfigurations: List<IssueServiceConfigurationRepresentation>
+        get() {
+            val issueServiceConfigurationRepresentations = mutableListOf<IssueServiceConfigurationRepresentation>()
+            for (issueServiceExtension in issueServiceExtensionMap.values) {
+                val configurationList = issueServiceExtension.configurationList
+                for (issueServiceConfiguration in configurationList) {
+                    issueServiceConfigurationRepresentations.add(
+                        of(
+                            issueServiceExtension,
+                            issueServiceConfiguration
                         )
-                );
-    }
-
-    @Override
-    public Collection<IssueServiceExtension> getIssueServices() {
-        return getIssueServiceExtensionMap().values();
-    }
-
-    @Override
-    public Optional<IssueServiceExtension> getOptionalIssueService(String id) {
-        return Optional.ofNullable(getIssueServiceExtensionMap().get(id));
-    }
-
-    @Override
-    public List<IssueServiceConfigurationRepresentation> getAvailableIssueServiceConfigurations() {
-        List<IssueServiceConfigurationRepresentation> issueServiceConfigurationRepresentations = new ArrayList<>();
-        for (IssueServiceExtension issueServiceExtension : getIssueServiceExtensionMap().values()) {
-            List<? extends IssueServiceConfiguration> configurationList = issueServiceExtension.getConfigurationList();
-            for (IssueServiceConfiguration issueServiceConfiguration : configurationList) {
-                issueServiceConfigurationRepresentations.add(
-                        IssueServiceConfigurationRepresentation.Companion.of(
-                                issueServiceExtension,
-                                issueServiceConfiguration
-                        )
-                );
+                    )
+                }
             }
+            return issueServiceConfigurationRepresentations
         }
-        return issueServiceConfigurationRepresentations;
-    }
 
-    @Override
-    public ConfiguredIssueService getConfiguredIssueService(String issueServiceConfigurationIdentifier) {
+    override fun getConfiguredIssueService(issueServiceConfigurationIdentifier: String): ConfiguredIssueService? {
         // Parsing
-        IssueServiceConfigurationIdentifier identifier = IssueServiceConfigurationIdentifier.parse(issueServiceConfigurationIdentifier);
+        val identifier = parse(issueServiceConfigurationIdentifier)
         if (identifier != null) {
-            Optional<IssueServiceExtension> issueService = getOptionalIssueService(identifier.getServiceId());
-            return issueService.map(issueServiceExtension -> new ConfiguredIssueService(
-                    issueServiceExtension,
-                    issueServiceExtension.getConfigurationByName(identifier.getName())
-            )).orElse(null);
+            val issueService = findIssueServiceById(identifier.serviceId)
+            return issueService?.run {
+                val config = getConfigurationByName(identifier.name)
+                config?.let {
+                    ConfiguredIssueService(
+                        this,
+                        it
+                    )
+                }
+            }
         } else {
-            return null;
+            return null
         }
     }
-
 }

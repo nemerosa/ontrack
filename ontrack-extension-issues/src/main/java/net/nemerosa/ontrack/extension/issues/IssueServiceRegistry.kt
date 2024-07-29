@@ -1,31 +1,34 @@
-package net.nemerosa.ontrack.extension.issues;
+package net.nemerosa.ontrack.extension.issues
 
-import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService;
-import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation;
-import org.jetbrains.annotations.Nullable;
+import net.nemerosa.ontrack.common.asOptional
+import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
+import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation
+import java.util.*
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-
-public interface IssueServiceRegistry {
+interface IssueServiceRegistry {
 
     /**
      * Gets all the issue services
      */
-    Collection<IssueServiceExtension> getIssueServices();
+    val issueServices: Collection<IssueServiceExtension>
 
     /**
      * Gets an issue service by its ID. It may be present or not.
      */
-    Optional<IssueServiceExtension> getOptionalIssueService(String id);
-
-    List<IssueServiceConfigurationRepresentation> getAvailableIssueServiceConfigurations();
+    fun findIssueServiceById(id: String): IssueServiceExtension?
 
     /**
-     * Gets the association between a service and a configuration, or <code>null</code>
+     * Gets an issue service by its ID. It may be present or not.
+     */
+    @Deprecated("Use findIssueServiceById", replaceWith = ReplaceWith("findIssueServiceById"))
+    fun getOptionalIssueService(id: String): Optional<IssueServiceExtension> =
+        findIssueServiceById(id).asOptional()
+
+    val availableIssueServiceConfigurations: List<IssueServiceConfigurationRepresentation>
+
+    /**
+     * Gets the association between a service and a configuration, or `null`
      * if neither service nor configuration can be found.
      */
-    @Nullable
-    ConfiguredIssueService getConfiguredIssueService(String issueServiceConfigurationIdentifier);
+    fun getConfiguredIssueService(issueServiceConfigurationIdentifier: String): ConfiguredIssueService?
 }
