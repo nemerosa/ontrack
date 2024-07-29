@@ -6,7 +6,7 @@ export default function Display({
                                     commitMessage,
                                     config,
                                     job,
-                                    parameters,
+                                    parameters = [],
                                     credentials,
                                 }) {
 
