@@ -47,6 +47,7 @@ export default function PropertiesSection({entityType, entityId}) {
             )
 
             const initialProperties = data.entity.properties
+                .sort((a, b) => a.type.name.localeCompare(b.type.name))
 
             const transformedProperties = await Promise.all(
                 initialProperties.map(async (property) => {
