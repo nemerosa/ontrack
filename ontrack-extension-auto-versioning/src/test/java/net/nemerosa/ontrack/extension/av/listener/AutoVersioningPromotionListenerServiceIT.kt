@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.av.AbstractAutoVersioningTestSupport
 import net.nemerosa.ontrack.extension.av.tracking.AutoVersioningTrackingService
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import kotlin.jvm.optionals.getOrNull
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -12,6 +13,36 @@ class AutoVersioningPromotionListenerServiceIT : AbstractAutoVersioningTestSuppo
 
     @Autowired
     private lateinit var autoVersioningTrackingService: AutoVersioningTrackingService
+
+    @Autowired
+    private lateinit var autoVersioningPromotionListenerService: AutoVersioningPromotionListenerService
+
+    @Test
+    fun `Checking that AV targets only eligible project and promotion`() {
+        withThreeDependencies { target, dep1, _, _ ->
+            val pl1 = structureService.findPromotionLevelByName(
+                dep1.project.name, dep1.name, "GOLD"
+            ).getOrNull() ?: error("Promotion level not found")
+            val tracking = autoVersioningTrackingService.startInMemoryTrail()
+            autoVersioningPromotionListenerService.getConfiguredBranches(pl1, tracking)
+            assertNotNull(tracking.trail, "Trail created") { trail ->
+                assertEquals(1, trail.branches.size)
+                val branchTrail = trail.branches.first()
+                assertEquals(
+                    target.id,
+                    branchTrail.branch.id
+                )
+                assertEquals(
+                    true,
+                    branchTrail.isEligible()
+                )
+                assertEquals(
+                    dep1.project.name,
+                    branchTrail.configuration.sourceProject
+                )
+            }
+        }
+    }
 
     @Test
     fun `Getting the trail of a promotion run`() {

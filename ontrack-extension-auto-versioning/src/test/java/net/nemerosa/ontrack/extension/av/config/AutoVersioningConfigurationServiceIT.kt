@@ -30,6 +30,17 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
     protected lateinit var eventSubscriptionService: EventSubscriptionService
 
     @Test
+    fun `Getting the branches configured to a promotion`() {
+        withThreeDependencies { target, dep1, _, _ ->
+            val targets = autoVersioningConfigurationService.getBranchesConfiguredFor(dep1.project.name, "GOLD")
+            assertEquals(
+                listOf(target),
+                targets
+            )
+        }
+    }
+
+    @Test
     fun `Using &same expression in source branch returns the same branch as the promoted build`() {
         asAdmin {
             project {

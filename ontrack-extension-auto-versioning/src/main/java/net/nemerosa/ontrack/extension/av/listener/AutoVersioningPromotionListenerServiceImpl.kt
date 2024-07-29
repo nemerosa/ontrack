@@ -40,6 +40,10 @@ class AutoVersioningPromotionListenerServiceImpl(
             .flatMap { branch ->
                 autoVersioningConfigurationService.getAutoVersioning(branch)
                     ?.configurations
+                    ?.filter { config ->
+                        config.sourceProject == promotionLevel.project.name &&
+                                config.sourcePromotion == promotionLevel.name
+                    }
                     ?.map { config ->
                         AutoVersioningConfiguredBranch(
                             branch = branch,
@@ -126,6 +130,8 @@ class AutoVersioningPromotionListenerServiceImpl(
             }
             return match
         } else {
+            // This is not supposed to happen since configurations are already filtered on
+            // source project & source promotion level name
             tracking.reject(branchTrail, "Project & promotion names not matching")
             return false
         }
@@ -140,11 +146,13 @@ class AutoVersioningPromotionListenerServiceImpl(
         val cacheKey = LatestSourceBranchCacheKey(branchTrail.branch, sourceBranch.project, branchTrail.configuration)
         val latestSourceBranch = cache.getOrPut(cacheKey) {
             LatestSourceBranchCacheValue(
-                autoVersioningConfigurationService.getLatestBranch(
-                    branchTrail.branch,
-                    sourceBranch.project,
-                    branchTrail.configuration
-                )
+                logger.logTime("AV Source Branch get [target=${branchTrail.branch.project.name}/${branchTrail.branch.name}][source=${sourceBranch.project.name}][config=${branchTrail.configuration.targetPath}]") {
+                    autoVersioningConfigurationService.getLatestBranch(
+                        branchTrail.branch,
+                        sourceBranch.project,
+                        branchTrail.configuration
+                    )
+                }
             )
         }.branch
         // We want the promoted build to be on the latest source branch

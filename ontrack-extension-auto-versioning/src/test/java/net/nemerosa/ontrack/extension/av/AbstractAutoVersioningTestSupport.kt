@@ -22,6 +22,66 @@ abstract class AbstractAutoVersioningTestSupport : AbstractQLKTITSupport() {
         autoVersioningConfigurationService.setAutoVersioning(this, init)
     }
 
+    protected fun withThreeDependencies(
+        code: (
+            target: Branch,
+            dep1: Branch,
+            dep2: Branch,
+            dep3: Branch,
+        ) -> Unit,
+    ) {
+        asAdmin {
+            val dep1 = project<Branch> {
+                branch {
+                    promotionLevel("GOLD")
+                }
+            }
+            val dep2 = project<Branch> {
+                branch {
+                    promotionLevel("GOLD")
+                }
+            }
+            val dep3 = project<Branch> {
+                branch {
+                    promotionLevel("GOLD")
+                }
+            }
+            mockSCMTester.withMockSCMRepository {
+                project {
+                    branch {
+                        configureMockSCMBranch()
+                        autoVersioningConfigurationService.setupAutoVersioning(
+                            this,
+                            AutoVersioningConfig(
+                                configurations = listOf(
+                                    AutoVersioningTestFixtures.sourceConfig(
+                                        sourceProject = dep1.project.name,
+                                        sourceBranch = dep1.name,
+                                        sourcePromotion = "GOLD",
+                                        targetPath = "dep1.properties",
+                                    ),
+                                    AutoVersioningTestFixtures.sourceConfig(
+                                        sourceProject = dep2.project.name,
+                                        sourceBranch = dep2.name,
+                                        sourcePromotion = "GOLD",
+                                        targetPath = "dep2.properties",
+                                    ),
+                                    AutoVersioningTestFixtures.sourceConfig(
+                                        sourceProject = dep3.project.name,
+                                        sourceBranch = dep3.name,
+                                        sourcePromotion = "GOLD",
+                                        targetPath = "dep3.properties",
+                                    ),
+                                )
+                            )
+                        )
+                        code(this, dep1, dep2, dep3)
+                    }
+                }
+            }
+        }
+    }
+
     protected fun withPromotionLevelTargets(
         code: (
             pl: PromotionLevel,
