@@ -71,6 +71,8 @@ class AutoVersioningProcessingServiceImpl(
                     )
                     // Audit
                     autoVersioningAuditService.onProcessingCreatingBranch(order, upgradeBranch)
+                    // Cleaning the branch first
+                    scm.deleteBranch(upgradeBranch)
                     // Creating the branch
                     scm.createBranch(scmBranch, upgradeBranch)
                 } catch (e: Exception) {

@@ -17,9 +17,9 @@ import org.springframework.http.MediaType
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
 import org.springframework.web.client.HttpClientErrorException.NotFound
-import org.springframework.web.client.HttpMessageConverterExtractor
 import org.springframework.web.client.RequestCallback
 import org.springframework.web.client.getForObject
+import org.springframework.web.client.postForObject
 import java.time.LocalDateTime
 
 
@@ -68,6 +68,9 @@ class BitbucketClientImpl(
             ?: throw BitbucketServerCannotCreateBranchException()
 
     override fun deleteBranch(repo: BitbucketRepository, branch: String) {
+        // Cleaning pending PRs
+        declinePendingPRs(repo, branch)
+        // Deleting the branch
         val request = mapOf(
             "name" to "refs/heads/$branch"
         )
@@ -80,11 +83,38 @@ class BitbucketClientImpl(
         )
     }
 
+    private fun declinePendingPRs(repo: BitbucketRepository, branch: String) {
+        // Get open pull requests from the branch
+        val response = template.getForObject<PendingPRsResponse>(
+            "/rest/api/1.0/projects/${repo.project}/repos/${repo.repository}/pull-requests?state=OPEN&direction=OUTGOING&at=refs/heads/$branch"
+        )
+        // Declining all PRs
+        response.values.forEach { pr ->
+            template.postForObject<JsonNode>(
+                "/rest/api/1.0/projects/${repo.project}/repos/${repo.repository}/pull-requests/${pr.id}/decline",
+                mapOf(
+                    "version" to pr.version,
+                )
+            )
+        }
+    }
+
     override fun isBranchExisting(repo: BitbucketRepository, branch: String): Boolean {
         val response = template.getForObject<FindBranchesResponse>(
             "/rest/api/1.0/projects/${repo.project}/repos/${repo.repository}/branches?filterText=${branch}"
         )
         return response.values.any { it.displayId == branch }
+    }
+
+    override fun geBranchLastCommit(repo: BitbucketRepository, branch: String): String? {
+        if (isBranchExisting(repo, branch)) {
+            val response = template.getForObject<GetBranchLastCommitResponse>(
+                "/rest/api/1.0/projects/${repo.project}/repos/${repo.repository}/commits?limit=1&until=refs/heads/${branch}"
+            )
+            return response.values.firstOrNull()?.id
+        } else {
+            return null
+        }
     }
 
     override fun download(repo: BitbucketRepository, branch: String?, path: String): ByteArray? =
@@ -210,7 +240,12 @@ class BitbucketClientImpl(
         .build()
 
     private class PRResponse(
+        val id: Int,
         val version: Int,
+    )
+
+    private class PendingPRsResponse(
+        val values: List<PRResponse>,
     )
 
     private class PRMergeableResponse(
@@ -252,7 +287,12 @@ class BitbucketClientImpl(
         val latestCommit: CommitResponse?
     )
 
+    private class GetBranchLastCommitResponse(
+        val values: List<CommitResponse>,
+    )
+
     private class CommitResponse(
+        val id: String,
         val authorTimestamp: Long?
     )
 

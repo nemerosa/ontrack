@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.github.githubTestConfigReal
 import net.nemerosa.ontrack.extension.github.githubTestEnv
 import net.nemerosa.ontrack.extension.github.model.GitHubRepositoryPermission
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
+import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Duration
@@ -41,6 +42,89 @@ class DefaultOntrackGitHubClientIT {
             organizations.any { it.login == githubTestEnv.organization },
             "Can get the list of organizations"
         )
+    }
+
+    @Test
+    fun `Creating and deleting a branch`() {
+        val branch = uid("test-")
+        // Existing HEAD commit
+        val commit = client.getBranchLastCommit(
+            repository = githubTestEnv.fullRepository,
+            branch = githubTestEnv.branch,
+        )
+        assertNotNull(commit, "Head commit is defined")
+        // Creating the branch
+        client.createBranch(
+            repository = githubTestEnv.fullRepository,
+            source = githubTestEnv.branch,
+            destination = branch,
+        )
+        // Checking the branch does exist
+        val branchCommit = client.getBranchLastCommit(
+            repository = githubTestEnv.fullRepository,
+            branch = branch,
+        )
+        assertEquals(commit, branchCommit, "Branch does exist")
+        // Deleting the branch
+        client.deleteBranch(
+            repository = githubTestEnv.fullRepository,
+            branch = branch,
+        )
+        // Checking the branch does not exist any longer
+        val deletedCommit = client.getBranchLastCommit(
+            repository = githubTestEnv.fullRepository,
+            branch = branch,
+            retryOnNotFound = false,
+        )
+        assertEquals(null, deletedCommit, "Branch does not exist any longer")
+    }
+
+    @Test
+    fun `Creating and deleting a branch with a PR`() {
+        val branch = uid("test-")
+        // Existing HEAD commit
+        val commit = client.getBranchLastCommit(
+            repository = githubTestEnv.fullRepository,
+            branch = githubTestEnv.branch,
+        )
+        assertNotNull(commit, "Head commit is defined")
+        // Creating the branch
+        client.createBranch(
+            repository = githubTestEnv.fullRepository,
+            source = githubTestEnv.branch,
+            destination = branch,
+        )
+        // Adding a commit
+        val testFile = uid("file-")
+        client.setFileContent(
+            repository = githubTestEnv.fullRepository,
+            branch = branch,
+            sha = "",
+            path = testFile,
+            content = testFile.toByteArray(),
+            message = "Adding $testFile",
+        )
+        // Creating a PR
+        client.createPR(
+            repository = githubTestEnv.fullRepository,
+            title = "PR for $testFile",
+            head = branch,
+            base = githubTestEnv.branch,
+            body = "Sample PR",
+            reviewers = emptyList()
+        )
+        // Deleting the branch
+        client.deleteBranch(
+            repository = githubTestEnv.fullRepository,
+            branch = branch,
+        )
+        // Checking the branch does not exist any longer
+        val deletedCommit = client.getBranchLastCommit(
+            repository = githubTestEnv.fullRepository,
+            branch = branch,
+            retryOnNotFound = false,
+        )
+        assertEquals(null, deletedCommit, "Branch does not exist any longer")
     }
 
     @Test

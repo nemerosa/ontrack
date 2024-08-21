@@ -21,7 +21,10 @@ import org.slf4j.LoggerFactory
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
-import org.springframework.web.client.*
+import org.springframework.web.client.HttpClientErrorException
+import org.springframework.web.client.RestClientResponseException
+import org.springframework.web.client.RestTemplate
+import org.springframework.web.client.getForObject
 import java.time.Duration
 import java.time.LocalDateTime
 
@@ -557,15 +560,37 @@ class DefaultOntrackGitHubClient(
         return result
     }
 
-    override fun getBranchLastCommit(repository: String, branch: String): String? {
+    override fun getBranchLastCommit(repository: String, branch: String, retryOnNotFound: Boolean): String? {
         // Gets the repository for this project
         val (owner, name) = getRepositoryParts(repository)
         // Retries
-        return retryOnNotFound("Get last commit for $branch") {
-            getForObject(
-                "/repos/${owner}/${name}/git/ref/heads/${branch}",
-                GitHubGetRefResponse::class.java
-            )?.`object`?.sha
+        if (retryOnNotFound) {
+            return retryOnNotFound("Get last commit for $branch") {
+                getForObject(
+                    "/repos/${owner}/${name}/git/ref/heads/${branch}",
+                    GitHubGetRefResponse::class.java
+                )?.`object`?.sha
+            }
+        } else {
+            val client = createGitHubRestTemplate()
+            return try {
+                client.getForObject(
+                    "/repos/${owner}/${name}/git/ref/heads/${branch}",
+                    GitHubGetRefResponse::class.java
+                )?.`object`?.sha
+            } catch (ex: HttpClientErrorException.NotFound) {
+                null
+            }
+        }
+    }
+
+    override fun deleteBranch(repository: String, branch: String) {
+        // Gets the repository for this project
+        val (owner, name) = getRepositoryParts(repository)
+        retryOnNotFound("Delete branch $branch") {
+            delete(
+                "/repos/${owner}/${name}/git/refs/heads/${branch}",
+            )
         }
     }
 

@@ -137,9 +137,18 @@ interface OntrackGitHubClient {
      *
      * @param repository Repository name, like `nemerosa/ontrack`
      * @param branch Name of the branch
+     * @param retryOnNotFound True if the call must be retried until something is found
      * @return SHA of the last commit of the branch, `null` if no commit or no branch
      */
-    fun getBranchLastCommit(repository: String, branch: String): String?
+    fun getBranchLastCommit(repository: String, branch: String, retryOnNotFound: Boolean = true): String?
+
+    /**
+     * Deletes a branch if it exists. Any linked PR will be declined first.
+     *
+     * @param repository Repository name, like `nemerosa/ontrack`
+     * @param branch Name of the branch`
+     */
+    fun deleteBranch(repository: String, branch: String)
 
     /**
      * Creates a branch

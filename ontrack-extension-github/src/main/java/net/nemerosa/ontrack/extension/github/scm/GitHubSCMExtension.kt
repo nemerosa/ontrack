@@ -106,6 +106,14 @@ class GitHubSCMExtension(
             return branchProperty?.branch
         }
 
+        override fun getBranchLastCommit(branch: String): String? {
+            return client.getBranchLastCommit(repository, branch, retryOnNotFound = false)
+        }
+
+        override fun deleteBranch(branch: String) {
+            client.deleteBranch(repository, branch)
+        }
+
         override fun createBranch(sourceBranch: String, newBranch: String): String {
             return client.createBranch(repository, sourceBranch, newBranch)
                 ?: throw GitHubCannotCreateBranchException(

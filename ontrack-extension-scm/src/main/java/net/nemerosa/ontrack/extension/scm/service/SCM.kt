@@ -42,6 +42,21 @@ interface SCM {
     fun getSCMBranch(branch: Branch): String?
 
     /**
+     * Deletes, if it exists, the given branch.
+     *
+     * @param branch Branch to delete
+     */
+    fun deleteBranch(branch: String)
+
+    /**
+     * Checking if a branch exists by returning its last commit or null if not existing
+     *
+     * @param branch Branch to check
+     * @return Commit hash if the branch exists, null otherwise.
+     */
+    fun getBranchLastCommit(branch: String): String?
+
+    /**
      * Creates a new branch in a project.
      *
      * @param sourceBranch Source branch

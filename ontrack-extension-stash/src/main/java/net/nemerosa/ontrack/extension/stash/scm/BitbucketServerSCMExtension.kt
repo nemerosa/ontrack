@@ -107,6 +107,13 @@ class BitbucketServerSCMExtension(
             return branchProperty?.branch
         }
 
+        override fun getBranchLastCommit(branch: String): String? =
+            client.geBranchLastCommit(repo, branch)
+
+        override fun deleteBranch(branch: String) {
+            client.deleteBranch(repo, branch)
+        }
+
         override fun createBranch(sourceBranch: String, newBranch: String): String =
             client.createBranch(repo, sourceBranch, newBranch)
 

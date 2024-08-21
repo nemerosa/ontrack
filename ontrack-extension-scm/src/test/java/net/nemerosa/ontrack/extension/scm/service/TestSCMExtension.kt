@@ -61,6 +61,9 @@ class TestSCMExtension(
 
         override fun getSCMBranch(branch: Branch): String = branch.name
 
+        override fun deleteBranch(branch: String) {
+        }
+
         override fun createBranch(sourceBranch: String, newBranch: String): String =
             uid("$newBranch-commit-")
 
@@ -90,6 +93,9 @@ class TestSCMExtension(
             TODO("Not yet implemented")
         }
 
+        override fun getBranchLastCommit(branch: String): String? {
+            TODO("Not yet implemented")
+        }
     }
 
     class TestSCMExtensionFile(

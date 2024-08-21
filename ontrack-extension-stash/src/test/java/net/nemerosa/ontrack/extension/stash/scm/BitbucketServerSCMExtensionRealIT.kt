@@ -143,14 +143,14 @@ class BitbucketServerSCMExtensionRealIT : AbstractBitbucketTestSupport() {
 
     @Test
     fun `Creating a PR without auto approval`() {
-        withPR(autoApproval = false) { pr, _, _ ->
+        withPR(autoApproval = false) { _, pr, _, _ ->
             assertFalse(pr.merged, "PR not merged")
         }
     }
 
     @Test
     fun `Creating a PR with auto approval`() {
-        withPR(autoApproval = true) { pr, head, config ->
+        withPR(autoApproval = true) { _, pr, head, config ->
             assertTrue(pr.merged, "PR is merged")
             // Checks that the source branch has been deleted
             val client = bitbucketClientFactory.getBitbucketClient(config)
@@ -165,10 +165,43 @@ class BitbucketServerSCMExtensionRealIT : AbstractBitbucketTestSupport() {
         }
     }
 
+    @Test
+    fun `Creating and deleting a branch`() {
+        withScm { scm, _ ->
+            val branch = uid("test/")
+            // Creating the branch
+            val commit = scm.createBranch(
+                sourceBranch = bitbucketServerEnv.defaultBranch,
+                newBranch = branch
+            )
+            assertTrue(commit.isNotBlank(), "Commit returned")
+            // Checking the branch has been created
+            assertNotNull(scm.getBranchLastCommit(branch)) {
+                assertEquals(commit, it)
+            }
+            // Deleting the branch
+            scm.deleteBranch(branch)
+            // Checking the branch has been deleted
+            assertNull(scm.getBranchLastCommit(branch), "Branch has been deleted")
+
+        }
+    }
+
+    @Test
+    fun `Creating and deleting a branch with a PR`() {
+        withPR(autoApproval = false, remoteAutoMerge = false) { scm, _, head, _ ->
+            // Deleting the branch
+            scm.deleteBranch(head)
+            // Checking the branch has been deleted
+            assertNull(scm.getBranchLastCommit(head), "Branch has been deleted")
+
+        }
+    }
+
     private fun withPR(
         autoApproval: Boolean,
         remoteAutoMerge: Boolean = false,
-        code: (pr: SCMPullRequest, head: String, config: StashConfiguration) -> Unit,
+        code: (scm: SCM, pr: SCMPullRequest, head: String, config: StashConfiguration) -> Unit,
     ) {
         withScm { scm, config ->
             val commonName = uid("branch-")
@@ -210,7 +243,7 @@ class BitbucketServerSCMExtensionRealIT : AbstractBitbucketTestSupport() {
             )
             // Checks
             assertTrue(pr.id.isNotBlank(), "PR created")
-            code(pr, headName, config)
+            code(scm, pr, headName, config)
         }
     }
 

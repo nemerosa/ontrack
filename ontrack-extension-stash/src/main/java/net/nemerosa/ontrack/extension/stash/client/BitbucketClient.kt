@@ -122,4 +122,12 @@ interface BitbucketClient {
      */
     fun isBranchExisting(repo: BitbucketRepository, branch: String): Boolean
 
+    /**
+     * Checking if a branch exists by returning its last commit or null if not existing
+     *
+     * @param branch Branch to check
+     * @return Commit hash if the branch exists, null otherwise.
+     */
+    fun geBranchLastCommit(repo: BitbucketRepository, branch: String): String?
+
 }

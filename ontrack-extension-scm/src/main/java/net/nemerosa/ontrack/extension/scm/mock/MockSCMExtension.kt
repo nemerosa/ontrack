@@ -120,6 +120,10 @@ class MockSCMExtension(
 
         fun getFile(scmBranch: String?, path: String) = files[scmBranch ?: ""]?.get(path)
 
+        fun deleteBranch(branch: String) {
+            createdBranches.remove(branch)
+        }
+
         fun createBranch(sourceBranch: String, newBranch: String): String {
             createdBranches[sourceBranch] = newBranch
             return newBranch
@@ -292,6 +296,13 @@ class MockSCMExtension(
 
         override fun getSCMBranch(branch: Branch): String? =
             propertyService.getPropertyValue(branch, MockSCMBranchPropertyType::class.java)?.name
+
+        override fun getBranchLastCommit(branch: String): String? =
+            repository(mockScmProjectProperty.name).getBranch(branch)?.lastCommit?.id
+
+        override fun deleteBranch(branch: String) {
+            repository(mockScmProjectProperty.name).deleteBranch(branch)
+        }
 
         override fun createBranch(sourceBranch: String, newBranch: String): String =
             repository(mockScmProjectProperty.name).createBranch(sourceBranch, newBranch)

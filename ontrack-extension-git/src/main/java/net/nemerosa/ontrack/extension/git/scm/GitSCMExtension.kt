@@ -67,6 +67,14 @@ class GitSCMExtension(
             return branchProperty?.branch
         }
 
+        override fun getBranchLastCommit(branch: String): String? {
+            unsupported("deleteBranch")
+        }
+
+        override fun deleteBranch(branch: String) {
+            unsupported("deleteBranch")
+        }
+
         override fun createBranch(sourceBranch: String, newBranch: String): String {
             unsupported("createBranch")
         }
