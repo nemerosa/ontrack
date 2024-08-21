@@ -4,7 +4,6 @@ import {Button, Popover, Space, Table, Typography} from "antd";
 import ValidationStamp from "@components/validationStamps/ValidationStamp";
 import ValidationRunLink from "@components/validationRuns/ValidationRunLink";
 import ValidationRunStatus from "@components/validationRuns/ValidationRunStatus";
-import Duration from "@components/common/Duration";
 import Timestamp from "@components/common/Timestamp";
 import {FaEraser, FaGavel, FaInfoCircle} from "react-icons/fa";
 import AnnotatedDescription from "@components/common/AnnotatedDescription";
@@ -14,6 +13,7 @@ import BuildValidateAction from "@components/builds/BuildValidateAction";
 import {isAuthorized} from "@components/common/authorizations";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import GridCell from "@components/grid/GridCell";
+import RunInfo from "@components/common/RunInfo";
 
 export default function BuildContentValidations({build}) {
 
@@ -144,6 +144,10 @@ export default function BuildContentValidations({build}) {
                                     runOrder
                                     runInfo {
                                         runTime
+                                        sourceType
+                                        sourceUri
+                                        triggerType
+                                        triggerData
                                     }
                                     lastStatus {
                                         creation {
@@ -248,9 +252,9 @@ export default function BuildContentValidations({build}) {
             </Popover>
         },
         {
-            title: "Duration",
-            key: 'runtime',
-            render: (_, run) => <Duration seconds={run.runInfo?.runTime}/>
+            title: "Run info",
+            key: 'run-info',
+            render: (_, run) => run.runInfo ? <RunInfo info={run.runInfo} mode="minimal"/> : undefined
         },
         {
             title: "Data",

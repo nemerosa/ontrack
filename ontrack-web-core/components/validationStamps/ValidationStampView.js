@@ -12,7 +12,6 @@ import {useGraphQLClient} from "@components/providers/ConnectionContextProvider"
 import {getValidationStampById} from "@components/services/fragments";
 import {CloseCommand} from "@components/common/Commands";
 import {branchUri} from "@components/common/Links";
-import ValidationStampImage from "@components/validationStamps/ValidationStampImage";
 import GridCell from "@components/grid/GridCell";
 import ValidationStampHistory from "@components/validationStamps/ValidationStampHistory";
 import StoredGridLayoutResetCommand from "@components/grid/StoredGridLayoutResetCommand";
