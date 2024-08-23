@@ -36,15 +36,13 @@ class LabelOnlyVersionSourceIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    fun `Build label but not configured for label`() {
+    fun `Build label but not configured for label still gives the label`() {
         project {
             branch {
                 build {
                     val label = uid("v_")
                     releaseProperty(this, label)
-                    assertFailsWith<VersionSourceNoVersionException> {
-                        source.getVersion(this, null)
-                    }
+                    assertEquals(label, source.getVersion(this, null))
                 }
             }
         }

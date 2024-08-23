@@ -25,6 +25,24 @@ fun getVersionSourceConfig(token: String?): Pair<String, String?> =
     }
 
 /**
+ * Given a build and a version source expression, returns the build's version according to this expression.
+ *
+ * @receiver The [VersionSourceFactory] service
+ * @param build The build for which to get a version
+ * @param versionSource The version source expression
+ * @return The build's version according to the AV configuration
+ */
+fun VersionSourceFactory.getBuildVersion(
+    build: Build,
+    versionSource: String?,
+): String {
+    val (id, param) = versionSource?.let {
+        getVersionSourceConfig(it)
+    } ?: (DefaultVersionSource.ID to null)
+    return getVersionSource(id).getVersion(build, param)
+}
+
+/**
  * Given a build and an AV config, returns the build's version according to this configuration.
  *
  * @receiver The [VersionSourceFactory] service
@@ -35,11 +53,21 @@ fun getVersionSourceConfig(token: String?): Pair<String, String?> =
 fun VersionSourceFactory.getBuildVersion(
     build: Build,
     config: AutoVersioningSourceConfig,
-): String {
-    val (id, param) = config.versionSource?.let {
+): String = getBuildVersion(build, config.versionSource)
+
+/**
+ * Given a source project and a version, use the `versionSource` ID to get
+ * the corresponding build.
+ */
+fun VersionSourceFactory.getBuildWithVersion(
+    sourceProject: Project,
+    versionSource: String?,
+    version: String
+): Build? {
+    val (id, param) = versionSource?.let {
         getVersionSourceConfig(it)
     } ?: (DefaultVersionSource.ID to null)
-    return getVersionSource(id).getVersion(build, param)
+    return getVersionSource(id).getBuildFromVersion(sourceProject, param, version)
 }
 
 /**
@@ -50,9 +78,4 @@ fun VersionSourceFactory.getBuildWithVersion(
     sourceProject: Project,
     config: AutoVersioningSourceConfig,
     version: String
-): Build? {
-    val (id, param) = config.versionSource?.let {
-        getVersionSourceConfig(it)
-    } ?: (DefaultVersionSource.ID to null)
-    return getVersionSource(id).getBuildFromVersion(sourceProject, param, version)
-}
+): Build? = getBuildWithVersion(sourceProject, config.versionSource, version)
