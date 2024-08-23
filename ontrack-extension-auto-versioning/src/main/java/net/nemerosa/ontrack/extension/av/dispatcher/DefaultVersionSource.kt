@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.av.dispatcher
 
-import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.BuildDisplayNameService
+import net.nemerosa.ontrack.model.structure.Project
 import org.springframework.stereotype.Component
 
 /**

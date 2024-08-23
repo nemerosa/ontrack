@@ -13,7 +13,7 @@ class LabelOnlyVersionSource(
     override val id: String = "labelOnly"
 
     override fun getVersion(build: Build, config: String?): String =
-        buildDisplayNameService.getEligibleBuildDisplayName(build) { null } ?: throw VersionSourceNoVersionException(
+        buildDisplayNameService.getFirstBuildDisplayName(build) ?: throw VersionSourceNoVersionException(
             "Build ${build.id} (${build.entityDisplayName}) was promoted, " +
                     "but is not eligible to auto versioning because no version was returned. " +
                     "This can typically be due to the fact that its project requires a label " +
