@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.scm.changelog.PromotionChangeLogTemplating
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.docs.DocumentationExampleCode
+import net.nemerosa.ontrack.model.docs.DocumentationQualifier
 import net.nemerosa.ontrack.model.events.EventRenderer
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
@@ -31,6 +32,7 @@ import org.springframework.stereotype.Component
 """
 )
 @Documentation(PromotionRunChangeLogTemplatingSourceConfig::class)
+@DocumentationQualifier("promotion-run", "PromotionRun")
 @DocumentationExampleCode("${'$'}{promotionRun.changelog}")
 class PromotionRunChangeLogTemplatingSource(
     private val promotionChangeLogTemplatingService: PromotionChangeLogTemplatingService,

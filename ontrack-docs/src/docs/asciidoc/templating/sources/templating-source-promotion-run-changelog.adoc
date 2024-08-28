@@ -1,5 +1,5 @@
-[[templating-source-changelog]]
-===== changelog
+[[templating-source-promotion-run-changelog]]
+===== PromotionRun.changelog
 
 Renders a change log for this promotion run.
 

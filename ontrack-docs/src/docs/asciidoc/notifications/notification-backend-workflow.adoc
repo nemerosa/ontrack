@@ -17,6 +17,8 @@ Configuration:
 
 *** **data** - JSON - required - Raw data associated with the node, to be used by the node executor.
 
+*** **description** - String - optional - Description of the node in its workflow.
+
 *** **executorId** - String - required - ID of the executor to use
 
 *** **id** - String - required - Unique ID of the node in its workflow.

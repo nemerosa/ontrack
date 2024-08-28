@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.extension.scm.changelog
 
 import net.nemerosa.ontrack.extension.scm.mock.MockSCMTester
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.model.structure.Build
 import org.springframework.beans.factory.annotation.Autowired
 
-abstract class AbstractSCMChangeLogTestSupport : AbstractDSLTestSupport() {
+abstract class AbstractSCMChangeLogTestSupport : AbstractQLKTITSupport() {
 
     @Autowired
     private lateinit var mockSCMTester: MockSCMTester

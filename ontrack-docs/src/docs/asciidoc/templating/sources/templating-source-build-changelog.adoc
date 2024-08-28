@@ -1,0 +1,39 @@
+[[templating-source-build-changelog]]
+===== Build.changelog
+
+Renders a change log for this build.
+
+The "to build" is the one being referred to.
+ 
+The "from build" is the build whose ID is set by the "from" parameter.
+
+If `project` is set to a comma-separated list of strings, the change log will be rendered 
+for the recursive links, in the order to the projects being set (going deeper and deeper
+in the links). 
+
+Applicable for:
+
+* build
+
+Configuration:
+
+* **allQualifiers** - Boolean - required - Loop over all qualifiers for the last level of `dependencies`, including the default one. Qualifiers at `dependencies` take precedence.
+
+* **commitsOption** - NONE, OPTIONAL, ALWAYS - required - Defines how to render commits for a change log
+
+* **defaultQualifierFallback** - Boolean - required - If a qualifier has no previous link, uses the default qualifier (empty) qualifier.
+
+* **dependencies** - List - required - Comma-separated list of project links to follow one by one for a get deep change log. Each item in the list is either a project name, or a project name and qualifier separated by a colon (:).
+
+* **empty** - String - required - String to use to render an empty or non existent change log
+
+* **from** - Int - required - ID to the build to get the change log from
+
+* **title** - Boolean - required - Include a title for the change log
+
+Example:
+
+[source]
+----
+${build.changelog?from=1}
+----

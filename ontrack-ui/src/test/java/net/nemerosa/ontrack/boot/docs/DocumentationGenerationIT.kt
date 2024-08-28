@@ -3,10 +3,11 @@ package net.nemerosa.ontrack.boot.docs
 import net.nemerosa.ontrack.extension.notifications.channels.NoTemplate
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannel
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutor
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.annotations.getAPITypeDescription
-import net.nemerosa.ontrack.model.annotations.getAPITypeName
-import net.nemerosa.ontrack.model.docs.*
+import net.nemerosa.ontrack.model.docs.DocumentationIgnore
+import net.nemerosa.ontrack.model.docs.DocumentationQualifier
+import net.nemerosa.ontrack.model.docs.getDocumentationExampleCode
+import net.nemerosa.ontrack.model.docs.getFieldsDocumentation
 import net.nemerosa.ontrack.model.events.*
 import net.nemerosa.ontrack.model.templating.TemplatingFilter
 import net.nemerosa.ontrack.model.templating.TemplatingFunction
@@ -15,7 +16,7 @@ import net.nemerosa.ontrack.model.templating.TemplatingSource
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import java.io.File
+import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.findAnnotations
 import kotlin.reflect.full.hasAnnotation
 import kotlin.test.fail
@@ -271,7 +272,7 @@ class DocumentationGenerationIT : AbstractDocumentationGenerationTestSupport() {
                 level = 4,
                 title = "List of templating sources",
                 items = templatingSources.associate { templatingSource ->
-                    getTemplatingSourceFileId(templatingSource) to templatingSource.field
+                    getTemplatingSourceFileId(templatingSource) to getTemplatingSourceTitle(templatingSource)
                 }
             )
 
@@ -379,7 +380,6 @@ class DocumentationGenerationIT : AbstractDocumentationGenerationTestSupport() {
         "templating-filter-${templatingFilter.id}"
 
     private fun generateTemplatingSource(directoryContext: DirectoryContext, templatingSource: TemplatingSource) {
-        val field = templatingSource.field
         val description = getAPITypeDescription(templatingSource::class)
         val parameters = if (templatingSource::class.hasAnnotation<DocumentationIgnore>()) {
             emptyList()
@@ -401,7 +401,7 @@ class DocumentationGenerationIT : AbstractDocumentationGenerationTestSupport() {
         directoryContext.writeFile(
             fileId = fileId,
             level = 5,
-            title = field,
+            title = getTemplatingSourceTitle(templatingSource),
             header = description,
             fields = parameters,
             example = example,
@@ -415,7 +415,22 @@ class DocumentationGenerationIT : AbstractDocumentationGenerationTestSupport() {
         )
     }
 
-    private fun getTemplatingSourceFileId(templatingSource: TemplatingSource) =
-        "templating-source-${templatingSource.field}"
+    private fun getTemplatingSourceFileId(templatingSource: TemplatingSource): String {
+        val qualifier = templatingSource::class.findAnnotation<DocumentationQualifier>()?.value
+        if (qualifier.isNullOrBlank()) {
+            return "templating-source-${templatingSource.field}"
+        } else {
+            return "templating-source-${qualifier}-${templatingSource.field}"
+        }
+    }
+
+    private fun getTemplatingSourceTitle(templatingSource: TemplatingSource): String {
+        val qualifier = templatingSource::class.findAnnotation<DocumentationQualifier>()
+        if (qualifier == null) {
+            return templatingSource.field
+        } else {
+            return "${qualifier.name}.${templatingSource.field}"
+        }
+    }
 
 }
