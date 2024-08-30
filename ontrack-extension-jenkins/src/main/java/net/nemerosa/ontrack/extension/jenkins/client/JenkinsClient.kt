@@ -11,7 +11,13 @@ interface JenkinsClient {
     /**
      * Runs a job remotely and waits for its completion.
      */
-    fun runJob(job: String, parameters: Map<String, String>, retries: Int, retriesDelaySeconds: Int): JenkinsBuild
+    fun runJob(
+        job: String,
+        parameters: Map<String, String>,
+        retries: Int,
+        retriesDelaySeconds: Int,
+        buildFeedback: (build: JenkinsBuild) -> Unit,
+    ): JenkinsBuild
 
     /**
      * Fires and forgets a job.

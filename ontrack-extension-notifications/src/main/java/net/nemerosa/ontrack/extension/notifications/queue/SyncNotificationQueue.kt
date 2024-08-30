@@ -23,7 +23,7 @@ class SyncNotificationQueue(
                 notificationQueueItemConverter.convertForQueue(item)
             ),
             context = emptyMap()
-        )
+        ) {}
         // OK
         return true
     }

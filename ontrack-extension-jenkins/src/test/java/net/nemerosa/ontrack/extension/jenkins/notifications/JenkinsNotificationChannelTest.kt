@@ -12,7 +12,6 @@ import net.nemerosa.ontrack.extension.notifications.channels.NotificationResultT
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventFactoryImpl
 import net.nemerosa.ontrack.model.events.EventTemplatingService
-import net.nemerosa.ontrack.model.events.EventVariableService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.BeforeEach
@@ -125,7 +124,7 @@ class JenkinsNotificationChannelTest {
             result = "SUCCESS",
         )
 
-        every { jenkinsClient.runJob(JOB, emptyMap(), any(), any()) } returns jenkinsBuild
+        every { jenkinsClient.runJob(JOB, emptyMap(), any(), any(), any()) } returns jenkinsBuild
 
         val result = jenkinsNotificationChannel.publish(config, event, emptyMap(), null) { it }
 
@@ -150,7 +149,7 @@ class JenkinsNotificationChannelTest {
             result = "FAILURE",
         )
 
-        every { jenkinsClient.runJob(JOB, emptyMap(), any(), any()) } returns jenkinsBuild
+        every { jenkinsClient.runJob(JOB, emptyMap(), any(), any(), any()) } returns jenkinsBuild
 
         val result = jenkinsNotificationChannel.publish(config, event, emptyMap(), null) { it }
 

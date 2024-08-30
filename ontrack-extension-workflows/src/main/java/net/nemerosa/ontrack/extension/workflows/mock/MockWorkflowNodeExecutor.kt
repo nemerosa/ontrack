@@ -44,7 +44,8 @@ class MockWorkflowNodeExecutor(
 
     override suspend fun execute(
         workflowInstance: WorkflowInstance,
-        workflowNodeId: String
+        workflowNodeId: String,
+        workflowNodeExecutorResultFeedback: (output: JsonNode?) -> Unit,
     ): WorkflowNodeExecutorResult {
         // Gets the node & its data
         val nodeRawData = workflowInstance.workflow.getNode(workflowNodeId).data

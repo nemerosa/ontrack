@@ -85,6 +85,7 @@ class DefaultJenkinsClient(
         parameters: Map<String, String>,
         retries: Int,
         retriesDelaySeconds: Int,
+        buildFeedback: (build: JenkinsBuild) -> Unit,
     ): JenkinsBuild {
         val retriesDelay = Duration.ofSeconds(retriesDelaySeconds.toLong())
         return runBlocking {
@@ -106,7 +107,13 @@ class DefaultJenkinsClient(
                 // Waits for its completion
                 untilTimeout("Waiting for build completion at ${executable.url(path)}", retries, retriesDelay) {
                     logger.debug("build={},job={},path={},parameters={}", executable.number, job, path, parameters)
-                    getBuildStatus(path, executable)
+                    val build = getBuildStatus(path, executable)
+                    // Feedback
+                    if (build != null) {
+                        buildFeedback(build)
+                    }
+                    // Going on
+                    build
                 }
             }
         }

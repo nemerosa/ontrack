@@ -8,8 +8,11 @@ import net.nemerosa.ontrack.kdsl.spec.extension.jenkins.jenkins
 import net.nemerosa.ontrack.kdsl.spec.extension.notifications.notifications
 import net.nemerosa.ontrack.kdsl.spec.extension.workflows.WorkflowInstanceNodeStatus
 import net.nemerosa.ontrack.kdsl.spec.extension.workflows.WorkflowInstanceStatus
+import net.nemerosa.ontrack.kdsl.spec.extension.workflows.workflows
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 import kotlin.test.fail
 
 class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
@@ -58,14 +61,6 @@ class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
             // Creating a branch to trigger the workflow
             branch {}
 
-            // Gets the workflow instance ID from the output of the notification
-
-            fun getWorkflowInstanceId() = ontrack.notifications.notificationRecordsOutputs("workflow")
-                .firstOrNull()
-                ?.output
-                ?.path("workflowInstanceId")
-                ?.asText()
-
             waitUntil(
                 timeout = 30_000,
                 interval = 500L,
@@ -98,6 +93,88 @@ class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
                 message?.trim() == "Message for PRJ-123 in project $name"
             }
         }
+    }
+
+    @Test
+    fun `Workflow node contains the build URL while the node is running`() {
+        // Job to call
+        val job = uid("job_")
+        // Jenkins configuration
+        val jenkinsConfName = uid("j_")
+        ontrack.configurations.jenkins.create(
+            JenkinsConfiguration(
+                name = jenkinsConfName,
+                url = "any",
+                user = "any",
+                password = "any",
+            )
+        )
+        // Defining a workflow
+        val workflowName = uid("w-")
+        val yaml = """
+            name: $workflowName
+            nodes:
+                - id: start
+                  executorId: notification
+                  data:
+                    channel: mock-jenkins
+                    channelConfig:
+                        config: $jenkinsConfName
+                        job: /mock/$job
+                        callMode: SYNC
+                        parameters:
+                            - name: waiting
+                              value: 5000
+        """.trimIndent()
+
+
+
+        project {
+            // Subscribe to new branches
+            subscribe(
+                name = "Test",
+                channel = "workflow",
+                channelConfig = mapOf(
+                    "workflow" to WorkflowTestSupport.yamlWorkflowToJson(yaml)
+                ),
+                keywords = null,
+                events = listOf(
+                    "new_branch",
+                ),
+            )
+            // Creating a branch to trigger the workflow
+            branch {}
+
+            // Gets the workflow instance ID from the output of the notification
+
+
+            waitUntil(
+                timeout = 30_000L,
+                interval = 500L,
+            ) {
+                val instanceId = getWorkflowInstanceId()
+                instanceId.isNullOrBlank().not()
+            }
+
+            // Getting the instance ID
+            val instanceId = getWorkflowInstanceId() ?: fail("Cannot get the workflow instance ID")
+
+            // Checks that the node is marked as ongoing & contains the build URL
+            waitUntil(interval = 500L, timeout = 2_000L, task = "Waiting for the build URL") {
+                val instance = ontrack.workflows.workflowInstance(instanceId) ?: fail("Instance not found")
+                val output = instance.getExecutionOutput("start") ?: return@waitUntil false
+                val buildUrl = output.path("buildUrl").asText()
+                !buildUrl.isNullOrBlank()
+            }
+            // Waiting for the workflow result
+            val instance = waitUntilWorkflowFinished(instanceId)
+            // Checks that the node is marked as success & contains the build URL
+            assertNotNull(instance.getExecutionOutput("start"), "Output filled in") { output ->
+                val buildUrl = output.path("buildUrl").asText()
+                assertTrue(buildUrl.isNotBlank(), "Build URL must not be blank")
+            }
+        }
+
     }
 
     @Test
@@ -157,14 +234,6 @@ class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
                     // Promoting to trigger the worflow
                     promote(pl.name)
 
-                    // Gets the workflow instance ID from the output of the notification
-
-                    fun getWorkflowInstanceId() = ontrack.notifications.notificationRecordsOutputs("workflow")
-                        .firstOrNull()
-                        ?.output
-                        ?.path("workflowInstanceId")
-                        ?.asText()
-
                     waitUntil(
                         timeout = 30_000,
                         interval = 500L,
@@ -190,5 +259,14 @@ class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
             }
         }
     }
+
+    /**
+     * Gets the workflow instance ID from the output of the notification
+     */
+    private fun getWorkflowInstanceId() = ontrack.notifications.notificationRecordsOutputs("workflow")
+        .firstOrNull()
+        ?.output
+        ?.path("workflowInstanceId")
+        ?.asText()
 
 }

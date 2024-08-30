@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.jenkins.mock
 
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.extension.jenkins.JenkinsConfiguration
 import net.nemerosa.ontrack.extension.jenkins.client.AbstractJenkinsClient
 import net.nemerosa.ontrack.extension.jenkins.client.JenkinsBuild
@@ -21,10 +23,27 @@ class MockJenkinsClient(
         job: String,
         parameters: Map<String, String>,
         retries: Int,
-        retriesDelaySeconds: Int
+        retriesDelaySeconds: Int,
+        buildFeedback: (build: JenkinsBuild) -> Unit,
     ): JenkinsBuild {
         val build = jobs.getOrPut(job) { MockJenkinsJob(job) }.build(parameters)
         val result = parameters[PARAM_RESULT] ?: "SUCCESS"
+        val waiting: Long? = parameters[PARAM_WAITING]?.toLong()
+        if (waiting != null) {
+            // Creating the ongoing build
+            val ongoingBuild = JenkinsBuild(
+                id = build.number.toString(),
+                building = true,
+                url = "$url/$job/${build.number}",
+                result = null,
+            )
+            // Feedback
+            buildFeedback(ongoingBuild)
+            // Waiting
+            runBlocking {
+                delay(waiting)
+            }
+        }
         return JenkinsBuild(
             id = build.number.toString(),
             building = false,
@@ -44,5 +63,6 @@ class MockJenkinsClient(
 
     companion object {
         private const val PARAM_RESULT = "result"
+        private const val PARAM_WAITING = "waiting"
     }
 }

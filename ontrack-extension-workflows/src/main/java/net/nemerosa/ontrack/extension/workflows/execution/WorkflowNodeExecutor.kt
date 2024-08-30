@@ -29,6 +29,7 @@ interface WorkflowNodeExecutor : Extension {
     suspend fun execute(
         workflowInstance: WorkflowInstance,
         workflowNodeId: String,
+        workflowNodeExecutorResultFeedback: (output: JsonNode?) -> Unit,
     ): WorkflowNodeExecutorResult
 
 }

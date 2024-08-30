@@ -88,6 +88,10 @@ data class WorkflowInstance(
         node.error(throwable, message)
     }
 
+    fun progressNode(nodeId: String, output: JsonNode) = updateNode(nodeId) { node ->
+        node.progress(output)
+    }
+
     fun getNode(nodeId: String) = nodesExecutions.firstOrNull { it.id == nodeId }
         ?: throw WorkflowNodeNotFoundException(nodeId)
 

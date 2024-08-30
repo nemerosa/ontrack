@@ -28,12 +28,16 @@ class DefaultNotificationProcessingService(
     private val transactionHelper: TransactionHelper,
 ) : NotificationProcessingService {
 
-    override fun process(item: Notification, context: Map<String, Any>): NotificationResult<*>? {
+    override fun process(
+        item: Notification,
+        context: Map<String, Any>,
+        outputFeedback: (output: Any?) -> Unit,
+    ): NotificationResult<*>? {
         meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_started, item)
         val channel = notificationChannelRegistry.findChannel(item.channel)
         if (channel != null) {
             meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_started, item)
-            return process(channel, item, context)
+            return process(channel, item, context, outputFeedback)
         } else {
             meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_unknown, item)
             return null
@@ -43,7 +47,8 @@ class DefaultNotificationProcessingService(
     private fun <C, R> process(
         channel: NotificationChannel<C, R>,
         item: Notification,
-        context: Map<String, Any>
+        context: Map<String, Any>,
+        outputFeedback: (output: R) -> Unit,
     ): NotificationResult<R>? {
 
         // Unique ID for the record
@@ -62,6 +67,8 @@ class DefaultNotificationProcessingService(
                     validatedConfig = validatedConfig.config.asJson(),
                     result = NotificationResult.ongoing(output),
                 )
+                // Feedback
+                outputFeedback(current)
                 // OK, returning the new value
                 current
             }

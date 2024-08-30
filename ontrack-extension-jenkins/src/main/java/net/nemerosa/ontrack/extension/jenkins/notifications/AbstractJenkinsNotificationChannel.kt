@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.jenkins.notifications
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.jenkins.JenkinsConfiguration
 import net.nemerosa.ontrack.extension.jenkins.JenkinsConfigurationService
+import net.nemerosa.ontrack.extension.jenkins.client.JenkinsBuild
 import net.nemerosa.ontrack.extension.jenkins.client.JenkinsClient
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
@@ -57,7 +58,11 @@ abstract class AbstractJenkinsNotificationChannel(
         // Running the job
         val (error, buildUrl) = when (config.callMode) {
             JenkinsNotificationChannelConfigCallMode.ASYNC -> launchAsync(jenkinsClient, job, parameters)
-            JenkinsNotificationChannelConfigCallMode.SYNC -> launchSync(jenkinsClient, job, config.timeout, parameters)
+            JenkinsNotificationChannelConfigCallMode.SYNC -> launchSync(jenkinsClient, job, config.timeout, parameters) { build ->
+                output = outputProgressCallback(
+                    output.withBuildUrl(build.url)
+                )
+            }
         }
         // Output
         output = outputProgressCallback(
@@ -82,7 +87,8 @@ abstract class AbstractJenkinsNotificationChannel(
         jenkinsClient: JenkinsClient,
         job: String,
         timeout: Int,
-        parameters: Map<String, String>
+        parameters: Map<String, String>,
+        buildFeedback: (build: JenkinsBuild) -> Unit,
     ): JobLaunchResult {
         val interval = 30 // seconds
         val retries = timeout / interval
@@ -91,6 +97,7 @@ abstract class AbstractJenkinsNotificationChannel(
             parameters = parameters,
             retries = retries,
             retriesDelaySeconds = interval,
+            buildFeedback = buildFeedback,
         )
         return if (build.successful) {
             JobLaunchResult(

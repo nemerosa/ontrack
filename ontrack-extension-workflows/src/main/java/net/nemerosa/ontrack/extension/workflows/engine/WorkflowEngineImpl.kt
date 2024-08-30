@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.workflows.engine
 
+import com.fasterxml.jackson.databind.JsonNode
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
@@ -9,6 +10,7 @@ import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowValidation
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorResultType
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorService
+import net.nemerosa.ontrack.model.tx.TransactionHelper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -23,6 +25,7 @@ class WorkflowEngineImpl(
     private val workflowQueueProcessor: WorkflowQueueProcessor,
     private val workflowNodeExecutorService: WorkflowNodeExecutorService,
     private val workflowQueueSourceExtension: WorkflowQueueSourceExtension,
+    private val transactionHelper: TransactionHelper,
 ) : WorkflowEngine {
 
     private val logger: Logger = LoggerFactory.getLogger(WorkflowEngine::class.java)
@@ -92,11 +95,21 @@ class WorkflowEngineImpl(
                 val executor = workflowNodeExecutorService.getExecutor(node.executorId)
                 // Timeout
                 val timeout = Duration.ofSeconds(node.timeout)
+
+                // Continuous feedback for the node
+                val nodeFeedback: (JsonNode?) -> Unit = { output: JsonNode? ->
+                    if (output != null) {
+                        transactionHelper.inNewTransaction {
+                            workflowInstanceStore.store(instance.progressNode(node.id, output))
+                        }
+                    }
+                }
+
                 // Running the executor
                 val result = runBlocking {
                     withTimeoutOrNull(timeout.toMillis()) {
                         val deferred = async {
-                            executor.execute(instance, node.id)
+                            executor.execute(instance, node.id, nodeFeedback)
                         }
                         deferred.await()
                     }

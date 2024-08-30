@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.workflows.notifications
 
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResultType
 import net.nemerosa.ontrack.extension.notifications.processing.NotificationProcessingService
 import net.nemerosa.ontrack.extension.notifications.queue.NotificationQueueItem
@@ -55,7 +56,8 @@ class WorkflowNotificationChannelNodeExecutor(
 
     override suspend fun execute(
         workflowInstance: WorkflowInstance,
-        workflowNodeId: String
+        workflowNodeId: String,
+        workflowNodeExecutorResultFeedback: (output: JsonNode?) -> Unit,
     ): WorkflowNodeExecutorResult {
         // Gets the node's data
         val (channel, channelConfig, template) = workflowInstance.workflow.getNode(workflowNodeId).data.parse<WorkflowNotificationChannelNodeData>()
@@ -74,8 +76,12 @@ class WorkflowNotificationChannelNodeExecutor(
             "workflow" to WorkflowTemplatingRenderable(workflowInstance),
             "workflowInfo" to WorkflowInfoTemplatingRenderable(workflowInstance),
         )
+        // Feedback
+        val outputFeedback = { output: Any? ->
+            workflowNodeExecutorResultFeedback(output?.asJson())
+        }
         // Processing
-        val result = notificationProcessingService.process(notification, context)
+        val result = notificationProcessingService.process(notification, context, outputFeedback)
         // Result of the execution
         return if (result != null) {
             when (result.type) {

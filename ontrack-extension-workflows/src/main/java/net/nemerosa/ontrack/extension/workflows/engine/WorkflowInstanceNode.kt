@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.workflows.engine
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.common.reducedStackTrace
 import java.time.Duration
 import java.time.LocalDateTime
 
@@ -53,6 +52,15 @@ data class WorkflowInstanceNode(
         status = WorkflowInstanceNodeStatus.SUCCESS,
         startTime = startTime,
         endTime = time,
+        output = output,
+        error = null,
+    )
+
+    fun progress(output: JsonNode) = WorkflowInstanceNode(
+        id = id,
+        status = status,
+        startTime = startTime,
+        endTime = endTime,
         output = output,
         error = null,
     )

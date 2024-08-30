@@ -80,7 +80,7 @@ class JenkinsPostProcessing(
             parameters,
             settings.retries,
             settings.retriesDelaySeconds
-        )
+        ) {}
 
         // Check for success
         if (!jenkinsBuild.successful) {
