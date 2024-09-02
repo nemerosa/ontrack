@@ -157,6 +157,7 @@ export default function ConfigurationPage({
                     dataSource={configurations}
                     columns={[...columns, actionsColumn]}
                     rowKey={(configuration) => `config-${configuration.name}`}
+                    pagination={false}
                 />
             </StandardPage>
             <ConfigurationDialog configurationDialog={dialog}/>
