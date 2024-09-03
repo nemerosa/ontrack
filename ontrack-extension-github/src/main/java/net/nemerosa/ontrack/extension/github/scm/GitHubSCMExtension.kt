@@ -111,7 +111,9 @@ class GitHubSCMExtension(
         }
 
         override fun deleteBranch(branch: String) {
-            client.deleteBranch(repository, branch)
+            if (client.getBranchLastCommit(repository, branch, retryOnNotFound = false) != null) {
+                client.deleteBranch(repository, branch)
+            }
         }
 
         override fun createBranch(sourceBranch: String, newBranch: String): String {
