@@ -43,8 +43,8 @@ class BuildChangeLogTemplatingSource(
             val fromId = configMap.getRequiredTemplatingParam(BuildChangeLogTemplatingSourceConfig::from.name).toInt()
             val from = structureService.getBuild(ID.of(fromId))
             changeLogTemplatingService.render(
-                fromBuild = entity,
-                toBuild = from,
+                fromBuild = from,
+                toBuild = entity,
                 configMap = configMap,
                 renderer = renderer,
             )
