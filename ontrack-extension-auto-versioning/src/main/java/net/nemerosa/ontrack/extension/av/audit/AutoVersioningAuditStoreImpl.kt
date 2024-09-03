@@ -14,7 +14,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
-import kotlin.jvm.optionals.getOrNull
 
 /**
  * Auto versioning audit store based on the entity data store of the source project.
@@ -103,6 +102,7 @@ class AutoVersioningAuditStoreImpl(
                     prTitleTemplate = prTitleTemplate,
                     prBodyTemplate = prBodyTemplate,
                     prBodyTemplateFormat = prBodyTemplateFormat,
+                    additionalPaths = additionalPaths,
                 )
             }
         )
@@ -158,6 +158,7 @@ class AutoVersioningAuditStoreImpl(
                         prTitleTemplate = prTitleTemplate,
                         prBodyTemplate = prBodyTemplate,
                         prBodyTemplateFormat = prBodyTemplateFormat,
+                        additionalPaths = additionalPaths,
                     )
                 }
             }
@@ -230,6 +231,7 @@ class AutoVersioningAuditStoreImpl(
                     prTitleTemplate = prTitleTemplate,
                     prBodyTemplate = prBodyTemplate,
                     prBodyTemplateFormat = prBodyTemplateFormat,
+                    additionalPaths = additionalPaths,
                 ),
                 audit = states,
                 routing = routing,

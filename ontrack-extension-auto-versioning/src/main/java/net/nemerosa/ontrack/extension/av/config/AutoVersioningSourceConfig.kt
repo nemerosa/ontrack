@@ -56,6 +56,8 @@ data class AutoVersioningSourceConfig(
     val prBodyTemplate: String?,
     @APIDescription("Template format for the body of the pull request (plain by default, html, markdown as possible values)")
     val prBodyTemplateFormat: String?,
+    @APIDescription("Additional paths to change")
+    val additionalPaths: List<AutoVersioningSourceConfigPath>? = null,
 ) : AutoVersioningTargetConfig {
 
     /**
@@ -63,6 +65,20 @@ data class AutoVersioningSourceConfig(
      */
     @JsonIgnore
     fun getTargetPaths(): List<String> = targetPath.split(",").map { it.trim() }
+
+    /**
+     * Gets the default path
+     */
+    @get:JsonIgnore
+    val defaultPath: AutoVersioningSourceConfigPath = AutoVersioningSourceConfigPath(
+        path = targetPath,
+        regex = targetRegex,
+        property = targetProperty,
+        propertyRegex = targetPropertyRegex,
+        propertyType = targetPropertyType,
+        versionSource = versionSource,
+    )
+
 
     /**
      * Validates that this configuration is consistent. Checks that at least the regex or the property is set,

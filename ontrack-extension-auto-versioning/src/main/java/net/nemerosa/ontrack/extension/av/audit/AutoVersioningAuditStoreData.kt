@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.av.audit
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.av.config.AutoApprovalMode
+import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfigPath
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class AutoVersioningAuditStoreData(
@@ -31,6 +32,7 @@ data class AutoVersioningAuditStoreData(
     val prTitleTemplate: String?,
     val prBodyTemplate: String?,
     val prBodyTemplateFormat: String?,
+    val additionalPaths: List<AutoVersioningSourceConfigPath>?,
 ) {
     val mostRecentState
         get() = states.first().state
@@ -64,5 +66,6 @@ data class AutoVersioningAuditStoreData(
         prTitleTemplate = prTitleTemplate,
         prBodyTemplate = prBodyTemplate,
         prBodyTemplateFormat = prBodyTemplateFormat,
+        additionalPaths = additionalPaths,
     )
 }

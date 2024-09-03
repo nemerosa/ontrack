@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.av.dispatcher
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.av.config.AutoApprovalMode
+import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfigPath
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningTargetConfig
 import net.nemerosa.ontrack.model.structure.Branch
 
@@ -32,6 +33,7 @@ data class AutoVersioningOrder(
     val prTitleTemplate: String?,
     val prBodyTemplate: String?,
     val prBodyTemplateFormat: String?,
+    val additionalPaths: List<AutoVersioningSourceConfigPath>?,
 ) : AutoVersioningTargetConfig {
     /**
      * Gets a meaningful commit message for this order

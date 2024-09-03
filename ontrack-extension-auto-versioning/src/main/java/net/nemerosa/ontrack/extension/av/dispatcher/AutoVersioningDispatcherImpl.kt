@@ -84,6 +84,7 @@ class AutoVersioningDispatcherImpl(
                 prTitleTemplate = config.prTitleTemplate,
                 prBodyTemplate = config.prBodyTemplate,
                 prBodyTemplateFormat = config.prBodyTemplateFormat,
+                additionalPaths = config.additionalPaths,
             )
         } catch (ex: Exception) {
             // Logging the event
