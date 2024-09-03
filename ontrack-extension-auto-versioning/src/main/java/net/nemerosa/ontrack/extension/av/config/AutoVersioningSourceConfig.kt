@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.av.config
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.graphql.support.IgnoreRef
 import net.nemerosa.ontrack.graphql.support.ListRef
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import org.apache.commons.codec.digest.DigestUtils
@@ -57,6 +58,7 @@ data class AutoVersioningSourceConfig(
     @APIDescription("Template format for the body of the pull request (plain by default, html, markdown as possible values)")
     val prBodyTemplateFormat: String?,
     @APIDescription("Additional paths to change")
+    @ListRef(embedded = true, suffix = "Input")
     val additionalPaths: List<AutoVersioningSourceConfigPath>? = null,
 ) : AutoVersioningTargetConfig {
 
@@ -70,6 +72,7 @@ data class AutoVersioningSourceConfig(
      * Gets the default path
      */
     @get:JsonIgnore
+    @IgnoreRef
     val defaultPath: AutoVersioningSourceConfigPath = AutoVersioningSourceConfigPath(
         path = targetPath,
         regex = targetRegex,
