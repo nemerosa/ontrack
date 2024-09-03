@@ -45,6 +45,17 @@ class DefaultOntrackGitHubClientIT {
     }
 
     @Test
+    fun `Checking a non existing branch`() {
+        val branch = uid("test-")
+        val commit = client.getBranchLastCommit(
+            repository = githubTestEnv.fullRepository,
+            branch = branch,
+            retryOnNotFound = false,
+        )
+        assertNull(commit, "Branch does not exist")
+    }
+
+    @Test
     fun `Creating and deleting a branch`() {
         val branch = uid("test-")
         // Existing HEAD commit
