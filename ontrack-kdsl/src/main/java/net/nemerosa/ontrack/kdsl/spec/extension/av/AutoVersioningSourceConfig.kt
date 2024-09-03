@@ -25,4 +25,5 @@ data class AutoVersioningSourceConfig(
     val prTitleTemplate: String? = null,
     val prBodyTemplate: String? = null,
     val prBodyTemplateFormat: String? = null,
+    val additionalPaths: List<AutoVersioningSourceConfigPath>? = null,
 )
