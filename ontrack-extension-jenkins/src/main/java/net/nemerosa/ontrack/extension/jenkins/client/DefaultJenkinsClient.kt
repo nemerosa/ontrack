@@ -107,13 +107,13 @@ class DefaultJenkinsClient(
                 // Waits for its completion
                 untilTimeout("Waiting for build completion at ${executable.url(path)}", retries, retriesDelay) {
                     logger.debug("build={},job={},path={},parameters={}", executable.number, job, path, parameters)
-                    val build = getBuildStatus(path, executable)
+                    val build = getBuild(path, executable)
                     // Feedback
                     if (build != null) {
                         buildFeedback(build)
                     }
                     // Going on
-                    build
+                    build?.takeIf { !build.building }
                 }
             }
         }
@@ -138,9 +138,11 @@ class DefaultJenkinsClient(
         }
     }
 
-    private fun getBuildStatus(job: String, buildId: JenkinsBuildId): JenkinsBuild? {
+    private fun getBuild(
+        job: String,
+        buildId: JenkinsBuildId,
+    ): JenkinsBuild? {
         val buildInfoUrl = "${buildId.url(job)}/api/json"
-        val build: JenkinsBuild? = client.getForObject(buildInfoUrl, JenkinsBuild::class.java)
-        return build?.takeIf { !build.building }
+        return client.getForObject(buildInfoUrl, JenkinsBuild::class.java)
     }
 }
