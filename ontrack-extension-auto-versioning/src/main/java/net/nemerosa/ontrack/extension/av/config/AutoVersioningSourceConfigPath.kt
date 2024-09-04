@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.av.config
 
+import net.nemerosa.ontrack.graphql.support.IgnoreRef
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APIIgnore
 
@@ -19,6 +20,7 @@ data class AutoVersioningSourceConfigPath(
     val versionSource: String? = null,
 ) {
     @APIIgnore
+    @IgnoreRef
     val paths: List<String> = toPaths(path)
 
     companion object {
