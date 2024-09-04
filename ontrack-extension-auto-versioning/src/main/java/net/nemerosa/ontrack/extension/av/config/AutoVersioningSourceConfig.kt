@@ -18,13 +18,13 @@ data class AutoVersioningSourceConfig(
     @APIDescription("Comma-separated list of file to update with the new version")
     val targetPath: String,
     @APIDescription("Regex to use in the target file to identify the line to replace with the new version. The first matching group must be the version.")
-    override val targetRegex: String? = null,
+    val targetRegex: String? = null,
     @APIDescription("Optional replacement for the regex, using only a property name")
-    override val targetProperty: String? = null,
+    val targetProperty: String? = null,
     @APIDescription("Optional regex to use on the targetProperty value")
-    override val targetPropertyRegex: String? = null,
+    val targetPropertyRegex: String? = null,
     @APIDescription("When targetProperty is defined, defines the type of property (defaults to Java properties file, but could be NPM, etc.)")
-    override val targetPropertyType: String? = null,
+    val targetPropertyType: String? = null,
     @APIDescription("Check if the PR must be approved automatically or not (`true` by default)")
     val autoApproval: Boolean? = null,
     @APIDescription("Prefix to use for the upgrade branch in Git, defaults to `feature/auto-upgrade-<project>-<version>-<branch>`")
@@ -60,7 +60,7 @@ data class AutoVersioningSourceConfig(
     @APIDescription("Additional paths to change")
     @ListRef(embedded = true, suffix = "Input")
     val additionalPaths: List<AutoVersioningSourceConfigPath>? = null,
-) : AutoVersioningTargetConfig {
+) {
 
     /**
      * Gets the default path
