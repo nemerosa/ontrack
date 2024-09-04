@@ -172,6 +172,7 @@ data class AutoVersioningSourceConfig(
             prTitleTemplate = prTitleTemplate,
             prBodyTemplate = prBodyTemplate,
             prBodyTemplateFormat = prBodyTemplateFormat,
+            additionalPaths = additionalPaths,
         )
 
 }

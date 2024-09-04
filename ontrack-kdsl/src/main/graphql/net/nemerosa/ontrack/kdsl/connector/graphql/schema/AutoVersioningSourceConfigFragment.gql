@@ -22,4 +22,12 @@ fragment AutoVersioningSourceConfigFragment on AutoVersioningSourceConfig {
     prTitleTemplate
     prBodyTemplate
     prBodyTemplateFormat
+    additionalPaths {
+        path
+        regex
+        property
+        propertyRegex
+        propertyType
+        versionSource
+    }
 }

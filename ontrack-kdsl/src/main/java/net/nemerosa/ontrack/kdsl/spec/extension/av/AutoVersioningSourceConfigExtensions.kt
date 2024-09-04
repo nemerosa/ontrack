@@ -35,4 +35,14 @@ fun AutoVersioningSourceConfigFragment.toAutoVersioningSourceConfig() =
         prTitleTemplate = prTitleTemplate(),
         prBodyTemplate = prBodyTemplate(),
         prBodyTemplateFormat = prBodyTemplateFormat(),
+        additionalPaths = additionalPaths()?.map {
+            AutoVersioningSourceConfigPath(
+                path = it.path(),
+                regex = it.regex(),
+                property = it.property(),
+                propertyRegex = it.propertyRegex(),
+                propertyType = it.propertyType(),
+                versionSource = it.versionSource(),
+            )
+        }
     )

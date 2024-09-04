@@ -1085,6 +1085,18 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "promotionRun",
+              "description": "Promotion which triggered the auto-versioning",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "PromotionRun",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "inputFields": null,
@@ -2077,6 +2089,26 @@
           "description": "Configuration of the auto versioning for one source.",
           "fields": [
             {
+              "name": "additionalPaths",
+              "description": "Additional paths to change",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "AutoVersioningSourceConfigPath",
+                    "ofType": null
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "autoApproval",
               "description": "Check if the PR must be approved automatically or not (`true` by default)",
               "args": [],
@@ -2397,6 +2429,24 @@
           "fields": null,
           "inputFields": [
             {
+              "name": "additionalPaths",
+              "description": "Additional paths to change",
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "AutoVersioningSourceConfigPathInput",
+                    "ofType": null
+                  }
+                }
+              },
+              "defaultValue": null
+            },
+            {
               "name": "autoApproval",
               "description": "Check if the PR must be approved automatically or not (`true` by default)",
               "type": {
@@ -2641,6 +2691,168 @@
             {
               "name": "validationStamp",
               "description": "Validation stamp to create on auto versioning (optional)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "versionSource",
+              "description": "Source of the version for the build. By default, uses the build label is the source project is configured so, or the build name itself. This allows the customization of this behavior.",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "AutoVersioningSourceConfigPath",
+          "description": "Configuration for an additional path in an auto-versioning configuration.",
+          "fields": [
+            {
+              "name": "path",
+              "description": "Comma-separated list of file to update with the new version",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "property",
+              "description": "Optional replacement for the regex, using only a property name",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "propertyRegex",
+              "description": "Optional regex to use on the property value",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "propertyType",
+              "description": "When property is defined, defines the type of property (defaults to Java properties file, but could be NPM, etc.)",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "regex",
+              "description": "Regex to use in the target file to identify the line to replace with the new version. The first matching group must be the version.",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "versionSource",
+              "description": "Source of the version for the build. By default, uses the build label is the source project is configured so, or the build name itself. This allows the customization of this behavior.",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "AutoVersioningSourceConfigPathInput",
+          "description": null,
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "path",
+              "description": "Comma-separated list of file to update with the new version",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "property",
+              "description": "Optional replacement for the regex, using only a property name",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "propertyRegex",
+              "description": "Optional regex to use on the property value",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "propertyType",
+              "description": "When property is defined, defines the type of property (defaults to Java properties file, but could be NPM, etc.)",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "regex",
+              "description": "Regex to use in the target file to identify the line to replace with the new version. The first matching group must be the version.",
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
@@ -4914,6 +5126,43 @@
                       "name": "EntityInformation"
                     }
                   }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "render",
+              "description": "Renders a template for this build",
+              "args": [
+                {
+                  "name": "format",
+                  "description": "Format of the rendering",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "template",
+                  "description": "Template for the rendering",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
                 }
               },
               "isDeprecated": false,
@@ -39625,6 +39874,26 @@
                     "ofType": null
                   },
                   "defaultValue": null
+                },
+                {
+                  "name": "eventEntityType",
+                  "description": "Filtering on the entity type targeted by the event (eventEntityId must be provided as well)",
+                  "type": {
+                    "kind": "ENUM",
+                    "name": "ProjectEntityType",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "eventEntityId",
+                  "description": "Filtering on the entity ID targeted by the event (eventEntityType must be provided as well)",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  },
+                  "defaultValue": null
                 }
               ],
               "type": {
@@ -40135,6 +40404,29 @@
                 "kind": "OBJECT",
                 "name": "SCMChangeLog",
                 "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "issueServiceConfigurations",
+              "description": "List of issue services",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "IssueServiceConfigurationRepresentation"
+                    }
+                  }
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null

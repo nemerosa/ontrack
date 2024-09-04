@@ -7,7 +7,8 @@ import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfigPath
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningTargetFileService
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
-import net.nemerosa.ontrack.extension.av.dispatcher.VersionSourceFactoryImpl
+import net.nemerosa.ontrack.extension.av.dispatcher.VersionSourceFactory
+import net.nemerosa.ontrack.extension.av.dispatcher.getBuildVersion
 import net.nemerosa.ontrack.extension.av.event.AutoVersioningEventService
 import net.nemerosa.ontrack.extension.av.metrics.AutoVersioningMetricsService
 import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessing
@@ -17,7 +18,10 @@ import net.nemerosa.ontrack.extension.av.properties.FilePropertyType
 import net.nemerosa.ontrack.extension.scm.service.SCM
 import net.nemerosa.ontrack.extension.scm.service.SCMDetector
 import net.nemerosa.ontrack.extension.scm.service.uploadLines
+import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.NameDescription
+import net.nemerosa.ontrack.model.structure.StructureService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -34,7 +38,8 @@ class AutoVersioningProcessingServiceImpl(
     private val autoVersioningEventService: AutoVersioningEventService,
     private val autoVersioningCompletionListeners: MutableList<out AutoVersioningCompletionListener>,
     private val autoVersioningTemplatingService: AutoVersioningTemplatingService,
-    private val versionSourceFactoryImpl: VersionSourceFactoryImpl,
+    private val versionSourceFactory: VersionSourceFactory,
+    private val structureService: StructureService,
 ) : AutoVersioningProcessingService {
 
     private val logger: Logger = LoggerFactory.getLogger(AutoVersioningProcessingServiceImpl::class.java)
@@ -44,6 +49,12 @@ class AutoVersioningProcessingServiceImpl(
         logger.debug("Processing auto versioning order: {}", order)
         autoVersioningAuditService.onProcessingStart(order)
         val branch = order.branch
+        // Source build
+        val sourceBuild: Build? by lazy {
+            order.sourceBuildId?.let {
+                structureService.getBuild(ID.of(it))
+            }
+        }
         // Gets the SCM configuration for the project
         val scm = scmDetector.getSCM(branch.project)
         val scmBranch: String? = scm?.getSCMBranch(branch)
@@ -92,7 +103,18 @@ class AutoVersioningProcessingServiceImpl(
                     val targetVersion: String = if (configPath.versionSource.isNullOrBlank()) {
                         order.targetVersion
                     } else {
-                        TODO("Gets the custom version")
+                        val build = sourceBuild
+                        if (build != null) {
+                            versionSourceFactory.getBuildVersion(
+                                build = build,
+                                versionSource = configPath.versionSource,
+                            )
+                        } else {
+                            throw AutoVersioningCustomVersionNotFoundException(
+                                configPath.path,
+                                configPath.versionSource
+                            )
+                        }
                     }
                     configPath.paths.map { targetPath ->
                         // Gets the content of the target file
@@ -326,7 +348,10 @@ class AutoVersioningProcessingServiceImpl(
         postProcessing.postProcessing(config, order, repositoryURI, repository, upgradeBranch, scm)
     }
 
-    private fun AutoVersioningSourceConfigPath.replaceVersion(content: List<String>, targetVersion: String): List<String> {
+    private fun AutoVersioningSourceConfigPath.replaceVersion(
+        content: List<String>,
+        targetVersion: String
+    ): List<String> {
         val type = filePropertyType
         val actualValue = if (propertyRegex.isNullOrBlank()) {
             targetVersion

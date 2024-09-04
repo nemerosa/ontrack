@@ -19,7 +19,7 @@ class ACCAutoVersioningMultiplePaths : AbstractACCAutoVersioningTestSupport() {
                 repositoryFile("manifest.toml") {
                     """
                         [global]
-                        oneVersion = 1.0.0-toml
+                        oneVersion = "1.0.0-toml"
                     """.trimIndent()
                 }
                 val dependency = branchWithPromotion(promotion = "IRON")
@@ -38,6 +38,7 @@ class ACCAutoVersioningMultiplePaths : AbstractACCAutoVersioningTestSupport() {
                                         AutoVersioningSourceConfigPath(
                                             path = "manifest.toml",
                                             property = "global.oneVersion",
+                                            propertyType = "toml",
                                             versionSource = "metaInfo/toml",
                                         )
                                     )
@@ -61,7 +62,7 @@ class ACCAutoVersioningMultiplePaths : AbstractACCAutoVersioningTestSupport() {
                             fileContains("manifest.toml") {
                                 """
                                     [global]
-                                    oneVersion = 2.0.0-toml
+                                    oneVersion = "2.0.0-toml"
                                 """.trimIndent()
                             }
                         }
