@@ -3,13 +3,109 @@ package net.nemerosa.ontrack.extension.av.audit
 import com.fasterxml.jackson.databind.node.NullNode
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.av.config.AutoApprovalMode
+import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfigPath
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.structure.Signature
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class AutoVersioningAuditStoreDataTest {
+
+    @Test
+    fun `Additional paths backward compatibility`() {
+        val json = mapOf(
+            "sourceProject" to "test",
+            "targetPaths" to listOf(
+                "gradle.properties"
+            ),
+            "targetRegex" to null,
+            "targetProperty" to "version",
+            "targetPropertyRegex" to null,
+            "targetPropertyType" to null,
+            "targetVersion" to "2.0.0",
+            "autoApproval" to true,
+            "upgradeBranchPattern" to "feature/version-<version>",
+            "postProcessing" to null,
+            "postProcessingConfig" to null,
+            "validationStamp" to null,
+            "running" to true,
+            "autoApprovalMode" to "CLIENT",
+            "states" to listOf(
+                mapOf(
+                    "state" to "CREATED",
+                    "data" to emptyMap<String, String>(),
+                    "signature" to mapOf(
+                        "time" to Time.store(Time.now()),
+                        "user" to mapOf(
+                            "name" to "test"
+                        )
+                    )
+                )
+            ),
+            "routing" to "routing",
+            "queue" to null,
+        ).asJson()
+        val data: AutoVersioningAuditStoreData = json.parse()
+        assertNull(data.additionalPaths)
+    }
+
+    @Test
+    fun `Additional paths`() {
+        val json = mapOf(
+            "sourceProject" to "test",
+            "targetPaths" to listOf(
+                "gradle.properties"
+            ),
+            "targetRegex" to null,
+            "targetProperty" to "version",
+            "targetPropertyRegex" to null,
+            "targetPropertyType" to null,
+            "targetVersion" to "2.0.0",
+            "autoApproval" to true,
+            "upgradeBranchPattern" to "feature/version-<version>",
+            "postProcessing" to null,
+            "postProcessingConfig" to null,
+            "validationStamp" to null,
+            "running" to true,
+            "autoApprovalMode" to "CLIENT",
+            "states" to listOf(
+                mapOf(
+                    "state" to "CREATED",
+                    "data" to emptyMap<String, String>(),
+                    "signature" to mapOf(
+                        "time" to Time.store(Time.now()),
+                        "user" to mapOf(
+                            "name" to "test"
+                        )
+                    )
+                )
+            ),
+            "routing" to "routing",
+            "queue" to null,
+            "additionalPaths" to listOf(
+                mapOf(
+                    "path" to "manifest.toml",
+                    "property" to "global.myVersion",
+                    "propertyType" to "toml",
+                    "versionSource" to "metaInfo/rpmVersion",
+                )
+            )
+        ).asJson()
+        val data: AutoVersioningAuditStoreData = json.parse()
+        assertEquals(
+            listOf(
+                AutoVersioningSourceConfigPath(
+                    path = "manifest.toml",
+                    property = "global.myVersion",
+                    propertyType = "toml",
+                    versionSource = "metaInfo/rpmVersion",
+                )
+            ),
+            data.additionalPaths
+        )
+    }
 
     @Test
     fun `Reading JSON record with the running flag`() {
