@@ -76,17 +76,11 @@ export default function AutoVersioningAuditEntry({entry}) {
                 />,
         },
         {
-            key: 'targetPaths',
-            label: "Target paths",
-            children: <Space>
-                {
-                    entry.order.targetPaths.map((path, index) =>
-                        <Typography.Text key={index} code>
-                            {path}
-                        </Typography.Text>
-                    )
-                }
-            </Space>,
+            key: 'targetPath',
+            label: "Target path(s)",
+            children: <Typography.Text code>
+                {entry.order.targetPath}
+            </Typography.Text>,
         },
         {
             key: 'targetPropertyType',

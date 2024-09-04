@@ -151,7 +151,7 @@ export default function AutoVersioningAuditView() {
                                         }
                                     }
                                     repositoryHtmlURL
-                                    targetPaths
+                                    targetPath
                                     targetRegex
                                     targetProperty
                                     targetPropertyRegex

@@ -75,7 +75,7 @@ export default function AutoVersioningAuditEntryView({uuid}) {
                                         }
                                     }
                                     repositoryHtmlURL
-                                    targetPaths
+                                    targetPath
                                     targetRegex
                                     targetProperty
                                     targetPropertyRegex

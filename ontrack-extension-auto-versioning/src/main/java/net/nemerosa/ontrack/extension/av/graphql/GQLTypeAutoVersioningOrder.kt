@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.extension.av.graphql
 
-import graphql.Scalars
 import graphql.Scalars.GraphQLString
-import graphql.schema.GraphQLList
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
@@ -33,10 +31,16 @@ class GQLTypeAutoVersioningOrder(
                     .description("Target branch for the processing order")
                     .type(GraphQLTypeReference(GQLTypeBranch.BRANCH))
             }
+            .stringField(AutoVersioningOrder::targetPath, "Target path(s) for the processing order")
             .field {
                 it.name("targetPaths")
-                    .description("List of paths to update with the target version")
-                    .type(GraphQLList(Scalars.GraphQLString))
+                    .description("Target path(s) for the processing order")
+                    .deprecate("Deprecated, use `targetPath`")
+                    .type(GraphQLString)
+                    .dataFetcher { env ->
+                        val order = env.getSource<AutoVersioningOrder>()
+                        order.defaultPath.paths
+                    }
             }
             .stringField(
                 AutoVersioningOrder::targetRegex,
