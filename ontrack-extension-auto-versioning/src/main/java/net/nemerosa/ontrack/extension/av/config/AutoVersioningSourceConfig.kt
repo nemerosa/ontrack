@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.av.config
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.graphql.support.IgnoreRef
 import net.nemerosa.ontrack.graphql.support.ListRef
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import org.apache.commons.codec.digest.DigestUtils
@@ -63,25 +62,17 @@ data class AutoVersioningSourceConfig(
 ) : AutoVersioningTargetConfig {
 
     /**
-     * Gets the list of paths
-     */
-    @JsonIgnore
-    fun getTargetPaths(): List<String> = targetPath.split(",").map { it.trim() }
-
-    /**
      * Gets the default path
      */
     @get:JsonIgnore
-    @IgnoreRef
     val defaultPath: AutoVersioningSourceConfigPath = AutoVersioningSourceConfigPath(
         path = targetPath,
         regex = targetRegex,
         property = targetProperty,
         propertyRegex = targetPropertyRegex,
         propertyType = targetPropertyType,
-        versionSource = versionSource,
+        versionSource = null,
     )
-
 
     /**
      * Validates that this configuration is consistent. Checks that at least the regex or the property is set,

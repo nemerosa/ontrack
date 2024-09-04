@@ -17,7 +17,7 @@ data class AutoVersioningOrder(
     val sourceBackValidation: String?, // Nullable for backward compatibility
     // Target information
     val branch: Branch,
-    val targetPaths: List<String>,
+    val targetPath: String,
     override val targetRegex: String?,
     override val targetProperty: String?,
     override val targetPropertyRegex: String?,
@@ -41,4 +41,23 @@ data class AutoVersioningOrder(
     @JsonIgnore
     fun getCommitMessage() =
         "[auto-versioning] Upgrade of $sourceProject to version $targetVersion"
+
+    /**
+     * Gets the default path
+     */
+    @get:JsonIgnore
+    val defaultPath: AutoVersioningSourceConfigPath = AutoVersioningSourceConfigPath(
+        path = targetPath,
+        regex = targetRegex,
+        property = targetProperty,
+        propertyRegex = targetPropertyRegex,
+        propertyType = targetPropertyType,
+        versionSource = null,
+    )
+
+    /**
+     * Gets all paths
+     */
+    @get:JsonIgnore
+    val allPaths: List<AutoVersioningSourceConfigPath> = listOf(defaultPath) + (additionalPaths ?: emptyList())
 }

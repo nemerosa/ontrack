@@ -46,8 +46,8 @@ class AutoVersioningTemplatingServiceImpl(
                 "sourceProject" to sourceProject,
                 "targetBranch" to order.branch,
                 "PROMOTION" to order.sourcePromotion!!,
-                "PATH" to order.targetPaths.first(),
-                "PATHS" to order.targetPaths.joinToString(","),
+                "PATH" to order.defaultPath.paths.first(),
+                "PATHS" to order.allPaths.flatMap { it.paths }.joinToString(","),
                 "PROPERTY" to (order.targetProperty ?: ""),
                 "VERSION" to order.targetVersion,
                 "av" to AutoVersioningOrderTemplatingRenderable(order, currentVersions, sourceProject),
@@ -106,9 +106,10 @@ class AutoVersioningTemplatingServiceImpl(
         renderer: EventRenderer
     ): String {
         val empty = ChangeLogTemplatingServiceConfig.emptyValue(configMap)
-        return if (order.sourceBuildId != null && !order.sourcePromotion.isNullOrBlank() && order.targetPaths.size == 1) {
-            // Only auto versioning with ONE target path is supported for the change logs
-            val currentVersion = currentVersions[order.targetPaths.first()] ?: return empty
+        return if (order.sourceBuildId != null && !order.sourcePromotion.isNullOrBlank()) {
+            // Only the first path is taken into by the change log
+            val targetPath = order.defaultPath.paths.first()
+            val currentVersion = currentVersions[targetPath] ?: return empty
             // The "to" build of the change log is the build having been promoted
             val toBuild = structureService.getBuild(ID.of(order.sourceBuildId))
             // For the "from" build, we look for this build in the source project with the

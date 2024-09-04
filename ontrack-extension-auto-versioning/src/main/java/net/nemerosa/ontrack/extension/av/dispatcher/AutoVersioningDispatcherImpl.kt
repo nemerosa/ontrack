@@ -67,7 +67,7 @@ class AutoVersioningDispatcherImpl(
                 sourcePromotion = promotionRun.promotionLevel.name,
                 sourceBackValidation = config.backValidation,
                 branch = branch,
-                targetPaths = config.getTargetPaths(),
+                targetPath = config.targetPath,
                 targetRegex = config.targetRegex,
                 targetProperty = config.targetProperty,
                 targetPropertyRegex = config.targetPropertyRegex,

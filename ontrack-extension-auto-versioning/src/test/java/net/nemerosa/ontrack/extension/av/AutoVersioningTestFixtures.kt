@@ -2,10 +2,7 @@ package net.nemerosa.ontrack.extension.av
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.NullNode
-import net.nemerosa.ontrack.extension.av.config.AutoApprovalMode
-import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfig
-import net.nemerosa.ontrack.extension.av.config.AutoVersioningNotification
-import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
+import net.nemerosa.ontrack.extension.av.config.*
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
@@ -25,7 +22,7 @@ object AutoVersioningTestFixtures {
         sourcePromotion = "GOLD",
         sourceBackValidation = null,
         branch = targetBranch,
-        targetPaths = listOf("gradle.properties"),
+        targetPath = "gradle.properties",
         targetRegex = null,
         targetProperty = "version",
         targetPropertyRegex = null,
@@ -62,7 +59,7 @@ object AutoVersioningTestFixtures {
         sourcePromotion = "GOLD",
         sourceBackValidation = sourceBackValidation,
         branch = this,
-        targetPaths = targetPaths,
+        targetPath = AutoVersioningSourceConfigPath.toString(targetPaths),
         targetRegex = null,
         targetProperty = "version",
         targetPropertyRegex = null,

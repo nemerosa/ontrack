@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.av.config
 
 import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.annotations.APIIgnore
 
 @APIDescription("Configuration for an additional path in an auto-versioning configuration.")
 data class AutoVersioningSourceConfigPath(
@@ -16,4 +17,12 @@ data class AutoVersioningSourceConfigPath(
     val propertyType: String? = null,
     @APIDescription("Source of the version for the build. By default, uses the build label is the source project is configured so, or the build name itself. This allows the customization of this behavior.")
     val versionSource: String? = null,
-)
+) {
+    @APIIgnore
+    val paths: List<String> = toPaths(path)
+
+    companion object {
+        fun toPaths(path: String) = path.split(",").map { it.trim() }
+        fun toString(paths: List<String>) = paths.joinToString(",")
+    }
+}

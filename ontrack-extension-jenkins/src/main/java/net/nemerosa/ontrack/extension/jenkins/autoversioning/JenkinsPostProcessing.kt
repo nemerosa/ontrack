@@ -95,6 +95,6 @@ class JenkinsPostProcessing(
     }
 
     private val AutoVersioningOrder.defaultCommitMessage: String
-        get() = "Post processing for version change in $targetPaths for $targetVersion"
+        get() = "Post processing for version change in ${defaultPath.paths.first()} for $targetVersion"
 
 }

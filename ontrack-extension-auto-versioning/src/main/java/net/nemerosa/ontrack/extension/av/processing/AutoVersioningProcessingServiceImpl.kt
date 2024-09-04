@@ -4,8 +4,10 @@ import net.nemerosa.ontrack.common.replaceGroup
 import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditService
 import net.nemerosa.ontrack.extension.av.config.AutoApprovalMode
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
+import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfigPath
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningTargetFileService
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
+import net.nemerosa.ontrack.extension.av.dispatcher.VersionSourceFactoryImpl
 import net.nemerosa.ontrack.extension.av.event.AutoVersioningEventService
 import net.nemerosa.ontrack.extension.av.metrics.AutoVersioningMetricsService
 import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessing
@@ -30,8 +32,9 @@ class AutoVersioningProcessingServiceImpl(
     private val autoVersioningAuditService: AutoVersioningAuditService,
     private val metrics: AutoVersioningMetricsService,
     private val autoVersioningEventService: AutoVersioningEventService,
-    private val autoVersioningCompletionListeners: List<AutoVersioningCompletionListener>,
+    private val autoVersioningCompletionListeners: MutableList<out AutoVersioningCompletionListener>,
     private val autoVersioningTemplatingService: AutoVersioningTemplatingService,
+    private val versionSourceFactoryImpl: VersionSourceFactoryImpl,
 ) : AutoVersioningProcessingService {
 
     private val logger: Logger = LoggerFactory.getLogger(AutoVersioningProcessingServiceImpl::class.java)
@@ -57,7 +60,7 @@ class AutoVersioningProcessingServiceImpl(
                 version = sanitizedVersion,
                 branch = scmBranch,
                 promotion = order.sourcePromotion,
-                paths = order.targetPaths,
+                paths = order.allPaths.flatMap { it.paths },
                 branchHash = true // Target branch name and other elements as a hash (to avoid too long names)
             )
             // Commit ID of the new branch (not null when target branch is actually created)
@@ -81,64 +84,47 @@ class AutoVersioningProcessingServiceImpl(
                 }
             }
             // Map of current versions per path
-            val currentVersions = mutableMapOf<String,String>()
+            val currentVersions = mutableMapOf<String, String>()
             // For each target path
             val targetPathUpdated: List<Boolean> = try {
-                order.targetPaths.map { targetPath ->
-                    // Gets the content of the target file
-                    val lines = scm.download(scmBranch, targetPath, retryOnNotFound = true)
-                        ?.toString(Charsets.UTF_8)
-                        ?.lines()
-                        ?: throw AutoVersioningNoContentException(scmBranch, targetPath)
-                    // Gets the current version in this file
-                    val currentVersion: String = autoVersioningTargetFileService.readVersion(order, lines)
-                        ?: throw AutoVersioningVersionNotFoundException(targetPath)
-                    // If different version
-                    if (currentVersion != order.targetVersion) {
-                        // Storing the version
-                        currentVersions[targetPath] = currentVersion
-                        // Changes the version
-                        val updatedLines = order.replaceVersion(lines)
-                        // Pushes the change to the branch
-                        logger.debug(
-                            "Processing auto versioning order pushing upgrade to {}/{}: {}",
-                            upgradeBranch,
-                            targetPath,
-                            order
-                        )
-                        // Audit
-                        autoVersioningAuditService.onProcessingUpdatingFile(order, upgradeBranch, targetPath)
-                        // Uploads of the file content
-                        scm.uploadLines(upgradeBranch, commitId, targetPath, updatedLines, message = order.getCommitMessage())
-                        // Post processing
-                        if (!order.postProcessing.isNullOrBlank()) {
-                            // Gets the post processor
-                            val postProcessing = postProcessingRegistry.getPostProcessingById<Any>(order.postProcessing)
-                            // If processing cannot be found, we consider this an error
-                            if (postProcessing == null) {
-                                throw PostProcessingNotFoundException(order.postProcessing)
-                            }
-                            // Launching the post processing
-                            else {
-                                logger.debug("Processing auto versioning order launching post processing: {}", order)
-                                autoVersioningAuditService.onPostProcessingStart(order, upgradeBranch)
-                                measureAndLaunchPostProcessing(
-                                    postProcessing,
-                                    order,
-                                    repositoryURI,
-                                    repository,
-                                    upgradeBranch,
-                                    scm,
-                                )
-                                logger.debug("Processing auto versioning order end of post processing: {}", order)
-                                autoVersioningAuditService.onPostProcessingEnd(order, upgradeBranch)
-                            }
-                        }
-                        // Changed
-                        true
+                order.allPaths.flatMap { configPath ->
+                    // Target version
+                    val targetVersion: String = if (configPath.versionSource.isNullOrBlank()) {
+                        order.targetVersion
                     } else {
-                        // Not changed
-                        false
+                        TODO("Gets the custom version")
+                    }
+                    configPath.paths.map { targetPath ->
+                        // Gets the content of the target file
+                        val lines = scm.download(scmBranch, targetPath, retryOnNotFound = true)
+                            ?.toString(Charsets.UTF_8)
+                            ?.lines()
+                            ?: throw AutoVersioningNoContentException(scmBranch, targetPath)
+                        // Gets the current version in this file
+                        val currentVersion: String = autoVersioningTargetFileService.readVersion(configPath, lines)
+                            ?: throw AutoVersioningVersionNotFoundException(targetPath)
+                        // If different version
+                        if (currentVersion != order.targetVersion) {
+                            // Storing the version
+                            currentVersions[targetPath] = currentVersion
+                            // Changes the version
+                            val updatedLines = configPath.replaceVersion(lines, targetVersion)
+                            // Audit
+                            autoVersioningAuditService.onProcessingUpdatingFile(order, upgradeBranch, targetPath)
+                            // Uploads of the file content
+                            scm.uploadLines(
+                                upgradeBranch,
+                                commitId,
+                                targetPath,
+                                updatedLines,
+                                message = order.getCommitMessage()
+                            )
+                            // Changed
+                            true
+                        } else {
+                            // Not changed
+                            false
+                        }
                     }
                 }
             } catch (e: Exception) {
@@ -149,9 +135,33 @@ class AutoVersioningProcessingServiceImpl(
                 )
                 throw e
             }
-
-            // If at least one path updated
+            // At least one path was changed
             if (targetPathUpdated.any { it }) {
+
+                // Post-processing
+                if (!order.postProcessing.isNullOrBlank()) {
+                    // Gets the post processor
+                    val postProcessing = postProcessingRegistry.getPostProcessingById<Any>(order.postProcessing)
+                    // If processing cannot be found, we consider this an error
+                    if (postProcessing == null) {
+                        throw PostProcessingNotFoundException(order.postProcessing)
+                    }
+                    // Launching the post-processing
+                    else {
+                        logger.debug("Processing auto versioning order launching post processing: {}", order)
+                        autoVersioningAuditService.onPostProcessingStart(order, upgradeBranch)
+                        measureAndLaunchPostProcessing(
+                            postProcessing,
+                            order,
+                            repositoryURI,
+                            repository,
+                            upgradeBranch,
+                            scm,
+                        )
+                        logger.debug("Processing auto versioning order end of post processing: {}", order)
+                        autoVersioningAuditService.onPostProcessingEnd(order, upgradeBranch)
+                    }
+                }
 
                 // Creates a PR with auto approval
                 try {
@@ -195,6 +205,7 @@ class AutoVersioningProcessingServiceImpl(
                                 // OK
                                 AutoVersioningProcessingOutcome.CREATED
                             }
+
                             AutoApprovalMode.CLIENT -> if (!pr.merged) {
                                 logger.debug("Processing auto versioning order PR timed out: {}", order)
                                 // Audit
@@ -311,23 +322,23 @@ class AutoVersioningProcessingServiceImpl(
     ) {
         // Parsing and validation of the configuration
         val config: T = postProcessing.parseAndValidate(order.postProcessingConfig)
-        // Launching the post processing
+        // Launching the post-processing
         postProcessing.postProcessing(config, order, repositoryURI, repository, upgradeBranch, scm)
     }
 
-    private fun AutoVersioningOrder.replaceVersion(content: List<String>): List<String> {
+    private fun AutoVersioningSourceConfigPath.replaceVersion(content: List<String>, targetVersion: String): List<String> {
         val type = filePropertyType
-        val actualValue = if (targetPropertyRegex.isNullOrBlank()) {
+        val actualValue = if (propertyRegex.isNullOrBlank()) {
             targetVersion
         } else {
-            val regex = targetPropertyRegex.toRegex()
-            val previousValue = type.readProperty(content, targetProperty) ?: error("Cannot find target property")
+            val regex = propertyRegex.toRegex()
+            val previousValue = type.readProperty(content, property) ?: error("Cannot find target property")
             regex.replaceGroup(previousValue, 1, targetVersion)
         }
-        return type.replaceProperty(content, targetProperty, actualValue)
+        return type.replaceProperty(content, property, actualValue)
     }
 
-    private val AutoVersioningOrder.filePropertyType: FilePropertyType
+    private val AutoVersioningSourceConfigPath.filePropertyType: FilePropertyType
         get() = autoVersioningTargetFileService.getFilePropertyType(this)
 
 }

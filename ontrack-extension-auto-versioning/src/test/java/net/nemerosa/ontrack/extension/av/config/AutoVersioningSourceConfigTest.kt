@@ -14,7 +14,7 @@ class AutoVersioningSourceConfigTest {
     fun `Target paths when only one path`() {
         assertEquals(
             listOf("Jenkinsfile"),
-            sourceConfig(targetPath = "Jenkinsfile").getTargetPaths()
+            sourceConfig(targetPath = "Jenkinsfile").defaultPath.paths
         )
     }
 
@@ -27,7 +27,8 @@ class AutoVersioningSourceConfigTest {
                 "Jenkinsfile.nightly",
                 ".jobs/pipelines/deployDGCDocker.groovy"
             ),
-            sourceConfig(targetPath = "Jenkinsfile, Jenkinsfile.acceptance, Jenkinsfile.nightly, .jobs/pipelines/deployDGCDocker.groovy").getTargetPaths()
+            sourceConfig(targetPath = "Jenkinsfile, Jenkinsfile.acceptance, Jenkinsfile.nightly, .jobs/pipelines/deployDGCDocker.groovy")
+                .defaultPath.paths
         )
     }
 

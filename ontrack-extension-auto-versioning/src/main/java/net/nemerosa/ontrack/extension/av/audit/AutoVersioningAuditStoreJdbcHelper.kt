@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.av.audit
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfigPath
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.structure.ID
@@ -59,7 +60,7 @@ class AutoVersioningAuditStoreJdbcHelper(
                     sourcePromotionRunId = data.sourcePromotionRunId,
                     sourcePromotion = data.sourcePromotion,
                     sourceBackValidation = data.sourceBackValidation,
-                    targetPaths = data.targetPaths,
+                    targetPath = AutoVersioningSourceConfigPath.toString(data.targetPaths),
                     targetRegex = data.targetRegex,
                     targetProperty = data.targetProperty,
                     targetPropertyRegex = data.targetPropertyRegex,

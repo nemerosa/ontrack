@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.av.audit
 
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditStoreConstants.STORE_CATEGORY
+import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfigPath
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.security.SecurityService
@@ -48,7 +49,7 @@ class AutoVersioningAuditStoreImpl(
             project = order.branch.project.name,
             branch = order.branch.name,
             states = AutoVersioningAuditState.runningAndNotProcessingStates,
-            targetPaths = order.targetPaths,
+            targetPaths = order.allPaths.flatMap { it.paths },
         )
         findByFilter(filter).forEach { entry ->
             logger.debug("Cancelling {}", entry)
@@ -76,7 +77,7 @@ class AutoVersioningAuditStoreImpl(
                     sourcePromotionRunId = sourcePromotionRunId,
                     sourcePromotion = sourcePromotion,
                     sourceBackValidation = sourceBackValidation,
-                    targetPaths = targetPaths,
+                    targetPaths = defaultPath.paths,
                     targetRegex = targetRegex,
                     targetProperty = targetProperty,
                     targetPropertyRegex = targetPropertyRegex,
@@ -215,7 +216,7 @@ class AutoVersioningAuditStoreImpl(
                     sourcePromotionRunId = sourcePromotionRunId,
                     sourcePromotion = sourcePromotion,
                     sourceBackValidation = sourceBackValidation,
-                    targetPaths = targetPaths,
+                    targetPath = AutoVersioningSourceConfigPath.toString(targetPaths),
                     targetRegex = targetRegex,
                     targetProperty = targetProperty,
                     targetPropertyRegex = targetPropertyRegex,

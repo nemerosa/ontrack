@@ -4,8 +4,8 @@ import net.nemerosa.ontrack.extension.av.properties.FilePropertyType
 
 interface AutoVersioningTargetFileService {
 
-    fun readVersion(config: AutoVersioningTargetConfig, lines: List<String>): String?
+    fun readVersion(path: AutoVersioningSourceConfigPath, lines: List<String>): String?
 
-    fun getFilePropertyType(config: AutoVersioningTargetConfig): FilePropertyType
+    fun getFilePropertyType(path: AutoVersioningSourceConfigPath): FilePropertyType
 
 }

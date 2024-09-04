@@ -1,21 +1,19 @@
 package net.nemerosa.ontrack.extension.av.validation
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationService
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningTargetFileService
 import net.nemerosa.ontrack.extension.av.dispatcher.VersionSourceFactory
 import net.nemerosa.ontrack.extension.av.dispatcher.getBuildVersion
 import net.nemerosa.ontrack.extension.av.dispatcher.getBuildWithVersion
-import net.nemerosa.ontrack.extension.av.dispatcher.getVersionSourceConfig
 import net.nemerosa.ontrack.extension.av.settings.AutoVersioningSettings
-import net.nemerosa.ontrack.extension.general.ReleasePropertyType
 import net.nemerosa.ontrack.extension.scm.service.SCMDetector
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import kotlin.jvm.optionals.getOrNull
 
 @Service
 @Transactional
@@ -92,13 +90,11 @@ class AutoVersioningValidationServiceImpl(
                 }
                 if (existingLink == null) {
                     // Source project
-                    if (sourceProject != null) {
-                        structureService.createBuildLink(
-                            fromBuild = build,
-                            toBuild = current.build,
-                            qualifier = config.qualifier ?: BuildLink.DEFAULT,
-                        )
-                    }
+                    structureService.createBuildLink(
+                        fromBuild = build,
+                        toBuild = current.build,
+                        qualifier = config.qualifier ?: BuildLink.DEFAULT,
+                    )
                 }
             }
             // OK
@@ -162,13 +158,14 @@ class AutoVersioningValidationServiceImpl(
     private fun readCurrentVersion(branch: Branch, config: AutoVersioningSourceConfig): String? {
         val scm = scmDetector.getSCM(branch.project) ?: return null
         val scmBranch: String = scm.getSCMBranch(branch) ?: return null
-        // Using the first path only
-        val targetPath = config.getTargetPaths().first()
+        // Using the first path of the default path config
+        val defaultPath = config.defaultPath
+        val targetPath = defaultPath.paths.first()
         val lines = scm.download(scmBranch, targetPath)
             ?.toString(Charsets.UTF_8)
             ?.lines()
             ?: emptyList()
-        return autoVersioningTargetFileService.readVersion(config, lines)
+        return autoVersioningTargetFileService.readVersion(defaultPath, lines)
     }
 
     private fun getLastVersion(
