@@ -232,7 +232,7 @@ class AutoVersioningAuditStoreImpl(
                     prTitleTemplate = prTitleTemplate,
                     prBodyTemplate = prBodyTemplate,
                     prBodyTemplateFormat = prBodyTemplateFormat,
-                    additionalPaths = additionalPaths,
+                    additionalPaths = additionalPaths ?: emptyList(),
                 ),
                 audit = states,
                 routing = routing,

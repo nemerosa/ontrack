@@ -32,7 +32,7 @@ data class AutoVersioningOrder(
     val prTitleTemplate: String?,
     val prBodyTemplate: String?,
     val prBodyTemplateFormat: String?,
-    val additionalPaths: List<AutoVersioningSourceConfigPath>?,
+    val additionalPaths: List<AutoVersioningSourceConfigPath>,
 ) {
     /**
      * Gets a meaningful commit message for this order

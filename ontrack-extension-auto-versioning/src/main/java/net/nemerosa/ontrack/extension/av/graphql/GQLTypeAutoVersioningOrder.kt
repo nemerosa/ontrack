@@ -83,5 +83,6 @@ class GQLTypeAutoVersioningOrder(
                             ?.repositoryHtmlURL
                     }
             }
+            .listField(AutoVersioningOrder::additionalPaths)
             .build()
 }
