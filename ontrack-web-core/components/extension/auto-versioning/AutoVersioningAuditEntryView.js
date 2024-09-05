@@ -87,6 +87,14 @@ export default function AutoVersioningAuditEntryView({uuid}) {
                                     postProcessing
                                     postProcessingConfig
                                     validationStamp
+                                    additionalPaths {
+                                        path
+                                        propertyType
+                                        regex
+                                        property
+                                        propertyRegex
+                                        versionSource
+                                    }
                                 }
                             }
                         }

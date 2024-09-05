@@ -12,6 +12,7 @@ import AutoVersioningAuditEntryPR from "@components/extension/auto-versioning/Au
 import AutoVersioningApproval from "@components/extension/auto-versioning/AutoVersioningApproval";
 import Link from "next/link";
 import DefaultPromotionRunLink from "@components/promotionRuns/DefaultPromotionRunLink";
+import AutoVersioningAdditionalPaths from "@components/extension/auto-versioning/AutoVersioningAdditionalPaths";
 
 export default function AutoVersioningAuditEntry({entry}) {
 
@@ -101,6 +102,11 @@ export default function AutoVersioningAuditEntry({entry}) {
             key: 'targetRegex',
             label: "Target regex",
             children: <Typography.Text code>{entry.order.targetRegex}</Typography.Text>,
+        },
+        {
+            key: 'additionalPaths',
+            label: "Additional paths",
+            children: <AutoVersioningAdditionalPaths additionalPaths={entry.order.additionalPaths}/>,
         },
         {
             key: 'upgradeBranchPattern',

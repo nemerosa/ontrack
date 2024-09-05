@@ -235,6 +235,8 @@ type AutoVersioningNotification {
 
 "Auto versioning processing order"
 type AutoVersioningOrder {
+    "additionalPaths field"
+    additionalPaths: [AutoVersioningSourceConfigPath!]!
     "If the PR must be auto approved & merged"
     autoApproval: Boolean
     "Defines the way the PR is merged when auto approval is set."
