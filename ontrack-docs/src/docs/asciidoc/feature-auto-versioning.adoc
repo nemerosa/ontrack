@@ -122,7 +122,7 @@ This can be represented as YAML using:
 # List of configurations
 configurations:
     # Project to watch
-    sourceProject: String
+  - sourceProject: String
     # Name of the branch to take into account for the dependency. Several branches can be selected using
     # a regular expression. If several branches are eligible, only the latest version
     # can be used, based on inverted order of semantic versioning. Branches which
@@ -188,6 +188,24 @@ configurations:
     # How must the version to use be computed from the source build?
     # See "Version source" below
     versionSource: String?
+    # Additional paths to change.
+    # See "Additional paths" below
+    additionalPaths:
+      - # Comma-separated list of file to update with the new version
+        path: String
+        # Regex to use in the target file to identify the line to replace with the new version.
+        # The first matching group must be the version.")
+        regex: String?
+        # Optional replacement for the regex, using only a property name
+        property: String?
+        # Optional regex to use on the property value
+        propertyRegex: String?
+        # When property is defined, defines the type of property (defaults to Java properties
+        # file, but could be NPM, etc.)
+        propertyType: String?
+        # Source of the version for the build. By default, uses the build label is the source project
+        # is configured so, or the build name itself. This allows the customization of this behavior.
+        versionSource: String?
 ----
 
 [NOTE]
@@ -331,6 +349,42 @@ The different options for this parameter are:
 * `name` - uses the name of the build, regardless of the source project configuration
 * `labelOnly` - uses the label attached to the build, regardless of the source project configuration. If there is no label, the auto versioning request is rejected
 * `metaInfo/<category>/<name>` or `metaInfo/<name>` - the version is the value of a meta information item of the request category (optional) or name. If so such meta information is found, the auto versioning request is rejected.
+
+[[auto-versioning-additional-paths]]
+===== Additional paths
+
+The `additionalPaths` configuration property allows the specification of additional paths to update
+instead of just the main one.
+
+[NOTE]
+====
+This can somehow be considered as a form of <<auto-versioning-post-processing,post-processing>> but
+without the need to call an external service.
+====
+
+Example:
+
+[source,yaml]
+----
+configurations:
+  - # ...
+    targetPath: "gradle.properties"
+    targetProperty: "one-version"
+    additionalPaths:
+      - path: manifest.toml
+        property: global.oneVersion
+        propertyType: toml
+        versionSource: metaInfo/rpmVersion
+----
+
+In this example, we want the auto-versioning to:
+
+* update the `one-version` property of the `gradle.properties` file using the version of the build having been promoted
+* update the `global.oneVersion` property of the `manifest.toml` file, but this time using the `rpmVersion` meta-information of the build having been promoted
+
+Both changes will be part of the same PR.
+
+<<auto-versioning-post-processing,Post-processing>> is still possible and would be run after all changes have been applied first (default path & additional paths).
 
 [[auto-versioning-config-type]]
 ===== Target files types
