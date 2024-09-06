@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.av.config.AutoApprovalMode
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
+import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfigPath
 
 /**
  * Json representation of an auto versioning config
@@ -37,6 +38,7 @@ data class JsonAutoVersioningConfig(
     val prTitleTemplate: String? = null,
     val prBodyTemplate: String? = null,
     val prBodyTemplateFormat: String? = null,
+    val additionalPaths: List<AutoVersioningSourceConfigPath>? = null,
 ) {
     fun toConfig() = AutoVersioningSourceConfig(
         sourceProject = project,
@@ -59,5 +61,6 @@ data class JsonAutoVersioningConfig(
         prTitleTemplate = prTitleTemplate,
         prBodyTemplate = prBodyTemplate,
         prBodyTemplateFormat = prBodyTemplateFormat,
+        additionalPaths = additionalPaths,
     )
 }
