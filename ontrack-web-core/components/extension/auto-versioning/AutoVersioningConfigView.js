@@ -74,6 +74,14 @@ export default function AutoVersioningConfigView({branchId}) {
                                         config
                                         notificationTemplate
                                     }
+                                    additionalPaths {
+                                        path
+                                        propertyType
+                                        regex
+                                        property
+                                        propertyRegex
+                                        versionSource
+                                    }
                                 }
                             }
                         }

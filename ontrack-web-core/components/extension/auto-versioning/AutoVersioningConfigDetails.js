@@ -1,6 +1,7 @@
 import {Descriptions, Typography} from "antd";
 import AutoVersioningPostProcessing from "@components/extension/auto-versioning/AutoVersioningPostProcessing";
 import AutoVersioningConfigNotifications from "@components/extension/auto-versioning/AutoVersioningConfigNotifications";
+import AutoVersioningAdditionalPaths from "@components/extension/auto-versioning/AutoVersioningAdditionalPaths";
 
 export default function AutoVersioningConfigDetails({source}) {
 
@@ -115,7 +116,12 @@ export default function AutoVersioningConfigDetails({source}) {
                 notifications={source.notifications}
             />,
             span: 12,
-        }
+        },
+        {
+            key: 'additionalPaths',
+            label: "Additional paths",
+            children: <AutoVersioningAdditionalPaths additionalPaths={source.additionalPaths}/>,
+        },
     ]
 
     return (
