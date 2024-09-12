@@ -20,7 +20,9 @@ export default function BuildNode({data}) {
                 style={
                     selected ? {
                         border: 'solid 3px blue'
-                    } : {}
+                    } : {
+                        border: 'solid 2px #777'
+                    }
                 }
                 bodyStyle={{
                     overflow: 'hidden'

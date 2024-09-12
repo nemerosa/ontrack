@@ -1,4 +1,4 @@
-import {applyNodeChanges, Background, Controls, MarkerType, ReactFlow, ReactFlowProvider} from "reactflow";
+import {applyNodeChanges, Background, Controls, ReactFlow, ReactFlowProvider} from "reactflow";
 import {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import {gql} from "graphql-request";
 import BranchNode from "@components/links/BranchNode";
@@ -7,6 +7,7 @@ import {autoLayout} from "@components/links/GraphUtils";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {Skeleton} from "antd";
 import {AutoRefreshContext} from "@components/common/AutoRefresh";
+import {edgeStyle} from "@components/links/LinksGraphConstants";
 
 function BranchLinksFlow({branch}) {
 
@@ -212,12 +213,7 @@ function BranchLinksFlow({branch}) {
                     id: edgeStartId,
                     source: startNode.id,
                     target: dependencyNode.id,
-                    type: 'smoothstep',
-                    markerStart: {
-                        type: MarkerType.ArrowClosed,
-                        width: 40,
-                        height: 40,
-                    },
+                    ...edgeStyle,
                 }
                 edges.push(edge)
                 edgesCache[edgeStartId] = edge
@@ -230,7 +226,7 @@ function BranchLinksFlow({branch}) {
                     id: edgeChildId,
                     source: dependencyNode.id,
                     target: childNode.id,
-                    type: 'smoothstep',
+                    ...edgeStyle,
                 }
                 edges.push(edge)
                 edgesCache[edgeChildId] = edge
@@ -275,12 +271,7 @@ function BranchLinksFlow({branch}) {
                     id: edgeParentId,
                     source: parentNode.id,
                     target: dependencyNode.id,
-                    type: 'smoothstep',
-                    markerStart: {
-                        type: MarkerType.ArrowClosed,
-                        width: 40,
-                        height: 40,
-                    },
+                    ...edgeStyle,
                 }
                 edges.push(edge)
                 edgesCache[edgeParentId] = edge
@@ -293,7 +284,7 @@ function BranchLinksFlow({branch}) {
                     id: edgeStartId,
                     source: dependencyNode.id,
                     target: startNode.id,
-                    type: 'smoothstep',
+                    ...edgeStyle,
                 }
                 edges.push(edge)
                 edgesCache[edgeStartId] = edge

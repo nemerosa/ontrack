@@ -1,5 +1,4 @@
 import {applyNodeChanges, Background, Controls, ReactFlow, ReactFlowProvider} from "reactflow";
-import {gql} from "graphql-request";
 import {useCallback, useEffect, useMemo, useState} from "react";
 import BuildNode from "@components/links/BuildNode";
 import BuildGroupNode from "@components/links/BuildGroupNode";
@@ -7,15 +6,12 @@ import {autoLayout} from "@components/links/GraphUtils";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {Skeleton} from "antd";
 import {buildQuery} from "@components/links/BuildLinksUtils";
-
+import {edgeStyle} from "@components/links/LinksGraphConstants";
 
 
 function BuildLinksFlow({build}) {
 
     const client = useGraphQLClient()
-
-    const maxDownstreamDepth = 5
-    const maxUpstreamDepth = 5
 
     const [nodes, setNodes] = useState([])
     const [edges, setEdges] = useState([])
@@ -40,8 +36,7 @@ function BuildLinksFlow({build}) {
     const collectUpstreamBoxes = (build, currentBox, boxes) => {
         build.usedByQualified?.pageItems?.forEach(link => {
             const parent = link.build
-            const parentProject = parent.branch.project.name
-            const parentBoxId = parentProject
+            const parentBoxId = parent.branch.project.name
 
             let parentBox = boxes[parentBoxId]
             if (!parentBox) {
@@ -106,7 +101,7 @@ function BuildLinksFlow({build}) {
                             id: edgeId,
                             source: String(boxNode.id),
                             target: String(childId),
-                            type: 'smoothstep',
+                            ...edgeStyle,
                         }
                         edges.push(edge)
                         edgesCache[edgeId] = edgeId
@@ -158,9 +153,9 @@ function BuildLinksFlow({build}) {
                     id: edgeId,
                     source: String(build.id),
                     target: String(child.id),
-                    type: 'smoothstep',
                     qualifiers: [link.qualifier],
                     label: link.qualifier,
+                    ...edgeStyle,
                 }
                 edges.push(edge)
                 edgesCache[edgeId] = edge
