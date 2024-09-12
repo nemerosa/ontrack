@@ -77,6 +77,7 @@ class DefaultNotificationProcessingService(
                 meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_publishing, item)
 
                 val result = channel.publish(
+                    recordId = recordId,
                     config = validatedConfig.config,
                     event = item.event,
                     context = context,

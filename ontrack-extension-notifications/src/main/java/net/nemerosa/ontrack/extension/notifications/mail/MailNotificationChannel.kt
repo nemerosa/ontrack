@@ -53,6 +53,7 @@ class MailNotificationChannel(
     override fun toText(config: MailNotificationChannelConfig): String = config.subject
 
     override fun publish(
+        recordId: String,
         config: MailNotificationChannelConfig,
         event: Event,
         context: Map<String, Any>,

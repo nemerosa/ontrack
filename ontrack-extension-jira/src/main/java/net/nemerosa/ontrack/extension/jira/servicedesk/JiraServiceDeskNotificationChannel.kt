@@ -43,6 +43,7 @@ class JiraServiceDeskNotificationChannel(
     override val enabled: Boolean = true
 
     override fun publish(
+        recordId: String,
         config: JiraServiceDeskNotificationChannelConfig,
         event: Event,
         context: Map<String, Any>,

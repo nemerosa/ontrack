@@ -32,6 +32,7 @@ class OntrackValidationNotificationChannel(
 ) {
 
     override fun publish(
+        recordId: String,
         config: OntrackValidationNotificationChannelConfig,
         event: Event,
         context: Map<String, Any>,

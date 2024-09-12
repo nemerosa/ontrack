@@ -29,6 +29,7 @@ class WebhookNotificationChannel(
 ) {
 
     override fun publish(
+        recordId: String,
         config: WebhookNotificationChannelConfig,
         event: Event,
         context: Map<String, Any>,

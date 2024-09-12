@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.jira.notifications
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.jira.JIRAConfiguration
 import net.nemerosa.ontrack.extension.jira.JIRAConfigurationService
-import net.nemerosa.ontrack.extension.jira.model.JIRAIssueStub
 import net.nemerosa.ontrack.extension.jira.tx.JIRASessionFactory
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
@@ -38,6 +37,7 @@ class JiraCreationNotificationChannel(
     private val logger: Logger = LoggerFactory.getLogger(JiraCreationNotificationChannel::class.java)
 
     override fun publish(
+        recordId: String,
         config: JiraCreationNotificationChannelConfig,
         event: Event,
         context: Map<String, Any>,

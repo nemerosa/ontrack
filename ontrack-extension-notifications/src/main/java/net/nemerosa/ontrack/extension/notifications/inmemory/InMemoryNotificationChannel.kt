@@ -37,6 +37,7 @@ class InMemoryNotificationChannel(
     internal fun getMessages(group: String) = messages[group] ?: emptyList()
 
     override fun publish(
+        recordId: String,
         config: InMemoryNotificationChannelConfig,
         event: Event,
         context: Map<String, Any>,

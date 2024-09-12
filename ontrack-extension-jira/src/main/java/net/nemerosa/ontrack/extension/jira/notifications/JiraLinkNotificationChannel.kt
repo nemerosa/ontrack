@@ -29,6 +29,7 @@ class JiraLinkNotificationChannel(
 ) {
 
     override fun publish(
+        recordId: String,
         config: JiraLinkNotificationChannelConfig,
         event: Event,
         context: Map<String, Any>,

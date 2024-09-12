@@ -32,6 +32,7 @@ class SlackNotificationChannel(
 ) {
 
     override fun publish(
+        recordId: String,
         config: SlackNotificationChannelConfig,
         event: Event,
         context: Map<String, Any>,

@@ -17,6 +17,7 @@ interface NotificationChannel<C, R> {
     /**
      * Sends an event onto this channel.
      *
+     * @param recordId Unique ID for the recording of this notification
      * @param config Configuration for the channel
      * @param event Event to send notification about
      * @param context Notification template context
@@ -25,6 +26,7 @@ interface NotificationChannel<C, R> {
      * @return Response by the channel
      */
     fun publish(
+        recordId: String,
         config: C,
         event: Event,
         context: Map<String, Any>,

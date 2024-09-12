@@ -28,6 +28,7 @@ class MockNotificationChannel(
     fun targetMessages(target: String) = messages[target]?.toList() ?: emptyList()
 
     override fun publish(
+        recordId: String,
         config: MockNotificationChannelConfig,
         event: Event,
         context: Map<String, Any>,

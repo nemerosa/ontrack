@@ -1,14 +1,9 @@
 package net.nemerosa.ontrack.extension.workflows.notifications
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.NullNode
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NoTemplate
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
-import net.nemerosa.ontrack.extension.notifications.model.Notification
-import net.nemerosa.ontrack.extension.notifications.queue.NotificationQueueItemConverter
-import net.nemerosa.ontrack.extension.workflows.definition.Workflow
-import net.nemerosa.ontrack.extension.workflows.definition.WorkflowNode
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowContext
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowEngine
 import net.nemerosa.ontrack.json.asJson
@@ -34,6 +29,7 @@ class WorkflowNotificationChannel(
 ) {
 
     override fun publish(
+        recordId: String,
         config: WorkflowNotificationChannelConfig,
         event: Event,
         context: Map<String, Any>,
@@ -57,10 +53,15 @@ class WorkflowNotificationChannel(
             // Converting the event to a suitable format
             val item = workflowNotificationItemConverter.convertForQueue(event, instanceId)
             // Adding to the context
-            ctx.withData(
-                WorkflowNotificationChannelNodeExecutor.CONTEXT_EVENT,
-                item.asJson()
-            )
+            ctx
+                .withData(
+                    WorkflowNotificationChannelNodeExecutor.CONTEXT_EVENT,
+                    item.asJson()
+                )
+                .withData(
+                    WorkflowNotificationChannelNotificationRecord.CONTEXT_NOTIFICATION_RECORD_ID,
+                    WorkflowNotificationChannelNotificationRecord(recordId).asJson()
+                )
         }
         // Output contains only the instance ID
         return NotificationResult.ok(

@@ -23,6 +23,7 @@ class OtherMockNotificationChannel(
     val messages = mutableMapOf<String, MutableList<String>>()
 
     override fun publish(
+        recordId: String,
         config: MockNotificationChannelConfig,
         event: Event,
         context: Map<String,Any>,

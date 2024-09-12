@@ -66,6 +66,7 @@ class WorkflowNotificationChannelTest {
         } returns instance
 
         channel.publish(
+            recordId = "1",
             config = WorkflowNotificationChannelConfig(
                 workflow = Workflow(
                     name = "Initial name",

@@ -20,6 +20,7 @@ abstract class AbstractJenkinsNotificationChannel(
     JenkinsNotificationChannelConfig::class
 ) {
     override fun publish(
+        recordId: String,
         config: JenkinsNotificationChannelConfig,
         event: Event,
         context: Map<String, Any>,

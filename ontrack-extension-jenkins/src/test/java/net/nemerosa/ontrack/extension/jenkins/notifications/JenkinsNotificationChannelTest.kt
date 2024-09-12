@@ -71,7 +71,7 @@ class JenkinsNotificationChannelTest {
 
         every { jenkinsClient.fireAndForgetJob(JOB, emptyMap()) } returns URI("uri:queue")
 
-        val result = jenkinsNotificationChannel.publish(config, event, emptyMap(), null) { it }
+        val result = jenkinsNotificationChannel.publish("1", config, event, emptyMap(), null) { it }
 
         assertEquals(NotificationResultType.OK, result.type)
     }
@@ -93,7 +93,7 @@ class JenkinsNotificationChannelTest {
             )
         } returns URI("uri:queue")
 
-        val result = jenkinsNotificationChannel.publish(config, event, emptyMap(), null) { it }
+        val result = jenkinsNotificationChannel.publish("1", config, event, emptyMap(), null) { it }
 
         assertEquals(NotificationResultType.OK, result.type)
     }
@@ -105,7 +105,7 @@ class JenkinsNotificationChannelTest {
 
         every { jenkinsClient.fireAndForgetJob(JOB, emptyMap()) } returns null
 
-        val result = jenkinsNotificationChannel.publish(config, event, emptyMap(), null) { it }
+        val result = jenkinsNotificationChannel.publish("1", config, event, emptyMap(), null) { it }
 
         assertEquals(NotificationResultType.ERROR, result.type)
     }
@@ -126,7 +126,7 @@ class JenkinsNotificationChannelTest {
 
         every { jenkinsClient.runJob(JOB, emptyMap(), any(), any(), any()) } returns jenkinsBuild
 
-        val result = jenkinsNotificationChannel.publish(config, event, emptyMap(), null) { it }
+        val result = jenkinsNotificationChannel.publish("1", config, event, emptyMap(), null) { it }
 
         assertEquals(NotificationResultType.OK, result.type)
         assertNotNull(result.output) { output ->
@@ -151,7 +151,7 @@ class JenkinsNotificationChannelTest {
 
         every { jenkinsClient.runJob(JOB, emptyMap(), any(), any(), any()) } returns jenkinsBuild
 
-        val result = jenkinsNotificationChannel.publish(config, event, emptyMap(), null) { it }
+        val result = jenkinsNotificationChannel.publish("1", config, event, emptyMap(), null) { it }
 
         assertEquals(NotificationResultType.ERROR, result.type)
         assertNotNull(result.output) { output ->
