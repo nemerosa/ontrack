@@ -33,6 +33,16 @@ class DefaultNotificationRecordingService(
         )
     }
 
+    override fun findRecordById(id: String): NotificationRecord? {
+        securityService.checkGlobalFunction(NotificationRecordingAccess::class.java)
+
+        return storageService.find(
+            STORE,
+            id,
+            NotificationRecord::class
+        )
+    }
+
     override fun filter(filter: NotificationRecordFilter): PaginatedList<NotificationRecord> {
         securityService.checkGlobalFunction(NotificationRecordingAccess::class.java)
 

@@ -13,6 +13,11 @@ interface NotificationRecordingService {
 
     fun filter(filter: NotificationRecordFilter): PaginatedList<NotificationRecord>
 
+    /**
+     * Gets a record using its ID
+     */
+    fun findRecordById(id: String): NotificationRecord?
+
     fun clear(retentionSeconds: Long)
 
 }

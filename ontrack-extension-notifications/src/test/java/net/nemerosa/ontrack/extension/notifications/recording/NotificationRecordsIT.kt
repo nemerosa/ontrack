@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 class NotificationRecordsIT : AbstractNotificationTestSupport() {
 
@@ -64,6 +65,11 @@ class NotificationRecordsIT : AbstractNotificationTestSupport() {
                             ).asJson(),
                             record.source?.data
                         )
+
+                        // Getting the same record using its ID
+                        assertNotNull(notificationRecordingService.findRecordById(record.id), "Getting record by ID") {
+                            assertEquals(record.id, it.id)
+                        }
                     }
                 }
             }

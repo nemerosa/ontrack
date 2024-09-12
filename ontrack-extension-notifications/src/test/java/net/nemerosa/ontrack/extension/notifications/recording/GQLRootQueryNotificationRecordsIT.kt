@@ -82,6 +82,61 @@ internal class GQLRootQueryNotificationRecordsIT : AbstractNotificationTestSuppo
     }
 
     @Test
+    fun `Getting a notification record by ID`() {
+        asAdmin {
+            // One event
+            val project = project {}
+            val event = eventFactory.newProject(project)
+            // Records a notification
+            val recordId = UUID.randomUUID().toString()
+            notificationRecordingService.record(
+                NotificationRecord(
+                    id = recordId,
+                    source = mockSource(),
+                    timestamp = Time.now(),
+                    channel = "mock",
+                    channelConfig = MockNotificationChannelConfig("#target").asJson(),
+                    event = event.asJson(),
+                    result = NotificationResult.ok(
+                        output = MockNotificationChannelOutput(text = "The actual text", data = null)
+                    ).toNotificationRecordResult(),
+                )
+            )
+            // Getting this notification record
+            run(
+                """{
+                    notificationRecord(id: "$recordId") {
+                        id
+                        timestamp
+                        source {
+                            id
+                            data
+                        }
+                        channel
+                        channelConfig
+                        event
+                        result {
+                            type
+                            message
+                        }
+                    }
+                }"""
+            ) { data ->
+                assertJsonNotNull(data.path("notificationRecord")) {
+                    assertEquals(recordId, getRequiredTextField("id"))
+                    assertEquals("mock", getRequiredTextField("channel"))
+                    assertEquals("#target", path("channelConfig").getRequiredTextField("target"))
+                    assertEquals(project.id(), path("event").path("entities").path("PROJECT").getRequiredIntField("id"))
+                    assertEquals("OK", path("result").getRequiredTextField("type"))
+                    assertJsonNull(path("result").path("message"))
+                    assertEquals("mock", path("source").path("id").asText())
+                    assertEquals("test", path("source").path("data").path("text").asText())
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Getting the list of notifications filtered by result type`() {
         asAdmin {
             notificationRecordingService.clearAll()
