@@ -10,6 +10,7 @@ import WorkflowInstanceStatus from "@components/extension/workflows/WorkflowInst
 import TimestampText from "@components/common/TimestampText";
 import DurationMs from "@components/common/DurationMs";
 import Link from "next/link";
+import NotificationRecordLink from "@components/extension/notifications/NotificationRecordLink";
 
 export default function WorkflowsAuditView() {
 
@@ -34,6 +35,12 @@ export default function WorkflowsAuditView() {
                     startTime
                     endTime
                     durationMs
+                    context {
+                        data {
+                            key
+                            value
+                        }
+                    }
                     workflow {
                         name
                     }
@@ -63,12 +70,25 @@ export default function WorkflowsAuditView() {
                         {
                             key: 'id',
                             title: 'ID',
-                            render: (_, instance) => <Link href={`/extension/workflows/instances/${instance.id}`}>{instance.id}</Link>,
+                            render: (_, instance) => <Link
+                                href={`/extension/workflows/instances/${instance.id}`}>{instance.id}</Link>,
                         },
                         {
                             key: 'name',
                             title: 'Workflow name',
                             render: (_, instance) => instance.workflow.name,
+                        },
+                        {
+                            key: 'notification',
+                            title: "Notification",
+                            render: (_, instance) => {
+                                const notificationRecordId = instance.context.data.find(it => it.key === 'notificationRecordId')?.value?.recordId
+                                if (notificationRecordId) {
+                                    return <NotificationRecordLink recordId={notificationRecordId}/>
+                                } else {
+                                    return undefined
+                                }
+                            }
                         },
                         {
                             key: 'status',
@@ -78,7 +98,8 @@ export default function WorkflowsAuditView() {
                         {
                             key: 'startTime',
                             title: 'Start time',
-                            render: (_, instance) => <TimestampText value={instance.startTime} format="YYYY MMM DD, HH:mm:ss"/>,
+                            render: (_, instance) => <TimestampText value={instance.startTime}
+                                                                    format="YYYY MMM DD, HH:mm:ss"/>,
                         },
                         {
                             key: 'duration',
@@ -88,7 +109,8 @@ export default function WorkflowsAuditView() {
                         {
                             key: 'timestamp',
                             title: 'Last update',
-                            render: (_, instance) => <TimestampText value={instance.timestamp} format="YYYY MMM DD, HH:mm:ss"/>,
+                            render: (_, instance) => <TimestampText value={instance.timestamp}
+                                                                    format="YYYY MMM DD, HH:mm:ss"/>,
                         },
                     ]}
                 />
