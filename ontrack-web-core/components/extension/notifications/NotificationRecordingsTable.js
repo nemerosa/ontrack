@@ -2,7 +2,6 @@ import {useEffect, useState} from "react";
 import {Table} from "antd";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
-import Timestamp from "@components/common/Timestamp";
 import NotificationResultType from "@components/extension/notifications/NotificationResultType";
 import NotificationRecordDetails from "@components/extension/notifications/NotificationRecordDetails";
 import TablePaginationFooter from "@components/common/table/TablePaginationFooter";
@@ -11,6 +10,8 @@ import SelectNotificationResultType from "@components/extension/notifications/Se
 import SelectNotificationChannel from "@components/extension/notifications/SelectNotificationChannel";
 import NotificationSourceData from "@components/extension/notifications/NotificationSourceData";
 import {gqlNotificationRecordContent} from "@components/extension/notifications/NotificationRecordsGraphQLFragments";
+import TimestampText from "@components/common/TimestampText";
+import Link from "next/link";
 
 const {Column} = Table
 
@@ -119,10 +120,13 @@ export default function NotificationRecordingsTable({entity}) {
                 <Column
                     key="timestamp"
                     title="Timestamp"
-                    render={(_, record) => <Timestamp
-                        value={record.timestamp}
-                        format="YYYY MMM DD, HH:mm:ss"
-                    />}
+                    render={(_, record) => <Link href={`/extension/notifications/recordings/${record.id}`}>
+                        <TimestampText
+                            value={record.timestamp}
+                            format="YYYY MMM DD, HH:mm:ss"
+                        />
+                    </Link>
+                    }
                 />
 
                 <Column
