@@ -86,14 +86,14 @@ class WorkflowNotificationChannelNodeExecutor(
         return if (result != null) {
             when (result.type) {
                 NotificationResultType.OK -> WorkflowNodeExecutorResult.success(result.output?.asJson())
-                NotificationResultType.ONGOING -> WorkflowNodeExecutorResult.error("Notification is still ongoing")
-                NotificationResultType.NOT_CONFIGURED -> WorkflowNodeExecutorResult.error("Notification is not configured")
-                NotificationResultType.INVALID_CONFIGURATION -> WorkflowNodeExecutorResult.error("Notification configuration is invalid")
-                NotificationResultType.DISABLED -> WorkflowNodeExecutorResult.error("Notification is disabled")
-                NotificationResultType.ERROR -> WorkflowNodeExecutorResult.error(result.message ?: "Unknown error")
+                NotificationResultType.ONGOING -> WorkflowNodeExecutorResult.error("Notification is still ongoing", result.output?.asJson())
+                NotificationResultType.NOT_CONFIGURED -> WorkflowNodeExecutorResult.error("Notification is not configured", result.output?.asJson())
+                NotificationResultType.INVALID_CONFIGURATION -> WorkflowNodeExecutorResult.error("Notification configuration is invalid", result.output?.asJson())
+                NotificationResultType.DISABLED -> WorkflowNodeExecutorResult.error("Notification is disabled", result.output?.asJson())
+                NotificationResultType.ERROR -> WorkflowNodeExecutorResult.error(result.message ?: "Unknown error", result.output?.asJson())
             }
         } else {
-            WorkflowNodeExecutorResult.error("Notification did not return any result")
+            WorkflowNodeExecutorResult.error("Notification did not return any result", null)
         }
     }
 }

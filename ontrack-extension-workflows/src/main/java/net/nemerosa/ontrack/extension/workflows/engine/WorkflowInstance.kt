@@ -84,8 +84,8 @@ data class WorkflowInstance(
         node.success(output)
     }
 
-    fun errorNode(nodeId: String, throwable: Throwable?, message: String?) = updateNode(nodeId) { node ->
-        node.error(throwable, message)
+    fun errorNode(nodeId: String, throwable: Throwable?, message: String?, output: JsonNode?) = updateNode(nodeId) { node ->
+        node.error(throwable, message, output)
     }
 
     fun progressNode(nodeId: String, output: JsonNode) = updateNode(nodeId) { node ->

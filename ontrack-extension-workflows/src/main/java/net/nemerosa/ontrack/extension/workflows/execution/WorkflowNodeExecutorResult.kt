@@ -9,10 +9,10 @@ data class WorkflowNodeExecutorResult(
 ) {
     companion object {
 
-        fun error(message: String) = WorkflowNodeExecutorResult(
+        fun error(message: String, output: JsonNode?) = WorkflowNodeExecutorResult(
             type = WorkflowNodeExecutorResultType.ERROR,
             message = message,
-            output = null,
+            output = output,
         )
 
         fun success(output: JsonNode?) = WorkflowNodeExecutorResult(

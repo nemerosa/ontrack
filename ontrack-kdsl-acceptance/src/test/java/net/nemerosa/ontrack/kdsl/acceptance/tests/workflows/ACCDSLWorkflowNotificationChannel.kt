@@ -96,6 +96,88 @@ class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
     }
 
     @Test
+    fun `Workflow node must still contain the build URL in its output when the remote job fails`() {
+        // Job to call
+        val job = uid("job_")
+        // Jenkins configuration
+        val jenkinsConfName = uid("j_")
+        ontrack.configurations.jenkins.create(
+            JenkinsConfiguration(
+                name = jenkinsConfName,
+                url = "any",
+                user = "any",
+                password = "any",
+            )
+        )
+        // Defining a workflow
+        val workflowName = uid("w-")
+        val yaml = """
+            name: $workflowName
+            nodes:
+                - id: start
+                  executorId: notification
+                  data:
+                    channel: mock-jenkins
+                    channelConfig:
+                        config: $jenkinsConfName
+                        job: /mock/$job
+                        callMode: SYNC
+                        parameters:
+                            - name: result
+                              value: FAILURE
+                            - name: waiting
+                              value: 1000
+        """.trimIndent()
+
+        project {
+            // Subscribe to new branches
+            subscribe(
+                name = "Test",
+                channel = "workflow",
+                channelConfig = mapOf(
+                    "workflow" to WorkflowTestSupport.yamlWorkflowToJson(yaml)
+                ),
+                keywords = null,
+                events = listOf(
+                    "new_branch",
+                ),
+            )
+            // Creating a branch to trigger the workflow
+            branch {}
+
+            // Gets the workflow instance ID from the output of the notification
+
+
+            waitUntil(
+                task = "Getting the workflow instance id",
+                timeout = 30_000L,
+                interval = 500L,
+            ) {
+                val instanceId = getWorkflowInstanceId()
+                instanceId.isNullOrBlank().not()
+            }
+
+            // Getting the instance ID
+            val instanceId = getWorkflowInstanceId() ?: fail("Cannot get the workflow instance ID")
+
+            // Waits until the workflow is finished
+            val instance = waitUntilWorkflowFinished(
+                instanceId = instanceId,
+                returnInstanceOnError = true,
+            )
+
+            // Checks that the node is marked as success & contains the build URL
+            assertNotNull(instance.getWorkflowInstanceNode("start"), "Node accessed") { node ->
+                assertTrue(!node.error.isNullOrBlank(), "There is an error")
+                assertNotNull(node.output) { output ->
+                    val buildUrl = output.path("buildUrl").asText()
+                    assertTrue(buildUrl.isNotBlank(), "Build URL must not be blank")
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Workflow node contains the build URL while the node is running`() {
         // Job to call
         val job = uid("job_")
@@ -146,9 +228,8 @@ class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
             branch {}
 
             // Gets the workflow instance ID from the output of the notification
-
-
             waitUntil(
+                task = "Getting the workflow instance id",
                 timeout = 30_000L,
                 interval = 500L,
             ) {

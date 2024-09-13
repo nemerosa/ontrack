@@ -7,7 +7,10 @@ data class WorkflowInstance(
     val finished: Boolean,
     val nodesExecutions: List<WorkflowInstanceNode>,
 ) {
-    fun getExecutionOutput(nodeId: String): JsonNode? {
-        return nodesExecutions.firstOrNull { it.id == nodeId }?.output
+    fun getWorkflowInstanceNode(nodeId: String): WorkflowInstanceNode? {
+        return nodesExecutions.firstOrNull { it.id == nodeId }
     }
+
+    fun getExecutionOutput(nodeId: String): JsonNode? =
+        getWorkflowInstanceNode(nodeId)?.output
 }

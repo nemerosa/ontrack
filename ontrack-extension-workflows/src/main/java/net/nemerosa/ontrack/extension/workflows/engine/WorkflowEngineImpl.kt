@@ -125,7 +125,8 @@ class WorkflowEngineImpl(
                             instance.errorNode(
                                 node.id,
                                 throwable = null,
-                                message = result.message
+                                message = result.message,
+                                output = result.output,
                             )
                         )
                         stopWorkflow(workflowInstanceId)
@@ -154,7 +155,7 @@ class WorkflowEngineImpl(
                 }
             } catch (any: Throwable) {
                 // Stores the node error status
-                workflowInstanceStore.store(instance.errorNode(node.id, throwable = any, message = null))
+                workflowInstanceStore.store(instance.errorNode(node.id, throwable = any, message = null, output = null))
                 // Stopping the workflow
                 stopWorkflow(workflowInstanceId)
             }
