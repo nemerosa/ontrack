@@ -1,5 +1,6 @@
 import {useRouter} from "next/router";
 import MainLayout from "@components/layouts/MainLayout";
+import NotificationRecordingView from "@components/extension/notifications/NotificationRecordingView";
 
 export default function NotificationRecordingPage() {
     const router = useRouter()
@@ -9,7 +10,7 @@ export default function NotificationRecordingPage() {
         <>
             <main>
                 <MainLayout>
-                    {id}
+                    <NotificationRecordingView id={id}/>
                 </MainLayout>
             </main>
         </>
