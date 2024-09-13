@@ -12,7 +12,7 @@ test('notifications are visible on the promotion run page', async ({page}) => {
     // Provisioning of the subscription
     const group = generate("pl-group-")
     await pl.subscribe({
-        name: `Promotion run ${group}`,
+        name: `Subscription ${group}`,
         events: ["new_promotion_run"],
         channel: "in-memory",
         channelConfig: {
@@ -28,5 +28,5 @@ test('notifications are visible on the promotion run page', async ({page}) => {
     const runPage = new PromotionRunPage(page, run)
     await runPage.goTo()
     // Checking that the notification is visible
-    await runPage.assertNotificationPresent(`Promotion run ${group}`)
+    await runPage.assertNotificationPresent(`Subscription ${group} @ ${pl.name} | ${branch.name} / ${project.name}`)
 })
