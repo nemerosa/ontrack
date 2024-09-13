@@ -12,6 +12,7 @@ import NotificationSourceData from "@components/extension/notifications/Notifica
 import {gqlNotificationRecordContent} from "@components/extension/notifications/NotificationRecordsGraphQLFragments";
 import TimestampText from "@components/common/TimestampText";
 import Link from "next/link";
+import EventEntity from "@components/core/model/EventEntity";
 
 const {Column} = Table
 
@@ -183,6 +184,16 @@ export default function NotificationRecordingsTable({entity}) {
                     key="event"
                     title="Event"
                     render={(_, record) => record.event.eventType.id}
+                />
+
+                <Column
+                    key="entity"
+                    title="Entity"
+                    render={(_, record) => (
+                        <>
+                            <EventEntity event={record.event}/>
+                        </>
+                    )}
                 />
 
             </Table>
