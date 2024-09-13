@@ -5385,6 +5385,11 @@ type Query {
     ): [String!]!
     "List of all notification channels"
     notificationChannels: [NotificationChannel!]!
+    "Getting a notification record using its ID"
+    notificationRecord(
+        "Record ID"
+        id: String!
+    ): NotificationRecord
     "Access to the notification recordings"
     notificationRecords(
         "Filtering on the channel"
