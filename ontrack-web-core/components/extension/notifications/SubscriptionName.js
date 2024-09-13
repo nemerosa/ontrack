@@ -5,7 +5,7 @@ import {useGraphQLClient} from "@components/providers/ConnectionContextProvider"
 import {gql} from "graphql-request";
 import {getUserErrors} from "@components/services/graphql-utils";
 
-export default function SubscriptionName({subscription, entity, managePermission, onRenamed}) {
+export default function SubscriptionName({subscription, text, entity, managePermission, onRenamed}) {
 
     const client = useGraphQLClient()
     const [messageApi, contextHolder] = message.useMessage()
@@ -53,7 +53,7 @@ export default function SubscriptionName({subscription, entity, managePermission
                     icon: changing ? <Spin size="small"/> : <FaPencilAlt size={12}/>,
                 } : false}
             >
-                {subscription.name}
+                {text ?? subscription.name}
             </Typography.Text>
         </>
     )

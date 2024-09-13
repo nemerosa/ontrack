@@ -1,24 +1,33 @@
 import {useProjectEntityPageInfo} from "@components/entities/ProjectEntityPageInfo";
-import Link from "next/link";
-import {Space} from "antd";
+import {Space, Tooltip, Typography} from "antd";
 import SubscriptionLink from "@components/extension/notifications/SubscriptionLink";
 
 export default function EntitySubscriptionNotificationSource({entityType, entityId, subscriptionName}) {
 
-    const {title, uri, entity} = useProjectEntityPageInfo(entityType, entityId)
+    const {title, entityTypeName} = useProjectEntityPageInfo(entityType, entityId)
 
     return (
         <>
-            <Space direction="vertical">
-                <Link href={uri}>{title}</Link>
-                <SubscriptionLink
-                    subscription={{name: subscriptionName}}
-                    entity={{
-                        type: entityType,
-                        id: entityId,
-                    }}
-                />
-            </Space>
+            <Tooltip title={`Subscription for a ${entityTypeName}`}>
+                <Space>
+                    <SubscriptionLink
+                        subscription={{
+                            name: subscriptionName,
+                        }}
+                        text={
+                            <>
+                                <Typography.Link>
+                                    {subscriptionName} @ {title}
+                                </Typography.Link>
+                            </>
+                        }
+                        entity={{
+                            type: entityType,
+                            id: entityId,
+                        }}
+                    />
+                </Space>
+            </Tooltip>
         </>
 
     )

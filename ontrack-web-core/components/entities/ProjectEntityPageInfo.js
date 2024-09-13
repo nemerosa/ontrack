@@ -99,6 +99,7 @@ export const useProjectEntityPageInfo = (type, id, what) => {
     const [breadcrumbs, setBreadcrumbs] = useState([])
     const [uri, setUri] = useState('')
     const [entity, setEntity] = useState({})
+    const [entityTypeName, setEntityTypeName] = useState('')
 
     useEffect(() => {
         if (client && type && id) {
@@ -119,6 +120,7 @@ export const useProjectEntityPageInfo = (type, id, what) => {
                             }
                         `, {id}
                     ).then(data => {
+                        setEntityTypeName("Project")
                         setTitle(projectTitleName(data.project, what))
 
                         const breadcrumbs = projectBreadcrumbs()
@@ -153,6 +155,7 @@ export const useProjectEntityPageInfo = (type, id, what) => {
                             }
                         `, {id}
                     ).then(data => {
+                        setEntityTypeName("Branch")
                         setTitle(branchTitleName(data.branch, what))
                         setBreadcrumbs(downToBranchBreadcrumbs(data))
                         setUri(branchUri(data.branch))
@@ -186,6 +189,7 @@ export const useProjectEntityPageInfo = (type, id, what) => {
                             }
                         `, {id}
                     ).then(data => {
+                        setEntityTypeName("Promotion level")
                         setTitle(promotionLevelTitleName(data.promotionLevel, what))
 
                         const breadcrumbs = promotionLevelBreadcrumbs(data.promotionLevel)
@@ -230,6 +234,7 @@ export const useProjectEntityPageInfo = (type, id, what) => {
                             }
                         `, {id}
                     ).then(data => {
+                        setEntityTypeName("Validation stamp")
                         setTitle(validationStampTitleName(data.validationStamp, what))
 
                         const breadcrumbs = validationStampBreadcrumbs(data.validationStamp)
@@ -253,6 +258,7 @@ export const useProjectEntityPageInfo = (type, id, what) => {
     }, [client, type, id]);
 
     return {
+        entityTypeName,
         title,
         breadcrumbs,
         /**
