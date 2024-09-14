@@ -1,8 +1,10 @@
 package net.nemerosa.ontrack.extension.notifications.listener
 
+import com.rabbitmq.client.Channel
 import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.extension.notifications.metrics.NotificationsMetrics
 import net.nemerosa.ontrack.extension.notifications.metrics.incrementForEvent
+import net.nemerosa.ontrack.extension.notifications.queue.ackMessage
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.model.events.EventFactory
@@ -13,11 +15,11 @@ import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry
 import net.nemerosa.ontrack.model.support.ApplicationLogService
 import org.springframework.amqp.core.Message
-import org.springframework.amqp.core.MessageListener
 import org.springframework.amqp.rabbit.annotation.RabbitListenerConfigurer
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerEndpoint
 import org.springframework.amqp.rabbit.listener.RabbitListenerEndpoint
 import org.springframework.amqp.rabbit.listener.RabbitListenerEndpointRegistrar
+import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener
 import org.springframework.stereotype.Component
 
 @Component
@@ -41,7 +43,7 @@ class AsyncEventListeningQueueListener(
         return SimpleRabbitListenerEndpoint().configure(queue)
     }
 
-    private val listener = MessageListener(::onMessage)
+    private val listener = ChannelAwareMessageListener(::onMessage)
 
     private fun SimpleRabbitListenerEndpoint.configure(
         queue: String,
@@ -53,7 +55,9 @@ class AsyncEventListeningQueueListener(
         return this
     }
 
-    private fun onMessage(message: Message) {
+    private fun onMessage(message: Message, channel: Channel?) {
+        // Always acknowledge the message to prevent re-delivery
+        applicationLogService.ackMessage(message, channel)
         try {
             val body = message.body.toString(Charsets.UTF_8)
             val payload = body.parseAsJson().parse<AsyncEventListeningQueueEvent>()
@@ -72,8 +76,10 @@ class AsyncEventListeningQueueListener(
             applicationLogService.log(
                 ApplicationLogEntry.error(
                     any,
-                    NameDescription.nd("notifications-dispatching-error",
-                        "Catch-all error in notifications dispatching"),
+                    NameDescription.nd(
+                        "notifications-dispatching-error",
+                        "Catch-all error in notifications dispatching"
+                    ),
                     "Uncaught error during the notifications dispatching"
                 )
             )
