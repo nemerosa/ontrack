@@ -51,7 +51,40 @@ You can feed information into Ontrack using:
 
 ## Quick start
 
-The fastest way to start Ontrack is to use Docker Compose:
+### On Kubernetes
+
+You can install Ontrack using its [Helm chart](https://github.com/nemerosa/ontrack-chart):
+
+```
+helm repo add ontrack https://nemerosa.github.io/ontrack-chart
+```
+
+To install the `ontrack` chart:
+
+```
+helm install ontrack ontrack/ontrack
+```
+
+To uninstall the chart:
+
+```
+helm delete ontrack
+```
+
+This installs 4 services:
+
+* Ontrack itself
+* a Postgres 15 database
+* an Elasticsearch 7 single node
+* a RabbitMQ message broker
+
+> To connect to Ontrack, enable the ingress or activate a port forward.
+
+See https://github.com/nemerosa/ontrack-chart for more options.
+
+### With Docker Compose
+
+On a local machine, you can start Ontrack using Docker Compose:
 
 ```bash
 curl -fsSLO https://raw.githubusercontent.com/nemerosa/ontrack/master/compose/docker-compose.yml

@@ -1,7 +1,48 @@
 [[quick-start]]
 == Quick start
 
-The fastest way to start Ontrack is to use Docker Compose:
+[[quick-start-kubernetes]]
+=== On Kubernetes
+
+You can install Ontrack using its https://github.com/nemerosa/ontrack-chart[Helm chart]:
+
+[source,bash]
+----
+helm repo add ontrack https://nemerosa.github.io/ontrack-chart
+----
+
+To install the `ontrack` chart:
+
+[source,bash]
+----
+helm install ontrack ontrack/ontrack
+----
+
+To uninstall the chart:
+
+[source,bash]
+----
+helm delete ontrack
+----
+
+This installs 4 services:
+
+* Ontrack itself
+* a Postgres 15 database
+* an Elasticsearch 7 single node
+* a RabbitMQ message broker
+
+[NOTE]
+====
+To connect to Ontrack, enable the ingress or activate a port forward.
+====
+
+See https://github.com/nemerosa/ontrack-chart for more options.
+
+[[quick-start-compose]]
+=== With Docker Compose
+
+On a local machine, you can start Ontrack using Docker Compose:
 
 [source,bash,subs="attributes"]
 ----
