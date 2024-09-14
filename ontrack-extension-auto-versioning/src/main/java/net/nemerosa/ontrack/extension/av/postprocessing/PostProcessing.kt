@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.av.postprocessing
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
+import net.nemerosa.ontrack.extension.av.processing.AutoVersioningTemplateRenderer
 import net.nemerosa.ontrack.extension.scm.service.SCM
 import net.nemerosa.ontrack.model.extension.Extension
 
@@ -31,6 +32,7 @@ interface PostProcessing<T> : Extension {
      * @param repository Path to the repository
      * @param upgradeBranch Remote branch already containing the upgraded version
      * @param scm The target SCM
+     * @param avTemplateRenderer Template renderer used to render templates in the auto-versioning context
      */
     fun postProcessing(
         config: T,
@@ -39,6 +41,7 @@ interface PostProcessing<T> : Extension {
         repository: String,
         upgradeBranch: String,
         scm: SCM,
+        avTemplateRenderer: AutoVersioningTemplateRenderer,
     )
 
     /**

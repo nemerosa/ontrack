@@ -185,6 +185,7 @@ class AutoVersioningProcessingServiceImpl(
                             repository,
                             upgradeBranch,
                             scm,
+                            avRenderer,
                         )
                         logger.debug("Processing auto versioning order end of post processing: {}", order)
                         autoVersioningAuditService.onPostProcessingEnd(order, upgradeBranch)
@@ -315,6 +316,7 @@ class AutoVersioningProcessingServiceImpl(
         repository: String,
         upgradeBranch: String,
         scm: SCM,
+        avTemplateRenderer: AutoVersioningTemplateRenderer,
     ) {
         // Count
         metrics.onPostProcessingStarted(order, postProcessing)
@@ -328,6 +330,7 @@ class AutoVersioningProcessingServiceImpl(
                     repository,
                     upgradeBranch,
                     scm,
+                    avTemplateRenderer,
                 )
             }
             // Success
@@ -347,11 +350,12 @@ class AutoVersioningProcessingServiceImpl(
         repository: String,
         upgradeBranch: String,
         scm: SCM,
+        avTemplateRenderer: AutoVersioningTemplateRenderer,
     ) {
         // Parsing and validation of the configuration
         val config: T = postProcessing.parseAndValidate(order.postProcessingConfig)
         // Launching the post-processing
-        postProcessing.postProcessing(config, order, repositoryURI, repository, upgradeBranch, scm)
+        postProcessing.postProcessing(config, order, repositoryURI, repository, upgradeBranch, scm, avTemplateRenderer)
     }
 
     private fun AutoVersioningSourceConfigPath.replaceVersion(

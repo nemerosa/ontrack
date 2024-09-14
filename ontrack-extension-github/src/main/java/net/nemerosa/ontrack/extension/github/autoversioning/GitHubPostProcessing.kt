@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.common.untilTimeout
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
 import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessing
 import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessingMissingConfigException
+import net.nemerosa.ontrack.extension.av.processing.AutoVersioningTemplateRenderer
 import net.nemerosa.ontrack.extension.github.GitHubExtensionFeature
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
@@ -50,6 +51,7 @@ class GitHubPostProcessing(
         repository: String,
         upgradeBranch: String,
         scm: SCM,
+        avTemplateRenderer: AutoVersioningTemplateRenderer,
     ) {
         // Gets the settings
         val settings = cachedSettingsService.getCachedSettings(GitHubPostProcessingSettings::class.java)
@@ -64,10 +66,9 @@ class GitHubPostProcessing(
             ?: throw GitHubPostProcessingConfigException("Cannot find GitHub configuration with name: $ghConfigName")
 
         // Local repository
-        if (config.workflow != null && config.workflow.isNotBlank()) {
+        if (!config.workflow.isNullOrBlank()) {
             runPostProcessing(
                 ghConfig,
-                config,
                 repository,
                 config.workflow,
                 upgradeBranch,
@@ -85,7 +86,6 @@ class GitHubPostProcessing(
             }
             runPostProcessing(
                 ghConfig,
-                config,
                 settings.repository,
                 settings.workflow,
                 settings.branch,
@@ -104,7 +104,6 @@ class GitHubPostProcessing(
 
     private fun runPostProcessing(
         ghConfig: GitHubEngineConfiguration,
-        config: GitHubPostProcessingConfig,
         repository: String,
         workflow: String,
         branch: String,

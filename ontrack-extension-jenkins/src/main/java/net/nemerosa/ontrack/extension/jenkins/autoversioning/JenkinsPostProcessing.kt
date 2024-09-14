@@ -4,12 +4,14 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
 import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessing
 import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessingMissingConfigException
+import net.nemerosa.ontrack.extension.av.processing.AutoVersioningTemplateRenderer
 import net.nemerosa.ontrack.extension.jenkins.JenkinsConfiguration
 import net.nemerosa.ontrack.extension.jenkins.JenkinsConfigurationService
 import net.nemerosa.ontrack.extension.jenkins.JenkinsExtensionFeature
 import net.nemerosa.ontrack.extension.jenkins.client.JenkinsClientFactory
 import net.nemerosa.ontrack.extension.scm.service.SCM
 import net.nemerosa.ontrack.extension.support.AbstractExtension
+import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import org.springframework.stereotype.Component
 
@@ -43,13 +45,15 @@ class JenkinsPostProcessing(
         repository: String,
         upgradeBranch: String,
         scm: SCM,
+        avTemplateRenderer: AutoVersioningTemplateRenderer,
     ) {
         // Gets the global settings
         val settings: JenkinsPostProcessingSettings =
             cachedSettingsService.getCachedSettings(JenkinsPostProcessingSettings::class.java)
         // Configuration
         val jenkinsConfigName = config.config ?: settings.config
-        val jenkinsJobPath = config.job ?: settings.job
+        val jenkinsJobPathTemplate = config.job ?: settings.job
+        val jenkinsJobPath = avTemplateRenderer.render(jenkinsJobPathTemplate, PlainEventRenderer.INSTANCE)
         // Checks the configuration
         if (jenkinsConfigName.isBlank() || jenkinsJobPath.isBlank()) {
             throw JenkinsPostProcessingSettingsNotFoundException()
@@ -72,7 +76,11 @@ class JenkinsPostProcessing(
         )
 
         // Extra parameters
-        parameters.putAll(config.parameters.associate { it.name to it.value })
+        parameters.putAll(
+            config.parameters.associate {
+                it.name to avTemplateRenderer.render(it.value, PlainEventRenderer.INSTANCE)
+            }
+        )
 
         // Launches the job and waits for its completion
         val jenkinsBuild = jenkinsClient.runJob(

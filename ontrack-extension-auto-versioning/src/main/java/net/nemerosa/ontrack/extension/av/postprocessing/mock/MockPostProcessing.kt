@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.av.AutoVersioningExtensionFeature
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
 import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessing
 import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessingMissingConfigException
+import net.nemerosa.ontrack.extension.av.processing.AutoVersioningTemplateRenderer
 import net.nemerosa.ontrack.extension.scm.service.SCM
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.json.parse
@@ -39,6 +40,7 @@ class MockPostProcessing(
         repository: String,
         upgradeBranch: String,
         scm: SCM,
+        avTemplateRenderer: AutoVersioningTemplateRenderer,
     ) {
         if (config.durationMs > 0) {
             runBlocking {
