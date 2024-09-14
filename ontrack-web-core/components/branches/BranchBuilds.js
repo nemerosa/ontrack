@@ -13,7 +13,8 @@ import ValidationGroups from "@components/validationRuns/ValidationGroups";
 import {ValidationStampFilterContext} from "@components/branches/filters/validationStamps/ValidationStampFilterContext";
 import {useConnection, useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
-import {scmChangeLogUri} from "@components/common/Links";
+import {buildUri, scmChangeLogUri} from "@components/common/Links";
+import EntityNotificationsBadge from "@components/extension/notifications/EntityNotificationsBadge";
 
 const {Column} = Table;
 
@@ -216,7 +217,13 @@ export default function BranchBuilds({
                         key="build"
                         colSpan={0} // Header managed by the "header" column
                         render={(_, build) =>
-                            <BuildBox build={build} displayDecorations={true}/>
+                            <BuildBox build={build} displayDecorations={true}>
+                                <EntityNotificationsBadge
+                                    entityType="BUILD"
+                                    entityId={build.id}
+                                    href={buildUri(build)}
+                                />
+                            </BuildBox>
                         }
                     />
                     <Column

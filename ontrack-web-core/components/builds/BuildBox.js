@@ -21,7 +21,8 @@ export default function BuildBox({
                                      build, text, extra,
                                      displayDecorations = true,
                                      creationDisplayMode = "inline",
-                                     className
+                                     className,
+                                     children
                                  }) {
 
     const core =
@@ -31,6 +32,7 @@ export default function BuildBox({
                 {
                     displayDecorations && <Decorations entity={build}/>
                 }
+                {children}
             </Space>
             {
                 creationDisplayMode === 'inline' &&
