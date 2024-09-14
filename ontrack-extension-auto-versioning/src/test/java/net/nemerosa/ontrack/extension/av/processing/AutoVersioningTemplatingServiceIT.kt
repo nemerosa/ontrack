@@ -39,9 +39,14 @@ class AutoVersioningTemplatingServiceIT : AbstractAutoVersioningTestSupport() {
                             prBodyTemplate = null,
                         )
 
-                        val (title, body) = autoVersioningTemplatingService.generatePRInfo(
+                        val avRenderer = autoVersioningTemplatingService.createAutoVersioningTemplateRenderer(
                             order = order,
                             currentVersions = mapOf("gradle.properties" to "2.0.0")
+                        )
+
+                        val (title, body) = autoVersioningTemplatingService.generatePRInfo(
+                            order = order,
+                            avRenderer = avRenderer,
                         )
 
                         assertEquals(
@@ -77,10 +82,14 @@ class AutoVersioningTemplatingServiceIT : AbstractAutoVersioningTestSupport() {
                                     prBodyTemplate = "The version of \${sourceProject} in \${PATH} has been upgraded to \${VERSION}.",
                                 )
 
+                                val avRenderer = autoVersioningTemplatingService.createAutoVersioningTemplateRenderer(
+                                    order = order,
+                                    currentVersions = mapOf("gradle.properties" to "1.0.0")
+                                )
 
                                 val (title, body) = autoVersioningTemplatingService.generatePRInfo(
                                     order = order,
-                                    currentVersions = mapOf("gradle.properties" to "1.0.0")
+                                    avRenderer = avRenderer,
                                 )
 
                                 assertEquals(
@@ -121,10 +130,14 @@ class AutoVersioningTemplatingServiceIT : AbstractAutoVersioningTestSupport() {
                                     prBodyTemplate = "The version of \${sourceProject} in \${PATH} has been upgraded to \${VERSION}.",
                                 )
 
+                                val avRenderer = autoVersioningTemplatingService.createAutoVersioningTemplateRenderer(
+                                    order = order,
+                                    currentVersions = mapOf("gradle.properties" to "1.0.0")
+                                )
 
                                 val (title, body) = autoVersioningTemplatingService.generatePRInfo(
                                     order = order,
-                                    currentVersions = mapOf("gradle.properties" to "1.0.0")
+                                    avRenderer = avRenderer,
                                 )
 
                                 assertEquals(
@@ -163,9 +176,14 @@ class AutoVersioningTemplatingServiceIT : AbstractAutoVersioningTestSupport() {
                                     prBodyTemplateFormat = "html",
                                 )
 
-                                val (title, body) = autoVersioningTemplatingService.generatePRInfo(
+                                val avRenderer = autoVersioningTemplatingService.createAutoVersioningTemplateRenderer(
                                     order = order,
                                     currentVersions = mapOf("gradle.properties" to "1.0.0")
+                                )
+
+                                val (title, body) = autoVersioningTemplatingService.generatePRInfo(
+                                    order = order,
+                                    avRenderer = avRenderer,
                                 )
 
                                 assertEquals(
@@ -194,7 +212,7 @@ class AutoVersioningTemplatingServiceIT : AbstractAutoVersioningTestSupport() {
                         configureMockSCMBranch()
 
                         build {}
-                        val from = build {
+                        /* val from = */ build {
                             // Links this build to the expected current version
                             releaseProperty(this, "1.0.0")
                             // Mock termination commit
@@ -231,10 +249,14 @@ class AutoVersioningTemplatingServiceIT : AbstractAutoVersioningTestSupport() {
                                     """.trimIndent(),
                                 )
 
+                                val avRenderer = autoVersioningTemplatingService.createAutoVersioningTemplateRenderer(
+                                    order = order,
+                                    currentVersions = mapOf("gradle.properties" to "1.0.0")
+                                )
 
                                 val (title, body) = autoVersioningTemplatingService.generatePRInfo(
                                     order = order,
-                                    currentVersions = mapOf("gradle.properties" to "1.0.0")
+                                    avRenderer = avRenderer,
                                 )
 
                                 assertEquals(

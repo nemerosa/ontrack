@@ -160,6 +160,12 @@ class AutoVersioningProcessingServiceImpl(
             // At least one path was changed
             if (targetPathUpdated.any { it }) {
 
+                // Templating renderer
+                val avRenderer = autoVersioningTemplatingService.createAutoVersioningTemplateRenderer(
+                    order = order,
+                    currentVersions = currentVersions,
+                )
+
                 // Post-processing
                 if (!order.postProcessing.isNullOrBlank()) {
                     // Gets the post processor
@@ -191,7 +197,7 @@ class AutoVersioningProcessingServiceImpl(
                     // Audit
                     autoVersioningAuditService.onPRCreating(order, upgradeBranch)
                     // PR title & message
-                    val (prTitle, prBody) = autoVersioningTemplatingService.generatePRInfo(order, currentVersions)
+                    val (prTitle, prBody) = autoVersioningTemplatingService.generatePRInfo(order, avRenderer)
                     // PR creation
                     val pr = scm.createPR(
                         from = upgradeBranch,

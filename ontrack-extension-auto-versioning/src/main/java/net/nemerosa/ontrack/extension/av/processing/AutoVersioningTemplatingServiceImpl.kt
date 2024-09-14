@@ -24,10 +24,10 @@ class AutoVersioningTemplatingServiceImpl(
     private val eventRendererRegistry: EventRendererRegistry,
 ) : AutoVersioningTemplatingService {
 
-    override fun generatePRInfo(
+    override fun createAutoVersioningTemplateRenderer(
         order: AutoVersioningOrder,
         currentVersions: Map<String, String>,
-    ): AutoVersioningPRInfo {
+    ): AutoVersioningTemplateRenderer {
 
         val sourceProject: Project by lazy {
             structureService.findProjectByName(order.sourceProject)
@@ -58,12 +58,28 @@ class AutoVersioningTemplatingServiceImpl(
             tmp
         }
 
+        return object : AutoVersioningTemplateRenderer {
+            override fun render(template: String, renderer: EventRenderer): String {
+                return templatingService.render(
+                    template = template,
+                    context = context,
+                    renderer = renderer,
+                )
+            }
+        }
+
+    }
+
+    override fun generatePRInfo(
+        order: AutoVersioningOrder,
+        avRenderer: AutoVersioningTemplateRenderer,
+    ): AutoVersioningPRInfo {
+
         val title = if (order.prTitleTemplate.isNullOrBlank()) {
             order.getCommitMessage()
         } else {
-            templatingService.render(
+            avRenderer.render(
                 template = order.prTitleTemplate,
-                context = context,
                 renderer = PlainEventRenderer.INSTANCE,
             )
         }
@@ -75,9 +91,8 @@ class AutoVersioningTemplatingServiceImpl(
         val body = if (order.prBodyTemplate.isNullOrBlank()) {
             order.getCommitMessage()
         } else {
-            templatingService.render(
+            avRenderer.render(
                 template = order.prBodyTemplate,
-                context = context,
                 renderer = renderer,
             )
         }
