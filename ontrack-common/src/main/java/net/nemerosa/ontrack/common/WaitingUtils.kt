@@ -4,6 +4,23 @@ import kotlinx.coroutines.delay
 import java.time.Duration
 import java.util.concurrent.TimeoutException
 
+suspend fun <T> untilTimeout(
+    name: String,
+    timeout: Duration,
+    retryDelay: Duration = Duration.ofSeconds(30),
+    logger: (String) -> Unit = {},
+    code: () -> T?,
+): T {
+    val retries = (timeout.toMillis() / retryDelay.toMillis()) + 1
+    return untilTimeout(
+        name = name,
+        retryCount = retries.toInt(),
+        retryDelay = retryDelay,
+        logger = logger,
+        code = code,
+    )
+}
+
 /**
  * Runs some [code] until it returns something (different than null) and does not timeout.
  *

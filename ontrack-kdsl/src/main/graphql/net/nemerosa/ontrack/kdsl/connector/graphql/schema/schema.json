@@ -1883,11 +1883,11 @@
               "deprecationReason": null
             },
             {
-              "name": "targetPaths",
-              "description": "List of paths to update with the target version",
+              "name": "targetPath",
+              "description": "Target path(s) for the processing order",
               "args": [],
               "type": {
-                "kind": "LIST",
+                "kind": "NON_NULL",
                 "name": null,
                 "ofType": {
                   "kind": "SCALAR",
@@ -2073,6 +2073,29 @@
                 "kind": "SCALAR",
                 "name": "String",
                 "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "additionalPaths",
+              "description": "additionalPaths field",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "AutoVersioningSourceConfigPath"
+                    }
+                  }
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -31483,6 +31506,12 @@
               "description": null,
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "TIMEOUT",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "possibleTypes": null
@@ -39807,6 +39836,33 @@
                     }
                   }
                 }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "notificationRecord",
+              "description": "Getting a notification record using its ID",
+              "args": [
+                {
+                  "name": "id",
+                  "description": "Record ID",
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "NotificationRecord",
+                "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null

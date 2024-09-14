@@ -23,8 +23,14 @@ data class NotificationResult<R>(
                 output = null
             )
 
+        fun <R> timeout() = NotificationResult<R>(
+            type = NotificationResultType.TIMEOUT,
+            message = null,
+            output = null
+        )
+
         fun <R> error(message: String, output: R? = null) =
-            NotificationResult<R>(NotificationResultType.ERROR, message, output = output)
+            NotificationResult(NotificationResultType.ERROR, message, output = output)
 
         fun <R> disabled(message: String) = NotificationResult<R>(NotificationResultType.DISABLED, message, null)
     }

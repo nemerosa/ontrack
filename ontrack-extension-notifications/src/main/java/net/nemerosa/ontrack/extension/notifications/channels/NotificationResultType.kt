@@ -12,6 +12,8 @@ enum class NotificationResultType {
 
     DISABLED,
 
-    ERROR
+    ERROR,
+
+    TIMEOUT
 
 }
