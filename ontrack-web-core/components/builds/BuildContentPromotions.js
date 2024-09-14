@@ -11,6 +11,9 @@ import {useGraphQLClient} from "@components/providers/ConnectionContextProvider"
 import GridCell from "@components/grid/GridCell";
 import PromotionRunLink from "@components/promotionRuns/PromotionRunLink";
 import {FaCog} from "react-icons/fa";
+import EntityNotificationsBadge from "@components/extension/notifications/EntityNotificationsBadge";
+import {promotionLevelUri, promotionRunUri} from "@components/common/Links";
+import Link from "next/link";
 
 export default function BuildContentPromotions({build}) {
 
@@ -125,10 +128,19 @@ export default function BuildContentPromotions({build}) {
                                             /> : undefined
                                     }
                                 </Space>,
-                                children: <Popover title={promotionLevel.name}
-                                                   content={<AnnotatedDescription entity={promotionLevel}/>}>
-                                    <Typography.Text>{promotionLevel.name}</Typography.Text>
-                                </Popover>,
+                                children: <Space>
+                                    <Popover title={promotionLevel.name}
+                                             content={<AnnotatedDescription entity={promotionLevel}/>}>
+                                        <Link href={promotionLevelUri(promotionLevel)}>
+                                            <Typography.Text>{promotionLevel.name}</Typography.Text>
+                                        </Link>
+                                    </Popover>
+                                    <EntityNotificationsBadge
+                                        entityType="PROMOTION_RUN"
+                                        entityId={run.id}
+                                        href={promotionRunUri(run)}
+                                    />
+                                </Space>,
                                 dot: <PromotionLevel
                                     promotionLevel={promotionLevel}
                                     size={16}
@@ -147,7 +159,9 @@ export default function BuildContentPromotions({build}) {
                                 /> : undefined,
                             children: <Popover title={promotionLevel.name}
                                                content={<AnnotatedDescription entity={promotionLevel}/>}>
-                                <Typography.Text disabled>{promotionLevel.name}</Typography.Text>
+                                <Link href={promotionLevelUri(promotionLevel)}>
+                                    <Typography.Text type="secondary">{promotionLevel.name}</Typography.Text>
+                                </Link>
                             </Popover>,
                             dot: <PromotionLevel
                                 promotionLevel={promotionLevel}
