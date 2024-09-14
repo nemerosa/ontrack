@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NoTemplate
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
+import net.nemerosa.ontrack.extension.workflows.definition.totalTimeout
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowContext
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowEngine
 import net.nemerosa.ontrack.json.asJson
@@ -45,6 +46,8 @@ class WorkflowNotificationChannel(
                 renderer = PlainEventRenderer.INSTANCE,
             )
         }
+        // Total timeout
+        val workflowTimeout = workflow.totalTimeout
         // Launching the workflow (with the event as context, template is not used)
         val instance = workflowEngine.startWorkflow(
             workflow = workflow,
