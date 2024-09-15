@@ -56,7 +56,6 @@ class AsyncNotificationQueueListener(
     }
 
     private fun onMessage(message: Message, channel: Channel?) {
-        applicationLogService.ackMessage(message, channel)
         try {
             val body = message.body.toString(Charsets.UTF_8)
             val payload = body.parseAsJson().parse<NotificationQueueItem>()

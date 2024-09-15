@@ -4,7 +4,6 @@ import com.rabbitmq.client.Channel
 import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.extension.notifications.metrics.NotificationsMetrics
 import net.nemerosa.ontrack.extension.notifications.metrics.incrementForEvent
-import net.nemerosa.ontrack.extension.notifications.queue.ackMessage
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.model.events.EventFactory
@@ -56,8 +55,6 @@ class AsyncEventListeningQueueListener(
     }
 
     private fun onMessage(message: Message, channel: Channel?) {
-        // Always acknowledge the message to prevent re-delivery
-        applicationLogService.ackMessage(message, channel)
         try {
             val body = message.body.toString(Charsets.UTF_8)
             val payload = body.parseAsJson().parse<AsyncEventListeningQueueEvent>()
