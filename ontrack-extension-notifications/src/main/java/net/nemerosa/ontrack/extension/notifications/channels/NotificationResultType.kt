@@ -14,6 +14,6 @@ enum class NotificationResultType {
 
     ERROR,
 
-    TIMEOUT
+    ASYNC,
 
 }

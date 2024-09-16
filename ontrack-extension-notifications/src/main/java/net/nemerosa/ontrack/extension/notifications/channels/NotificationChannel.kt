@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.notifications.channels
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.extension.notifications.recording.NotificationRecord
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.form.Form
 
@@ -33,6 +34,19 @@ interface NotificationChannel<C, R> {
         template: String?,
         outputProgressCallback: (current: R) -> R,
     ): NotificationResult<R>
+
+    /**
+     * Getting the result of a notification dynamically.
+     *
+     * By default, returns null, meaning that the notification result is
+     * immediately returned by the channel.
+     *
+     * @param notificationRecord Notification to get the result for
+     * @return Actual notification result or null if must be ignored
+     */
+    fun getNotificationResult(
+        notificationRecord: NotificationRecord,
+    ): NotificationResult<R>? = null
 
     /**
      * Given a search token, returns a configuration which would match a JSON.

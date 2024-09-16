@@ -1,5 +1,5 @@
 import {Space, Spin} from "antd";
-import {FaCheck, FaExclamationTriangle, FaHourglass, FaTimesCircle} from "react-icons/fa";
+import {FaCheck, FaExclamationTriangle, FaTimesCircle} from "react-icons/fa";
 
 export const notificationResultTypes = [
     {
@@ -39,10 +39,10 @@ export const notificationResultTypes = [
         icon: <FaTimesCircle color="red"/>,
     },
     {
-        key: 'TIMEOUT',
-        name: 'Timeout',
-        color: 'red',
-        icon: <FaHourglass color="red"/>,
+        key: 'ASYNC',
+        name: 'Async',
+        color: 'green',
+        icon: <Spin size="small"/>,
     },
 ]
 

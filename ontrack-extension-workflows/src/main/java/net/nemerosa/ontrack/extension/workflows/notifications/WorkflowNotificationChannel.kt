@@ -1,17 +1,15 @@
 package net.nemerosa.ontrack.extension.workflows.notifications
 
 import com.fasterxml.jackson.databind.JsonNode
-import kotlinx.coroutines.runBlocking
-import net.nemerosa.ontrack.common.untilTimeout
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NoTemplate
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
-import net.nemerosa.ontrack.extension.workflows.definition.totalTimeout
+import net.nemerosa.ontrack.extension.notifications.recording.NotificationRecord
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowContext
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowEngine
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceStatus
-import net.nemerosa.ontrack.extension.workflows.engine.getWorkflowInstance
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.getTextField
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
@@ -19,8 +17,6 @@ import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.form.Form
 import org.springframework.stereotype.Component
-import java.time.Duration
-import java.util.concurrent.TimeoutException
 
 @Component
 @APIDescription("Launches a workflow")
@@ -52,8 +48,6 @@ class WorkflowNotificationChannel(
                 renderer = PlainEventRenderer.INSTANCE,
             )
         }
-        // Total timeout
-        val workflowTimeout = workflow.totalTimeout
         // Launching the workflow (with the event as context, template is not used)
         val instance = workflowEngine.startWorkflow(
             workflow = workflow,
@@ -74,57 +68,39 @@ class WorkflowNotificationChannel(
         }
 
         // Output = just an ID to the workflow instance
-        val output = WorkflowNotificationChannelOutput(
-            workflowInstanceId = instance.id,
+        return NotificationResult.async(
+            WorkflowNotificationChannelOutput(
+                workflowInstanceId = instance.id,
+            )
         )
+    }
 
-        // Reporting the start
-        outputProgressCallback(output)
+    override fun getNotificationResult(notificationRecord: NotificationRecord): NotificationResult<WorkflowNotificationChannelOutput>? {
+        // Getting the workflow instance ID
+        val instanceId =
+            notificationRecord.result.output?.getTextField(WorkflowNotificationChannelOutput::workflowInstanceId.name)
+                ?: return null
+        // Loading the instance
+        val instance = workflowEngine.findWorkflowInstance(instanceId) ?: return null
+        // Getting result
+        val output = WorkflowNotificationChannelOutput(workflowInstanceId = instance.id)
+        return when (instance.status) {
 
-        // Waits until the workflow is finished
-        return try {
-            val finalStatus = runBlocking {
-                untilTimeout(
-                    name = "Waiting until ${instance.id} workflow is finished",
-                    timeout = Duration.ofMillis(workflowTimeout),
-                    retryDelay = Duration.ofSeconds(1),
-                ) {
-                    // Getting the status of the workflow
-                    val status = workflowEngine.getWorkflowInstance(instance.id).status
-                    // Returning not-null if finished
-                    // Returning null if not finished
-                    status.takeIf { it.finished }
-                }
-            }
+            WorkflowInstanceStatus.STARTED -> NotificationResult.async(output)
 
-            // Returning the status
-            when (finalStatus) {
-                WorkflowInstanceStatus.SUCCESS ->
-                    NotificationResult.ok(
-                        output
-                    )
+            WorkflowInstanceStatus.RUNNING -> NotificationResult.ongoing(output)
 
-                WorkflowInstanceStatus.STOPPED ->
-                    NotificationResult.error(
-                        message = "Workflow was stopped",
-                        output = output
-                    )
+            WorkflowInstanceStatus.STOPPED -> NotificationResult.error(
+                message = "Workflow has been stopped",
+                output = output,
+            )
 
-                WorkflowInstanceStatus.ERROR ->
-                    NotificationResult.error(
-                        message = "Workflow failed with an error",
-                        output = output
-                    )
+            WorkflowInstanceStatus.ERROR -> NotificationResult.error(
+                message = "Workflow in error",
+                output = output,
+            )
 
-                else ->
-                    NotificationResult.error(
-                        message = "Workflow in an running state but reported finished: $finalStatus",
-                        output = output
-                    )
-
-            }
-        } catch (ex: TimeoutException) {
-            NotificationResult.timeout(output)
+            WorkflowInstanceStatus.SUCCESS -> NotificationResult.ok(output)
         }
     }
 

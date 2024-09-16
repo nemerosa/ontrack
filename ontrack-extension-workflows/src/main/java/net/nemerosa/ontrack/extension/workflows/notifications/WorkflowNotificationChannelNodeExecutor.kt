@@ -86,6 +86,7 @@ class WorkflowNotificationChannelNodeExecutor(
         return if (result != null) {
             when (result.type) {
                 NotificationResultType.OK -> WorkflowNodeExecutorResult.success(result.output?.asJson())
+                NotificationResultType.ASYNC -> WorkflowNodeExecutorResult.success(result.output?.asJson())
                 NotificationResultType.ONGOING -> WorkflowNodeExecutorResult.error(
                     "Notification is still ongoing",
                     result.output?.asJson()
@@ -108,11 +109,6 @@ class WorkflowNotificationChannelNodeExecutor(
 
                 NotificationResultType.ERROR -> WorkflowNodeExecutorResult.error(
                     result.message ?: "Unknown error",
-                    result.output?.asJson()
-                )
-
-                NotificationResultType.TIMEOUT -> WorkflowNodeExecutorResult.error(
-                    "Timeout: ${result.message ?: "Unknown error"}",
                     result.output?.asJson()
                 )
             }

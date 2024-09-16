@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.notifications.recording
 
 import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.extension.notifications.channels.GQLTypeNotificationRecordResult
+import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannelRegistry
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.*
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Component
 @Component
 class GQLTypeNotificationRecord(
     private val gqlTypeNotificationRecordResult: GQLTypeNotificationRecordResult,
-    private val gqlTypeNotificationSourceData: GQLTypeNotificationSourceData,
+    private val notificationChannelRegistry: NotificationChannelRegistry,
 ) : GQLType {
 
     override fun getTypeName(): String = NotificationRecord::class.java.simpleName
@@ -49,6 +50,21 @@ class GQLTypeNotificationRecord(
                 it.name(NotificationRecord::result.name)
                     .description(getPropertyDescription(NotificationRecord::result))
                     .type(gqlTypeNotificationRecordResult.typeRef.toNotNull())
+                    .dataFetcher { env ->
+                        val record: NotificationRecord = env.getSource()
+                        getNotificationRecordResult(record)
+                    }
             }
             .build()
+
+    private fun getNotificationRecordResult(record: NotificationRecord): NotificationRecordResult {
+        val channel = notificationChannelRegistry.findChannel(record.channel)
+        return if (channel != null) {
+            channel.getNotificationResult(record)
+                ?.toNotificationRecordResult()
+                ?: record.result
+        } else {
+            record.result
+        }
+    }
 }

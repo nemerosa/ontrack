@@ -23,8 +23,8 @@ data class NotificationResult<R>(
                 output = null
             )
 
-        fun <R> timeout(output: R?) = NotificationResult<R>(
-            type = NotificationResultType.TIMEOUT,
+        fun <R> async(output: R?) = NotificationResult(
+            type = NotificationResultType.ASYNC,
             message = null,
             output = output
         )
