@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.workflows
 
+import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
 import net.nemerosa.ontrack.kdsl.spec.configurations.configurations
@@ -47,8 +48,9 @@ class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
 
         project {
             // Subscribe to new branches
+            val subName = uid("sub-")
             subscribe(
-                name = "Test",
+                name = subName,
                 channel = "workflow",
                 channelConfig = mapOf(
                     "workflow" to WorkflowTestSupport.yamlWorkflowToJson(yaml)
@@ -65,12 +67,12 @@ class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
                 timeout = 30_000,
                 interval = 500L,
             ) {
-                val instanceId = getWorkflowInstanceId()
+                val instanceId = getWorkflowInstanceId(subName)
                 instanceId.isNullOrBlank().not()
             }
 
             // Getting the instance ID
-            val instanceId = getWorkflowInstanceId() ?: fail("Cannot get the workflow instance ID")
+            val instanceId = getWorkflowInstanceId(subName) ?: fail("Cannot get the workflow instance ID")
 
             // Waits until the workflow is finished
             waitUntilWorkflowFinished(instanceId = instanceId)
@@ -131,8 +133,9 @@ class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
 
         project {
             // Subscribe to new branches
+            val subName = uid("sub-")
             subscribe(
-                name = "Test",
+                name = subName,
                 channel = "workflow",
                 channelConfig = mapOf(
                     "workflow" to WorkflowTestSupport.yamlWorkflowToJson(yaml)
@@ -146,19 +149,17 @@ class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
             branch {}
 
             // Gets the workflow instance ID from the output of the notification
-
-
             waitUntil(
                 task = "Getting the workflow instance id",
                 timeout = 30_000L,
                 interval = 500L,
             ) {
-                val instanceId = getWorkflowInstanceId()
+                val instanceId = getWorkflowInstanceId(subName)
                 instanceId.isNullOrBlank().not()
             }
 
             // Getting the instance ID
-            val instanceId = getWorkflowInstanceId() ?: fail("Cannot get the workflow instance ID")
+            val instanceId = getWorkflowInstanceId(subName) ?: fail("Cannot get the workflow instance ID")
 
             // Waits until the workflow is finished
             val instance = waitUntilWorkflowFinished(
@@ -213,8 +214,9 @@ class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
 
         project {
             // Subscribe to new branches
+            val subName = uid("sub-")
             subscribe(
-                name = "Test",
+                name = subName,
                 channel = "workflow",
                 channelConfig = mapOf(
                     "workflow" to WorkflowTestSupport.yamlWorkflowToJson(yaml)
@@ -233,12 +235,12 @@ class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
                 timeout = 30_000L,
                 interval = 500L,
             ) {
-                val instanceId = getWorkflowInstanceId()
+                val instanceId = getWorkflowInstanceId(subName)
                 instanceId.isNullOrBlank().not()
             }
 
             // Getting the instance ID
-            val instanceId = getWorkflowInstanceId() ?: fail("Cannot get the workflow instance ID")
+            val instanceId = getWorkflowInstanceId(subName) ?: fail("Cannot get the workflow instance ID")
 
             // Checks that the node is marked as ongoing & contains the build URL
             waitUntil(interval = 500L, timeout = 2_000L, task = "Waiting for the build URL") {
@@ -298,9 +300,10 @@ class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
 
         project {
             branch {
+                val subName = uid("sub-")
                 val pl = promotion().apply {
                     subscribe(
-                        name = "Test",
+                        name = subName,
                         channel = "workflow",
                         channelConfig = mapOf(
                             "workflow" to WorkflowTestSupport.yamlWorkflowToJson(yaml)
@@ -319,12 +322,12 @@ class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
                         timeout = 30_000,
                         interval = 500L,
                     ) {
-                        val instanceId = getWorkflowInstanceId()
+                        val instanceId = getWorkflowInstanceId(subName)
                         instanceId.isNullOrBlank().not()
                     }
 
                     // Getting the instance ID
-                    val instanceId = getWorkflowInstanceId() ?: fail("Cannot get the workflow instance ID")
+                    val instanceId = getWorkflowInstanceId(subName) ?: fail("Cannot get the workflow instance ID")
 
                     // Waits until the workflow is finished
                     val instance = waitUntilWorkflowFinished(instanceId = instanceId, returnInstanceOnError = true)
@@ -344,9 +347,13 @@ class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
     /**
      * Gets the workflow instance ID from the output of the notification
      */
-    private fun getWorkflowInstanceId() = ontrack.notifications.notificationRecordsOutputs("workflow")
+    private fun getWorkflowInstanceId(subscriptionName: String) = ontrack.notifications.notificationRecords("workflow")
+        .filter { record ->
+            record.source?.id == "entity-subscription" &&
+                    record.source?.data?.getRequiredTextField("subscriptionName") == subscriptionName
+        }
         .firstOrNull()
-        ?.output
+        ?.result?.output
         ?.path("workflowInstanceId")
         ?.asText()
 

@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.kdsl.connector.Connected
 import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.NotificationRecordsOutputsQuery
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.NotificationRecordsQuery
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.SubscribeToEntityEventsMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.SubscriptionsByEntityQuery
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
@@ -84,18 +84,32 @@ class NotificationsMgt(connector: Connector) : Connected(connector) {
     }
 
     /**
-     * Gets the last notification record outputs for a given channel
+     * Gets the last notification record for a given channel
      */
-    fun notificationRecordsOutputs(channel: String?): List<NotificationRecordOutput> {
+    fun notificationRecords(channel: String?): List<NotificationRecord> {
         return graphqlConnector.query(
-            NotificationRecordsOutputsQuery(Input.fromNullable(channel))
+            NotificationRecordsQuery(Input.fromNullable(channel))
         )?.notificationRecords()?.pageItems()
-            ?.map { it.result() }
             ?.map {
-                NotificationRecordOutput(
-                    type = it.type().name,
-                    message = it.message(),
-                    output = it.output(),
+                NotificationRecord(
+                    id = it.id(),
+                    source = it.source()?.let { source ->
+                        NotificationSourceData(
+                            id = source.id(),
+                            data = source.data(),
+                        )
+                    },
+                    timestamp = it.timestamp(),
+                    channel = it.channel(),
+                    channelConfig = it.channelConfig(),
+                    event = it.event(),
+                    result = it.result().let { result ->
+                        NotificationRecordResult(
+                            type = result.type().name,
+                            message = result.message(),
+                            output = result.output(),
+                        )
+                    }
                 )
             } ?: emptyList()
     }

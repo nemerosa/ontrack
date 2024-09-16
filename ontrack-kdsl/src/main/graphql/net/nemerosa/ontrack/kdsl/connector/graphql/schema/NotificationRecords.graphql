@@ -1,8 +1,17 @@
-query NotificationRecordsOutputs(
+query NotificationRecords(
     $channel: String,
 ) {
     notificationRecords(channel: $channel) {
         pageItems {
+            id
+            source {
+                id
+                data
+            }
+            timestamp
+            channel
+            channelConfig
+            event
             result {
                 type
                 message

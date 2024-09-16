@@ -92,7 +92,7 @@ class DefaultNotificationProcessingService(
                     result = result,
                 )
                 result
-            } catch (any: Exception) {
+            } catch (any: Throwable) {
                 meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_error, item)
                 recordError(
                     recordId = recordId,
@@ -145,7 +145,7 @@ class DefaultNotificationProcessingService(
         recordId: String,
         item: Notification,
         validatedConfig: JsonNode,
-        error: Exception,
+        error: Throwable,
         output: Any?,
     ) {
         record(
@@ -156,7 +156,7 @@ class DefaultNotificationProcessingService(
                 channel = item.channel,
                 channelConfig = validatedConfig,
                 event = item.event.asJson(),
-                result = NotificationResult.error<Any>(ExceptionUtils.getStackTrace(error), output)
+                result = NotificationResult.error(ExceptionUtils.getStackTrace(error), output)
                     .toNotificationRecordResult(),
             )
         )
