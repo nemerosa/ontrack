@@ -124,7 +124,7 @@ class WorkflowNotificationChannel(
 
             }
         } catch (ex: TimeoutException) {
-            NotificationResult.timeout()
+            NotificationResult.timeout(output)
         }
     }
 

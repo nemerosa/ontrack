@@ -23,10 +23,10 @@ data class NotificationResult<R>(
                 output = null
             )
 
-        fun <R> timeout() = NotificationResult<R>(
+        fun <R> timeout(output: R?) = NotificationResult<R>(
             type = NotificationResultType.TIMEOUT,
             message = null,
-            output = null
+            output = output
         )
 
         fun <R> error(message: String, output: R? = null) =

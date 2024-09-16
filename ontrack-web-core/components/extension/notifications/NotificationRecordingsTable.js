@@ -13,6 +13,7 @@ import {gqlNotificationRecordContent} from "@components/extension/notifications/
 import TimestampText from "@components/common/TimestampText";
 import Link from "next/link";
 import EventEntity from "@components/core/model/EventEntity";
+import NotificationRecordResultLink from "@components/extension/notifications/NotificationRecordResultLink";
 
 const {Column} = Table
 
@@ -150,6 +151,16 @@ export default function NotificationRecordingsTable({entity}) {
                         </TableColumnFilterDropdown>
                     }
                     filteredValue={filter.channel}
+                />
+
+                <Column
+                    key="link"
+                    title="Link"
+                    render={(_, record) => (
+                        <>
+                            <NotificationRecordResultLink channel={record.channel} result={record.result}/>
+                        </>
+                    )}
                 />
 
                 <Column
