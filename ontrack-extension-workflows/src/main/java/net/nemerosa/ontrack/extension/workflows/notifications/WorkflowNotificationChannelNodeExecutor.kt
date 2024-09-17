@@ -111,6 +111,11 @@ class WorkflowNotificationChannelNodeExecutor(
                     result.message ?: "Unknown error",
                     result.output?.asJson()
                 )
+
+                NotificationResultType.TIMEOUT -> WorkflowNodeExecutorResult.error(
+                    "Timeout when running a workflow",
+                    result.output?.asJson()
+                )
             }
         } else {
             WorkflowNodeExecutorResult.error("Notification did not return any result", null)
