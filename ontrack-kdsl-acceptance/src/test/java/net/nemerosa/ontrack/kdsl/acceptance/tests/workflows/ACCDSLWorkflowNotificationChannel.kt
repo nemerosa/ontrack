@@ -344,17 +344,107 @@ class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
         }
     }
 
+    @Test
+    fun `A workflow notification result is the result of its workflow`() {
+        // Job to call
+        val job = uid("job_")
+        // Jenkins configuration
+        val jenkinsConfName = uid("j_")
+        ontrack.configurations.jenkins.create(
+            JenkinsConfiguration(
+                name = jenkinsConfName,
+                url = "any",
+                user = "any",
+                password = "any",
+            )
+        )
+        // Defining a workflow
+        val workflowName = uid("w-")
+        val yaml = """
+            name: $workflowName
+            nodes:
+                - id: start
+                  executorId: notification
+                  data:
+                    channel: mock-jenkins
+                    channelConfig:
+                        config: $jenkinsConfName
+                        job: /mock/$job
+                        callMode: SYNC
+                        parameters:
+                            - name: waiting
+                              value: 5000
+                            - name: result
+                              value: FAILURE
+        """.trimIndent()
+
+        project {
+            // Subscribe to new branches
+            val subName = uid("sub-")
+            subscribe(
+                name = subName,
+                channel = "workflow",
+                channelConfig = mapOf(
+                    "workflow" to WorkflowTestSupport.yamlWorkflowToJson(yaml)
+                ),
+                keywords = null,
+                events = listOf(
+                    "new_branch",
+                ),
+            )
+            // Creating a branch to trigger the workflow
+            branch {}
+
+            // Gets the workflow instance ID from the output of the notification
+            waitUntil(
+                task = "Getting the workflow instance id",
+                timeout = 30_000L,
+                interval = 500L,
+            ) {
+                val instanceId = getWorkflowInstanceId(subName)
+                instanceId.isNullOrBlank().not()
+            }
+
+            // Getting the instance ID
+            val instanceId = getWorkflowInstanceId(subName) ?: fail("Cannot get the workflow instance ID")
+
+            // Getting the notification record & checks it's running
+            waitUntil(
+                task = "Getting the running notification",
+                timeout = 2_000L,
+                interval = 250L,
+            ) {
+                val record = getWorkflowNotificationRecord(subName)
+                record?.result?.type == "ONGOING"
+            }
+
+            // Waiting until the workflow itself is finished (and in error)
+            val instance = waitUntilWorkflowFinished(instanceId = instanceId, returnInstanceOnError = true)
+            assertEquals(WorkflowInstanceStatus.ERROR, instance.status)
+
+            // Checks the notification record again
+            val record = getWorkflowNotificationRecord(subName)
+            assertEquals("ERROR", record?.result?.type)
+        }
+    }
+
+    /**
+     * Gets the workflow notification record from the output of the notification
+     */
+    private fun getWorkflowNotificationRecord(subscriptionName: String) =
+        ontrack.notifications.notificationRecords("workflow")
+            .firstOrNull { record ->
+                record.source?.id == "entity-subscription" &&
+                        record.source?.data?.getRequiredTextField("subscriptionName") == subscriptionName
+            }
+
     /**
      * Gets the workflow instance ID from the output of the notification
      */
-    private fun getWorkflowInstanceId(subscriptionName: String) = ontrack.notifications.notificationRecords("workflow")
-        .filter { record ->
-            record.source?.id == "entity-subscription" &&
-                    record.source?.data?.getRequiredTextField("subscriptionName") == subscriptionName
-        }
-        .firstOrNull()
-        ?.result?.output
-        ?.path("workflowInstanceId")
-        ?.asText()
+    private fun getWorkflowInstanceId(subscriptionName: String) =
+        getWorkflowNotificationRecord(subscriptionName)
+            ?.result?.output
+            ?.path("workflowInstanceId")
+            ?.asText()
 
 }
