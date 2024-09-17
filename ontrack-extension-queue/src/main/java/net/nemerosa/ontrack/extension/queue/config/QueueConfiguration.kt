@@ -37,7 +37,7 @@ class QueueConfiguration(
 
         // Default queues
         val prefix = processor.queueNamePrefix
-        val scale = queueConfigProperties.specific[id]?.scale ?: 1
+        val scale = queueConfigProperties.getQueueProcessorScale(processor)
         (0 until scale).forEach { index ->
             val queue = Queue("$prefix.$index", true)
             val binding = BindingBuilder

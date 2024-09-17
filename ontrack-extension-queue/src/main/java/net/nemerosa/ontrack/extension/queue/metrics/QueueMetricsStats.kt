@@ -27,7 +27,7 @@ class QueueMetricsStats(
                     Tag.of("processor", queueProcessor.id)
             ), registry) {
                 var count = 0
-                val scale = queueConfigProperties.specific[queueProcessor.id]?.scale ?: 1
+                val scale = queueConfigProperties.getQueueProcessorScale(queueProcessor)
                 (0 until scale).forEach { index ->
                     val queueName = "ontrack.queue.${queueProcessor.id}.$index"
                     val queueProperties: Properties? = amqpAdmin.getQueueProperties(queueName)

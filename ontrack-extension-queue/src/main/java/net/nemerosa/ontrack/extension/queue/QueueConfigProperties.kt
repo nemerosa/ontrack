@@ -57,7 +57,7 @@ class QueueConfigProperties {
         payload: T
     ): String {
         val prefix = queueProcessor.queueRoutingPrefix
-        val scale = specific[queueProcessor.id]?.scale ?: 1
+        val scale = getQueueProcessorScale(queueProcessor)
         return if (scale > 1) {
             val identifier = queueProcessor.getRoutingIdentifier(payload)
             val code = abs(identifier.hashCode()) % scale
@@ -66,6 +66,9 @@ class QueueConfigProperties {
             "$prefix.0"
         }
     }
+
+    fun getQueueProcessorScale(queueProcessor: QueueProcessor<*>) =
+        specific[queueProcessor.id]?.scale ?: queueProcessor.defaultScale ?: 1
 
     companion object {
         const val PREFIX = "ontrack.extension.queue"

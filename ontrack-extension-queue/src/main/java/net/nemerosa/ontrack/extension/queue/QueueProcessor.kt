@@ -17,6 +17,13 @@ interface QueueProcessor<T : Any> {
     val sync: Boolean get() = false
 
     /**
+     * Default number of queues to create (defaults to 1 if not specified).
+     *
+     * It can always be overridden at properties level.
+     */
+    val defaultScale: Int? get() = null
+
+    /**
      * Gets a specific routing key for the payload.
      *
      * Returns null by default, to rely on the global settings

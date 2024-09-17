@@ -17,6 +17,11 @@ class WorkflowQueueProcessor(
 
     override val id: String = "workflows"
 
+    /**
+     * Minimum of 5 queues for the workflows.
+     */
+    override val defaultScale: Int = 5
+
     override val payloadType: KClass<WorkflowQueuePayload> = WorkflowQueuePayload::class
 
     override fun isCancelled(payload: WorkflowQueuePayload): String? = null

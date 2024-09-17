@@ -14,7 +14,6 @@ import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry
 import net.nemerosa.ontrack.model.support.ApplicationLogService
 import org.springframework.amqp.core.Message
-import org.springframework.amqp.core.MessageListener
 import org.springframework.amqp.rabbit.annotation.RabbitListenerConfigurer
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerEndpoint
 import org.springframework.amqp.rabbit.listener.RabbitListenerEndpoint
@@ -44,7 +43,7 @@ class QueueListener(
         queueProcessor: QueueProcessor<*>
     ) {
         // Default listeners
-        val scale = queueConfigProperties.specific[queueProcessor.id]?.scale ?: 1
+        val scale = queueConfigProperties.getQueueProcessorScale(queueProcessor)
         (0 until scale).forEach { index ->
             registrar.registerEndpoint(
                 createDefaultListener(queueProcessor, index)
