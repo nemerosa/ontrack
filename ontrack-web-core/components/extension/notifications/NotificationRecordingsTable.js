@@ -17,7 +17,7 @@ import NotificationRecordResultLink from "@components/extension/notifications/No
 
 const {Column} = Table
 
-export default function NotificationRecordingsTable({entity}) {
+export default function NotificationRecordingsTable({entity, sourceId}) {
 
     const client = useGraphQLClient()
 
@@ -48,6 +48,7 @@ export default function NotificationRecordingsTable({entity}) {
                         $resultType: NotificationResultType,
                         $eventEntityType: ProjectEntityType,
                         $eventEntityId: Int,
+                        $sourceId: String,
                     ) {
                         notificationRecords(
                             offset: $offset,
@@ -56,6 +57,7 @@ export default function NotificationRecordingsTable({entity}) {
                             resultType: $resultType,
                             eventEntityType: $eventEntityType,
                             eventEntityId: $eventEntityId,
+                            sourceId: $sourceId,
                         ) {
                             pageInfo {
                                 nextPage {
@@ -75,6 +77,7 @@ export default function NotificationRecordingsTable({entity}) {
                     size: pagination.size,
                     eventEntityType: entity?.type,
                     eventEntityId: entity?.id,
+                    sourceId: sourceId,
                     ...filter,
                 }
             ).then(data => {
@@ -88,7 +91,7 @@ export default function NotificationRecordingsTable({entity}) {
                 setLoading(false)
             })
         }
-    }, [client, pagination, filter]);
+    }, [client, pagination, filter, sourceId, entity]);
 
     const onTableChange = (_, filters) => {
         setFilter({

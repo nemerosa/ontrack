@@ -199,6 +199,7 @@ export default function PromotionRunView({id}) {
                                     type: 'PROMOTION_RUN',
                                     id: run.id,
                                 }}
+                                sourceId="entity-subscription"
                             />
                         </PageSection>
                     </Space>

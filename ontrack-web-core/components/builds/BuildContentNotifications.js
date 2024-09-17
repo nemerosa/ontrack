@@ -11,6 +11,7 @@ export default function BuildContentNotifications({build}) {
                         type: 'BUILD',
                         id: build.id,
                     }}
+                    sourceId="entity-subscription"
                 />
             </GridCell>
         </>

@@ -23,6 +23,7 @@ export default function EntityNotificationsBadge({entityType, entityId, href}) {
                         notificationRecords(
                             eventEntityType: $entityType,
                             eventEntityId: $entityId,
+                            sourceId: "entity-subscription",
                         ) {
                             pageItems {
                                 result {
