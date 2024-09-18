@@ -45,6 +45,7 @@ export default function EntityNotificationsBadge({entityType, entityId, href}) {
                             success++
                             break
                         case 'ONGOING':
+                        case 'ASYNC':
                             running++
                             break
                         default:
