@@ -21,6 +21,11 @@ class BranchAuthorizationContributor(
                 ),
                 Authorization(
                     CoreAuthorizationContributor.BRANCH,
+                    Authorization.DISABLE,
+                    securityService.isProjectFunctionGranted<BranchDisable>(branch)
+                ),
+                Authorization(
+                    CoreAuthorizationContributor.BRANCH,
                     "build_filter_manage",
                     securityService.isProjectFunctionGranted<BranchFilterMgt>(branch)
                 ),

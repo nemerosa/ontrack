@@ -3,13 +3,16 @@ package net.nemerosa.ontrack.service
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.security.PromotionLevelCreate
+import net.nemerosa.ontrack.model.security.Roles
 import net.nemerosa.ontrack.model.security.ValidationRunStatusChange
 import net.nemerosa.ontrack.model.security.ValidationStampCreate
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
+import org.springframework.security.access.AccessDeniedException
 import java.time.Duration
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -28,10 +31,12 @@ class StructureServiceNewIT : AbstractDSLTestSupport() {
             // Creating a branch without a build
             val branch = branch {}
             // Getting the list of branches (as asked by the project page)
-            val branches = structureService.filterBranchesForProject(project, BranchFilter(
-                count = 20,
-                order = true,
-            ))
+            val branches = structureService.filterBranchesForProject(
+                project, BranchFilter(
+                    count = 20,
+                    order = true,
+                )
+            )
             // Checks the branch is there
             assertEquals(
                 listOf(branch),
@@ -67,10 +72,12 @@ class StructureServiceNewIT : AbstractDSLTestSupport() {
                 updateBuildSignature(time = ref.minusHours(3))
             }
             // Getting the list of branches (as asked by the project page)
-            val list = structureService.filterBranchesForProject(project, BranchFilter(
-                count = 20,
-                order = true,
-            ))
+            val list = structureService.filterBranchesForProject(
+                project, BranchFilter(
+                    count = 20,
+                    order = true,
+                )
+            )
             // Checks the branch is there
             assertEquals(
                 listOf(branch2, branch0, branch1).map { it.name },
@@ -98,10 +105,12 @@ class StructureServiceNewIT : AbstractDSLTestSupport() {
                 updateBranchSignature(time = ref.minusHours(1))
             }
             // Getting the list of branches (as asked by the project page)
-            val branches = structureService.filterBranchesForProject(project, BranchFilter(
-                count = 20,
-                order = true,
-            ))
+            val branches = structureService.filterBranchesForProject(
+                project, BranchFilter(
+                    count = 20,
+                    order = true,
+                )
+            )
             // Checks the branches are both there, with the one without a build in front
             assertEquals(
                 listOf("recent-without-build", "with-build", "old-without-build"),
@@ -141,7 +150,7 @@ class StructureServiceNewIT : AbstractDSLTestSupport() {
         asAdmin {
             val projects = structureService.findProjectsByNamePattern(rootA)
             assertEquals(
-                (0..4).map { "X$rootA$it"},
+                (0..4).map { "X$rootA$it" },
                 projects.map { it.name }
             )
         }
@@ -161,7 +170,7 @@ class StructureServiceNewIT : AbstractDSLTestSupport() {
             asUserWithView(*projectsA.take(3).toTypedArray()) {
                 val projects = structureService.findProjectsByNamePattern(rootA)
                 assertEquals(
-                    (0..2).map { "X$rootA$it"},
+                    (0..2).map { "X$rootA$it" },
                     projects.map { it.name }
                 )
             }
@@ -215,10 +224,10 @@ class StructureServiceNewIT : AbstractDSLTestSupport() {
             branch {
                 asUser().with(this, PromotionLevelCreate::class.java).call {
                     val pl = structureService.newPromotionLevel(
-                            PromotionLevel.of(
-                                    this,
-                                    NameDescription.nd(promotionName, "")
-                            )
+                        PromotionLevel.of(
+                            this,
+                            NameDescription.nd(promotionName, "")
+                        )
                     )
                     // Description must be aligned
                     assertEquals("My predefined description", pl.description)
@@ -240,10 +249,10 @@ class StructureServiceNewIT : AbstractDSLTestSupport() {
             branch {
                 asUser().with(this, ValidationStampCreate::class.java).call {
                     val vs = structureService.newValidationStamp(
-                            ValidationStamp.of(
-                                    this,
-                                    NameDescription.nd(validationName, "")
-                            )
+                        ValidationStamp.of(
+                            this,
+                            NameDescription.nd(validationName, "")
+                        )
                     )
                     // Description must be aligned
                     assertEquals("My predefined description", vs.description)
@@ -266,10 +275,12 @@ class StructureServiceNewIT : AbstractDSLTestSupport() {
                     repeat(5) { buildNo ->
                         build(name = "build-$buildNo") {
                             repeat(5) { runNo ->
-                                validate(vs, description = "run-$runNo", signature = Signature.of(
-                                    ref.plusDays(index++),
-                                    "test"
-                                ))
+                                validate(
+                                    vs, description = "run-$runNo", signature = Signature.of(
+                                        ref.plusDays(index++),
+                                        "test"
+                                    )
+                                )
                             }
                         }
                     }
@@ -296,6 +307,47 @@ class StructureServiceNewIT : AbstractDSLTestSupport() {
                         names
                     )
                 }
+            }
+        }
+    }
+
+    @Test
+    fun `An admin can disable and enable a project`() {
+        val project = project()
+        asAdmin {
+            structureService.disableProject(project)
+            assertTrue(structureService.getProject(project.id).isDisabled, "Project is disabled")
+            structureService.enableProject(project)
+            assertFalse(structureService.getProject(project.id).isDisabled, "Project is enabled")
+        }
+    }
+
+    @Test
+    fun `Automation can disable and enable a project`() {
+        val project = project()
+        withGrantViewToAll {
+            asGlobalRole(Roles.GLOBAL_AUTOMATION) {
+                structureService.disableProject(project)
+                assertTrue(structureService.getProject(project.id).isDisabled, "Project is disabled")
+                structureService.enableProject(project)
+                assertFalse(structureService.getProject(project.id).isDisabled, "Project is enabled")
+            }
+        }
+    }
+
+    @Test
+    fun `Participants cannot disable and enable a project`() {
+        val project = project()
+        withGrantViewToAll {
+            asGlobalRole(Roles.GLOBAL_PARTICIPANT) {
+                assertFailsWith<AccessDeniedException> {
+                    structureService.disableProject(project)
+                }
+                assertFalse(structureService.getProject(project.id).isDisabled, "Project is NOT disabled")
+                assertFailsWith<AccessDeniedException> {
+                    structureService.enableProject(project)
+                }
+                assertFalse(structureService.getProject(project.id).isDisabled, "Project is enabled")
             }
         }
     }

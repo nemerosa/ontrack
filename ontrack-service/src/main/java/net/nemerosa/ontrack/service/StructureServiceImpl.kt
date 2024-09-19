@@ -116,16 +116,18 @@ class StructureServiceImpl(
     }
 
     override fun disableProject(project: Project): Project {
+        securityService.checkProjectFunction(project, ProjectDisable::class.java)
         val disabledProject = project.withDisabled(true)
-        saveProject(disabledProject)
-        eventPostService.post(eventFactory.disableProject(project))
+        structureRepository.saveProject(disabledProject)
+        eventPostService.post(eventFactory.disableProject(disabledProject))
         return disabledProject
     }
 
     override fun enableProject(project: Project): Project {
+        securityService.checkProjectFunction(project, ProjectDisable::class.java)
         val enabledProject = project.withDisabled(false)
-        saveProject(enabledProject)
-        eventPostService.post(eventFactory.enableProject(project))
+        structureRepository.saveProject(enabledProject)
+        eventPostService.post(eventFactory.enableProject(enabledProject))
         return enabledProject
     }
 
@@ -197,6 +199,7 @@ class StructureServiceImpl(
     }
 
     override fun disableBranch(branch: Branch): Branch {
+        securityService.checkProjectFunction(branch, BranchDisable::class.java)
         val disabledBranch = branch.withDisabled(true)
         saveBranch(disabledBranch)
         eventPostService.post(eventFactory.disableBranch(branch))
@@ -204,6 +207,7 @@ class StructureServiceImpl(
     }
 
     override fun enableBranch(branch: Branch): Branch {
+        securityService.checkProjectFunction(branch, BranchDisable::class.java)
         val disabledBranch = branch.withDisabled(false)
         saveBranch(disabledBranch)
         eventPostService.post(eventFactory.enableBranch(branch))

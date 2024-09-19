@@ -61,7 +61,7 @@ class GQLTypeProject(
                 .actions(uiActionsGraphQLService, Project::class)
                 // Authorizations
                 .apply {
-                    gqlInterfaceAuthorizableService.apply(this, PromotionLevel::class)
+                    gqlInterfaceAuthorizableService.apply(this, Project::class)
                 }
                 // Is this project a favourite?
                 .field {

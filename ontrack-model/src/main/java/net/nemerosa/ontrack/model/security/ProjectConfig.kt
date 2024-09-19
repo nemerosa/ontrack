@@ -6,7 +6,7 @@ import net.nemerosa.ontrack.model.labels.ProjectLabelManagement
  * Configuration for a project.
  */
 @CoreFunction
-interface ProjectConfig : ProjectView,
+interface ProjectConfig : ProjectView, ProjectDisable,
         ProjectLabelManagement,
         ValidationStampFilterCreate,
         ValidationStampFilterShare,

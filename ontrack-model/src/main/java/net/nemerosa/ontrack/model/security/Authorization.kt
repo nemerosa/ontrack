@@ -49,6 +49,11 @@ data class Authorization(
          */
         const val SETTINGS = "settings"
 
+        /**
+         * Common actions: disable state
+         */
+        const val DISABLE = "disable"
+
     }
 
 }

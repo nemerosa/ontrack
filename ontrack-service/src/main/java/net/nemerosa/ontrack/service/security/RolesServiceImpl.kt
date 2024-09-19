@@ -125,6 +125,7 @@ class RolesServiceImpl(
         projectManagerFunctions.add(BranchFilterMgt::class.java)
         projectManagerFunctions.add(BranchCreate::class.java)
         projectManagerFunctions.add(BranchEdit::class.java)
+        projectManagerFunctions.add(BranchDisable::class.java)
         projectManagerFunctions.add(BranchDelete::class.java)
         projectManagerFunctions.add(ProjectLabelManagement::class.java)
         registerProjectRole(Roles.PROJECT_MANAGER, "Project manager",
@@ -222,7 +223,9 @@ class RolesServiceImpl(
                 listOf(
                         // Structure creation functions only
                         ProjectConfig::class.java,
+                        ProjectDisable::class.java,
                         BranchCreate::class.java,
+                        BranchDisable::class.java,
                         PromotionLevelCreate::class.java,
                         ValidationStampCreate::class.java
                 )
@@ -238,9 +241,11 @@ class RolesServiceImpl(
                 listOf(
                         // Structure creation functions only
                         ProjectConfig::class.java,
+                        ProjectDisable::class.java,
                         ProjectAuthorisationMgt::class.java,
                         BranchCreate::class.java,
                         BranchEdit::class.java,
+                        BranchDisable::class.java,
                         PromotionLevelCreate::class.java,
                         PromotionLevelEdit::class.java,
                         ValidationStampCreate::class.java,

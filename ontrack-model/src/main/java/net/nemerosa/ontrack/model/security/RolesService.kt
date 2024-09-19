@@ -114,11 +114,13 @@ interface RolesService {
         val defaultProjectFunctions = listOf(
                 ProjectView::class.java,
                 ProjectEdit::class.java,
+                ProjectDisable::class.java,
                 ProjectAuthorisationMgt::class.java,
                 ProjectConfig::class.java,
                 ProjectDelete::class.java,
                 BranchCreate::class.java,
                 BranchEdit::class.java,
+                BranchDisable::class.java,
                 BranchFilterMgt::class.java,
                 BranchDelete::class.java,
                 PromotionLevelCreate::class.java,

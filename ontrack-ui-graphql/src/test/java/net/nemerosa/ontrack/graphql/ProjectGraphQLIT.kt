@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.api.support.TestSimpleProperty
 import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType
 import net.nemerosa.ontrack.json.isNullOrNullNode
 import net.nemerosa.ontrack.model.security.ProjectCreation
+import net.nemerosa.ontrack.model.security.Roles
 import net.nemerosa.ontrack.model.structure.BranchFavouriteService
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
@@ -14,7 +15,10 @@ import net.nemerosa.ontrack.test.assertNotPresent
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.graphql.execution.ErrorType
-import kotlin.test.*
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class ProjectGraphQLIT : AbstractQLKTITSupport() {
 
@@ -40,8 +44,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
         project {
             run("""{projects(name: "$name") { id }}""") { data ->
                 assertEquals(
-                        id(),
-                        data.path("projects").first().path("id").asInt()
+                    id(),
+                    data.path("projects").first().path("id").asInt()
                 )
             }
         }
@@ -54,12 +58,12 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
             branch("B2")
             run("{projects(id: ${id}) { name branches { name } }}") { data ->
                 assertEquals(
-                        listOf("B2", "B1"),
-                        data.path("projects").first()
-                                .path("branches")
-                                .map {
-                                    it.path("name").asText()
-                                }
+                    listOf("B2", "B1"),
+                    data.path("projects").first()
+                        .path("branches")
+                        .map {
+                            it.path("name").asText()
+                        }
                 )
             }
         }
@@ -72,12 +76,12 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
             branch("B2")
             run("""{projects(id: ${id}) { name branches(name: "B2") { name } }}""") { data ->
                 assertEquals(
-                        listOf("B2"),
-                        data.path("projects").first()
-                                .path("branches")
-                                .map {
-                                    it.path("name").asText()
-                                }
+                    listOf("B2"),
+                    data.path("projects").first()
+                        .path("branches")
+                        .map {
+                            it.path("name").asText()
+                        }
                 )
             }
         }
@@ -90,12 +94,12 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
             branch("11.9.0")
             run("""{projects(id: ${id}) { name branches(name: "11\\.9\\.*") { name } } }""") { data ->
                 assertEquals(
-                        listOf("11.9.0"),
-                        data.path("projects").first()
-                                .path("branches")
-                                .map {
-                                    it.path("name").asText()
-                                }
+                    listOf("11.9.0"),
+                    data.path("projects").first()
+                        .path("branches")
+                        .map {
+                            it.path("name").asText()
+                        }
                 )
             }
         }
@@ -108,7 +112,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                 (1..5).forEach { no ->
                     promotionLevel("PL$no", "Promotion level $no")
                 }
-                run("""{
+                run(
+                    """{
                     projects (id: ${project.id}) {
                         branches (name: "$name") {
                             promotionLevels {
@@ -116,15 +121,16 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                             }
                         }
                     }
-                }""") { data ->
+                }"""
+                ) { data ->
                     assertEquals(
-                            (1..5).map { "PL$it" },
-                            data.path("projects").first()
-                                    .path("branches").first()
-                                    .path("promotionLevels")
-                                    .map {
-                                        it.path("name").asText()
-                                    }
+                        (1..5).map { "PL$it" },
+                        data.path("projects").first()
+                            .path("branches").first()
+                            .path("promotionLevels")
+                            .map {
+                                it.path("name").asText()
+                            }
                     )
                 }
             }
@@ -139,7 +145,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                 (1..5).forEach { no ->
                     validationStamp("VS$no", description = "Validation stamp $no")
                 }
-                run("""{
+                run(
+                    """{
                     projects (id: ${project.id}) {
                         branches (name: "$name") {
                             validationStamps {
@@ -147,15 +154,16 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                             }
                         }
                     }
-                }""") { data ->
+                }"""
+                ) { data ->
                     assertEquals(
-                            (1..5).map { "VS$it" },
-                            data.path("projects").first()
-                                    .path("branches").first()
-                                    .path("validationStamps")
-                                    .map {
-                                        it.path("name").asText()
-                                    }
+                        (1..5).map { "VS$it" },
+                        data.path("projects").first()
+                            .path("branches").first()
+                            .path("validationStamps")
+                            .map {
+                                it.path("name").asText()
+                            }
                     )
                 }
             }
@@ -175,7 +183,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                         }
                     }
                 }
-                run("""{
+                run(
+                    """{
                     projects (id: ${project.id}) {
                         branches (name: "$name") {
                             promotionLevels {
@@ -188,15 +197,16 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                             }
                         }
                     }
-                }""") { data ->
+                }"""
+                ) { data ->
                     assertEquals(
-                            listOf("4", "2"),
-                            data.path("projects").first()
-                                    .path("branches").first()
-                                    .path("promotionLevels").first()
-                                    .path("promotionRuns").map {
-                                        it.path("build").path("name").asText()
-                                    }
+                        listOf("4", "2"),
+                        data.path("projects").first()
+                            .path("branches").first()
+                            .path("promotionLevels").first()
+                            .path("promotionRuns").map {
+                                it.path("build").path("name").asText()
+                            }
                     )
                 }
             }
@@ -215,7 +225,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                         }
                     }
                 }
-                run("""{
+                run(
+                    """{
                     projects (id: ${project.id}) {
                         branches (name: "$name") {
                             validationStamps {
@@ -228,15 +239,16 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                             }
                         }
                     }
-                }""") { data ->
+                }"""
+                ) { data ->
                     assertEquals(
-                            listOf("4", "2"),
-                            data.path("projects").first()
-                                    .path("branches").first()
-                                    .path("validationStamps").first()
-                                    .path("validationRuns").map {
-                                        it.path("build").path("name").asText()
-                                    }
+                        listOf("4", "2"),
+                        data.path("projects").first()
+                            .path("branches").first()
+                            .path("validationStamps").first()
+                            .path("validationRuns").map {
+                                it.path("build").path("name").asText()
+                            }
                     )
                 }
             }
@@ -253,7 +265,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                     promote(pl1)
                     promote(pl2)
                 }
-                run("""{
+                run(
+                    """{
                     projects (id: ${project.id}) {
                         branches (name: "$name") {
                             builds(count: 1) {
@@ -265,15 +278,16 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                             }
                         }
                     }
-                }""") { data ->
+                }"""
+                ) { data ->
                     assertEquals(
-                            listOf("PL2", "PL1"),
-                            data.path("projects").first()
-                                    .path("branches").first()
-                                    .path("builds").first()
-                                    .path("promotionRuns").map {
-                                        it.path("promotionLevel").path("name").asText()
-                                    }
+                        listOf("PL2", "PL1"),
+                        data.path("projects").first()
+                            .path("branches").first()
+                            .path("builds").first()
+                            .path("promotionRuns").map {
+                                it.path("promotionLevel").path("name").asText()
+                            }
                     )
                 }
             }
@@ -290,7 +304,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                     promote(pl1)
                     promote(pl2)
                 }
-                run("""{
+                run(
+                    """{
                     projects (id: ${project.id}) {
                         branches (name: "$name") {
                             builds(count: 1) {
@@ -302,15 +317,16 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                             }
                         }
                     }
-                }""") { data ->
+                }"""
+                ) { data ->
                     assertEquals(
-                            listOf("PL1"),
-                            data.path("projects").first()
-                                    .path("branches").first()
-                                    .path("builds").first()
-                                    .path("promotionRuns").map {
-                                        it.path("promotionLevel").path("name").asText()
-                                    }
+                        listOf("PL1"),
+                        data.path("projects").first()
+                            .path("branches").first()
+                            .path("builds").first()
+                            .path("promotionRuns").map {
+                                it.path("promotionLevel").path("name").asText()
+                            }
                     )
                 }
             }
@@ -329,7 +345,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                         }
                     }
                 }
-                run("""{
+                run(
+                    """{
                     projects (id: ${project.id}) {
                         branches (name: "$name") {
                             promotionLevels {
@@ -342,15 +359,16 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                             }
                         }
                     }
-                }""") { data ->
+                }"""
+                ) { data ->
                     assertEquals(
-                            listOf("20", "18", "16", "14", "12"),
-                            data.path("projects").first()
-                                    .path("branches").first()
-                                    .path("promotionLevels").first()
-                                    .path("promotionRuns").map {
-                                        it.path("build").path("name").asText()
-                                    }
+                        listOf("20", "18", "16", "14", "12"),
+                        data.path("projects").first()
+                            .path("branches").first()
+                            .path("promotionLevels").first()
+                            .path("promotionRuns").map {
+                                it.path("build").path("name").asText()
+                            }
                     )
                 }
             }
@@ -369,7 +387,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                         }
                     }
                 }
-                run("""{
+                run(
+                    """{
                     projects (id: ${project.id}) {
                         branches (name: "$name") {
                             promotionLevels {
@@ -382,15 +401,16 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                             }
                         }
                     }
-                }""") { data ->
+                }"""
+                ) { data ->
                     assertEquals(
-                            listOf("6", "4", "2"),
-                            data.path("projects").first()
-                                    .path("branches").first()
-                                    .path("promotionLevels").first()
-                                    .path("promotionRuns").map {
-                                        it.path("build").path("name").asText()
-                                    }
+                        listOf("6", "4", "2"),
+                        data.path("projects").first()
+                            .path("branches").first()
+                            .path("promotionLevels").first()
+                            .path("promotionRuns").map {
+                                it.path("build").path("name").asText()
+                            }
                     )
                 }
             }
@@ -411,14 +431,16 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
             setProperty(this, TestSimplePropertyType::class.java, TestSimpleProperty("X1"))
         }
         // Looks for projects having this property
-        run("""{
+        run(
+            """{
             projects(withProperty: {type: "${TestSimplePropertyType::class.java.name}"}) {
                 name
             }
-        }""") { data ->
+        }"""
+        ) { data ->
             assertEquals(
-                    setOf(p1.name, p3.name, p4.name),
-                    data.path("projects").map { it.path("name").asText() }.toSet()
+                setOf(p1.name, p3.name, p4.name),
+                data.path("projects").map { it.path("name").asText() }.toSet()
             )
         }
     }
@@ -437,14 +459,16 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
             setProperty(this, TestSimplePropertyType::class.java, TestSimpleProperty("X1"))
         }
         // Looks for projects having this property
-        run("""{
+        run(
+            """{
             projects(withProperty: {type: "${TestSimplePropertyType::class.java.name}", value: "P"}) {
                 name
             }
-        }""") { data ->
+        }"""
+        ) { data ->
             assertEquals(
-                    setOf(p1.name, p3.name),
-                    data.path("projects").map { it.path("name").asText() }.toSet()
+                setOf(p1.name, p3.name),
+                data.path("projects").map { it.path("name").asText() }.toSet()
             )
         }
     }
@@ -463,14 +487,16 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
             setProperty(this, TestSimplePropertyType::class.java, TestSimpleProperty("X1"))
         }
         // Looks for projects having this property
-        run("""{
+        run(
+            """{
             projects(withProperty: {type: "${TestSimplePropertyType::class.java.name}", value: "P1"}) {
                 name
             }
-        }""") { data ->
+        }"""
+        ) { data ->
             assertEquals(
-                    setOf(p1.name),
-                    data.path("projects").map { it.path("name").asText() }.toSet()
+                setOf(p1.name),
+                data.path("projects").map { it.path("name").asText() }.toSet()
             )
         }
     }
@@ -486,15 +512,17 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
             project(name = NameDescription.nd("Y${rootB}$it", ""))
         }
         asAdmin {
-            run("""{
+            run(
+                """{
                 projects(pattern: "X$rootA") {
                     name
                 }
-            }""").let { data ->
+            }"""
+            ).let { data ->
                 val names = data.path("projects").map { it.path("name").asText() }
                 assertEquals(
-                        (0..4).map { "X$rootA$it" },
-                        names
+                    (0..4).map { "X$rootA$it" },
+                    names
                 )
             }
         }
@@ -512,15 +540,17 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
         }
         withNoGrantViewToAll {
             asUserWithView(*projectsA.take(3).toTypedArray()) {
-                run("""{
+                run(
+                    """{
                     projects(pattern: "X$rootA") {
                         name
                     }
-                }""").let { data ->
+                }"""
+                ).let { data ->
                     val names = data.path("projects").map { it.path("name").asText() }
                     assertEquals(
-                            (0..2).map { "X$rootA$it" },
-                            names
+                        (0..2).map { "X$rootA$it" },
+                        names
                     )
                 }
             }
@@ -536,21 +566,23 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                     branch(name = "1.$it")
                 }
                 // Query for the last 10
-                run("""{
+                run(
+                    """{
                     projects(id: $id) {
                         branches(count: 10) {
                             name
                         }
                     }
-                }""").let { data ->
+                }"""
+                ).let { data ->
                     val names = data.path("projects").path(0).path("branches").map {
                         it.path("name").asText()
                     }
                     assertEquals(
-                            names,
-                            (19 downTo 10).map {
-                                "1.$it"
-                            }
+                        names,
+                        (19 downTo 10).map {
+                            "1.$it"
+                        }
                     )
                 }
             }
@@ -562,7 +594,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
     fun `Creating a project`() {
         asAdmin {
             val name = uid("P")
-            val data = run("""
+            val data = run(
+                """
                 mutation CreateProject(${'$'}name: String!) {
                     createProject(input: {name: ${'$'}name}) {
                         project {
@@ -574,7 +607,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                         }
                     }
                 }
-            """, mapOf("name" to name))
+            """, mapOf("name" to name)
+            )
             // Checks the project has been created
             assertNotNull(structureService.findProjectByName(name).getOrNull(), "Project has been created") {
                 assertFalse(it.isDisabled, "Project is not disabled")
@@ -591,7 +625,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
     fun `Creating a project but name already exist`() {
         asAdmin {
             project {
-                val data = run("""
+                val data = run(
+                    """
                     mutation CreateProject(${'$'}name: String!) {
                         createProject(input: {name: ${'$'}name}) {
                             project {
@@ -604,11 +639,15 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                             }
                         }
                     }
-                """, mapOf("name" to name))
+                """, mapOf("name" to name)
+                )
                 // Checks the errors
                 val error = data["createProject"]["errors"][0]
                 assertEquals("Project name already exists: $name", error["message"].asText())
-                assertEquals("net.nemerosa.ontrack.model.exceptions.ProjectNameAlreadyDefinedException", error["exception"].asText())
+                assertEquals(
+                    "net.nemerosa.ontrack.model.exceptions.ProjectNameAlreadyDefinedException",
+                    error["exception"].asText()
+                )
                 assertTrue(data["createProject"]["project"].isNullOrNullNode(), "Project not returned")
             }
         }
@@ -617,7 +656,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
     @Test
     fun `Creating a project with an invalid name`() {
         asAdmin {
-            val data = run("""
+            val data = run(
+                """
                 mutation CreateProject(${'$'}name: String!) {
                     createProject(input: {name: ${'$'}name}) {
                         project {
@@ -631,11 +671,18 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                         }
                     }
                 }
-            """, mapOf("name" to "white space"))
+            """, mapOf("name" to "white space")
+            )
             // Checks the errors
             val error = data["createProject"]["errors"][0]
-            assertEquals("The name can only have letters, digits, dots (.), dashes (-) or underscores (_).", error["message"].asText())
-            assertEquals("net.nemerosa.ontrack.graphql.support.MutationInputValidationException", error["exception"].asText())
+            assertEquals(
+                "The name can only have letters, digits, dots (.), dashes (-) or underscores (_).",
+                error["message"].asText()
+            )
+            assertEquals(
+                "net.nemerosa.ontrack.graphql.support.MutationInputValidationException",
+                error["exception"].asText()
+            )
             assertEquals("name", error["location"].asText())
             assertTrue(data["createProject"]["project"].isNullOrNullNode(), "Project not returned")
         }
@@ -645,7 +692,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
     fun `Creating a project which already exist in get mode`() {
         asAdmin {
             val project = project()
-            val data = run("""
+            val data = run(
+                """
                 mutation CreateProject(${'$'}name: String!) {
                     createProjectOrGet(input: {name: ${'$'}name}) {
                         project {
@@ -659,7 +707,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                         }
                     }
                 }
-            """, mapOf("name" to project.name))
+            """, mapOf("name" to project.name)
+            )
             // Checks the errors
             assertNoUserError(data, "createProjectOrGet")
             val node = data["createProjectOrGet"]["project"]
@@ -674,7 +723,7 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
             withNoGrantViewToAll {
                 asUserWithView {
                     val data = run(
-                            """
+                        """
                                 mutation CreateProject(${'$'}name: String!) {
                                     createProjectOrGet(input: {name: ${'$'}name}) {
                                         project {
@@ -706,7 +755,7 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
         withNoGrantViewToAll {
             asUserWith<ProjectCreation> {
                 val data = run(
-                        """
+                    """
                         mutation CreateProject(${'$'}name: String!) {
                             createProjectOrGet(input: {name: ${'$'}name}) {
                                 project {
@@ -726,8 +775,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                 val error = data["createProjectOrGet"]["errors"][0]
                 assertEquals("Project name already exists: ${project.name}", error["message"].asText())
                 assertEquals(
-                        "net.nemerosa.ontrack.model.exceptions.ProjectNameAlreadyDefinedException",
-                        error["exception"].asText()
+                    "net.nemerosa.ontrack.model.exceptions.ProjectNameAlreadyDefinedException",
+                    error["exception"].asText()
                 )
                 assertTrue(data["createProjectOrGet"]["project"].isNullOrNullNode(), "Project not returned")
             }
@@ -739,7 +788,7 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
         asUserWith<ProjectCreation> {
             val name = uid("P")
             val data = run(
-                    """
+                """
                     mutation CreateProject(${'$'}name: String!) {
                         createProjectOrGet(input: {name: ${'$'}name}) {
                             project {
@@ -767,7 +816,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
         asAdmin {
             project {
                 val newName = uid("P")
-                val data = run("""
+                val data = run(
+                    """
                     mutation UpdateProject(${'$'}name: String!) {
                         updateProject(input: {id: $id, name: ${'$'}name}) {
                             project {
@@ -780,7 +830,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                             }
                         }
                     }
-                """, mapOf("name" to newName))
+                """, mapOf("name" to newName)
+                )
                 // Checks for errors
                 checkGraphQLUserErrors(data, "updateProject")
                 // Checks the project has been created
@@ -801,7 +852,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
         asAdmin {
             project {
                 val newDescription = uid("P")
-                val data = run("""
+                val data = run(
+                    """
                     mutation UpdateProject(${'$'}description: String!) {
                         updateProject(input: {id: $id, description: ${'$'}description}) {
                             project {
@@ -815,7 +867,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                             }
                         }
                     }
-                """, mapOf("description" to newDescription))
+                """, mapOf("description" to newDescription)
+                )
                 // Checks for errors
                 checkGraphQLUserErrors(data, "updateProject")
                 // Checks the project has been created
@@ -835,7 +888,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
     fun `Updating a project's state`() {
         asAdmin {
             project {
-                val data = run("""
+                val data = run(
+                    """
                     mutation UpdateProject {
                         updateProject(input: {id: $id, disabled: true}) {
                             project {
@@ -849,7 +903,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                             }
                         }
                     }
-                """)
+                """
+                )
                 // Checks for errors
                 checkGraphQLUserErrors(data, "updateProject")
                 // Checks the project has been created
@@ -870,7 +925,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
         asAdmin {
             val existingName = project().name
             project {
-                val data = run("""
+                val data = run(
+                    """
                     mutation UpdateProject(${'$'}name: String!) {
                         updateProject(input: {id: $id, name: ${'$'}name}) {
                             project {
@@ -883,11 +939,15 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                             }
                         }
                     }
-                """, mapOf("name" to existingName))
+                """, mapOf("name" to existingName)
+                )
                 // Checks the errors
                 val error = data["updateProject"]["errors"][0]
                 assertEquals("Project name already exists: $existingName", error["message"].asText())
-                assertEquals("net.nemerosa.ontrack.model.exceptions.ProjectNameAlreadyDefinedException", error["exception"].asText())
+                assertEquals(
+                    "net.nemerosa.ontrack.model.exceptions.ProjectNameAlreadyDefinedException",
+                    error["exception"].asText()
+                )
                 assertTrue(data["updateProject"]["project"].isNullOrNullNode(), "Project not returned")
             }
         }
@@ -897,7 +957,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
     fun `Deleting a project`() {
         asAdmin {
             project {
-                val data = run("""
+                val data = run(
+                    """
                     mutation DeleteProject {
                         deleteProject(input: {id: $id}) {
                             errors {
@@ -906,7 +967,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                             }
                         }
                     }
-                """)
+                """
+                )
                 // Checks the project has been deleted
                 assertNotPresent(structureService.findProjectByName(name))
                 // Checks the data
@@ -919,7 +981,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
     fun `Disabling a project`() {
         asAdmin {
             project {
-                val data = run("""
+                val data = run(
+                    """
                     mutation DisableProject {
                         disableProject(input: {id: $id}) {
                             project {
@@ -927,7 +990,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                             }
                         }
                     }
-                """)
+                """
+                )
                 // Checks the project has been disabled
                 assertTrue(structureService.getProject(id).isDisabled)
                 // Checks the data
@@ -941,7 +1005,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
         asAdmin {
             project {
                 structureService.disableProject(this)
-                val data = run("""
+                val data = run(
+                    """
                     mutation EnableProject {
                         enableProject(input: {id: $id}) {
                             project {
@@ -949,7 +1014,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                             }
                         }
                     }
-                """)
+                """
+                )
                 // Checks the project has been enabled
                 assertFalse(structureService.getProject(id).isDisabled)
                 // Checks the data
@@ -963,7 +1029,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
         asAdmin {
             val project = project()
             structureService.deleteProject(project.id)
-            val data = run("""
+            val data = run(
+                """
                     mutation DeleteProject {
                         deleteProject(input: {id: ${project.id}}) {
                             errors {
@@ -972,7 +1039,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                             }
                         }
                     }
-                """)
+                """
+            )
             // Checks the errors
             val error = data["deleteProject"]["errors"][0]
             assertEquals("Project ID not found: ${project.id}", error["message"].asText())
@@ -992,7 +1060,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
             }
             // Gets the favourite branches in project
             val data = asConfigurableAccount(account).withView(this).call {
-                run("""
+                run(
+                    """
                     {
                         projects(id: ${this.id}) {
                             branches(favourite: true) {
@@ -1000,12 +1069,13 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                             }
                         }
                     }
-                """)
+                """
+                )
             }
             val branchIds: Set<Int> = data["projects"][0]["branches"].map { it["id"].asInt() }.toSet()
             assertEquals(
-                    setOf(fav.id()),
-                    branchIds
+                setOf(fav.id()),
+                branchIds
             )
         }
     }
@@ -1026,7 +1096,10 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
         // Looks for this project by name, with a not authorized user
         withNoGrantViewToAll {
             asUser().execute {
-                runWithError("""{ projects(name: "${project.name}") { id } }""", errorClassification = ErrorType.FORBIDDEN)
+                runWithError(
+                    """{ projects(name: "${project.name}") { id } }""",
+                    errorClassification = ErrorType.FORBIDDEN
+                )
             }
         }
     }
@@ -1042,7 +1115,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
         val build2 = doCreateBuild(pl.branch, NameDescription.nd("2", ""))
         doPromote(build2, pl, "Two")
         // Run a GraphQL query at project level and gets the last promotion run
-        val data = run("""{
+        val data = run(
+            """{
             |   projects(id: ${pl.project.id}) {
             |      branches {
             |          promotionLevels {
@@ -1056,7 +1130,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
             |      }
             |   }
             |}
-        """.trimMargin())
+        """.trimMargin()
+        )
         // Checks that the build associated with the promotion is the last one
         val plNode = data["projects"][0]["branches"][0]["promotionLevels"][0]
         assertEquals(pl.name, plNode["name"].asText())
@@ -1076,7 +1151,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                         validationStatus(ValidationRunStatusID.STATUS_INVESTIGATING, "Investigating")
                         validationStatus(ValidationRunStatusID.STATUS_EXPLAINED, "Explained")
                     }
-                    val data = run("""{
+                    val data = run(
+                        """{
                         projects (id: ${project.id}) {
                             branches (name: "${branch.name}") {
                                 validationStamps {
@@ -1092,16 +1168,17 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                                 }
                             }
                         }
-                    }""")
+                    }"""
+                    )
                     val validationRunStatuses =
-                            data["projects"][0]["branches"][0]["validationStamps"][0]["validationRuns"][0]["validationRunStatuses"]
+                        data["projects"][0]["branches"][0]["validationStamps"][0]["validationRuns"][0]["validationRunStatuses"]
                     assertEquals(
-                            listOf("EXPLAINED", "INVESTIGATING", "FAILED"),
-                            validationRunStatuses.map { it["statusID"]["id"].asText() }
+                        listOf("EXPLAINED", "INVESTIGATING", "FAILED"),
+                        validationRunStatuses.map { it["statusID"]["id"].asText() }
                     )
                     assertEquals(
-                            listOf("Explained", "Investigating", "Validation failed"),
-                            validationRunStatuses.map { it["description"].asText() }
+                        listOf("Explained", "Investigating", "Validation failed"),
+                        validationRunStatuses.map { it["description"].asText() }
                     )
                 }
             }
@@ -1111,14 +1188,16 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
     @Test
     fun `Project creation time`() {
         project {
-            run("""{
+            run(
+                """{
                 projects(id: $id) {
                     name
                     creation {
                         time
                     }
                 }
-            }""") { data ->
+            }"""
+            ) { data ->
                 assertEquals(name, data.path("projects").first().path("name").asText())
                 val time = data.path("projects").first().path("creation").path("time").asText()
                 assertTrue(time.isNotBlank(), "Creation date has been set")
@@ -1130,7 +1209,8 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
     fun `Branch creation time`() {
         project {
             branch {
-                run("""{
+                run(
+                    """{
                     projects(id: ${project.id}) {
                         name
                         branches {
@@ -1140,11 +1220,86 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
                             }
                         }
                     }
-                }""") { data ->
+                }"""
+                ) { data ->
                     val branch = data.path("projects").first()
-                            .path("branches").first()
+                        .path("branches").first()
                     val time = branch.path("creation").path("time").asText()
                     assertTrue(time.isNotBlank(), "Creation date has been set")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Getting list of authorizations on a project for an admin`() {
+        asAdmin {
+            project {
+                run(
+                    """
+                    {
+                        project(id: $id) {
+                            authorizations {
+                                name
+                                action
+                                authorized
+                            }
+                        }
+                    }
+                """
+                ) { data ->
+                    val auths = data.path("project").path("authorizations")
+                    // Configuration rights
+                    assertEquals(
+                        true,
+                        auths
+                            .find { it.path("name").asText() == "project" && it.path("action").asText() == "config" }
+                            ?.path("authorized")?.asBoolean()
+                    )
+                    // Disabling rights
+                    assertEquals(
+                        true,
+                        auths
+                            .find { it.path("name").asText() == "project" && it.path("action").asText() == "disable" }
+                            ?.path("authorized")?.asBoolean()
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Getting list of authorizations on a project for automation`() {
+        asGlobalRole(Roles.GLOBAL_AUTOMATION) {
+            project {
+                run(
+                    """
+                    {
+                        project(id: $id) {
+                            authorizations {
+                                name
+                                action
+                                authorized
+                            }
+                        }
+                    }
+                """
+                ) { data ->
+                    val auths = data.path("project").path("authorizations")
+                    // Configuration rights
+                    assertEquals(
+                        true,
+                        auths
+                            .find { it.path("name").asText() == "project" && it.path("action").asText() == "config" }
+                            ?.path("authorized")?.asBoolean()
+                    )
+                    // Disabling rights
+                    assertEquals(
+                        true,
+                        auths
+                            .find { it.path("name").asText() == "project" && it.path("action").asText() == "disable" }
+                            ?.path("authorized")?.asBoolean()
+                    )
                 }
             }
         }
