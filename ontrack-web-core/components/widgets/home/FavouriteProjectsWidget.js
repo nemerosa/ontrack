@@ -7,6 +7,7 @@ import {useEventForRefresh} from "@components/common/EventsContext";
 import {DashboardWidgetCellContext} from "@components/dashboards/DashboardWidgetCellContextProvider";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import PaddedContent from "@components/common/PaddedContent";
+import {gqlProjectContentFragment} from "@components/projects/ProjectGraphQLFragments";
 
 export default function FavouriteProjectsWidget() {
 
@@ -20,8 +21,7 @@ export default function FavouriteProjectsWidget() {
                 gql`
                     query FavouriteProjects {
                         projects(favourites: true) {
-                            id
-                            name
+                            ...ProjectContent
                             favourite
                             decorations {
                                 ...decorationContent
@@ -48,6 +48,7 @@ export default function FavouriteProjectsWidget() {
                         }
                     }
                     ${gqlDecorationFragment}
+                    ${gqlProjectContentFragment}
                 `
             ).then(data => {
                 setProjects(data.projects)

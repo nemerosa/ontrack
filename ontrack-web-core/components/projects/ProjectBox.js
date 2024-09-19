@@ -10,7 +10,9 @@ export default function ProjectBox({project, displayFavourite = true, displayDec
                 {displayFavourite ? <ProjectFavourite project={project}/> : undefined}
                 <ProjectLink
                     project={project}
-                    text={<Typography.Text strong>{project.name}</Typography.Text>}
+                    text={<Typography.Text strong type={
+                        project.disabled ? "secondary" : undefined
+                    }>{project.name}</Typography.Text>}
                 />
                 {
                     displayDecorations && <Decorations entity={project}/>
