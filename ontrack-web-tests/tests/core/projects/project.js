@@ -13,4 +13,24 @@ export class ProjectPage {
         await expect(this.page.getByText(this.project.name)).toBeVisible()
     }
 
+    async checkNoDisabledBanner() {
+        await expect(this.getDisabledBanner()).not.toBeVisible()
+    }
+
+    async checkDisabledBanner() {
+        await expect(this.getDisabledBanner()).toBeVisible()
+    }
+
+    async disableProject() {
+        await this.page.getByRole('button', {name: "Disable project"}).click()
+    }
+
+    async enableProject() {
+        await this.page.getByRole('button', {name: "Enable project"}).click()
+    }
+
+    getDisabledBanner() {
+        return this.page.getByTestId("banner-disabled")
+    }
+
 }

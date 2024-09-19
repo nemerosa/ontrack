@@ -4,11 +4,12 @@ import Link from "next/link";
 import {homeUri} from "@components/common/Links";
 import LegacyLink from "@components/common/LegacyLink";
 
-export function Command({icon, text, href, action, title, legacy = false}) {
+export function Command({icon, text, href, action, title, legacy = false, disabled = false}) {
     return <Button
         type="text"
         onClick={action}
         title={title}
+        disabled={disabled}
     >
         {href && !legacy && <Link href={href}>{icon} {text}</Link>}
         {href && legacy && <LegacyLink href={href}>{icon} {text}</LegacyLink>}

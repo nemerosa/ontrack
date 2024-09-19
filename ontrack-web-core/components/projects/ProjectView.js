@@ -23,6 +23,10 @@ import {useEventForRefresh} from "@components/common/EventsContext";
 import ProjectInfoViewDrawer from "@components/projects/ProjectInfoViewDrawer";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import UserMenuActions from "@components/entities/UserMenuActions";
+import {gqlProjectContentFragment} from "@components/projects/ProjectGraphQLFragments";
+import {isAuthorized} from "@components/common/authorizations";
+import DisableProjectCommand from "@components/projects/DisableProjectCommand";
+import DisabledProjectBanner from "@components/projects/DisabledProjectBanner";
 
 export default function ProjectView({id}) {
 
@@ -33,8 +37,10 @@ export default function ProjectView({id}) {
     const [project, setProject] = useState({})
     const [branches, setBranches] = useState([])
     const [favouriteBranches, setFavouriteBranches] = useState([])
+    const [commands, setCommands] = useState([])
 
     const favouriteRefreshCount = useEventForRefresh("branch.favourite")
+    const projectUpdated = useEventForRefresh("project.updated")
 
     useEffect(() => {
         if (id && client) {
@@ -42,9 +48,8 @@ export default function ProjectView({id}) {
             client.request(
                 gql`
                     query GetProject($id: Int!) {
-                        projects(id: $id) {
-                            id
-                            name
+                        project(id: $id) {
+                            ...ProjectContent
                             properties {
                                 ...propertiesFragment
                             }
@@ -53,6 +58,11 @@ export default function ProjectView({id}) {
                             }
                             userMenuActions {
                                 ...userMenuActionFragment
+                            }
+                            authorizations {
+                                name
+                                action
+                                authorized
                             }
                             branches(order: true, count: 6) {
                                 project {
@@ -101,29 +111,46 @@ export default function ProjectView({id}) {
                     ${gqlPropertiesFragment}
                     ${gqlInformationFragment}
                     ${gqlUserMenuActionFragment}
+                    ${gqlProjectContentFragment}
                 `,
                 {id}
             ).then(data => {
-                setProject(data.projects[0])
-                setFavouriteBranches(data.projects[0].favouriteBranches)
-                setBranches(data.projects[0].branches)
+                const project = data.project
+                setProject(project)
+                setFavouriteBranches(project.favouriteBranches)
+                setBranches(project.branches)
+
+                // Commands
+                const commands = []
+                // Commands depending on the project authorizations & state
+                if (isAuthorized(project, 'project', 'disable')) {
+                    commands.push(
+                        <DisableProjectCommand
+                            key="disable-enable"
+                            project={project}
+                        />
+                    )
+                }
+                // All the rest of commands
+                commands.push(
+                    <UserMenuActions key="userMenuActions" actions={project.userMenuActions}/>,
+                    <JumpToBranch key="branch" projectName={project.name}/>,
+                    <LegacyLinkCommand
+                        key="legacy"
+                        href={legacyProjectUri(project)}
+                        text="Legacy project"
+                        title="Goes to the legacy project page"
+                    />,
+                    <CloseCommand key="close" href={homeUri()}/>,
+                )
+                // Setting the commands
+                setCommands(commands)
             }).finally(() => {
                 setLoadingProject(false)
             })
         }
-    }, [client, id, favouriteRefreshCount])
+    }, [client, id, favouriteRefreshCount, projectUpdated])
 
-    const commands = [
-        <UserMenuActions key="userMenuActions" actions={project.userMenuActions}/>,
-        <JumpToBranch key="branch" projectName={project.name}/>,
-        <LegacyLinkCommand
-            key="legacy"
-            href={legacyProjectUri(project)}
-            text="Legacy project"
-            title="Goes to the legacy project page"
-        />,
-        <CloseCommand key="close" href={homeUri()}/>,
-    ]
 
     return (
         <>
@@ -141,6 +168,7 @@ export default function ProjectView({id}) {
                 commands={commands}
             >
                 <Space direction="vertical" className="ot-line" size={16}>
+                    <DisabledProjectBanner project={project}/>
                     {
                         favouriteBranches && favouriteBranches.length > 0 &&
                         <PageSection

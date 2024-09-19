@@ -8,10 +8,11 @@ const gqlProjectData = gql`
     fragment ProjectData on Project {
         id
         name
+        disabled
     }
 `
 
-export  const projectList = async (ontrack) => {
+export const projectList = async (ontrack) => {
     const data = await graphQLCall(
         ontrack.connection,
         gql`
@@ -24,6 +25,22 @@ export  const projectList = async (ontrack) => {
         `
     )
     return data.projects.map(it => projectInstance(ontrack, it))
+}
+
+export const getProjectById = async (ontrack, id) => {
+    const data = await graphQLCall(
+        ontrack.connection,
+        gql`
+            query GetProjectById($id: Int!) {
+                project(id: $id) {
+                    ...ProjectData
+                }
+            }
+            ${gqlProjectData}
+        `,
+        {id}
+    )
+    return projectInstance(ontrack, data.project)
 }
 
 export const createProject = async (ontrack, name) => {
