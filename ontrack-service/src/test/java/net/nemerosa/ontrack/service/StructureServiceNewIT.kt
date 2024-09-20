@@ -352,4 +352,51 @@ class StructureServiceNewIT : AbstractDSLTestSupport() {
         }
     }
 
+    @Test
+    fun `An admin can disable and enable a branch`() {
+        val branch = project<Branch> {
+            branch()
+        }
+        asAdmin {
+            structureService.disableBranch(branch)
+            assertTrue(structureService.getBranch(branch.id).isDisabled, "Branch is disabled")
+            structureService.enableBranch(branch)
+            assertFalse(structureService.getBranch(branch.id).isDisabled, "Branch is enabled")
+        }
+    }
+
+    @Test
+    fun `Automation can disable and enable a branch`() {
+        val branch = project<Branch> {
+            branch()
+        }
+        withGrantViewToAll {
+            asGlobalRole(Roles.GLOBAL_AUTOMATION) {
+                structureService.disableBranch(branch)
+                assertTrue(structureService.getBranch(branch.id).isDisabled, "Branch is disabled")
+                structureService.enableBranch(branch)
+                assertFalse(structureService.getBranch(branch.id).isDisabled, "Branch is enabled")
+            }
+        }
+    }
+
+    @Test
+    fun `Participants cannot disable and enable a branch`() {
+        val branch = project<Branch> {
+            branch()
+        }
+        withGrantViewToAll {
+            asGlobalRole(Roles.GLOBAL_PARTICIPANT) {
+                assertFailsWith<AccessDeniedException> {
+                    structureService.disableBranch(branch)
+                }
+                assertFalse(structureService.getBranch(branch.id).isDisabled, "Branch is NOT disabled")
+                assertFailsWith<AccessDeniedException> {
+                    structureService.enableBranch(branch)
+                }
+                assertFalse(structureService.getBranch(branch.id).isDisabled, "Branch is enabled")
+            }
+        }
+    }
+
 }

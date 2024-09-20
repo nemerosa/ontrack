@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.graphql
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.api.support.*
 import net.nemerosa.ontrack.json.isNullOrNullNode
+import net.nemerosa.ontrack.model.security.Roles
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.BranchFavouriteService
 import net.nemerosa.ontrack.model.structure.NameDescription
@@ -11,7 +12,10 @@ import net.nemerosa.ontrack.test.assertJsonNotNull
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.graphql.execution.ErrorType
-import kotlin.test.*
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class BranchGraphQLIT : AbstractQLKTITSupport() {
 
@@ -703,6 +707,74 @@ class BranchGraphQLIT : AbstractQLKTITSupport() {
         val promotionRun = promotionRuns.get(0)
         assertEquals("Twice", promotionRun.path("description").asText())
         assertEquals("COPPER", promotionRun.path("promotionLevel").path("name").asText())
+    }
+
+    @Test
+    fun `Getting list of authorizations on a branch for an admin`() {
+        asAdmin {
+            project {
+                branch {
+                    run(
+                        """
+                        {
+                            branch(id: $id) {
+                                authorizations {
+                                    name
+                                    action
+                                    authorized
+                                }
+                            }
+                        }
+                    """
+                    ) { data ->
+                        val auths = data.path("branch").path("authorizations")
+                        // Disabling rights
+                        assertEquals(
+                            true,
+                            auths
+                                .find {
+                                    it.path("name").asText() == "branch" && it.path("action").asText() == "disable"
+                                }
+                                ?.path("authorized")?.asBoolean()
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Getting list of authorizations on a project for automation`() {
+        asGlobalRole(Roles.GLOBAL_AUTOMATION) {
+            project {
+                branch {
+                    run(
+                        """
+                        {
+                            branch(id: $id) {
+                                authorizations {
+                                    name
+                                    action
+                                    authorized
+                                }
+                            }
+                        }
+                    """
+                    ) { data ->
+                        val auths = data.path("branch").path("authorizations")
+                        // Disabling rights
+                        assertEquals(
+                            true,
+                            auths
+                                .find {
+                                    it.path("name").asText() == "branch" && it.path("action").asText() == "disable"
+                                }
+                                ?.path("authorized")?.asBoolean()
+                        )
+                    }
+                }
+            }
+        }
     }
 
 }

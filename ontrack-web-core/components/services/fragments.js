@@ -1,6 +1,7 @@
 import {gql} from "graphql-request";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {useEffect, useState} from "react";
+import {gqlBranchContentFragment} from "@components/branches/BranchGraphQLFragments";
 
 export const gqlUserMenuActionFragment = gql`
     fragment userMenuActionFragment on UserMenuAction {
@@ -149,16 +150,15 @@ export const gqlProjectCommonFragment = gql`
     }
 `
 
+/**
+ * @deprecated Use gqlBranchContentFragment
+ */
 export const gqlBranchCommonFragment = gql`
     fragment branchCommonFragment on Branch {
-        id
-        name
-        project {
-            ...projectCommonFragment
-        }
+        ...BranchContent
     }
-    
-    ${gqlProjectCommonFragment}
+
+    ${gqlBranchContentFragment}
 `
 
 export const gqlValidationStampByIdQuery = gql`

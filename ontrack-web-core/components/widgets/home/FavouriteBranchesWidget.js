@@ -6,6 +6,7 @@ import {Empty} from "antd";
 import {DashboardWidgetCellContext} from "@components/dashboards/DashboardWidgetCellContextProvider";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import PaddedContent from "@components/common/PaddedContent";
+import {gqlBranchContentFragment} from "@components/branches/BranchGraphQLFragments";
 
 export default function FavouriteBranchesWidget({project}) {
 
@@ -24,14 +25,8 @@ export default function FavouriteBranchesWidget({project}) {
                 gql`
                     query FavouriteBranches($project: String) {
                         branches(favourite: true, project: $project) {
-                            id
-                            name
-                            disabled
+                            ...BranchContent
                             favourite
-                            project {
-                                id
-                                name
-                            }
                             latestBuild: builds(count: 1) {
                                 id
                                 name
@@ -49,6 +44,7 @@ export default function FavouriteBranchesWidget({project}) {
                             }
                         }
                     }
+                    ${gqlBranchContentFragment}
                 `,
                 {project}
             ).then(data => {
