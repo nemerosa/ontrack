@@ -17,7 +17,10 @@ export default function BranchBox({branch, showProject, displayFavourite = true}
                 <BranchLink
                     branch={branch}
                     text={
-                        <Typography.Text strong>{branch.name}</Typography.Text>
+                        <Typography.Text
+                            strong
+                            type={branch.disabled ? "secondary" : undefined}
+                        >{branch.name}</Typography.Text>
                     }
                 />
             </Space>

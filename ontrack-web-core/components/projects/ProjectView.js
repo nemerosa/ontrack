@@ -27,6 +27,7 @@ import {gqlProjectContentFragment} from "@components/projects/ProjectGraphQLFrag
 import {isAuthorized} from "@components/common/authorizations";
 import DisableProjectCommand from "@components/projects/DisableProjectCommand";
 import DisabledProjectBanner from "@components/projects/DisabledProjectBanner";
+import {gqlBranchContentFragment} from "@components/branches/BranchGraphQLFragments";
 
 export default function ProjectView({id}) {
 
@@ -65,26 +66,15 @@ export default function ProjectView({id}) {
                                 authorized
                             }
                             branches(order: true, count: 6) {
-                                project {
-                                    id
-                                    name
-                                }
-                                id
-                                name
+                                ...BranchContent
                                 favourite
                                 decorations {
                                     ...decorationContent
                                 }
                             }
                             favouriteBranches: branches(favourite: true, order: true) {
-                                project {
-                                    id
-                                    name
-                                }
-                                id
-                                name
+                                ...BranchContent
                                 favourite
-                                disabled
                                 decorations {
                                     ...decorationContent
                                 }
@@ -112,6 +102,7 @@ export default function ProjectView({id}) {
                     ${gqlInformationFragment}
                     ${gqlUserMenuActionFragment}
                     ${gqlProjectContentFragment}
+                    ${gqlBranchContentFragment}
                 `,
                 {id}
             ).then(data => {
