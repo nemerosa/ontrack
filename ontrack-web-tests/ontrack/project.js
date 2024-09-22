@@ -74,7 +74,7 @@ export const createProject = async (ontrack, name) => {
     return projectInstance(ontrack, data.createProject.project)
 }
 
-const projectInstance = (ontrack, data) => {
+export const projectInstance = (ontrack, data) => {
     const project = {
         ontrack,
         type: 'PROJECT',

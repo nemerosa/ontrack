@@ -63,6 +63,26 @@ class BranchMutations(
             branchFavouriteService.setBranchFavourite(branch, false)
             structureService.getBranch(ID.of(input.id))
         },
+        /**
+         * Disables a branch
+         */
+        simpleMutation(
+            "disableBranch", "Disables an existing branch", DisableBranchInput::class,
+            "branch", "Updated branch", Branch::class
+        ) { input ->
+            val branch = structureService.getBranch(ID(input.id))
+            structureService.disableBranch(branch)
+        },
+        /**
+         * Enables a branch
+         */
+        simpleMutation(
+            "enableBranch", "Enables an existing branch", EnableBranchInput::class,
+            "branch", "Updated branch", Branch::class
+        ) { input ->
+            val branch = structureService.getBranch(ID(input.id))
+            structureService.enableBranch(branch)
+        },
     )
 
 
@@ -163,6 +183,16 @@ data class FavouriteBranchInput(
 )
 
 data class UnfavouriteBranchInput(
+    @APIDescription("Branch ID")
+    val id: Int
+)
+
+data class DisableBranchInput(
+    @APIDescription("Branch ID")
+    val id: Int
+)
+
+data class EnableBranchInput(
     @APIDescription("Branch ID")
     val id: Int
 )

@@ -3,6 +3,7 @@ import {createProject, getProjectById, projectList} from "@ontrack/project";
 import {getValidationRunById} from "@ontrack/validationRun";
 import {admin} from "@ontrack/admin";
 import {OntrackConfigurations} from "@ontrack/configurations";
+import {getBranchById} from "@ontrack/branch";
 
 /**
  * Ontrack root
@@ -20,7 +21,9 @@ export const ontrack = (customCredentials) => {
 
     self.createProject = async (name) => createProject(self, name)
     self.projectList = async () => projectList(self)
+
     self.getProjectById = async (id) => getProjectById(self, id)
+    self.getBranchById = async (id) => getBranchById(self, id)
 
     self.getValidationRunById = async (runId) => getValidationRunById(self, runId)
 

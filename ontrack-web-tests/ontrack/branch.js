@@ -1,9 +1,22 @@
 import {generate} from "@ontrack/utils";
-import {graphQLCallMutation} from "@ontrack/graphql";
+import {graphQLCall, graphQLCallMutation} from "@ontrack/graphql";
 import {gql} from "graphql-request";
 import {createValidationStamp} from "@ontrack/validationStamp";
 import {createBuild} from "@ontrack/build";
 import {createPromotionLevel} from "@ontrack/promotionLevel";
+import {projectInstance} from "@ontrack/project";
+
+const gqlBranchData = gql`
+    fragment BranchData on Branch {
+        id
+        name
+        disabled
+        project {
+            id
+            name
+        }
+    }
+`
 
 export const createBranch = async (project, name) => {
     const actualName = name ?? generate('bch_')
@@ -37,6 +50,23 @@ export const createBranch = async (project, name) => {
     )
 
     return branchInstance(project.ontrack, data.createBranch.branch, project)
+}
+
+export const getBranchById = async (ontrack, id) => {
+    const data = await graphQLCall(
+        ontrack.connection,
+        gql`
+            query GetBranchById($id: Int!) {
+                branch(id: $id) {
+                    ...BranchData
+                }
+            }
+            ${gqlBranchData}
+        `,
+        {id}
+    )
+    const project = projectInstance(ontrack, data.branch.project)
+    return branchInstance(ontrack, data.branch, project)
 }
 
 const branchInstance = (ontrack, data, project) => {

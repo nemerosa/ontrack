@@ -9,6 +9,7 @@ import {useRouter} from "next/router";
 import ValidationStampFilterContextProvider
     from "@components/branches/filters/validationStamps/ValidationStampFilterContext";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import DisabledBranchBanner from "@components/branches/DisabledBranchBanner";
 
 export default function ClassicBranchView({branch}) {
 
@@ -146,6 +147,7 @@ export default function ClassicBranchView({branch}) {
     return (
         <>
             <Space direction="vertical" className="ot-line">
+                <DisabledBranchBanner branch={branch}/>
                 <ValidationStampFilterContextProvider branch={branch}>
                     <BranchBuilds
                         branch={branch}

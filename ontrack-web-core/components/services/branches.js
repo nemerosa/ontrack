@@ -1,15 +1,11 @@
 import {gql} from "graphql-request";
 import {gqlInformationFragment, gqlPropertiesFragment, gqlUserMenuActionFragment} from "@components/services/fragments";
+import {gqlBranchContentFragment} from "@components/branches/BranchGraphQLFragments";
 
 export const gqlGetBranch = gql`
     query GetBranch($id: Int!) {
         branches(id: $id) {
-            id
-            name
-            project {
-                id
-                name
-            }
+            ...BranchContent
             authorizations {
                 name
                 action
@@ -26,6 +22,7 @@ export const gqlGetBranch = gql`
             }
         }
     }
+    ${gqlBranchContentFragment}
     ${gqlPropertiesFragment}
     ${gqlInformationFragment}
     ${gqlUserMenuActionFragment}

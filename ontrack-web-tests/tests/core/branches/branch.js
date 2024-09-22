@@ -46,6 +46,26 @@ class BranchPage {
         await dialog.waitFor()
         return dialog
     }
+
+    async checkNoDisabledBanner() {
+        await expect(this.getDisabledBanner()).not.toBeVisible()
+    }
+
+    async checkDisabledBanner() {
+        await expect(this.getDisabledBanner()).toBeVisible()
+    }
+
+    async disableBranch() {
+        await this.page.getByRole('button', {name: "Disable branch"}).click()
+    }
+
+    async enableBranch() {
+        await this.page.getByRole('button', {name: "Enable branch"}).click()
+    }
+
+    getDisabledBanner() {
+        return this.page.getByTestId("banner-disabled")
+    }
 }
 
 

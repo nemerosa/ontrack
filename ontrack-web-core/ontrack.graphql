@@ -1742,6 +1742,14 @@ type DisableAccountPayload implements Payload {
     errors: [UserError]
 }
 
+"Output type for the disableBranch mutation."
+type DisableBranchPayload implements Payload {
+    "Updated branch"
+    branch: Branch
+    "List of errors"
+    errors: [UserError]
+}
+
 "Output type for the disableProject mutation."
 type DisableProjectPayload implements Payload {
     "List of errors"
@@ -1762,6 +1770,14 @@ type DisableSubscriptionPayload implements Payload {
 type EnableAccountPayload implements Payload {
     "Updated account"
     account: Account
+    "List of errors"
+    errors: [UserError]
+}
+
+"Output type for the enableBranch mutation."
+type EnableBranchPayload implements Payload {
+    "Updated branch"
+    branch: Branch
     "List of errors"
     errors: [UserError]
 }
@@ -3575,6 +3591,11 @@ type Mutation {
         "Input for the mutation"
         input: DisableAccountInput
     ): DisableAccountPayload
+    "Disables an existing branch"
+    disableBranch(
+        "Input for the mutation"
+        input: DisableBranchInput
+    ): DisableBranchPayload
     "Disables an existing project"
     disableProject(
         "Input for the mutation"
@@ -3590,6 +3611,11 @@ type Mutation {
         "Input for the mutation"
         input: EnableAccountInput
     ): EnableAccountPayload
+    "Enables an existing branch"
+    enableBranch(
+        "Input for the mutation"
+        input: EnableBranchInput
+    ): EnableBranchPayload
     "Enables an existing project"
     enableProject(
         "Input for the mutation"
@@ -7660,12 +7686,14 @@ enum MessageType {
 
 "Type of result for a notification"
 enum NotificationResultType {
+    ASYNC
     DISABLED
     ERROR
     INVALID_CONFIGURATION
     NOT_CONFIGURED
     OK
     ONGOING
+    TIMEOUT
 }
 
 "Project entity type"
@@ -8708,6 +8736,12 @@ input DisableAccountInput {
     id: Int!
 }
 
+"Input type for the disableBranch mutation."
+input DisableBranchInput {
+    "Branch ID"
+    id: Int!
+}
+
 "Input type for the disableProject mutation."
 input DisableProjectInput {
     "Project ID"
@@ -8727,6 +8761,12 @@ input DisableSubscriptionInput {
 "Input type for the enableAccount mutation."
 input EnableAccountInput {
     "ID of the account"
+    id: Int!
+}
+
+"Input type for the enableBranch mutation."
+input EnableBranchInput {
+    "Branch ID"
     id: Int!
 }
 

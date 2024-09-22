@@ -1,12 +1,6 @@
 import {useEffect, useState} from "react";
 import {CloseCommand, Command, LegacyLinkCommand} from "@components/common/Commands";
-import {
-    branchLegacyUri,
-    branchLinksUri,
-    branchPromotionLevelsUri,
-    branchUri,
-    projectUri
-} from "@components/common/Links";
+import {branchLegacyUri, branchLinksUri, branchPromotionLevelsUri, projectUri} from "@components/common/Links";
 import Head from "next/head";
 import {branchTitle} from "@components/common/Titles";
 import MainPage from "@components/layouts/MainPage";
@@ -23,6 +17,9 @@ import {FaMedal, FaProjectDiagram} from "react-icons/fa";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gqlGetBranch} from "@components/services/branches";
 import UserMenuActions from "@components/entities/UserMenuActions";
+import {isAuthorized} from "@components/common/authorizations";
+import DisableBranchCommand from "@components/branches/DisableBranchCommand";
+import {useEventForRefresh} from "@components/common/EventsContext";
 
 export default function BranchPageView({id}) {
     const [loadingBranch, setLoadingBranch] = useState(true)
@@ -39,6 +36,7 @@ export default function BranchPageView({id}) {
     const preferences = usePreferences()
 
     const [selectedBranchView, setSelectedBranchView] = useState(defaultEmptyView)
+    const branchUpdated = useEventForRefresh("branch.updated")
 
     const router = useRouter()
 
@@ -83,7 +81,16 @@ export default function BranchPageView({id}) {
                 setBranch(branch)
                 let loadedBranchViews = getBranchViews(branch);
                 setBranchViews(loadedBranchViews)
-                setCommands([
+                const commands = []
+                if (isAuthorized(branch, "branch", "disable")) {
+                    commands.push(
+                        <DisableBranchCommand
+                            key="disable-enable"
+                            branch={branch}
+                        />
+                    )
+                }
+                commands.push(
                     // TODO Since only one view for now (classic), not allowing to change views
                     // <BranchViewSelector
                     //     branchViews={loadedBranchViews}
@@ -113,12 +120,13 @@ export default function BranchPageView({id}) {
                         title="Goes to the legacy branch page"
                     />,
                     <CloseCommand key="close" href={projectUri(branch.project)}/>,
-                ])
+                )
+                setCommands(commands)
             }).finally(() => {
                 setLoadingBranch(false)
             })
         }
-    }, [client, id])
+    }, [client, id, branchUpdated])
 
     return (
         <>
