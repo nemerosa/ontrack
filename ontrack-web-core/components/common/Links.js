@@ -76,6 +76,10 @@ export function validationStampUri(validationStamp) {
     return `/validationStamp/${validationStamp.id}`
 }
 
+export function validationRunUri(validationRun) {
+    return `/validationRun/${validationRun.id}`
+}
+
 export function restPromotionLevelImageUri(promotionLevel) {
     return `/rest/structure/promotionLevels/${promotionLevel.id}/image`
 }

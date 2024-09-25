@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {List, Modal, Space, Typography} from "antd";
+import {Modal, Space, Typography} from "antd";
 import {gql} from "graphql-request";
 import LoadingContainer from "@components/common/LoadingContainer";
 import BuildLink from "@components/builds/BuildLink";
@@ -7,16 +7,12 @@ import ValidationStampLink from "@components/validationStamps/ValidationStampLin
 import PageSection from "@components/common/PageSection";
 import ValidationRunLink from "@components/validationRuns/ValidationRunLink";
 import ValidationRunStatus from "@components/validationRuns/ValidationRunStatus";
-import AnnotatedDescription from "@components/common/AnnotatedDescription";
-import Timestamp from "@components/common/Timestamp";
 import Rows from "@components/common/Rows";
-import ValidationRunStatusChange from "@components/validationRuns/ValidationRunStatusChange";
-import {isAuthorized} from "@components/common/authorizations";
 import ValidationDataType from "@components/framework/validation-data-type/ValidationDataType";
 import InfoBox from "@components/common/InfoBox";
-import ValidationRunData from "@components/framework/validation-run-data/ValidationRunData";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
-import RunInfo from "@components/common/RunInfo";
+import {gqlValidationRunContent} from "@components/validationRuns/ValidationRunGraphQLFragments";
+import ValidationRun from "@components/validationRuns/ValidationRun";
 
 export function useValidationRunHistoryDialog() {
     const [open, setOpen] = useState(false)
@@ -107,59 +103,14 @@ export default function ValidationRunHistoryDialog({dialog, onChange}) {
                                                 }
                                             }
                                             pageItems {
-                                                id
-                                                runOrder
-                                                data {
-                                                    descriptor {
-                                                        id
-                                                        feature {
-                                                            id
-                                                        }
-                                                    }
-                                                    data
-                                                }
-                                                authorizations {
-                                                    name
-                                                    action
-                                                    authorized
-                                                }
-                                                runInfo {
-                                                    sourceType
-                                                    sourceUri
-                                                    triggerType
-                                                    triggerData
-                                                    runTime
-                                                }
-                                                lastStatus {
-                                                    statusID {
-                                                        id
-                                                        name
-                                                    }
-                                                }
-                                                validationRunStatuses {
-                                                    id
-                                                    creation {
-                                                        user
-                                                        time
-                                                    }
-                                                    description
-                                                    annotatedDescription
-                                                    statusID {
-                                                        id
-                                                        name
-                                                    }
-                                                    authorizations {
-                                                        name
-                                                        action
-                                                        authorized
-                                                    }
-                                                }
+                                                ...ValidationRunContent
                                             }
                                         }
                                     }
                                 }
                             }
                         }
+                        ${gqlValidationRunContent}
                     `, {
                         buildId,
                         validationStampName,
@@ -189,61 +140,17 @@ export default function ValidationRunHistoryDialog({dialog, onChange}) {
         setRunsReload(runsReload + 1)
     }
 
-    const replaceStatusCommentInRun = (run, vrsId, description, annotatedDescription) => ({
-        ...run,
-        validationRunStatuses: run.validationRunStatuses.map(vrs => {
-            if (vrs.id === vrsId) {
+    const onRunChanged = (run) => {
+        setRuns(runs => runs.map(oldRun => {
+            if (oldRun.id === run.id) {
                 return {
-                    ...vrs,
-                    description,
-                    annotatedDescription,
+                    ...oldRun,
+                    ...run,
                 }
             } else {
-                return vrs
+                return oldRun
             }
-        }),
-    })
-
-    const replaceStatusCommentInRuns = (runs, vrsId, description, annotatedDescription) => runs.map(run => replaceStatusCommentInRun(run, vrsId, description, annotatedDescription))
-
-    const editStatusComment = async (vrs, text) => {
-        const data = await client.request(
-            gql`
-                mutation ChangeStatusComment(
-                    $validationRunStatusId: Int!,
-                    $comment: String!,
-                ) {
-                    changeValidationRunStatusComment(input: {
-                        validationRunStatusId: $validationRunStatusId,
-                        comment: $comment,
-                    }) {
-                        validationRun {
-                            validationRunStatuses {
-                                id
-                                description
-                                annotatedDescription
-                            }
-                        }
-                        errors {
-                            message
-                        }
-                    }
-                }
-            `,
-            {
-                validationRunStatusId: vrs.id,
-                comment: text,
-            }
-        )
-        // Gets the text of the changed status
-        const newVrs = data.changeValidationRunStatusComment.validationRun
-            .validationRunStatuses
-            .find(it => it.id === vrs.id)
-        // Refreshes only the status
-        if (newVrs) {
-            const {description, annotatedDescription} = newVrs
-            setRuns(replaceStatusCommentInRuns(runs, vrs.id, description, annotatedDescription))
-        }
+        }))
     }
 
     return (
@@ -284,68 +191,11 @@ export default function ValidationRunHistoryDialog({dialog, onChange}) {
                                     }
                                     padding={false}
                                 >
-                                    <Rows>
-                                        {/* Adding a comment */}
-                                        {
-                                            isAuthorized(run, 'validation_run', 'status_change') &&
-                                            <ValidationRunStatusChange
-                                                run={run}
-                                                onStatusChanged={reloadOnStatusChanged}
-                                            />
-                                        }
-                                        {/* Validation run data */}
-                                        {
-                                            run.data &&
-                                            <ValidationRunData data={run.data}/>
-                                        }
-                                        {/* Run info */}
-                                        {
-                                            run.runInfo &&
-                                            <RunInfo info={run.runInfo}/>
-                                        }
-                                        {/* List of statuses */}
-                                        <List
-                                            dataSource={run.validationRunStatuses}
-                                            renderItem={vrs => (
-                                                <List.Item
-                                                    key={vrs.id}
-                                                    style={{padding: 8, paddingLeft: 24}}
-                                                    actions={[
-                                                        <Timestamp
-                                                            key={vrs.id}
-                                                            prefix={
-                                                                `${vrs.creation.user} @`
-                                                            }
-                                                            value={vrs.creation.time}
-                                                        />
-                                                    ]}
-                                                >
-                                                    <List.Item.Meta
-                                                        title={
-                                                            <Space>
-                                                                <ValidationRunStatus
-                                                                    status={vrs}
-                                                                    displayText={false}
-                                                                    tooltip={false}
-                                                                />
-                                                                <Typography.Text
-                                                                    strong>{vrs.statusID.name}</Typography.Text>
-                                                            </Space>
-                                                        }
-                                                        description={
-                                                            <AnnotatedDescription
-                                                                entity={vrs}
-                                                                disabled={false}
-                                                                editable={isAuthorized(vrs, 'validation_run_status', 'comment_change')}
-                                                                onChange={(text) => editStatusComment(vrs, text)}
-                                                            />
-                                                        }
-                                                    />
-                                                </List.Item>
-                                            )}
-                                        >
-                                        </List>
-                                    </Rows>
+                                    <ValidationRun
+                                        run={run}
+                                        onStatusChanged={reloadOnStatusChanged}
+                                        onRunChanged={onRunChanged}
+                                    />
                                 </PageSection>
                             )
                         }

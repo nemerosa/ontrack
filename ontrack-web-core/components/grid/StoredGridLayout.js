@@ -21,7 +21,7 @@ export default function StoredGridLayout({id, defaultLayout, items, rowHeight = 
         if (resetLayoutCount > 0) {
             setLayout(defaultLayout)
         }
-    }, [resetLayoutCount]);
+    }, [defaultLayout, resetLayoutCount]);
 
     const onLayoutChange = (newLayout) => {
         localStorage.setItem(id, JSON.stringify(newLayout))
