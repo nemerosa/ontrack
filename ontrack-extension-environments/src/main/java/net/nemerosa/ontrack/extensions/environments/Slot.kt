@@ -9,6 +9,7 @@ data class Slot(
     val description: String?,
     val project: Project,
     val qualifier: String?,
+    val admissionRules: List<SlotAdmissionRule>,
     val deployed: Build?,
     val candidate: Build?,
 )

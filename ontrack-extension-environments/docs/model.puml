@@ -8,7 +8,7 @@ class Environment {
 }
 
 class Slot {
-    id: Long <<generated>>
+    id: String <<generated>>
     description: String?
     qualifier: String?
 }
