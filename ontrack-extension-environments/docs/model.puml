@@ -1,0 +1,36 @@
+@startuml
+
+class Environment {
+    id: Long <<generated>>
+    name: String
+    order: Int
+    description: String?
+}
+
+class Slot {
+    id: Long <<generated>>
+    description: String?
+    qualifier: String?
+}
+
+class SlotAdmissionRule {
+    id: Long <<generated>>
+    name: String
+    description: String?
+    ruleId: String
+    ruleConfig: JSON
+}
+
+class Project <<core>> #FCC
+class Build <<core>> #FCC
+
+Slot "*" - "1" Environment: environment >
+Slot "*" -down- "1" Project: project >
+Slot - "?" Build: deployed >
+Slot - "?" Build: candidate >
+
+SlotAdmissionRule "*" - "1" Slot: slot >
+
+Project - Build
+
+@enduml

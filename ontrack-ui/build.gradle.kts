@@ -1,5 +1,4 @@
 import net.nemerosa.versioning.VersioningExtension
-import org.apache.commons.lang3.time.DateFormatUtils
 import org.springframework.boot.gradle.dsl.SpringBootExtension
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 import org.springframework.boot.gradle.tasks.run.BootRun
@@ -87,6 +86,7 @@ dependencies {
     runtimeOnly(project(":ontrack-extension-hook"))
     runtimeOnly(project(":ontrack-extension-queue"))
     runtimeOnly(project(":ontrack-extension-workflows"))
+    runtimeOnly(project(":ontrack-extension-environments"))
 }
 
 /**
