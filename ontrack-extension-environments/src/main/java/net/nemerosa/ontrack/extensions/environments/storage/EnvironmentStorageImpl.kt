@@ -2,11 +2,9 @@ package net.nemerosa.ontrack.extensions.environments.storage
 
 import net.nemerosa.ontrack.extensions.environments.Environment
 import net.nemerosa.ontrack.model.support.StorageService
-import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
+import org.springframework.stereotype.Repository
 
-@Service
-@Transactional
+@Repository
 class EnvironmentStorageImpl(
     private val storageService: StorageService,
 ) : EnvironmentStorage {
@@ -45,4 +43,11 @@ class EnvironmentStorageImpl(
             size = Int.MAX_VALUE,
             orderQuery = "ORDER BY data::jsonb->>'order'"
         )
+
+    override fun delete(env: Environment) {
+        storageService.delete(
+            store = STORE,
+            key = env.id,
+        )
+    }
 }

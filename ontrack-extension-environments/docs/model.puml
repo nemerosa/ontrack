@@ -1,7 +1,7 @@
 @startuml
 
 class Environment {
-    id: Long <<generated>>
+    id: String <<generated>>
     name: String
     order: Int
     description: String?
@@ -11,26 +11,61 @@ class Slot {
     id: String <<generated>>
     description: String?
     qualifier: String?
+    ---
+    /candidateBuild: Build?
+    /deployedBuild: Build?
 }
 
-class SlotAdmissionRule {
-    id: Long <<generated>>
+class Project <<core>> #FCC
+class Build <<core>> #FCC
+
+Slot -> Environment: environment
+Slot -down-> Project: project
+
+Project <.up. Build
+
+class SlotAdmissionRuleConfig {
+    id: String <<generated>>
     name: String
     description: String?
     ruleId: String
     ruleConfig: JSON
 }
 
-class Project <<core>> #FCC
-class Build <<core>> #FCC
+interface SlotAdmissionRule {
+    ruleId: String
+    isBuildEligible(build: Build): Boolean
+}
 
-Slot "*" - "1" Environment: environment >
-Slot "*" -down- "1" Project: project >
-Slot - "?" Build: deployed >
-Slot - "?" Build: candidate >
+class SlotPipeline {
+    id: String <<generated>>
+    start: Date
+    end: Date?
+    status: SlotPipelineStatus
+}
 
-SlotAdmissionRule "*" - "1" Slot: slot >
+enum SlotPipelineStatus {
+    ONGOING
+    CANCELLED
+    DEPLOYING
+    ERROR
+    DEPLOYED
+}
 
-Project - Build
+SlotPipeline --> Build: build
+SlotPipeline --> Slot: slot
+SlotPipeline .up.> SlotPipelineStatus
+
+class SlotPipelineAdmissionRuleStatus {
+    id: String <<generated>>
+    status: JSON?
+}
+
+SlotPipelineAdmissionRuleStatus --> SlotPipeline: pipeline
+SlotPipelineAdmissionRuleStatus --> SlotAdmissionRuleConfig: config
+
+Slot *--> SlotAdmissionRuleConfig: rules[]
+
+SlotAdmissionRuleConfig ..> SlotAdmissionRule
 
 @enduml

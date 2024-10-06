@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.Project
 
 data class Slot(
-    val id: Int,
+    val id: String,
     val environment: Environment,
     val description: String?,
     val project: Project,

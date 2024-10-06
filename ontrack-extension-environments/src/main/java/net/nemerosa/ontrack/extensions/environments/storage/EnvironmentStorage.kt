@@ -8,5 +8,6 @@ interface EnvironmentStorage {
     fun getById(id: String): Environment
     fun findByName(name: String): Environment?
     fun findEnvironments(): List<Environment>
+    fun delete(env: Environment)
 
 }

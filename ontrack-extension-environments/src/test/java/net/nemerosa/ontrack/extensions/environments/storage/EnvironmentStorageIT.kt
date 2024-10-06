@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class EnvironmentStorageIT : AbstractDSLTestSupport() {
 
@@ -31,6 +32,15 @@ class EnvironmentStorageIT : AbstractDSLTestSupport() {
             list.find { it.name == env.name },
             "Environment found"
         )
+    }
+
+    @Test
+    fun `Deleting an environment`() {
+        val env = EnvironmentTestFixtures.testEnvironment()
+        environmentStorage.save(env)
+        assertNotNull(environmentStorage.findByName(env.name), "Environment present")
+        environmentStorage.delete(env)
+        assertNull(environmentStorage.findByName(env.name), "Environment not present")
     }
 
 }
