@@ -11,6 +11,7 @@ dependencies {
 
     implementation(project(":ontrack-ui-graphql"))
     implementation(project(":ontrack-extension-casc"))
+    implementation(project(":ontrack-repository"))
     implementation(project(":ontrack-repository-support"))
 
     testImplementation(project(path = ":ontrack-model", configuration = "tests"))

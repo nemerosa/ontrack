@@ -8,7 +8,9 @@ import java.sql.ResultSet
 import javax.sql.DataSource
 
 @Repository
-class EnvironmentRepository(dataSource: DataSource) : AbstractJdbcRepository(dataSource) {
+class EnvironmentRepository(
+    dataSource: DataSource,
+) : AbstractJdbcRepository(dataSource), EnvironmentRepositoryAccessor {
 
     fun save(environment: Environment) {
         namedParameterJdbcTemplate!!.update(
@@ -29,7 +31,7 @@ class EnvironmentRepository(dataSource: DataSource) : AbstractJdbcRepository(dat
         )
     }
 
-    fun getById(id: String): Environment {
+    override fun getEnvironmentById(id: String): Environment {
         return try {
             namedParameterJdbcTemplate!!.queryForObject(
                 """

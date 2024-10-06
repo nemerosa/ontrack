@@ -23,7 +23,7 @@ class EnvironmentServiceImpl(
 
     override fun getById(id: String): Environment {
         // TODO Security check
-        return environmentRepository.getById(id)
+        return environmentRepository.getEnvironmentById(id)
     }
 
     override fun findByName(name: String): Environment? {

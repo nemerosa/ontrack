@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extensions.environments
 
-import net.nemerosa.ontrack.extensions.environments.storage.EnvironmentStorage
+import net.nemerosa.ontrack.extensions.environments.service.EnvironmentService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -8,13 +8,13 @@ import org.springframework.stereotype.Component
 class EnvironmentTestSupport {
 
     @Autowired
-    private lateinit var environmentStorage: EnvironmentStorage
+    private lateinit var environmentService: EnvironmentService
 
     fun withEnvironment(
         env: Environment = EnvironmentTestFixtures.testEnvironment(),
         code: (env: Environment) -> Unit
     ) {
-        environmentStorage.save(env)
+        environmentService.save(env)
         code(env)
     }
 

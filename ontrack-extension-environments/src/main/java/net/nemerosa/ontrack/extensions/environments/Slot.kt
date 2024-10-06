@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extensions.environments
 
-import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.Project
 
 data class Slot(
@@ -8,8 +7,9 @@ data class Slot(
     val environment: Environment,
     val description: String?,
     val project: Project,
-    val qualifier: String?,
-    val admissionRules: List<SlotAdmissionRule>,
-    val deployed: Build?,
-    val candidate: Build?,
-)
+    val qualifier: String,
+) {
+    companion object {
+        const val DEFAULT_QUALIFIER = ""
+    }
+}
