@@ -1,15 +1,10 @@
 package net.nemerosa.ontrack.extensions.environments.service
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.extensions.environments.Environment
-import net.nemerosa.ontrack.extensions.environments.Slot
-import net.nemerosa.ontrack.extensions.environments.SlotAdmissionRule
-import net.nemerosa.ontrack.extensions.environments.SlotAdmissionRuleConfig
+import net.nemerosa.ontrack.extensions.environments.*
 import net.nemerosa.ontrack.extensions.environments.rules.SlotAdmissionRuleRegistry
-import net.nemerosa.ontrack.extensions.environments.storage.SlotAdmissionRuleConfigRepository
-import net.nemerosa.ontrack.extensions.environments.storage.SlotAlreadyDefinedException
-import net.nemerosa.ontrack.extensions.environments.storage.SlotIdAlreadyExistsException
-import net.nemerosa.ontrack.extensions.environments.storage.SlotRepository
+import net.nemerosa.ontrack.extensions.environments.storage.*
+import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.structure.Build
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -19,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional
 class SlotServiceImpl(
     private val slotRepository: SlotRepository,
     private val slotAdmissionRuleConfigRepository: SlotAdmissionRuleConfigRepository,
+    private val slotPipelineRepository: SlotPipelineRepository,
     private val slotAdmissionRuleRegistry: SlotAdmissionRuleRegistry,
 ) : SlotService {
 
@@ -118,5 +114,25 @@ class SlotServiceImpl(
     override fun getSlotById(id: String): Slot {
         // TODO Security check
         return slotRepository.getSlotById(id)
+    }
+
+    override fun startPipeline(slot: Slot, build: Build): SlotPipeline {
+        // TODO Security check
+        // Build must be eligible
+        if (!isBuildEligible(slot, build)) {
+            throw SlotPipelineBuildNotEligibleException(slot, build)
+        }
+        // TODO Cancelling all current pipelines
+        // Creating the new pipeline
+        val pipeline = SlotPipeline(build = build)
+        // Saving the pipeline
+        slotPipelineRepository.savePipeline(slot, pipeline)
+        // OK
+        return pipeline
+    }
+
+    override fun findPipelines(slot: Slot): PaginatedList<SlotPipeline> {
+        // TODO Security check
+        return slotPipelineRepository.findPipelines(slot)
     }
 }

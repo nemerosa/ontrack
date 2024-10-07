@@ -3,6 +3,8 @@ package net.nemerosa.ontrack.extensions.environments.service
 import net.nemerosa.ontrack.extensions.environments.Environment
 import net.nemerosa.ontrack.extensions.environments.Slot
 import net.nemerosa.ontrack.extensions.environments.SlotAdmissionRuleConfig
+import net.nemerosa.ontrack.extensions.environments.SlotPipeline
+import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.structure.Build
 
 interface SlotService {
@@ -46,5 +48,15 @@ interface SlotService {
      * Gets the last N builds eligible for this slot
      */
     fun getEligibleBuilds(slot: Slot, count: Int = 10): List<Build>
+
+    /**
+     * Starting a pipeline
+     */
+    fun startPipeline(slot: Slot, build: Build): SlotPipeline
+
+    /**
+     *
+     */
+    fun findPipelines(slot: Slot): PaginatedList<SlotPipeline>
 
 }

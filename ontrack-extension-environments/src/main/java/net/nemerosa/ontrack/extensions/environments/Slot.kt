@@ -12,4 +12,11 @@ data class Slot(
     companion object {
         const val DEFAULT_QUALIFIER = ""
     }
+
+    override fun toString(): String =
+        if (qualifier != DEFAULT_QUALIFIER) {
+            "${environment.name}/${project.name}/${qualifier}"
+        } else {
+            "${environment.name}/${project.name}"
+        }
 }
