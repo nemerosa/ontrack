@@ -31,4 +31,17 @@ class SlotTestSupport : AbstractDSLTestSupport() {
         }
     }
 
+    fun withSlotPipeline(
+        code: (pipeline: SlotPipeline) -> Unit,
+    ) {
+        withSlot { slot ->
+            slot.project.branch {
+                build {
+                    val pipeline = slotService.startPipeline(slot, this)
+                    code(pipeline)
+                }
+            }
+        }
+    }
+
 }

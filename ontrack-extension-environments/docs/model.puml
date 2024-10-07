@@ -56,6 +56,15 @@ SlotPipeline --> Build: build
 SlotPipeline --> Slot: slot
 SlotPipeline .up.> SlotPipelineStatus
 
+class SlotPipelineChange {
+    timestamp: Date
+    author: String
+    status: SlotPipelineStatus?
+    message: String?
+}
+
+SlotPipelineChange --> SlotPipeline: pipeline
+
 class SlotPipelineAdmissionRuleStatus {
     id: String <<generated>>
     status: JSON?

@@ -1,9 +1,6 @@
 package net.nemerosa.ontrack.extensions.environments.service
 
-import net.nemerosa.ontrack.extensions.environments.Environment
-import net.nemerosa.ontrack.extensions.environments.Slot
-import net.nemerosa.ontrack.extensions.environments.SlotAdmissionRuleConfig
-import net.nemerosa.ontrack.extensions.environments.SlotPipeline
+import net.nemerosa.ontrack.extensions.environments.*
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.structure.Build
 
@@ -58,5 +55,20 @@ interface SlotService {
      *
      */
     fun findPipelines(slot: Slot): PaginatedList<SlotPipeline>
+
+    /**
+     * Cancelling a pipeline
+     */
+    fun cancelPipeline(pipeline: SlotPipeline, reason: String)
+
+    /**
+     * Getting a pipeline by ID
+     */
+    fun findPipelineById(id: String): SlotPipeline?
+
+    /**
+     * Getting the history of a pipeline
+     */
+    fun getPipelineChanges(pipeline: SlotPipeline): List<SlotPipelineChange>
 
 }

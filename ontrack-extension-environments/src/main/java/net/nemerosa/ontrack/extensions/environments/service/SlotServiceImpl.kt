@@ -1,10 +1,12 @@
 package net.nemerosa.ontrack.extensions.environments.service
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extensions.environments.*
 import net.nemerosa.ontrack.extensions.environments.rules.SlotAdmissionRuleRegistry
 import net.nemerosa.ontrack.extensions.environments.storage.*
 import net.nemerosa.ontrack.model.pagination.PaginatedList
+import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Build
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -12,9 +14,11 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional
 class SlotServiceImpl(
+    private val securityService: SecurityService,
     private val slotRepository: SlotRepository,
     private val slotAdmissionRuleConfigRepository: SlotAdmissionRuleConfigRepository,
     private val slotPipelineRepository: SlotPipelineRepository,
+    private val slotPipelineChangeRepository: SlotPipelineChangeRepository,
     private val slotAdmissionRuleRegistry: SlotAdmissionRuleRegistry,
 ) : SlotService {
 
@@ -124,9 +128,9 @@ class SlotServiceImpl(
         }
         // TODO Cancelling all current pipelines
         // Creating the new pipeline
-        val pipeline = SlotPipeline(build = build)
+        val pipeline = SlotPipeline(slot = slot, build = build)
         // Saving the pipeline
-        slotPipelineRepository.savePipeline(slot, pipeline)
+        slotPipelineRepository.savePipeline(pipeline)
         // OK
         return pipeline
     }
@@ -134,5 +138,47 @@ class SlotServiceImpl(
     override fun findPipelines(slot: Slot): PaginatedList<SlotPipeline> {
         // TODO Security check
         return slotPipelineRepository.findPipelines(slot)
+    }
+
+    override fun cancelPipeline(pipeline: SlotPipeline, reason: String) {
+        // TODO Security check
+        changePipeline(
+            pipeline = pipeline,
+            status = SlotPipelineStatus.CANCELLED,
+            message = reason,
+        )
+    }
+
+    private fun changePipeline(
+        pipeline: SlotPipeline,
+        status: SlotPipelineStatus,
+        message: String,
+    ) {
+        val user = securityService.currentSignature.user.name
+        val timestamp = Time.now
+        slotPipelineChangeRepository.save(
+            SlotPipelineChange(
+                pipeline = pipeline,
+                user = user,
+                timestamp = timestamp,
+                status = status,
+                message = message,
+            )
+        )
+        var updatedPipeline = pipeline.withStatus(status)
+        if (status.finished) {
+            updatedPipeline = updatedPipeline.withEnd(timestamp)
+        }
+        slotPipelineRepository.savePipeline(updatedPipeline)
+    }
+
+    override fun findPipelineById(id: String): SlotPipeline? {
+        // TODO Security check
+        return slotPipelineRepository.findPipelineById(id)
+    }
+
+    override fun getPipelineChanges(pipeline: SlotPipeline): List<SlotPipelineChange> {
+        // TODO Security check
+        return slotPipelineChangeRepository.findByPipeline(pipeline)
     }
 }
