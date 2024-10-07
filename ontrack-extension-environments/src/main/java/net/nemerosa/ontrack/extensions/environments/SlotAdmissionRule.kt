@@ -54,7 +54,6 @@ interface SlotAdmissionRule<C> {
     fun getEligibleBuilds(
         slot: Slot,
         config: C,
-        offset: Int = 0,
         size: Int = 10,
     ): List<Build>
 

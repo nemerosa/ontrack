@@ -64,6 +64,33 @@ class PromotionLevelJdbcRepository(
             }
         }
 
+    override fun findBranchesWithPromotionLevel(
+        project: Project,
+        promotionLevelName: String,
+    ): List<Branch> =
+        namedParameterJdbcTemplate!!.query(
+            """
+                SELECT B.ID
+                FROM BRANCHES B
+                INNER JOIN PROMOTION_LEVELS PL ON PL.BRANCHID = B.ID
+                LEFT JOIN (
+                	SELECT DISTINCT ON (BRANCHID) BRANCHID, CREATION
+                	FROM BUILDS
+                	ORDER BY BRANCHID, CREATION DESC
+                ) LAST_BUILD ON LAST_BUILD.BRANCHID = B.ID
+                WHERE B.PROJECTID = :projectId
+                AND PL.NAME = :promotionLevelName
+                AND B.DISABLED = FALSE
+                ORDER BY COALESCE(LAST_BUILD.CREATION, B.CREATION) DESC
+            """.trimIndent(),
+            mapOf(
+                "projectId" to project.id(),
+                "promotionLevelName" to promotionLevelName,
+            )
+        ) { rs, _ ->
+            branchJdbcRepositoryAccessor.getBranch(id(rs), project)
+        }
+
     override fun toPromotionLevel(rs: ResultSet, branch: Branch?) = PromotionLevel(
         id = id(rs),
         name = rs.getString("name"),

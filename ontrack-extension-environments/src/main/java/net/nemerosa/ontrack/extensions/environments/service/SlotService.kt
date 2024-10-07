@@ -42,4 +42,9 @@ interface SlotService {
      */
     fun isBuildEligible(slot: Slot, build: Build): Boolean
 
+    /**
+     * Gets the last N builds eligible for this slot
+     */
+    fun getEligibleBuilds(slot: Slot, count: Int = 10): List<Build>
+
 }

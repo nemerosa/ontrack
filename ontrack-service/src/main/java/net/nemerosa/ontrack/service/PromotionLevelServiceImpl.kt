@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.service
 
+import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.PromotionLevelService
 import net.nemerosa.ontrack.repository.PromotionLevelRepository
 import org.springframework.stereotype.Service
@@ -13,4 +15,11 @@ class PromotionLevelServiceImpl(
         promotionLevelRepository.findNamesByToken(token)
             .sorted()
 
+    override fun findBranchesWithPromotionLevel(
+        project: Project,
+        promotionLevelName: String,
+        count: Int
+    ): List<Branch> =
+        promotionLevelRepository.findBranchesWithPromotionLevel(project, promotionLevelName)
+            .take(count)
 }

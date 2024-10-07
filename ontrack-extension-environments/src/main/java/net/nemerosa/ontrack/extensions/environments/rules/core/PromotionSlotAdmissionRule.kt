@@ -4,13 +4,17 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extensions.environments.Slot
 import net.nemerosa.ontrack.extensions.environments.SlotAdmissionRule
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.PromotionLevelService
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
 
 @Component
 class PromotionSlotAdmissionRule(
     private val structureService: StructureService,
+    private val promotionLevelService: PromotionLevelService,
+    private val buildFilterService: BuildFilterService,
 ) : SlotAdmissionRule<PromotionSlotAdmissionRuleConfig> {
 
     companion object {
@@ -20,13 +24,25 @@ class PromotionSlotAdmissionRule(
     override val id: String = ID
     override val name: String = "Promotion"
 
+    /**
+     * Getting the last branches having the configured promotion
+     * and getting their last builds.
+     */
     override fun getEligibleBuilds(
         slot: Slot,
         config: PromotionSlotAdmissionRuleConfig,
-        offset: Int,
         size: Int
     ): List<Build> {
-        TODO("Not yet implemented")
+        val branches = promotionLevelService.findBranchesWithPromotionLevel(slot.project, config.promotion, size)
+        return branches.asSequence()
+            .flatMap { branch ->
+                buildFilterService.standardFilterProviderData(size)
+                    .build()
+                    .filterBranchBuilds(branch)
+                    .asSequence()
+            }
+            .take(size)
+            .toList()
     }
 
     override fun parseConfig(jsonRuleConfig: JsonNode): PromotionSlotAdmissionRuleConfig = jsonRuleConfig.parse()

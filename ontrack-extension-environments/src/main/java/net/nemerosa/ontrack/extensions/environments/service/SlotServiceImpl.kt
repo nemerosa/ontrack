@@ -71,6 +71,33 @@ class SlotServiceImpl(
         }
     }
 
+    override fun getEligibleBuilds(slot: Slot, count: Int): List<Build> {
+        // TODO Security check
+        // Gets all the admission rules
+        val configs = slotAdmissionRuleConfigRepository.getAdmissionRuleConfigs(slot)
+        // Gets all eligible builds
+        return configs.flatMap { config ->
+            getEligibleBuilds(slot, config, count)
+        }
+            .distinctBy { it.id }
+            .sortedByDescending { it.signature.time }
+    }
+
+    private fun getEligibleBuilds(slot: Slot, config: SlotAdmissionRuleConfig, count: Int): List<Build> {
+        val rule = slotAdmissionRuleRegistry.getRule(config.ruleId)
+        return getEligibleBuilds(slot, rule, config.ruleConfig, count)
+    }
+
+    private fun <C> getEligibleBuilds(
+        slot: Slot,
+        rule: SlotAdmissionRule<C>,
+        jsonRuleConfig: JsonNode,
+        count: Int,
+    ): List<Build> {
+        val ruleConfig = rule.parseConfig(jsonRuleConfig)
+        return rule.getEligibleBuilds(slot, ruleConfig, count)
+    }
+
     private fun isBuildEligible(slot: Slot, config: SlotAdmissionRuleConfig, build: Build): Boolean {
         val rule = slotAdmissionRuleRegistry.getRule(config.ruleId)
         return isBuildEligible(slot, rule, config.ruleConfig, build)
