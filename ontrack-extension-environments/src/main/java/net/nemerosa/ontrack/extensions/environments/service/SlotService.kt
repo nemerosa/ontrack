@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extensions.environments.service
 
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extensions.environments.*
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.structure.Build
@@ -99,5 +100,14 @@ interface SlotService {
      * Overriding an admission rule
      */
     fun overrideAdmissionRule(pipeline: SlotPipeline, admissionRuleConfig: SlotAdmissionRuleConfig, message: String)
+
+    /**
+     * Setting up some data for a rule in a pipeline
+     */
+    fun setupAdmissionRule(
+        pipeline: SlotPipeline,
+        admissionRuleConfig: SlotAdmissionRuleConfig,
+        data: JsonNode,
+    )
 
 }

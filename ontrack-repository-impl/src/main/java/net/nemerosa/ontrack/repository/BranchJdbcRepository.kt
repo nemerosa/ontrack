@@ -1,6 +1,9 @@
 package net.nemerosa.ontrack.repository
 
-import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.BranchFilter
+import net.nemerosa.ontrack.model.structure.ID
+import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.springframework.stereotype.Repository
 import javax.sql.DataSource
@@ -79,6 +82,13 @@ class BranchJdbcRepository(
                 ) LAST_BUILD ON LAST_BUILD.BRANCHID = B.ID
             """.trimIndent()
             orderClause = "ORDER BY COALESCE(LAST_BUILD.CREATION, B.CREATION) DESC"
+        }
+
+        // Filter: enabled
+        val enabled = filter.enabled
+        if (enabled != null) {
+            criterias += "B.DISABLED = :disabled"
+            params["disabled"] = !enabled
         }
 
         // Filter: Count

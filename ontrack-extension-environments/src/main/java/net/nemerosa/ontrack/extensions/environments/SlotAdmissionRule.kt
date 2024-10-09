@@ -7,8 +7,9 @@ import net.nemerosa.ontrack.model.structure.Build
  * This service is responsible for checking the eligibility of a build into a slot pipeline.
  *
  * @param C Type of the configuration for the rule.
+ * @param D Type of the data for the rule.
  */
-interface SlotAdmissionRule<C> {
+interface SlotAdmissionRule<C, D> {
 
     /**
      * Unique ID for this rule
@@ -43,9 +44,10 @@ interface SlotAdmissionRule<C> {
      * Checks if this build can be deployable into the slot
      */
     fun isBuildDeployable(
-        build: Build,
-        slot: Slot,
-        config: C,
+        pipeline: SlotPipeline,
+        admissionRuleConfig: SlotAdmissionRuleConfig,
+        ruleConfig: C,
+        ruleData: SlotPipelineAdmissionRuleData<D>?,
     ): Boolean
 
     /**
@@ -56,5 +58,10 @@ interface SlotAdmissionRule<C> {
         config: C,
         size: Int = 10,
     ): List<Build>
+
+    /**
+     * Parsing the stored/client data into typed data for this rule
+     */
+    fun parseData(node: JsonNode): D
 
 }

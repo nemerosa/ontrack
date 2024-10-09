@@ -1,8 +1,7 @@
 package net.nemerosa.ontrack.extensions.environments.rules.core
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.extensions.environments.Slot
-import net.nemerosa.ontrack.extensions.environments.SlotAdmissionRule
+import net.nemerosa.ontrack.extensions.environments.*
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.structure.Build
@@ -18,7 +17,7 @@ class ValidationSlotAdmissionRule(
     private val validationStampService: ValidationStampService,
     private val buildFilterService: BuildFilterService,
     private val validationRunStatusService: ValidationRunStatusService,
-) : SlotAdmissionRule<ValidationSlotAdmissionRuleConfig> {
+) : SlotAdmissionRule<ValidationSlotAdmissionRuleConfig, Any> {
 
     companion object {
         const val ID = "validation"
@@ -56,14 +55,19 @@ class ValidationSlotAdmissionRule(
     override fun isBuildEligible(build: Build, slot: Slot, config: ValidationSlotAdmissionRuleConfig): Boolean =
         structureService.getValidationStampListForBranch(build.branch.id).any { it.name == config.validation }
 
-    override fun isBuildDeployable(build: Build, slot: Slot, config: ValidationSlotAdmissionRuleConfig): Boolean {
+    override fun isBuildDeployable(
+        pipeline: SlotPipeline,
+        admissionRuleConfig: SlotAdmissionRuleConfig,
+        ruleConfig: ValidationSlotAdmissionRuleConfig,
+        ruleData: SlotPipelineAdmissionRuleData<Any>?
+    ): Boolean {
         val vs = structureService.findValidationStampByName(
-            build.project.name,
-            build.branch.name,
-            config.validation
+            pipeline.build.project.name,
+            pipeline.build.branch.name,
+            ruleConfig.validation
         ).getOrNull() ?: return false
         return structureService.getValidationRunsForBuildAndValidationStamp(
-            build = build,
+            build = pipeline.build,
             validationStamp = vs,
             statuses = validationRunStatusService.validationRunStatusList.filter { it.isPassed }.map { it.id }
         ).isNotEmpty()
@@ -72,4 +76,7 @@ class ValidationSlotAdmissionRule(
     override fun getConfigName(config: ValidationSlotAdmissionRuleConfig): String {
         TODO("Not yet implemented")
     }
+
+
+    override fun parseData(node: JsonNode): Any = ""
 }

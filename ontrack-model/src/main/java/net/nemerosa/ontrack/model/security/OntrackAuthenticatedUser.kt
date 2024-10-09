@@ -22,4 +22,9 @@ interface OntrackAuthenticatedUser : UserDetails, AuthorisationsCheck {
      */
     fun id(): Int = account.id()
 
+    /**
+     * Gets the list of groups for this user
+     */
+    val accountGroups: List<AccountGroup>
+
 }

@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extensions.environments.*
 import net.nemerosa.ontrack.extensions.environments.rules.SlotAdmissionRuleRegistry
 import net.nemerosa.ontrack.extensions.environments.storage.*
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Build
@@ -89,9 +90,9 @@ class SlotServiceImpl(
         return getEligibleBuilds(slot, rule, config.ruleConfig, count)
     }
 
-    private fun <C> getEligibleBuilds(
+    private fun <C, D> getEligibleBuilds(
         slot: Slot,
-        rule: SlotAdmissionRule<C>,
+        rule: SlotAdmissionRule<C, D>,
         jsonRuleConfig: JsonNode,
         count: Int,
     ): List<Build> {
@@ -104,9 +105,9 @@ class SlotServiceImpl(
         return isBuildEligible(slot, rule, config.ruleConfig, build)
     }
 
-    private fun <C> isBuildEligible(
+    private fun <C, D> isBuildEligible(
         slot: Slot,
-        rule: SlotAdmissionRule<C>,
+        rule: SlotAdmissionRule<C, D>,
         jsonRuleConfig: JsonNode,
         build: Build
     ): Boolean {
@@ -198,7 +199,7 @@ class SlotServiceImpl(
         // All rules must assert that the build is OK for being deployed
         val status = SlotPipelineDeploymentStatus(
             checks = configs.map { config ->
-                checkDeployment(pipeline, config, pipeline.build)
+                checkDeployment(pipeline, config)
             }
         )
         // Actual start
@@ -245,11 +246,10 @@ class SlotServiceImpl(
     private fun checkDeployment(
         pipeline: SlotPipeline,
         config: SlotAdmissionRuleConfig,
-        build: Build
     ): SlotPipelineDeploymentCheck {
         // Checking the rule
         val rule = slotAdmissionRuleRegistry.getRule(config.ruleId)
-        val check = checkDeployment(pipeline.slot, rule, config.ruleConfig, build)
+        val check = checkDeployment(pipeline, config, rule)
         // Getting the rule status for this pipeline
         if (!check.status) {
             val slotPipelineAdmissionRuleStatus =
@@ -263,19 +263,28 @@ class SlotServiceImpl(
         return check
     }
 
-    private fun <C> checkDeployment(
-        slot: Slot,
-        rule: SlotAdmissionRule<C>,
-        jsonRuleConfig: JsonNode,
-        build: Build
+    private fun <C, D> checkDeployment(
+        pipeline: SlotPipeline,
+        config: SlotAdmissionRuleConfig,
+        rule: SlotAdmissionRule<C, D>,
     ): SlotPipelineDeploymentCheck {
         // Parsing the config
-        val ruleConfig = rule.parseConfig(jsonRuleConfig)
+        val ruleConfig = rule.parseConfig(config.ruleConfig)
+        // Gets any data associated with this config & pipeline
+        val state = findPipelineAdmissionRuleStatusByAdmissionRuleConfigId(pipeline, config.id)
+        val ruleData = state?.data?.let {
+            SlotPipelineAdmissionRuleData(
+                timestamp = state.timestamp,
+                user = state.user,
+                data = rule.parseData(it),
+            )
+        }
         // Checking the rule
         return SlotPipelineDeploymentCheck(
-            status = rule.isBuildDeployable(build, slot, ruleConfig),
+            status = rule.isBuildDeployable(pipeline, config, ruleConfig, ruleData),
             ruleId = rule.id,
-            ruleConfig = jsonRuleConfig,
+            ruleConfig = config.ruleConfig,
+            ruleData = ruleData?.asJson(),
         )
     }
 
@@ -296,10 +305,7 @@ class SlotServiceImpl(
     ) {
         // TODO Security check
         // Checking that we are targeting the same slot
-        val configs = getAdmissionRuleConfigs(pipeline.slot)
-        if (configs.none { it.id == admissionRuleConfig.id }) {
-            throw SlotAdmissionRuleConfigIdNotFoundInSlotException(pipeline, admissionRuleConfig)
-        }
+        checkSameSlot(pipeline, admissionRuleConfig)
         // Overriding the rule
         slotPipelineAdmissionRuleStatusRepository.saveStatus(
             SlotPipelineAdmissionRuleStatus(
@@ -310,6 +316,38 @@ class SlotServiceImpl(
                 data = null,
                 override = true,
                 overrideMessage = message,
+            )
+        )
+    }
+
+    private fun checkSameSlot(
+        pipeline: SlotPipeline,
+        admissionRuleConfig: SlotAdmissionRuleConfig
+    ) {
+        val configs = getAdmissionRuleConfigs(pipeline.slot)
+        if (configs.none { it.id == admissionRuleConfig.id }) {
+            throw SlotAdmissionRuleConfigIdNotFoundInSlotException(pipeline, admissionRuleConfig)
+        }
+    }
+
+    override fun setupAdmissionRule(
+        pipeline: SlotPipeline,
+        admissionRuleConfig: SlotAdmissionRuleConfig,
+        data: JsonNode
+    ) {
+        // TODO Security check
+        // Checking that we are targeting the same slot
+        checkSameSlot(pipeline, admissionRuleConfig)
+        // Overriding the rule
+        slotPipelineAdmissionRuleStatusRepository.saveStatus(
+            SlotPipelineAdmissionRuleStatus(
+                pipeline = pipeline,
+                admissionRuleConfig = admissionRuleConfig,
+                timestamp = Time.now,
+                user = securityService.currentSignature.user.name,
+                data = data,
+                override = false,
+                overrideMessage = null,
             )
         )
     }

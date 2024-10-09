@@ -1,8 +1,7 @@
 package net.nemerosa.ontrack.extensions.environments.rules.core
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.extensions.environments.Slot
-import net.nemerosa.ontrack.extensions.environments.SlotAdmissionRule
+import net.nemerosa.ontrack.extensions.environments.*
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.structure.Build
@@ -16,7 +15,7 @@ class PromotionSlotAdmissionRule(
     private val structureService: StructureService,
     private val promotionLevelService: PromotionLevelService,
     private val buildFilterService: BuildFilterService,
-) : SlotAdmissionRule<PromotionSlotAdmissionRuleConfig> {
+) : SlotAdmissionRule<PromotionSlotAdmissionRuleConfig, Any> {
 
     companion object {
         const val ID = "promotion"
@@ -54,16 +53,24 @@ class PromotionSlotAdmissionRule(
     override fun isBuildEligible(build: Build, slot: Slot, config: PromotionSlotAdmissionRuleConfig): Boolean =
         structureService.getPromotionLevelListForBranch(build.branch.id).any { it.name == config.promotion }
 
-    override fun isBuildDeployable(build: Build, slot: Slot, config: PromotionSlotAdmissionRuleConfig): Boolean {
+    override fun isBuildDeployable(
+        pipeline: SlotPipeline,
+        admissionRuleConfig: SlotAdmissionRuleConfig,
+        ruleConfig: PromotionSlotAdmissionRuleConfig,
+        ruleData: SlotPipelineAdmissionRuleData<Any>?
+    ): Boolean {
         val pl = structureService.findPromotionLevelByName(
-            build.project.name,
-            build.branch.name,
-            config.promotion
+            pipeline.build.project.name,
+            pipeline.build.branch.name,
+            ruleConfig.promotion
         ).getOrNull() ?: return false
-        return structureService.getLastPromotionRunForBuildAndPromotionLevel(build, pl).getOrNull() != null
+        return structureService.getLastPromotionRunForBuildAndPromotionLevel(pipeline.build, pl).getOrNull() != null
     }
 
     override fun getConfigName(config: PromotionSlotAdmissionRuleConfig): String {
         TODO("Not yet implemented")
     }
+
+    override fun parseData(node: JsonNode): Any = ""
+
 }

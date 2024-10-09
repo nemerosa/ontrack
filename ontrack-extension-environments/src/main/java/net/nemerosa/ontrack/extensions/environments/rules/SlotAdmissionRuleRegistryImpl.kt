@@ -5,11 +5,11 @@ import org.springframework.stereotype.Component
 
 @Component
 class SlotAdmissionRuleRegistryImpl(
-    rules: List<SlotAdmissionRule<*>>,
+    rules: List<SlotAdmissionRule<*, *>>,
 ) : SlotAdmissionRuleRegistry {
 
     private val index = rules.associateBy { it.id }
 
-    override fun getRule(ruleId: String): SlotAdmissionRule<*> =
+    override fun getRule(ruleId: String): SlotAdmissionRule<*, *> =
         index[ruleId] ?: throw SlotAdmissionRuleIdNotFoundException(ruleId)
 }

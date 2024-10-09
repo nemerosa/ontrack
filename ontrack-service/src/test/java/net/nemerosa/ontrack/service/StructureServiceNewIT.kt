@@ -21,6 +21,26 @@ import kotlin.test.assertTrue
  */
 class StructureServiceNewIT : AbstractDSLTestSupport() {
 
+    @Test
+    fun `Filtering on enabled branches only`() {
+        project {
+            val branches = (1..10).map {
+                branch("1.$it") {
+                    if (it % 2 == 0) {
+                        structureService.disableBranch(this)
+                    }
+                }
+            }
+            val enabledBranches = structureService.filterBranchesForProject(this, BranchFilter(enabled = true))
+            assertEquals(
+                listOf(
+                    "1.1", "1.3", "1.5", "1.7", "1.9"
+                ).reversed(),
+                enabledBranches.map { it.name }
+            )
+        }
+    }
+
     /**
      * Making sure that branches without a build (yet) are still returned when getting
      * the list of branches for a project.

@@ -117,11 +117,13 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
                         status = true,
                         ruleId = PromotionSlotAdmissionRule.ID,
                         ruleConfig = PromotionSlotAdmissionRuleConfig(promotion = pl.name).asJson(),
+                        ruleData = null,
                     ),
                     SlotPipelineDeploymentCheck(
                         status = false,
                         ruleId = ValidationSlotAdmissionRule.ID,
                         ruleConfig = ValidationSlotAdmissionRuleConfig(validation = vs.name).asJson(),
+                        ruleData = null,
                     ),
                 ),
                 deploymentStatus.checks
@@ -137,11 +139,13 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
                         status = true,
                         ruleId = PromotionSlotAdmissionRule.ID,
                         ruleConfig = PromotionSlotAdmissionRuleConfig(promotion = pl.name).asJson(),
+                        ruleData = null,
                     ),
                     SlotPipelineDeploymentCheck(
                         status = true,
                         ruleId = ValidationSlotAdmissionRule.ID,
                         ruleConfig = ValidationSlotAdmissionRuleConfig(validation = vs.name).asJson(),
+                        ruleData = null,
                     ),
                 ),
                 deploymentStatus.checks
