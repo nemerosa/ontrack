@@ -187,7 +187,11 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
     fun `Overriding the pipeline deployment even if it was not deploying`() {
         slotTestSupport.withSlotPipeline { pipeline ->
             // By default, not possible to mark this pipeline as deployed
-            assertEquals("Pipeline can be deployed only if deployment has been started first.", slotService.finishDeployment(pipeline), "Deployment completion not possible")
+            assertEquals(
+                "Pipeline can be deployed only if deployment has been started first.",
+                slotService.finishDeployment(pipeline),
+                "Deployment completion not possible"
+            )
             // Forcing the deployment
             assertEquals(
                 null,
@@ -201,6 +205,47 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
                 assertEquals("Deployment forced", it.message)
                 assertEquals(true, it.override)
                 assertEquals("Deployment was marked manually.", it.overrideMessage)
+            }
+        }
+    }
+
+    @Test
+    fun `Overriding a slot admission rule`() {
+        slotTestSupport.withSlotPipeline { pipeline ->
+            // Adds a promotion rule to the slot
+            val pl = pipeline.build.branch.promotionLevel(name = "GOLD")
+            val admissionRuleConfig = SlotAdmissionRuleConfig(
+                name = "Promotion to GOLD",
+                description = null,
+                ruleId = PromotionSlotAdmissionRule.ID,
+                ruleConfig = PromotionSlotAdmissionRuleConfig(promotion = pl.name).asJson(),
+            )
+            slotService.addAdmissionRuleConfig(
+                slot = pipeline.slot,
+                config = admissionRuleConfig,
+            )
+            // By default, we cannot mark the build for deployment because rule is not complete
+            var status = slotService.startDeployment(pipeline, dryRun = false)
+            assertFalse(status.status, "Pipeline admission not possible")
+            // Overriding the rule
+            slotService.overrideAdmissionRule(
+                pipeline = pipeline,
+                admissionRuleConfig = admissionRuleConfig,
+                message = "Because I want to",
+            )
+            // Deployment is now possible
+            status = slotService.startDeployment(pipeline, dryRun = false)
+            assertTrue(status.status, "Pipeline admission is now possible")
+            // Checking that admission rule status
+            val admissionRuleStatus = slotService.getPipelineAdmissionRuleStatuses(pipeline)
+                .find { it.admissionRuleConfig.id == admissionRuleConfig.id }
+            assertNotNull(
+                admissionRuleStatus,
+                "Admission rule status found"
+            ) {
+                assertNull(it.data, "No stored status for this rule")
+                assertTrue(it.override, "Rule was overridden")
+                assertEquals("Because I want to", it.overrideMessage)
             }
         }
     }

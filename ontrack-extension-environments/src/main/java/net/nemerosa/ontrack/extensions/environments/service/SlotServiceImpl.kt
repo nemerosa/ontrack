@@ -19,6 +19,7 @@ class SlotServiceImpl(
     private val slotAdmissionRuleConfigRepository: SlotAdmissionRuleConfigRepository,
     private val slotPipelineRepository: SlotPipelineRepository,
     private val slotPipelineChangeRepository: SlotPipelineChangeRepository,
+    private val slotPipelineAdmissionRuleStatusRepository: SlotPipelineAdmissionRuleStatusRepository,
     private val slotAdmissionRuleRegistry: SlotAdmissionRuleRegistry,
 ) : SlotService {
 
@@ -197,7 +198,7 @@ class SlotServiceImpl(
         // All rules must assert that the build is OK for being deployed
         val status = SlotPipelineDeploymentStatus(
             checks = configs.map { config ->
-                checkDeployment(pipeline.slot, config, pipeline.build)
+                checkDeployment(pipeline, config, pipeline.build)
             }
         )
         // Actual start
@@ -242,12 +243,24 @@ class SlotServiceImpl(
     }
 
     private fun checkDeployment(
-        slot: Slot,
+        pipeline: SlotPipeline,
         config: SlotAdmissionRuleConfig,
         build: Build
     ): SlotPipelineDeploymentCheck {
+        // Checking the rule
         val rule = slotAdmissionRuleRegistry.getRule(config.ruleId)
-        return checkDeployment(slot, rule, config.ruleConfig, build)
+        val check = checkDeployment(pipeline.slot, rule, config.ruleConfig, build)
+        // Getting the rule status for this pipeline
+        if (!check.status) {
+            val slotPipelineAdmissionRuleStatus =
+                slotPipelineAdmissionRuleStatusRepository.findStatusesByPipelineAndAdmissionRuleConfig(pipeline, config)
+                    .firstOrNull { it.override }
+            if (slotPipelineAdmissionRuleStatus != null) {
+                return check.withOverride(slotPipelineAdmissionRuleStatus)
+            }
+        }
+        // OK
+        return check
     }
 
     private fun <C> checkDeployment(
@@ -269,5 +282,35 @@ class SlotServiceImpl(
     override fun getCurrentPipeline(slot: Slot): SlotPipeline? {
         // TODO Security check
         return findPipelines(slot).pageItems.firstOrNull()
+    }
+
+    override fun getPipelineAdmissionRuleStatuses(pipeline: SlotPipeline): List<SlotPipelineAdmissionRuleStatus> {
+        // TODO Security check
+        return slotPipelineAdmissionRuleStatusRepository.findStatusesByPipeline(pipeline)
+    }
+
+    override fun overrideAdmissionRule(
+        pipeline: SlotPipeline,
+        admissionRuleConfig: SlotAdmissionRuleConfig,
+        message: String
+    ) {
+        // TODO Security check
+        // Checking that we are targeting the same slot
+        val configs = getAdmissionRuleConfigs(pipeline.slot)
+        if (configs.none { it.id == admissionRuleConfig.id }) {
+            throw SlotAdmissionRuleConfigIdNotFoundInSlotException(pipeline, admissionRuleConfig)
+        }
+        // Overriding the rule
+        slotPipelineAdmissionRuleStatusRepository.saveStatus(
+            SlotPipelineAdmissionRuleStatus(
+                pipeline = pipeline,
+                admissionRuleConfig = admissionRuleConfig,
+                timestamp = Time.now,
+                user = securityService.currentSignature.user.name,
+                data = null,
+                override = true,
+                overrideMessage = message,
+            )
+        )
     }
 }

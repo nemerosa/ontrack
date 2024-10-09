@@ -90,4 +90,14 @@ interface SlotService {
         message: String = "Deployment finished"
     ): String?
 
+    /**
+     * Gets the stored states of admission rules for a given pipeline.
+     */
+    fun getPipelineAdmissionRuleStatuses(pipeline: SlotPipeline): List<SlotPipelineAdmissionRuleStatus>
+
+    /**
+     * Overriding an admission rule
+     */
+    fun overrideAdmissionRule(pipeline: SlotPipeline, admissionRuleConfig: SlotAdmissionRuleConfig, message: String)
+
 }

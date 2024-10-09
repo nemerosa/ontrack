@@ -2,8 +2,10 @@ package net.nemerosa.ontrack.extensions.environments.storage
 
 import net.nemerosa.ontrack.extensions.environments.Slot
 import net.nemerosa.ontrack.extensions.environments.SlotAdmissionRuleConfig
+import net.nemerosa.ontrack.extensions.environments.service.SlotAdmissionRuleConfigIdNotFound
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.springframework.stereotype.Repository
+import java.sql.ResultSet
 import javax.sql.DataSource
 
 @Repository
@@ -38,14 +40,16 @@ class SlotAdmissionRuleConfigRepository(dataSource: DataSource) : AbstractJdbcRe
                 "slotId" to slot.id,
             )
         ) { rs, _ ->
-            SlotAdmissionRuleConfig(
-                id = rs.getString("id"),
-                name = rs.getString("name"),
-                description = rs.getString("description"),
-                ruleId = rs.getString("rule_id"),
-                ruleConfig = readJson(rs, "rule_config")
-            )
+            toSlotAdmissionRuleConfig(rs)
         }
+
+    private fun toSlotAdmissionRuleConfig(rs: ResultSet) = SlotAdmissionRuleConfig(
+        id = rs.getString("id"),
+        name = rs.getString("name"),
+        description = rs.getString("description"),
+        ruleId = rs.getString("rule_id"),
+        ruleConfig = readJson(rs, "rule_config")
+    )
 
     fun deleteAdmissionRuleConfig(config: SlotAdmissionRuleConfig) {
         namedParameterJdbcTemplate!!.update(
@@ -56,5 +60,21 @@ class SlotAdmissionRuleConfigRepository(dataSource: DataSource) : AbstractJdbcRe
             mapOf("id" to config.id)
         )
     }
+
+    fun getAdmissionRuleConfigById(slot: Slot, id: String): SlotAdmissionRuleConfig =
+        namedParameterJdbcTemplate!!.queryForObject(
+            """
+                SELECT *
+                    FROM ENV_SLOT_ADMISSION_RULE_CONFIGS
+                    WHERE SLOT_ID = :slotId
+                    AND ID = :id
+            """,
+            mapOf(
+                "slotId" to slot.id,
+                "id" to id,
+            )
+        ) { rs, _ ->
+            toSlotAdmissionRuleConfig(rs)
+        } ?: throw SlotAdmissionRuleConfigIdNotFound(id)
 
 }
