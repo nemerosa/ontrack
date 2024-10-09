@@ -167,6 +167,41 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
         slotTestSupport.withSlotPipeline { pipeline ->
             assertTrue(slotService.startDeployment(pipeline, dryRun = false).status, "Deployment started")
             assertEquals(null, slotService.finishDeployment(pipeline), "Deployment finished")
+            // Gets the pipeline
+            val latestPipeline = slotService.getCurrentPipeline(pipeline.slot) ?: fail("Could not find pipeline")
+            assertEquals(
+                SlotPipelineStatus.DEPLOYED,
+                latestPipeline.status,
+            )
+            val change = slotService.getPipelineChanges(pipeline).firstOrNull()
+            assertNotNull(change) {
+                assertEquals(SlotPipelineStatus.DEPLOYED, it.status)
+                assertEquals("Deployment finished", it.message)
+                assertEquals(false, it.override)
+                assertEquals(null, it.overrideMessage)
+            }
+        }
+    }
+
+    @Test
+    fun `Overriding the pipeline deployment even if it was not deploying`() {
+        slotTestSupport.withSlotPipeline { pipeline ->
+            // By default, not possible to mark this pipeline as deployed
+            assertEquals("Pipeline can be deployed only if deployment has been started first.", slotService.finishDeployment(pipeline), "Deployment completion not possible")
+            // Forcing the deployment
+            assertEquals(
+                null,
+                slotService.finishDeployment(pipeline, forcing = true, message = "Deployment forced"),
+                "Deployment forced"
+            )
+            // Checking the change
+            val change = slotService.getPipelineChanges(pipeline).firstOrNull()
+            assertNotNull(change) {
+                assertEquals(SlotPipelineStatus.DEPLOYED, it.status)
+                assertEquals("Deployment forced", it.message)
+                assertEquals(true, it.override)
+                assertEquals("Deployment was marked manually.", it.overrideMessage)
+            }
         }
     }
 

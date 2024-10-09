@@ -153,6 +153,8 @@ class SlotServiceImpl(
         pipeline: SlotPipeline,
         status: SlotPipelineStatus,
         message: String,
+        override: Boolean = false,
+        overrideMessage: String? = null,
     ) {
         val user = securityService.currentSignature.user.name
         val timestamp = Time.now
@@ -163,6 +165,8 @@ class SlotServiceImpl(
                 timestamp = timestamp,
                 status = status,
                 message = message,
+                override = override,
+                overrideMessage = overrideMessage,
             )
         )
         var updatedPipeline = pipeline.withStatus(status)
@@ -210,7 +214,7 @@ class SlotServiceImpl(
         return status
     }
 
-    override fun finishDeployment(pipeline: SlotPipeline): String? {
+    override fun finishDeployment(pipeline: SlotPipeline, forcing: Boolean, message: String): String? {
         // TODO Security check
         // Only last pipeline can be deployed
         val lastPipeline = getCurrentPipeline(pipeline.slot)
@@ -218,14 +222,20 @@ class SlotServiceImpl(
             return "Only the last pipeline can be deployed."
         }
         // Checking if pipeline is deploying
-        if (lastPipeline.status != SlotPipelineStatus.DEPLOYING) {
+        if (lastPipeline.status != SlotPipelineStatus.DEPLOYING && !forcing) {
             return "Pipeline can be deployed only if deployment has been started first."
         }
         // Marking the pipeline as deployed
         changePipeline(
             pipeline = pipeline,
             status = SlotPipelineStatus.DEPLOYED,
-            message = "Deployment finished",
+            message = message,
+            override = forcing,
+            overrideMessage = if (forcing) {
+                "Deployment was marked manually."
+            } else {
+                null
+            },
         )
         // OK
         return null

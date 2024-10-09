@@ -84,6 +84,10 @@ interface SlotService {
     /**
      * Marking a pipeline as being deployed
      */
-    fun finishDeployment(pipeline: SlotPipeline): String?
+    fun finishDeployment(
+        pipeline: SlotPipeline,
+        forcing: Boolean = false,
+        message: String = "Deployment finished"
+    ): String?
 
 }

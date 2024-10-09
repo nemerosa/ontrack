@@ -10,4 +10,6 @@ data class SlotPipelineChange(
     val timestamp: LocalDateTime,
     val status: SlotPipelineStatus?,
     val message: String?,
+    val override: Boolean,
+    val overrideMessage: String?,
 )

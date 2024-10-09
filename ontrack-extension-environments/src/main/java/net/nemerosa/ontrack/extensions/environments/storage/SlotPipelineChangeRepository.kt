@@ -17,8 +17,8 @@ class SlotPipelineChangeRepository(
     fun save(slotPipelineChange: SlotPipelineChange) {
         namedParameterJdbcTemplate!!.update(
             """
-                INSERT INTO ENV_SLOT_PIPELINE_CHANGE (ID, PIPELINE_ID, "USER", TIMESTAMP, STATUS, MESSAGE)
-                VALUES (:id, :pipelineId, :user, :timestamp, :status, :message)
+                INSERT INTO ENV_SLOT_PIPELINE_CHANGE (ID, PIPELINE_ID, "USER", TIMESTAMP, STATUS, MESSAGE, OVERRIDE, OVERRIDE_MESSAGE)
+                VALUES (:id, :pipelineId, :user, :timestamp, :status, :message, :override, :overrideMessage)
             """,
             mapOf(
                 "id" to slotPipelineChange.id,
@@ -27,6 +27,8 @@ class SlotPipelineChangeRepository(
                 "timestamp" to Time.store(slotPipelineChange.timestamp),
                 "status" to slotPipelineChange.status?.name,
                 "message" to slotPipelineChange.message,
+                "override" to slotPipelineChange.override,
+                "overrideMessage" to slotPipelineChange.overrideMessage,
             )
         )
     }
@@ -37,6 +39,7 @@ class SlotPipelineChangeRepository(
                 SELECT *
                 FROM ENV_SLOT_PIPELINE_CHANGE
                 WHERE PIPELINE_ID = :pipelineId
+                ORDER BY TIMESTAMP DESC
             """.trimIndent(),
             mapOf(
                 "pipelineId" to pipeline.id,
@@ -49,6 +52,8 @@ class SlotPipelineChangeRepository(
                 timestamp = Time.fromStorage(rs.getString("timestamp"))!!,
                 status = rs.getString("status")?.let { SlotPipelineStatus.valueOf(it) },
                 message = rs.getString("message"),
+                override = rs.getBoolean("override"),
+                overrideMessage = rs.getString("override_message"),
             )
         }
     }
