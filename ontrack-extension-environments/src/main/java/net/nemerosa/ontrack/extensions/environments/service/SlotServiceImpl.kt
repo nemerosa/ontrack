@@ -251,7 +251,7 @@ class SlotServiceImpl(
         val rule = slotAdmissionRuleRegistry.getRule(config.ruleId)
         val check = checkDeployment(pipeline, config, rule)
         // Getting the rule status for this pipeline
-        if (!check.status) {
+        if (!check.check.status) {
             val slotPipelineAdmissionRuleStatus =
                 slotPipelineAdmissionRuleStatusRepository.findStatusesByPipelineAndAdmissionRuleConfig(pipeline, config)
                     .firstOrNull { it.override }
@@ -281,7 +281,7 @@ class SlotServiceImpl(
         }
         // Checking the rule
         return SlotPipelineDeploymentCheck(
-            status = rule.isBuildDeployable(pipeline, config, ruleConfig, ruleData),
+            check = rule.isBuildDeployable(pipeline, config, ruleConfig, ruleData),
             ruleId = rule.id,
             ruleConfig = config.ruleConfig,
             ruleData = ruleData?.asJson(),

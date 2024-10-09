@@ -63,29 +63,29 @@ class ManualApprovalSlotAdmissionRule(
         admissionRuleConfig: SlotAdmissionRuleConfig,
         ruleConfig: ManualApprovalSlotAdmissionRuleConfig,
         ruleData: SlotPipelineAdmissionRuleData<ManualApprovalSlotAdmissionRuleData>?
-    ): Boolean {
+    ): DeployableCheck {
         return if (ruleData?.data != null) {
             if (!ruleData.data.approval) {
-                false // Not approved
+                DeployableCheck.nok("Rejected")
             } else {
                 // Controls of the user
                 if (ruleConfig.users.isNotEmpty()) {
                     if (ruleData.user !in ruleConfig.users) {
-                        return false
+                        return DeployableCheck.nok("User not authorized to approve")
                     }
                 }
                 // Controls of the group
                 if (ruleConfig.groups.isNotEmpty()) {
                     val groups = securityService.currentAccount?.accountGroups?.map { it.name } ?: emptyList()
                     if (ruleConfig.groups.intersect(groups).isEmpty()) {
-                        return false
+                        return DeployableCheck.nok("Group not authorized to approve")
                     }
                 }
                 // OK
-                true
+                DeployableCheck.ok()
             }
         } else {
-            false // No state
+            DeployableCheck.nok("No approval")
         }
     }
 

@@ -48,7 +48,7 @@ interface SlotAdmissionRule<C, D> {
         admissionRuleConfig: SlotAdmissionRuleConfig,
         ruleConfig: C,
         ruleData: SlotPipelineAdmissionRuleData<D>?,
-    ): Boolean
+    ): DeployableCheck
 
     /**
      * Gets a list of eligible builds for a slot pipeline.

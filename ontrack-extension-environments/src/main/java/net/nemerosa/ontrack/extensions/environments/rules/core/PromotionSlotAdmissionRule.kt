@@ -58,13 +58,17 @@ class PromotionSlotAdmissionRule(
         admissionRuleConfig: SlotAdmissionRuleConfig,
         ruleConfig: PromotionSlotAdmissionRuleConfig,
         ruleData: SlotPipelineAdmissionRuleData<Any>?
-    ): Boolean {
+    ): DeployableCheck {
         val pl = structureService.findPromotionLevelByName(
             pipeline.build.project.name,
             pipeline.build.branch.name,
             ruleConfig.promotion
-        ).getOrNull() ?: return false
-        return structureService.getLastPromotionRunForBuildAndPromotionLevel(pipeline.build, pl).getOrNull() != null
+        ).getOrNull() ?: return DeployableCheck.nok("Promotion not existing")
+        return DeployableCheck.check(
+            structureService.getLastPromotionRunForBuildAndPromotionLevel(pipeline.build, pl).getOrNull() != null,
+            "Build promoted",
+            "Build not promoted"
+        )
     }
 
     override fun getConfigName(config: PromotionSlotAdmissionRuleConfig): String {

@@ -60,17 +60,21 @@ class ValidationSlotAdmissionRule(
         admissionRuleConfig: SlotAdmissionRuleConfig,
         ruleConfig: ValidationSlotAdmissionRuleConfig,
         ruleData: SlotPipelineAdmissionRuleData<Any>?
-    ): Boolean {
+    ): DeployableCheck {
         val vs = structureService.findValidationStampByName(
             pipeline.build.project.name,
             pipeline.build.branch.name,
             ruleConfig.validation
-        ).getOrNull() ?: return false
-        return structureService.getValidationRunsForBuildAndValidationStamp(
-            build = pipeline.build,
-            validationStamp = vs,
-            statuses = validationRunStatusService.validationRunStatusList.filter { it.isPassed }.map { it.id }
-        ).isNotEmpty()
+        ).getOrNull() ?: return DeployableCheck.nok("Validation not existing")
+        return DeployableCheck.check(
+            check = structureService.getValidationRunsForBuildAndValidationStamp(
+                build = pipeline.build,
+                validationStamp = vs,
+                statuses = validationRunStatusService.validationRunStatusList.filter { it.isPassed }.map { it.id }
+            ).isNotEmpty(),
+            ok = "Build validated",
+            nok = "Build not validated"
+        )
     }
 
     override fun getConfigName(config: ValidationSlotAdmissionRuleConfig): String {

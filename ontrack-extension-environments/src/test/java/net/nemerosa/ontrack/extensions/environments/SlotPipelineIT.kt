@@ -114,13 +114,19 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
             assertEquals(
                 listOf(
                     SlotPipelineDeploymentCheck(
-                        status = true,
+                        check = DeployableCheck(
+                            status = true,
+                            reason = "Build promoted"
+                        ),
                         ruleId = PromotionSlotAdmissionRule.ID,
                         ruleConfig = PromotionSlotAdmissionRuleConfig(promotion = pl.name).asJson(),
                         ruleData = null,
                     ),
                     SlotPipelineDeploymentCheck(
-                        status = false,
+                        check = DeployableCheck(
+                            status = false,
+                            reason = "Build not validated"
+                        ),
                         ruleId = ValidationSlotAdmissionRule.ID,
                         ruleConfig = ValidationSlotAdmissionRuleConfig(validation = vs.name).asJson(),
                         ruleData = null,
@@ -136,13 +142,19 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
             assertEquals(
                 listOf(
                     SlotPipelineDeploymentCheck(
-                        status = true,
+                        check = DeployableCheck(
+                            status = true,
+                            reason = "Build promoted"
+                        ),
                         ruleId = PromotionSlotAdmissionRule.ID,
                         ruleConfig = PromotionSlotAdmissionRuleConfig(promotion = pl.name).asJson(),
                         ruleData = null,
                     ),
                     SlotPipelineDeploymentCheck(
-                        status = true,
+                        check = DeployableCheck(
+                            status = true,
+                            reason = "Build validated"
+                        ),
                         ruleId = ValidationSlotAdmissionRule.ID,
                         ruleConfig = ValidationSlotAdmissionRuleConfig(validation = vs.name).asJson(),
                         ruleData = null,

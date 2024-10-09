@@ -34,7 +34,7 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
                 )
                 assertTrue(status.status, "Deployment accepted")
                 val check = status.checks.first()
-                assertTrue(check.status, "Manual approval OK")
+                assertTrue(check.check.status, "Manual approval OK")
                 assertNull(check.override, "Manual approval not overridden")
 
                 val state =
