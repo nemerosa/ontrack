@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.PromotionLevelService
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
+import kotlin.jvm.optionals.getOrNull
 
 @Component
 class PromotionSlotAdmissionRule(
@@ -54,7 +55,12 @@ class PromotionSlotAdmissionRule(
         structureService.getPromotionLevelListForBranch(build.branch.id).any { it.name == config.promotion }
 
     override fun isBuildDeployable(build: Build, slot: Slot, config: PromotionSlotAdmissionRuleConfig): Boolean {
-        TODO("Not yet implemented")
+        val pl = structureService.findPromotionLevelByName(
+            build.project.name,
+            build.branch.name,
+            config.promotion
+        ).getOrNull() ?: return false
+        return structureService.getLastPromotionRunForBuildAndPromotionLevel(build, pl).getOrNull() != null
     }
 
     override fun getConfigName(config: PromotionSlotAdmissionRuleConfig): String {

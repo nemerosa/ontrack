@@ -181,4 +181,83 @@ class SlotServiceImpl(
         // TODO Security check
         return slotPipelineChangeRepository.findByPipeline(pipeline)
     }
+
+    override fun startDeployment(pipeline: SlotPipeline, dryRun: Boolean): SlotPipelineDeploymentStatus {
+        // TODO Security check
+        // Always checking the project
+        if (pipeline.build.project != pipeline.slot.project) {
+            throw SlotPipelineProjectException(pipeline)
+        }
+        // Gets all the admission rules
+        val configs = slotAdmissionRuleConfigRepository.getAdmissionRuleConfigs(pipeline.slot)
+        // All rules must assert that the build is OK for being deployed
+        val status = SlotPipelineDeploymentStatus(
+            checks = configs.map { config ->
+                checkDeployment(pipeline.slot, config, pipeline.build)
+            }
+        )
+        // Actual start
+        if (!dryRun) {
+            // TODO Cancels all other pipelines for the slot
+            // Marks this pipeline as deploying
+            changePipeline(
+                pipeline = pipeline,
+                status = SlotPipelineStatus.DEPLOYING,
+                message = "Deployment started",
+            )
+        }
+        // OK
+        return status
+    }
+
+    override fun finishDeployment(pipeline: SlotPipeline): String? {
+        // TODO Security check
+        // Only last pipeline can be deployed
+        val lastPipeline = getCurrentPipeline(pipeline.slot)
+        if (lastPipeline?.id != pipeline.id) {
+            return "Only the last pipeline can be deployed."
+        }
+        // Checking if pipeline is deploying
+        if (lastPipeline.status != SlotPipelineStatus.DEPLOYING) {
+            return "Pipeline can be deployed only if deployment has been started first."
+        }
+        // Marking the pipeline as deployed
+        changePipeline(
+            pipeline = pipeline,
+            status = SlotPipelineStatus.DEPLOYED,
+            message = "Deployment finished",
+        )
+        // OK
+        return null
+    }
+
+    private fun checkDeployment(
+        slot: Slot,
+        config: SlotAdmissionRuleConfig,
+        build: Build
+    ): SlotPipelineDeploymentCheck {
+        val rule = slotAdmissionRuleRegistry.getRule(config.ruleId)
+        return checkDeployment(slot, rule, config.ruleConfig, build)
+    }
+
+    private fun <C> checkDeployment(
+        slot: Slot,
+        rule: SlotAdmissionRule<C>,
+        jsonRuleConfig: JsonNode,
+        build: Build
+    ): SlotPipelineDeploymentCheck {
+        // Parsing the config
+        val ruleConfig = rule.parseConfig(jsonRuleConfig)
+        // Checking the rule
+        return SlotPipelineDeploymentCheck(
+            status = rule.isBuildDeployable(build, slot, ruleConfig),
+            ruleId = rule.id,
+            ruleConfig = jsonRuleConfig,
+        )
+    }
+
+    override fun getCurrentPipeline(slot: Slot): SlotPipeline? {
+        // TODO Security check
+        return findPipelines(slot).pageItems.firstOrNull()
+    }
 }

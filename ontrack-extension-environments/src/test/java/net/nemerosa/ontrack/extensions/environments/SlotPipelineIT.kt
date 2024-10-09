@@ -1,7 +1,12 @@
 package net.nemerosa.ontrack.extensions.environments
 
+import net.nemerosa.ontrack.extensions.environments.rules.core.PromotionSlotAdmissionRule
+import net.nemerosa.ontrack.extensions.environments.rules.core.PromotionSlotAdmissionRuleConfig
+import net.nemerosa.ontrack.extensions.environments.rules.core.ValidationSlotAdmissionRule
+import net.nemerosa.ontrack.extensions.environments.rules.core.ValidationSlotAdmissionRuleConfig
 import net.nemerosa.ontrack.extensions.environments.service.SlotService
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.json.asJson
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
@@ -46,6 +51,122 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
             assertTrue(change.user.isNotBlank(), "Change user is filled in")
             assertEquals(SlotPipelineStatus.CANCELLED, change.status)
             assertEquals("Cancelling for test", change.message)
+        }
+    }
+
+    @Test
+    fun `Checking if a pipeline is deployable`() {
+        slotTestSupport.withSlotPipeline { pipeline ->
+            // Adds a promotion rule to the slot
+            val pl = pipeline.build.branch.promotionLevel(name = "GOLD")
+            slotService.addAdmissionRuleConfig(
+                slot = pipeline.slot,
+                config = SlotAdmissionRuleTestFixtures.testAdmissionRuleConfig(),
+            )
+            // Build not promoted yet, pipeline is not deployable
+            assertEquals(
+                false,
+                slotService.startDeployment(pipeline, dryRun = true).status,
+                "Build not promoted yet, pipeline is not deployable"
+            )
+            // Build promoted, pipeline is deployable
+            pipeline.build.promote(pl)
+            assertEquals(
+                true,
+                slotService.startDeployment(pipeline, dryRun = true).status,
+                "Build promoted, pipeline is deployable"
+            )
+        }
+    }
+
+    @Test
+    fun `Getting the reasons why a pipeline is not deployable`() {
+        slotTestSupport.withSlotPipeline { pipeline ->
+            // Adds a promotion rule to the slot
+            val pl = pipeline.build.branch.promotionLevel(name = "GOLD")
+            slotService.addAdmissionRuleConfig(
+                slot = pipeline.slot,
+                config = SlotAdmissionRuleConfig(
+                    name = "Promotion to GOLD",
+                    description = null,
+                    ruleId = PromotionSlotAdmissionRule.ID,
+                    ruleConfig = PromotionSlotAdmissionRuleConfig(promotion = pl.name).asJson(),
+                ),
+            )
+            // Adds a validation rule to the slot
+            val vs = pipeline.build.branch.validationStamp(name = "ready")
+            slotService.addAdmissionRuleConfig(
+                slot = pipeline.slot,
+                config = SlotAdmissionRuleConfig(
+                    name = "Validation to ready",
+                    description = null,
+                    ruleId = ValidationSlotAdmissionRule.ID,
+                    ruleConfig = ValidationSlotAdmissionRuleConfig(validation = vs.name).asJson(),
+                ),
+            )
+            // Build is promoted, not validated
+            pipeline.build.promote(pl)
+            // Dry-run to start the build deployment
+            var deploymentStatus = slotService.startDeployment(pipeline, dryRun = true)
+            // Deployment not started
+            assertFalse(deploymentStatus.status, "Deployment not possible")
+            // Reasons
+            assertEquals(
+                listOf(
+                    SlotPipelineDeploymentCheck(
+                        status = true,
+                        ruleId = PromotionSlotAdmissionRule.ID,
+                        ruleConfig = PromotionSlotAdmissionRuleConfig(promotion = pl.name).asJson(),
+                    ),
+                    SlotPipelineDeploymentCheck(
+                        status = false,
+                        ruleId = ValidationSlotAdmissionRule.ID,
+                        ruleConfig = ValidationSlotAdmissionRuleConfig(validation = vs.name).asJson(),
+                    ),
+                ),
+                deploymentStatus.checks
+            )
+            // Passing the validation
+            pipeline.build.validate(vs)
+            deploymentStatus = slotService.startDeployment(pipeline, dryRun = true)
+            assertTrue(deploymentStatus.status, "Deployment possible")
+            // Reasons
+            assertEquals(
+                listOf(
+                    SlotPipelineDeploymentCheck(
+                        status = true,
+                        ruleId = PromotionSlotAdmissionRule.ID,
+                        ruleConfig = PromotionSlotAdmissionRuleConfig(promotion = pl.name).asJson(),
+                    ),
+                    SlotPipelineDeploymentCheck(
+                        status = true,
+                        ruleId = ValidationSlotAdmissionRule.ID,
+                        ruleConfig = ValidationSlotAdmissionRuleConfig(validation = vs.name).asJson(),
+                    ),
+                ),
+                deploymentStatus.checks
+            )
+        }
+    }
+
+    @Test
+    fun `Marking a pipeline as deploying`() {
+        slotTestSupport.withSlotPipeline { pipeline ->
+            slotService.startDeployment(pipeline, dryRun = false)
+            // Gets the pipeline
+            val latestPipeline = slotService.getCurrentPipeline(pipeline.slot) ?: fail("Could not find pipeline")
+            assertEquals(
+                SlotPipelineStatus.DEPLOYING,
+                latestPipeline.status,
+            )
+        }
+    }
+
+    @Test
+    fun `Marking a pipeline as deployed (only if it was deploying)`() {
+        slotTestSupport.withSlotPipeline { pipeline ->
+            assertTrue(slotService.startDeployment(pipeline, dryRun = false).status, "Deployment started")
+            assertEquals(null, slotService.finishDeployment(pipeline), "Deployment finished")
         }
     }
 

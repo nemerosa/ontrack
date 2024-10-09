@@ -71,4 +71,19 @@ interface SlotService {
      */
     fun getPipelineChanges(pipeline: SlotPipeline): List<SlotPipelineChange>
 
+    /**
+     * Starts a deployment
+     */
+    fun startDeployment(pipeline: SlotPipeline, dryRun: Boolean): SlotPipelineDeploymentStatus
+
+    /**
+     * Gets the latest (current) pipeline for a slot
+     */
+    fun getCurrentPipeline(slot: Slot): SlotPipeline?
+
+    /**
+     * Marking a pipeline as being deployed
+     */
+    fun finishDeployment(pipeline: SlotPipeline): String?
+
 }

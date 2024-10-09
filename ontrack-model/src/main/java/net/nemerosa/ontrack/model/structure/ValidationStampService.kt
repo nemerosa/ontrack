@@ -6,4 +6,6 @@ interface ValidationStampService {
         token: String
     ): List<String>
 
+    fun findBranchesWithValidationStamp(project: Project, validation: String, size: Int): List<Branch>
+
 }

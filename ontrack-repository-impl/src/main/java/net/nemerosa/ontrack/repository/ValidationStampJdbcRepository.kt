@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.repository
 
+import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.ValidationStamp
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.springframework.stereotype.Repository
@@ -23,6 +25,30 @@ class ValidationStampJdbcRepository(
             mapOf("name" to "%$token%")
         ) { rs, _ ->
             toValidationStamp(rs)
+        }
+
+    override fun findBranchesWithValidationStamp(project: Project, validation: String): List<Branch> =
+        namedParameterJdbcTemplate!!.query(
+            """
+                SELECT B.ID
+                FROM BRANCHES B
+                INNER JOIN VALIDATION_STAMPS VS ON VS.BRANCHID = B.ID
+                LEFT JOIN (
+                	SELECT DISTINCT ON (BRANCHID) BRANCHID, CREATION
+                	FROM BUILDS
+                	ORDER BY BRANCHID, CREATION DESC
+                ) LAST_BUILD ON LAST_BUILD.BRANCHID = B.ID
+                WHERE B.PROJECTID = :projectId
+                AND VS.NAME = :validation
+                AND B.DISABLED = FALSE
+                ORDER BY COALESCE(LAST_BUILD.CREATION, B.CREATION) DESC
+            """.trimIndent(),
+            mapOf(
+                "projectId" to project.id(),
+                "validation" to validation,
+            )
+        ) { rs, _ ->
+            branchJdbcRepositoryAccessor.getBranch(id(rs), project)
         }
 
     override fun toValidationStamp(rs: ResultSet) = ValidationStamp(

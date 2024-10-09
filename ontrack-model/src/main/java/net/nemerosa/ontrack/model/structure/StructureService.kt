@@ -441,8 +441,8 @@ interface StructureService {
     fun getValidationRunsForBuildAndValidationStamp(
         build: Build,
         validationStamp: ValidationStamp,
-        offset: Int,
-        count: Int,
+        offset: Int = 0,
+        count: Int = 10,
         sortingMode: ValidationRunSortingMode? = ValidationRunSortingMode.ID,
         statuses: List<String>? = null,
     ): List<ValidationRun>
