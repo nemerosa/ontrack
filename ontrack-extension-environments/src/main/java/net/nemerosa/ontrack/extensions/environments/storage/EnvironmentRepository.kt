@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extensions.environments.storage
 
 import net.nemerosa.ontrack.extensions.environments.Environment
+import net.nemerosa.ontrack.extensions.environments.EnvironmentFilter
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.springframework.dao.IncorrectResultSizeDataAccessException
 import org.springframework.stereotype.Repository
@@ -15,18 +16,20 @@ class EnvironmentRepository(
     fun save(environment: Environment) {
         namedParameterJdbcTemplate!!.update(
             """
-                INSERT INTO ENVIRONMENTS (ID, NAME, "ORDER", DESCRIPTION)
-                VALUES (:id, :name, :order, :description)
+                INSERT INTO ENVIRONMENTS (ID, NAME, "ORDER", DESCRIPTION, TAGS)
+                VALUES (:id, :name, :order, :description, :tags)
                 ON CONFLICT (ID) DO UPDATE SET
                     NAME = EXCLUDED.NAME,
                     "ORDER" = EXCLUDED."ORDER",
-                    DESCRIPTION = EXCLUDED.DESCRIPTION;
+                    DESCRIPTION = EXCLUDED.DESCRIPTION,
+                    TAGS = EXCLUDED.TAGS;
             """,
             mapOf(
                 "id" to environment.id,
                 "name" to environment.name,
                 "order" to environment.order,
                 "description" to environment.description,
+                "tags" to environment.tags.toTypedArray(),
             )
         )
     }
@@ -60,16 +63,29 @@ class EnvironmentRepository(
             toEnvironment(rs)
         }.firstOrNull()
 
-    fun findAll(): List<Environment> =
-        namedParameterJdbcTemplate!!.query(
-            """
-                    SELECT *
-                    FROM ENVIRONMENTS
-                    ORDER BY "ORDER"
-            """,
+    fun findAll(filter: EnvironmentFilter): List<Environment> {
+        val criteria = mutableListOf<String>()
+        val params = mutableMapOf<String, Any?>()
+
+        if (filter.tags.isNotEmpty()) {
+            criteria += "TAGS @> :tags::text[]"
+            params["tags"] = filter.tags.toTypedArray()
+        }
+
+        var sql = "SELECT * FROM ENVIRONMENTS "
+        if (criteria.isNotEmpty()) {
+            sql += " WHERE "
+            sql += criteria.joinToString(" AND ") { "( $it )" }
+        }
+        sql += """ ORDER BY "ORDER" """
+
+        return namedParameterJdbcTemplate!!.query(
+            sql,
+            params,
         ) { rs, _ ->
             toEnvironment(rs)
         }
+    }
 
     fun delete(env: Environment) {
         namedParameterJdbcTemplate!!.update(
@@ -81,11 +97,13 @@ class EnvironmentRepository(
         )
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun toEnvironment(rs: ResultSet) = Environment(
         id = rs.getString("ID"),
         name = rs.getString("NAME"),
         order = rs.getInt("ORDER"),
         description = rs.getString("DESCRIPTION"),
+        tags = (rs.getArray("TAGS").array as Array<String>).toList()
     )
 
 }

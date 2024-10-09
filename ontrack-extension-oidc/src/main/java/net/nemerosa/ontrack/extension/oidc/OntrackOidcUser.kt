@@ -4,9 +4,11 @@ import net.nemerosa.ontrack.model.security.*
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 
 class OntrackOidcUser(
-        private val base: OidcUser,
-        private val ontrackAuthenticatedUser: OntrackAuthenticatedUser
+    private val base: OidcUser,
+    private val ontrackAuthenticatedUser: OntrackAuthenticatedUser
 ) : OidcUser by base, OntrackAuthenticatedUser {
+
+    override val accountGroups: List<AccountGroup> = ontrackAuthenticatedUser.accountGroups
 
     override val user: OntrackUser = ontrackAuthenticatedUser.user
     override val account: Account = ontrackAuthenticatedUser.account
@@ -24,8 +26,8 @@ class OntrackOidcUser(
     override fun isAccountNonLocked(): Boolean = ontrackAuthenticatedUser.isAccountNonLocked
 
     override fun isGranted(fn: Class<out GlobalFunction>): Boolean =
-            ontrackAuthenticatedUser.isGranted(fn)
+        ontrackAuthenticatedUser.isGranted(fn)
 
     override fun isGranted(projectId: Int, fn: Class<out ProjectFunction>): Boolean =
-            ontrackAuthenticatedUser.isGranted(projectId, fn)
+        ontrackAuthenticatedUser.isGranted(projectId, fn)
 }

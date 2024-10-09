@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extensions.environments
 import net.nemerosa.ontrack.extensions.environments.service.EnvironmentService
 import net.nemerosa.ontrack.extensions.environments.storage.EnvironmentNameAlreadyExists
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
@@ -54,6 +55,82 @@ class EnvironmentServiceIT : AbstractDSLTestSupport() {
         assertNotNull(environmentService.findByName(env.name), "Environment present")
         environmentService.delete(env)
         assertNull(environmentService.findByName(env.name), "Environment gone")
+    }
+
+    @Test
+    fun `Creating and retrieving an environment with tags`() {
+        val env = EnvironmentTestFixtures.testEnvironment(
+            tags = listOf("custom"),
+        )
+        environmentService.save(env)
+        assertNotNull(environmentService.findByName(env.name), "Environment present") {
+            assertEquals(
+                listOf("custom"),
+                it.tags
+            )
+        }
+    }
+
+    @Test
+    fun `Selecting environments based on tags`() {
+        val tag1 = uid("t1-")
+        val tag2 = uid("t2-")
+        val env1 = EnvironmentTestFixtures.testEnvironment(
+            tags = listOf(tag1, tag2)
+        ).apply { environmentService.save(this) }
+        val env2 = EnvironmentTestFixtures.testEnvironment(
+            tags = listOf(tag1)
+        ).apply { environmentService.save(this) }
+
+        assertEquals(
+            listOf(env1, env2),
+            environmentService.findAll(
+                EnvironmentFilter(
+                    tags = listOf(tag1)
+                )
+            )
+        )
+
+        assertEquals(
+            listOf(env1),
+            environmentService.findAll(
+                EnvironmentFilter(
+                    tags = listOf(tag1, tag2)
+                )
+            )
+        )
+
+        assertEquals(
+            listOf(env1),
+            environmentService.findAll(
+                EnvironmentFilter(
+                    tags = listOf(tag2)
+                )
+            )
+        )
+    }
+
+    @Test
+    fun `Updating the tags of an environment`() {
+        val env = EnvironmentTestFixtures.testEnvironment(
+            tags = listOf("custom"),
+        )
+        environmentService.save(env)
+        val tag = uid("t-")
+        environmentService.save(
+            env.withTags(listOf("custom", tag))
+        )
+        val saved = environmentService.getById(env.id)
+        val envs = environmentService.findAll(
+            EnvironmentFilter(
+                tags = listOf(tag)
+            )
+        )
+
+        assertEquals(
+            listOf(saved),
+            envs
+        )
     }
 
 }

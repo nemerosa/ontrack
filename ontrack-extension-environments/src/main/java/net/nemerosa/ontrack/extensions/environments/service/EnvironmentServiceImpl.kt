@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extensions.environments.service
 
 import net.nemerosa.ontrack.extensions.environments.Environment
+import net.nemerosa.ontrack.extensions.environments.EnvironmentFilter
 import net.nemerosa.ontrack.extensions.environments.storage.EnvironmentNameAlreadyExists
 import net.nemerosa.ontrack.extensions.environments.storage.EnvironmentRepository
 import org.springframework.stereotype.Service
@@ -31,9 +32,11 @@ class EnvironmentServiceImpl(
         return environmentRepository.findByName(name)
     }
 
-    override fun findAll(): List<Environment> {
+    override fun findAll(
+        filter: EnvironmentFilter,
+    ): List<Environment> {
         // TODO Security check
-        return environmentRepository.findAll()
+        return environmentRepository.findAll(filter)
     }
 
     override fun delete(env: Environment) {
