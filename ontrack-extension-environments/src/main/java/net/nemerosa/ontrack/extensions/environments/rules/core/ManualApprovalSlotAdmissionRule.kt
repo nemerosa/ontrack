@@ -68,20 +68,6 @@ class ManualApprovalSlotAdmissionRule(
             if (!ruleData.data.approval) {
                 DeployableCheck.nok("Rejected")
             } else {
-                // Controls of the user
-                if (ruleConfig.users.isNotEmpty()) {
-                    if (ruleData.user !in ruleConfig.users) {
-                        return DeployableCheck.nok("User not authorized to approve")
-                    }
-                }
-                // Controls of the group
-                if (ruleConfig.groups.isNotEmpty()) {
-                    val groups = securityService.currentAccount?.accountGroups?.map { it.name } ?: emptyList()
-                    if (ruleConfig.groups.intersect(groups).isEmpty()) {
-                        return DeployableCheck.nok("Group not authorized to approve")
-                    }
-                }
-                // OK
                 DeployableCheck.ok()
             }
         } else {
@@ -95,4 +81,24 @@ class ManualApprovalSlotAdmissionRule(
 
     override fun parseData(node: JsonNode): ManualApprovalSlotAdmissionRuleData =
         node.parse()
+
+    override fun checkData(ruleConfig: JsonNode, data: JsonNode) {
+        val c = parseConfig(ruleConfig)
+        val d = parseData(data)
+        // Controls of the user
+        val user = securityService.currentSignature.user.name
+        if (c.users.isNotEmpty()) {
+            if (user !in c.users) {
+                throw ManualApprovalSlotAdmissionRuleException("User not authorized to approve")
+            }
+        }
+        // Controls of the group
+        if (c.groups.isNotEmpty()) {
+            val groups = securityService.currentAccount?.accountGroups?.map { it.name } ?: emptyList()
+            if (c.groups.intersect(groups).isEmpty()) {
+                throw ManualApprovalSlotAdmissionRuleException("Group not authorized to approve")
+            }
+        }
+        // OK
+    }
 }

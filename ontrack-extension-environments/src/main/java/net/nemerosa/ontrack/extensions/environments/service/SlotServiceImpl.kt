@@ -341,6 +341,10 @@ class SlotServiceImpl(
         // TODO Security check
         // Checking that we are targeting the same slot
         checkSameSlot(pipeline, admissionRuleConfig)
+        // Gets the rule
+        val rule = slotAdmissionRuleRegistry.getRule(admissionRuleConfig.ruleId)
+        // Checks the rule for the new state
+        rule.checkData(admissionRuleConfig.ruleConfig, data)
         // Overriding the rule
         slotPipelineAdmissionRuleStatusRepository.saveStatus(
             SlotPipelineAdmissionRuleStatus(

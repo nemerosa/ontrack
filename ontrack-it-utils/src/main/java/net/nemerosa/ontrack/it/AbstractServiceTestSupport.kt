@@ -261,9 +261,9 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
         }
     }
 
-    protected fun asUser(): UserCall = UserCall()
+    protected fun asUser(name: String = uid("U")): UserCall = UserCall(name = name)
 
-    protected fun asUserWithAuthenticationSource(authenticationSource: AuthenticationSource): UserCall = UserCall(authenticationSource)
+    protected fun asUserWithAuthenticationSource(authenticationSource: AuthenticationSource): UserCall = UserCall(authenticationSource = authenticationSource)
 
     protected fun asAdmin(): AdminCall = AdminCall()
 
@@ -510,10 +510,10 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
     }
 
     protected inner class UserCall(
+        name: String = uid("U"),
         authenticationSource: AuthenticationSource? = null,
     ) : ConfigurableAccountCall(
             securityService.asAdmin {
-                val name = uid("U")
                 val accountInput = AccountInput(
                     name,
                     "$name von Test",

@@ -19,7 +19,6 @@ import net.nemerosa.ontrack.test.TestUtils
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDateTime
-import kotlin.math.sign
 import kotlin.reflect.KClass
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -84,7 +83,7 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     /**
      * Kotlin friendly user execution
      */
-    fun <T> asUser(code: () -> T): T = asUser().call(code)
+    fun <T> asUser(name: String = uid("U"), code: () -> T): T = asUser(name = name).call(code)
 
     /**
      * Kotlin friendly account role execution
@@ -302,19 +301,19 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
      * Creates a validation run on a build, possibly with some data and a status.
      */
     fun <T> Build.validateWithData(
-            validationStamp: ValidationStamp,
-            validationRunStatusID: ValidationRunStatusID? = null,
-            validationDataTypeId: String? = null,
-            validationRunData: T? = null,
-            description: String? = null,
-            signature: Signature? = null,
+        validationStamp: ValidationStamp,
+        validationRunStatusID: ValidationRunStatusID? = null,
+        validationDataTypeId: String? = null,
+        validationRunData: T? = null,
+        description: String? = null,
+        signature: Signature? = null,
     ) = validateWithData(
-            validationStampName = validationStamp.name,
-            validationRunStatusID = validationRunStatusID,
-            validationDataTypeId = validationDataTypeId,
-            validationRunData = validationRunData,
-            description = description,
-            signature = signature,
+        validationStampName = validationStamp.name,
+        validationRunStatusID = validationRunStatusID,
+        validationDataTypeId = validationDataTypeId,
+        validationRunData = validationRunData,
+        description = description,
+        signature = signature,
     )
 
     /**

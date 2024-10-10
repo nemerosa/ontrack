@@ -3,17 +3,16 @@ package net.nemerosa.ontrack.extensions.environments
 import net.nemerosa.ontrack.extensions.environments.rules.core.ManualApprovalSlotAdmissionRule
 import net.nemerosa.ontrack.extensions.environments.rules.core.ManualApprovalSlotAdmissionRuleConfig
 import net.nemerosa.ontrack.extensions.environments.rules.core.ManualApprovalSlotAdmissionRuleData
+import net.nemerosa.ontrack.extensions.environments.rules.core.ManualApprovalSlotAdmissionRuleException
 import net.nemerosa.ontrack.extensions.environments.service.SlotService
 import net.nemerosa.ontrack.extensions.environments.service.findPipelineAdmissionRuleStatusByAdmissionRuleConfigId
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class ManualApprovalIT : AbstractDSLTestSupport() {
 
@@ -53,23 +52,65 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
         }
     }
 
-    private fun SlotService.approve(pipeline: SlotPipeline, admissionRuleConfig: SlotAdmissionRuleConfig) {
+    @Test
+    fun `Manual approval rejected by a super admin`() {
+        withManuallyApprovedPipeline { pipeline, admissionRuleConfig ->
+            asAdmin {
+                slotService.approve(
+                    pipeline,
+                    admissionRuleConfig,
+                    approval = false,
+                    message = "No way"
+                )
+                val status = slotService.startDeployment(
+                    pipeline,
+                    dryRun = true
+                )
+                assertFalse(status.status, "Deployment rejected")
+                val check = status.checks.first()
+                assertFalse(check.check.status, "Manual approval rejected")
+                assertNull(check.override, "Manual approval not overridden")
+
+                val state =
+                    slotService.findPipelineAdmissionRuleStatusByAdmissionRuleConfigId(pipeline, admissionRuleConfig.id)
+                assertNotNull(state, "Manual approval state stored") {
+                    assertEquals("admin", it.user)
+                    assertEquals(
+                        ManualApprovalSlotAdmissionRuleData(
+                            approval = false,
+                            message = "No way"
+                        ),
+                        it.data?.parse()
+                    )
+                }
+            }
+        }
+    }
+
+    private fun SlotService.approve(
+        pipeline: SlotPipeline,
+        admissionRuleConfig: SlotAdmissionRuleConfig,
+        approval: Boolean = true,
+        message: String = "With pleasure",
+    ) {
         setupAdmissionRule(
             pipeline,
             admissionRuleConfig,
             ManualApprovalSlotAdmissionRuleData(
-                approval = true,
-                message = "With pleasure"
+                approval = approval,
+                message = message
             ).asJson()
         )
     }
 
     private fun withManuallyApprovedPipeline(
+        users: List<String> = emptyList(),
         code: (pipeline: SlotPipeline, admissionRuleConfig: SlotAdmissionRuleConfig) -> Unit,
     ) {
         slotTestSupport.withSlotPipeline { pipeline ->
             val ruleConfig = ManualApprovalSlotAdmissionRuleConfig(
                 message = "Approval required",
+                users = users,
             )
             val admissionRuleConfig = SlotAdmissionRuleConfig(
                 name = "Manual approval",
@@ -83,6 +124,104 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
             )
 
             code(pipeline, admissionRuleConfig)
+        }
+    }
+
+    @Test
+    fun `Manual rejected approval overridden by an admin`() {
+        withManuallyApprovedPipeline { pipeline, admissionRuleConfig ->
+            asAdmin {
+                slotService.approve(
+                    pipeline,
+                    admissionRuleConfig,
+                    approval = false,
+                    message = "No way"
+                )
+
+                // Overriding the decision
+                slotService.overrideAdmissionRule(
+                    pipeline = pipeline,
+                    admissionRuleConfig = admissionRuleConfig,
+                    message = "Because I want to",
+                )
+
+                val status = slotService.startDeployment(
+                    pipeline,
+                    dryRun = true
+                )
+                assertTrue(status.status, "Deployment accepted")
+                val check = status.checks.first()
+                assertFalse(check.check.status, "Manual approval rejected")
+                assertNotNull(check.override, "Manual rejection overridden") {
+                    assertEquals("admin", it.user)
+                    assertTrue(it.override, "Overridden")
+                    assertEquals("Because I want to", it.overrideMessage)
+                }
+
+                val state =
+                    slotService.findPipelineAdmissionRuleStatusByAdmissionRuleConfigId(pipeline, admissionRuleConfig.id)
+                assertNotNull(state, "Manual approval state stored") {
+                    assertEquals("admin", it.user)
+                    assertEquals(
+                        ManualApprovalSlotAdmissionRuleData(
+                            approval = false,
+                            message = "No way"
+                        ),
+                        it.data?.parse()
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Manual approval by anybody`() {
+        withManuallyApprovedPipeline { pipeline, admissionRuleConfig ->
+            asUser {
+                slotService.approve(pipeline, admissionRuleConfig)
+                val status = slotService.startDeployment(
+                    pipeline,
+                    dryRun = true
+                )
+                assertTrue(status.status, "Deployment accepted")
+            }
+        }
+    }
+
+    @Test
+    fun `Manual approval by an allowed user`() {
+        val name = uid("U")
+        withManuallyApprovedPipeline(
+            users = listOf(name),
+        ) { pipeline, admissionRuleConfig ->
+            asUser(name = name) {
+                slotService.approve(pipeline, admissionRuleConfig)
+                val status = slotService.startDeployment(
+                    pipeline,
+                    dryRun = true
+                )
+                assertTrue(status.status, "Deployment accepted")
+                val state =
+                    slotService.findPipelineAdmissionRuleStatusByAdmissionRuleConfigId(pipeline, admissionRuleConfig.id)
+                assertNotNull(state, "Manual approval state stored") {
+                    assertEquals(name, it.user)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Manual approval not possible if not in the list of users`() {
+        val name = uid("U")
+        val otherName = uid("U")
+        withManuallyApprovedPipeline(
+            users = listOf(name),
+        ) { pipeline, admissionRuleConfig ->
+            asUser(name = otherName) {
+                assertFailsWith<ManualApprovalSlotAdmissionRuleException> {
+                    slotService.approve(pipeline, admissionRuleConfig)
+                }
+            }
         }
     }
 }
