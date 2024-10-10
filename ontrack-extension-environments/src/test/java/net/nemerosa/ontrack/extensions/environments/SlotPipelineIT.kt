@@ -266,4 +266,22 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
         }
     }
 
+    @Test
+    fun `Starting a pipeline cancels all other ongoing pipelines`() {
+        slotTestSupport.withSlotPipeline { pipeline1 ->
+            // On the same slot, creates another pipeline for another build
+            pipeline1.build.branch.build {
+                val pipeline2 = slotService.startPipeline(pipeline1.slot, this)
+                // Checks that the pipeline 1 is cancelled
+                assertNotNull(slotService.findPipelineById(pipeline1.id)) {
+                    assertEquals(SlotPipelineStatus.CANCELLED, it.status)
+                }
+                // Checks that the pipeline 2 is active
+                assertNotNull(slotService.findPipelineById(pipeline2.id)) {
+                    assertEquals(SlotPipelineStatus.ONGOING, it.status)
+                }
+            }
+        }
+    }
+
 }

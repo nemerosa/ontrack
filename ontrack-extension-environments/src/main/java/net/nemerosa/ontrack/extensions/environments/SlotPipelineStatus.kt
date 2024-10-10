@@ -18,5 +18,11 @@ enum class SlotPipelineStatus(
     ),
     DEPLOYED(
         finished = true
-    ),
+    );
+
+    companion object {
+        val activeStatuses: List<SlotPipelineStatus> = values()
+            .filter { !it.finished }
+            .toList()
+    }
 }

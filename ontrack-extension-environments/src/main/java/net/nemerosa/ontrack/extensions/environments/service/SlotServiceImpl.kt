@@ -128,7 +128,10 @@ class SlotServiceImpl(
         if (!isBuildEligible(slot, build)) {
             throw SlotPipelineBuildNotEligibleException(slot, build)
         }
-        // TODO Cancelling all current pipelines
+        // Cancelling all current pipelines
+        slotPipelineRepository.forAllActivePipelines(slot) { pipeline ->
+            cancelPipeline(pipeline, "Cancelled by more recent pipeline.")
+        }
         // Creating the new pipeline
         val pipeline = SlotPipeline(slot = slot, build = build)
         // Saving the pipeline

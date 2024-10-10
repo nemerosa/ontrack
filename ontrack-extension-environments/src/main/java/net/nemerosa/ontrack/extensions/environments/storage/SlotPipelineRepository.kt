@@ -38,6 +38,25 @@ class SlotPipelineRepository(
         )
     }
 
+    fun forAllActivePipelines(slot: Slot, code: (pipeline: SlotPipeline) -> Unit) {
+        val activeStatuses = SlotPipelineStatus.activeStatuses
+            .joinToString(", ") { "'$it'" }
+        namedParameterJdbcTemplate!!.query(
+            """
+                SELECT *
+                FROM ENV_SLOT_PIPELINE
+                WHERE SLOT_ID = :slotId
+                AND STATUS IN ($activeStatuses)
+            """.trimIndent(),
+            mapOf(
+                "slotId" to slot.id,
+            )
+        ) { rs ->
+            val pipeline = toPipeline(rs)
+            code(pipeline)
+        }
+    }
+
     fun findPipelines(slot: Slot): PaginatedList<SlotPipeline> {
         // TODO Pagination
         val list = namedParameterJdbcTemplate!!.query(
