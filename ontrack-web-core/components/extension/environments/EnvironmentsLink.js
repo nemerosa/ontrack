@@ -2,7 +2,7 @@ import {Space, Typography} from "antd";
 import {FaServer} from "react-icons/fa";
 import Link from "next/link";
 
-export const environmentsUri = '/extensions/environments/environments'
+export const environmentsUri = '/extension/environments/environments'
 
 export default function EnvironmentsLink() {
     return (
