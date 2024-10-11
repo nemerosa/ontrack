@@ -17,7 +17,7 @@ class SlotAdmissionRuleIT : AbstractDSLTestSupport() {
     @Test
     fun `Adding an admission rule to a slot`() {
         slotTestSupport.withSlot { slot ->
-            val config = SlotAdmissionRuleTestFixtures.testAdmissionRuleConfig()
+            val config = SlotAdmissionRuleTestFixtures.testAdmissionRuleConfig(slot)
             slotService.addAdmissionRuleConfig(slot, config)
         }
     }
@@ -25,10 +25,10 @@ class SlotAdmissionRuleIT : AbstractDSLTestSupport() {
     @Test
     fun `Getting the admission rules for a slot`() {
         slotTestSupport.withSlot { slot ->
-            val config1 = SlotAdmissionRuleTestFixtures.testAdmissionRuleConfig().apply {
+            val config1 = SlotAdmissionRuleTestFixtures.testAdmissionRuleConfig(slot).apply {
                 slotService.addAdmissionRuleConfig(slot, this)
             }
-            val config2 = SlotAdmissionRuleTestFixtures.testAdmissionRuleConfig().apply {
+            val config2 = SlotAdmissionRuleTestFixtures.testAdmissionRuleConfig(slot).apply {
                 slotService.addAdmissionRuleConfig(slot, this)
             }
             val configs = slotService.getAdmissionRuleConfigs(slot)
@@ -42,7 +42,7 @@ class SlotAdmissionRuleIT : AbstractDSLTestSupport() {
     @Test
     fun `Deleting an admission rule from a slot`() {
         slotTestSupport.withSlot { slot ->
-            val config = SlotAdmissionRuleTestFixtures.testAdmissionRuleConfig().apply {
+            val config = SlotAdmissionRuleTestFixtures.testAdmissionRuleConfig(slot).apply {
                 slotService.addAdmissionRuleConfig(slot, this)
             }
             assertNotNull(
@@ -60,7 +60,7 @@ class SlotAdmissionRuleIT : AbstractDSLTestSupport() {
     @Test
     fun `Checking if a build is eligible to a slot`() {
         slotTestSupport.withSlot { slot ->
-            SlotAdmissionRuleTestFixtures.testAdmissionRuleConfig().apply {
+            SlotAdmissionRuleTestFixtures.testAdmissionRuleConfig(slot).apply {
                 slotService.addAdmissionRuleConfig(slot, this)
             }
 
@@ -100,7 +100,7 @@ class SlotAdmissionRuleIT : AbstractDSLTestSupport() {
     @Test
     fun `Always checking that the build is in the same project as the slot`() {
         slotTestSupport.withSlot { slot ->
-            SlotAdmissionRuleTestFixtures.testAdmissionRuleConfig().apply {
+            SlotAdmissionRuleTestFixtures.testAdmissionRuleConfig(slot).apply {
                 slotService.addAdmissionRuleConfig(slot, this)
             }
 
@@ -122,7 +122,7 @@ class SlotAdmissionRuleIT : AbstractDSLTestSupport() {
     @Test
     fun `Get the eligible builds for a slot`() {
         slotTestSupport.withSlot { slot ->
-            SlotAdmissionRuleTestFixtures.testAdmissionRuleConfig().apply {
+            SlotAdmissionRuleTestFixtures.testAdmissionRuleConfig(slot).apply {
                 slotService.addAdmissionRuleConfig(slot, this)
             }
 

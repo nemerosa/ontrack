@@ -7,9 +7,11 @@ import net.nemerosa.ontrack.test.TestUtils.uid
 
 object SlotAdmissionRuleTestFixtures {
     fun testAdmissionRuleConfig(
+        slot: Slot,
         name: String = uid("rule-"),
         promotion: String = "GOLD",
     ) = SlotAdmissionRuleConfig(
+        slot = slot,
         name = name,
         description = null,
         ruleId = PromotionSlotAdmissionRule.ID,

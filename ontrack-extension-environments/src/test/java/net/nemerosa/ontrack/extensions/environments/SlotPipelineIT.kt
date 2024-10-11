@@ -61,7 +61,7 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
             val pl = pipeline.build.branch.promotionLevel(name = "GOLD")
             slotService.addAdmissionRuleConfig(
                 slot = pipeline.slot,
-                config = SlotAdmissionRuleTestFixtures.testAdmissionRuleConfig(),
+                config = SlotAdmissionRuleTestFixtures.testAdmissionRuleConfig(pipeline.slot),
             )
             // Build not promoted yet, pipeline is not deployable
             assertEquals(
@@ -87,6 +87,7 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
             slotService.addAdmissionRuleConfig(
                 slot = pipeline.slot,
                 config = SlotAdmissionRuleConfig(
+                    slot = pipeline.slot,
                     name = "Promotion to GOLD",
                     description = null,
                     ruleId = PromotionSlotAdmissionRule.ID,
@@ -98,6 +99,7 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
             slotService.addAdmissionRuleConfig(
                 slot = pipeline.slot,
                 config = SlotAdmissionRuleConfig(
+                    slot = pipeline.slot,
                     name = "Validation to ready",
                     description = null,
                     ruleId = ValidationSlotAdmissionRule.ID,
@@ -231,6 +233,7 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
             // Adds a promotion rule to the slot
             val pl = pipeline.build.branch.promotionLevel(name = "GOLD")
             val admissionRuleConfig = SlotAdmissionRuleConfig(
+                slot = pipeline.slot,
                 name = "Promotion to GOLD",
                 description = null,
                 ruleId = PromotionSlotAdmissionRule.ID,

@@ -4,9 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extensions.environments.*
 import net.nemerosa.ontrack.extensions.environments.rules.SlotAdmissionRuleRegistry
+import net.nemerosa.ontrack.extensions.environments.security.*
 import net.nemerosa.ontrack.extensions.environments.storage.*
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.pagination.PaginatedList
+import net.nemerosa.ontrack.model.security.ProjectFunction
+import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Build
 import org.springframework.stereotype.Service
@@ -24,8 +27,17 @@ class SlotServiceImpl(
     private val slotAdmissionRuleRegistry: SlotAdmissionRuleRegistry,
 ) : SlotService {
 
+    private inline fun <reified P : ProjectFunction> checkSlotAccess(slot: Slot) {
+        securityService.checkGlobalFunction(EnvironmentList::class.java)
+        securityService.checkProjectFunction(slot.project, ProjectView::class.java)
+        securityService.checkProjectFunction(slot.project, SlotView::class.java)
+        if (P::class != SlotView::class) {
+            securityService.checkProjectFunction(slot.project, P::class.java)
+        }
+    }
+
     override fun addSlot(slot: Slot) {
-        // TODO Security check
+        checkSlotAccess<SlotCreate>(slot)
         // Checks for ID
         if (slotRepository.findSlotById(slot.id) != null) {
             throw SlotIdAlreadyExistsException(slot.id)
@@ -40,29 +52,36 @@ class SlotServiceImpl(
         slotRepository.addSlot(slot)
     }
 
-    override fun findSlotsByEnvironment(environment: Environment): List<Slot> {
-        // TODO Checks for security
-        // TODO Security filter on the slots projects
-        return slotRepository.findByEnvironment(environment).sortedBy { it.project.name }
-    }
+    override fun findSlotsByEnvironment(environment: Environment): List<Slot> =
+        if (securityService.isGlobalFunctionGranted(EnvironmentList::class.java)) {
+            securityService.asAdmin {
+                slotRepository.findByEnvironment(environment)
+                    .filter {
+                        securityService.isProjectFunctionGranted(it.project, ProjectView::class.java)
+                    }
+            }
+                .sortedBy { it.project.name }
+        } else {
+            emptyList()
+        }
 
     override fun addAdmissionRuleConfig(slot: Slot, config: SlotAdmissionRuleConfig) {
-        // TODO Security check
+        checkSlotAccess<SlotUpdate>(slot)
         slotAdmissionRuleConfigRepository.addAdmissionRuleConfig(slot, config)
     }
 
     override fun getAdmissionRuleConfigs(slot: Slot): List<SlotAdmissionRuleConfig> {
-        // TODO Security checks
+        checkSlotAccess<SlotView>(slot)
         return slotAdmissionRuleConfigRepository.getAdmissionRuleConfigs(slot)
     }
 
     override fun deleteAdmissionRuleConfig(config: SlotAdmissionRuleConfig) {
-        // TODO Security check
+        checkSlotAccess<SlotUpdate>(config.slot)
         slotAdmissionRuleConfigRepository.deleteAdmissionRuleConfig(config)
     }
 
     override fun isBuildEligible(slot: Slot, build: Build): Boolean {
-        // TODO Security check
+        checkSlotAccess<SlotView>(slot)
         // Always checking the project
         if (build.project != slot.project) return false
         // Gets all the admission rules
@@ -74,7 +93,7 @@ class SlotServiceImpl(
     }
 
     override fun getEligibleBuilds(slot: Slot, count: Int): List<Build> {
-        // TODO Security check
+        checkSlotAccess<SlotView>(slot)
         // Gets all the admission rules
         val configs = slotAdmissionRuleConfigRepository.getAdmissionRuleConfigs(slot)
         // Gets all eligible builds
@@ -118,12 +137,13 @@ class SlotServiceImpl(
     }
 
     override fun getSlotById(id: String): Slot {
-        // TODO Security check
-        return slotRepository.getSlotById(id)
+        return slotRepository.getSlotById(id).apply {
+            checkSlotAccess<SlotView>(this)
+        }
     }
 
     override fun startPipeline(slot: Slot, build: Build): SlotPipeline {
-        // TODO Security check
+        checkSlotAccess<SlotPipelineCreate>(slot)
         // Build must be eligible
         if (!isBuildEligible(slot, build)) {
             throw SlotPipelineBuildNotEligibleException(slot, build)
@@ -141,12 +161,12 @@ class SlotServiceImpl(
     }
 
     override fun findPipelines(slot: Slot): PaginatedList<SlotPipeline> {
-        // TODO Security check
+        checkSlotAccess<SlotView>(slot)
         return slotPipelineRepository.findPipelines(slot)
     }
 
     override fun cancelPipeline(pipeline: SlotPipeline, reason: String) {
-        // TODO Security check
+        checkSlotAccess<SlotPipelineCancel>(pipeline.slot)
         changePipeline(
             pipeline = pipeline,
             status = SlotPipelineStatus.CANCELLED,
@@ -182,17 +202,18 @@ class SlotServiceImpl(
     }
 
     override fun findPipelineById(id: String): SlotPipeline? {
-        // TODO Security check
-        return slotPipelineRepository.findPipelineById(id)
+        return slotPipelineRepository.findPipelineById(id)?.apply {
+            checkSlotAccess<SlotView>(slot)
+        }
     }
 
     override fun getPipelineChanges(pipeline: SlotPipeline): List<SlotPipelineChange> {
-        // TODO Security check
+        checkSlotAccess<SlotView>(pipeline.slot)
         return slotPipelineChangeRepository.findByPipeline(pipeline)
     }
 
     override fun startDeployment(pipeline: SlotPipeline, dryRun: Boolean): SlotPipelineDeploymentStatus {
-        // TODO Security check
+        checkSlotAccess<SlotPipelineStart>(pipeline.slot)
         // Always checking the project
         if (pipeline.build.project != pipeline.slot.project) {
             throw SlotPipelineProjectException(pipeline)
@@ -220,7 +241,7 @@ class SlotServiceImpl(
     }
 
     override fun finishDeployment(pipeline: SlotPipeline, forcing: Boolean, message: String): String? {
-        // TODO Security check
+        checkSlotAccess<SlotPipelineFinish>(pipeline.slot)
         // Only last pipeline can be deployed
         val lastPipeline = getCurrentPipeline(pipeline.slot)
         if (lastPipeline?.id != pipeline.id) {
@@ -292,12 +313,12 @@ class SlotServiceImpl(
     }
 
     override fun getCurrentPipeline(slot: Slot): SlotPipeline? {
-        // TODO Security check
+        checkSlotAccess<SlotView>(slot)
         return findPipelines(slot).pageItems.firstOrNull()
     }
 
     override fun getPipelineAdmissionRuleStatuses(pipeline: SlotPipeline): List<SlotPipelineAdmissionRuleStatus> {
-        // TODO Security check
+        checkSlotAccess<SlotView>(pipeline.slot)
         return slotPipelineAdmissionRuleStatusRepository.findStatusesByPipeline(pipeline)
     }
 
@@ -306,7 +327,7 @@ class SlotServiceImpl(
         admissionRuleConfig: SlotAdmissionRuleConfig,
         message: String
     ) {
-        // TODO Security check
+        checkSlotAccess<SlotPipelineOverride>(pipeline.slot)
         // Checking that we are targeting the same slot
         checkSameSlot(pipeline, admissionRuleConfig)
         // Overriding the rule
@@ -338,7 +359,6 @@ class SlotServiceImpl(
         admissionRuleConfig: SlotAdmissionRuleConfig,
         data: JsonNode
     ) {
-        // TODO Security check
         // Checking that we are targeting the same slot
         checkSameSlot(pipeline, admissionRuleConfig)
         // Gets the rule

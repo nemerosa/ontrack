@@ -40,11 +40,12 @@ class SlotAdmissionRuleConfigRepository(dataSource: DataSource) : AbstractJdbcRe
                 "slotId" to slot.id,
             )
         ) { rs, _ ->
-            toSlotAdmissionRuleConfig(rs)
+            toSlotAdmissionRuleConfig(rs, slot)
         }
 
-    private fun toSlotAdmissionRuleConfig(rs: ResultSet) = SlotAdmissionRuleConfig(
+    private fun toSlotAdmissionRuleConfig(rs: ResultSet, slot: Slot) = SlotAdmissionRuleConfig(
         id = rs.getString("id"),
+        slot = slot,
         name = rs.getString("name"),
         description = rs.getString("description"),
         ruleId = rs.getString("rule_id"),
@@ -74,7 +75,7 @@ class SlotAdmissionRuleConfigRepository(dataSource: DataSource) : AbstractJdbcRe
                 "id" to id,
             )
         ) { rs, _ ->
-            toSlotAdmissionRuleConfig(rs)
+            toSlotAdmissionRuleConfig(rs, slot)
         } ?: throw SlotAdmissionRuleConfigIdNotFound(id)
 
 }

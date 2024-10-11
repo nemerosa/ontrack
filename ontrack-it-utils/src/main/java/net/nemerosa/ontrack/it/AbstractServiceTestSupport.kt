@@ -342,7 +342,7 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
         fun <T> call(call: () -> T): T
     }
 
-    protected abstract class AbstractContextCall : ContextCall {
+    abstract class AbstractContextCall : ContextCall {
 
         override fun <T> call(call: () -> T): T {
             // Gets the current context
@@ -377,7 +377,7 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
         }
     }
 
-    protected open inner class AccountCall<T : AccountCall<T>>(
+    open inner class AccountCall<T : AccountCall<T>>(
             protected val account: Account
     ) : AbstractContextCall() {
 
@@ -400,7 +400,7 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
 
     protected inner class FixedAccountCall(account: Account) : AccountCall<FixedAccountCall>(account)
 
-    protected open inner class ConfigurableAccountCall(
+    open inner class ConfigurableAccountCall(
             account: Account
     ) : AccountCall<ConfigurableAccountCall>(account) {
 

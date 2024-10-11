@@ -1,7 +1,11 @@
 package net.nemerosa.ontrack.extensions.environments
 
+import net.nemerosa.ontrack.extensions.environments.security.EnvironmentList
+import net.nemerosa.ontrack.extensions.environments.security.SlotView
 import net.nemerosa.ontrack.extensions.environments.service.SlotService
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.model.security.ProjectView
+import net.nemerosa.ontrack.test.TestUtils.uid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -41,6 +45,20 @@ class SlotTestSupport : AbstractDSLTestSupport() {
                     code(pipeline)
                 }
             }
+        }
+    }
+
+    fun withSlotUser(
+        slot: Slot,
+        name: String = uid("U"),
+        code: (user: ConfigurableAccountCall) -> Unit,
+    ) {
+        val user = asUser(name = name)
+            .with(EnvironmentList::class.java)
+            .withProjectFunction(slot.project, SlotView::class.java)
+            .withProjectFunction(slot.project, ProjectView::class.java)
+        user.call {
+            code(user)
         }
     }
 

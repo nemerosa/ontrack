@@ -2,8 +2,12 @@ package net.nemerosa.ontrack.extensions.environments.service
 
 import net.nemerosa.ontrack.extensions.environments.Environment
 import net.nemerosa.ontrack.extensions.environments.EnvironmentFilter
+import net.nemerosa.ontrack.extensions.environments.security.EnvironmentDelete
+import net.nemerosa.ontrack.extensions.environments.security.EnvironmentList
+import net.nemerosa.ontrack.extensions.environments.security.EnvironmentSave
 import net.nemerosa.ontrack.extensions.environments.storage.EnvironmentNameAlreadyExists
 import net.nemerosa.ontrack.extensions.environments.storage.EnvironmentRepository
+import net.nemerosa.ontrack.model.security.SecurityService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -11,10 +15,11 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class EnvironmentServiceImpl(
     private val environmentRepository: EnvironmentRepository,
+    private val securityService: SecurityService,
 ) : EnvironmentService {
 
     override fun save(environment: Environment) {
-        // TODO Security check
+        securityService.checkGlobalFunction(EnvironmentSave::class.java)
         val existing = environmentRepository.findByName(environment.name)
         if (existing != null && existing.id != environment.id) {
             throw EnvironmentNameAlreadyExists(environment.name)
@@ -23,24 +28,24 @@ class EnvironmentServiceImpl(
     }
 
     override fun getById(id: String): Environment {
-        // TODO Security check
+        securityService.checkGlobalFunction(EnvironmentList::class.java)
         return environmentRepository.getEnvironmentById(id)
     }
 
     override fun findByName(name: String): Environment? {
-        // TODO Security check
+        securityService.checkGlobalFunction(EnvironmentList::class.java)
         return environmentRepository.findByName(name)
     }
 
     override fun findAll(
         filter: EnvironmentFilter,
     ): List<Environment> {
-        // TODO Security check
+        securityService.checkGlobalFunction(EnvironmentList::class.java)
         return environmentRepository.findAll(filter)
     }
 
     override fun delete(env: Environment) {
-        // TODO Security check
+        securityService.checkGlobalFunction(EnvironmentDelete::class.java)
         environmentRepository.delete(env)
     }
 }

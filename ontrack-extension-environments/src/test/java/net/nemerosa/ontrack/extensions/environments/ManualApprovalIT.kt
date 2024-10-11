@@ -113,6 +113,7 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
                 users = users,
             )
             val admissionRuleConfig = SlotAdmissionRuleConfig(
+                slot = pipeline.slot,
                 name = "Manual approval",
                 description = "Manual approval is required",
                 ruleId = ManualApprovalSlotAdmissionRule.ID,
@@ -177,14 +178,16 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
     @Test
     fun `Manual approval by anybody`() {
         withManuallyApprovedPipeline { pipeline, admissionRuleConfig ->
-            asUser {
+            slotTestSupport.withSlotUser(pipeline.slot) {
                 slotService.approve(pipeline, admissionRuleConfig)
-                val status = slotService.startDeployment(
+            }
+            val status = asAdmin {
+                slotService.startDeployment(
                     pipeline,
                     dryRun = true
                 )
-                assertTrue(status.status, "Deployment accepted")
             }
+            assertTrue(status.status, "Deployment accepted")
         }
     }
 
@@ -194,18 +197,24 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
         withManuallyApprovedPipeline(
             users = listOf(name),
         ) { pipeline, admissionRuleConfig ->
-            asUser(name = name) {
+            slotTestSupport.withSlotUser(
+                name = name,
+                slot = pipeline.slot,
+            ) {
                 slotService.approve(pipeline, admissionRuleConfig)
-                val status = slotService.startDeployment(
+            }
+            val status = slotService.startDeployment(
+                pipeline,
+                dryRun = true
+            )
+            assertTrue(status.status, "Deployment accepted")
+            val state =
+                slotService.findPipelineAdmissionRuleStatusByAdmissionRuleConfigId(
                     pipeline,
-                    dryRun = true
+                    admissionRuleConfig.id
                 )
-                assertTrue(status.status, "Deployment accepted")
-                val state =
-                    slotService.findPipelineAdmissionRuleStatusByAdmissionRuleConfigId(pipeline, admissionRuleConfig.id)
-                assertNotNull(state, "Manual approval state stored") {
-                    assertEquals(name, it.user)
-                }
+            assertNotNull(state, "Manual approval state stored") {
+                assertEquals(name, it.user)
             }
         }
     }
@@ -217,7 +226,7 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
         withManuallyApprovedPipeline(
             users = listOf(name),
         ) { pipeline, admissionRuleConfig ->
-            asUser(name = otherName) {
+            slotTestSupport.withSlotUser(name = otherName, slot = pipeline.slot) {
                 assertFailsWith<ManualApprovalSlotAdmissionRuleException> {
                     slotService.approve(pipeline, admissionRuleConfig)
                 }

@@ -3,6 +3,6 @@ package net.nemerosa.ontrack.extensions.environments.security
 import net.nemerosa.ontrack.model.security.GlobalFunction
 
 /**
- * Updating an environment
+ * Creating and updating environments
  */
-interface EnvironmentUpdate: GlobalFunction
+interface EnvironmentSave: GlobalFunction

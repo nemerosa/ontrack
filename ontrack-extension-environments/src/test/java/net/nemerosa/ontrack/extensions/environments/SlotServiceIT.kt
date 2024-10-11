@@ -73,23 +73,25 @@ class SlotServiceIT : AbstractDSLTestSupport() {
 
     @Test
     fun `Getting a list of slots for an environment`() {
-        environmentTestSupport.withEnvironment { environment ->
-            val slot1 = project<Slot> {
-                SlotTestFixtures.testSlot(env = environment, project = project).apply {
-                    slotService.addSlot(this)
+        asAdmin {
+            environmentTestSupport.withEnvironment { environment ->
+                val slot1 = project<Slot> {
+                    SlotTestFixtures.testSlot(env = environment, project = project).apply {
+                        slotService.addSlot(this)
+                    }
                 }
-            }
-            val slot2 = project<Slot> {
-                SlotTestFixtures.testSlot(env = environment, project = project).apply {
-                    slotService.addSlot(this)
+                val slot2 = project<Slot> {
+                    SlotTestFixtures.testSlot(env = environment, project = project).apply {
+                        slotService.addSlot(this)
+                    }
                 }
-            }
 
-            val slots = slotService.findSlotsByEnvironment(environment)
-            assertEquals(
-                setOf(slot1, slot2),
-                slots.toSet()
-            )
+                val slots = slotService.findSlotsByEnvironment(environment)
+                assertEquals(
+                    setOf(slot1, slot2),
+                    slots.toSet()
+                )
+            }
         }
     }
 
