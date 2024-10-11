@@ -4,16 +4,24 @@ import {UserContext} from "@components/providers/UserProvider";
 import {legacyGraphiQLUri} from "@components/common/Links";
 import {
     FaCode,
-    FaCog, FaCogs,
+    FaCog,
+    FaCogs,
     FaDoorOpen,
     FaExpandArrowsAlt,
     FaGithub,
     FaInfo,
-    FaJenkins, FaJira,
+    FaJenkins,
+    FaJira,
     FaList,
-    FaMagic, FaMailBulk, FaPaperPlane, FaProjectDiagram,
-    FaSignOutAlt, FaTag,
-    FaUser, FaWrench
+    FaMagic,
+    FaMailBulk,
+    FaPaperPlane,
+    FaProjectDiagram,
+    FaServer,
+    FaSignOutAlt,
+    FaTag,
+    FaUser,
+    FaWrench
 } from "react-icons/fa";
 import {MainLayoutContext} from "@components/layouts/MainLayout";
 import {useLogout} from "@components/providers/ConnectionContextProvider";
@@ -62,6 +70,7 @@ export default function UserMenu({userMenu}) {
         'extension/notifications/subscriptions/global': <FaPaperPlane/>,
         'extension/notifications/recordings': <FaMailBulk/>,
         'extension/workflows/audit': <FaProjectDiagram/>,
+        'extension/environments/environments': <FaServer/>,
     }
 
     useEffect(() => {
