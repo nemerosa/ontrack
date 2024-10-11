@@ -3,6 +3,7 @@ import {useContext, useEffect, useState} from "react";
 import {UserContext} from "@components/providers/UserProvider";
 import {legacyGraphiQLUri} from "@components/common/Links";
 import {
+    FaCertificate,
     FaCode,
     FaCog,
     FaCogs,
@@ -71,6 +72,7 @@ export default function UserMenu({userMenu}) {
         'extension/notifications/recordings': <FaMailBulk/>,
         'extension/workflows/audit': <FaProjectDiagram/>,
         'extension/environments/environments': <FaServer/>,
+        'extension/license/info': <FaCertificate/>,
     }
 
     useEffect(() => {

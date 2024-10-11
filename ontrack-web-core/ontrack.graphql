@@ -3062,6 +3062,42 @@ type LaunchWorkflowPayload implements Payload {
     workflowInstanceId: String
 }
 
+type License {
+    "Is the license active?"
+    active: Boolean!
+    "Name of the assignee"
+    assignee: String!
+    "Licenses features IDs"
+    features: [String!]!
+    "Available features"
+    licensedFeatures: [LicensedFeature!]!
+    "Maximum number of projects which can be created (0 for unlimited)"
+    maxProjects: Int!
+    "Display name for the license"
+    name: String!
+    "Type of license"
+    type: String!
+    " End of validity for this license (null for unlimited)"
+    validUntil: String
+}
+
+type LicenseControl {
+    active: Boolean!
+    expiration: LicenseExpiration!
+    projectCountExceeded: Boolean!
+}
+
+type LicenseResponse {
+    license: License
+    licenseControl: LicenseControl!
+}
+
+type LicensedFeature {
+    enabled: Boolean!
+    id: String!
+    name: String!
+}
+
 "Output type for the linkBuildById mutation."
 type LinkBuildByIdPayload implements Payload {
     "Build linked from"
@@ -5404,6 +5440,8 @@ type Query {
         "Maximum number of projects to return"
         count: Int = 10
     ): [Project!]!
+    "License"
+    licenseInfo: LicenseResponse!
     "Getting a list of texts generated for a mock workflow"
     mockWorkflowTexts(
         "ID of the workflow instance"
@@ -7674,6 +7712,12 @@ enum JobState {
     INVALID
     PAUSED
     RUNNING
+}
+
+enum LicenseExpiration {
+    ALMOST
+    EXPIRED
+    OK
 }
 
 "List of types of messages"

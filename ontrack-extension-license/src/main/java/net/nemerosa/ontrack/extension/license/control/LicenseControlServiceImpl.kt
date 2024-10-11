@@ -1,10 +1,11 @@
 package net.nemerosa.ontrack.extension.license.control
 
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.extension.license.License
-import net.nemerosa.ontrack.extension.license.LicenseConfigurationProperties
+import net.nemerosa.ontrack.extension.license.*
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.StructureService
+import net.nemerosa.ontrack.model.support.EnvService
+import net.nemerosa.ontrack.model.support.isProdProfile
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -14,6 +15,9 @@ class LicenseControlServiceImpl(
     private val licenseConfigurationProperties: LicenseConfigurationProperties,
     private val structureService: StructureService,
     private val securityService: SecurityService,
+    private val licenseService: LicenseService,
+    private val envService: EnvService,
+    private val licensedFeatureProviders: List<LicensedFeatureProvider>,
 ) : LicenseControlService {
 
     override fun control(license: License?): LicenseControl =
@@ -26,6 +30,31 @@ class LicenseControlServiceImpl(
             LicenseControl.OK
         }
 
+    override fun getLicensedFeatures(license: License): List<LicensedFeature> =
+        licensedFeatureProviders.flatMap {
+            it.providedFeatures
+        }.map {
+            LicensedFeature(
+                id = it.id,
+                name = it.name,
+                enabled = it.alwaysEnabled || license.features.contains(it.id),
+            )
+        }.sortedBy { it.name }
+
+    override fun isFeatureEnabled(featureID: String): Boolean {
+        val license = licenseService.license
+        return if (license != null) {
+            license.active && license.features.contains(featureID)
+        } else {
+            isFeatureEnabledByDefault()
+        }
+    }
+
+    /**
+     * Enabling all features by default if not running in PROD.
+     */
+    private fun isFeatureEnabledByDefault(): Boolean =
+        !envService.isProdProfile()
 
     fun control(license: License, count: Int) = LicenseControl(
         active = license.active,

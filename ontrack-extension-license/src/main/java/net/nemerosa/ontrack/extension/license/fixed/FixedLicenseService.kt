@@ -17,11 +17,13 @@ class FixedLicenseService(
 ) : LicenseService {
 
     override var license: License? = License(
+        type = "Fixed",
         name = fixedLicenseConfigurationProperties.name,
         assignee = fixedLicenseConfigurationProperties.assignee,
         validUntil = Time.fromStorage(fixedLicenseConfigurationProperties.validUntil),
         maxProjects = fixedLicenseConfigurationProperties.maxProjects,
         active = fixedLicenseConfigurationProperties.active,
+        features = emptyList(),
     )
 
 }

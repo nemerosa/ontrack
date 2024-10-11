@@ -19,16 +19,19 @@ abstract class AbstractLicenseTestSupport : AbstractDSLTestSupport() {
     protected fun withLicense(
         validUntil: LocalDateTime? = null,
         maxProjects: Int = 0,
+        features: List<String> = emptyList(),
         code: () -> Unit,
     ) {
         val oldLicense = licenseService.license
         try {
             licenseService.license = License(
+                type = "Fixed",
                 name = "Test license",
                 assignee = "CI",
                 validUntil = validUntil,
                 maxProjects = maxProjects,
                 active = true,
+                features = features,
             )
             code()
         } finally {

@@ -11,6 +11,8 @@
     <div class="row" ng-if="license.name">
         <div class="col-md-12">
             <dl>
+                <dt>License type</dt>
+                <dd>{{ license.type }}</dd>
                 <dt>License name</dt>
                 <dd>{{ license.name }}</dd>
                 <dt>License assignee</dt>
@@ -24,6 +26,12 @@
                 <dd>
                     <span ng-if="license.maxProjects > 0">{{ license.maxProjects }}</span>
                     <span ng-if="license.maxProjects <= 0">Unlimited</span>
+                </dd>
+                <dt>Features</dt>
+                <dd>
+                    <ul>
+                        <li ng-repeat="feature in license.features">{{ feature }}</li>
+                    </ul>
                 </dd>
             </dl>
         </div>

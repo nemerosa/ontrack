@@ -1,18 +1,94 @@
 import {useEffect, useState} from "react";
-import {Alert} from "antd";
 import StandardPage from "@components/layouts/StandardPage";
-import {useRestClient} from "@components/providers/ConnectionContextProvider";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import LoadingContainer from "@components/common/LoadingContainer";
+import {gql} from "graphql-request";
+import {Alert, Card, Col, Descriptions, Row, Space, Tag, Typography} from "antd";
+import PageSection from "@components/common/PageSection";
+import LicenseActive from "@components/extension/license/LicenseActive";
+import LicenseValidUntil from "@components/extension/license/LicenseValidUntil";
+import LicenseMaxProjects from "@components/extension/license/LicenseMaxProjects";
 
-export default function ExtensionLicenseInfoPage() {
+export default function LicenseInfoPage() {
 
-    const client = useRestClient()
+    const client = useGraphQLClient()
 
-    const [license, setLicense] = useState({})
+    const [licenseInfo, setLicenseInfo] = useState({})
+    const [licenseItems, setLicenseItems] = useState([])
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         if (client) {
-            client.get('/extension/license').then(data => {
-                setLicense(data.license)
+            setLoading(true)
+            client.request(
+                gql`
+                    query LicenseInfo {
+                        licenseInfo {
+                            license {
+                                type
+                                name
+                                assignee
+                                active
+                                validUntil
+                                maxProjects
+                                licensedFeatures {
+                                    id
+                                    name
+                                    enabled
+                                }
+                            }
+                            licenseControl {
+                                active
+                            }
+                        }
+                    }
+                `
+            ).then(data => {
+                const info = data.licenseInfo
+                setLicenseInfo(info)
+                if (info.license) {
+                    setLicenseItems([
+                        {
+                            key: 'type',
+                            label: "Source",
+                            children: info.license.type,
+                        },
+                        {
+                            key: 'name',
+                            label: "Name",
+                            children: info.license.name,
+                        },
+                        {
+                            key: 'assignee',
+                            label: "Assignee",
+                            children: info.license.assignee,
+                        },
+                        {
+                            key: 'active',
+                            label: "Activation",
+                            children: <LicenseActive active={info.license.active}/>
+                        },
+                        {
+                            key: 'validUntil',
+                            label: "Valid until",
+                            children: <LicenseValidUntil validUntil={info.license.validUntil}/>,
+                        },
+                        {
+                            key: 'maxProjects',
+                            label: "Max. projects",
+                            children: <LicenseMaxProjects maxProjects={info.license.maxProjects}/>,
+                        },
+                    ])
+                } else {
+                    setLicenseItems([
+                        {
+                            key: 'none',
+                            children: <Typography.Text strong>No license.</Typography.Text>
+                        }
+                    ])
+                }
+            }).finally(() => {
+                setLoading(false)
             })
         }
     }, [client])
@@ -20,29 +96,53 @@ export default function ExtensionLicenseInfoPage() {
     return (
         <StandardPage
             pageTitle="License info">
-            {
-                !license &&
-                <Alert message="No license is associated with this instance." type="info"/>
-            }
-            {
-                license &&
-                <dl>
-                    <dt>License name</dt>
-                    <dd>{license.name}</dd>
-                    <dt>License assignee</dt>
-                    <dd>{license.assignee}</dd>
-                    <dt>Valid until</dt>
-                    <dd>
-                        <span ng-if="license.validUntil">{license.validUntil}</span>
-                        <span ng-if="!license.validUntil">Unlimited</span>
-                    </dd>
-                    <dt>Max projects</dt>
-                    <dd>
-                        <span ng-if="license.maxProjects > 0">{license.maxProjects}</span>
-                        <span ng-if="license.maxProjects <= 0">Unlimited</span>
-                    </dd>
-                </dl>
-            }
+            <LoadingContainer loading={loading}>
+                <Space direction="vertical">
+                    {
+                        licenseInfo?.licenseControl && (
+                            licenseInfo.licenseControl.active ?
+                                <Alert
+                                    type="success"
+                                    message="License is active."
+                                    showIcon
+                                /> :
+                                <Alert
+                                    type="error"
+                                    message="License is disabled."
+                                    showIcon
+                                />
+                        )
+                    }
+                    <PageSection
+                        title=""
+                        padding={true}
+                    >
+                        <Space direction="vertical">
+                            <Descriptions
+                                items={licenseItems}
+                                layout="vertical"
+                            />
+                            <Row gutter={[8, 8]}>
+                                {
+                                    licenseInfo?.license?.licensedFeatures.map(feature => (
+                                        <Col key={feature.id} span={6}>
+                                            <Card
+                                                title={feature.name}
+                                            >
+                                                {
+                                                    feature.enabled ?
+                                                        <Tag color="success">Enabled</Tag> :
+                                                        <Tag color="error">Disabled</Tag>
+                                                }
+                                            </Card>
+                                        </Col>
+                                    ))
+                                }
+                            </Row>
+                        </Space>
+                    </PageSection>
+                </Space>
+            </LoadingContainer>
         </StandardPage>
     )
 }

@@ -1,0 +1,46 @@
+type License {
+    """Type of license"""
+    type: String!
+    """Display name for the license"""
+    name: String!
+    """Name of the assignee"""
+    assignee: String!
+    """Is the license active?"""
+    active: Boolean!
+    """ End of validity for this license (null for unlimited)"""
+    validUntil: String
+    """Maximum number of projects which can be created (0 for unlimited)"""
+    maxProjects: Int!
+    """Licenses features IDs"""
+    features: [String!]!
+    """Available features"""
+    licensedFeatures: [LicensedFeature!]!
+}
+
+type LicensedFeature {
+    id: String!
+    name: String!
+    enabled: Boolean!
+}
+
+enum LicenseExpiration {
+    OK,
+    ALMOST,
+    EXPIRED
+}
+
+type LicenseControl {
+    active: Boolean!
+    expiration: LicenseExpiration!
+    projectCountExceeded: Boolean!
+}
+
+type LicenseResponse {
+    license: License
+    licenseControl: LicenseControl!
+}
+
+extend type Query {
+    """License"""
+    licenseInfo: LicenseResponse!
+}

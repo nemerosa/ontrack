@@ -19,6 +19,20 @@ fun <T> Form.textField(
             .value(value)
     )
 
+fun <T> Form.memoField(
+    property: KProperty1<T, String?>,
+    value: String?,
+    readOnly: Boolean = false,
+): Form =
+    with(
+        Memo.of(property.name)
+            .label(getPropertyLabel(property))
+            .help(getPropertyDescription(property))
+            .optional(property.returnType.isMarkedNullable)
+            .readOnly(readOnly)
+            .value(value)
+    )
+
 fun <T> Form.passwordField(property: KProperty1<T, String?>): Form =
     with(
         Password.of(property.name)
