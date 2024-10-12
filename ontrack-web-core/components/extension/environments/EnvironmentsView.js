@@ -5,15 +5,20 @@ import {CloseCommand} from "@components/common/Commands";
 import {homeUri} from "@components/common/Links";
 import MainPage from "@components/layouts/MainPage";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import {gql} from "graphql-request";
+import {UserContext} from "@components/providers/UserProvider";
+import EnvironmentCreateCommand from "@components/extension/environments/EnvironmentCreateCommand";
+import LoadingContainer from "@components/common/LoadingContainer";
 
 export default function EnvironmentsView() {
 
     const client = useGraphQLClient()
+    const user = useContext(UserContext)
 
     const [loading, setLoading] = useState(false)
     const [environments, setEnvironments] = useState([])
+    const [commands, setCommands] = useState([])
 
     useEffect(() => {
         if (client) {
@@ -32,6 +37,16 @@ export default function EnvironmentsView() {
                 `
             ).then(data => {
                 setEnvironments(data.environments)
+                const commands = []
+                if (user.authorizations.environment?.create) {
+                    commands.push(
+                        <EnvironmentCreateCommand key="create"/>
+                    )
+                }
+                commands.push(
+                    <CloseCommand key="close" href={homeUri()}/>
+                )
+                setCommands(commands)
             }).finally(() => {
                 setLoading(false)
             })
@@ -46,11 +61,11 @@ export default function EnvironmentsView() {
             <MainPage
                 title="Environments"
                 breadcrumbs={homeBreadcrumbs()}
-                commands={[
-                    <CloseCommand key="close" href={homeUri()}/>
-                ]}
+                commands={commands}
             >
-                {JSON.stringify(environments)}
+                <LoadingContainer loading={loading}>
+                    {JSON.stringify(environments)}
+                </LoadingContainer>
             </MainPage>
         </>
     )
