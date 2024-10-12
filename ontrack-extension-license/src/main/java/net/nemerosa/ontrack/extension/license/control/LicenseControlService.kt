@@ -14,4 +14,9 @@ interface LicenseControlService {
      */
     fun isFeatureEnabled(featureID: String): Boolean
 
+    /**
+     * Checks if the given feature is enabled for the current license and fails if not.
+     */
+    fun checkFeatureEnabled(featureID: String)
+
 }

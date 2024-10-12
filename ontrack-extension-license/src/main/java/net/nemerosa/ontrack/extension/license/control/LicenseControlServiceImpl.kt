@@ -50,6 +50,12 @@ class LicenseControlServiceImpl(
         }
     }
 
+    override fun checkFeatureEnabled(featureID: String) {
+        if (!isFeatureEnabled(featureID)) {
+            throw LicenseFeatureException(featureID)
+        }
+    }
+
     /**
      * Enabling all features by default if not running in PROD.
      */
