@@ -1074,6 +1074,14 @@ type CreateConfigurationPayload implements Payload {
     errors: [UserError]
 }
 
+"Output type for the createEnvironment mutation."
+type CreateEnvironmentPayload implements Payload {
+    "Created environment"
+    environment: Environment
+    "List of errors"
+    errors: [UserError]
+}
+
 "Output type for the createGitHubConfiguration mutation."
 type CreateGitHubConfigurationPayload implements Payload {
     "Saved configuration"
@@ -1812,6 +1820,20 @@ type EntityInformation {
     title: String!
     "Type of information"
     type: String!
+}
+
+"Description of an environment"
+type Environment {
+    "description field"
+    description: String
+    "id field"
+    id: String!
+    "name field"
+    name: String!
+    "order field"
+    order: Int
+    "tags field"
+    tags: [String!]!
 }
 
 "EventSubscriptionPayload"
@@ -3208,6 +3230,11 @@ type Mutation {
         "Input for the mutation"
         input: CreateConfigurationInput
     ): CreateConfigurationPayload
+    "Creates a new environment"
+    createEnvironment(
+        "Input for the mutation"
+        input: CreateEnvironmentInput
+    ): CreateEnvironmentPayload
     "Creates a new GitHub configuration."
     createGitHubConfiguration(
         "Input for the mutation"
@@ -5283,6 +5310,11 @@ type Query {
     ): ProjectEntityInformation
     "Collection of entity counts"
     entityCounts: EntityCounts!
+    "List of environments"
+    environments(
+        "Filter on the environments"
+        filter: EnvironmentFilter
+    ): [Environment!]!
     "List of event subscriptions"
     eventSubscriptions(
         "Filter for the subscriptions"
@@ -8099,6 +8131,18 @@ input CreateConfigurationInput {
     type: String!
 }
 
+"Input type for the createEnvironment mutation."
+input CreateEnvironmentInput {
+    "description field"
+    description: String!
+    "name field"
+    name: String!
+    "order field"
+    order: Int!
+    "tags field"
+    tags: [String!]!
+}
+
 "Input type for the createGitHubConfiguration mutation."
 input CreateGitHubConfigurationInput {
     "ID of the GitHub App to use for authentication"
@@ -8828,6 +8872,11 @@ input EnableSubscriptionInput {
     name: String
     "Target project entity (null for global events)"
     projectEntity: ProjectEntityIDInput
+}
+
+input EnvironmentFilter {
+    "tags field"
+    tags: [String!]!
 }
 
 input EventSubscriptionFilter {
