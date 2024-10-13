@@ -21,6 +21,9 @@ import ValidationRunData from "@components/framework/validation-run-data/Validat
 import RunInfo from "@components/common/RunInfo";
 import InfoBox from "@components/common/InfoBox";
 import ValidationDataType from "@components/framework/validation-data-type/ValidationDataType";
+import {isAuthorized} from "@components/common/authorizations";
+import ValidationRunStatusChange from "@components/validationRuns/ValidationRunStatusChange";
+import {useRefresh} from "@components/common/RefreshUtils";
 
 export default function ValidationRunView({id}) {
 
@@ -29,6 +32,8 @@ export default function ValidationRunView({id}) {
     const [loading, setLoading] = useState(true)
     const [run, setRun] = useState({})
     const [commands, setCommands] = useState([])
+
+    const [refreshState, refresh] = useRefresh()
 
     useEffect(() => {
         if (client && id) {
@@ -88,7 +93,7 @@ export default function ValidationRunView({id}) {
                 setLoading(false)
             })
         }
-    }, [client, id])
+    }, [client, id, refreshState])
 
     const tableRunStatuses = "table-run-statuses"
     const sectionRunData = "section-run-data"
@@ -107,9 +112,18 @@ export default function ValidationRunView({id}) {
                 id={tableRunStatuses}
                 title="Statuses"
             >
-                <ValidationRunStatusList
-                    run={run}
-                />
+                <Space direction="vertical">
+                    {
+                        isAuthorized(run, 'validation_run', 'status_change') &&
+                        <ValidationRunStatusChange
+                            run={run}
+                            onStatusChanged={refresh}
+                        />
+                    }
+                    <ValidationRunStatusList
+                        run={run}
+                    />
+                </Space>
             </GridCell>,
         },
         {
