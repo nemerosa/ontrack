@@ -4,7 +4,7 @@ import {gql} from "graphql-request";
 import Head from "next/head";
 import {buildKnownName, pageTitle, validationStampTitleName} from "@components/common/Titles";
 import MainPage from "@components/layouts/MainPage";
-import {Space, Typography} from "antd";
+import {Empty, Space, Typography} from "antd";
 import ValidationStampLink from "@components/validationStamps/ValidationStampLink";
 import {downToBuildBreadcrumbs} from "@components/common/Breadcrumbs";
 import {CloseCommand} from "@components/common/Commands";
@@ -17,6 +17,7 @@ import StoredGridLayout from "@components/grid/StoredGridLayout";
 import StoredGridLayoutResetCommand from "@components/grid/StoredGridLayoutResetCommand";
 import {gqlValidationRunContent} from "@components/validationRuns/ValidationRunGraphQLFragments";
 import ValidationRunStatusList from "@components/validationRuns/ValidationRunStatusList";
+import ValidationRunData from "@components/framework/validation-run-data/ValidationRunData";
 
 export default function ValidationRunView({id}) {
 
@@ -81,9 +82,11 @@ export default function ValidationRunView({id}) {
     }, [client, id])
 
     const tableRunStatuses = "table-run-statuses"
+    const sectionRunData = "section-run-data"
 
     const defaultLayout = [
-        {i: tableRunStatuses, x: 0, y: 0, w: 12, h: 12},
+        {i: tableRunStatuses, x: 0, y: 0, w: 6, h: 12},
+        {i: sectionRunData, x: 6, y: 0, w: 6, h: 6},
     ]
 
     const items = [
@@ -98,6 +101,22 @@ export default function ValidationRunView({id}) {
                 />
             </GridCell>,
         },
+        {
+            id: sectionRunData,
+            content: <GridCell
+                id={sectionRunData}
+                title="Data"
+                padding={true}
+            >
+                {
+                    run.data &&
+                    <ValidationRunData data={run.data}/>
+                }
+                {
+                    !run.data && <Empty description="No data associated with this validation."/>
+                }
+            </GridCell>
+        }
     ]
 
     return (
