@@ -18,6 +18,9 @@ import StoredGridLayoutResetCommand from "@components/grid/StoredGridLayoutReset
 import {gqlValidationRunContent} from "@components/validationRuns/ValidationRunGraphQLFragments";
 import ValidationRunStatusList from "@components/validationRuns/ValidationRunStatusList";
 import ValidationRunData from "@components/framework/validation-run-data/ValidationRunData";
+import RunInfo from "@components/common/RunInfo";
+import InfoBox from "@components/common/InfoBox";
+import ValidationDataType from "@components/framework/validation-data-type/ValidationDataType";
 
 export default function ValidationRunView({id}) {
 
@@ -46,6 +49,12 @@ export default function ValidationRunView({id}) {
                                         id
                                         name
                                     }
+                                }
+                                dataType {
+                                    descriptor {
+                                        id
+                                    }
+                                    config
                                 }
                             }
                             build {
@@ -83,10 +92,12 @@ export default function ValidationRunView({id}) {
 
     const tableRunStatuses = "table-run-statuses"
     const sectionRunData = "section-run-data"
+    const sectionRunInfo = "section-run-info"
 
     const defaultLayout = [
         {i: tableRunStatuses, x: 0, y: 0, w: 6, h: 12},
         {i: sectionRunData, x: 6, y: 0, w: 6, h: 6},
+        {i: sectionRunInfo, x: 6, y: 6, w: 6, h: 6},
     ]
 
     const items = [
@@ -108,15 +119,39 @@ export default function ValidationRunView({id}) {
                 title="Data"
                 padding={true}
             >
+                <Space direction="vertical">
+                    {
+                        run.validationStamp && run.validationStamp.dataType &&
+                        <InfoBox>
+                            <ValidationDataType dataType={run.validationStamp.dataType}/>
+                        </InfoBox>
+                    }
+                    {
+                        run.data &&
+                        <ValidationRunData data={run.data}/>
+                    }
+                    {
+                        !run.data && <Empty description="No data associated with this validation."/>
+                    }
+                </Space>
+            </GridCell>
+        },
+        {
+            id: sectionRunInfo,
+            content: <GridCell
+                id={sectionRunInfo}
+                title="Run info"
+                padding={true}
+            >
                 {
-                    run.data &&
-                    <ValidationRunData data={run.data}/>
+                    run.runInfo &&
+                    <RunInfo info={run.runInfo}/>
                 }
                 {
-                    !run.data && <Empty description="No data associated with this validation."/>
+                    !run.runInfo && <Empty description="No run info associated with this validation."/>
                 }
             </GridCell>
-        }
+        },
     ]
 
     return (
