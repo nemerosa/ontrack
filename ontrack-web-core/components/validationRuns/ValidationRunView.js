@@ -123,6 +123,7 @@ export default function ValidationRunView({id}) {
                     }
                     <ValidationRunStatusList
                         run={run}
+                        onRunChanged={refresh}
                     />
                 </Space>
             </GridCell>,
