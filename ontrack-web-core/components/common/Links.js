@@ -95,7 +95,3 @@ export function restPredefinedValidationStampImageUri(predefinedValidationStamp)
 export function restValidationStampImageUri(validationStamp) {
     return `/rest/structure/validationStamps/${validationStamp.id}/image`
 }
-
-export function legacyValidationRunUri(validationRun) {
-    return `#/validationRun/${validationRun.id}`
-}
