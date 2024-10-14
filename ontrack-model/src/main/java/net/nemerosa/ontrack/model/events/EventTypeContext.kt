@@ -49,13 +49,13 @@ private fun eventEntity(
 fun eventAnyEntity(description: String) = "entity" to EventTypeContextAnyEntity(description)
 
 fun eventProject(description: String) = "project" to eventEntity(ProjectEntityType.PROJECT, description)
-fun eventXProject(description: String) = "xProject" to eventEntity(ProjectEntityType.PROJECT, description)
 fun eventBranch(description: String) = "branch" to eventEntity(ProjectEntityType.BRANCH, description)
 fun eventBuild(description: String) = "build" to eventEntity(ProjectEntityType.BUILD, description)
 fun eventPromotionLevel(description: String) =
     "promotionLevel" to eventEntity(ProjectEntityType.PROMOTION_LEVEL, description)
 
 fun eventPromotionRun(description: String) = "promotionRun" to eventEntity(ProjectEntityType.PROMOTION_RUN, description)
+fun eventXPromotionRun(description: String) = "xPromotionRun" to eventEntity(ProjectEntityType.PROMOTION_RUN, description)
 fun eventValidationStamp(description: String) =
     "validationStamp" to eventEntity(ProjectEntityType.VALIDATION_STAMP, description)
 

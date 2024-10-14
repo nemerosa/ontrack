@@ -17,7 +17,7 @@ object AutoVersioningEvents {
         context = eventContext(
             eventProject("Target project"),
             eventBranch("Target branch"),
-            eventXProject("Dependency/source project"),
+            eventXPromotionRun("Source promotion run"),
             eventValue("VERSION", "Version being set"),
             eventValue("MESSAGE", "Auto versioning message"),
             eventValue("PR_NAME", "Title of the PR having been created"),
@@ -38,7 +38,7 @@ object AutoVersioningEvents {
         context = eventContext(
             eventProject("Target project"),
             eventBranch("Target branch"),
-            eventXProject("Dependency/source project"),
+            eventXPromotionRun("Source promotion run"),
             eventValue("VERSION", "Version being set"),
             eventValue("MESSAGE", "Auto versioning message"),
             eventValue("ERROR", "Error message"),
@@ -56,7 +56,7 @@ object AutoVersioningEvents {
         context = eventContext(
             eventProject("Target project"),
             eventBranch("Target branch"),
-            eventXProject("Dependency/source project"),
+            eventXPromotionRun("Source promotion run"),
             eventValue("VERSION", "Version being set"),
             eventValue("MESSAGE", "Auto versioning message"),
             eventValue("LINK", "Link to the post processing process"),
@@ -76,7 +76,7 @@ object AutoVersioningEvents {
         context = eventContext(
             eventProject("Target project"),
             eventBranch("Target branch"),
-            eventXProject("Dependency/source project"),
+            eventXPromotionRun("Source promotion run"),
             eventValue("VERSION", "Version being set"),
             eventValue("PR_NAME", "Title of the PR having been created"),
             eventValue("PR_LINK", "Link to the PR having been created"),

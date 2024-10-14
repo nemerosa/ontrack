@@ -14,11 +14,12 @@ object AutoVersioningTestFixtures {
     fun Build.createOrder(
         targetBranch: Branch,
         targetVersion: String = "2.0.0",
+        sourcePromotionRunId: Int? = null,
     ) = AutoVersioningOrder(
         uuid = UUID.randomUUID().toString(),
         sourceProject = project.name,
         sourceBuildId = id(),
-        sourcePromotionRunId = null,
+        sourcePromotionRunId = sourcePromotionRunId,
         sourcePromotion = "GOLD",
         sourceBackValidation = null,
         branch = targetBranch,

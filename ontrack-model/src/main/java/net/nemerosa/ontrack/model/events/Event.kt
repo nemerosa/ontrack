@@ -84,10 +84,6 @@ class Event(
             return with(project)
         }
 
-        fun withExtraProject(project: Project): EventBuilder {
-            return withExtra(project)
-        }
-
         fun withRef(entity: ProjectEntity): EventBuilder {
             ref = entity.projectEntityType
             return withProject(entity.project).with(entity)
