@@ -24,6 +24,7 @@ import ValidationDataType from "@components/framework/validation-data-type/Valid
 import {isAuthorized} from "@components/common/authorizations";
 import ValidationRunStatusChange from "@components/validationRuns/ValidationRunStatusChange";
 import {useRefresh} from "@components/common/RefreshUtils";
+import ValidationRunViewDrawer from "@components/validationRuns/ValidationRunViewDrawer";
 
 export default function ValidationRunView({id}) {
 
@@ -199,6 +200,7 @@ export default function ValidationRunView({id}) {
                                 items={items}
                                 rowHeight={30}
                             />
+                            <ValidationRunViewDrawer run={run}/>
                         </Space>
                     </LoadingContainer>
                 </MainPage>
