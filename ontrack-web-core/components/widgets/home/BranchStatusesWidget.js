@@ -2,7 +2,7 @@ import {useContext, useEffect, useState} from "react";
 import {gql} from "graphql-request";
 import {Space, Table, Typography} from "antd";
 import {FaBan} from "react-icons/fa";
-import {promotionLevelUri, validationStampUri} from "@components/common/Links";
+import {promotionLevelUri, validationRunUri, validationStampUri} from "@components/common/Links";
 import ValidationRunStatus from "@components/validationRuns/ValidationRunStatus";
 import Timestamp from "@components/common/Timestamp";
 import PredefinedPromotionLevelImage from "@components/promotionLevels/PredefinedPromotionLevelImage";
@@ -101,6 +101,7 @@ export default function BranchStatusesWidget({promotions, validations, refreshIn
                                         }
                                     }
                                     validationStatuses(names: $validations) {
+                                        id
                                         validationStamp {
                                             id
                                             name
@@ -202,6 +203,7 @@ export default function BranchStatusesWidget({promotions, validations, refreshIn
                                                                 build={run.build}
                                                             />
                                                         }
+                                                        href={validationRunUri(run)}
                                                     />
                                                     <Link href={validationStampUri(run.validationStamp)}>
                                                         <Typography.Text type="secondary">[history]</Typography.Text>
