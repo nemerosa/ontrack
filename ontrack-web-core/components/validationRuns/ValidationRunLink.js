@@ -1,13 +1,13 @@
-import {legacyValidationRunUri} from "@components/common/Links";
-import LegacyLink from "@components/common/LegacyLink";
+import {validationRunUri} from "@components/common/Links";
 import {Typography} from "antd";
+import Link from "next/link";
 
 export default function ValidationRunLink({run, text}) {
     return (
         <>
-            <LegacyLink href={legacyValidationRunUri(run)}>
+            <Link href={validationRunUri(run)}>
                 <Typography.Text>{text ? text : `#${run.runOrder}`}</Typography.Text>
-            </LegacyLink>
+            </Link>
         </>
     )
 }
