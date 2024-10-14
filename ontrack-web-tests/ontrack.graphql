@@ -235,6 +235,8 @@ type AutoVersioningNotification {
 
 "Auto versioning processing order"
 type AutoVersioningOrder {
+    "additionalPaths field"
+    additionalPaths: [AutoVersioningSourceConfigPath!]!
     "If the PR must be auto approved & merged"
     autoApproval: Boolean
     "Defines the way the PR is merged when auto approval is set."
@@ -253,8 +255,10 @@ type AutoVersioningOrder {
     sourceProject: String!
     "Source promotion for the processing order"
     sourcePromotion: String
-    "List of paths to update with the target version"
-    targetPaths: [String]
+    "Target path(s) for the processing order"
+    targetPath: String!
+    "Target path(s) for the processing order"
+    targetPaths: String @deprecated(reason: "Deprecated, use `targetPath`")
     "Property in the target file"
     targetProperty: String
     "Regex used in property value to identify the version"
@@ -275,6 +279,8 @@ type AutoVersioningOrder {
 
 "Configuration of the auto versioning for one source."
 type AutoVersioningSourceConfig {
+    "Additional paths to change"
+    additionalPaths: [AutoVersioningSourceConfigPath!]
     "Check if the PR must be approved automatically or not (`true` by default)"
     autoApproval: Boolean
     "Auto approval mode"
@@ -319,6 +325,22 @@ type AutoVersioningSourceConfig {
     upgradeBranchPattern: String
     "Validation stamp to create on auto versioning (optional)"
     validationStamp: String
+    "Source of the version for the build. By default, uses the build label is the source project is configured so, or the build name itself. This allows the customization of this behavior."
+    versionSource: String
+}
+
+"Configuration for an additional path in an auto-versioning configuration."
+type AutoVersioningSourceConfigPath {
+    "Comma-separated list of file to update with the new version"
+    path: String!
+    "Optional replacement for the regex, using only a property name"
+    property: String
+    "Optional regex to use on the property value"
+    propertyRegex: String
+    "When property is defined, defines the type of property (defaults to Java properties file, but could be NPM, etc.)"
+    propertyType: String
+    "Regex to use in the target file to identify the line to replace with the new version. The first matching group must be the version."
+    regex: String
     "Source of the version for the build. By default, uses the build label is the source project is configured so, or the build name itself. This allows the customization of this behavior."
     versionSource: String
 }
@@ -656,6 +678,13 @@ type Build implements Authorizable & ProjectEntity {
     ): [Property!]!
     "Release indicator on the build."
     releaseProperty: Property
+    "Renders a template for this build"
+    render(
+        "Format of the rendering"
+        format: String,
+        "Template for the rendering"
+        template: String
+    ): String!
     "Run info associated with this build"
     runInfo: RunInfo
     "List of builds using this one."
@@ -1041,6 +1070,14 @@ type CreateBuiltInAccountPayload implements Payload {
 
 "Output type for the createConfiguration mutation."
 type CreateConfigurationPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
+"Output type for the createEnvironment mutation."
+type CreateEnvironmentPayload implements Payload {
+    "Created environment"
+    environment: Environment
     "List of errors"
     errors: [UserError]
 }
@@ -1713,6 +1750,14 @@ type DisableAccountPayload implements Payload {
     errors: [UserError]
 }
 
+"Output type for the disableBranch mutation."
+type DisableBranchPayload implements Payload {
+    "Updated branch"
+    branch: Branch
+    "List of errors"
+    errors: [UserError]
+}
+
 "Output type for the disableProject mutation."
 type DisableProjectPayload implements Payload {
     "List of errors"
@@ -1733,6 +1778,14 @@ type DisableSubscriptionPayload implements Payload {
 type EnableAccountPayload implements Payload {
     "Updated account"
     account: Account
+    "List of errors"
+    errors: [UserError]
+}
+
+"Output type for the enableBranch mutation."
+type EnableBranchPayload implements Payload {
+    "Updated branch"
+    branch: Branch
     "List of errors"
     errors: [UserError]
 }
@@ -1767,6 +1820,20 @@ type EntityInformation {
     title: String!
     "Type of information"
     type: String!
+}
+
+"Description of an environment"
+type Environment {
+    "description field"
+    description: String
+    "id field"
+    id: String!
+    "name field"
+    name: String!
+    "order field"
+    order: Int
+    "tags field"
+    tags: [String!]!
 }
 
 "EventSubscriptionPayload"
@@ -3017,6 +3084,42 @@ type LaunchWorkflowPayload implements Payload {
     workflowInstanceId: String
 }
 
+type License {
+    "Is the license active?"
+    active: Boolean!
+    "Name of the assignee"
+    assignee: String!
+    "Licenses features IDs"
+    features: [String!]!
+    "Available features"
+    licensedFeatures: [LicensedFeature!]!
+    "Maximum number of projects which can be created (0 for unlimited)"
+    maxProjects: Int!
+    "Display name for the license"
+    name: String!
+    "Type of license"
+    type: String!
+    " End of validity for this license (null for unlimited)"
+    validUntil: String
+}
+
+type LicenseControl {
+    active: Boolean!
+    expiration: LicenseExpiration!
+    projectCountExceeded: Boolean!
+}
+
+type LicenseResponse {
+    license: License
+    licenseControl: LicenseControl!
+}
+
+type LicensedFeature {
+    enabled: Boolean!
+    id: String!
+    name: String!
+}
+
 "Output type for the linkBuildById mutation."
 type LinkBuildByIdPayload implements Payload {
     "Build linked from"
@@ -3127,6 +3230,11 @@ type Mutation {
         "Input for the mutation"
         input: CreateConfigurationInput
     ): CreateConfigurationPayload
+    "Creates a new environment"
+    createEnvironment(
+        "Input for the mutation"
+        input: CreateEnvironmentInput
+    ): CreateEnvironmentPayload
     "Creates a new GitHub configuration."
     createGitHubConfiguration(
         "Input for the mutation"
@@ -3546,6 +3654,11 @@ type Mutation {
         "Input for the mutation"
         input: DisableAccountInput
     ): DisableAccountPayload
+    "Disables an existing branch"
+    disableBranch(
+        "Input for the mutation"
+        input: DisableBranchInput
+    ): DisableBranchPayload
     "Disables an existing project"
     disableProject(
         "Input for the mutation"
@@ -3561,6 +3674,11 @@ type Mutation {
         "Input for the mutation"
         input: EnableAccountInput
     ): EnableAccountPayload
+    "Enables an existing branch"
+    enableBranch(
+        "Input for the mutation"
+        input: EnableBranchInput
+    ): EnableBranchPayload
     "Enables an existing project"
     enableProject(
         "Input for the mutation"
@@ -5192,6 +5310,16 @@ type Query {
     ): ProjectEntityInformation
     "Collection of entity counts"
     entityCounts: EntityCounts!
+    "Getting an environment using its name"
+    environmentByName(
+        "Name of the environment"
+        name: String!
+    ): Environment
+    "List of environments"
+    environments(
+        "Filter on the environments"
+        filter: EnvironmentFilter
+    ): [Environment!]!
     "List of event subscriptions"
     eventSubscriptions(
         "Filter for the subscriptions"
@@ -5302,6 +5430,8 @@ type Query {
     info: Info
     "List of available export formats"
     issueExportFormats: [IssueExportFormat!]! @deprecated(reason: "Use the templating service")
+    "List of issue services"
+    issueServiceConfigurations: [IssueServiceConfigurationRepresentation!]!
     "Getting a Jenkins configuration by name"
     jenkinsConfiguration(name: String!): JenkinsConfiguration
     "List of Jenkins configurations"
@@ -5347,6 +5477,8 @@ type Query {
         "Maximum number of projects to return"
         count: Int = 10
     ): [Project!]!
+    "License"
+    licenseInfo: LicenseResponse!
     "Getting a list of texts generated for a mock workflow"
     mockWorkflowTexts(
         "ID of the workflow instance"
@@ -5354,6 +5486,11 @@ type Query {
     ): [String!]!
     "List of all notification channels"
     notificationChannels: [NotificationChannel!]!
+    "Getting a notification record using its ID"
+    notificationRecord(
+        "Record ID"
+        id: String!
+    ): NotificationRecord
     "Access to the notification recordings"
     notificationRecords(
         "Filtering on the channel"
@@ -7614,6 +7751,12 @@ enum JobState {
     RUNNING
 }
 
+enum LicenseExpiration {
+    ALMOST
+    EXPIRED
+    OK
+}
+
 "List of types of messages"
 enum MessageType {
     ERROR
@@ -7624,12 +7767,14 @@ enum MessageType {
 
 "Type of result for a notification"
 enum NotificationResultType {
+    ASYNC
     DISABLED
     ERROR
     INVALID_CONFIGURATION
     NOT_CONFIGURED
     OK
     ONGOING
+    TIMEOUT
 }
 
 "Project entity type"
@@ -7757,6 +7902,8 @@ input AutoVersioningNotificationInput {
 }
 
 input AutoVersioningSourceConfigInput {
+    "Additional paths to change"
+    additionalPaths: [AutoVersioningSourceConfigPathInput!]
     "Check if the PR must be approved automatically or not (`true` by default)"
     autoApproval: Boolean
     "Auto approval mode"
@@ -7801,6 +7948,21 @@ input AutoVersioningSourceConfigInput {
     upgradeBranchPattern: String
     "Validation stamp to create on auto versioning (optional)"
     validationStamp: String
+    "Source of the version for the build. By default, uses the build label is the source project is configured so, or the build name itself. This allows the customization of this behavior."
+    versionSource: String
+}
+
+input AutoVersioningSourceConfigPathInput {
+    "Comma-separated list of file to update with the new version"
+    path: String!
+    "Optional replacement for the regex, using only a property name"
+    property: String
+    "Optional regex to use on the property value"
+    propertyRegex: String
+    "When property is defined, defines the type of property (defaults to Java properties file, but could be NPM, etc.)"
+    propertyType: String
+    "Regex to use in the target file to identify the line to replace with the new version. The first matching group must be the version."
+    regex: String
     "Source of the version for the build. By default, uses the build label is the source project is configured so, or the build name itself. This allows the customization of this behavior."
     versionSource: String
 }
@@ -7972,6 +8134,18 @@ input CreateConfigurationInput {
     name: String!
     "type field"
     type: String!
+}
+
+"Input type for the createEnvironment mutation."
+input CreateEnvironmentInput {
+    "description field"
+    description: String!
+    "name field"
+    name: String!
+    "order field"
+    order: Int!
+    "tags field"
+    tags: [String!]!
 }
 
 "Input type for the createGitHubConfiguration mutation."
@@ -8655,6 +8829,12 @@ input DisableAccountInput {
     id: Int!
 }
 
+"Input type for the disableBranch mutation."
+input DisableBranchInput {
+    "Branch ID"
+    id: Int!
+}
+
 "Input type for the disableProject mutation."
 input DisableProjectInput {
     "Project ID"
@@ -8677,6 +8857,12 @@ input EnableAccountInput {
     id: Int!
 }
 
+"Input type for the enableBranch mutation."
+input EnableBranchInput {
+    "Branch ID"
+    id: Int!
+}
+
 "Input type for the enableProject mutation."
 input EnableProjectInput {
     "Project ID"
@@ -8691,6 +8877,11 @@ input EnableSubscriptionInput {
     name: String
     "Target project entity (null for global events)"
     projectEntity: ProjectEntityIDInput
+}
+
+input EnvironmentFilter {
+    "tags field"
+    tags: [String!]!
 }
 
 input EventSubscriptionFilter {

@@ -10,6 +10,7 @@ import {gql} from "graphql-request";
 import EnvironmentCreateCommand from "@components/extension/environments/EnvironmentCreateCommand";
 import LoadingContainer from "@components/common/LoadingContainer";
 import {useEventForRefresh} from "@components/common/EventsContext";
+import EnvironmentList from "@components/extension/environments/EnvironmentList";
 
 export default function EnvironmentsView() {
 
@@ -59,7 +60,7 @@ export default function EnvironmentsView() {
                 commands={commands}
             >
                 <LoadingContainer loading={loading}>
-                    {JSON.stringify(environments)}
+                    <EnvironmentList environments={environments}/>
                 </LoadingContainer>
             </MainPage>
         </>
