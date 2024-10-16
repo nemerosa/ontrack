@@ -1,5 +1,6 @@
 import {Col, Row, Space} from "antd";
 import EnvironmentCard from "@components/extension/environments/EnvironmentCard";
+import SlotCard from "@components/extension/environments/SlotCard";
 
 export default function EnvironmentList({environments}) {
     return (
@@ -7,10 +8,17 @@ export default function EnvironmentList({environments}) {
             <Space direction="vertical" className="ot-line">
                 {
                     environments.map(environment => (
-                        <Row gutter={[16, 16]} key={environment.id}>
-                            <Col span={6}>
+                        <Row data-testid={`environment-row-${environment.id}`} gutter={[16, 16]} key={environment.id} wrap={false}>
+                            <Col span={4}>
                                 <EnvironmentCard environment={environment}/>
                             </Col>
+                            {
+                                environment.slots.map(slot => (
+                                    <Col key={slot.id} span={6}>
+                                        <SlotCard slot={slot}/>
+                                    </Col>
+                                ))
+                            }
                         </Row>
                     ))
                 }

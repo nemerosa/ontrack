@@ -4,6 +4,7 @@ import {gql} from "graphql-request";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 
 export default function SelectProject({
+                                          id,
                                           value, onChange,
                                           placeholder = "Project name",
                                           idAsValue = false,
@@ -52,6 +53,8 @@ export default function SelectProject({
     return (
         <>
             <Select
+                id={id}
+                data-testid={id}
                 showSearch={true}
                 value={value}
                 placeholder={placeholder}

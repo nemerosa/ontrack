@@ -11,6 +11,8 @@ import EnvironmentCreateCommand from "@components/extension/environments/Environ
 import LoadingContainer from "@components/common/LoadingContainer";
 import {useEventForRefresh} from "@components/common/EventsContext";
 import EnvironmentList from "@components/extension/environments/EnvironmentList";
+import SlotCreateCommand from "@components/extension/environments/SlotCreateCommand";
+import {gqlSlotData} from "@components/extension/environments/EnvironmentGraphQL";
 
 export default function EnvironmentsView() {
 
@@ -21,6 +23,7 @@ export default function EnvironmentsView() {
     const [commands, setCommands] = useState([])
 
     const environmentCreated = useEventForRefresh("environment.created")
+    const slotCreated = useEventForRefresh("slot.created")
 
     useEffect(() => {
         if (client) {
@@ -34,20 +37,26 @@ export default function EnvironmentsView() {
                             description
                             order
                             tags
+                            slots {
+                                ...SlotData
+                            }
                         }
                     }
+
+                    ${gqlSlotData}
                 `
             ).then(data => {
                 setEnvironments(data.environments)
                 setCommands([
-                    <EnvironmentCreateCommand key="create"/>,
+                    <EnvironmentCreateCommand key="create-environment"/>,
+                    <SlotCreateCommand key="create-slot"/>,
                     <CloseCommand key="close" href={homeUri()}/>,
                 ])
             }).finally(() => {
                 setLoading(false)
             })
         }
-    }, [client, environmentCreated])
+    }, [client, environmentCreated, slotCreated])
 
     return (
         <>

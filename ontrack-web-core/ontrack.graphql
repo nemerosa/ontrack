@@ -1136,6 +1136,14 @@ type CreatePromotionRunPayload implements Payload {
     promotionRun: PromotionRun
 }
 
+"Output type for the createSlots mutation."
+type CreateSlotsPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "List of the created slots"
+    slots: SlotList
+}
+
 "Output type for the createValidationRunById mutation."
 type CreateValidationRunByIdPayload implements Payload {
     "List of errors"
@@ -1832,6 +1840,8 @@ type Environment {
     name: String!
     "order field"
     order: Int
+    "List of slots for this environment"
+    slots: [Slot!]!
     "tags field"
     tags: [String!]!
 }
@@ -3270,6 +3280,11 @@ type Mutation {
         "Input for the mutation"
         input: CreatePromotionRunByIdInput
     ): CreatePromotionRunByIdPayload
+    "Creates several slots, one per provided environment"
+    createSlots(
+        "Input for the mutation"
+        input: CreateSlotsInput
+    ): CreateSlotsPayload
     "Creating a validation run for a build identified by its name"
     createValidationRun(
         "Input for the mutation"
@@ -5310,6 +5325,11 @@ type Query {
     ): ProjectEntityInformation
     "Collection of entity counts"
     entityCounts: EntityCounts!
+    "Getting an environment using its name"
+    environmentByName(
+        "Name of the environment"
+        name: String!
+    ): Environment
     "List of environments"
     environments(
         "Filter on the environments"
@@ -6813,6 +6833,26 @@ type Signature {
     user: String
 }
 
+"Deployment slot into an environment"
+type Slot {
+    "description field"
+    description: String
+    "environment field"
+    environment: Environment!
+    "id field"
+    id: String!
+    "project field"
+    project: Project!
+    "qualifier field"
+    qualifier: String!
+}
+
+"Holds a list of slots"
+type SlotList {
+    "Holds a list of slots"
+    slots: [Slot!]!
+}
+
 "StepIngestionConfigValidation"
 type StepIngestionConfigValidation {
     "Description for the validation stamp"
@@ -8233,6 +8273,18 @@ input CreatePromotionRunInput {
     project: String!
     "Promotion name"
     promotion: String!
+}
+
+"Input type for the createSlots mutation."
+input CreateSlotsInput {
+    "description field"
+    description: String
+    "environmentIds field"
+    environmentIds: [String!]!
+    "projectId field"
+    projectId: Int!
+    "qualifier field"
+    qualifier: String
 }
 
 "Input type for the createValidationRunById mutation."

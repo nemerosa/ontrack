@@ -1,9 +1,10 @@
 package net.nemerosa.ontrack.extensions.environments
 
 import net.nemerosa.ontrack.model.structure.Project
+import java.util.*
 
 data class Slot(
-    val id: String,
+    val id: String = UUID.randomUUID().toString(),
     val environment: Environment,
     val description: String?,
     val project: Project,

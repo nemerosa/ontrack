@@ -1,6 +1,6 @@
 import {Command} from "@components/common/Commands";
 import {FaPlus} from "react-icons/fa";
-import NewEnvironmentDialog, {useNewEnvironmentDialog} from "@components/extension/environments/NewEnvironmenttDialog";
+import NewEnvironmentDialog, {useNewEnvironmentDialog} from "@components/extension/environments/NewEnvironmentDialog";
 import {useContext} from "react";
 import {UserContext} from "@components/providers/UserProvider";
 
