@@ -44,7 +44,7 @@ class SlotsAuthorizationContributor(
                         securityService.isProjectFunctionGranted(slot.project, SlotUpdate::class.java)
             ),
             Authorization(
-                name = SLOT,
+                name = "pipeline",
                 action = "create",
                 authorized = environmentFeatureEnabled &&
                         securityService.isProjectFunctionGranted(slot.project, SlotPipelineCreate::class.java)

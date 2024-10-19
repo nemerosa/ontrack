@@ -4277,6 +4277,11 @@ type Mutation {
         "Input for the mutation"
         input: ShareSCMFileChangeFilterInput
     ): ShareSCMFileChangeFilterPayload
+    "Starts a pipeline for a slot and a build"
+    startSlotPipeline(
+        "Input for the mutation"
+        input: StartSlotPipelineInput
+    ): StartSlotPipelinePayload
     "Stops a job"
     stopJob(id: Int!): JobActionResult!
     "Stopping a running workflow. Does not do anything if already stopped."
@@ -6839,7 +6844,9 @@ type Signature {
 }
 
 "Deployment slot into an environment"
-type Slot {
+type Slot implements Authorizable {
+    "Authorizations for this context"
+    authorizations: [Authorization!]!
     "description field"
     description: String
     "Last eligible build for this slot"
@@ -6858,6 +6865,30 @@ type Slot {
 type SlotList {
     "Holds a list of slots"
     slots: [Slot!]!
+}
+
+"Pipeline for a slot"
+type SlotPipeline {
+    "build field"
+    build: Build!
+    "end field"
+    end: LocalDateTime
+    "id field"
+    id: String!
+    "slot field"
+    slot: Slot!
+    "start field"
+    start: LocalDateTime!
+    "status field"
+    status: SlotPipelineStatus!
+}
+
+"Output type for the startSlotPipeline mutation."
+type StartSlotPipelinePayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Created pipeline"
+    pipeline: SlotPipeline
 }
 
 "StepIngestionConfigValidation"
@@ -7858,6 +7889,15 @@ enum SCMChangeLogFileChangeType {
     MODIFIED
     RENAMED
     UNDEFINED
+}
+
+"List of pipelines for a status"
+enum SlotPipelineStatus {
+    CANCELLED
+    DEPLOYED
+    DEPLOYING
+    ERROR
+    ONGOING
 }
 
 "Class of tokens"
@@ -10552,6 +10592,14 @@ input StandardBuildFilter {
     withValidationStamp: String
     "... with status"
     withValidationStampStatus: String
+}
+
+"Input type for the startSlotPipeline mutation."
+input StartSlotPipelineInput {
+    "buildId field"
+    buildId: Int!
+    "slotId field"
+    slotId: String!
 }
 
 "Input type for the stopWorkflow mutation."
