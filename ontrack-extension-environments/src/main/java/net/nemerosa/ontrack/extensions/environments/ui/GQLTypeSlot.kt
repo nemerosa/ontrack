@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component
 @Component
 class GQLTypeSlot(
     private val slotService: SlotService,
+    private val gqlTypeSlotPipeline: GQLTypeSlotPipeline,
     private val gqlInterfaceAuthorizableService: GQLInterfaceAuthorizableService,
 ) : GQLType {
     override fun getTypeName(): String = Slot::class.java.simpleName
@@ -40,6 +41,16 @@ class GQLTypeSlot(
                     .dataFetcher { env ->
                         val slot: Slot = env.getSource()
                         slotService.getEligibleBuilds(slot, count = 1).firstOrNull()
+                    }
+            }
+            // Current pipeline
+            .field {
+                it.name("currentPipeline")
+                    .description("Current pipeline active in the slot")
+                    .type(gqlTypeSlotPipeline.typeRef)
+                    .dataFetcher { env ->
+                        val slot: Slot = env.getSource()
+                        slotService.getCurrentPipeline(slot)
                     }
             }
             // OK

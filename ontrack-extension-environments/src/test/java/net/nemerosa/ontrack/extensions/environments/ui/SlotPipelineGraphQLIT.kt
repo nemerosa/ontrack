@@ -57,4 +57,29 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
         }
     }
 
+    @Test
+    fun `Getting the current pipeline for a slot`() {
+        slotTestSupport.withSlotPipeline { pipeline ->
+            run(
+                """
+                {
+                    slotById(id: "${pipeline.slot.id}") {
+                        currentPipeline {
+                            id
+                        }
+                    }
+                }
+            """
+            ) { data ->
+                assertEquals(
+                    pipeline.id,
+                    data.path("slotById")
+                        .path("currentPipeline")
+                        .path("id")
+                        .asText()
+                )
+            }
+        }
+    }
+
 }
