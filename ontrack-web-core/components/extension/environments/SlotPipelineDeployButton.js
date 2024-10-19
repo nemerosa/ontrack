@@ -115,11 +115,11 @@ export default function SlotPipelineDeployButton({pipeline, onDeploy}) {
         <>
             {contextHolder}
             {
-                pipeline.status === 'ONGOING' && deploymentStatus &&
+                deploymentStatus &&
                 <LoadingInline loading={loadingDeployable} text="">
                     <Space>
                         {
-                            !deploymentStatus.status &&
+                            pipeline.status === 'ONGOING' && !deploymentStatus.status &&
                             <Button
                                 icon={<FaInfoCircle color="green"/>}
                                 title="Deploys this pipeline"
@@ -127,7 +127,7 @@ export default function SlotPipelineDeployButton({pipeline, onDeploy}) {
                             />
                         }
                         {
-                            deploymentStatus.status &&
+                            pipeline.status === 'ONGOING' && deploymentStatus.status &&
                             <Popconfirm
                                 title="Deploying pipeline"
                                 description="Deploying this pipeline may trigger an event to perform an actual deployment. Do you want to continue?"
