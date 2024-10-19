@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extensions.environments.service.SlotService
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeBuild
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
+import net.nemerosa.ontrack.graphql.schema.authorizations.GQLInterfaceAuthorizableService
 import net.nemerosa.ontrack.graphql.support.field
 import net.nemerosa.ontrack.graphql.support.stringField
 import org.springframework.stereotype.Component
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component
 @Component
 class GQLTypeSlot(
     private val slotService: SlotService,
+    private val gqlInterfaceAuthorizableService: GQLInterfaceAuthorizableService,
 ) : GQLType {
     override fun getTypeName(): String = Slot::class.java.simpleName
 
@@ -26,6 +28,10 @@ class GQLTypeSlot(
             .field(Slot::project)
             .stringField(Slot::qualifier)
             .field(Slot::environment)
+            // Authorizations
+            .apply {
+                gqlInterfaceAuthorizableService.apply(this, Slot::class)
+            }
             // Last eligible build
             .field {
                 it.name("eligibleBuild")
