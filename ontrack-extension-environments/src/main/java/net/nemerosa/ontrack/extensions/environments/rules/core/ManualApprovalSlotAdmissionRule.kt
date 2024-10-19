@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.security.AccountService
 import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.model.structure.BranchFilter
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
@@ -29,22 +28,14 @@ class ManualApprovalSlotAdmissionRule(
     override fun parseConfig(jsonRuleConfig: JsonNode): ManualApprovalSlotAdmissionRuleConfig = jsonRuleConfig.parse()
 
     /**
-     * Getting the last N builds of a project for enabled branches
+     * Any build is eligible
      */
-    override fun getEligibleBuilds(slot: Slot, config: ManualApprovalSlotAdmissionRuleConfig, size: Int): List<Build> {
-        val branches = structureService.filterBranchesForProject(
-            slot.project,
-            BranchFilter(count = size, enabled = true)
-        )
-        return branches.asSequence()
-            .flatMap { branch ->
-                buildFilterService.standardFilterProviderData(size)
-                    .build()
-                    .filterBranchBuilds(branch)
-                    .asSequence()
-            }
-            .take(size)
-            .toList()
+    override fun fillEligibilityCriteria(
+        slot: Slot,
+        config: ManualApprovalSlotAdmissionRuleConfig,
+        queries: MutableList<String>,
+        params: MutableMap<String, Any?>
+    ) {
     }
 
     /**

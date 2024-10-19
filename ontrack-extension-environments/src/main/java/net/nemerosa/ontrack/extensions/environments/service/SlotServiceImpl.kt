@@ -96,27 +96,40 @@ class SlotServiceImpl(
         checkSlotAccess<SlotView>(slot)
         // Gets all the admission rules
         val configs = slotAdmissionRuleConfigRepository.getAdmissionRuleConfigs(slot)
-        // Gets all eligible builds
-        return configs.flatMap { config ->
-            getEligibleBuilds(slot, config, count)
+        // Collecting parameters & queries
+        val queries = mutableListOf<String>()
+        val params = mutableMapOf<String, Any?>()
+        configs.forEach { config ->
+            fillEligibilityCriteria(slot, config, queries, params)
         }
-            .distinctBy { it.id }
-            .sortedByDescending { it.signature.time }
+        // Gets all eligible builds
+        return slotRepository.getEligibleBuilds(slot, queries, params)
     }
 
-    private fun getEligibleBuilds(slot: Slot, config: SlotAdmissionRuleConfig, count: Int): List<Build> {
+    private fun fillEligibilityCriteria(
+        slot: Slot,
+        config: SlotAdmissionRuleConfig,
+        queries: MutableList<String>,
+        params: MutableMap<String, Any?>,
+    ) {
         val rule = slotAdmissionRuleRegistry.getRule(config.ruleId)
-        return getEligibleBuilds(slot, rule, config.ruleConfig, count)
+        fillEligibilityCriteria(slot, rule, config.ruleConfig, queries, params)
     }
 
-    private fun <C, D> getEligibleBuilds(
+    private fun <C, D> fillEligibilityCriteria(
         slot: Slot,
         rule: SlotAdmissionRule<C, D>,
         jsonRuleConfig: JsonNode,
-        count: Int,
-    ): List<Build> {
+        queries: MutableList<String>,
+        params: MutableMap<String, Any?>,
+    ) {
         val ruleConfig = rule.parseConfig(jsonRuleConfig)
-        return rule.getEligibleBuilds(slot, ruleConfig, count)
+        rule.fillEligibilityCriteria(
+            slot = slot,
+            config = ruleConfig,
+            queries = queries,
+            params = params,
+        )
     }
 
     private fun isBuildEligible(slot: Slot, config: SlotAdmissionRuleConfig, build: Build): Boolean {

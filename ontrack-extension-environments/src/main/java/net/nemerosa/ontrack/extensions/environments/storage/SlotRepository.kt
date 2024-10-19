@@ -2,8 +2,10 @@ package net.nemerosa.ontrack.extensions.environments.storage
 
 import net.nemerosa.ontrack.extensions.environments.Environment
 import net.nemerosa.ontrack.extensions.environments.Slot
+import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.Project
+import net.nemerosa.ontrack.repository.BuildJdbcRepositoryAccessor
 import net.nemerosa.ontrack.repository.ProjectJdbcRepositoryAccessor
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.springframework.stereotype.Repository
@@ -15,6 +17,7 @@ class SlotRepository(
     dataSource: DataSource,
     private val environmentRepositoryAccessor: EnvironmentRepositoryAccessor,
     private val projectJdbcRepositoryAccessor: ProjectJdbcRepositoryAccessor,
+    private val buildJdbcRepositoryAccessor: BuildJdbcRepositoryAccessor,
 ) : AbstractJdbcRepository(dataSource) {
 
     fun addSlot(slot: Slot) {
@@ -92,5 +95,37 @@ class SlotRepository(
         ) { rs, _ ->
             toSlot(rs)
         }
+
+    fun getEligibleBuilds(
+        slot: Slot,
+        queries: List<String>,
+        params: Map<String, Any?>,
+    ): List<Build> {
+        var query = """
+            SELECT DISTINCT (BD.ID)
+            FROM BUILDS BD
+                     INNER JOIN BRANCHES B ON BD.BRANCHID = B.ID
+                     LEFT JOIN PROMOTION_RUNS PR ON BD.ID = PR.BUILDID
+                     LEFT JOIN PROMOTION_LEVELS PL ON B.ID = PL.BRANCHID
+            WHERE B.PROJECTID = :projectId
+            AND B.DISABLED = FALSE
+        """.trimIndent()
+
+        query += queries.joinToString("") { " AND ($it)" }
+
+        val parameters = params.toMutableMap()
+        parameters["projectId"] = slot.project.id()
+
+        // Order
+        query += " ORDER BY BD.ID DESC"
+
+        return namedParameterJdbcTemplate!!.query(
+            query,
+            parameters,
+        ) { rs, _ ->
+            val id = rs.getInt("ID")
+            buildJdbcRepositoryAccessor.getBuild(ID.of(id))
+        }
+    }
 
 }

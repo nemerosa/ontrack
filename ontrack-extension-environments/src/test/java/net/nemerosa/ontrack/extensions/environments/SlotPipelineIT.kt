@@ -61,7 +61,7 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
             val pl = pipeline.build.branch.promotionLevel(name = "GOLD")
             slotService.addAdmissionRuleConfig(
                 slot = pipeline.slot,
-                config = SlotAdmissionRuleTestFixtures.testAdmissionRuleConfig(pipeline.slot),
+                config = SlotAdmissionRuleTestFixtures.testPromotionAdmissionRuleConfig(pipeline.slot),
             )
             // Build not promoted yet, pipeline is not deployable
             assertEquals(

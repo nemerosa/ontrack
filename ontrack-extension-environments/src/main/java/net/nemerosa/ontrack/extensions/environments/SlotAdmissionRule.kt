@@ -41,6 +41,16 @@ interface SlotAdmissionRule<C, D> {
     ): Boolean
 
     /**
+     * Participates into the criteria to find eligible builds for a slot.
+     */
+    fun fillEligibilityCriteria(
+        slot: Slot,
+        config: C,
+        queries: MutableList<String>,
+        params: MutableMap<String, Any?>,
+    )
+
+    /**
      * Checks if this build can be deployable into the slot
      */
     fun isBuildDeployable(
@@ -49,15 +59,6 @@ interface SlotAdmissionRule<C, D> {
         ruleConfig: C,
         ruleData: SlotPipelineAdmissionRuleData<D>?,
     ): DeployableCheck
-
-    /**
-     * Gets a list of eligible builds for a slot pipeline.
-     */
-    fun getEligibleBuilds(
-        slot: Slot,
-        config: C,
-        size: Int = 10,
-    ): List<Build>
 
     /**
      * Parsing the stored/client data into typed data for this rule

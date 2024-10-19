@@ -27,24 +27,15 @@ class ValidationSlotAdmissionRule(
     override val name: String = "Validation"
 
     /**
-     * Getting the last branches having the configured validation
-     * and getting their last builds.
+     * Getting builds which have passed
      */
-    override fun getEligibleBuilds(
+    override fun fillEligibilityCriteria(
         slot: Slot,
         config: ValidationSlotAdmissionRuleConfig,
-        size: Int
-    ): List<Build> {
-        val branches = validationStampService.findBranchesWithValidationStamp(slot.project, config.validation, size)
-        return branches.asSequence()
-            .flatMap { branch ->
-                buildFilterService.standardFilterProviderData(size)
-                    .build()
-                    .filterBranchBuilds(branch)
-                    .asSequence()
-            }
-            .take(size)
-            .toList()
+        queries: MutableList<String>,
+        params: MutableMap<String, Any?>
+    ) {
+        TODO("Not yet implemented")
     }
 
     override fun parseConfig(jsonRuleConfig: JsonNode): ValidationSlotAdmissionRuleConfig = jsonRuleConfig.parse()

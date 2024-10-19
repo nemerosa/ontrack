@@ -25,24 +25,18 @@ class PromotionSlotAdmissionRule(
     override val name: String = "Promotion"
 
     /**
-     * Getting the last branches having the configured promotion
-     * and getting their last builds.
+     * Getting builds where their branch contains the configured promotion.
+     *
+     * Builds may or may not be promoted
      */
-    override fun getEligibleBuilds(
+    override fun fillEligibilityCriteria(
         slot: Slot,
         config: PromotionSlotAdmissionRuleConfig,
-        size: Int
-    ): List<Build> {
-        val branches = promotionLevelService.findBranchesWithPromotionLevel(slot.project, config.promotion, size)
-        return branches.asSequence()
-            .flatMap { branch ->
-                buildFilterService.standardFilterProviderData(size)
-                    .build()
-                    .filterBranchBuilds(branch)
-                    .asSequence()
-            }
-            .take(size)
-            .toList()
+        queries: MutableList<String>,
+        params: MutableMap<String, Any?>
+    ) {
+        queries += "PL.NAME = :promotionName"
+        params["promotionName"] = config.promotion
     }
 
     override fun parseConfig(jsonRuleConfig: JsonNode): PromotionSlotAdmissionRuleConfig = jsonRuleConfig.parse()

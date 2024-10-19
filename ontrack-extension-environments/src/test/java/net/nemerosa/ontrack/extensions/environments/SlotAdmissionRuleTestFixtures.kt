@@ -6,7 +6,7 @@ import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.test.TestUtils.uid
 
 object SlotAdmissionRuleTestFixtures {
-    fun testAdmissionRuleConfig(
+    fun testPromotionAdmissionRuleConfig(
         slot: Slot,
         name: String = uid("rule-"),
         promotion: String = "GOLD",
