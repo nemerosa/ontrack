@@ -7,10 +7,16 @@ import TimestampText from "@components/common/TimestampText";
 import BuildLink from "@components/builds/BuildLink";
 import PromotionRuns from "@components/promotionRuns/PromotionRuns";
 import SlotPipelineStatus from "@components/extension/environments/SlotPipelineStatus";
+import SlotPipelineDeployButton from "@components/extension/environments/SlotPipelineDeployButton";
 
 export default function SlotCurrentPipeline({slot, slotState}) {
 
     const client = useGraphQLClient()
+
+    const [pipelineState, setPipelineState] = useState(0)
+    const changePipelineState = () => {
+        setPipelineState(i => i + 1)
+    }
 
     const [loading, setLoading] = useState(false)
     const [pipeline, setPipeline] = useState()
@@ -40,7 +46,9 @@ export default function SlotCurrentPipeline({slot, slotState}) {
                         {
                             key: 'status',
                             label: 'Status',
-                            children: <SlotPipelineStatus pipeline={pipeline}/>,
+                            children: <SlotPipelineStatus pipeline={pipeline}>
+                                <SlotPipelineDeployButton pipeline={pipeline} onDeploy={changePipelineState}/>
+                            </SlotPipelineStatus>,
                             span: 12,
                         },
                         {
@@ -75,7 +83,7 @@ export default function SlotCurrentPipeline({slot, slotState}) {
                 setLoading(false)
             })
         }
-    }, [client, slot, slotState])
+    }, [client, slot, slotState, pipelineState])
 
     return (
         <>
