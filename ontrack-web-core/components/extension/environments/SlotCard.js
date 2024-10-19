@@ -1,5 +1,6 @@
-import {Card, Typography} from "antd";
+import {Card, Divider, Space, Typography} from "antd";
 import SlotTitle from "@components/extension/environments/SlotTitle";
+import SlotEligibleBuild from "@components/extension/environments/SlotEligibleBuild";
 
 export default function SlotCard({slot}) {
     return (
@@ -10,7 +11,17 @@ export default function SlotCard({slot}) {
                 }}
                 title={<SlotTitle slot={slot}/>}
             >
-                <Typography.Text type="secondary">{slot.description}</Typography.Text>
+                <Space direction="vertical" className="ot-line">
+                    {
+                        slot.description && <>
+                            <Typography.Text type="secondary">{slot.description}</Typography.Text>
+                            <Divider type="horizontal"/>
+                        </>
+                    }
+                    <SlotEligibleBuild
+                        slot={slot}
+                    />
+                </Space>
             </Card>
         </>
     )

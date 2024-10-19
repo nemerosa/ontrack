@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extensions.environments.EnvironmentTestSupport
 import net.nemerosa.ontrack.extensions.environments.SlotTestSupport
 import net.nemerosa.ontrack.extensions.environments.service.SlotService
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.test.assertJsonNull
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
@@ -85,6 +86,60 @@ class SlotGraphQLIT : AbstractQLKTITSupport() {
                             it.path("id").asText()
                         }
                     )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Last eligible for a slot can be empty`() {
+        asAdmin {
+            slotTestSupport.withSlot { slot ->
+                slot.project.branch {
+                    run(
+                        """
+                        {
+                            slotById(id: "${slot.id}") {
+                                eligibleBuild {
+                                    id
+                                }
+                            }
+                        }
+                    """.trimIndent()
+                    ) { data ->
+                        val slotData = data.path("slot")
+                        val build = slotData.path("build")
+                        assertJsonNull(build, "No eligible build")
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Last eligible for a slot`() {
+        asAdmin {
+            slotTestSupport.withSlot { slot ->
+                slot.project.branch {
+                    val build = build()
+                    run(
+                        """
+                        {
+                            slotById(id: "${slot.id}") {
+                                eligibleBuild {
+                                    id
+                                }
+                            }
+                        }
+                    """.trimIndent()
+                    ) { data ->
+                        val slotData = data.path("slot")
+                        val buildData = slotData.path("build")
+                        assertEquals(
+                            build.id(),
+                            buildData.path("id").asInt()
+                        )
+                    }
                 }
             }
         }

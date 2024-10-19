@@ -4,6 +4,9 @@ export default function EnvironmentCard({environment}) {
     return (
         <>
             <Card
+                style={{
+                    height: '100%',
+                }}
                 data-testid={`environment-${environment.id}`}
                 title={environment.name}
                 extra={
