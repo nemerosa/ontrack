@@ -40,8 +40,9 @@ export default function StandardTable({
                     size: pagination.size,
                 }
             ).then(data => {
-                const newItems = data[queryNode].pageItems;
-                setPageInfo(data[queryNode].pageInfo)
+                const userNode = typeof queryNode === 'function' ? queryNode(data) : data[queryNode]
+                const newItems = userNode.pageItems;
+                setPageInfo(userNode.pageInfo)
                 if (pagination.offset > 0) {
                     setItems((entries) => [...entries, ...newItems])
                 } else {

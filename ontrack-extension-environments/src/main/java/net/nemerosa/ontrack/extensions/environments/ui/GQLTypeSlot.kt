@@ -3,12 +3,14 @@ package net.nemerosa.ontrack.extensions.environments.ui
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.extensions.environments.Slot
+import net.nemerosa.ontrack.extensions.environments.SlotPipeline
 import net.nemerosa.ontrack.extensions.environments.service.SlotService
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeBuild
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.authorizations.GQLInterfaceAuthorizableService
 import net.nemerosa.ontrack.graphql.support.field
+import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
 import net.nemerosa.ontrack.graphql.support.stringField
 import org.springframework.stereotype.Component
 
@@ -17,6 +19,7 @@ class GQLTypeSlot(
     private val slotService: SlotService,
     private val gqlTypeSlotPipeline: GQLTypeSlotPipeline,
     private val gqlInterfaceAuthorizableService: GQLInterfaceAuthorizableService,
+    private val paginatedListFactory: GQLPaginatedListFactory,
 ) : GQLType {
     override fun getTypeName(): String = Slot::class.java.simpleName
 
@@ -53,6 +56,20 @@ class GQLTypeSlot(
                         slotService.getCurrentPipeline(slot)
                     }
             }
+            // Paginated list of pipelines
+            .field(
+                paginatedListFactory.createPaginatedField<Slot, SlotPipeline>(
+                    cache = cache,
+                    fieldName = "pipelines",
+                    fieldDescription = "Paginated list of pipelines",
+                    itemType = gqlTypeSlotPipeline.typeName,
+                    // TODO Filtering the pipelines
+                    itemPaginatedListProvider = { _, slot, _, _ ->
+                        // TODO Pagination of pipelines
+                        slotService.findPipelines(slot)
+                    }
+                )
+            )
             // OK
             .build()
 }

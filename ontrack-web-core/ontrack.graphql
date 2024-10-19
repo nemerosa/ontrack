@@ -6888,6 +6888,13 @@ type Slot implements Authorizable {
     environment: Environment!
     "id field"
     id: String!
+    "Paginated list of pipelines"
+    pipelines(
+        "Offset for the page"
+        offset: Int = 0,
+        "Size of the page"
+        size: Int = 20
+    ): SlotPipelinePaginated
     "project field"
     project: Project!
     "qualifier field"
@@ -6966,6 +6973,13 @@ type SlotPipelineDeploymentStatus {
     override: Boolean
     "status field"
     status: Boolean
+}
+
+type SlotPipelinePaginated {
+    "Information about the current page"
+    pageInfo: PageInfo
+    "Items in the current page"
+    pageItems: [SlotPipeline!]!
 }
 
 "Output type for the startSlotPipelineDeployment mutation."
