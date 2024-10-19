@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extensions.environments.ui
 
 import net.nemerosa.ontrack.extensions.environments.SlotPipeline
+import net.nemerosa.ontrack.extensions.environments.SlotPipelineDeploymentFinishStatus
 import net.nemerosa.ontrack.extensions.environments.SlotPipelineDeploymentStatus
 import net.nemerosa.ontrack.extensions.environments.service.SlotService
 import net.nemerosa.ontrack.graphql.schema.Mutation
@@ -47,6 +48,23 @@ class SlotPipelineMutations(
                 )
             }
         },
+        simpleMutation(
+            name = "finishSlotPipelineDeployment",
+            description = "Finishes the deployment of a pipeline",
+            input = FinishSlotPipelineDeploymentInput::class,
+            outputName = "finishStatus",
+            outputDescription = "Status of the deployment",
+            outputType = SlotPipelineDeploymentFinishStatus::class,
+        ) { input ->
+            val pipeline = slotService.findPipelineById(input.pipelineId)
+            pipeline?.let {
+                slotService.finishDeployment(
+                    pipeline = it,
+                    forcing = input.forcing,
+                    message = input.message,
+                )
+            }
+        },
     )
 }
 
@@ -57,4 +75,10 @@ data class StartSlotPipelineInput(
 
 data class StartSlotPipelineDeploymentInput(
     val pipelineId: String,
+)
+
+data class FinishSlotPipelineDeploymentInput(
+    val pipelineId: String,
+    val forcing: Boolean = false,
+    val message: String? = null,
 )

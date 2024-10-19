@@ -1930,6 +1930,14 @@ type FavouriteProjectPayload implements Payload {
     project: Project
 }
 
+"Output type for the finishSlotPipelineDeployment mutation."
+type FinishSlotPipelineDeploymentPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Status of the deployment"
+    finishStatus: SlotPipelineDeploymentFinishStatus
+}
+
 "Output type for the generateToken mutation."
 type GenerateTokenPayload implements Payload {
     "List of errors"
@@ -3722,6 +3730,11 @@ type Mutation {
         "Input for the mutation"
         input: FavouriteProjectInput
     ): FavouriteProjectPayload
+    "Finishes the deployment of a pipeline"
+    finishSlotPipelineDeployment(
+        "Input for the mutation"
+        input: FinishSlotPipelineDeploymentInput
+    ): FinishSlotPipelineDeploymentPayload
     "Generate a new token"
     generateToken(
         "Input for the mutation"
@@ -6935,6 +6948,14 @@ type SlotPipelineDeploymentCheck {
     ruleId: String!
 }
 
+"Status returned when finishing a deployment"
+type SlotPipelineDeploymentFinishStatus {
+    "deployed field"
+    deployed: Boolean
+    "message field"
+    message: String!
+}
+
 "Status for the admission check of a pipeline"
 type SlotPipelineDeploymentStatus {
     "checks field"
@@ -9079,6 +9100,16 @@ input FavouriteBranchInput {
 input FavouriteProjectInput {
     "Project ID"
     id: Int!
+}
+
+"Input type for the finishSlotPipelineDeployment mutation."
+input FinishSlotPipelineDeploymentInput {
+    "forcing field"
+    forcing: Boolean!
+    "message field"
+    message: String
+    "pipelineId field"
+    pipelineId: String!
 }
 
 "Input type for the generateToken mutation."

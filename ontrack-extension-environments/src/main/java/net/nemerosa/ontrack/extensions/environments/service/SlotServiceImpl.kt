@@ -253,22 +253,28 @@ class SlotServiceImpl(
         return status
     }
 
-    override fun finishDeployment(pipeline: SlotPipeline, forcing: Boolean, message: String): String? {
+    override fun finishDeployment(
+        pipeline: SlotPipeline,
+        forcing: Boolean,
+        message: String?
+    ): SlotPipelineDeploymentFinishStatus {
         checkSlotAccess<SlotPipelineFinish>(pipeline.slot)
         // Only last pipeline can be deployed
         val lastPipeline = getCurrentPipeline(pipeline.slot)
         if (lastPipeline?.id != pipeline.id) {
-            return "Only the last pipeline can be deployed."
+            return SlotPipelineDeploymentFinishStatus.nok("Only the last pipeline can be deployed.")
         }
         // Checking if pipeline is deploying
         if (lastPipeline.status != SlotPipelineStatus.DEPLOYING && !forcing) {
-            return "Pipeline can be deployed only if deployment has been started first."
+            return SlotPipelineDeploymentFinishStatus.nok("Pipeline can be deployed only if deployment has been started first.")
         }
+        // Actual message
+        val actualMessage = message ?: "Deployment finished"
         // Marking the pipeline as deployed
         changePipeline(
             pipeline = pipeline,
             status = SlotPipelineStatus.DEPLOYED,
-            message = message,
+            message = actualMessage,
             override = forcing,
             overrideMessage = if (forcing) {
                 "Deployment was marked manually."
@@ -277,7 +283,7 @@ class SlotServiceImpl(
             },
         )
         // OK
-        return null
+        return SlotPipelineDeploymentFinishStatus.ok(actualMessage)
     }
 
     private fun checkDeployment(

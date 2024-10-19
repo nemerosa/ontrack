@@ -88,8 +88,8 @@ interface SlotService {
     fun finishDeployment(
         pipeline: SlotPipeline,
         forcing: Boolean = false,
-        message: String = "Deployment finished"
-    ): String?
+        message: String? = null,
+    ): SlotPipelineDeploymentFinishStatus
 
     /**
      * Gets the stored states of admission rules for a given pipeline.
