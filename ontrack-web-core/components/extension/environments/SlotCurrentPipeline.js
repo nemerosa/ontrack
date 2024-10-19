@@ -7,6 +7,7 @@ import TimestampText from "@components/common/TimestampText";
 import BuildLink from "@components/builds/BuildLink";
 import PromotionRuns from "@components/promotionRuns/PromotionRuns";
 import SlotPipelineStatus from "@components/extension/environments/SlotPipelineStatus";
+import SlotPipelineDeployButton from "@components/extension/environments/SlotPipelineDeployButton";
 
 export default function SlotCurrentPipeline({slot, slotState}) {
 
@@ -40,7 +41,9 @@ export default function SlotCurrentPipeline({slot, slotState}) {
                         {
                             key: 'status',
                             label: 'Status',
-                            children: <SlotPipelineStatus pipeline={pipeline}/>,
+                            children: <SlotPipelineStatus pipeline={pipeline}>
+                                <SlotPipelineDeployButton pipeline={pipeline}/>
+                            </SlotPipelineStatus>,
                             span: 12,
                         },
                         {

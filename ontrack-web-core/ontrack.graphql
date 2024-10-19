@@ -1750,6 +1750,14 @@ type DeletionPayload implements PayloadInterface {
     errors: [PayloadUserError]
 }
 
+"Result for the check of the admission for a pipeline"
+type DeployableCheck {
+    "reason field"
+    reason: String
+    "status field"
+    status: Boolean
+}
+
 "Output type for the disableAccount mutation."
 type DisableAccountPayload implements Payload {
     "Updated account"
@@ -5673,6 +5681,11 @@ type Query {
         "ID of the slot"
         id: String!
     ): Slot
+    "Getting a slot pipeline by ID"
+    slotPipelineById(
+        "Pipeline ID"
+        id: String!
+    ): SlotPipeline
     "Getting the list of template renderers"
     templatingRenderers: [TemplatingRenderer!]!
     "Gets the current user"
@@ -6873,6 +6886,8 @@ type SlotList {
 type SlotPipeline {
     "build field"
     build: Build!
+    "Deployment status for the pipeline"
+    deploymentStatus: SlotPipelineDeploymentStatus
     "end field"
     end: LocalDateTime
     "id field"
@@ -6883,6 +6898,46 @@ type SlotPipeline {
     start: LocalDateTime!
     "status field"
     status: SlotPipelineStatus!
+}
+
+"Stored state for an admission rule in a pipeline"
+type SlotPipelineAdmissionRuleStatus {
+    "data field"
+    data: JSON
+    "id field"
+    id: String!
+    "override field"
+    override: Boolean
+    "overrideMessage field"
+    overrideMessage: String
+    "timestamp field"
+    timestamp: LocalDateTime!
+    "user field"
+    user: String!
+}
+
+"List of checks for admission for a pipeline"
+type SlotPipelineDeploymentCheck {
+    "check field"
+    check: DeployableCheck!
+    "override field"
+    override: SlotPipelineAdmissionRuleStatus
+    "ruleConfig field"
+    ruleConfig: JSON
+    "ruleData field"
+    ruleData: JSON
+    "ruleId field"
+    ruleId: String!
+}
+
+"Status for the admission check of a pipeline"
+type SlotPipelineDeploymentStatus {
+    "checks field"
+    checks: [SlotPipelineDeploymentCheck!]!
+    "override field"
+    override: Boolean
+    "status field"
+    status: Boolean
 }
 
 "Output type for the startSlotPipeline mutation."
