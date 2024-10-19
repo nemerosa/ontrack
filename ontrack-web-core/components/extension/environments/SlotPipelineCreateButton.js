@@ -1,4 +1,4 @@
-import {Button} from "antd";
+import {Button, Popconfirm} from "antd";
 import {FaPlay} from "react-icons/fa";
 import {useState} from "react";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
@@ -41,12 +41,17 @@ export default function SlotPipelineCreateButton({slot, build}) {
 
     return (
         <>
-            <Button
-                icon={<FaPlay color="green"/>}
-                title="Starts a pipeline for this build"
-                loading={loading}
-                onClick={onClick}
-            />
+            <Popconfirm
+                title="Starting pipeline"
+                description="Starting this pipeline will cancel all currently active pipelines for this slot. Are you sure to continue?"
+                onConfirm={onClick}
+            >
+                <Button
+                    icon={<FaPlay color="green"/>}
+                    title="Starts a pipeline for this build"
+                    loading={loading}
+                />
+            </Popconfirm>
         </>
     )
 }
