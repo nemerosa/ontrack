@@ -6,6 +6,7 @@ import {gqlSlotPipelineData} from "@components/extension/environments/Environmen
 import TimestampText from "@components/common/TimestampText";
 import BuildLink from "@components/builds/BuildLink";
 import PromotionRuns from "@components/promotionRuns/PromotionRuns";
+import SlotPipelineStatus from "@components/extension/environments/SlotPipelineStatus";
 
 export default function SlotCurrentPipeline({slot, slotState}) {
 
@@ -39,7 +40,7 @@ export default function SlotCurrentPipeline({slot, slotState}) {
                         {
                             key: 'status',
                             label: 'Status',
-                            children: pipeline.status,
+                            children: <SlotPipelineStatus pipeline={pipeline}/>,
                             span: 12,
                         },
                         {
