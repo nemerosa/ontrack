@@ -7,6 +7,7 @@ import java.util.*
 
 data class SlotPipeline(
     val id: String = UUID.randomUUID().toString(),
+    val number: Int = 0,
     val start: LocalDateTime = Time.now,
     val end: LocalDateTime? = null,
     val status: SlotPipelineStatus = SlotPipelineStatus.ONGOING,
@@ -19,7 +20,8 @@ data class SlotPipeline(
         end = end,
         status = status,
         slot = slot,
-        build = build
+        build = build,
+        number = number,
     )
 
     fun withEnd(end: LocalDateTime) = SlotPipeline(
@@ -28,6 +30,17 @@ data class SlotPipeline(
         end = end,
         status = status,
         slot = slot,
-        build = build
+        build = build,
+        number = number,
+    )
+
+    fun withNumber(number: Int)= SlotPipeline(
+        id = id,
+        start = start,
+        end = end,
+        status = status,
+        slot = slot,
+        build = build,
+        number = number,
     )
 }

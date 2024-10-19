@@ -184,7 +184,8 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
     fun `Marking a pipeline as deployed (only if it was deploying)`() {
         slotTestSupport.withSlotPipeline { pipeline ->
             assertTrue(slotService.startDeployment(pipeline, dryRun = false).status, "Deployment started")
-            assertEquals(null, slotService.finishDeployment(pipeline), "Deployment finished")
+            val finishStatus = slotService.finishDeployment(pipeline)
+            assertEquals(true, finishStatus.deployed, "Deployment finished")
             // Gets the pipeline
             val latestPipeline = slotService.getCurrentPipeline(pipeline.slot) ?: fail("Could not find pipeline")
             assertEquals(
@@ -205,17 +206,16 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
     fun `Overriding the pipeline deployment even if it was not deploying`() {
         slotTestSupport.withSlotPipeline { pipeline ->
             // By default, not possible to mark this pipeline as deployed
+            var finishStatus = slotService.finishDeployment(pipeline)
+            assertFalse(finishStatus.deployed, "Deployment not possible")
             assertEquals(
                 "Pipeline can be deployed only if deployment has been started first.",
-                slotService.finishDeployment(pipeline),
+                finishStatus.message,
                 "Deployment completion not possible"
             )
             // Forcing the deployment
-            assertEquals(
-                null,
-                slotService.finishDeployment(pipeline, forcing = true, message = "Deployment forced"),
-                "Deployment forced"
-            )
+            finishStatus = slotService.finishDeployment(pipeline, forcing = true, message = "Deployment forced")
+            assertTrue(finishStatus.deployed, "Deployment done")
             // Checking the change
             val change = slotService.getPipelineChanges(pipeline).firstOrNull()
             assertNotNull(change) {

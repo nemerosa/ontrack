@@ -61,6 +61,7 @@ export const gqlSlotPipelineBuildData = gql`
 export const gqlSlotPipelineData = gql`
     fragment SlotPipelineData on SlotPipeline {
         id
+        number
         start
         end
         status

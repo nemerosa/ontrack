@@ -93,7 +93,7 @@ export default function SlotCurrentPipeline({slot, slotState}) {
                 !pipeline &&
                 <Card
                     loading={loading}
-                    title="No pipeline started"
+                    title="No pipeline"
                 >
                     <Empty description=""/>
                 </Card>
@@ -102,7 +102,7 @@ export default function SlotCurrentPipeline({slot, slotState}) {
                 pipeline &&
                 <Card
                     loading={loading}
-                    title="Pipeline started"
+                    title={`Pipeline #${pipeline.number}`}
                 >
                     <Descriptions
                         items={items}

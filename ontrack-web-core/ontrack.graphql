@@ -6910,6 +6910,8 @@ type SlotPipeline {
     end: LocalDateTime
     "id field"
     id: String!
+    "number field"
+    number: Int
     "slot field"
     slot: Slot!
     "start field"

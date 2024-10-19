@@ -18,24 +18,55 @@ class SlotPipelineRepository(
     private val slotRepository: SlotRepository,
 ) : AbstractJdbcRepository(dataSource) {
 
-    fun savePipeline(pipeline: SlotPipeline) {
-        namedParameterJdbcTemplate!!.update(
-            """
-                INSERT INTO ENV_SLOT_PIPELINE (ID, SLOT_ID, BUILD_ID, START, "END", STATUS)
-                VALUES (:id, :slotId, :buildId, :start, :end, :status)
-                ON CONFLICT (ID) DO UPDATE SET
-                "END" = excluded."END",
-                STATUS = excluded.STATUS
+    fun savePipeline(pipeline: SlotPipeline): SlotPipeline {
+        // Getting the pipeline
+        val existing = findPipelineById(pipeline.id)
+        return if (existing != null) {
+            // Saving the pipeline
+            namedParameterJdbcTemplate!!.update(
+                """
+                UPDATE ENV_SLOT_PIPELINE
+                SET "END" = :end, STATUS = :status
+                WHERE ID = :id
             """,
-            mapOf(
-                "id" to pipeline.id,
-                "slotId" to pipeline.slot.id,
-                "buildId" to pipeline.build.id(),
-                "start" to dateTimeForDB(pipeline.start),
-                "end" to pipeline.end?.let { Time.store(it) },
-                "status" to pipeline.status.name,
+                mapOf(
+                    "id" to pipeline.id,
+                    "end" to pipeline.end?.let { Time.store(it) },
+                    "status" to pipeline.status.name,
+                )
             )
-        )
+            // OK
+            pipeline
+        } else {
+            // Getting the number of pipelines in the slot
+            val number = (namedParameterJdbcTemplate!!.queryForObject(
+                """
+                SELECT MAX(NUMBER)
+                FROM ENV_SLOT_PIPELINE
+                WHERE SLOT_ID = :slotId
+            """.trimIndent(),
+                mapOf("slotId" to pipeline.slot.id),
+                Int::class.java,
+            ) ?: 0) + 1
+            // Saving the pipeline
+            namedParameterJdbcTemplate!!.update(
+                """
+                INSERT INTO ENV_SLOT_PIPELINE (ID, SLOT_ID, BUILD_ID, NUMBER, START, "END", STATUS)
+                VALUES (:id, :slotId, :buildId, :number, :start, :end, :status)
+            """,
+                mapOf(
+                    "id" to pipeline.id,
+                    "slotId" to pipeline.slot.id,
+                    "buildId" to pipeline.build.id(),
+                    "number" to number,
+                    "start" to dateTimeForDB(pipeline.start),
+                    "end" to pipeline.end?.let { Time.store(it) },
+                    "status" to pipeline.status.name,
+                )
+            )
+            // OK
+            pipeline.withNumber(number)
+        }
     }
 
     fun forAllActivePipelines(slot: Slot, code: (pipeline: SlotPipeline) -> Unit) {
@@ -64,7 +95,7 @@ class SlotPipelineRepository(
                 SELECT *
                 FROM ENV_SLOT_PIPELINE
                 WHERE SLOT_ID = :slotId
-                ORDER BY START DESC
+                ORDER BY NUMBER DESC
             """.trimIndent(),
             mapOf(
                 "slotId" to slot.id,
@@ -79,6 +110,7 @@ class SlotPipelineRepository(
         id = rs.getString("ID"),
         start = Time.fromStorage(rs.getString("START"))!!,
         end = Time.fromStorage(rs.getString("END")),
+        number = rs.getInt("NUMBER"),
         status = SlotPipelineStatus.valueOf(rs.getString("STATUS")),
         build = buildJdbcRepositoryAccessor.getBuild(id(rs, "BUILD_ID")),
         slot = slotRepository.getSlotById(rs.getString("SLOT_ID")),

@@ -5,10 +5,7 @@ import net.nemerosa.ontrack.extensions.environments.SlotPipeline
 import net.nemerosa.ontrack.extensions.environments.service.SlotService
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
-import net.nemerosa.ontrack.graphql.support.enumField
-import net.nemerosa.ontrack.graphql.support.field
-import net.nemerosa.ontrack.graphql.support.localDateTimeField
-import net.nemerosa.ontrack.graphql.support.stringField
+import net.nemerosa.ontrack.graphql.support.*
 import org.springframework.stereotype.Component
 
 @Component
@@ -24,6 +21,7 @@ class GQLTypeSlotPipeline(
             .name(typeName)
             .description("Pipeline for a slot")
             .stringField(SlotPipeline::id)
+            .intField(SlotPipeline::number)
             .localDateTimeField(SlotPipeline::start)
             .localDateTimeField(SlotPipeline::end)
             .enumField(SlotPipeline::status)
