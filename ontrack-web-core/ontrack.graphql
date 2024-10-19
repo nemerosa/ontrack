@@ -6847,6 +6847,8 @@ type Signature {
 type Slot implements Authorizable {
     "Authorizations for this context"
     authorizations: [Authorization!]!
+    "Current pipeline active in the slot"
+    currentPipeline: SlotPipeline
     "description field"
     description: String
     "Last eligible build for this slot"

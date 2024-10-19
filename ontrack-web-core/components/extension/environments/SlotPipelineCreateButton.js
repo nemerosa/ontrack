@@ -4,7 +4,7 @@ import {useState} from "react";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
 
-export default function SlotPipelineCreateButton({slot, build}) {
+export default function SlotPipelineCreateButton({slot, build, onStart}) {
 
     const client = useGraphQLClient()
 
@@ -13,7 +13,7 @@ export default function SlotPipelineCreateButton({slot, build}) {
     const onClick = async () => {
         setLoading(true)
         try {
-            const data = await client.request(
+            await client.request(
                 gql`
                     mutation StartPipeline(
                         $slotId: String!,
@@ -34,6 +34,7 @@ export default function SlotPipelineCreateButton({slot, build}) {
                     buildId: build.id,
                 }
             )
+            if (onStart) onStart()
         } finally {
             setLoading(false)
         }

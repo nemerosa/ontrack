@@ -23,3 +23,50 @@ export const gqlSlotData = gql`
 
     ${gqlProjectContentFragment}
 `;
+
+export const gqlSlotPipelineBuildData = gql`
+    fragment SlotPipelineBuildData on Build {
+        id
+        name
+        creation {
+            time
+        }
+        branch {
+            id
+            name
+            project {
+                id
+                name
+            }
+        }
+        promotionRuns(lastPerLevel: true) {
+            id
+            creation {
+                time
+            }
+            promotionLevel {
+                id
+                name
+                description
+                image
+                _image
+            }
+        }
+        releaseProperty {
+            value
+        }
+    }
+`;
+
+export const gqlSlotPipelineData = gql`
+    fragment SlotPipelineData on SlotPipeline {
+        id
+        start
+        end
+        status
+        build {
+            ...SlotPipelineBuildData
+        }
+    }
+    ${gqlSlotPipelineBuildData}
+`;

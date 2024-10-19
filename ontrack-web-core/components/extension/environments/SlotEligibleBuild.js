@@ -1,14 +1,14 @@
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {useEffect, useState} from "react";
 import {gql} from "graphql-request";
-import LoadingInline from "@components/common/LoadingInline";
-import {Space, Typography} from "antd";
+import {Card, Space, Typography} from "antd";
 import BuildLink from "@components/builds/BuildLink";
 import PromotionRuns from "@components/promotionRuns/PromotionRuns";
 import {isAuthorized} from "@components/common/authorizations";
 import SlotPipelineCreateButton from "@components/extension/environments/SlotPipelineCreateButton";
+import {gqlSlotPipelineBuildData} from "@components/extension/environments/EnvironmentGraphQL";
 
-export default function SlotEligibleBuild({slot}) {
+export default function SlotEligibleBuild({slot, onStart}) {
     const client = useGraphQLClient()
 
     const [loading, setLoading] = useState(false)
@@ -28,38 +28,11 @@ export default function SlotEligibleBuild({slot}) {
                                 authorized
                             }
                             eligibleBuild {
-                                id
-                                name
-                                creation {
-                                    time
-                                }
-                                branch {
-                                    id
-                                    name
-                                    project {
-                                        id
-                                        name
-                                    }
-                                }
-                                promotionRuns(lastPerLevel: true) {
-                                    id
-                                    creation {
-                                        time
-                                    }
-                                    promotionLevel {
-                                        id
-                                        name
-                                        description
-                                        image
-                                        _image
-                                    }
-                                }
-                                releaseProperty {
-                                    value
-                                }
+                                ...SlotPipelineBuildData
                             }
                         }
                     }
+                    ${gqlSlotPipelineBuildData}
                 `,
                 {
                     id: slot.id,
@@ -75,7 +48,7 @@ export default function SlotEligibleBuild({slot}) {
 
     return (
         <>
-            <LoadingInline loading={loading}>
+            <Card loading={loading}>
                 {
                     build &&
                     <Space>
@@ -87,6 +60,7 @@ export default function SlotEligibleBuild({slot}) {
                             <SlotPipelineCreateButton
                                 slot={slot}
                                 build={build}
+                                onStart={onStart}
                             />
                         }
                     </Space>
@@ -94,7 +68,7 @@ export default function SlotEligibleBuild({slot}) {
                 {
                     !build && <Typography.Text type="secondary">No eligible build</Typography.Text>
                 }
-            </LoadingInline>
+            </Card>
         </>
     )
 }
