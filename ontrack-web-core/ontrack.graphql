@@ -5663,6 +5663,11 @@ type Query {
     searchResultTypes: [SearchResultType!]!
     "Ontrack settings"
     settings: Settings!
+    "Getting a slot using its id"
+    slotById(
+        "ID of the slot"
+        id: String!
+    ): Slot
     "Getting the list of template renderers"
     templatingRenderers: [TemplatingRenderer!]!
     "Gets the current user"
@@ -6837,6 +6842,8 @@ type Signature {
 type Slot {
     "description field"
     description: String
+    "Last eligible build for this slot"
+    eligibleBuild: Build
     "environment field"
     environment: Environment!
     "id field"

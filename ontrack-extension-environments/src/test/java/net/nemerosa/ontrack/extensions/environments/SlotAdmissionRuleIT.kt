@@ -153,4 +153,36 @@ class SlotAdmissionRuleIT : AbstractDSLTestSupport() {
         }
     }
 
+    @Test
+    fun `Get the eligible builds for a slot without any admission rule`() {
+        slotTestSupport.withSlot { slot ->
+            slot.project.branch {
+                val pl = promotionLevel("GOLD")
+                val build10 = build()
+                val build11 = build {
+                    promote(pl)
+                }
+                val build12 = build()
+
+                slot.project.branch {
+                    val build20 = build()
+                    val build21 = build()
+
+                    // Only the builds of the branches containing the GOLD promotion are eligible
+                    val builds = slotService.getEligibleBuilds(slot)
+                    assertEquals(
+                        listOf(
+                            build21,
+                            build20,
+                            build12,
+                            build11,
+                            build10
+                        ).map { it.id },
+                        builds.map { it.id }
+                    )
+                }
+            }
+        }
+    }
+
 }

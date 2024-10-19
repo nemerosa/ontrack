@@ -1,12 +1,20 @@
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import {gql} from "graphql-request";
+import LoadingInline from "@components/common/LoadingInline";
+import {Space, Typography} from "antd";
+import BuildLink from "@components/builds/BuildLink";
+import PromotionRuns from "@components/promotionRuns/PromotionRuns";
 
 export default function SlotEligibleBuild({slot}) {
     const client = useGraphQLClient()
 
+    const [loading, setLoading] = useState(false)
+    const [build, setBuild] = useState()
+
     useEffect(() => {
         if (client && slot) {
+            setLoading(true)
             client.request(
                 gql`
                     query SlotEligibleBuild($id: String!) {
@@ -49,10 +57,28 @@ export default function SlotEligibleBuild({slot}) {
                     id: slot.id,
                 }
             ).then(data => {
-
+                setBuild(data.slotById?.eligibleBuild)
             }).finally(() => {
-
+                setLoading(false)
             })
         }
     }, [client, slot])
+
+    return (
+        <>
+            <LoadingInline loading={loading}>
+                {
+                    build &&
+                    <Space>
+                        <BuildLink build={build}/>
+                        <PromotionRuns promotionRuns={build.promotionRuns}/>
+                        <Typography.Text>is eligible</Typography.Text>
+                    </Space>
+                }
+                {
+                    !build && <Typography.Text type="secondary">No eligible build</Typography.Text>
+                }
+            </LoadingInline>
+        </>
+    )
 }

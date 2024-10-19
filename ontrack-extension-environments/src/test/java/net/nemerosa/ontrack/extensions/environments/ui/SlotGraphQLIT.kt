@@ -107,8 +107,8 @@ class SlotGraphQLIT : AbstractQLKTITSupport() {
                         }
                     """.trimIndent()
                     ) { data ->
-                        val slotData = data.path("slot")
-                        val build = slotData.path("build")
+                        val slotData = data.path("slotById")
+                        val build = slotData.path("eligibleBuild")
                         assertJsonNull(build, "No eligible build")
                     }
                 }
@@ -133,8 +133,8 @@ class SlotGraphQLIT : AbstractQLKTITSupport() {
                         }
                     """.trimIndent()
                     ) { data ->
-                        val slotData = data.path("slot")
-                        val buildData = slotData.path("build")
+                        val slotData = data.path("slotById")
+                        val buildData = slotData.path("eligibleBuild")
                         assertEquals(
                             build.id(),
                             buildData.path("id").asInt()
