@@ -13,22 +13,33 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 abstract class AbstractSignatureLicenseService : LicenseService {
 
     abstract val encodedLicense: String?
-    abstract val encodedSignature: String?
     abstract val licenseType: String
+
+    private data class LicenseData(
+        val data: String,
+        val signature: String,
+    )
 
     @OptIn(ExperimentalEncodingApi::class)
     override val license: License? by lazy {
-        // Reads the license content (decoding with Base64)
-        val licenseContent = encodedLicense
+        // Parsing the license data (license data + signature)
+        val licenseData = encodedLicense
             ?.takeIf { it.isNotBlank() }
             ?.run {
                 Base64.decode(this)
             }
+            ?.toString(Charsets.UTF_8)
+            ?.parseAsJson()
+            ?.parse<LicenseData>()
             ?: throw SignatureLicenseException("No license content has been provided")
 
+        // Decoded license data
+        val decodedLicenseData = Base64.decode(licenseData.data)
+
         // Gets the license signature
-        val licenseSignatureBytes = encodedSignature
-            ?.takeIf { it.isNotBlank() }
+        val licenseSignatureBytes = licenseData
+            .signature
+            .takeIf { it.isNotBlank() }
             ?.run {
                 Base64.decode(this)
             }
@@ -53,14 +64,14 @@ abstract class AbstractSignatureLicenseService : LicenseService {
         // Checking the signature of the encoded license content
         val signature: Signature = Signature.getInstance("SHA256withECDSA")
         signature.initVerify(publicKey)
-        signature.update(licenseContent)
+        signature.update(decodedLicenseData)
         val signatureOK = signature.verify(licenseSignatureBytes)
         if (!signatureOK) {
             throw SignatureLicenseException("License signature verification failed")
         }
 
         // Decoding the license content (base64)
-        val decodedLicense = licenseContent.toString(Charsets.UTF_8)
+        val decodedLicense = decodedLicenseData.toString(Charsets.UTF_8)
 
         // Parsing the license
         val signatureLicense = decodedLicense.parseAsJson().parse<SignatureLicense>()

@@ -18,7 +18,6 @@ class LicenseSettingsProvider(
 
     override fun getSettings() = LicenseSettings(
         license = settingsRepository.getString(LicenseSettings::license, ""),
-        signature = settingsRepository.getString(LicenseSettings::signature, ""),
     )
 
     override fun getSettingsClass(): Class<LicenseSettings> = LicenseSettings::class.java

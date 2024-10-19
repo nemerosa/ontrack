@@ -7,5 +7,4 @@ import org.springframework.stereotype.Component
 @Component
 class EmbeddedLicenseConfigurationProperties {
     var license: String? = null
-    var signature: String? = null
 }

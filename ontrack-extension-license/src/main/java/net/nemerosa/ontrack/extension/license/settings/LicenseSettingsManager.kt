@@ -28,7 +28,6 @@ class LicenseSettingsManager(
 
     override fun doSaveSettings(settings: LicenseSettings) {
         settingsRepository.setString<LicenseSettings>(settings::license)
-        settingsRepository.setString<LicenseSettings>(settings::signature)
     }
 
     override fun getId(): String = "license"
@@ -39,6 +38,5 @@ class LicenseSettingsManager(
     override fun getSettingsForm(settings: LicenseSettings): Form =
         Form.create()
             .memoField(LicenseSettings::license, settings.license)
-            .memoField(LicenseSettings::signature, settings.signature)
 
 }

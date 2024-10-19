@@ -21,7 +21,4 @@ class SettingsLicenseService(
     override val encodedLicense: String?
         get() = cachedSettingsService.getCachedSettings(LicenseSettings::class.java).license
 
-    override val encodedSignature: String?
-        get() = cachedSettingsService.getCachedSettings(LicenseSettings::class.java).signature
-
 }

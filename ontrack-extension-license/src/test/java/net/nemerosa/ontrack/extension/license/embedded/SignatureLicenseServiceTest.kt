@@ -26,26 +26,11 @@ class SignatureLicenseServiceTest {
     }
 
     @Test
-    fun `No license signature provided`() {
-        val service = EmbeddedLicenseService(
-            EmbeddedLicenseConfigurationProperties().apply {
-                license = encodedLicense()
-                signature = null
-            }
-        )
-        assertFailsWith<SignatureLicenseException> {
-            service.license
-        }
-    }
-
-    @Test
     fun `License OK`() {
         val service = EmbeddedLicenseService(
             EmbeddedLicenseConfigurationProperties().apply {
                 license =
-                    "ewogICJuYW1lIjogIk5lbWVyb3NhIiwKICAiYXNzaWduZWUiOiAiRGFtaWVuIiwKICAidmFsaWRVbnRpbCI6IG51bGwsCiAgIm1heFByb2plY3RzIjogMCwKICAiZmVhdHVyZXMiOiBbCiAgICAiZXh0ZW5zaW9uLmVudmlyb25tZW50cyIKICBdCn0KCg=="
-                signature =
-                    "MEUCIQD/ADUHavkC+yUOQhsj6O8NOHR10xp7d6vl2HuG2qo1LgIgHPD6fsQPd6gmQgjxkGLhQu1Hs+HNuHQ6MFDzl68YFNQ="
+                    "eyJkYXRhIjoiZXlKdVlXMWxJam9pVUhKbGJXbDFiU0lzSW1GemMybG5ibVZsSWpvaVRtVnRaWEp2YzJFaUxDSjJZV3hwWkZWdWRHbHNJanB1ZFd4c0xDSnRZWGhRY205cVpXTjBjeUk2TUN3aVptVmhkSFZ5WlhNaU9sc2laWGgwWlc1emFXOXVMbVZ1ZG1seWIyNXRaVzUwY3lKZGZRPT0iLCJzaWduYXR1cmUiOiJNRVlDSVFEeUxkUFhBL1k0RjdzR0V1V3RUN3laa0gzQnVMMWZ6S0hRV3hnRDJVSm12UUloQU1seXFxblZkdXpPcEx6VVVyV1N5anNqNU1LVE9WYlRSdTFCam9jZXlqRWUifQ=="
             }
         )
         assertEquals(
@@ -64,8 +49,8 @@ class SignatureLicenseServiceTest {
         license().asJson()
 
     private fun license() = SignatureLicense(
-        name = "Nemerosa",
-        assignee = "Damien",
+        name = "Premium",
+        assignee = "Nemerosa",
         validUntil = null,
         maxProjects = 0,
         features = listOf(
