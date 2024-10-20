@@ -1,7 +1,7 @@
 import {Button, Popconfirm} from "antd";
 import {FaTrash} from "react-icons/fa";
 
-export default function InlineConfirmCommand({title, confirm, icon = <FaTrash color="red"/>, onConfirm}) {
+export default function InlineConfirmCommand({title, confirm, icon = <FaTrash color="red"/>, onConfirm, loading}) {
     return (
         <>
             <Popconfirm
@@ -13,6 +13,7 @@ export default function InlineConfirmCommand({title, confirm, icon = <FaTrash co
                     type="text"
                     icon={icon}
                     title={title}
+                    loading={loading}
                 />
             </Popconfirm>
         </>

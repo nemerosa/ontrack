@@ -1663,6 +1663,12 @@ type DeletePromotionRunPayload implements Payload {
     errors: [UserError]
 }
 
+"Output type for the deleteSlotAdmissionRuleConfig mutation."
+type DeleteSlotAdmissionRuleConfigPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
 "Output type for the deleteSubscription mutation."
 type DeleteSubscriptionPayload implements Payload {
     "List of errors"
@@ -3625,6 +3631,11 @@ type Mutation {
         "Input for the mutation"
         input: DeletePromotionRunMetaInfoPropertyByIdInput
     ): DeletePromotionRunMetaInfoPropertyByIdPayload
+    "Deletes an admission rule for a slot"
+    deleteSlotAdmissionRuleConfig(
+        "Input for the mutation"
+        input: DeleteSlotAdmissionRuleConfigInput
+    ): DeleteSlotAdmissionRuleConfigPayload
     "Deletes an existing subscription using its ID"
     deleteSubscription(
         "Input for the mutation"
@@ -3864,6 +3875,11 @@ type Mutation {
     saveDashboard(input: SaveDashboardInput!): SaveDashboardPayload
     "Saving some generic settings"
     saveSettings(input: SaveSettingsInput!): SaveSettingsPayload
+    "Saves or creates a configured admission rule for a slot"
+    saveSlotAdmissionRuleConfig(
+        "Input for the mutation"
+        input: SaveSlotAdmissionRuleConfigInput
+    ): SaveSlotAdmissionRuleConfigPayload
     "Saves a workflow which is defined as YAML"
     saveYamlWorkflow(
         "Input for the mutation"
@@ -5694,6 +5710,8 @@ type Query {
     searchResultTypes: [SearchResultType!]!
     "Ontrack settings"
     settings: Settings!
+    "List of existing admission rules"
+    slotAdmissionRules: [SlotAdmissionRule!]!
     "Getting a slot using its id"
     slotById(
         "ID of the slot"
@@ -6087,6 +6105,14 @@ type SaveDashboardPayload implements PayloadInterface {
 type SaveSettingsPayload implements PayloadInterface {
     "List of errors"
     errors: [PayloadUserError]
+}
+
+"Output type for the saveSlotAdmissionRuleConfig mutation."
+type SaveSlotAdmissionRuleConfigPayload implements Payload {
+    "Saved admission rule config"
+    admissionRuleConfig: SlotAdmissionRuleConfig
+    "List of errors"
+    errors: [UserError]
 }
 
 "Output type for the saveYamlWorkflow mutation."
@@ -6876,6 +6902,8 @@ type Signature {
 
 "Deployment slot into an environment"
 type Slot implements Authorizable {
+    "List of configured admission rules for this slot"
+    admissionRules: [SlotAdmissionRuleConfig!]!
     "Authorizations for this context"
     authorizations: [Authorization!]!
     "Current pipeline active in the slot"
@@ -6899,6 +6927,28 @@ type Slot implements Authorizable {
     project: Project!
     "qualifier field"
     qualifier: String!
+}
+
+"Admission rule"
+type SlotAdmissionRule {
+    "id field"
+    id: String!
+    "name field"
+    name: String!
+}
+
+"Configured admission rule for a slot"
+type SlotAdmissionRuleConfig {
+    "description field"
+    description: String
+    "id field"
+    id: String!
+    "name field"
+    name: String!
+    "ruleConfig field"
+    ruleConfig: JSON
+    "ruleId field"
+    ruleId: String!
 }
 
 "Holds a list of slots"
@@ -8932,6 +8982,12 @@ input DeletePromotionRunMetaInfoPropertyInput {
     promotion: String!
 }
 
+"Input type for the deleteSlotAdmissionRuleConfig mutation."
+input DeleteSlotAdmissionRuleConfigInput {
+    "id field"
+    id: String!
+}
+
 "Input type for the deleteSubscription mutation."
 input DeleteSubscriptionInput {
     "ID of the subscription to delete"
@@ -9608,6 +9664,22 @@ input SaveSettingsInput {
     id: String!
     "Values for the settings"
     values: JSON!
+}
+
+"Input type for the saveSlotAdmissionRuleConfig mutation."
+input SaveSlotAdmissionRuleConfigInput {
+    "description field"
+    description: String!
+    "id field"
+    id: String
+    "name field"
+    name: String!
+    "ruleConfig field"
+    ruleConfig: JSON!
+    "ruleId field"
+    ruleId: String!
+    "slotId field"
+    slotId: String
 }
 
 "Input type for the saveYamlWorkflow mutation."

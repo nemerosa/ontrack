@@ -14,6 +14,7 @@ import PageSection from "@components/common/PageSection";
 import SlotPipelinesTable from "@components/extension/environments/SlotPipelinesTable";
 import SlotEligibleBuildsTable from "@components/extension/environments/SlotEligibleBuildsTable";
 import {useReloadState} from "@components/common/StateUtils";
+import SlotAdmissionRulesTable from "@components/extension/environments/SlotAdmissionRulesTable";
 
 export default function SlotView({id}) {
 
@@ -33,6 +34,11 @@ export default function SlotView({id}) {
                     query Slot($id: String!) {
                         slotById(id: $id) {
                             ...SlotData
+                            authorizations {
+                                name
+                                action
+                                authorized
+                            }
                             environment {
                                 ...EnvironmentData
                             }
@@ -89,10 +95,18 @@ export default function SlotView({id}) {
                         </Col>
                         <Col span={24}>
                             <PageSection
+                                title="Admission rules"
+                                padding={false}
+                            >
+                                <SlotAdmissionRulesTable slot={slot} onChange={reload}/>
+                            </PageSection>
+                        </Col>
+                        <Col span={24}>
+                            <PageSection
                                 title="Pipelines"
                                 padding={false}
                             >
-                                <SlotPipelinesTable slot={slot}/>
+                                <SlotPipelinesTable slot={slot} onChange={reload}/>
                             </PageSection>
                         </Col>
                     </Row>

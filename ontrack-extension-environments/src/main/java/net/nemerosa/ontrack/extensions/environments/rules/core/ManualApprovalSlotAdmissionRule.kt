@@ -3,19 +3,13 @@ package net.nemerosa.ontrack.extensions.environments.rules.core
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extensions.environments.*
 import net.nemerosa.ontrack.json.parse
-import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
-import net.nemerosa.ontrack.model.security.AccountService
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Build
-import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
 
 @Component
 class ManualApprovalSlotAdmissionRule(
-    private val structureService: StructureService,
-    private val buildFilterService: BuildFilterService,
     private val securityService: SecurityService,
-    private val accountService: AccountService,
 ) : SlotAdmissionRule<ManualApprovalSlotAdmissionRuleConfig, ManualApprovalSlotAdmissionRuleData> {
 
     companion object {

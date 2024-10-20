@@ -9,7 +9,10 @@ import java.sql.ResultSet
 import javax.sql.DataSource
 
 @Repository
-class SlotAdmissionRuleConfigRepository(dataSource: DataSource) : AbstractJdbcRepository(dataSource) {
+class SlotAdmissionRuleConfigRepository(
+    dataSource: DataSource,
+    private val slotRepository: SlotRepository,
+) : AbstractJdbcRepository(dataSource) {
 
     fun addAdmissionRuleConfig(slot: Slot, config: SlotAdmissionRuleConfig) {
         namedParameterJdbcTemplate!!.update(
@@ -61,6 +64,23 @@ class SlotAdmissionRuleConfigRepository(dataSource: DataSource) : AbstractJdbcRe
             mapOf("id" to config.id)
         )
     }
+
+    fun findAdmissionRuleConfigById(id: String): SlotAdmissionRuleConfig? =
+        namedParameterJdbcTemplate!!.queryForObject(
+            """
+                SELECT *
+                    FROM ENV_SLOT_ADMISSION_RULE_CONFIGS
+                    WHERE ID = :id
+            """,
+            mapOf(
+                "id" to id,
+            )
+        ) { rs, _ ->
+            toSlotAdmissionRuleConfig(
+                rs,
+                slot = slotRepository.getSlotById(rs.getString("slot_id"))
+            )
+        }
 
     fun getAdmissionRuleConfigById(slot: Slot, id: String): SlotAdmissionRuleConfig =
         namedParameterJdbcTemplate!!.queryForObject(

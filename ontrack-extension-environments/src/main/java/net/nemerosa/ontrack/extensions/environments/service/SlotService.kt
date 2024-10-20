@@ -110,4 +110,9 @@ interface SlotService {
         data: JsonNode,
     )
 
+    /**
+     * Finds a configured admission rule using its ID
+     */
+    fun findAdmissionRuleConfigById(id: String): SlotAdmissionRuleConfig?
+
 }

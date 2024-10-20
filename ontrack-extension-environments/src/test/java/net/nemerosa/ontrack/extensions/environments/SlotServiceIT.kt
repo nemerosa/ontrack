@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNotNull
 
 class SlotServiceIT : AbstractDSLTestSupport() {
 
@@ -91,6 +92,23 @@ class SlotServiceIT : AbstractDSLTestSupport() {
                     setOf(slot1, slot2),
                     slots.toSet()
                 )
+            }
+        }
+    }
+
+    @Test
+    fun `Finding a configured admission rule by ID`() {
+        slotTestSupport.withSlot { slot ->
+            val config = SlotAdmissionRuleTestFixtures.testPromotionAdmissionRuleConfig(slot)
+            slotService.addAdmissionRuleConfig(
+                slot = slot,
+                config = config,
+            )
+            assertNotNull(
+                slotService.findAdmissionRuleConfigById(config.id),
+                "Found configured admission rule"
+            ) {
+                assertEquals(config, it)
             }
         }
     }

@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.graphql.schema.GQLTypeBuild
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.authorizations.GQLInterfaceAuthorizableService
 import net.nemerosa.ontrack.graphql.support.field
+import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
 import net.nemerosa.ontrack.graphql.support.stringField
 import org.springframework.stereotype.Component
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component
 class GQLTypeSlot(
     private val slotService: SlotService,
     private val gqlTypeSlotPipeline: GQLTypeSlotPipeline,
+    private val gqlTypeSlotAdmissionRuleConfig: GQLTypeSlotAdmissionRuleConfig,
     private val gqlInterfaceAuthorizableService: GQLInterfaceAuthorizableService,
     private val paginatedListFactory: GQLPaginatedListFactory,
 ) : GQLType {
@@ -70,6 +72,16 @@ class GQLTypeSlot(
                     }
                 )
             )
+            // List of rules
+            .field {
+                it.name("admissionRules")
+                    .description("List of configured admission rules for this slot")
+                    .type(listType(gqlTypeSlotAdmissionRuleConfig.typeRef))
+                    .dataFetcher { env ->
+                        val slot: Slot = env.getSource()
+                        slotService.getAdmissionRuleConfigs(slot)
+                    }
+            }
             // OK
             .build()
 }

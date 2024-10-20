@@ -26,3 +26,38 @@ useEffect(() => {
     }
 }, [client, /* ... */])
 ```
+
+## Mutations
+
+Mutations are usually called upon an action initiated by a user, typically in an `async` function.
+
+Errors can be processed automatically by doing:
+
+```javascript
+const onAction = async () => {
+    const data = await client.request(
+        gql`
+            mutation {
+                doSomething {
+                    errors {
+                        message
+                    }
+                }
+            }
+        `
+    )
+    if (processGraphQLErrors(data, 'doSomething')) {
+        // Success
+    }
+}
+```
+
+If errors must be explicitly collected (for a form for example):
+
+```javascript
+const data = await client.request(/*...*/)
+const errors = getGraphQLErrors(data, 'doSomething')
+if (errors) {
+    // There are some errors
+}
+```

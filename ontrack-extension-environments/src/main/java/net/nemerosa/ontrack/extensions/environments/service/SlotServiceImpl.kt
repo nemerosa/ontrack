@@ -27,6 +27,13 @@ class SlotServiceImpl(
     private val slotAdmissionRuleRegistry: SlotAdmissionRuleRegistry,
 ) : SlotService {
 
+    private inline fun <reified P : ProjectFunction> isSlotAccessible(slot: Slot): Boolean {
+        return securityService.isGlobalFunctionGranted(EnvironmentList::class.java) &&
+                securityService.isProjectFunctionGranted(slot.project, ProjectView::class.java) &&
+                securityService.isProjectFunctionGranted(slot.project, SlotView::class.java) &&
+                (P::class == SlotView::class || securityService.isProjectFunctionGranted(slot.project, P::class.java))
+    }
+
     private inline fun <reified P : ProjectFunction> checkSlotAccess(slot: Slot) {
         securityService.checkGlobalFunction(EnvironmentList::class.java)
         securityService.checkProjectFunction(slot.project, ProjectView::class.java)
@@ -67,8 +74,13 @@ class SlotServiceImpl(
 
     override fun addAdmissionRuleConfig(slot: Slot, config: SlotAdmissionRuleConfig) {
         checkSlotAccess<SlotUpdate>(slot)
+        // TODO Controls the provided configuration
         slotAdmissionRuleConfigRepository.addAdmissionRuleConfig(slot, config)
     }
+
+    override fun findAdmissionRuleConfigById(id: String): SlotAdmissionRuleConfig? =
+        slotAdmissionRuleConfigRepository.findAdmissionRuleConfigById(id)
+            ?.takeIf { isSlotAccessible<ProjectView>(it.slot) }
 
     override fun getAdmissionRuleConfigs(slot: Slot): List<SlotAdmissionRuleConfig> {
         checkSlotAccess<SlotView>(slot)
