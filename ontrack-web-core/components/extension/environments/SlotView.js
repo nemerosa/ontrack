@@ -78,12 +78,24 @@ export default function SlotView({id}) {
                 <LoadingContainer loading={loading}>
                     <Row gutter={[16, 16]} wrap>
                         <Col span={12}>
-                            <PageSection
-                                title="Slot details"
-                                padding={true}
-                            >
-                                <SlotDetails slot={slot}/>
-                            </PageSection>
+                            <Row gutter={[16, 16]} wrap style={{height: '100%'}}>
+                                <Col span={24}>
+                                    <PageSection
+                                        title="Slot details"
+                                        padding={true}
+                                    >
+                                        <SlotDetails slot={slot}/>
+                                    </PageSection>
+                                </Col>
+                                <Col span={24}>
+                                    <PageSection
+                                        title="Admission rules"
+                                        padding={false}
+                                    >
+                                        <SlotAdmissionRulesTable slot={slot} onChange={reload}/>
+                                    </PageSection>
+                                </Col>
+                            </Row>
                         </Col>
                         <Col span={12}>
                             <PageSection
@@ -91,14 +103,6 @@ export default function SlotView({id}) {
                                 padding={false}
                             >
                                 <SlotEligibleBuildsTable slot={slot} onChange={reload}/>
-                            </PageSection>
-                        </Col>
-                        <Col span={24}>
-                            <PageSection
-                                title="Admission rules"
-                                padding={false}
-                            >
-                                <SlotAdmissionRulesTable slot={slot} onChange={reload}/>
                             </PageSection>
                         </Col>
                         <Col span={24}>
