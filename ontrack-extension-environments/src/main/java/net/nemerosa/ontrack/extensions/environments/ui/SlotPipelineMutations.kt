@@ -65,6 +65,16 @@ class SlotPipelineMutations(
                 )
             }
         },
+        unitMutation(
+            name = "cancelSlotPipeline",
+            description = "Cancelling a pipeline",
+            input = CancelSlotPipelineInput::class,
+        ) { input ->
+            val pipeline = slotService.findPipelineById(input.pipelineId)
+            pipeline?.let {
+                slotService.cancelPipeline(pipeline, input.reason)
+            }
+        },
     )
 }
 
@@ -81,4 +91,9 @@ data class FinishSlotPipelineDeploymentInput(
     val pipelineId: String,
     val forcing: Boolean = false,
     val message: String? = null,
+)
+
+data class CancelSlotPipelineInput(
+    val pipelineId: String,
+    val reason: String,
 )

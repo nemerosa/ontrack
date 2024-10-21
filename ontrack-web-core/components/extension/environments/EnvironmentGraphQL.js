@@ -65,6 +65,10 @@ export const gqlSlotPipelineData = gql`
         start
         end
         status
+        finished
+        lastChange {
+            message
+        }
         build {
             ...SlotPipelineBuildData
         }

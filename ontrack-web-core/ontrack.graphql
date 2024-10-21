@@ -904,6 +904,12 @@ type BulkUpdateValidationStampByIdPayload implements Payload {
     errors: [UserError]
 }
 
+"Output type for the cancelSlotPipeline mutation."
+type CancelSlotPipelinePayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
 "Configuration as code information"
 type CasC {
     "Renders the current settings as JSON"
@@ -3215,6 +3221,11 @@ type Mutation {
         "Input for the mutation"
         input: BulkUpdateValidationStampByIdInput
     ): BulkUpdateValidationStampByIdPayload
+    "Cancelling a pipeline"
+    cancelSlotPipeline(
+        "Input for the mutation"
+        input: CancelSlotPipelineInput
+    ): CancelSlotPipelinePayload
     "Changing the password of the current user"
     changePassword(input: ChangePasswordInput!): ChangePasswordPayload
     "Change the status of a validation run"
@@ -6972,8 +6983,12 @@ type SlotPipeline {
     deploymentStatus: SlotPipelineDeploymentStatus
     "end field"
     end: LocalDateTime
+    "Is the pipeline finished?"
+    finished: Boolean!
     "id field"
     id: String!
+    "Last change having occurred to the pipeline"
+    lastChange: SlotPipelineChange
     "number field"
     number: Int
     "slot field"
@@ -6994,6 +7009,26 @@ type SlotPipelineAdmissionRuleStatus {
     override: Boolean
     "overrideMessage field"
     overrideMessage: String
+    "timestamp field"
+    timestamp: LocalDateTime!
+    "user field"
+    user: String!
+}
+
+"Change happening to a pipeline"
+type SlotPipelineChange {
+    "id field"
+    id: String!
+    "message field"
+    message: String
+    "override field"
+    override: Boolean
+    "overrideMessage field"
+    overrideMessage: String
+    "pipeline field"
+    pipeline: SlotPipeline!
+    "status field"
+    status: SlotPipelineStatus
     "timestamp field"
     timestamp: LocalDateTime!
     "user field"
@@ -8255,6 +8290,14 @@ input CHMLLevel {
     level: CHML!
     "Count to reach to raise this level"
     value: Int!
+}
+
+"Input type for the cancelSlotPipeline mutation."
+input CancelSlotPipelineInput {
+    "pipelineId field"
+    pipelineId: String!
+    "reason field"
+    reason: String!
 }
 
 """
