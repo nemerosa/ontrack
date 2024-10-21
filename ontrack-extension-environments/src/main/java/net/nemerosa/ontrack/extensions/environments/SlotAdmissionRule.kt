@@ -22,11 +22,6 @@ interface SlotAdmissionRule<C, D> {
     val name: String
 
     /**
-     * Name for the rule being configured
-     */
-    fun getConfigName(config: C): String
-
-    /**
      * Parsing a configuration
      */
     fun parseConfig(jsonRuleConfig: JsonNode): C

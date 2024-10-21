@@ -68,10 +68,5 @@ class ValidationSlotAdmissionRule(
         )
     }
 
-    override fun getConfigName(config: ValidationSlotAdmissionRuleConfig): String {
-        TODO("Not yet implemented")
-    }
-
-
     override fun parseData(node: JsonNode): Any = ""
 }

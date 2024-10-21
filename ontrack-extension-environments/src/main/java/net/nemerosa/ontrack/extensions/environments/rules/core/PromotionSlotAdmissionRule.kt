@@ -3,9 +3,7 @@ package net.nemerosa.ontrack.extensions.environments.rules.core
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extensions.environments.*
 import net.nemerosa.ontrack.json.parse
-import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.structure.Build
-import net.nemerosa.ontrack.model.structure.PromotionLevelService
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
 import kotlin.jvm.optionals.getOrNull
@@ -13,8 +11,6 @@ import kotlin.jvm.optionals.getOrNull
 @Component
 class PromotionSlotAdmissionRule(
     private val structureService: StructureService,
-    private val promotionLevelService: PromotionLevelService,
-    private val buildFilterService: BuildFilterService,
 ) : SlotAdmissionRule<PromotionSlotAdmissionRuleConfig, Any> {
 
     companion object {
@@ -63,10 +59,6 @@ class PromotionSlotAdmissionRule(
             "Build promoted",
             "Build not promoted"
         )
-    }
-
-    override fun getConfigName(config: PromotionSlotAdmissionRuleConfig): String {
-        TODO("Not yet implemented")
     }
 
     override fun parseData(node: JsonNode): Any = ""

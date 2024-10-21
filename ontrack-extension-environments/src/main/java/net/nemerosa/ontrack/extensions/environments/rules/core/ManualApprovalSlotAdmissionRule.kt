@@ -60,10 +60,6 @@ class ManualApprovalSlotAdmissionRule(
         }
     }
 
-    override fun getConfigName(config: ManualApprovalSlotAdmissionRuleConfig): String {
-        TODO("Not yet implemented")
-    }
-
     override fun parseData(node: JsonNode): ManualApprovalSlotAdmissionRuleData =
         node.parse()
 

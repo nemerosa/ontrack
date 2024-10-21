@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ingestion.support
 
+@Deprecated("Use common.FilterHelper and extensions instead")
 object FilterHelper {
 
     fun includes(name: String, includes: String, excludes: String): Boolean {

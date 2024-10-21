@@ -36,10 +36,11 @@ class SlotTestSupport : AbstractDSLTestSupport() {
     }
 
     fun withSlotPipeline(
+        branchName: String = uid("B"),
         code: (pipeline: SlotPipeline) -> Unit,
     ) {
         withSlot { slot ->
-            slot.project.branch {
+            slot.project.branch(name = branchName) {
                 build {
                     val pipeline = slotService.startPipeline(slot, this)
                     code(pipeline)
