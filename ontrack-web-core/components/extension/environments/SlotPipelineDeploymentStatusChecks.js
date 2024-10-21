@@ -1,4 +1,4 @@
-import {Table} from "antd";
+import {Table, Typography} from "antd";
 import YesNo from "@components/common/YesNo";
 
 const {Column} = Table
@@ -8,6 +8,9 @@ export default function SlotPipelineDeploymentStatusChecks({checks}) {
         <>
             <Table
                 dataSource={checks}
+                pagination={false}
+                style={{width: '100%'}}
+                title={() => <Typography.Title level={4}>Deployment checks</Typography.Title>}
             >
 
                 <Column

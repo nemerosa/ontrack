@@ -2,18 +2,18 @@ import {Popover} from "antd";
 import {FaInfoCircle} from "react-icons/fa";
 import SlotPipelineDeploymentStatus from "@components/extension/environments/SlotPipelineDeploymentStatus";
 
-export default function SlotPipelineDeploymentStatusButton({deploymentStatus}) {
+export default function SlotPipelineDeploymentStatusButton({pipeline}) {
     return (
         <>
             <Popover
-                title="Deployment Status"
+                title={`Pipeline #${pipeline.number}`}
                 content={
                     <SlotPipelineDeploymentStatus
-                        deploymentStatus={deploymentStatus}
+                        pipeline={pipeline}
                     />
                 }
                 overlayStyle={{
-                    width: '33%',
+                    width: '75%',
                 }}
             >
                 <FaInfoCircle className="ot-action"/>

@@ -62,6 +62,16 @@ class GQLTypeSlotPipeline(
                         slotService.getPipelineChanges(pipeline).firstOrNull()
                     }
             }
+            // All changes
+            .field {
+                it.name("changes")
+                    .description("Changes having occurred to the pipeline")
+                    .type(listType(gqlTypeSlotPipelineChange.typeRef))
+                    .dataFetcher { env ->
+                        val pipeline: SlotPipeline = env.getSource()
+                        slotService.getPipelineChanges(pipeline)
+                    }
+            }
             // OK
             .build()
 }

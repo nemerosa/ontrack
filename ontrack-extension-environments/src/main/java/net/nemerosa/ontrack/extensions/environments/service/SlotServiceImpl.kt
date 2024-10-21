@@ -181,6 +181,18 @@ class SlotServiceImpl(
         val pipeline = SlotPipeline(slot = slot, build = build)
         // Saving the pipeline
         slotPipelineRepository.savePipeline(pipeline)
+        // Saving the initial change
+        slotPipelineChangeRepository.save(
+            SlotPipelineChange(
+                pipeline = pipeline,
+                user = securityService.currentSignature.user.name,
+                timestamp = pipeline.start,
+                status = pipeline.status,
+                message = null,
+                override = false,
+                overrideMessage = null,
+            )
+        )
         // OK
         return pipeline
     }

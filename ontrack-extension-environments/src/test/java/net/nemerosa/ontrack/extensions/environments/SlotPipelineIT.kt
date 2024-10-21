@@ -32,6 +32,11 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
                     val pipelines = slotService.findPipelines(slot).pageItems
                     assertEquals(listOf(pipeline.id), pipelines.map { it.id })
                     assertEquals(listOf(this), pipelines.map { it.build })
+                    // There must be at least one change
+                    val changes = slotService.getPipelineChanges(pipeline)
+                    assertEquals(1, changes.size)
+                    val change = changes.first()
+                    assertEquals(SlotPipelineStatus.ONGOING, change.status)
                 }
             }
         }

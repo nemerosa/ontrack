@@ -1,36 +1,120 @@
-import {Descriptions} from "antd";
+import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import {useEffect, useState} from "react";
+import LoadingContainer from "@components/common/LoadingContainer";
+import {gql} from "graphql-request";
+import {Descriptions, Space} from "antd";
 import YesNo from "@components/common/YesNo";
 import SlotPipelineDeploymentStatusChecks from "@components/extension/environments/SlotPipelineDeploymentStatusChecks";
+import SlotPipelineDeploymentChangeTable from "@components/extension/environments/SlotPipelineDeploymentChangeTable";
+import {gqlSlotPipelineBuildData} from "@components/extension/environments/EnvironmentGraphQL";
+import BuildLink from "@components/builds/BuildLink";
+import PromotionRuns from "@components/promotionRuns/PromotionRuns";
 
-export default function SlotPipelineDeploymentStatus({deploymentStatus}) {
+export default function SlotPipelineDeploymentStatus({pipeline}) {
 
-    const items = [
-        {
-            key: 'status',
-            label: 'Deployable',
-            span: 12,
-            children: <YesNo value={deploymentStatus.status}/>,
-        },
-        {
-            key: 'override',
-            label: 'Overridden',
-            span: 12,
-            children: <YesNo value={deploymentStatus.override}/>,
-        },
-        {
-            key: 'checks',
-            label: 'Checks',
-            span: 12,
-            children: <SlotPipelineDeploymentStatusChecks checks={deploymentStatus.checks}/>,
-        },
-    ]
+    const client = useGraphQLClient()
+
+    const [loading, setLoading] = useState(true)
+    const [items, setItems] = useState([])
+
+    useEffect(() => {
+        if (client && pipeline) {
+            setLoading(true)
+            client.request(
+                gql`
+                    query PipelineInfo($id: String!) {
+                        slotPipelineById(id: $id) {
+                            build {
+                                ...SlotPipelineBuildData
+                            }
+                            deploymentStatus {
+                                status
+                                override
+                                checks {
+                                    check {
+                                        status
+                                        reason
+                                    }
+                                    override {
+                                        override
+                                        overrideMessage
+                                    }
+                                    ruleId
+                                    ruleConfig
+                                    ruleData
+                                }
+                            }
+                            changes {
+                                id
+                                message
+                                status
+                                user
+                                timestamp
+                                override
+                                overrideMessage
+                            }
+                        }
+                    }
+                    ${gqlSlotPipelineBuildData}
+                `,
+                {id: pipeline.id}
+            ).then(data => {
+                const slotPipeline = data.slotPipelineById
+                const items = []
+
+                items.push({
+                    key: 'status',
+                    label: "Deployable",
+                    span: 6,
+                    children: <YesNo value={slotPipeline.deploymentStatus.status}/>,
+                })
+
+                items.push({
+                    key: 'override',
+                    label: "Overridden",
+                    span: 6,
+                    children: <YesNo value={slotPipeline.deploymentStatus.override}/>,
+                })
+
+                items.push({
+                    key: 'build',
+                    label: "Build",
+                    span: 12,
+                    children: <Space>
+                        <BuildLink build={slotPipeline.build}/>
+                        <PromotionRuns promotionRuns={slotPipeline.build.promotionRuns}/>
+                    </Space>,
+                })
+
+                items.push({
+                    key: 'checks',
+                    span: 12,
+                    children: <SlotPipelineDeploymentStatusChecks checks={slotPipeline.deploymentStatus.checks}/>,
+                })
+
+                items.push({
+                    key: 'changes',
+                    span: 12,
+                    children: <SlotPipelineDeploymentChangeTable changes={slotPipeline.changes}/>,
+                })
+
+                setItems(items)
+            }).finally(() => {
+                setLoading(false)
+            })
+        }
+    }, [client, pipeline])
 
     return (
         <>
-            <Descriptions
-                items={items}
-                layout="horizontal"
-            />
+            <LoadingContainer loading={loading}>
+                <Descriptions
+                    loading={loading}
+                    items={items}
+                    column={12}
+                    layout="horizontal"
+                />
+            </LoadingContainer>
         </>
     )
 }

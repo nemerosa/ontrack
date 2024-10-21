@@ -6979,6 +6979,8 @@ type SlotList {
 type SlotPipeline {
     "build field"
     build: Build!
+    "Changes having occurred to the pipeline"
+    changes: [SlotPipelineChange!]!
     "Deployment status for the pipeline"
     deploymentStatus: SlotPipelineDeploymentStatus
     "end field"

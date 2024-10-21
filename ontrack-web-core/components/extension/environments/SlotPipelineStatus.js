@@ -8,7 +8,7 @@ export default function SlotPipelineStatus({pipeline, children}) {
                 {
                     pipeline.status === 'ONGOING' && <>
                         <FaSpinner color="blue"/>
-                        Ongoing
+                        Pending
                     </>
                 }
                 {

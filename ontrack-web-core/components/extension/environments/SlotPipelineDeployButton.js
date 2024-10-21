@@ -4,7 +4,6 @@ import {Button, message, Popconfirm, Space} from "antd";
 import {FaInfoCircle, FaPlay} from "react-icons/fa";
 import LoadingInline from "@components/common/LoadingInline";
 import {gql} from "graphql-request";
-import SlotPipelineDeploymentStatusButton from "@components/extension/environments/SlotPipelineDeploymentStatusButton";
 import {getUserErrors} from "@components/services/graphql-utils";
 
 export default function SlotPipelineDeployButton({pipeline, onDeploy}) {
@@ -139,11 +138,6 @@ export default function SlotPipelineDeployButton({pipeline, onDeploy}) {
                                     loading={deploying}
                                 />
                             </Popconfirm>
-                        }
-                        {
-                            <SlotPipelineDeploymentStatusButton
-                                deploymentStatus={deploymentStatus}
-                            />
                         }
                     </Space>
                 </LoadingInline>
