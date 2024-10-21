@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extensions.environments.rules.core
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extensions.environments.*
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
@@ -59,6 +60,11 @@ class PromotionSlotAdmissionRule(
             "Build promoted",
             "Build not promoted"
         )
+    }
+
+    override fun checkConfig(ruleConfig: JsonNode) {
+        ruleConfig.parseOrNull<PromotionSlotAdmissionRuleConfig>()
+            ?: throw SlotAdmissionRuleConfigException("Cannot parse the rule config")
     }
 
     override fun parseData(node: JsonNode): Any = ""

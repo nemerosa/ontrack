@@ -9680,7 +9680,7 @@ input SaveSlotAdmissionRuleConfigInput {
     "id field"
     id: String
     "name field"
-    name: String!
+    name: String
     "ruleConfig field"
     ruleConfig: JSON!
     "ruleId field"

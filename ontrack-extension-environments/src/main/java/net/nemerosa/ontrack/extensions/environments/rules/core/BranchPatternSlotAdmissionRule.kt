@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.FilterHelper
 import net.nemerosa.ontrack.extensions.environments.*
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.structure.Build
 import org.springframework.stereotype.Component
 
@@ -65,4 +66,9 @@ class BranchPatternSlotAdmissionRule(
         )
 
     override fun parseData(node: JsonNode): Any = ""
+
+    override fun checkConfig(ruleConfig: JsonNode) {
+        ruleConfig.parseOrNull<BranchPatternSlotAdmissionRuleConfig>()
+            ?: throw SlotAdmissionRuleConfigException("Cannot parse the rule config")
+    }
 }

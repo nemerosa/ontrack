@@ -3,19 +3,16 @@ package net.nemerosa.ontrack.extensions.environments.rules.core
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extensions.environments.*
 import net.nemerosa.ontrack.json.parse
-import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
+import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusService
-import net.nemerosa.ontrack.model.structure.ValidationStampService
 import org.springframework.stereotype.Component
 import kotlin.jvm.optionals.getOrNull
 
 @Component
 class ValidationSlotAdmissionRule(
     private val structureService: StructureService,
-    private val validationStampService: ValidationStampService,
-    private val buildFilterService: BuildFilterService,
     private val validationRunStatusService: ValidationRunStatusService,
 ) : SlotAdmissionRule<ValidationSlotAdmissionRuleConfig, Any> {
 
@@ -25,6 +22,11 @@ class ValidationSlotAdmissionRule(
 
     override val id: String = ID
     override val name: String = "Validation"
+
+    override fun checkConfig(ruleConfig: JsonNode) {
+        ruleConfig.parseOrNull<ValidationSlotAdmissionRuleConfig>()
+            ?: throw SlotAdmissionRuleConfigException("Cannot parse the rule config")
+    }
 
     /**
      * Getting builds which have passed

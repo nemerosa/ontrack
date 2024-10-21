@@ -25,7 +25,7 @@ export const useSlotAdmissionRuleConfigDialog = ({onSuccess}) => {
         query: gql`
             mutation SaveAdmissionRuleConfig(
                 $slotId: String!,
-                $name: String!,
+                $name: String,
                 $description: String!,
                 $ruleId: String!,
                 $ruleConfig: JSON!,
@@ -72,12 +72,6 @@ export default function SlotAdmissionRuleConfigDialog({dialog}) {
                 <Form.Item
                     name="name"
                     label="Name"
-                    rules={[
-                        {
-                            required: true,
-                            message: 'Rule name is required.',
-                        },
-                    ]}
                 >
                     <Input/>
                 </Form.Item>

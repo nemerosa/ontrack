@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extensions.environments.ui
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extensions.environments.SlotAdmissionRuleConfig
+import net.nemerosa.ontrack.extensions.environments.rules.SlotAdmissionRuleRegistry
 import net.nemerosa.ontrack.extensions.environments.service.SlotService
 import net.nemerosa.ontrack.graphql.schema.Mutation
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component
 @Component
 class SlotAdmissionRuleConfigMutations(
     private val slotService: SlotService,
+    private val slotAdmissionRuleRegistry: SlotAdmissionRuleRegistry,
 ) : TypedMutationProvider() {
     override val mutations: List<Mutation> = listOf(
         simpleMutation(
@@ -27,11 +29,15 @@ class SlotAdmissionRuleConfigMutations(
                     TODO("Saving the configuration of an existing rule")
                 }
             } else if (!input.slotId.isNullOrBlank()) {
-                // Creation of a new rule
                 val slot = slotService.getSlotById(input.slotId)
+                // Getting the rule
+                val rule = slotAdmissionRuleRegistry.getRule(input.ruleId)
+                // Checking the configuration
+                rule.checkConfig(input.ruleConfig)
+                // Creation of a new rule
                 val config = SlotAdmissionRuleConfig(
                     slot = slot,
-                    name = input.name,
+                    name = input.name?.takeIf { it.isNotBlank() } ?: rule.name,
                     description = input.description,
                     ruleId = input.ruleId,
                     ruleConfig = input.ruleConfig,
@@ -61,7 +67,7 @@ class SlotAdmissionRuleConfigMutations(
 data class SaveSlotAdmissionRuleConfigInput(
     val id: String?,
     val slotId: String?,
-    val name: String,
+    val name: String?,
     val description: String,
     val ruleId: String,
     val ruleConfig: JsonNode,

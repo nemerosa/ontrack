@@ -65,4 +65,9 @@ interface SlotAdmissionRule<C, D> {
      */
     fun checkData(ruleConfig: JsonNode, data: JsonNode) {}
 
+    /**
+     * Checks if the given configuration is valid for the rule
+     */
+    fun checkConfig(ruleConfig: JsonNode)
+
 }

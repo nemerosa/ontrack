@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extensions.environments.rules.core
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extensions.environments.*
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Build
 import org.springframework.stereotype.Component
@@ -58,6 +59,11 @@ class ManualApprovalSlotAdmissionRule(
         } else {
             DeployableCheck.nok("No approval")
         }
+    }
+
+    override fun checkConfig(ruleConfig: JsonNode) {
+        ruleConfig.parseOrNull<ManualApprovalSlotAdmissionRuleConfig>()
+            ?: throw SlotAdmissionRuleConfigException("Cannot parse the rule config")
     }
 
     override fun parseData(node: JsonNode): ManualApprovalSlotAdmissionRuleData =
