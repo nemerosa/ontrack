@@ -13,6 +13,8 @@ import net.nemerosa.ontrack.graphql.support.field
 import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
 import net.nemerosa.ontrack.graphql.support.stringField
+import net.nemerosa.ontrack.model.pagination.PaginatedList
+import net.nemerosa.ontrack.model.structure.Build
 import org.springframework.stereotype.Component
 
 @Component
@@ -48,6 +50,23 @@ class GQLTypeSlot(
                         slotService.getEligibleBuilds(slot, count = 1).firstOrNull()
                     }
             }
+            // Paginated list of eligible builds
+            .field(
+                paginatedListFactory.createPaginatedField<Slot, Build>(
+                    cache = cache,
+                    fieldName = "eligibleBuilds",
+                    fieldDescription = "Paginated list of eligible builds",
+                    itemType = GQLTypeBuild.BUILD,
+                    itemPaginatedListProvider = { _, slot, _, _ ->
+                        // TODO Pagination of eligible builds
+                        PaginatedList.create(
+                            slotService.getEligibleBuilds(slot, count = 10),
+                            offset = 0,
+                            pageSize = 10
+                        )
+                    }
+                )
+            )
             // Current pipeline
             .field {
                 it.name("currentPipeline")

@@ -1,9 +1,58 @@
-import SlotEligibleBuild from "@components/extension/environments/SlotEligibleBuild";
+import {gql} from "graphql-request";
+import {gqlSlotPipelineBuildData} from "@components/extension/environments/EnvironmentGraphQL";
+import StandardTable from "@components/common/table/StandardTable";
+import {Space} from "antd";
+import BuildLink from "@components/builds/BuildLink";
+import PromotionRuns from "@components/promotionRuns/PromotionRuns";
+import {isAuthorized} from "@components/common/authorizations";
+import SlotPipelineCreateButton from "@components/extension/environments/SlotPipelineCreateButton";
 
 export default function SlotEligibleBuildsTable({slot, onChange}) {
     return (
         <>
-            <SlotEligibleBuild slot={slot} onStart={onChange}/>
+            <StandardTable
+                query={
+                    gql`
+                        query SlotEligibleBuilds($id: String!) {
+                            slotById(id: $id) {
+                                eligibleBuilds {
+                                    pageInfo {
+                                        nextPage {
+                                            offset
+                                            size  
+                                        }                                    
+                                    }
+                                    pageItems {
+                                        ...SlotPipelineBuildData
+                                    }
+                                }
+                            }
+                        }
+                        ${gqlSlotPipelineBuildData}
+                    `
+                }
+                variables={{id: slot.id}}
+                queryNode={data => data.slotById.eligibleBuilds}
+                filter={{}}
+                columns={[
+                    {
+                        key: 'build',
+                        title: 'Build',
+                        render: (_, build) => <Space>
+                            <BuildLink build={build}/>
+                            <PromotionRuns promotionRuns={build.promotionRuns}/>
+                            {
+                                isAuthorized(slot, "pipeline", "create") &&
+                                <SlotPipelineCreateButton
+                                    slot={slot}
+                                    build={build}
+                                    onStart={onChange}
+                                />
+                            }
+                        </Space>
+                    }
+                ]}
+            />
         </>
     )
 }

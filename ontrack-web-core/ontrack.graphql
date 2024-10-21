@@ -6912,6 +6912,13 @@ type Slot implements Authorizable {
     description: String
     "Last eligible build for this slot"
     eligibleBuild: Build
+    "Paginated list of eligible builds"
+    eligibleBuilds(
+        "Offset for the page"
+        offset: Int = 0,
+        "Size of the page"
+        size: Int = 20
+    ): BuildPaginated
     "environment field"
     environment: Environment!
     "id field"
