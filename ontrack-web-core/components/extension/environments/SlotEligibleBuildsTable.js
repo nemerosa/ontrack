@@ -15,7 +15,7 @@ export default function SlotEligibleBuildsTable({slot, onChange}) {
                     gql`
                         query SlotEligibleBuilds($id: String!) {
                             slotById(id: $id) {
-                                eligibleBuilds {
+                                eligibleBuilds(size: 5) {
                                     pageInfo {
                                         nextPage {
                                             offset

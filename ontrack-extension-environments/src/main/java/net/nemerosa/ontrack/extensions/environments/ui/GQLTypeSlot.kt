@@ -57,12 +57,12 @@ class GQLTypeSlot(
                     fieldName = "eligibleBuilds",
                     fieldDescription = "Paginated list of eligible builds",
                     itemType = GQLTypeBuild.BUILD,
-                    itemPaginatedListProvider = { _, slot, _, _ ->
+                    itemPaginatedListProvider = { _, slot, _, size ->
                         // TODO Pagination of eligible builds
                         PaginatedList.create(
-                            slotService.getEligibleBuilds(slot, count = 10),
+                            slotService.getEligibleBuilds(slot, count = size),
                             offset = 0,
-                            pageSize = 10
+                            pageSize = size
                         )
                     }
                 )
