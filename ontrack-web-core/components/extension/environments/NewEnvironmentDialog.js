@@ -10,6 +10,12 @@ export function useNewEnvironmentDialog() {
         onSuccess: (env) => {
             eventsContext.fireEvent("environment.created", {id: env.id})
         },
+        prepareValues: (values) => {
+            return {
+                ...values,
+                description: values.description ?? '',
+            }
+        },
         query: gql`
             mutation CreateEnvironment(
                 $name: String!,
@@ -52,10 +58,6 @@ export default function NewEnvironmentDialog({newEnvironmentDialog}) {
                 <Form.Item name="description"
                            label="Description"
                            rules={[
-                               {
-                                   required: true,
-                                   message: 'Environment description is required.',
-                               },
                                {
                                    max: 500,
                                    type: 'string',
