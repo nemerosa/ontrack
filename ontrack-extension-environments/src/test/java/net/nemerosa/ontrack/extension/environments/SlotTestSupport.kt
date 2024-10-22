@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.environments.security.SlotView
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.security.ProjectView
+import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -19,10 +20,11 @@ class SlotTestSupport : AbstractDSLTestSupport() {
     private lateinit var slotService: SlotService
 
     fun withSlot(
+        project: Project = project(),
         qualifier: String = Slot.DEFAULT_QUALIFIER,
         code: (slot: Slot) -> Unit,
     ) {
-        project {
+        asAdmin {
             environmentTestSupport.withEnvironment { env ->
                 val slot = SlotTestFixtures.testSlot(
                     env = env,
@@ -46,6 +48,38 @@ class SlotTestSupport : AbstractDSLTestSupport() {
                     code(pipeline)
                 }
             }
+        }
+    }
+
+    fun createPipeline(
+        branchName: String = uid("B"),
+        slot: Slot
+    ): SlotPipeline =
+        slot.project.branch<SlotPipeline>(name = branchName) {
+            val build = build()
+            slotService.startPipeline(slot, build)
+        }
+
+    fun createStartAndDeployPipeline(
+        branchName: String = uid("B"),
+        slot: Slot
+    ): SlotPipeline =
+        createPipeline(branchName, slot).apply {
+            startAndDeployPipeline(this)
+        }
+
+    fun startAndDeployPipeline(pipeline: SlotPipeline) {
+        slotService.startDeployment(pipeline, dryRun = false)
+        slotService.finishDeployment(pipeline)
+    }
+
+    fun withDeployedSlotPipeline(
+        branchName: String = uid("B"),
+        code: (pipeline: SlotPipeline) -> Unit,
+    ) {
+        withSlotPipeline(branchName = branchName) { pipeline ->
+            startAndDeployPipeline(pipeline)
+            code(pipeline)
         }
     }
 

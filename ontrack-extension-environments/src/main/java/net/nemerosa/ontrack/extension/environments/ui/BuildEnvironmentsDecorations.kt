@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.environments.ui
 
 import net.nemerosa.ontrack.extension.api.DecorationExtension
 import net.nemerosa.ontrack.extension.environments.EnvironmentsExtensionFeature
-import net.nemerosa.ontrack.extension.environments.SlotPipelineStub
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.structure.Build
@@ -16,17 +15,29 @@ import java.util.*
 class BuildEnvironmentsDecorations(
     extensionFeature: EnvironmentsExtensionFeature,
     private val slotService: SlotService,
-) : AbstractExtension(extensionFeature), DecorationExtension<List<SlotPipelineStub>> {
+) : AbstractExtension(extensionFeature), DecorationExtension<List<BuildEnvironmentsDecorationsData>> {
 
-    override fun getDecorations(entity: ProjectEntity): List<Decoration<List<SlotPipelineStub>>> =
+    override fun getDecorations(entity: ProjectEntity): List<Decoration<List<BuildEnvironmentsDecorationsData>>> =
         if (entity is Build) {
-            val stubs: List<SlotPipelineStub> = slotService.findSlotPipelineStubsByBuild(entity)
-            listOf(
-                Decoration.of(
-                    this,
-                    stubs
+            val pipelines = slotService.findLastDeployedSlotPipelinesByBuild(entity)
+            if (pipelines.isNotEmpty()) {
+                listOf(
+                    Decoration.of(
+                        this,
+                        pipelines.map {
+                            BuildEnvironmentsDecorationsData(
+                                environmentId = it.slot.environment.id,
+                                environmentName = it.slot.environment.name,
+                                slotId = it.slot.id,
+                                qualifier = it.slot.qualifier,
+                                pipelineId = it.id,
+                            )
+                        }
+                    )
                 )
-            )
+            } else {
+                emptyList()
+            }
         } else {
             emptyList()
         }

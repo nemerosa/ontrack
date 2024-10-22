@@ -131,4 +131,19 @@ class SlotPipelineRepository(
     fun getPipelineById(id: String): SlotPipeline =
         findPipelineById(id) ?: throw SlotPipelineIdNotFoundException(id)
 
+    fun findLastDeployedPipeline(slot: Slot): SlotPipeline? =
+        namedParameterJdbcTemplate!!.query(
+            """
+                SELECT *
+                FROM ENV_SLOT_PIPELINE
+                WHERE SLOT_ID = :slotId
+                AND STATUS = 'DEPLOYED'
+                ORDER BY NUMBER DESC
+                LIMIT 1
+            """.trimIndent(),
+            mapOf("slotId" to slot.id)
+        ) { rs, _ ->
+            toPipeline(rs)
+        }.firstOrNull()
+
 }

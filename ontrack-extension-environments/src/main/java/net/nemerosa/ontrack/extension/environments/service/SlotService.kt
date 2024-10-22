@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.environments.*
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.Project
 
 interface SlotService {
 
@@ -119,6 +120,23 @@ interface SlotService {
      * Given one build, gets the list of slots where it's actually deployed (ie. the current deployed pipeline
      * on a slot points to the build)
      */
-    fun findSlotPipelineStubsByBuild(build: Build): List<SlotPipelineStub>
+    fun findLastDeployedSlotPipelinesByBuild(build: Build): Set<SlotPipeline>
+
+    /**
+     * Finds all the slots for the given project and optional qualifier.
+     *
+     * @param project Project to get the slots for
+     * @param qualifier If not null, additional filter on the qualifier
+     * @return List of slots
+     */
+    fun findSlotsByProject(project: Project, qualifier: String? = null): Set<Slot>
+
+    /**
+     * Finds the last pipeline of this slot marked as [SlotPipelineStatus.DEPLOYED].
+     *
+     * @param slot Slot where to find the pipeline
+     * @return Last deployed pipeline or `null` if none is present
+     */
+    fun getLastDeployedPipeline(slot: Slot): SlotPipeline?
 
 }

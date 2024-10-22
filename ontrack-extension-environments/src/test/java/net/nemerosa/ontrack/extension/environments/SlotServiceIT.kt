@@ -10,6 +10,7 @@ import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class SlotServiceIT : AbstractDSLTestSupport() {
 
@@ -109,6 +110,165 @@ class SlotServiceIT : AbstractDSLTestSupport() {
                 "Found configured admission rule"
             ) {
                 assertEquals(config, it)
+            }
+        }
+    }
+
+    @Test
+    fun `Finds slots for a given project`() {
+        slotTestSupport.withSlot { other ->
+            project {
+                slotTestSupport.withSlot(
+                    project = project,
+                ) { defaultQualifier ->
+                    slotTestSupport.withSlot(
+                        project = project,
+                        qualifier = "demo",
+                    ) { qualified ->
+                        // Any qualifier
+                        assertEquals(
+                            setOf(defaultQualifier, qualified),
+                            slotService.findSlotsByProject(project)
+                        )
+                        // Default qualifier
+                        assertEquals(
+                            setOf(defaultQualifier),
+                            slotService.findSlotsByProject(project, qualifier = Slot.DEFAULT_QUALIFIER)
+                        )
+                        // Specific qualifier
+                        assertEquals(
+                            setOf(qualified),
+                            slotService.findSlotsByProject(project, qualifier = "demo")
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Getting the last deployed pipeline for a slot when there is no pipeline`() {
+        slotTestSupport.withSlot { slot ->
+            assertNull(
+                slotService.getLastDeployedPipeline(slot),
+                "No deployed pipeline"
+            )
+        }
+    }
+
+    @Test
+    fun `Getting the last deployed pipeline for a slot when where a pipeline is ongoing`() {
+        slotTestSupport.withSlotPipeline { pipeline ->
+            assertNull(
+                slotService.getLastDeployedPipeline(pipeline.slot),
+                "No deployed pipeline"
+            )
+        }
+    }
+
+    @Test
+    fun `Getting the last deployed pipeline for a slot when a pipeline is deployed`() {
+        slotTestSupport.withDeployedSlotPipeline { pipeline ->
+            assertEquals(
+                pipeline.id,
+                slotService.getLastDeployedPipeline(pipeline.slot)?.id,
+                "Getting the deployed pipeline"
+            )
+        }
+    }
+
+    @Test
+    fun `Getting the last deployed pipeline for a slot when where several pipelines are deployed`() {
+        slotTestSupport.withSlot { slot ->
+            /* val pipeline1 = */ slotTestSupport.createStartAndDeployPipeline(slot = slot)
+            val pipeline2 = slotTestSupport.createStartAndDeployPipeline(slot = slot)
+            assertEquals(
+                pipeline2.id,
+                slotService.getLastDeployedPipeline(slot)?.id,
+                "Getting the last deployed pipeline"
+            )
+        }
+    }
+
+    @Test
+    fun `Getting the last deployed pipeline for a slot when where a pipeline is deployed before an ongoing one`() {
+        slotTestSupport.withSlot { slot ->
+            val pipeline1 = slotTestSupport.createStartAndDeployPipeline(slot = slot)
+            /* val pipeline2 = */ slotTestSupport.createPipeline(slot = slot)
+            assertEquals(
+                pipeline1.id,
+                slotService.getLastDeployedPipeline(slot)?.id,
+                "Getting the last deployed pipeline"
+            )
+        }
+    }
+
+    @Test
+    fun `Finding deployed slot pipelines for a build for a very simple case`() {
+        slotTestSupport.withSlotPipeline { pipeline ->
+            // Starting the deployment
+            slotService.startDeployment(pipeline, dryRun = false)
+            // Finishing the deployment
+            slotService.finishDeployment(pipeline)
+            // Getting the pipelines for the build
+            val pipelines = slotService.findLastDeployedSlotPipelinesByBuild(pipeline.build)
+            assertEquals(
+                listOf(
+                    pipeline.id
+                ),
+                pipelines.map { it.id }
+            )
+        }
+    }
+
+    @Test
+    fun `Finds deployed pipelines for a build when new deployment ongoing for other build`() {
+        project {
+            slotTestSupport.withSlot(project = project) { slot ->
+                branch {
+                    val build = build()
+                    val deployedPipeline = slotService.startPipeline(slot, build).apply {
+                        slotTestSupport.startAndDeployPipeline(this)
+                    }
+
+                    val other = build()
+                    slotService.startPipeline(slot, other)
+
+                    val pipelines = slotService.findLastDeployedSlotPipelinesByBuild(build)
+                    assertEquals(
+                        listOf(
+                            deployedPipeline.id
+                        ),
+                        pipelines.map { it.id }
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Finds deployed pipelines for a build with several qualifiers`() {
+        project {
+            slotTestSupport.withSlot(project = project) { defaultSlot ->
+                slotTestSupport.withSlot(project = project, qualifier = "demo") { demoSlot ->
+                    branch {
+                        val build = build()
+                        val defaultPipeline = slotService.startPipeline(defaultSlot, build).apply {
+                            slotTestSupport.startAndDeployPipeline(this)
+                        }
+                        val demoPipeline = slotService.startPipeline(demoSlot, build).apply {
+                            slotTestSupport.startAndDeployPipeline(this)
+                        }
+                        val pipelines = slotService.findLastDeployedSlotPipelinesByBuild(build)
+                        assertEquals(
+                            setOf(
+                                defaultPipeline.id,
+                                demoPipeline.id,
+                            ),
+                            pipelines.map { it.id }.toSet()
+                        )
+                    }
+                }
             }
         }
     }

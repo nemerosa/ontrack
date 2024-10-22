@@ -51,7 +51,7 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
             assertEquals(SlotPipelineStatus.CANCELLED, lastPipeline.status)
             // Gets the changes for this pipeline
             val changes = slotService.getPipelineChanges(lastPipeline)
-            assertEquals(1, changes.size)
+            assertEquals(2, changes.size)
             val change = changes.first()
             assertTrue(change.user.isNotBlank(), "Change user is filled in")
             assertEquals(SlotPipelineStatus.CANCELLED, change.status)

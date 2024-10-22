@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.model.security.ProjectFunction
 import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.Project
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -197,8 +198,33 @@ class SlotServiceImpl(
         return pipeline
     }
 
-    override fun findSlotPipelineStubsByBuild(build: Build): List<SlotPipelineStub> {
-        return slotRepository.findSlotPipelineStubsByBuild(build)
+    override fun findSlotsByProject(project: Project, qualifier: String?): Set<Slot> =
+        slotRepository.findSlotsByProject(project, qualifier).filter {
+            isSlotAccessible<ProjectView>(it)
+        }.toSet()
+
+    override fun getLastDeployedPipeline(slot: Slot): SlotPipeline? =
+        slotPipelineRepository.findLastDeployedPipeline(slot)
+
+    override fun findLastDeployedSlotPipelinesByBuild(build: Build): Set<SlotPipeline> {
+        // Finds the slots for the corresponding project
+        val slots: Set<Slot> = findSlotsByProject(build.project)
+        // For each slot, gets the last DEPLOYED pipeline and uses it
+        // if for the given build
+        val lastDeployedPipelines: List<SlotPipeline> = slots.mapNotNull { slot ->
+            getLastDeployedPipeline(slot)
+        }.filter {
+            // Keeping only the pipelines for the given build
+            it.build.id() == build.id()
+        }
+        // Grouping per qualifier
+        val lastDeployedPipelinesPerQualifier = lastDeployedPipelines.groupBy { it.slot.qualifier }
+        // For each group, gets the pipeline with the highest environment
+        val highestPipelinePerQualifier = lastDeployedPipelinesPerQualifier.map { (qualifier, pipelines) ->
+            qualifier to pipelines.maxBy { it.slot.environment.order }
+        }.toMap()
+        // Returning the pipelines
+        return highestPipelinePerQualifier.values.toSet()
     }
 
     override fun findPipelines(slot: Slot): PaginatedList<SlotPipeline> {
