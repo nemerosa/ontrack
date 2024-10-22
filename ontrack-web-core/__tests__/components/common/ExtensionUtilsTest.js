@@ -2,7 +2,7 @@ import {getExtensionShortName} from "@components/common/ExtensionUtils";
 
 describe('ExtensionUtils', () => {
     it('returns an extension short name based on a long class name', () => {
-        const typeName = 'net.nemerosa.ontrack.extensions.environments.ui.BuildEnvironmentsDecorations'
+        const typeName = 'net.nemerosa.ontrack.extension.environments.ui.BuildEnvironmentsDecorations'
         const shortName = getExtensionShortName(typeName)
         expect(shortName).toEqual('environments.ui.BuildEnvironmentsDecorations')
     })
