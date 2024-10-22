@@ -197,6 +197,10 @@ class SlotServiceImpl(
         return pipeline
     }
 
+    override fun findSlotPipelineStubsByBuild(build: Build): List<SlotPipelineStub> {
+        return slotRepository.findSlotPipelineStubsByBuild(build)
+    }
+
     override fun findPipelines(slot: Slot): PaginatedList<SlotPipeline> {
         checkSlotAccess<SlotView>(slot)
         return slotPipelineRepository.findPipelines(slot)

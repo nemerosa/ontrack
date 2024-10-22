@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extensions.environments.storage
 
 import net.nemerosa.ontrack.extensions.environments.Environment
 import net.nemerosa.ontrack.extensions.environments.Slot
+import net.nemerosa.ontrack.extensions.environments.SlotPipelineStub
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.Project
@@ -125,6 +126,32 @@ class SlotRepository(
         ) { rs, _ ->
             val id = rs.getInt("ID")
             buildJdbcRepositoryAccessor.getBuild(ID.of(id))
+        }
+    }
+
+    fun findSlotPipelineStubsByBuild(build: Build): List<SlotPipelineStub> {
+        return namedParameterJdbcTemplate!!.query(
+            """
+                 SELECT E.ID AS ENV_ID, E.NAME AS ENV_NAME,
+                        S.ID AS SLOT_ID, S.QUALIFIER AS SLOT_QUALIFIER,
+                        P.ID AS PIPELINE_ID, P.STATUS AS PIPELINE_STATUS
+                 FROM BUILDS BD
+                 INNER JOIN BRANCHES B ON B.ID = BD.BRANCHID
+                 INNER JOIN ENV_SLOTS S ON S.PROJECT_ID = B.PROJECTID
+                 INNER JOIN ENVIRONMENTS E ON E.ID = S.ENVIRONMENT_ID
+                 INNER JOIN ENV_SLOT_PIPELINE P ON P.SLOT_ID = S.ID AND P.BUILD_ID = BD.ID
+                 WHERE B.ID = :buildId
+                 AND P.STATUS = 'DEPLOYED' 
+            """,
+            mapOf("buildId" to build.id())
+        ) { rs, _ ->
+            SlotPipelineStub(
+                environmentId = rs.getString("ENV_ID"),
+                environmentName = rs.getString("ENV_NAME"),
+                slotId = rs.getString("SLOT_ID"),
+                qualifier = rs.getString("SLOT_QUALIFIER"),
+                pipelineId = rs.getString("PIPELINE_ID"),
+            )
         }
     }
 

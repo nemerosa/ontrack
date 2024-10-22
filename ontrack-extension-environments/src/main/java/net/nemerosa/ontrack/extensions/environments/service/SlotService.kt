@@ -115,4 +115,10 @@ interface SlotService {
      */
     fun findAdmissionRuleConfigById(id: String): SlotAdmissionRuleConfig?
 
+    /**
+     * Given one build, gets the list of slots where it's actually deployed (ie. the current deployed pipeline
+     * on a slot points to the build)
+     */
+    fun findSlotPipelineStubsByBuild(build: Build): List<SlotPipelineStub>
+
 }

@@ -1,12 +1,10 @@
-import useDynamic from "@components/common/Dynamic";
+import {getExtensionShortName} from "@components/common/ExtensionUtils";
 
 export default function Decoration({decoration}) {
-    const shortTypeName = decoration.decorationType.slice("net.nemerosa.ontrack.extension.".length)
-
-    return useDynamic({
-        path: `framework/decorations/${shortTypeName}`,
-        errorMessage: `Cannot load decoration: ${shortTypeName}`,
-        props: {decoration}
-    })
+    const shortName = getExtensionShortName(decoration.decorationType)
+    // return <Dynamic
+    //     path={`framework/decorations/${shortName}`}
+    //     props={{decoration}}
+    // />
 
 }
