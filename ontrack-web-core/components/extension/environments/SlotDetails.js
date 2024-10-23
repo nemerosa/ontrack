@@ -8,11 +8,7 @@ export default function SlotDetails({slot}) {
             key: 'environment',
             label: 'Environment',
             children: slot.environment.name,
-        },
-        {
-            key: 'description',
-            label: 'Description',
-            children: slot.description,
+            span: 6,
         },
         {
             key: 'project',
@@ -24,12 +20,22 @@ export default function SlotDetails({slot}) {
                     <Typography.Text>[{slot.qualifier}]</Typography.Text>
                 }
             </Space>,
+            span: 6,
         },
     ]
+    if (slot.description) {
+        items.push({
+            key: 'description',
+            label: 'Description',
+            children: slot.description,
+            span: 12,
+        })
+    }
 
     return (
         <>
             <Descriptions
+                column={12}
                 items={items}
             />
         </>

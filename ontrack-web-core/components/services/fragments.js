@@ -9,6 +9,8 @@ export const gqlUserMenuActionFragment = gql`
         extension
         id
         name
+        local
+        arguments
     }
 `
 

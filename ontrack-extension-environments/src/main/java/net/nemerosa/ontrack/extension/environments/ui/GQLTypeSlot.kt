@@ -70,11 +70,21 @@ class GQLTypeSlot(
             // Current pipeline
             .field {
                 it.name("currentPipeline")
-                    .description("Current pipeline active in the slot")
+                    .description("Current pipeline in the slot")
                     .type(gqlTypeSlotPipeline.typeRef)
                     .dataFetcher { env ->
                         val slot: Slot = env.getSource()
                         slotService.getCurrentPipeline(slot)
+                    }
+            }
+            // Last deployed pipeline
+            .field {
+                it.name("lastDeployedPipeline")
+                    .description("Last deployed pipeline in the slot")
+                    .type(gqlTypeSlotPipeline.typeRef)
+                    .dataFetcher { env ->
+                        val slot: Slot = env.getSource()
+                        slotService.getLastDeployedPipeline(slot)
                     }
             }
             // Paginated list of pipelines

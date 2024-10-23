@@ -7,7 +7,12 @@ import {useEffect, useState} from "react";
 import {gql} from "graphql-request";
 import {CloseCommand, Command, LegacyLinkCommand} from "@components/common/Commands";
 import {branchUri, buildLegacyUri, buildLinksUri} from "@components/common/Links";
-import {gqlDecorationFragment, gqlInformationFragment, gqlPropertiesFragment} from "@components/services/fragments";
+import {
+    gqlDecorationFragment,
+    gqlInformationFragment,
+    gqlPropertiesFragment,
+    gqlUserMenuActionFragment
+} from "@components/services/fragments";
 import BuildContent from "@components/builds/BuildContent";
 import {Space} from "antd";
 import Decorations from "@components/framework/decorations/Decorations";
@@ -16,6 +21,7 @@ import {useGraphQLClient} from "@components/providers/ConnectionContextProvider"
 import StoredGridLayoutResetCommand from "@components/grid/StoredGridLayoutResetCommand";
 import StoredGridLayoutContextProvider from "@components/grid/StoredGridLayoutContext";
 import {FaProjectDiagram} from "react-icons/fa";
+import UserMenuActions from "@components/entities/UserMenuActions";
 
 export default function BuildView({id}) {
 
@@ -37,6 +43,9 @@ export default function BuildView({id}) {
                             creation {
                                 user
                                 time
+                            }
+                            userMenuActions {
+                                ...userMenuActionFragment
                             }
                             releaseProperty {
                                 value
@@ -64,13 +73,17 @@ export default function BuildView({id}) {
                     ${gqlDecorationFragment}
                     ${gqlPropertiesFragment}
                     ${gqlInformationFragment}
+                    ${gqlUserMenuActionFragment}
                 `,
                 {id}
             ).then(data => {
                 setBuild(data.build)
                 setLoadingBuild(false)
                 setCommands([
-                    <StoredGridLayoutResetCommand key="reset"/>,
+                    <UserMenuActions
+                        key="tools"
+                        actions={data.build.userMenuActions}
+                    />,
                     <Command
                         key="links"
                         icon={<FaProjectDiagram/>}
@@ -84,6 +97,7 @@ export default function BuildView({id}) {
                         text="Legacy build"
                         title="Goes to the legacy build page"
                     />,
+                    <StoredGridLayoutResetCommand key="reset"/>,
                     <CloseCommand key="close" href={branchUri(data.build.branch)}/>,
                 ])
             })

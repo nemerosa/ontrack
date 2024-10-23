@@ -20,20 +20,20 @@ class SlotTestSupport : AbstractDSLTestSupport() {
     private lateinit var slotService: SlotService
 
     fun withSlot(
+        environment: Environment? = null,
         project: Project = project(),
         qualifier: String = Slot.DEFAULT_QUALIFIER,
         code: (slot: Slot) -> Unit,
     ) {
         asAdmin {
-            environmentTestSupport.withEnvironment { env ->
-                val slot = SlotTestFixtures.testSlot(
-                    env = env,
-                    project = project,
-                    qualifier = qualifier,
-                )
-                slotService.addSlot(slot)
-                code(slot)
-            }
+            val env = environment ?: environmentTestSupport.withEnvironment {}
+            val slot = SlotTestFixtures.testSlot(
+                env = env,
+                project = project,
+                qualifier = qualifier,
+            )
+            slotService.addSlot(slot)
+            code(slot)
         }
     }
 
@@ -94,6 +94,68 @@ class SlotTestSupport : AbstractDSLTestSupport() {
             .withProjectFunction(slot.project, ProjectView::class.java)
         user.call {
             code(user)
+        }
+    }
+
+    fun withSquareSlotsAndOther(
+        code: (
+            project: Project,
+            stagingDefaultSlot: Slot,
+            stagingDemoSlot: Slot,
+            productionDefaultSlot: Slot,
+            productionDemoSlot: Slot,
+            other: Slot
+        ) -> Unit
+    ) {
+        project {
+            environmentTestSupport.withEnvironment { staging ->
+                withSlot(
+                    project = project,
+                    environment = staging
+                ) { stagingDefaultSlot ->
+                    withSlot(
+                        project = project,
+                        environment = staging,
+                        qualifier = "demo"
+                    ) { stagingDemoSlot ->
+                        environmentTestSupport.withEnvironment { production ->
+                            withSlot(
+                                project = project,
+                                environment = production
+                            ) { productionDefaultSlot ->
+                                withSlot(
+                                    project = project,
+                                    environment = production,
+                                    qualifier = "demo"
+                                ) { productionDemoSlot ->
+
+                                    // Only release branches for the production default slot
+                                    slotService.addAdmissionRuleConfig(
+                                        slot = productionDefaultSlot,
+                                        config = SlotAdmissionRuleTestFixtures.testBranchPatternAdmissionRuleConfig(
+                                            productionDefaultSlot
+                                        )
+                                    )
+
+                                    // Whole project altogether
+                                    withSlot { other ->
+
+                                        // Running the code
+                                        code(
+                                            project,
+                                            stagingDefaultSlot,
+                                            stagingDemoSlot,
+                                            productionDefaultSlot,
+                                            productionDemoSlot,
+                                            other,
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 

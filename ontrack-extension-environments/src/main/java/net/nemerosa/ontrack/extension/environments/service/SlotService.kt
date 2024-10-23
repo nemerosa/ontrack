@@ -139,4 +139,10 @@ interface SlotService {
      */
     fun getLastDeployedPipeline(slot: Slot): SlotPipeline?
 
+    /**
+     * Gets a list of slots accessible to the given build (having the same project)
+     * and their eligibility status.
+     */
+    fun getEligibleSlotsForBuild(build: Build): List<EligibleSlot>
+
 }

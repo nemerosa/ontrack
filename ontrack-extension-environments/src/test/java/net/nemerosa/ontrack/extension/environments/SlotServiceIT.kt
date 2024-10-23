@@ -273,4 +273,28 @@ class SlotServiceIT : AbstractDSLTestSupport() {
         }
     }
 
+    @Test
+    fun `Getting a list of eligible slots for a build`() {
+        slotTestSupport.withSquareSlotsAndOther { project, stagingDefaultSlot, stagingDemoSlot, productionDefaultSlot, productionDemoSlot, _ ->
+            // Creating a build on a non-release branch
+            project.branch {
+                build {
+                    // Checking its eligible slots
+                    val eligibleSlots = slotService.getEligibleSlotsForBuild(this)
+                    val index = eligibleSlots.associate {
+                        it.slot.id to it.eligible
+                    }
+                    assertEquals(
+                        mapOf(
+                            stagingDefaultSlot.id to true,
+                            stagingDemoSlot.id to true,
+                            productionDefaultSlot.id to false,
+                            productionDemoSlot.id to true,
+                        ),
+                        index
+                    )
+                }
+            }
+        }
+    }
 }

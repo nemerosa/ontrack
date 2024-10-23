@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.model.support
 
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.model.extension.ExtensionFeature
 
 /**
@@ -10,16 +11,22 @@ data class UserMenuItem(
     val extension: String,
     val id: String,
     val name: String,
+    val local: Boolean = false,
+    val arguments: JsonNode? = null,
 ) {
     constructor(
         groupId: String,
         extension: ExtensionFeature,
         id: String,
         name: String,
+        local: Boolean = false,
+        arguments: JsonNode? = null,
     ) : this(
         groupId = groupId,
         extension = "extension/${extension.id}",
         id = id,
         name = name,
+        local = local,
+        arguments = arguments,
     )
 }

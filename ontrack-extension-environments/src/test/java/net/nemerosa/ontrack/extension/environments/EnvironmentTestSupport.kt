@@ -14,11 +14,12 @@ class EnvironmentTestSupport : AbstractDSLTestSupport() {
     fun withEnvironment(
         env: Environment = EnvironmentTestFixtures.testEnvironment(),
         code: (env: Environment) -> Unit
-    ) {
+    ): Environment {
         asAdmin {
             environmentService.save(env)
         }
         code(env)
+        return env
     }
 
 }

@@ -1802,6 +1802,14 @@ type DisableSubscriptionPayload implements Payload {
     subscription: EventSubscriptionPayload
 }
 
+"Association of a slot with its eligibility"
+type EligibleSlot {
+    "eligible field"
+    eligible: Boolean
+    "slot field"
+    slot: Slot!
+}
+
 "Output type for the enableAccount mutation."
 type EnableAccountPayload implements Payload {
     "Updated account"
@@ -5374,6 +5382,11 @@ type Query {
     ): [Configuration!]!
     "List of available widgets"
     dashboardWidgets: [Widget!]!
+    "Getting the eligible slots for a build"
+    eligibleSlotsForBuild(
+        "ID of the build"
+        buildId: Int
+    ): [EligibleSlot!]!
     "Getting a project entity using its type and ID."
     entity(
         "ID of the entity"
@@ -6917,7 +6930,7 @@ type Slot implements Authorizable {
     admissionRules: [SlotAdmissionRuleConfig!]!
     "Authorizations for this context"
     authorizations: [Authorization!]!
-    "Current pipeline active in the slot"
+    "Current pipeline in the slot"
     currentPipeline: SlotPipeline
     "description field"
     description: String
@@ -6934,6 +6947,8 @@ type Slot implements Authorizable {
     environment: Environment!
     "id field"
     id: String!
+    "Last deployed pipeline in the slot"
+    lastDeployedPipeline: SlotPipeline
     "Paginated list of pipelines"
     pipelines(
         "Offset for the page"
@@ -7339,12 +7354,16 @@ type UserError {
 
 "Item in the user menu"
 type UserMenuAction {
+    "Arguments for a local function"
+    arguments: JSON
     "Extension contributing this user menu item"
     extension: String!
     "ID of the group this item belongs to"
     groupId: String!
     "Unique ID for this user menu item in the given extension"
     id: String!
+    "Local function to call, not a link"
+    local: Boolean
     "Display name for this user menu item"
     name: String!
 }

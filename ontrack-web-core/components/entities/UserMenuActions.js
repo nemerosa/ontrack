@@ -3,6 +3,7 @@ import {Button, Dropdown, Space, Typography} from "antd";
 import {FaCogs} from "react-icons/fa";
 import UserMenuItemLink from "@components/layouts/UserMenuItemLink";
 import {groupIcons} from "@components/layouts/UserMenu";
+import UserMenuActionLocal from "@components/entities/UserMenuActionLocal";
 
 export default function UserMenuActions({actions}) {
 
@@ -14,7 +15,7 @@ export default function UserMenuActions({actions}) {
                 actions.map(action => ({
                     key: `${action.extension}-${action.id}`,
                     icon: groupIcons[action.groupId],
-                    label: <UserMenuItemLink item={action}/>,
+                    label: action.local ? <UserMenuActionLocal item={action}/> : <UserMenuItemLink item={action}/>,
                 }))
             )
         }

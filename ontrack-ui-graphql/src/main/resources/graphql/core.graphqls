@@ -58,6 +58,10 @@ type UserMenuAction {
     id: String!
     """Display name for this user menu item"""
     name: String!
+    """Local function to call, not a link"""
+    local: Boolean
+    """Arguments for a local function"""
+    arguments: JSON
 }
 
 extend type Query {

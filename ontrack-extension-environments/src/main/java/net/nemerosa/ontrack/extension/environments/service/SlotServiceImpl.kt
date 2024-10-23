@@ -206,6 +206,14 @@ class SlotServiceImpl(
     override fun getLastDeployedPipeline(slot: Slot): SlotPipeline? =
         slotPipelineRepository.findLastDeployedPipeline(slot)
 
+    override fun getEligibleSlotsForBuild(build: Build): List<EligibleSlot> =
+        slotRepository.findSlotsByProject(build.project, qualifier = null).map { slot ->
+            EligibleSlot(
+                slot = slot,
+                eligible = isBuildEligible(slot, build),
+            )
+        }
+
     override fun findLastDeployedSlotPipelinesByBuild(build: Build): Set<SlotPipeline> {
         // Finds the slots for the corresponding project
         val slots: Set<Slot> = findSlotsByProject(build.project)
