@@ -93,6 +93,7 @@ export class SlotDialog {
             await this.page.getByLabel('Environments').type(environmentName)
             await this.page.getByLabel('Environments').press('Enter')
         }
+        await this.page.getByLabel('Environments').press('Escape')
     }
 
     async ok() {
