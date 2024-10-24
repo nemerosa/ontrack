@@ -1,7 +1,7 @@
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {useEffect, useState} from "react";
 import {Button, message, Popconfirm, Space} from "antd";
-import {FaBan, FaPlay} from "react-icons/fa";
+import {FaPlay} from "react-icons/fa";
 import LoadingInline from "@components/common/LoadingInline";
 import {gql} from "graphql-request";
 import {getUserErrors} from "@components/services/graphql-utils";
@@ -117,14 +117,6 @@ export default function SlotPipelineDeployButton({pipeline, onDeploy}) {
                 deploymentStatus &&
                 <LoadingInline loading={loadingDeployable} text="">
                     <Space>
-                        {
-                            pipeline.status === 'ONGOING' && !deploymentStatus.status &&
-                            <Button
-                                icon={<FaBan color="orange"/>}
-                                title="Cannot deploy this pipeline. Checks the deployment checks information."
-                                loading={loadingDeployable}
-                            />
-                        }
                         {
                             pipeline.status === 'ONGOING' && deploymentStatus.status &&
                             <Popconfirm

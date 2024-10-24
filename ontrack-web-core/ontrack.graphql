@@ -7080,8 +7080,22 @@ type SlotPipelineDeploymentStatus {
     checks: [SlotPipelineDeploymentCheck!]!
     "override field"
     override: Boolean
+    "progress field"
+    progress: SlotPipelineDeploymentStatusProgress!
     "status field"
     status: Boolean
+}
+
+"Progress for a deployment status"
+type SlotPipelineDeploymentStatusProgress {
+    "ok field"
+    ok: Int
+    "overridden field"
+    overridden: Boolean
+    "percentage field"
+    percentage: Int
+    "total field"
+    total: Int
 }
 
 type SlotPipelinePaginated {

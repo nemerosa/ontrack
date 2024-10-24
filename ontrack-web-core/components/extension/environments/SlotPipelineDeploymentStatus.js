@@ -77,9 +77,10 @@ export default function SlotPipelineDeploymentStatus({pipeline}) {
                     label: 'Status',
                     children: <SlotPipelineStatusActions
                         pipeline={pipeline}
-                        info={false}
+                        info={true}
+                        linkInfo={false}
                         actions={true}
-                        // TODO Refreshes the page
+                        // TODO Refreshes the page on change
                     />,
                     span: 4,
                 })

@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.environments.SlotPipelineDeploymentStatus
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.booleanField
+import net.nemerosa.ontrack.graphql.support.field
 import net.nemerosa.ontrack.graphql.support.listField
 import org.springframework.stereotype.Component
 
@@ -20,5 +21,6 @@ class GQLTypeSlotPipelineDeploymentStatus : GQLType {
             .listField(SlotPipelineDeploymentStatus::checks)
             .booleanField(SlotPipelineDeploymentStatus::status)
             .booleanField(SlotPipelineDeploymentStatus::override)
+            .field(SlotPipelineDeploymentStatus::progress)
             .build()
 }
