@@ -6,7 +6,11 @@ import MainPage from "@components/layouts/MainPage";
 import LoadingContainer from "@components/common/LoadingContainer";
 import {gql} from "graphql-request";
 import {gqlEnvironmentData, gqlSlotData} from "@components/extension/environments/EnvironmentGraphQL";
-import {environmentsBreadcrumbs, environmentsUri} from "@components/extension/environments/EnvironmentsLinksUtils";
+import {
+    environmentsBreadcrumbs,
+    environmentsUri,
+    slotTitle
+} from "@components/extension/environments/EnvironmentsLinksUtils";
 import {CloseCommand} from "@components/common/Commands";
 import {Col, Row} from "antd";
 import SlotDetails from "@components/extension/environments/SlotDetails";
@@ -52,11 +56,7 @@ export default function SlotView({id}) {
             ).then(data => {
                 const slot = data.slotById;
                 setSlot(slot)
-                let title = `Slot ${slot.environment.name} - ${slot.project.name}`
-                if (slot.qualifier) {
-                    title += ` [${slot.qualifier}]`
-                }
-                setTitle(title)
+                setTitle(slotTitle(slot))
             }).finally(() => {
                 setLoading(false)
             })

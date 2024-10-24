@@ -1,23 +1,13 @@
-import {Popover} from "antd";
 import {FaInfoCircle} from "react-icons/fa";
-import SlotPipelineDeploymentStatus from "@components/extension/environments/SlotPipelineDeploymentStatus";
+import Link from "next/link";
+import {slotPipelineUri} from "@components/extension/environments/EnvironmentsLinksUtils";
 
 export default function SlotPipelineDeploymentStatusButton({pipeline}) {
     return (
         <>
-            <Popover
-                title={`Pipeline #${pipeline.number}`}
-                content={
-                    <SlotPipelineDeploymentStatus
-                        pipeline={pipeline}
-                    />
-                }
-                overlayStyle={{
-                    width: '75%',
-                }}
-            >
+            <Link href={slotPipelineUri(pipeline.id)} title={`Pipeline #${pipeline.number} details`}>
                 <FaInfoCircle className="ot-action"/>
-            </Popover>
+            </Link>
         </>
     )
 }

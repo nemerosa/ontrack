@@ -9,6 +9,8 @@ import SlotPipelineDeploymentChangeTable from "@components/extension/environment
 import {gqlSlotPipelineBuildData} from "@components/extension/environments/EnvironmentGraphQL";
 import BuildLink from "@components/builds/BuildLink";
 import PromotionRuns from "@components/promotionRuns/PromotionRuns";
+import SlotPipelineStatusActions from "@components/extension/environments/SlotPipelineStatusActions";
+import TimestampText from "@components/common/TimestampText";
 
 export default function SlotPipelineDeploymentStatus({pipeline}) {
 
@@ -27,6 +29,9 @@ export default function SlotPipelineDeploymentStatus({pipeline}) {
                             build {
                                 ...SlotPipelineBuildData
                             }
+                            status
+                            start
+                            end
                             deploymentStatus {
                                 status
                                 override
@@ -65,28 +70,58 @@ export default function SlotPipelineDeploymentStatus({pipeline}) {
                 const slotPipeline = data.slotPipelineById
                 const items = []
 
+                const span = pipeline.end ? 3 : 4
+
                 items.push({
                     key: 'status',
+                    label: 'Status',
+                    children: <SlotPipelineStatusActions
+                        pipeline={pipeline}
+                        info={false}
+                        actions={true}
+                        // TODO Refreshes the page
+                    />,
+                    span: 4,
+                })
+
+                items.push({
+                    key: 'build',
+                    label: "Build",
+                    span: 8,
+                    children: <Space>
+                        <BuildLink build={slotPipeline.build}/>
+                        <PromotionRuns promotionRuns={slotPipeline.build.promotionRuns}/>
+                    </Space>,
+                })
+
+                items.push({
+                    key: 'start',
+                    label: 'Started at',
+                    children: <TimestampText value={pipeline.start}/>,
+                    span: span,
+                })
+
+                if (pipeline.end) {
+                    items.push({
+                        key: 'end',
+                        label: 'Ended at',
+                        children: <TimestampText value={pipeline.end}/>,
+                        span: span,
+                    })
+                }
+
+                items.push({
+                    key: 'deployable',
                     label: "Deployable",
-                    span: 6,
+                    span: span,
                     children: <YesNo value={slotPipeline.deploymentStatus.status}/>,
                 })
 
                 items.push({
                     key: 'override',
                     label: "Overridden",
-                    span: 6,
+                    span: span,
                     children: <YesNo value={slotPipeline.deploymentStatus.override}/>,
-                })
-
-                items.push({
-                    key: 'build',
-                    label: "Build",
-                    span: 12,
-                    children: <Space>
-                        <BuildLink build={slotPipeline.build}/>
-                        <PromotionRuns promotionRuns={slotPipeline.build.promotionRuns}/>
-                    </Space>,
                 })
 
                 items.push({

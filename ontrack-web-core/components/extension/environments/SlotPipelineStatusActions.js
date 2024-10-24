@@ -5,13 +5,16 @@ import SlotPipelineCancelButton from "@components/extension/environments/SlotPip
 import {Typography} from "antd";
 import SlotPipelineDeploymentStatusButton from "@components/extension/environments/SlotPipelineDeploymentStatusButton";
 
-export default function SlotPipelineStatusActions({pipeline, actions = true, onChange}) {
+export default function SlotPipelineStatusActions({pipeline, info = true, actions = true, onChange}) {
     return (
         <>
             <SlotPipelineStatus pipeline={pipeline}>
-                <SlotPipelineDeploymentStatusButton
-                    pipeline={pipeline}
-                />
+                {
+                    info &&
+                    <SlotPipelineDeploymentStatusButton
+                        pipeline={pipeline}
+                    />
+                }
                 {
                     actions && <>
                         <SlotPipelineDeployButton pipeline={pipeline} onDeploy={onChange}/>

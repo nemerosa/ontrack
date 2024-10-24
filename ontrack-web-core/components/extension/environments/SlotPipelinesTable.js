@@ -7,6 +7,8 @@ import PromotionRuns from "@components/promotionRuns/PromotionRuns";
 import TimestampText from "@components/common/TimestampText";
 import SlotPipelineStatusActions from "@components/extension/environments/SlotPipelineStatusActions";
 import {useReloadState} from "@components/common/StateUtils";
+import Link from "next/link";
+import {slotPipelineUri} from "@components/extension/environments/EnvironmentsLinksUtils";
 
 export default function SlotPipelinesTable({slot}) {
 
@@ -45,7 +47,7 @@ export default function SlotPipelinesTable({slot}) {
                     {
                         key: 'number',
                         title: 'Number',
-                        render: (_, item) => `#${item.number}`,
+                        render: (_, item) => <Link href={slotPipelineUri(item.id)}>{`#${item.number}`}</Link>,
                     },
                     {
                         key: 'build',
