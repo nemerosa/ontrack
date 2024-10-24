@@ -38,6 +38,9 @@ export default function SlotPipelineDeploymentStatus({pipeline}) {
                                     override {
                                         override
                                         overrideMessage
+                                        user
+                                        timestamp
+                                        data
                                     }
                                     ruleId
                                     ruleConfig
