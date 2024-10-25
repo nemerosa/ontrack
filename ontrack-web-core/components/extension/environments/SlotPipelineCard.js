@@ -52,6 +52,7 @@ export default function SlotPipelineCard({pipeline, actions = true, titlePrefix,
         <>
             <Card
                 title={fullCardTitle(titlePrefix, `Pipeline #${pipeline.number}`)}
+                size="small"
             >
                 <Descriptions
                     items={items}

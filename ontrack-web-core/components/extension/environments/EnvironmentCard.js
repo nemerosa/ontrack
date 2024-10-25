@@ -7,6 +7,7 @@ export default function EnvironmentCard({environment}) {
                 style={{
                     height: '100%',
                 }}
+                size="small"
                 data-testid={`environment-${environment.id}`}
                 title={environment.name}
                 extra={
