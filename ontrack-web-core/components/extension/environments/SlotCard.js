@@ -17,6 +17,7 @@ export default function SlotCard({slot}) {
                 style={{
                     height: '100%',
                 }}
+                size="small"
                 title={<SlotTitle slot={slot}/>}
                 extra={
                     <Link href={slotUri(slot)} title="Slot details and configuration">
@@ -31,13 +32,13 @@ export default function SlotCard({slot}) {
                             <Divider type="horizontal"/>
                         </>
                     }
-                    <SlotEligibleBuild
-                        slot={slot}
-                        onStart={onSlotStateChanged}
-                    />
                     <SlotCurrentPipeline
                         slot={slot}
                         slotState={slotState}
+                    />
+                    <SlotEligibleBuild
+                        slot={slot}
+                        onStart={onSlotStateChanged}
                     />
                 </Space>
             </Card>

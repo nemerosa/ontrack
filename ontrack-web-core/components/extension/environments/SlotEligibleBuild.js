@@ -48,7 +48,7 @@ export default function SlotEligibleBuild({slot, onStart}) {
 
     return (
         <>
-            <Card loading={loading}>
+            <Card loading={loading} size="small" hoverable={true}>
                 {
                     build &&
                     <Space>
