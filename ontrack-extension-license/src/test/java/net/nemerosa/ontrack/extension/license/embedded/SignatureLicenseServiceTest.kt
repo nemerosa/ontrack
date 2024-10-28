@@ -17,7 +17,7 @@ class SignatureLicenseServiceTest {
     fun `No license content provided`() {
         val service = EmbeddedLicenseService(
             EmbeddedLicenseConfigurationProperties().apply {
-                license = null
+                key = null
             }
         )
         assertFailsWith<SignatureLicenseException> {
@@ -29,7 +29,7 @@ class SignatureLicenseServiceTest {
     fun `License OK`() {
         val service = EmbeddedLicenseService(
             EmbeddedLicenseConfigurationProperties().apply {
-                license =
+                key =
                     "eyJkYXRhIjoiZXlKdVlXMWxJam9pVUhKbGJXbDFiU0lzSW1GemMybG5ibVZsSWpvaVRtVnRaWEp2YzJFaUxDSjJZV3hwWkZWdWRHbHNJanB1ZFd4c0xDSnRZWGhRY205cVpXTjBjeUk2TUN3aVptVmhkSFZ5WlhNaU9sc2laWGgwWlc1emFXOXVMbVZ1ZG1seWIyNXRaVzUwY3lKZGZRPT0iLCJzaWduYXR1cmUiOiJNRVlDSVFEeUxkUFhBL1k0RjdzR0V1V3RUN3laa0gzQnVMMWZ6S0hRV3hnRDJVSm12UUloQU1seXFxblZkdXpPcEx6VVVyV1N5anNqNU1LVE9WYlRSdTFCam9jZXlqRWUifQ=="
             }
         )

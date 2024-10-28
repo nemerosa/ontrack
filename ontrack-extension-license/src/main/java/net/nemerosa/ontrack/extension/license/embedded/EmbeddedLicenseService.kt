@@ -16,5 +16,5 @@ class EmbeddedLicenseService(
 ) : AbstractSignatureLicenseService() {
 
     override val licenseType: String = "Embedded"
-    override val encodedLicense: String? = embeddedLicenseConfigurationProperties.license
+    override val encodedLicense: String? = embeddedLicenseConfigurationProperties.key
 }

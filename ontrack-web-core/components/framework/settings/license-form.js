@@ -6,16 +6,8 @@ export default function LicenseForm({id, ...values}) {
         <>
             <SettingsForm id={id} values={values}>
                 <Form.Item
-                    name="license"
-                    label="License"
-                    extra="License key"
-                >
-                    <Input.TextArea/>
-                </Form.Item>
-                <Form.Item
-                    name="signature"
-                    label="Signature"
-                    extra="Signature key"
+                    name="key"
+                    label="License key"
                 >
                     <Input.TextArea/>
                 </Form.Item>

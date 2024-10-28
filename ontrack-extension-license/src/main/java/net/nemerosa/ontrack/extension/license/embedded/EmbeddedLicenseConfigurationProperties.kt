@@ -6,5 +6,5 @@ import org.springframework.stereotype.Component
 @ConfigurationProperties(prefix = "ontrack.config.license.embedded")
 @Component
 class EmbeddedLicenseConfigurationProperties {
-    var license: String? = null
+    var key: String? = null
 }

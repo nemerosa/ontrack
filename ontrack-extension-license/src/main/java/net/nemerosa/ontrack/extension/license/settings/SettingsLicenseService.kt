@@ -19,6 +19,6 @@ class SettingsLicenseService(
     override val licenseType: String = "Settings"
 
     override val encodedLicense: String?
-        get() = cachedSettingsService.getCachedSettings(LicenseSettings::class.java).license
+        get() = cachedSettingsService.getCachedSettings(LicenseSettings::class.java).key
 
 }

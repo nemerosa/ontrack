@@ -27,7 +27,7 @@ class LicenseSettingsManager(
 ) {
 
     override fun doSaveSettings(settings: LicenseSettings) {
-        settingsRepository.setString<LicenseSettings>(settings::license)
+        settingsRepository.setString<LicenseSettings>(settings::key)
     }
 
     override fun getId(): String = "license"
@@ -37,6 +37,6 @@ class LicenseSettingsManager(
     @Deprecated("Deprecated in Java")
     override fun getSettingsForm(settings: LicenseSettings): Form =
         Form.create()
-            .memoField(LicenseSettings::license, settings.license)
+            .memoField(LicenseSettings::key, settings.key)
 
 }
