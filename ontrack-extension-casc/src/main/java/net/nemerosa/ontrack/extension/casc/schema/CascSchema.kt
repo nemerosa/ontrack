@@ -4,13 +4,16 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.casc.CascContext
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APIIgnore
+import net.nemerosa.ontrack.model.annotations.getPropertyDescription
 import net.nemerosa.ontrack.model.annotations.getPropertyName
 import java.time.Duration
+import kotlin.jvm.internal.Reflection
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.full.memberProperties
+import kotlin.reflect.jvm.javaType
 import kotlin.reflect.jvm.jvmErasure
 
 sealed class CascType(
@@ -46,7 +49,7 @@ class CascJson : CascType("JSON type") {
     override val __type: String = "JSON"
 }
 
-class CascDuration: CascType("Duration") {
+class CascDuration : CascType("Duration") {
     override val __type: String = "Duration"
 }
 
@@ -181,9 +184,28 @@ internal fun cascFieldType(property: KProperty<*>): CascType =
             Long::class -> cascLong
             JsonNode::class -> cascJson
             Duration::class -> cascDuration
+            List::class -> cascArray(property)
             else -> error("Cannot get CasC type for $property")
         }
     }
+
+private fun cascArray(property: KProperty<*>): CascType {
+    val listArguments = property.returnType.arguments
+    return if (listArguments.size == 1) {
+        val elementType = listArguments.first().type?.javaType
+        if (elementType is Class<*>) {
+            val kotlinClass = Reflection.createKotlinClass(elementType)
+            cascArray(
+                description = getPropertyDescription(property),
+                type = cascObject(kotlinClass)
+            )
+        } else {
+            error("Only list with typed elements are supported for $property")
+        }
+    } else {
+        error("No argument found for the list type $property")
+    }
+}
 
 private fun cascPropertyType(property: KProperty<*>): CascType {
     val propertyType = property.findAnnotation<CascPropertyType>()
