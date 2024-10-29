@@ -8,7 +8,9 @@ class EnvironmentsCascModelTest {
     @Test
     fun `Casc type`() {
         val context = EnvironmentsCascContext(
-            environmentService = mockk()
+            environmentService = mockk(),
+            structureService = mockk(),
+            slotService = mockk(),
         )
         val type = context.type
         println(type)

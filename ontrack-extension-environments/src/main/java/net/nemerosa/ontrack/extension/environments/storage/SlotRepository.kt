@@ -115,6 +115,25 @@ class SlotRepository(
         }
     }
 
+    fun findSlotByProjectAndEnvironment(environment: Environment, project: Project, qualifier: String): Slot? =
+        namedParameterJdbcTemplate!!.query(
+            """
+                SELECT *
+                FROM ENV_SLOTS
+                WHERE ENVIRONMENT_ID = :environmentId
+                AND PROJECT_ID = :projectId
+                AND QUALIFIER = :qualifier
+            """,
+            mapOf(
+                "environmentId" to environment.id,
+                "projectId" to project.id(),
+                "qualifier" to qualifier,
+            ),
+        ) { rs, _ ->
+            toSlot(rs)
+        }.firstOrNull()
+
+
     fun getEligibleBuilds(
         slot: Slot,
         queries: List<String>,

@@ -31,6 +31,23 @@ class SlotAdmissionRuleConfigRepository(
         )
     }
 
+    fun saveAdmissionRuleConfig(config: SlotAdmissionRuleConfig) {
+        namedParameterJdbcTemplate!!.update(
+            """
+                UPDATE ENV_SLOT_ADMISSION_RULE_CONFIGS
+                SET RULE_CONFIG = CAST(:ruleConfig AS JSONB), DESCRIPTION = :description
+                WHERE ID = :id
+                AND SLOT_ID = :slotId
+            """,
+            mapOf(
+                "id" to config.id,
+                "slotId" to config.slot.id,
+                "description" to config.description,
+                "ruleConfig" to writeJson(config.ruleConfig),
+            )
+        )
+    }
+
     fun getAdmissionRuleConfigs(slot: Slot): List<SlotAdmissionRuleConfig> =
         namedParameterJdbcTemplate!!.query(
             """

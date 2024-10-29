@@ -79,6 +79,12 @@ class SlotServiceImpl(
         slotAdmissionRuleConfigRepository.addAdmissionRuleConfig(slot, config)
     }
 
+    override fun saveAdmissionRuleConfig(config: SlotAdmissionRuleConfig) {
+        checkSlotAccess<SlotUpdate>(config.slot)
+        // TODO Controls the provided configuration
+        slotAdmissionRuleConfigRepository.saveAdmissionRuleConfig(config)
+    }
+
     override fun findAdmissionRuleConfigById(id: String): SlotAdmissionRuleConfig? =
         slotAdmissionRuleConfigRepository.findAdmissionRuleConfigById(id)
             ?.takeIf { isSlotAccessible<ProjectView>(it.slot) }
@@ -213,6 +219,9 @@ class SlotServiceImpl(
                 eligible = isBuildEligible(slot, build),
             )
         }
+
+    override fun findSlotByProjectAndEnvironment(environment: Environment, project: Project, qualifier: String): Slot? =
+        slotRepository.findSlotByProjectAndEnvironment(environment, project, qualifier)
 
     override fun findLastDeployedSlotPipelinesByBuild(build: Build): Set<SlotPipeline> {
         // Finds the slots for the corresponding project

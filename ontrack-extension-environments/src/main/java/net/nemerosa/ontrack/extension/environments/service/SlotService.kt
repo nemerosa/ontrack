@@ -29,6 +29,11 @@ interface SlotService {
     fun addAdmissionRuleConfig(slot: Slot, config: SlotAdmissionRuleConfig)
 
     /**
+     * Saves an existing configured slot admission rule
+     */
+    fun saveAdmissionRuleConfig(config: SlotAdmissionRuleConfig)
+
+    /**
      * List of configured admission rules for a slot
      */
     fun getAdmissionRuleConfigs(slot: Slot): List<SlotAdmissionRuleConfig>
@@ -130,6 +135,16 @@ interface SlotService {
      * @return List of slots
      */
     fun findSlotsByProject(project: Project, qualifier: String? = null): Set<Slot>
+
+    /**
+     * Finds all the slots for the given project, qualifier and environment.
+     *
+     * @param environment Environment
+     * @param project Project to get the slots for
+     * @param qualifier Qualifier
+     * @return List of slots
+     */
+    fun findSlotByProjectAndEnvironment(environment: Environment, project: Project, qualifier: String): Slot?
 
     /**
      * Finds the last pipeline of this slot marked as [SlotPipelineStatus.DEPLOYED].

@@ -2,13 +2,15 @@ package net.nemerosa.ontrack.extension.environments.casc
 
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.extension.environments.Environment
+import net.nemerosa.ontrack.extension.environments.Slot
+import net.nemerosa.ontrack.extension.environments.SlotAdmissionRuleTestFixtures
+import net.nemerosa.ontrack.extension.environments.SlotTestSupport
 import net.nemerosa.ontrack.extension.environments.service.EnvironmentService
+import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.json.asJson
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
+import kotlin.test.*
 
 class EnvironmentsCascContextIT : AbstractCascTestSupport() {
 
@@ -16,7 +18,13 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
     private lateinit var environmentService: EnvironmentService
 
     @Autowired
+    private lateinit var slotService: SlotService
+
+    @Autowired
     private lateinit var environmentsCascContext: EnvironmentsCascContext
+
+    @Autowired
+    private lateinit var slotTestSupport: SlotTestSupport
 
     @Test
     fun `Defining environments keeps existing environments by default`() {
@@ -144,10 +152,311 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                             "order" to 200,
                             "tags" to listOf("release"),
                         ),
-                    )
+                    ),
+                    "slots" to emptyList<String>(),
                 ).asJson(),
                 json
             )
+        }
+    }
+
+    @Test
+    fun `Defining slots and rules with existing projects`() {
+        asAdmin {
+            deleteAllEnvironments()
+            val project = project { }
+            casc(
+                """
+                    ontrack:
+                        config:
+                            environments:
+                                environments:
+                                    - name: staging
+                                      description: Repetition environment
+                                      order: 100
+                                      tags:
+                                        - release
+                                    - name: production
+                                      order: 200
+                                      tags:
+                                        - release
+                                slots:
+                                    - project: ${project.name}
+                                      environments:
+                                        - name: staging
+                                          admissionRules:
+                                            - ruleId: promotion
+                                              ruleConfig:
+                                                promotion: SILVER
+                                        - name: production
+                                          admissionRules:
+                                            - ruleId: promotion
+                                              ruleConfig:
+                                                promotion: GOLD
+                                            - ruleId: branchPattern
+                                              ruleConfig:
+                                                includes:
+                                                  - "release-.*"
+                                    - project: ${project.name}
+                                      qualifier: demo
+                                      environments:
+                                        - name: staging
+                                          admissionRules:
+                                            - ruleId: promotion
+                                              ruleConfig:
+                                                promotion: SILVER
+                                        - name: production
+                                          admissionRules:
+                                            - ruleId: promotion
+                                              ruleConfig:
+                                                promotion: GOLD
+                                            - name: releaseOnly
+                                              ruleId: branchPattern
+                                              ruleConfig:
+                                                includes:
+                                                  - "release-.*"
+                """.trimIndent()
+            )
+            val staging = environmentService.findByName("staging") ?: fail("Staging not found")
+            val production = environmentService.findByName("production") ?: fail("Production not found")
+            assertNotNull(slotService.findSlotByProjectAndEnvironment(staging, project, Slot.DEFAULT_QUALIFIER)) {
+                val rules = slotService.getAdmissionRuleConfigs(it)
+                assertEquals(
+                    mapOf(
+                        "promotion" to mapOf(
+                            "ruleId" to "promotion",
+                            "ruleConfig" to mapOf(
+                                "promotion" to "SILVER"
+                            ).asJson()
+                        )
+                    ),
+                    rules.associate { rule ->
+                        rule.name to mapOf(
+                            "ruleId" to rule.ruleId,
+                            "ruleConfig" to rule.ruleConfig,
+                        )
+                    }
+                )
+            }
+            assertNotNull(slotService.findSlotByProjectAndEnvironment(staging, project, "demo")) {
+                val rules = slotService.getAdmissionRuleConfigs(it)
+                assertEquals(
+                    mapOf(
+                        "promotion" to mapOf(
+                            "ruleId" to "promotion",
+                            "ruleConfig" to mapOf(
+                                "promotion" to "SILVER"
+                            ).asJson()
+                        )
+                    ),
+                    rules.associate { rule ->
+                        rule.name to mapOf(
+                            "ruleId" to rule.ruleId,
+                            "ruleConfig" to rule.ruleConfig,
+                        )
+                    }
+                )
+            }
+            assertNotNull(slotService.findSlotByProjectAndEnvironment(production, project, Slot.DEFAULT_QUALIFIER)) {
+                val rules = slotService.getAdmissionRuleConfigs(it)
+                assertEquals(
+                    mapOf(
+                        "promotion" to mapOf(
+                            "ruleId" to "promotion",
+                            "ruleConfig" to mapOf(
+                                "promotion" to "GOLD"
+                            ).asJson()
+                        ),
+                        "branchPattern" to mapOf(
+                            "ruleId" to "branchPattern",
+                            "ruleConfig" to mapOf(
+                                "includes" to listOf("release-.*"),
+                            ).asJson()
+                        ),
+                    ),
+                    rules.associate { rule ->
+                        rule.name to mapOf(
+                            "ruleId" to rule.ruleId,
+                            "ruleConfig" to rule.ruleConfig,
+                        )
+                    }
+                )
+            }
+            assertNotNull(slotService.findSlotByProjectAndEnvironment(production, project, "demo")) {
+                val rules = slotService.getAdmissionRuleConfigs(it)
+                assertEquals(
+                    mapOf(
+                        "promotion" to mapOf(
+                            "ruleId" to "promotion",
+                            "ruleConfig" to mapOf(
+                                "promotion" to "GOLD"
+                            ).asJson()
+                        ),
+                        "releaseOnly" to mapOf(
+                            "ruleId" to "branchPattern",
+                            "ruleConfig" to mapOf(
+                                "includes" to listOf("release-.*"),
+                            ).asJson()
+                        ),
+                    ),
+                    rules.associate { rule ->
+                        rule.name to mapOf(
+                            "ruleId" to rule.ruleId,
+                            "ruleConfig" to rule.ruleConfig,
+                        )
+                    }
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Rendering of slot and admission rules`() {
+        asAdmin {
+            deleteAllEnvironments()
+            slotTestSupport.withSlot(qualifier = "demo") { slot ->
+                val rule = SlotAdmissionRuleTestFixtures.testPromotionAdmissionRuleConfig(
+                    slot = slot,
+                    promotion = "GOLD"
+                )
+                slotService.addAdmissionRuleConfig(
+                    slot = slot,
+                    config = rule
+                )
+                val json = environmentsCascContext.render()
+                assertEquals(
+                    mapOf(
+                        "keepEnvironments" to true,
+                        "environments" to listOf(
+                            mapOf(
+                                "name" to slot.environment.name,
+                                "description" to "",
+                                "order" to slot.environment.order,
+                                "tags" to slot.environment.tags,
+                            ),
+                        ),
+                        "slots" to listOf(
+                            mapOf(
+                                "project" to slot.project.name,
+                                "qualifier" to "demo",
+                                "description" to "",
+                                "environments" to listOf(
+                                    mapOf(
+                                        "name" to slot.environment.name,
+                                        "admissionRules" to listOf(
+                                            mapOf(
+                                                "name" to rule.name,
+                                                "description" to "",
+                                                "ruleId" to rule.ruleId,
+                                                "ruleConfig" to rule.ruleConfig,
+                                            )
+                                        )
+                                    )
+                                ),
+                            )
+                        ),
+                    ).asJson(),
+                    json
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Deleting unconfigured admission rules`() {
+        asAdmin {
+            deleteAllEnvironments()
+            slotTestSupport.withSlot(qualifier = "demo") { slot ->
+                val rule = SlotAdmissionRuleTestFixtures.testPromotionAdmissionRuleConfig(
+                    slot = slot,
+                    promotion = "GOLD"
+                )
+                slotService.addAdmissionRuleConfig(
+                    slot = slot,
+                    config = rule
+                )
+                casc(
+                    """
+                        ontrack:
+                            config:
+                                environments:
+                                    environments:
+                                        - name: ${slot.environment.name}
+                                          order: ${slot.environment.order}
+                                    slots:
+                                        - project: ${slot.project.name}
+                                          qualifier: demo
+                                          environments:
+                                            - name: ${slot.environment.name}
+                                              admissionRules: []
+                    """.trimIndent()
+                )
+                // Checks that the admission rule is gone
+                val newRules = slotService.getAdmissionRuleConfigs(slot)
+                assertTrue(
+                    newRules.isEmpty(),
+                    "Admission rule is gone"
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Idempotency of admission rules`() {
+        asAdmin {
+            deleteAllEnvironments()
+            val project = project { }
+            val cascYaml =
+                """
+                    ontrack:
+                        config:
+                            environments:
+                                environments:
+                                    - name: production
+                                      order: 200
+                                      tags:
+                                        - release
+                                slots:
+                                    - project: ${project.name}
+                                      environments:
+                                        - name: production
+                                          admissionRules:
+                                            - ruleId: promotion
+                                              ruleConfig:
+                                                promotion: GOLD
+                                            - ruleId: branchPattern
+                                              ruleConfig:
+                                                includes:
+                                                  - "release-.*"
+                """.trimIndent()
+            casc(cascYaml)
+            casc(cascYaml) // Twice
+            val production = environmentService.findByName("production") ?: fail("Production not found")
+            assertNotNull(slotService.findSlotByProjectAndEnvironment(production, project, Slot.DEFAULT_QUALIFIER)) {
+                val rules = slotService.getAdmissionRuleConfigs(it)
+                assertEquals(
+                    mapOf(
+                        "promotion" to mapOf(
+                            "ruleId" to "promotion",
+                            "ruleConfig" to mapOf(
+                                "promotion" to "GOLD"
+                            ).asJson()
+                        ),
+                        "branchPattern" to mapOf(
+                            "ruleId" to "branchPattern",
+                            "ruleConfig" to mapOf(
+                                "includes" to listOf("release-.*"),
+                            ).asJson()
+                        ),
+                    ),
+                    rules.associate { rule ->
+                        rule.name to mapOf(
+                            "ruleId" to rule.ruleId,
+                            "ruleConfig" to rule.ruleConfig,
+                        )
+                    }
+                )
+            }
         }
     }
 
