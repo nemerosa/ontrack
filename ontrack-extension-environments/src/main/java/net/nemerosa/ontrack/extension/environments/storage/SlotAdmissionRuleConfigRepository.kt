@@ -14,7 +14,7 @@ class SlotAdmissionRuleConfigRepository(
     private val slotRepository: SlotRepository,
 ) : AbstractJdbcRepository(dataSource) {
 
-    fun addAdmissionRuleConfig(slot: Slot, config: SlotAdmissionRuleConfig) {
+    fun addAdmissionRuleConfig(config: SlotAdmissionRuleConfig) {
         namedParameterJdbcTemplate!!.update(
             """
                  INSERT INTO ENV_SLOT_ADMISSION_RULE_CONFIGS(ID, SLOT_ID, NAME, DESCRIPTION, RULE_ID, RULE_CONFIG)
@@ -22,7 +22,7 @@ class SlotAdmissionRuleConfigRepository(
             """,
             mapOf(
                 "id" to config.id,
-                "slotId" to slot.id,
+                "slotId" to config.slot.id,
                 "name" to config.name,
                 "description" to config.description,
                 "ruleId" to config.ruleId,
@@ -35,12 +35,13 @@ class SlotAdmissionRuleConfigRepository(
         namedParameterJdbcTemplate!!.update(
             """
                 UPDATE ENV_SLOT_ADMISSION_RULE_CONFIGS
-                SET RULE_CONFIG = CAST(:ruleConfig AS JSONB), DESCRIPTION = :description
+                SET NAME = :name, RULE_CONFIG = CAST(:ruleConfig AS JSONB), DESCRIPTION = :description
                 WHERE ID = :id
                 AND SLOT_ID = :slotId
             """,
             mapOf(
                 "id" to config.id,
+                "name" to config.name,
                 "slotId" to config.slot.id,
                 "description" to config.description,
                 "ruleConfig" to writeJson(config.ruleConfig),

@@ -43,7 +43,6 @@ class SlotAdmissionRuleConfigGraphQLIT : AbstractQLKTITSupport() {
         slotTestSupport.withSlot { slot ->
             val config = SlotAdmissionRuleTestFixtures.testPromotionAdmissionRuleConfig(slot)
             slotService.addAdmissionRuleConfig(
-                slot = slot,
                 config = config,
             )
             run(

@@ -1,9 +1,12 @@
 package net.nemerosa.ontrack.extension.environments
 
+import net.nemerosa.ontrack.extension.environments.rules.core.PromotionSlotAdmissionRuleConfig
+import net.nemerosa.ontrack.extension.environments.service.SlotAdmissionRuleConfigNameFormatException
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.extension.environments.storage.SlotAlreadyDefinedException
 import net.nemerosa.ontrack.extension.environments.storage.SlotIdAlreadyExistsException
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.json.asJson
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.util.*
@@ -102,7 +105,6 @@ class SlotServiceIT : AbstractDSLTestSupport() {
         slotTestSupport.withSlot { slot ->
             val config = SlotAdmissionRuleTestFixtures.testPromotionAdmissionRuleConfig(slot)
             slotService.addAdmissionRuleConfig(
-                slot = slot,
                 config = config,
             )
             assertNotNull(
@@ -294,6 +296,22 @@ class SlotServiceIT : AbstractDSLTestSupport() {
                         index
                     )
                 }
+            }
+        }
+    }
+
+    @Test
+    fun `Slot admission rule names must be normalized`() {
+        slotTestSupport.withSlot { slot ->
+            val rule = SlotAdmissionRuleConfig(
+                slot = slot,
+                name = "Not a good name",
+                description = "",
+                ruleId = "promotion",
+                ruleConfig = PromotionSlotAdmissionRuleConfig(promotion = "GOLD").asJson(),
+            )
+            assertFailsWith<SlotAdmissionRuleConfigNameFormatException> {
+                slotService.addAdmissionRuleConfig(rule)
             }
         }
     }

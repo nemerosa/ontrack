@@ -136,7 +136,6 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
         slotTestSupport.withSlotPipeline { pipeline ->
             /* val pl = */ pipeline.build.branch.promotionLevel("GOLD")
             slotService.addAdmissionRuleConfig(
-                slot = pipeline.slot,
                 config = SlotAdmissionRuleTestFixtures.testPromotionAdmissionRuleConfig(pipeline.slot),
             )
             run(
@@ -200,7 +199,6 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
         slotTestSupport.withSlotPipeline { pipeline ->
             val pl = pipeline.build.branch.promotionLevel("GOLD")
             slotService.addAdmissionRuleConfig(
-                slot = pipeline.slot,
                 config = SlotAdmissionRuleTestFixtures.testPromotionAdmissionRuleConfig(pipeline.slot),
             )
             pipeline.build.promote(pl)
@@ -266,7 +264,6 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
             /* val pl = */ pipeline.build.branch.promotionLevel("GOLD")
             val admissionRuleConfig = SlotAdmissionRuleTestFixtures.testPromotionAdmissionRuleConfig(pipeline.slot)
             slotService.addAdmissionRuleConfig(
-                slot = pipeline.slot,
                 config = admissionRuleConfig,
             )
             slotService.overrideAdmissionRule(

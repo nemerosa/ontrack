@@ -132,7 +132,6 @@ class SlotTestSupport : AbstractDSLTestSupport() {
 
                                     // Only release branches for the production default slot
                                     slotService.addAdmissionRuleConfig(
-                                        slot = productionDefaultSlot,
                                         config = SlotAdmissionRuleTestFixtures.testBranchPatternAdmissionRuleConfig(
                                             productionDefaultSlot
                                         )

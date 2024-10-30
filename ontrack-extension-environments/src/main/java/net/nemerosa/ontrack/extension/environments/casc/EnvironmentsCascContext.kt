@@ -89,7 +89,6 @@ class EnvironmentsCascContext(
             }
             onCreation { a ->
                 slotService.addAdmissionRuleConfig(
-                    slot = slot,
                     config = SlotAdmissionRuleConfig(
                         slot = slot,
                         name = a.actualName,

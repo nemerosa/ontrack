@@ -43,7 +43,6 @@ class SlotAdmissionRuleConfigMutations(
                     ruleConfig = input.ruleConfig,
                 )
                 slotService.addAdmissionRuleConfig(
-                    slot = slot,
                     config = config
                 )
                 config

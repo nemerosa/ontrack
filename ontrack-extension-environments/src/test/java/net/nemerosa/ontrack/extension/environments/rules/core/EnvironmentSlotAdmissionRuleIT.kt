@@ -25,7 +25,6 @@ class EnvironmentSlotAdmissionRuleIT : AbstractDSLTestSupport() {
         slotTestSupport.withSlot { previousSlot ->
             slotTestSupport.withSlot(project = previousSlot.project) { slot ->
                 slotService.addAdmissionRuleConfig(
-                    slot = slot,
                     config = SlotAdmissionRuleTestFixtures.testEnvironmentAdmissionRuleConfig(
                         slot,
                         previousSlot
@@ -47,7 +46,6 @@ class EnvironmentSlotAdmissionRuleIT : AbstractDSLTestSupport() {
         slotTestSupport.withSlot(qualifier = "demo") { previousSlot ->
             slotTestSupport.withSlot(project = previousSlot.project, qualifier = "demo") { slot ->
                 slotService.addAdmissionRuleConfig(
-                    slot = slot,
                     config = SlotAdmissionRuleTestFixtures.testEnvironmentAdmissionRuleConfig(
                         slot,
                         previousSlot
@@ -70,7 +68,6 @@ class EnvironmentSlotAdmissionRuleIT : AbstractDSLTestSupport() {
             // Different project
             slotTestSupport.withSlot { slot ->
                 slotService.addAdmissionRuleConfig(
-                    slot = slot,
                     config = SlotAdmissionRuleTestFixtures.testEnvironmentAdmissionRuleConfig(
                         slot,
                         previousSlot
@@ -92,7 +89,6 @@ class EnvironmentSlotAdmissionRuleIT : AbstractDSLTestSupport() {
         slotTestSupport.withSlot(/* default qualifier */) { previousSlot ->
             slotTestSupport.withSlot(project = previousSlot.project, qualifier = "demo") { slot ->
                 slotService.addAdmissionRuleConfig(
-                    slot = slot,
                     config = SlotAdmissionRuleTestFixtures.testEnvironmentAdmissionRuleConfig(
                         slot,
                         previousSlot,
@@ -152,7 +148,6 @@ class EnvironmentSlotAdmissionRuleIT : AbstractDSLTestSupport() {
         slotTestSupport.withSlot { previousSlot ->
             slotTestSupport.withSlot(project = previousSlot.project) { slot ->
                 slotService.addAdmissionRuleConfig(
-                    slot = slot,
                     config = SlotAdmissionRuleTestFixtures.testEnvironmentAdmissionRuleConfig(
                         slot,
                         previousSlot
@@ -177,7 +172,6 @@ class EnvironmentSlotAdmissionRuleIT : AbstractDSLTestSupport() {
             // Different project
             slotTestSupport.withSlot { slot ->
                 slotService.addAdmissionRuleConfig(
-                    slot = slot,
                     config = SlotAdmissionRuleTestFixtures.testEnvironmentAdmissionRuleConfig(
                         slot,
                         previousSlot
@@ -217,7 +211,6 @@ class EnvironmentSlotAdmissionRuleIT : AbstractDSLTestSupport() {
             }
             slotTestSupport.withSlot(project = previousPipeline.build.project, qualifier = qualifier) { slot ->
                 slotService.addAdmissionRuleConfig(
-                    slot = slot,
                     config = SlotAdmissionRuleTestFixtures.testEnvironmentAdmissionRuleConfig(
                         slot,
                         previousPipeline.slot,

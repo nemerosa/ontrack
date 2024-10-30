@@ -75,10 +75,9 @@ class BranchPatternSlotAdmissionRuleIT : AbstractDSLTestSupport() {
     fun `List of eligible builds based on branch pattern`() {
         slotTestSupport.withSlot { slot ->
             slotService.addAdmissionRuleConfig(
-                slot = slot,
                 config = SlotAdmissionRuleConfig(
                     slot = slot,
-                    name = "Only release branches",
+                    name = "releaseBranches",
                     description = null,
                     ruleId = BranchPatternSlotAdmissionRule.ID,
                     ruleConfig = BranchPatternSlotAdmissionRuleConfig(
@@ -111,10 +110,9 @@ class BranchPatternSlotAdmissionRuleIT : AbstractDSLTestSupport() {
     fun `Deployability is the same as eligibility for the branch pattern, positive test`() {
         slotTestSupport.withSlotPipeline(branchName = "release-1.31") { pipeline ->
             slotService.addAdmissionRuleConfig(
-                slot = pipeline.slot,
                 config = SlotAdmissionRuleConfig(
                     slot = pipeline.slot,
-                    name = "Only release branches",
+                    name = "releaseBranches",
                     description = null,
                     ruleId = BranchPatternSlotAdmissionRule.ID,
                     ruleConfig = BranchPatternSlotAdmissionRuleConfig(
@@ -135,10 +133,9 @@ class BranchPatternSlotAdmissionRuleIT : AbstractDSLTestSupport() {
     fun `Deployability is the same as eligibility for the branch pattern, negative test`() {
         slotTestSupport.withSlotPipeline(branchName = "release-1.31") { pipeline ->
             slotService.addAdmissionRuleConfig(
-                slot = pipeline.slot,
                 config = SlotAdmissionRuleConfig(
                     slot = pipeline.slot,
-                    name = "Only release branches",
+                    name = "releaseBranches",
                     description = null,
                     ruleId = BranchPatternSlotAdmissionRule.ID,
                     ruleConfig = BranchPatternSlotAdmissionRuleConfig(

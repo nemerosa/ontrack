@@ -73,14 +73,18 @@ class SlotServiceImpl(
             emptyList()
         }
 
-    override fun addAdmissionRuleConfig(slot: Slot, config: SlotAdmissionRuleConfig) {
-        checkSlotAccess<SlotUpdate>(slot)
+    override fun addAdmissionRuleConfig(config: SlotAdmissionRuleConfig) {
+        checkSlotAccess<SlotUpdate>(config.slot)
+        // Controls the name
+        config.checkName()
         // TODO Controls the provided configuration
-        slotAdmissionRuleConfigRepository.addAdmissionRuleConfig(slot, config)
+        slotAdmissionRuleConfigRepository.addAdmissionRuleConfig(config)
     }
 
     override fun saveAdmissionRuleConfig(config: SlotAdmissionRuleConfig) {
         checkSlotAccess<SlotUpdate>(config.slot)
+        // Controls the name
+        config.checkName()
         // TODO Controls the provided configuration
         slotAdmissionRuleConfigRepository.saveAdmissionRuleConfig(config)
     }

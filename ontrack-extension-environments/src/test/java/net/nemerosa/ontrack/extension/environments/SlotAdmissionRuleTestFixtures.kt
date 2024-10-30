@@ -19,7 +19,7 @@ object SlotAdmissionRuleTestFixtures {
 
     fun testBranchPatternAdmissionRuleConfig(
         slot: Slot,
-        name: String = "Release branches only",
+        name: String = "releaseBranchesOnly",
         includes: List<String> = listOf("release-.*"),
     ) = SlotAdmissionRuleConfig(
         slot = slot,
@@ -37,7 +37,7 @@ object SlotAdmissionRuleTestFixtures {
         qualifier: String? = null,
     ) = SlotAdmissionRuleConfig(
         slot = slot,
-        name = "",
+        name = "environment",
         description = null,
         ruleId = EnvironmentSlotAdmissionRule.ID,
         ruleConfig = EnvironmentSlotAdmissionRuleConfig(

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.environments
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.extension.environments.service.SlotAdmissionRuleConfigNameFormatException
 import java.util.*
 
 /**
@@ -31,4 +32,20 @@ data class SlotAdmissionRuleConfig(
         ruleId = ruleId,
         ruleConfig = ruleConfig
     )
+
+    fun checkName() {
+        checkRuleName(name)
+    }
+
+    companion object {
+
+        const val PATTERN = "^[a-zA-Z][a-zA-Z0-9-]*\$"
+        private val regex = PATTERN.toRegex()
+
+        fun checkRuleName(name: String) {
+            if (!regex.matches(name)) {
+                throw SlotAdmissionRuleConfigNameFormatException(name)
+            }
+        }
+    }
 }

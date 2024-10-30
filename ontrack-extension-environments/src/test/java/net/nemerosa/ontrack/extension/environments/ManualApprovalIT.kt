@@ -113,13 +113,12 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
             )
             val admissionRuleConfig = SlotAdmissionRuleConfig(
                 slot = pipeline.slot,
-                name = "Manual approval",
+                name = "manualApproval",
                 description = "Manual approval is required",
                 ruleId = net.nemerosa.ontrack.extension.environments.rules.core.ManualApprovalSlotAdmissionRule.ID,
                 ruleConfig = ruleConfig.asJson()
             )
             slotService.addAdmissionRuleConfig(
-                pipeline.slot,
                 admissionRuleConfig
             )
 

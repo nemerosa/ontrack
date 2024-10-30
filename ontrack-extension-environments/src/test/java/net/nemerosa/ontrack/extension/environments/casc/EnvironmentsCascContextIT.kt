@@ -320,7 +320,6 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                     promotion = "GOLD"
                 )
                 slotService.addAdmissionRuleConfig(
-                    slot = slot,
                     config = rule
                 )
                 val json = environmentsCascContext.render()
@@ -372,7 +371,6 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                     promotion = "GOLD"
                 )
                 slotService.addAdmissionRuleConfig(
-                    slot = slot,
                     config = rule
                 )
                 casc(

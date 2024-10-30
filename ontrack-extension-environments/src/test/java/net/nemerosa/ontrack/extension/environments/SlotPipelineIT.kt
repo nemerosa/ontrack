@@ -65,7 +65,6 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
             // Adds a promotion rule to the slot
             val pl = pipeline.build.branch.promotionLevel(name = "GOLD")
             slotService.addAdmissionRuleConfig(
-                slot = pipeline.slot,
                 config = SlotAdmissionRuleTestFixtures.testPromotionAdmissionRuleConfig(pipeline.slot),
             )
             // Build not promoted yet, pipeline is not deployable
@@ -90,10 +89,9 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
             // Adds a promotion rule to the slot
             val pl = pipeline.build.branch.promotionLevel(name = "GOLD")
             slotService.addAdmissionRuleConfig(
-                slot = pipeline.slot,
                 config = SlotAdmissionRuleConfig(
                     slot = pipeline.slot,
-                    name = "Promotion to GOLD",
+                    name = "GoldPromotion",
                     description = null,
                     ruleId = PromotionSlotAdmissionRule.ID,
                     ruleConfig = PromotionSlotAdmissionRuleConfig(promotion = pl.name).asJson(),
@@ -102,10 +100,9 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
             // Adds a validation rule to the slot
             val vs = pipeline.build.branch.validationStamp(name = "ready")
             slotService.addAdmissionRuleConfig(
-                slot = pipeline.slot,
                 config = SlotAdmissionRuleConfig(
                     slot = pipeline.slot,
-                    name = "Validation to ready",
+                    name = "ValidationReady",
                     description = null,
                     ruleId = ValidationSlotAdmissionRule.ID,
                     ruleConfig = ValidationSlotAdmissionRuleConfig(validation = vs.name).asJson(),
@@ -239,13 +236,12 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
             val pl = pipeline.build.branch.promotionLevel(name = "GOLD")
             val admissionRuleConfig = SlotAdmissionRuleConfig(
                 slot = pipeline.slot,
-                name = "Promotion to GOLD",
+                name = "GoldPromotion",
                 description = null,
                 ruleId = PromotionSlotAdmissionRule.ID,
                 ruleConfig = PromotionSlotAdmissionRuleConfig(promotion = pl.name).asJson(),
             )
             slotService.addAdmissionRuleConfig(
-                slot = pipeline.slot,
                 config = admissionRuleConfig,
             )
             // By default, we cannot mark the build for deployment because rule is not complete

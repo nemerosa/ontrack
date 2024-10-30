@@ -26,7 +26,7 @@ interface SlotService {
     /**
      * Adds a configured slot admission rule to a slot
      */
-    fun addAdmissionRuleConfig(slot: Slot, config: SlotAdmissionRuleConfig)
+    fun addAdmissionRuleConfig(config: SlotAdmissionRuleConfig)
 
     /**
      * Saves an existing configured slot admission rule
