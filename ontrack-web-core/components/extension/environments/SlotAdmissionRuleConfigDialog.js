@@ -83,7 +83,7 @@ export default function SlotAdmissionRuleConfigDialog({dialog}) {
                 </Form.Item>
                 <Form.Item
                     name="ruleId"
-                    label="Rule"
+                    label="Rule configuration"
                     rules={[
                         {
                             required: true,

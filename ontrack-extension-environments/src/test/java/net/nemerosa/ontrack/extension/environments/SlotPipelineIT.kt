@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.extension.environments
 
-import net.nemerosa.ontrack.extension.environments.rules.core.PromotionSlotAdmissionRule
-import net.nemerosa.ontrack.extension.environments.rules.core.PromotionSlotAdmissionRuleConfig
-import net.nemerosa.ontrack.extension.environments.rules.core.ValidationSlotAdmissionRule
-import net.nemerosa.ontrack.extension.environments.rules.core.ValidationSlotAdmissionRuleConfig
+import com.fasterxml.jackson.databind.node.BooleanNode
+import com.fasterxml.jackson.databind.node.TextNode
+import net.nemerosa.ontrack.extension.environments.rules.core.*
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parse
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
@@ -284,6 +284,85 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
                 assertNotNull(slotService.findPipelineById(pipeline2.id)) {
                     assertEquals(SlotPipelineStatus.ONGOING, it.status)
                 }
+            }
+        }
+    }
+
+    @Test
+    fun `Getting a list of needed inputs for a pipeline`() {
+        slotTestSupport.withSlotPipeline { pipeline ->
+            val config = SlotAdmissionRuleTestFixtures.testManualApprovalRuleConfig(pipeline.slot)
+            slotService.addAdmissionRuleConfig(
+                config
+            )
+            val inputs = slotService.getRequiredInputs(pipeline)
+            assertEquals(
+                listOf(
+                    SlotAdmissionRuleInput(
+                        config = config,
+                        fields = listOf(
+                            SlotAdmissionRuleInputField(
+                                type = SlotAdmissionRuleInputFieldType.BOOLEAN,
+                                name = "approval",
+                                label = "Approval",
+                                value = null,
+                            ),
+                            SlotAdmissionRuleInputField(
+                                type = SlotAdmissionRuleInputFieldType.TEXT,
+                                name = "message",
+                                label = "Approval message",
+                                value = null,
+                            ),
+                        )
+                    )
+                ),
+                inputs,
+            )
+        }
+    }
+
+    @Test
+    fun `Updating the data for a pipeline`() {
+        slotTestSupport.withSlotPipeline { pipeline ->
+            val config = SlotAdmissionRuleTestFixtures.testManualApprovalRuleConfig(pipeline.slot)
+            slotService.addAdmissionRuleConfig(config)
+
+            assertFalse(slotService.getRequiredInputs(pipeline).isEmpty(), "Pipeline requires some input")
+
+            slotService.updatePipelineData(
+                pipeline = pipeline,
+                inputs = listOf(
+                    SlotPipelineDataInput(
+                        name = config.name,
+                        values = listOf(
+                            SlotPipelineDataInputValue(
+                                name = "approval",
+                                value = BooleanNode.TRUE,
+                            ),
+                            SlotPipelineDataInputValue(
+                                name = "message",
+                                value = TextNode.valueOf("OK for me"),
+                            )
+                        )
+                    )
+                )
+            )
+
+            assertTrue(slotService.getRequiredInputs(pipeline).isEmpty(), "Pipeline doesn't require inputs any longer")
+
+            val ruleStatus =
+                slotService.getPipelineAdmissionRuleStatuses(pipeline)
+                    .find { it.admissionRuleConfig.id == config.id }
+
+            assertNotNull(ruleStatus, "Rule status data") {
+                val data = it.data?.parse<ManualApprovalSlotAdmissionRuleData>()
+                assertEquals(
+                    ManualApprovalSlotAdmissionRuleData(
+                        approval = true,
+                        message = "OK for me"
+                    ),
+                    data
+                )
             }
         }
     }

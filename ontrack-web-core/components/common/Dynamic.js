@@ -1,19 +1,12 @@
-import {Space, Spin, Tooltip, Typography} from "antd";
+import {Spin} from "antd";
 import {lazy, Suspense} from "react";
-import {FaTimes} from "react-icons/fa";
 import {ErrorBoundary} from "react-error-boundary";
+import InlineError from "@components/common/InlineError";
 
 // See https://react.dev/reference/react/lazy
 
 function LoadingError({path}) {
-    return (
-        <Tooltip title={`Could not load dynamic component at ${path}. This is a defect.`}>
-            <Space>
-                <FaTimes color="red"/>
-                <Typography.Text>Error</Typography.Text>
-            </Space>
-        </Tooltip>
-    )
+    return <InlineError message={`Could not load dynamic component at ${path}. This is a defect.`}/>
 }
 
 export default function useDynamic({path, props}, dependencies = []) {

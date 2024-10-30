@@ -2,7 +2,7 @@ import {useSlotAdmissionRules} from "@components/extension/environments/SlotAdmi
 import {useEffect, useState} from "react";
 import {Select} from "antd";
 
-export default function SelectSlotAdmissionRule({value, onChange}) {
+export default function SelectSlotAdmissionRule({id = "selectSlotAdmissionRule", value, onChange}) {
 
     const rules = useSlotAdmissionRules()
 
@@ -18,6 +18,8 @@ export default function SelectSlotAdmissionRule({value, onChange}) {
     return (
         <>
             <Select
+                id={id}
+                data-testid={id}
                 value={value}
                 onChange={onChange}
                 options={options}

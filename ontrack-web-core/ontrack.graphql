@@ -4435,6 +4435,11 @@ type Mutation {
         "Input for the mutation"
         input: UpdateJenkinsConfigurationInput
     ): UpdateJenkinsConfigurationPayload
+    "Updating the pipeline admission data"
+    updatePipelineData(
+        "Input for the mutation"
+        input: UpdatePipelineDataInput
+    ): UpdatePipelineDataPayload
     "Updates an existing project"
     updateProject(
         "Input for the mutation"
@@ -6984,6 +6989,26 @@ type SlotAdmissionRuleConfig {
     ruleId: String!
 }
 
+"Input for an admission rule"
+type SlotAdmissionRuleInput {
+    "config field"
+    config: SlotAdmissionRuleConfig!
+    "fields field"
+    fields: [SlotAdmissionRuleInputField!]!
+}
+
+"Input for an admission rule"
+type SlotAdmissionRuleInputField {
+    "label field"
+    label: String!
+    "name field"
+    name: String!
+    "type field"
+    type: SlotAdmissionRuleInputFieldType!
+    "value field"
+    value: JSON
+}
+
 "Holds a list of slots"
 type SlotList {
     "Holds a list of slots"
@@ -7008,6 +7033,8 @@ type SlotPipeline {
     lastChange: SlotPipelineChange
     "number field"
     number: Int
+    "List of required inputs for the admission rules"
+    requiredInputs: [SlotAdmissionRuleInput!]!
     "slot field"
     slot: Slot!
     "start field"
@@ -7312,6 +7339,12 @@ type UpdateConfigurationPayload implements Payload {
 
 "Output type for the updateJenkinsConfiguration mutation."
 type UpdateJenkinsConfigurationPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
+"Output type for the updatePipelineData mutation."
+type UpdatePipelineDataPayload implements Payload {
     "List of errors"
     errors: [UserError]
 }
@@ -8123,6 +8156,12 @@ enum SCMChangeLogFileChangeType {
     MODIFIED
     RENAMED
     UNDEFINED
+}
+
+"Type of field for an input"
+enum SlotAdmissionRuleInputFieldType {
+    BOOLEAN
+    TEXT
 }
 
 "List of pipelines for a status"
@@ -10823,6 +10862,20 @@ input ShareSCMFileChangeFilterInput {
     projectId: Int!
 }
 
+input SlotPipelineDataInput {
+    "Name of the rule"
+    name: String!
+    "List of values for the rule"
+    values: [SlotPipelineDataInputValue!]!
+}
+
+input SlotPipelineDataInputValue {
+    "Name of the field"
+    name: String!
+    "Value for the field"
+    value: JSON
+}
+
 input StandardBuildFilter {
     "Build created after or on this date"
     afterDate: String
@@ -11136,6 +11189,14 @@ input UpdateJenkinsConfigurationInput {
     url: String!
     "user field"
     user: String
+}
+
+"Input type for the updatePipelineData mutation."
+input UpdatePipelineDataInput {
+    "inputs field"
+    inputs: [SlotPipelineDataInput!]!
+    "pipelineId field"
+    pipelineId: String!
 }
 
 "Input type for the updateProject mutation."

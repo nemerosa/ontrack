@@ -160,4 +160,14 @@ interface SlotService {
      */
     fun getEligibleSlotsForBuild(build: Build): List<EligibleSlot>
 
+    /**
+     * Given a pipeline, returns its list of required inputs.
+     */
+    fun getRequiredInputs(pipeline: SlotPipeline): List<SlotAdmissionRuleInput>
+
+    /**
+     * Updates the data for the admission rules
+     */
+    fun updatePipelineData(pipeline: SlotPipeline, inputs: List<SlotPipelineDataInput>)
+
 }

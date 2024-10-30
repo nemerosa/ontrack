@@ -54,6 +54,7 @@ export default function SlotPipelineCard({pipeline, actions = true, titlePrefix,
                 title={fullCardTitle(titlePrefix, `Pipeline #${pipeline.number}`)}
                 size="small"
                 hoverable={true}
+                data-testid={pipeline.id}
             >
                 <Descriptions
                     items={items}

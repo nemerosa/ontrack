@@ -1,10 +1,12 @@
 package net.nemerosa.ontrack.extension.environments.ui
 
 import net.nemerosa.ontrack.extension.environments.SlotPipeline
+import net.nemerosa.ontrack.extension.environments.SlotPipelineDataInput
 import net.nemerosa.ontrack.extension.environments.SlotPipelineDeploymentFinishStatus
 import net.nemerosa.ontrack.extension.environments.SlotPipelineDeploymentStatus
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.graphql.schema.Mutation
+import net.nemerosa.ontrack.graphql.support.ListRef
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.StructureService
@@ -75,6 +77,16 @@ class SlotPipelineMutations(
                 slotService.cancelPipeline(pipeline, input.reason)
             }
         },
+        unitMutation(
+            name = "updatePipelineData",
+            description = "Updating the pipeline admission data",
+            input = UpdatePipelineDataInput::class
+        ) { input ->
+            val pipeline = slotService.findPipelineById(input.pipelineId)
+            pipeline?.let {
+                slotService.updatePipelineData(pipeline, input.inputs)
+            }
+        },
     )
 }
 
@@ -96,4 +108,10 @@ data class FinishSlotPipelineDeploymentInput(
 data class CancelSlotPipelineInput(
     val pipelineId: String,
     val reason: String,
+)
+
+data class UpdatePipelineDataInput(
+    val pipelineId: String,
+    @ListRef(embedded = true)
+    val inputs: List<SlotPipelineDataInput>,
 )

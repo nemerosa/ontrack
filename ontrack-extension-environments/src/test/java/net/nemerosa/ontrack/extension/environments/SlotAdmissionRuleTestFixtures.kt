@@ -45,4 +45,16 @@ object SlotAdmissionRuleTestFixtures {
             qualifier = qualifier ?: previousSlot.qualifier,
         ).asJson(),
     )
+
+    fun testManualApprovalRuleConfig(
+        slot: Slot,
+    ) = SlotAdmissionRuleConfig(
+        slot = slot,
+        name = "manualApproval",
+        description = "Manual approval is required",
+        ruleId = ManualApprovalSlotAdmissionRule.ID,
+        ruleConfig = ManualApprovalSlotAdmissionRuleConfig(
+            message = "Approval message",
+        ).asJson()
+    )
 }
