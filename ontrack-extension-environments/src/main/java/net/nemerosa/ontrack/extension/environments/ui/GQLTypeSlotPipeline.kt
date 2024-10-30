@@ -2,7 +2,9 @@ package net.nemerosa.ontrack.extension.environments.ui
 
 import graphql.Scalars.GraphQLBoolean
 import graphql.schema.GraphQLObjectType
+import net.nemerosa.ontrack.extension.environments.SlotAdmissionRuleInput
 import net.nemerosa.ontrack.extension.environments.SlotPipeline
+import net.nemerosa.ontrack.extension.environments.SlotPipelineChange
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
@@ -63,14 +65,18 @@ class GQLTypeSlotPipeline(
                     }
             }
             // All changes
-            .field {
-                it.name("changes")
-                    .description("Changes having occurred to the pipeline")
-                    .type(listType(gqlTypeSlotPipelineChange.typeRef))
-                    .dataFetcher { env ->
-                        val pipeline: SlotPipeline = env.getSource()
-                        slotService.getPipelineChanges(pipeline)
-                    }
+            .listFieldGetter<SlotPipeline, SlotPipelineChange>(
+                name = "changes",
+                description = "Changes having occurred to the pipeline"
+            ) { pipeline ->
+                slotService.getPipelineChanges(pipeline)
+            }
+            // Required inputs
+            .listFieldGetter<SlotPipeline, SlotAdmissionRuleInput>(
+                name = "requiredInputs",
+                description = "List of required inputs for the admission rules"
+            ) { pipeline ->
+                slotService.getRequiredInputs(pipeline)
             }
             // OK
             .build()

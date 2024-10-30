@@ -47,8 +47,10 @@ export default function SlotPipelineDeploymentStatus({pipeline}) {
                                         timestamp
                                         data
                                     }
-                                    ruleId
-                                    ruleConfig
+                                    config {
+                                        ruleId
+                                        ruleConfig
+                                    }
                                     ruleData
                                 }
                             }

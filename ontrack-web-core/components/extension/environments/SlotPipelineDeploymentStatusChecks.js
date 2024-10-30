@@ -62,8 +62,8 @@ export default function SlotPipelineDeploymentStatusChecks({checks}) {
                     render={
                         (_, item) => <SlotAdmissionRuleCheck
                             check={item.check.status}
-                            ruleId={item.ruleId}
-                            ruleConfig={item.ruleConfig}
+                            ruleId={item.config.ruleId}
+                            ruleConfig={item.config.ruleConfig}
                             ruleData={item.ruleData}
                         />
                     }

@@ -1,8 +1,8 @@
-package net.nemerosa.ontrack.extension.environments
+package net.nemerosa.ontrack.extension.environments.rules.core
 
-import net.nemerosa.ontrack.extension.environments.rules.core.ManualApprovalSlotAdmissionRuleConfig
-import net.nemerosa.ontrack.extension.environments.rules.core.ManualApprovalSlotAdmissionRuleData
-import net.nemerosa.ontrack.extension.environments.rules.core.ManualApprovalSlotAdmissionRuleException
+import net.nemerosa.ontrack.extension.environments.SlotAdmissionRuleConfig
+import net.nemerosa.ontrack.extension.environments.SlotPipeline
+import net.nemerosa.ontrack.extension.environments.SlotTestSupport
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.extension.environments.service.findPipelineAdmissionRuleStatusByAdmissionRuleConfigId
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
@@ -115,7 +115,7 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
                 slot = pipeline.slot,
                 name = "manualApproval",
                 description = "Manual approval is required",
-                ruleId = net.nemerosa.ontrack.extension.environments.rules.core.ManualApprovalSlotAdmissionRule.ID,
+                ruleId = ManualApprovalSlotAdmissionRule.ID,
                 ruleConfig = ruleConfig.asJson()
             )
             slotService.addAdmissionRuleConfig(

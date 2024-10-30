@@ -4,15 +4,13 @@ import com.fasterxml.jackson.databind.JsonNode
 
 data class SlotPipelineDeploymentCheck(
     val check: DeployableCheck,
-    val ruleId: String,
-    val ruleConfig: JsonNode,
+    val config: SlotAdmissionRuleConfig,
     val ruleData: JsonNode?,
     val override: SlotPipelineAdmissionRuleStatus? = null,
 ) {
     fun withOverride(override: SlotPipelineAdmissionRuleStatus) = SlotPipelineDeploymentCheck(
         check = check,
-        ruleId = ruleId,
-        ruleConfig = ruleConfig,
+        config = config,
         ruleData = ruleData,
         override = override
     )

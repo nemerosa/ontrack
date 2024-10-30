@@ -1,10 +1,17 @@
 import {expect} from "@playwright/test";
 import {ontrack} from "@ontrack/ontrack";
+import {ui} from "@ontrack/connection";
+import {PipelineActions} from "./PipelineActions";
 
 export class EnvironmentsPage {
 
     constructor(page) {
         this.page = page
+    }
+
+    async goTo() {
+        await this.page.goto(`${ui()}/extension/environments/environments`)
+        await expect(this.page.getByRole('button', {name: 'New environment'})).toBeVisible()
     }
 
     async createEnvironment({name, description, order, tags}) {
@@ -40,6 +47,13 @@ export class EnvironmentsPage {
     async checkSlotIsVisible(environment, projectName, qualifier) {
         const row = this.page.getByTestId(`environment-row-${environment.id}`)
         await expect(row.getByText(projectName, {exact: true})).toBeVisible()
+    }
+
+    async checkPipelineCard(pipeline) {
+        await expect(this.page.getByTestId(pipeline.id)).toBeVisible()
+        return {
+            pipelineActions: new PipelineActions(this.page, pipeline)
+        }
     }
 
 }

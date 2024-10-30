@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.extension.environments
 
-import net.nemerosa.ontrack.extension.environments.rules.core.PromotionSlotAdmissionRule
-import net.nemerosa.ontrack.extension.environments.rules.core.PromotionSlotAdmissionRuleConfig
-import net.nemerosa.ontrack.extension.environments.rules.core.ValidationSlotAdmissionRule
-import net.nemerosa.ontrack.extension.environments.rules.core.ValidationSlotAdmissionRuleConfig
+import com.fasterxml.jackson.databind.node.BooleanNode
+import com.fasterxml.jackson.databind.node.TextNode
+import net.nemerosa.ontrack.extension.environments.rules.core.*
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parse
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
@@ -88,25 +88,27 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
         slotTestSupport.withSlotPipeline { pipeline ->
             // Adds a promotion rule to the slot
             val pl = pipeline.build.branch.promotionLevel(name = "GOLD")
+            val promotionConfig = SlotAdmissionRuleConfig(
+                slot = pipeline.slot,
+                name = "GoldPromotion",
+                description = null,
+                ruleId = PromotionSlotAdmissionRule.ID,
+                ruleConfig = PromotionSlotAdmissionRuleConfig(promotion = pl.name).asJson(),
+            )
             slotService.addAdmissionRuleConfig(
-                config = SlotAdmissionRuleConfig(
-                    slot = pipeline.slot,
-                    name = "GoldPromotion",
-                    description = null,
-                    ruleId = PromotionSlotAdmissionRule.ID,
-                    ruleConfig = PromotionSlotAdmissionRuleConfig(promotion = pl.name).asJson(),
-                ),
+                config = promotionConfig,
             )
             // Adds a validation rule to the slot
             val vs = pipeline.build.branch.validationStamp(name = "ready")
+            val validationConfig = SlotAdmissionRuleConfig(
+                slot = pipeline.slot,
+                name = "ValidationReady",
+                description = null,
+                ruleId = ValidationSlotAdmissionRule.ID,
+                ruleConfig = ValidationSlotAdmissionRuleConfig(validation = vs.name).asJson(),
+            )
             slotService.addAdmissionRuleConfig(
-                config = SlotAdmissionRuleConfig(
-                    slot = pipeline.slot,
-                    name = "ValidationReady",
-                    description = null,
-                    ruleId = ValidationSlotAdmissionRule.ID,
-                    ruleConfig = ValidationSlotAdmissionRuleConfig(validation = vs.name).asJson(),
-                ),
+                config = validationConfig,
             )
             // Build is promoted, not validated
             pipeline.build.promote(pl)
@@ -122,8 +124,7 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
                             status = true,
                             reason = "Build promoted"
                         ),
-                        ruleId = PromotionSlotAdmissionRule.ID,
-                        ruleConfig = PromotionSlotAdmissionRuleConfig(promotion = pl.name).asJson(),
+                        config = promotionConfig,
                         ruleData = null,
                     ),
                     SlotPipelineDeploymentCheck(
@@ -131,8 +132,7 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
                             status = false,
                             reason = "Build not validated"
                         ),
-                        ruleId = ValidationSlotAdmissionRule.ID,
-                        ruleConfig = ValidationSlotAdmissionRuleConfig(validation = vs.name).asJson(),
+                        config = validationConfig,
                         ruleData = null,
                     ),
                 ),
@@ -150,8 +150,7 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
                             status = true,
                             reason = "Build promoted"
                         ),
-                        ruleId = PromotionSlotAdmissionRule.ID,
-                        ruleConfig = PromotionSlotAdmissionRuleConfig(promotion = pl.name).asJson(),
+                        config = promotionConfig,
                         ruleData = null,
                     ),
                     SlotPipelineDeploymentCheck(
@@ -159,8 +158,7 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
                             status = true,
                             reason = "Build validated"
                         ),
-                        ruleId = ValidationSlotAdmissionRule.ID,
-                        ruleConfig = ValidationSlotAdmissionRuleConfig(validation = vs.name).asJson(),
+                        config = validationConfig,
                         ruleData = null,
                     ),
                 ),
@@ -284,6 +282,85 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
                 assertNotNull(slotService.findPipelineById(pipeline2.id)) {
                     assertEquals(SlotPipelineStatus.ONGOING, it.status)
                 }
+            }
+        }
+    }
+
+    @Test
+    fun `Getting a list of needed inputs for a pipeline`() {
+        slotTestSupport.withSlotPipeline { pipeline ->
+            val config = SlotAdmissionRuleTestFixtures.testManualApprovalRuleConfig(pipeline.slot)
+            slotService.addAdmissionRuleConfig(
+                config
+            )
+            val inputs = slotService.getRequiredInputs(pipeline)
+            assertEquals(
+                listOf(
+                    SlotAdmissionRuleInput(
+                        config = config,
+                        fields = listOf(
+                            SlotAdmissionRuleInputField(
+                                type = SlotAdmissionRuleInputFieldType.BOOLEAN,
+                                name = "approval",
+                                label = "Approval",
+                                value = null,
+                            ),
+                            SlotAdmissionRuleInputField(
+                                type = SlotAdmissionRuleInputFieldType.TEXT,
+                                name = "message",
+                                label = "Approval message",
+                                value = null,
+                            ),
+                        )
+                    )
+                ),
+                inputs,
+            )
+        }
+    }
+
+    @Test
+    fun `Updating the data for a pipeline`() {
+        slotTestSupport.withSlotPipeline { pipeline ->
+            val config = SlotAdmissionRuleTestFixtures.testManualApprovalRuleConfig(pipeline.slot)
+            slotService.addAdmissionRuleConfig(config)
+
+            assertFalse(slotService.getRequiredInputs(pipeline).isEmpty(), "Pipeline requires some input")
+
+            slotService.updatePipelineData(
+                pipeline = pipeline,
+                inputs = listOf(
+                    SlotPipelineDataInput(
+                        name = config.name,
+                        values = listOf(
+                            SlotPipelineDataInputValue(
+                                name = "approval",
+                                value = BooleanNode.TRUE,
+                            ),
+                            SlotPipelineDataInputValue(
+                                name = "message",
+                                value = TextNode.valueOf("OK for me"),
+                            )
+                        )
+                    )
+                )
+            )
+
+            assertTrue(slotService.getRequiredInputs(pipeline).isEmpty(), "Pipeline doesn't require inputs any longer")
+
+            val ruleStatus =
+                slotService.getPipelineAdmissionRuleStatuses(pipeline)
+                    .find { it.admissionRuleConfig.id == config.id }
+
+            assertNotNull(ruleStatus, "Rule status data") {
+                val data = it.data?.parse<ManualApprovalSlotAdmissionRuleData>()
+                assertEquals(
+                    ManualApprovalSlotAdmissionRuleData(
+                        approval = true,
+                        message = "OK for me"
+                    ),
+                    data
+                )
             }
         }
     }

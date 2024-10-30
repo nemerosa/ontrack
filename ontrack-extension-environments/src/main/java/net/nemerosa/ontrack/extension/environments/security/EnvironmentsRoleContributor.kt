@@ -62,6 +62,7 @@ class EnvironmentsRoleContributor : RoleContributor {
             SlotPipelineStart::class.java,
             SlotPipelineCancel::class.java,
             SlotPipelineFinish::class.java,
+            SlotPipelineData::class.java,
             SlotPipelineOverride::class.java,
         ),
         Roles.GLOBAL_PARTICIPANT to listOf(
@@ -79,6 +80,7 @@ class EnvironmentsRoleContributor : RoleContributor {
             SlotPipelineStart::class.java,
             SlotPipelineCancel::class.java,
             SlotPipelineFinish::class.java,
+            SlotPipelineData::class.java,
             SlotPipelineOverride::class.java,
         ),
     )
@@ -94,6 +96,7 @@ class EnvironmentsRoleContributor : RoleContributor {
                 SlotPipelineStart::class.java,
                 SlotPipelineCancel::class.java,
                 SlotPipelineFinish::class.java,
+                SlotPipelineData::class.java,
                 SlotPipelineOverride::class.java,
             ),
             Roles.PROJECT_MANAGER to listOf(
@@ -105,6 +108,7 @@ class EnvironmentsRoleContributor : RoleContributor {
                 SlotPipelineStart::class.java,
                 SlotPipelineCancel::class.java,
                 SlotPipelineFinish::class.java,
+                SlotPipelineData::class.java,
                 SlotPipelineOverride::class.java,
             ),
             Roles.PROJECT_PARTICIPANT to listOf(
@@ -121,6 +125,7 @@ class EnvironmentsRoleContributor : RoleContributor {
                 SlotPipelineStart::class.java,
                 SlotPipelineCancel::class.java,
                 SlotPipelineFinish::class.java,
+                SlotPipelineData::class.java,
                 SlotPipelineOverride::class.java,
             ),
             PROJECT_ROLE_PIPELINES_MANAGER to listOf(
@@ -128,6 +133,7 @@ class EnvironmentsRoleContributor : RoleContributor {
                 SlotPipelineStart::class.java,
                 SlotPipelineCancel::class.java,
                 SlotPipelineFinish::class.java,
+                SlotPipelineData::class.java,
                 SlotPipelineOverride::class.java,
             ),
         )

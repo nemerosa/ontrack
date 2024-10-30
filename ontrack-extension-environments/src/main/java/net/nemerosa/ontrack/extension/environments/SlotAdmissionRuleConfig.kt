@@ -10,10 +10,10 @@ import java.util.*
 data class SlotAdmissionRuleConfig(
     val id: String = UUID.randomUUID().toString(),
     val slot: Slot,
-    val name: String,
     val description: String?,
     val ruleId: String,
     val ruleConfig: JsonNode,
+    val name: String = ruleId,
 ) {
     fun withDescription(description: String?) = SlotAdmissionRuleConfig(
         id = id,

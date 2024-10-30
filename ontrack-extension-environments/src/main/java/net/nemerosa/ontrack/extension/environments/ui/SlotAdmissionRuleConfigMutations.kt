@@ -37,7 +37,7 @@ class SlotAdmissionRuleConfigMutations(
                 // Creation of a new rule
                 val config = SlotAdmissionRuleConfig(
                     slot = slot,
-                    name = input.name?.takeIf { it.isNotBlank() } ?: rule.name,
+                    name = input.name?.takeIf { it.isNotBlank() } ?: rule.id,
                     description = input.description,
                     ruleId = input.ruleId,
                     ruleConfig = input.ruleConfig,

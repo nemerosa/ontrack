@@ -904,6 +904,12 @@ type BulkUpdateValidationStampByIdPayload implements Payload {
     errors: [UserError]
 }
 
+"Output type for the cancelSlotPipeline mutation."
+type CancelSlotPipelinePayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
 "Configuration as code information"
 type CasC {
     "Renders the current settings as JSON"
@@ -1134,6 +1140,14 @@ type CreatePromotionRunPayload implements Payload {
     errors: [UserError]
     "Created promotion run"
     promotionRun: PromotionRun
+}
+
+"Output type for the createSlots mutation."
+type CreateSlotsPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "List of the created slots"
+    slots: SlotList
 }
 
 "Output type for the createValidationRunById mutation."
@@ -1655,6 +1669,12 @@ type DeletePromotionRunPayload implements Payload {
     errors: [UserError]
 }
 
+"Output type for the deleteSlotAdmissionRuleConfig mutation."
+type DeleteSlotAdmissionRuleConfigPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
 "Output type for the deleteSubscription mutation."
 type DeleteSubscriptionPayload implements Payload {
     "List of errors"
@@ -1742,6 +1762,14 @@ type DeletionPayload implements PayloadInterface {
     errors: [PayloadUserError]
 }
 
+"Result for the check of the admission for a pipeline"
+type DeployableCheck {
+    "reason field"
+    reason: String
+    "status field"
+    status: Boolean
+}
+
 "Output type for the disableAccount mutation."
 type DisableAccountPayload implements Payload {
     "Updated account"
@@ -1772,6 +1800,14 @@ type DisableSubscriptionPayload implements Payload {
     errors: [UserError]
     "Saved subscription"
     subscription: EventSubscriptionPayload
+}
+
+"Association of a slot with its eligibility"
+type EligibleSlot {
+    "eligible field"
+    eligible: Boolean
+    "slot field"
+    slot: Slot!
 }
 
 "Output type for the enableAccount mutation."
@@ -1832,6 +1868,8 @@ type Environment {
     name: String!
     "order field"
     order: Int
+    "List of slots for this environment"
+    slots: [Slot!]!
     "tags field"
     tags: [String!]!
 }
@@ -1910,6 +1948,14 @@ type FavouriteProjectPayload implements Payload {
     errors: [UserError]
     "Updated project"
     project: Project
+}
+
+"Output type for the finishSlotPipelineDeployment mutation."
+type FinishSlotPipelineDeploymentPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Status of the deployment"
+    finishStatus: SlotPipelineDeploymentFinishStatus
 }
 
 "Output type for the generateToken mutation."
@@ -3183,6 +3229,11 @@ type Mutation {
         "Input for the mutation"
         input: BulkUpdateValidationStampByIdInput
     ): BulkUpdateValidationStampByIdPayload
+    "Cancelling a pipeline"
+    cancelSlotPipeline(
+        "Input for the mutation"
+        input: CancelSlotPipelineInput
+    ): CancelSlotPipelinePayload
     "Changing the password of the current user"
     changePassword(input: ChangePasswordInput!): ChangePasswordPayload
     "Change the status of a validation run"
@@ -3270,6 +3321,11 @@ type Mutation {
         "Input for the mutation"
         input: CreatePromotionRunByIdInput
     ): CreatePromotionRunByIdPayload
+    "Creates several slots, one per provided environment"
+    createSlots(
+        "Input for the mutation"
+        input: CreateSlotsInput
+    ): CreateSlotsPayload
     "Creating a validation run for a build identified by its name"
     createValidationRun(
         "Input for the mutation"
@@ -3594,6 +3650,11 @@ type Mutation {
         "Input for the mutation"
         input: DeletePromotionRunMetaInfoPropertyByIdInput
     ): DeletePromotionRunMetaInfoPropertyByIdPayload
+    "Deletes an admission rule for a slot"
+    deleteSlotAdmissionRuleConfig(
+        "Input for the mutation"
+        input: DeleteSlotAdmissionRuleConfigInput
+    ): DeleteSlotAdmissionRuleConfigPayload
     "Deletes an existing subscription using its ID"
     deleteSubscription(
         "Input for the mutation"
@@ -3699,6 +3760,11 @@ type Mutation {
         "Input for the mutation"
         input: FavouriteProjectInput
     ): FavouriteProjectPayload
+    "Finishes the deployment of a pipeline"
+    finishSlotPipelineDeployment(
+        "Input for the mutation"
+        input: FinishSlotPipelineDeploymentInput
+    ): FinishSlotPipelineDeploymentPayload
     "Generate a new token"
     generateToken(
         "Input for the mutation"
@@ -3828,6 +3894,11 @@ type Mutation {
     saveDashboard(input: SaveDashboardInput!): SaveDashboardPayload
     "Saving some generic settings"
     saveSettings(input: SaveSettingsInput!): SaveSettingsPayload
+    "Saves or creates a configured admission rule for a slot"
+    saveSlotAdmissionRuleConfig(
+        "Input for the mutation"
+        input: SaveSlotAdmissionRuleConfigInput
+    ): SaveSlotAdmissionRuleConfigPayload
     "Saves a workflow which is defined as YAML"
     saveYamlWorkflow(
         "Input for the mutation"
@@ -4262,6 +4333,16 @@ type Mutation {
         "Input for the mutation"
         input: ShareSCMFileChangeFilterInput
     ): ShareSCMFileChangeFilterPayload
+    "Starts a pipeline for a slot and a build"
+    startSlotPipeline(
+        "Input for the mutation"
+        input: StartSlotPipelineInput
+    ): StartSlotPipelinePayload
+    "Starts the deployment of a pipeline"
+    startSlotPipelineDeployment(
+        "Input for the mutation"
+        input: StartSlotPipelineDeploymentInput
+    ): StartSlotPipelineDeploymentPayload
     "Stops a job"
     stopJob(id: Int!): JobActionResult!
     "Stopping a running workflow. Does not do anything if already stopped."
@@ -5301,6 +5382,11 @@ type Query {
     ): [Configuration!]!
     "List of available widgets"
     dashboardWidgets: [Widget!]!
+    "Getting the eligible slots for a build"
+    eligibleSlotsForBuild(
+        "ID of the build"
+        buildId: Int
+    ): [EligibleSlot!]!
     "Getting a project entity using its type and ID."
     entity(
         "ID of the entity"
@@ -5648,6 +5734,18 @@ type Query {
     searchResultTypes: [SearchResultType!]!
     "Ontrack settings"
     settings: Settings!
+    "List of existing admission rules"
+    slotAdmissionRules: [SlotAdmissionRule!]!
+    "Getting a slot using its id"
+    slotById(
+        "ID of the slot"
+        id: String!
+    ): Slot
+    "Getting a slot pipeline by ID"
+    slotPipelineById(
+        "Pipeline ID"
+        id: String!
+    ): SlotPipeline
     "Getting the list of template renderers"
     templatingRenderers: [TemplatingRenderer!]!
     "Gets the current user"
@@ -6031,6 +6129,14 @@ type SaveDashboardPayload implements PayloadInterface {
 type SaveSettingsPayload implements PayloadInterface {
     "List of errors"
     errors: [PayloadUserError]
+}
+
+"Output type for the saveSlotAdmissionRuleConfig mutation."
+type SaveSlotAdmissionRuleConfigPayload implements Payload {
+    "Saved admission rule config"
+    admissionRuleConfig: SlotAdmissionRuleConfig
+    "List of errors"
+    errors: [UserError]
 }
 
 "Output type for the saveYamlWorkflow mutation."
@@ -6818,6 +6924,225 @@ type Signature {
     user: String
 }
 
+"Deployment slot into an environment"
+type Slot implements Authorizable {
+    "List of configured admission rules for this slot"
+    admissionRules: [SlotAdmissionRuleConfig!]!
+    "Authorizations for this context"
+    authorizations: [Authorization!]!
+    "Current pipeline in the slot"
+    currentPipeline: SlotPipeline
+    "description field"
+    description: String
+    "Last eligible build for this slot"
+    eligibleBuild: Build
+    "Paginated list of eligible builds"
+    eligibleBuilds(
+        "Offset for the page"
+        offset: Int = 0,
+        "Size of the page"
+        size: Int = 20
+    ): BuildPaginated
+    "environment field"
+    environment: Environment!
+    "id field"
+    id: String!
+    "Last deployed pipeline in the slot"
+    lastDeployedPipeline: SlotPipeline
+    "Paginated list of pipelines"
+    pipelines(
+        "Offset for the page"
+        offset: Int = 0,
+        "Size of the page"
+        size: Int = 20
+    ): SlotPipelinePaginated
+    "project field"
+    project: Project!
+    "qualifier field"
+    qualifier: String!
+}
+
+"Admission rule"
+type SlotAdmissionRule {
+    "id field"
+    id: String!
+    "name field"
+    name: String!
+}
+
+"Configured admission rule for a slot"
+type SlotAdmissionRuleConfig {
+    "description field"
+    description: String
+    "id field"
+    id: String!
+    "name field"
+    name: String!
+    "ruleConfig field"
+    ruleConfig: JSON
+    "ruleId field"
+    ruleId: String!
+}
+
+"Input for an admission rule"
+type SlotAdmissionRuleInput {
+    "config field"
+    config: SlotAdmissionRuleConfig!
+    "fields field"
+    fields: [SlotAdmissionRuleInputField!]!
+}
+
+"Input for an admission rule"
+type SlotAdmissionRuleInputField {
+    "label field"
+    label: String!
+    "name field"
+    name: String!
+    "type field"
+    type: SlotAdmissionRuleInputFieldType!
+    "value field"
+    value: JSON
+}
+
+"Holds a list of slots"
+type SlotList {
+    "Holds a list of slots"
+    slots: [Slot!]!
+}
+
+"Pipeline for a slot"
+type SlotPipeline {
+    "build field"
+    build: Build!
+    "Changes having occurred to the pipeline"
+    changes: [SlotPipelineChange!]!
+    "Deployment status for the pipeline"
+    deploymentStatus: SlotPipelineDeploymentStatus
+    "end field"
+    end: LocalDateTime
+    "Is the pipeline finished?"
+    finished: Boolean!
+    "id field"
+    id: String!
+    "Last change having occurred to the pipeline"
+    lastChange: SlotPipelineChange
+    "number field"
+    number: Int
+    "List of required inputs for the admission rules"
+    requiredInputs: [SlotAdmissionRuleInput!]!
+    "slot field"
+    slot: Slot!
+    "start field"
+    start: LocalDateTime!
+    "status field"
+    status: SlotPipelineStatus!
+}
+
+"Stored state for an admission rule in a pipeline"
+type SlotPipelineAdmissionRuleStatus {
+    "data field"
+    data: JSON
+    "id field"
+    id: String!
+    "override field"
+    override: Boolean
+    "overrideMessage field"
+    overrideMessage: String
+    "timestamp field"
+    timestamp: LocalDateTime!
+    "user field"
+    user: String!
+}
+
+"Change happening to a pipeline"
+type SlotPipelineChange {
+    "id field"
+    id: String!
+    "message field"
+    message: String
+    "override field"
+    override: Boolean
+    "overrideMessage field"
+    overrideMessage: String
+    "pipeline field"
+    pipeline: SlotPipeline!
+    "status field"
+    status: SlotPipelineStatus
+    "timestamp field"
+    timestamp: LocalDateTime!
+    "user field"
+    user: String!
+}
+
+"List of checks for admission for a pipeline"
+type SlotPipelineDeploymentCheck {
+    "check field"
+    check: DeployableCheck!
+    "override field"
+    override: SlotPipelineAdmissionRuleStatus
+    "ruleConfig field"
+    ruleConfig: JSON
+    "ruleData field"
+    ruleData: JSON
+    "ruleId field"
+    ruleId: String!
+}
+
+"Status returned when finishing a deployment"
+type SlotPipelineDeploymentFinishStatus {
+    "deployed field"
+    deployed: Boolean
+    "message field"
+    message: String!
+}
+
+"Status for the admission check of a pipeline"
+type SlotPipelineDeploymentStatus {
+    "checks field"
+    checks: [SlotPipelineDeploymentCheck!]!
+    "override field"
+    override: Boolean
+    "progress field"
+    progress: SlotPipelineDeploymentStatusProgress!
+    "status field"
+    status: Boolean
+}
+
+"Progress for a deployment status"
+type SlotPipelineDeploymentStatusProgress {
+    "ok field"
+    ok: Int
+    "overridden field"
+    overridden: Boolean
+    "percentage field"
+    percentage: Int
+    "total field"
+    total: Int
+}
+
+type SlotPipelinePaginated {
+    "Information about the current page"
+    pageInfo: PageInfo
+    "Items in the current page"
+    pageItems: [SlotPipeline!]!
+}
+
+"Output type for the startSlotPipelineDeployment mutation."
+type StartSlotPipelineDeploymentPayload implements Payload {
+    "Pipeline deployment status"
+    deploymentStatus: SlotPipelineDeploymentStatus
+    "List of errors"
+    errors: [UserError]
+}
+
+"Output type for the startSlotPipeline mutation."
+type StartSlotPipelinePayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Created pipeline"
+    pipeline: SlotPipeline
+}
+
 "StepIngestionConfigValidation"
 type StepIngestionConfigValidation {
     "Description for the validation stamp"
@@ -7065,12 +7390,16 @@ type UserError {
 
 "Item in the user menu"
 type UserMenuAction {
+    "Arguments for a local function"
+    arguments: JSON
     "Extension contributing this user menu item"
     extension: String!
     "ID of the group this item belongs to"
     groupId: String!
     "Unique ID for this user menu item in the given extension"
     id: String!
+    "Local function to call, not a link"
+    local: Boolean
     "Display name for this user menu item"
     name: String!
 }
@@ -7818,6 +8147,21 @@ enum SCMChangeLogFileChangeType {
     UNDEFINED
 }
 
+"Type of field for an input"
+enum SlotAdmissionRuleInputFieldType {
+    BOOLEAN
+    TEXT
+}
+
+"List of pipelines for a status"
+enum SlotPipelineStatus {
+    CANCELLED
+    DEPLOYED
+    DEPLOYING
+    ERROR
+    ONGOING
+}
+
 "Class of tokens"
 enum TokenScope {
     NEXT_UI
@@ -8009,6 +8353,14 @@ input CHMLLevel {
     level: CHML!
     "Count to reach to raise this level"
     value: Int!
+}
+
+"Input type for the cancelSlotPipeline mutation."
+input CancelSlotPipelineInput {
+    "pipelineId field"
+    pipelineId: String!
+    "reason field"
+    reason: String!
 }
 
 """
@@ -8238,6 +8590,18 @@ input CreatePromotionRunInput {
     project: String!
     "Promotion name"
     promotion: String!
+}
+
+"Input type for the createSlots mutation."
+input CreateSlotsInput {
+    "description field"
+    description: String
+    "environmentIds field"
+    environmentIds: [String!]!
+    "projectId field"
+    projectId: Int!
+    "qualifier field"
+    qualifier: String
 }
 
 "Input type for the createValidationRunById mutation."
@@ -8731,6 +9095,12 @@ input DeletePromotionRunMetaInfoPropertyInput {
     promotion: String!
 }
 
+"Input type for the deleteSlotAdmissionRuleConfig mutation."
+input DeleteSlotAdmissionRuleConfigInput {
+    "id field"
+    id: String!
+}
+
 "Input type for the deleteSubscription mutation."
 input DeleteSubscriptionInput {
     "ID of the subscription to delete"
@@ -8915,6 +9285,16 @@ input FavouriteBranchInput {
 input FavouriteProjectInput {
     "Project ID"
     id: Int!
+}
+
+"Input type for the finishSlotPipelineDeployment mutation."
+input FinishSlotPipelineDeploymentInput {
+    "forcing field"
+    forcing: Boolean!
+    "message field"
+    message: String
+    "pipelineId field"
+    pipelineId: String!
 }
 
 "Input type for the generateToken mutation."
@@ -9397,6 +9777,22 @@ input SaveSettingsInput {
     id: String!
     "Values for the settings"
     values: JSON!
+}
+
+"Input type for the saveSlotAdmissionRuleConfig mutation."
+input SaveSlotAdmissionRuleConfigInput {
+    "description field"
+    description: String!
+    "id field"
+    id: String
+    "name field"
+    name: String
+    "ruleConfig field"
+    ruleConfig: JSON!
+    "ruleId field"
+    ruleId: String!
+    "slotId field"
+    slotId: String
 }
 
 "Input type for the saveYamlWorkflow mutation."
@@ -10498,6 +10894,20 @@ input StandardBuildFilter {
     withValidationStamp: String
     "... with status"
     withValidationStampStatus: String
+}
+
+"Input type for the startSlotPipelineDeployment mutation."
+input StartSlotPipelineDeploymentInput {
+    "pipelineId field"
+    pipelineId: String!
+}
+
+"Input type for the startSlotPipeline mutation."
+input StartSlotPipelineInput {
+    "buildId field"
+    buildId: Int!
+    "slotId field"
+    slotId: String!
 }
 
 "Input type for the stopWorkflow mutation."

@@ -172,7 +172,8 @@ fun <T> TypeBuilder.listField(
     description: String? = null,
 ): GraphQLObjectType.Builder =
     field {
-        val itemTypeName = (property.returnType.arguments.firstOrNull()?.type?.classifier as? KClass<*>)?.java?.simpleName
+        val itemTypeName =
+            (property.returnType.arguments.firstOrNull()?.type?.classifier as? KClass<*>)?.java?.simpleName
         if (itemTypeName.isNullOrBlank()) error("Cannot get list item type for $property")
         it.name(property.name)
             .description(getPropertyDescription(property, description))
@@ -183,6 +184,20 @@ fun <T> TypeBuilder.listField(
                 )
             )
     }
+
+inline fun <P, reified E> TypeBuilder.listFieldGetter(
+    name: String,
+    description: String,
+    noinline code: (source: P) -> List<E>
+): GraphQLObjectType.Builder = field {
+    it.name(name)
+        .description(description)
+        .type(listType(GraphQLTypeReference(E::class.java.simpleName)))
+        .dataFetcher { env ->
+            val source: P = env.getSource()
+            code(source)
+        }
+}
 
 fun <E : Enum<E>> TypeBuilder.enumAsStringField(
     property: KProperty<E?>,

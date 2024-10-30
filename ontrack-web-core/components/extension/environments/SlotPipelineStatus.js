@@ -4,7 +4,7 @@ import {FaBan, FaPlay, FaSpinner, FaThumbsUp, FaTimesCircle} from "react-icons/f
 export default function SlotPipelineStatus({pipeline, children}) {
     return (
         <>
-            <Space>
+            <Space data-testid={`pipeline-actions-${pipeline.id}`}>
                 {
                     pipeline.status === 'ONGOING' && <>
                         <FaSpinner color="blue"/>

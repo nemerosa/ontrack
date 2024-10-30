@@ -4,13 +4,17 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.environments.SlotAdmissionRuleTestFixtures
 import net.nemerosa.ontrack.extension.environments.SlotPipelineStatus
 import net.nemerosa.ontrack.extension.environments.SlotTestSupport
+import net.nemerosa.ontrack.extension.environments.rules.core.ManualApprovalSlotAdmissionRuleData
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parse
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
 
@@ -34,6 +38,7 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                                 }) {
                                     pipeline {
                                         id
+                                        number
                                     }
                                     errors {
                                         message
@@ -43,10 +48,12 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                         """
                     ) { data ->
                         checkGraphQLUserErrors(data, "startSlotPipeline") { node ->
-                            val pipelineId = node
-                                .path("pipeline")
-                                .path("id")
-                                .asText()
+                            val pipeline = node.path("pipeline")
+                            assertEquals(
+                                1,
+                                pipeline.path("number").asInt()
+                            )
+                            val pipelineId = pipeline.path("id").asText()
                             assertNotNull(slotService.findPipelineById(pipelineId), "Pipeline found") { pipeline ->
                                 assertEquals(
                                     SlotPipelineStatus.ONGOING,
@@ -100,8 +107,10 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                                         status
                                         reason
                                     }
-                                    ruleId
-                                    ruleConfig
+                                    config {
+                                        ruleId
+                                        ruleConfig
+                                    }
                                     ruleData
                                     override {
                                         timestamp
@@ -150,8 +159,10 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                                         status
                                         reason
                                     }
-                                    ruleId
-                                    ruleConfig
+                                    config {
+                                        ruleId
+                                        ruleConfig
+                                    }
                                     ruleData
                                     override {
                                         timestamp
@@ -177,9 +188,11 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                                             "status" to false,
                                             "reason" to "Build not promoted"
                                         ),
-                                        "ruleId" to "promotion",
-                                        "ruleConfig" to mapOf(
-                                            "promotion" to "GOLD"
+                                        "config" to mapOf(
+                                            "ruleId" to "promotion",
+                                            "ruleConfig" to mapOf(
+                                                "promotion" to "GOLD"
+                                            ),
                                         ),
                                         "ruleData" to null,
                                         "override" to null,
@@ -214,8 +227,10 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                                         status
                                         reason
                                     }
-                                    ruleId
-                                    ruleConfig
+                                    config {
+                                        ruleId
+                                        ruleConfig
+                                    }
                                     ruleData
                                     override {
                                         timestamp
@@ -241,9 +256,11 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                                             "status" to true,
                                             "reason" to "Build promoted"
                                         ),
-                                        "ruleId" to "promotion",
-                                        "ruleConfig" to mapOf(
-                                            "promotion" to "GOLD"
+                                        "config" to mapOf(
+                                            "ruleId" to "promotion",
+                                            "ruleConfig" to mapOf(
+                                                "promotion" to "GOLD"
+                                            ),
                                         ),
                                         "ruleData" to null,
                                         "override" to null,
@@ -283,8 +300,10 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                                         status
                                         reason
                                     }
-                                    ruleId
-                                    ruleConfig
+                                    config {
+                                        ruleId
+                                        ruleConfig
+                                    }
                                     ruleData
                                     override {
                                         user
@@ -309,9 +328,11 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                                             "status" to false,
                                             "reason" to "Build not promoted"
                                         ),
-                                        "ruleId" to "promotion",
-                                        "ruleConfig" to mapOf(
-                                            "promotion" to "GOLD"
+                                        "config" to mapOf(
+                                            "ruleId" to "promotion",
+                                            "ruleConfig" to mapOf(
+                                                "promotion" to "GOLD"
+                                            ),
                                         ),
                                         "ruleData" to null,
                                         "override" to mapOf(
@@ -324,6 +345,137 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                             )
                         )
                     ).asJson(),
+                    data
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Getting a list of needed inputs for a pipeline`() {
+        slotTestSupport.withSlotPipeline { pipeline ->
+            val config = SlotAdmissionRuleTestFixtures.testManualApprovalRuleConfig(pipeline.slot)
+            slotService.addAdmissionRuleConfig(
+                config
+            )
+            run(
+                """
+                {
+                    slotPipelineById(id: "${pipeline.id}") {
+                        requiredInputs {
+                            config {
+                                id
+                                name
+                                description
+                                ruleId
+                                ruleConfig
+                            }
+                            fields {
+                                type
+                                name
+                                label
+                                value
+                            }
+                        }
+                    }
+                }
+            """.trimIndent()
+            ) { data ->
+                assertEquals(
+                    mapOf(
+                        "slotPipelineById" to mapOf(
+                            "requiredInputs" to listOf(
+                                mapOf(
+                                    "config" to mapOf(
+                                        "id" to config.id,
+                                        "name" to config.name,
+                                        "description" to config.description,
+                                        "ruleId" to config.ruleId,
+                                        "ruleConfig" to config.ruleConfig,
+                                    ),
+                                    "fields" to listOf(
+                                        mapOf(
+                                            "type" to "BOOLEAN",
+                                            "name" to "approval",
+                                            "label" to "Approval",
+                                            "value" to null
+                                        ),
+                                        mapOf(
+                                            "type" to "TEXT",
+                                            "name" to "message",
+                                            "label" to "Approval message",
+                                            "value" to null
+                                        ),
+                                    )
+                                )
+                            )
+                        )
+                    ).asJson(),
+                    data
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Updating the data for a pipeline`() {
+        slotTestSupport.withSlotPipeline { pipeline ->
+            val config = SlotAdmissionRuleTestFixtures.testManualApprovalRuleConfig(pipeline.slot)
+            slotService.addAdmissionRuleConfig(config)
+
+            assertFalse(slotService.getRequiredInputs(pipeline).isEmpty(), "Pipeline requires some input")
+
+            run(
+                """
+                    mutation UpdatePipelineData(
+                        ${'$'}pipelineId: String!,
+                        ${'$'}inputs: [SlotPipelineDataInput!]!,
+                    ) {
+                        updatePipelineData(input: {
+                            pipelineId: ${'$'}pipelineId,
+                            inputs: ${'$'}inputs,
+                        }) {
+                            errors {
+                                message
+                            }
+                        }
+                    }
+                """.trimIndent(),
+                mapOf(
+                    "pipelineId" to pipeline.id,
+                    "inputs" to listOf(
+                        mapOf(
+                            "name" to "manualApproval",
+                            "values" to listOf(
+                                mapOf(
+                                    "name" to "approval",
+                                    "value" to true,
+                                ),
+                                mapOf(
+                                    "name" to "message",
+                                    "value" to "\"OK for me\"",
+                                ),
+                            )
+                        )
+                    )
+                )
+            ) { data ->
+                checkGraphQLUserErrors(data, "updatePipelineData")
+            }
+
+            assertTrue(slotService.getRequiredInputs(pipeline).isEmpty(), "Pipeline doesn't require inputs any longer")
+
+            val ruleStatus =
+                slotService.getPipelineAdmissionRuleStatuses(pipeline)
+                    .find { it.admissionRuleConfig.id == config.id }
+
+            assertNotNull(ruleStatus, "Rule status data") {
+                val data = it.data?.parse<ManualApprovalSlotAdmissionRuleData>()
+                assertEquals(
+                    ManualApprovalSlotAdmissionRuleData(
+                        approval = true,
+                        message = "OK for me"
+                    ),
                     data
                 )
             }

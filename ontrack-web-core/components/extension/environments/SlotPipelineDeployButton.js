@@ -26,8 +26,10 @@ export default function SlotPipelineDeployButton({pipeline, onDeploy}) {
                     status
                     reason
                 }
-                ruleId
-                ruleConfig
+                config {
+                    ruleId
+                    ruleConfig
+                }
                 ruleData
                 override {
                     timestamp
