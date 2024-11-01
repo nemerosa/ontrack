@@ -3,6 +3,8 @@ import TimestampText from "@components/common/TimestampText";
 import {Card, Descriptions, Space} from "antd";
 import BuildLink from "@components/builds/BuildLink";
 import PromotionRuns from "@components/promotionRuns/PromotionRuns";
+import Link from "next/link";
+import {slotPipelineUri} from "@components/extension/environments/EnvironmentsLinksUtils";
 
 const fullCardTitle = (prefix, title) => {
     if (prefix) {
@@ -51,7 +53,13 @@ export default function SlotPipelineCard({pipeline, actions = true, titlePrefix,
     return (
         <>
             <Card
-                title={fullCardTitle(titlePrefix, `Pipeline #${pipeline.number}`)}
+                title={
+                    <>
+                        <Link href={slotPipelineUri(pipeline.id)}>
+                            {fullCardTitle(titlePrefix, `Pipeline #${pipeline.number}`)}
+                        </Link>
+                    </>
+                }
                 size="small"
                 hoverable={true}
                 data-testid={pipeline.id}
