@@ -74,6 +74,7 @@ export default function SlotPipelineFinishButton({pipeline, onFinish}) {
                         icon={<FaThumbsUp color="green"/>}
                         title="Marks this pipeline as deployed"
                         loading={changing}
+                        data-testid={`pipeline-finish-${pipeline.id}`}
                     />
                 </Popconfirm>
             }

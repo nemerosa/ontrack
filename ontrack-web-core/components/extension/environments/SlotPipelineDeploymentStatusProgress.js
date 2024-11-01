@@ -6,7 +6,7 @@ import LoadingInline from "@components/common/LoadingInline";
 import Link from "next/link";
 import {slotPipelineUri} from "@components/extension/environments/EnvironmentsLinksUtils";
 
-export default function SlotPipelineDeploymentStatusProgress({pipeline, link = true}) {
+export default function SlotPipelineDeploymentStatusProgress({pipeline, link = true, reloadState}) {
 
     const client = useGraphQLClient()
 
@@ -38,7 +38,7 @@ export default function SlotPipelineDeploymentStatusProgress({pipeline, link = t
                 setLoading(false)
             })
         }
-    }, [client, pipeline.id])
+    }, [client, pipeline.id, reloadState])
 
     return (
         <>
@@ -47,12 +47,12 @@ export default function SlotPipelineDeploymentStatusProgress({pipeline, link = t
                 {
                     link &&
                     <Link href={slotPipelineUri(pipeline.id)} title="Pipeline details">
-                        <Progress type="circle" percent={progress?.percentage} size={32}/>
+                        <Progress data-testid={`pipeline-progress-${pipeline.id}`} type="circle" percent={progress?.percentage} size={32}/>
                     </Link>
                 }
                 {
                     !link &&
-                    <Progress type="circle" percent={progress?.percentage} size={32}/>
+                    <Progress data-testid={`pipeline-progress-${pipeline.id}`} type="circle" percent={progress?.percentage} size={32}/>
                 }
             </LoadingInline>
         </>

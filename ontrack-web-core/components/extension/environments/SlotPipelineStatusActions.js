@@ -6,24 +6,29 @@ import {Typography} from "antd";
 import SlotPipelineDeploymentStatusProgress
     from "@components/extension/environments/SlotPipelineDeploymentStatusProgress";
 import SlotPipelineInputButton from "@components/extension/environments/SlotPipelineInputButton";
+import {useReloadState} from "@components/common/StateUtils";
 
 export default function SlotPipelineStatusActions({pipeline, info = true, linkInfo = true, actions = true, onChange}) {
+
+    const [reloadState, reload] = useReloadState({callback: onChange})
+
     return (
         <>
             <SlotPipelineStatus pipeline={pipeline}>
                 {
-                    info &&
+                    info && pipeline.status === 'ONGOING' &&
                     <SlotPipelineDeploymentStatusProgress
                         pipeline={pipeline}
                         link={linkInfo}
+                        reloadState={reloadState}
                     />
                 }
                 {
                     actions && <>
-                        <SlotPipelineInputButton pipeline={pipeline} onChange={onChange}/>
-                        <SlotPipelineDeployButton pipeline={pipeline} onDeploy={onChange}/>
-                        <SlotPipelineFinishButton pipeline={pipeline} onFinish={onChange}/>
-                        <SlotPipelineCancelButton pipeline={pipeline} onCancel={onChange}/>
+                        <SlotPipelineInputButton pipeline={pipeline} onChange={reload}/>
+                        <SlotPipelineDeployButton pipeline={pipeline} onDeploy={reload}/>
+                        <SlotPipelineFinishButton pipeline={pipeline} onFinish={reload}/>
+                        <SlotPipelineCancelButton pipeline={pipeline} onCancel={reload}/>
                     </>
                 }
                 {

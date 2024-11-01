@@ -7,7 +7,7 @@ export default function ManualApprovalDataForm({configId, message}) {
                 name={[configId, "approval"]}
                 label="Approval"
             >
-                <Switch/>
+                <Switch data-testid="manual-approval"/>
             </Form.Item>
             <Form.Item
                 name={[configId, "message"]}

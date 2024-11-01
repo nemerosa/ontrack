@@ -130,6 +130,7 @@ export default function SlotPipelineDeployButton({pipeline, onDeploy}) {
                                     icon={<FaPlay color="green"/>}
                                     title="Deploys this pipeline"
                                     loading={deploying}
+                                    data-testid={`pipeline-deploy-${pipeline.id}`}
                                 />
                             </Popconfirm>
                         }
