@@ -24,8 +24,8 @@ test('manual approval on the environments page', async ({page}) => {
 
     await pipelineActions.manualInput({
         actions: (dialog) => {
-            dialog.getByTestId('manual_approval').click()
-            dialog.getByTestId('manual_message').fill("OK for me")
+            dialog.getByLabel('Approval', { exact: true }).click()
+            dialog.getByLabel('Approval message').fill("OK for me")
         }
     })
 
@@ -51,8 +51,8 @@ test('manual approval on the pipeline page', async ({page}) => {
 
     await pipelineActions.manualInput({
         actions: (dialog) => {
-            dialog.getByTestId('manual_approval').click()
-            dialog.getByTestId('manual_message').fill("OK for me")
+            dialog.getByLabel('Approval', { exact: true }).click()
+            dialog.getByLabel('Approval message').fill("OK for me")
         }
     })
 

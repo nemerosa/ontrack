@@ -1,7 +1,5 @@
 package net.nemerosa.ontrack.extension.environments
 
-import com.fasterxml.jackson.databind.node.BooleanNode
-import com.fasterxml.jackson.databind.node.TextNode
 import net.nemerosa.ontrack.extension.environments.rules.core.*
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
@@ -298,20 +296,7 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
                 listOf(
                     SlotAdmissionRuleInput(
                         config = config,
-                        fields = listOf(
-                            SlotAdmissionRuleInputField(
-                                type = SlotAdmissionRuleInputFieldType.BOOLEAN,
-                                name = "approval",
-                                label = "Approval",
-                                value = null,
-                            ),
-                            SlotAdmissionRuleInputField(
-                                type = SlotAdmissionRuleInputFieldType.TEXT,
-                                name = "message",
-                                label = "Approval message",
-                                value = null,
-                            ),
-                        )
+                        data = null,
                     )
                 ),
                 inputs,
@@ -327,23 +312,13 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
 
             assertFalse(slotService.getRequiredInputs(pipeline).isEmpty(), "Pipeline requires some input")
 
-            slotService.updatePipelineData(
+            slotService.setupAdmissionRule(
                 pipeline = pipeline,
-                inputs = listOf(
-                    SlotPipelineDataInput(
-                        name = config.name,
-                        values = listOf(
-                            SlotPipelineDataInputValue(
-                                name = "approval",
-                                value = BooleanNode.TRUE,
-                            ),
-                            SlotPipelineDataInputValue(
-                                name = "message",
-                                value = TextNode.valueOf("OK for me"),
-                            )
-                        )
-                    )
-                )
+                admissionRuleConfig = config,
+                data = mapOf(
+                    "approval" to true,
+                    "message" to "OK for me"
+                ).asJson()
             )
 
             assertTrue(slotService.getRequiredInputs(pipeline).isEmpty(), "Pipeline doesn't require inputs any longer")

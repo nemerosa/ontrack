@@ -165,9 +165,4 @@ interface SlotService {
      */
     fun getRequiredInputs(pipeline: SlotPipeline): List<SlotAdmissionRuleInput>
 
-    /**
-     * Updates the data for the admission rules
-     */
-    fun updatePipelineData(pipeline: SlotPipeline, inputs: List<SlotPipelineDataInput>)
-
 }

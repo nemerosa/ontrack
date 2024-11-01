@@ -370,12 +370,6 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                                 ruleId
                                 ruleConfig
                             }
-                            fields {
-                                type
-                                name
-                                label
-                                value
-                            }
                         }
                     }
                 }
@@ -392,20 +386,6 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                                         "description" to config.description,
                                         "ruleId" to config.ruleId,
                                         "ruleConfig" to config.ruleConfig,
-                                    ),
-                                    "fields" to listOf(
-                                        mapOf(
-                                            "type" to "BOOLEAN",
-                                            "name" to "approval",
-                                            "label" to "Approval",
-                                            "value" to null
-                                        ),
-                                        mapOf(
-                                            "type" to "TEXT",
-                                            "name" to "message",
-                                            "label" to "Approval message",
-                                            "value" to null
-                                        ),
                                     )
                                 )
                             )
@@ -429,11 +409,11 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                 """
                     mutation UpdatePipelineData(
                         ${'$'}pipelineId: String!,
-                        ${'$'}inputs: [SlotPipelineDataInput!]!,
+                        ${'$'}values: [SlotPipelineDataInputValue!]!,
                     ) {
                         updatePipelineData(input: {
                             pipelineId: ${'$'}pipelineId,
-                            inputs: ${'$'}inputs,
+                            values: ${'$'}values,
                         }) {
                             errors {
                                 message
@@ -443,18 +423,12 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                 """.trimIndent(),
                 mapOf(
                     "pipelineId" to pipeline.id,
-                    "inputs" to listOf(
+                    "values" to listOf(
                         mapOf(
-                            "name" to "manualApproval",
-                            "values" to listOf(
-                                mapOf(
-                                    "name" to "approval",
-                                    "value" to true,
-                                ),
-                                mapOf(
-                                    "name" to "message",
-                                    "value" to "\"OK for me\"",
-                                ),
+                            "configId" to config.id,
+                            "data" to mapOf(
+                                "approval" to true,
+                                "message" to "OK for me"
                             )
                         )
                     )

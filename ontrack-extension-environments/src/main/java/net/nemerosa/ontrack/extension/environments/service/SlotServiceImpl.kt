@@ -92,39 +92,6 @@ class SlotServiceImpl(
             emptyList()
         }
 
-    override fun updatePipelineData(pipeline: SlotPipeline, inputs: List<SlotPipelineDataInput>) {
-        checkSlotAccess<SlotPipelineData>(pipeline.slot)
-        if (pipeline.status == SlotPipelineStatus.ONGOING) {
-            val configs = getAdmissionRuleConfigs(pipeline.slot)
-            val inputsPerRules = inputs.associate { it.name to it.values }
-            configs.forEach { config ->
-                val rule = slotAdmissionRuleRegistry.getRule(config.ruleId)
-                updatePipelineRuleData(pipeline, rule, config, inputsPerRules[config.name])
-            }
-        } else {
-            throw SlotPipelineDataNotOngoingException()
-        }
-    }
-
-    private fun <C, D> updatePipelineRuleData(
-        pipeline: SlotPipeline,
-        rule: SlotAdmissionRule<C, D>,
-        config: SlotAdmissionRuleConfig,
-        slotPipelineInputValues: List<SlotPipelineDataInputValue>?,
-    ) {
-        if (slotPipelineInputValues != null) {
-            val data = slotPipelineInputValues.associate {
-                it.name to it.value
-            }.asJson()
-            rule.checkData(config.ruleConfig, data)
-            setupAdmissionRule(
-                pipeline = pipeline,
-                admissionRuleConfig = config,
-                data = data,
-            )
-        }
-    }
-
     private fun <C, D> getRequiredInput(
         pipeline: SlotPipeline,
         config: SlotAdmissionRuleConfig,
@@ -142,14 +109,10 @@ class SlotServiceImpl(
         return if (ruleData?.data != null && rule.isDataComplete(ruleConfig, ruleData.data)) {
             null
         } else {
-            rule.getInputFields(ruleConfig, ruleData?.data)
-                .takeIf { it.isNotEmpty() }
-                ?.let { fields ->
-                    SlotAdmissionRuleInput(
-                        config = config,
-                        fields = fields
-                    )
-                }
+            SlotAdmissionRuleInput(
+                config = config,
+                data = ruleData?.data?.asJson()
+            )
         }
     }
 
@@ -524,23 +487,28 @@ class SlotServiceImpl(
         admissionRuleConfig: SlotAdmissionRuleConfig,
         data: JsonNode
     ) {
+        checkSlotAccess<SlotPipelineData>(pipeline.slot)
         // Checking that we are targeting the same slot
         checkSameSlot(pipeline, admissionRuleConfig)
-        // Gets the rule
-        val rule = slotAdmissionRuleRegistry.getRule(admissionRuleConfig.ruleId)
-        // Checks the rule for the new state
-        rule.checkData(admissionRuleConfig.ruleConfig, data)
-        // Overriding the rule
-        slotPipelineAdmissionRuleStatusRepository.saveStatus(
-            SlotPipelineAdmissionRuleStatus(
-                pipeline = pipeline,
-                admissionRuleConfig = admissionRuleConfig,
-                timestamp = Time.now,
-                user = securityService.currentSignature.user.name,
-                data = data,
-                override = false,
-                overrideMessage = null,
+        if (pipeline.status == SlotPipelineStatus.ONGOING) {
+            // Gets the rule
+            val rule = slotAdmissionRuleRegistry.getRule(admissionRuleConfig.ruleId)
+            // Checks the rule for the new state
+            rule.checkData(admissionRuleConfig.ruleConfig, data)
+            // Overriding the rule
+            slotPipelineAdmissionRuleStatusRepository.saveStatus(
+                SlotPipelineAdmissionRuleStatus(
+                    pipeline = pipeline,
+                    admissionRuleConfig = admissionRuleConfig,
+                    timestamp = Time.now,
+                    user = securityService.currentSignature.user.name,
+                    data = data,
+                    override = false,
+                    overrideMessage = null,
+                )
             )
-        )
+        } else {
+            throw SlotPipelineDataNotOngoingException()
+        }
     }
 }

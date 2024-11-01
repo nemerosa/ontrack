@@ -6993,20 +6993,6 @@ type SlotAdmissionRuleConfig {
 type SlotAdmissionRuleInput {
     "config field"
     config: SlotAdmissionRuleConfig!
-    "fields field"
-    fields: [SlotAdmissionRuleInputField!]!
-}
-
-"Input for an admission rule"
-type SlotAdmissionRuleInputField {
-    "label field"
-    label: String!
-    "name field"
-    name: String!
-    "type field"
-    type: SlotAdmissionRuleInputFieldType!
-    "value field"
-    value: JSON
 }
 
 "Holds a list of slots"
@@ -8154,12 +8140,6 @@ enum SCMChangeLogFileChangeType {
     MODIFIED
     RENAMED
     UNDEFINED
-}
-
-"Type of field for an input"
-enum SlotAdmissionRuleInputFieldType {
-    BOOLEAN
-    TEXT
 }
 
 "List of pipelines for a status"
@@ -10860,18 +10840,11 @@ input ShareSCMFileChangeFilterInput {
     projectId: Int!
 }
 
-input SlotPipelineDataInput {
-    "Name of the rule"
-    name: String!
-    "List of values for the rule"
-    values: [SlotPipelineDataInputValue!]!
-}
-
 input SlotPipelineDataInputValue {
-    "Name of the field"
-    name: String!
-    "Value for the field"
-    value: JSON
+    "ID of the configured admission rule"
+    configId: String!
+    "Input data for the rule"
+    data: JSON!
 }
 
 input StandardBuildFilter {
@@ -11191,10 +11164,10 @@ input UpdateJenkinsConfigurationInput {
 
 "Input type for the updatePipelineData mutation."
 input UpdatePipelineDataInput {
-    "inputs field"
-    inputs: [SlotPipelineDataInput!]!
     "pipelineId field"
     pipelineId: String!
+    "values field"
+    values: [SlotPipelineDataInputValue!]!
 }
 
 "Input type for the updateProject mutation."

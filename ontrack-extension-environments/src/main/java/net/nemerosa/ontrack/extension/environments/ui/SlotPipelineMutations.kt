@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.environments.ui
 
 import net.nemerosa.ontrack.extension.environments.SlotPipeline
-import net.nemerosa.ontrack.extension.environments.SlotPipelineDataInput
+import net.nemerosa.ontrack.extension.environments.SlotPipelineDataInputValue
 import net.nemerosa.ontrack.extension.environments.SlotPipelineDeploymentFinishStatus
 import net.nemerosa.ontrack.extension.environments.SlotPipelineDeploymentStatus
 import net.nemerosa.ontrack.extension.environments.service.SlotService
@@ -84,7 +84,16 @@ class SlotPipelineMutations(
         ) { input ->
             val pipeline = slotService.findPipelineById(input.pipelineId)
             pipeline?.let {
-                slotService.updatePipelineData(pipeline, input.inputs)
+                val configs = slotService.getAdmissionRuleConfigs(pipeline.slot).associateBy { it.id }
+                input.values.forEach { input ->
+                    val config = configs[input.configId]
+                        ?: throw SlotPipelineDataInputConfigNotFoundException(input.configId)
+                    slotService.setupAdmissionRule(
+                        pipeline = pipeline,
+                        admissionRuleConfig = config,
+                        data = input.data,
+                    )
+                }
             }
         },
     )
@@ -113,5 +122,5 @@ data class CancelSlotPipelineInput(
 data class UpdatePipelineDataInput(
     val pipelineId: String,
     @ListRef(embedded = true)
-    val inputs: List<SlotPipelineDataInput>,
+    val values: List<SlotPipelineDataInputValue>,
 )

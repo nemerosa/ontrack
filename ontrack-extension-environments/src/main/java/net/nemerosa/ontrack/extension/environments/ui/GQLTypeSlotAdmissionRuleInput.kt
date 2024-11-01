@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.extension.environments.SlotAdmissionRuleInput
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.field
-import net.nemerosa.ontrack.graphql.support.listField
 import org.springframework.stereotype.Component
 
 @Component
@@ -18,6 +17,5 @@ class GQLTypeSlotAdmissionRuleInput : GQLType {
             .name(typeName)
             .description("Input for an admission rule")
             .field(SlotAdmissionRuleInput::config)
-            .listField(SlotAdmissionRuleInput::fields)
             .build()
 }

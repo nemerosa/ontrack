@@ -1,5 +1,5 @@
-import {Card, Form} from "antd";
-import SlotPipelineInputField from "@components/extension/environments/SlotPipelineInputField";
+import {Card} from "antd";
+import SlotAdmissionRuleDataForm from "@components/extension/environments/SlotAdmissionRuleDataForm";
 
 export default function SlotPipelineInput({input}) {
     return (
@@ -8,19 +8,11 @@ export default function SlotPipelineInput({input}) {
                 size="small"
                 title={input.config.name}
             >
-                {
-                    input.fields.map((field, index) => (
-                        <Form.Item
-                            key={index}
-                            name={[input.config.name, field.name]}
-                            label={field.label}
-                        >
-                            <SlotPipelineInputField
-                                type={field.type}
-                            />
-                        </Form.Item>
-                    ))
-                }
+                <SlotAdmissionRuleDataForm
+                    configId={input.config.id}
+                    ruleId={input.config.ruleId}
+                    ruleConfig={input.config.ruleConfig}
+                />
             </Card>
         </>
     )

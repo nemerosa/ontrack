@@ -69,15 +69,6 @@ class ManualApprovalSlotAdmissionRule(
     override fun parseData(node: JsonNode): ManualApprovalSlotAdmissionRuleData =
         node.parse()
 
-    override fun getInputFields(
-        ruleConfig: ManualApprovalSlotAdmissionRuleConfig,
-        data: ManualApprovalSlotAdmissionRuleData?
-    ): List<SlotAdmissionRuleInputField> =
-        listOf(
-            inputBoolean(ManualApprovalSlotAdmissionRuleData::approval, value = data?.approval),
-            inputText(ManualApprovalSlotAdmissionRuleData::message, value = data?.message),
-        )
-
     override fun checkData(ruleConfig: JsonNode, data: JsonNode) {
         val c = parseConfig(ruleConfig)
         val d = parseData(data)

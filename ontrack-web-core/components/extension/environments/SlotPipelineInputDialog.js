@@ -23,13 +23,11 @@ export const useSlotPipelineInputDialog = () => {
                         slotPipelineById(id: $id) {
                             requiredInputs {
                                 config {
+                                    id
                                     name
-                                }
-                                fields {
-                                    name
-                                    type
-                                    label
-                                    value
+                                    description
+                                    ruleId
+                                    ruleConfig
                                 }
                             }
                         }
@@ -39,48 +37,32 @@ export const useSlotPipelineInputDialog = () => {
             ).then(data => {
                 const inputs = data.slotPipelineById.requiredInputs;
                 setInputs(inputs)
-                inputs.forEach(input => {
-                    input.fields.forEach(field => {
-                        form.setFieldValue(
-                            [input.config.name, field.name],
-                            field.value
-                        )
-                    })
-                })
             }).finally(() => {
                 setLoading(false)
             })
         },
         prepareValues: (values, {pipeline}) => {
             const inputs = []
-            Object.keys(values).forEach(ruleName => {
-                const input = {
-                    name: ruleName,
-                    values: [],
-                }
-                inputs.push(input)
-                const ruleValues = values[ruleName]
-                Object.keys(ruleValues).forEach(ruleValueKey => {
-                    const ruleValue = ruleValues[ruleValueKey]
-                    input.values.push({
-                        name: ruleValueKey,
-                        value: JSON.stringify(ruleValue),
-                    })
+            Object.keys(values).forEach(configId => {
+                const data = values[configId]
+                inputs.push({
+                    configId,
+                    data,
                 })
             })
             return {
                 pipelineId: pipeline.id,
-                inputs: inputs,
+                values: inputs,
             }
         },
         query: gql`
             mutation PipelineInput(
                 $pipelineId: String!,
-                $inputs: [SlotPipelineDataInput!]!,
+                $values: [SlotPipelineDataInputValue!]!,
             ) {
                 updatePipelineData(input: {
                     pipelineId: $pipelineId,
-                    inputs: $inputs,
+                    values: $values,
                 }) {
                     errors {
                         message

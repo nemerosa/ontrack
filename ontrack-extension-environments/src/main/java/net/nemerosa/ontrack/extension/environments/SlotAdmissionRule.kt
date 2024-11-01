@@ -75,12 +75,4 @@ interface SlotAdmissionRule<C, D> {
      */
     fun isDataComplete(ruleConfig: C, ruleData: D): Boolean = true
 
-    /**
-     * Given a configuration and some initial data, returns a list of fields
-     * to enter some data for this rule.
-     *
-     * @return Empty if the rule is not editable
-     */
-    fun getInputFields(ruleConfig: C, data: D?): List<SlotAdmissionRuleInputField> = emptyList()
-
 }

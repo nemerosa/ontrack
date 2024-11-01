@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.environments
 
 import net.nemerosa.ontrack.extension.environments.security.EnvironmentList
+import net.nemerosa.ontrack.extension.environments.security.SlotPipelineData
 import net.nemerosa.ontrack.extension.environments.security.SlotView
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
@@ -93,6 +94,7 @@ class SlotTestSupport : AbstractDSLTestSupport() {
             .with(EnvironmentList::class.java)
             .withProjectFunction(slot.project, SlotView::class.java)
             .withProjectFunction(slot.project, ProjectView::class.java)
+            .withProjectFunction(slot.project, SlotPipelineData::class.java)
         user.call {
             code(user)
         }
