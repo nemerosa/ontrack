@@ -1,5 +1,5 @@
 import {test} from "@playwright/test";
-import {manualApprovalInEnvironmentsPage} from "./manualInputs.spec";
+import {manualApprovalInEnvironmentsPage} from "./manualApprovalFixtures";
 
 test('pipeline status refreshed when inputs completed', async ({page}) => {
     await manualApprovalInEnvironmentsPage(page)
