@@ -1,8 +1,8 @@
-import {createSlot} from "./Slots";
 import {ontrack} from "@ontrack/ontrack";
 import {login} from "../../core/login";
 import {EnvironmentsPage} from "./Environments";
 import {expect} from "@playwright/test";
+import {createSlot} from "./slotFixtures";
 
 export const manualApprovalInEnvironmentsPage = async (page) => {
     const {project, slot} = await createSlot(ontrack())

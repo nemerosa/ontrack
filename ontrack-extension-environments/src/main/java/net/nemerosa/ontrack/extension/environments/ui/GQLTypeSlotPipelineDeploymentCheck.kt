@@ -1,15 +1,20 @@
 package net.nemerosa.ontrack.extension.environments.ui
 
+import graphql.Scalars.GraphQLBoolean
 import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.extension.environments.SlotPipelineDeploymentCheck
+import net.nemerosa.ontrack.extension.environments.security.SlotPipelineOverride
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.field
 import net.nemerosa.ontrack.graphql.support.jsonField
+import net.nemerosa.ontrack.model.security.SecurityService
 import org.springframework.stereotype.Component
 
 @Component
-class GQLTypeSlotPipelineDeploymentCheck : GQLType {
+class GQLTypeSlotPipelineDeploymentCheck(
+    private val securityService: SecurityService,
+) : GQLType {
 
     override fun getTypeName(): String = SlotPipelineDeploymentCheck::class.java.simpleName
 
@@ -21,5 +26,17 @@ class GQLTypeSlotPipelineDeploymentCheck : GQLType {
             .field(SlotPipelineDeploymentCheck::config)
             .jsonField(SlotPipelineDeploymentCheck::ruleData)
             .field(SlotPipelineDeploymentCheck::override)
+            .field {
+                it.name("canBeOverridden")
+                    .description("True if the user is allowed to override this rule")
+                    .type(GraphQLBoolean)
+                    .dataFetcher { env ->
+                        val check: SlotPipelineDeploymentCheck = env.getSource()
+                        securityService.isProjectFunctionGranted(
+                            check.config.slot.project,
+                            SlotPipelineOverride::class.java
+                        )
+                    }
+            }
             .build()
 }

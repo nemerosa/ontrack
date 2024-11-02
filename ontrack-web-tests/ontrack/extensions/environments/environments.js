@@ -193,6 +193,16 @@ export class EnvironmentsExtension {
             }
         })
     }
+
+    async addPromotionRule({slot, promotion = "GOLD"}) {
+        await this.addAdmissionRule({
+            slot,
+            ruleId: "promotion",
+            ruleConfig: {
+                promotion: promotion,
+            }
+        })
+    }
 }
 
 const gqlEnvironmentData = gql`

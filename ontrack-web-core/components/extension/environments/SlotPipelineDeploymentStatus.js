@@ -11,10 +11,13 @@ import BuildLink from "@components/builds/BuildLink";
 import PromotionRuns from "@components/promotionRuns/PromotionRuns";
 import SlotPipelineStatusActions from "@components/extension/environments/SlotPipelineStatusActions";
 import TimestampText from "@components/common/TimestampText";
+import {useReloadState} from "@components/common/StateUtils";
 
 export default function SlotPipelineDeploymentStatus({pipeline}) {
 
     const client = useGraphQLClient()
+
+    const [reloadState, reload] = useReloadState()
 
     const [loading, setLoading] = useState(true)
     const [items, setItems] = useState([])
@@ -26,6 +29,7 @@ export default function SlotPipelineDeploymentStatus({pipeline}) {
                 gql`
                     query PipelineInfo($id: String!) {
                         slotPipelineById(id: $id) {
+                            id
                             build {
                                 ...SlotPipelineBuildData
                             }
@@ -36,6 +40,7 @@ export default function SlotPipelineDeploymentStatus({pipeline}) {
                                 status
                                 override
                                 checks {
+                                    canBeOverridden
                                     check {
                                         status
                                         reason
@@ -48,6 +53,8 @@ export default function SlotPipelineDeploymentStatus({pipeline}) {
                                         data
                                     }
                                     config {
+                                        id
+                                        name
                                         ruleId
                                         ruleConfig
                                     }
@@ -130,7 +137,11 @@ export default function SlotPipelineDeploymentStatus({pipeline}) {
                 items.push({
                     key: 'checks',
                     span: 12,
-                    children: <SlotPipelineDeploymentStatusChecks checks={slotPipeline.deploymentStatus.checks}/>,
+                    children: <SlotPipelineDeploymentStatusChecks
+                        pipeline={slotPipeline}
+                        checks={slotPipeline.deploymentStatus.checks}
+                        onChange={reload}
+                    />,
                 })
 
                 items.push({
@@ -144,7 +155,7 @@ export default function SlotPipelineDeploymentStatus({pipeline}) {
                 setLoading(false)
             })
         }
-    }, [client, pipeline])
+    }, [client, pipeline, reloadState])
 
     return (
         <>

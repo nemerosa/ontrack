@@ -66,6 +66,8 @@ class ManualApprovalSlotAdmissionRule(
             ?: throw SlotAdmissionRuleConfigException("Cannot parse the rule config")
     }
 
+    override fun isDataNeeded(ruleConfig: ManualApprovalSlotAdmissionRuleConfig): Boolean = true
+
     override fun parseData(node: JsonNode): ManualApprovalSlotAdmissionRuleData =
         node.parse()
 

@@ -18,4 +18,28 @@ export class PipelinePage {
         await expect(this.page.getByTestId(`pipeline-actions-${this.pipeline.id}`)).toBeVisible()
         return new PipelineActions(this.page, this.pipeline)
     }
+
+    async checkRuleOverridden({name, overridden = true}) {
+        const text = overridden ? "Yes" : "No"
+        const id = `overridden-${name}`
+        const overriddenText = this.page.getByTestId(id);
+        await expect(overriddenText).toBeVisible()
+        await expect(overriddenText).toContainText(text)
+    }
+
+    locatorOverrideRuleButton(name) {
+        return this.page.getByTestId(`override-${name}`)
+    }
+
+    async checkOverrideRuleButton({name, visible = true}) {
+        await expect(this.locatorOverrideRuleButton(name)).toBeVisible({visible})
+    }
+
+    async overrideRule({name, message}) {
+        await this.locatorOverrideRuleButton(name).click()
+        const messageInput = this.page.getByLabel("Message", {exact: true})
+        await expect(messageInput).toBeVisible()
+        await messageInput.fill(message)
+        await this.page.getByRole("button", {name: "OK"}).click()
+    }
 }

@@ -1,8 +1,9 @@
 import {test} from "@playwright/test";
 import {ontrack} from "@ontrack/ontrack";
 import {login} from "../../core/login";
-import {createSlot, SlotPage} from "./Slots";
 import {generate} from "@ontrack/utils";
+import {createSlot} from "./slotFixtures";
+import {SlotPage} from "./SlotPage";
 
 test('adding a branch pattern admission rule with default name', async ({page}) => {
     // Provisioning

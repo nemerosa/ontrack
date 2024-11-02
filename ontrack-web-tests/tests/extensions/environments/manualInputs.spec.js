@@ -1,9 +1,9 @@
 import {test} from "@playwright/test";
 import {ontrack} from "@ontrack/ontrack";
-import {createSlot} from "./Slots";
 import {login} from "../../core/login";
 import {PipelinePage} from "./PipelinePage";
 import {manualApprovalInEnvironmentsPage} from "./manualApprovalFixtures";
+import {createSlot} from "./slotFixtures";
 
 test('manual approval on the environments page', async ({page}) => {
     await manualApprovalInEnvironmentsPage(page)

@@ -3842,6 +3842,11 @@ type Mutation {
         "Input for the mutation"
         input: LockAccountInput
     ): LockAccountPayload
+    "Overriding a rule into a pipeline"
+    overridePipelineRule(
+        "Input for the mutation"
+        input: OverridePipelineRuleInput
+    ): OverridePipelineRulePayload
     "Pausing the execution of all jobs"
     pauseAllJobs: JobActionResult!
     "Pauses a job"
@@ -4588,6 +4593,12 @@ type OntrackGitIssueInfo {
     issue: JSON
     "Issue service associated with the issue"
     issueServiceConfigurationRepresentation: IssueServiceConfigurationRepresentation
+}
+
+"Output type for the overridePipelineRule mutation."
+type OverridePipelineRulePayload implements Payload {
+    "List of errors"
+    errors: [UserError]
 }
 
 type PageInfo {
@@ -7067,6 +7078,8 @@ type SlotPipelineChange {
 
 "List of checks for admission for a pipeline"
 type SlotPipelineDeploymentCheck {
+    "True if the user is allowed to override this rule"
+    canBeOverridden: Boolean
     "check field"
     check: DeployableCheck!
     "config field"
@@ -9602,6 +9615,16 @@ input MetricsEntryInput {
     name: String!
     "Metric value"
     value: Float!
+}
+
+"Input type for the overridePipelineRule mutation."
+input OverridePipelineRuleInput {
+    "admissionRuleConfigId field"
+    admissionRuleConfigId: String!
+    "message field"
+    message: String!
+    "pipelineId field"
+    pipelineId: String!
 }
 
 "Input type for the postQueue mutation."

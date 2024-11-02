@@ -1,17 +1,6 @@
 import {ui} from "@ontrack/connection";
 import {expect} from "@playwright/test";
 
-export const createSlot = async (ontrack) => {
-    const environment = await ontrack.environments.createEnvironment({})
-    const project = await ontrack.createProject()
-    const slot = await environment.createSlot({project})
-    return {
-        environment,
-        project,
-        slot,
-    }
-}
-
 export class SlotPage {
     constructor(page, slot) {
         this.page = page

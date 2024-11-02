@@ -97,8 +97,9 @@ class SlotServiceImpl(
         config: SlotAdmissionRuleConfig,
         rule: SlotAdmissionRule<C, D>
     ): SlotAdmissionRuleInput? {
-        val state = findPipelineAdmissionRuleStatusByAdmissionRuleConfigId(pipeline, config.id)
         val ruleConfig = rule.parseConfig(config.ruleConfig)
+        if (!rule.isDataNeeded(ruleConfig)) return null
+        val state = findPipelineAdmissionRuleStatusByAdmissionRuleConfigId(pipeline, config.id)
         val ruleData = state?.data?.let {
             SlotPipelineAdmissionRuleData(
                 timestamp = state.timestamp,

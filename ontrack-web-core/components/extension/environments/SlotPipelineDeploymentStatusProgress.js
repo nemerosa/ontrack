@@ -40,19 +40,28 @@ export default function SlotPipelineDeploymentStatusProgress({pipeline, link = t
         }
     }, [client, pipeline.id, reloadState])
 
+    const progressComponent = () => <Progress
+        strokeColor={progress?.overridden ? "orange" : undefined}
+        data-testid={`pipeline-progress-${pipeline.id}`}
+        type="circle"
+        percent={progress?.percentage}
+        size={32}
+        title={
+            progress?.overridden ? "Some rules have been overridden" : "All admission rules have been validated"
+        }
+    />
+
     return (
         <>
-            {/* TODO Show if overridden */}
             <LoadingInline loading={loading}>
                 {
                     link &&
                     <Link href={slotPipelineUri(pipeline.id)} title="Pipeline details">
-                        <Progress data-testid={`pipeline-progress-${pipeline.id}`} type="circle" percent={progress?.percentage} size={32}/>
+                        {progressComponent()}
                     </Link>
                 }
                 {
-                    !link &&
-                    <Progress data-testid={`pipeline-progress-${pipeline.id}`} type="circle" percent={progress?.percentage} size={32}/>
+                    !link && progressComponent()
                 }
             </LoadingInline>
         </>

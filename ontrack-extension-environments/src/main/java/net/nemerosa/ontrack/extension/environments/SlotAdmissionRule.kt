@@ -75,4 +75,9 @@ interface SlotAdmissionRule<C, D> {
      */
     fun isDataComplete(ruleConfig: C, ruleData: D): Boolean = true
 
+    /**
+     * Does this rule need some data?
+     */
+    fun isDataNeeded(ruleConfig: C): Boolean = false
+
 }

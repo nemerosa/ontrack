@@ -3842,6 +3842,11 @@ type Mutation {
         "Input for the mutation"
         input: LockAccountInput
     ): LockAccountPayload
+    "Overriding a rule into a pipeline"
+    overridePipelineRule(
+        "Input for the mutation"
+        input: OverridePipelineRuleInput
+    ): OverridePipelineRulePayload
     "Pausing the execution of all jobs"
     pauseAllJobs: JobActionResult!
     "Pauses a job"
@@ -4435,6 +4440,11 @@ type Mutation {
         "Input for the mutation"
         input: UpdateJenkinsConfigurationInput
     ): UpdateJenkinsConfigurationPayload
+    "Updating the pipeline admission data"
+    updatePipelineData(
+        "Input for the mutation"
+        input: UpdatePipelineDataInput
+    ): UpdatePipelineDataPayload
     "Updates an existing project"
     updateProject(
         "Input for the mutation"
@@ -4583,6 +4593,12 @@ type OntrackGitIssueInfo {
     issue: JSON
     "Issue service associated with the issue"
     issueServiceConfigurationRepresentation: IssueServiceConfigurationRepresentation
+}
+
+"Output type for the overridePipelineRule mutation."
+type OverridePipelineRulePayload implements Payload {
+    "List of errors"
+    errors: [UserError]
 }
 
 type PageInfo {
@@ -6988,20 +7004,6 @@ type SlotAdmissionRuleConfig {
 type SlotAdmissionRuleInput {
     "config field"
     config: SlotAdmissionRuleConfig!
-    "fields field"
-    fields: [SlotAdmissionRuleInputField!]!
-}
-
-"Input for an admission rule"
-type SlotAdmissionRuleInputField {
-    "label field"
-    label: String!
-    "name field"
-    name: String!
-    "type field"
-    type: SlotAdmissionRuleInputFieldType!
-    "value field"
-    value: JSON
 }
 
 "Holds a list of slots"
@@ -7076,16 +7078,16 @@ type SlotPipelineChange {
 
 "List of checks for admission for a pipeline"
 type SlotPipelineDeploymentCheck {
+    "True if the user is allowed to override this rule"
+    canBeOverridden: Boolean
     "check field"
     check: DeployableCheck!
+    "config field"
+    config: SlotAdmissionRuleConfig!
     "override field"
     override: SlotPipelineAdmissionRuleStatus
-    "ruleConfig field"
-    ruleConfig: JSON
     "ruleData field"
     ruleData: JSON
-    "ruleId field"
-    ruleId: String!
 }
 
 "Status returned when finishing a deployment"
@@ -7334,6 +7336,12 @@ type UpdateConfigurationPayload implements Payload {
 
 "Output type for the updateJenkinsConfiguration mutation."
 type UpdateJenkinsConfigurationPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
+"Output type for the updatePipelineData mutation."
+type UpdatePipelineDataPayload implements Payload {
     "List of errors"
     errors: [UserError]
 }
@@ -8145,12 +8153,6 @@ enum SCMChangeLogFileChangeType {
     MODIFIED
     RENAMED
     UNDEFINED
-}
-
-"Type of field for an input"
-enum SlotAdmissionRuleInputFieldType {
-    BOOLEAN
-    TEXT
 }
 
 "List of pipelines for a status"
@@ -9615,6 +9617,16 @@ input MetricsEntryInput {
     value: Float!
 }
 
+"Input type for the overridePipelineRule mutation."
+input OverridePipelineRuleInput {
+    "admissionRuleConfigId field"
+    admissionRuleConfigId: String!
+    "message field"
+    message: String!
+    "pipelineId field"
+    pipelineId: String!
+}
+
 "Input type for the postQueue mutation."
 input PostQueueInput {
     "payload field"
@@ -10851,6 +10863,13 @@ input ShareSCMFileChangeFilterInput {
     projectId: Int!
 }
 
+input SlotPipelineDataInputValue {
+    "ID of the configured admission rule"
+    configId: String!
+    "Input data for the rule"
+    data: JSON!
+}
+
 input StandardBuildFilter {
     "Build created after or on this date"
     afterDate: String
@@ -11164,6 +11183,14 @@ input UpdateJenkinsConfigurationInput {
     url: String!
     "user field"
     user: String
+}
+
+"Input type for the updatePipelineData mutation."
+input UpdatePipelineDataInput {
+    "pipelineId field"
+    pipelineId: String!
+    "values field"
+    values: [SlotPipelineDataInputValue!]!
 }
 
 "Input type for the updateProject mutation."

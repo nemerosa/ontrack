@@ -96,6 +96,21 @@ class SlotPipelineMutations(
                 }
             }
         },
+        unitMutation(
+            name = "overridePipelineRule",
+            description = "Overriding a rule into a pipeline",
+            input = OverridePipelineRuleInput::class
+        ) { input ->
+            val pipeline = slotService.findPipelineById(input.pipelineId)
+            val config = slotService.findAdmissionRuleConfigById(input.admissionRuleConfigId)
+            if (pipeline != null && config != null) {
+                slotService.overrideAdmissionRule(
+                    pipeline = pipeline,
+                    admissionRuleConfig = config,
+                    message = input.message,
+                )
+            }
+        },
     )
 }
 
@@ -123,4 +138,10 @@ data class UpdatePipelineDataInput(
     val pipelineId: String,
     @ListRef(embedded = true)
     val values: List<SlotPipelineDataInputValue>,
+)
+
+data class OverridePipelineRuleInput(
+    val pipelineId: String,
+    val admissionRuleConfigId: String,
+    val message: String,
 )

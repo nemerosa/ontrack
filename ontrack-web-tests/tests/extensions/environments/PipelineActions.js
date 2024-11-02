@@ -21,7 +21,7 @@ export class PipelineActions {
         }
     }
 
-    async expectStatusProgress({present = true, value = 0}) {
+    async expectStatusProgress({present = true, value = 0, overridden = false}) {
         const pipelineActions = this.locatePipelineActions()
         const pipelineProgress = pipelineActions.getByTestId(`pipeline-progress-${this.pipeline.id}`)
         await expect(pipelineProgress).toBeVisible({visible: present})

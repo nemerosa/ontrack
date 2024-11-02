@@ -1,7 +1,7 @@
 import {Typography} from "antd";
 
-export default function YesNo({value, strong = false, prefix = ''}) {
-    return <Typography.Text strong={strong}>
+export default function YesNo({id, value, strong = false, prefix = ''}) {
+    return <Typography.Text id={id} data-testid={id} strong={strong}>
         {prefix}
         {
             value ? "Yes" : "No"

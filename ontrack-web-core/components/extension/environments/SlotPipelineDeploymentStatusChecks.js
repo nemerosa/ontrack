@@ -3,10 +3,12 @@ import YesNo from "@components/common/YesNo";
 import PopoverInfoIcon from "@components/common/PopoverInfoIcon";
 import SlotAdmissionRuleCheck from "@components/extension/environments/SlotAdmissionRuleCheck";
 import CheckIcon from "@components/common/CheckIcon";
+import SlotPipelineOverrideRuleButton from "@components/extension/environments/SlotPipelineOverrideRuleButton";
+import {FaExclamationTriangle} from "react-icons/fa";
 
 const {Column} = Table
 
-export default function SlotPipelineDeploymentStatusChecks({checks}) {
+export default function SlotPipelineDeploymentStatusChecks({pipeline, checks, onChange}) {
     return (
         <>
             <Table
@@ -39,9 +41,15 @@ export default function SlotPipelineDeploymentStatusChecks({checks}) {
                     title="Overridden"
                     render={
                         (_, item) => <Space>
-                            <YesNo value={item.check.override?.override}/>
+                            <YesNo id={`overridden-${item.config.name}`} value={item.override?.override}/>
+                            <SlotPipelineOverrideRuleButton
+                                pipeline={pipeline}
+                                check={item}
+                                onChange={onChange}
+                            />
                             <PopoverInfoIcon
                                 condition={item.override?.override === true}
+                                icon={<FaExclamationTriangle color="orange"/>}
                                 title="This check has been overridden"
                                 content={
                                     <Space direction="vertical">
