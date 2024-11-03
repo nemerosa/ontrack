@@ -12,12 +12,14 @@ dependencies {
     implementation(project(":ontrack-ui-graphql"))
     implementation(project(":ontrack-extension-license"))
     implementation(project(":ontrack-extension-casc"))
+    implementation(project(":ontrack-extension-workflows"))
     implementation(project(":ontrack-repository"))
     implementation(project(":ontrack-repository-support"))
 
     testImplementation(project(path = ":ontrack-model", configuration = "tests"))
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))
+    testImplementation(project(path = ":ontrack-extension-workflows", configuration = "tests"))
     testImplementation(project(":ontrack-it-utils"))
 
     testRuntimeOnly(project(":ontrack-service"))

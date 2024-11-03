@@ -6,9 +6,10 @@ import net.nemerosa.ontrack.extension.environments.*
 import net.nemerosa.ontrack.extension.environments.rules.SlotAdmissionRuleRegistry
 import net.nemerosa.ontrack.extension.environments.security.*
 import net.nemerosa.ontrack.extension.environments.storage.*
+import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowService
+import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowTrigger
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.pagination.PaginatedList
-import net.nemerosa.ontrack.model.security.ProjectFunction
 import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Build
@@ -26,26 +27,11 @@ class SlotServiceImpl(
     private val slotPipelineChangeRepository: SlotPipelineChangeRepository,
     private val slotPipelineAdmissionRuleStatusRepository: SlotPipelineAdmissionRuleStatusRepository,
     private val slotAdmissionRuleRegistry: SlotAdmissionRuleRegistry,
+    private val slotWorkflowService: SlotWorkflowService,
 ) : SlotService {
 
-    private inline fun <reified P : ProjectFunction> isSlotAccessible(slot: Slot): Boolean {
-        return securityService.isGlobalFunctionGranted(EnvironmentList::class.java) &&
-                securityService.isProjectFunctionGranted(slot.project, ProjectView::class.java) &&
-                securityService.isProjectFunctionGranted(slot.project, SlotView::class.java) &&
-                (P::class == SlotView::class || securityService.isProjectFunctionGranted(slot.project, P::class.java))
-    }
-
-    private inline fun <reified P : ProjectFunction> checkSlotAccess(slot: Slot) {
-        securityService.checkGlobalFunction(EnvironmentList::class.java)
-        securityService.checkProjectFunction(slot.project, ProjectView::class.java)
-        securityService.checkProjectFunction(slot.project, SlotView::class.java)
-        if (P::class != SlotView::class) {
-            securityService.checkProjectFunction(slot.project, P::class.java)
-        }
-    }
-
     override fun addSlot(slot: Slot) {
-        checkSlotAccess<SlotCreate>(slot)
+        securityService.checkSlotAccess<SlotCreate>(slot)
         // Checks for ID
         if (slotRepository.findSlotById(slot.id) != null) {
             throw SlotIdAlreadyExistsException(slot.id)
@@ -74,7 +60,7 @@ class SlotServiceImpl(
         }
 
     override fun addAdmissionRuleConfig(config: SlotAdmissionRuleConfig) {
-        checkSlotAccess<SlotUpdate>(config.slot)
+        securityService.checkSlotAccess<SlotUpdate>(config.slot)
         // Controls the name
         config.checkName()
         // TODO Controls the provided configuration
@@ -118,7 +104,7 @@ class SlotServiceImpl(
     }
 
     override fun saveAdmissionRuleConfig(config: SlotAdmissionRuleConfig) {
-        checkSlotAccess<SlotUpdate>(config.slot)
+        securityService.checkSlotAccess<SlotUpdate>(config.slot)
         // Controls the name
         config.checkName()
         // TODO Controls the provided configuration
@@ -127,20 +113,20 @@ class SlotServiceImpl(
 
     override fun findAdmissionRuleConfigById(id: String): SlotAdmissionRuleConfig? =
         slotAdmissionRuleConfigRepository.findAdmissionRuleConfigById(id)
-            ?.takeIf { isSlotAccessible<ProjectView>(it.slot) }
+            ?.takeIf { securityService.isSlotAccessible<ProjectView>(it.slot) }
 
     override fun getAdmissionRuleConfigs(slot: Slot): List<SlotAdmissionRuleConfig> {
-        checkSlotAccess<SlotView>(slot)
+        securityService.checkSlotAccess<SlotView>(slot)
         return slotAdmissionRuleConfigRepository.getAdmissionRuleConfigs(slot)
     }
 
     override fun deleteAdmissionRuleConfig(config: SlotAdmissionRuleConfig) {
-        checkSlotAccess<SlotUpdate>(config.slot)
+        securityService.checkSlotAccess<SlotUpdate>(config.slot)
         slotAdmissionRuleConfigRepository.deleteAdmissionRuleConfig(config)
     }
 
     override fun isBuildEligible(slot: Slot, build: Build): Boolean {
-        checkSlotAccess<SlotView>(slot)
+        securityService.checkSlotAccess<SlotView>(slot)
         // Always checking the project
         if (build.project != slot.project) return false
         // Gets all the admission rules
@@ -152,7 +138,7 @@ class SlotServiceImpl(
     }
 
     override fun getEligibleBuilds(slot: Slot, count: Int): List<Build> {
-        checkSlotAccess<SlotView>(slot)
+        securityService.checkSlotAccess<SlotView>(slot)
         // Gets all the admission rules
         val configs = slotAdmissionRuleConfigRepository.getAdmissionRuleConfigs(slot)
         // Collecting parameters & queries
@@ -210,12 +196,12 @@ class SlotServiceImpl(
 
     override fun getSlotById(id: String): Slot {
         return slotRepository.getSlotById(id).apply {
-            checkSlotAccess<SlotView>(this)
+            securityService.checkSlotAccess<SlotView>(this)
         }
     }
 
     override fun startPipeline(slot: Slot, build: Build): SlotPipeline {
-        checkSlotAccess<SlotPipelineCreate>(slot)
+        securityService.checkSlotAccess<SlotPipelineCreate>(slot)
         // Build must be eligible
         if (!isBuildEligible(slot, build)) {
             throw SlotPipelineBuildNotEligibleException(slot, build)
@@ -240,13 +226,15 @@ class SlotServiceImpl(
                 overrideMessage = null,
             )
         )
+        // Workflow triggers
+        slotWorkflowService.startWorkflowsForPipeline(pipeline, SlotWorkflowTrigger.CREATION)
         // OK
         return findPipelineById(pipeline.id) ?: throw SlotPipelineIdNotFoundException(pipeline.id)
     }
 
     override fun findSlotsByProject(project: Project, qualifier: String?): Set<Slot> =
         slotRepository.findSlotsByProject(project, qualifier).filter {
-            isSlotAccessible<ProjectView>(it)
+            securityService.isSlotAccessible<ProjectView>(it)
         }.toSet()
 
     override fun getLastDeployedPipeline(slot: Slot): SlotPipeline? =
@@ -285,12 +273,12 @@ class SlotServiceImpl(
     }
 
     override fun findPipelines(slot: Slot): PaginatedList<SlotPipeline> {
-        checkSlotAccess<SlotView>(slot)
+        securityService.checkSlotAccess<SlotView>(slot)
         return slotPipelineRepository.findPipelines(slot)
     }
 
     override fun cancelPipeline(pipeline: SlotPipeline, reason: String) {
-        checkSlotAccess<SlotPipelineCancel>(pipeline.slot)
+        securityService.checkSlotAccess<SlotPipelineCancel>(pipeline.slot)
         changePipeline(
             pipeline = pipeline,
             status = SlotPipelineStatus.CANCELLED,
@@ -327,17 +315,17 @@ class SlotServiceImpl(
 
     override fun findPipelineById(id: String): SlotPipeline? {
         return slotPipelineRepository.findPipelineById(id)?.apply {
-            checkSlotAccess<SlotView>(slot)
+            securityService.checkSlotAccess<SlotView>(slot)
         }
     }
 
     override fun getPipelineChanges(pipeline: SlotPipeline): List<SlotPipelineChange> {
-        checkSlotAccess<SlotView>(pipeline.slot)
+        securityService.checkSlotAccess<SlotView>(pipeline.slot)
         return slotPipelineChangeRepository.findByPipeline(pipeline)
     }
 
     override fun startDeployment(pipeline: SlotPipeline, dryRun: Boolean): SlotPipelineDeploymentStatus {
-        checkSlotAccess<SlotPipelineStart>(pipeline.slot)
+        securityService.checkSlotAccess<SlotPipelineStart>(pipeline.slot)
         // Always checking the project
         if (pipeline.build.project != pipeline.slot.project) {
             throw SlotPipelineProjectException(pipeline)
@@ -352,13 +340,14 @@ class SlotServiceImpl(
         )
         // Actual start
         if (!dryRun) {
-            // TODO Cancels all other pipelines for the slot
             // Marks this pipeline as deploying
             changePipeline(
                 pipeline = pipeline,
                 status = SlotPipelineStatus.DEPLOYING,
                 message = "Deployment started",
             )
+            // Workflows
+            slotWorkflowService.startWorkflowsForPipeline(pipeline, SlotWorkflowTrigger.DEPLOYING)
         }
         // OK
         return status
@@ -369,7 +358,7 @@ class SlotServiceImpl(
         forcing: Boolean,
         message: String?
     ): SlotPipelineDeploymentFinishStatus {
-        checkSlotAccess<SlotPipelineFinish>(pipeline.slot)
+        securityService.checkSlotAccess<SlotPipelineFinish>(pipeline.slot)
         // Only last pipeline can be deployed
         val lastPipeline = getCurrentPipeline(pipeline.slot)
         if (lastPipeline?.id != pipeline.id) {
@@ -393,6 +382,8 @@ class SlotServiceImpl(
                 null
             },
         )
+        // Workflows
+        slotWorkflowService.startWorkflowsForPipeline(pipeline, SlotWorkflowTrigger.DEPLOYED)
         // OK
         return SlotPipelineDeploymentFinishStatus.ok(actualMessage)
     }
@@ -442,12 +433,12 @@ class SlotServiceImpl(
     }
 
     override fun getCurrentPipeline(slot: Slot): SlotPipeline? {
-        checkSlotAccess<SlotView>(slot)
+        securityService.checkSlotAccess<SlotView>(slot)
         return findPipelines(slot).pageItems.firstOrNull()
     }
 
     override fun getPipelineAdmissionRuleStatuses(pipeline: SlotPipeline): List<SlotPipelineAdmissionRuleStatus> {
-        checkSlotAccess<SlotView>(pipeline.slot)
+        securityService.checkSlotAccess<SlotView>(pipeline.slot)
         return slotPipelineAdmissionRuleStatusRepository.findStatusesByPipeline(pipeline)
     }
 
@@ -456,7 +447,7 @@ class SlotServiceImpl(
         admissionRuleConfig: SlotAdmissionRuleConfig,
         message: String
     ) {
-        checkSlotAccess<SlotPipelineOverride>(pipeline.slot)
+        securityService.checkSlotAccess<SlotPipelineOverride>(pipeline.slot)
         // Checking that we are targeting the same slot
         checkSameSlot(pipeline, admissionRuleConfig)
         // Overriding the rule
@@ -488,7 +479,7 @@ class SlotServiceImpl(
         admissionRuleConfig: SlotAdmissionRuleConfig,
         data: JsonNode
     ) {
-        checkSlotAccess<SlotPipelineData>(pipeline.slot)
+        securityService.checkSlotAccess<SlotPipelineData>(pipeline.slot)
         // Checking that we are targeting the same slot
         checkSameSlot(pipeline, admissionRuleConfig)
         if (pipeline.status == SlotPipelineStatus.ONGOING) {

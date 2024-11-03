@@ -64,6 +64,7 @@ class EnvironmentsRoleContributor : RoleContributor {
             SlotPipelineFinish::class.java,
             SlotPipelineData::class.java,
             SlotPipelineOverride::class.java,
+            SlotPipelineWorkflowRun::class.java,
         ),
         Roles.GLOBAL_PARTICIPANT to listOf(
             SlotView::class.java,
@@ -82,6 +83,7 @@ class EnvironmentsRoleContributor : RoleContributor {
             SlotPipelineFinish::class.java,
             SlotPipelineData::class.java,
             SlotPipelineOverride::class.java,
+            SlotPipelineWorkflowRun::class.java,
         ),
     )
 
@@ -98,6 +100,7 @@ class EnvironmentsRoleContributor : RoleContributor {
                 SlotPipelineFinish::class.java,
                 SlotPipelineData::class.java,
                 SlotPipelineOverride::class.java,
+                SlotPipelineWorkflowRun::class.java,
             ),
             Roles.PROJECT_MANAGER to listOf(
                 SlotCreate::class.java,
@@ -110,6 +113,7 @@ class EnvironmentsRoleContributor : RoleContributor {
                 SlotPipelineFinish::class.java,
                 SlotPipelineData::class.java,
                 SlotPipelineOverride::class.java,
+                SlotPipelineWorkflowRun::class.java,
             ),
             Roles.PROJECT_PARTICIPANT to listOf(
                 SlotView::class.java,
@@ -127,6 +131,7 @@ class EnvironmentsRoleContributor : RoleContributor {
                 SlotPipelineFinish::class.java,
                 SlotPipelineData::class.java,
                 SlotPipelineOverride::class.java,
+                SlotPipelineWorkflowRun::class.java,
             ),
             PROJECT_ROLE_PIPELINES_MANAGER to listOf(
                 SlotPipelineCreate::class.java,
@@ -135,6 +140,7 @@ class EnvironmentsRoleContributor : RoleContributor {
                 SlotPipelineFinish::class.java,
                 SlotPipelineData::class.java,
                 SlotPipelineOverride::class.java,
+                SlotPipelineWorkflowRun::class.java,
             ),
         )
 }
