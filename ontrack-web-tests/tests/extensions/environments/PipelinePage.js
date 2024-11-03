@@ -19,12 +19,28 @@ export class PipelinePage {
         return new PipelineActions(this.page, this.pipeline)
     }
 
+    async checkRuleDeployable({name, deployable = true}) {
+        const text = deployable ? "Yes" : "No"
+        const id = `deployable-${name}`
+        const deployableText = this.page.getByTestId(id)
+        await expect(deployableText).toBeVisible()
+        await expect(deployableText).toContainText(text)
+    }
+
     async checkRuleOverridden({name, overridden = true}) {
         const text = overridden ? "Yes" : "No"
         const id = `overridden-${name}`
-        const overriddenText = this.page.getByTestId(id);
+        const overriddenText = this.page.getByTestId(id)
         await expect(overriddenText).toBeVisible()
         await expect(overriddenText).toContainText(text)
+    }
+
+    async checkRuleDetails({configId, checks}) {
+        const details = this.page.getByTestId(`details-${configId}`)
+        await expect(details).toBeVisible()
+        if (checks) {
+            await checks(details)
+        }
     }
 
     locatorOverrideRuleButton(name) {

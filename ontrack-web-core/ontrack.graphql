@@ -116,6 +116,14 @@ type Action {
     uri: String
 }
 
+"Output type for the addSlotWorkflow mutation."
+type AddSlotWorkflowPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Created slot workflow"
+    slotWorkflow: SlotWorkflow
+}
+
 "Authentication source for an account or group."
 type AuthenticationSource {
     "Is this authentication source allowing to change a password?"
@@ -3219,6 +3227,11 @@ type Message {
 }
 
 type Mutation {
+    "Add a workflow into an existing slot"
+    addSlotWorkflow(
+        "Input for the mutation"
+        input: AddSlotWorkflowInput
+    ): AddSlotWorkflowPayload
     "Bulk update of a promotion level"
     bulkUpdatePromotionLevelById(
         "Input for the mutation"
@@ -5762,6 +5775,11 @@ type Query {
         "Pipeline ID"
         id: String!
     ): SlotPipeline
+    "Getting a slot workflow instance by id"
+    slotWorkflowInstanceById(
+        "Slot workflow instance if"
+        id: String!
+    ): SlotWorkflowInstance
     "Getting the list of template renderers"
     templatingRenderers: [TemplatingRenderer!]!
     "Gets the current user"
@@ -7129,6 +7147,32 @@ type SlotPipelinePaginated {
     pageItems: [SlotPipeline!]!
 }
 
+"Workflow registered in a slot"
+type SlotWorkflow {
+    "ID for this workflow"
+    id: String!
+    "Slot this workflow is registered for"
+    slot: Slot!
+    "Event which triggers this workflow"
+    trigger: SlotWorkflowTrigger!
+    "Workflow to run"
+    workflow: Workflow!
+}
+
+"Running instance of a workflow for a pipeline"
+type SlotWorkflowInstance {
+    "id field"
+    id: String!
+    "pipeline field"
+    pipeline: SlotPipeline!
+    "slotWorkflow field"
+    slotWorkflow: SlotWorkflow!
+    "start field"
+    start: LocalDateTime!
+    "workflowInstance field"
+    workflowInstance: WorkflowInstance!
+}
+
 "Output type for the startSlotPipelineDeployment mutation."
 type StartSlotPipelineDeploymentPayload implements Payload {
     "Pipeline deployment status"
@@ -8164,6 +8208,13 @@ enum SlotPipelineStatus {
     ONGOING
 }
 
+"List of triggers for the slot workflows"
+enum SlotWorkflowTrigger {
+    CREATION
+    DEPLOYED
+    DEPLOYING
+}
+
 "Class of tokens"
 enum TokenScope {
     NEXT_UI
@@ -8213,6 +8264,16 @@ scalar Long
 
 "UUID"
 scalar UUID
+
+"Input type for the addSlotWorkflow mutation."
+input AddSlotWorkflowInput {
+    "slotId field"
+    slotId: String!
+    "trigger field"
+    trigger: SlotWorkflowTrigger!
+    "workflowYaml field"
+    workflowYaml: String!
+}
 
 "Filter when querying auto versioning processing orders"
 input AutoVersioningAuditQueryFilter {

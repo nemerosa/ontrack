@@ -16,4 +16,9 @@ interface SlotWorkflowService {
 
     fun startWorkflowsForPipeline(pipeline: SlotPipeline, trigger: SlotWorkflowTrigger)
 
+    fun findSlotWorkflowInstanceByPipelineAndSlotWorkflow(
+        pipeline: SlotPipeline,
+        slotWorkflow: SlotWorkflow
+    ): SlotWorkflowInstance?
+
 }

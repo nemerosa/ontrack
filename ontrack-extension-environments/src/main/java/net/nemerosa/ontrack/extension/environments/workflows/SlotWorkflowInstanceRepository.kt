@@ -72,4 +72,23 @@ class SlotWorkflowInstanceRepository(
         workflowInstance = workflowInstanceStore.getById(rs.getString("workflow_instance_id")),
     )
 
+    fun findSlotWorkflowInstanceByPipelineAndSlotWorkflow(
+        pipeline: SlotPipeline,
+        slotWorkflow: SlotWorkflow
+    ): SlotWorkflowInstance? =
+        namedParameterJdbcTemplate!!.query(
+            """
+                SELECT *
+                FROM ENV_SLOT_WORKFLOW_INSTANCES
+                WHERE PIPELINE_ID = :pipelineId
+                AND SLOT_WORKFLOW_ID = :slotWorkflowId
+            """,
+            mapOf(
+                "pipelineId" to pipeline.id,
+                "slotWorkflowId" to slotWorkflow.id,
+            )
+        ) { rs, _ ->
+            toSlotWorkflowInstance(rs)
+        }.firstOrNull()
+
 }

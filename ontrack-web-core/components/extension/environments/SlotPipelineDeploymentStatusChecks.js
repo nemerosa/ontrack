@@ -24,7 +24,7 @@ export default function SlotPipelineDeploymentStatusChecks({pipeline, checks, on
                     render={
                         (_, item) => <Space>
                             <CheckIcon value={item.check.status}/>
-                            <YesNo value={item.check.status}/>
+                            <YesNo id={`deployable-${item.config.id}`} value={item.check.status}/>
                             <PopoverInfoIcon
                                 condition={item.check.reason}
                                 title="Pipeline cannot be deployed"
@@ -70,6 +70,7 @@ export default function SlotPipelineDeploymentStatusChecks({pipeline, checks, on
                     render={
                         (_, item) => <SlotAdmissionRuleCheck
                             check={item.check.status}
+                            configId={item.config.id}
                             ruleId={item.config.ruleId}
                             ruleConfig={item.config.ruleConfig}
                             ruleData={item.ruleData}

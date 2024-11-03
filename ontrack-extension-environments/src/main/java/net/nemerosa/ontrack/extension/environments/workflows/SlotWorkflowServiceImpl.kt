@@ -77,4 +77,15 @@ class SlotWorkflowServiceImpl(
 
     override fun getSlotWorkflowInstanceById(id: String): SlotWorkflowInstance =
         findSlotWorkflowInstanceById(id) ?: throw SlotWorkflowInstanceIdNotFoundException(id)
+
+    override fun findSlotWorkflowInstanceByPipelineAndSlotWorkflow(
+        pipeline: SlotPipeline,
+        slotWorkflow: SlotWorkflow
+    ): SlotWorkflowInstance? {
+        securityService.checkSlotAccess<SlotView>(pipeline.slot)
+        return slotWorkflowInstanceRepository.findSlotWorkflowInstanceByPipelineAndSlotWorkflow(
+            pipeline,
+            slotWorkflow,
+        )
+    }
 }

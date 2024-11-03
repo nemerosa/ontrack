@@ -5,10 +5,13 @@ import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.extension.workflows.WorkflowTestSupport
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceStatus
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.json.asJson
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.TestPropertySource
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 import kotlin.test.fail
 
 @TestPropertySource(
@@ -30,6 +33,9 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var slotService: SlotService
+
+    @Autowired
+    private lateinit var slotWorkflowTestSupport: SlotWorkflowTestSupport
 
     @Test
     fun `Registering a workflow on a slot`() {
@@ -84,16 +90,7 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
 
     @Test
     fun `Running a workflow on pipeline creation`() {
-        slotTestSupport.withSlot { slot ->
-
-            val testWorkflow = SlotWorkflowTestFixtures.testWorkflow()
-            val slotWorkflow = SlotWorkflow(
-                slot = slot,
-                trigger = SlotWorkflowTrigger.CREATION,
-                workflow = testWorkflow,
-            )
-            slotWorkflowService.addSlotWorkflow(slotWorkflow)
-
+        slotWorkflowTestSupport.withSlotWorkflow(trigger = SlotWorkflowTrigger.CREATION) { slot, slotWorkflow ->
             val pipeline = slotTestSupport.createPipeline(slot = slot)
 
             val slotWorkflowInstance = slotWorkflowService.getSlotWorkflowInstancesByPipeline(pipeline).firstOrNull()
@@ -108,16 +105,7 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
 
     @Test
     fun `Running a workflow on pipeline deploying`() {
-        slotTestSupport.withSlot { slot ->
-
-            val testWorkflow = SlotWorkflowTestFixtures.testWorkflow()
-            val slotWorkflow = SlotWorkflow(
-                slot = slot,
-                trigger = SlotWorkflowTrigger.DEPLOYING,
-                workflow = testWorkflow,
-            )
-            slotWorkflowService.addSlotWorkflow(slotWorkflow)
-
+        slotWorkflowTestSupport.withSlotWorkflow(trigger = SlotWorkflowTrigger.DEPLOYING) { slot, slotWorkflow ->
             val pipeline = slotTestSupport.createPipeline(slot = slot)
             slotService.startDeployment(pipeline, dryRun = false)
 
@@ -133,15 +121,7 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
 
     @Test
     fun `Running a workflow on pipeline deployed`() {
-        slotTestSupport.withSlot { slot ->
-
-            val testWorkflow = SlotWorkflowTestFixtures.testWorkflow()
-            val slotWorkflow = SlotWorkflow(
-                slot = slot,
-                trigger = SlotWorkflowTrigger.DEPLOYED,
-                workflow = testWorkflow,
-            )
-            slotWorkflowService.addSlotWorkflow(slotWorkflow)
+        slotWorkflowTestSupport.withSlotWorkflow(trigger = SlotWorkflowTrigger.DEPLOYED) { slot, _ ->
 
             val pipeline = slotTestSupport.createStartAndDeployPipeline(slot = slot)
 
@@ -152,6 +132,49 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
 
             val finishedSlotWorkflowInstance = slotWorkflowService.getSlotWorkflowInstanceById(slotWorkflowInstance.id)
             assertEquals(WorkflowInstanceStatus.SUCCESS, finishedSlotWorkflowInstance.workflowInstance.status)
+        }
+    }
+
+    @Test
+    fun `Workflows on creation participate into the pipeline check list`() {
+        slotWorkflowTestSupport.withSlotWorkflow(
+            trigger = SlotWorkflowTrigger.CREATION,
+            waitMs = 2_000,
+        ) { slot, slotWorkflow ->
+
+            // Creating a pipeline (this triggers the workflow)
+            val pipeline = slotTestSupport.createPipeline(slot = slot)
+
+            // Pipeline workflow is finished when we reach this code
+            // because workflows run synchronously in unit test mode
+            val status = slotService.startDeployment(pipeline, dryRun = true)
+            assertTrue(status.status, "Pipeline can start deployment")
+
+            // Getting the details of the check
+            assertNotNull(status.checks.firstOrNull(), "There is a check for the workflow") { check ->
+                assertTrue(check.check.status, "Workflow finished")
+                assertEquals("Workflow successful", check.check.reason)
+                assertEquals("workflow", check.config.ruleId)
+                assertEquals(
+                    mapOf(
+                        "slotWorkflowId" to slotWorkflow.id
+                    ).asJson(),
+                    check.config.ruleConfig
+                )
+                assertEquals(
+                    slotWorkflow.workflow.name,
+                    check.config.name,
+                )
+                assertNotNull(
+                    check.ruleData?.path("slotWorkflowInstanceId")?.asText(),
+                    "slotWorkflowInstanceId is present in the check data"
+                ) { slotWorkflowInstanceId ->
+                    assertTrue(
+                        slotWorkflowInstanceId.isNotBlank(),
+                        "slotWorkflowInstanceId is present in the check data"
+                    )
+                }
+            }
         }
     }
 

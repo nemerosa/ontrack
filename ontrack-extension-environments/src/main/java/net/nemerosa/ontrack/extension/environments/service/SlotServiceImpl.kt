@@ -6,8 +6,8 @@ import net.nemerosa.ontrack.extension.environments.*
 import net.nemerosa.ontrack.extension.environments.rules.SlotAdmissionRuleRegistry
 import net.nemerosa.ontrack.extension.environments.security.*
 import net.nemerosa.ontrack.extension.environments.storage.*
-import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowService
-import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowTrigger
+import net.nemerosa.ontrack.extension.environments.workflows.*
+import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceStatus
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.security.ProjectView
@@ -332,11 +332,14 @@ class SlotServiceImpl(
         }
         // Gets all the admission rules
         val configs = slotAdmissionRuleConfigRepository.getAdmissionRuleConfigs(pipeline.slot)
+        val rulesChecks = configs.map { config ->
+            checkDeployment(pipeline, config)
+        }
+        // "On creation" workflows participate into the checks
+        val workflowChecks = getWorkflowDeploymentChecks(pipeline)
         // All rules must assert that the build is OK for being deployed
         val status = SlotPipelineDeploymentStatus(
-            checks = configs.map { config ->
-                checkDeployment(pipeline, config)
-            }
+            checks = rulesChecks + workflowChecks
         )
         // Actual start
         if (!dryRun) {
@@ -352,6 +355,84 @@ class SlotServiceImpl(
         // OK
         return status
     }
+
+    private fun getWorkflowDeploymentChecks(pipeline: SlotPipeline): List<SlotPipelineDeploymentCheck> {
+        return slotWorkflowService.getSlotWorkflowsBySlot(
+            pipeline.slot,
+            SlotWorkflowTrigger.CREATION,
+        ).map { slotWorkflow ->
+            val slotWorkflowInstance =
+                slotWorkflowService.findSlotWorkflowInstanceByPipelineAndSlotWorkflow(pipeline, slotWorkflow)
+            slotWorkflowInstance
+                ?.let {
+                    getWorkflowDeploymentCheck(it)
+                }
+                ?: getWorkflowDeploymentCheckNotFound(pipeline, slotWorkflow)
+        }
+    }
+
+    private fun getWorkflowDeploymentCheck(slotWorkflowInstance: SlotWorkflowInstance): SlotPipelineDeploymentCheck =
+        when (slotWorkflowInstance.workflowInstance.status) {
+
+            WorkflowInstanceStatus.STARTED -> getWorkflowDeploymentCheck(
+                slotWorkflowInstance,
+                status = false,
+                reason = "Workflow started"
+            )
+
+            WorkflowInstanceStatus.RUNNING -> getWorkflowDeploymentCheck(
+                slotWorkflowInstance,
+                status = false,
+                reason = "Workflow running"
+            )
+
+            WorkflowInstanceStatus.SUCCESS -> getWorkflowDeploymentCheck(
+                slotWorkflowInstance,
+                status = true,
+                reason = "Workflow successful"
+            )
+
+            WorkflowInstanceStatus.STOPPED -> getWorkflowDeploymentCheck(
+                slotWorkflowInstance,
+                status = false,
+                reason = "Workflow stopped"
+            )
+
+            WorkflowInstanceStatus.ERROR -> getWorkflowDeploymentCheck(
+                slotWorkflowInstance,
+                status = false,
+                reason = "Workflow in error"
+            )
+        }
+
+    private fun getWorkflowDeploymentCheck(
+        slotWorkflowInstance: SlotWorkflowInstance,
+        status: Boolean,
+        reason: String
+    ) = SlotPipelineDeploymentCheck(
+        check = DeployableCheck.check(status, reason, reason),
+        config = getWorkflowRuleConfig(slotWorkflowInstance.pipeline, slotWorkflowInstance.slotWorkflow),
+        ruleData = WorkflowSlotAdmissionRuleData(slotWorkflowInstanceId = slotWorkflowInstance.id).asJson(),
+    )
+
+    private fun getWorkflowDeploymentCheckNotFound(pipeline: SlotPipeline, slotWorkflow: SlotWorkflow) =
+        SlotPipelineDeploymentCheck(
+            check = DeployableCheck.nok("Workflow not started"),
+            config = getWorkflowRuleConfig(pipeline, slotWorkflow),
+            ruleData = null,
+        )
+
+    private fun getWorkflowRuleConfig(
+        pipeline: SlotPipeline,
+        slotWorkflow: SlotWorkflow
+    ) = SlotAdmissionRuleConfig(
+        id = slotWorkflow.id,
+        slot = pipeline.slot,
+        name = slotWorkflow.workflow.name,
+        description = "Workflow rule",
+        ruleId = WorkflowSlotAdmissionRule.ID,
+        ruleConfig = WorkflowSlotAdmissionRule.getConfig(slotWorkflow).asJson(),
+    )
 
     override fun finishDeployment(
         pipeline: SlotPipeline,

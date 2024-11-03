@@ -1,21 +1,5 @@
-import Link from "next/link";
-import {Button, Space} from "antd";
-import {FaProjectDiagram} from "react-icons/fa";
+import WorkflowInstanceLink from "@components/extension/workflows/WorkflowInstanceLink";
 
 export default function ResultLink({workflowInstanceId}) {
-    return (
-        <>
-            {
-                workflowInstanceId &&
-                <Link href={`/extension/workflows/instances/${workflowInstanceId}`} passHref>
-                    <Button>
-                        <Space>
-                            <FaProjectDiagram/>
-                            Workflow
-                        </Space>
-                    </Button>
-                </Link>
-            }
-        </>
-    )
+    return <WorkflowInstanceLink workflowInstanceId={workflowInstanceId}/>
 }
