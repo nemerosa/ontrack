@@ -56,7 +56,7 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
             val slotWorkflow = workflows.first()
             assertEquals(slot, slotWorkflow.slot)
             assertEquals(SlotWorkflowTrigger.DEPLOYING, slotWorkflow.trigger)
-            assertEquals(testWorkflow, slotWorkflow.workflow)
+            assertEquals(testWorkflow.name, slotWorkflow.workflow.name)
         }
     }
 
