@@ -1,6 +1,7 @@
 import {ui} from "@ontrack/connection";
 import {expect} from "@playwright/test";
 import {PipelineActions} from "./PipelineActions";
+import {PipelineWorkflows} from "./PipelineWorkflows";
 
 export class PipelinePage {
     constructor(page, pipeline) {
@@ -57,5 +58,11 @@ export class PipelinePage {
         await expect(messageInput).toBeVisible()
         await messageInput.fill(message)
         await this.page.getByRole("button", {name: "OK"}).click()
+    }
+
+    async getPipelineWorkflows() {
+        const locator = this.page.getByTestId(`pipeline-workflows-table-${this.pipeline.id}`)
+        await expect(locator).toBeVisible()
+        return new PipelineWorkflows(this.page, this.pipeline, locator)
     }
 }

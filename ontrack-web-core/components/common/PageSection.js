@@ -12,6 +12,7 @@ export default function PageSection({
     return (
         <Card
             id={id}
+            data-testid={id}
             size="small"
             title={loading ? "Loading..." : title}
             extra={extra}

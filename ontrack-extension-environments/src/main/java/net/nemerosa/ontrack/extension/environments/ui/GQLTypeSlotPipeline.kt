@@ -6,6 +6,8 @@ import net.nemerosa.ontrack.extension.environments.SlotAdmissionRuleInput
 import net.nemerosa.ontrack.extension.environments.SlotPipeline
 import net.nemerosa.ontrack.extension.environments.SlotPipelineChange
 import net.nemerosa.ontrack.extension.environments.service.SlotService
+import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowInstance
+import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowService
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.*
@@ -16,6 +18,7 @@ class GQLTypeSlotPipeline(
     private val gqlTypeSlotPipelineDeploymentStatus: GQLTypeSlotPipelineDeploymentStatus,
     private val gqlTypeSlotPipelineChange: GQLTypeSlotPipelineChange,
     private val slotService: SlotService,
+    private val slotWorkflowService: SlotWorkflowService,
 ) : GQLType {
 
     override fun getTypeName(): String = SlotPipeline::class.java.simpleName
@@ -77,6 +80,13 @@ class GQLTypeSlotPipeline(
                 description = "List of required inputs for the admission rules"
             ) { pipeline ->
                 slotService.getRequiredInputs(pipeline)
+            }
+            // List of workflow instances
+            .listFieldGetter<SlotPipeline, SlotWorkflowInstance>(
+                name = "slotWorkflowInstances",
+                description = "List of workflow instances for this pipeline",
+            ) { pipeline ->
+                slotWorkflowService.getSlotWorkflowInstancesByPipeline(pipeline)
             }
             // OK
             .build()

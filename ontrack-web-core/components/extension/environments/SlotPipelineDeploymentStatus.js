@@ -12,6 +12,8 @@ import PromotionRuns from "@components/promotionRuns/PromotionRuns";
 import SlotPipelineStatusActions from "@components/extension/environments/SlotPipelineStatusActions";
 import TimestampText from "@components/common/TimestampText";
 import {useReloadState} from "@components/common/StateUtils";
+import PageSection from "@components/common/PageSection";
+import SlotPipelineWorkflowsTable from "@components/extension/environments/SlotPipelineWorkflowsTable";
 
 export default function SlotPipelineDeploymentStatus({pipeline}) {
 
@@ -137,17 +139,38 @@ export default function SlotPipelineDeploymentStatus({pipeline}) {
                 items.push({
                     key: 'checks',
                     span: 12,
-                    children: <SlotPipelineDeploymentStatusChecks
-                        pipeline={slotPipeline}
-                        checks={slotPipeline.deploymentStatus.checks}
-                        onChange={reload}
-                    />,
+                    children: <PageSection
+                        title="Deployment checks"
+                    >
+                        <SlotPipelineDeploymentStatusChecks
+                            pipeline={slotPipeline}
+                            checks={slotPipeline.deploymentStatus.checks}
+                            onChange={reload}
+                        />
+                    </PageSection>,
+                })
+
+                items.push({
+                    key: 'workflows',
+                    span: 12,
+                    children: <PageSection
+                        id={`pipeline-workflows-${pipeline.id}`}
+                        title="Workflows"
+                    >
+                        <SlotPipelineWorkflowsTable
+                            pipeline={slotPipeline}
+                        />
+                    </PageSection>
                 })
 
                 items.push({
                     key: 'changes',
                     span: 12,
-                    children: <SlotPipelineDeploymentChangeTable changes={slotPipeline.changes}/>,
+                    children: <PageSection
+                        title="Pipeline change history"
+                    >
+                        <SlotPipelineDeploymentChangeTable changes={slotPipeline.changes}/>
+                    </PageSection>,
                 })
 
                 setItems(items)

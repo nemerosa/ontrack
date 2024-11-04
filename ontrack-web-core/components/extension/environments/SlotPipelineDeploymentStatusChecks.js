@@ -15,7 +15,6 @@ export default function SlotPipelineDeploymentStatusChecks({pipeline, checks, on
                 dataSource={checks}
                 pagination={false}
                 style={{width: '100%'}}
-                title={() => <Typography.Title level={4}>Deployment checks</Typography.Title>}
             >
 
                 <Column

@@ -7052,6 +7052,8 @@ type SlotPipeline {
     requiredInputs: [SlotAdmissionRuleInput!]!
     "slot field"
     slot: Slot!
+    "List of workflow instances for this pipeline"
+    slotWorkflowInstances: [SlotWorkflowInstance!]!
     "start field"
     start: LocalDateTime!
     "status field"

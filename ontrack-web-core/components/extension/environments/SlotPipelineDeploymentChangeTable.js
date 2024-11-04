@@ -9,7 +9,6 @@ export default function SlotPipelineDeploymentChangeTable({changes}) {
                 dataSource={changes}
                 pagination={false}
                 style={{width: '100%'}}
-                title={() => <Typography.Title level={4}>Changes</Typography.Title>}
             >
                 <Table.Column
                     key="user"

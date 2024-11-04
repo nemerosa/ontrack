@@ -105,4 +105,11 @@ test('workflows on creation participate into the pipeline check list', async ({p
             await expect(details.getByText("Success")).toBeVisible()
         }
     })
+
+    const pipelineWorkflows = await pipelinePage.getPipelineWorkflows()
+    await pipelineWorkflows.checkWorkflow({
+        slotWorkflowId: slotWorkflow.id,
+        trigger: 'CREATION',
+        status: 'Success',
+    })
 })

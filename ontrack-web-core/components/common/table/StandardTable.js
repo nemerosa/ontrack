@@ -4,6 +4,7 @@ import {useEffect, useState} from "react";
 import TablePaginationFooter from "@components/common/table/TablePaginationFooter";
 
 export default function StandardTable({
+                                          id,
                                           query,
                                           queryNode,
                                           variables = {},
@@ -63,6 +64,8 @@ export default function StandardTable({
     return (
         <>
             <Table
+                id={id}
+                data-testid={id}
                 loading={loading}
                 dataSource={items}
                 pagination={false}

@@ -4,6 +4,12 @@ import {addSlotWorkflow} from "@ontrack/extensions/environments/workflows";
 import {graphQLCall} from "@ontrack/graphql";
 import {gql} from "graphql-request";
 
+export const triggerMapping = {
+    CREATION: "Creation",
+    DEPLOYING: "Deploying",
+    DEPLOYED: "Deployed",
+}
+
 export const withSlotWorkflow = async ({trigger}) => {
     const {slot, project} = await createSlot(ontrack())
     const slotWorkflow = await addSlotWorkflow({
