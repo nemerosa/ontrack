@@ -5775,6 +5775,11 @@ type Query {
         "Pipeline ID"
         id: String!
     ): SlotPipeline
+    "Getting a slot workflow instance by id"
+    slotWorkflowInstanceById(
+        "Slot workflow instance if"
+        id: String!
+    ): SlotWorkflowInstance
     "Getting the list of template renderers"
     templatingRenderers: [TemplatingRenderer!]!
     "Gets the current user"
@@ -7047,6 +7052,8 @@ type SlotPipeline {
     requiredInputs: [SlotAdmissionRuleInput!]!
     "slot field"
     slot: Slot!
+    "List of workflow instances for this pipeline"
+    slotWorkflowInstances: [SlotWorkflowInstance!]!
     "start field"
     start: LocalDateTime!
     "status field"
@@ -7152,6 +7159,20 @@ type SlotWorkflow {
     trigger: SlotWorkflowTrigger!
     "Workflow to run"
     workflow: Workflow!
+}
+
+"Running instance of a workflow for a pipeline"
+type SlotWorkflowInstance {
+    "id field"
+    id: String!
+    "pipeline field"
+    pipeline: SlotPipeline!
+    "slotWorkflow field"
+    slotWorkflow: SlotWorkflow!
+    "start field"
+    start: LocalDateTime!
+    "workflowInstance field"
+    workflowInstance: WorkflowInstance!
 }
 
 "Output type for the startSlotPipelineDeployment mutation."

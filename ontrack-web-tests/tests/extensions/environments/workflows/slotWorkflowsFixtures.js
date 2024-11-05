@@ -3,6 +3,7 @@ import {ontrack} from "@ontrack/ontrack";
 import {addSlotWorkflow} from "@ontrack/extensions/environments/workflows";
 import {graphQLCall} from "@ontrack/graphql";
 import {gql} from "graphql-request";
+import {waitUntilCondition} from "../../../support/timing";
 
 export const triggerMapping = {
     CREATION: "Creation",
@@ -34,34 +35,62 @@ export const withSlotWorkflow = async ({trigger}) => {
     return {slot, project, slotWorkflow}
 }
 
-export const waitForPipelineToBeDeployable = async (page, pipelineId) => {
-    const startTime = Date.now()
-    let conditionMet = false
-    while ((Date.now() - startTime) < 5000 && !conditionMet) {
-        const data = await graphQLCall(
-            ontrack().connection,
-            gql`
-                query PipelineDeploymentStatus($pipelineId: String!) {
-                    slotPipelineById(id: $pipelineId) {
-                        deploymentStatus {
-                            status
+export const waitForPipelineWorkflowToBeFinished = async (page, pipelineId, slotWorkflow) => {
+    await waitUntilCondition({
+        page,
+        condition: async () => {
+            const data = await graphQLCall(
+                ontrack().connection,
+                gql`
+                    query PipelineDeploymentStatus($pipelineId: String!) {
+                        slotPipelineById(id: $pipelineId) {
+                            slotWorkflowInstances {
+                                slotWorkflow {
+                                    id
+                                }
+                                workflowInstance {
+                                    finished
+                                }
+                            }
                         }
                     }
+                `,
+                {
+                    pipelineId: pipelineId,
                 }
-            `,
-            {
-                pipelineId: pipelineId,
-            }
-        )
-        if (data.slotPipelineById.deploymentStatus.status === true) {
-            conditionMet = true
-            break
-        }
-        // Wait for a short interval before retrying
-        await page.waitForTimeout(500)
-    }
+            )
+            // Looking for the instance for the slot workflow
+            const slotWorkflowInstance = data.slotPipelineById?.slotWorkflowInstances?.find(it =>
+                it.slotWorkflow.id === slotWorkflow.id
+            )
+            // Condition is that the workflow instance is finished to run
+            return slotWorkflowInstance?.workflowInstance?.finished
+        },
+        message: `Pipeline workflow for ${slotWorkflow.workflow.name} not finished in 5 seconds`
+    })
+}
 
-    if (!conditionMet) {
-        throw new Error('Pipeline not ready for deployment within 5 seconds');
-    }
+export const waitForPipelineToBeDeployable = async (page, pipelineId) => {
+    await waitUntilCondition({
+        page,
+        condition: async () => {
+            const data = await graphQLCall(
+                ontrack().connection,
+                gql`
+                    query PipelineDeploymentStatus($pipelineId: String!) {
+                        slotPipelineById(id: $pipelineId) {
+                            deploymentStatus {
+                                status
+                            }
+                        }
+                    }
+                `,
+                {
+                    pipelineId: pipelineId,
+                }
+            )
+            return (data.slotPipelineById.deploymentStatus.status === true)
+        },
+        message: 'Pipeline not ready for deployment within 5 seconds'
+    })
 }

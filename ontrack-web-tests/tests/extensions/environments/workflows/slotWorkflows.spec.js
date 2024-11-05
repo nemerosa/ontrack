@@ -1,11 +1,17 @@
 import {expect, test} from "@playwright/test";
-import {waitForPipelineToBeDeployable, withSlotWorkflow} from "./slotWorkflowsFixtures";
+import {
+    waitForPipelineToBeDeployable,
+    waitForPipelineWorkflowToBeFinished,
+    withSlotWorkflow
+} from "./slotWorkflowsFixtures";
 import {createPipeline} from "../pipelineFixtures";
 import {graphQLCall} from "@ontrack/graphql";
 import {ontrack} from "@ontrack/ontrack";
 import {gql} from "graphql-request";
 import {login} from "../../../core/login";
 import {PipelinePage} from "../PipelinePage";
+import {createSlot} from "../slotFixtures";
+import {addSlotWorkflow} from "@ontrack/extensions/environments/workflows";
 
 test('API - workflows on creation participate into the pipeline check list', async ({page}) => {
     const {slot, project, slotWorkflow} = await withSlotWorkflow({trigger: 'CREATION'})
@@ -82,7 +88,6 @@ test('API - workflows on creation participate into the pipeline check list', asy
     await expect(check.check.reason).toStrictEqual('Workflow successful')
 })
 
-
 test('workflows on creation participate into the pipeline check list', async ({page}) => {
     const {slot, project, slotWorkflow} = await withSlotWorkflow({trigger: 'CREATION'})
     const {pipeline} = await createPipeline({project, slot})
@@ -112,4 +117,47 @@ test('workflows on creation participate into the pipeline check list', async ({p
         trigger: 'CREATION',
         status: 'Success',
     })
+})
+
+test('workflows on creation participate into the pipeline progress', async ({page}) => {
+    const {slot, project} = await createSlot(ontrack())
+    // Adding two workflows, one successful, one with error
+    const slotWorkflowSuccess = await addSlotWorkflow({
+        slot,
+        trigger: 'CREATION',
+        workflowYaml: `
+            name: Success
+            nodes:
+              - id: test
+                executorId: mock
+                data:
+                    text: Success
+                    error: false
+        `
+    })
+    const slotWorkflowError = await addSlotWorkflow({
+        slot,
+        trigger: 'CREATION',
+        workflowYaml: `
+            name: Error
+            nodes:
+              - id: test
+                executorId: mock
+                data:
+                    text: Error
+                    error: true
+        `
+    })
+    const {pipeline} = await createPipeline({project, slot})
+
+    await waitForPipelineWorkflowToBeFinished(page, pipeline.id, slotWorkflowSuccess)
+    await waitForPipelineWorkflowToBeFinished(page, pipeline.id, slotWorkflowError)
+
+    await login(page)
+
+    const pipelinePage = new PipelinePage(page, pipeline)
+    await pipelinePage.goTo()
+
+    const pipelineActions = await pipelinePage.checkPipelineActions()
+    await pipelineActions.expectStatusProgress({value: 50})
 })
