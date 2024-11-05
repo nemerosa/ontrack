@@ -48,7 +48,7 @@ class DatabaseWorkflowInstanceStore(
     }
 
     override fun findById(id: String): WorkflowInstance? =
-        transactionHelper.inNewTransaction {
+        transactionHelper.inNewTransactionNullable {
             storageService.find(STORE, id, WorkflowInstance::class)
         }
 

@@ -13,12 +13,24 @@ class DefaultTransactionHelper(
     private val platformTransactionManager: PlatformTransactionManager,
 ) : TransactionHelper {
 
-    override fun <T> inNewTransaction(code: () -> T): T {
+    override fun <T : Any> inNewTransaction(code: () -> T): T =
+        executeTransaction(code, allowNull = false)!!
+
+    override fun <T : Any> inNewTransactionNullable(code: () -> T?): T? =
+        executeTransaction(code, allowNull = true)
+
+    private fun <T : Any> executeTransaction(
+        code: () -> T?,
+        allowNull: Boolean
+    ): T? {
         val transactionTemplate = TransactionTemplate(platformTransactionManager)
         transactionTemplate.propagationBehavior = TransactionDefinition.PROPAGATION_REQUIRES_NEW
-        return transactionTemplate.execute {
+        val result = transactionTemplate.execute {
             code()
-        } ?: error("Unexpected transaction result: null")
+        }
+        if (!allowNull && result == null) {
+            error("Unexpected transaction result: null")
+        }
+        return result
     }
-
 }

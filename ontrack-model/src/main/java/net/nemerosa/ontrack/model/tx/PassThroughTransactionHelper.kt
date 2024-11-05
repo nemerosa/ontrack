@@ -12,8 +12,11 @@ import org.springframework.stereotype.Component
 @Profile(RunProfile.UNIT_TEST)
 class PassThroughTransactionHelper : TransactionHelper {
 
-    override fun <T> inNewTransaction(code: () -> T): T {
+    override fun <T : Any> inNewTransaction(code: () -> T): T {
         return code()
     }
 
+    override fun <T : Any> inNewTransactionNullable(code: () -> T?): T? {
+        return code()
+    }
 }

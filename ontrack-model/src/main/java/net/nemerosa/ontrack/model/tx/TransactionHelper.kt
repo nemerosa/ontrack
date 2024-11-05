@@ -10,6 +10,13 @@ interface TransactionHelper {
      *
      * When running in test mode, no new transaction is created.
      */
-    fun <T> inNewTransaction(code: () -> T): T
+    fun <T: Any> inNewTransaction(code: () -> T): T
+
+    /**
+     * Runs some code into a new transaction.
+     *
+     * When running in test mode, no new transaction is created.
+     */
+    fun <T: Any> inNewTransactionNullable(code: () -> T?): T?
 
 }
