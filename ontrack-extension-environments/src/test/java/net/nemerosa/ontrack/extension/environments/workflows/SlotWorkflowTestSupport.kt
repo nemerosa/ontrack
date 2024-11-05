@@ -13,7 +13,7 @@ class SlotWorkflowTestSupport(
 
     fun withSlotWorkflow(
         trigger: SlotWorkflowTrigger,
-        waitMs: Long = 0,
+        waitMs: Int = 0,
         code: (slot: Slot, slotWorkflow: SlotWorkflow) -> Unit
     ) {
         slotTestSupport.withSlot { slot ->

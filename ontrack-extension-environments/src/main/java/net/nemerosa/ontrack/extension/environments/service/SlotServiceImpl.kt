@@ -357,7 +357,7 @@ class SlotServiceImpl(
     }
 
     private fun getWorkflowDeploymentChecks(pipeline: SlotPipeline): List<SlotPipelineDeploymentCheck> {
-        return slotWorkflowService.getSlotWorkflowsBySlot(
+        return slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(
             pipeline.slot,
             SlotWorkflowTrigger.CREATION,
         ).map { slotWorkflow ->

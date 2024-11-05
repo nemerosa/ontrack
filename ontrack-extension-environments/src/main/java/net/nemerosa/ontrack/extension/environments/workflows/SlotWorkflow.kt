@@ -14,4 +14,18 @@ data class SlotWorkflow(
     val trigger: SlotWorkflowTrigger,
     @APIDescription("Workflow to run")
     val workflow: Workflow,
-)
+) {
+    fun withTrigger(trigger: SlotWorkflowTrigger) = SlotWorkflow(
+        id = id,
+        slot = slot,
+        trigger = trigger,
+        workflow = workflow
+    )
+
+    fun withWorkflow(workflow: Workflow) = SlotWorkflow(
+        id = id,
+        slot = slot,
+        trigger = trigger,
+        workflow = workflow
+    )
+}

@@ -48,7 +48,7 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
                     workflow = testWorkflow,
                 )
             )
-            val workflows = slotWorkflowService.getSlotWorkflowsBySlot(
+            val workflows = slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(
                 slot = slot,
                 trigger = SlotWorkflowTrigger.DEPLOYING,
             )

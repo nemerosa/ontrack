@@ -29,7 +29,32 @@ class SlotWorkflowRepository(
         )
     }
 
-    fun getSlotWorkflowsBySlot(slot: Slot, trigger: SlotWorkflowTrigger): List<SlotWorkflow> =
+    fun deleteSlotWorkflow(slotWorkflow: SlotWorkflow) {
+        namedParameterJdbcTemplate!!.update(
+            """
+                DELETE FROM ENV_SLOT_WORKFLOWS
+                WHERE ID = :id
+            """,
+            mapOf("id" to slotWorkflow.id)
+        )
+    }
+
+    fun updateSlotWorkflow(slotWorkflow: SlotWorkflow) {
+        namedParameterJdbcTemplate!!.update(
+            """
+                UPDATE ENV_SLOT_WORKFLOWS
+                SET TRIGGER = :trigger, WORKFLOW = CAST(:workflow AS JSONB)
+                WHERE ID = :id
+            """.trimIndent(),
+            mapOf(
+                "id" to slotWorkflow.id,
+                "trigger" to slotWorkflow.trigger.name,
+                "workflow" to writeJson(slotWorkflow.workflow),
+            )
+        )
+    }
+
+    fun getSlotWorkflowsBySlotAndTrigger(slot: Slot, trigger: SlotWorkflowTrigger): List<SlotWorkflow> =
         namedParameterJdbcTemplate!!.query(
             """
                 SELECT *
@@ -40,6 +65,20 @@ class SlotWorkflowRepository(
             mapOf(
                 "slotId" to slot.id,
                 "trigger" to trigger.name,
+            )
+        ) { rs, _ ->
+            toSlotWorkflow(rs)
+        }
+
+    fun getSlotWorkflowsBySlot(slot: Slot): List<SlotWorkflow> =
+        namedParameterJdbcTemplate!!.query(
+            """
+                SELECT *
+                FROM ENV_SLOT_WORKFLOWS
+                WHERE SLOT_ID = :slotId
+            """,
+            mapOf(
+                "slotId" to slot.id,
             )
         ) { rs, _ ->
             toSlotWorkflow(rs)

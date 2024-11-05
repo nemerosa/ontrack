@@ -11,6 +11,9 @@ import net.nemerosa.ontrack.extension.environments.Slot
 import net.nemerosa.ontrack.extension.environments.SlotAdmissionRuleConfig
 import net.nemerosa.ontrack.extension.environments.service.EnvironmentService
 import net.nemerosa.ontrack.extension.environments.service.SlotService
+import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflow
+import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowService
+import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.structure.StructureService
@@ -23,6 +26,7 @@ class EnvironmentsCascContext(
     private val environmentService: EnvironmentService,
     private val structureService: StructureService,
     private val slotService: SlotService,
+    private val slotWorkflowService: SlotWorkflowService,
 ) : AbstractCascContext(), SubConfigContext {
 
     private val logger = LoggerFactory.getLogger(EnvironmentsCascContext::class.java)
@@ -68,12 +72,53 @@ class EnvironmentsCascContext(
                             }
                         }
                         runSlotAdmissionRules(slot, slotEnvironmentCasc)
+                        runSlotWorkflows(slot, slotEnvironmentCasc)
                     } else {
                         logger.warn("Environment ${slotEnvironmentCasc.name} does not exist")
                     }
                 }
             } else {
                 logger.warn("Project ${slotCasc.project} does not exist")
+            }
+        }
+    }
+
+    private fun runSlotWorkflows(slot: Slot, slotEnvironmentCasc: SlotEnvironmentCasc) {
+        val existingWorkflows = slotWorkflowService.getSlotWorkflowsBySlot(slot)
+        val cascWorkflows = slotEnvironmentCasc.workflows
+        syncForward(
+            from = cascWorkflows,
+            to = existingWorkflows
+        ) {
+            equality { a, b ->
+                a.name == b.workflow.name
+            }
+            onCreation { a ->
+                slotWorkflowService.addSlotWorkflow(
+                    SlotWorkflow(
+                        slot = slot,
+                        trigger = a.trigger,
+                        workflow = Workflow(
+                            name = a.name,
+                            nodes = a.nodes,
+                        )
+                    )
+                )
+            }
+            onModification { a, existing ->
+                slotWorkflowService.updateSlotWorkflow(
+                    existing
+                        .withTrigger(a.trigger)
+                        .withWorkflow(
+                            Workflow(
+                                name = a.name,
+                                nodes = a.nodes
+                            )
+                        )
+                )
+            }
+            onDeletion { existing ->
+                slotWorkflowService.deleteSlotWorkflow(existing)
             }
         }
     }
@@ -175,6 +220,13 @@ class EnvironmentsCascContext(
                                     description = rule.description ?: "",
                                     ruleId = rule.ruleId,
                                     ruleConfig = rule.ruleConfig,
+                                )
+                            },
+                            workflows = slotWorkflowService.getSlotWorkflowsBySlot(slot).map { sw ->
+                                SlotWorkflowCasc(
+                                    trigger = sw.trigger,
+                                    name = sw.workflow.name,
+                                    nodes = sw.workflow.nodes,
                                 )
                             }
                         )

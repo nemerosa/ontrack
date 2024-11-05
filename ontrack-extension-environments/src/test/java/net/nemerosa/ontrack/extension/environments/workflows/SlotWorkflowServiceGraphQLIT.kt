@@ -67,7 +67,7 @@ class SlotWorkflowServiceGraphQLIT : AbstractQLKTITSupport() {
                 )
             ) { data ->
                 checkGraphQLUserErrors(data, "addSlotWorkflow") { node ->
-                    val workflows = slotWorkflowService.getSlotWorkflowsBySlot(
+                    val workflows = slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(
                         slot = slot,
                         trigger = SlotWorkflowTrigger.DEPLOYING,
                     )

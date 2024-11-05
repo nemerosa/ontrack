@@ -27,9 +27,15 @@ class SlotWorkflowServiceImpl(
         slotWorkflowRepository.addSlotWorkflow(slotWorkflow)
     }
 
-    override fun getSlotWorkflowsBySlot(slot: Slot, trigger: SlotWorkflowTrigger): List<SlotWorkflow> {
+    override fun getSlotWorkflowsBySlotAndTrigger(slot: Slot, trigger: SlotWorkflowTrigger): List<SlotWorkflow> {
         securityService.checkSlotAccess<SlotView>(slot)
-        return slotWorkflowRepository.getSlotWorkflowsBySlot(slot, trigger)
+        return slotWorkflowRepository.getSlotWorkflowsBySlotAndTrigger(slot, trigger)
+            .sortedBy { it.workflow.name }
+    }
+
+    override fun getSlotWorkflowsBySlot(slot: Slot): List<SlotWorkflow> {
+        securityService.checkSlotAccess<SlotView>(slot)
+        return slotWorkflowRepository.getSlotWorkflowsBySlot(slot)
             .sortedBy { it.workflow.name }
     }
 
@@ -60,7 +66,7 @@ class SlotWorkflowServiceImpl(
 
     override fun startWorkflowsForPipeline(pipeline: SlotPipeline, trigger: SlotWorkflowTrigger) {
         securityService.checkSlotAccess<SlotPipelineWorkflowRun>(pipeline.slot)
-        val slotWorkflows = getSlotWorkflowsBySlot(pipeline.slot, trigger)
+        val slotWorkflows = getSlotWorkflowsBySlotAndTrigger(pipeline.slot, trigger)
         slotWorkflows.forEach { slotWorkflow ->
             startWorkflow(pipeline, slotWorkflow)
         }
@@ -87,5 +93,15 @@ class SlotWorkflowServiceImpl(
             pipeline,
             slotWorkflow,
         )
+    }
+
+    override fun deleteSlotWorkflow(slotWorkflow: SlotWorkflow) {
+        securityService.checkSlotAccess<SlotUpdate>(slotWorkflow.slot)
+        slotWorkflowRepository.deleteSlotWorkflow(slotWorkflow)
+    }
+
+    override fun updateSlotWorkflow(slotWorkflow: SlotWorkflow) {
+        securityService.checkSlotAccess<SlotUpdate>(slotWorkflow.slot)
+        slotWorkflowRepository.updateSlotWorkflow(slotWorkflow)
     }
 }

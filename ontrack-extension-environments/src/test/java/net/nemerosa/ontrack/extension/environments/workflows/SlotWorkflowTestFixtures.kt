@@ -8,7 +8,7 @@ import net.nemerosa.ontrack.test.TestUtils.uid
 object SlotWorkflowTestFixtures {
     fun testWorkflow(
         name: String = uid("w-"),
-        waitMs: Long = 0,
+        waitMs: Int = 0,
     ) = Workflow(
         name = name,
         nodes = listOf(

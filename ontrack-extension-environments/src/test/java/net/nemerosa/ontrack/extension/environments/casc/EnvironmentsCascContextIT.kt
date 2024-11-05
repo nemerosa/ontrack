@@ -7,6 +7,10 @@ import net.nemerosa.ontrack.extension.environments.SlotAdmissionRuleTestFixtures
 import net.nemerosa.ontrack.extension.environments.SlotTestSupport
 import net.nemerosa.ontrack.extension.environments.service.EnvironmentService
 import net.nemerosa.ontrack.extension.environments.service.SlotService
+import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflow
+import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowService
+import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowTestFixtures
+import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowTrigger
 import net.nemerosa.ontrack.json.asJson
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,6 +23,9 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
 
     @Autowired
     private lateinit var slotService: SlotService
+
+    @Autowired
+    private lateinit var slotWorkflowService: SlotWorkflowService
 
     @Autowired
     private lateinit var environmentsCascContext: EnvironmentsCascContext
@@ -322,6 +329,14 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                 slotService.addAdmissionRuleConfig(
                     config = rule
                 )
+                val workflow = SlotWorkflowTestFixtures.testWorkflow()
+                slotWorkflowService.addSlotWorkflow(
+                    SlotWorkflow(
+                        slot = slot,
+                        trigger = SlotWorkflowTrigger.DEPLOYING,
+                        workflow = workflow,
+                    )
+                )
                 val json = environmentsCascContext.render()
                 assertEquals(
                     mapOf(
@@ -348,6 +363,13 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                                                 "description" to "",
                                                 "ruleId" to rule.ruleId,
                                                 "ruleConfig" to rule.ruleConfig,
+                                            )
+                                        ),
+                                        "workflows" to listOf(
+                                            mapOf(
+                                                "trigger" to "DEPLOYING",
+                                                "name" to workflow.name,
+                                                "nodes" to workflow.nodes,
                                             )
                                         )
                                     )
@@ -454,6 +476,218 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                         )
                     }
                 )
+            }
+        }
+    }
+
+    @Test
+    fun `Registration of workflows using Casc`() {
+        asAdmin {
+            deleteAllEnvironments()
+            val project = project { }
+            val cascYaml =
+                """
+                    ontrack:
+                        config:
+                            environments:
+                                environments:
+                                    - name: production
+                                      order: 200
+                                      tags:
+                                        - release
+                                slots:
+                                    - project: ${project.name}
+                                      environments:
+                                        - name: production
+                                          workflows:
+                                            - name: Creation
+                                              trigger: CREATION
+                                              nodes:
+                                                - id: start
+                                                  executorId: mock
+                                                  data:
+                                                      text: Start
+                                                - id: end
+                                                  parents:
+                                                    - id: start
+                                                  executorId: mock
+                                                  data:
+                                                      text: End
+                                            - name: Deploying
+                                              trigger: DEPLOYING
+                                              nodes:
+                                                - id: deploy
+                                                  executorId: mock
+                                                  data:
+                                                      text: Deploy
+                                            - name: Deployed
+                                              trigger: DEPLOYED
+                                              nodes:
+                                                - id: deployed
+                                                  executorId: mock
+                                                  data:
+                                                      text: Deployed
+                """.trimIndent()
+            casc(cascYaml)
+            casc(cascYaml) // Testing the updates
+
+            val production = environmentService.findByName("production") ?: fail("Production not found")
+            assertNotNull(
+                slotService.findSlotByProjectAndEnvironment(
+                    production,
+                    project,
+                    Slot.DEFAULT_QUALIFIER
+                )
+            ) { slot ->
+                assertNotNull(
+                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.CREATION).firstOrNull()
+                ) { sw ->
+                    assertEquals("Creation", sw.workflow.name)
+                }
+                assertNotNull(
+                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.DEPLOYING).firstOrNull()
+                ) { sw ->
+                    assertEquals("Deploying", sw.workflow.name)
+                }
+                assertNotNull(
+                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.DEPLOYED).firstOrNull()
+                ) { sw ->
+                    assertEquals("Deployed", sw.workflow.name)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Deletion of workflows using Casc`() {
+        asAdmin {
+            deleteAllEnvironments()
+            val project = project { }
+            val cascYaml =
+                """
+                    ontrack:
+                        config:
+                            environments:
+                                environments:
+                                    - name: production
+                                      order: 200
+                                      tags:
+                                        - release
+                                slots:
+                                    - project: ${project.name}
+                                      environments:
+                                        - name: production
+                                          workflows:
+                                            - name: Creation
+                                              trigger: CREATION
+                                              nodes:
+                                                - id: start
+                                                  executorId: mock
+                                                  data:
+                                                      text: Start
+                                                - id: end
+                                                  parents:
+                                                    - id: start
+                                                  executorId: mock
+                                                  data:
+                                                      text: End
+                                            - name: Deploying
+                                              trigger: DEPLOYING
+                                              nodes:
+                                                - id: deploy
+                                                  executorId: mock
+                                                  data:
+                                                      text: Deploy
+                                            - name: Deployed
+                                              trigger: DEPLOYED
+                                              nodes:
+                                                - id: deployed
+                                                  executorId: mock
+                                                  data:
+                                                      text: Deployed
+                """.trimIndent()
+            casc(cascYaml)
+
+            val production = environmentService.findByName("production") ?: fail("Production not found")
+            assertNotNull(
+                slotService.findSlotByProjectAndEnvironment(
+                    production,
+                    project,
+                    Slot.DEFAULT_QUALIFIER
+                )
+            ) { slot ->
+                assertNotNull(
+                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.CREATION).firstOrNull()
+                ) { sw ->
+                    assertEquals("Creation", sw.workflow.name)
+                }
+                assertNotNull(
+                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.DEPLOYING).firstOrNull()
+                ) { sw ->
+                    assertEquals("Deploying", sw.workflow.name)
+                }
+                assertNotNull(
+                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.DEPLOYED).firstOrNull()
+                ) { sw ->
+                    assertEquals("Deployed", sw.workflow.name)
+                }
+            }
+
+            // Deletion
+            casc(
+                """
+                    ontrack:
+                        config:
+                            environments:
+                                environments:
+                                    - name: production
+                                      order: 200
+                                      tags:
+                                        - release
+                                slots:
+                                    - project: ${project.name}
+                                      environments:
+                                        - name: production
+                                          workflows:
+                                            - name: Deploying
+                                              trigger: DEPLOYING
+                                              nodes:
+                                                - id: deploy
+                                                  executorId: mock
+                                                  data:
+                                                      text: Deploy
+                                            - name: Deployed
+                                              trigger: DEPLOYED
+                                              nodes:
+                                                - id: deployed
+                                                  executorId: mock
+                                                  data:
+                                                      text: Deployed
+                """.trimIndent()
+            )
+
+            assertNotNull(
+                slotService.findSlotByProjectAndEnvironment(
+                    environmentService.findByName("production")
+                        ?: fail("Production not found"),
+                    project,
+                    Slot.DEFAULT_QUALIFIER
+                )
+            ) { slot ->
+                assertNull(
+                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.CREATION).firstOrNull(),
+                    "Creation workflow is gone"
+                )
+                assertNotNull(
+                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.DEPLOYING).firstOrNull()
+                ) { sw ->
+                    assertEquals("Deploying", sw.workflow.name)
+                }
+                assertNotNull(
+                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.DEPLOYED).firstOrNull()
+                ) { sw ->
+                    assertEquals("Deployed", sw.workflow.name)
+                }
             }
         }
     }

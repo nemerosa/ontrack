@@ -11,6 +11,7 @@ class EnvironmentsCascModelTest {
             environmentService = mockk(),
             structureService = mockk(),
             slotService = mockk(),
+            slotWorkflowService = mockk(),
         )
         val type = context.type
         println(type)

@@ -12,6 +12,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.hasAnnotation
+import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.javaType
 import kotlin.reflect.jvm.jvmErasure
@@ -51,6 +52,13 @@ class CascJson : CascType("JSON type") {
 
 class CascDuration : CascType("Duration") {
     override val __type: String = "Duration"
+}
+
+class CascEnum(
+    val name: String,
+    val values: List<String>,
+) : CascType("Enum") {
+    override val __type: String = "Enum"
 }
 
 sealed class CascScalar(
@@ -185,7 +193,13 @@ internal fun cascFieldType(property: KProperty<*>): CascType =
             JsonNode::class -> cascJson
             Duration::class -> cascDuration
             List::class -> cascArray(property)
-            else -> error("Cannot get CasC type for $property")
+            else -> {
+                val kclass = property.returnType.classifier as? KClass<*>
+                when {
+                    kclass?.isSubclassOf(Enum::class) == true -> cascEnum(property)
+                    else -> error("Cannot get CasC type for $property")
+                }
+            }
         }
     }
 
@@ -205,6 +219,14 @@ private fun cascArray(property: KProperty<*>): CascType {
     } else {
         error("No argument found for the list type $property")
     }
+}
+
+private fun cascEnum(property: KProperty<*>): CascType {
+    val kclass = property.returnType.classifier as KClass<*>
+    return CascEnum(
+        name = kclass.simpleName!!,
+        values = kclass.java.enumConstants.map { it.toString() },
+    )
 }
 
 private fun cascPropertyType(property: KProperty<*>): CascType {
