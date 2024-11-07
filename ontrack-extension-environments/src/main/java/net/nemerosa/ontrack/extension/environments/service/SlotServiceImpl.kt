@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.environments.service
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.environments.*
+import net.nemerosa.ontrack.extension.environments.events.EnvironmentsEventsFactory
 import net.nemerosa.ontrack.extension.environments.rules.SlotAdmissionRuleRegistry
 import net.nemerosa.ontrack.extension.environments.security.*
 import net.nemerosa.ontrack.extension.environments.storage.*
@@ -28,6 +29,7 @@ class SlotServiceImpl(
     private val slotPipelineAdmissionRuleStatusRepository: SlotPipelineAdmissionRuleStatusRepository,
     private val slotAdmissionRuleRegistry: SlotAdmissionRuleRegistry,
     private val slotWorkflowService: SlotWorkflowService,
+    private val environmentsEventsFactory: EnvironmentsEventsFactory,
 ) : SlotService {
 
     override fun addSlot(slot: Slot) {
@@ -227,7 +229,11 @@ class SlotServiceImpl(
             )
         )
         // Workflow triggers
-        slotWorkflowService.startWorkflowsForPipeline(pipeline, SlotWorkflowTrigger.CREATION)
+        slotWorkflowService.startWorkflowsForPipeline(
+            pipeline,
+            SlotWorkflowTrigger.CREATION,
+            environmentsEventsFactory.pipelineCreation(pipeline)
+        )
         // OK
         return findPipelineById(pipeline.id) ?: throw SlotPipelineIdNotFoundException(pipeline.id)
     }
@@ -350,7 +356,11 @@ class SlotServiceImpl(
                 message = "Deployment started",
             )
             // Workflows
-            slotWorkflowService.startWorkflowsForPipeline(pipeline, SlotWorkflowTrigger.DEPLOYING)
+            slotWorkflowService.startWorkflowsForPipeline(
+                pipeline,
+                SlotWorkflowTrigger.DEPLOYING,
+                environmentsEventsFactory.pipelineDeploying(pipeline)
+            )
         }
         // OK
         return status
@@ -464,7 +474,11 @@ class SlotServiceImpl(
             },
         )
         // Workflows
-        slotWorkflowService.startWorkflowsForPipeline(pipeline, SlotWorkflowTrigger.DEPLOYED)
+        slotWorkflowService.startWorkflowsForPipeline(
+            pipeline,
+            SlotWorkflowTrigger.DEPLOYED,
+            environmentsEventsFactory.pipelineDeployed(pipeline)
+        )
         // OK
         return SlotPipelineDeploymentFinishStatus.ok(actualMessage)
     }

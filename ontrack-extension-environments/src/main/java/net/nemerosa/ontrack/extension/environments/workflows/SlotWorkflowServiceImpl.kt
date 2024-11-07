@@ -9,6 +9,10 @@ import net.nemerosa.ontrack.extension.environments.service.checkSlotAccess
 import net.nemerosa.ontrack.extension.environments.service.isSlotAccessible
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowContext
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowEngine
+import net.nemerosa.ontrack.extension.workflows.notifications.WorkflowNotificationChannelNodeExecutor
+import net.nemerosa.ontrack.extension.workflows.notifications.WorkflowNotificationItemConverter
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.security.SecurityService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -20,6 +24,7 @@ class SlotWorkflowServiceImpl(
     private val slotWorkflowRepository: SlotWorkflowRepository,
     private val slotWorkflowInstanceRepository: SlotWorkflowInstanceRepository,
     private val workflowEngine: WorkflowEngine,
+    private val workflowNotificationItemConverter: WorkflowNotificationItemConverter,
 ) : SlotWorkflowService {
 
     override fun addSlotWorkflow(slotWorkflow: SlotWorkflow) {
@@ -39,7 +44,11 @@ class SlotWorkflowServiceImpl(
             .sortedBy { it.workflow.name }
     }
 
-    override fun startWorkflow(pipeline: SlotPipeline, slotWorkflow: SlotWorkflow): SlotWorkflowInstance {
+    override fun startWorkflow(
+        pipeline: SlotPipeline,
+        slotWorkflow: SlotWorkflow,
+        event: Event,
+    ): SlotWorkflowInstance {
         securityService.checkSlotAccess<SlotPipelineWorkflowRun>(pipeline.slot)
         if (pipeline.slot.id != slotWorkflow.slot.id) {
             error("Cannot start a workflow for a slot that is different than the one of the pipeline.")
@@ -48,9 +57,15 @@ class SlotWorkflowServiceImpl(
         val workflowInstance = workflowEngine.startWorkflow(
             workflow = slotWorkflow.workflow,
             context = WorkflowContext.noContext()
-        ) { context, instanceId ->
-            // TODO Slot/pipeline contributions to the context
-            context
+        ) { ctx, instanceId ->
+            // Converting the event to a suitable format
+            val item = workflowNotificationItemConverter.convertForQueue(event, instanceId)
+            // Adding to the context
+            ctx
+                .withData(
+                    WorkflowNotificationChannelNodeExecutor.CONTEXT_EVENT,
+                    item.asJson()
+                )
         }
         // Slot workflow instance record
         val slotWorkflowInstance = SlotWorkflowInstance(
@@ -64,11 +79,15 @@ class SlotWorkflowServiceImpl(
         return slotWorkflowInstance
     }
 
-    override fun startWorkflowsForPipeline(pipeline: SlotPipeline, trigger: SlotWorkflowTrigger) {
+    override fun startWorkflowsForPipeline(
+        pipeline: SlotPipeline,
+        trigger: SlotWorkflowTrigger,
+        event: Event,
+    ) {
         securityService.checkSlotAccess<SlotPipelineWorkflowRun>(pipeline.slot)
         val slotWorkflows = getSlotWorkflowsBySlotAndTrigger(pipeline.slot, trigger)
         slotWorkflows.forEach { slotWorkflow ->
-            startWorkflow(pipeline, slotWorkflow)
+            startWorkflow(pipeline, slotWorkflow, event)
         }
     }
 

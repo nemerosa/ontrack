@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.environments.workflows
 
 import net.nemerosa.ontrack.extension.environments.SlotTestSupport
+import net.nemerosa.ontrack.extension.environments.events.EnvironmentsEventsFactory
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.extension.workflows.WorkflowTestSupport
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceStatus
@@ -36,6 +37,9 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var slotWorkflowTestSupport: SlotWorkflowTestSupport
+
+    @Autowired
+    private lateinit var environmentsEventsFactory: EnvironmentsEventsFactory
 
     @Test
     fun `Registering a workflow on a slot`() {
@@ -73,7 +77,8 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
                 slotWorkflow
             )
 
-            val startedSlotWorkflowInstance = slotWorkflowService.startWorkflow(pipeline, slotWorkflow)
+            val event = environmentsEventsFactory.pipelineCreation(pipeline)
+            val startedSlotWorkflowInstance = slotWorkflowService.startWorkflow(pipeline, slotWorkflow, event)
 
             workflowTestSupport.waitForWorkflowInstance(startedSlotWorkflowInstance.workflowInstance.id)
 

@@ -5,6 +5,8 @@ import net.nemerosa.ontrack.model.events.Event
 
 interface EnvironmentsEventsFactory {
 
+    fun pipelineCreation(pipeline: SlotPipeline): Event
     fun pipelineDeploying(pipeline: SlotPipeline): Event
+    fun pipelineDeployed(pipeline: SlotPipeline): Event
 
 }
