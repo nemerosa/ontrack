@@ -20,6 +20,8 @@ data class WorkflowContext(
         return value.parse()
     }
 
+    fun hasValue(key: String): Boolean = index.containsKey(key)
+
     fun getValue(key: String): JsonNode {
         return findValue(key) ?: throw WorkflowContextKeyNotFoundException(key)
     }
