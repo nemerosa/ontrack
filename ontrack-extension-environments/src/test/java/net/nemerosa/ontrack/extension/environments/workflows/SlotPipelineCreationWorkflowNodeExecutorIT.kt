@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.environments.EnvironmentTestSupport
 import net.nemerosa.ontrack.extension.environments.SlotPipelineStatus
 import net.nemerosa.ontrack.extension.environments.SlotTestSupport
 import net.nemerosa.ontrack.extension.environments.service.SlotService
+import net.nemerosa.ontrack.extension.environments.workflows.executors.SlotPipelineCreationWorkflowNodeExecutorData
 import net.nemerosa.ontrack.extension.notifications.AbstractNotificationTestSupport
 import net.nemerosa.ontrack.extension.notifications.subscriptions.subscribe
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
@@ -210,6 +211,106 @@ class SlotPipelineCreationWorkflowNodeExecutorIT : AbstractNotificationTestSuppo
                             Build <a href="http://localhost:8080/#/build/$id">$name</a> has started its deployment at <a href="http://localhost:3000/ui/extension/environments/pipeline/${pipeline.id}">${pipeline.fullName()}</a>
                         """.trimIndent().trim(),
                         message?.trim()
+                    )
+                }
+            }
+        }
+    }
+
+    @OptIn(ExperimentalTime::class)
+    @Test
+    fun `On a promotion, running a workflow to put a pipeline into a slot, deploying it and finishing it`() {
+        slotTestSupport.withSlot { slot ->
+            slot.project.branch {
+                val pl = promotionLevel()
+
+                // Promotion subscription running a workflow which pushes the build into a slot
+                val mockChannelTarget = uid("mock-")
+                eventSubscriptionService.subscribe(
+                    name = "Start pipeline on promotion",
+                    channel = workflowNotificationChannel,
+                    channelConfig = WorkflowNotificationChannelConfig(
+                        workflow = WorkflowParser.parseYamlWorkflow(
+                            """
+                                name: Start pipeline
+                                nodes:
+                                  - id: start
+                                    executorId: slot-pipeline-creation
+                                    data:
+                                        environment: ${slot.environment.name}
+                                  - id: deploying
+                                    parents:
+                                      - id: start
+                                    executorId: slot-pipeline-deploying
+                                    data: {}
+                                  - id: deployment
+                                    parents:
+                                      - id: deploying
+                                    executorId: notification
+                                    data:
+                                        channel: mock
+                                        channelConfig:
+                                            target: $mockChannelTarget
+                                            rendererType: html
+                                        template: |
+                                            Build ${'$'}{build} has starting its deployment at ${'$'}{#.pipeline?id=workflow.pipeline.targetPipelineId}
+                                  - id: deployed
+                                    parents:
+                                      - id: deployment
+                                    executorId: slot-pipeline-deployed
+                                    data: {}
+                                  - id: deployed-message
+                                    parents:
+                                      - id: deployed
+                                    executorId: notification
+                                    data:
+                                        channel: mock
+                                        channelConfig:
+                                            target: $mockChannelTarget
+                                            rendererType: html
+                                        template: |
+                                            Build ${'$'}{build} has been deployed at ${'$'}{#.pipeline?id=workflow.pipeline.targetPipelineId}
+                            """
+                        ),
+                    ),
+                    projectEntity = pl,
+                    keywords = null,
+                    origin = "Test",
+                    contentTemplate = null,
+                    EventFactory.NEW_PROMOTION_RUN,
+                )
+
+                build {
+                    // Promoting & launching the workflow
+                    promote(pl)
+
+                    // Waiting for this build to be into a pipeline
+                    // ... and this pipeline must be deployed
+                    waitUntil(
+                        message = "Pipeline deployed",
+                        timeout = 10.seconds,
+                        interval = 1.seconds,
+                    ) {
+                        val pipeline = slotService.getCurrentPipeline(slot)
+                        pipeline?.build?.id == id && pipeline.status == SlotPipelineStatus.DEPLOYED
+                    }
+
+                    // Pipeline
+                    val pipeline = slotService.getCurrentPipeline(slot)
+                        ?: error("No current pipeline found")
+
+                    // Checking the messages
+                    val messages = mockNotificationChannel.targetMessages(mockChannelTarget)
+                    assertEquals(
+                        listOf(
+                            """
+                                Build <a href="http://localhost:8080/#/build/$id">$name</a> has started its deployment at <a href="http://localhost:3000/ui/extension/environments/pipeline/${pipeline.id}">${pipeline.fullName()}</a>
+                            """.trimIndent().trim(),
+                            """
+                                Build <a href="http://localhost:8080/#/build/$id">$name</a> has been deployed at <a href="http://localhost:3000/ui/extension/environments/pipeline/${pipeline.id}">${pipeline.fullName()}</a>
+                            """.trimIndent().trim(),
+                        ),
+                        messages.map { it.trim() }
                     )
                 }
             }

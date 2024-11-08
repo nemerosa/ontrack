@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.environments.security.SlotUpdate
 import net.nemerosa.ontrack.extension.environments.security.SlotView
 import net.nemerosa.ontrack.extension.environments.service.checkSlotAccess
 import net.nemerosa.ontrack.extension.environments.service.isSlotAccessible
+import net.nemerosa.ontrack.extension.environments.workflows.executors.SlotPipelineWorkflowContext
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowContext
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowEngine
 import net.nemerosa.ontrack.extension.workflows.notifications.WorkflowNotificationChannelNodeExecutor

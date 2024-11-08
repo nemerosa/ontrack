@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.environments.workflows
+package net.nemerosa.ontrack.extension.environments.workflows.executors
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.environments.EnvironmentsExtensionFeature

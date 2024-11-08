@@ -348,7 +348,7 @@ class SlotServiceImpl(
             checks = rulesChecks + workflowChecks
         )
         // Actual start
-        if (!dryRun) {
+        if (!dryRun && status.status) {
             // Marks this pipeline as deploying
             changePipeline(
                 pipeline = pipeline,
