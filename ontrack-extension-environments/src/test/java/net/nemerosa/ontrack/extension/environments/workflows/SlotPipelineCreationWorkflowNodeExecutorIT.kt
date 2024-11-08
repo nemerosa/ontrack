@@ -14,6 +14,7 @@ import net.nemerosa.ontrack.extension.workflows.registry.WorkflowParser
 import net.nemerosa.ontrack.it.waitUntil
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.EventFactory
+import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.TestPropertySource
@@ -138,6 +139,78 @@ class SlotPipelineCreationWorkflowNodeExecutorIT : AbstractNotificationTestSuppo
                     ) {
                         slotService.getCurrentPipeline(slot)?.build?.id == id
                     }
+                }
+            }
+        }
+    }
+
+    @OptIn(ExperimentalTime::class)
+    @Test
+    fun `On a promotion, running a workflow to put a pipeline into a slot and send a link to this pipeline`() {
+        slotTestSupport.withSlot { slot ->
+            slot.project.branch {
+                val pl = promotionLevel()
+
+                // Promotion subscription running a workflow which pushes the build into a slot
+                val mockChannelTarget = uid("mock-")
+                eventSubscriptionService.subscribe(
+                    name = "Start pipeline on promotion",
+                    channel = workflowNotificationChannel,
+                    channelConfig = WorkflowNotificationChannelConfig(
+                        workflow = WorkflowParser.parseYamlWorkflow(
+                            """
+                                name: Start pipeline
+                                nodes:
+                                  - id: pipeline
+                                    executorId: slot-pipeline-creation
+                                    data:
+                                        environment: ${slot.environment.name}
+                                  - id: notification
+                                    parents:
+                                      - id: pipeline
+                                    executorId: notification
+                                    data:
+                                        channel: mock
+                                        channelConfig:
+                                            target: $mockChannelTarget
+                                            rendererType: html
+                                        template: |
+                                            Build ${'$'}{build} has started its deployment at ${'$'}{#.pipeline?id=workflow.pipeline.targetPipelineId}
+                            """
+                        ),
+                    ),
+                    projectEntity = pl,
+                    keywords = null,
+                    origin = "Test",
+                    contentTemplate = null,
+                    EventFactory.NEW_PROMOTION_RUN,
+                )
+
+                build {
+                    // Promoting & launching the workflow
+                    promote(pl)
+
+                    // Waiting for this build to be into a pipeline
+                    waitUntil(
+                        message = "Build into pipeline",
+                        timeout = 10.seconds,
+                        interval = 1.seconds,
+                    ) {
+                        slotService.getCurrentPipeline(slot)?.build?.id == id
+                    }
+
+                    // Pipeline
+                    val pipeline = slotService.getCurrentPipeline(slot)
+                        ?: error("No current pipeline found")
+
+                    // Checking the message
+                    val message = mockNotificationChannel.targetMessages(mockChannelTarget).firstOrNull()
+                    assertEquals(
+                        """
+                            Build <a href="http://localhost:8080/#/build/$id">$name</a> has started its deployment at <a href="http://localhost:3000/ui/extension/environments/pipeline/${pipeline.id}">${pipeline.fullName()}</a>
+                        """.trimIndent().trim(),
+                        message?.trim()
+                    )
                 }
             }
         }

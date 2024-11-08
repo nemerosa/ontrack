@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificatio
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.Event
+import net.nemerosa.ontrack.model.events.EventRendererRegistry
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.form.Form
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component
 @Component
 class MockNotificationChannel(
     private val eventTemplatingService: EventTemplatingService,
+    private val eventRendererRegistry: EventRendererRegistry,
 ) :
     AbstractNotificationChannel<MockNotificationChannelConfig, MockNotificationChannelOutput>(MockNotificationChannelConfig::class) {
 
@@ -35,11 +37,14 @@ class MockNotificationChannel(
         template: String?,
         outputProgressCallback: (current: MockNotificationChannelOutput) -> MockNotificationChannelOutput
     ): NotificationResult<MockNotificationChannelOutput> {
+        val rendererType = config.rendererType ?: PlainEventRenderer.INSTANCE.id
+        val renderer = eventRendererRegistry.findEventRendererById(rendererType)
+            ?: PlainEventRenderer.INSTANCE
         val text = eventTemplatingService.renderEvent(
-            event,
-            context,
-            template,
-            PlainEventRenderer.INSTANCE,
+            event = event,
+            context = context,
+            template = template,
+            renderer = renderer,
         )
         messages.getOrPut(config.target) { mutableListOf() }.add(text)
         return NotificationResult.ok(

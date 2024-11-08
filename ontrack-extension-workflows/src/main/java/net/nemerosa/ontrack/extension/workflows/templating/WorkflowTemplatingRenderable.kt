@@ -18,16 +18,15 @@ class WorkflowTemplatingRenderable(
         if (field.isNullOrBlank()) {
             throw TemplatingRenderableFieldRequiredException()
         } else {
+            val (nodeId, path) = extractParameters(field, configMap)
             // Field == node ID
-            val node = workflowInstance.getNode(field)
+            val node = workflowInstance.getNode(nodeId)
             // Checking the node state
             if (node.status != WorkflowInstanceNodeStatus.SUCCESS) {
-                throw TemplatingGeneralException("Node $field is not in SUCCESS state and cannot be used.")
+                throw TemplatingGeneralException("Node $nodeId is not in SUCCESS state and cannot be used.")
             } else if (node.output == null) {
-                throw TemplatingGeneralException("Node $field has no output.")
+                throw TemplatingGeneralException("Node $nodeId has no output.")
             }
-            // We require the path to the data to get
-            val path = configMap.getRequiredTemplatingParam(WorkflowTemplatingRenderableParameters::path.name)
             // Getting the raw JSON data from the node output
             val data: JsonNode? = JsonPathUtils.get(node.output, path)
             // Only text is supported
@@ -36,8 +35,22 @@ class WorkflowTemplatingRenderable(
             } else if (data.isTextual) {
                 data.asText()
             } else {
-                throw TemplatingGeneralException("Node $field output does not contain a text node at $path")
+                throw TemplatingGeneralException("Node $nodeId output does not contain a text node at $path")
             }
         }
+
+    private fun extractParameters(field: String, configMap: Map<String, String>): Pair<String, String> {
+        if (field.contains(".")) {
+            val nodeId = field.substringBefore(".")
+            val path = field.substringAfter(".")
+            return nodeId to path
+        } else {
+            val nodeId = field
+            // We require the path to the data to get
+            val path = configMap.getRequiredTemplatingParam(WorkflowTemplatingRenderableParameters::path.name)
+            // OK
+            return nodeId to path
+        }
+    }
 
 }

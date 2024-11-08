@@ -4,6 +4,11 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity;
 
 import java.net.URI;
 
+/**
+ * @deprecated Will not be removed in V5 but should not be used any longer. See ontrack.config.url/ontrack.config.ui.url
+ * configuration properties instead.
+ */
+@Deprecated
 public interface URIBuilder {
 
     URI build(Object methodInvocation);

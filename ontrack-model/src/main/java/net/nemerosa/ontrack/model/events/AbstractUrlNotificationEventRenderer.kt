@@ -11,6 +11,7 @@ abstract class AbstractUrlNotificationEventRenderer(
     protected val url: String = ontrackConfigProperties.url.trimEnd('/')
 
     protected fun getUrl(relativeURI: String): String =
+        // TODO Use UILocations
         "$url/$relativeURI"
 
     final override fun render(projectEntity: ProjectEntity, name: String): String =

@@ -9,4 +9,5 @@ package net.nemerosa.ontrack.extension.notifications.mock
 data class MockNotificationChannelConfig(
     val target: String,
     val data: String? = null,
+    val rendererType: String? = null,
 )
