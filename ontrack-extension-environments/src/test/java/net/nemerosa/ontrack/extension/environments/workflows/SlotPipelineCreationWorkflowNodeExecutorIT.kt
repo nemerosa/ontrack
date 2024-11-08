@@ -20,7 +20,7 @@ import kotlin.time.ExperimentalTime
         "ontrack.extension.queue.general.async=false",
     ]
 )
-class SlotPipelineCreationNotificationChannelWorkflowIT : AbstractDSLTestSupport() {
+class SlotPipelineCreationWorkflowNodeExecutorIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var environmentTestSupport: EnvironmentTestSupport
@@ -53,11 +53,9 @@ class SlotPipelineCreationNotificationChannelWorkflowIT : AbstractDSLTestSupport
                                     name: Deployment to production
                                     nodes:
                                         - id: deploy
-                                          executorId: notification
+                                          executorId: slot-pipeline-creation
                                           data:
-                                            channel: slot-pipeline-creation
-                                            channelConfig:
-                                                environment: ${productionEnv.name}
+                                            environment: ${productionEnv.name}
                                 """.trimIndent()
                             )
                         )

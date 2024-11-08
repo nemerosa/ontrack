@@ -66,6 +66,13 @@ class SlotWorkflowServiceImpl(
                     WorkflowNotificationChannelNodeExecutor.CONTEXT_EVENT,
                     item.asJson()
                 )
+                .withData(
+                    SlotPipelineWorkflowContext.CONTEXT,
+                    SlotPipelineWorkflowContext(
+                        pipelineId = pipeline.id,
+                        slotWorkflowId = slotWorkflow.id,
+                    ).asJson()
+                )
         }
         // Slot workflow instance record
         val slotWorkflowInstance = SlotWorkflowInstance(
