@@ -15,14 +15,14 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import org.springframework.stereotype.Component
 
 @Component
-class SlotPipelineDeployingWorkflowNodeExecutor(
+class SlotPipelineDeployedWorkflowNodeExecutor(
     extensionFeature: EnvironmentsExtensionFeature,
     private val slotService: SlotService,
     private val securityService: SecurityService,
 ) : AbstractExtension(extensionFeature), WorkflowNodeExecutor {
 
-    override val id: String = "slot-pipeline-deploying"
-    override val displayName: String = "Deploying pipeline"
+    override val id: String = "slot-pipeline-deployed"
+    override val displayName: String = "Deployed pipeline"
 
     override suspend fun execute(
         workflowInstance: WorkflowInstance,
@@ -33,18 +33,18 @@ class SlotPipelineDeployingWorkflowNodeExecutor(
             // Getting the pipeline from the context
             val pipeline = getPipelineFromContext(workflowInstance.context)
             // Progressing the pipeline
-            val status = slotService.startDeployment(pipeline, dryRun = false)
+            val status = slotService.finishDeployment(pipeline)
             // Deployment started
-            val result = if (status.status) {
+            val result = if (status.deployed) {
                 WorkflowNodeExecutorResult.success(
-                    SlotPipelineDeployingWorkflowNodeExecutorOutput(
+                    SlotPipelineDeployedWorkflowNodeExecutorOutput(
                         pipelineId = pipeline.id,
                     ).asJson()
                 )
             } else {
                 WorkflowNodeExecutorResult.error(
-                    "Pipeline conditions were not met to start the deployment.",
-                    SlotPipelineDeployingWorkflowNodeExecutorOutput(
+                    "Pipeline could not be deployed: ${status.message}",
+                    SlotPipelineDeployedWorkflowNodeExecutorOutput(
                         pipelineId = pipeline.id,
                     ).asJson()
                 )

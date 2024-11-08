@@ -91,7 +91,7 @@ data class WorkflowInstance(
     fun successNode(
         nodeId: String,
         output: JsonNode,
-        context: Map<String, JsonNode>,
+        context: Map<String, JsonNode> = emptyMap(),
     ) = updateNode(nodeId) { node ->
         node.success(output)
     }.run {

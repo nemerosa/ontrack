@@ -29,7 +29,7 @@ import kotlin.time.ExperimentalTime
         "ontrack.extension.queue.general.async=false",
     ]
 )
-class SlotPipelineCreationWorkflowNodeExecutorIT : AbstractNotificationTestSupport() {
+class SlotPipelineWorkflowNodeExecutorsIT : AbstractNotificationTestSupport() {
 
     @Autowired
     private lateinit var environmentTestSupport: EnvironmentTestSupport
@@ -253,7 +253,7 @@ class SlotPipelineCreationWorkflowNodeExecutorIT : AbstractNotificationTestSuppo
                                             target: $mockChannelTarget
                                             rendererType: html
                                         template: |
-                                            Build ${'$'}{build} has starting its deployment at ${'$'}{#.pipeline?id=workflow.pipeline.targetPipelineId}
+                                            Build ${'$'}{build} has started its deployment at ${'$'}{#.pipeline?id=workflow.start.targetPipelineId}
                                   - id: deployed
                                     parents:
                                       - id: deployment
@@ -269,7 +269,7 @@ class SlotPipelineCreationWorkflowNodeExecutorIT : AbstractNotificationTestSuppo
                                             target: $mockChannelTarget
                                             rendererType: html
                                         template: |
-                                            Build ${'$'}{build} has been deployed at ${'$'}{#.pipeline?id=workflow.pipeline.targetPipelineId}
+                                            Build ${'$'}{build} has been deployed at ${'$'}{#.pipeline?id=workflow.start.targetPipelineId}
                             """
                         ),
                     ),
