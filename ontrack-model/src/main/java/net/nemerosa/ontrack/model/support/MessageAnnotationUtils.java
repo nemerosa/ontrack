@@ -62,24 +62,27 @@ public final class MessageAnnotationUtils {
                 if (messageAnnotator != null) {
                     root = root.transform(node -> {
                         if (node.isLeaf()) {
-                            String text1 = node.getData().getText();
-                            if (StringUtils.isNotBlank(text1)) {
-                                Collection<MessageAnnotation> annotations = messageAnnotator.annotate(text1);
-                                Collection<Node<Markup>> nodes = new ArrayList<>();
-                                for (MessageAnnotation annotation : annotations) {
-                                    if (annotation.isText()) {
-                                        nodes.add(factory.leaf(Markup.text(annotation.getText())));
-                                    } else {
-                                        Node<Markup> child = factory.leaf(Markup.of(annotation.type, annotation.getAttributes()));
-                                        if (annotation.hasText()) {
-                                            child.append(
-                                                    factory.leaf(Markup.text(annotation.getText()))
-                                            );
+                            Markup nodeData = node.getData();
+                            if (nodeData != null) {
+                                String text1 = nodeData.getText();
+                                if (StringUtils.isNotBlank(text1)) {
+                                    Collection<MessageAnnotation> annotations = messageAnnotator.annotate(text1);
+                                    Collection<Node<Markup>> nodes = new ArrayList<>();
+                                    for (MessageAnnotation annotation : annotations) {
+                                        if (annotation.isText()) {
+                                            nodes.add(factory.leaf(Markup.text(annotation.getText())));
+                                        } else {
+                                            Node<Markup> child = factory.leaf(Markup.of(annotation.type, annotation.getAttributes()));
+                                            if (annotation.hasText()) {
+                                                child.append(
+                                                        factory.leaf(Markup.text(annotation.getText()))
+                                                );
+                                            }
+                                            nodes.add(child);
                                         }
-                                        nodes.add(child);
                                     }
+                                    return factory.node(null, nodes);
                                 }
-                                return factory.node(null, nodes);
                             }
                         }
                         return node;
