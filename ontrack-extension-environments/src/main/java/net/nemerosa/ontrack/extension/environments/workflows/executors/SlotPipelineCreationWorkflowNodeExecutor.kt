@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.environments.workflows.executors
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.extension.casc.context.ConfigContext
 import net.nemerosa.ontrack.extension.environments.EnvironmentsExtensionFeature
 import net.nemerosa.ontrack.extension.environments.Slot
 import net.nemerosa.ontrack.extension.environments.service.EnvironmentService
@@ -29,6 +30,7 @@ class SlotPipelineCreationWorkflowNodeExecutor(
     private val environmentService: EnvironmentService,
     private val securityService: SecurityService,
     private val structureService: StructureService,
+    private val configContext: ConfigContext,
 ) : AbstractExtension(extensionFeature), WorkflowNodeExecutor {
 
     override val id: String = "slot-pipeline-creation"
@@ -68,11 +70,16 @@ class SlotPipelineCreationWorkflowNodeExecutor(
             }
             // Creating the pipeline
             val targetPipeline = slotService.startPipeline(targetSlot, build)
+            // Adding some configContext
+            val context = mapOf(
+                SlotPipelineContext.CONTEXT to SlotPipelineContext(pipelineId = targetPipeline.id).asJson()
+            )
             // OK
             WorkflowNodeExecutorResult.success(
-                SlotPipelineCreationWorkflowNodeExecutorOutput(
+                output = SlotPipelineCreationWorkflowNodeExecutorOutput(
                     targetPipelineId = targetPipeline.id,
-                ).asJson()
+                ).asJson(),
+                context = context,
             )
         }
     }

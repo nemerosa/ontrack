@@ -6,6 +6,7 @@ data class WorkflowNodeExecutorResult(
     val type: WorkflowNodeExecutorResultType,
     val message: String?,
     val output: JsonNode?,
+    val context: Map<String, JsonNode> = emptyMap(),
 ) {
     companion object {
 
@@ -15,10 +16,11 @@ data class WorkflowNodeExecutorResult(
             output = output,
         )
 
-        fun success(output: JsonNode?) = WorkflowNodeExecutorResult(
+        fun success(output: JsonNode?, context: Map<String, JsonNode> = emptyMap()) = WorkflowNodeExecutorResult(
             type = WorkflowNodeExecutorResultType.SUCCESS,
             message = null,
             output = output,
+            context = context,
         )
 
     }

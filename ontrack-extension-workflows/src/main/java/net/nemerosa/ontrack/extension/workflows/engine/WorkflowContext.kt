@@ -32,6 +32,12 @@ data class WorkflowContext(
         data = data + WorkflowContextData(key, value)
     )
 
+    fun update(context: Map<String, JsonNode>) = WorkflowContext(
+        data = data + context.map { (key, value) ->
+            WorkflowContextData(key, value)
+        }
+    )
+
     companion object {
         fun noContext() = WorkflowContext(emptyList())
     }

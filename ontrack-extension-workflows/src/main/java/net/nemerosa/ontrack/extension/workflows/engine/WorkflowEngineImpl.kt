@@ -97,7 +97,7 @@ class WorkflowEngineImpl(
                 val timeout = Duration.ofSeconds(node.timeout)
 
                 // Continuous feedback for the node
-                val nodeFeedback: (JsonNode?) -> Unit = { output: JsonNode? ->
+                val nodeFeedback: (output: JsonNode?) -> Unit = { output: JsonNode? ->
                     if (output != null) {
                         transactionHelper.inNewTransaction {
                             workflowInstanceStore.store(instance.progressNode(node.id, output))
@@ -136,8 +136,9 @@ class WorkflowEngineImpl(
                         // Stores the output back into the instance and progresses the node's status
                         workflowInstanceStore.store(
                             instance.successNode(
-                                node.id,
-                                result.output ?: error("Missing notification output")
+                                nodeId = node.id,
+                                output = result.output ?: error("Missing notification output"),
+                                context = result.context,
                             )
                         )
                         // Loads the current state of the instance

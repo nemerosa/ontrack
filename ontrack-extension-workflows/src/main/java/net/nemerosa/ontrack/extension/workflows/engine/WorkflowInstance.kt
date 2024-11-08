@@ -61,6 +61,14 @@ data class WorkflowInstance(
             }
         }
 
+    private fun updateContext(context: Map<String, JsonNode>) = WorkflowInstance(
+        id = id,
+        timestamp = Time.now,
+        workflow = workflow,
+        context = this.context.update(context),
+        nodesExecutions = nodesExecutions,
+    )
+
     private fun updateNode(nodeId: String, update: (node: WorkflowInstanceNode) -> WorkflowInstanceNode) =
         WorkflowInstance(
             id = id,
@@ -80,13 +88,20 @@ data class WorkflowInstance(
         node.start(time)
     }
 
-    fun successNode(nodeId: String, output: JsonNode) = updateNode(nodeId) { node ->
+    fun successNode(
+        nodeId: String,
+        output: JsonNode,
+        context: Map<String, JsonNode>,
+    ) = updateNode(nodeId) { node ->
         node.success(output)
+    }.run {
+        updateContext(context)
     }
 
-    fun errorNode(nodeId: String, throwable: Throwable?, message: String?, output: JsonNode?) = updateNode(nodeId) { node ->
-        node.error(throwable, message, output)
-    }
+    fun errorNode(nodeId: String, throwable: Throwable?, message: String?, output: JsonNode?) =
+        updateNode(nodeId) { node ->
+            node.error(throwable, message, output)
+        }
 
     fun progressNode(nodeId: String, output: JsonNode) = updateNode(nodeId) { node ->
         node.progress(output)
