@@ -666,6 +666,7 @@ internal class AutoVersioningConfigurationServiceIT : AbstractAutoVersioningTest
                                 channelConfig = mapOf(
                                     "target" to target,
                                     "data" to null,
+                                    "rendererType" to null,
                                 ).asJson(),
                                 disabled = false,
                                 origin = "test",
