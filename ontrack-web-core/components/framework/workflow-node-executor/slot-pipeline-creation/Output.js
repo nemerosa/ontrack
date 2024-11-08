@@ -6,7 +6,7 @@ export default function SlotPipelineCreationWorkflowNodeExecutorOutput({data}) {
 
     return (
         <>
-            <SlotPipelineLink pipelineId={targetPipelineId}/>
+            <SlotPipelineLink pipelineId={targetPipelineId} status={true}/>
         </>
     )
 }

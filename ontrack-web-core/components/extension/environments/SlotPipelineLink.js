@@ -4,8 +4,10 @@ import {useGraphQLClient} from "@components/providers/ConnectionContextProvider"
 import {useEffect, useState} from "react";
 import LoadingInline from "@components/common/LoadingInline";
 import {gql} from "graphql-request";
+import {Space} from "antd";
+import SlotPipelineStatus from "@components/extension/environments/SlotPipelineStatus";
 
-export default function SlotPipelineLink({pipelineId}) {
+export default function SlotPipelineLink({pipelineId, status}) {
 
     const client = useGraphQLClient()
     const [loading, setLoading] = useState(true)
@@ -17,6 +19,8 @@ export default function SlotPipelineLink({pipelineId}) {
                 gql`
                     query PipelineLink($id: String!) {
                         slotPipelineById(id: $id) {
+                            id
+                            status
                             number
                             slot {
                                 project {
@@ -41,11 +45,17 @@ export default function SlotPipelineLink({pipelineId}) {
 
     return (
         <>
-            <Link href={slotPipelineUri(pipelineId)}>
-                <LoadingInline loading={loading}>
-                    Pipeline {pipeline.slot.environment.name}/{pipeline.slot.project.name}{pipeline.slot.qualifier && `/${pipeline.slot.qualifier}`}#{pipeline.number}
-                </LoadingInline>
-            </Link>
+            <LoadingInline loading={loading}>
+                {
+                    pipeline &&
+                    <Space>
+                        <Link href={slotPipelineUri(pipelineId)}>
+                            Pipeline {pipeline.slot.environment.name}/{pipeline.slot.project.name}{pipeline.slot.qualifier && `/${pipeline.slot.qualifier}`}#{pipeline.number}
+                        </Link>
+                        {status && <SlotPipelineStatus pipeline={pipeline}/>}
+                    </Space>
+                }
+            </LoadingInline>
         </>
     )
 }
