@@ -12,6 +12,8 @@ import {login} from "../../../core/login";
 import {PipelinePage} from "../PipelinePage";
 import {createSlot} from "../slotFixtures";
 import {addSlotWorkflow} from "@ontrack/extensions/environments/workflows";
+import {gqlPipelineData} from "@ontrack/extensions/environments/environments";
+import {waitUntilCondition} from "../../../support/timing";
 
 test('API - workflows on creation participate into the pipeline check list', async ({page}) => {
     const {slot, project, slotWorkflow} = await withSlotWorkflow({trigger: 'CREATION'})
@@ -160,4 +162,76 @@ test('workflows on creation participate into the pipeline progress', async ({pag
 
     const pipelineActions = await pipelinePage.checkPipelineActions()
     await pipelineActions.expectStatusProgress({value: 50})
+})
+
+test('API - workflow on promotion leading to the deployment of a build', async ({page}) => {
+    // Creating a slot
+    const {slot, project} = await createSlot(ontrack())
+
+    // Creating a promotion
+    const branch = await project.createBranch()
+    const pl = await branch.createPromotionLevel()
+
+    // Creating a subscription on promotions to run a workflow
+    await pl.subscribe({
+        name: "Deployment on promotion",
+        events: ['new_promotion_run'],
+        channel: 'workflow',
+        channelConfig: {
+            workflow: {
+                name: "Deployment",
+                nodes: [
+                    {
+                        id: "start",
+                        executorId: "slot-pipeline-creation",
+                        data: {
+                            environment: slot.environment.name,
+                        }
+                    },
+                    {
+                        id: "deploying",
+                        executorId: "slot-pipeline-deploying",
+                        data: {}
+                    },
+                    {
+                        id: "deployed",
+                        executorId: "slot-pipeline-deployed",
+                        data: {}
+                    },
+                ]
+            }
+        }
+    })
+
+    // Creating a build and promoting it
+    const build = await branch.createBuild()
+    await build.promote(pl)
+
+    let pipeline
+    await waitUntilCondition({
+        page,
+        condition: async () => {
+            // Getting the current pipeline of the slot and checking its status
+            const data = await graphQLCall(
+                ontrack().connection,
+                gql`
+                    query SlotPipeline($slotId: String!) {
+                        slotById(id: $slotId) {
+                            currentPipeline {
+                                ...PipelineData
+                            }
+                        }
+                    }
+                    ${gqlPipelineData}
+                `,
+                {slotId: slot.id}
+            )
+            pipeline = data.slotById?.currentPipeline
+            return pipeline && pipeline.status === 'DEPLOYED'
+        },
+        message: "Pipeline not created or not deployed"
+    })
+
+    await expect(pipeline.number).toStrictEqual(1)
+
 })

@@ -215,7 +215,7 @@ const gqlEnvironmentData = gql`
     }
 `
 
-const gqlSlotData = gql`
+export const gqlSlotData = gql`
     fragment SlotData on Slot {
         id
         description
@@ -231,10 +231,11 @@ const gqlSlotData = gql`
     }
 `
 
-const gqlPipelineData = gql`
+export const gqlPipelineData = gql`
     fragment PipelineData on SlotPipeline {
         id
         number
+        status
         slot {
             ...SlotData
         }
