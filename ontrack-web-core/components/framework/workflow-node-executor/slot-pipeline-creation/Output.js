@@ -1,15 +1,12 @@
-import Link from "next/link";
-import {slotPipelineUri} from "@components/extension/environments/EnvironmentsLinksUtils";
+import SlotPipelineLink from "@components/extension/environments/SlotPipelineLink";
 
-export default function SlotPipelineCreationWorkflowNodeExecutorOutput({data, nodeData}) {
+export default function SlotPipelineCreationWorkflowNodeExecutorOutput({data}) {
 
     const {targetPipelineId} = data
 
     return (
         <>
-            <Link href={slotPipelineUri(targetPipelineId)}>
-                TODO Loads the pipeline details
-            </Link>
+            <SlotPipelineLink pipelineId={targetPipelineId}/>
         </>
     )
 }
