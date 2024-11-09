@@ -2,6 +2,7 @@ const {ui} = require("@ontrack/connection");
 const {expect} = require("@playwright/test");
 const {ValidationRunHistoryDialog} = require("../validationRuns/ValidationRunHistoryDialog");
 const {SCMChangeLogPage} = require("../../extensions/scm/scm");
+const {PromotionsPage} = require("../promotionLevels/PromotionsPage");
 
 class BranchPage {
     constructor(page, branch) {
@@ -65,6 +66,15 @@ class BranchPage {
 
     getDisabledBanner() {
         return this.page.getByTestId("banner-disabled")
+    }
+
+    async navigateToPromotions() {
+        const promotionsButton = this.page.getByRole('button', {name: "Promotions", exact: true})
+        await expect(promotionsButton).toBeVisible()
+        await promotionsButton.click()
+        const promotionsPage = new PromotionsPage(this.page, this.branch)
+        await promotionsPage.checkOnPage()
+        return promotionsPage
     }
 }
 
