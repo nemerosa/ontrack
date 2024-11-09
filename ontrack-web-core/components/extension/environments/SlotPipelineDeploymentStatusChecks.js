@@ -5,14 +5,51 @@ import SlotAdmissionRuleCheck from "@components/extension/environments/SlotAdmis
 import CheckIcon from "@components/common/CheckIcon";
 import SlotPipelineOverrideRuleButton from "@components/extension/environments/SlotPipelineOverrideRuleButton";
 import {FaExclamationTriangle} from "react-icons/fa";
+import {useQuery} from "@components/services/useQuery";
+import {gql} from "graphql-request";
 
 const {Column} = Table
 
-export default function SlotPipelineDeploymentStatusChecks({pipeline, checks, onChange}) {
+export default function SlotPipelineDeploymentStatusChecks({pipeline, onChange}) {
+
+    const {loading, error, data} = useQuery(
+        gql`
+            query PipelineChecks($pipelineId: String!) {
+                slotPipelineById(id: $pipelineId) {
+                    deploymentStatus {
+                        checks {
+                            canBeOverridden
+                            check {
+                                status
+                                reason
+                            }
+                            override {
+                                override
+                                overrideMessage
+                                user
+                                timestamp
+                                data
+                            }
+                            config {
+                                id
+                                name
+                                ruleId
+                                ruleConfig
+                            }
+                            ruleData
+                        }
+                    }
+                }
+            }
+        `,
+        {variables: {pipelineId: pipeline.id}},
+    )
+
     return (
         <>
             <Table
-                dataSource={checks}
+                loading={loading}
+                dataSource={data?.slotPipelineById?.deploymentStatus?.checks}
                 pagination={false}
                 style={{width: '100%'}}
             >

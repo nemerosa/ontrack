@@ -41,27 +41,6 @@ export default function SlotPipelineDeploymentStatus({pipeline}) {
                             deploymentStatus {
                                 status
                                 override
-                                checks {
-                                    canBeOverridden
-                                    check {
-                                        status
-                                        reason
-                                    }
-                                    override {
-                                        override
-                                        overrideMessage
-                                        user
-                                        timestamp
-                                        data
-                                    }
-                                    config {
-                                        id
-                                        name
-                                        ruleId
-                                        ruleConfig
-                                    }
-                                    ruleData
-                                }
                             }
                             changes {
                                 id
@@ -144,7 +123,6 @@ export default function SlotPipelineDeploymentStatus({pipeline}) {
                     >
                         <SlotPipelineDeploymentStatusChecks
                             pipeline={slotPipeline}
-                            checks={slotPipeline.deploymentStatus.checks}
                             onChange={reload}
                         />
                     </PageSection>,

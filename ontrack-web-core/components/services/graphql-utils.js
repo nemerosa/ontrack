@@ -21,11 +21,13 @@ export const getGraphQLErrors = (data, userNodeName) => {
     const errors = []
     // TODO Getting the errors at top level
     // Errors at user node level
-    const userNode = data[userNodeName]
-    if (userNode && userNode.errors) {
-        userNode.errors.forEach(error => {
-            errors.push(error.message)
-        })
+    if (userNodeName) {
+        const userNode = data[userNodeName]
+        if (userNode && userNode.errors) {
+            userNode.errors.forEach(error => {
+                errors.push(error.message)
+            })
+        }
     }
     // OK
     return errors
