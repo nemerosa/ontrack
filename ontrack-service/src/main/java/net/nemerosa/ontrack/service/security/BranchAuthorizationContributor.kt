@@ -44,6 +44,11 @@ class BranchAuthorizationContributor(
                     Authorization.CREATE,
                     securityService.isProjectFunctionGranted<PromotionLevelCreate>(branch)
                 ),
+                Authorization(
+                    CoreAuthorizationContributor.BUILD,
+                    Authorization.CREATE,
+                    securityService.isProjectFunctionGranted<BuildCreate>(branch)
+                ),
             )
         }
 }

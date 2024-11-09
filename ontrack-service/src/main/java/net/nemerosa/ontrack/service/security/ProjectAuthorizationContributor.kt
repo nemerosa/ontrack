@@ -24,6 +24,11 @@ class ProjectAuthorizationContributor(
                     Authorization.DISABLE,
                     securityService.isProjectFunctionGranted<ProjectDisable>(project)
                 ),
+                Authorization(
+                    CoreAuthorizationContributor.BRANCH,
+                    Authorization.CREATE,
+                    securityService.isProjectFunctionGranted<BranchCreate>(project)
+                )
             )
         }
 }
