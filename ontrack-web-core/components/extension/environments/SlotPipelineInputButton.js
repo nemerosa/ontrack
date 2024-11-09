@@ -9,7 +9,7 @@ import SlotPipelineInputDialog, {
 } from "@components/extension/environments/SlotPipelineInputDialog";
 import {useReloadState} from "@components/common/StateUtils";
 
-export default function SlotPipelineInputButton({pipeline, onChange}) {
+export default function SlotPipelineInputButton({pipeline, onChange, size}) {
     const client = useGraphQLClient()
 
     const [loading, setLoading] = useState(true)
@@ -63,6 +63,7 @@ export default function SlotPipelineInputButton({pipeline, onChange}) {
                         icon={<FaHandPaper color="orange"/>}
                         title="Some input is needed for this pipeline"
                         onClick={pipelineInput}
+                        size={size}
                     />
                 }
             </LoadingInline>

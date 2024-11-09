@@ -80,6 +80,17 @@ class SlotServiceImpl(
             emptyList()
         }
 
+    override fun findPipelineByBuild(build: Build): List<SlotPipeline> =
+        slotPipelineRepository.findPipelineByBuild(build)
+            .filter { securityService.isSlotAccessible<ProjectView>(it.slot) }
+
+    override fun findEligibleSlotsByBuild(build: Build): List<Slot> {
+        val projectSlots = findSlotsByProject(build.project)
+        return projectSlots.filter {
+            isBuildEligible(it, build)
+        }.sortedBy { it.environment.order }
+    }
+
     private fun <C, D> getRequiredInput(
         pipeline: SlotPipeline,
         config: SlotAdmissionRuleConfig,

@@ -1,8 +1,7 @@
 package net.nemerosa.ontrack.extension.environments.security
 
+import net.nemerosa.ontrack.extension.environments.EnvironmentsLicense
 import net.nemerosa.ontrack.extension.environments.Slot
-import net.nemerosa.ontrack.extension.environments.environmentFeatureEnabled
-import net.nemerosa.ontrack.extension.license.control.LicenseControlService
 import net.nemerosa.ontrack.model.security.Authorization
 import net.nemerosa.ontrack.model.security.AuthorizationContributor
 import net.nemerosa.ontrack.model.security.OntrackAuthenticatedUser
@@ -11,7 +10,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class SlotsAuthorizationContributor(
-    private val licenseControlService: LicenseControlService,
+    private val environmentsLicense: EnvironmentsLicense,
     private val securityService: SecurityService,
 ) : AuthorizationContributor {
 
@@ -23,7 +22,7 @@ class SlotsAuthorizationContributor(
 
     override fun getAuthorizations(user: OntrackAuthenticatedUser, context: Any): List<Authorization> {
         val slot = context as Slot
-        val environmentFeatureEnabled = licenseControlService.environmentFeatureEnabled
+        val environmentFeatureEnabled = environmentsLicense.environmentFeatureEnabled
         return listOf(
             Authorization(
                 name = SLOT,

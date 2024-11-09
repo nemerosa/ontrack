@@ -19,6 +19,10 @@ export const gqlSlotData = gql`
         }
         qualifier
         description
+        environment {
+            id
+            name
+        }
     }
 
     ${gqlProjectContentFragment}

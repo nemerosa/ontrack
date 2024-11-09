@@ -6,7 +6,7 @@ import {gql} from "graphql-request";
 import {useConfirmWithReason} from "@components/common/ConfirmWithReason";
 import {processGraphQLErrors} from "@components/services/graphql-utils";
 
-export default function SlotPipelineCancelButton({pipeline, onCancel}) {
+export default function SlotPipelineCancelButton({pipeline, onCancel, size}) {
     const [messageApi, contextHolder] = message.useMessage()
     const client = useGraphQLClient()
     const [cancelling, setCancelling] = useState(false)
@@ -59,6 +59,7 @@ export default function SlotPipelineCancelButton({pipeline, onCancel}) {
                     title="Cancels this pipeline"
                     loading={cancelling}
                     onClick={cancelConfirm}
+                    size={size}
                 />
             }
         </>

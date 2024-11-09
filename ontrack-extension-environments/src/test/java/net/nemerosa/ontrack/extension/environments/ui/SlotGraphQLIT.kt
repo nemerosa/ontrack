@@ -1,9 +1,11 @@
 package net.nemerosa.ontrack.extension.environments.ui
 
 import net.nemerosa.ontrack.extension.environments.EnvironmentTestSupport
+import net.nemerosa.ontrack.extension.environments.SlotAdmissionRuleTestFixtures
 import net.nemerosa.ontrack.extension.environments.SlotTestSupport
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.test.assertJsonNull
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -178,6 +180,80 @@ class SlotGraphQLIT : AbstractQLKTITSupport() {
                         )
                     }
                 }
+            }
+        }
+    }
+
+    @Test
+    fun `Getting a list of pipelines for a build`() {
+        slotTestSupport.withSlotPipeline { _ ->
+            slotTestSupport.withSlotPipeline { pipeline1 ->
+                slotTestSupport.withSlot(project = pipeline1.slot.project) { slot2 ->
+                    val pipeline2 = slotService.startPipeline(slot2, pipeline1.build)
+                    run(
+                        """{
+                            build(id: ${pipeline1.build.id}) {
+                                slotPipelines {
+                                    id
+                                }
+                            }
+                        }""".trimIndent()
+                    ) { data ->
+                        val pipelineIds = data.path("build")
+                            .path("slotPipelines")
+                            .map { it.path("id").asText() }
+                        assertEquals(
+                            listOf(
+                                pipeline2.id,
+                                pipeline1.id,
+                            ),
+                            pipelineIds
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Getting list of eligible builds for a slot`() {
+        asAdmin {
+            val project = project()
+            val build = project.branch<Build> {
+                build()
+            }
+            val slot1 = slotTestSupport.withSlot(project = project) {
+                // Eligible
+            }
+            val slot2 = slotTestSupport.withSlot(project = project) {
+                // Eligible
+            }
+            /* val slot3 = */ slotTestSupport.withSlot(project = project) {
+            // Not eligible
+            slotService.addAdmissionRuleConfig(
+                SlotAdmissionRuleTestFixtures.testPromotionAdmissionRuleConfig(it)
+            )
+        }
+
+            run(
+                """{
+                    build(id: ${build.id}) {
+                        eligibleSlots {
+                            id
+                        }
+                    }
+                }""".trimIndent()
+            ) { data ->
+                assertEquals(
+                    setOf(
+                        slot1.id,
+                        slot2.id,
+                    ),
+                    data.path("build")
+                        .path("eligibleSlots")
+                        .map { it.path("id").asText() }
+                        .toSet()
+                )
             }
         }
     }

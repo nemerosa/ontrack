@@ -1,13 +1,12 @@
 package net.nemerosa.ontrack.extension.environments.security
 
-import net.nemerosa.ontrack.extension.environments.environmentFeatureEnabled
-import net.nemerosa.ontrack.extension.license.control.LicenseControlService
+import net.nemerosa.ontrack.extension.environments.EnvironmentsLicense
 import net.nemerosa.ontrack.model.security.*
 import org.springframework.stereotype.Component
 
 @Component
 class EnvironmentsAuthorizationContributor(
-    private val licenseControlService: LicenseControlService,
+    private val environmentsLicense: EnvironmentsLicense,
     private val securityService: SecurityService,
 ) : AuthorizationContributor {
 
@@ -18,7 +17,7 @@ class EnvironmentsAuthorizationContributor(
     override fun appliesTo(context: Any): Boolean = context is GlobalAuthorizationContext
 
     override fun getAuthorizations(user: OntrackAuthenticatedUser, context: Any): List<Authorization> {
-        val environmentFeatureEnabled = licenseControlService.environmentFeatureEnabled
+        val environmentFeatureEnabled = environmentsLicense.environmentFeatureEnabled
         return listOf(
             Authorization(
                 name = CONTEXT,

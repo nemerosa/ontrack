@@ -2,9 +2,8 @@ package net.nemerosa.ontrack.extension.environments.ui
 
 import net.nemerosa.ontrack.extension.api.UserMenuItemExtension
 import net.nemerosa.ontrack.extension.environments.EnvironmentsExtensionFeature
-import net.nemerosa.ontrack.extension.environments.environmentFeatureEnabled
+import net.nemerosa.ontrack.extension.environments.EnvironmentsLicense
 import net.nemerosa.ontrack.extension.environments.security.EnvironmentList
-import net.nemerosa.ontrack.extension.license.control.LicenseControlService
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.CoreUserMenuGroups
@@ -15,7 +14,7 @@ import org.springframework.stereotype.Component
 class EnvironmentsUserMenuItemExtension(
     private val securityService: SecurityService,
     environmentsExtensionFeature: EnvironmentsExtensionFeature,
-    private val licenseControlService: LicenseControlService,
+    private val environmentsLicense: EnvironmentsLicense,
 ) : AbstractExtension(environmentsExtensionFeature), UserMenuItemExtension {
     override val items: List<UserMenuItem>
         get() = listOfNotNull(
@@ -25,7 +24,7 @@ class EnvironmentsUserMenuItemExtension(
                 id = "environments",
                 name = "Environments",
             ).takeIf {
-                licenseControlService.environmentFeatureEnabled &&
+                environmentsLicense.environmentFeatureEnabled &&
                         securityService.isGlobalFunctionGranted(EnvironmentList::class.java)
             }
         )

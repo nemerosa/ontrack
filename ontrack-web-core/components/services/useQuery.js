@@ -1,6 +1,7 @@
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {useEffect, useState} from "react";
 import {getGraphQLErrors} from "@components/services/graphql-utils";
+import {useReloadState} from "@components/common/StateUtils";
 
 export const useQuery = (query, {variables} = {}) => {
     const client = useGraphQLClient()
@@ -8,6 +9,8 @@ export const useQuery = (query, {variables} = {}) => {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
     const [data, setData] = useState()
+
+    const [reloadState, reload] = useReloadState()
 
     useEffect(() => {
         if (client) {
@@ -29,11 +32,12 @@ export const useQuery = (query, {variables} = {}) => {
             // noinspection JSIgnoredPromiseFromCall
             runQuery()
         }
-    }, [client])
+    }, [client, reloadState])
 
     return {
         loading,
         error,
         data,
+        refetch: reload,
     }
 }

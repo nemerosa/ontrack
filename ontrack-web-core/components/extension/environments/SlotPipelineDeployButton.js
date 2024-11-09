@@ -6,7 +6,7 @@ import LoadingInline from "@components/common/LoadingInline";
 import {gql} from "graphql-request";
 import {getUserErrors} from "@components/services/graphql-utils";
 
-export default function SlotPipelineDeployButton({pipeline, onDeploy}) {
+export default function SlotPipelineDeployButton({pipeline, onDeploy, size}) {
 
     const [messageApi, contextHolder] = message.useMessage()
     const client = useGraphQLClient()
@@ -131,6 +131,7 @@ export default function SlotPipelineDeployButton({pipeline, onDeploy}) {
                                     title="Deploys this pipeline"
                                     loading={deploying}
                                     data-testid={`pipeline-deploy-${pipeline.id}`}
+                                    size={size}
                                 />
                             </Popconfirm>
                         }

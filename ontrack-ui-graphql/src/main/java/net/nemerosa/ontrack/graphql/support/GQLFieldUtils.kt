@@ -76,6 +76,22 @@ fun <T : Any> listField(
     fetcher = fetcher
 )
 
+fun <P, T : Any> typedListField(
+    type: KClass<T>,
+    name: String,
+    description: String,
+    nullable: Boolean = false,
+    fetcher: (P) -> List<T>
+) = listField(
+    type = type,
+    name = name,
+    description = description,
+    nullable = nullable
+) { env ->
+    val p: P = env.getSource()
+    fetcher(p)
+}
+
 fun <T> listField(
     type: GraphQLOutputType,
     name: String,

@@ -1,9 +1,8 @@
 package net.nemerosa.ontrack.extension.environments.ui
 
 import net.nemerosa.ontrack.extension.environments.Environment
-import net.nemerosa.ontrack.extension.environments.checkEnvironmentFeatureEnabled
+import net.nemerosa.ontrack.extension.environments.EnvironmentsLicense
 import net.nemerosa.ontrack.extension.environments.service.EnvironmentService
-import net.nemerosa.ontrack.extension.license.control.LicenseControlService
 import net.nemerosa.ontrack.graphql.schema.Mutation
 import net.nemerosa.ontrack.graphql.support.ListRef
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
@@ -11,7 +10,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class EnvironmentsMutations(
-    private val licenseControlService: LicenseControlService,
+    private val environmentsLicense: EnvironmentsLicense,
     private val environmentService: EnvironmentService,
 ) : TypedMutationProvider() {
     override val mutations: List<Mutation> = listOf(
@@ -23,7 +22,7 @@ class EnvironmentsMutations(
             outputDescription = "Created environment",
             outputType = Environment::class,
         ) { input ->
-            licenseControlService.checkEnvironmentFeatureEnabled()
+            environmentsLicense.checkEnvironmentFeatureEnabled()
             Environment(
                 name = input.name,
                 order = input.order,

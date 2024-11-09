@@ -1,6 +1,6 @@
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {gql} from "graphql-request";
-import {Popover, Space, Timeline, Typography} from "antd";
+import {Divider, Popover, Space, Timeline, Typography} from "antd";
 import dayjs from "dayjs";
 import AnnotatedDescription from "@components/common/AnnotatedDescription";
 import PromotionLevel from "@components/promotionLevels/PromotionLevel";
@@ -14,12 +14,17 @@ import {FaCog} from "react-icons/fa";
 import EntityNotificationsBadge from "@components/extension/notifications/EntityNotificationsBadge";
 import {promotionLevelUri, promotionRunUri} from "@components/common/Links";
 import Link from "next/link";
+import {UserContext} from "@components/providers/UserProvider";
+import BuildEnvironments from "@components/extension/environments/BuildEnvironments";
+import TimestampText from "@components/common/TimestampText";
 
 export default function BuildContentPromotions({build}) {
 
+    const user = useContext(UserContext)
     const client = useGraphQLClient()
 
     const [loading, setLoading] = useState(true)
+    const [title, setTitle] = useState("Promotions")
     const [promotionRunItems, setPromotionRunItems] = useState([])
 
     const [reloadCount, setReloadCount] = useState(0)
@@ -82,6 +87,11 @@ export default function BuildContentPromotions({build}) {
                         .sort((a, b) => a.creation.time.localeCompare(b.creation.time))
                 })
 
+                // Title depends on if the environments are accessible
+                if (user.authorizations.environment?.view) {
+                    setTitle("Promotions & Environments")
+                }
+
                 // Converting the list of promotion levels and their runs into a timeline
                 const items = []
                 promotionLevels.forEach(promotionLevel => {
@@ -95,7 +105,7 @@ export default function BuildContentPromotions({build}) {
                                     <Popover content={
                                         <Space direction="vertical">
                                             <Typography.Text>Promoted by {run.creation.user}</Typography.Text>
-                                            {dayjs(run.creation.time).format("YYYY MMM DD, HH:mm:ss")}
+                                            <TimestampText value={run.creation.time}/>
                                             <AnnotatedDescription entity={run}/>
                                         </Space>
                                     }>
@@ -181,15 +191,24 @@ export default function BuildContentPromotions({build}) {
 
     return (
         <>
-            <GridCell id="promotions" title="Promotions" loading={loading} padding={true}>
-                <Timeline
-                    style={{
-                        paddingTop: 16,
-                    }}
-                    mode="right"
-                    reverse={true}
-                    items={promotionRunItems}
-                />
+            <GridCell id="promotions" title={title} loading={loading} padding={true}>
+                <Space direction="vertical" className="ot-line">
+                    {
+                        user.authorizations.environment?.view &&
+                        <>
+                            <BuildEnvironments build={build}/>
+                            <Divider/>
+                        </>
+                    }
+                    <Timeline
+                        style={{
+                            paddingTop: user.authorizations.environment?.view ? 0 : 16,
+                        }}
+                        mode="right"
+                        reverse={true}
+                        items={promotionRunItems}
+                    />
+                </Space>
             </GridCell>
         </>
     )

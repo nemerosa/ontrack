@@ -639,6 +639,8 @@ type Build implements Authorizable & ProjectEntity {
         type: String
     ): [Decoration!]!
     description: String
+    "List of slots this eligible to"
+    eligibleSlots: [Slot!]!
     gitChangeLog(
         "Name of the build to end the change log with. If not set, compares with the previous build."
         to: String
@@ -695,6 +697,8 @@ type Build implements Authorizable & ProjectEntity {
     ): String!
     "Run info associated with this build"
     runInfo: RunInfo
+    "List of pipelines this build is associated with"
+    slotPipelines: [SlotPipeline!]!
     "List of builds using this one."
     usedBy(
         "Keeps only links targeted from this branch. `project` argument is also required."

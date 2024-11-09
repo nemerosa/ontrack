@@ -4,7 +4,7 @@ import {useState} from "react";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
 
-export default function SlotPipelineCreateButton({slot, build, onStart}) {
+export default function SlotPipelineCreateButton({slot, build, size, onStart}) {
 
     const client = useGraphQLClient()
 
@@ -51,6 +51,7 @@ export default function SlotPipelineCreateButton({slot, build, onStart}) {
                     icon={<FaPlay color="green"/>}
                     title="Starts a pipeline for this build"
                     loading={loading}
+                    size={size}
                 />
             </Popconfirm>
         </>

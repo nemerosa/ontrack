@@ -25,7 +25,7 @@ class SlotTestSupport : AbstractDSLTestSupport() {
         project: Project = project(),
         qualifier: String = Slot.DEFAULT_QUALIFIER,
         code: (slot: Slot) -> Unit,
-    ) {
+    ): Slot =
         asAdmin {
             val env = environment ?: environmentTestSupport.withEnvironment {}
             val slot = SlotTestFixtures.testSlot(
@@ -35,12 +35,12 @@ class SlotTestSupport : AbstractDSLTestSupport() {
             )
             slotService.addSlot(slot)
             code(slot)
+            slot
         }
-    }
 
     fun withSlotPipeline(
         branchName: String = uid("B"),
-        qualifier : String = Slot.DEFAULT_QUALIFIER,
+        qualifier: String = Slot.DEFAULT_QUALIFIER,
         code: (pipeline: SlotPipeline) -> Unit,
     ) {
         withSlot(qualifier = qualifier) { slot ->

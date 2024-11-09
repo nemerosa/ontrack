@@ -5,7 +5,7 @@ import {useGraphQLClient} from "@components/providers/ConnectionContextProvider"
 import {gql} from "graphql-request";
 import {getUserErrors} from "@components/services/graphql-utils";
 
-export default function SlotPipelineFinishButton({pipeline, onFinish}) {
+export default function SlotPipelineFinishButton({pipeline, onFinish, size}) {
     const [messageApi, contextHolder] = message.useMessage()
     const client = useGraphQLClient()
     const [changing, setChanging] = useState(false)
@@ -75,6 +75,7 @@ export default function SlotPipelineFinishButton({pipeline, onFinish}) {
                         title="Marks this pipeline as deployed"
                         loading={changing}
                         data-testid={`pipeline-finish-${pipeline.id}`}
+                        size={size}
                     />
                 </Popconfirm>
             }

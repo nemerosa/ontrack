@@ -6,7 +6,7 @@ import LoadingInline from "@components/common/LoadingInline";
 import Link from "next/link";
 import {slotPipelineUri} from "@components/extension/environments/EnvironmentsLinksUtils";
 
-export default function SlotPipelineDeploymentStatusProgress({pipeline, link = true, reloadState}) {
+export default function SlotPipelineDeploymentStatusProgress({pipeline, link = true, reloadState, size}) {
 
     const client = useGraphQLClient()
 
@@ -45,7 +45,7 @@ export default function SlotPipelineDeploymentStatusProgress({pipeline, link = t
         data-testid={`pipeline-progress-${pipeline.id}`}
         type="circle"
         percent={progress?.percentage}
-        size={32}
+        size={size === "small" ? 16 : 32}
         title={
             progress?.overridden ? "Some rules have been overridden" : "All admission rules have been validated"
         }

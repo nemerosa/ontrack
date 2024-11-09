@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.environments.Slot
 import net.nemerosa.ontrack.extension.environments.SlotPipeline
 import net.nemerosa.ontrack.extension.environments.SlotPipelineStatus
 import net.nemerosa.ontrack.model.pagination.PaginatedList
+import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.repository.BuildJdbcRepositoryAccessor
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.springframework.stereotype.Repository
@@ -145,5 +146,18 @@ class SlotPipelineRepository(
         ) { rs, _ ->
             toPipeline(rs)
         }.firstOrNull()
+
+    fun findPipelineByBuild(build: Build): List<SlotPipeline> =
+        namedParameterJdbcTemplate!!.query(
+            """
+                SELECT *
+                FROM ENV_SLOT_PIPELINE
+                WHERE BUILD_ID = :buildId
+                ORDER BY START DESC
+            """.trimIndent(),
+            mapOf("buildId" to build.id())
+        ) { rs, _ ->
+            toPipeline(rs)
+        }
 
 }

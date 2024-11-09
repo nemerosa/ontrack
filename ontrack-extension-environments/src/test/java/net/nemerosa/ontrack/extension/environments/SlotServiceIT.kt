@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.environments.storage.SlotAlreadyDefinedExc
 import net.nemerosa.ontrack.extension.environments.storage.SlotIdAlreadyExistsException
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.model.structure.Build
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.util.*
@@ -313,6 +314,56 @@ class SlotServiceIT : AbstractDSLTestSupport() {
             assertFailsWith<SlotAdmissionRuleConfigNameFormatException> {
                 slotService.addAdmissionRuleConfig(rule)
             }
+        }
+    }
+
+    @Test
+    fun `Getting a list of pipelines for a build`() {
+        slotTestSupport.withSlotPipeline { _ ->
+            slotTestSupport.withSlotPipeline { pipeline1 ->
+                slotTestSupport.withSlot(project = pipeline1.slot.project) { slot2 ->
+                    val pipeline2 = slotService.startPipeline(slot2, pipeline1.build)
+                    val pipelines = slotService.findPipelineByBuild(pipeline1.build)
+                    assertEquals(
+                        listOf(
+                            pipeline2.id,
+                            pipeline1.id,
+                        ),
+                        pipelines.map { it.id }
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Getting list of eligible builds for a slot`() {
+        asAdmin {
+            val project = project()
+            val build = project.branch<Build> {
+                build()
+            }
+            val slot1 = slotTestSupport.withSlot(project = project) {
+                // Eligible
+            }
+            val slot2 = slotTestSupport.withSlot(project = project) {
+                // Eligible
+            }
+            /* val slot3 = */ slotTestSupport.withSlot(project = project) {
+            // Not eligible
+            slotService.addAdmissionRuleConfig(
+                SlotAdmissionRuleTestFixtures.testPromotionAdmissionRuleConfig(it)
+            )
+        }
+
+            val slots = slotService.findEligibleSlotsByBuild(build)
+            assertEquals(
+                setOf(
+                    slot1.id,
+                    slot2.id,
+                ),
+                slots.map { it.id }.toSet()
+            )
         }
     }
 }
