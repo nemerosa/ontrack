@@ -208,7 +208,7 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
             structureService.newPromotionLevel(
                     PromotionLevel.of(
                             branch,
-                            nameDescription
+                            nameDescription,
                     )
             )
         }
