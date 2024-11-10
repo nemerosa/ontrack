@@ -31,24 +31,34 @@ class BuildPromotionInfoServiceImpl(
         val withPromotionItems = promotionLevels.map { promotionLevel ->
             // List of items to collect
             val items = mutableListOf<BuildPromotionInfoItem<*>>()
-            // TODO Extensions (after promotion level)
+            // Extensions (after promotion level)
+            items += extensions.flatMap {
+                it.buildPromotionInfoItemsAfterPromotion(build, promotionLevel)
+            }
             // Promotion level itself
             items += buildPromotionInfoItemForPromotionLevel(promotionLevel)
             // Promotion runs
             items += structureService.getPromotionRunsForBuildAndPromotionLevel(build, promotionLevel).map {
                 buildPromotionInfoItemForPromotionRun(it)
             }
-            // TODO Extensions (before promotion level)
+            // Extensions (before promotion level)
+            items += extensions.flatMap {
+                it.buildPromotionInfoItemsBeforePromotion(build, promotionLevel)
+            }
             // OK
             LinkedBuildPromotionInfoItems(
                 promotionLevel = promotionLevel,
                 items = items,
             )
         }
-        // TODO No promotion items (extensions only)
+        // No promotion items (extensions only)
+        val noPromotionItems =
+            extensions.flatMap {
+                it.buildPromotionInfoItemsWithNoPromotion(build)
+            }
         // OK
         return BuildPromotionInfo(
-            noPromotionItems = emptyList(),
+            noPromotionItems = noPromotionItems,
             withPromotionItems = withPromotionItems,
         )
     }

@@ -12,7 +12,8 @@ class EnvironmentTestSupport : AbstractDSLTestSupport() {
     private lateinit var environmentService: EnvironmentService
 
     fun withEnvironment(
-        env: Environment = EnvironmentTestFixtures.testEnvironment(),
+        order: Int = 1,
+        env: Environment = EnvironmentTestFixtures.testEnvironment(order = order),
         code: (env: Environment) -> Unit
     ): Environment {
         asAdmin {

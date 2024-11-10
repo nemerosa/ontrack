@@ -21,13 +21,14 @@ class SlotTestSupport : AbstractDSLTestSupport() {
     private lateinit var slotService: SlotService
 
     fun withSlot(
+        order: Int = 1,
         environment: Environment? = null,
         project: Project = project(),
         qualifier: String = Slot.DEFAULT_QUALIFIER,
         code: (slot: Slot) -> Unit,
     ): Slot =
         asAdmin {
-            val env = environment ?: environmentTestSupport.withEnvironment {}
+            val env = environment ?: environmentTestSupport.withEnvironment(order = order) {}
             val slot = SlotTestFixtures.testSlot(
                 env = env,
                 project = project,
