@@ -52,16 +52,16 @@ class EnvironmentsBuildPromotionInfoExtensionIT : AbstractDSLTestSupport() {
                     }
 
                     /* val nonEligibleSlotOnSameProject = */ slotTestSupport.withSlot(
-                        order = 30,
-                        project = project,
-                    ) {
-                        slotService.addAdmissionRuleConfig(
-                            SlotAdmissionRuleTestFixtures.testBranchPatternAdmissionRuleConfig(
-                                slot = it,
-                                includes = listOf("release-.*"),
-                            )
+                    order = 30,
+                    project = project,
+                ) {
+                    slotService.addAdmissionRuleConfig(
+                        SlotAdmissionRuleTestFixtures.testBranchPatternAdmissionRuleConfig(
+                            slot = it,
+                            includes = listOf("release-.*"),
                         )
-                    }
+                    )
+                }
 
                     build {
                         val runBronze1 = promote(bronze)
@@ -85,13 +85,11 @@ class EnvironmentsBuildPromotionInfoExtensionIT : AbstractDSLTestSupport() {
                         // Getting the pipelines & slots not linked to promotions
                         assertEquals(2, info.noPromotionItems.size)
                         info.noPromotionItems[0].apply {
-                            assertEquals("eligibleSlot", type)
                             assertIs<Slot>(data) {
                                 assertEquals(eligibleSlotWithNoPromotionRule, it)
                             }
                         }
                         info.noPromotionItems[1].apply {
-                            assertEquals("slotPipeline", type)
                             assertIs<SlotPipeline>(data) {
                                 assertEquals(eligibleSlotWithNoPromotionRulePipeline.id, it.id)
                             }
@@ -104,7 +102,6 @@ class EnvironmentsBuildPromotionInfoExtensionIT : AbstractDSLTestSupport() {
                         assertEquals(gold, expectedGold.promotionLevel)
                         assertEquals(1, expectedGold.items.size)
                         val goldPromotion = expectedGold.items.first()
-                        assertEquals("promotionLevel", goldPromotion.type)
                         assertIs<PromotionLevel>(goldPromotion.data) {
                             assertEquals(gold, it)
                         }
@@ -114,31 +111,26 @@ class EnvironmentsBuildPromotionInfoExtensionIT : AbstractDSLTestSupport() {
                         val expectedSilverItems = expectedSilver.items
                         assertEquals(5, expectedSilverItems.size)
                         expectedSilverItems[0].apply {
-                            assertEquals("eligibleSlot", type)
                             assertIs<Slot>(data) {
                                 assertEquals(eligibleSlotWithSilverPromotionRule, it)
                             }
                         }
                         expectedSilverItems[1].apply {
-                            assertEquals("slotPipeline", type)
                             assertIs<SlotPipeline>(data) {
                                 assertEquals(eligibleSlotWithSilverPromotionRulePipelines[1].id, it.id)
                             }
                         }
                         expectedSilverItems[2].apply {
-                            assertEquals("slotPipeline", type)
                             assertIs<SlotPipeline>(data) {
                                 assertEquals(eligibleSlotWithSilverPromotionRulePipelines[0].id, it.id)
                             }
                         }
                         expectedSilverItems[3].apply {
-                            assertEquals("promotionLevel", type)
                             assertIs<PromotionLevel>(data) {
                                 assertEquals(silver, it)
                             }
                         }
                         expectedSilverItems[4].apply {
-                            assertEquals("promotionRun", type)
                             assertIs<PromotionRun>(data) {
                                 assertEquals(runSilver, it)
                             }
@@ -149,19 +141,16 @@ class EnvironmentsBuildPromotionInfoExtensionIT : AbstractDSLTestSupport() {
                         val expectedBronzeItems = expectedBronze.items
                         assertEquals(3, expectedBronzeItems.size)
                         expectedBronzeItems[0].apply {
-                            assertEquals("promotionLevel", type)
                             assertIs<PromotionLevel>(data) {
                                 assertEquals(bronze, it)
                             }
                         }
                         expectedBronzeItems[1].apply {
-                            assertEquals("promotionRun", type)
                             assertIs<PromotionRun>(data) {
                                 assertEquals(runBronze2, it)
                             }
                         }
                         expectedBronzeItems[2].apply {
-                            assertEquals("promotionRun", type)
                             assertIs<PromotionRun>(data) {
                                 assertEquals(runBronze1, it)
                             }

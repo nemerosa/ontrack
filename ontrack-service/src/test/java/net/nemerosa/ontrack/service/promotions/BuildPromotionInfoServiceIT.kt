@@ -61,7 +61,6 @@ class BuildPromotionInfoServiceIT : AbstractDSLTestSupport() {
                         assertEquals(gold, expectedGold.promotionLevel)
                         assertEquals(1, expectedGold.items.size)
                         val goldPromotion = expectedGold.items.first()
-                        assertEquals("promotionLevel", goldPromotion.type)
                         assertIs<PromotionLevel>(goldPromotion.data) {
                             assertEquals(gold, it)
                         }
@@ -71,7 +70,6 @@ class BuildPromotionInfoServiceIT : AbstractDSLTestSupport() {
                         val expectedSilverItems = expectedSilver.items
                         assertEquals(1, expectedSilverItems.size)
                         expectedSilverItems[0].apply {
-                            assertEquals("promotionLevel", type)
                             assertIs<PromotionLevel>(data) {
                                 assertEquals(silver, it)
                             }
@@ -82,7 +80,6 @@ class BuildPromotionInfoServiceIT : AbstractDSLTestSupport() {
                         val expectedBronzeItems = expectedBronze.items
                         assertEquals(1, expectedBronzeItems.size)
                         expectedBronzeItems[0].apply {
-                            assertEquals("promotionLevel", type)
                             assertIs<PromotionLevel>(data) {
                                 assertEquals(bronze, it)
                             }
@@ -121,7 +118,6 @@ class BuildPromotionInfoServiceIT : AbstractDSLTestSupport() {
                         assertEquals(gold, expectedGold.promotionLevel)
                         assertEquals(1, expectedGold.items.size)
                         val goldPromotion = expectedGold.items.first()
-                        assertEquals("promotionLevel", goldPromotion.type)
                         assertIs<PromotionLevel>(goldPromotion.data) {
                             assertEquals(gold, it)
                         }
@@ -131,13 +127,11 @@ class BuildPromotionInfoServiceIT : AbstractDSLTestSupport() {
                         val expectedSilverItems = expectedSilver.items
                         assertEquals(2, expectedSilverItems.size)
                         expectedSilverItems[0].apply {
-                            assertEquals("promotionLevel", type)
                             assertIs<PromotionLevel>(data) {
                                 assertEquals(silver, it)
                             }
                         }
                         expectedSilverItems[1].apply {
-                            assertEquals("promotionRun", type)
                             assertIs<PromotionRun>(data) {
                                 assertEquals(runSilver, it)
                             }
@@ -148,19 +142,16 @@ class BuildPromotionInfoServiceIT : AbstractDSLTestSupport() {
                         val expectedBronzeItems = expectedBronze.items
                         assertEquals(3, expectedBronzeItems.size)
                         expectedBronzeItems[0].apply {
-                            assertEquals("promotionLevel", type)
                             assertIs<PromotionLevel>(data) {
                                 assertEquals(bronze, it)
                             }
                         }
                         expectedBronzeItems[1].apply {
-                            assertEquals("promotionRun", type)
                             assertIs<PromotionRun>(data) {
                                 assertEquals(runBronze2, it)
                             }
                         }
                         expectedBronzeItems[2].apply {
-                            assertEquals("promotionRun", type)
                             assertIs<PromotionRun>(data) {
                                 assertEquals(runBronze1, it)
                             }

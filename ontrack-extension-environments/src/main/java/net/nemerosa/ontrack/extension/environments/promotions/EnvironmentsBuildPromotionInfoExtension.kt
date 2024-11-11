@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.model.promotions.BuildPromotionInfoItem
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.PromotionLevel
 import org.springframework.stereotype.Component
+import kotlin.reflect.KClass
 
 @Component
 class EnvironmentsBuildPromotionInfoExtension(
@@ -18,10 +19,10 @@ class EnvironmentsBuildPromotionInfoExtension(
     private val slotAdmissionRuleRegistry: SlotAdmissionRuleRegistry,
 ) : AbstractExtension(extensionFeature), BuildPromotionInfoExtension {
 
-    companion object {
-        const val BUILD_PROMOTION_INFO_ELIGIBLE_SLOT = "eligibleSlot"
-        const val BUILD_PROMOTION_INFO_SLOT_PIPELINE = "slotPipeline"
-    }
+    override val types: Collection<KClass<*>> = setOf(
+        Slot::class,
+        SlotPipeline::class,
+    )
 
     override fun buildPromotionInfoItemsWithNoPromotion(build: Build): List<BuildPromotionInfoItem<*>> {
         // Items
@@ -122,13 +123,11 @@ class EnvironmentsBuildPromotionInfoExtension(
 
     private fun buildPromotionInfoItemForEligibleSlot(slot: Slot) =
         BuildPromotionInfoItem(
-            type = BUILD_PROMOTION_INFO_ELIGIBLE_SLOT,
             data = slot,
         )
 
     private fun buildPromotionInfoItemForSlotPipeline(slotPipeline: SlotPipeline) =
         BuildPromotionInfoItem(
-            type = BUILD_PROMOTION_INFO_SLOT_PIPELINE,
             data = slotPipeline,
         )
 }
