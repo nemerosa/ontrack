@@ -63,13 +63,20 @@ fun TypeBuilder.stringListField(
 fun TypeBuilder.idField(property: KProperty<ID>, description: String? = null): GraphQLObjectType.Builder =
     field {
         it.name(getPropertyName(property))
-            .description(net.nemerosa.ontrack.model.annotations.getPropertyDescription(property, description))
+            .description(getPropertyDescription(property, description))
             .type(GraphQLInt)
             .dataFetcher { env ->
                 val source = env.getSource<Any>()
                 val id = property.call(source)
                 id.get()
             }
+    }
+
+fun TypeBuilder.idFieldForString(property: KProperty<String>, description: String? = null): GraphQLObjectType.Builder =
+    field {
+        it.name(property.name)
+            .description(getPropertyDescription(property, description))
+            .type(GraphQLID.toNotNull())
     }
 
 fun TypeBuilder.dateField(name: String, description: String, nullable: Boolean = true): GraphQLObjectType.Builder =
@@ -96,7 +103,7 @@ fun TypeBuilder.jsonField(
 ): GraphQLObjectType.Builder =
     field {
         it.name(getPropertyName(property))
-            .description(net.nemerosa.ontrack.model.annotations.getPropertyDescription(property, description))
+            .description(getPropertyDescription(property, description))
             .apply {
                 if (!deprecation.isNullOrBlank()) {
                     deprecate(deprecation)
@@ -249,7 +256,7 @@ fun TypeBuilder.nameValuesFromMapField(
 fun TypeBuilder.classField(property: KProperty<Class<*>?>, description: String? = null): GraphQLObjectType.Builder =
     field {
         it.name(getPropertyName(property))
-            .description(net.nemerosa.ontrack.model.annotations.getPropertyDescription(property, description))
+            .description(getPropertyDescription(property, description))
             .type(nullableOutputType(GraphQLString, property.returnType.isMarkedNullable))
             .dataFetcher { env ->
                 val source = env.getSource<Any>()

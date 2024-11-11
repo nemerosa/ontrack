@@ -158,7 +158,7 @@ class EnvironmentsBuildPromotionInfoExtensionGraphQLIT : AbstractQLKTITSupport()
                                                         ),
                                                         mapOf(
                                                             "__typename" to "PromotionRun",
-                                                            "id" to runSilver.id,
+                                                            "id" to runSilver.id.toString(),
                                                         ),
                                                     )
                                                 ),
@@ -173,11 +173,11 @@ class EnvironmentsBuildPromotionInfoExtensionGraphQLIT : AbstractQLKTITSupport()
                                                         ),
                                                         mapOf(
                                                             "__typename" to "PromotionRun",
-                                                            "id" to runBronze2.id,
+                                                            "id" to runBronze2.id.toString(),
                                                         ),
                                                         mapOf(
                                                             "__typename" to "PromotionRun",
-                                                            "id" to runBronze1.id,
+                                                            "id" to runBronze1.id.toString(),
                                                         ),
                                                     )
                                                 ),

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.environments.ui
 
 import graphql.Scalars.GraphQLBoolean
 import graphql.schema.GraphQLObjectType
+import net.nemerosa.ontrack.extension.environments.Slot
 import net.nemerosa.ontrack.extension.environments.SlotAdmissionRuleInput
 import net.nemerosa.ontrack.extension.environments.SlotPipeline
 import net.nemerosa.ontrack.extension.environments.SlotPipelineChange
@@ -27,7 +28,7 @@ class GQLTypeSlotPipeline(
         GraphQLObjectType.newObject()
             .name(typeName)
             .description("Pipeline for a slot")
-            .stringField(SlotPipeline::id)
+            .idFieldForString(Slot::id)
             .intField(SlotPipeline::number)
             .localDateTimeField(SlotPipeline::start)
             .localDateTimeField(SlotPipeline::end)

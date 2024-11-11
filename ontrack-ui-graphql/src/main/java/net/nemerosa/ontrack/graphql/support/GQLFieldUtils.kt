@@ -180,7 +180,7 @@ fun <T> stdListArgumentsFilter(list: List<T>, environment: DataFetchingEnvironme
 fun idField(): GraphQLFieldDefinition =
     GraphQLFieldDefinition.newFieldDefinition()
         .name("id")
-        .type(GraphQLInt.toNotNull())
+        .type(GraphQLID.toNotNull())
         .dataFetcher { environment: DataFetchingEnvironment ->
             val source = environment.getSource<Any>()
             if (source is Entity) {

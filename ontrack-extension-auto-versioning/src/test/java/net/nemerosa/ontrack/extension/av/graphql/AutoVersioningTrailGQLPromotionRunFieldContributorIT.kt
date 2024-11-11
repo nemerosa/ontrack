@@ -41,7 +41,7 @@ class AutoVersioningTrailGQLPromotionRunFieldContributorIT : AbstractAutoVersion
                                     "branches" to listOf(
                                         mapOf(
                                             "branch" to mapOf(
-                                                "id" to app2.id(),
+                                                "id" to app2.id().toString(),
                                             ),
                                             "configuration" to mapOf(
                                                 "targetPath" to "app2.properties"
@@ -50,7 +50,7 @@ class AutoVersioningTrailGQLPromotionRunFieldContributorIT : AbstractAutoVersion
                                         ),
                                         mapOf(
                                             "branch" to mapOf(
-                                                "id" to app1.id(),
+                                                "id" to app1.id().toString(),
                                             ),
                                             "configuration" to mapOf(
                                                 "targetPath" to "app1.properties"
@@ -146,7 +146,7 @@ class AutoVersioningTrailGQLPromotionRunFieldContributorIT : AbstractAutoVersion
                                     "branches" to listOf(
                                         mapOf(
                                             "branch" to mapOf(
-                                                "id" to app2.id(),
+                                                "id" to app2.id().toString(),
                                             ),
                                             "configuration" to mapOf(
                                                 "targetPath" to "app2.properties"
@@ -155,7 +155,7 @@ class AutoVersioningTrailGQLPromotionRunFieldContributorIT : AbstractAutoVersion
                                         ),
                                         mapOf(
                                             "branch" to mapOf(
-                                                "id" to app1.id(),
+                                                "id" to app1.id().toString(),
                                             ),
                                             "configuration" to mapOf(
                                                 "targetPath" to "app1.properties"

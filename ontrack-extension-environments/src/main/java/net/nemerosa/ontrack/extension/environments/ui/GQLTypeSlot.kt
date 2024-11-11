@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.graphql.schema.GQLTypeBuild
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.authorizations.GQLInterfaceAuthorizableService
 import net.nemerosa.ontrack.graphql.support.field
+import net.nemerosa.ontrack.graphql.support.idFieldForString
 import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
 import net.nemerosa.ontrack.graphql.support.stringField
@@ -31,7 +32,7 @@ class GQLTypeSlot(
         GraphQLObjectType.newObject()
             .name(typeName)
             .description("Deployment slot into an environment")
-            .stringField(Slot::id)
+            .idFieldForString(Slot::id)
             .stringField(Slot::description)
             .field(Slot::project)
             .stringField(Slot::qualifier)

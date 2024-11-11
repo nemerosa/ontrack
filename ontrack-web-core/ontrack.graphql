@@ -26,9 +26,12 @@ interface PayloadInterface {
 interface ProjectEntity {
     creation: Signature
     description: String
-    id: Int!
+    id: ID!
     name: String
 }
+
+"Information about the promotion of a build"
+union BuildPromotionInfoItem = PromotionLevel | PromotionRun | Slot | SlotPipeline
 
 type Account {
     "Source of authentication (builtin, ldap, etc.)"
@@ -47,7 +50,7 @@ type Account {
     globalRole: GlobalRole
     "List of groups the account belongs to"
     groups: [AccountGroup!]!
-    id: Int!
+    id: ID!
     "Links"
     links: AccountLinks @deprecated(reason: "Use the `actions` field instead.")
     "Is this account locked (meaning that no change can be performed)?"
@@ -72,7 +75,7 @@ type AccountGroup {
     description: String
     "Global role for the account group"
     globalRole: GlobalRole
-    id: Int!
+    id: ID!
     "Links"
     links: AccountGroupLinks @deprecated(reason: "Use the `actions` field instead.")
     "Mappings for this group"
@@ -92,7 +95,7 @@ type AccountGroupMapping {
     authenticationSource: AuthenticationSource
     "Associated group"
     group: AccountGroup
-    id: Int!
+    id: ID!
     "Name of the mapping"
     name: String
 }
@@ -437,7 +440,7 @@ type Branch implements Authorizable & ProjectEntity {
         "Direction for the dependencies"
         direction: BranchLinksDirection!
     ): BranchLinksNode! @deprecated(reason: "Graph UI will be dropped in 4.6 and `graph` fields in 5.0.")
-    id: Int!
+    id: ID!
     "List of information components attached to this entity"
     information: [EntityInformation!]!
     "Link to a Jenkins Job"
@@ -652,7 +655,7 @@ type Build implements Authorizable & ProjectEntity {
         "Direction for the dependencies"
         direction: BranchLinksDirection!
     ): BranchLinksNode! @deprecated(reason: "Graph UI will be dropped in 4.6 and `graph` fields in 5.0.")
-    id: Int!
+    id: ID!
     "List of information components attached to this entity"
     information: [EntityInformation!]!
     "Link to a Jenkins Build"
@@ -672,6 +675,8 @@ type Build implements Authorizable & ProjectEntity {
     nextBuild: Build
     "Previous build"
     previousBuild: Build
+    "Information about the promotions of this build"
+    promotionInfo: BuildPromotionInfo
     "Promotions for this build"
     promotionRuns(
         "Returns the last promotion run per promotion level"
@@ -902,6 +907,14 @@ type BuildPaginated {
     pageInfo: PageInfo
     "Items in the current page"
     pageItems: [Build!]!
+}
+
+"Information about the promotions of a build"
+type BuildPromotionInfo {
+    "Items not linked to any promotion"
+    noPromotionItems: [BuildPromotionInfoItem!]!
+    "withPromotionItems field"
+    withPromotionItems: [LinkedBuildPromotionInfoItems!]!
 }
 
 "Output type for the bulkUpdatePromotionLevelById mutation."
@@ -3206,6 +3219,14 @@ type LinkChange {
     to: Build
 }
 
+"Information linked to promotion levels"
+type LinkedBuildPromotionInfoItems {
+    "Items linked to this promotion"
+    items: [BuildPromotionInfoItem!]!
+    "promotionLevel field"
+    promotionLevel: PromotionLevel!
+}
+
 "Output type for the linksBuild mutation."
 type LinksBuildPayload implements Payload {
     "Build linked from"
@@ -4763,7 +4784,7 @@ type Project implements Authorizable & ProjectEntity {
     gitProjectConfigurationProperty: Property
     "URL to the HTML page of the Git repository associated with this project"
     gitRepositoryHtmlURL: String
-    id: Int!
+    id: ID!
     "List of indicator portfolios associated with this project, through its labels."
     indicatorPortfolios: [IndicatorPortfolio!]!
     "List of information components attached to this entity"
@@ -5143,7 +5164,7 @@ type PromotionLevel implements Authorizable & ProjectEntity {
         type: String
     ): [Decoration!]!
     description: String
-    id: Int!
+    id: ID!
     "Flag to indicate if an image is associated"
     image: Boolean
     "List of information components attached to this entity"
@@ -5229,7 +5250,7 @@ type PromotionRun implements Authorizable & ProjectEntity {
         type: String
     ): [Decoration!]!
     description: String
-    id: Int!
+    id: ID!
     "List of information components attached to this entity"
     information: [EntityInformation!]!
     "Link to a Jenkins Build"
@@ -6984,7 +7005,7 @@ type Slot implements Authorizable {
     "environment field"
     environment: Environment!
     "id field"
-    id: String!
+    id: ID!
     "Last deployed pipeline in the slot"
     lastDeployedPipeline: SlotPipeline
     "Paginated list of pipelines"
@@ -7047,7 +7068,7 @@ type SlotPipeline {
     "Is the pipeline finished?"
     finished: Boolean!
     "id field"
-    id: String!
+    id: ID!
     "Last change having occurred to the pipeline"
     lastChange: SlotPipelineChange
     "number field"
@@ -7596,7 +7617,7 @@ type ValidationRun implements Authorizable & ProjectEntity {
         type: String
     ): [Decoration!]!
     description: String
-    id: Int!
+    id: ID!
     "List of information components attached to this entity"
     information: [EntityInformation!]!
     "Link to a Jenkins Build"
@@ -7721,7 +7742,7 @@ type ValidationStamp implements Authorizable & ProjectEntity {
         type: String
     ): [Decoration!]!
     description: String
-    id: Int!
+    id: ID!
     "Flag to indicate if an image is associated"
     image: Boolean
     "List of information components attached to this entity"
