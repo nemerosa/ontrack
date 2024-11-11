@@ -18,6 +18,12 @@ import {UserContext} from "@components/providers/UserProvider";
 import BuildEnvironments from "@components/extension/environments/BuildEnvironments";
 import TimestampText from "@components/common/TimestampText";
 
+/**
+ * Not used directly any longer. Replaced by BuildPromotionInfo.
+ * @param build
+ * @return {Element}
+ * @constructor
+ */
 export default function BuildContentPromotions({build}) {
 
     const user = useContext(UserContext)

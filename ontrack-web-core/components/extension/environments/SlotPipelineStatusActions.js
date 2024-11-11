@@ -8,7 +8,7 @@ import SlotPipelineDeploymentStatusProgress
 import SlotPipelineInputButton from "@components/extension/environments/SlotPipelineInputButton";
 import {useReloadState} from "@components/common/StateUtils";
 
-export default function SlotPipelineStatusActions({pipeline, info = true, linkInfo = true, actions = true, size, onChange}) {
+export default function SlotPipelineStatusActions({pipeline, info = true, linkInfo = true, actions = true, size, showMessageOnCancelled = true, onChange}) {
 
     const [reloadState, reload] = useReloadState({callback: onChange})
 
@@ -34,6 +34,7 @@ export default function SlotPipelineStatusActions({pipeline, info = true, linkIn
                 }
                 {
                     pipeline.status === 'CANCELLED' &&
+                    showMessageOnCancelled &&
                     pipeline.lastChange?.message &&
                     <Typography.Text type="secondary">{pipeline.lastChange.message}</Typography.Text>
                 }
