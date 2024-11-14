@@ -74,10 +74,10 @@ class EnvironmentsBuildPromotionInfoExtensionGraphQLIT : AbstractQLKTITSupport()
 
                         run(
                             """
-                                fragment BuildPromotionInfoItemData on BuildPromotionInfoItem {
+                                fragment BuildPromotionInfoItemDataContent on BuildPromotionInfoItemData {
                                     __typename
                                     ... on PromotionLevel {
-                                        name
+                                        id
                                     }
                                     ... on PromotionRun {
                                         id
@@ -92,15 +92,12 @@ class EnvironmentsBuildPromotionInfoExtensionGraphQLIT : AbstractQLKTITSupport()
                                 query BuildPromotionInfo {
                                     build(id: $id) {
                                         promotionInfo {
-                                            noPromotionItems {
-                                                ...BuildPromotionInfoItemData
-                                            }
-                                            withPromotionItems {
+                                            items {
                                                 promotionLevel {
                                                     name
                                                 }
-                                                items {
-                                                    ...BuildPromotionInfoItemData
+                                                data {
+                                                    ...BuildPromotionInfoItemDataContent
                                                 }
                                             }
                                         }
@@ -113,75 +110,103 @@ class EnvironmentsBuildPromotionInfoExtensionGraphQLIT : AbstractQLKTITSupport()
                                 mapOf(
                                     "build" to mapOf(
                                         "promotionInfo" to mapOf(
-                                            "noPromotionItems" to listOf(
-                                                mapOf(
-                                                    "__typename" to "Slot",
-                                                    "id" to eligibleSlotWithNoPromotionRule.id,
-                                                ),
-                                                mapOf(
-                                                    "__typename" to "SlotPipeline",
-                                                    "id" to eligibleSlotWithNoPromotionRulePipeline.id,
-                                                ),
-                                            ),
-                                            "withPromotionItems" to listOf(
+                                            "items" to listOf(
                                                 mapOf(
                                                     "promotionLevel" to mapOf(
-                                                        "name" to gold.name,
+                                                        "name" to silver.name,
                                                     ),
-                                                    "items" to listOf(
-                                                        mapOf(
-                                                            "__typename" to "PromotionLevel",
-                                                            "name" to gold.name,
-                                                        ),
+                                                    "data" to mapOf(
+                                                        "__typename" to "Slot",
+                                                        "id" to eligibleSlotWithSilverPromotionRule.id
                                                     )
                                                 ),
                                                 mapOf(
                                                     "promotionLevel" to mapOf(
                                                         "name" to silver.name,
                                                     ),
-                                                    "items" to listOf(
-                                                        mapOf(
-                                                            "__typename" to "Slot",
-                                                            "id" to eligibleSlotWithSilverPromotionRule.id,
-                                                        ),
-                                                        mapOf(
-                                                            "__typename" to "SlotPipeline",
-                                                            "id" to eligibleSlotWithSilverPromotionRulePipelines[1].id,
-                                                        ),
-                                                        mapOf(
-                                                            "__typename" to "SlotPipeline",
-                                                            "id" to eligibleSlotWithSilverPromotionRulePipelines[0].id,
-                                                        ),
-                                                        mapOf(
-                                                            "__typename" to "PromotionLevel",
-                                                            "name" to silver.name,
-                                                        ),
-                                                        mapOf(
-                                                            "__typename" to "PromotionRun",
-                                                            "id" to runSilver.id.toString(),
-                                                        ),
+                                                    "data" to mapOf(
+                                                        "__typename" to "SlotPipeline",
+                                                        "id" to eligibleSlotWithSilverPromotionRulePipelines[1].id
+                                                    )
+                                                ),
+                                                mapOf(
+                                                    "promotionLevel" to mapOf(
+                                                        "name" to silver.name,
+                                                    ),
+                                                    "data" to mapOf(
+                                                        "__typename" to "SlotPipeline",
+                                                        "id" to eligibleSlotWithSilverPromotionRulePipelines[0].id
+                                                    )
+                                                ),
+                                                mapOf(
+                                                    "promotionLevel" to null,
+                                                    "data" to mapOf(
+                                                        "__typename" to "Slot",
+                                                        "id" to eligibleSlotWithNoPromotionRule.id
+                                                    )
+                                                ),
+                                                mapOf(
+                                                    "promotionLevel" to null,
+                                                    "data" to mapOf(
+                                                        "__typename" to "SlotPipeline",
+                                                        "id" to eligibleSlotWithNoPromotionRulePipeline.id
+                                                    )
+                                                ),
+                                                mapOf(
+                                                    "promotionLevel" to mapOf(
+                                                        "name" to gold.name,
+                                                    ),
+                                                    "data" to mapOf(
+                                                        "__typename" to "PromotionLevel",
+                                                        "id" to gold.id.toString()
+                                                    )
+                                                ),
+                                                mapOf(
+                                                    "promotionLevel" to mapOf(
+                                                        "name" to silver.name,
+                                                    ),
+                                                    "data" to mapOf(
+                                                        "__typename" to "PromotionLevel",
+                                                        "id" to silver.id.toString()
+                                                    )
+                                                ),
+                                                mapOf(
+                                                    "promotionLevel" to mapOf(
+                                                        "name" to silver.name,
+                                                    ),
+                                                    "data" to mapOf(
+                                                        "__typename" to "PromotionRun",
+                                                        "id" to runSilver.id.toString()
                                                     )
                                                 ),
                                                 mapOf(
                                                     "promotionLevel" to mapOf(
                                                         "name" to bronze.name,
                                                     ),
-                                                    "items" to listOf(
-                                                        mapOf(
-                                                            "__typename" to "PromotionLevel",
-                                                            "name" to bronze.name,
-                                                        ),
-                                                        mapOf(
-                                                            "__typename" to "PromotionRun",
-                                                            "id" to runBronze2.id.toString(),
-                                                        ),
-                                                        mapOf(
-                                                            "__typename" to "PromotionRun",
-                                                            "id" to runBronze1.id.toString(),
-                                                        ),
+                                                    "data" to mapOf(
+                                                        "__typename" to "PromotionLevel",
+                                                        "id" to bronze.id.toString()
                                                     )
                                                 ),
-                                            )
+                                                mapOf(
+                                                    "promotionLevel" to mapOf(
+                                                        "name" to bronze.name,
+                                                    ),
+                                                    "data" to mapOf(
+                                                        "__typename" to "PromotionRun",
+                                                        "id" to runBronze2.id.toString()
+                                                    )
+                                                ),
+                                                mapOf(
+                                                    "promotionLevel" to mapOf(
+                                                        "name" to bronze.name,
+                                                    ),
+                                                    "data" to mapOf(
+                                                        "__typename" to "PromotionRun",
+                                                        "id" to runBronze1.id.toString()
+                                                    )
+                                                ),
+                                            ),
                                         )
                                     )
                                 ).asJson(),

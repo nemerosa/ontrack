@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.json.asJson
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class GQLBuildPromotionInfoIT : AbstractQLKTITSupport() {
 
@@ -22,83 +22,97 @@ class GQLBuildPromotionInfoIT : AbstractQLKTITSupport() {
 
                         run(
                             """
-                            fragment BuildPromotionInfoItemData on BuildPromotionInfoItem {
-                                __typename
-                                ... on PromotionLevel {
-                                    name
+                                fragment BuildPromotionInfoItemDataContent on BuildPromotionInfoItemData {
+                                    __typename
+                                    ... on PromotionLevel {
+                                        id
+                                    }
+                                    ... on PromotionRun {
+                                        id
+                                    }
                                 }
-                                ... on PromotionRun {
-                                    id
-                                }
-                            }
-                            query BuildPromotionInfo {
-                                build(id: $id) {
-                                    promotionInfo {
-                                        noPromotionItems {
-                                            ...BuildPromotionInfoItemData
-                                        }
-                                        withPromotionItems {
-                                            promotionLevel {
-                                                name
-                                            }
+                                query BuildPromotionInfo {
+                                    build(id: $id) {
+                                        promotionInfo {
                                             items {
-                                                ...BuildPromotionInfoItemData
+                                                promotionLevel {
+                                                    name
+                                                }
+                                                data {
+                                                    ...BuildPromotionInfoItemDataContent
+                                                }
                                             }
                                         }
                                     }
                                 }
-                            }
                             """.trimIndent()
                         ) { data ->
-
-                            val buildPromotionInfo = data.path("build")
-                                .path("promotionInfo")
-
-                            // By default, without extensions, no info without promotion
-                            assertTrue(
-                                buildPromotionInfo.path("noPromotionItems").isEmpty(),
-                                "Promotion info without promotions should not be empty"
+                            assertEquals(
+                                mapOf(
+                                    "build" to mapOf(
+                                        "promotionInfo" to mapOf(
+                                            "items" to listOf(
+                                                mapOf(
+                                                    "promotionLevel" to mapOf(
+                                                        "name" to gold.name,
+                                                    ),
+                                                    "data" to mapOf(
+                                                        "__typename" to "PromotionLevel",
+                                                        "id" to gold.id.toString()
+                                                    )
+                                                ),
+                                                mapOf(
+                                                    "promotionLevel" to mapOf(
+                                                        "name" to silver.name,
+                                                    ),
+                                                    "data" to mapOf(
+                                                        "__typename" to "PromotionLevel",
+                                                        "id" to silver.id.toString()
+                                                    )
+                                                ),
+                                                mapOf(
+                                                    "promotionLevel" to mapOf(
+                                                        "name" to silver.name,
+                                                    ),
+                                                    "data" to mapOf(
+                                                        "__typename" to "PromotionRun",
+                                                        "id" to runSilver.id.toString()
+                                                    )
+                                                ),
+                                                mapOf(
+                                                    "promotionLevel" to mapOf(
+                                                        "name" to bronze.name,
+                                                    ),
+                                                    "data" to mapOf(
+                                                        "__typename" to "PromotionLevel",
+                                                        "id" to bronze.id.toString()
+                                                    )
+                                                ),
+                                                mapOf(
+                                                    "promotionLevel" to mapOf(
+                                                        "name" to bronze.name,
+                                                    ),
+                                                    "data" to mapOf(
+                                                        "__typename" to "PromotionRun",
+                                                        "id" to runBronze2.id.toString()
+                                                    )
+                                                ),
+                                                mapOf(
+                                                    "promotionLevel" to mapOf(
+                                                        "name" to bronze.name,
+                                                    ),
+                                                    "data" to mapOf(
+                                                        "__typename" to "PromotionRun",
+                                                        "id" to runBronze1.id.toString()
+                                                    )
+                                                ),
+                                            ),
+                                        )
+                                    )
+                                ).asJson(),
+                                data
                             )
 
-                            // Checking each promotion
-                            assertEquals(3, buildPromotionInfo.path("withPromotionItems").size())
-
-                            val expectedGold = buildPromotionInfo.path("withPromotionItems").path(0)
-                            assertEquals(gold.name, expectedGold.path("promotionLevel").path("name").asText())
-                            assertEquals(1, expectedGold.path("items").size())
-                            val goldPromotion = expectedGold.path("items").path(0)
-                            assertEquals("PromotionLevel", goldPromotion.path("__typename").asText())
-                            assertEquals(gold.name, goldPromotion.path("name").asText())
-
-                            val expectedSilver = buildPromotionInfo.path("withPromotionItems").path(1)
-                            assertEquals(silver.name, expectedSilver.path("promotionLevel").path("name").asText())
-                            val expectedSilverItems = expectedSilver.path("items")
-                            assertEquals(2, expectedSilverItems.size())
-                            expectedSilverItems[0].apply {
-                                assertEquals("PromotionLevel", path("__typename").asText())
-                                assertEquals(silver.name, path("name").asText())
-                            }
-                            expectedSilverItems[1].apply {
-                                assertEquals("PromotionRun", path("__typename").asText())
-                                assertEquals(runSilver.id(), path("id").asInt())
-                            }
-
-                            val expectedBronze = buildPromotionInfo.path("withPromotionItems").path(2)
-                            assertEquals(bronze.name, expectedBronze.path("promotionLevel").path("name").asText())
-                            val expectedBronzeItems = expectedBronze.path("items")
-                            assertEquals(3, expectedBronzeItems.size())
-                            expectedBronzeItems[0].apply {
-                                assertEquals("PromotionLevel", path("__typename").asText())
-                                assertEquals(bronze.name, path("name").asText())
-                            }
-                            expectedBronzeItems[1].apply {
-                                assertEquals("PromotionRun", path("__typename").asText())
-                                assertEquals(runBronze2.id(), path("id").asInt())
-                            }
-                            expectedBronzeItems[2].apply {
-                                assertEquals("PromotionRun", path("__typename").asText())
-                                assertEquals(runBronze1.id(), path("id").asInt())
-                            }
                         }
                     }
                 }

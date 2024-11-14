@@ -24,67 +24,35 @@ class EnvironmentsBuildPromotionInfoExtension(
         SlotPipeline::class,
     )
 
-    override fun buildPromotionInfoItemsWithNoPromotion(build: Build): List<BuildPromotionInfoItem<*>> {
-        // Items
-        val items = mutableListOf<BuildPromotionInfoItem<*>>()
-        // Getting the eligible slots which have NO rule on promotions
-        val eligibleSlots = slotService.getEligibleSlotsForBuild(build)
-            .filter { it.eligible }
-            .map { it.slot }
-            .filter {
-                isSlotForNoPromotionLevel(it)
-            }
-            .sortedByDescending { it.environment.order }
-        items += eligibleSlots.map {
-            buildPromotionInfoItemForEligibleSlot(it)
-        }
-        // Getting the pipelines whose slots have NO rule on promotions
-        val pipelines = slotService.findPipelineByBuild(build)
-            .filter {
-                isSlotForNoPromotionLevel(it.slot)
-            }
-            .sortedWith(
-                compareByDescending<SlotPipeline> { it.slot.environment.order }
-                    .thenByDescending { it.number }
-            )
-        items += pipelines.map {
-            buildPromotionInfoItemForSlotPipeline(it)
-        }
-        // OK
-        return items
-    }
-
-    override fun buildPromotionInfoItemsAfterPromotion(
+    override fun buildPromotionInfoItems(
+        items: MutableList<BuildPromotionInfoItem<*>>,
         build: Build,
-        promotionLevel: PromotionLevel
-    ): List<BuildPromotionInfoItem<*>> {
-        // Items
-        val items = mutableListOf<BuildPromotionInfoItem<*>>()
-        // Getting the eligible slots which have a rule on this promotion
+        promotionLevels: List<PromotionLevel>
+    ) {
+        val contributions = mutableListOf<BuildPromotionInfoItem<*>>()
+        // Pipelines for this build
+        val buildPipelines = slotService.findPipelineByBuild(build)
+        // Gets the eligible slots for this build
         val eligibleSlots = slotService.getEligibleSlotsForBuild(build)
             .filter { it.eligible }
             .map { it.slot }
-            .filter {
-                isSlotForPromotionLevel(it, promotionLevel)
-            }
             .sortedByDescending { it.environment.order }
-        items += eligibleSlots.map {
-            buildPromotionInfoItemForEligibleSlot(it)
-        }
-        // Getting the pipelines whose slot has a rule on this promotion
-        val pipelines = slotService.findPipelineByBuild(build)
-            .filter {
-                isSlotForPromotionLevel(it.slot, promotionLevel)
+        eligibleSlots.forEach { slot ->
+            // Getting the promotion level for this slot
+            val promotionLevel = promotionLevels.firstOrNull { pl ->
+                isSlotForPromotionLevel(slot, pl)
             }
-            .sortedWith(
-                compareByDescending<SlotPipeline> { it.slot.environment.order }
-                    .thenByDescending { it.number }
-            )
-        items += pipelines.map {
-            buildPromotionInfoItemForSlotPipeline(it)
+            // Adding the contribution for this slot
+            contributions += buildPromotionInfoItemForEligibleSlot(slot, promotionLevel)
+            // Getting the pipelines for this slot & build
+            val pipelines = buildPipelines.filter { it.slot.id == slot.id }
+                .sortedByDescending { it.number }
+            pipelines.forEach { pipeline ->
+                contributions += buildPromotionInfoItemForSlotPipeline(pipeline, promotionLevel)
+            }
         }
-        // OK
-        return items
+        // Add the contributions before all the other items
+        items.addAll(0, contributions)
     }
 
     private fun isSlotForPromotionLevel(
@@ -96,16 +64,6 @@ class EnvironmentsBuildPromotionInfoExtension(
                 val rule = slotAdmissionRuleRegistry.getRule(config.ruleId)
                 isAdmissionRuleConfigForPromotionLevel(rule, config, promotionLevel)
             } == 1
-    }
-
-    private fun isSlotForNoPromotionLevel(
-        slot: Slot,
-    ): Boolean {
-        return slotService.getAdmissionRuleConfigs(slot)
-            .none { config ->
-                val rule = slotAdmissionRuleRegistry.getRule(config.ruleId)
-                rule is PromotionRelatedSlotAdmissionRule
-            }
     }
 
     private fun <T, D> isAdmissionRuleConfigForPromotionLevel(
@@ -121,13 +79,15 @@ class EnvironmentsBuildPromotionInfoExtension(
         }
     }
 
-    private fun buildPromotionInfoItemForEligibleSlot(slot: Slot) =
+    private fun buildPromotionInfoItemForEligibleSlot(slot: Slot, promotionLevel: PromotionLevel?) =
         BuildPromotionInfoItem(
+            promotionLevel = promotionLevel,
             data = slot,
         )
 
-    private fun buildPromotionInfoItemForSlotPipeline(slotPipeline: SlotPipeline) =
+    private fun buildPromotionInfoItemForSlotPipeline(slotPipeline: SlotPipeline, promotionLevel: PromotionLevel?) =
         BuildPromotionInfoItem(
+            promotionLevel = promotionLevel,
             data = slotPipeline,
         )
 }

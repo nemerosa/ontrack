@@ -1,18 +1,16 @@
 package net.nemerosa.ontrack.extension.environments.promotions
 
-import net.nemerosa.ontrack.extension.environments.Slot
 import net.nemerosa.ontrack.extension.environments.SlotAdmissionRuleTestFixtures
 import net.nemerosa.ontrack.extension.environments.SlotPipeline
 import net.nemerosa.ontrack.extension.environments.SlotTestSupport
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.promotions.BuildPromotionInfoService
-import net.nemerosa.ontrack.model.structure.PromotionLevel
 import net.nemerosa.ontrack.model.structure.PromotionRun
-import net.nemerosa.ontrack.test.assertIs
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class EnvironmentsBuildPromotionInfoExtensionIT : AbstractDSLTestSupport() {
 
@@ -82,78 +80,66 @@ class EnvironmentsBuildPromotionInfoExtensionIT : AbstractDSLTestSupport() {
 
                         val info = buildPromotionInfoService.getBuildPromotionInfo(this)
 
-                        // Getting the pipelines & slots not linked to promotions
-                        assertEquals(2, info.noPromotionItems.size)
-                        info.noPromotionItems[0].apply {
-                            assertIs<Slot>(data) {
-                                assertEquals(eligibleSlotWithNoPromotionRule, it)
-                            }
-                        }
-                        info.noPromotionItems[1].apply {
-                            assertIs<SlotPipeline>(data) {
-                                assertEquals(eligibleSlotWithNoPromotionRulePipeline.id, it.id)
-                            }
+                        // Checking all items have been collected
+                        assertEquals(11, info.items.size)
+
+                        // First, the slots & their pipelines
+
+                        info.items[0].apply {
+                            assertEquals(silver, promotionLevel)
+                            assertEquals(eligibleSlotWithSilverPromotionRule, data)
                         }
 
-                        // Checking each promotion
-                        assertEquals(3, info.withPromotionItems.size)
-
-                        val expectedGold = info.withPromotionItems[0]
-                        assertEquals(gold, expectedGold.promotionLevel)
-                        assertEquals(1, expectedGold.items.size)
-                        val goldPromotion = expectedGold.items.first()
-                        assertIs<PromotionLevel>(goldPromotion.data) {
-                            assertEquals(gold, it)
+                        info.items[1].apply {
+                            assertEquals(silver, promotionLevel)
+                            assertEquals(eligibleSlotWithSilverPromotionRulePipelines[1].id, (data as SlotPipeline).id)
                         }
 
-                        val expectedSilver = info.withPromotionItems[1]
-                        assertEquals(silver, expectedSilver.promotionLevel)
-                        val expectedSilverItems = expectedSilver.items
-                        assertEquals(5, expectedSilverItems.size)
-                        expectedSilverItems[0].apply {
-                            assertIs<Slot>(data) {
-                                assertEquals(eligibleSlotWithSilverPromotionRule, it)
-                            }
-                        }
-                        expectedSilverItems[1].apply {
-                            assertIs<SlotPipeline>(data) {
-                                assertEquals(eligibleSlotWithSilverPromotionRulePipelines[1].id, it.id)
-                            }
-                        }
-                        expectedSilverItems[2].apply {
-                            assertIs<SlotPipeline>(data) {
-                                assertEquals(eligibleSlotWithSilverPromotionRulePipelines[0].id, it.id)
-                            }
-                        }
-                        expectedSilverItems[3].apply {
-                            assertIs<PromotionLevel>(data) {
-                                assertEquals(silver, it)
-                            }
-                        }
-                        expectedSilverItems[4].apply {
-                            assertIs<PromotionRun>(data) {
-                                assertEquals(runSilver, it)
-                            }
+                        info.items[2].apply {
+                            assertEquals(silver, promotionLevel)
+                            assertEquals(eligibleSlotWithSilverPromotionRulePipelines[0].id, (data as SlotPipeline).id)
                         }
 
-                        val expectedBronze = info.withPromotionItems[2]
-                        assertEquals(bronze, expectedBronze.promotionLevel)
-                        val expectedBronzeItems = expectedBronze.items
-                        assertEquals(3, expectedBronzeItems.size)
-                        expectedBronzeItems[0].apply {
-                            assertIs<PromotionLevel>(data) {
-                                assertEquals(bronze, it)
-                            }
+                        info.items[3].apply {
+                            assertNull(promotionLevel)
+                            assertEquals(eligibleSlotWithNoPromotionRule, data)
                         }
-                        expectedBronzeItems[1].apply {
-                            assertIs<PromotionRun>(data) {
-                                assertEquals(runBronze2, it)
-                            }
+
+                        info.items[4].apply {
+                            assertNull(promotionLevel)
+                            assertEquals(eligibleSlotWithNoPromotionRulePipeline.id, (data as SlotPipeline).id)
                         }
-                        expectedBronzeItems[2].apply {
-                            assertIs<PromotionRun>(data) {
-                                assertEquals(runBronze1, it)
-                            }
+
+                        // Then the promotions & their promotion runs
+
+                        info.items[5].apply {
+                            assertEquals(gold, promotionLevel)
+                            assertEquals(gold, data)
+                        }
+
+                        info.items[6].apply {
+                            assertEquals(silver, promotionLevel)
+                            assertEquals(silver, data)
+                        }
+
+                        info.items[7].apply {
+                            assertEquals(silver, promotionLevel)
+                            assertEquals(runSilver.id, (data as PromotionRun).id)
+                        }
+
+                        info.items[8].apply {
+                            assertEquals(bronze, promotionLevel)
+                            assertEquals(bronze, data)
+                        }
+
+                        info.items[9].apply {
+                            assertEquals(bronze, promotionLevel)
+                            assertEquals(runBronze2.id, (data as PromotionRun).id)
+                        }
+
+                        info.items[10].apply {
+                            assertEquals(bronze, promotionLevel)
+                            assertEquals(runBronze1.id, (data as PromotionRun).id)
                         }
                     }
                 }

@@ -22,7 +22,7 @@ export default function BuildPromotionInfo({build}) {
                 gql`
                     ${gqlSlotData}
                     ${gqlSlotPipelineData}
-                    fragment BuildPromotionInfoItemData on BuildPromotionInfoItem {
+                    fragment BuildPromotionInfoItemDataContent on BuildPromotionInfoItemData {
                         __typename
                         ... on Slot {
                             id
@@ -71,17 +71,14 @@ export default function BuildPromotionInfo({build}) {
                                 authorized
                             }
                             promotionInfo {
-                                noPromotionItems {
-                                    ...BuildPromotionInfoItemData
-                                }
-                                withPromotionItems {
+                                items {
                                     promotionLevel {
                                         id
                                         name
                                         image
                                     }
-                                    items {
-                                        ...BuildPromotionInfoItemData
+                                    data {
+                                        ...BuildPromotionInfoItemDataContent
                                     }
                                 }
                             }
@@ -94,30 +91,16 @@ export default function BuildPromotionInfo({build}) {
                 const promotionInfo = data.build.promotionInfo
                 // Mapping items to their components
                 const itemList = []
-                // First, the items not linked to any promotion
-                promotionInfo.noPromotionItems.forEach(item => {
+                promotionInfo.items.forEach(item => {
                     itemList.push(
                         buildPromotionInfoItem({
-                            item,
+                            item: item.data,
+                            promotionLevel: item.promotionLevel,
                             build: localBuild,
                             onChange: reload,
                         })
                     )
                 })
-                // Then, promotions and their items
-                promotionInfo.withPromotionItems.forEach(({promotionLevel, items}) => {
-                    items.forEach(item => {
-                        itemList.push(
-                            buildPromotionInfoItem({
-                                item,
-                                build: localBuild,
-                                promotionLevel,
-                                onChange: reload,
-                            })
-                        )
-                    })
-                })
-                // OK
                 setItems(itemList)
             }).finally(() => {
                 setLoading(false)

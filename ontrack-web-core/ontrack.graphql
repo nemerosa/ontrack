@@ -31,7 +31,7 @@ interface ProjectEntity {
 }
 
 "Information about the promotion of a build"
-union BuildPromotionInfoItem = PromotionLevel | PromotionRun | Slot | SlotPipeline
+union BuildPromotionInfoItemData = PromotionLevel | PromotionRun | Slot | SlotPipeline
 
 type Account {
     "Source of authentication (builtin, ldap, etc.)"
@@ -911,10 +911,16 @@ type BuildPaginated {
 
 "Information about the promotions of a build"
 type BuildPromotionInfo {
-    "Items not linked to any promotion"
-    noPromotionItems: [BuildPromotionInfoItem!]!
-    "withPromotionItems field"
-    withPromotionItems: [LinkedBuildPromotionInfoItems!]!
+    "items field"
+    items: [BuildPromotionInfoItem!]!
+}
+
+"Information about the promotions of a build"
+type BuildPromotionInfoItem {
+    "Item's data"
+    data: BuildPromotionInfoItemData!
+    "promotionLevel field"
+    promotionLevel: PromotionLevel
 }
 
 "Output type for the bulkUpdatePromotionLevelById mutation."
@@ -3217,14 +3223,6 @@ type LinkChange {
     qualifier: String!
     "to field"
     to: Build
-}
-
-"Information linked to promotion levels"
-type LinkedBuildPromotionInfoItems {
-    "Items linked to this promotion"
-    items: [BuildPromotionInfoItem!]!
-    "promotionLevel field"
-    promotionLevel: PromotionLevel!
 }
 
 "Output type for the linksBuild mutation."

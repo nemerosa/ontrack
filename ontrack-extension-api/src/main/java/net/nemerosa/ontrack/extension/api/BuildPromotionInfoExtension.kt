@@ -13,18 +13,10 @@ interface BuildPromotionInfoExtension : Extension {
 
     val types: Collection<KClass<*>>
 
-    fun buildPromotionInfoItemsWithNoPromotion(build: Build): List<BuildPromotionInfoItem<*>> = emptyList()
-
-    fun buildPromotionInfoItemsAfterPromotion(
+    fun buildPromotionInfoItems(
+        items: MutableList<BuildPromotionInfoItem<*>>,
         build: Build,
-        promotionLevel: PromotionLevel
-    ): List<BuildPromotionInfoItem<*>> =
-        emptyList()
-
-    fun buildPromotionInfoItemsBeforePromotion(
-        build: Build,
-        promotionLevel: PromotionLevel
-    ): List<BuildPromotionInfoItem<*>> =
-        emptyList()
+        promotionLevels: List<PromotionLevel>
+    )
 
 }

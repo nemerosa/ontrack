@@ -15,9 +15,13 @@ import org.springframework.stereotype.Component
 import kotlin.reflect.KClass
 
 @Component
-class GQLContributorBuildPromotionInfo(
+class GQLUnionBuildPromotionInfoItemData(
     private val extensionManager: ExtensionManager,
 ) : GQLContributor {
+
+    companion object {
+        val TYPE: String = "${BuildPromotionInfoItem::class.java.simpleName}Data"
+    }
 
     private val extensions: Collection<BuildPromotionInfoExtension> by lazy {
         extensionManager.getExtensions(BuildPromotionInfoExtension::class.java)
@@ -31,7 +35,7 @@ class GQLContributorBuildPromotionInfo(
         buildPromotionInfoItemTypes += extensions.flatMap { it.types }
 
         val gqlUnionBuildPromotionInfoItem = GraphQLUnionType.newUnionType()
-            .name(BuildPromotionInfoItem::class.java.simpleName)
+            .name(TYPE)
             .description("Information about the promotion of a build")
             .possibleTypes(
                 *buildPromotionInfoItemTypes.map {

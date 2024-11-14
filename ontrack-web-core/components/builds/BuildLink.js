@@ -3,13 +3,13 @@ import {buildKnownName} from "@components/common/Titles";
 import Link from "next/link";
 import {Popover, Space, Typography} from "antd";
 
-export default function BuildLink({build, text, displayTooltip}) {
+export default function BuildLink({build, text, displayTooltip, tooltipText = "Link to the build"}) {
     return (
         <>
             {
                 displayTooltip && <Popover content={
                     <Space direction="vertical">
-                        <Typography.Text>Link to the build</Typography.Text>
+                        <Typography.Text>{tooltipText}</Typography.Text>
                         <Typography.Text>
                             {build.name}
                             {
