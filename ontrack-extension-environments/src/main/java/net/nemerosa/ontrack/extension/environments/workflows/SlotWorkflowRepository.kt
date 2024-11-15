@@ -19,6 +19,9 @@ class SlotWorkflowRepository(
             """
                 INSERT INTO ENV_SLOT_WORKFLOWS(ID, SLOT_ID, TRIGGER, WORKFLOW)
                  VALUES (:id, :slotId, :trigger, CAST(:workflow AS JSONB))
+                ON CONFLICT (ID) DO UPDATE SET
+                    TRIGGER = :trigger,
+                    WORKFLOW = CAST(:workflow AS JSONB)
             """,
             mapOf(
                 "id" to slotWorkflow.id,

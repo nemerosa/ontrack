@@ -18,6 +18,9 @@ interface SlotWorkflowService {
 
     fun getSlotWorkflowInstancesByPipeline(pipeline: SlotPipeline): List<SlotWorkflowInstance>
 
+    fun findSlotWorkflowById(id: String): SlotWorkflow?
+    fun getSlotWorkflowById(id: String): SlotWorkflow
+
     fun findSlotWorkflowInstanceById(id: String): SlotWorkflowInstance?
     fun getSlotWorkflowInstanceById(id: String): SlotWorkflowInstance
 

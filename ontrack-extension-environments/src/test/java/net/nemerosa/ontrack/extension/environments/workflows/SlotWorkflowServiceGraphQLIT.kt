@@ -1,7 +1,10 @@
 package net.nemerosa.ontrack.extension.environments.workflows
 
 import net.nemerosa.ontrack.extension.environments.SlotTestSupport
+import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.TestPropertySource
@@ -76,6 +79,59 @@ class SlotWorkflowServiceGraphQLIT : AbstractQLKTITSupport() {
                     assertEquals(slot, slotWorkflow.slot)
                     assertEquals(SlotWorkflowTrigger.DEPLOYING, slotWorkflow.trigger)
                     assertEquals("Test", slotWorkflow.workflow.name)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Saving a workflow on a slot`() {
+        slotTestSupport.withSlot { slot ->
+            // Adding a workflow
+            val workflow = SlotWorkflowTestFixtures.testWorkflow()
+            val slotWorkflow = SlotWorkflow(
+                slot = slot,
+                trigger = SlotWorkflowTrigger.DEPLOYING,
+                workflow = workflow,
+            )
+            slotWorkflowService.addSlotWorkflow(slotWorkflow)
+            // Changing the workflow using GraphQL
+            val newName = uid("w-")
+            run(
+                """
+                    mutation SaveSlotWorkflow(
+                        ${'$'}workflow: JSON!,
+                    ) {
+                        saveSlotWorkflow(input: {
+                            id: "${slotWorkflow.id}",
+                            slotId: "${slot.id}",
+                            trigger: DEPLOYING,
+                            workflow: ${'$'}workflow,
+                        }) {
+                            slotWorkflow {
+                                id
+                            }
+                            errors {
+                                message
+                            }
+                        }
+                    }
+                """,
+                mapOf(
+                    "workflow" to Workflow(
+                        name = newName,
+                        nodes = workflow.nodes,
+                    ).asJson(),
+                )
+            ) { data ->
+                checkGraphQLUserErrors(data, "saveSlotWorkflow") { node ->
+                    val savedSlotWorkflow = slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(
+                        slot = slot,
+                        trigger = SlotWorkflowTrigger.DEPLOYING,
+                    ).first()
+                    assertEquals(slotWorkflow.id, savedSlotWorkflow.id)
+                    assertEquals(newName, savedSlotWorkflow.workflow.name)
+                    assertEquals(slotWorkflow.workflow.nodes, savedSlotWorkflow.workflow.nodes)
                 }
             }
         }

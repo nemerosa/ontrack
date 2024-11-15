@@ -1,18 +1,13 @@
 import {Tag} from "antd";
 
+export const slotWorkflowTriggers = {
+    CREATION: "On creation",
+    DEPLOYING: "When deploying",
+    DEPLOYED: "When deployed",
+}
+
 export default function SlotWorkflowTrigger({trigger}) {
-    let text
-    switch (trigger) {
-        case 'CREATION':
-            text = 'Creation'
-            break
-        case 'DEPLOYING':
-            text = 'Deploying'
-            break
-        case 'DEPLOYED':
-            text = 'Deployed'
-            break
-    }
+    const text = slotWorkflowTriggers[trigger]
     return (
         <>
             <Tag>{text}</Tag>

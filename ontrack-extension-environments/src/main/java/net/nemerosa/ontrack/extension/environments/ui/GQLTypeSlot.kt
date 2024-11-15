@@ -5,15 +5,14 @@ import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.extension.environments.Slot
 import net.nemerosa.ontrack.extension.environments.SlotPipeline
 import net.nemerosa.ontrack.extension.environments.service.SlotService
+import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflow
+import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowService
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeBuild
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.authorizations.GQLInterfaceAuthorizableService
-import net.nemerosa.ontrack.graphql.support.field
-import net.nemerosa.ontrack.graphql.support.idFieldForString
-import net.nemerosa.ontrack.graphql.support.listType
+import net.nemerosa.ontrack.graphql.support.*
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
-import net.nemerosa.ontrack.graphql.support.stringField
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.structure.Build
 import org.springframework.stereotype.Component
@@ -25,6 +24,7 @@ class GQLTypeSlot(
     private val gqlTypeSlotAdmissionRuleConfig: GQLTypeSlotAdmissionRuleConfig,
     private val gqlInterfaceAuthorizableService: GQLInterfaceAuthorizableService,
     private val paginatedListFactory: GQLPaginatedListFactory,
+    private val slotWorkflowService: SlotWorkflowService,
 ) : GQLType {
     override fun getTypeName(): String = Slot::class.java.simpleName
 
@@ -111,6 +111,10 @@ class GQLTypeSlot(
                         val slot: Slot = env.getSource()
                         slotService.getAdmissionRuleConfigs(slot)
                     }
+            }
+            // List of workflows
+            .listFieldGetter<Slot, SlotWorkflow>("workflows", "List of workflows for this slot") {
+                slotWorkflowService.getSlotWorkflowsBySlot(it)
             }
             // OK
             .build()

@@ -1706,6 +1706,12 @@ type DeleteSlotAdmissionRuleConfigPayload implements Payload {
     errors: [UserError]
 }
 
+"Output type for the deleteSlotWorkflow mutation."
+type DeleteSlotWorkflowPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
 "Output type for the deleteSubscription mutation."
 type DeleteSubscriptionPayload implements Payload {
     "List of errors"
@@ -3691,6 +3697,11 @@ type Mutation {
         "Input for the mutation"
         input: DeleteSlotAdmissionRuleConfigInput
     ): DeleteSlotAdmissionRuleConfigPayload
+    "Deletes a workflow from a slot"
+    deleteSlotWorkflow(
+        "Input for the mutation"
+        input: DeleteSlotWorkflowInput
+    ): DeleteSlotWorkflowPayload
     "Deletes an existing subscription using its ID"
     deleteSubscription(
         "Input for the mutation"
@@ -3940,6 +3951,11 @@ type Mutation {
         "Input for the mutation"
         input: SaveSlotAdmissionRuleConfigInput
     ): SaveSlotAdmissionRuleConfigPayload
+    "Add or saves a workflow into an existing slot"
+    saveSlotWorkflow(
+        "Input for the mutation"
+        input: SaveSlotWorkflowInput
+    ): SaveSlotWorkflowPayload
     "Saves a workflow which is defined as YAML"
     saveYamlWorkflow(
         "Input for the mutation"
@@ -6196,6 +6212,14 @@ type SaveSlotAdmissionRuleConfigPayload implements Payload {
     errors: [UserError]
 }
 
+"Output type for the saveSlotWorkflow mutation."
+type SaveSlotWorkflowPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Created or updated slot workflow"
+    slotWorkflow: SlotWorkflow
+}
+
 "Output type for the saveYamlWorkflow mutation."
 type SaveYamlWorkflowPayload implements Payload {
     "List of errors"
@@ -7017,6 +7041,8 @@ type Slot implements Authorizable {
     project: Project!
     "qualifier field"
     qualifier: String!
+    "List of workflows for this slot"
+    workflows: [SlotWorkflow!]!
 }
 
 "Admission rule"
@@ -9189,6 +9215,12 @@ input DeleteSlotAdmissionRuleConfigInput {
     id: String!
 }
 
+"Input type for the deleteSlotWorkflow mutation."
+input DeleteSlotWorkflowInput {
+    "id field"
+    id: String!
+}
+
 "Input type for the deleteSubscription mutation."
 input DeleteSubscriptionInput {
     "ID of the subscription to delete"
@@ -9891,6 +9923,18 @@ input SaveSlotAdmissionRuleConfigInput {
     ruleId: String!
     "slotId field"
     slotId: String
+}
+
+"Input type for the saveSlotWorkflow mutation."
+input SaveSlotWorkflowInput {
+    "id field"
+    id: String
+    "slotId field"
+    slotId: String!
+    "trigger field"
+    trigger: SlotWorkflowTrigger!
+    "workflow field"
+    workflow: JSON!
 }
 
 "Input type for the saveYamlWorkflow mutation."

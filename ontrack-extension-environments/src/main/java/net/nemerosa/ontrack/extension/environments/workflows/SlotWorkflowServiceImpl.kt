@@ -33,6 +33,13 @@ class SlotWorkflowServiceImpl(
         slotWorkflowRepository.addSlotWorkflow(slotWorkflow)
     }
 
+    override fun findSlotWorkflowById(id: String): SlotWorkflow? {
+        return slotWorkflowRepository.findSlotWorkflowById(id)
+    }
+
+    override fun getSlotWorkflowById(id: String): SlotWorkflow =
+        slotWorkflowRepository.getSlotWorkflowById(id)
+
     override fun getSlotWorkflowsBySlotAndTrigger(slot: Slot, trigger: SlotWorkflowTrigger): List<SlotWorkflow> {
         securityService.checkSlotAccess<SlotView>(slot)
         return slotWorkflowRepository.getSlotWorkflowsBySlotAndTrigger(slot, trigger)

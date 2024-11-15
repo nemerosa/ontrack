@@ -19,6 +19,7 @@ import SlotPipelinesTable from "@components/extension/environments/SlotPipelines
 import SlotEligibleBuildsTable from "@components/extension/environments/SlotEligibleBuildsTable";
 import {useReloadState} from "@components/common/StateUtils";
 import SlotAdmissionRulesTable from "@components/extension/environments/SlotAdmissionRulesTable";
+import SlotWorkflowsTable from "@components/extension/environments/SlotWorkflowsTable";
 
 export default function SlotView({id}) {
 
@@ -93,6 +94,14 @@ export default function SlotView({id}) {
                                         padding={false}
                                     >
                                         <SlotAdmissionRulesTable slot={slot} onChange={reload}/>
+                                    </PageSection>
+                                </Col>
+                                <Col span={24}>
+                                    <PageSection
+                                        title="Workflows"
+                                        padding={false}
+                                    >
+                                        <SlotWorkflowsTable slot={slot} onChange={reload}/>
                                     </PageSection>
                                 </Col>
                             </Row>

@@ -1,10 +1,12 @@
 package net.nemerosa.ontrack.extension.environments.workflows
 
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.extension.workflows.registry.WorkflowParser
 import net.nemerosa.ontrack.graphql.schema.Mutation
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import org.springframework.stereotype.Component
+import java.util.*
 
 @Component
 class GQLSlotWorkflowMutations(
@@ -28,7 +30,33 @@ class GQLSlotWorkflowMutations(
             )
             slotWorkflowService.addSlotWorkflow(slotWorkflow)
             slotWorkflow
-        }
+        },
+        simpleMutation(
+            name = "saveSlotWorkflow",
+            description = "Add or saves a workflow into an existing slot",
+            input = SaveSlotWorkflowInput::class,
+            outputType = SlotWorkflow::class,
+            outputName = "slotWorkflow",
+            outputDescription = "Created or updated slot workflow"
+        ) { input ->
+            val slot = slotService.getSlotById(input.slotId)
+            val slotWorkflow = SlotWorkflow(
+                id = input.id ?: UUID.randomUUID().toString(),
+                slot = slot,
+                trigger = input.trigger,
+                workflow = WorkflowParser.parseJsonWorkflow(input.workflow),
+            )
+            slotWorkflowService.addSlotWorkflow(slotWorkflow)
+            slotWorkflow
+        },
+        unitMutation(
+            name = "deleteSlotWorkflow",
+            description = "Deletes a workflow from a slot",
+            input = DeleteSlotWorkflowInput::class,
+        ) { input ->
+            val slotWorkflow = slotWorkflowService.getSlotWorkflowById(input.id)
+            slotWorkflowService.deleteSlotWorkflow(slotWorkflow)
+        },
     )
 }
 
@@ -36,4 +64,15 @@ data class AddSlotWorkflowInput(
     val slotId: String,
     val trigger: SlotWorkflowTrigger,
     val workflowYaml: String,
+)
+
+data class SaveSlotWorkflowInput(
+    val id: String?,
+    val slotId: String,
+    val trigger: SlotWorkflowTrigger,
+    val workflow: JsonNode,
+)
+
+data class DeleteSlotWorkflowInput(
+    val id: String,
 )

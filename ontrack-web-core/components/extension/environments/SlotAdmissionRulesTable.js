@@ -58,6 +58,7 @@ export default function SlotAdmissionRulesTable({slot, onChange}) {
                 dataSource={rules}
                 loading={loading}
                 pagination={false}
+                size="small"
                 footer={() =>
                     <Space>
                         {
