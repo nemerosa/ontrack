@@ -1,0 +1,13 @@
+mutation CreateSlotWorkflow(
+    $slotId: String!,
+    $trigger: SlotWorkflowTrigger!,
+    $workflowYaml: String!,
+) {
+    addSlotWorkflow(input: {
+        slotId: $slotId,
+        trigger: $trigger,
+        workflowYaml: $workflowYaml,
+    }) {
+        ...PayloadUserErrors
+    }
+}

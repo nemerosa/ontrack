@@ -1,0 +1,11 @@
+fragment SlotPipelineFragment on SlotPipeline {
+    id
+    number
+    status
+    build {
+        ...BuildFragment
+    }
+    slot {
+        ...SlotFragment
+    }
+}

@@ -1,0 +1,7 @@
+fragment EnvironmentFragment on Environment {
+    id
+    name
+    order
+    description
+    tags
+}

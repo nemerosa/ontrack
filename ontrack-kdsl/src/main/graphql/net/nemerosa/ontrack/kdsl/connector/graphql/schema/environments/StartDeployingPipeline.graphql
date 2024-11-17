@@ -1,0 +1,12 @@
+mutation StartDeployingPipeline(
+    $pipelineId: String!,
+) {
+    startSlotPipelineDeployment(input: {
+        pipelineId: $pipelineId,
+    }) {
+        ...PayloadUserErrors
+        deploymentStatus {
+            status
+        }
+    }
+}

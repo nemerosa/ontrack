@@ -6631,31 +6631,8 @@
           "description": "Information about the promotions of a build",
           "fields": [
             {
-              "name": "noPromotionItems",
-              "description": "Items not linked to any promotion",
-              "args": [],
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "LIST",
-                  "name": null,
-                  "ofType": {
-                    "kind": "NON_NULL",
-                    "name": null,
-                    "ofType": {
-                      "kind": "UNION",
-                      "name": "BuildPromotionInfoItem"
-                    }
-                  }
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "withPromotionItems",
-              "description": "withPromotionItems field",
+              "name": "items",
+              "description": "items field",
               "args": [],
               "type": {
                 "kind": "NON_NULL",
@@ -6668,7 +6645,7 @@
                     "name": null,
                     "ofType": {
                       "kind": "OBJECT",
-                      "name": "LinkedBuildPromotionInfoItems"
+                      "name": "BuildPromotionInfoItem"
                     }
                   }
                 }
@@ -6683,8 +6660,47 @@
           "possibleTypes": null
         },
         {
-          "kind": "UNION",
+          "kind": "OBJECT",
           "name": "BuildPromotionInfoItem",
+          "description": "Information about the promotions of a build",
+          "fields": [
+            {
+              "name": "promotionLevel",
+              "description": "promotionLevel field",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "PromotionLevel",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "data",
+              "description": "Item's data",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "UNION",
+                  "name": "BuildPromotionInfoItemData",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "UNION",
+          "name": "BuildPromotionInfoItemData",
           "description": "Information about the promotion of a build",
           "fields": null,
           "inputFields": null,
@@ -15019,6 +15035,64 @@
           "kind": "OBJECT",
           "name": "DeleteSlotAdmissionRuleConfigPayload",
           "description": "Output type for the deleteSlotAdmissionRuleConfig mutation.",
+          "fields": [
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "DeleteSlotWorkflowInput",
+          "description": "Input type for the deleteSlotWorkflow mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "id",
+              "description": "id field",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "DeleteSlotWorkflowPayload",
+          "description": "Output type for the deleteSlotWorkflow mutation.",
           "fields": [
             {
               "name": "errors",
@@ -26244,56 +26318,6 @@
           "possibleTypes": null
         },
         {
-          "kind": "OBJECT",
-          "name": "LinkedBuildPromotionInfoItems",
-          "description": "Information linked to promotion levels",
-          "fields": [
-            {
-              "name": "promotionLevel",
-              "description": "promotionLevel field",
-              "args": [],
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "OBJECT",
-                  "name": "PromotionLevel",
-                  "ofType": null
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "items",
-              "description": "Items linked to this promotion",
-              "args": [],
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "LIST",
-                  "name": null,
-                  "ofType": {
-                    "kind": "NON_NULL",
-                    "name": null,
-                    "ofType": {
-                      "kind": "UNION",
-                      "name": "BuildPromotionInfoItem"
-                    }
-                  }
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            }
-          ],
-          "inputFields": null,
-          "interfaces": [],
-          "enumValues": null,
-          "possibleTypes": null
-        },
-        {
           "kind": "INPUT_OBJECT",
           "name": "LinksBuildInput",
           "description": "Input type for the linksBuild mutation.",
@@ -32378,6 +32402,52 @@
               "deprecationReason": null
             },
             {
+              "name": "saveSlotWorkflow",
+              "description": "Add or saves a workflow into an existing slot",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "SaveSlotWorkflowInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "SaveSlotWorkflowPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "deleteSlotWorkflow",
+              "description": "Deletes a workflow from a slot",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "DeleteSlotWorkflowInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "DeleteSlotWorkflowPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "validateJsonWorkflow",
               "description": "Validates a workflow which is defined as JSON",
               "args": [
@@ -34120,6 +34190,11 @@
             },
             {
               "kind": "OBJECT",
+              "name": "DeleteSlotWorkflowPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
               "name": "DeleteSubscriptionPayload",
               "ofType": null
             },
@@ -34361,6 +34436,11 @@
             {
               "kind": "OBJECT",
               "name": "SaveSlotAdmissionRuleConfigPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SaveSlotWorkflowPayload",
               "ofType": null
             },
             {
@@ -45464,6 +45544,114 @@
         },
         {
           "kind": "INPUT_OBJECT",
+          "name": "SaveSlotWorkflowInput",
+          "description": "Input type for the saveSlotWorkflow mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "id",
+              "description": "id field",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "slotId",
+              "description": "slotId field",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "trigger",
+              "description": "trigger field",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "ENUM",
+                  "name": "SlotWorkflowTrigger",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "workflow",
+              "description": "workflow field",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "JSON",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "SaveSlotWorkflowPayload",
+          "description": "Output type for the saveSlotWorkflow mutation.",
+          "fields": [
+            {
+              "name": "slotWorkflow",
+              "description": "Created or updated slot workflow",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "SlotWorkflow",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
           "name": "SaveYamlWorkflowInput",
           "description": "Input type for the saveYamlWorkflow mutation.",
           "fields": null,
@@ -55828,6 +56016,29 @@
                     "ofType": {
                       "kind": "OBJECT",
                       "name": "SlotAdmissionRuleConfig"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "workflows",
+              "description": "List of workflows for this slot",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "SlotWorkflow"
                     }
                   }
                 }

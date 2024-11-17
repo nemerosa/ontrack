@@ -1,0 +1,11 @@
+fragment SlotFragment on Slot {
+    id
+    description
+    project {
+        ...ProjectFragment
+    }
+    qualifier
+    environment {
+        ...EnvironmentFragment
+    }
+}

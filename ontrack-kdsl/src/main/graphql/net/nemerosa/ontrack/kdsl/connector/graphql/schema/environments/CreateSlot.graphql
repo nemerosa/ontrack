@@ -1,0 +1,20 @@
+mutation CreateSlot(
+    $environmentId: String!,
+    $projectId: Int!,
+    $qualifier: String! = "",
+    $description: String = null,
+) {
+    createSlots(input: {
+        environmentIds: [$environmentId],
+        projectId: $projectId,
+        qualifier: $qualifier,
+        description: $description,
+    }) {
+        ...PayloadUserErrors
+        slots {
+            slots {
+                id
+            }
+        }
+    }
+}

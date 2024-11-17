@@ -1,0 +1,16 @@
+mutation CreatePipeline(
+    $slotId: String!,
+    $buildId: Int!,
+) {
+    startSlotPipeline(input: {
+        slotId: $slotId,
+        buildId: $buildId,
+    }) {
+        ...PayloadUserErrors
+        pipeline {
+            id
+            number
+            status
+        }
+    }
+}

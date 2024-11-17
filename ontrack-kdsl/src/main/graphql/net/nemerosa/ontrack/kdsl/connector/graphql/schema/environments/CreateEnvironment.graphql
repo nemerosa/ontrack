@@ -1,0 +1,18 @@
+mutation CreateEnvironment(
+    $name: String!,
+    $order: Int!,
+    $description: String! = "",
+    $tags: [String!]! = [],
+) {
+    createEnvironment(input: {
+        name: $name,
+        order: $order,
+        description: $description,
+        tags: $tags,
+    }) {
+        ...PayloadUserErrors
+        environment {
+            id
+        }
+    }
+}

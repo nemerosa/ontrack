@@ -1,0 +1,7 @@
+query FindPipelineById(
+    $id: String!,
+) {
+    slotPipelineById(id: $id) {
+        ...SlotPipelineFragment
+    }
+}
