@@ -113,9 +113,12 @@ class Event(
             return this
         }
 
-        fun with(name: String, value: String?): EventBuilder {
-            return with(name, NameValue(name, value!!))
-        }
+        fun with(name: String, value: String?): EventBuilder =
+            if (value == null) {
+                this
+            } else {
+                with(name, NameValue(name, value))
+            }
 
         @Deprecated("Use build()", replaceWith = ReplaceWith("build()"))
         fun get(): Event = build()

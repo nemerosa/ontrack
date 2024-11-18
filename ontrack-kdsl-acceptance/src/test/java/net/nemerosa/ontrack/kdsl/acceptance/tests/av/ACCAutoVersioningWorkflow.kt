@@ -15,6 +15,7 @@ class ACCAutoVersioningWorkflow : AbstractACCAutoVersioningTestSupport() {
     fun `Deployment workflow triggering an auto-versioning followed by the change of state to deployed`() {
         // Creating an application project
         val application = project { this }
+        val applicationBranch = application.branch { this }
 
         // Creating an environment
         val environment = ontrack.environments.createEnvironment(
@@ -33,7 +34,7 @@ class ACCAutoVersioningWorkflow : AbstractACCAutoVersioningTestSupport() {
 
                 project {
                     val gitOps = this
-                    branch {
+                    branch("main") {
                         val gitOpsBranch = this
                         configuredForMockRepository()
 
@@ -47,7 +48,7 @@ class ACCAutoVersioningWorkflow : AbstractACCAutoVersioningTestSupport() {
                                     executorId: auto-versioning
                                     data:
                                         targetProject: ${gitOps.name}
-                                        targetBranch ${gitOpsBranch.name}
+                                        targetBranch: ${gitOpsBranch.name}
                                         targetPath: gradle.properties
                                         targetProperty: version
                                         targetVersion: ${'$'}{build}
@@ -60,7 +61,7 @@ class ACCAutoVersioningWorkflow : AbstractACCAutoVersioningTestSupport() {
                         )
 
                         // Creating a build for the application project
-                        val build = build(name = "1.0.0") { this }
+                        val build = applicationBranch.build(name = "1.0.0") { this }
                         // Creating a pipeline for this build & starting its deployment
                         val pipeline = slot.createPipeline(build = build)
                         pipeline.startDeploying()

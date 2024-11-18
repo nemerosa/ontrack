@@ -3,17 +3,31 @@ package net.nemerosa.ontrack.extension.av.workflows
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.av.AutoVersioningExtensionFeature
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
+import net.nemerosa.ontrack.extension.av.processing.AutoVersioningProcessingOutcome
 import net.nemerosa.ontrack.extension.av.processing.AutoVersioningProcessingService
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
 import net.nemerosa.ontrack.extension.workflows.execution.AbstractTypedWorkflowNodeExecutor
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorResult
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.model.events.Event
+import net.nemerosa.ontrack.model.events.EventTemplatingService
+import net.nemerosa.ontrack.model.events.PlainEventRenderer
+import net.nemerosa.ontrack.model.events.SerializableEventService
+import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.ProjectEntityType
+import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
 import java.util.*
+import kotlin.jvm.optionals.getOrNull
 
 @Component
 class AutoVersioningWorkflowNodeExecutor(
     extensionFeature: AutoVersioningExtensionFeature,
     private val autoVersioningProcessingService: AutoVersioningProcessingService,
+    private val structureService: StructureService,
+    private val eventTemplatingService: EventTemplatingService,
+    private val serializableEventService: SerializableEventService,
 ) : AbstractTypedWorkflowNodeExecutor<AutoVersioningWorkflowNodeExecutorData>(
     feature = extensionFeature,
     id = "auto-versioning",
@@ -27,39 +41,78 @@ class AutoVersioningWorkflowNodeExecutor(
         workflowNodeExecutorResultFeedback: (output: JsonNode?) -> Unit
     ): WorkflowNodeExecutorResult {
         val order = createOrder(workflowInstance, data)
+        val output = AutoVersioningWorkflowNodeExecutorOutput(
+            autoVersioningOrderId = order.uuid,
+        )
+        workflowNodeExecutorResultFeedback(output.asJson())
         val outcome = autoVersioningProcessingService.process(order)
-        TODO("Checks the outcome")
+        return if (outcome == AutoVersioningProcessingOutcome.CREATED) {
+            WorkflowNodeExecutorResult.success(
+                output = output.asJson()
+            )
+        } else {
+            WorkflowNodeExecutorResult.error(
+                message = outcome.message,
+                output = output.asJson(),
+            )
+        }
     }
 
     private fun createOrder(
         workflowInstance: WorkflowInstance,
         data: AutoVersioningWorkflowNodeExecutorData,
     ): AutoVersioningOrder {
+
+        val hydratedEvent = serializableEventService.hydrate(workflowInstance.event)
+        val sourceBuild = getSourceBuild(hydratedEvent)
+
+        val resolvedData = data.resolve {
+            eventTemplatingService.renderEvent(
+                event = hydratedEvent,
+                context = emptyMap(),
+                template = it,
+                renderer = PlainEventRenderer.INSTANCE,
+            )
+        }
+        val targetBranch = getTargetBranch(resolvedData)
+
         return AutoVersioningOrder(
             uuid = UUID.randomUUID().toString(),
-            sourceProject = TODO(),
-            sourceBuildId = null,
+            sourceProject = sourceBuild.project.name,
+            sourceBuildId = sourceBuild.id(),
             sourcePromotionRunId = null,
             sourcePromotion = null,
             sourceBackValidation = null,
-            branch = TODO(),
-            targetPath = data.targetPath,
-            targetRegex = data.targetRegex,
-            targetProperty = data.targetProperty,
-            targetPropertyRegex = data.targetPropertyRegex,
-            targetPropertyType = data.targetPropertyType,
-            targetVersion = data.targetVersion,
-            autoApproval = data.autoApproval,
-            upgradeBranchPattern = data.upgradeBranchPattern,
-            postProcessing = data.postProcessing,
-            postProcessingConfig = data.postProcessingConfig,
-            validationStamp = data.validationStamp,
-            autoApprovalMode = data.autoApprovalMode,
-            reviewers = data.reviewers,
-            prTitleTemplate = data.prTitleTemplate,
-            prBodyTemplate = data.prBodyTemplate,
-            prBodyTemplateFormat = data.prBodyTemplateFormat,
-            additionalPaths = data.additionalPaths,
+            branch = targetBranch,
+            targetPath = resolvedData.targetPath,
+            targetRegex = resolvedData.targetRegex,
+            targetProperty = resolvedData.targetProperty,
+            targetPropertyRegex = resolvedData.targetPropertyRegex,
+            targetPropertyType = resolvedData.targetPropertyType,
+            targetVersion = resolvedData.targetVersion,
+            autoApproval = resolvedData.autoApproval,
+            upgradeBranchPattern = resolvedData.upgradeBranchPattern,
+            postProcessing = resolvedData.postProcessing,
+            postProcessingConfig = resolvedData.postProcessingConfig,
+            validationStamp = resolvedData.validationStamp,
+            autoApprovalMode = resolvedData.autoApprovalMode,
+            reviewers = resolvedData.reviewers,
+            prTitleTemplate = resolvedData.prTitleTemplate,
+            prBodyTemplate = resolvedData.prBodyTemplate,
+            prBodyTemplateFormat = resolvedData.prBodyTemplateFormat,
+            additionalPaths = resolvedData.additionalPaths,
         )
     }
+
+    private fun getTargetBranch(
+        data: AutoVersioningWorkflowNodeExecutorData
+    ): Branch =
+        structureService.findBranchByName(
+            data.targetProject,
+            data.targetBranch
+        ).getOrNull() ?: error("Cannot find branch ${data.targetProject}/${data.targetBranch}")
+
+    private fun getSourceBuild(event: Event): Build =
+        event.entities[ProjectEntityType.BUILD] as? Build?
+            ?: error("Cannot find build in workflow context")
 }

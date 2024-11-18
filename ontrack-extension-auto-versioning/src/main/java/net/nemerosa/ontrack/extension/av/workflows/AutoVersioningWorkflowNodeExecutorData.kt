@@ -25,4 +25,28 @@ data class AutoVersioningWorkflowNodeExecutorData(
     val prBodyTemplate: String? = null,
     val prBodyTemplateFormat: String? = null,
     val additionalPaths: List<AutoVersioningSourceConfigPath> = emptyList(),
-)
+) {
+
+    fun resolve(templating: (text: String) -> String) = AutoVersioningWorkflowNodeExecutorData(
+        targetProject = templating(targetProject),
+        targetBranch = templating(targetBranch),
+        targetVersion = templating(targetVersion),
+        targetPath = targetPath,
+        targetRegex = targetRegex,
+        targetProperty = targetProperty,
+        targetPropertyRegex = targetPropertyRegex,
+        targetPropertyType = targetPropertyType,
+        autoApproval = autoApproval,
+        upgradeBranchPattern = upgradeBranchPattern,
+        postProcessing = postProcessing,
+        postProcessingConfig = postProcessingConfig,
+        validationStamp = validationStamp,
+        autoApprovalMode = autoApprovalMode,
+        reviewers = reviewers,
+        prTitleTemplate = prTitleTemplate,
+        prBodyTemplate = prBodyTemplate,
+        prBodyTemplateFormat = prBodyTemplateFormat,
+        additionalPaths = additionalPaths
+    )
+
+}

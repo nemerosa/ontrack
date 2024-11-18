@@ -11,9 +11,9 @@ data class AutoVersioningOrder(
     // Source information
     val sourceProject: String,
     val sourceBuildId: Int?, // Nullable for backward compatibility
-    val sourcePromotionRunId: Int?, // Nullable for backward compatibility
-    val sourcePromotion: String?, // Nullable for backward compatibility
-    val sourceBackValidation: String?, // Nullable for backward compatibility
+    val sourcePromotionRunId: Int?, // Can be null if the AV is not linked to a promotion
+    val sourcePromotion: String?, // Can be null if the AV is not linked to a promotion
+    val sourceBackValidation: String?,
     // Target information
     val branch: Branch,
     val targetPath: String,

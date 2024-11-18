@@ -45,7 +45,6 @@ class AutoVersioningProcessingServiceImpl(
     private val logger: Logger = LoggerFactory.getLogger(AutoVersioningProcessingServiceImpl::class.java)
 
     override fun process(order: AutoVersioningOrder): AutoVersioningProcessingOutcome {
-        if (order.sourcePromotion == null) error("AV order source promotion cannot be null for new requests.")
         logger.debug("Processing auto versioning order: {}", order)
         autoVersioningAuditService.onProcessingStart(order)
         val branch = order.branch
@@ -64,13 +63,15 @@ class AutoVersioningProcessingServiceImpl(
             val repository = scm.repository
             // Sanitization of the version (for the branch name)
             val sanitizedVersion: String = NameDescription.escapeName(order.targetVersion)
+            // The source promotion may be null (when AV is triggered from another source than a promotion run for example)
+            val sourcePromotion = order.sourcePromotion ?: "none"
             // Name of the upgrade branch
             val upgradeBranch = AutoVersioningSourceConfig.getUpgradeBranch(
                 upgradeBranchPattern = order.upgradeBranchPattern,
                 project = order.sourceProject,
                 version = sanitizedVersion,
                 branch = scmBranch,
-                promotion = order.sourcePromotion,
+                promotion = sourcePromotion,
                 paths = order.allPaths.flatMap { it.paths },
                 branchHash = true // Target branch name and other elements as a hash (to avoid too long names)
             )
