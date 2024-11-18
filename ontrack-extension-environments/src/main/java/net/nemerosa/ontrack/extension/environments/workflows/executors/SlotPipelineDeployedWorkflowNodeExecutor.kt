@@ -6,11 +6,11 @@ import net.nemerosa.ontrack.extension.environments.SlotPipeline
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.extension.environments.service.getPipelineById
 import net.nemerosa.ontrack.extension.support.AbstractExtension
-import net.nemerosa.ontrack.extension.workflows.engine.WorkflowContext
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutor
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorResult
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.model.events.SerializableEvent
 import net.nemerosa.ontrack.model.security.SecurityService
 import org.springframework.stereotype.Component
 
@@ -31,7 +31,7 @@ class SlotPipelineDeployedWorkflowNodeExecutor(
     ): WorkflowNodeExecutorResult {
         return securityService.asAdmin {
             // Getting the pipeline from the context
-            val pipeline = getPipelineFromContext(workflowInstance.context)
+            val pipeline = getPipelineFromContext(workflowInstance.event)
             // Progressing the pipeline
             val status = slotService.finishDeployment(pipeline)
             // Deployment started
@@ -54,9 +54,9 @@ class SlotPipelineDeployedWorkflowNodeExecutor(
         }
     }
 
-    private fun getPipelineFromContext(context: WorkflowContext): SlotPipeline {
-        if (context.hasValue(SlotPipelineContext.CONTEXT)) {
-            val (pipelineId) = context.parse<SlotPipelineContext>(SlotPipelineContext.CONTEXT)
+    private fun getPipelineFromContext(serializableEvent: SerializableEvent): SlotPipeline {
+        val pipelineId = serializableEvent.findValue(SlotWorkflowContext.EVENT_SLOT_PIPELINE_ID)
+        if (!pipelineId.isNullOrBlank()) {
             return slotService.getPipelineById(pipelineId)
         } else {
             error("Cannot find any pipeline in the workflow context")

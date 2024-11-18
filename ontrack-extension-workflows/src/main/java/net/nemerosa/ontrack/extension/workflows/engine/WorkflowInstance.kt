@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
+import net.nemerosa.ontrack.model.events.SerializableEvent
 import java.time.Duration
 import java.time.LocalDateTime
 
@@ -13,7 +14,7 @@ import java.time.LocalDateTime
  * @property id Unique ID for this workflow instance.
  * @property timestamp Last time the instance was updated.
  * @property workflow Associated workflow
- * @property context Mutable index of context objects used by the workflow
+ * @property event Serializable event linked to the workflow
  * @property nodesExecutions Information about the node executions
  * @property status Status of the execution of this workflow
  */
@@ -21,9 +22,13 @@ data class WorkflowInstance(
     val id: String,
     val timestamp: LocalDateTime,
     val workflow: Workflow,
-    val context: WorkflowContext,
+    val event: SerializableEvent,
     val nodesExecutions: List<WorkflowInstanceNode>,
 ) {
+
+    companion object {
+        const val EVENT_INSTANCE_ID = "workflowInstanceId"
+    }
 
     @get:JsonIgnore
     val startTime: LocalDateTime? by lazy {
@@ -61,11 +66,13 @@ data class WorkflowInstance(
             }
         }
 
-    private fun updateContext(context: Map<String, JsonNode>) = WorkflowInstance(
+    private fun updateContext(
+        eventToMerge: SerializableEvent? = null,
+    ) = WorkflowInstance(
         id = id,
         timestamp = Time.now,
         workflow = workflow,
-        context = this.context.update(context),
+        event = eventToMerge ?: event,
         nodesExecutions = nodesExecutions,
     )
 
@@ -74,7 +81,7 @@ data class WorkflowInstance(
             id = id,
             timestamp = Time.now,
             workflow = workflow,
-            context = context,
+            event = event,
             nodesExecutions = nodesExecutions.map { node ->
                 if (node.id == nodeId) {
                     update(node)
@@ -91,11 +98,11 @@ data class WorkflowInstance(
     fun successNode(
         nodeId: String,
         output: JsonNode,
-        context: Map<String, JsonNode> = emptyMap(),
+        eventToMerge: SerializableEvent? = null,
     ) = updateNode(nodeId) { node ->
         node.success(output)
     }.run {
-        updateContext(context)
+        updateContext(eventToMerge)
     }
 
     fun errorNode(nodeId: String, throwable: Throwable?, message: String?, output: JsonNode?) =
@@ -135,7 +142,7 @@ data class WorkflowInstance(
             id = id,
             timestamp = timestamp,
             workflow = workflow,
-            context = context,
+            event = event,
             nodesExecutions = nodesExecutions.map { nx ->
                 if (nx.status.finished) {
                     nx

@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificatio
 import net.nemerosa.ontrack.extension.notifications.channels.NoTemplate
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.notifications.recording.NotificationRecord
-import net.nemerosa.ontrack.extension.workflows.engine.WorkflowContext
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowEngine
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceStatus
 import net.nemerosa.ontrack.json.asJson
@@ -15,6 +14,7 @@ import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
+import net.nemerosa.ontrack.model.events.SerializableEventService
 import net.nemerosa.ontrack.model.form.Form
 import org.springframework.stereotype.Component
 
@@ -25,8 +25,8 @@ import org.springframework.stereotype.Component
 @Documentation(WorkflowNotificationChannelOutput::class, section = "output")
 class WorkflowNotificationChannel(
     private val workflowEngine: WorkflowEngine,
-    private val workflowNotificationItemConverter: WorkflowNotificationItemConverter,
     private val eventTemplatingService: EventTemplatingService,
+    private val serializableEventService: SerializableEventService,
 ) : AbstractNotificationChannel<WorkflowNotificationChannelConfig, WorkflowNotificationChannelOutput>(
     WorkflowNotificationChannelConfig::class
 ) {
@@ -48,25 +48,17 @@ class WorkflowNotificationChannel(
                 renderer = PlainEventRenderer.INSTANCE,
             )
         }
+        // Completing the event for the workflow
+        val workflowEvent = serializableEventService.dehydrate(event)
+            .withValue(
+                WorkflowNotificationChannelNotificationRecord.CONTEXT_NOTIFICATION_RECORD_ID,
+                recordId
+            )
         // Launching the workflow (with the event as context, template is not used)
         val instance = workflowEngine.startWorkflow(
             workflow = workflow,
-            context = WorkflowContext.noContext(),
-        ) { ctx, instanceId ->
-            // Converting the event to a suitable format
-            val item = workflowNotificationItemConverter.convertForQueue(event, instanceId)
-            // Adding to the context
-            ctx
-                .withData(
-                    WorkflowNotificationChannelNodeExecutor.CONTEXT_EVENT,
-                    item.asJson()
-                )
-                .withData(
-                    WorkflowNotificationChannelNotificationRecord.CONTEXT_NOTIFICATION_RECORD_ID,
-                    WorkflowNotificationChannelNotificationRecord(recordId).asJson()
-                )
-        }
-
+            event = workflowEvent,
+        )
         // Output = just an ID to the workflow instance
         return NotificationResult.async(
             WorkflowNotificationChannelOutput(

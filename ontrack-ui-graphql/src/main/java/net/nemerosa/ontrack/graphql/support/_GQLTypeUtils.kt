@@ -60,6 +60,7 @@ fun TypeBuilder.stringListField(
             .type(listType(GraphQLString))
     }
 
+@Deprecated("Prefer using graphQLIDField")
 fun TypeBuilder.idField(property: KProperty<ID>, description: String? = null): GraphQLObjectType.Builder =
     field {
         it.name(getPropertyName(property))
@@ -70,6 +71,13 @@ fun TypeBuilder.idField(property: KProperty<ID>, description: String? = null): G
                 val id = property.call(source)
                 id.get()
             }
+    }
+
+fun TypeBuilder.idFieldForInt(property: KProperty<Int>, description: String? = null): GraphQLObjectType.Builder =
+    field {
+        it.name(getPropertyName(property))
+            .description(getPropertyDescription(property, description))
+            .type(GraphQLID)
     }
 
 fun TypeBuilder.idFieldForString(property: KProperty<String>, description: String? = null): GraphQLObjectType.Builder =

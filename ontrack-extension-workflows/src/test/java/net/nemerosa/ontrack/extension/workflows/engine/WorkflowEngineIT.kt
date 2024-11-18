@@ -1,16 +1,16 @@
 package net.nemerosa.ontrack.extension.workflows.engine
 
-import com.fasterxml.jackson.databind.node.TextNode
-import net.nemerosa.ontrack.extension.workflows.definition.WorkflowFixtures
-import net.nemerosa.ontrack.extension.workflows.mock.MockWorkflowNodeExecutor
 import net.nemerosa.ontrack.extension.workflows.AbstractWorkflowTestSupport
+import net.nemerosa.ontrack.extension.workflows.definition.WorkflowFixtures
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowValidationException
+import net.nemerosa.ontrack.extension.workflows.mock.MockWorkflowNodeExecutor
 import net.nemerosa.ontrack.it.waitUntil
+import net.nemerosa.ontrack.model.events.MockEventType
+import net.nemerosa.ontrack.model.events.SerializableEventService
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
@@ -22,13 +22,20 @@ class WorkflowEngineIT : AbstractWorkflowTestSupport() {
     @Autowired
     private lateinit var mockWorkflowNodeExecutor: MockWorkflowNodeExecutor
 
+    @Autowired
+    private lateinit var serializableEventService: SerializableEventService
+
     @OptIn(ExperimentalTime::class)
     @Test
     fun `Simple linear workflow`() {
         // Defining a workflow
         val workflow = WorkflowFixtures.simpleLinearWorkflow()
+        // Event
+        val event = serializableEventService.dehydrate(
+            MockEventType.mockEvent("Linear")
+        )
         // Running the workflow
-        val instance = workflowEngine.startWorkflow(workflow, WorkflowContext("mock", TextNode("Linear")))
+        val instance = workflowEngine.startWorkflow(workflow, event)
         // Waiting until the workflow is completed (error or success)
         waitUntil("Waiting until workflow is complete", timeout = 10.seconds) {
             val workflowInstance = workflowEngine.getWorkflowInstance(instance.id)
@@ -50,9 +57,13 @@ class WorkflowEngineIT : AbstractWorkflowTestSupport() {
     fun `Launching a workflow with an error`() {
         // Defining a workflow
         val workflow = WorkflowFixtures.cyclicWorkflow()
+        // Event
+        val event = serializableEventService.dehydrate(
+            MockEventType.mockEvent("Cyclic")
+        )
         // Running the workflow
         assertFailsWith<WorkflowValidationException> {
-            workflowEngine.startWorkflow(workflow, WorkflowContext("mock", TextNode("Cyclic")))
+            workflowEngine.startWorkflow(workflow, event)
         }
     }
 
@@ -106,8 +117,12 @@ class WorkflowEngineIT : AbstractWorkflowTestSupport() {
     fun `Parallel with join`() {
         // Defining a workflow
         val workflow = WorkflowFixtures.twoParallelAndJoin()
+        // Event
+        val event = serializableEventService.dehydrate(
+            MockEventType.mockEvent("Parallel / Join")
+        )
         // Running the workflow
-        val instance = workflowEngine.startWorkflow(workflow, WorkflowContext("mock", TextNode("Parallel / Join")))
+        val instance = workflowEngine.startWorkflow(workflow, event)
         // Waiting until the workflow is completed (error or success)
         waitUntil("Waiting until workflow is complete", timeout = 10.seconds) {
             val workflowInstance = workflowEngine.getWorkflowInstance(instance.id)

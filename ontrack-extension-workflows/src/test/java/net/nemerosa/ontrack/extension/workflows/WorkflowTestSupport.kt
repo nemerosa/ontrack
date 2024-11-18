@@ -1,13 +1,12 @@
 package net.nemerosa.ontrack.extension.workflows
 
-import com.fasterxml.jackson.databind.node.TextNode
-import net.nemerosa.ontrack.extension.workflows.engine.*
-import net.nemerosa.ontrack.extension.workflows.notifications.WorkflowNotificationChannelNodeExecutor
-import net.nemerosa.ontrack.extension.workflows.notifications.WorkflowNotificationItemConverter
+import net.nemerosa.ontrack.extension.workflows.engine.WorkflowEngine
+import net.nemerosa.ontrack.extension.workflows.engine.getWorkflowInstance
 import net.nemerosa.ontrack.extension.workflows.registry.WorkflowRegistry
 import net.nemerosa.ontrack.it.waitUntil
-import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.Event
+import net.nemerosa.ontrack.model.events.MockEventType
+import net.nemerosa.ontrack.model.events.SerializableEventService
 import net.nemerosa.ontrack.model.security.SecurityService
 import org.springframework.stereotype.Component
 import java.util.concurrent.TimeoutException
@@ -20,8 +19,8 @@ import kotlin.time.ExperimentalTime
 class WorkflowTestSupport(
     private val workflowEngine: WorkflowEngine,
     private val workflowRegistry: WorkflowRegistry,
-    private val workflowNotificationItemConverter: WorkflowNotificationItemConverter,
     private val securityService: SecurityService,
+    private val serializableEventService: SerializableEventService,
 ) {
 
     private fun displayInstance(instanceId: String) {
@@ -45,24 +44,23 @@ class WorkflowTestSupport(
     ): String {
         return securityService.asAdmin {
             val workflowId = workflowRegistry.saveYamlWorkflow(yaml)
+
             // Getting the workflow
             val record = workflowRegistry.findWorkflow(workflowId) ?: fail("No workflow found for $workflowId")
 
+            // Actual event
+            val actualEvent = event ?: MockEventType.mockEvent(
+                workflowContextName
+                    ?.takeIf { it.isNotBlank() }
+                    ?: "No name"
+            )
+
+            // Workflow event
+            val serializableEvent = serializableEventService.dehydrate(actualEvent)
+
             // Launching the workflow
             val instance =
-                workflowEngine.startWorkflow(record.workflow, WorkflowContext.noContext()) { ctx, instanceId ->
-                    var result = ctx
-                    if (!workflowContextName.isNullOrBlank()) {
-                        result = result.withData("mock", TextNode(workflowContextName))
-                    }
-                    if (event != null) {
-                        val item = workflowNotificationItemConverter.convertForQueue(event, instanceId)
-                        result = result.withData(
-                            WorkflowNotificationChannelNodeExecutor.CONTEXT_EVENT, item.asJson()
-                        )
-                    }
-                    result
-                }
+                workflowEngine.startWorkflow(record.workflow, serializableEvent)
             // Waiting until the workflow is completed (error or success)
             if (wait) {
                 waitForWorkflowInstance(instance.id)

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.notifications.model.Notification
 import net.nemerosa.ontrack.extension.notifications.queue.NotificationQueueItem
 import net.nemerosa.ontrack.model.events.Event
+import net.nemerosa.ontrack.model.events.SerializableEvent
 
 interface WorkflowNotificationItemConverter {
 
@@ -14,7 +15,7 @@ interface WorkflowNotificationItemConverter {
         channel: String,
         channelConfig: JsonNode,
         template: String?,
-        queueItem: NotificationQueueItem,
+        event: SerializableEvent,
     ): Notification
 
 }

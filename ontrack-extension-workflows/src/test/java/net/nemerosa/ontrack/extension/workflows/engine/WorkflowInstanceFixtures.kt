@@ -1,10 +1,8 @@
 package net.nemerosa.ontrack.extension.workflows.engine
 
-import com.fasterxml.jackson.databind.node.NullNode
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.extension.workflows.WorkflowsExtensionFeature
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowFixtures
-import net.nemerosa.ontrack.extension.workflows.mock.MockWorkflowNodeExecutor
+import net.nemerosa.ontrack.model.events.MockEventType
 import java.time.LocalDateTime
 
 object WorkflowInstanceFixtures {
@@ -13,9 +11,11 @@ object WorkflowInstanceFixtures {
         timestamp: LocalDateTime = Time.now(),
     ): WorkflowInstance {
         val workflow = WorkflowFixtures.simpleLinearWorkflow()
+        // Event
+        val event = MockEventType.serializedMockEvent("Some text")
         return createInstance(
             workflow = workflow,
-            context = WorkflowContext.noContext(),
+            event = event,
             timestamp = timestamp,
         )
     }

@@ -3,13 +3,12 @@ package net.nemerosa.ontrack.extension.workflows.graphql
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.workflows.acl.WorkflowStop
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowValidation
-import net.nemerosa.ontrack.extension.workflows.engine.WorkflowContext
-import net.nemerosa.ontrack.extension.workflows.engine.WorkflowContextData
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowEngine
+import net.nemerosa.ontrack.extension.workflows.events.WorkflowEventFactory
 import net.nemerosa.ontrack.extension.workflows.registry.WorkflowRegistry
 import net.nemerosa.ontrack.graphql.schema.Mutation
-import net.nemerosa.ontrack.graphql.support.ListRef
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
+import net.nemerosa.ontrack.model.events.dehydrate
 import net.nemerosa.ontrack.model.security.SecurityService
 import org.springframework.stereotype.Component
 
@@ -18,6 +17,7 @@ class WorkflowsMutations(
     private val workflowRegistry: WorkflowRegistry,
     private val workflowEngine: WorkflowEngine,
     private val securityService: SecurityService,
+    private val workflowEventFactory: WorkflowEventFactory,
 ) : TypedMutationProvider() {
 
     override val mutations: List<Mutation> = listOf(
@@ -53,11 +53,7 @@ class WorkflowsMutations(
             if (workflowRecord != null) {
                 workflowEngine.startWorkflow(
                     workflow = workflowRecord.workflow,
-                    context = WorkflowContext(
-                        input.context.map {
-                            WorkflowContextData(it.key, it.value)
-                        }
-                    ),
+                    event = workflowEventFactory.workflowStandalone().dehydrate(),
                 ).id
             } else {
                 null
@@ -84,13 +80,6 @@ data class SaveYamlWorkflowInput(
 
 data class LaunchWorkflowInput(
     val workflowId: String,
-    @ListRef(embedded = true)
-    val context: List<LaunchWorkflowInputContext>,
-)
-
-data class LaunchWorkflowInputContext(
-    val key: String,
-    val value: JsonNode,
 )
 
 data class StopWorkflowInput(

@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowValidation
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorResultType
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorService
+import net.nemerosa.ontrack.model.events.SerializableEvent
 import net.nemerosa.ontrack.model.tx.TransactionHelper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -32,13 +33,12 @@ class WorkflowEngineImpl(
 
     override fun startWorkflow(
         workflow: Workflow,
-        context: WorkflowContext,
-        contextContribution: (context: WorkflowContext, instanceId: String) -> WorkflowContext,
+        event: SerializableEvent,
     ): WorkflowInstance {
         // Checks the workflow consistency (cycles, etc.) - use a public method, usable by extensions
         WorkflowValidation.validateWorkflow(workflow).throwErrorIfAny()
         // Creating the instance
-        val instance = createInstance(workflow, context, contextContribution = contextContribution)
+        val instance = createInstance(workflow = workflow, event = event)
         // Storing the instance
         workflowInstanceStore.store(instance)
         // Getting the starting nodes
@@ -138,7 +138,7 @@ class WorkflowEngineImpl(
                             instance.successNode(
                                 nodeId = node.id,
                                 output = result.output ?: error("Missing notification output"),
-                                context = result.context,
+                                eventToMerge = result.event,
                             )
                         )
                         // Loads the current state of the instance

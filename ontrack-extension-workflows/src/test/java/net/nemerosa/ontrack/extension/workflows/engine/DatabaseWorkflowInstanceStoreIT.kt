@@ -5,6 +5,8 @@ import net.nemerosa.ontrack.extension.workflows.definition.WorkflowFixtures
 import net.nemerosa.ontrack.extension.workflows.mgt.WorkflowSettings
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.model.events.MockEventType
+import net.nemerosa.ontrack.model.events.SerializableEventService
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,14 +20,16 @@ class DatabaseWorkflowInstanceStoreIT : AbstractDSLTestSupport() {
     @Autowired
     private lateinit var databaseWorkflowInstanceStore: DatabaseWorkflowInstanceStore
 
+    @Autowired
+    private lateinit var serializableEventService: SerializableEventService
+
     @Test
     fun `Saving and retrieving one workflow instance from a database`() {
         val instance = createInstance(
             workflow = WorkflowFixtures.simpleLinearWorkflow(),
-            context = WorkflowContext(
-                key = "mock",
-                value = mapOf("text" to "Some text").asJson()
-            )
+            event = serializableEventService.dehydrate(
+                MockEventType.mockEvent("Some text")
+            ),
         )
         databaseWorkflowInstanceStore.store(instance)
 
@@ -41,10 +45,9 @@ class DatabaseWorkflowInstanceStoreIT : AbstractDSLTestSupport() {
                 workflow = WorkflowFixtures.simpleLinearWorkflow(
                     name = uid("w-")
                 ),
-                context = WorkflowContext(
-                    key = "mock",
-                    value = mapOf("text" to "Some text").asJson()
-                )
+                event = serializableEventService.dehydrate(
+                    MockEventType.mockEvent("Some text")
+                ),
             ).apply {
                 databaseWorkflowInstanceStore.store(this)
             }

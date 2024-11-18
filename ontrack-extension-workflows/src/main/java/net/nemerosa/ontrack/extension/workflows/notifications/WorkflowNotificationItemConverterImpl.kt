@@ -7,12 +7,15 @@ import net.nemerosa.ontrack.extension.notifications.model.createData
 import net.nemerosa.ontrack.extension.notifications.queue.NotificationQueueItem
 import net.nemerosa.ontrack.extension.notifications.queue.NotificationQueueItemConverter
 import net.nemerosa.ontrack.model.events.Event
+import net.nemerosa.ontrack.model.events.SerializableEvent
+import net.nemerosa.ontrack.model.events.SerializableEventService
 import org.springframework.stereotype.Component
 
 @Component
 class WorkflowNotificationItemConverterImpl(
     private val notificationQueueItemConverter: NotificationQueueItemConverter,
     private val workflowNotificationSource: WorkflowNotificationSource,
+    private val serializableEventService: SerializableEventService,
 ) : WorkflowNotificationItemConverter {
 
     companion object {
@@ -40,20 +43,18 @@ class WorkflowNotificationItemConverterImpl(
         channel: String,
         channelConfig: JsonNode,
         template: String?,
-        queueItem: NotificationQueueItem,
+        event: SerializableEvent,
     ): Notification {
-        return notificationQueueItemConverter.convertFromQueue(queueItem).run {
-            Notification(
-                source = workflowNotificationSource.createData(
-                    WorkflowNotificationSourceDataType(
-                        workflowInstanceId = instanceId
-                    )
-                ),
-                channel = channel,
-                channelConfig = channelConfig,
-                event = event,
-                template = template,
-            )
-        }
+        return Notification(
+            source = workflowNotificationSource.createData(
+                WorkflowNotificationSourceDataType(
+                    workflowInstanceId = instanceId
+                )
+            ),
+            channel = channel,
+            channelConfig = channelConfig,
+            event = serializableEventService.hydrate(event),
+            template = template,
+        )
     }
 }

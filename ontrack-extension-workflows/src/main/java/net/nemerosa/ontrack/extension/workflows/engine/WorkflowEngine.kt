@@ -1,8 +1,7 @@
 package net.nemerosa.ontrack.extension.workflows.engine
 
-import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
-import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutor
+import net.nemerosa.ontrack.model.events.SerializableEvent
 
 /**
  * Engine used to orchestrate the execution of workflows.
@@ -13,14 +12,12 @@ interface WorkflowEngine {
      * Starts the execution of a workflow.
      *
      * @param workflow Workflow to run
-     * @param context Execution context
-     * @param contextContribution Optional adjustment of the context just before the creation of the instance
+     * @param event Execution context
      * @return Initial state of the workflow instance
      */
     fun startWorkflow(
         workflow: Workflow,
-        context: WorkflowContext,
-        contextContribution: (context: WorkflowContext, instanceId: String) -> WorkflowContext = { ctx, _ -> ctx },
+        event: SerializableEvent,
     ): WorkflowInstance
 
     /**

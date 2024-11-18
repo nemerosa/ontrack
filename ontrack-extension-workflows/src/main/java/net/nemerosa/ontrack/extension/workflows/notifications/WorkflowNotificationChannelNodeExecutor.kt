@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.workflows.notifications
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResultType
 import net.nemerosa.ontrack.extension.notifications.processing.NotificationProcessingService
-import net.nemerosa.ontrack.extension.notifications.queue.NotificationQueueItem
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.extension.workflows.WorkflowsExtensionFeature
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
@@ -47,8 +46,6 @@ class WorkflowNotificationChannelNodeExecutor(
 
     companion object {
         const val ID: String = "notification"
-
-        const val CONTEXT_EVENT = "event"
     }
 
     override val id: String = ID
@@ -61,15 +58,13 @@ class WorkflowNotificationChannelNodeExecutor(
     ): WorkflowNodeExecutorResult {
         // Gets the node's data
         val (channel, channelConfig, template) = workflowInstance.workflow.getNode(workflowNodeId).data.parse<WorkflowNotificationChannelNodeData>()
-        // Gets the context
-        val queueItem = workflowInstance.context.parse<NotificationQueueItem>(CONTEXT_EVENT)
         // Creating the notification item
         val notification = workflowNotificationItemConverter.convertFromQueue(
             instanceId = workflowInstance.id,
             channel = channel,
             channelConfig = channelConfig,
             template = template,
-            queueItem = queueItem
+            event = workflowInstance.event
         )
         // Enriches the context
         val context = mapOf(

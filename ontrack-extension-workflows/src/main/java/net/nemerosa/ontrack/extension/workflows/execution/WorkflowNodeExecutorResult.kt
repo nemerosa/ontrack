@@ -1,12 +1,16 @@
 package net.nemerosa.ontrack.extension.workflows.execution
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.model.events.SerializableEvent
 
+/**
+ * @property event Event to merge with the workflow's current context
+ */
 data class WorkflowNodeExecutorResult(
     val type: WorkflowNodeExecutorResultType,
     val message: String?,
     val output: JsonNode?,
-    val context: Map<String, JsonNode> = emptyMap(),
+    val event: SerializableEvent? = null,
 ) {
     companion object {
 
@@ -16,11 +20,11 @@ data class WorkflowNodeExecutorResult(
             output = output,
         )
 
-        fun success(output: JsonNode?, context: Map<String, JsonNode> = emptyMap()) = WorkflowNodeExecutorResult(
+        fun success(output: JsonNode?, event: SerializableEvent? = null) = WorkflowNodeExecutorResult(
             type = WorkflowNodeExecutorResultType.SUCCESS,
             message = null,
             output = output,
-            context = context,
+            event = event,
         )
 
     }

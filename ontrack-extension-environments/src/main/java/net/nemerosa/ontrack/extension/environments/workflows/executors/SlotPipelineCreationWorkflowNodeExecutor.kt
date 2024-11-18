@@ -7,15 +7,13 @@ import net.nemerosa.ontrack.extension.environments.Slot
 import net.nemerosa.ontrack.extension.environments.service.EnvironmentService
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.extension.environments.service.getPipelineById
-import net.nemerosa.ontrack.extension.notifications.queue.NotificationQueueItem
 import net.nemerosa.ontrack.extension.support.AbstractExtension
-import net.nemerosa.ontrack.extension.workflows.engine.WorkflowContext
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutor
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorResult
-import net.nemerosa.ontrack.extension.workflows.notifications.WorkflowNotificationChannelNodeExecutor.Companion.CONTEXT_EVENT
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.model.events.SerializableEvent
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.ID
@@ -51,7 +49,7 @@ class SlotPipelineCreationWorkflowNodeExecutor(
                     output = null
                 )
 
-            val (build, buildQualifier) = getBuildFromContext(workflowInstance.context)
+            val (build, buildQualifier) = getBuildFromContext(workflowInstance.event)
             // Finding the target slot for the same project
             val qualifier = configuredQualifier ?: buildQualifier
             val targetSlot = slotService.findSlotsByEnvironment(targetEnvironment).find {
@@ -70,33 +68,29 @@ class SlotPipelineCreationWorkflowNodeExecutor(
             }
             // Creating the pipeline
             val targetPipeline = slotService.startPipeline(targetSlot, build)
-            // Adding some configContext
-            val context = mapOf(
-                SlotPipelineContext.CONTEXT to SlotPipelineContext(pipelineId = targetPipeline.id).asJson()
-            )
             // OK
             WorkflowNodeExecutorResult.success(
                 output = SlotPipelineCreationWorkflowNodeExecutorOutput(
                     targetPipelineId = targetPipeline.id,
                 ).asJson(),
-                context = context,
+                event = workflowInstance.event.forSlotPipeline(targetPipeline),
             )
         }
     }
 
-    private fun getBuildFromContext(context: WorkflowContext): QualifiedBuild =
-        if (context.hasValue(SlotPipelineWorkflowContext.CONTEXT)) {
-            getBuildFromSlotPipelineWorkflowContext(context)
-        } else if (context.hasValue(CONTEXT_EVENT)) {
-            getBuildFromEvent(context)
+    private fun getBuildFromContext(serializableEvent: SerializableEvent): QualifiedBuild {
+        val pipelineId = serializableEvent.findValue(SlotWorkflowContext.EVENT_SLOT_PIPELINE_ID)
+        val buildId = serializableEvent.findEntityId(ProjectEntityType.BUILD)
+        return if (!pipelineId.isNullOrBlank()) {
+            getBuildFromSlotPipelineWorkflowContext(pipelineId)
+        } else if (buildId != null) {
+            getBuildFromEvent(buildId)
         } else {
             error("Cannot get build from workflow context")
         }
+    }
 
-    private fun getBuildFromEvent(context: WorkflowContext): QualifiedBuild {
-        val eventContext = context.parse<NotificationQueueItem>(CONTEXT_EVENT)
-        val buildId = eventContext.entities[ProjectEntityType.BUILD]
-            ?: error("Cannot find a reference to a build into the event context")
+    private fun getBuildFromEvent(buildId: Int): QualifiedBuild {
         val build = structureService.getBuild(ID.of(buildId))
         return QualifiedBuild(
             build = build,
@@ -104,13 +98,8 @@ class SlotPipelineCreationWorkflowNodeExecutor(
         )
     }
 
-    private fun getBuildFromSlotPipelineWorkflowContext(context: WorkflowContext): QualifiedBuild {
-        val (pipelineId, _) = context
-            .parse<SlotPipelineWorkflowContext>(SlotPipelineWorkflowContext.CONTEXT)
-
-        // Getting the pipeline
+    private fun getBuildFromSlotPipelineWorkflowContext(pipelineId: String): QualifiedBuild {
         val pipeline = slotService.getPipelineById(pipelineId)
-
         return QualifiedBuild(
             build = pipeline.build,
             qualifier = pipeline.slot.qualifier,

@@ -31,8 +31,8 @@ class GQLTypeWorkflowInstance(
             ) {
                 it.status.finished
             }
-            // Context of the workflow execution
-            .field(WorkflowInstance::context)
+            // Event
+            .field(WorkflowInstance::event)
             // Node executions
             .field {
                 it.name(WorkflowInstance::nodesExecutions.name)

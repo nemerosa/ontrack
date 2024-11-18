@@ -35,6 +35,10 @@ class MockWorkflowNodeExecutor(
     workflowsExtensionFeature: WorkflowsExtensionFeature,
 ) : AbstractExtension(workflowsExtensionFeature), WorkflowNodeExecutor {
 
+    companion object {
+        const val EVENT_MOCK = "mock"
+    }
+
     override val id: String = "mock"
     override val displayName: String = "Mock"
 
@@ -66,15 +70,8 @@ class MockWorkflowNodeExecutor(
         }
         // Gets the parent outputs in an index
         val parentsData = workflowInstance.getParentsData(workflowNodeId)
-        // Using the context
-        val execContext = workflowInstance.context.findValue("mock")
-        val context = if (execContext == null) {
-            ""
-        } else if (execContext.has("text")) {
-            execContext.path("text").asText()
-        } else {
-            execContext.asText()
-        }
+        // Using the event context
+        val context = workflowInstance.event.findValue(EVENT_MOCK)
 
         // Initial text
         val initialText = nodeData.text
