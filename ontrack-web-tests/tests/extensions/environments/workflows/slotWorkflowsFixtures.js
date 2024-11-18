@@ -6,9 +6,9 @@ import {gql} from "graphql-request";
 import {waitUntilCondition} from "../../../support/timing";
 
 export const triggerMapping = {
-    CREATION: "Creation",
-    DEPLOYING: "Deploying",
-    DEPLOYED: "Deployed",
+    CREATION: "On creation",
+    DEPLOYING: "When deploying",
+    DEPLOYED: "When deployed",
 }
 
 export const withSlotWorkflow = async ({trigger}) => {
