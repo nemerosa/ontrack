@@ -1,9 +1,6 @@
 package net.nemerosa.ontrack.extension.environments.events
 
-import net.nemerosa.ontrack.model.events.EventType
-import net.nemerosa.ontrack.model.events.SimpleEventType
-import net.nemerosa.ontrack.model.events.eventContext
-import net.nemerosa.ontrack.model.events.eventValue
+import net.nemerosa.ontrack.model.events.*
 
 object EnvironmentsEvents {
 
@@ -17,6 +14,9 @@ object EnvironmentsEvents {
         description = "When a slot pipeline has started",
         context = eventContext(
             eventValue(EVENT_PIPELINE_ID, "ID of the pipeline"),
+            eventProject("Project of the build in the pipeline"),
+            eventBranch("Branch of the build in the pipeline"),
+            eventBuild("Build in the pipeline"),
         )
     )
 
@@ -28,6 +28,9 @@ object EnvironmentsEvents {
         description = "When a slot pipeline is starting its deployment",
         context = eventContext(
             eventValue(EVENT_PIPELINE_ID, "ID of the pipeline"),
+            eventProject("Project of the build in the pipeline"),
+            eventBranch("Branch of the build in the pipeline"),
+            eventBuild("Build in the pipeline"),
         )
     )
 
@@ -39,6 +42,9 @@ object EnvironmentsEvents {
         description = "When a slot pipeline has completed its deployment",
         context = eventContext(
             eventValue(EVENT_PIPELINE_ID, "ID of the pipeline"),
+            eventProject("Project of the build in the pipeline"),
+            eventBranch("Branch of the build in the pipeline"),
+            eventBuild("Build in the pipeline"),
         )
     )
 

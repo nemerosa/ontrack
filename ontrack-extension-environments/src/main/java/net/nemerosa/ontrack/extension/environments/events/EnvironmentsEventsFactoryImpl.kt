@@ -14,16 +14,19 @@ class EnvironmentsEventsFactoryImpl(
     override fun pipelineCreation(pipeline: SlotPipeline): Event =
         Event.of(EnvironmentsEvents.PIPELINE_CREATION)
             .with(EnvironmentsEvents.EVENT_PIPELINE_ID, pipeline.id)
+            .withBuild(pipeline.build)
             .build()
 
     override fun pipelineDeploying(pipeline: SlotPipeline): Event =
         Event.of(EnvironmentsEvents.PIPELINE_DEPLOYING)
             .with(EnvironmentsEvents.EVENT_PIPELINE_ID, pipeline.id)
+            .withBuild(pipeline.build)
             .build()
 
     override fun pipelineDeployed(pipeline: SlotPipeline): Event =
         Event.of(EnvironmentsEvents.PIPELINE_DEPLOYED)
             .with(EnvironmentsEvents.EVENT_PIPELINE_ID, pipeline.id)
+            .withBuild(pipeline.build)
             .build()
 
     override fun getName(): String = "Registration of environment events"
