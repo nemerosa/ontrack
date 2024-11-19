@@ -64,9 +64,9 @@ export default function WorkflowInstanceView({id}) {
                                     }
                                 }
                             }
-                            context {
-                                data {
-                                    key
+                            event {
+                                values {
+                                    name
                                     value
                                 }
                             }

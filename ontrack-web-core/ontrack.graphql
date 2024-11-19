@@ -4972,6 +4972,13 @@ type ProjectCategoryIndicators {
     indicators: [ProjectIndicator!]!
 }
 
+type ProjectEntityID {
+    "Project entity ID"
+    id: ID
+    "Project entity type"
+    type: ProjectEntityType!
+}
+
 "Information about a project entity"
 type ProjectEntityInformation {
     "Project entity"
@@ -6282,6 +6289,16 @@ type SearchResultType {
 type SelectDashboardPayload implements PayloadInterface {
     "List of errors"
     errors: [PayloadUserError]
+}
+
+"Minimal form for an event"
+type SerializableEvent {
+    "List of entities"
+    entities: [ProjectEntityID!]!
+    "eventType field"
+    eventType: String!
+    "List of arbitrary values"
+    values: [NameValue!]!
 }
 
 "Service configuration or data associated with an ID"
@@ -7964,28 +7981,14 @@ type Workflow {
     nodes: [WorkflowNode!]!
 }
 
-"Workflow context, data which is passed to the workflow initially"
-type WorkflowContext {
-    "data field"
-    data: [WorkflowContextData!]!
-}
-
-"Data in a workflow context"
-type WorkflowContextData {
-    "key field"
-    key: String!
-    "value field"
-    value: JSON
-}
-
 "Running workflow instance"
 type WorkflowInstance {
-    "context field"
-    context: WorkflowContext!
     "durationMs field"
     durationMs: Int
     "endTime field"
     endTime: LocalDateTime
+    "event field"
+    event: SerializableEvent!
     "Is the workflow finished?"
     finished: Boolean!
     "id field"
@@ -9659,10 +9662,10 @@ input LaunchWorkflowInput {
 }
 
 input LaunchWorkflowInputContext {
-    "key field"
-    key: String!
+    "name field"
+    name: String!
     "value field"
-    value: JSON!
+    value: String!
 }
 
 "Input type for the linkBuildById mutation."

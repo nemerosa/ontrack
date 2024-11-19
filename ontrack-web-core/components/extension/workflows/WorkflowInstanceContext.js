@@ -8,24 +8,22 @@ export default function WorkflowInstanceContext({instance}) {
 
     useEffect(() => {
         const index = {}
-        instance.context.data.forEach(item => {
-            index[item.key] = item.value
+        instance.event.values.forEach((name, value) => {
+            index[name] = value
         })
 
         const items = []
 
-        console.log({index})
-
-        if (index.notificationRecordId && index.notificationRecordId.recordId) {
+        if (index.notificationRecordId) {
             items.push({
                 key: 'notificationRecord',
                 label: "Notification",
-                children: <NotificationRecordSummary recordId={index.notificationRecordId.recordId}/>
+                children: <NotificationRecordSummary recordId={index.notificationRecordId}/>
             })
         }
 
         setItems(items)
-    }, [instance.context.data])
+    }, [instance.event.values])
 
     return (
         <>

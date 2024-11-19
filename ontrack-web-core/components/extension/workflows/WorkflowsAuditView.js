@@ -35,9 +35,9 @@ export default function WorkflowsAuditView() {
                     startTime
                     endTime
                     durationMs
-                    context {
-                        data {
-                            key
+                    event {
+                        values {
+                            name
                             value
                         }
                     }
@@ -82,7 +82,7 @@ export default function WorkflowsAuditView() {
                             key: 'notification',
                             title: "Notification",
                             render: (_, instance) => {
-                                const notificationRecordId = instance.context.data.find(it => it.key === 'notificationRecordId')?.value?.recordId
+                                const notificationRecordId = instance.event.values.find(it => it.name === 'notificationRecordId')?.value
                                 if (notificationRecordId) {
                                     return <NotificationRecordLink recordId={notificationRecordId}/>
                                 } else {
