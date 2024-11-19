@@ -2,10 +2,7 @@ package net.nemerosa.ontrack.kdsl.acceptance.tests.workflows
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.kdsl.acceptance.tests.AbstractACCDSLTestSupport
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
-import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
 import net.nemerosa.ontrack.kdsl.spec.extension.workflows.WorkflowInstanceNodeStatus
 import net.nemerosa.ontrack.kdsl.spec.extension.workflows.WorkflowInstanceStatus
 import net.nemerosa.ontrack.kdsl.spec.extension.workflows.mock.mock
@@ -25,10 +22,12 @@ class ACCDSLWorkflows : AbstractACCDSLWorkflowsTestSupport() {
             nodes:
                 - id: start
                   executorId: mock
-                  data: "Start node"
+                  data:
+                    text: "Start node"
                 - id: end
                   executorId: mock
-                  data: "End node"
+                  data:
+                    text: "End node"
                   parents:
                     - id: start
         """.trimIndent()
@@ -39,7 +38,7 @@ class ACCDSLWorkflows : AbstractACCDSLWorkflowsTestSupport() {
         // Running the workflow
         val instanceId = ontrack.workflows.launchWorkflow(
             workflowId = workflowId,
-            context = "mock" to mapOf("text" to "Linear").asJson(),
+            context = mapOf("mock" to "Linear"),
         ) ?: fail("Error while launching workflow")
         // Waiting for the workflow result
         waitUntilWorkflowFinished(instanceId)
@@ -63,13 +62,16 @@ class ACCDSLWorkflows : AbstractACCDSLWorkflowsTestSupport() {
             nodes:
                 - id: start-a
                   executorId: mock
-                  data: "Start node A"
+                  data:
+                    text: "Start node A"
                 - id: start-b
                   executorId: mock
-                  data: "Start node B"
+                  data:
+                    text: "Start node B"
                 - id: end
                   executorId: mock
-                  data: "End node"
+                  data:
+                    text: "End node"
                   parents:
                     - id: start-a
                     - id: start-b
@@ -81,7 +83,7 @@ class ACCDSLWorkflows : AbstractACCDSLWorkflowsTestSupport() {
         // Running the workflow
         val instanceId = ontrack.workflows.launchWorkflow(
             workflowId = workflowId,
-            context = "mock" to mapOf("text" to "Parallel / Join").asJson(),
+            context = mapOf("mock" to "Parallel / Join"),
         ) ?: fail("Error while launching workflow")
         // Waiting for the workflow result
         waitUntilWorkflowFinished(instanceId)
@@ -138,7 +140,7 @@ class ACCDSLWorkflows : AbstractACCDSLWorkflowsTestSupport() {
         // Running the workflow
         val instanceId = ontrack.workflows.launchWorkflow(
             workflowId = workflowId,
-            context = "mock" to mapOf("text" to "Complex").asJson(),
+            context = mapOf("mock" to "Complex"),
         ) ?: fail("Error while launching workflow")
         // Waiting for the workflow result
         waitUntilWorkflowFinished(instanceId)
@@ -203,7 +205,7 @@ class ACCDSLWorkflows : AbstractACCDSLWorkflowsTestSupport() {
         // Running the workflow
         val instanceId = ontrack.workflows.launchWorkflow(
             workflowId = workflowId,
-            context = "mock" to mapOf("text" to "Complex").asJson(),
+            context = mapOf("mock" to "Complex"),
         ) ?: fail("Error while launching workflow")
         // Waiting for the workflow result
         waitUntilWorkflowFinished(instanceId)
@@ -253,7 +255,7 @@ class ACCDSLWorkflows : AbstractACCDSLWorkflowsTestSupport() {
         // Running the workflow
         val instanceId = ontrack.workflows.launchWorkflow(
             workflowId = workflowId,
-            context = "mock" to mapOf("text" to "SPE").asJson(),
+            context = mapOf("mock" to "SPE"),
         ) ?: fail("Error while launching workflow")
         // Waiting for the workflow result
         waitUntilWorkflowFinished(instanceId)
@@ -302,7 +304,7 @@ class ACCDSLWorkflows : AbstractACCDSLWorkflowsTestSupport() {
         // Running the workflow
         val instanceId = ontrack.workflows.launchWorkflow(
             workflowId = workflowId,
-            context = "mock" to mapOf("text" to "Error test").asJson(),
+            context = mapOf("mock" to "Error test"),
         ) ?: fail("Error while launching workflow")
         // Waiting for the workflow result
         val instance = waitUntilWorkflowFinished(instanceId, returnInstanceOnError = true)
@@ -347,7 +349,7 @@ class ACCDSLWorkflows : AbstractACCDSLWorkflowsTestSupport() {
         // Running the workflow
         val instanceId = ontrack.workflows.launchWorkflow(
             workflowId = workflowId,
-            context = "mock" to mapOf("text" to "Error test").asJson(),
+            context = mapOf("mock" to "Error test"),
         ) ?: fail("Error while launching workflow")
         // Waiting for the workflow result
         val instance = waitUntilWorkflowFinished(instanceId, returnInstanceOnError = true)
@@ -392,7 +394,7 @@ class ACCDSLWorkflows : AbstractACCDSLWorkflowsTestSupport() {
         // Running the workflow
         val instanceId = ontrack.workflows.launchWorkflow(
             workflowId = workflowId,
-            context = "mock" to mapOf("text" to "Error test").asJson(),
+            context = mapOf("mock" to "Error test"),
         ) ?: fail("Error while launching workflow")
         // Stopping the workflow
         runBlocking {
@@ -436,7 +438,7 @@ class ACCDSLWorkflows : AbstractACCDSLWorkflowsTestSupport() {
         // Running the workflow
         val instanceId = ontrack.workflows.launchWorkflow(
             workflowId = workflowId,
-            context = "mock" to mapOf("text" to "Error test").asJson(),
+            context = mapOf("mock" to "Error test"),
         ) ?: fail("Error while launching workflow")
         // Waiting for the workflow result
         val instance = waitUntilWorkflowFinished(instanceId, returnInstanceOnError = true)

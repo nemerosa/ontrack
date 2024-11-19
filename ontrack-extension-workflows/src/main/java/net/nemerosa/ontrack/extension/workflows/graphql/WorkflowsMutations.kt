@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.workflows.engine.WorkflowEngine
 import net.nemerosa.ontrack.extension.workflows.events.WorkflowEventFactory
 import net.nemerosa.ontrack.extension.workflows.registry.WorkflowRegistry
 import net.nemerosa.ontrack.graphql.schema.Mutation
+import net.nemerosa.ontrack.graphql.support.ListRef
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.model.events.dehydrate
 import net.nemerosa.ontrack.model.security.SecurityService
@@ -51,9 +52,13 @@ class WorkflowsMutations(
         ) { input ->
             val workflowRecord = workflowRegistry.findWorkflow(input.workflowId)
             if (workflowRecord != null) {
+                var event = workflowEventFactory.workflowStandalone().dehydrate()
+                input.context.forEach { (name, value) ->
+                    event = event.withValue(name, value)
+                }
                 workflowEngine.startWorkflow(
                     workflow = workflowRecord.workflow,
-                    event = workflowEventFactory.workflowStandalone().dehydrate(),
+                    event = event,
                 ).id
             } else {
                 null
@@ -80,6 +85,13 @@ data class SaveYamlWorkflowInput(
 
 data class LaunchWorkflowInput(
     val workflowId: String,
+    @ListRef(embedded = true)
+    val context: List<LaunchWorkflowInputContext> = emptyList(),
+)
+
+data class LaunchWorkflowInputContext(
+    val name: String,
+    val value: String,
 )
 
 data class StopWorkflowInput(

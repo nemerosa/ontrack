@@ -25622,8 +25622,8 @@
           "fields": null,
           "inputFields": [
             {
-              "name": "key",
-              "description": "key field",
+              "name": "name",
+              "description": "name field",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -25643,7 +25643,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "SCALAR",
-                  "name": "JSON",
+                  "name": "String",
                   "ofType": null
                 }
               },
@@ -36950,6 +36950,45 @@
           ]
         },
         {
+          "kind": "OBJECT",
+          "name": "ProjectEntityID",
+          "description": null,
+          "fields": [
+            {
+              "name": "type",
+              "description": "Project entity type",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "ENUM",
+                  "name": "ProjectEntityType",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "id",
+              "description": "Project entity ID",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
           "kind": "INPUT_OBJECT",
           "name": "ProjectEntityIDInput",
           "description": null,
@@ -46026,6 +46065,79 @@
               "ofType": null
             }
           ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "SerializableEvent",
+          "description": "Minimal form for an event",
+          "fields": [
+            {
+              "name": "eventType",
+              "description": "eventType field",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "entities",
+              "description": "List of entities",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "ProjectEntityID"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "values",
+              "description": "List of arbitrary values",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "NameValue"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -64987,79 +65099,6 @@
         },
         {
           "kind": "OBJECT",
-          "name": "WorkflowContext",
-          "description": "Workflow context, data which is passed to the workflow initially",
-          "fields": [
-            {
-              "name": "data",
-              "description": "data field",
-              "args": [],
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "LIST",
-                  "name": null,
-                  "ofType": {
-                    "kind": "NON_NULL",
-                    "name": null,
-                    "ofType": {
-                      "kind": "OBJECT",
-                      "name": "WorkflowContextData"
-                    }
-                  }
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            }
-          ],
-          "inputFields": null,
-          "interfaces": [],
-          "enumValues": null,
-          "possibleTypes": null
-        },
-        {
-          "kind": "OBJECT",
-          "name": "WorkflowContextData",
-          "description": "Data in a workflow context",
-          "fields": [
-            {
-              "name": "key",
-              "description": "key field",
-              "args": [],
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "value",
-              "description": "value field",
-              "args": [],
-              "type": {
-                "kind": "SCALAR",
-                "name": "JSON",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            }
-          ],
-          "inputFields": null,
-          "interfaces": [],
-          "enumValues": null,
-          "possibleTypes": null
-        },
-        {
-          "kind": "OBJECT",
           "name": "WorkflowInstance",
           "description": "Running workflow instance",
           "fields": [
@@ -65128,15 +65167,15 @@
               "deprecationReason": null
             },
             {
-              "name": "context",
-              "description": "context field",
+              "name": "event",
+              "description": "event field",
               "args": [],
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
                 "ofType": {
                   "kind": "OBJECT",
-                  "name": "WorkflowContext",
+                  "name": "SerializableEvent",
                   "ofType": null
                 }
               },

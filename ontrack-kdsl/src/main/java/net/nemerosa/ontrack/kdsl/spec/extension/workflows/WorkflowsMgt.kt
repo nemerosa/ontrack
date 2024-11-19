@@ -1,14 +1,9 @@
 package net.nemerosa.ontrack.kdsl.spec.extension.workflows
 
-import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.kdsl.connector.Connected
 import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.LaunchWorkflowMutation
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.SaveYamlWorkflowMutation
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.StopWorkflowMutation
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.WorkflowInstanceQuery
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.WorkflowInstancesByNameQuery
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.*
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.LaunchWorkflowInputContext
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 
@@ -21,16 +16,19 @@ class WorkflowsMgt(connector: Connector) : Connected(connector) {
             it?.saveYamlWorkflow()?.fragments()?.payloadUserErrors()?.convert()
         }?.saveYamlWorkflow()?.workflowId()
 
-    fun launchWorkflow(workflowId: String, context: Pair<String, JsonNode>): String? {
-        val (key, value) = context
+    fun launchWorkflow(
+        workflowId: String,
+        context: Map<String, String>,
+    ): String? {
         return graphqlConnector.mutate(
             LaunchWorkflowMutation(
-                workflowId, listOf(
+                workflowId,
+                context.map {
                     LaunchWorkflowInputContext.builder()
-                        .key(key)
-                        .value(value)
+                        .name(it.key)
+                        .value(it.value)
                         .build()
-                )
+                }
             )
         ) {
             it?.launchWorkflow()?.fragments()?.payloadUserErrors()?.convert()
