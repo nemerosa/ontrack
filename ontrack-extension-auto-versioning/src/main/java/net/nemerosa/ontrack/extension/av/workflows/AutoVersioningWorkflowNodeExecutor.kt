@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.av.workflows
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.av.AutoVersioningExtensionFeature
+import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditStore
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
 import net.nemerosa.ontrack.extension.av.processing.AutoVersioningProcessingOutcome
 import net.nemerosa.ontrack.extension.av.processing.AutoVersioningProcessingService
@@ -28,6 +29,7 @@ class AutoVersioningWorkflowNodeExecutor(
     private val structureService: StructureService,
     private val eventTemplatingService: EventTemplatingService,
     private val serializableEventService: SerializableEventService,
+    private val autoVersioningAuditStore: AutoVersioningAuditStore,
 ) : AbstractTypedWorkflowNodeExecutor<AutoVersioningWorkflowNodeExecutorData>(
     feature = extensionFeature,
     id = "auto-versioning",
@@ -45,7 +47,10 @@ class AutoVersioningWorkflowNodeExecutor(
             autoVersioningOrderId = order.uuid,
         )
         workflowNodeExecutorResultFeedback(output.asJson())
+
+        autoVersioningAuditStore.create(order, routing = "") // Initialize an audit trail
         val outcome = autoVersioningProcessingService.process(order)
+
         return if (outcome == AutoVersioningProcessingOutcome.CREATED) {
             WorkflowNodeExecutorResult.success(
                 output = output.asJson()

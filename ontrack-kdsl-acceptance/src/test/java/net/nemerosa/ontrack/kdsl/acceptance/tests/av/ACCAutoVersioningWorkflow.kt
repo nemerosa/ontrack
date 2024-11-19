@@ -5,9 +5,11 @@ import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.SlotPipelineStatus
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.SlotWorkflowTrigger
+import net.nemerosa.ontrack.kdsl.spec.extension.av.autoVersioning
 import net.nemerosa.ontrack.kdsl.spec.extension.environments.environments
 import net.nemerosa.ontrack.kdsl.spec.extension.environments.workflows.addWorkflow
 import org.junit.jupiter.api.Test
+import kotlin.test.assertNotNull
 
 class ACCAutoVersioningWorkflow : AbstractACCAutoVersioningTestSupport() {
 
@@ -79,6 +81,12 @@ class ACCAutoVersioningWorkflow : AbstractACCAutoVersioningTestSupport() {
                         assertThatMockScmRepository {
                             fileContains("gradle.properties") { "version = 1.0.0" }
                         }
+
+                        // We expect an entry in the AV audit trail
+                        val entry = ontrack.autoVersioning.audit.entries(
+                            project = gitOps.name
+                        ).firstOrNull()
+                        assertNotNull(entry, "Audit entry has been created")
                     }
                 }
             }
