@@ -8607,14 +8607,14 @@ input CreateConfigurationInput {
 
 "Input type for the createEnvironment mutation."
 input CreateEnvironmentInput {
-    "description field"
-    description: String!
-    "name field"
+    "Description for the environment"
+    description: String
+    "Unique name for the environment"
     name: String!
-    "order field"
+    "Order to the environment, used to sort them from lower environments to higher ones"
     order: Int!
-    "tags field"
-    tags: [String!]!
+    "Tags for the environment"
+    tags: [String!]
 }
 
 "Input type for the createGitHubConfiguration mutation."

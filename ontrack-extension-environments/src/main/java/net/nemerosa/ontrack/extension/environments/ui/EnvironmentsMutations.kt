@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.environments.service.EnvironmentService
 import net.nemerosa.ontrack.graphql.schema.Mutation
 import net.nemerosa.ontrack.graphql.support.ListRef
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
+import net.nemerosa.ontrack.model.annotations.APIDescription
 import org.springframework.stereotype.Component
 
 @Component
@@ -27,7 +28,7 @@ class EnvironmentsMutations(
                 name = input.name,
                 order = input.order,
                 description = input.description,
-                tags = input.tags,
+                tags = input.tags ?: emptyList(),
             ).apply {
                 environmentService.save(this)
             }
@@ -36,9 +37,13 @@ class EnvironmentsMutations(
 }
 
 data class CreateEnvironmentInput(
+    @APIDescription("Unique name for the environment")
     val name: String,
-    val description: String,
+    @APIDescription("Order to the environment, used to sort them from lower environments to higher ones")
     val order: Int,
+    @APIDescription("Description for the environment")
+    val description: String?,
+    @APIDescription("Tags for the environment")
     @ListRef
-    val tags: List<String>,
+    val tags: List<String>?,
 )

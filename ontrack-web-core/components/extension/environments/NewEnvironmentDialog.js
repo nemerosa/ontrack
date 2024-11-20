@@ -19,9 +19,9 @@ export function useNewEnvironmentDialog() {
         query: gql`
             mutation CreateEnvironment(
                 $name: String!,
-                $description: String!,
+                $description: String,
                 $order: Int!,
-                $tags: [String!]!,
+                $tags: [String!],
             ) {
                 createEnvironment(input: {
                     name: $name,
