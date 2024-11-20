@@ -48,9 +48,7 @@ class WorkflowEngineImpl(
                     TODO("Handle the error and mark the workflow as failed")
                 }
                 // OK, returning the final instance
-                transactionHelper.inNewTransaction {
-                    workflowInstanceStore.getById(instance.id)
-                }
+                txWorkflowInstance(instance.id)
             }
         }
     }
@@ -81,7 +79,7 @@ class WorkflowEngineImpl(
 
     suspend fun CoroutineScope.processNode(workflowInstanceId: String, workflowNodeId: String) {
         // Getting the instance & the node
-        var instance = getWorkflowInstance(workflowInstanceId)
+        var instance = txWorkflowInstance(workflowInstanceId)
         val node = instance.workflow.getNode(workflowNodeId)
         val instanceNode = instance.getNode(workflowNodeId)
         // Checking the node status
@@ -183,7 +181,7 @@ class WorkflowEngineImpl(
 
     private fun canRunNode(instanceId: String, nodeId: String): Boolean {
         // Getting the latest state of the instance
-        val instance = getWorkflowInstance(instanceId)
+        val instance = txWorkflowInstance(instanceId)
         // Getting the instance node state
         val instanceNode = instance.getNode(nodeId)
         // Getting the workflow node
@@ -198,9 +196,13 @@ class WorkflowEngineImpl(
                 }
     }
 
+    private fun txWorkflowInstance(instanceId: String) = transactionHelper.inNewTransaction {
+        workflowInstanceStore.getById(instanceId)
+    }
+
     private fun doStopWorkflow(workflowInstanceId: String) {
         // Getting the instance
-        val instance = getWorkflowInstance(workflowInstanceId)
+        val instance = txWorkflowInstance(workflowInstanceId)
         // TODO Marks the workflow as stopped and interrupt the current running tasks
         // Stopping all unfinished nodes
         // TODO store(instance.stopNodes())
