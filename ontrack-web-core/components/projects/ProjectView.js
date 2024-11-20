@@ -28,6 +28,7 @@ import {isAuthorized} from "@components/common/authorizations";
 import DisableProjectCommand from "@components/projects/DisableProjectCommand";
 import DisabledProjectBanner from "@components/projects/DisabledProjectBanner";
 import {gqlBranchContentFragment} from "@components/branches/BranchGraphQLFragments";
+import NewBranchCommand from "@components/branches/NewBranchCommand";
 
 export default function ProjectView({id}) {
 
@@ -42,6 +43,7 @@ export default function ProjectView({id}) {
 
     const favouriteRefreshCount = useEventForRefresh("branch.favourite")
     const projectUpdated = useEventForRefresh("project.updated")
+    const branchCreated = useEventForRefresh("branch.created")
 
     useEffect(() => {
         if (id && client) {
@@ -114,6 +116,12 @@ export default function ProjectView({id}) {
                 // Commands
                 const commands = []
                 // Commands depending on the project authorizations & state
+                commands.push(
+                    <NewBranchCommand
+                        key="branch-create"
+                        project={project}
+                    />
+                )
                 if (isAuthorized(project, 'project', 'disable')) {
                     commands.push(
                         <DisableProjectCommand
@@ -140,7 +148,7 @@ export default function ProjectView({id}) {
                 setLoadingProject(false)
             })
         }
-    }, [client, id, favouriteRefreshCount, projectUpdated])
+    }, [client, id, favouriteRefreshCount, projectUpdated, branchCreated])
 
 
     return (

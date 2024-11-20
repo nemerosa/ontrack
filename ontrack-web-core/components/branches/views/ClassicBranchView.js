@@ -10,6 +10,7 @@ import ValidationStampFilterContextProvider
     from "@components/branches/filters/validationStamps/ValidationStampFilterContext";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import DisabledBranchBanner from "@components/branches/DisabledBranchBanner";
+import {useEventForRefresh} from "@components/common/EventsContext";
 
 export default function ClassicBranchView({branch}) {
 
@@ -66,6 +67,9 @@ export default function ClassicBranchView({branch}) {
         }
     }
 
+    // Build created
+    const buildCreated = useEventForRefresh("build.created")
+
     // Loading the builds
     const [loadingBuilds, setLoadingBuilds] = useState(true)
     useEffect(() => {
@@ -92,7 +96,7 @@ export default function ClassicBranchView({branch}) {
                 setLoadingBuilds(false)
             })
         }
-    }, [client, branch, pagination, buildsReloads, selectedBuildFilter])
+    }, [client, branch, pagination, buildsReloads, selectedBuildFilter, buildCreated])
 
     // Loading more builds
     const onLoadMoreBuilds = () => {

@@ -13,21 +13,21 @@ import org.springframework.stereotype.Service
 
 @Service
 class SonarQubeConfigurationServiceImpl(
-        configurationRepository: ConfigurationRepository,
-        securityService: SecurityService,
-        encryptionService: EncryptionService,
-        eventPostService: EventPostService,
-        eventFactory: EventFactory,
-        ontrackConfigProperties: OntrackConfigProperties,
-        private val sonarQubeClientFactory: SonarQubeClientFactory
+    configurationRepository: ConfigurationRepository,
+    securityService: SecurityService,
+    encryptionService: EncryptionService,
+    eventPostService: EventPostService,
+    eventFactory: EventFactory,
+    ontrackConfigProperties: OntrackConfigProperties,
+    private val sonarQubeClientFactory: SonarQubeClientFactory
 ) : AbstractConfigurationService<SonarQubeConfiguration>(
-        SonarQubeConfiguration::class.java,
-        configurationRepository,
-        securityService,
-        encryptionService,
-        eventPostService,
-        eventFactory,
-        ontrackConfigProperties
+    SonarQubeConfiguration::class.java,
+    configurationRepository,
+    securityService,
+    encryptionService,
+    eventPostService,
+    eventFactory,
+    ontrackConfigProperties
 ), SonarQubeConfigurationService {
 
     override val type: String = "sonarqube"
@@ -37,12 +37,10 @@ class SonarQubeConfigurationServiceImpl(
         val client = sonarQubeClientFactory.getClient(configuration)
         // Tests the connection by getting the version
         return try {
+            // Getting the version through the API
             client.serverVersion
-            val health = client.systemHealth
-            when (health) {
-                "GREEN" -> ConnectionResult.ok()
-                else -> ConnectionResult.error("SonarQube health: $health")
-            }
+            // OK
+            ConnectionResult.ok()
         } catch (ex: Exception) {
             ConnectionResult.error(ex)
         }

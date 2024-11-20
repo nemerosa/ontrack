@@ -8,16 +8,16 @@ interface SonarQubeClient {
      *
      * The map contains `null` for a metric if the metric was present but could not be converted.
      */
-    fun getMeasuresForVersion(key: String, branch: String, version: String, metrics: List<String>): Map<String, Double?>?
+    fun getMeasuresForVersion(
+        key: String,
+        branch: String,
+        version: String,
+        metrics: List<String>
+    ): Map<String, Double?>?
 
     /**
      * Server version
      */
     val serverVersion: String
-
-    /**
-     * System health
-     */
-    val systemHealth: String
 
 }

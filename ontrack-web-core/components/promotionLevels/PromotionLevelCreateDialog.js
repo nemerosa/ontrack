@@ -14,6 +14,7 @@ export const usePromotionLevelCreateDialog = () => {
         prepareValues: (values, {branch}) => {
             return {
                 ...values,
+                description: values.description ?? '',
                 branchId: branch.id,
             }
         },

@@ -1,6 +1,9 @@
 package net.nemerosa.ontrack.extension.sonarqube.client
 
-import net.nemerosa.ontrack.extension.sonarqube.client.model.*
+import net.nemerosa.ontrack.extension.sonarqube.client.model.Analysis
+import net.nemerosa.ontrack.extension.sonarqube.client.model.MeasureSearchHistory
+import net.nemerosa.ontrack.extension.sonarqube.client.model.PagedResult
+import net.nemerosa.ontrack.extension.sonarqube.client.model.ProjectAnalysisSearch
 import net.nemerosa.ontrack.extension.sonarqube.configuration.SonarQubeConfiguration
 import net.nemerosa.ontrack.json.asJson
 import org.slf4j.LoggerFactory
@@ -11,7 +14,7 @@ import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.DefaultUriBuilderFactory
 
 class SonarQubeClientImpl(
-        configuration: SonarQubeConfiguration
+    configuration: SonarQubeConfiguration
 ) : SonarQubeClient {
 
     private val logger = LoggerFactory.getLogger(SonarQubeClient::class.java)
@@ -19,29 +22,31 @@ class SonarQubeClientImpl(
     override val serverVersion: String
         get() = restTemplate.getForObject("/api/server/version", String::class.java)!!
 
-    override val systemHealth: String
-        get() = restTemplate.getForObject("/api/system/health", SystemHealth::class.java)!!.health
-
-    override fun getMeasuresForVersion(key: String, branch: String, version: String, metrics: List<String>): Map<String, Double?>? {
+    override fun getMeasuresForVersion(
+        key: String,
+        branch: String,
+        version: String,
+        metrics: List<String>
+    ): Map<String, Double?>? {
 
         if (logger.isDebugEnabled) {
             logger.debug("Getting measures,key=$key,branch=$branch,version=$version,metrics=$metrics")
         }
 
         val analysis: Analysis? = paginateUntil(
-                ProjectAnalysisSearch::class.java,
-                uri = { page ->
-                    "/api/project_analyses/search?project={project}&branch={branch}&category=VERSION&p={page}" to mapOf(
-                            "project" to key,
-                            "branch" to branch,
-                            "page" to page
-                    )
-                },
-                search = { result ->
-                    result.analyses.find { analysis ->
-                        analysis.events.any { event -> event.name == version }
-                    }
+            ProjectAnalysisSearch::class.java,
+            uri = { page ->
+                "/api/project_analyses/search?project={project}&branch={branch}&category=VERSION&p={page}" to mapOf(
+                    "project" to key,
+                    "branch" to branch,
+                    "page" to page
+                )
+            },
+            search = { result ->
+                result.analyses.find { analysis ->
+                    analysis.events.any { event -> event.name == version }
                 }
+            }
         )
 
         if (analysis != null) {
@@ -52,14 +57,14 @@ class SonarQubeClientImpl(
             val timestamp = analysis.date
             // History measures
             val measures: MeasureSearchHistory = restTemplate.getForObject(
-                    "/api/measures/search_history?component={component}&branch={branch}&metrics={metrics}&from={timestamp}&to={timestamp}",
-                    MeasureSearchHistory::class.java,
-                    mapOf(
-                            "component" to key,
-                            "branch" to branch,
-                            "metrics" to metrics.joinToString(","),
-                            "timestamp" to timestamp
-                    )
+                "/api/measures/search_history?component={component}&branch={branch}&metrics={metrics}&from={timestamp}&to={timestamp}",
+                MeasureSearchHistory::class.java,
+                mapOf(
+                    "component" to key,
+                    "branch" to branch,
+                    "metrics" to metrics.joinToString(","),
+                    "timestamp" to timestamp
+                )
             )!!
             if (logger.isDebugEnabled) {
                 logger.debug("Getting measures,key=$key,branch=$branch,version=$version,metrics=$metrics,measures=${measures.measures.asJson()}")
@@ -89,19 +94,19 @@ class SonarQubeClientImpl(
     }
 
     internal val restTemplate: RestTemplate = RestTemplateBuilder()
-            .rootUri(configuration.url)
-            // SonarQube requires a strict encoding per value (esp. for "+" characters which are no longer encoded with Spring 5)
-            // See https://github.com/spring-projects/spring-framework/issues/20750
-            .uriTemplateHandler(DefaultUriBuilderFactory().apply {
-                encodingMode = DefaultUriBuilderFactory.EncodingMode.VALUES_ONLY
-            })
-            .basicAuthentication(configuration.password, "") // See https://docs.sonarqube.org/latest/extend/web-api/
-            .build()
+        .rootUri(configuration.url)
+        // SonarQube requires a strict encoding per value (esp. for "+" characters which are no longer encoded with Spring 5)
+        // See https://github.com/spring-projects/spring-framework/issues/20750
+        .uriTemplateHandler(DefaultUriBuilderFactory().apply {
+            encodingMode = DefaultUriBuilderFactory.EncodingMode.VALUES_ONLY
+        })
+        .basicAuthentication(configuration.password, "") // See https://docs.sonarqube.org/latest/extend/web-api/
+        .build()
 
     private fun <T, R : PagedResult> paginateUntil(
-            resultType: Class<R>,
-            uri: (page: Int) -> Pair<String, Map<String, Any>>,
-            search: (result: R) -> T?
+        resultType: Class<R>,
+        uri: (page: Int) -> Pair<String, Map<String, Any>>,
+        search: (result: R) -> T?
     ): T? {
         var page = 1
         var result: T? = null

@@ -13,6 +13,7 @@ class CoreAuthorizationContributor : AuthorizationContributor {
         const val BRANCH = "branch"
         const val PROMOTION_LEVEL = "promotion_level"
         const val VALIDATION_STAMP = "validation_stamp"
+        const val BUILD = "build"
     }
 
     override fun appliesTo(context: Any): Boolean = context is GlobalAuthorizationContext

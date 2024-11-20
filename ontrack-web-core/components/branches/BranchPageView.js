@@ -20,6 +20,7 @@ import UserMenuActions from "@components/entities/UserMenuActions";
 import {isAuthorized} from "@components/common/authorizations";
 import DisableBranchCommand from "@components/branches/DisableBranchCommand";
 import {useEventForRefresh} from "@components/common/EventsContext";
+import NewBuildCommand from "@components/builds/NewBuildCommand";
 
 export default function BranchPageView({id}) {
     const [loadingBranch, setLoadingBranch] = useState(true)
@@ -82,6 +83,12 @@ export default function BranchPageView({id}) {
                 let loadedBranchViews = getBranchViews(branch);
                 setBranchViews(loadedBranchViews)
                 const commands = []
+                commands.push(
+                    <NewBuildCommand
+                        key="build-create"
+                        branch={branch}
+                    />
+                )
                 if (isAuthorized(branch, "branch", "disable")) {
                     commands.push(
                         <DisableBranchCommand

@@ -76,6 +76,10 @@ export function validationStampUri(validationStamp) {
     return `/validationStamp/${validationStamp.id}`
 }
 
+export function validationRunUri(validationRun) {
+    return `/validationRun/${validationRun.id}`
+}
+
 export function restPromotionLevelImageUri(promotionLevel) {
     return `/rest/structure/promotionLevels/${promotionLevel.id}/image`
 }
@@ -90,8 +94,4 @@ export function restPredefinedValidationStampImageUri(predefinedValidationStamp)
 
 export function restValidationStampImageUri(validationStamp) {
     return `/rest/structure/validationStamps/${validationStamp.id}/image`
-}
-
-export function legacyValidationRunUri(validationRun) {
-    return `#/validationRun/${validationRun.id}`
 }
