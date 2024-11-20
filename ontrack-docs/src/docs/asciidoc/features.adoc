@@ -9,6 +9,8 @@ include::feature-scm.adoc[]
 
 include::feature-workflows.adoc[]
 
+include::feature-environments.adoc[]
+
 //include::usage-validation-stamps.adoc[]
 //
 //include::usage-promotion-levels.adoc[]

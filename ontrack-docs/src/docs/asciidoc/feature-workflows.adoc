@@ -5,7 +5,10 @@ Workflows allow the execution of several actions orchestrated in a DAG (directed
 
 [NOTE]
 ====
-As of version 4.8, workflows can only be triggered using the <<notifications>>.
+As of version 4.11, workflows can be triggered using:
+
+* <<notifications>>
+* <<environments,environment pipelines>>
 
 There is already some partial and undocumented support through API calls to run some standalone workflows but this is very experimental.
 ====
