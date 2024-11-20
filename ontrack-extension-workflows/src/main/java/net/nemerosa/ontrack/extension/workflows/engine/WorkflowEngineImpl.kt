@@ -45,7 +45,14 @@ class WorkflowEngineImpl(
                 try {
                     nodeTasks.awaitAll()
                 } catch (e: Exception) {
-                    TODO("Handle the error and mark the workflow as failed")
+                    transactionHelper.inNewTransaction {
+                        workflowInstanceStore.error(
+                            instance = instance,
+                            message = "Exception while running the workflow",
+                            throwable = e,
+                        )
+                        doStopWorkflow(instance.id)
+                    }
                 }
                 // OK, returning the final instance
                 txWorkflowInstance(instance.id)

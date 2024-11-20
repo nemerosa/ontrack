@@ -52,6 +52,21 @@ class DatabaseWorkflowInstanceStore(
         return getById(instance.id)
     }
 
+    override fun error(instance: WorkflowInstance, message: String, throwable: Exception): WorkflowInstance {
+        namedParameterJdbcTemplate!!.update(
+            """
+                UPDATE WKF_INSTANCES
+                SET ERROR = :error
+                WHERE ID = :id
+            """,
+            mapOf(
+                "id" to instance.id,
+                "error" to message,
+            )
+        )
+        return getById(instance.id)
+    }
+
     private fun doSaveNodes(instance: WorkflowInstance): WorkflowInstance {
         // Saving or updating all nodes
         instance.nodesExecutions.forEach { node ->
@@ -150,6 +165,7 @@ class DatabaseWorkflowInstanceStore(
             timestamp = dateTimeFromDB(rs.getString("TIMESTAMP"))!!,
             workflow = readJson(rs.getString("WORKFLOW")).parse(),
             event = readJson(rs.getString("EVENT")).parse(),
+            error = rs.getString("ERROR"),
             nodesExecutions = nodes,
         )
     }

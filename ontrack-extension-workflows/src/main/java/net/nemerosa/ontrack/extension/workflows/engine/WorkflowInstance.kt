@@ -24,6 +24,7 @@ data class WorkflowInstance(
     val workflow: Workflow,
     val event: SerializableEvent,
     val nodesExecutions: List<WorkflowInstanceNode>,
+    val error: String?,
 ) {
 
     companion object {
@@ -52,17 +53,21 @@ data class WorkflowInstance(
     @get:JsonIgnore
     val status: WorkflowInstanceStatus
         get() {
-            val nodes = nodesExecutions.map { it.status }
-            return if (nodes.any { it == WorkflowInstanceNodeStatus.ERROR }) {
+            return if (!error.isNullOrBlank()) {
                 WorkflowInstanceStatus.ERROR
-            } else if (nodes.any { it == WorkflowInstanceNodeStatus.STOPPED }) {
-                WorkflowInstanceStatus.STOPPED
-            } else if (nodes.all { it == WorkflowInstanceNodeStatus.SUCCESS }) {
-                WorkflowInstanceStatus.SUCCESS
-            } else if (nodes.any { it == WorkflowInstanceNodeStatus.STARTED }) {
-                WorkflowInstanceStatus.RUNNING
             } else {
-                WorkflowInstanceStatus.STARTED
+                val nodes = nodesExecutions.map { it.status }
+                if (nodes.any { it == WorkflowInstanceNodeStatus.ERROR }) {
+                    WorkflowInstanceStatus.ERROR
+                } else if (nodes.any { it == WorkflowInstanceNodeStatus.STOPPED }) {
+                    WorkflowInstanceStatus.STOPPED
+                } else if (nodes.all { it == WorkflowInstanceNodeStatus.SUCCESS }) {
+                    WorkflowInstanceStatus.SUCCESS
+                } else if (nodes.any { it == WorkflowInstanceNodeStatus.STARTED }) {
+                    WorkflowInstanceStatus.RUNNING
+                } else {
+                    WorkflowInstanceStatus.STARTED
+                }
             }
         }
 
@@ -74,6 +79,7 @@ data class WorkflowInstance(
         workflow = workflow,
         event = eventToMerge ?: event,
         nodesExecutions = nodesExecutions,
+        error = error,
     )
 
     private fun updateNode(nodeId: String, update: (node: WorkflowInstanceNode) -> WorkflowInstanceNode) =
@@ -82,6 +88,7 @@ data class WorkflowInstance(
             timestamp = Time.now,
             workflow = workflow,
             event = event,
+            error = error,
             nodesExecutions = nodesExecutions.map { node ->
                 if (node.id == nodeId) {
                     update(node)
@@ -103,15 +110,6 @@ data class WorkflowInstance(
         node.success(output)
     }.run {
         updateContext(eventToMerge)
-    }
-
-    fun errorNode(nodeId: String, throwable: Throwable?, message: String?, output: JsonNode?) =
-        updateNode(nodeId) { node ->
-            node.error(throwable, message, output)
-        }
-
-    fun progressNode(nodeId: String, output: JsonNode) = updateNode(nodeId) { node ->
-        node.progress(output)
     }
 
     fun getNode(nodeId: String) = nodesExecutions.firstOrNull { it.id == nodeId }
@@ -143,6 +141,7 @@ data class WorkflowInstance(
             timestamp = timestamp,
             workflow = workflow,
             event = event,
+            error = error,
             nodesExecutions = nodesExecutions.map { nx ->
                 if (nx.status.finished) {
                     nx

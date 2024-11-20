@@ -31,6 +31,7 @@ fun createInstance(
         timestamp = timestamp,
         workflow = workflow,
         event = eventWithInstance,
+        error = null,
         nodesExecutions = workflow.nodes.map { it.toStartExecution() },
     )
 }

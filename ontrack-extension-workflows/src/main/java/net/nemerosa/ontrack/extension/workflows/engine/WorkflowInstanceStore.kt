@@ -15,6 +15,8 @@ interface WorkflowInstanceStore {
     
     fun saveEvent(instance: WorkflowInstance, event: SerializableEvent): WorkflowInstance
 
+    fun error(instance: WorkflowInstance, message: String, throwable: Exception): WorkflowInstance
+
     fun findById(id: String): WorkflowInstance?
 
     fun findByFilter(
