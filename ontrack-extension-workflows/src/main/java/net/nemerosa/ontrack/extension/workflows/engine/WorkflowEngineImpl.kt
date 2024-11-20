@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Duration
+import java.util.concurrent.ConcurrentHashMap
 
 @Service
 @Transactional
@@ -23,6 +24,8 @@ class WorkflowEngineImpl(
 ) : WorkflowEngine {
 
     private val logger: Logger = LoggerFactory.getLogger(WorkflowEngine::class.java)
+
+    private val jobs = ConcurrentHashMap<String, Job>()
 
     override fun startWorkflow(
         workflow: Workflow,
@@ -41,9 +44,14 @@ class WorkflowEngineImpl(
             coroutineScope {
                 // Getting the tasks for all nodes
                 val nodeTasks = createNodeTasks(instance)
-                // Waiting on all nodes to complete
-                try {
+                // Job to wait on all nodes to complete
+                val job = launch {
                     nodeTasks.awaitAll()
+                }.apply {
+                    jobs[instance.id] = this
+                }
+                try {
+                    job.join()
                 } catch (e: Exception) {
                     transactionHelper.inNewTransaction {
                         workflowInstanceStore.error(
@@ -53,6 +61,8 @@ class WorkflowEngineImpl(
                         )
                         doStopWorkflow(instance.id)
                     }
+                } finally {
+                    jobs.remove(instance.id)
                 }
                 // OK, returning the final instance
                 txWorkflowInstance(instance.id)
@@ -214,7 +224,9 @@ class WorkflowEngineImpl(
         transactionHelper.inNewTransaction {
             workflowInstanceStore.stop(instance)
         }
-        // TODO Interrupt the current running tasks
+        // Interrupt the current running tasks
+        jobs[workflowInstanceId]?.cancel()
+        jobs.remove(workflowInstanceId)
     }
 
     override fun stopWorkflow(workflowInstanceId: String) {
