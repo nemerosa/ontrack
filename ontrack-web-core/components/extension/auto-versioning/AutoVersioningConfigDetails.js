@@ -3,14 +3,25 @@ import AutoVersioningPostProcessing from "@components/extension/auto-versioning/
 import AutoVersioningConfigNotifications from "@components/extension/auto-versioning/AutoVersioningConfigNotifications";
 import AutoVersioningAdditionalPaths from "@components/extension/auto-versioning/AutoVersioningAdditionalPaths";
 
-export default function AutoVersioningConfigDetails({source}) {
+export default function AutoVersioningConfigDetails({source, additionalItems = [], size}) {
 
-    const items = [
+    const items = additionalItems
+    if (source.versionSource) {
+        items.push(
+            {
+                key: 'versionSource',
+                label: 'Version source',
+                children: <Typography.Text code>{source.versionSource}</Typography.Text>,
+                span: 4,
+            }
+        )
+    }
+    items.push(
         {
-            key: 'versionSource',
-            label: 'Version source',
-            children: <Typography.Text code>{source.versionSource}</Typography.Text>,
-            span: 4,
+            key: 'targetPath',
+            label: 'Target path',
+            children: <Typography.Text code>{source.targetPath}</Typography.Text>,
+            span: 12,
         },
         {
             key: 'targetPropertyType',
@@ -122,7 +133,7 @@ export default function AutoVersioningConfigDetails({source}) {
             label: "Additional paths",
             children: <AutoVersioningAdditionalPaths additionalPaths={source.additionalPaths}/>,
         },
-    ]
+    )
 
     return (
         <>
@@ -130,6 +141,7 @@ export default function AutoVersioningConfigDetails({source}) {
                 items={items}
                 column={12}
                 bordered={true}
+                size={size}
             />
         </>
     )

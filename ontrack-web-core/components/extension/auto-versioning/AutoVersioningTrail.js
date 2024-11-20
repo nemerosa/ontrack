@@ -93,6 +93,7 @@ export default function AutoVersioningTrail({trail, displayAudit = true}) {
                         title="Audit"
                         render={(_, branchTrail) => (
                             <>
+                                {/* TODO Use AutoVersioningAuditEntryLink */}
                                 {
                                     !branchTrail.orderId && <Space>
                                         <FaBan/>

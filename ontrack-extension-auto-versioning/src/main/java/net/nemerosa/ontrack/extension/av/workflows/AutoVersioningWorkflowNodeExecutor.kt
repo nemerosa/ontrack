@@ -33,7 +33,7 @@ class AutoVersioningWorkflowNodeExecutor(
 ) : AbstractTypedWorkflowNodeExecutor<AutoVersioningWorkflowNodeExecutorData>(
     feature = extensionFeature,
     id = "auto-versioning",
-    displayName = "Auto-versioning of a given branch",
+    displayName = "Auto-versioning",
     dataType = AutoVersioningWorkflowNodeExecutorData::class,
 ) {
 

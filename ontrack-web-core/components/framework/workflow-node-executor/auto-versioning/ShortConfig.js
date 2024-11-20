@@ -1,10 +1,10 @@
 export default function AutoVersioningWorkflowNodeExecutorShortConfig({data}) {
 
-    const {targetProject, targetBranch, targetPath} = data
+    const {targetProject, targetPath} = data
 
     return (
         <>
-            {JSON.stringify(data)}
+            {targetProject} @ {targetPath}
         </>
     )
 
