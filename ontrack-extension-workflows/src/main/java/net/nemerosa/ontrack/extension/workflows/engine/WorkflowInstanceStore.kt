@@ -17,6 +17,8 @@ interface WorkflowInstanceStore {
 
     fun error(instance: WorkflowInstance, message: String, throwable: Exception): WorkflowInstance
 
+    fun stop(instance: WorkflowInstance)
+
     fun findById(id: String): WorkflowInstance?
 
     fun findByFilter(

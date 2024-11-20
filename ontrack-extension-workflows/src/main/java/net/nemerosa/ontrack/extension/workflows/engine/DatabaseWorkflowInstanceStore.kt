@@ -67,6 +67,11 @@ class DatabaseWorkflowInstanceStore(
         return getById(instance.id)
     }
 
+    override fun stop(instance: WorkflowInstance) {
+        val stoppedInstance = instance.stopNodes()
+        doSaveNodes(stoppedInstance)
+    }
+
     private fun doSaveNodes(instance: WorkflowInstance): WorkflowInstance {
         // Saving or updating all nodes
         instance.nodesExecutions.forEach { node ->

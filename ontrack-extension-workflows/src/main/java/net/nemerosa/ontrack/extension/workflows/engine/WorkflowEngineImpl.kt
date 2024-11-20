@@ -210,9 +210,11 @@ class WorkflowEngineImpl(
     private fun doStopWorkflow(workflowInstanceId: String) {
         // Getting the instance
         val instance = txWorkflowInstance(workflowInstanceId)
-        // TODO Marks the workflow as stopped and interrupt the current running tasks
-        // Stopping all unfinished nodes
-        // TODO store(instance.stopNodes())
+        // Marks the workflow as stopped
+        transactionHelper.inNewTransaction {
+            workflowInstanceStore.stop(instance)
+        }
+        // TODO Interrupt the current running tasks
     }
 
     override fun stopWorkflow(workflowInstanceId: String) {
