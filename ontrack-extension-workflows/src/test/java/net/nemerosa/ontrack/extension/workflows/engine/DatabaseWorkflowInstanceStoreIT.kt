@@ -4,7 +4,6 @@ import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowFixtures
 import net.nemerosa.ontrack.extension.workflows.mgt.WorkflowSettings
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
-import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.MockEventType
 import net.nemerosa.ontrack.model.events.SerializableEventService
 import net.nemerosa.ontrack.test.TestUtils.uid
@@ -31,10 +30,14 @@ class DatabaseWorkflowInstanceStoreIT : AbstractDSLTestSupport() {
                 MockEventType.mockEvent("Some text")
             ),
         )
-        databaseWorkflowInstanceStore.store(instance)
+        databaseWorkflowInstanceStore.create(instance)
 
         assertNotNull(databaseWorkflowInstanceStore.findById(instance.id)) { saved ->
-            assertEquals(instance.asJson(), saved.asJson())
+            assertEquals(instance.id, saved.id)
+            assertEquals(instance.status, saved.status)
+            assertEquals(instance.event, saved.event)
+            assertEquals(instance.workflow, saved.workflow)
+            assertEquals(instance.nodesExecutions, saved.nodesExecutions)
         }
     }
 
@@ -49,7 +52,7 @@ class DatabaseWorkflowInstanceStoreIT : AbstractDSLTestSupport() {
                     MockEventType.mockEvent("Some text")
                 ),
             ).apply {
-                databaseWorkflowInstanceStore.store(this)
+                databaseWorkflowInstanceStore.create(this)
             }
         }
 
@@ -79,12 +82,12 @@ class DatabaseWorkflowInstanceStoreIT : AbstractDSLTestSupport() {
                 val old = WorkflowInstanceFixtures.simpleLinear(
                     timestamp = now - Duration.ofDays(2)
                 )
-                databaseWorkflowInstanceStore.store(old)
+                databaseWorkflowInstanceStore.create(old)
                 // Saving an instance now
                 val recent = WorkflowInstanceFixtures.simpleLinear(
                     timestamp = now
                 )
-                databaseWorkflowInstanceStore.store(recent)
+                databaseWorkflowInstanceStore.create(recent)
                 // Launching the cleanup
                 databaseWorkflowInstanceStore.cleanup()
                 // Only the most recent instance is present

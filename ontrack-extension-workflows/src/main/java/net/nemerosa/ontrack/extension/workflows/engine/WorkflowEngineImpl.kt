@@ -1,11 +1,7 @@
 package net.nemerosa.ontrack.extension.workflows.engine
 
 import com.fasterxml.jackson.databind.JsonNode
-import kotlinx.coroutines.async
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withTimeoutOrNull
-import net.nemerosa.ontrack.extension.queue.dispatching.QueueDispatcher
-import net.nemerosa.ontrack.extension.queue.source.createQueueSource
+import kotlinx.coroutines.*
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowValidation
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorResultType
@@ -22,10 +18,7 @@ import java.time.Duration
 @Transactional
 class WorkflowEngineImpl(
     private val workflowInstanceStore: WorkflowInstanceStore,
-    private val queueDispatcher: QueueDispatcher,
-    private val workflowQueueProcessor: WorkflowQueueProcessor,
     private val workflowNodeExecutorService: WorkflowNodeExecutorService,
-    private val workflowQueueSourceExtension: WorkflowQueueSourceExtension,
     private val transactionHelper: TransactionHelper,
 ) : WorkflowEngine {
 
@@ -40,47 +33,53 @@ class WorkflowEngineImpl(
         // Creating the instance
         val instance = createInstance(workflow = workflow, event = event)
         // Storing the instance
-        workflowInstanceStore.store(instance)
-        // Getting the starting nodes
-        val nodes = instance.workflow.getNextNodes(null)
-        // Scheduling the nodes
-        for (nodeId in nodes) {
-            queueNode(instance, nodeId)
+        transactionHelper.inNewTransaction {
+            workflowInstanceStore.create(instance)
         }
-        // Returning the instance
-        return instance
+        // Starting a coroutine scope
+        return runBlocking {
+            coroutineScope {
+                // Getting the tasks for all nodes
+                val nodeTasks = createNodeTasks(instance)
+                // Waiting on all nodes to complete
+                try {
+                    nodeTasks.awaitAll()
+                } catch (e: Exception) {
+                    TODO("Handle the error and mark the workflow as failed")
+                }
+                // OK, returning the final instance
+                transactionHelper.inNewTransaction {
+                    workflowInstanceStore.getById(instance.id)
+                }
+            }
+        }
     }
 
-    override fun stopWorkflow(workflowInstanceId: String) {
-        // Getting the instance
-        val instance = getWorkflowInstance(workflowInstanceId)
-        // Stopping all unfinished nodes
-        workflowInstanceStore.store(instance.stopNodes())
+    private fun CoroutineScope.createNodeTasks(instance: WorkflowInstance): Collection<Deferred<Unit>> {
+        val nodeTasks = mutableMapOf<String, Deferred<Unit>>()
+        for (node in instance.workflow.nodes) {
+            val nodeTask = async {
+                // Logging
+                logger.debug("{instance=${instance.id}}{node=${node.id}} Starting")
+                // Wait for all parent nodes to complete
+                for (parent in node.parents) {
+                    logger.debug("{instance=${instance.id}}{node=${node.id}} Waiting for ${parent.id}")
+                    val parentTask = nodeTasks[parent.id] ?: error("Parent not found: ${parent.id}")
+                    parentTask.await()
+                }
+                // Checking the parent's status
+                if (canRunNode(instance.id, node.id)) {
+                    logger.debug("{instance=${instance.id}}{node=${node.id}} Processing")
+                    // Process the node
+                    processNode(workflowInstanceId = instance.id, workflowNodeId = node.id)
+                }
+            }
+            nodeTasks[node.id] = nodeTask
+        }
+        return nodeTasks.values
     }
 
-    private fun queueNode(
-        instance: WorkflowInstance,
-        nodeId: String
-    ) {
-        val node = instance.workflow.getNode(nodeId)
-        queueDispatcher.dispatch(
-            queueProcessor = workflowQueueProcessor,
-            payload = WorkflowQueuePayload(
-                workflowInstanceId = instance.id,
-                workflowNodeId = node.id,
-                workflowNodeExecutorId = node.executorId,
-            ),
-            source = workflowQueueSourceExtension.createQueueSource(
-                WorkflowQueueSourceData(
-                    workflowInstanceId = instance.id,
-                    workflowNodeId = node.id,
-                    workflowNodeExecutorId = node.executorId,
-                )
-            )
-        )
-    }
-
-    override fun processNode(workflowInstanceId: String, workflowNodeId: String) {
+    suspend fun CoroutineScope.processNode(workflowInstanceId: String, workflowNodeId: String) {
         // Getting the instance & the node
         var instance = getWorkflowInstance(workflowInstanceId)
         val node = instance.workflow.getNode(workflowNodeId)
@@ -90,7 +89,12 @@ class WorkflowEngineImpl(
         if (nodeStatus == WorkflowInstanceNodeStatus.IDLE) {
             try {
                 // Starting the node
-                instance = workflowInstanceStore.store(instance.startNode(node.id))
+                instance = transactionHelper.inNewTransaction {
+                    workflowInstanceStore.saveNode(instance, node.id) {
+                        it.start()
+                    }
+                }
+
                 // Getting the node executor
                 val executor = workflowNodeExecutorService.getExecutor(node.executorId)
                 // Timeout
@@ -100,72 +104,86 @@ class WorkflowEngineImpl(
                 val nodeFeedback: (output: JsonNode?) -> Unit = { output: JsonNode? ->
                     if (output != null) {
                         transactionHelper.inNewTransaction {
-                            workflowInstanceStore.store(instance.progressNode(node.id, output))
+                            workflowInstanceStore.saveNode(instance, node.id) {
+                                it.progress(output)
+                            }
                         }
                     }
                 }
 
                 // Running the executor
-                val result = runBlocking {
-                    withTimeoutOrNull(timeout.toMillis()) {
-                        val deferred = async {
-                            executor.execute(instance, node.id, nodeFeedback)
-                        }
-                        deferred.await()
+                val result = withTimeoutOrNull(timeout.toMillis()) {
+                    val deferred = async {
+                        executor.execute(instance, node.id, nodeFeedback)
                     }
+                    deferred.await()
                 }
+
                 // Timeout?
                 if (result == null) {
                     throw WorkflowExecutionTimeoutException(timeout)
                 }
+
                 // Progressing the instance or stopping it in case of error
                 when (result.type) {
                     WorkflowNodeExecutorResultType.ERROR -> {
-                        workflowInstanceStore.store(
-                            instance.errorNode(
-                                node.id,
-                                throwable = null,
-                                message = result.message,
-                                output = result.output,
-                            )
-                        )
-                        stopWorkflow(workflowInstanceId)
+                        transactionHelper.inNewTransaction {
+                            workflowInstanceStore.saveNode(
+                                instance,
+                                node.id
+                            ) {
+                                it.error(
+                                    throwable = null,
+                                    message = result.message,
+                                    output = result.output,
+                                )
+                            }
+                        }
+                        doStopWorkflow(workflowInstanceId)
                     }
 
                     WorkflowNodeExecutorResultType.SUCCESS -> {
                         // Stores the output back into the instance and progresses the node's status
-                        workflowInstanceStore.store(
-                            instance.successNode(
-                                nodeId = node.id,
-                                output = result.output ?: error("Missing notification output"),
-                                eventToMerge = result.event,
-                            )
-                        )
-                        // Loads the current state of the instance
-                        instance = getWorkflowInstance(workflowInstanceId)
-                        // Getting the next nodes
-                        val nextNodes = instance.workflow.getNextNodes(node.id)
-                        for (nextNode in nextNodes) {
-                            // For each next node, checks if it can be scheduled or not
-                            if (canRunNode(instance, nextNode)) {
-                                // Schedule the node
-                                queueNode(instance, nextNode)
+                        transactionHelper.inNewTransaction {
+                            workflowInstanceStore.saveNode(
+                                instance,
+                                node.id
+                            ) {
+                                it.success(
+                                    output = result.output ?: error("Missing notification output"),
+                                )
+                            }.run {
+                                if (result.event != null) {
+                                    workflowInstanceStore.saveEvent(instance, event)
+                                } else {
+                                    this
+                                }
                             }
                         }
                     }
                 }
             } catch (any: Throwable) {
                 // Stores the node error status
-                workflowInstanceStore.store(instance.errorNode(node.id, throwable = any, message = null, output = null))
+                transactionHelper.inNewTransaction {
+                    workflowInstanceStore.saveNode(instance, node.id) {
+                        it.error(
+                            throwable = any,
+                            message = null,
+                            output = null,
+                        )
+                    }
+                }
                 // Stopping the workflow
-                stopWorkflow(workflowInstanceId)
+                doStopWorkflow(workflowInstanceId)
             }
         } else {
             logger.warn("Node already started, should not be processed. workflowInstanceId=$workflowInstanceId,workflowNodeId=$workflowNodeId")
         }
     }
 
-    private fun canRunNode(instance: WorkflowInstance, nodeId: String): Boolean {
+    private fun canRunNode(instanceId: String, nodeId: String): Boolean {
+        // Getting the latest state of the instance
+        val instance = getWorkflowInstance(instanceId)
         // Getting the instance node state
         val instanceNode = instance.getNode(nodeId)
         // Getting the workflow node
@@ -178,6 +196,18 @@ class WorkflowEngineImpl(
                     val parentNode = instance.getNode(parent.id)
                     parentNode.status == WorkflowInstanceNodeStatus.SUCCESS
                 }
+    }
+
+    private fun doStopWorkflow(workflowInstanceId: String) {
+        // Getting the instance
+        val instance = getWorkflowInstance(workflowInstanceId)
+        // TODO Marks the workflow as stopped and interrupt the current running tasks
+        // Stopping all unfinished nodes
+        // TODO store(instance.stopNodes())
+    }
+
+    override fun stopWorkflow(workflowInstanceId: String) {
+        doStopWorkflow(workflowInstanceId)
     }
 
     override fun findWorkflowInstance(id: String): WorkflowInstance? =

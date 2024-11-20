@@ -19,7 +19,7 @@ class GQLRootQueryWorkflowInstancesIT : AbstractQLKTITSupport() {
             workflowInstanceStore.clearAll()
 
             val instance = WorkflowInstanceFixtures.simpleLinear()
-            workflowInstanceStore.store(instance)
+            workflowInstanceStore.create(instance)
 
             run(
                 """{

@@ -10,7 +10,6 @@ dependencies {
     api(project(":ontrack-extension-support"))
     api(project(":ontrack-ui-support"))
 
-    implementation(project(":ontrack-extension-queue"))
     implementation(project(":ontrack-extension-notifications"))
     implementation(project(":ontrack-ui-graphql"))
     implementation("org.springframework:spring-context")
@@ -18,6 +17,7 @@ dependencies {
     implementation("io.micrometer:micrometer-core")
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation(project(":ontrack-extension-casc"))
+    implementation(project(":ontrack-repository-support"))
 
     testImplementation(project(path = ":ontrack-model", configuration = "tests"))
     testImplementation(project(path = ":ontrack-ui-support", configuration = "tests"))

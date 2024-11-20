@@ -26,11 +26,6 @@ interface WorkflowEngine {
     fun findWorkflowInstance(id: String): WorkflowInstance?
 
     /**
-     * Processing one node in a workflow
-     */
-    fun processNode(workflowInstanceId: String, workflowNodeId: String)
-
-    /**
      * Stops a workflow and all its nodes
      */
     fun stopWorkflow(workflowInstanceId: String)
