@@ -13,11 +13,13 @@ interface WorkflowEngine {
      *
      * @param workflow Workflow to run
      * @param event Execution context
+     * @param callback Function to call when the workflow is finished (successful or in error)
      * @return Initial state of the workflow instance
      */
     fun startWorkflow(
         workflow: Workflow,
         event: SerializableEvent,
+        callback: (instance: WorkflowInstance) -> Unit,
     ): WorkflowInstance
 
     /**

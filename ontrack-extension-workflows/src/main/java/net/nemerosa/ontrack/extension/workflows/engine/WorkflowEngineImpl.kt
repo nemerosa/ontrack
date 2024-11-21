@@ -30,6 +30,7 @@ class WorkflowEngineImpl(
     override fun startWorkflow(
         workflow: Workflow,
         event: SerializableEvent,
+        callback: (instance: WorkflowInstance) -> Unit,
     ): WorkflowInstance {
         // Checks the workflow consistency (cycles, etc.) - use a public method, usable by extensions
         WorkflowValidation.validateWorkflow(workflow).throwErrorIfAny()
@@ -39,35 +40,27 @@ class WorkflowEngineImpl(
         transactionHelper.inNewTransaction {
             workflowInstanceStore.create(instance)
         }
-        // Starting a coroutine scope
-        return runBlocking {
-            coroutineScope {
-                // Getting the tasks for all nodes
-                val nodeTasks = createNodeTasks(instance)
-                // Job to wait on all nodes to complete
-                val job = launch {
-                    nodeTasks.awaitAll()
-                }.apply {
-                    jobs[instance.id] = this
-                }
-                try {
-                    job.join()
-                } catch (e: Exception) {
-                    transactionHelper.inNewTransaction {
-                        workflowInstanceStore.error(
-                            instance = instance,
-                            message = "Exception while running the workflow",
-                            throwable = e,
-                        )
-                        doStopWorkflow(instance.id)
-                    }
-                } finally {
-                    jobs.remove(instance.id)
-                }
-                // OK, returning the final instance
-                txWorkflowInstance(instance.id)
+        // Job to run
+        logger.debug("{instance=${instance.id}} Creating the job")
+        CoroutineScope(Dispatchers.Default).launch {
+            // Getting the tasks for all nodes
+            val nodeTasks = createNodeTasks(instance)
+            // Job to wait on all nodes to complete
+            try {
+                nodeTasks.awaitAll()
+            } finally {
+                // Loads the final instance
+                val finalInstance = txWorkflowInstance(instance.id)
+                // Callback
+                callback(finalInstance)
             }
+        }.apply {
+            // Registering the job
+            jobs[instance.id] = this
         }
+        logger.debug("{instance=${instance.id}} Started")
+        // Returning the instance immediately
+        return txWorkflowInstance(instance.id)
     }
 
     private fun CoroutineScope.createNodeTasks(instance: WorkflowInstance): Collection<Deferred<Unit>> {

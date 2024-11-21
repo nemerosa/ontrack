@@ -35,7 +35,7 @@ class WorkflowEngineIT : AbstractWorkflowTestSupport() {
             MockEventType.mockEvent("Linear")
         )
         // Running the workflow
-        val instance = workflowEngine.startWorkflow(workflow, event)
+        val instance = workflowEngine.startWorkflow(workflow, event, {})
         // Waiting until the workflow is completed (error or success)
         waitUntil("Waiting until workflow is complete", timeout = 10.seconds) {
             val workflowInstance = workflowEngine.getWorkflowInstance(instance.id)
@@ -63,7 +63,7 @@ class WorkflowEngineIT : AbstractWorkflowTestSupport() {
         )
         // Running the workflow
         assertFailsWith<WorkflowValidationException> {
-            workflowEngine.startWorkflow(workflow, event)
+            workflowEngine.startWorkflow(workflow, event, {})
         }
     }
 
@@ -122,7 +122,7 @@ class WorkflowEngineIT : AbstractWorkflowTestSupport() {
             MockEventType.mockEvent("Parallel / Join")
         )
         // Running the workflow
-        val instance = workflowEngine.startWorkflow(workflow, event)
+        val instance = workflowEngine.startWorkflow(workflow, event, {})
         // Waiting until the workflow is completed (error or success)
         waitUntil("Waiting until workflow is complete", timeout = 10.seconds) {
             val workflowInstance = workflowEngine.getWorkflowInstance(instance.id)

@@ -58,6 +58,7 @@ class WorkflowNotificationChannel(
         val instance = workflowEngine.startWorkflow(
             workflow = workflow,
             event = workflowEvent,
+            callback = {}, // Not waiting for the workflow to finish
         )
         // Output = just an ID to the workflow instance
         return NotificationResult.async(

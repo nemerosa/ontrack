@@ -59,6 +59,7 @@ class WorkflowsMutations(
                 workflowEngine.startWorkflow(
                     workflow = workflowRecord.workflow,
                     event = event,
+                    callback = {},
                 ).id
             } else {
                 null

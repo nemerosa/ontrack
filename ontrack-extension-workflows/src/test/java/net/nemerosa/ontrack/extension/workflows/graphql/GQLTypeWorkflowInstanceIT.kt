@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.workflows.graphql
 
-import net.nemerosa.ontrack.extension.workflows.WorkflowTestSupport
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowEngine
 import net.nemerosa.ontrack.extension.workflows.registry.WorkflowParser
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
@@ -10,9 +9,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
 class GQLTypeWorkflowInstanceIT : AbstractQLKTITSupport() {
-
-    @Autowired
-    private lateinit var workflowTestSupport: WorkflowTestSupport
 
     @Autowired
     private lateinit var workflowEngine: WorkflowEngine
@@ -26,17 +22,21 @@ class GQLTypeWorkflowInstanceIT : AbstractQLKTITSupport() {
             branch {
                 val event = eventFactory.newBranch(this).dehydrate()
                 val instance = workflowEngine.startWorkflow(
-                    workflow = WorkflowParser.parseYamlWorkflow("""
-                        name: Test
-                        nodes:
-                          - id: start
-                            executorId: mock
-                            data:
-                              text: This is a test
-                    """.trimIndent()),
+                    workflow = WorkflowParser.parseYamlWorkflow(
+                        """
+                            name: Test
+                            nodes:
+                              - id: start
+                                executorId: mock
+                                data:
+                                  text: This is a test
+                        """.trimIndent()
+                    ),
                     event = event,
+                    callback = {},
                 )
-                run("""{
+                run(
+                    """{
                     workflowInstance(id: "${instance.id}") {
                       event {
                         eventType
@@ -50,7 +50,8 @@ class GQLTypeWorkflowInstanceIT : AbstractQLKTITSupport() {
                         }
                       }
                     }
-                }""".trimIndent()) { data ->
+                }""".trimIndent()
+                ) { data ->
 
                 }
             }
