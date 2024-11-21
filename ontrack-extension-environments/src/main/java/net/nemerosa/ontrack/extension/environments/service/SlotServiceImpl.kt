@@ -353,7 +353,7 @@ class SlotServiceImpl(
             checkDeployment(pipeline, config)
         }
         // "On creation" workflows participate into the checks
-        val workflowChecks = getWorkflowDeploymentChecks(pipeline)
+        val workflowChecks = getWorkflowPipelineChecks(pipeline, SlotWorkflowTrigger.CREATION)
         // All rules must assert that the build is OK for being deployed
         val status = SlotPipelineDeploymentStatus(
             checks = rulesChecks + workflowChecks
@@ -377,10 +377,13 @@ class SlotServiceImpl(
         return status
     }
 
-    private fun getWorkflowDeploymentChecks(pipeline: SlotPipeline): List<SlotPipelineDeploymentCheck> {
+    private fun getWorkflowPipelineChecks(
+        pipeline: SlotPipeline,
+        trigger: SlotWorkflowTrigger,
+    ): List<SlotPipelineDeploymentCheck> {
         return slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(
             pipeline.slot,
-            SlotWorkflowTrigger.CREATION,
+            trigger,
         ).map { slotWorkflow ->
             val slotWorkflowInstance =
                 slotWorkflowService.findSlotWorkflowInstanceByPipelineAndSlotWorkflow(pipeline, slotWorkflow)
@@ -469,6 +472,13 @@ class SlotServiceImpl(
         // Checking if pipeline is deploying
         if (lastPipeline.status != SlotPipelineStatus.DEPLOYING && !forcing) {
             return SlotPipelineDeploymentFinishStatus.nok("Pipeline can be deployed only if deployment has been started first.")
+        }
+        // "On creation" workflows participate into the checks
+        val workflowChecks = getWorkflowPipelineChecks(pipeline, SlotWorkflowTrigger.DEPLOYING)
+        // All rules must assert that the build is OK for being deployed
+        val status = SlotPipelineDeploymentStatus(checks = workflowChecks)
+        if (!status.status) {
+            return SlotPipelineDeploymentFinishStatus.nok("Pipeline can not be deployed because some workflows are failing.")
         }
         // Actual message
         val actualMessage = message ?: "Deployment finished"

@@ -1,5 +1,5 @@
 import {Space} from "antd";
-import {FaBan, FaPlay, FaSpinner, FaThumbsUp, FaTimesCircle} from "react-icons/fa";
+import {FaBan, FaPlay, FaSpinner, FaThumbsUp} from "react-icons/fa";
 
 export default function SlotPipelineStatus({pipeline, showText = true, children}) {
     return (
@@ -21,12 +21,6 @@ export default function SlotPipelineStatus({pipeline, showText = true, children}
                     pipeline.status === 'CANCELLED' && <>
                         <FaBan color="gray"/>
                         { showText && "Cancelled" }
-                    </>
-                }
-                {
-                    pipeline.status === 'ERROR' && <>
-                        <FaTimesCircle color="red"/>
-                        { showText && "Error" }
                     </>
                 }
                 {
