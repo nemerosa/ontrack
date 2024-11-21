@@ -65,6 +65,9 @@ class SlotWorkflowServiceImpl(
         val workflowInstance = workflowEngine.startWorkflow(
             workflow = slotWorkflow.workflow,
             event = workflowEvent,
+            callback = {
+                // TODO Marks the pipeline in error
+            }
         )
         // Slot workflow instance record
         val slotWorkflowInstance = SlotWorkflowInstance(
