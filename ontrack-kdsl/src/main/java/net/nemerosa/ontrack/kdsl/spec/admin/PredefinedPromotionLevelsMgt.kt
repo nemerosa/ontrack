@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.kdsl.spec.admin
 
 import net.nemerosa.ontrack.kdsl.connector.Connected
 import net.nemerosa.ontrack.kdsl.connector.Connector
+import net.nemerosa.ontrack.kdsl.connector.FileContent
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.PredefinedPromotionLevelByNameQuery
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 import java.net.URL
@@ -21,14 +22,21 @@ class PredefinedPromotionLevelsMgt(connector: Connector) : Connected(connector) 
     fun createPredefinedPromotionLevel(
         name: String,
         description: String = "",
-        image: URL? = null
+        image: URL? = null,
+        override: Boolean = false,
     ) {
         // Gets an existing predefined promotion level by name
         val existing = graphqlConnector.query(
             PredefinedPromotionLevelByNameQuery(name)
         )?.predefinedPromotionLevelByName()
-        // Creating only if not existing
-        if (existing == null) {
+        // Overriding?
+        var create = existing == null
+        if (existing != null && override) {
+            create = true
+            connector.delete("/rest/admin/predefinedPromotionLevels/${existing.id()}")
+        }
+        // Creating
+        if (create) {
             val pplId = connector.post(
                 "/rest/admin/predefinedPromotionLevels/create",
                 body = mapOf(
@@ -42,7 +50,11 @@ class PredefinedPromotionLevelsMgt(connector: Connector) : Connected(connector) 
                 connector.uploadFile(
                     "/rest/admin/predefinedPromotionLevels/${pplId}/image",
                     headers = emptyMap(),
-                    "file" to imageBytes,
+                    file = FileContent(
+                        name = "file",
+                        content = imageBytes,
+                        type = "image/png"
+                    ),
                 )
             }
         }

@@ -1,0 +1,7 @@
+mutation DeleteEnvironment($id: String!) {
+    deleteEnvironment(input: {
+        id: $id
+    }) {
+        ...PayloadUserErrors
+    }
+}

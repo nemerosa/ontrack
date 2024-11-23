@@ -8724,21 +8724,17 @@
           "inputFields": [
             {
               "name": "description",
-              "description": "description field",
+              "description": "Description for the environment",
               "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
               },
               "defaultValue": null
             },
             {
               "name": "name",
-              "description": "name field",
+              "description": "Unique name for the environment",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -8752,7 +8748,7 @@
             },
             {
               "name": "order",
-              "description": "order field",
+              "description": "Order to the environment, used to sort them from lower environments to higher ones",
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -8766,20 +8762,17 @@
             },
             {
               "name": "tags",
-              "description": "tags field",
+              "description": "Tags for the environment",
               "type": {
-                "kind": "NON_NULL",
+                "kind": "LIST",
                 "name": null,
                 "ofType": {
-                  "kind": "LIST",
+                  "kind": "NON_NULL",
                   "name": null,
                   "ofType": {
-                    "kind": "NON_NULL",
-                    "name": null,
-                    "ofType": {
-                      "kind": "SCALAR",
-                      "name": "String"
-                    }
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
                   }
                 }
               },
@@ -12083,6 +12076,64 @@
             }
           ],
           "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "DeleteEnvironmentInput",
+          "description": "Input type for the deleteEnvironment mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "id",
+              "description": "ID of the environment to delete",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "DeleteEnvironmentPayload",
+          "description": "Output type for the deleteEnvironment mutation.",
+          "fields": [
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
           "enumValues": null,
           "possibleTypes": null
         },
@@ -32172,6 +32223,29 @@
               "deprecationReason": null
             },
             {
+              "name": "deleteEnvironment",
+              "description": "Deletes an existing environment",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "DeleteEnvironmentInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "DeleteEnvironmentPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "saveSlotAdmissionRuleConfig",
               "description": "Saves or creates a configured admission rule for a slot",
               "args": [
@@ -33981,6 +34055,11 @@
             {
               "kind": "OBJECT",
               "name": "DeleteConfigurationPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeleteEnvironmentPayload",
               "ofType": null
             },
             {

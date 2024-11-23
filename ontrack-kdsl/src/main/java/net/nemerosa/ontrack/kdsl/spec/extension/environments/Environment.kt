@@ -4,6 +4,7 @@ import com.apollographql.apollo.api.Input
 import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.environments.CreateSlotMutation
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.environments.DeleteEnvironmentMutation
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 import net.nemerosa.ontrack.kdsl.spec.Project
 import net.nemerosa.ontrack.kdsl.spec.Resource
@@ -40,6 +41,12 @@ class Environment(
             qualifier = qualifier,
             description = description,
         )
+    }
+
+    fun delete() {
+        graphqlConnector.mutate(
+            DeleteEnvironmentMutation(id)
+        ) { it?.deleteEnvironment()?.fragments()?.payloadUserErrors()?.convert() }
     }
 
 }

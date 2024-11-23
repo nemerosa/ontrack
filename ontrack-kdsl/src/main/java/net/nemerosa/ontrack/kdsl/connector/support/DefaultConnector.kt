@@ -3,9 +3,11 @@ package net.nemerosa.ontrack.kdsl.connector.support
 import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.ConnectorResponse
 import net.nemerosa.ontrack.kdsl.connector.ConnectorResponseBody
+import net.nemerosa.ontrack.kdsl.connector.FileContent
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.util.LinkedMultiValueMap
@@ -14,7 +16,6 @@ import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.getForEntity
 import org.springframework.web.client.postForEntity
 import org.springframework.web.util.UriComponentsBuilder
-import java.net.URLEncoder
 import java.nio.charset.Charset
 
 
@@ -80,6 +81,7 @@ class DefaultConnector(
         restTemplate(headers).delete(path)
     }
 
+    @Deprecated("Use uploadFile with the file content")
     override fun uploadFile(path: String, headers: Map<String, String>, file: Pair<String, ByteArray>) {
         val actualHeaders = headers.toMutableMap()
         actualHeaders["Content-Type"] = MediaType.MULTIPART_FORM_DATA.toString()
@@ -87,6 +89,30 @@ class DefaultConnector(
         val body: MultiValueMap<String, Any> = LinkedMultiValueMap()
         val (fileName, fileBytes) = file
         body.add(fileName, ByteArrayResource(fileBytes))
+
+        val requestEntity: HttpEntity<MultiValueMap<String, Any>> = HttpEntity(body)
+
+        restTemplate(actualHeaders).postForEntity(
+            path,
+            requestEntity,
+            String::class.java
+        )
+    }
+
+    override fun uploadFile(path: String, headers: Map<String, String>, file: FileContent) {
+        val actualHeaders = headers.toMutableMap()
+        actualHeaders["Content-Type"] = MediaType.MULTIPART_FORM_DATA.toString()
+
+        val resource = object : ByteArrayResource(file.content) {
+            override fun getFilename(): String = file.name
+        }
+
+        // File part
+        val fileHeaders = HttpHeaders()
+        fileHeaders.contentType = MediaType.parseMediaType(file.type)
+        val fileEntity = HttpEntity<ByteArrayResource>(resource, fileHeaders)
+        val body: MultiValueMap<String, Any> = LinkedMultiValueMap()
+        body.add(file.name, fileEntity)
 
         val requestEntity: HttpEntity<MultiValueMap<String, Any>> = HttpEntity(body)
 
