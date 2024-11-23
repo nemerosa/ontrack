@@ -60,13 +60,13 @@ export default function SlotBuildPromotionInfoItemActions({item, build, onChange
                 <LoadingInline loading={loading}>
                     {
                         pipeline &&
-                        <>
+                        <Space>
                             <BuildLink build={pipeline.build} displayTooltip={true}
                                        tooltipText="Build being currently in the pipeline for this environment"/>
                             <Link href={slotPipelineUri(pipeline.id)} title="Pipeline details">
                                 <SlotPipelineStatus pipeline={pipeline} showText={false}/>
                             </Link>
-                        </>
+                        </Space>
                     }
                 </LoadingInline>
             </Space>

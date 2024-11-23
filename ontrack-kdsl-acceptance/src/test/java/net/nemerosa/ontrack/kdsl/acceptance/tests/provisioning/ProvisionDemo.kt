@@ -53,10 +53,24 @@ class ProvisionDemo : AbstractACCDSLTestSupport() {
         branch.promotion(SILVER)
         branch.promotion(GOLD)
 
-        // Creating a build with the 2 first promotions
-        val build = branch.build("1.0.0") {
+        // Creating a build with all the promotions
+        val build1 = branch.build("1.0.0") {
             promote(BRONZE)
             promote(SILVER)
+            promote(GOLD)
+            this
+        }
+
+        // Creating a build with the 2 first promotions
+        val build2 = branch.build("1.0.1") {
+            promote(BRONZE)
+            promote(SILVER)
+            this
+        }
+
+        // Creating a build with the first promotion
+        val build3 = branch.build("1.0.2") {
+            promote(BRONZE)
             this
         }
 
