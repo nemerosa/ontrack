@@ -74,14 +74,6 @@ class ProvisionDemo : AbstractACCDSLTestSupport() {
             this
         }
 
-        // Creating the environments
-        val envStaging = ontrack.environments.createEnvironment(ENV_STAGING, 100)
-        val envProduction = ontrack.environments.createEnvironment(ENV_PRODUCTION, 200)
-
-        // Creating the slots for the project
-        val slotStaging = envStaging.createSlot(project)
-        val slotProduction = envProduction.createSlot(project)
-
     }
 
 }
