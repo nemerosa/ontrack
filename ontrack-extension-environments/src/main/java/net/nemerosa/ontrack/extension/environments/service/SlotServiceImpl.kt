@@ -341,23 +341,41 @@ class SlotServiceImpl(
         return slotPipelineChangeRepository.findByPipeline(pipeline)
     }
 
+    override fun status(pipeline: SlotPipeline): SlotPipelineDeploymentStatus {
+        securityService.checkSlotAccess<SlotView>(pipeline.slot)
+
+        // Gets all the admission rules
+        val configs = slotAdmissionRuleConfigRepository.getAdmissionRuleConfigs(pipeline.slot)
+        val rulesChecks = configs.map { config ->
+            checkDeployment(pipeline, config)
+        }
+
+        // Gets the workflows based on the pipeline status
+        val workflowTrigger = when (pipeline.status) {
+            SlotPipelineStatus.ONGOING -> SlotWorkflowTrigger.CREATION
+            SlotPipelineStatus.DEPLOYING -> SlotWorkflowTrigger.DEPLOYING
+            SlotPipelineStatus.DEPLOYED -> SlotWorkflowTrigger.DEPLOYED
+            SlotPipelineStatus.CANCELLED -> null
+        }
+        val workflowChecks =
+            workflowTrigger?.let {
+                getWorkflowPipelineChecks(pipeline, it)
+            } ?: emptyList()
+
+        // All rules must assert that the build is OK for being deployed
+        return SlotPipelineDeploymentStatus(
+            checks = rulesChecks + workflowChecks
+        )
+    }
+
     override fun startDeployment(pipeline: SlotPipeline, dryRun: Boolean): SlotPipelineDeploymentStatus {
         securityService.checkSlotAccess<SlotPipelineStart>(pipeline.slot)
         // Always checking the project
         if (pipeline.build.project != pipeline.slot.project) {
             throw SlotPipelineProjectException(pipeline)
         }
-        // Gets all the admission rules
-        val configs = slotAdmissionRuleConfigRepository.getAdmissionRuleConfigs(pipeline.slot)
-        val rulesChecks = configs.map { config ->
-            checkDeployment(pipeline, config)
-        }
-        // "On creation" workflows participate into the checks
-        val workflowChecks = getWorkflowPipelineChecks(pipeline, SlotWorkflowTrigger.CREATION)
-        // All rules must assert that the build is OK for being deployed
-        val status = SlotPipelineDeploymentStatus(
-            checks = rulesChecks + workflowChecks
-        )
+        // Getting the pipeline status
+        val status = status(pipeline)
         // Actual start
         if (!dryRun && status.status) {
             // Marks this pipeline as deploying
@@ -473,10 +491,8 @@ class SlotServiceImpl(
         if (lastPipeline.status != SlotPipelineStatus.DEPLOYING && !forcing) {
             return SlotPipelineDeploymentFinishStatus.nok("Pipeline can be deployed only if deployment has been started first.")
         }
-        // "On creation" workflows participate into the checks
-        val workflowChecks = getWorkflowPipelineChecks(pipeline, SlotWorkflowTrigger.DEPLOYING)
-        // All rules must assert that the build is OK for being deployed
-        val status = SlotPipelineDeploymentStatus(checks = workflowChecks)
+        // Checking the status
+        val status = status(pipeline)
         if (!status.status) {
             return SlotPipelineDeploymentFinishStatus.nok("Pipeline can not be deployed because some workflows are failing.")
         }

@@ -7102,7 +7102,7 @@ type SlotPipeline {
     build: Build!
     "Changes having occurred to the pipeline"
     changes: [SlotPipelineChange!]!
-    "Deployment status for the pipeline"
+    "Current status for the pipeline"
     deploymentStatus: SlotPipelineDeploymentStatus
     "end field"
     end: LocalDateTime
@@ -8258,7 +8258,6 @@ enum SlotPipelineStatus {
     CANCELLED
     DEPLOYED
     DEPLOYING
-    ERROR
     ONGOING
 }
 
