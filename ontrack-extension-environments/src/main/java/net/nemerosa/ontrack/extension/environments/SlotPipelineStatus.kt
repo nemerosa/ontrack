@@ -13,9 +13,6 @@ enum class SlotPipelineStatus(
     CANCELLED(
         finished = true,
     ),
-    ERROR(
-        finished = true
-    ),
     DEPLOYED(
         finished = true
     );

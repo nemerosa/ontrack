@@ -10,10 +10,7 @@ import net.nemerosa.ontrack.json.asJson
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.TestPropertySource
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
-import kotlin.test.fail
+import kotlin.test.*
 
 @TestPropertySource(
     properties = [
@@ -180,6 +177,44 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
                     )
                 }
             }
+        }
+    }
+
+    @Test
+    fun `Cannot start a deployment if not all workflows are successful`() {
+        slotWorkflowTestSupport.withSlotWorkflow(
+            trigger = SlotWorkflowTrigger.CREATION,
+            error = true,
+        ) { slot, _ ->
+
+            // Creating a pipeline (this triggers the workflow)
+            val pipeline = slotTestSupport.createPipeline(slot = slot)
+
+            // Trying to start the deployment
+            val status = slotService.startDeployment(pipeline, dryRun = false)
+            assertFalse(status.status, "Pipeline can not start its deployment")
+
+        }
+    }
+
+    @Test
+    fun `Cannot finish a deployment if not all workflows are successful`() {
+        slotWorkflowTestSupport.withSlotWorkflow(
+            trigger = SlotWorkflowTrigger.DEPLOYING,
+            error = true,
+        ) { slot, _ ->
+
+            // Creating a pipeline
+            val pipeline = slotTestSupport.createPipeline(slot = slot)
+
+            // Starting the deployment
+            val status = slotService.startDeployment(pipeline, dryRun = false)
+            assertTrue(status.status, "Pipeline has started its deployment")
+
+            // Finish the deployment
+            val end = slotService.finishDeployment(pipeline)
+            assertFalse(end.deployed, "Pipeline could not be deployed")
+
         }
     }
 

@@ -235,3 +235,50 @@ test('API - workflow on promotion leading to the deployment of a build', async (
     await expect(pipeline.number).toStrictEqual(1)
 
 })
+
+test('failing workflows on deploying block the deployment completion', async ({page}) => {
+    const {slot, project} = await createSlot(ontrack())
+    // Adding two workflows, one successful, one with error
+    const slotWorkflowSuccess = await addSlotWorkflow({
+        slot,
+        trigger: 'DEPLOYING',
+        workflowYaml: `
+            name: Success
+            nodes:
+              - id: test
+                executorId: mock
+                data:
+                    text: Success
+                    error: false
+        `
+    })
+    const slotWorkflowError = await addSlotWorkflow({
+        slot,
+        trigger: 'DEPLOYING',
+        workflowYaml: `
+            name: Error
+            nodes:
+              - id: test
+                executorId: mock
+                data:
+                    text: Error
+                    error: true
+        `
+    })
+
+    // Creating a pipeline and starting its deployment
+    const {pipeline} = await createPipeline({project, slot})
+    await ontrack().environments.startPipeline({pipeline})
+
+    await waitForPipelineWorkflowToBeFinished(page, pipeline.id, slotWorkflowSuccess)
+    await waitForPipelineWorkflowToBeFinished(page, pipeline.id, slotWorkflowError)
+
+    await login(page)
+
+    const pipelinePage = new PipelinePage(page, pipeline)
+    await pipelinePage.goTo()
+
+    const pipelineActions = await pipelinePage.checkPipelineActions()
+    await pipelineActions.checkDeployedAction() // Deployed action is still visible
+    await pipelineActions.expectStatusProgress({value: 50})
+})

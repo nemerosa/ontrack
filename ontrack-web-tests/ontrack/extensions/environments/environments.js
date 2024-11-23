@@ -152,6 +152,37 @@ export class EnvironmentsExtension {
         return pipeline
     }
 
+    async startPipeline({pipeline}) {
+        const data = await graphQLCallMutation(
+            this.ontrack.connection,
+            'startSlotPipelineDeployment',
+            gql`
+                mutation StartPipeline(
+                    $pipelineId: String!,
+                ) {
+                    startSlotPipelineDeployment(input: {
+                        pipelineId: $pipelineId,
+                    }) {
+                        errors {
+                            message
+                        }
+                        deploymentStatus {
+                            status
+                        }
+                    }
+                }
+            `,
+            {
+                pipelineId: pipeline.id,
+            }
+        )
+
+        const status = data.startSlotPipelineDeployment.deploymentStatus?.status
+        if (!status) {
+            throw new Error("Cannot deploy pipeline")
+        }
+    }
+
     async addAdmissionRule({slot, description = "", ruleId, ruleConfig}) {
         await graphQLCallMutation(
             this.ontrack.connection,

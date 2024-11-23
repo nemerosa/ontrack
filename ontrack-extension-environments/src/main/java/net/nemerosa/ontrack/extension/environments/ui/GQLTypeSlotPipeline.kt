@@ -48,13 +48,12 @@ class GQLTypeSlotPipeline(
             // Deployment status
             .field {
                 it.name("deploymentStatus")
-                    .description("Deployment status for the pipeline")
+                    .description("Current status for the pipeline")
                     .type(gqlTypeSlotPipelineDeploymentStatus.typeRef)
                     .dataFetcher { env ->
                         val pipeline: SlotPipeline = env.getSource()
-                        slotService.startDeployment(
+                        slotService.status(
                             pipeline = pipeline,
-                            dryRun = true,
                         )
                     }
             }

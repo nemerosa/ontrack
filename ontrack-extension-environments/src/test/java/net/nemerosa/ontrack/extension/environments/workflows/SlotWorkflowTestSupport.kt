@@ -14,11 +14,15 @@ class SlotWorkflowTestSupport(
     fun withSlotWorkflow(
         trigger: SlotWorkflowTrigger,
         waitMs: Int = 0,
+        error: Boolean = false,
         code: (slot: Slot, slotWorkflow: SlotWorkflow) -> Unit
     ) {
         slotTestSupport.withSlot { slot ->
 
-            val testWorkflow = SlotWorkflowTestFixtures.testWorkflow(waitMs = waitMs)
+            val testWorkflow = SlotWorkflowTestFixtures.testWorkflow(
+                waitMs = waitMs,
+                error = error,
+            )
             val slotWorkflow = SlotWorkflow(
                 slot = slot,
                 trigger = trigger,

@@ -16,7 +16,7 @@ export default function SlotPipelineStatusActions({pipeline, info = true, linkIn
         <>
             <SlotPipelineStatus pipeline={pipeline}>
                 {
-                    info && pipeline.status === 'ONGOING' &&
+                    info &&
                     <SlotPipelineDeploymentStatusProgress
                         pipeline={pipeline}
                         link={linkInfo}

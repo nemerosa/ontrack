@@ -9,6 +9,7 @@ object SlotWorkflowTestFixtures {
     fun testWorkflow(
         name: String = uid("w-"),
         waitMs: Int = 0,
+        error: Boolean = false,
     ) = Workflow(
         name = name,
         nodes = listOf(
@@ -19,6 +20,7 @@ object SlotWorkflowTestFixtures {
                 data = mapOf(
                     "text" to "Test",
                     "waitMs" to waitMs,
+                    "error" to error,
                 ).asJson(),
             )
         )
