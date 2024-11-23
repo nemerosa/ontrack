@@ -32,7 +32,16 @@ class EnvironmentsMutations(
             ).apply {
                 environmentService.save(this)
             }
-        }
+        },
+        unitMutation(
+            name = "deleteEnvironment",
+            description = "Deletes an existing environment",
+            input = DeleteEnvironmentInput::class,
+        ) { input ->
+            environmentsLicense.checkEnvironmentFeatureEnabled()
+            val env = environmentService.getById(input.id)
+            environmentService.delete(env)
+        },
     )
 }
 
@@ -46,4 +55,9 @@ data class CreateEnvironmentInput(
     @APIDescription("Tags for the environment")
     @ListRef
     val tags: List<String>?,
+)
+
+data class DeleteEnvironmentInput(
+    @APIDescription("ID of the environment to delete")
+    val id: String,
 )

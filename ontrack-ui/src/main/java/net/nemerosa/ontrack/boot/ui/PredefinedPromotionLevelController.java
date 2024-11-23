@@ -108,7 +108,7 @@ public class PredefinedPromotionLevelController extends AbstractResourceControll
         return predefinedPromotionLevelService.getPredefinedPromotionLevelImage(predefinedPromotionLevelId);
     }
 
-    @RequestMapping(value = "predefinedPromotionLevels/{predefinedPromotionLevelId}/image", method = RequestMethod.POST)
+    @PostMapping(value = "predefinedPromotionLevels/{predefinedPromotionLevelId}/image")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void setPromotionLevelImage(@PathVariable ID predefinedPromotionLevelId, @RequestParam MultipartFile file) throws IOException {
         predefinedPromotionLevelService.setPredefinedPromotionLevelImage(predefinedPromotionLevelId, new Document(

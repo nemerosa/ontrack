@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.kdsl.connector.Connected
 import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.environments.CreateEnvironmentMutation
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.environments.FindEnvironmentByNameQuery
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.environments.FindPipelineByIdQuery
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 
@@ -33,6 +34,12 @@ class EnvironmentsMgt(connector: Connector) : Connected(connector) {
             description = description,
         )
     }
+
+    fun findEnvironmentByName(name: String): Environment? =
+        graphqlConnector.query(
+            FindEnvironmentByNameQuery(name)
+        )?.environmentByName()?.fragments()
+            ?.environmentFragment()?.toEnvironment(this)
 
     fun findPipelineById(id: String): SlotPipeline? =
         graphqlConnector.query(
