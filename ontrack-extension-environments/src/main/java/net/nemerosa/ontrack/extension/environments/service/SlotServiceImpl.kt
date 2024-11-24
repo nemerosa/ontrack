@@ -341,7 +341,7 @@ class SlotServiceImpl(
         return slotPipelineChangeRepository.findByPipeline(pipeline)
     }
 
-    override fun status(pipeline: SlotPipeline): SlotPipelineDeploymentStatus {
+    override fun status(pipeline: SlotPipeline, skipWorkflowId: String?): SlotPipelineDeploymentStatus {
         securityService.checkSlotAccess<SlotView>(pipeline.slot)
 
         // Collecting all checks
@@ -365,7 +365,7 @@ class SlotServiceImpl(
         }
         val workflowChecks =
             workflowTrigger?.let {
-                getWorkflowPipelineChecks(pipeline, it)
+                getWorkflowPipelineChecks(pipeline, it, skipWorkflowId)
             } ?: emptyList()
         checks += workflowChecks
 
@@ -373,14 +373,18 @@ class SlotServiceImpl(
         return SlotPipelineDeploymentStatus(checks = checks)
     }
 
-    override fun startDeployment(pipeline: SlotPipeline, dryRun: Boolean): SlotPipelineDeploymentStatus {
+    override fun startDeployment(
+        pipeline: SlotPipeline,
+        dryRun: Boolean,
+        skipWorkflowId: String?
+    ): SlotPipelineDeploymentStatus {
         securityService.checkSlotAccess<SlotPipelineStart>(pipeline.slot)
         // Always checking the project
         if (pipeline.build.project != pipeline.slot.project) {
             throw SlotPipelineProjectException(pipeline)
         }
         // Getting the pipeline status
-        val status = status(pipeline)
+        val status = status(pipeline, skipWorkflowId)
         // Actual start
         if (!dryRun && status.status) {
             // Marks this pipeline as deploying
@@ -403,19 +407,22 @@ class SlotServiceImpl(
     private fun getWorkflowPipelineChecks(
         pipeline: SlotPipeline,
         trigger: SlotWorkflowTrigger,
+        skipWorkflowId: String?,
     ): List<SlotPipelineDeploymentCheck> {
         return slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(
             pipeline.slot,
             trigger,
-        ).map { slotWorkflow ->
-            val slotWorkflowInstance =
-                slotWorkflowService.findSlotWorkflowInstanceByPipelineAndSlotWorkflow(pipeline, slotWorkflow)
-            slotWorkflowInstance
-                ?.let {
-                    getWorkflowDeploymentCheck(it)
-                }
-                ?: getWorkflowDeploymentCheckNotFound(pipeline, slotWorkflow)
-        }
+        )
+            .filter { skipWorkflowId == null || skipWorkflowId != it.id }
+            .map { slotWorkflow ->
+                val slotWorkflowInstance =
+                    slotWorkflowService.findSlotWorkflowInstanceByPipelineAndSlotWorkflow(pipeline, slotWorkflow)
+                slotWorkflowInstance
+                    ?.let {
+                        getWorkflowDeploymentCheck(it)
+                    }
+                    ?: getWorkflowDeploymentCheckNotFound(pipeline, slotWorkflow)
+            }
     }
 
     private fun getWorkflowDeploymentCheck(slotWorkflowInstance: SlotWorkflowInstance): SlotPipelineDeploymentCheck =
@@ -483,6 +490,7 @@ class SlotServiceImpl(
 
     override fun finishDeployment(
         pipeline: SlotPipeline,
+        skipWorkflowId: String?,
         forcing: Boolean,
         message: String?
     ): SlotPipelineDeploymentFinishStatus {
@@ -497,7 +505,7 @@ class SlotServiceImpl(
             return SlotPipelineDeploymentFinishStatus.nok("Pipeline can be deployed only if deployment has been started first.")
         }
         // Checking the status
-        val status = status(pipeline)
+        val status = status(pipeline, skipWorkflowId)
         if (!status.status) {
             return SlotPipelineDeploymentFinishStatus.nok("Pipeline can not be deployed because some workflows are failing.")
         }

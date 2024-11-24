@@ -29,7 +29,7 @@ class ACCEnvironmentsWorkflows : AbstractACCDSLTestSupport() {
 
         // Adding a workflow to this slot
         slot.addWorkflow(
-            trigger = SlotWorkflowTrigger.DEPLOYING,
+            trigger = SlotWorkflowTrigger.CREATION,
             workflowYaml = """
                 name: Creation
                 nodes:

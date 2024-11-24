@@ -9,6 +9,8 @@ object SlotWorkflowContext {
     const val EVENT_SLOT_WORKFLOW_ID = "slotWorkflowId"
 }
 
+fun SerializableEvent.findSlotWorkflowId() = findValue(SlotWorkflowContext.EVENT_SLOT_WORKFLOW_ID)
+
 fun SerializableEvent.forSlotWorkflowExecution(
     pipeline: SlotPipeline,
     slotWorkflow: SlotWorkflow,

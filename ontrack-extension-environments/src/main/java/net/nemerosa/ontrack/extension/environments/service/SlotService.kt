@@ -81,12 +81,12 @@ interface SlotService {
     /**
      * Gets the current status for a pipeline
      */
-    fun status(pipeline: SlotPipeline): SlotPipelineDeploymentStatus
+    fun status(pipeline: SlotPipeline, skipWorkflowId: String? = null): SlotPipelineDeploymentStatus
 
     /**
      * Starts a deployment
      */
-    fun startDeployment(pipeline: SlotPipeline, dryRun: Boolean): SlotPipelineDeploymentStatus
+    fun startDeployment(pipeline: SlotPipeline, dryRun: Boolean, skipWorkflowId: String? = null): SlotPipelineDeploymentStatus
 
     /**
      * Gets the latest (current) pipeline for a slot
@@ -98,6 +98,7 @@ interface SlotService {
      */
     fun finishDeployment(
         pipeline: SlotPipeline,
+        skipWorkflowId: String? = null,
         forcing: Boolean = false,
         message: String? = null,
     ): SlotPipelineDeploymentFinishStatus

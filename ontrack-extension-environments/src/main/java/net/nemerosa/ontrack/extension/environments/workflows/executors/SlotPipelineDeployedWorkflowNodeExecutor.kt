@@ -32,9 +32,13 @@ class SlotPipelineDeployedWorkflowNodeExecutor(
         return securityService.asAdmin {
             // Getting the pipeline from the context
             val pipeline = getPipelineFromContext(workflowInstance.event)
+            // Getting the slot workflow
+            val slotWorkflowId = workflowInstance.event.findSlotWorkflowId()
             // Progressing the pipeline
             val status = slotService.finishDeployment(
                 pipeline = pipeline,
+                // Skipping the check on its own workflow
+                skipWorkflowId = slotWorkflowId,
             )
             // Deployment started
             val result = if (status.deployed) {
