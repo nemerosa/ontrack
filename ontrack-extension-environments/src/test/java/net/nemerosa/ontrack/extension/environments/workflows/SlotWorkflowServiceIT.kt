@@ -1,8 +1,10 @@
 package net.nemerosa.ontrack.extension.environments.workflows
 
+import net.nemerosa.ontrack.extension.environments.SlotPipelineStatus
 import net.nemerosa.ontrack.extension.environments.SlotTestSupport
 import net.nemerosa.ontrack.extension.environments.events.EnvironmentsEventsFactory
 import net.nemerosa.ontrack.extension.environments.service.SlotService
+import net.nemerosa.ontrack.extension.environments.service.getPipelineById
 import net.nemerosa.ontrack.extension.workflows.WorkflowTestSupport
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceStatus
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
@@ -211,8 +213,12 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
             val status = slotService.startDeployment(pipeline, dryRun = false)
             assertTrue(status.status, "Pipeline has started its deployment")
 
+            // Reloading the pipeline's status
+            val deployingPipeline = slotService.getPipelineById(pipeline.id)
+            assertEquals(SlotPipelineStatus.DEPLOYING, deployingPipeline.status)
+
             // Finish the deployment
-            val end = slotService.finishDeployment(pipeline)
+            val end = slotService.finishDeployment(deployingPipeline)
             assertFalse(end.deployed, "Pipeline could not be deployed")
 
         }

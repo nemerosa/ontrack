@@ -344,10 +344,16 @@ class SlotServiceImpl(
     override fun status(pipeline: SlotPipeline): SlotPipelineDeploymentStatus {
         securityService.checkSlotAccess<SlotView>(pipeline.slot)
 
+        // Collecting all checks
+        val checks = mutableListOf<SlotPipelineDeploymentCheck>()
+
         // Gets all the admission rules
-        val configs = slotAdmissionRuleConfigRepository.getAdmissionRuleConfigs(pipeline.slot)
-        val rulesChecks = configs.map { config ->
-            checkDeployment(pipeline, config)
+        if (pipeline.status == SlotPipelineStatus.ONGOING) {
+            val configs = slotAdmissionRuleConfigRepository.getAdmissionRuleConfigs(pipeline.slot)
+            val rulesChecks = configs.map { config ->
+                checkDeployment(pipeline, config)
+            }
+            checks += rulesChecks
         }
 
         // Gets the workflows based on the pipeline status
@@ -361,11 +367,10 @@ class SlotServiceImpl(
             workflowTrigger?.let {
                 getWorkflowPipelineChecks(pipeline, it)
             } ?: emptyList()
+        checks += workflowChecks
 
         // All rules must assert that the build is OK for being deployed
-        return SlotPipelineDeploymentStatus(
-            checks = rulesChecks + workflowChecks
-        )
+        return SlotPipelineDeploymentStatus(checks = checks)
     }
 
     override fun startDeployment(pipeline: SlotPipeline, dryRun: Boolean): SlotPipelineDeploymentStatus {
