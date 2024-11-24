@@ -7,6 +7,7 @@ import PromotionRunLink from "@components/promotionRuns/PromotionRunLink";
 import {FaCog} from "react-icons/fa";
 import PromotionRunDeleteAction from "@components/promotionRuns/PromotionRunDeleteAction";
 import {promotionRunUri} from "@components/common/Links";
+import Link from "next/link";
 
 export default function PromotionRunBuildPromotionInfoItemActions({item, build, promotionLevel, onChange}) {
     return (
@@ -19,9 +20,9 @@ export default function PromotionRunBuildPromotionInfoItemActions({item, build, 
                         <AnnotatedDescription entity={item}/>
                     </Space>
                 }>
-                    <Typography.Link href={promotionRunUri(item)}>
+                    <Link href={promotionRunUri(item)}>
                         <TimestampText value={item.creation.time}/>
-                    </Typography.Link>
+                    </Link>
                 </Popover>
                 {/* Link to the promotion run */}
                 {
