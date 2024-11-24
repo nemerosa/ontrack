@@ -33,7 +33,9 @@ class SlotPipelineDeployedWorkflowNodeExecutor(
             // Getting the pipeline from the context
             val pipeline = getPipelineFromContext(workflowInstance.event)
             // Progressing the pipeline
-            val status = slotService.finishDeployment(pipeline)
+            val status = slotService.finishDeployment(
+                pipeline = pipeline,
+            )
             // Deployment started
             val result = if (status.deployed) {
                 WorkflowNodeExecutorResult.success(
