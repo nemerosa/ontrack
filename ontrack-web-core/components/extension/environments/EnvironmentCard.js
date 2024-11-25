@@ -1,4 +1,5 @@
 import {Card, Space, Tag, Typography} from "antd";
+import EnvironmentOrder from "@components/extension/environments/EnvironmentOrder";
 
 export default function EnvironmentCard({environment}) {
     return (
@@ -12,8 +13,7 @@ export default function EnvironmentCard({environment}) {
                 title={environment.name}
                 extra={
                     <>
-                        <Typography.Text type="secondary"
-                                         title="Environment order number">{environment.order}</Typography.Text>
+                        <EnvironmentOrder order={environment.order}/>
                     </>
                 }
             >

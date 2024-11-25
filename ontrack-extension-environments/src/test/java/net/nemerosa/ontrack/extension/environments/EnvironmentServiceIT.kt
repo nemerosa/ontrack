@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.environments
 import net.nemerosa.ontrack.extension.environments.service.EnvironmentService
 import net.nemerosa.ontrack.extension.environments.storage.EnvironmentNameAlreadyExists
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -15,6 +16,12 @@ class EnvironmentServiceIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var environmentService: EnvironmentService
+
+    @Autowired
+    private lateinit var slotTestSupport: SlotTestSupport
+
+    @Autowired
+    private lateinit var environmentTestSupport: EnvironmentTestSupport
 
     @Test
     fun `Creating and retrieving an environment`() {
@@ -116,6 +123,55 @@ class EnvironmentServiceIT : AbstractDSLTestSupport() {
                 environmentService.findAll(
                     EnvironmentFilter(
                         tags = listOf(tag2)
+                    )
+                )
+            )
+        }
+    }
+
+    @Test
+    fun `Selecting environments based on tags and projects`() {
+        asAdmin {
+            val project1 = project(NameDescription(uid("p1-"), ""))
+            val project2 = project(NameDescription(uid("p2-"), ""))
+            val tag1 = uid("t1-")
+            val tag2 = uid("t2-")
+
+            val env1 = environmentTestSupport.withEnvironment(tags = listOf(tag1)) {}
+            val env2 = environmentTestSupport.withEnvironment(tags = listOf(tag1, tag2)) {}
+            val env3 = environmentTestSupport.withEnvironment(tags = listOf(tag2)) {}
+
+            slotTestSupport.withSlot(environment = env1, project = project1) {}
+            slotTestSupport.withSlot(environment = env2, project = project1) {}
+            slotTestSupport.withSlot(environment = env2, project = project2) {}
+            slotTestSupport.withSlot(environment = env3, project = project1) {}
+
+            assertEquals(
+                listOf(env1, env2),
+                environmentService.findAll(
+                    EnvironmentFilter(
+                        tags = listOf(tag1),
+                        projects = listOf(project1.name),
+                    )
+                )
+            )
+
+            assertEquals(
+                listOf(env2),
+                environmentService.findAll(
+                    EnvironmentFilter(
+                        tags = listOf(tag1),
+                        projects = listOf(project2.name),
+                    )
+                )
+            )
+
+            assertEquals(
+                listOf(env2, env3),
+                environmentService.findAll(
+                    EnvironmentFilter(
+                        tags = listOf(tag2),
+                        projects = listOf(project1.name),
                     )
                 )
             )

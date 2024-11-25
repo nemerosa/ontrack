@@ -1,7 +1,7 @@
 import FormDialog, {useFormDialog} from "@components/form/FormDialog";
 import {Form, Input} from "antd";
 import SelectProject from "@components/projects/SelectProject";
-import SelectEnvironment from "@components/extension/environments/SelectEnvironment";
+import SelectEnvironmentIds from "@components/extension/environments/SelectEnvironmentIds";
 import {gql} from "graphql-request";
 import {useContext} from "react";
 import {EventsContext} from "@components/common/EventsContext";
@@ -67,7 +67,7 @@ export default function NewSlotDialog({newSlotDialog}) {
                     name="environmentIds"
                     label="Environments"
                 >
-                    <SelectEnvironment/>
+                    <SelectEnvironmentIds/>
                 </Form.Item>
             </FormDialog>
         </>

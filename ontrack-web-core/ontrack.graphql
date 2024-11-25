@@ -1392,6 +1392,12 @@ type DeleteConfigurationPayload implements Payload {
     errors: [UserError]
 }
 
+"Output type for the deleteEnvironment mutation."
+type DeleteEnvironmentPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
 "Output type for the deleteGenericProperty mutation."
 type DeleteGenericPropertyPayload implements Payload {
     "List of errors"
@@ -1906,7 +1912,10 @@ type Environment {
     "order field"
     order: Int
     "List of slots for this environment"
-    slots: [Slot!]!
+    slots(
+        "List of project names"
+        projects: [String!]
+    ): [Slot!]!
     "tags field"
     tags: [String!]!
 }
@@ -3490,6 +3499,11 @@ type Mutation {
     ): DeleteConfigurationPayload
     "Deletes a dashboard"
     deleteDashboard(input: DeleteDashboardInput!): DeletionPayload
+    "Deletes an existing environment"
+    deleteEnvironment(
+        "Input for the mutation"
+        input: DeleteEnvironmentInput
+    ): DeleteEnvironmentPayload
     "Generic deletion for a property and an entity"
     deleteGenericProperty(
         "Input for the mutation"
@@ -8943,6 +8957,12 @@ input DeleteDashboardInput {
     uuid: String!
 }
 
+"Input type for the deleteEnvironment mutation."
+input DeleteEnvironmentInput {
+    "ID of the environment to delete"
+    id: String!
+}
+
 "Input type for the deleteGenericProperty mutation."
 input DeleteGenericPropertyInput {
     "entityId field"
@@ -9372,8 +9392,10 @@ input EnableSubscriptionInput {
 }
 
 input EnvironmentFilter {
+    "projects field"
+    projects: [String!]
     "tags field"
-    tags: [String!]!
+    tags: [String!]
 }
 
 input EventSubscriptionFilter {

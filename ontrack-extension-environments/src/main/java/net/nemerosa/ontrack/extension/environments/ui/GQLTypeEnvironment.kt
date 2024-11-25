@@ -5,10 +5,7 @@ import net.nemerosa.ontrack.extension.environments.Environment
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
-import net.nemerosa.ontrack.graphql.support.intField
-import net.nemerosa.ontrack.graphql.support.listType
-import net.nemerosa.ontrack.graphql.support.stringField
-import net.nemerosa.ontrack.graphql.support.stringListField
+import net.nemerosa.ontrack.graphql.support.*
 import org.springframework.stereotype.Component
 
 @Component
@@ -31,10 +28,16 @@ class GQLTypeEnvironment(
             .field {
                 it.name("slots")
                     .description("List of slots for this environment")
+                    .argument(stringListArgument("projects", "List of project names", nullable = true))
                     .type(listType(gqlTypeSlot.typeRef))
                     .dataFetcher { env ->
+                        val projectNames: List<String> = env.getArgument("projects") ?: emptyList()
+                        val projectNamesIndex = projectNames.toSet()
                         val environment: Environment = env.getSource()
                         slotService.findSlotsByEnvironment(environment)
+                            .filter {
+                                projectNamesIndex.isEmpty() || it.project.name in projectNamesIndex
+                            }
                     }
             }
             .build()

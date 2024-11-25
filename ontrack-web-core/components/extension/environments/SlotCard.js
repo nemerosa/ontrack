@@ -3,11 +3,9 @@ import SlotTitle from "@components/extension/environments/SlotTitle";
 import SlotEligibleBuild from "@components/extension/environments/SlotEligibleBuild";
 import SlotCurrentPipeline from "@components/extension/environments/SlotCurrentPipeline";
 import useSlotState from "@components/extension/environments/SlotState";
-import Link from "next/link";
-import {FaCog} from "react-icons/fa";
-import {slotUri} from "@components/extension/environments/EnvironmentsLinksUtils";
+import SlotLink from "@components/extension/environments/SlotLink";
 
-export default function SlotCard({slot}) {
+export default function SlotCard({slot, showLastDeployed = false}) {
 
     const [slotState, onSlotStateChanged] = useSlotState()
 
@@ -20,9 +18,7 @@ export default function SlotCard({slot}) {
                 size="small"
                 title={<SlotTitle slot={slot}/>}
                 extra={
-                    <Link href={slotUri(slot)} title="Slot details and configuration">
-                        <FaCog/>
-                    </Link>
+                    <SlotLink slot={slot}/>
                 }
             >
                 <Space direction="vertical" className="ot-line">
@@ -35,6 +31,7 @@ export default function SlotCard({slot}) {
                     <SlotCurrentPipeline
                         slot={slot}
                         slotState={slotState}
+                        showLastDeployed={showLastDeployed}
                     />
                     <SlotEligibleBuild
                         slot={slot}

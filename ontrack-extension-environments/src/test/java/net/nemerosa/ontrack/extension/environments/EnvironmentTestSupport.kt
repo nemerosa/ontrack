@@ -13,7 +13,8 @@ class EnvironmentTestSupport : AbstractDSLTestSupport() {
 
     fun withEnvironment(
         order: Int = 1,
-        env: Environment = EnvironmentTestFixtures.testEnvironment(order = order),
+        tags: List<String> = emptyList(),
+        env: Environment = EnvironmentTestFixtures.testEnvironment(order = order, tags = tags),
         code: (env: Environment) -> Unit
     ): Environment {
         asAdmin {

@@ -64,15 +64,28 @@ class EnvironmentRepository(
         }.firstOrNull()
 
     fun findAll(filter: EnvironmentFilter): List<Environment> {
+        val joins = mutableListOf<String>()
         val criteria = mutableListOf<String>()
         val params = mutableMapOf<String, Any?>()
 
-        if (filter.tags.isNotEmpty()) {
-            criteria += "TAGS @> :tags::text[]"
+        if (!filter.tags.isNullOrEmpty()) {
+            criteria += "E.TAGS @> :tags::text[]"
             params["tags"] = filter.tags.toTypedArray()
         }
 
-        var sql = "SELECT * FROM ENVIRONMENTS "
+        if (!filter.projects.isNullOrEmpty()) {
+            joins += """
+                INNER JOIN ENV_SLOTS S ON S.ENVIRONMENT_ID = E.ID
+                INNER JOIN PROJECTS P ON P.ID = S.PROJECT_ID
+            """.trimIndent()
+            criteria += "P.NAME = ANY(:projects)"
+            params["projects"] = filter.projects.toTypedArray()
+        }
+
+        var sql = "SELECT E.* FROM ENVIRONMENTS E "
+        if (joins.isNotEmpty()) {
+            sql += joins.joinToString(" ")
+        }
         if (criteria.isNotEmpty()) {
             sql += " WHERE "
             sql += criteria.joinToString(" AND ") { "( $it )" }

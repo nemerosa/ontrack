@@ -4,7 +4,7 @@ import {useGraphQLClient} from "@components/providers/ConnectionContextProvider"
 import {gql} from "graphql-request";
 import {gqlEnvironmentData} from "@components/extension/environments/EnvironmentGraphQL";
 
-export default function SelectEnvironment({id = "environments", value, onChange}) {
+export default function SelectEnvironmentIds({id = "environments", value, onChange}) {
 
     const client = useGraphQLClient()
 

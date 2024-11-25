@@ -7,7 +7,7 @@ import {gql} from "graphql-request";
 import {Space} from "antd";
 import SlotPipelineStatus from "@components/extension/environments/SlotPipelineStatus";
 
-export default function SlotPipelineLink({pipelineId, status}) {
+export default function SlotPipelineLink({pipelineId, status, numberOnly = false}) {
 
     const client = useGraphQLClient()
     const [loading, setLoading] = useState(true)
@@ -50,7 +50,14 @@ export default function SlotPipelineLink({pipelineId, status}) {
                     pipeline &&
                     <Space>
                         <Link href={slotPipelineUri(pipelineId)}>
-                            Pipeline {pipeline.slot.environment.name}/{pipeline.slot.project.name}{pipeline.slot.qualifier && `/${pipeline.slot.qualifier}`}#{pipeline.number}
+                            {
+                                numberOnly && `#${pipeline.number}`
+                            }
+                            {
+                                !numberOnly && <>
+                                    Pipeline {pipeline.slot.environment.name}/{pipeline.slot.project.name}{pipeline.slot.qualifier && `/${pipeline.slot.qualifier}`}#{pipeline.number}
+                                </>
+                            }
                         </Link>
                         {status && <SlotPipelineStatus pipeline={pipeline}/>}
                     </Space>
