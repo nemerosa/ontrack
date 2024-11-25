@@ -156,7 +156,7 @@ export default function ValidationStampView({id}) {
                         id: chartMetrics,
                         content: <GridCell
                             id={chartMetrics}
-                            title="Validation metrtics"
+                            title="Validation metrics"
                             extra={command}
                         >
                             <ValidationStampMetricsChart
