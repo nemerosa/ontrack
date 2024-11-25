@@ -109,7 +109,7 @@ class WorkflowEngineIT : AbstractWorkflowTestSupport() {
         // Checking all nodes
         assertEquals(WorkflowInstanceNodeStatus.SUCCESS, instance.getNode("ticket").status)
         assertEquals(WorkflowInstanceNodeStatus.ERROR, instance.getNode("jenkins").status)
-        assertEquals(WorkflowInstanceNodeStatus.STOPPED, instance.getNode("mail").status)
+        assertEquals(WorkflowInstanceNodeStatus.CANCELLED, instance.getNode("mail").status)
     }
 
     @OptIn(ExperimentalTime::class)

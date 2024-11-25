@@ -55,11 +55,11 @@ data class WorkflowInstance(
             val nodes = nodesExecutions.map { it.status }
             return if (nodes.any { it == WorkflowInstanceNodeStatus.ERROR }) {
                 WorkflowInstanceStatus.ERROR
-            } else if (nodes.any { it == WorkflowInstanceNodeStatus.STOPPED }) {
+            } else if (nodes.any { it == WorkflowInstanceNodeStatus.CANCELLED }) {
                 WorkflowInstanceStatus.STOPPED
             } else if (nodes.all { it == WorkflowInstanceNodeStatus.SUCCESS }) {
                 WorkflowInstanceStatus.SUCCESS
-            } else if (nodes.any { it == WorkflowInstanceNodeStatus.STARTED }) {
+            } else if (nodes.any { it == WorkflowInstanceNodeStatus.STARTED } || nodes.any { it == WorkflowInstanceNodeStatus.WAITING }) {
                 WorkflowInstanceStatus.RUNNING
             } else {
                 WorkflowInstanceStatus.STARTED

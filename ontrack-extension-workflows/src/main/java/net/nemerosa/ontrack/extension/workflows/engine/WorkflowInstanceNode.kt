@@ -40,7 +40,7 @@ data class WorkflowInstanceNode(
 
     fun stop(time: LocalDateTime = Time.now) = WorkflowInstanceNode(
         id = id,
-        status = WorkflowInstanceNodeStatus.STOPPED,
+        status = WorkflowInstanceNodeStatus.CANCELLED,
         startTime = time,
         endTime = endTime,
         output = output,

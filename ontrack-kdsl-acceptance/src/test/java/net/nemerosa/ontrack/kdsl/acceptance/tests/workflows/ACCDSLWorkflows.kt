@@ -313,7 +313,7 @@ class ACCDSLWorkflows : AbstractACCDSLWorkflowsTestSupport() {
         val nodeStatuses = instance.nodesExecutions.associate { it.id to it.status }
         assertEquals(WorkflowInstanceNodeStatus.SUCCESS, nodeStatuses["ticket"])
         assertEquals(WorkflowInstanceNodeStatus.ERROR, nodeStatuses["jenkins"])
-        assertEquals(WorkflowInstanceNodeStatus.STOPPED, nodeStatuses["mail"])
+        assertEquals(WorkflowInstanceNodeStatus.CANCELLED, nodeStatuses["mail"])
     }
 
     @Test
@@ -358,7 +358,7 @@ class ACCDSLWorkflows : AbstractACCDSLWorkflowsTestSupport() {
         val nodeStatuses = instance.nodesExecutions.associate { it.id to it.status }
         assertEquals(WorkflowInstanceNodeStatus.SUCCESS, nodeStatuses["ticket"])
         assertEquals(WorkflowInstanceNodeStatus.ERROR, nodeStatuses["jenkins"])
-        assertEquals(WorkflowInstanceNodeStatus.STOPPED, nodeStatuses["mail"])
+        assertEquals(WorkflowInstanceNodeStatus.CANCELLED, nodeStatuses["mail"])
     }
 
     @Test
@@ -407,8 +407,8 @@ class ACCDSLWorkflows : AbstractACCDSLWorkflowsTestSupport() {
         // Checks the node statuses
         val nodeStatuses = instance.nodesExecutions.associate { it.id to it.status }
         assertEquals(WorkflowInstanceNodeStatus.SUCCESS, nodeStatuses["ticket"])
-        assertEquals(WorkflowInstanceNodeStatus.STOPPED, nodeStatuses["jenkins"])
-        assertEquals(WorkflowInstanceNodeStatus.STOPPED, nodeStatuses["mail"])
+        assertEquals(WorkflowInstanceNodeStatus.CANCELLED, nodeStatuses["jenkins"])
+        assertEquals(WorkflowInstanceNodeStatus.CANCELLED, nodeStatuses["mail"])
     }
 
     @Test

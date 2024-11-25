@@ -14,11 +14,18 @@ import net.nemerosa.ontrack.model.events.SerializableEvent
 import net.nemerosa.ontrack.model.tx.TransactionHelper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Duration
 
 @Service
+@ConditionalOnProperty(
+    prefix = "ontrack.config.extension.workflows",
+    name = ["mode"],
+    havingValue = "LEGACY",
+    matchIfMissing = true,
+)
 @Transactional
 class WorkflowEngineImpl(
     private val workflowInstanceStore: WorkflowInstanceStore,
@@ -87,7 +94,7 @@ class WorkflowEngineImpl(
         val instanceNode = instance.getNode(workflowNodeId)
         // Checking the node status
         val nodeStatus = instanceNode.status
-        if (nodeStatus == WorkflowInstanceNodeStatus.IDLE) {
+        if (nodeStatus == WorkflowInstanceNodeStatus.CREATED) {
             try {
                 // Starting the node
                 instance = workflowInstanceStore.store(instance.startNode(node.id))
@@ -172,7 +179,7 @@ class WorkflowEngineImpl(
         val workflowNode = instance.workflow.getNode(nodeId)
         // Running all the checks
         // 1. node must be idle
-        return instanceNode.status == WorkflowInstanceNodeStatus.IDLE &&
+        return instanceNode.status == WorkflowInstanceNodeStatus.CREATED &&
                 // 2. all its parents must be in SUCCESS state
                 workflowNode.parents.all { parent ->
                     val parentNode = instance.getNode(parent.id)

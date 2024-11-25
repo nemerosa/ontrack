@@ -1,7 +1,9 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.workflows
 
+import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.kdsl.acceptance.tests.notifications.AbstractACCDSLNotificationsTestSupport
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
+import net.nemerosa.ontrack.kdsl.spec.extension.notifications.notifications
 import net.nemerosa.ontrack.kdsl.spec.extension.workflows.WorkflowInstance
 import net.nemerosa.ontrack.kdsl.spec.extension.workflows.WorkflowInstanceStatus
 import net.nemerosa.ontrack.kdsl.spec.extension.workflows.workflows
@@ -29,10 +31,12 @@ abstract class AbstractACCDSLWorkflowsTestSupport : AbstractACCDSLNotificationsT
     protected fun waitUntilWorkflowFinished(
         instanceId: String,
         returnInstanceOnError: Boolean = false,
+        timeout: Long = 30_000L,
+        interval: Long = 500L,
     ): WorkflowInstance {
         waitUntil(
-            timeout = 30_000L,
-            interval = 500L,
+            timeout = timeout,
+            interval = interval,
         ) {
             val instance = ontrack.workflows.workflowInstance(instanceId)
             instance != null && instance.finished
@@ -61,5 +65,24 @@ abstract class AbstractACCDSLWorkflowsTestSupport : AbstractACCDSLNotificationsT
         // OK, returning the final state of the instance
         return instance
     }
+
+    /**
+     * Gets the workflow notification record from the output of the notification
+     */
+    protected fun getWorkflowNotificationRecord(subscriptionName: String) =
+        ontrack.notifications.notificationRecords("workflow")
+            .firstOrNull { record ->
+                record.source?.id == "entity-subscription" &&
+                        record.source?.data?.getRequiredTextField("subscriptionName") == subscriptionName
+            }
+
+    /**
+     * Gets the workflow instance ID from the output of the notification
+     */
+    protected fun getWorkflowInstanceId(subscriptionName: String) =
+        getWorkflowNotificationRecord(subscriptionName)
+            ?.result?.output
+            ?.path("workflowInstanceId")
+            ?.asText()
 
 }

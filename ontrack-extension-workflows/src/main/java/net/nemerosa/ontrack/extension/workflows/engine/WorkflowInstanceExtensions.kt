@@ -37,7 +37,7 @@ fun createInstance(
 
 private fun WorkflowNode.toStartExecution() = WorkflowInstanceNode(
     id = id,
-    status = WorkflowInstanceNodeStatus.IDLE,
+    status = WorkflowInstanceNodeStatus.CREATED,
     output = null,
     error = null,
 )

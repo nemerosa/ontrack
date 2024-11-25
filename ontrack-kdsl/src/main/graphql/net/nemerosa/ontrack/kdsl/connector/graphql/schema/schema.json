@@ -16953,7 +16953,26 @@
             {
               "name": "slots",
               "description": "List of slots for this environment",
-              "args": [],
+              "args": [
+                {
+                  "name": "projects",
+                  "description": "List of project names",
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "SCALAR",
+                        "name": "String",
+                        "ofType": null
+                      }
+                    }
+                  },
+                  "defaultValue": null
+                }
+              ],
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -16986,21 +17005,36 @@
           "fields": null,
           "inputFields": [
             {
+              "name": "projects",
+              "description": "projects field",
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                }
+              },
+              "defaultValue": null
+            },
+            {
               "name": "tags",
               "description": "tags field",
               "type": {
-                "kind": "NON_NULL",
+                "kind": "LIST",
                 "name": null,
                 "ofType": {
-                  "kind": "LIST",
+                  "kind": "NON_NULL",
                   "name": null,
                   "ofType": {
-                    "kind": "NON_NULL",
-                    "name": null,
-                    "ofType": {
-                      "kind": "SCALAR",
-                      "name": "String"
-                    }
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
                   }
                 }
               },
@@ -56563,7 +56597,7 @@
             },
             {
               "name": "deploymentStatus",
-              "description": "Deployment status for the pipeline",
+              "description": "Current status for the pipeline",
               "args": [],
               "type": {
                 "kind": "OBJECT",
@@ -57236,12 +57270,6 @@
             },
             {
               "name": "CANCELLED",
-              "description": null,
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "ERROR",
               "description": null,
               "isDeprecated": false,
               "deprecationReason": null
@@ -65454,7 +65482,13 @@
           "interfaces": null,
           "enumValues": [
             {
-              "name": "IDLE",
+              "name": "CREATED",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "WAITING",
               "description": null,
               "isDeprecated": false,
               "deprecationReason": null
@@ -65466,7 +65500,7 @@
               "deprecationReason": null
             },
             {
-              "name": "STOPPED",
+              "name": "CANCELLED",
               "description": null,
               "isDeprecated": false,
               "deprecationReason": null

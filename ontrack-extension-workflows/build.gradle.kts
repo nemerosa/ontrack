@@ -18,6 +18,7 @@ dependencies {
     implementation("io.micrometer:micrometer-core")
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation(project(":ontrack-extension-casc"))
+    implementation(project(":ontrack-repository-support"))
 
     testImplementation(project(path = ":ontrack-model", configuration = "tests"))
     testImplementation(project(path = ":ontrack-ui-support", configuration = "tests"))

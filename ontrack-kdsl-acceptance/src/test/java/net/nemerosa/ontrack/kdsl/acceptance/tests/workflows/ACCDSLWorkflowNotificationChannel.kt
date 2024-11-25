@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.workflows
 
-import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
 import net.nemerosa.ontrack.kdsl.spec.configurations.configurations
@@ -338,7 +337,7 @@ class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
                     // Checking the node states
                     val nodeStatuses = instance.nodesExecutions.associate { it.id to it.status }
                     assertEquals(WorkflowInstanceNodeStatus.ERROR, nodeStatuses["start"])
-                    assertEquals(WorkflowInstanceNodeStatus.STOPPED, nodeStatuses["end"])
+                    assertEquals(WorkflowInstanceNodeStatus.CANCELLED, nodeStatuses["end"])
                 }
             }
         }
@@ -427,24 +426,5 @@ class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
             assertEquals("ERROR", record?.result?.type)
         }
     }
-
-    /**
-     * Gets the workflow notification record from the output of the notification
-     */
-    private fun getWorkflowNotificationRecord(subscriptionName: String) =
-        ontrack.notifications.notificationRecords("workflow")
-            .firstOrNull { record ->
-                record.source?.id == "entity-subscription" &&
-                        record.source?.data?.getRequiredTextField("subscriptionName") == subscriptionName
-            }
-
-    /**
-     * Gets the workflow instance ID from the output of the notification
-     */
-    private fun getWorkflowInstanceId(subscriptionName: String) =
-        getWorkflowNotificationRecord(subscriptionName)
-            ?.result?.output
-            ?.path("workflowInstanceId")
-            ?.asText()
 
 }
