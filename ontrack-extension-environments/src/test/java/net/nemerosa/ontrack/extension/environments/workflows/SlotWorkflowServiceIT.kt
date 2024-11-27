@@ -16,7 +16,6 @@ import kotlin.test.*
 
 @TestPropertySource(
     properties = [
-        "net.nemerosa.ontrack.extension.workflows.store=memory",
         "ontrack.extension.queue.general.async=false",
     ]
 )
@@ -149,8 +148,10 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
             // Creating a pipeline (this triggers the workflow)
             val pipeline = slotTestSupport.createPipeline(slot = slot)
 
-            // Pipeline workflow is finished when we reach this code
-            // because workflows run synchronously in unit test mode
+            // Waiting for the pipeline's workflows to finish
+            slotWorkflowTestSupport.waitForSlotWorkflowsToFinish(pipeline, SlotWorkflowTrigger.CREATION)
+
+            // Checking the pipeline can start its deployment
             val status = slotService.startDeployment(pipeline, dryRun = true)
             assertTrue(status.status, "Pipeline can start deployment")
 
@@ -216,6 +217,9 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
             // Reloading the pipeline's status
             val deployingPipeline = slotService.getPipelineById(pipeline.id)
             assertEquals(SlotPipelineStatus.DEPLOYING, deployingPipeline.status)
+
+            // Waiting for the pipeline's workflows to finish
+            slotWorkflowTestSupport.waitForSlotWorkflowsToFinish(pipeline, SlotWorkflowTrigger.DEPLOYING)
 
             // Finish the deployment
             val end = slotService.finishDeployment(deployingPipeline)

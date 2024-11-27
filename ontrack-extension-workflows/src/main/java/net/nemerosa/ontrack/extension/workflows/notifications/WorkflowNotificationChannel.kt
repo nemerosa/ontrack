@@ -58,6 +58,7 @@ class WorkflowNotificationChannel(
         val instance = workflowEngine.startWorkflow(
             workflow = workflow,
             event = workflowEvent,
+            pauseMs = config.pauseMs,
         )
         // Output = just an ID to the workflow instance
         return NotificationResult.async(

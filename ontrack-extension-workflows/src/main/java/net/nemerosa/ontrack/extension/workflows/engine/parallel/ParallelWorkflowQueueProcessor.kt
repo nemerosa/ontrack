@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.workflows.engine.parallel
 
+import net.nemerosa.ontrack.extension.queue.QueueAckMode
 import net.nemerosa.ontrack.extension.queue.QueueProcessor
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowEngine
 import org.springframework.context.ApplicationContext
@@ -17,6 +18,16 @@ class ParallelWorkflowQueueProcessor(
 
     override val id: String = "workflow-parallel"
     override val payloadType: KClass<WorkflowQueuePayload> = WorkflowQueuePayload::class
+
+    /**
+     * Minimum of 5 queues for the workflows.
+     */
+    override val defaultScale: Int = 5
+
+    /**
+     * Immediately ack the messages
+     */
+    override val ackMode: QueueAckMode = QueueAckMode.IMMEDIATE
 
     override fun isCancelled(payload: WorkflowQueuePayload): String? = null
 

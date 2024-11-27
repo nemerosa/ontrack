@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.workflows.definition
 
-import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowNodeNotFoundException
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.DocumentationList
@@ -40,4 +39,10 @@ data class Workflow(
 
     fun getNode(nodeId: String) = nodes.firstOrNull { it.id == nodeId }
         ?: throw WorkflowNodeNotFoundException(nodeId)
+
+    fun addNodeBeforeEach(node: WorkflowNode): Workflow =
+        Workflow(
+            name = name,
+            nodes = listOf(node) + nodes.map { it.addParent(node) },
+        )
 }

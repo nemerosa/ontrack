@@ -8,7 +8,10 @@ import net.nemerosa.ontrack.extension.workflows.WorkflowConfigurationProperties
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowParentNode
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowValidation
-import net.nemerosa.ontrack.extension.workflows.engine.*
+import net.nemerosa.ontrack.extension.workflows.engine.WorkflowEngine
+import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
+import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceNodeStatus
+import net.nemerosa.ontrack.extension.workflows.engine.createInstance
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorResultType
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorService
 import net.nemerosa.ontrack.extension.workflows.repository.WorkflowInstanceRepository
@@ -26,7 +29,7 @@ import java.time.Duration
     prefix = "ontrack.config.extension.workflows",
     name = ["mode"],
     havingValue = "PARALLEL",
-    matchIfMissing = false,
+    matchIfMissing = true,
 )
 class ParallelWorkflowEngine(
     private val workflowInstanceRepository: WorkflowInstanceRepository,
@@ -42,13 +45,29 @@ class ParallelWorkflowEngine(
 
     private val transactionHelper = DefaultTransactionHelper(platformTransactionManager)
 
-    override fun startWorkflow(workflow: Workflow, event: SerializableEvent): WorkflowInstance {
+    override fun startWorkflow(
+        workflow: Workflow,
+        event: SerializableEvent,
+        pauseMs: Long,
+    ): WorkflowInstance {
         // Checks the workflow consistency (cycles, etc.) - use a public method, usable by extensions
         WorkflowValidation.validateWorkflow(workflow).throwErrorIfAny()
+
+        // Adapting the workflow with additional nodes
+        var actualWorkflow = workflow
+        // Pause node
+        if (pauseMs > 0) {
+            actualWorkflow = actualWorkflow.addNodeBeforeEach(pauseNode(pauseMs))
+        }
+        // TODO Termination node
+
         // Creating the instance
-        val instance = createInstance(workflow = workflow, event = event)
+        val instance = createInstance(workflow = actualWorkflow, event = event)
+
         // Storing the instance
-        workflowInstanceRepository.createInstance(instance)
+        transactionHelper.inNewTransaction {
+            workflowInstanceRepository.createInstance(instance)
+        }
 
         for (node in instance.workflow.nodes) {
             queueDispatcher.dispatch(
@@ -65,8 +84,6 @@ class ParallelWorkflowEngine(
                 )
             )
         }
-
-        // TODO Termination node
 
         // OK
         return instance
@@ -121,8 +138,10 @@ class ParallelWorkflowEngine(
             if (okToStart) {
                 logger.debug("{} INSTANCE {} NODE STARTED", workflowInstanceId, workflowNodeId)
                 nodeStarted(workflowInstanceId, workflowNodeId)
+                // Loading a fresh instance before starting
+                val freshInstance = getWorkflowInstanceTx(workflowInstanceId)
                 // Starts the node execution
-                nodeExecution(instance, workflowNodeId)
+                nodeExecution(freshInstance, workflowNodeId)
             } else {
                 logger.debug("{} INSTANCE {} NODE PARENT NOT OK", workflowInstanceId, workflowNodeId)
                 nodeCancelled(workflowInstanceId, workflowNodeId, "Parents conditions were not met.")
@@ -193,26 +212,26 @@ class ParallelWorkflowEngine(
             // Timeout?
             if (result == null) {
                 logger.debug("{} INSTANCE {} NODE TIMEOUT", instance.id, nodeId)
-                throw WorkflowExecutionTimeoutException(timeout)
+                nodeError(instance.id, nodeId, "Timeout", null)
             }
-
             // Progressing the instance or stopping it in case of error
-            when (result.type) {
-                WorkflowNodeExecutorResultType.ERROR -> {
-                    logger.debug("{} INSTANCE {} NODE ERROR", instance.id, nodeId)
-                    nodeError(instance.id, nodeId, result.message, result.output)
-                }
+            else {
+                when (result.type) {
+                    WorkflowNodeExecutorResultType.ERROR -> {
+                        logger.debug("{} INSTANCE {} NODE ERROR", instance.id, nodeId)
+                        nodeError(instance.id, nodeId, result.message, result.output)
+                    }
 
-                WorkflowNodeExecutorResultType.SUCCESS -> {
-                    logger.debug("{} INSTANCE {} NODE SUCCESS", instance.id, nodeId)
-                    // Stores the output back into the instance and progresses the node's status
-                    nodeSuccess(instance.id, nodeId, result.output)
+                    WorkflowNodeExecutorResultType.SUCCESS -> {
+                        logger.debug("{} INSTANCE {} NODE SUCCESS", instance.id, nodeId)
+                        // Stores the output back into the instance and progresses the node's status
+                        nodeSuccess(instance.id, nodeId, result.output, result.event)
+                    }
                 }
             }
-
         } catch (any: Throwable) {
             // Stores the node error status
-            logger.debug("{} INSTANCE {} NODE UNCAUGHT ERROR", instance.id, nodeId)
+            logger.error("${instance.id} INSTANCE $nodeId NODE UNCAUGHT ERROR", any)
             nodeError(instance.id, nodeId, any.message, null)
         }
     }
@@ -246,20 +265,28 @@ class ParallelWorkflowEngine(
         }
     }
 
-    private fun nodeSuccess(workflowInstanceId: String, workflowNodeId: String, output: JsonNode?) {
+    private fun nodeSuccess(
+        workflowInstanceId: String,
+        workflowNodeId: String,
+        output: JsonNode?,
+        event: SerializableEvent?
+    ) {
         transactionHelper.inNewTransaction {
-            workflowInstanceRepository.nodeSuccess(workflowInstanceId, workflowNodeId, output)
+            workflowInstanceRepository.nodeSuccess(workflowInstanceId, workflowNodeId, output, event)
         }
     }
 
     private fun nodeError(instanceId: String, nodeId: String, message: String?, output: JsonNode?) {
         transactionHelper.inNewTransaction {
             workflowInstanceRepository.nodeError(instanceId, nodeId, message, output)
+            workflowInstanceRepository.stopInstance(instanceId)
         }
     }
 
     override fun findWorkflowInstance(id: String): WorkflowInstance? =
-        workflowInstanceRepository.findWorkflowInstance(id)
+        transactionHelper.inNewTransactionNullable {
+            workflowInstanceRepository.findWorkflowInstance(id)
+        }
 
     override fun stopWorkflow(workflowInstanceId: String) {
         transactionHelper.inNewTransaction {

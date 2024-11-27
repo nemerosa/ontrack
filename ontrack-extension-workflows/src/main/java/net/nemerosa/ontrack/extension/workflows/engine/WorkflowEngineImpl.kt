@@ -24,7 +24,7 @@ import java.time.Duration
     prefix = "ontrack.config.extension.workflows",
     name = ["mode"],
     havingValue = "LEGACY",
-    matchIfMissing = true,
+    matchIfMissing = false,
 )
 @Transactional
 class WorkflowEngineImpl(
@@ -41,6 +41,7 @@ class WorkflowEngineImpl(
     override fun startWorkflow(
         workflow: Workflow,
         event: SerializableEvent,
+        pauseMs: Long,
     ): WorkflowInstance {
         // Checks the workflow consistency (cycles, etc.) - use a public method, usable by extensions
         WorkflowValidation.validateWorkflow(workflow).throwErrorIfAny()

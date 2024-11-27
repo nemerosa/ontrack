@@ -34,6 +34,10 @@ class TemplatingServiceImpl(
     private val regexToken =
         "^([a-zA-Z_]+|#)(?:\\.([a-zA-Z_\\.-]+))?(?:\\?((?:[a-zA-Z]+=[a-zA-Z0-9\\s,_\\.:-]+)(?:&[a-zA-Z]+=[a-zA-Z0-9\\s,_\\.:-]+)*))?(?:\\|([a-zA-Z_-]+))?\$".toRegex()
 
+    override fun isTemplate(templating: String): Boolean {
+        return regexExpressions.containsMatchIn(templating) || isLegacyTemplate(templating)
+    }
+
     @Deprecated("Legacy templates will be removed in V5.")
     override fun isLegacyTemplate(template: String): Boolean =
         SimpleExpand.regex.containsMatchIn(template) &&

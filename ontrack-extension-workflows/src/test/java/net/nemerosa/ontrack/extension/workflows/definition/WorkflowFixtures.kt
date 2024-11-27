@@ -1,10 +1,25 @@
 package net.nemerosa.ontrack.extension.workflows.definition
 
-import com.fasterxml.jackson.databind.node.NullNode
 import com.fasterxml.jackson.databind.node.TextNode
 
 object WorkflowFixtures {
 
+    val simpleLinearWorkflowYaml = """
+        name: Simple Linear
+        nodes:
+          - id: start
+            executorId: mock
+            data:
+              text: Start node
+          - id: end
+            parents:
+              - id: start
+            executorId: mock
+            data:
+              text: End node
+    """.trimIndent()
+
+    @Deprecated("Use YAML instead")
     fun simpleLinearWorkflow(
         name: String = "Simple linear"
     ) =
@@ -30,6 +45,7 @@ object WorkflowFixtures {
             )
         )
 
+    @Deprecated("Use YAML instead")
     fun cyclicWorkflow() =
         Workflow(
             name = "Simple cyclic",
@@ -57,6 +73,7 @@ object WorkflowFixtures {
             )
         )
 
+    @Deprecated("Use YAML instead")
     fun twoParallelAndJoin() =
         Workflow(
             name = "Parallel with join",

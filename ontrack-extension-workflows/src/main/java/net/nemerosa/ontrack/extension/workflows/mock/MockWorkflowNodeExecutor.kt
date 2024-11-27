@@ -9,11 +9,16 @@ import net.nemerosa.ontrack.extension.workflows.WorkflowsExtensionFeature
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutor
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorResult
+import net.nemerosa.ontrack.extension.workflows.templating.WorkflowTemplatingContext
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.docs.DocumentationExampleCode
+import net.nemerosa.ontrack.model.events.EventTemplatingService
+import net.nemerosa.ontrack.model.events.PlainEventRenderer
+import net.nemerosa.ontrack.model.events.SerializableEventService
+import net.nemerosa.ontrack.model.templating.TemplatingService
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
@@ -33,6 +38,9 @@ import org.springframework.stereotype.Component
 )
 class MockWorkflowNodeExecutor(
     workflowsExtensionFeature: WorkflowsExtensionFeature,
+    private val eventTemplatingService: EventTemplatingService,
+    private val serializableEventService: SerializableEventService,
+    private val templatingService: TemplatingService,
 ) : AbstractExtension(workflowsExtensionFeature), WorkflowNodeExecutor {
 
     companion object {
@@ -68,25 +76,25 @@ class MockWorkflowNodeExecutor(
                 delay(nodeData.waitMs)
             }
         }
-        // Gets the parent outputs in an index
-        val parentsData = workflowInstance.getParentsData(workflowNodeId)
+
         // Using the event context
         val context = workflowInstance.event.findValue(EVENT_MOCK)
 
         // Initial text
         val initialText = nodeData.text
 
-        // Replacements by parents references
-        val replacedText = "#([a-zA-Z][a-zA-Z0-9_-]*)".toRegex().replace(initialText) { m ->
-            val parentId = m.groupValues[1]
-            val parentOutput = parentsData[parentId]
-            if (parentOutput != null) {
-                val output = parentOutput.parse<MockNodeOutput>()
-                output.text
-            } else {
-                // Parent has no data
-                "#none"
-            }
+        // Templating
+        val replacedText = if (templatingService.isTemplate(initialText)) {
+            val templatingEvent = serializableEventService.hydrate(workflowInstance.event)
+            val additionalContext = WorkflowTemplatingContext.createTemplatingContext(workflowInstance)
+            eventTemplatingService.renderEvent(
+                event = templatingEvent,
+                template = initialText,
+                renderer = PlainEventRenderer.INSTANCE,
+                context = additionalContext,
+            )
+        } else {
+            initialText
         }
 
         // Returning some new text

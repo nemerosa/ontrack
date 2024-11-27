@@ -105,8 +105,4 @@ class ACCDSLWorkflowParallel : AbstractACCDSLWorkflowsTestSupport() {
 
     }
 
-    @Test
-    fun `Running a parallel workflow in parallel with termination`() {
-        TODO()
-    }
 }

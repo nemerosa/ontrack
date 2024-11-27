@@ -13,11 +13,13 @@ interface WorkflowEngine {
      *
      * @param workflow Workflow to run
      * @param event Execution context
+     * @param pauseMs Pause before launching the workflow (used for tests)
      * @return Initial state of the workflow instance
      */
     fun startWorkflow(
         workflow: Workflow,
         event: SerializableEvent,
+        pauseMs: Long = 0,
     ): WorkflowInstance
 
     /**

@@ -15,9 +15,13 @@ import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.model.support.SettingsRepository
+import net.nemerosa.ontrack.model.tx.DefaultTransactionHelper
+import net.nemerosa.ontrack.model.tx.TransactionHelper
 import net.nemerosa.ontrack.test.TestUtils
 import net.nemerosa.ontrack.test.TestUtils.uid
+import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.transaction.PlatformTransactionManager
 import java.time.LocalDateTime
 import kotlin.reflect.KClass
 import kotlin.test.assertEquals
@@ -51,6 +55,37 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
 
     @Autowired
     protected lateinit var runInfoService: RunInfoService
+
+    /**
+     * When working with asynchronous process, having the transaction isolated
+     * at test level becomes very important so that asynchronous data can
+     * have access to the test data.
+     */
+
+    @Autowired
+    private lateinit var platformTransactionManager: PlatformTransactionManager
+
+    private lateinit var transactionHelper: TransactionHelper
+
+    @BeforeEach
+    fun setupTxHelper() {
+        transactionHelper = DefaultTransactionHelper(platformTransactionManager)
+    }
+
+    protected fun <T : Any> inNewTransaction(code: () -> T): T = transactionHelper.inNewTransaction(code)
+
+    protected inner class Then<T : Any>(private val initial: T) {
+        infix fun then(code: (T) -> Unit) {
+            inNewTransaction {
+                code(initial)
+            }
+        }
+    }
+
+    protected fun <T : Any> startNewTransaction(code: () -> T): Then<T> {
+        val result = inNewTransaction { code() }
+        return Then(result)
+    }
 
     /**
      * Kotlin friendly
@@ -135,6 +170,17 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     fun <T> Project.branch(name: String = uid("B"), init: Branch.() -> T): T {
         val branch = doCreateBranch(this, NameDescription.nd(name, ""))
         return branch.init()
+    }
+
+    /**
+     * Deleting all projects
+     */
+    fun deleteAllProjects() {
+        asAdmin {
+            structureService.projectList.forEach {
+                structureService.deleteProject(it.id)
+            }
+        }
     }
 
     /**

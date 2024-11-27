@@ -27,10 +27,10 @@ class EventTemplatingServiceImpl(
             val parameters = eventVariableService.getTemplateParameters(event, caseVariants = true)
             SimpleExpand.expand(template, parameters)
         } else {
-            val context = eventVariableService.getTemplateContext(event, context)
+            val templateContext = eventVariableService.getTemplateContext(event, context)
             templatingService.render(
                 template = template,
-                context = context,
+                context = templateContext,
                 renderer = renderer,
             )
         }

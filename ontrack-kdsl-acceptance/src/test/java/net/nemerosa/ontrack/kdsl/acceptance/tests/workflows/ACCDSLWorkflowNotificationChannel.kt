@@ -167,6 +167,7 @@ class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
             )
 
             // Checks that the node is marked as success & contains the build URL
+            assertEquals(WorkflowInstanceStatus.ERROR, instance.status)
             assertNotNull(instance.getWorkflowInstanceNode("start"), "Node accessed") { node ->
                 assertTrue(!node.error.isNullOrBlank(), "There is an error")
                 assertNotNull(node.output) { output ->

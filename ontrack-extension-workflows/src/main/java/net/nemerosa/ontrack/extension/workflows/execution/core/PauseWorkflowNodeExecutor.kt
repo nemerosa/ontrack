@@ -1,0 +1,32 @@
+package net.nemerosa.ontrack.extension.workflows.execution.core
+
+import com.fasterxml.jackson.databind.JsonNode
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import net.nemerosa.ontrack.extension.workflows.WorkflowsExtensionFeature
+import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
+import net.nemerosa.ontrack.extension.workflows.execution.AbstractTypedWorkflowNodeExecutor
+import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorResult
+import org.springframework.stereotype.Component
+
+@Component
+class PauseWorkflowNodeExecutor(
+    feature: WorkflowsExtensionFeature,
+) : AbstractTypedWorkflowNodeExecutor<PauseWorkflowNodeExecutorData>(
+    feature,
+    "pause",
+    "Pause",
+    PauseWorkflowNodeExecutorData::class
+) {
+    override fun execute(
+        workflowInstance: WorkflowInstance,
+        data: PauseWorkflowNodeExecutorData,
+        workflowNodeExecutorResultFeedback: (output: JsonNode?) -> Unit
+    ): WorkflowNodeExecutorResult {
+        runBlocking {
+            delay(data.pauseMs)
+        }
+        return WorkflowNodeExecutorResult.success(output = null)
+    }
+
+}

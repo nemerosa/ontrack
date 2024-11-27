@@ -1,31 +1,29 @@
 package net.nemerosa.ontrack.extension.environments.workflows
 
 import net.nemerosa.ontrack.extension.environments.EnvironmentTestSupport
+import net.nemerosa.ontrack.extension.environments.Slot
 import net.nemerosa.ontrack.extension.environments.SlotPipelineStatus
 import net.nemerosa.ontrack.extension.environments.SlotTestSupport
 import net.nemerosa.ontrack.extension.environments.service.SlotService
-import net.nemerosa.ontrack.extension.environments.workflows.executors.SlotPipelineCreationWorkflowNodeExecutorData
 import net.nemerosa.ontrack.extension.notifications.AbstractNotificationTestSupport
 import net.nemerosa.ontrack.extension.notifications.subscriptions.subscribe
-import net.nemerosa.ontrack.extension.workflows.definition.Workflow
-import net.nemerosa.ontrack.extension.workflows.definition.WorkflowNode
 import net.nemerosa.ontrack.extension.workflows.notifications.WorkflowNotificationChannel
 import net.nemerosa.ontrack.extension.workflows.notifications.WorkflowNotificationChannelConfig
 import net.nemerosa.ontrack.extension.workflows.registry.WorkflowParser
 import net.nemerosa.ontrack.it.waitUntil
-import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.EventFactory
+import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.TestPropertySource
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
 @TestPropertySource(
     properties = [
-        "net.nemerosa.ontrack.extension.workflows.store=memory",
         "ontrack.extension.queue.general.async=false",
     ]
 )
@@ -49,97 +47,109 @@ class SlotPipelineWorkflowNodeExecutorsIT : AbstractNotificationTestSupport() {
     @OptIn(ExperimentalTime::class)
     @Test
     fun `Creating a pipeline into another slot for the same build using a workflow on deployed`() {
-        slotTestSupport.withSlot { staging ->
-            environmentTestSupport.withEnvironment { productionEnv ->
-                slotTestSupport.withSlot(
-                    environment = productionEnv,
-                    project = staging.project,
-                ) { production ->
-
-                    slotWorkflowService.addSlotWorkflow(
-                        SlotWorkflow(
-                            slot = staging,
-                            trigger = SlotWorkflowTrigger.DEPLOYED,
-                            workflow = WorkflowParser.parseYamlWorkflow(
-                                """
-                                    name: Deployment to production
-                                    nodes:
-                                        - id: deploy
-                                          executorId: slot-pipeline-creation
-                                          data:
-                                            environment: ${productionEnv.name}
-                                """.trimIndent()
+        asAdmin {
+            var production: Slot? = null
+            startNewTransaction {
+                slotTestSupport.withSlot { staging ->
+                    environmentTestSupport.withEnvironment { productionEnv ->
+                        slotTestSupport.withSlot(
+                            environment = productionEnv,
+                            project = staging.project,
+                        ) {
+                            production = it
+                            slotWorkflowService.addSlotWorkflow(
+                                SlotWorkflow(
+                                    pauseMs = 500,
+                                    slot = staging,
+                                    trigger = SlotWorkflowTrigger.DEPLOYED,
+                                    workflow = WorkflowParser.parseYamlWorkflow(
+                                        """
+                                            name: Deployment to production
+                                            nodes:
+                                                - id: deploy
+                                                  executorId: slot-pipeline-creation
+                                                  data:
+                                                    environment: ${productionEnv.name}
+                                        """.trimIndent()
+                                    )
+                                )
                             )
-                        )
-                    )
-
-                    // Creating, starting & finishing a pipeline
-                    // This will trigger the workflow
-                    /* val stagingPipeline = */ slotTestSupport.createStartAndDeployPipeline(slot = staging)
-
-                    // We wait until the new pipeline is registered
-                    waitUntil(
-                        message = "New pipeline registered in production",
-                        timeout = 10.seconds,
-                        interval = 1.seconds,
-                    ) {
-                        slotService.findPipelines(production).pageItems.isNotEmpty()
+                            // Creating, starting & finishing a pipeline
+                            // This will trigger the workflow
+                            slotTestSupport.createStartAndDeployPipeline(slot = staging)
+                        }
                     }
-
-                    // Getting the new pipeline
-                    val productionPipeline = slotService.findPipelines(production).pageItems.first()
-                    assertEquals(SlotPipelineStatus.ONGOING, productionPipeline.status)
                 }
+            } then {
+                assertNotNull(production, "Production slot created")
+                // We wait until the new pipeline is registered
+                waitUntil(
+                    message = "New pipeline registered in production",
+                    timeout = 10.seconds,
+                    interval = 1.seconds,
+                ) {
+                    inNewTransaction {
+                        slotService.findPipelines(production!!).pageItems.isNotEmpty()
+                    }
+                }
+
+                // Getting the new pipeline
+                val productionPipeline = inNewTransaction {
+                    slotService.findPipelines(production!!).pageItems.first()
+                }
+                assertEquals(SlotPipelineStatus.ONGOING, productionPipeline.status)
             }
+
         }
+
     }
 
     @OptIn(ExperimentalTime::class)
     @Test
     fun `On a promotion, running a workflow to put a pipeline into a slot`() {
-        slotTestSupport.withSlot { slot ->
-            slot.project.branch {
-                val pl = promotionLevel()
-
-                // Promotion subscription running a workflow which pushes the build into a slot
-                eventSubscriptionService.subscribe(
-                    name = "Start pipeline on promotion",
-                    channel = workflowNotificationChannel,
-                    channelConfig = WorkflowNotificationChannelConfig(
-                        workflow = Workflow(
-                            name = "Start pipeline",
-                            nodes = listOf(
-                                WorkflowNode(
-                                    id = "pipeline",
-                                    description = null,
-                                    executorId = "slot-pipeline-creation",
-                                    data = SlotPipelineCreationWorkflowNodeExecutorData(
-                                        environment = slot.environment.name,
-                                        qualifier = null
-                                    ).asJson(),
-                                )
+        asAdmin {
+            startNewTransaction {
+                val slot = slotTestSupport.withSlot {}
+                val build = slot.project.branch<Build> {
+                    val pl = promotionLevel()
+                    // Promotion subscription running a workflow which pushes the build into a slot
+                    eventSubscriptionService.subscribe(
+                        name = "Start pipeline on promotion",
+                        channel = workflowNotificationChannel,
+                        channelConfig = WorkflowNotificationChannelConfig(
+                            pauseMs = 500,
+                            workflow = WorkflowParser.parseYamlWorkflow(
+                                """
+                                    name: Start pipeline
+                                    nodes:
+                                      - id: pipeline
+                                        executorId: slot-pipeline-creation
+                                        data:
+                                          environment: ${slot.environment.name}
+                                          qualifier: null
+                                """.trimIndent()
                             )
-                        )
-                    ),
-                    projectEntity = pl,
-                    keywords = null,
-                    origin = "Test",
-                    contentTemplate = null,
-                    EventFactory.NEW_PROMOTION_RUN,
-                )
+                        ),
+                        projectEntity = pl,
+                        keywords = null,
+                        origin = "Test",
+                        contentTemplate = null,
+                        EventFactory.NEW_PROMOTION_RUN,
+                    )
 
-                build {
-                    // Promoting & launching the workflow
-                    promote(pl)
-
-                    // Waiting for this build to be into a pipeline
-                    waitUntil(
-                        message = "Build into pipeline",
-                        timeout = 10.seconds,
-                        interval = 1.seconds,
-                    ) {
-                        slotService.getCurrentPipeline(slot)?.build?.id == id
+                    build {
+                        promote(pl)
                     }
+                }
+                slot to build
+            } then { (slot, build) ->
+                // Waiting for this build to be into a pipeline
+                waitUntil(
+                    message = "Build into pipeline",
+                    timeout = 10.seconds,
+                    interval = 1.seconds,
+                ) {
+                    slotService.getCurrentPipeline(slot)?.build?.id == build.id
                 }
             }
         }
@@ -148,18 +158,21 @@ class SlotPipelineWorkflowNodeExecutorsIT : AbstractNotificationTestSupport() {
     @OptIn(ExperimentalTime::class)
     @Test
     fun `On a promotion, running a workflow to put a pipeline into a slot and send a link to this pipeline`() {
-        slotTestSupport.withSlot { slot ->
-            slot.project.branch {
-                val pl = promotionLevel()
+        val mockChannelTarget = uid("mock-")
+        asAdmin {
+            startNewTransaction {
+                val slot = slotTestSupport.slot()
+                val build = slot.project.branch<Build> {
+                    val pl = promotionLevel()
 
-                // Promotion subscription running a workflow which pushes the build into a slot
-                val mockChannelTarget = uid("mock-")
-                eventSubscriptionService.subscribe(
-                    name = "Start pipeline on promotion",
-                    channel = workflowNotificationChannel,
-                    channelConfig = WorkflowNotificationChannelConfig(
-                        workflow = WorkflowParser.parseYamlWorkflow(
-                            """
+                    // Promotion subscription running a workflow which pushes the build into a slot
+                    eventSubscriptionService.subscribe(
+                        name = "Start pipeline on promotion",
+                        channel = workflowNotificationChannel,
+                        channelConfig = WorkflowNotificationChannelConfig(
+                            pauseMs = 500,
+                            workflow = WorkflowParser.parseYamlWorkflow(
+                                """
                                 name: Start pipeline
                                 nodes:
                                   - id: pipeline
@@ -178,41 +191,43 @@ class SlotPipelineWorkflowNodeExecutorsIT : AbstractNotificationTestSupport() {
                                         template: |
                                             Build ${'$'}{build} has started its deployment at ${'$'}{#.pipeline?id=workflow.pipeline.targetPipelineId}
                             """
+                            ),
                         ),
-                    ),
-                    projectEntity = pl,
-                    keywords = null,
-                    origin = "Test",
-                    contentTemplate = null,
-                    EventFactory.NEW_PROMOTION_RUN,
-                )
-
-                build {
-                    // Promoting & launching the workflow
-                    promote(pl)
-
-                    // Waiting for this build to be into a pipeline
-                    waitUntil(
-                        message = "Build into pipeline",
-                        timeout = 10.seconds,
-                        interval = 1.seconds,
-                    ) {
-                        slotService.getCurrentPipeline(slot)?.build?.id == id
-                    }
-
-                    // Pipeline
-                    val pipeline = slotService.getCurrentPipeline(slot)
-                        ?: error("No current pipeline found")
-
-                    // Checking the message
-                    val message = mockNotificationChannel.targetMessages(mockChannelTarget).firstOrNull()
-                    assertEquals(
-                        """
-                            Build <a href="http://localhost:8080/#/build/$id">$name</a> has started its deployment at <a href="http://localhost:3000/ui/extension/environments/pipeline/${pipeline.id}">${pipeline.fullName()}</a>
-                        """.trimIndent().trim(),
-                        message?.trim()
+                        projectEntity = pl,
+                        keywords = null,
+                        origin = "Test",
+                        contentTemplate = null,
+                        EventFactory.NEW_PROMOTION_RUN,
                     )
+
+                    build {
+                        // Promoting & launching the workflow
+                        promote(pl)
+                    }
                 }
+                slot to build
+            } then { (slot, build) ->
+                // Waiting for this build to be into a pipeline
+                waitUntil(
+                    message = "Build into pipeline",
+                    timeout = 10.seconds,
+                    interval = 1.seconds,
+                ) {
+                    slotService.getCurrentPipeline(slot)?.build?.id == build.id
+                }
+
+                // Pipeline
+                val pipeline = slotService.getCurrentPipeline(slot)
+                    ?: error("No current pipeline found")
+
+                // Checking the message
+                mockNotificationChannel.waitUntilReceivedMessage(
+                    what = "Pipeline message",
+                    target = mockChannelTarget,
+                    expectedMessage = """
+                        Build <a href="http://localhost:8080/#/build/${build.id}">${build.name}</a> has started its deployment at <a href="http://localhost:3000/ui/extension/environments/pipeline/${pipeline.id}">${pipeline.fullName()}</a>
+                    """.trimIndent().trim()
+                )
             }
         }
     }
@@ -220,18 +235,21 @@ class SlotPipelineWorkflowNodeExecutorsIT : AbstractNotificationTestSupport() {
     @OptIn(ExperimentalTime::class)
     @Test
     fun `On a promotion, running a workflow to put a pipeline into a slot, deploying it and finishing it`() {
-        slotTestSupport.withSlot { slot ->
-            slot.project.branch {
-                val pl = promotionLevel()
+        asAdmin {
+            val mockChannelTarget = uid("mock-")
+            startNewTransaction {
+                val slot = slotTestSupport.slot()
+                val build = slot.project.branch<Build> {
+                    val pl = promotionLevel()
 
-                // Promotion subscription running a workflow which pushes the build into a slot
-                val mockChannelTarget = uid("mock-")
-                eventSubscriptionService.subscribe(
-                    name = "Start pipeline on promotion",
-                    channel = workflowNotificationChannel,
-                    channelConfig = WorkflowNotificationChannelConfig(
-                        workflow = WorkflowParser.parseYamlWorkflow(
-                            """
+                    // Promotion subscription running a workflow which pushes the build into a slot
+                    eventSubscriptionService.subscribe(
+                        name = "Start pipeline on promotion",
+                        channel = workflowNotificationChannel,
+                        channelConfig = WorkflowNotificationChannelConfig(
+                            pauseMs = 500,
+                            workflow = WorkflowParser.parseYamlWorkflow(
+                                """
                                 name: Start pipeline
                                 nodes:
                                   - id: start
@@ -271,48 +289,55 @@ class SlotPipelineWorkflowNodeExecutorsIT : AbstractNotificationTestSupport() {
                                         template: |
                                             Build ${'$'}{build} has been deployed at ${'$'}{#.pipeline?id=workflow.start.targetPipelineId}
                             """
+                            ),
                         ),
-                    ),
-                    projectEntity = pl,
-                    keywords = null,
-                    origin = "Test",
-                    contentTemplate = null,
-                    EventFactory.NEW_PROMOTION_RUN,
-                )
-
-                build {
-                    // Promoting & launching the workflow
-                    promote(pl)
-
-                    // Waiting for this build to be into a pipeline
-                    // ... and this pipeline must be deployed
-                    waitUntil(
-                        message = "Pipeline deployed",
-                        timeout = 10.seconds,
-                        interval = 1.seconds,
-                    ) {
-                        val pipeline = slotService.getCurrentPipeline(slot)
-                        pipeline?.build?.id == id && pipeline.status == SlotPipelineStatus.DEPLOYED
-                    }
-
-                    // Pipeline
-                    val pipeline = slotService.getCurrentPipeline(slot)
-                        ?: error("No current pipeline found")
-
-                    // Checking the messages
-                    val messages = mockNotificationChannel.targetMessages(mockChannelTarget)
-                    assertEquals(
-                        listOf(
-                            """
-                                Build <a href="http://localhost:8080/#/build/$id">$name</a> has started its deployment at <a href="http://localhost:3000/ui/extension/environments/pipeline/${pipeline.id}">${pipeline.fullName()}</a>
-                            """.trimIndent().trim(),
-                            """
-                                Build <a href="http://localhost:8080/#/build/$id">$name</a> has been deployed at <a href="http://localhost:3000/ui/extension/environments/pipeline/${pipeline.id}">${pipeline.fullName()}</a>
-                            """.trimIndent().trim(),
-                        ),
-                        messages.map { it.trim() }
+                        projectEntity = pl,
+                        keywords = null,
+                        origin = "Test",
+                        contentTemplate = null,
+                        EventFactory.NEW_PROMOTION_RUN,
                     )
+                    build {
+                        // Promoting & launching the workflow
+                        promote(pl)
+                    }
                 }
+                slot to build
+            } then { (slot, build) ->
+
+                // Waiting for this build to be into a pipeline
+                // ... and this pipeline must be deployed
+                waitUntil(
+                    message = "Pipeline deployed",
+                    timeout = 10.seconds,
+                    interval = 1.seconds,
+                ) {
+                    val pipeline = slotService.getCurrentPipeline(slot)
+                    pipeline?.build?.id == build.id && pipeline.status == SlotPipelineStatus.DEPLOYED
+                }
+
+                // Pipeline
+                val pipeline = slotService.getCurrentPipeline(slot)
+                    ?: error("No current pipeline found")
+
+                // Checking the messages
+                mockNotificationChannel.waitUntilReceivedCountMessages(
+                    what = "Received messages",
+                    target = mockChannelTarget,
+                    expectedCount = 2,
+                )
+                val messages = mockNotificationChannel.targetMessages(mockChannelTarget)
+                assertEquals(
+                    listOf(
+                        """
+                            Build <a href="http://localhost:8080/#/build/${build.id}">${build.name}</a> has started its deployment at <a href="http://localhost:3000/ui/extension/environments/pipeline/${pipeline.id}">${pipeline.fullName()}</a>
+                        """.trimIndent().trim(),
+                        """
+                            Build <a href="http://localhost:8080/#/build/${build.id}">${build.name}</a> has been deployed at <a href="http://localhost:3000/ui/extension/environments/pipeline/${pipeline.id}">${pipeline.fullName()}</a>
+                        """.trimIndent().trim(),
+                    ),
+                    messages.map { it.trim() }
+                )
             }
         }
     }

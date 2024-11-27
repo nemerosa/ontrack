@@ -14,7 +14,6 @@ import kotlin.test.fail
 
 @TestPropertySource(
     properties = [
-        "net.nemerosa.ontrack.extension.workflows.store=memory",
         "ontrack.extension.queue.general.async=false",
     ]
 )
@@ -178,7 +177,7 @@ class SlotWorkflowServiceGraphQLIT : AbstractQLKTITSupport() {
                 assertEquals(slotWorkflowInstance.slotWorkflow.id, node.path("slotWorkflow").path("id").asText())
                 val workflowInstanceNode = node.path("workflowInstance")
                 assertTrue(workflowInstanceNode.path("id").asText().isNotBlank())
-                assertEquals("SUCCESS", workflowInstanceNode.path("status").asText())
+                assertEquals("RUNNING", workflowInstanceNode.path("status").asText())
                 assertEquals(slotWorkflow.workflow.name, workflowInstanceNode.path("workflow").path("name").asText())
             }
         }

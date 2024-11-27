@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+    <logger name="net.nemerosa.ontrack" level="INFO"/>
+    <logger name="net.nemerosa.ontrack.extension.workflows" level="DEBUG"/>
+    <!--<logger name="net.nemerosa.ontrack.common.Utils" level="TRACE"/>-->
+
+</configuration>

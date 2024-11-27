@@ -9,6 +9,11 @@ import net.nemerosa.ontrack.model.events.EventRenderer
 interface TemplatingService {
 
     /**
+     * Checks if a string is a template
+     */
+    fun isTemplate(templating: String): Boolean
+
+    /**
      * Checks if a given template contains legacy templating
      * and no new syntax.
      */

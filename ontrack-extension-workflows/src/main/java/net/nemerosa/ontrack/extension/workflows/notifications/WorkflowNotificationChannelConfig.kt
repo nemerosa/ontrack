@@ -8,4 +8,6 @@ data class WorkflowNotificationChannelConfig(
     @APIDescription("Workflow to run")
     @DocumentationField
     val workflow: Workflow,
+    @APIDescription("(used for test only) Short pause before launching the workflow")
+    val pauseMs: Long = 0,
 )

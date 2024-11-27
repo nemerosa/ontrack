@@ -1,10 +1,13 @@
 package net.nemerosa.ontrack.extension.workflows.repository
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceNode
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceNodeStatus
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.model.events.SerializableEvent
+import net.nemerosa.ontrack.model.events.merge
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
@@ -90,14 +93,6 @@ class WorkflowInstanceRepository(dataSource: DataSource) : AbstractJdbcRepositor
     )
 
     fun nodeWaiting(instanceId: String, nodeId: String) {
-        nodeStatus(instanceId, nodeId, WorkflowInstanceNodeStatus.WAITING)
-    }
-
-    fun nodeStarted(instanceId: String, nodeId: String) {
-        nodeStatus(instanceId, nodeId, WorkflowInstanceNodeStatus.STARTED)
-    }
-
-    private fun nodeStatus(instanceId: String, nodeId: String, status: WorkflowInstanceNodeStatus) {
         namedParameterJdbcTemplate!!.update(
             """
                 UPDATE WKF_INSTANCE_NODES
@@ -108,16 +103,36 @@ class WorkflowInstanceRepository(dataSource: DataSource) : AbstractJdbcRepositor
             mapOf(
                 "instanceId" to instanceId,
                 "nodeId" to nodeId,
-                "status" to status.name,
+                "status" to WorkflowInstanceNodeStatus.WAITING.name,
             )
         )
     }
 
-    fun nodeSuccess(instanceId: String, nodeId: String, output: JsonNode?) {
+    fun nodeStarted(instanceId: String, nodeId: String) {
         namedParameterJdbcTemplate!!.update(
             """
                 UPDATE WKF_INSTANCE_NODES
-                SET STATUS = :status, OUTPUT = CAST(:output as JSONB)
+                SET STATUS = :status, START_TIME = :startTime
+                WHERE INSTANCE_ID = :instanceId
+                AND NODE_ID = :nodeId
+            """.trimIndent(),
+            mapOf(
+                "instanceId" to instanceId,
+                "nodeId" to nodeId,
+                "status" to WorkflowInstanceNodeStatus.STARTED.name,
+                "startTime" to dateTimeForDB(Time.now),
+            )
+        )
+    }
+
+    fun nodeSuccess(instanceId: String, nodeId: String, output: JsonNode?, event: SerializableEvent?) {
+        if (event != null) {
+            mergeInstanceEvent(instanceId, event)
+        }
+        namedParameterJdbcTemplate!!.update(
+            """
+                UPDATE WKF_INSTANCE_NODES
+                SET STATUS = :status, OUTPUT = CAST(:output as JSONB), END_TIME = :endTime
                 WHERE INSTANCE_ID = :instanceId
                 AND NODE_ID = :nodeId
             """.trimIndent(),
@@ -126,6 +141,38 @@ class WorkflowInstanceRepository(dataSource: DataSource) : AbstractJdbcRepositor
                 "nodeId" to nodeId,
                 "status" to WorkflowInstanceNodeStatus.SUCCESS.name,
                 "output" to writeJson(output),
+                "endTime" to dateTimeForDB(Time.now),
+            )
+        )
+    }
+
+    private fun mergeInstanceEvent(instanceId: String, event: SerializableEvent) {
+        // Locking the existing event
+        val existingEvent = namedParameterJdbcTemplate!!.query(
+            """
+                SELECT EVENT
+                FROM WKF_INSTANCES
+                WHERE ID = :instanceId
+                FOR UPDATE
+            """.trimIndent(),
+            mapOf(
+                "instanceId" to instanceId,
+            )
+        ) { rs, _ ->
+            readJson(rs, "EVENT").parse<SerializableEvent>()
+        }.first()
+        // Merging the two events
+        val mergedEvent: SerializableEvent = existingEvent.merge(event)
+        // Saving the event back
+        namedParameterJdbcTemplate!!.update(
+            """
+                UPDATE WKF_INSTANCES
+                SET EVENT = CAST(:event AS JSONB)
+                WHERE ID = :instanceId
+            """.trimIndent(),
+            mapOf(
+                "instanceId" to instanceId,
+                "event" to writeJson(mergedEvent)
             )
         )
     }
@@ -147,19 +194,21 @@ class WorkflowInstanceRepository(dataSource: DataSource) : AbstractJdbcRepositor
     }
 
     fun nodeError(instanceId: String, nodeId: String, message: String?, output: JsonNode?) {
+        val actualOutput = output ?: getNodeOutput(instanceId, nodeId)
         namedParameterJdbcTemplate!!.update(
             """
                 UPDATE WKF_INSTANCE_NODES
-                SET STATUS = :status, OUTPUT = CAST(:output as JSONB), ERROR = :error
+                SET STATUS = :status, OUTPUT = CAST(:output as JSONB), ERROR = :error, END_TIME = :endTime
                 WHERE INSTANCE_ID = :instanceId
                 AND NODE_ID = :nodeId
             """.trimIndent(),
             mapOf(
                 "instanceId" to instanceId,
                 "nodeId" to nodeId,
-                "status" to WorkflowInstanceNodeStatus.SUCCESS.name,
-                "output" to writeJson(output),
+                "status" to WorkflowInstanceNodeStatus.ERROR.name,
+                "output" to writeJson(actualOutput),
                 "error" to message,
+                "endTime" to dateTimeForDB(Time.now),
             )
         )
     }
@@ -168,7 +217,7 @@ class WorkflowInstanceRepository(dataSource: DataSource) : AbstractJdbcRepositor
         namedParameterJdbcTemplate!!.update(
             """
                 UPDATE WKF_INSTANCE_NODES
-                SET STATUS = :status, ERROR = :error
+                SET STATUS = :status, ERROR = :error, END_TIME = :endTime
                 WHERE INSTANCE_ID = :instanceId
                 AND NODE_ID = :nodeId
             """.trimIndent(),
@@ -177,6 +226,7 @@ class WorkflowInstanceRepository(dataSource: DataSource) : AbstractJdbcRepositor
                 "nodeId" to nodeId,
                 "status" to WorkflowInstanceNodeStatus.CANCELLED.name,
                 "error" to message,
+                "endTime" to dateTimeForDB(Time.now),
             )
         )
     }
@@ -195,6 +245,22 @@ class WorkflowInstanceRepository(dataSource: DataSource) : AbstractJdbcRepositor
             ),
             String::class.java
         )?.let { WorkflowInstanceNodeStatus.valueOf(it) }
+
+    fun getNodeOutput(instanceId: String, nodeId: String): JsonNode? =
+        namedParameterJdbcTemplate!!.query(
+            """
+                SELECT OUTPUT
+                FROM WKF_INSTANCE_NODES
+                WHERE INSTANCE_ID = :instanceId
+                AND NODE_ID = :nodeId
+            """.trimIndent(),
+            mapOf(
+                "instanceId" to instanceId,
+                "nodeId" to nodeId,
+            ),
+        ) { rs, _ ->
+            readJson(rs, "OUTPUT")
+        }.firstOrNull()
 
     fun stopInstance(instanceId: String) {
         findWorkflowInstance(instanceId)?.let { instance ->

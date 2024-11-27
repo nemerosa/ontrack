@@ -6,7 +6,6 @@ import org.springframework.test.context.TestPropertySource
 
 @TestPropertySource(
     properties = [
-        "net.nemerosa.ontrack.extension.workflows.store=memory",
         "ontrack.extension.queue.general.async=false",
     ]
 )

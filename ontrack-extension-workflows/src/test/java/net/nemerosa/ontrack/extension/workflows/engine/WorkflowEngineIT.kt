@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.workflows.AbstractWorkflowTestSupport
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowFixtures
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowValidationException
 import net.nemerosa.ontrack.extension.workflows.mock.MockWorkflowNodeExecutor
+import net.nemerosa.ontrack.extension.workflows.registry.WorkflowParser
 import net.nemerosa.ontrack.it.waitUntil
 import net.nemerosa.ontrack.model.events.MockEventType
 import net.nemerosa.ontrack.model.events.SerializableEventService
@@ -29,7 +30,7 @@ class WorkflowEngineIT : AbstractWorkflowTestSupport() {
     @Test
     fun `Simple linear workflow`() {
         // Defining a workflow
-        val workflow = WorkflowFixtures.simpleLinearWorkflow()
+        val workflow = WorkflowParser.parseYamlWorkflow(WorkflowFixtures.simpleLinearWorkflowYaml)
         // Event
         val event = serializableEventService.dehydrate(
             MockEventType.mockEvent("Linear")
@@ -217,7 +218,7 @@ class WorkflowEngineIT : AbstractWorkflowTestSupport() {
                 - id: end
                   executorId: mock
                   data:
-                    text: End of (#parallel-a) and (#parallel-b)
+                    text: End of (${'$'}{workflow.parallel-a.text}) and (${'$'}{workflow.parallel-b.text})
                   parents:
                     - id: parallel-a
                     - id: parallel-b

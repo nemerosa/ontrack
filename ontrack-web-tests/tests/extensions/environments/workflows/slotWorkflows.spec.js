@@ -190,11 +190,17 @@ test('API - workflow on promotion leading to the deployment of a build', async (
                     },
                     {
                         id: "deploying",
+                        parents: [
+                            {id: "start"}
+                        ],
                         executorId: "slot-pipeline-deploying",
                         data: {}
                     },
                     {
                         id: "deployed",
+                        parents: [
+                            {id: "deploying"}
+                        ],
                         executorId: "slot-pipeline-deployed",
                         data: {}
                     },

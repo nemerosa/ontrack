@@ -4,8 +4,8 @@ import net.nemerosa.ontrack.extension.notifications.channels.NotificationResultT
 import net.nemerosa.ontrack.extension.workflows.AbstractWorkflowTestSupport
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowNode
-import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceStore
-import net.nemerosa.ontrack.extension.workflows.engine.getById
+import net.nemerosa.ontrack.extension.workflows.engine.WorkflowEngine
+import net.nemerosa.ontrack.extension.workflows.engine.getWorkflowInstance
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.MockEventType
@@ -20,7 +20,7 @@ class WorkflowNotificationChannelIT : AbstractWorkflowTestSupport() {
     private lateinit var workflowNotificationChannel: WorkflowNotificationChannel
 
     @Autowired
-    private lateinit var workflowInstanceStore: WorkflowInstanceStore
+    private lateinit var workflowEngine: WorkflowEngine
 
     @Test
     fun `Workflow is renamed before being launched`() {
@@ -54,7 +54,7 @@ class WorkflowNotificationChannelIT : AbstractWorkflowTestSupport() {
         assertEquals(NotificationResultType.ASYNC, result.type)
         assertNotNull(result.output) { output ->
             val instanceId = output.workflowInstanceId
-            val instance = workflowInstanceStore.getById(instanceId)
+            val instance = workflowEngine.getWorkflowInstance(instanceId)
             assertEquals(
                 "For project ${project.name}",
                 instance.workflow.name,

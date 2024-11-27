@@ -8,13 +8,13 @@ import net.nemerosa.ontrack.extension.workflows.WorkflowsExtensionFeature
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutor
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorResult
-import net.nemerosa.ontrack.extension.workflows.templating.WorkflowInfoTemplatingRenderable
-import net.nemerosa.ontrack.extension.workflows.templating.WorkflowTemplatingRenderable
+import net.nemerosa.ontrack.extension.workflows.templating.WorkflowTemplatingContext
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.docs.DocumentationExampleCode
+import net.nemerosa.ontrack.model.security.SecurityService
 import org.springframework.stereotype.Component
 
 @Component
@@ -42,6 +42,7 @@ class WorkflowNotificationChannelNodeExecutor(
     workflowsExtensionFeature: WorkflowsExtensionFeature,
     private val notificationProcessingService: NotificationProcessingService,
     private val workflowNotificationItemConverter: WorkflowNotificationItemConverter,
+    private val securityService: SecurityService,
 ) : AbstractExtension(workflowsExtensionFeature), WorkflowNodeExecutor {
 
     companion object {
@@ -59,18 +60,17 @@ class WorkflowNotificationChannelNodeExecutor(
         // Gets the node's data
         val (channel, channelConfig, template) = workflowInstance.workflow.getNode(workflowNodeId).data.parse<WorkflowNotificationChannelNodeData>()
         // Creating the notification item
-        val notification = workflowNotificationItemConverter.convertFromQueue(
-            instanceId = workflowInstance.id,
-            channel = channel,
-            channelConfig = channelConfig,
-            template = template,
-            event = workflowInstance.event
-        )
+        val notification = securityService.asAdmin {
+            workflowNotificationItemConverter.convertFromQueue(
+                instanceId = workflowInstance.id,
+                channel = channel,
+                channelConfig = channelConfig,
+                template = template,
+                event = workflowInstance.event
+            )
+        }
         // Enriches the context
-        val context = mapOf(
-            "workflow" to WorkflowTemplatingRenderable(workflowInstance),
-            "workflowInfo" to WorkflowInfoTemplatingRenderable(workflowInstance),
-        )
+        val context = WorkflowTemplatingContext.createTemplatingContext(workflowInstance)
         // Feedback
         val outputFeedback = { output: Any? ->
             workflowNodeExecutorResultFeedback(output?.asJson())

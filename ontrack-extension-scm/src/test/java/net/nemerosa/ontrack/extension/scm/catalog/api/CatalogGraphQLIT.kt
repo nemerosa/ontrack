@@ -7,17 +7,18 @@ import net.nemerosa.ontrack.extension.scm.catalog.CatalogLinkService
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalog
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogAccessFunction
 import net.nemerosa.ontrack.extension.scm.catalog.mock.MockSCMCatalogProvider
-import net.nemerosa.ontrack.graphql.AbstractQLKTITJUnit4Support
+import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getTextField
 import net.nemerosa.ontrack.model.security.Roles
-import org.junit.Test
+import net.nemerosa.ontrack.test.assertJsonNotNull
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-class CatalogGraphQLIT : AbstractQLKTITJUnit4Support() {
+class CatalogGraphQLIT : AbstractQLKTITSupport() {
 
     @Autowired
     private lateinit var scmCatalog: SCMCatalog
@@ -171,6 +172,7 @@ class CatalogGraphQLIT : AbstractQLKTITJUnit4Support() {
     @Test
     fun `Collection of entries and linking`() {
         scmCatalogProvider.clear()
+        deleteAllProjects()
         // Registration of mock entry
         val entry = entry(scm = "mocking", repository = "project/repository", config = "my-config")
         scmCatalogProvider.storeEntry(entry)
@@ -181,21 +183,22 @@ class CatalogGraphQLIT : AbstractQLKTITJUnit4Support() {
             asUserWith<SCMCatalogAccessFunction, JsonNode> {
                 run(
                     """{
-                    scmCatalog {
-                        pageItems {
-                            entry {
-                                scm
-                                config
-                                repository
-                                repositoryPage
+                        scmCatalog(scm: "mocking") {
+                            pageItems {
+                                entry {
+                                    scm
+                                    config
+                                    repository
+                                    repositoryPage
+                                }
                             }
                         }
-                    }
-                }"""
+                    }"""
                 )
             }
         }
         val item = collectionData["scmCatalog"]["pageItems"][0]
+        assertJsonNotNull(item["entry"], "Entry is defined")
         assertEquals("mocking", item["entry"]["scm"].asText())
         assertEquals("my-config", item["entry"]["config"].asText())
         assertEquals("project/repository", item["entry"]["repository"].asText())

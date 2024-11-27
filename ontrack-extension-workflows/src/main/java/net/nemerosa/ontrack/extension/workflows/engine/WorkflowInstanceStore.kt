@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.workflows.engine
 
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 
+@Deprecated("Use database access")
 interface WorkflowInstanceStore {
 
     fun store(instance: WorkflowInstance): WorkflowInstance

@@ -25,6 +25,8 @@ class WorkflowTestSupport(
 
     private fun displayInstance(instanceId: String) {
         val workflowInstance = workflowEngine.getWorkflowInstance(instanceId)
+        println("status = ${workflowInstance.status}")
+        println("durations (ms) = ${workflowInstance.durationMs}")
         workflowInstance.nodesExecutions.forEach { node ->
             println("node = ${node.id}")
             println("   * status = ${node.status}")
@@ -77,7 +79,7 @@ class WorkflowTestSupport(
     @OptIn(ExperimentalTime::class)
     fun waitForWorkflowInstance(instanceId: String, timeout: Duration = 10.seconds) {
         try {
-            waitUntil("Waiting until workflow is complete", timeout = timeout) {
+            waitUntil("Waiting until workflow is complete", timeout = timeout, interval = 1.seconds) {
                 val workflowInstance = workflowEngine.getWorkflowInstance(instanceId)
                 println("workflowInstance = $workflowInstance")
                 workflowInstance.status.finished

@@ -2,8 +2,7 @@ package net.nemerosa.ontrack.extension.environments.workflows
 
 import net.nemerosa.ontrack.extension.environments.SlotPipeline
 import net.nemerosa.ontrack.extension.environments.storage.SlotPipelineRepository
-import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceStore
-import net.nemerosa.ontrack.extension.workflows.engine.getById
+import net.nemerosa.ontrack.extension.workflows.repository.WorkflowInstanceRepository
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
@@ -14,7 +13,7 @@ class SlotWorkflowInstanceRepository(
     dataSource: DataSource,
     private val slotPipelineRepository: SlotPipelineRepository,
     private val slotWorkflowRepository: SlotWorkflowRepository,
-    private val workflowInstanceStore: WorkflowInstanceStore,
+    private val workflowInstanceRepository: WorkflowInstanceRepository,
 ) : AbstractJdbcRepository(dataSource) {
 
     fun addSlotWorkflowInstance(slotWorkflowInstance: SlotWorkflowInstance) {
@@ -64,13 +63,17 @@ class SlotWorkflowInstanceRepository(
             toSlotWorkflowInstance(rs)
         }.firstOrNull()
 
-    private fun toSlotWorkflowInstance(rs: ResultSet) = SlotWorkflowInstance(
-        id = rs.getString("id"),
-        start = dateTimeFromDB(rs.getString("start"))!!,
-        pipeline = slotPipelineRepository.getPipelineById(rs.getString("pipeline_id")),
-        slotWorkflow = slotWorkflowRepository.getSlotWorkflowById(rs.getString("slot_workflow_id")),
-        workflowInstance = workflowInstanceStore.getById(rs.getString("workflow_instance_id")),
-    )
+    private fun toSlotWorkflowInstance(rs: ResultSet): SlotWorkflowInstance {
+        val workflowInstanceId = rs.getString("workflow_instance_id")
+        return SlotWorkflowInstance(
+            id = rs.getString("id"),
+            start = dateTimeFromDB(rs.getString("start"))!!,
+            pipeline = slotPipelineRepository.getPipelineById(rs.getString("pipeline_id")),
+            slotWorkflow = slotWorkflowRepository.getSlotWorkflowById(rs.getString("slot_workflow_id")),
+            workflowInstance = workflowInstanceRepository.findWorkflowInstance(workflowInstanceId)
+                ?: error("Cannot find workflow instance with ID: $workflowInstanceId"),
+        )
+    }
 
     fun findSlotWorkflowInstanceByPipelineAndSlotWorkflow(
         pipeline: SlotPipeline,

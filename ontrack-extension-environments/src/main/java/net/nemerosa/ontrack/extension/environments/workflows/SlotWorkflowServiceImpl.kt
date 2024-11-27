@@ -65,6 +65,7 @@ class SlotWorkflowServiceImpl(
         val workflowInstance = workflowEngine.startWorkflow(
             workflow = slotWorkflow.workflow,
             event = workflowEvent,
+            pauseMs = slotWorkflow.pauseMs,
         )
         // Slot workflow instance record
         val slotWorkflowInstance = SlotWorkflowInstance(

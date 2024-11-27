@@ -29,4 +29,13 @@ data class WorkflowNode(
     val parents: List<WorkflowParentNode> = emptyList(),
     @APIDescription("Timeout in seconds (5 minutes by default)")
     val timeout: Long = 5 * 60,
-)
+) {
+    fun addParent(node: WorkflowNode) = WorkflowNode(
+        id = id,
+        description = description,
+        executorId = executorId,
+        data = data,
+        parents = parents + WorkflowParentNode(node.id),
+        timeout = timeout
+    )
+}

@@ -20,12 +20,11 @@ class SlotTestSupport : AbstractDSLTestSupport() {
     @Autowired
     private lateinit var slotService: SlotService
 
-    fun withSlot(
+    fun slot(
         order: Int = 1,
         environment: Environment? = null,
         project: Project = project(),
         qualifier: String = Slot.DEFAULT_QUALIFIER,
-        code: (slot: Slot) -> Unit,
     ): Slot =
         asAdmin {
             val env = environment ?: environmentTestSupport.withEnvironment(order = order) {}
@@ -35,8 +34,22 @@ class SlotTestSupport : AbstractDSLTestSupport() {
                 qualifier = qualifier,
             )
             slotService.addSlot(slot)
-            code(slot)
             slot
+        }
+
+    fun withSlot(
+        order: Int = 1,
+        environment: Environment? = null,
+        project: Project = project(),
+        qualifier: String = Slot.DEFAULT_QUALIFIER,
+        code: (slot: Slot) -> Unit,
+    ): Slot =
+        slot(
+            order, environment, project, qualifier
+        ).apply {
+            asAdmin {
+                code(this)
+            }
         }
 
     fun withSlotPipeline(

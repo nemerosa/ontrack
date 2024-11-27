@@ -14,18 +14,22 @@ data class SlotWorkflow(
     val trigger: SlotWorkflowTrigger,
     @APIDescription("Workflow to run")
     val workflow: Workflow,
+    @APIDescription("(test only) Pause before running the worflow")
+    val pauseMs: Long = 0,
 ) {
     fun withTrigger(trigger: SlotWorkflowTrigger) = SlotWorkflow(
         id = id,
         slot = slot,
         trigger = trigger,
-        workflow = workflow
+        workflow = workflow,
+        pauseMs = pauseMs,
     )
 
     fun withWorkflow(workflow: Workflow) = SlotWorkflow(
         id = id,
         slot = slot,
         trigger = trigger,
-        workflow = workflow
+        workflow = workflow,
+        pauseMs = pauseMs,
     )
 }
