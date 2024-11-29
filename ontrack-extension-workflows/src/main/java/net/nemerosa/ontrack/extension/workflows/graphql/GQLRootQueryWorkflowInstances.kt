@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.workflows.graphql
 import graphql.schema.GraphQLFieldDefinition
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceFilter
-import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceStore
+import net.nemerosa.ontrack.extension.workflows.repository.WorkflowInstanceRepository
 import net.nemerosa.ontrack.graphql.schema.GQLRootQuery
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component
 class GQLRootQueryWorkflowInstances(
     private val gqlPaginatedListFactory: GQLPaginatedListFactory,
     private val gqlTypeWorkflowInstance: GQLTypeWorkflowInstance,
-    private val workflowInstanceStore: WorkflowInstanceStore,
+    private val workflowInstanceRepository: WorkflowInstanceRepository,
 ) : GQLRootQuery {
     override fun getFieldDefinition(): GraphQLFieldDefinition =
         gqlPaginatedListFactory.createPaginatedField<Any?, WorkflowInstance>(
@@ -27,7 +27,7 @@ class GQLRootQueryWorkflowInstances(
             ),
             itemPaginatedListProvider = { env, _, offset, size ->
                 val name: String? = env.getArgument(ARG_NAME)
-                workflowInstanceStore.findByFilter(
+                workflowInstanceRepository.findInstances(
                     WorkflowInstanceFilter(
                         offset = offset,
                         size = size,

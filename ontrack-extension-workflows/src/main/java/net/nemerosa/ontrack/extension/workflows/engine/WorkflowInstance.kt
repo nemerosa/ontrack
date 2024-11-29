@@ -30,6 +30,16 @@ data class WorkflowInstance(
         const val EVENT_INSTANCE_ID = "workflowInstanceId"
     }
 
+    private fun withTimestamp(timestamp: LocalDateTime) = WorkflowInstance(
+        id = id,
+        timestamp = timestamp,
+        workflow = workflow,
+        event = event,
+        nodesExecutions = nodesExecutions,
+    )
+
+    fun truncateTimestamp() = withTimestamp(Time.truncate(timestamp))
+
     @get:JsonIgnore
     val startTime: LocalDateTime? by lazy {
         nodesExecutions.mapNotNull { it.startTime }.minOrNull()

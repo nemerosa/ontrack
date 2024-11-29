@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.environments.SlotTestSupport
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.extension.notifications.AbstractNotificationTestSupport
 import net.nemerosa.ontrack.extension.notifications.subscriptions.subscribe
+import net.nemerosa.ontrack.extension.queue.QueueNoAsync
 import net.nemerosa.ontrack.extension.workflows.notifications.WorkflowNotificationChannel
 import net.nemerosa.ontrack.extension.workflows.notifications.WorkflowNotificationChannelConfig
 import net.nemerosa.ontrack.extension.workflows.registry.WorkflowParser
@@ -16,17 +17,12 @@ import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.test.context.TestPropertySource
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
-@TestPropertySource(
-    properties = [
-        "ontrack.extension.queue.general.async=false",
-    ]
-)
+@QueueNoAsync
 class SlotPipelineWorkflowNodeExecutorsIT : AbstractNotificationTestSupport() {
 
     @Autowired

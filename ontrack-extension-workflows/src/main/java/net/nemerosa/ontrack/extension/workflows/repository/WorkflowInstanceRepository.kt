@@ -3,14 +3,17 @@ package net.nemerosa.ontrack.extension.workflows.repository
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
+import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceFilter
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceNode
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceNodeStatus
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.events.SerializableEvent
 import net.nemerosa.ontrack.model.events.merge
+import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
+import java.time.LocalDateTime
 import javax.sql.DataSource
 
 @Repository
@@ -271,6 +274,78 @@ class WorkflowInstanceRepository(dataSource: DataSource) : AbstractJdbcRepositor
                 }
             }
         }
+    }
+
+    fun findInstances(workflowInstanceFilter: WorkflowInstanceFilter): PaginatedList<WorkflowInstance> {
+
+        val criterias = mutableListOf<String>()
+        val params = mutableMapOf<String, Any?>()
+
+        if (!workflowInstanceFilter.name.isNullOrBlank()) {
+            criterias += "WORKFLOW::JSONB->>'name' = :name"
+            params["name"] = workflowInstanceFilter.name
+        }
+
+        val where = if (criterias.isEmpty()) {
+            ""
+        } else {
+            "WHERE " + criterias.joinToString(" AND ") { "($it)" }
+        }
+
+        val count = namedParameterJdbcTemplate!!.queryForObject(
+            """
+                SELECT COUNT(*)
+                FROM WKF_INSTANCES
+                $where
+            """.trimIndent(),
+            params,
+            Int::class.java
+        ) ?: 0
+
+        val items = namedParameterJdbcTemplate!!.query(
+            """
+                SELECT *
+                FROM WKF_INSTANCES
+                $where
+                LIMIT :limit
+                OFFSET :offset
+            """.trimIndent(),
+            params + mapOf(
+                "limit" to workflowInstanceFilter.size,
+                "offset" to workflowInstanceFilter.offset
+            )
+        ) { rs, _ ->
+            toWorkflowInstance(rs)
+        }
+
+        return PaginatedList.create(
+            items = items,
+            offset = workflowInstanceFilter.offset,
+            pageSize = workflowInstanceFilter.size,
+            total = count
+        )
+    }
+
+    fun clearAll() {
+        jdbcTemplate!!.update(
+            """
+                -- noinspection SqlWithoutWhere
+                DELETE FROM WKF_INSTANCES
+            """.trimIndent()
+        )
+    }
+
+    fun cleanup(time: LocalDateTime) {
+        val timestamp = dateTimeForDB(time)!!
+        namedParameterJdbcTemplate!!.update(
+            """
+                DELETE FROM WKF_INSTANCES
+                WHERE TIMESTAMP < :timestamp
+            """.trimIndent(),
+            mapOf(
+                "timestamp" to timestamp,
+            )
+        )
     }
 
 }

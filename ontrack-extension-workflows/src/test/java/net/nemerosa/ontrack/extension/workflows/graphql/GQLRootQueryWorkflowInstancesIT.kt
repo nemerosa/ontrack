@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.workflows.graphql
 
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceFixtures
-import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceStore
+import net.nemerosa.ontrack.extension.workflows.repository.WorkflowInstanceRepository
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.json.getRequiredTextField
 import org.junit.jupiter.api.Test
@@ -11,15 +11,15 @@ import kotlin.test.assertEquals
 class GQLRootQueryWorkflowInstancesIT : AbstractQLKTITSupport() {
 
     @Autowired
-    private lateinit var workflowInstanceStore: WorkflowInstanceStore
+    private lateinit var workflowInstanceRepository: WorkflowInstanceRepository
 
     @Test
     fun `Getting a list of workflow instances using the GraphQL API`() {
         asAdmin {
-            workflowInstanceStore.clearAll()
+            workflowInstanceRepository.clearAll()
 
             val instance = WorkflowInstanceFixtures.simpleLinear()
-            workflowInstanceStore.store(instance)
+            workflowInstanceRepository.createInstance(instance)
 
             run(
                 """{

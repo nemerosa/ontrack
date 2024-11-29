@@ -10,14 +10,7 @@ import java.time.temporal.ChronoUnit
 @ConfigurationProperties(prefix = "ontrack.config.extension.workflows")
 class WorkflowConfigurationProperties {
 
-    var mode: WorkflowMode = WorkflowMode.LEGACY
-
     @DurationUnit(ChronoUnit.SECONDS)
     var parentWaitingInterval: Duration = Duration.ofSeconds(1)
 
-}
-
-enum class WorkflowMode {
-    LEGACY,
-    PARALLEL,
 }

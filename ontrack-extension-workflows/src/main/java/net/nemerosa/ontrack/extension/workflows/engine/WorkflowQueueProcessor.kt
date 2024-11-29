@@ -15,14 +15,18 @@ class WorkflowQueueProcessor(
         applicationContext.getBean(WorkflowEngine::class.java)
     }
 
-    override val id: String = "workflows"
+    override val id: String = "workflow"
+    override val payloadType: KClass<WorkflowQueuePayload> = WorkflowQueuePayload::class
 
     /**
      * Minimum of 5 queues for the workflows.
      */
     override val defaultScale: Int = 5
 
-    override val payloadType: KClass<WorkflowQueuePayload> = WorkflowQueuePayload::class
+    /**
+     * Immediately ack the messages
+     */
+    override val ackMode: QueueAckMode = QueueAckMode.IMMEDIATE
 
     override fun isCancelled(payload: WorkflowQueuePayload): String? = null
 
@@ -33,8 +37,7 @@ class WorkflowQueueProcessor(
         )
     }
 
-    override fun getRoutingIdentifier(payload: WorkflowQueuePayload): String = payload.workflowInstanceId
-
-    override val ackMode: QueueAckMode = QueueAckMode.IMMEDIATE
+    override fun getRoutingIdentifier(payload: WorkflowQueuePayload): String =
+        "${payload.workflowInstanceId}-${payload.workflowNodeId}"
 
 }

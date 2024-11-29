@@ -1,22 +1,18 @@
 package net.nemerosa.ontrack.extension.environments.workflows
 
 import net.nemerosa.ontrack.extension.environments.SlotTestSupport
+import net.nemerosa.ontrack.extension.queue.QueueNoAsync
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.test.context.TestPropertySource
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.test.fail
 
-@TestPropertySource(
-    properties = [
-        "ontrack.extension.queue.general.async=false",
-    ]
-)
+@QueueNoAsync
 class SlotWorkflowServiceGraphQLIT : AbstractQLKTITSupport() {
 
     @Autowired
