@@ -1,25 +1,32 @@
 import {Space} from "antd";
-import {FaCheckCircle, FaSpinner, FaStop, FaTimesCircle} from "react-icons/fa";
+import {FaCheckCircle, FaHourglass, FaSpinner, FaStop, FaTimesCircle} from "react-icons/fa";
 
 export default function WorkflowInstanceNodeStatus({status}) {
     return (
         <>
             {
-                status === 'IDLE' &&
+                status === 'CREATED' &&
                 <Space>
-                    <FaSpinner color="green"/>
+                    <FaSpinner color="gray" className="anticon-spin"/>
                     Idle
+                </Space>
+            }
+            {
+                status === 'WAITING' &&
+                <Space>
+                    <FaHourglass color="blue" className="anticon-spin"/>
+                    Waiting
                 </Space>
             }
             {
                 status === 'STARTED' &&
                 <Space>
-                    <FaSpinner color="blue"/>
+                    <FaSpinner color="green" className="anticon-spin"/>
                     Started
                 </Space>
             }
             {
-                status === 'STOPPED' &&
+                status === 'CANCELLED' &&
                 <Space>
                     <FaStop color="red"/>
                     Stopped
