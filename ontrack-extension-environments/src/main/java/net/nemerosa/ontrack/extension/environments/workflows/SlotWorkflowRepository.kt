@@ -17,17 +17,19 @@ class SlotWorkflowRepository(
     fun addSlotWorkflow(slotWorkflow: SlotWorkflow) {
         namedParameterJdbcTemplate!!.update(
             """
-                INSERT INTO ENV_SLOT_WORKFLOWS(ID, SLOT_ID, TRIGGER, WORKFLOW)
-                 VALUES (:id, :slotId, :trigger, CAST(:workflow AS JSONB))
+                INSERT INTO ENV_SLOT_WORKFLOWS(ID, SLOT_ID, TRIGGER, WORKFLOW, PAUSE_MS)
+                 VALUES (:id, :slotId, :trigger, CAST(:workflow AS JSONB), :pauseMs)
                 ON CONFLICT (ID) DO UPDATE SET
                     TRIGGER = :trigger,
-                    WORKFLOW = CAST(:workflow AS JSONB)
+                    WORKFLOW = CAST(:workflow AS JSONB),
+                    PAUSE_MS = :pauseMs
             """,
             mapOf(
                 "id" to slotWorkflow.id,
                 "slotId" to slotWorkflow.slot.id,
                 "trigger" to slotWorkflow.trigger.name,
                 "workflow" to writeJson(slotWorkflow.workflow),
+                "pauseMs" to slotWorkflow.pauseMs,
             )
         )
     }
@@ -46,13 +48,14 @@ class SlotWorkflowRepository(
         namedParameterJdbcTemplate!!.update(
             """
                 UPDATE ENV_SLOT_WORKFLOWS
-                SET TRIGGER = :trigger, WORKFLOW = CAST(:workflow AS JSONB)
+                SET TRIGGER = :trigger, WORKFLOW = CAST(:workflow AS JSONB), PAUSE_MS = :pauseMs
                 WHERE ID = :id
             """.trimIndent(),
             mapOf(
                 "id" to slotWorkflow.id,
                 "trigger" to slotWorkflow.trigger.name,
                 "workflow" to writeJson(slotWorkflow.workflow),
+                "pauseMs" to slotWorkflow.pauseMs,
             )
         )
     }
@@ -92,6 +95,7 @@ class SlotWorkflowRepository(
         slot = slotRepository.getSlotById(rs.getString("slot_id")),
         trigger = SlotWorkflowTrigger.valueOf(rs.getString("trigger")),
         workflow = readJson(rs, "workflow").parse(),
+        pauseMs = rs.getLong("pause_ms"),
     )
 
     fun findSlotWorkflowById(id: String): SlotWorkflow? =
