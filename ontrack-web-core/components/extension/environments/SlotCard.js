@@ -5,7 +5,7 @@ import SlotCurrentPipeline from "@components/extension/environments/SlotCurrentP
 import useSlotState from "@components/extension/environments/SlotState";
 import SlotLink from "@components/extension/environments/SlotLink";
 
-export default function SlotCard({slot, showLastDeployed = false}) {
+export default function SlotCard({slot, showLastDeployed = false, showLastDeployedInTitle = false}) {
 
     const [slotState, onSlotStateChanged] = useSlotState()
 
@@ -16,7 +16,7 @@ export default function SlotCard({slot, showLastDeployed = false}) {
                     height: '100%',
                 }}
                 size="small"
-                title={<SlotTitle slot={slot}/>}
+                title={<SlotTitle slot={slot} showLastDeployed={showLastDeployedInTitle}/>}
                 extra={
                     <SlotLink slot={slot}/>
                 }

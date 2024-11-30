@@ -22,7 +22,11 @@ export default function EnvironmentList({environments}) {
                             {
                                 environment.slots.map(slot => (
                                     <Col key={slot.id} span={6}>
-                                        <SlotCard slot={slot} showLastDeployed={true}/>
+                                        <SlotCard
+                                            slot={slot}
+                                            showLastDeployed={true}
+                                            showLastDeployedInTitle={true}
+                                        />
                                     </Col>
                                 ))
                             }
