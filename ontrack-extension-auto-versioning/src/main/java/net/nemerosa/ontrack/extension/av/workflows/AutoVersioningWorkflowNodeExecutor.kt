@@ -14,6 +14,7 @@ import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.events.SerializableEventService
+import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
@@ -27,6 +28,7 @@ class AutoVersioningWorkflowNodeExecutor(
     extensionFeature: AutoVersioningExtensionFeature,
     private val autoVersioningProcessingService: AutoVersioningProcessingService,
     private val structureService: StructureService,
+    private val securityService: SecurityService,
     private val eventTemplatingService: EventTemplatingService,
     private val serializableEventService: SerializableEventService,
     private val autoVersioningAuditService: AutoVersioningAuditService,
@@ -42,7 +44,9 @@ class AutoVersioningWorkflowNodeExecutor(
         data: AutoVersioningWorkflowNodeExecutorData,
         workflowNodeExecutorResultFeedback: (output: JsonNode?) -> Unit
     ): WorkflowNodeExecutorResult {
-        val order = createOrder(workflowInstance, data)
+        val order = securityService.asAdmin {
+            createOrder(workflowInstance, data)
+        }
         val output = AutoVersioningWorkflowNodeExecutorOutput(
             autoVersioningOrderId = order.uuid,
         )
