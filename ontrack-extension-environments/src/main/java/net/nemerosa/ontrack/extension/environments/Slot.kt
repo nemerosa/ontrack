@@ -14,10 +14,9 @@ data class Slot(
         const val DEFAULT_QUALIFIER = ""
     }
 
-    override fun toString(): String =
-        if (qualifier != DEFAULT_QUALIFIER) {
-            "${environment.name}/${project.name}/${qualifier}"
-        } else {
-            "${environment.name}/${project.name}"
-        }
+    fun fullName() = "${environment.name}/${project.name}${
+        qualifier.takeIf { it.isNotBlank() }?.let { "/$it" } ?: ""
+    }"
+
+    override fun toString(): String = fullName()
 }

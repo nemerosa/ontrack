@@ -32,7 +32,7 @@ interface EventTemplatingService {
      */
     fun renderEvent(
         event: Event,
-        context: Map<String, Any>,
+        context: Map<String, Any> = emptyMap(),
         template: String? = null,
         renderer: EventRenderer = PlainEventRenderer.INSTANCE,
     ): String

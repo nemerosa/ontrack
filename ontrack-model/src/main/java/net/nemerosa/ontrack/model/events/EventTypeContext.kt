@@ -38,6 +38,12 @@ fun eventContext(
     items = items.toMap()
 )
 
+fun EventTypeContext.add(
+    vararg items: Pair<String, EventTypeContextItem>
+) = EventTypeContext(
+    items = this.items + items.toMap()
+)
+
 private fun eventEntity(
     projectEntityType: ProjectEntityType,
     description: String,
@@ -55,7 +61,9 @@ fun eventPromotionLevel(description: String) =
     "promotionLevel" to eventEntity(ProjectEntityType.PROMOTION_LEVEL, description)
 
 fun eventPromotionRun(description: String) = "promotionRun" to eventEntity(ProjectEntityType.PROMOTION_RUN, description)
-fun eventXPromotionRun(description: String) = "xPromotionRun" to eventEntity(ProjectEntityType.PROMOTION_RUN, description)
+fun eventXPromotionRun(description: String) =
+    "xPromotionRun" to eventEntity(ProjectEntityType.PROMOTION_RUN, description)
+
 fun eventValidationStamp(description: String) =
     "validationStamp" to eventEntity(ProjectEntityType.VALIDATION_STAMP, description)
 

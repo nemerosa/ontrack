@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.extension.environments.storage.*
 import net.nemerosa.ontrack.extension.environments.workflows.*
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceStatus
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.model.events.EventPostService
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.security.SecurityService
@@ -29,6 +30,7 @@ class SlotServiceImpl(
     private val slotPipelineAdmissionRuleStatusRepository: SlotPipelineAdmissionRuleStatusRepository,
     private val slotAdmissionRuleRegistry: SlotAdmissionRuleRegistry,
     private val slotWorkflowService: SlotWorkflowService,
+    private val eventPostService: EventPostService,
     private val environmentsEventsFactory: EnvironmentsEventsFactory,
 ) : SlotService {
 
@@ -46,6 +48,7 @@ class SlotServiceImpl(
         }
         // Saving
         slotRepository.addSlot(slot)
+        eventPostService.post(environmentsEventsFactory.slotCreation(slot))
     }
 
     override fun findSlotsByEnvironment(environment: Environment): List<Slot> =
@@ -67,6 +70,7 @@ class SlotServiceImpl(
         config.checkName()
         // TODO Controls the provided configuration
         slotAdmissionRuleConfigRepository.addAdmissionRuleConfig(config)
+        eventPostService.post(environmentsEventsFactory.slotUpdated(config.slot))
     }
 
     override fun getRequiredInputs(pipeline: SlotPipeline): List<SlotAdmissionRuleInput> =
@@ -122,6 +126,7 @@ class SlotServiceImpl(
         config.checkName()
         // TODO Controls the provided configuration
         slotAdmissionRuleConfigRepository.saveAdmissionRuleConfig(config)
+        eventPostService.post(environmentsEventsFactory.slotUpdated(config.slot))
     }
 
     override fun findAdmissionRuleConfigById(id: String): SlotAdmissionRuleConfig? =
@@ -136,6 +141,7 @@ class SlotServiceImpl(
     override fun deleteAdmissionRuleConfig(config: SlotAdmissionRuleConfig) {
         securityService.checkSlotAccess<SlotUpdate>(config.slot)
         slotAdmissionRuleConfigRepository.deleteAdmissionRuleConfig(config)
+        eventPostService.post(environmentsEventsFactory.slotUpdated(config.slot))
     }
 
     override fun isBuildEligible(slot: Slot, build: Build): Boolean {
@@ -240,11 +246,13 @@ class SlotServiceImpl(
             )
         )
         // Workflow triggers
+        val event = environmentsEventsFactory.pipelineCreation(pipeline)
         slotWorkflowService.startWorkflowsForPipeline(
             pipeline,
             SlotWorkflowTrigger.CREATION,
-            environmentsEventsFactory.pipelineCreation(pipeline)
+            event
         )
+        eventPostService.post(event)
         // OK
         return findPipelineById(pipeline.id) ?: throw SlotPipelineIdNotFoundException(pipeline.id)
     }
@@ -301,6 +309,7 @@ class SlotServiceImpl(
             status = SlotPipelineStatus.CANCELLED,
             message = reason,
         )
+        eventPostService.post(environmentsEventsFactory.pipelineCancelled(pipeline))
     }
 
     private fun changePipeline(
@@ -394,11 +403,13 @@ class SlotServiceImpl(
                 message = "Deployment started",
             )
             // Workflows
+            val event = environmentsEventsFactory.pipelineDeploying(pipeline)
             slotWorkflowService.startWorkflowsForPipeline(
                 pipeline,
                 SlotWorkflowTrigger.DEPLOYING,
-                environmentsEventsFactory.pipelineDeploying(pipeline)
+                event
             )
+            eventPostService.post(event)
         }
         // OK
         return status
@@ -524,11 +535,14 @@ class SlotServiceImpl(
             },
         )
         // Workflows
+        val event = environmentsEventsFactory.pipelineDeployed(pipeline)
         slotWorkflowService.startWorkflowsForPipeline(
             pipeline,
             SlotWorkflowTrigger.DEPLOYED,
-            environmentsEventsFactory.pipelineDeployed(pipeline)
+            event
         )
+        // Event
+        eventPostService.post(event)
         // OK
         return SlotPipelineDeploymentFinishStatus.ok(actualMessage)
     }
@@ -607,6 +621,7 @@ class SlotServiceImpl(
                 overrideMessage = message,
             )
         )
+        eventPostService.post(environmentsEventsFactory.pipelineStatusOverridden(pipeline))
     }
 
     private fun checkSameSlot(
@@ -647,5 +662,6 @@ class SlotServiceImpl(
         } else {
             throw SlotPipelineDataNotOngoingException()
         }
+        eventPostService.post(environmentsEventsFactory.pipelineStatusChanged(pipeline))
     }
 }

@@ -2,11 +2,13 @@ package net.nemerosa.ontrack.extension.environments.service
 
 import net.nemerosa.ontrack.extension.environments.Environment
 import net.nemerosa.ontrack.extension.environments.EnvironmentFilter
+import net.nemerosa.ontrack.extension.environments.events.EnvironmentsEventsFactory
 import net.nemerosa.ontrack.extension.environments.security.EnvironmentDelete
 import net.nemerosa.ontrack.extension.environments.security.EnvironmentList
 import net.nemerosa.ontrack.extension.environments.security.EnvironmentSave
 import net.nemerosa.ontrack.extension.environments.storage.EnvironmentNameAlreadyExists
 import net.nemerosa.ontrack.extension.environments.storage.EnvironmentRepository
+import net.nemerosa.ontrack.model.events.EventPostService
 import net.nemerosa.ontrack.model.security.SecurityService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -16,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional
 class EnvironmentServiceImpl(
     private val environmentRepository: EnvironmentRepository,
     private val securityService: SecurityService,
+    private val eventPostService: EventPostService,
+    private val environmentsEventsFactory: EnvironmentsEventsFactory,
 ) : EnvironmentService {
 
     override fun save(environment: Environment) {
@@ -25,6 +29,11 @@ class EnvironmentServiceImpl(
             throw EnvironmentNameAlreadyExists(environment.name)
         }
         environmentRepository.save(environment)
+        if (existing != null) {
+            eventPostService.post(environmentsEventsFactory.environmentUpdated(environment))
+        } else {
+            eventPostService.post(environmentsEventsFactory.environmentCreation(environment))
+        }
     }
 
     override fun getById(id: String): Environment {
@@ -46,6 +55,7 @@ class EnvironmentServiceImpl(
 
     override fun delete(env: Environment) {
         securityService.checkGlobalFunction(EnvironmentDelete::class.java)
+        eventPostService.post(environmentsEventsFactory.environmentDeleted(env))
         environmentRepository.delete(env)
     }
 }

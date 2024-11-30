@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.environments.workflows
 
 import net.nemerosa.ontrack.extension.environments.events.EnvironmentsEvents
 import net.nemerosa.ontrack.extension.environments.service.SlotService
-import net.nemerosa.ontrack.extension.environments.service.getPipelineById
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.docs.DocumentationExampleCode
@@ -13,24 +12,20 @@ import net.nemerosa.ontrack.ui.controller.UILocations
 import org.springframework.stereotype.Component
 
 @Component
-@APIDescription("Renders a slot pipeline using its ID")
-@Documentation(PipelineTemplatingFunctionParameters::class)
+@APIDescription("Renders a slot using its ID")
+@Documentation(SlotTemplatingFunctionParameters::class)
 @DocumentationExampleCode(
     """
-       #.pipeline
-       
-       or
-       
-       #.pipeline?id=workflow.pipeline.targetPipelineId 
+       #.slot 
     """
 )
-class PipelineTemplatingFunction(
+class SlotTemplatingFunction(
     private val slotService: SlotService,
     private val uiLocations: UILocations,
     private val securityService: SecurityService,
 ) : TemplatingFunction {
 
-    override val id: String = "pipeline"
+    override val id: String = "slot"
 
     override fun render(
         configMap: Map<String, String>,
@@ -38,13 +33,13 @@ class PipelineTemplatingFunction(
         renderer: EventRenderer,
         expressionResolver: (expression: String) -> String
     ): String {
-        val idExpression = configMap["id"] ?: EnvironmentsEvents.EVENT_PIPELINE_ID
-        val id = expressionResolver(idExpression)
-        val pipeline = securityService.asAdmin {
-            slotService.getPipelineById(id)
+        val idExpression = configMap[SlotTemplatingFunctionParameters::id.name]
+        val id = expressionResolver(idExpression ?: EnvironmentsEvents.EVENT_SLOT_ID)
+        val slot = securityService.asAdmin {
+            slotService.getSlotById(id)
         }
-        val link = uiLocations.page("/extension/environments/pipeline/$id")
-        return renderer.renderLink(pipeline.fullName(), link)
+        val link = uiLocations.page("/extension/environments/slot/$id")
+        return renderer.renderLink(slot.fullName(), link)
     }
 
 }

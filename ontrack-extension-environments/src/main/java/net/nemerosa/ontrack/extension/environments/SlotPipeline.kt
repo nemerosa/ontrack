@@ -15,9 +15,7 @@ data class SlotPipeline(
     val build: Build,
 ) {
 
-    fun fullName() = "${slot.environment.name}/${slot.project.name}${
-        slot.qualifier.takeIf { it.isNotBlank() }?.let { "/$it" } ?: ""
-    }#$number"
+    fun fullName() = "${slot.fullName()}#$number"
 
     fun withStatus(status: SlotPipelineStatus) = SlotPipeline(
         id = id,
