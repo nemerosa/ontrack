@@ -61,7 +61,11 @@ interface SlotService {
     /**
      *
      */
-    fun findPipelines(slot: Slot): PaginatedList<SlotPipeline>
+    fun findPipelines(
+        slot: Slot,
+        offset: Int = 0,
+        size: Int = 10,
+    ): PaginatedList<SlotPipeline>
 
     /**
      * Cancelling a pipeline
@@ -86,7 +90,11 @@ interface SlotService {
     /**
      * Starts a deployment
      */
-    fun startDeployment(pipeline: SlotPipeline, dryRun: Boolean, skipWorkflowId: String? = null): SlotPipelineDeploymentStatus
+    fun startDeployment(
+        pipeline: SlotPipeline,
+        dryRun: Boolean,
+        skipWorkflowId: String? = null
+    ): SlotPipelineDeploymentStatus
 
     /**
      * Gets the latest (current) pipeline for a slot

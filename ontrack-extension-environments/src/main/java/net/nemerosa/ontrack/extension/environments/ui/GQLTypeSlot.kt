@@ -95,10 +95,8 @@ class GQLTypeSlot(
                     fieldName = "pipelines",
                     fieldDescription = "Paginated list of pipelines",
                     itemType = gqlTypeSlotPipeline.typeName,
-                    // TODO Filtering the pipelines
-                    itemPaginatedListProvider = { _, slot, _, _ ->
-                        // TODO Pagination of pipelines
-                        slotService.findPipelines(slot)
+                    itemPaginatedListProvider = { _, slot, offset, size ->
+                        slotService.findPipelines(slot, offset, size)
                     }
                 )
             )

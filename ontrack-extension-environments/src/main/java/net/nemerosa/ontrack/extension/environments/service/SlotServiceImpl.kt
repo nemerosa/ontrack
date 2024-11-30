@@ -289,9 +289,9 @@ class SlotServiceImpl(
         return highestPipelinePerQualifier.values.toSet()
     }
 
-    override fun findPipelines(slot: Slot): PaginatedList<SlotPipeline> {
+    override fun findPipelines(slot: Slot, offset: Int, size: Int): PaginatedList<SlotPipeline> {
         securityService.checkSlotAccess<SlotView>(slot)
-        return slotPipelineRepository.findPipelines(slot)
+        return slotPipelineRepository.findPipelines(slot, offset, size)
     }
 
     override fun cancelPipeline(pipeline: SlotPipeline, reason: String) {

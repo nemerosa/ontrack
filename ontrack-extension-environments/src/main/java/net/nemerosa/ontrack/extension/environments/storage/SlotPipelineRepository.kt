@@ -89,22 +89,36 @@ class SlotPipelineRepository(
         }
     }
 
-    fun findPipelines(slot: Slot): PaginatedList<SlotPipeline> {
-        // TODO Pagination
+    fun findPipelines(slot: Slot, offset: Int, size: Int): PaginatedList<SlotPipeline> {
+        val count = namedParameterJdbcTemplate!!.queryForObject(
+            """
+                SELECT COUNT(*)
+                FROM ENV_SLOT_PIPELINE
+                WHERE SLOT_ID = :slotId
+            """.trimIndent(),
+            mapOf(
+                "slotId" to slot.id,
+            ),
+            Int::class.java
+        ) ?: 0
         val list = namedParameterJdbcTemplate!!.query(
             """
                 SELECT *
                 FROM ENV_SLOT_PIPELINE
                 WHERE SLOT_ID = :slotId
                 ORDER BY NUMBER DESC
+                LIMIT :size
+                OFFSET :offset
             """.trimIndent(),
             mapOf(
                 "slotId" to slot.id,
+                "offset" to offset,
+                "size" to size,
             )
         ) { rs, _ ->
             toPipeline(rs)
         }
-        return PaginatedList.create(list, 0, 10)
+        return PaginatedList.create(items = list, offset = offset, pageSize = size, total = count)
     }
 
     private fun toPipeline(rs: ResultSet) = SlotPipeline(

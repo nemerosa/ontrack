@@ -19,9 +19,13 @@ export default function SlotPipelinesTable({slot}) {
             <StandardTable
                 query={
                     gql`
-                        query SlotPipelines($id: String!) {
+                        query SlotPipelines(
+                            $id: String!,
+                            $offset: Int!,
+                            $size: Int!,
+                        ) {
                             slotById(id: $id) {
-                                pipelines(offset: 0, size: 10) {
+                                pipelines(offset: $offset, size: $size) {
                                     pageInfo {
                                         nextPage {
                                             offset
