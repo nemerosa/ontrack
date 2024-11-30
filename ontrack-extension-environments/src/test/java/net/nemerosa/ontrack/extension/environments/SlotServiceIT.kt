@@ -78,6 +78,17 @@ class SlotServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    fun `Deleting a slot`() {
+        slotTestSupport.withSlot { slot ->
+            slotService.deleteSlot(slot)
+            assertNull(
+                slotService.findSlotsByEnvironment(slot.environment).find { it.id == slot.id },
+                "Slot has been deleted"
+            )
+        }
+    }
+
+    @Test
     fun `Getting a list of slots for an environment`() {
         asAdmin {
             environmentTestSupport.withEnvironment { environment ->

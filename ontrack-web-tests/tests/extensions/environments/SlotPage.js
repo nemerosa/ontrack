@@ -1,5 +1,6 @@
 import {ui} from "@ontrack/connection";
 import {expect} from "@playwright/test";
+import {confirmBox} from "../../support/confirm";
 
 export class SlotPage {
     constructor(page, slot) {
@@ -34,5 +35,12 @@ export class SlotPage {
         await expect(this.page.getByRole('button', {name: "OK"})).not.toBeVisible()
         await expect(this.page.getByText(name, {exact: true})).toBeVisible()
         await expect(this.page.getByText(description, {exact: true})).toBeVisible()
+    }
+
+    async delete() {
+        const button = this.page.getByRole('button', {name: 'Delete slot'})
+        await expect(button).toBeVisible()
+        await button.click()
+        await confirmBox(this.page, "Deleting slot", {okText: "Delete"})
     }
 }

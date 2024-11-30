@@ -1712,6 +1712,12 @@ type DeleteSlotAdmissionRuleConfigPayload implements Payload {
     errors: [UserError]
 }
 
+"Output type for the deleteSlot mutation."
+type DeleteSlotPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
 "Output type for the deleteSlotWorkflow mutation."
 type DeleteSlotWorkflowPayload implements Payload {
     "List of errors"
@@ -3706,6 +3712,11 @@ type Mutation {
         "Input for the mutation"
         input: DeletePromotionRunMetaInfoPropertyByIdInput
     ): DeletePromotionRunMetaInfoPropertyByIdPayload
+    "Deletes a slot using its ID"
+    deleteSlot(
+        "Input for the mutation"
+        input: DeleteSlotInput
+    ): DeleteSlotPayload
     "Deletes an admission rule for a slot"
     deleteSlotAdmissionRuleConfig(
         "Input for the mutation"
@@ -8304,11 +8315,12 @@ enum ValidationStampFilterScope {
 
 "Status of a node in a workflow"
 enum WorkflowInstanceNodeStatus {
+    CANCELLED
+    CREATED
     ERROR
-    IDLE
     STARTED
-    STOPPED
     SUCCESS
+    WAITING
 }
 
 "Status of a running workflow"
@@ -9235,6 +9247,12 @@ input DeletePromotionRunMetaInfoPropertyInput {
 input DeleteSlotAdmissionRuleConfigInput {
     "id field"
     id: String!
+}
+
+"Input type for the deleteSlot mutation."
+input DeleteSlotInput {
+    "slotId field"
+    slotId: String!
 }
 
 "Input type for the deleteSlotWorkflow mutation."

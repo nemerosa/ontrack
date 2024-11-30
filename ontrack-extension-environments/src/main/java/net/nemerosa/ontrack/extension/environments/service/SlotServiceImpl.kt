@@ -624,6 +624,12 @@ class SlotServiceImpl(
         eventPostService.post(environmentsEventsFactory.pipelineStatusOverridden(pipeline))
     }
 
+    override fun deleteSlot(slot: Slot) {
+        securityService.checkSlotAccess<SlotDelete>(slot)
+        eventPostService.post(environmentsEventsFactory.slotDeleted(slot))
+        slotRepository.deleteSlot(slot)
+    }
+
     private fun checkSameSlot(
         pipeline: SlotPipeline,
         admissionRuleConfig: SlotAdmissionRuleConfig

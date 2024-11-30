@@ -14,6 +14,11 @@ interface SlotService {
     fun addSlot(slot: Slot)
 
     /**
+     * Deleting a slot
+     */
+    fun deleteSlot(slot: Slot)
+
+    /**
      * Getting a slot using its ID.
      */
     fun getSlotById(id: String): Slot

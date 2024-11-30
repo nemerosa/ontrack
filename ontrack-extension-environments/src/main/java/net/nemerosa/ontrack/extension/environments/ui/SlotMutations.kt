@@ -39,6 +39,13 @@ class SlotMutations(
                 }
             }
             SlotList(slots = slots)
+        },
+        unitMutation(
+            name = "deleteSlot",
+            description = "Deletes a slot using its ID",
+            input = DeleteSlotInput::class,
+        ) { input ->
+            slotService.deleteSlot(slotService.getSlotById(input.slotId))
         }
     )
 }
@@ -49,4 +56,8 @@ data class CreateSlotsInput(
     val description: String?,
     @ListRef
     val environmentIds: List<String>,
+)
+
+data class DeleteSlotInput(
+    val slotId: String,
 )

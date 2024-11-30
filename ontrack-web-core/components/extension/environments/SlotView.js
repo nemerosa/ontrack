@@ -20,6 +20,7 @@ import SlotEligibleBuildsTable from "@components/extension/environments/SlotElig
 import {useReloadState} from "@components/common/StateUtils";
 import SlotAdmissionRulesTable from "@components/extension/environments/SlotAdmissionRulesTable";
 import SlotWorkflowsTable from "@components/extension/environments/SlotWorkflowsTable";
+import DeleteSlotCommand from "@components/extension/environments/DeleteSlotCommand";
 
 export default function SlotView({id}) {
 
@@ -30,6 +31,7 @@ export default function SlotView({id}) {
     const [loading, setLoading] = useState(true)
     const [slot, setSlot] = useState()
     const [title, setTitle] = useState(`Slot ${id}`)
+    const [commands, setCommands] = useState([])
 
     useEffect(() => {
         if (client && id) {
@@ -58,6 +60,10 @@ export default function SlotView({id}) {
                 const slot = data.slotById;
                 setSlot(slot)
                 setTitle(slotTitle(slot))
+                setCommands([
+                    <DeleteSlotCommand key="delete" slot={slot}/>,
+                    <CloseCommand key="close" href={environmentsUri}/>
+                ])
             }).finally(() => {
                 setLoading(false)
             })
@@ -72,9 +78,7 @@ export default function SlotView({id}) {
             <MainPage
                 title={title}
                 breadcrumbs={environmentsBreadcrumbs()}
-                commands={[
-                    <CloseCommand key="close" href={environmentsUri}/>
-                ]}
+                commands={commands}
             >
                 <LoadingContainer loading={loading}>
                     <Row gutter={[16, 16]} wrap>

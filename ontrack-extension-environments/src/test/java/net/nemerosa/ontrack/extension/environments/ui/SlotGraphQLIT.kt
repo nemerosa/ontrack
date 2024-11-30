@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.test.assertJsonNull
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class SlotGraphQLIT : AbstractQLKTITSupport() {
 
@@ -253,6 +254,29 @@ class SlotGraphQLIT : AbstractQLKTITSupport() {
                         .path("eligibleSlots")
                         .map { it.path("id").asText() }
                         .toSet()
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Deleting a slot`() {
+        slotTestSupport.withSlot { slot ->
+            run(
+                """
+                    mutation {
+                        deleteSlot(input: {slotId: "${slot.id}"}) {
+                            errors {
+                                message
+                            }
+                        }
+                    }
+                """
+            ) { data ->
+                checkGraphQLUserErrors(data, "deleteSlot")
+                assertNull(
+                    slotService.findSlotsByEnvironment(slot.environment).find { it.id == slot.id },
+                    "Slot has been deleted"
                 )
             }
         }

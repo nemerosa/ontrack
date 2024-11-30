@@ -166,4 +166,16 @@ class SlotRepository(
         }
     }
 
+    fun deleteSlot(slot: Slot) {
+        namedParameterJdbcTemplate!!.update(
+            """
+                DELETE FROM ENV_SLOTS
+                WHERE ID = :id
+            """.trimIndent(),
+            mapOf(
+                "id" to slot.id,
+            )
+        )
+    }
+
 }
