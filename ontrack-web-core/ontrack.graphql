@@ -3213,9 +3213,15 @@ type LicenseResponse {
 }
 
 type LicensedFeature {
+    data: [LicensedFeatureData!]!
     enabled: Boolean!
     id: String!
     name: String!
+}
+
+type LicensedFeatureData {
+    name: String!
+    value: String!
 }
 
 "Output type for the linkBuildById mutation."

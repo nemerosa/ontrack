@@ -17,10 +17,16 @@ type License {
     licensedFeatures: [LicensedFeature!]!
 }
 
+type LicensedFeatureData {
+    name: String!,
+    value: String!,
+}
+
 type LicensedFeature {
     id: String!
     name: String!
     enabled: Boolean!
+    data: [LicensedFeatureData!]!
 }
 
 enum LicenseExpiration {

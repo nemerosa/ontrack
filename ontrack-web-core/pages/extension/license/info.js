@@ -3,7 +3,7 @@ import StandardPage from "@components/layouts/StandardPage";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import LoadingContainer from "@components/common/LoadingContainer";
 import {gql} from "graphql-request";
-import {Alert, Card, Col, Descriptions, Row, Space, Tag, Typography} from "antd";
+import {Alert, Card, Col, Descriptions, Row, Space, Table, Tag, Typography} from "antd";
 import PageSection from "@components/common/PageSection";
 import LicenseActive from "@components/extension/license/LicenseActive";
 import LicenseValidUntil from "@components/extension/license/LicenseValidUntil";
@@ -35,6 +35,10 @@ export default function LicenseInfoPage() {
                                     id
                                     name
                                     enabled
+                                    data {
+                                        name
+                                        value
+                                    }
                                 }
                             }
                             licenseControl {
@@ -129,11 +133,32 @@ export default function LicenseInfoPage() {
                                             <Card
                                                 title={feature.name}
                                             >
-                                                {
-                                                    feature.enabled ?
-                                                        <Tag color="success">Enabled</Tag> :
-                                                        <Tag color="error">Disabled</Tag>
-                                                }
+                                                <Space direction="vertical" className="ot-line">
+                                                    {
+                                                        feature.enabled ?
+                                                            <Tag color="success">Enabled</Tag> :
+                                                            <Tag color="error">Disabled</Tag>
+                                                    }
+                                                    {
+                                                        feature.data.length > 0 &&
+                                                        <Table
+                                                            dataSource={feature.data}
+                                                            size="small"
+                                                            pagination={false}
+                                                        >
+                                                            <Table.Column
+                                                                key="name"
+                                                                title="Name"
+                                                                dataIndex="name"
+                                                            />
+                                                            <Table.Column
+                                                                key="value"
+                                                                title="Value"
+                                                                dataIndex="value"
+                                                            />
+                                                        </Table>
+                                                    }
+                                                </Space>
                                             </Card>
                                         </Col>
                                     ))

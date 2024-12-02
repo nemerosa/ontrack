@@ -41,6 +41,7 @@ class LicenseControlServiceImpl(
                 id = it.id,
                 name = it.name,
                 enabled = it.alwaysEnabled || license.isFeatureEnabled(it.id),
+                data = license.findFeatureData(it.id)?.data ?: emptyList(),
             )
         }.sortedBy { it.name }
 
