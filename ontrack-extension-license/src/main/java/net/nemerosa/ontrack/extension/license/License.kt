@@ -21,13 +21,15 @@ data class License(
     val active: Boolean,
     val validUntil: LocalDateTime?,
     val maxProjects: Int,
-    val features: List<String>,
+    val features: List<LicenseFeatureData>,
 ) {
 
-    private val featureIndex = features.toSet()
+    private val featureIndex = features.associateBy { it.id }
 
     fun isValid() = active && (validUntil == null || validUntil > Time.now)
 
-    fun isFeatureAllowed(featureId: String): Boolean = isValid() && featureIndex.contains(featureId)
+    fun findFeatureData(id: String) = featureIndex[id]
+
+    fun isFeatureEnabled(id: String) = findFeatureData(id)?.enabled == true
 
 }

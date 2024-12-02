@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.environments.service
 
 import net.nemerosa.ontrack.extension.environments.Environment
 import net.nemerosa.ontrack.extension.environments.EnvironmentFilter
+import net.nemerosa.ontrack.extension.environments.EnvironmentsLicense
 import net.nemerosa.ontrack.extension.environments.events.EnvironmentsEventsFactory
 import net.nemerosa.ontrack.extension.environments.security.EnvironmentDelete
 import net.nemerosa.ontrack.extension.environments.security.EnvironmentList
@@ -20,6 +21,7 @@ class EnvironmentServiceImpl(
     private val securityService: SecurityService,
     private val eventPostService: EventPostService,
     private val environmentsEventsFactory: EnvironmentsEventsFactory,
+    private val environmentsLicense: EnvironmentsLicense,
 ) : EnvironmentService {
 
     override fun save(environment: Environment) {
@@ -27,6 +29,15 @@ class EnvironmentServiceImpl(
         val existing = environmentRepository.findByName(environment.name)
         if (existing != null && existing.id != environment.id) {
             throw EnvironmentNameAlreadyExists(environment.name)
+        }
+        if (existing == null) {
+            val maxEnvironments = environmentsLicense.maxEnvironments
+            if (maxEnvironments > 0) {
+                val countEnvironments = environmentRepository.countEnvironments
+                if (countEnvironments >= maxEnvironments) {
+                    environmentsLicense.maxEnvironmentsReached()
+                }
+            }
         }
         environmentRepository.save(environment)
         if (existing != null) {

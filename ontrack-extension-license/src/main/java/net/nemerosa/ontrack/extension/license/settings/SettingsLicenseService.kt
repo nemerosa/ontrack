@@ -14,7 +14,8 @@ import org.springframework.stereotype.Service
 )
 class SettingsLicenseService(
     private val cachedSettingsService: CachedSettingsService,
-) : AbstractSignatureLicenseService() {
+    licenseKeyPath: String = "/keys/embedded.key",
+) : AbstractSignatureLicenseService(licenseKeyPath) {
 
     override val licenseType: String = "Settings"
 

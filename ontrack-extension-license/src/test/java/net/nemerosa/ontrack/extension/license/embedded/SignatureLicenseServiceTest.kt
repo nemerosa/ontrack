@@ -1,13 +1,10 @@
 package net.nemerosa.ontrack.extension.license.embedded
 
-import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.extension.license.LicenseFeatureData
 import net.nemerosa.ontrack.extension.license.signature.SignatureLicense
 import net.nemerosa.ontrack.extension.license.signature.SignatureLicenseException
-import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.json.format
+import net.nemerosa.ontrack.model.support.NameValue
 import org.junit.jupiter.api.Test
-import kotlin.io.encoding.Base64
-import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
@@ -16,9 +13,10 @@ class SignatureLicenseServiceTest {
     @Test
     fun `No license content provided`() {
         val service = EmbeddedLicenseService(
-            EmbeddedLicenseConfigurationProperties().apply {
+            embeddedLicenseConfigurationProperties = EmbeddedLicenseConfigurationProperties().apply {
                 key = null
-            }
+            },
+            licenseKeyPath = "/testing/keys/embedded.key"
         )
         assertFailsWith<SignatureLicenseException> {
             service.license
@@ -28,33 +26,33 @@ class SignatureLicenseServiceTest {
     @Test
     fun `License OK`() {
         val service = EmbeddedLicenseService(
-            EmbeddedLicenseConfigurationProperties().apply {
+            embeddedLicenseConfigurationProperties = EmbeddedLicenseConfigurationProperties().apply {
                 key =
-                    "eyJkYXRhIjoiZXlKdVlXMWxJam9pVUhKbGJXbDFiU0lzSW1GemMybG5ibVZsSWpvaVRtVnRaWEp2YzJFaUxDSjJZV3hwWkZWdWRHbHNJanB1ZFd4c0xDSnRZWGhRY205cVpXTjBjeUk2TUN3aVptVmhkSFZ5WlhNaU9sc2laWGgwWlc1emFXOXVMbVZ1ZG1seWIyNXRaVzUwY3lKZGZRPT0iLCJzaWduYXR1cmUiOiJNRVlDSVFEeUxkUFhBL1k0RjdzR0V1V3RUN3laa0gzQnVMMWZ6S0hRV3hnRDJVSm12UUloQU1seXFxblZkdXpPcEx6VVVyV1N5anNqNU1LVE9WYlRSdTFCam9jZXlqRWUifQ=="
-            }
+                    "eyJkYXRhIjoiZXlKdVlXMWxJam9pV0V3aUxDSmhjM05wWjI1bFpTSTZJazVsYldWeWIzTmhJRXh2WTJGc0lpd2lkbUZzYVdSVmJuUnBiQ0k2Ym5Wc2JDd2liV0Y0VUhKdmFtVmpkSE1pT2pBc0ltWmxZWFIxY21WeklqcGJleUpwWkNJNkltVjRkR1Z1YzJsdmJpNWxiblpwY205dWJXVnVkSE1pTENKbGJtRmliR1ZrSWpwMGNuVmxMQ0prWVhSaElqcGJleUp1WVcxbElqb2liV0Y0Ulc1MmFYSnZibTFsYm5Seklpd2lkbUZzZFdVaU9pSXdJbjFkZlYxOSIsInNpZ25hdHVyZSI6Ik1FVUNJUURiNmd5WkZNbktINUxXdFhTODFtdFlwMzN2STFRSFNmNldTREdGd2UxUnBRSWdOekMwditTd29ad1pVZ01CcFlDeCtmb2g0L0EwSnVhd0hYU2V5UW1sQ3dvPSJ9"
+            },
+            licenseKeyPath = "/testing/keys/embedded.key"
         )
+        val license = service.license
         assertEquals(
             license().toLicense("Embedded"),
-            service.license
+            license
         )
+        assertEquals(true, license?.isFeatureEnabled("extension.environments"))
     }
 
-    @OptIn(ExperimentalEncodingApi::class)
-    private fun encodedLicense(): String =
-        Base64.encode(
-            jsonLicense().format().toByteArray(Charsets.UTF_8),
-        )
-
-    private fun jsonLicense(): JsonNode =
-        license().asJson()
-
     private fun license() = SignatureLicense(
-        name = "Premium",
-        assignee = "Nemerosa",
+        name = "XL",
+        assignee = "Nemerosa Local",
         validUntil = null,
         maxProjects = 0,
         features = listOf(
-            "extension.environments",
+            LicenseFeatureData(
+                id = "extension.environments",
+                enabled = true,
+                data = listOf(
+                    NameValue("maxEnvironments", "0")
+                ),
+            )
         )
     )
 

@@ -19,7 +19,7 @@ abstract class AbstractLicenseTestSupport : AbstractDSLTestSupport() {
     protected fun withLicense(
         validUntil: LocalDateTime? = null,
         maxProjects: Int = 0,
-        features: List<String> = emptyList(),
+        features: List<LicenseFeatureData> = emptyList(),
         code: () -> Unit,
     ) {
         val oldLicense = licenseService.license

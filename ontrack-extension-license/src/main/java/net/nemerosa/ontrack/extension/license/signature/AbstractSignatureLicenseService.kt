@@ -10,7 +10,9 @@ import java.security.spec.X509EncodedKeySpec
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-abstract class AbstractSignatureLicenseService : LicenseService {
+abstract class AbstractSignatureLicenseService(
+    private val licenseKeyPath: String,
+) : LicenseService {
 
     abstract val encodedLicense: String?
     abstract val licenseType: String
@@ -46,7 +48,7 @@ abstract class AbstractSignatureLicenseService : LicenseService {
             ?: throw SignatureLicenseException("No license signature has been provided")
 
         // Gets the license key
-        val licenseKey = this::class.java.getResourceAsStream("/keys/embedded.key")
+        val licenseKey = this::class.java.getResourceAsStream(licenseKeyPath)
             ?.reader()
             ?.readText()
             ?: throw SignatureLicenseException("No license key has been provided")

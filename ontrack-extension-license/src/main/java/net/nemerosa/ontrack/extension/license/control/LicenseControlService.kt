@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.license.control
 
 import net.nemerosa.ontrack.extension.license.License
 import net.nemerosa.ontrack.extension.license.LicensedFeature
+import kotlin.reflect.KClass
 
 interface LicenseControlService {
 
@@ -14,9 +15,6 @@ interface LicenseControlService {
      */
     fun isFeatureEnabled(featureID: String): Boolean
 
-    /**
-     * Checks if the given feature is enabled for the current license and fails if not.
-     */
-    fun checkFeatureEnabled(featureID: String)
+    fun <T : Any> parseLicenseDataInto(featureID: String, type: KClass<T>): T?
 
 }

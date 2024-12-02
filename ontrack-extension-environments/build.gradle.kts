@@ -25,6 +25,7 @@ dependencies {
     testImplementation(project(path = ":ontrack-extension-queue", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-recordings", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
+    testImplementation(project(path = ":ontrack-extension-license", configuration = "tests"))
     testImplementation(project(":ontrack-it-utils"))
 
     testRuntimeOnly(project(":ontrack-service"))

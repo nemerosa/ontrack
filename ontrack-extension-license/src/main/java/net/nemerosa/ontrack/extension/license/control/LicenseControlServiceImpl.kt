@@ -2,12 +2,15 @@ package net.nemerosa.ontrack.extension.license.control
 
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.license.*
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parseInto
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.support.EnvService
 import net.nemerosa.ontrack.model.support.isProdProfile
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import kotlin.reflect.KClass
 
 @Service
 @Transactional
@@ -37,23 +40,23 @@ class LicenseControlServiceImpl(
             LicensedFeature(
                 id = it.id,
                 name = it.name,
-                enabled = it.alwaysEnabled || license.features.contains(it.id),
+                enabled = it.alwaysEnabled || license.isFeatureEnabled(it.id),
             )
         }.sortedBy { it.name }
 
     override fun isFeatureEnabled(featureID: String): Boolean {
         val license = licenseService.license
         return if (license != null) {
-            license.active && license.features.contains(featureID)
+            license.active && license.isFeatureEnabled(featureID)
         } else {
             isFeatureEnabledByDefault()
         }
     }
 
-    override fun checkFeatureEnabled(featureID: String) {
-        if (!isFeatureEnabled(featureID)) {
-            throw LicenseFeatureException(featureID)
-        }
+    override fun <T : Any> parseLicenseDataInto(featureID: String, type: KClass<T>): T? {
+        val license = licenseService.license
+        val feature = license?.findFeatureData(featureID)
+        return feature?.data?.associate { it.name to it.value }?.asJson()?.parseInto(type)
     }
 
     /**

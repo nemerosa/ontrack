@@ -3,9 +3,7 @@ package net.nemerosa.ontrack.extension.license.control
 import io.mockk.every
 import io.mockk.mockk
 import net.nemerosa.ontrack.common.RunProfile
-import net.nemerosa.ontrack.extension.license.License
-import net.nemerosa.ontrack.extension.license.LicenseConfigurationProperties
-import net.nemerosa.ontrack.extension.license.LicenseService
+import net.nemerosa.ontrack.extension.license.*
 import net.nemerosa.ontrack.it.MockSecurityService
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.StructureService
@@ -56,26 +54,24 @@ class LicenseControlServiceTest {
 
     @Test
     fun `License in DEV mode with feature enabled`() {
-
-        val featureId = uid("f-")
-        every { licenseService.license } returns license(featureId = featureId)
+        val featureData = LicenseFixtures.sampleFeatureData()
+        every { licenseService.license } returns license(featureData = featureData)
         every { envService.profiles } returns RunProfile.DEV
 
         assertTrue(
-            licenseControlService.isFeatureEnabled(featureId),
+            licenseControlService.isFeatureEnabled(featureData.id),
             "Feature enabled"
         )
     }
 
     @Test
     fun `License in DEV mode with feature enabled but not active`() {
-
-        val featureId = uid("f-")
-        every { licenseService.license } returns license(active = false, featureId = featureId)
+        val featureData = LicenseFixtures.sampleFeatureData()
+        every { licenseService.license } returns license(active = false, featureData = featureData)
         every { envService.profiles } returns RunProfile.DEV
 
         assertFalse(
-            licenseControlService.isFeatureEnabled(featureId),
+            licenseControlService.isFeatureEnabled(featureData.id),
             "Feature not enabled"
         )
     }
@@ -134,26 +130,24 @@ class LicenseControlServiceTest {
 
     @Test
     fun `License in production mode with feature enabled`() {
-
-        val featureId = uid("f-")
-        every { licenseService.license } returns license(featureId = featureId)
+        val featureData = LicenseFixtures.sampleFeatureData()
+        every { licenseService.license } returns license(featureData = featureData)
         every { envService.profiles } returns RunProfile.PROD
 
         assertTrue(
-            licenseControlService.isFeatureEnabled(featureId),
+            licenseControlService.isFeatureEnabled(featureData.id),
             "Feature enabled"
         )
     }
 
     @Test
     fun `License in production mode with feature enabled but not active`() {
-
-        val featureId = uid("f-")
-        every { licenseService.license } returns license(active = false, featureId = featureId)
+        val featureData = LicenseFixtures.sampleFeatureData()
+        every { licenseService.license } returns license(active = false, featureData = featureData)
         every { envService.profiles } returns RunProfile.PROD
 
         assertFalse(
-            licenseControlService.isFeatureEnabled(featureId),
+            licenseControlService.isFeatureEnabled(featureData.id),
             "Feature not enabled"
         )
     }
@@ -171,14 +165,14 @@ class LicenseControlServiceTest {
         )
     }
 
-    private fun license(active: Boolean = true, featureId: String? = null) = License(
+    private fun license(active: Boolean = true, featureData: LicenseFeatureData? = null) = License(
         type = "test",
         name = "Test License",
         assignee = "Tester",
         active = active,
         validUntil = null,
         maxProjects = 0,
-        features = listOfNotNull(featureId),
+        features = listOfNotNull(featureData),
     )
 
 }

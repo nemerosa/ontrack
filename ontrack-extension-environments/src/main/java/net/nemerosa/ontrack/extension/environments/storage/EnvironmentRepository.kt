@@ -13,6 +13,16 @@ class EnvironmentRepository(
     dataSource: DataSource,
 ) : AbstractJdbcRepository(dataSource), EnvironmentRepositoryAccessor {
 
+    val countEnvironments: Int
+        get() =
+            jdbcTemplate!!.queryForObject(
+                """
+                SELECT COUNT(*)
+                FROM ENVIRONMENTS
+            """.trimIndent(),
+                Int::class.java
+            ) ?: 0
+
     fun save(environment: Environment) {
         namedParameterJdbcTemplate!!.update(
             """

@@ -13,7 +13,8 @@ import org.springframework.stereotype.Service
 )
 class EmbeddedLicenseService(
     embeddedLicenseConfigurationProperties: EmbeddedLicenseConfigurationProperties,
-) : AbstractSignatureLicenseService() {
+    licenseKeyPath: String = "/keys/embedded.key",
+) : AbstractSignatureLicenseService(licenseKeyPath) {
 
     override val licenseType: String = "Embedded"
     override val encodedLicense: String? = embeddedLicenseConfigurationProperties.key
