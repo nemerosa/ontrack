@@ -3,7 +3,13 @@ import {useEffect, useState} from "react";
 import {Bar, CartesianGrid, ComposedChart, Legend, Tooltip, XAxis, YAxis} from "recharts";
 import ChartContainer from "@components/charts/ChartContainer";
 
-export default function CountChart({query, variables, yTickFormatter}) {
+export default function CountChart({
+                                       query,
+                                       variables,
+                                       yTickFormatter,
+                                       legendFormatter = () => "Count ",
+                                       domain,
+                                   }) {
 
     const client = useGraphQLClient()
 
@@ -40,10 +46,6 @@ export default function CountChart({query, variables, yTickFormatter}) {
         }
     }, [client, query, variables]);
 
-    const legendFormatter = (value, entry, index) => {
-        return "Count"
-    }
-
     const [inactiveSeries, setInactiveSeries] = useState([])
 
     const legendClick = ({dataKey}) => {
@@ -62,7 +64,7 @@ export default function CountChart({query, variables, yTickFormatter}) {
                 >
                     <CartesianGrid strokeDasharray="3 3"/>
                     <XAxis dataKey="date" angle={-45} tickMargin={30} height={80} interval="preserveStart"/>
-                    <YAxis tickFormatter={yTickFormatter}/>
+                    <YAxis tickFormatter={yTickFormatter} domain={domain}/>
                     <Tooltip/>
                     <Legend formatter={legendFormatter} onClick={legendClick} style={{cursor: 'pointer'}}/>
                     <Bar dataKey="value" fill="#6666aa" hide={inactiveSeries.includes('value')}/>

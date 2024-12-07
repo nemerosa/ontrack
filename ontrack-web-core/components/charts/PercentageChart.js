@@ -8,7 +8,9 @@ export default function PercentageChart({query, variables}) {
             <CountChart
                 query={query}
                 variables={variables}
-                yTickFormatter={percentageFormatter()}
+                yTickFormatter={percentageFormatter}
+                legendFormatter={() => "%"}
+                domain={[0, 100]}
             />
         </>
     )
