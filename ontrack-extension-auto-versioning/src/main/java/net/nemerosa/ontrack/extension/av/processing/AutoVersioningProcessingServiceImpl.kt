@@ -96,6 +96,8 @@ class AutoVersioningProcessingServiceImpl(
             }
             // Map of current versions per path
             val currentVersions = mutableMapOf<String, String>()
+            // Caching the updated content of each path
+            val updatedContent = mutableMapOf<String, List<String>>()
             // For each target path
             val targetPathUpdated: List<Boolean> = try {
                 order.allPaths.flatMap { configPath ->
@@ -118,10 +120,12 @@ class AutoVersioningProcessingServiceImpl(
                     }
                     configPath.paths.map { targetPath ->
                         // Gets the content of the target file
-                        val lines = scm.download(scmBranch, targetPath, retryOnNotFound = true)
-                            ?.toString(Charsets.UTF_8)
-                            ?.lines()
-                            ?: throw AutoVersioningNoContentException(scmBranch, targetPath)
+                        val lines = updatedContent.getOrPut(targetPath) {
+                            scm.download(scmBranch, targetPath, retryOnNotFound = true)
+                                ?.toString(Charsets.UTF_8)
+                                ?.lines()
+                                ?: throw AutoVersioningNoContentException(scmBranch, targetPath)
+                        }
                         // Gets the current version in this file
                         val currentVersion: String = autoVersioningTargetFileService.readVersion(configPath, lines)
                             ?: throw AutoVersioningVersionNotFoundException(targetPath)
@@ -133,14 +137,8 @@ class AutoVersioningProcessingServiceImpl(
                             val updatedLines = configPath.replaceVersion(lines, targetVersion)
                             // Audit
                             autoVersioningAuditService.onProcessingUpdatingFile(order, upgradeBranch, targetPath)
-                            // Uploads of the file content
-                            scm.uploadLines(
-                                upgradeBranch,
-                                commitId,
-                                targetPath,
-                                updatedLines,
-                                message = order.getCommitMessage()
-                            )
+                            // Updating the cache
+                            updatedContent[targetPath] = updatedLines
                             // Changed
                             true
                         } else {
@@ -159,6 +157,26 @@ class AutoVersioningProcessingServiceImpl(
             }
             // At least one path was changed
             if (targetPathUpdated.any { it }) {
+
+                // Uploading the file contents
+                try {
+                    updatedContent.forEach { (targetPath, updatedLines) ->
+                        scm.uploadLines(
+                            upgradeBranch,
+                            commitId,
+                            targetPath,
+                            updatedLines,
+                            message = order.getCommitMessage()
+                        )
+                    }
+                } catch (e: Exception) {
+                    autoVersioningEventService.sendError(
+                        order,
+                        e.message?.takeIf { it.isNotBlank() } ?: "Issue while uploading the change",
+                        e
+                    )
+                    throw e
+                }
 
                 // Templating renderer
                 val avRenderer = autoVersioningTemplatingService.createAutoVersioningTemplateRenderer(
