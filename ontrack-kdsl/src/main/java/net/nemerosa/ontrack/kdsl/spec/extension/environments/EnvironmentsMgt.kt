@@ -3,12 +3,17 @@ package net.nemerosa.ontrack.kdsl.spec.extension.environments
 import net.nemerosa.ontrack.kdsl.connector.Connected
 import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.environments.CreateEnvironmentMutation
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.environments.FindEnvironmentByNameQuery
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.environments.FindPipelineByIdQuery
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.environments.*
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 
 class EnvironmentsMgt(connector: Connector) : Connected(connector) {
+
+    fun list(): List<Environment> =
+        graphqlConnector.query(
+            ListEnvironmentsQuery()
+        )?.environments()?.map {
+            it.fragments().environmentFragment().toEnvironment(this)
+        } ?: emptyList()
 
     fun createEnvironment(
         name: String,
@@ -46,5 +51,16 @@ class EnvironmentsMgt(connector: Connector) : Connected(connector) {
             FindPipelineByIdQuery(id)
         )?.slotPipelineById()?.fragments()
             ?.slotPipelineFragment()?.toPipeline(this)
+
+    fun findSlot(environment: String, project: String): Slot? =
+        graphqlConnector.query(
+            FindSlotQuery(environment, project)
+        )?.environmentByName()
+            ?.slots()?.firstOrNull()
+            ?.fragments()?.slotFragment()?.toSlot(this)
+
+    fun getSlot(environment: String, project: String): Slot =
+        findSlot(environment, project)
+            ?: error("Could not find slot")
 
 }

@@ -1,0 +1,12 @@
+query PipelineRequiredInputs(
+    $id: String!,
+) {
+    slotPipelineById(id: $id) {
+        requiredInputs {
+            config {
+                id
+                ruleId
+            }
+        }
+    }
+}

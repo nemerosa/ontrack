@@ -1,0 +1,10 @@
+mutation FinishDeploymentPipeline(
+    $pipelineId: String!,
+) {
+    finishSlotPipelineDeployment(input: {
+        pipelineId: $pipelineId,
+        forcing: false,
+    }) {
+        ...PayloadUserErrors
+    }
+}

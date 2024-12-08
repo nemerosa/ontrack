@@ -37,6 +37,7 @@ class CascController(
             } else {
                 val content = file.bytes.toString(Charsets.UTF_8)
                 cascUploadService.upload(content)
+                cascLoadingService.load()
             }
         } else {
             throw CascUploadNotEnabledException()

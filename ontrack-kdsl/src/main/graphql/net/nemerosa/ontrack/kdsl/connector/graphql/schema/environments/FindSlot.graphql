@@ -1,0 +1,10 @@
+query FindSlot(
+    $environment: String!,
+    $project: String!,
+) {
+    environmentByName(name: $environment) {
+        slots(projects: [$project]) {
+            ...SlotFragment
+        }
+    }
+}

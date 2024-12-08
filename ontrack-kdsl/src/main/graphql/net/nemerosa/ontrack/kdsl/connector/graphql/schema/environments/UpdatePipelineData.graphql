@@ -1,0 +1,11 @@
+mutation UpdatePipelineData(
+    $pipelineId: String!,
+    $values: [SlotPipelineDataInputValue!]!,
+) {
+    updatePipelineData(input: {
+        pipelineId: $pipelineId,
+        values: $values,
+    }) {
+        ...PayloadUserErrors
+    }
+}
