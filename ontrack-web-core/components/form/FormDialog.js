@@ -142,7 +142,7 @@ export default function FormDialog({dialog, onValuesChange, children, hasOk = tr
                                 </Button>
                                 {
                                     hasOk &&
-                                    <Button type="primary" htmlType="submit" disabled={!submittable}>
+                                    <Button loading={loading} type="primary" htmlType="submit" disabled={loading || !submittable}>
                                         {okText ?? "OK"}
                                     </Button>
                                 }

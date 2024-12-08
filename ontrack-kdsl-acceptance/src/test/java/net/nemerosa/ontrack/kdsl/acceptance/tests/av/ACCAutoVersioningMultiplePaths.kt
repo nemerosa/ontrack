@@ -74,6 +74,62 @@ class ACCAutoVersioningMultiplePaths : AbstractACCAutoVersioningTestSupport() {
     }
 
     @Test
+    fun `Auto versioning with additional paths using the same path`() {
+        withMockScmRepository(ontrack) {
+            withAutoVersioning {
+                repositoryFile("gradle.properties") {
+                    """
+                        one-version = 1.0.0
+                        another-version = 1.0.0
+                    """.trimIndent()
+                }
+                val dependency = branchWithPromotion(promotion = "IRON")
+                project {
+                    branch {
+                        configuredForMockRepository()
+                        setAutoVersioningConfig(
+                            listOf(
+                                AutoVersioningSourceConfig(
+                                    sourceProject = dependency.project.name,
+                                    sourceBranch = dependency.name,
+                                    sourcePromotion = "IRON",
+                                    targetPath = "gradle.properties",
+                                    targetProperty = "one-version",
+                                    additionalPaths = listOf(
+                                        AutoVersioningSourceConfigPath(
+                                            path = "gradle.properties",
+                                            property = "another-version",
+                                        )
+                                    )
+                                )
+                            )
+                        )
+
+                        dependency.apply {
+                            build(name = "2.0.0") {
+                                setMetaInfoProperty("toml", "2.0.0-toml")
+                                promote("IRON")
+                            }
+                        }
+
+                        waitForAutoVersioningCompletion()
+
+                        assertThatMockScmRepository {
+                            fileContains("gradle.properties") {
+                                """
+                                    one-version = 2.0.0
+                                    another-version = 2.0.0
+                                """.trimIndent()
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun `Auto versioning on multiple paths`() {
         withMockScmRepository(ontrack) {
             withAutoVersioning {
