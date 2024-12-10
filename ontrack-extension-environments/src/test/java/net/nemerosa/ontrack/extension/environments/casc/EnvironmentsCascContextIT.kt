@@ -43,6 +43,7 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                     description = "",
                     order = 50,
                     tags = emptyList(),
+                    image = false,
                 )
             )
             casc(
@@ -87,6 +88,7 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                     description = "",
                     order = 50,
                     tags = emptyList(),
+                    image = false,
                 )
             )
             casc(
@@ -132,6 +134,7 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                     description = "Repetition environment",
                     order = 100,
                     tags = listOf("release"),
+                    image = false,
                 )
             )
             environmentService.save(
@@ -140,6 +143,7 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                     description = "",
                     order = 200,
                     tags = listOf("release"),
+                    image = false,
                 )
             )
             val json = environmentsCascContext.render()

@@ -48,7 +48,7 @@ class EnvironmentRepository(
         return try {
             namedParameterJdbcTemplate!!.queryForObject(
                 """
-                SELECT *
+                SELECT ID, NAME, "ORDER", DESCRIPTION, TAGS, (IMAGE IS NOT NULL) AS HAS_IMAGE
                 FROM ENVIRONMENTS
                 WHERE ID = :id
             """,
@@ -64,7 +64,7 @@ class EnvironmentRepository(
     fun findByName(name: String): Environment? =
         namedParameterJdbcTemplate!!.query(
             """
-                SELECT *
+                SELECT ID, NAME, "ORDER", DESCRIPTION, TAGS, (IMAGE IS NOT NULL) AS HAS_IMAGE 
                 FROM ENVIRONMENTS
                 WHERE NAME = :name
             """,
@@ -92,7 +92,11 @@ class EnvironmentRepository(
             params["projects"] = filter.projects.toTypedArray()
         }
 
-        var sql = "SELECT E.* FROM ENVIRONMENTS E "
+        var sql = """
+            SELECT E.ID, E.NAME, E."ORDER", E.DESCRIPTION, E.TAGS, (E.IMAGE IS NOT NULL) AS HAS_IMAGE
+            FROM ENVIRONMENTS E
+            
+        """.trimIndent()
         if (joins.isNotEmpty()) {
             sql += joins.joinToString(" ")
         }
@@ -126,7 +130,8 @@ class EnvironmentRepository(
         name = rs.getString("NAME"),
         order = rs.getInt("ORDER"),
         description = rs.getString("DESCRIPTION"),
-        tags = (rs.getArray("TAGS").array as Array<String>).toList()
+        tags = (rs.getArray("TAGS").array as Array<String>).toList(),
+        image = rs.getBoolean("HAS_IMAGE"),
     )
 
 }

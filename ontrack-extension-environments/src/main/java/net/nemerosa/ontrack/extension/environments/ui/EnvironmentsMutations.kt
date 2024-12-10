@@ -29,6 +29,7 @@ class EnvironmentsMutations(
                 order = input.order,
                 description = input.description,
                 tags = input.tags ?: emptyList(),
+                image = false,
             ).apply {
                 environmentService.save(this)
             }

@@ -170,6 +170,7 @@ class EnvironmentsCascContext(
                         description = env.description,
                         order = env.order,
                         tags = env.tags,
+                        image = false, // TODO
                     )
                 )
             }
@@ -180,6 +181,7 @@ class EnvironmentsCascContext(
                     description = env.description,
                     order = env.order,
                     tags = env.tags,
+                    image = false, // TODO
                 )
                 environmentService.save(adapted)
             }

@@ -8,12 +8,14 @@ data class Environment(
     val order: Int,
     val description: String?,
     val tags: List<String> = emptyList(),
+    val image: Boolean,
 ) {
     fun withTags(tags: List<String>) = Environment(
         id = id,
         name = name,
         order = order,
         description = description,
-        tags = tags
+        tags = tags,
+        image = image,
     )
 }

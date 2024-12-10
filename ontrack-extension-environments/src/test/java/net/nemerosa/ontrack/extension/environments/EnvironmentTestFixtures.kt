@@ -12,5 +12,6 @@ object EnvironmentTestFixtures {
         order = order,
         description = null,
         tags = tags,
+        image = false,
     )
 }

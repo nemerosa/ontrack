@@ -1,0 +1,4 @@
+-- 49. Environment icons
+
+ALTER TABLE ENVIRONMENTS
+    ADD COLUMN IMAGE BYTEA NULL;
