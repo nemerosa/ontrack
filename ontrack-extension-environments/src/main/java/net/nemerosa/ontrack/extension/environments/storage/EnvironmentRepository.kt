@@ -1,8 +1,10 @@
 package net.nemerosa.ontrack.extension.environments.storage
 
+import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.extension.environments.Environment
 import net.nemerosa.ontrack.extension.environments.EnvironmentFilter
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
+import net.nemerosa.ontrack.repository.support.getDocumentWithType
 import org.springframework.dao.IncorrectResultSizeDataAccessException
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
@@ -133,5 +135,33 @@ class EnvironmentRepository(
         tags = (rs.getArray("TAGS").array as Array<String>).toList(),
         image = rs.getBoolean("HAS_IMAGE"),
     )
+
+    fun setEnvironmentImage(environment: Environment, document: Document?) {
+        namedParameterJdbcTemplate!!.update(
+            """
+                UPDATE ENVIRONMENTS
+                SET IMAGE = :image
+                WHERE ID = :id
+            """.trimIndent(),
+            mapOf(
+                "id" to environment.id,
+                "image" to document?.content
+            )
+        )
+    }
+
+    fun getEnvironmentImage(environment: Environment): Document =
+        namedParameterJdbcTemplate!!.query(
+            """
+                SELECT IMAGE
+                FROM ENVIRONMENTS
+                WHERE ID = :id
+            """.trimIndent(),
+            mapOf(
+                "id" to environment.id,
+            )
+        ) { rs, _ -> rs.getDocumentWithType("IMAGE", "image/png") }
+            .firstOrNull()
+            ?: Document.EMPTY
 
 }

@@ -9,6 +9,7 @@ apply<OntrackExtensionPlugin>()
 dependencies {
     api(project(":ontrack-extension-support"))
 
+    implementation("org.springframework.boot:spring-boot-starter-web")
     implementation(project(":ontrack-ui-graphql"))
     implementation(project(":ontrack-extension-license"))
     implementation(project(":ontrack-extension-casc"))

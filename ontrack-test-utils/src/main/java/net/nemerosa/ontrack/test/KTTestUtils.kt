@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.test
 
 import com.fasterxml.jackson.databind.JsonNode
 import java.util.*
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.test.assertTrue
 import kotlin.test.fail
 
@@ -71,3 +73,14 @@ fun getOptionalEnv(property: String): String? {
 
 private fun propertyToEnvName(property: String) = property.uppercase().replace('.', '_')
 
+/**
+ * Gets the content of a resource as a Base64 encoded string
+ */
+@OptIn(ExperimentalEncodingApi::class)
+fun resourceBase64(path: String): String =
+    TestUtils::class.java.getResourceAsStream(path)
+        ?.use { it.readBytes() }
+        ?.let {
+            Base64.encode(it)
+        }
+        ?: error("Could not find resource $path")

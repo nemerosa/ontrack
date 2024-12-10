@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static net.nemerosa.ontrack.model.structure.Entity.isEntityDefined;
-import static net.nemerosa.ontrack.service.ImageHelper.checkImage;
+import static net.nemerosa.ontrack.model.support.ImageHelper.checkImage;
 
 @Service
 @Transactional

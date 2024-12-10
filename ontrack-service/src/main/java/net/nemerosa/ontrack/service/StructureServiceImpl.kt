@@ -18,9 +18,9 @@ import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.Entity.Companion.isEntityDefined
 import net.nemerosa.ontrack.model.structure.Entity.Companion.isEntityNew
+import net.nemerosa.ontrack.model.support.ImageHelper.checkImage
 import net.nemerosa.ontrack.model.support.UserTransaction
 import net.nemerosa.ontrack.repository.*
-import net.nemerosa.ontrack.service.ImageHelper.checkImage
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.Validate
 import org.slf4j.LoggerFactory

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.environments.service
 
+import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.extension.environments.Environment
 import net.nemerosa.ontrack.extension.environments.EnvironmentFilter
 
@@ -31,5 +32,17 @@ interface EnvironmentService {
      * Deletes an environment
      */
     fun delete(env: Environment)
+
+    /**
+     * Sets an image for an environment
+     */
+    fun setEnvironmentImage(id: String, document: Document)
+
+    /**
+     * Downloads the image for an environment.
+     *
+     * Returns an empty document if image is not available.
+     */
+    fun getEnvironmentImage(id: String): Document
 
 }

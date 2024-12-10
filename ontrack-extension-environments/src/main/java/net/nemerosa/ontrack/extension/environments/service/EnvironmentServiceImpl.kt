@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.environments.service
 
+import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.extension.environments.Environment
 import net.nemerosa.ontrack.extension.environments.EnvironmentFilter
 import net.nemerosa.ontrack.extension.environments.EnvironmentsLicense
@@ -11,6 +12,7 @@ import net.nemerosa.ontrack.extension.environments.storage.EnvironmentNameAlread
 import net.nemerosa.ontrack.extension.environments.storage.EnvironmentRepository
 import net.nemerosa.ontrack.model.events.EventPostService
 import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.support.ImageHelper
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -68,5 +70,19 @@ class EnvironmentServiceImpl(
         securityService.checkGlobalFunction(EnvironmentDelete::class.java)
         eventPostService.post(environmentsEventsFactory.environmentDeleted(env))
         environmentRepository.delete(env)
+    }
+
+    override fun setEnvironmentImage(id: String, document: Document) {
+        securityService.checkGlobalFunction(EnvironmentSave::class.java)
+        ImageHelper.checkImage(document)
+        val environment = getById(id)
+        environmentRepository.setEnvironmentImage(environment, document)
+        eventPostService.post(environmentsEventsFactory.environmentUpdated(environment))
+    }
+
+    override fun getEnvironmentImage(id: String): Document {
+        securityService.checkGlobalFunction(EnvironmentList::class.java)
+        val environment = getById(id)
+        return environmentRepository.getEnvironmentImage(environment)
     }
 }
