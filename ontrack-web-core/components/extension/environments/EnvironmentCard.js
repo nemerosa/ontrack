@@ -1,5 +1,6 @@
 import {Card, Space, Tag, Typography} from "antd";
 import EnvironmentOrder from "@components/extension/environments/EnvironmentOrder";
+import EnvironmentTitle from "@components/extension/environments/EnvironmentTitle";
 
 export default function EnvironmentCard({environment}) {
     return (
@@ -10,7 +11,9 @@ export default function EnvironmentCard({environment}) {
                 }}
                 size="small"
                 data-testid={`environment-${environment.id}`}
-                title={environment.name}
+                title={
+                    <EnvironmentTitle environment={environment}/>
+                }
                 extra={
                     <>
                         <EnvironmentOrder order={environment.order}/>
