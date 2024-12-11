@@ -84,6 +84,7 @@ private val builtinTypes = listOf(
     cascLong,
     cascBoolean,
     cascJson,
+    cascDuration,
 ).associateBy { it.__type }
 
 // ====================================================================================
