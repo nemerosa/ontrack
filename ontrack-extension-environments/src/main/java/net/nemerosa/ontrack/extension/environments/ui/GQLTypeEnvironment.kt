@@ -25,6 +25,7 @@ class GQLTypeEnvironment(
             .intField(Environment::order)
             .stringField(Environment::description)
             .stringListField(Environment::tags)
+            .booleanField(Environment::image)
             .field {
                 it.name("slots")
                     .description("List of slots for this environment")

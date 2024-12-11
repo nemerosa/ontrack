@@ -3,7 +3,9 @@ package net.nemerosa.ontrack.extension.environments.ui
 import net.nemerosa.ontrack.extension.environments.EnvironmentTestSupport
 import net.nemerosa.ontrack.extension.environments.service.EnvironmentService
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.model.support.ImageHelper
 import net.nemerosa.ontrack.test.TestUtils.uid
+import net.nemerosa.ontrack.test.resourceBase64
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
@@ -64,6 +66,33 @@ class EnvironmentGraphQLIT : AbstractQLKTITSupport() {
                 ) { data ->
                     val id = data.path("environmentByName").path("id").asText()
                     assertEquals(env.id, id)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Image flag for an environment`() {
+        val image = resourceBase64("/images/environment.png")
+        asAdmin {
+            environmentTestSupport.withEnvironment { environment ->
+                environmentService.setEnvironmentImage(
+                    environment.id,
+                    ImageHelper.imagePng(image)
+                )
+                run(
+                    """
+                        {
+                            environmentByName(name: "${environment.name}") {
+                                id
+                                image
+                            }
+                        }
+                    """.trimIndent()
+                ) { data ->
+                    val e = data.path("environmentByName")
+                    assertEquals(environment.id, e.path("id").asText())
+                    assertEquals(true, e.path("image").asBoolean())
                 }
             }
         }
