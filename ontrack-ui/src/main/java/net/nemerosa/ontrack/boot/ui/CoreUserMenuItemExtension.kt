@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.boot.ui
 
-import net.nemerosa.ontrack.boot.CoreExtensionFeature
 import net.nemerosa.ontrack.extension.api.UserMenuItemExtension
 import net.nemerosa.ontrack.extension.support.AbstractExtension
+import net.nemerosa.ontrack.extension.support.CoreExtensionFeature
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.security.isGlobalFunctionGranted

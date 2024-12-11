@@ -7,10 +7,10 @@ import net.nemerosa.ontrack.extension.casc.schema.CascType
 import net.nemerosa.ontrack.extension.casc.schema.cascArray
 import net.nemerosa.ontrack.extension.casc.schema.cascField
 import net.nemerosa.ontrack.extension.casc.schema.cascObject
-import net.nemerosa.ontrack.extension.scm.service.SCMRefService
-import net.nemerosa.ontrack.extension.scm.service.downloadDocument
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.model.files.FileRefService
+import net.nemerosa.ontrack.model.files.downloadDocument
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.NameDescription
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component
 @Component
 class PredefinedValidationStampsAdminContext(
     private val predefinedValidationStampService: PredefinedValidationStampService,
-    private val scmRefService: SCMRefService,
+    private val scmRefService: FileRefService,
 ) : AbstractCascContext(), SubAdminContext {
 
     private val logger: Logger = LoggerFactory.getLogger(PredefinedValidationStampsAdminContext::class.java)

@@ -1,11 +1,10 @@
 package net.nemerosa.ontrack.extension.github.ingestion.support
 
 import net.nemerosa.ontrack.common.Document
-import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfigurationPropertyType
-import net.nemerosa.ontrack.extension.scm.service.SCMRefService
-import net.nemerosa.ontrack.extension.scm.service.downloadDocument
+import net.nemerosa.ontrack.model.files.FileRefService
+import net.nemerosa.ontrack.model.files.downloadDocument
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.PropertyService
 import org.springframework.stereotype.Component
@@ -15,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class DefaultIngestionImageService(
     private val propertyService: PropertyService,
-    private val scmRefService: SCMRefService,
+    private val scmRefService: FileRefService,
 ) : IngestionImageService {
 
     override fun downloadImage(project: Project, ref: String): Document {

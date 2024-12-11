@@ -1,6 +1,4 @@
-package net.nemerosa.ontrack.boot
-
-import net.nemerosa.ontrack.extension.support.AbstractExtensionFeature
+package net.nemerosa.ontrack.extension.support
 
 class CoreExtensionFeature : AbstractExtensionFeature(
         "core",

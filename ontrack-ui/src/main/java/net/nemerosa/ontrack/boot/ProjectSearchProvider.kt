@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.boot
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.extension.support.CoreExtensionFeature
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventListener

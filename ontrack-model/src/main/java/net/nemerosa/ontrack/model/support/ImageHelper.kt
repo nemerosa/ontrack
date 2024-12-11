@@ -10,7 +10,7 @@ object ImageHelper {
 
     private const val ICON_IMAGE_SIZE_MAX = 16 * 1000L
 
-    private val IMAGE_PNG = "image/png"
+    const val IMAGE_PNG = "image/png"
 
     private val ACCEPTED_IMAGE_TYPES = listOf(
         IMAGE_PNG,

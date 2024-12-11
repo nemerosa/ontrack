@@ -1,12 +1,16 @@
 package net.nemerosa.ontrack.extension.stash.scm
 
-import net.nemerosa.ontrack.extension.scm.service.*
+import net.nemerosa.ontrack.extension.scm.service.SCM
+import net.nemerosa.ontrack.extension.scm.service.SCMDetector
+import net.nemerosa.ontrack.extension.scm.service.SCMPullRequest
 import net.nemerosa.ontrack.extension.stash.AbstractBitbucketTestSupport
 import net.nemerosa.ontrack.extension.stash.TestOnBitbucketServer
 import net.nemerosa.ontrack.extension.stash.bitbucketServerEnv
 import net.nemerosa.ontrack.extension.stash.client.BitbucketClientFactory
 import net.nemerosa.ontrack.extension.stash.model.BitbucketRepository
 import net.nemerosa.ontrack.extension.stash.model.StashConfiguration
+import net.nemerosa.ontrack.model.files.FileRefService
+import net.nemerosa.ontrack.model.files.downloadDocument
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,7 +23,7 @@ class BitbucketServerSCMExtensionRealIT : AbstractBitbucketTestSupport() {
     private lateinit var extension: BitbucketServerSCMExtension
 
     @Autowired
-    private lateinit var scmRefService: SCMRefService
+    private lateinit var scmRefService: FileRefService
 
     @Autowired
     private lateinit var scmDetector: SCMDetector

@@ -16,7 +16,10 @@ import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowService
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.model.files.FileRef
+import net.nemerosa.ontrack.model.files.FileRefService
 import net.nemerosa.ontrack.model.structure.StructureService
+import net.nemerosa.ontrack.model.support.ImageHelper
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import kotlin.io.encoding.Base64
@@ -29,6 +32,7 @@ class EnvironmentsCascContext(
     private val structureService: StructureService,
     private val slotService: SlotService,
     private val slotWorkflowService: SlotWorkflowService,
+    private val fileRefService: FileRefService,
 ) : AbstractCascContext(), SubConfigContext {
 
     private val logger = LoggerFactory.getLogger(EnvironmentsCascContext::class.java)
@@ -166,15 +170,15 @@ class EnvironmentsCascContext(
         ) {
             equality { a, b -> a.name == b.name }
             onCreation { env ->
-                environmentService.save(
-                    Environment(
-                        name = env.name,
-                        description = env.description,
-                        order = env.order,
-                        tags = env.tags,
-                        image = false, // TODO
-                    )
+                val environment = Environment(
+                    name = env.name,
+                    description = env.description,
+                    order = env.order,
+                    tags = env.tags,
+                    image = false,
                 )
+                environmentService.save(environment)
+                setImage(env, environment)
             }
             onModification { env, existing ->
                 val adapted = Environment(
@@ -183,15 +187,32 @@ class EnvironmentsCascContext(
                     description = env.description,
                     order = env.order,
                     tags = env.tags,
-                    image = false, // TODO
+                    image = existing.image,
                 )
                 environmentService.save(adapted)
+                setImage(env, adapted)
             }
             onDeletion { existing ->
                 if (!model.keepEnvironments) {
                     environmentService.delete(existing)
                 }
             }
+        }
+    }
+
+    private fun setImage(
+        env: EnvironmentCasc,
+        environment: Environment
+    ) {
+        if (!env.image.isNullOrBlank()) {
+            val image = fileRefService.downloadDocument(
+                ref = FileRef.parseUri(env.image) ?: error("Cannot parse image URI: ${env.image}"),
+                type = ImageHelper.IMAGE_PNG,
+            ) ?: error("Cannot download image at ${env.image}")
+            environmentService.setEnvironmentImage(
+                id = environment.id,
+                document = image
+            )
         }
     }
 

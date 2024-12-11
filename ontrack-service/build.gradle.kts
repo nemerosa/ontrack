@@ -8,6 +8,7 @@ dependencies {
     implementation(project(":ontrack-model"))
     implementation(project(":ontrack-repository"))
     implementation(project(":ontrack-extension-api"))
+    implementation(project(":ontrack-extension-support"))
     implementation(project(":ontrack-job"))
     implementation("org.springframework.security:spring-security-core")
     implementation("org.springframework.security:spring-security-config")
