@@ -4,13 +4,17 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.casc.CascContext
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APIIgnore
+import net.nemerosa.ontrack.model.annotations.getPropertyDescription
 import net.nemerosa.ontrack.model.annotations.getPropertyName
 import java.time.Duration
+import kotlin.jvm.internal.Reflection
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.hasAnnotation
+import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.memberProperties
+import kotlin.reflect.jvm.javaType
 import kotlin.reflect.jvm.jvmErasure
 
 sealed class CascType(
@@ -46,8 +50,15 @@ class CascJson : CascType("JSON type") {
     override val __type: String = "JSON"
 }
 
-class CascDuration: CascType("Duration") {
+class CascDuration : CascType("Duration") {
     override val __type: String = "Duration"
+}
+
+class CascEnum(
+    val name: String,
+    val values: List<String>,
+) : CascType("Enum") {
+    override val __type: String = "Enum"
 }
 
 sealed class CascScalar(
@@ -73,6 +84,7 @@ private val builtinTypes = listOf(
     cascLong,
     cascBoolean,
     cascJson,
+    cascDuration,
 ).associateBy { it.__type }
 
 // ====================================================================================
@@ -181,9 +193,42 @@ internal fun cascFieldType(property: KProperty<*>): CascType =
             Long::class -> cascLong
             JsonNode::class -> cascJson
             Duration::class -> cascDuration
-            else -> error("Cannot get CasC type for $property")
+            List::class -> cascArray(property)
+            else -> {
+                val kclass = property.returnType.classifier as? KClass<*>
+                when {
+                    kclass?.isSubclassOf(Enum::class) == true -> cascEnum(property)
+                    else -> error("Cannot get CasC type for $property")
+                }
+            }
         }
     }
+
+private fun cascArray(property: KProperty<*>): CascType {
+    val listArguments = property.returnType.arguments
+    return if (listArguments.size == 1) {
+        val elementType = listArguments.first().type?.javaType
+        if (elementType is Class<*>) {
+            val kotlinClass = Reflection.createKotlinClass(elementType)
+            cascArray(
+                description = getPropertyDescription(property),
+                type = cascObject(kotlinClass)
+            )
+        } else {
+            error("Only list with typed elements are supported for $property")
+        }
+    } else {
+        error("No argument found for the list type $property")
+    }
+}
+
+private fun cascEnum(property: KProperty<*>): CascType {
+    val kclass = property.returnType.classifier as KClass<*>
+    return CascEnum(
+        name = kclass.simpleName!!,
+        values = kclass.java.enumConstants.map { it.toString() },
+    )
+}
 
 private fun cascPropertyType(property: KProperty<*>): CascType {
     val propertyType = property.findAnnotation<CascPropertyType>()
