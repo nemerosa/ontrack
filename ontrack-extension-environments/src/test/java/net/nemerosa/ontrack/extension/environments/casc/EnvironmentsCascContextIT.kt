@@ -11,7 +11,11 @@ import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflow
 import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowService
 import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowTestFixtures
 import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowTrigger
+import net.nemerosa.ontrack.extension.scm.service.TestSCMExtension
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.test.TestUtils.resourceBytes
+import net.nemerosa.ontrack.test.TestUtils.uid
+import net.nemerosa.ontrack.test.resourceBase64
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
@@ -32,6 +36,9 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
 
     @Autowired
     private lateinit var slotTestSupport: SlotTestSupport
+
+    @Autowired
+    private lateinit var testSCMExtension: TestSCMExtension
 
     @Test
     fun `Defining environments keeps existing environments by default`() {
@@ -156,12 +163,14 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                             "description" to "Repetition environment",
                             "order" to 100,
                             "tags" to listOf("release"),
+                            "image" to null,
                         ),
                         mapOf(
                             "name" to "production",
                             "description" to "",
                             "order" to 200,
                             "tags" to listOf("release"),
+                            "image" to null,
                         ),
                     ),
                     "slots" to emptyList<String>(),
@@ -351,6 +360,7 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                                 "description" to "",
                                 "order" to slot.environment.order,
                                 "tags" to slot.environment.tags,
+                                "image" to null,
                             ),
                         ),
                         "slots" to listOf(
@@ -544,17 +554,20 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                 )
             ) { slot ->
                 assertNotNull(
-                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.CREATION).firstOrNull()
+                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.CREATION)
+                        .firstOrNull()
                 ) { sw ->
                     assertEquals("Creation", sw.workflow.name)
                 }
                 assertNotNull(
-                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.DEPLOYING).firstOrNull()
+                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.DEPLOYING)
+                        .firstOrNull()
                 ) { sw ->
                     assertEquals("Deploying", sw.workflow.name)
                 }
                 assertNotNull(
-                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.DEPLOYED).firstOrNull()
+                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.DEPLOYED)
+                        .firstOrNull()
                 ) { sw ->
                     assertEquals("Deployed", sw.workflow.name)
                 }
@@ -621,17 +634,20 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                 )
             ) { slot ->
                 assertNotNull(
-                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.CREATION).firstOrNull()
+                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.CREATION)
+                        .firstOrNull()
                 ) { sw ->
                     assertEquals("Creation", sw.workflow.name)
                 }
                 assertNotNull(
-                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.DEPLOYING).firstOrNull()
+                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.DEPLOYING)
+                        .firstOrNull()
                 ) { sw ->
                     assertEquals("Deploying", sw.workflow.name)
                 }
                 assertNotNull(
-                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.DEPLOYED).firstOrNull()
+                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.DEPLOYED)
+                        .firstOrNull()
                 ) { sw ->
                     assertEquals("Deployed", sw.workflow.name)
                 }
@@ -679,20 +695,122 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                 )
             ) { slot ->
                 assertNull(
-                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.CREATION).firstOrNull(),
+                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.CREATION)
+                        .firstOrNull(),
                     "Creation workflow is gone"
                 )
                 assertNotNull(
-                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.DEPLOYING).firstOrNull()
+                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.DEPLOYING)
+                        .firstOrNull()
                 ) { sw ->
                     assertEquals("Deploying", sw.workflow.name)
                 }
                 assertNotNull(
-                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.DEPLOYED).firstOrNull()
+                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.DEPLOYED)
+                        .firstOrNull()
                 ) { sw ->
                     assertEquals("Deployed", sw.workflow.name)
                 }
             }
+        }
+    }
+
+    @Test
+    fun `Setting an image for an environment using the classpath`() {
+        asAdmin {
+            deleteAllEnvironments()
+            casc(
+                """
+                    ontrack:
+                        config:
+                            environments:
+                                environments:
+                                    - name: staging
+                                      description: Repetition environment
+                                      order: 100
+                                      tags:
+                                        - release
+                                    - name: production
+                                      order: 200
+                                      tags:
+                                        - release
+                                      image: classpath:/images/environment.png
+                """.trimIndent()
+            )
+            val staging = environmentService.findByName("staging") ?: fail("Staging not found")
+            assertFalse(staging.image, "No image for staging")
+
+            val production = environmentService.findByName("production") ?: fail("Production not found")
+            assertTrue(production.image, "The production environment has an image")
+        }
+    }
+
+    @Test
+    fun `Setting an image for an environment using Base64`() {
+        val image = resourceBase64("/images/environment.png")
+        asAdmin {
+            deleteAllEnvironments()
+            casc(
+                """
+                    ontrack:
+                        config:
+                            environments:
+                                environments:
+                                    - name: staging
+                                      description: Repetition environment
+                                      order: 100
+                                      tags:
+                                        - release
+                                    - name: production
+                                      order: 200
+                                      tags:
+                                        - release
+                                      image: |
+                                        base64:$image
+                """.trimIndent()
+            )
+            val staging = environmentService.findByName("staging") ?: fail("Staging not found")
+            assertFalse(staging.image, "No image for staging")
+
+            val production = environmentService.findByName("production") ?: fail("Production not found")
+            assertTrue(production.image, "The production environment has an image")
+        }
+    }
+
+    @Test
+    fun `Setting an image for an environment using an SCM`() {
+        val config = uid("scm_")
+        // Registering the image
+        testSCMExtension.registerConfigForTestSCM(config) {
+            withBinaryFile("images/environment.png", branch = null /* default branch */) {
+                resourceBytes("/images/environment.png")
+            }
+        }
+        asAdmin {
+            deleteAllEnvironments()
+            casc(
+                """
+                    ontrack:
+                        config:
+                            environments:
+                                environments:
+                                    - name: staging
+                                      description: Repetition environment
+                                      order: 100
+                                      tags:
+                                        - release
+                                    - name: production
+                                      order: 200
+                                      tags:
+                                        - release
+                                      image: scm://test/$config/images/environment.png
+                """.trimIndent()
+            )
+            val staging = environmentService.findByName("staging") ?: fail("Staging not found")
+            assertFalse(staging.image, "No image for staging")
+
+            val production = environmentService.findByName("production") ?: fail("Production not found")
+            assertTrue(production.image, "The production environment has an image")
         }
     }
 

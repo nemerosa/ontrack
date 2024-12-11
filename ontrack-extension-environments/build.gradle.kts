@@ -18,6 +18,7 @@ dependencies {
     implementation(project(":ontrack-repository"))
     implementation(project(":ontrack-repository-support"))
 
+    testImplementation(project(":ontrack-extension-scm"))
     testImplementation(project(path = ":ontrack-model", configuration = "tests"))
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))
@@ -27,6 +28,7 @@ dependencies {
     testImplementation(project(path = ":ontrack-extension-recordings", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-license", configuration = "tests"))
+    testImplementation(project(path = ":ontrack-extension-scm", configuration = "tests"))
     testImplementation(project(":ontrack-it-utils"))
 
     testRuntimeOnly(project(":ontrack-service"))

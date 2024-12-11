@@ -17,6 +17,7 @@ data class EnvironmentCasc(
     val description: String = "",
     val order: Int,
     val tags: List<String> = emptyList(),
+    val image: String? = null,
 )
 
 data class SlotCasc(

@@ -19,6 +19,8 @@ import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.jvm.optionals.getOrNull
 
 @Component
@@ -193,6 +195,7 @@ class EnvironmentsCascContext(
         }
     }
 
+    @OptIn(ExperimentalEncodingApi::class)
     override fun render(): JsonNode {
         val environments = environmentService.findAll()
         return EnvironmentsCascModel(
@@ -203,6 +206,11 @@ class EnvironmentsCascContext(
                     description = it.description ?: "",
                     order = it.order,
                     tags = it.tags,
+                    image = environmentService.getEnvironmentImage(it.id)
+                        .takeIf { doc -> !doc.isEmpty }
+                        ?.content
+                        ?.let { bytes -> Base64.encode(bytes) }
+                        ?.let { base64 -> "base64:$base64" },
                 )
             },
             slots = environments.flatMap { environment ->
