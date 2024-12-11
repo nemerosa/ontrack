@@ -1,6 +1,7 @@
 import {getTextColorForBackground, numberToColorHsl} from "@components/common/colors/Colors";
+import {Tooltip} from "antd";
 
-export default function GeneratedIcon({name, colorIndex}) {
+export default function GeneratedIcon({name, colorIndex, onClick, tooltipText}) {
 
     const initials = generateInitials(name)
     const bgColor = numberToColorHsl(colorIndex)
@@ -8,24 +9,28 @@ export default function GeneratedIcon({name, colorIndex}) {
 
     return (
         <>
-            <span
-                style={{
-                    display: 'inline-block',
-                    width: '2.1em',
-                    height: '2.1em',
-                    lineHeight: '2.1em',
-                    textAlign: 'center',
-                    backgroundColor: bgColor,
-                    color: textColor,
-                    // Adjust font-size slightly smaller so both letters fit nicely.
-                    fontSize: '0.75em',
-                    // Optionally a small border radius to smooth corners, but it's optional.
-                    borderRadius: '0.1em',
-                    verticalAlign: 'middle'
-                }}
-            >
-              {initials}
-            </span>
+            <Tooltip title={tooltipText}>
+                <span
+                    style={{
+                        display: 'inline-block',
+                        width: '2.1em',
+                        height: '2.1em',
+                        lineHeight: '2.1em',
+                        textAlign: 'center',
+                        backgroundColor: bgColor,
+                        color: textColor,
+                        // Adjust font-size slightly smaller so both letters fit nicely.
+                        fontSize: '0.75em',
+                        // Optionally a small border radius to smooth corners, but it's optional.
+                        borderRadius: '0.1em',
+                        verticalAlign: 'middle'
+                    }}
+                    onClick={onClick}
+                    className={onClick ? 'ot-action' : undefined}
+                >
+                  {initials}
+                </span>
+            </Tooltip>
         </>
     )
 }

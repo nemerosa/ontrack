@@ -37,6 +37,7 @@ export default function EnvironmentsView() {
                             description
                             order
                             tags
+                            image
                             slots {
                                 ...SlotData
                             }

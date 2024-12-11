@@ -1913,6 +1913,8 @@ type Environment {
     description: String
     "id field"
     id: String!
+    "image field"
+    image: Boolean
     "name field"
     name: String!
     "order field"
@@ -5502,6 +5504,11 @@ type Query {
     ): ProjectEntityInformation
     "Collection of entity counts"
     entityCounts: EntityCounts!
+    "Getting an environment using its ID"
+    environmentById(
+        "ID of the environment"
+        id: String!
+    ): Environment
     "Getting an environment using its name"
     environmentByName(
         "Name of the environment"

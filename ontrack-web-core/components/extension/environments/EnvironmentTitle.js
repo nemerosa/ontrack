@@ -1,5 +1,5 @@
 import {Space, Typography} from "antd";
-import EnvironmentIcon from "@components/extension/environments/EnvironmentIcon";
+import EnvironmentEditableIcon from "@components/extension/environments/EnvironmentEditableIcon";
 
 export default function EnvironmentTitle({environment, icon = true}) {
     return (
@@ -7,7 +7,7 @@ export default function EnvironmentTitle({environment, icon = true}) {
             <Space>
                 {
                     icon &&
-                    <EnvironmentIcon environment={environment}/>
+                    <EnvironmentEditableIcon environment={environment}/>
                 }
                 <Typography.Text>{environment.name}</Typography.Text>
             </Space>

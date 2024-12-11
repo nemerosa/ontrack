@@ -15,6 +15,8 @@ export const slotUri = ({id}) => `/extension/environments/slot/${id}`
 
 export const environmentsUri = `/extension/environments/environments`
 
+export const restEnvironmentImageUri = ({id}) => `/rest/extension/environments/environments/${id}/image`
+
 export const environmentsBreadcrumbs = () => [
     ...homeBreadcrumbs(),
     <Link key="environments" href={environmentsUri}>Environments</Link>,

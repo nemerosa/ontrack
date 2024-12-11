@@ -1,10 +1,11 @@
 import {useRestClient} from "@components/providers/ConnectionContextProvider";
 import {useEffect, useState} from "react";
+import {Tooltip} from "antd";
 
 /**
  * This renders an image using a call to the REST API.
  */
-export default function ProxyImage({restUri, alt, width, height}) {
+export default function ProxyImage({restUri, alt, width, height, onClick, tooltipText}) {
 
     const client = useRestClient()
 
@@ -30,7 +31,16 @@ export default function ProxyImage({restUri, alt, width, height}) {
         <>
             {
                 dataUrl &&
-                <img src={dataUrl} alt={alt} width={width} height={height}/>
+                <Tooltip title={tooltipText}>
+                    <img
+                        src={dataUrl}
+                        alt={alt}
+                        width={width}
+                        height={height}
+                        onClick={onClick}
+                        className={onClick ? "ot-action" : undefined}
+                    />
+                </Tooltip>
             }
         </>
     )
