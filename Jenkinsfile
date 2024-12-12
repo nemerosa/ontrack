@@ -124,7 +124,7 @@ pipeline {
                         promotion: 'RELEASE',
                         channel: 'slack',
                         channelConfig: [
-                                channel: '#releases',
+                                channel: env.BRANCH_NAME ==~ /^release\/\d+\.\d+$/ ? '#releases' : '#internal-releases',
                                 type: 'SUCCESS'
                         ],
                         events: [
