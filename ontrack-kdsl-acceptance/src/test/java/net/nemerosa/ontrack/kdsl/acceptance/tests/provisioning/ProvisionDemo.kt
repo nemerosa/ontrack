@@ -3,10 +3,12 @@ package net.nemerosa.ontrack.kdsl.acceptance.tests.provisioning
 import net.nemerosa.ontrack.kdsl.acceptance.tests.AbstractACCDSLTestSupport
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.seconds
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
+import net.nemerosa.ontrack.kdsl.acceptance.tests.workflows.WorkflowTestSupport
 import net.nemerosa.ontrack.kdsl.spec.admin.admin
 import net.nemerosa.ontrack.kdsl.spec.extension.casc.casc
 import net.nemerosa.ontrack.kdsl.spec.extension.environments.environments
 import net.nemerosa.ontrack.kdsl.spec.extension.environments.startPipeline
+import net.nemerosa.ontrack.kdsl.spec.extension.notifications.notifications
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
@@ -37,7 +39,7 @@ class ProvisionDemo : AbstractACCDSLTestSupport() {
         // Project provisioning
         val project = ontrack.createProject(PRODUCT_A, "")
         val branch = project.branch("main") { this }
-        branch.promotion(BRONZE)
+        val bronze = branch.promotion(BRONZE)
         branch.promotion(SILVER)
         branch.promotion(GOLD)
         branch.promotion(DIAMOND)
@@ -65,6 +67,7 @@ class ProvisionDemo : AbstractACCDSLTestSupport() {
         }
 
         // Running some Casc
+        // TODO Deployment workflow on staging-pilot
         ontrack.casc.uploadYaml(
             """
                 ontrack:
@@ -115,6 +118,13 @@ class ProvisionDemo : AbstractACCDSLTestSupport() {
                                         - ruleId: promotion
                                           ruleConfig:
                                             promotion: BRONZE
+                                      workflows:
+                                        - trigger: DEPLOYING
+                                          name: Deployment
+                                          nodes:
+                                            - id: done
+                                              executorId: slot-pipeline-deployed
+                                              data: {}
                                     - name: staging-live
                                       admissionRules:
                                         - ruleId: environment
@@ -192,6 +202,31 @@ class ProvisionDemo : AbstractACCDSLTestSupport() {
             .manualApproval("OK for Production Live")
             .startDeploying()
             .finishDeployment()
+
+        // Workflow for deployment on BRONZE
+        ontrack.notifications.subscribe(
+            name = "Deployment to staging-pilot on BRONZE",
+            channel = "workflow",
+            channelConfig = mapOf(
+                "workflow" to WorkflowTestSupport.yamlWorkflowToJson(
+                    """
+                        name: Deployment to staging-pilot
+                        nodes:
+                          - id: start
+                            executorId: slot-pipeline-creation
+                            data:
+                              environment: staging-pilot
+                          - id: deploy
+                            parents:
+                              - id: start
+                            executorId: slot-pipeline-deploying
+                            data: {}
+                    """.trimIndent()
+                )
+            ),
+            events = listOf("new_promotion_run"),
+            projectEntity = bronze,
+        )
     }
 
     @Test

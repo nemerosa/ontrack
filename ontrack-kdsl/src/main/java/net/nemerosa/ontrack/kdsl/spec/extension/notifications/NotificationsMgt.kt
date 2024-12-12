@@ -31,7 +31,7 @@ class NotificationsMgt(connector: Connector) : Connected(connector) {
         name: String? = null,
         channel: String,
         channelConfig: Any,
-        keywords: String?,
+        keywords: String? = null,
         events: List<String>,
         projectEntity: ProjectEntity?,
         contentTemplate: String? = null,
