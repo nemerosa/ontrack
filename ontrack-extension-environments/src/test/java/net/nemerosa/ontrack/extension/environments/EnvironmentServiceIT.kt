@@ -94,9 +94,11 @@ class EnvironmentServiceIT : AbstractDSLTestSupport() {
             val tag1 = uid("t1-")
             val tag2 = uid("t2-")
             val env1 = EnvironmentTestFixtures.testEnvironment(
+                order = 10,
                 tags = listOf(tag1, tag2)
             ).apply { environmentService.save(this) }
             val env2 = EnvironmentTestFixtures.testEnvironment(
+                order = 20,
                 tags = listOf(tag1)
             ).apply { environmentService.save(this) }
 
@@ -130,6 +132,39 @@ class EnvironmentServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    fun `Selecting environments based on projects with qualifiers`() {
+        asAdmin {
+            val project1 = project(NameDescription(uid("p1-"), ""))
+            val project2 = project(NameDescription(uid("p2-"), ""))
+
+            val env1 = environmentTestSupport.withEnvironment(order = 10) {}
+            val env2 = environmentTestSupport.withEnvironment(order = 20) {}
+            val env3 = environmentTestSupport.withEnvironment(order = 30) {}
+
+            slotTestSupport.withSlot(environment = env1, project = project1) {}
+            slotTestSupport.withSlot(environment = env1, project = project2) {}
+            slotTestSupport.withSlot(environment = env1, project = project2, qualifier = "demo") {}
+
+            slotTestSupport.withSlot(environment = env2, project = project1) {}
+            slotTestSupport.withSlot(environment = env2, project = project2) {}
+            slotTestSupport.withSlot(environment = env2, project = project2, qualifier = "demo") {}
+
+            slotTestSupport.withSlot(environment = env3, project = project1) {}
+            slotTestSupport.withSlot(environment = env3, project = project2) {}
+            slotTestSupport.withSlot(environment = env3, project = project2, qualifier = "demo") {}
+
+            assertEquals(
+                listOf(env1, env2, env3),
+                environmentService.findAll(
+                    filter = EnvironmentFilter(
+                        projects = listOf(project2.name)
+                    )
+                )
+            )
+        }
+    }
+
+    @Test
     fun `Selecting environments based on tags and projects`() {
         asAdmin {
             val project1 = project(NameDescription(uid("p1-"), ""))
@@ -137,9 +172,9 @@ class EnvironmentServiceIT : AbstractDSLTestSupport() {
             val tag1 = uid("t1-")
             val tag2 = uid("t2-")
 
-            val env1 = environmentTestSupport.withEnvironment(tags = listOf(tag1)) {}
-            val env2 = environmentTestSupport.withEnvironment(tags = listOf(tag1, tag2)) {}
-            val env3 = environmentTestSupport.withEnvironment(tags = listOf(tag2)) {}
+            val env1 = environmentTestSupport.withEnvironment(order = 10, tags = listOf(tag1)) {}
+            val env2 = environmentTestSupport.withEnvironment(order = 20, tags = listOf(tag1, tag2)) {}
+            val env3 = environmentTestSupport.withEnvironment(order = 30, tags = listOf(tag2)) {}
 
             slotTestSupport.withSlot(environment = env1, project = project1) {}
             slotTestSupport.withSlot(environment = env2, project = project1) {}

@@ -95,7 +95,7 @@ class EnvironmentRepository(
         }
 
         var sql = """
-            SELECT E.ID, E.NAME, E."ORDER", E.DESCRIPTION, E.TAGS, (E.IMAGE IS NOT NULL) AS HAS_IMAGE
+            SELECT DISTINCT E.ID, E.NAME, E."ORDER", E.DESCRIPTION, E.TAGS, (E.IMAGE IS NOT NULL) AS HAS_IMAGE
             FROM ENVIRONMENTS E
             
         """.trimIndent()
