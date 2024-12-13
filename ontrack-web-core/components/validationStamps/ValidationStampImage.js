@@ -1,9 +1,8 @@
 import {restValidationStampImageUri} from "@components/common/Links";
-import {FaWrench} from "react-icons/fa";
-import LegacyImage from "@components/common/LegacyImage";
 import {EventsContext} from "@components/common/EventsContext";
 import {useContext, useState} from "react";
 import ProxyImage from "@components/common/ProxyImage";
+import GeneratedIcon from "@components/common/icons/GeneratedIcon";
 
 export default function ValidationStampImage({validationStamp, size = 16}) {
 
@@ -22,9 +21,9 @@ export default function ValidationStampImage({validationStamp, size = 16}) {
                 alt={validationStamp.name}
                 width={size}
                 height={size}
-            /> : <FaWrench
-                width={size}
-                height={size}
+            /> : <GeneratedIcon
+                name={validationStamp.name}
+                colorIndex={validationStamp.id}
             />
     )
 }
