@@ -1,4 +1,4 @@
-import {Space, Typography} from "antd";
+import {Card, Space, Typography} from "antd";
 import ProjectLink from "@components/projects/ProjectLink";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {useEffect, useState} from "react";
@@ -42,7 +42,9 @@ export default function SlotTitle({slot, showLastDeployed = false}) {
     return (
         <>
             <Space>
-                <ProjectLink project={slot.project}/>
+                <ProjectLink project={slot.project} text={
+                    <Typography.Text strong>{slot.project.name}</Typography.Text>
+                }/>
                 {
                     slot.qualifier &&
                     <Typography.Text>[{slot.qualifier}]</Typography.Text>
@@ -50,10 +52,12 @@ export default function SlotTitle({slot, showLastDeployed = false}) {
                 {
                     showLastDeployed && <LoadingInline loading={loading}>
                         {
-                            build && <Space>
-                                <BuildLink build={build}/>
-                                <PromotionRuns promotionRuns={build.promotionRuns}/>
-                            </Space>
+                            build && <Card size="small">
+                                <Space>
+                                    <BuildLink build={build}/>
+                                    <PromotionRuns promotionRuns={build.promotionRuns}/>
+                                </Space>
+                            </Card>
                         }
                     </LoadingInline>
                 }

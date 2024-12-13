@@ -6,11 +6,7 @@ import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.GraphQLMissingDataException
 import net.nemerosa.ontrack.kdsl.connector.graphql.checkData
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.CreateProjectMutation
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.FindBranchByNameQuery
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.FindByBuildByNameQuery
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.FindProjectByNameQuery
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.ProjectListQuery
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.*
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 
 class Ontrack(connector: Connector) : Connected(connector) {
@@ -21,7 +17,7 @@ class Ontrack(connector: Connector) : Connected(connector) {
      * @param name Name of the project
      * @param description Description for the project
      */
-    fun createProject(name: String, description: String): Project =
+    fun createProject(name: String, description: String = ""): Project =
         graphqlConnector.mutate(
             CreateProjectMutation(
                 name,

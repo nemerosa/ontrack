@@ -30,19 +30,30 @@ class ProvisionDemo : AbstractACCDSLTestSupport() {
     @Disabled
     fun `Acceptance, staging and production`() {
         // Cleanup
-        ontrack.findProjectByName(PRODUCT_A)?.delete()
+        ontrack.projects().forEach {
+            it.delete()
+        }
         ontrack.environments.list().forEach { it.delete() }
 
         // Predefined promotion levels
         predefinedPromotionLevels()
 
         // Project provisioning
-        val project = ontrack.createProject(PRODUCT_A, "")
+        val project = ontrack.createProject(PRODUCT_A)
         val branch = project.branch("main") { this }
         val bronze = branch.promotion(BRONZE)
         branch.promotion(SILVER)
         branch.promotion(GOLD)
         branch.promotion(DIAMOND)
+
+        // Another project
+        val projectB = ontrack.createProject("ProjectB")
+        projectB.branch("release-1.2") {
+            val pl = promotion("CANDIDATE")
+            build("1.2.0") {
+                promote("CANDIDATE")
+            }
+        }
 
         // Creating a build with all the promotions
         val build1 = branch.build("1.0.0") {
