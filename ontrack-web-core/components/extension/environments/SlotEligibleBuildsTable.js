@@ -7,15 +7,18 @@ import PromotionRuns from "@components/promotionRuns/PromotionRuns";
 import {isAuthorized} from "@components/common/authorizations";
 import SlotPipelineCreateButton from "@components/extension/environments/SlotPipelineCreateButton";
 
-export default function SlotEligibleBuildsTable({slot, onChange}) {
+export default function SlotEligibleBuildsTable({slot, onChange, showEligibleBuilds = false}) {
     return (
         <>
             <StandardTable
                 query={
                     gql`
-                        query SlotEligibleBuilds($id: String!) {
+                        query SlotEligibleBuilds(
+                            $id: String!,
+                            $deployableOnly: Boolean!,
+                        ) {
                             slotById(id: $id) {
-                                eligibleBuilds(size: 5) {
+                                eligibleBuilds(size: 5, deployableOnly: $deployableOnly) {
                                     pageInfo {
                                         nextPage {
                                             offset
@@ -31,7 +34,7 @@ export default function SlotEligibleBuildsTable({slot, onChange}) {
                         ${gqlSlotPipelineBuildData}
                     `
                 }
-                variables={{id: slot.id}}
+                variables={{id: slot.id, deployableOnly: !showEligibleBuilds}}
                 queryNode={data => data.slotById.eligibleBuilds}
                 filter={{}}
                 columns={[

@@ -29,7 +29,8 @@ class ManualApprovalSlotAdmissionRule(
         slot: Slot,
         config: ManualApprovalSlotAdmissionRuleConfig,
         queries: MutableList<String>,
-        params: MutableMap<String, Any?>
+        params: MutableMap<String, Any?>,
+        deployable: Boolean,
     ) {
     }
 

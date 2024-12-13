@@ -43,6 +43,7 @@ interface SlotAdmissionRule<C, D> {
         config: C,
         queries: MutableList<String>,
         params: MutableMap<String, Any?>,
+        deployable: Boolean = false,
     )
 
     /**

@@ -33,7 +33,8 @@ class BranchPatternSlotAdmissionRule(
         slot: Slot,
         config: BranchPatternSlotAdmissionRuleConfig,
         queries: MutableList<String>,
-        params: MutableMap<String, Any?>
+        params: MutableMap<String, Any?>,
+        deployable: Boolean,
     ) {
         if (config.includes.isEmpty()) {
             queries += "0 != 1" // No inclusion, no build

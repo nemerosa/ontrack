@@ -55,8 +55,14 @@ interface SlotService {
 
     /**
      * Gets the last N builds eligible for this slot
+     *
+     * @param deployable If true, restricts the list of builds to the ones which can actually be deployed.
      */
-    fun getEligibleBuilds(slot: Slot, count: Int = 10): List<Build>
+    fun getEligibleBuilds(
+        slot: Slot,
+        count: Int = 10,
+        deployable: Boolean = false,
+    ): List<Build>
 
     /**
      * Starting a pipeline

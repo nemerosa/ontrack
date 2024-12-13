@@ -156,7 +156,11 @@ class SlotServiceImpl(
         }
     }
 
-    override fun getEligibleBuilds(slot: Slot, count: Int): List<Build> {
+    override fun getEligibleBuilds(
+        slot: Slot,
+        count: Int,
+        deployable: Boolean,
+    ): List<Build> {
         securityService.checkSlotAccess<SlotView>(slot)
         // Gets all the admission rules
         val configs = slotAdmissionRuleConfigRepository.getAdmissionRuleConfigs(slot)
@@ -164,7 +168,7 @@ class SlotServiceImpl(
         val queries = mutableListOf<String>()
         val params = mutableMapOf<String, Any?>()
         configs.forEach { config ->
-            fillEligibilityCriteria(slot, config, queries, params)
+            fillEligibilityCriteria(slot, config, queries, params, deployable = deployable)
         }
         // Gets all eligible builds
         return slotRepository.getEligibleBuilds(slot, queries, params)
@@ -175,9 +179,10 @@ class SlotServiceImpl(
         config: SlotAdmissionRuleConfig,
         queries: MutableList<String>,
         params: MutableMap<String, Any?>,
+        deployable: Boolean,
     ) {
         val rule = slotAdmissionRuleRegistry.getRule(config.ruleId)
-        fillEligibilityCriteria(slot, rule, config.ruleConfig, queries, params)
+        fillEligibilityCriteria(slot, rule, config.ruleConfig, queries, params, deployable)
     }
 
     private fun <C, D> fillEligibilityCriteria(
@@ -186,6 +191,7 @@ class SlotServiceImpl(
         jsonRuleConfig: JsonNode,
         queries: MutableList<String>,
         params: MutableMap<String, Any?>,
+        deployable: Boolean,
     ) {
         val ruleConfig = rule.parseConfig(jsonRuleConfig)
         rule.fillEligibilityCriteria(
@@ -193,6 +199,7 @@ class SlotServiceImpl(
             config = ruleConfig,
             queries = queries,
             params = params,
+            deployable = deployable,
         )
     }
 

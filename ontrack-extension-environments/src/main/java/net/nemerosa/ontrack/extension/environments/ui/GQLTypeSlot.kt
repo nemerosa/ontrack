@@ -57,11 +57,18 @@ class GQLTypeSlot(
                     cache = cache,
                     fieldName = "eligibleBuilds",
                     fieldDescription = "Paginated list of eligible builds",
+                    arguments = listOf(
+                        booleanArgument(
+                            "deployable",
+                            "If true, restricts the list of builds to the ones which can actually be deployed."
+                        )
+                    ),
                     itemType = GQLTypeBuild.BUILD,
-                    itemPaginatedListProvider = { _, slot, _, size ->
+                    itemPaginatedListProvider = { env, slot, _, size ->
+                        val deployable: Boolean = env.getArgument("deployable") ?: false
                         // TODO Pagination of eligible builds
                         PaginatedList.create(
-                            slotService.getEligibleBuilds(slot, count = size),
+                            slotService.getEligibleBuilds(slot, count = size, deployable = deployable),
                             offset = 0,
                             pageSize = size
                         )

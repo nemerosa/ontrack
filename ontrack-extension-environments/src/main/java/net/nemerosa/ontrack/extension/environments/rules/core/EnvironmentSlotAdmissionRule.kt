@@ -90,21 +90,39 @@ class EnvironmentSlotAdmissionRule(
     /**
      * Adding to the criteria the fact that there must exist a slot in the previous environment
      * for the same qualifier & project.
+     *
+     * If [deployable] is `true`, we also add the criteria that a pipeline for the build must exist
+     * and be in status deployed.
      */
     override fun fillEligibilityCriteria(
         slot: Slot,
         config: EnvironmentSlotAdmissionRuleConfig,
         queries: MutableList<String>,
-        params: MutableMap<String, Any?>
+        params: MutableMap<String, Any?>,
+        deployable: Boolean,
     ) {
+
+        var joinDeployable = ""
+        var whereDeployable = ""
+        if (deployable) {
+            joinDeployable = """
+                INNER JOIN ENV_SLOT_PIPELINE PP ON PP.SLOT_ID = S.ID AND PP.BUILD_ID = BD.ID
+            """.trimIndent()
+            whereDeployable = """
+                AND PP.STATUS = '${SlotPipelineStatus.DEPLOYED.name}'
+            """.trimIndent()
+        }
+
         queries += """
             EXISTS (
                 SELECT S.ID
                 FROM ENV_SLOTS S
                 INNER JOIN ENVIRONMENTS E ON E.ID = S.ENVIRONMENT_ID
+                $joinDeployable
                 WHERE E.NAME = :environmentName
                 AND S.PROJECT_ID = :projectId
                 AND S.QUALIFIER = :qualifier
+                $whereDeployable
                 LIMIT 1
             )
         """

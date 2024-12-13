@@ -35,7 +35,8 @@ class ValidationSlotAdmissionRule(
         slot: Slot,
         config: ValidationSlotAdmissionRuleConfig,
         queries: MutableList<String>,
-        params: MutableMap<String, Any?>
+        params: MutableMap<String, Any?>,
+        deployable: Boolean,
     ) {
         TODO("Not yet implemented")
     }

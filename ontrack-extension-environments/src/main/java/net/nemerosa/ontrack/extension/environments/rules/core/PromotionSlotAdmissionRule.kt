@@ -33,10 +33,14 @@ class PromotionSlotAdmissionRule(
         slot: Slot,
         config: PromotionSlotAdmissionRuleConfig,
         queries: MutableList<String>,
-        params: MutableMap<String, Any?>
+        params: MutableMap<String, Any?>,
+        deployable: Boolean,
     ) {
         queries += "PL.NAME = :promotionName"
         params["promotionName"] = config.promotion
+        if (deployable) {
+            queries += "PR.ID IS NOT NULL"
+        }
     }
 
     override fun parseConfig(jsonRuleConfig: JsonNode): PromotionSlotAdmissionRuleConfig = jsonRuleConfig.parse()

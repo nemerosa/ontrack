@@ -16,11 +16,11 @@ import {Col, Row} from "antd";
 import SlotDetails from "@components/extension/environments/SlotDetails";
 import PageSection from "@components/common/PageSection";
 import SlotPipelinesTable from "@components/extension/environments/SlotPipelinesTable";
-import SlotEligibleBuildsTable from "@components/extension/environments/SlotEligibleBuildsTable";
 import {useReloadState} from "@components/common/StateUtils";
 import SlotAdmissionRulesTable from "@components/extension/environments/SlotAdmissionRulesTable";
 import SlotWorkflowsTable from "@components/extension/environments/SlotWorkflowsTable";
 import DeleteSlotCommand from "@components/extension/environments/DeleteSlotCommand";
+import SlotEligibleBuildsSection from "@components/extension/environments/SlotEligibleBuildsSection";
 
 export default function SlotView({id}) {
 
@@ -82,48 +82,46 @@ export default function SlotView({id}) {
             >
                 <LoadingContainer loading={loading}>
                     <Row gutter={[16, 16]} wrap>
-                        <Col span={12}>
-                            <Row gutter={[16, 16]} wrap style={{height: '100%'}}>
+                        <Col span={8}>
+                            <Row gutter={[16, 16]} wrap>
                                 <Col span={24}>
                                     <PageSection
-                                        title="Slot details"
+                                        title="Slot"
                                         padding={true}
                                     >
                                         <SlotDetails slot={slot}/>
                                     </PageSection>
                                 </Col>
                                 <Col span={24}>
-                                    <PageSection
-                                        title="Admission rules"
-                                        padding={false}
-                                    >
-                                        <SlotAdmissionRulesTable slot={slot} onChange={reload}/>
-                                    </PageSection>
-                                </Col>
-                                <Col span={24}>
-                                    <PageSection
-                                        title="Workflows"
-                                        padding={false}
-                                    >
-                                        <SlotWorkflowsTable slot={slot} onChange={reload}/>
-                                    </PageSection>
+                                    <SlotEligibleBuildsSection
+                                        slot={slot}
+                                        onChange={reload}
+                                    />
                                 </Col>
                             </Row>
                         </Col>
-                        <Col span={12}>
-                            <PageSection
-                                title="Eligible builds"
-                                padding={false}
-                            >
-                                <SlotEligibleBuildsTable slot={slot} onChange={reload}/>
-                            </PageSection>
-                        </Col>
-                        <Col span={24}>
+                        <Col span={16}>
                             <PageSection
                                 title="Pipelines"
                                 padding={false}
                             >
                                 <SlotPipelinesTable slot={slot} onChange={reload}/>
+                            </PageSection>
+                        </Col>
+                        <Col span={24}>
+                            <PageSection
+                                title="Admission rules"
+                                padding={false}
+                            >
+                                <SlotAdmissionRulesTable slot={slot} onChange={reload}/>
+                            </PageSection>
+                        </Col>
+                        <Col span={24}>
+                            <PageSection
+                                title="Workflows"
+                                padding={false}
+                            >
+                                <SlotWorkflowsTable slot={slot} onChange={reload}/>
                             </PageSection>
                         </Col>
                     </Row>

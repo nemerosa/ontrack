@@ -190,6 +190,41 @@ class EnvironmentSlotAdmissionRuleIT : AbstractDSLTestSupport() {
         }
     }
 
+    @Test
+    fun `Find eligible builds and deployable builds`() {
+        slotTestSupport.withSlot { previousSlot ->
+            slotTestSupport.withSlot(project = previousSlot.project) { slot ->
+                slotService.addAdmissionRuleConfig(
+                    config = SlotAdmissionRuleTestFixtures.testEnvironmentAdmissionRuleConfig(
+                        slot,
+                        previousSlot
+                    )
+                )
+
+                val branch = slot.project.branch()
+                // Build not deployed in previous environment (but eligible all the same)
+                val build1 = branch.build()
+                // Build deployed in previous environment (deployable)
+                val build2 = branch.build()
+                val pipeline = slotService.startPipeline(previousSlot, build2)
+                slotService.startDeployment(pipeline, dryRun = false)
+                slotService.finishDeployment(pipeline)
+
+                val eligibleBuilds = slotService.getEligibleBuilds(slot = slot)
+                assertEquals(
+                    listOf(build2.id, build1.id),
+                    eligibleBuilds.map { it.id }
+                )
+
+                val deployableBuilds = slotService.getEligibleBuilds(slot = slot, deployable = true)
+                assertEquals(
+                    listOf(build2.id),
+                    deployableBuilds.map { it.id }
+                )
+            }
+        }
+    }
+
     private fun withPreviousEnvironment(
         deployPreviousPipeline: Boolean,
         addPreviousPipeline: Boolean = false,

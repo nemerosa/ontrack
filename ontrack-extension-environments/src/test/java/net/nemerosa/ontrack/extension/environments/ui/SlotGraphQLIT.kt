@@ -218,6 +218,78 @@ class SlotGraphQLIT : AbstractQLKTITSupport() {
 
     @Test
     fun `Getting list of eligible builds for a slot`() {
+        slotTestSupport.withSlot { slot ->
+
+            val main = slot.project.branch(name = "main")
+            val silver = main.promotionLevel("SILVER")
+
+            val otherBranch = slot.project.branch(name = "other")
+
+            val build1 = main.build {
+                promote(silver)
+            }
+            val build2 = main.build()
+            /* val build3 = */ otherBranch.build()
+
+            slotService.addAdmissionRuleConfig(
+                SlotAdmissionRuleTestFixtures.testPromotionAdmissionRuleConfig(
+                    slot = slot,
+                    promotion = silver.name,
+                )
+            )
+
+            run(
+                """
+                    {
+                        slotById(id: "${slot.id}") {
+                            eligibleBuilds {
+                                pageItems {
+                                    id
+                                }
+                            }
+                        }
+                    }
+                """.trimIndent()
+            ) { data ->
+                val builds = data.path("slotById")
+                    .path("eligibleBuilds")
+                    .path("pageItems")
+                assertEquals(
+                    listOf(build2.id(), build1.id()),
+                    builds.map {
+                        it.path("id").asInt()
+                    }
+                )
+            }
+
+            run(
+                """
+                    {
+                        slotById(id: "${slot.id}") {
+                            eligibleBuilds(deployable: true) {
+                                pageItems {
+                                    id
+                                }
+                            }
+                        }
+                    }
+                """.trimIndent()
+            ) { data ->
+                val builds = data.path("slotById")
+                    .path("eligibleBuilds")
+                    .path("pageItems")
+                assertEquals(
+                    listOf(build1.id()),
+                    builds.map {
+                        it.path("id").asInt()
+                    }
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Getting list of eligible slots for a build`() {
         asAdmin {
             val project = project()
             val build = project.branch<Build> {
