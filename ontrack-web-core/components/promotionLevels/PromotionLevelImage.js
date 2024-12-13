@@ -2,7 +2,7 @@ import {restPromotionLevelImageUri} from "@components/common/Links";
 import {useContext, useState} from "react";
 import {EventsContext} from "@components/common/EventsContext";
 import ProxyImage from "@components/common/ProxyImage";
-import {FaMedal} from "react-icons/fa";
+import GeneratedIcon from "@components/common/icons/GeneratedIcon";
 
 export const PromotionLevelImage = ({promotionLevel, size = 16}) => {
 
@@ -20,9 +20,9 @@ export const PromotionLevelImage = ({promotionLevel, size = 16}) => {
                         alt={promotionLevel.name}
                         width={size}
                         height={size}
-            /> : <FaMedal
-                width={size}
-                height={size}
+            /> : <GeneratedIcon
+                name={promotionLevel.name}
+                colorIndex={promotionLevel.id}
             />
     )
 }
