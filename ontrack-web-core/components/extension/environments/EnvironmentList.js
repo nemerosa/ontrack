@@ -83,12 +83,6 @@ export default function EnvironmentList() {
         <>
             <LoadingContainer loading={loading}>
                 <Space direction="vertical" className="ot-line">
-                    {
-                        environments.length === 0 &&
-                        <Empty
-                            description="No environment has been created yet or the filter is too restrictive."
-                        />
-                    }
                     <>
                         <Card
                         >
@@ -132,6 +126,12 @@ export default function EnvironmentList() {
                                 </Form.Item>
                             </Form>
                         </Card>
+                        {
+                            environments.length === 0 &&
+                            <Empty
+                                description="No environment has been created yet or the filter is too restrictive."
+                            />
+                        }
                         {
                             environments.map(environment => (
                                 <Row data-testid={`environment-row-${environment.id}`} gutter={[16, 16]}

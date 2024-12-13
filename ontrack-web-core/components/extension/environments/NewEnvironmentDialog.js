@@ -83,7 +83,7 @@ export default function NewEnvironmentDialog({newEnvironmentDialog}) {
                            label="Tags"
                            extra="Tags used to group and filter the environments"
                 >
-                    <Select mode="tags"/>
+                    <Select data-testid="tags" mode="tags"/>
                 </Form.Item>
             </FormDialog>
         </>

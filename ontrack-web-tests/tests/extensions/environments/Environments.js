@@ -64,11 +64,12 @@ export class EnvironmentDialog {
     }
 
     async set({name, description, order, tags}) {
-        await expect(this.page.getByLabel('Name')).toBeVisible()
-        await this.page.getByLabel('Name').fill(name)
-        await this.page.getByLabel('Description').fill(description)
-        await this.page.getByLabel('Order').fill(order.toString())
-        const tagsField = this.page.getByLabel('Tags')
+        const dialog = this.page.getByRole('dialog')
+        await expect(dialog.getByLabel('Name')).toBeVisible()
+        await dialog.getByLabel('Name').fill(name)
+        await dialog.getByLabel('Description').fill(description)
+        await dialog.getByLabel('Order').fill(order.toString())
+        const tagsField = dialog.getByTestId('tags')
         for (const tag of tags) {
             await tagsField.click()
             await tagsField.type(tag)
@@ -88,7 +89,8 @@ export class SlotDialog {
     }
 
     async set({projectName, qualifier, description, environmentNames}) {
-        await expect(this.page.getByLabel('Project', {exact: true})).toBeVisible()
+        const dialog = this.page.getByRole('dialog')
+        await expect(dialog.getByLabel('Project', {exact: true})).toBeVisible()
 
         await this.page.getByTestId('projectId').getByLabel('Project').click()
         await this.page.getByTestId('projectId').getByLabel('Project').fill(projectName)
