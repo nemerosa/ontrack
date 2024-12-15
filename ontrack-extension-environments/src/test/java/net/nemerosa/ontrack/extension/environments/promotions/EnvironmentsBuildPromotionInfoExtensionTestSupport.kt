@@ -31,6 +31,7 @@ class EnvironmentsBuildPromotionInfoExtensionTestSupport : AbstractDSLTestSuppor
 
     fun withSetup(
         buildDisplayOption: EnvironmentsSettingsBuildDisplayOption,
+        deployed: Boolean = true,
         test: (info: TestInfo) -> Unit,
     ) {
         asAdmin {
@@ -80,24 +81,32 @@ class EnvironmentsBuildPromotionInfoExtensionTestSupport : AbstractDSLTestSuppor
                             val runBronze2 = promote(bronze)
                             val runSilver = promote(silver)
 
-                            val eligibleSlotWithNoPromotionRulePipeline = slotService.startPipeline(
-                                slot = eligibleSlotWithNoPromotionRule,
-                                build = this,
-                            ).apply {
-                                slotTestSupport.startAndDeployPipeline(this)
+                            val eligibleSlotWithNoPromotionRulePipeline = if (deployed) {
+                                slotService.startPipeline(
+                                    slot = eligibleSlotWithNoPromotionRule,
+                                    build = this,
+                                ).apply {
+                                    slotTestSupport.startAndDeployPipeline(this)
+                                }
+                            } else {
+                                null
                             }
 
-                            val eligibleSlotWithSilverPromotionRulePipeline =
+                            val eligibleSlotWithSilverPromotionRulePipeline = if (deployed) {
                                 slotService.startPipeline(
                                     slot = eligibleSlotWithSilverPromotionRule,
                                     build = this,
                                 ).apply {
                                     slotTestSupport.startAndDeployPipeline(this)
                                 }
+                            } else {
+                                null
+                            }
 
                             // Checking that everything is marked as deployed
                             val pipelines = slotService.findSlotPipelinesWhereBuildIsLastDeployed(this)
-                            assertEquals(2, pipelines.size, "All pipelines deployed")
+                            val count = if (deployed) 2 else 0
+                            assertEquals(count, pipelines.size, "All pipelines deployed")
 
                             val info = buildPromotionInfoService.getBuildPromotionInfo(this)
 
@@ -135,9 +144,9 @@ class EnvironmentsBuildPromotionInfoExtensionTestSupport : AbstractDSLTestSuppor
         val runBronze2: PromotionRun,
         val runSilver: PromotionRun,
         val eligibleSlotWithNoPromotionRule: Slot,
-        val eligibleSlotWithNoPromotionRulePipeline: SlotPipeline,
+        val eligibleSlotWithNoPromotionRulePipeline: SlotPipeline?,
         val eligibleSlotWithSilverPromotionRule: Slot,
-        val eligibleSlotWithSilverPromotionRulePipeline: SlotPipeline,
+        val eligibleSlotWithSilverPromotionRulePipeline: SlotPipeline?,
     )
 
 }

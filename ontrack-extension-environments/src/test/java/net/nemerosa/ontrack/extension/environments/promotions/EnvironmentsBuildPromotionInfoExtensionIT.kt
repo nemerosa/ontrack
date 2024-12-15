@@ -43,12 +43,12 @@ class EnvironmentsBuildPromotionInfoExtensionIT : AbstractDSLTestSupport() {
 
             info.items[index++].apply {
                 assertNull(promotionLevel)
-                assertEquals(eligibleSlotWithSilverPromotionRulePipeline.id, (data as SlotPipeline).id)
+                assertEquals(eligibleSlotWithSilverPromotionRulePipeline?.id, (data as SlotPipeline).id)
             }
 
             info.items[index++].apply {
                 assertNull(promotionLevel)
-                assertEquals(eligibleSlotWithNoPromotionRulePipeline.id, (data as SlotPipeline).id)
+                assertEquals(eligibleSlotWithNoPromotionRulePipeline?.id, (data as SlotPipeline).id)
             }
 
             // Then the promotions & their promotion runs
@@ -105,7 +105,65 @@ class EnvironmentsBuildPromotionInfoExtensionIT : AbstractDSLTestSupport() {
 
             info.items[index++].apply {
                 assertEquals(null, promotionLevel)
-                assertEquals(eligibleSlotWithSilverPromotionRulePipeline.id, (data as SlotPipeline).id)
+                assertEquals(eligibleSlotWithSilverPromotionRulePipeline?.id, (data as SlotPipeline).id)
+            }
+
+            // Then the promotions & their promotion runs
+
+            info.items[index++].apply {
+                assertEquals(gold, promotionLevel)
+                assertEquals(gold, data)
+            }
+
+            info.items[index++].apply {
+                assertEquals(silver, promotionLevel)
+                assertEquals(runSilver.id, (data as PromotionRun).id)
+            }
+
+            info.items[index++].apply {
+                assertEquals(bronze, promotionLevel)
+                assertEquals(runBronze2.id, (data as PromotionRun).id)
+            }
+
+            info.items[index].apply {
+                assertEquals(bronze, promotionLevel)
+                assertEquals(runBronze1.id, (data as PromotionRun).id)
+            }
+        }
+    }
+
+    @Test
+    fun `Getting the promotion info for a build with display option being HIGHEST and not deployed anywhere`() {
+        environmentsBuildPromotionInfoExtensionTestSupport.withSetup(
+            buildDisplayOption = EnvironmentsSettingsBuildDisplayOption.HIGHEST,
+            deployed = false,
+        ) { test ->
+
+            val (
+                build,
+                info,
+                bronze,
+                silver,
+                gold,
+                runBronze1,
+                runBronze2,
+                runSilver,
+                _,
+                _,
+                _,
+                _,
+            ) = test
+
+
+            // Checking all items have been collected
+            assertEquals(5, info.items.size)
+            var index = 0
+
+            // First, the slot where the build is deployed
+
+            info.items[index++].apply {
+                assertEquals(null, promotionLevel)
+                assertEquals(EnvironmentBuildCount(build, count = 0), data)
             }
 
             // Then the promotions & their promotion runs

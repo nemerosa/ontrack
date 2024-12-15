@@ -79,7 +79,7 @@ class EnvironmentsBuildPromotionInfoExtensionGraphQLIT : AbstractQLKTITSupport()
                                         "promotionLevel" to null,
                                         "data" to mapOf(
                                             "__typename" to "SlotPipeline",
-                                            "id" to eligibleSlotWithSilverPromotionRulePipeline.id
+                                            "id" to eligibleSlotWithSilverPromotionRulePipeline?.id
                                         )
                                     ),
                                     mapOf(

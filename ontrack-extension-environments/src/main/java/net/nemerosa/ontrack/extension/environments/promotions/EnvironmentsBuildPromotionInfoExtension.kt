@@ -54,6 +54,8 @@ class EnvironmentsBuildPromotionInfoExtension(
         val slotPipeline = slotService.findSlotPipelinesWhereBuildIsLastDeployed(build).firstOrNull()
         if (slotPipeline != null) {
             items.add(0, buildPromotionInfoItemForDeployedSlotPipeline(slotPipeline))
+        } else {
+            items.add(0, buildPromotionInfoItemForDeployedSlotCount(build, 0))
         }
     }
 
@@ -62,9 +64,13 @@ class EnvironmentsBuildPromotionInfoExtension(
         build: Build
     ) {
         val slotPipelines = slotService.findSlotPipelinesWhereBuildIsLastDeployed(build)
-        items.addAll(0, slotPipelines.map { slotPipeline ->
-            buildPromotionInfoItemForDeployedSlotPipeline(slotPipeline)
-        })
+        if (slotPipelines.isNotEmpty()) {
+            items.addAll(0, slotPipelines.map { slotPipeline ->
+                buildPromotionInfoItemForDeployedSlotPipeline(slotPipeline)
+            })
+        } else {
+            items.add(0, buildPromotionInfoItemForDeployedSlotCount(build, 0))
+        }
     }
 
     private fun buildPromotionInfoItemForDeployedSlotPipeline(
