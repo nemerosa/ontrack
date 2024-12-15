@@ -30,10 +30,13 @@ class BuildPromotionInfoServiceImpl(
             .reversed()
         // For each promotion level
         promotionLevels.forEach { promotionLevel ->
-            // Promotion level itself
-            items += buildPromotionInfoItemForPromotionLevel(promotionLevel)
+            val runs = structureService.getPromotionRunsForBuildAndPromotionLevel(build, promotionLevel)
+            // Promotion level itself only if no run
+            if (runs.isEmpty()) {
+                items += buildPromotionInfoItemForPromotionLevel(promotionLevel)
+            }
             // Promotion runs for this promotion level
-            items += structureService.getPromotionRunsForBuildAndPromotionLevel(build, promotionLevel).map {
+            items += runs.map {
                 buildPromotionInfoItemForPromotionRun(it)
             }
         }

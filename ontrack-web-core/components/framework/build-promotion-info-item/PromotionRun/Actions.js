@@ -8,6 +8,7 @@ import {FaCog} from "react-icons/fa";
 import PromotionRunDeleteAction from "@components/promotionRuns/PromotionRunDeleteAction";
 import {promotionRunUri} from "@components/common/Links";
 import Link from "next/link";
+import BuildPromoteAction from "@components/builds/BuildPromoteAction";
 
 export default function PromotionRunBuildPromotionInfoItemActions({item, build, promotionLevel, onChange}) {
     return (
@@ -30,6 +31,16 @@ export default function PromotionRunBuildPromotionInfoItemActions({item, build, 
                         promotionRun={item}
                         text={<FaCog/>}
                     />
+                }
+                {/* Repromoting */}
+                {
+                    isAuthorized(build, 'build', 'promote') ?
+                        <BuildPromoteAction
+                            build={build}
+                            promotionLevel={promotionLevel}
+                            onPromotion={onChange}
+                        /> : undefined
+
                 }
                 {/* Deleting the promotion */}
                 {

@@ -77,7 +77,7 @@ class BuildPromotionInfoServiceIT : AbstractDSLTestSupport() {
                         val info = buildPromotionInfoService.getBuildPromotionInfo(this)
 
                         // Checking each promotion
-                        assertEquals(6, info.items.size)
+                        assertEquals(4, info.items.size)
 
                         info.items[0].apply {
                             assertEquals(gold, promotionLevel)
@@ -86,25 +86,15 @@ class BuildPromotionInfoServiceIT : AbstractDSLTestSupport() {
 
                         info.items[1].apply {
                             assertEquals(silver, promotionLevel)
-                            assertEquals(silver, data)
-                        }
-
-                        info.items[2].apply {
-                            assertEquals(silver, promotionLevel)
                             assertEquals(runSilver.id, (data as PromotionRun).id)
                         }
 
-                        info.items[3].apply {
-                            assertEquals(bronze, promotionLevel)
-                            assertEquals(bronze, data)
-                        }
-
-                        info.items[4].apply {
+                        info.items[2].apply {
                             assertEquals(bronze, promotionLevel)
                             assertEquals(runBronze2.id, (data as PromotionRun).id)
                         }
 
-                        info.items[5].apply {
+                        info.items[3].apply {
                             assertEquals(bronze, promotionLevel)
                             assertEquals(runBronze1.id, (data as PromotionRun).id)
                         }

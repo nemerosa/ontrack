@@ -66,26 +66,8 @@ class GQLBuildPromotionInfoIT : AbstractQLKTITSupport() {
                                                         "name" to silver.name,
                                                     ),
                                                     "data" to mapOf(
-                                                        "__typename" to "PromotionLevel",
-                                                        "id" to silver.id.toString()
-                                                    )
-                                                ),
-                                                mapOf(
-                                                    "promotionLevel" to mapOf(
-                                                        "name" to silver.name,
-                                                    ),
-                                                    "data" to mapOf(
                                                         "__typename" to "PromotionRun",
                                                         "id" to runSilver.id.toString()
-                                                    )
-                                                ),
-                                                mapOf(
-                                                    "promotionLevel" to mapOf(
-                                                        "name" to bronze.name,
-                                                    ),
-                                                    "data" to mapOf(
-                                                        "__typename" to "PromotionLevel",
-                                                        "id" to bronze.id.toString()
                                                     )
                                                 ),
                                                 mapOf(
