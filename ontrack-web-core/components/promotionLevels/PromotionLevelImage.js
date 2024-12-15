@@ -4,7 +4,7 @@ import {EventsContext} from "@components/common/EventsContext";
 import ProxyImage from "@components/common/ProxyImage";
 import GeneratedIcon from "@components/common/icons/GeneratedIcon";
 
-export const PromotionLevelImage = ({promotionLevel, size = 16}) => {
+export const PromotionLevelImage = ({promotionLevel, size = 24, disabled = false}) => {
 
     const [refresh, setRefresh] = useState(0)
     const eventsContext = useContext(EventsContext)
@@ -20,9 +20,12 @@ export const PromotionLevelImage = ({promotionLevel, size = 16}) => {
                         alt={promotionLevel.name}
                         width={size}
                         height={size}
+                        disabled={disabled}
             /> : <GeneratedIcon
                 name={promotionLevel.name}
                 colorIndex={promotionLevel.id}
+                size={size}
+                disabled={disabled}
             />
     )
 }

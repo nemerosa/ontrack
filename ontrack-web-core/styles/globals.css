@@ -36,6 +36,13 @@
 }
 
 /**
+ * Disabled icon
+ */
+.ot-disabled {
+    filter: opacity(33%);
+}
+
+/**
  * Displaying a pointer cursor
  */
 .ot-action {

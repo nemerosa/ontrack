@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import GridCell from "@components/grid/GridCell";
 import {gql} from "graphql-request";
-import {Timeline} from "antd";
+import {Steps} from "antd";
 import buildPromotionInfoItem from "@components/builds/BuildPromotionInfoItem";
 import {useReloadState} from "@components/common/StateUtils";
 import {gqlSlotPipelineData} from "@components/extension/environments/EnvironmentGraphQL";
@@ -34,6 +34,7 @@ export default function BuildPromotionInfo({build}) {
                             id
                             name
                             image
+                            description
                         }
                         ... on PromotionRun {
                             id
@@ -89,6 +90,7 @@ export default function BuildPromotionInfo({build}) {
                         })
                     )
                 })
+                itemList.reverse()
                 setItems(itemList)
             }).finally(() => {
                 setLoading(false)
@@ -99,10 +101,10 @@ export default function BuildPromotionInfo({build}) {
     return (
         <>
             <GridCell id="promotions" title="Promotions" padding={true}>
-                <Timeline
-                    loading={loading}
-                    mode="left"
+                <Steps
                     items={items}
+                    labelPlacement="vertical"
+                    size="small"
                 />
             </GridCell>
         </>

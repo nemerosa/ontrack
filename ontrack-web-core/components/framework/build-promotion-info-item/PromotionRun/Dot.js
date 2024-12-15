@@ -1,8 +1,15 @@
 import React from "react";
-import {PromotionLevelImage} from "@components/promotionLevels/PromotionLevelImage";
+import PromotionRunStep from "@components/promotionRuns/PromotionRunStep";
 
 export default function PromotionRunBuildPromotionInfoItemDor({item, build, promotionLevel, onChange}) {
     return (
-        <PromotionLevelImage promotionLevel={promotionLevel} size={16}/>
+        <PromotionRunStep
+            run={{
+                ...item,
+                build,
+                promotionLevel,
+            }}
+            onChange={onChange}
+        />
     )
 }

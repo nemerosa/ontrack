@@ -1,7 +1,6 @@
 import BuildBox from "@components/builds/BuildBox";
 import {Button, Col, Popover, Row, Space, Spin, Table, Typography} from "antd";
 import {FaCheckSquare, FaEyeSlash, FaSearch, FaSquare} from "react-icons/fa";
-import PromotionRun from "@components/promotionRuns/PromotionRun";
 import RangeSelector from "@components/common/RangeSelector";
 import {useRouter} from "next/router";
 import BuildFilterDropdown from "@components/branches/filters/builds/BuildFilterDropdown";
@@ -15,6 +14,7 @@ import {useConnection, useGraphQLClient} from "@components/providers/ConnectionC
 import {gql} from "graphql-request";
 import {buildUri, scmChangeLogUri} from "@components/common/Links";
 import EntityNotificationsBadge from "@components/extension/notifications/EntityNotificationsBadge";
+import PromotionRunStep from "@components/promotionRuns/PromotionRunStep";
 
 const {Column} = Table;
 
@@ -233,10 +233,9 @@ export default function BranchBuilds({
                             <Space size={8}>
                                 {
                                     build.promotionRuns.map(promotionRun =>
-                                        <PromotionRun
+                                        <PromotionRunStep
                                             key={promotionRun.id}
-                                            promotionRun={promotionRun}
-                                            size={24}
+                                            run={promotionRun}
                                         />
                                     )
                                 }

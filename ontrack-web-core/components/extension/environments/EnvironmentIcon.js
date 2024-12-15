@@ -8,7 +8,7 @@ import {useGraphQLClient} from "@components/providers/ConnectionContextProvider"
 import {gql} from "graphql-request";
 import LoadingInline from "@components/common/LoadingInline";
 
-export default function EnvironmentIcon({environmentId, onClick, tooltipText, size = 16}) {
+export default function EnvironmentIcon({environmentId, onClick, showTooltip = true, tooltipText, size = 16}) {
 
     const client = useGraphQLClient()
     const [refreshState, refresh] = useReloadState()
@@ -35,7 +35,9 @@ export default function EnvironmentIcon({environmentId, onClick, tooltipText, si
             ).then(data => {
                 const env = data.environmentById;
                 setEnvironment(env)
-                setTooltip(tooltipText ?? env.name)
+                if (showTooltip) {
+                    setTooltip(tooltipText ?? env.name)
+                }
             }).finally(() => {
                 setLoading(false)
             })

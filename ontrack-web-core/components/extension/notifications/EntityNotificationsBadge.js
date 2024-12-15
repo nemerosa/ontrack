@@ -3,13 +3,16 @@ import {useEffect, useState} from "react";
 import LoadingInline from "@components/common/LoadingInline";
 import {gql} from "graphql-request";
 import NotificationStatusBadge from "@components/extension/notifications/NotificationStatusBadge";
-import {Space} from "antd";
+import {Badge, Space} from "antd";
 
-export default function EntityNotificationsBadge({entityType, entityId, href}) {
+export default function EntityNotificationsBadge({entityType, entityId, href, showText = false, children}) {
 
     const client = useGraphQLClient()
     const [loading, setLoading] = useState(true)
     const [statuses, setStatuses] = useState({})
+
+    const [badgeCount, setBadgeCount] = useState(0)
+    const [badgeColour, setBadgeColour] = useState('')
 
     useEffect(() => {
         if (client) {
@@ -54,6 +57,16 @@ export default function EntityNotificationsBadge({entityType, entityId, href}) {
                     }
                 })
                 setStatuses({success, running, error})
+                if (error) {
+                    setBadgeCount(error)
+                    setBadgeColour("red")
+                } else if (running) {
+                    setBadgeCount(running)
+                    setBadgeColour("blue")
+                } else if (success) {
+                    setBadgeCount(success)
+                    setBadgeColour("green")
+                }
             }).finally(() => {
                 setLoading(false)
             })
@@ -62,32 +75,45 @@ export default function EntityNotificationsBadge({entityType, entityId, href}) {
 
     return (
         <>
-            <LoadingInline
-                loading={loading}
-                text=""
-            >
-                <Space size={1}>
-                    <NotificationStatusBadge
-                        status="success"
-                        count={statuses.success}
-                        title={`${statuses.success} notification(s) have succeeded.`}
-                        href={href}
-                    />
-                    <NotificationStatusBadge
-                        status="processing"
-                        spin={true}
-                        count={statuses.running}
-                        title={`${statuses.running} notification(s) are still running.`}
-                        href={href}
-                    />
-                    <NotificationStatusBadge
-                        status="error"
-                        count={statuses.error}
-                        title={`${statuses.error} notification(s) have failed.`}
-                        href={href}
-                    />
-                </Space>
-            </LoadingInline>
+            {
+                children && <>
+                    <Badge overflowCount={10} showZero={false} count={badgeCount} title="" color={badgeColour} size="small">
+                        {children}
+                    </Badge>
+                </>
+            }
+            {
+                !children &&
+                <LoadingInline
+                    loading={loading}
+                    text=""
+                >
+                    <Space size={1}>
+                        <NotificationStatusBadge
+                            status="success"
+                            count={statuses.success}
+                            title={`${statuses.success} notification(s) have succeeded.`}
+                            href={href}
+                            showText={showText}
+                        />
+                        <NotificationStatusBadge
+                            status="processing"
+                            spin={true}
+                            count={statuses.running}
+                            title={`${statuses.running} notification(s) are still running.`}
+                            href={href}
+                            showText={showText}
+                        />
+                        <NotificationStatusBadge
+                            status="error"
+                            count={statuses.error}
+                            title={`${statuses.error} notification(s) have failed.`}
+                            href={href}
+                            showText={showText}
+                        />
+                    </Space>
+                </LoadingInline>
+            }
         </>
     )
 }
