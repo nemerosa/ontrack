@@ -81,7 +81,7 @@ class EnvironmentsBuildPromotionInfoExtensionIT : AbstractDSLTestSupport() {
                         val info = buildPromotionInfoService.getBuildPromotionInfo(this)
 
                         // Checking all items have been collected
-                        assertEquals(11, info.items.size)
+                        assertEquals(9, info.items.size)
 
                         // First, the slots & their pipelines
 
@@ -119,25 +119,15 @@ class EnvironmentsBuildPromotionInfoExtensionIT : AbstractDSLTestSupport() {
 
                         info.items[6].apply {
                             assertEquals(silver, promotionLevel)
-                            assertEquals(silver, data)
-                        }
-
-                        info.items[7].apply {
-                            assertEquals(silver, promotionLevel)
                             assertEquals(runSilver.id, (data as PromotionRun).id)
                         }
 
-                        info.items[8].apply {
-                            assertEquals(bronze, promotionLevel)
-                            assertEquals(bronze, data)
-                        }
-
-                        info.items[9].apply {
+                        info.items[7].apply {
                             assertEquals(bronze, promotionLevel)
                             assertEquals(runBronze2.id, (data as PromotionRun).id)
                         }
 
-                        info.items[10].apply {
+                        info.items[8].apply {
                             assertEquals(bronze, promotionLevel)
                             assertEquals(runBronze1.id, (data as PromotionRun).id)
                         }
