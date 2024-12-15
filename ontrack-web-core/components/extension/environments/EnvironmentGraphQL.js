@@ -22,6 +22,7 @@ export const gqlSlotData = gql`
         environment {
             id
             name
+            order
         }
     }
 
@@ -76,6 +77,10 @@ export const gqlSlotPipelineData = gql`
         build {
             ...SlotPipelineBuildData
         }
+        slot {
+            ...SlotData
+        }
     }
     ${gqlSlotPipelineBuildData}
+    ${gqlSlotData}
 `;

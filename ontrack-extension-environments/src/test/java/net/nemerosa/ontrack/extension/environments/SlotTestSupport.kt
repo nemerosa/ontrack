@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+import kotlin.test.assertTrue
 
 @Component
 class SlotTestSupport : AbstractDSLTestSupport() {
@@ -85,8 +86,10 @@ class SlotTestSupport : AbstractDSLTestSupport() {
         }
 
     fun startAndDeployPipeline(pipeline: SlotPipeline) {
-        slotService.startDeployment(pipeline, dryRun = false)
-        slotService.finishDeployment(pipeline)
+        val status = slotService.startDeployment(pipeline, dryRun = false)
+        assertTrue(status.status, "Pipeline deploying")
+        val result = slotService.finishDeployment(pipeline)
+        assertTrue(result.deployed, "Pipeline deployed")
     }
 
     fun withDeployedSlotPipeline(
