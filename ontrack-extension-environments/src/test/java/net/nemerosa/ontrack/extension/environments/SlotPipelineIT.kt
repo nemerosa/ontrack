@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.environments
 
-import net.nemerosa.ontrack.extension.environments.rules.core.*
+import net.nemerosa.ontrack.extension.environments.rules.core.ManualApprovalSlotAdmissionRuleData
+import net.nemerosa.ontrack.extension.environments.rules.core.PromotionSlotAdmissionRule
+import net.nemerosa.ontrack.extension.environments.rules.core.PromotionSlotAdmissionRuleConfig
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.json.asJson
@@ -85,31 +87,31 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
     fun `Getting the reasons why a pipeline is not deployable`() {
         slotTestSupport.withSlotPipeline { pipeline ->
             // Adds a promotion rule to the slot
-            val pl = pipeline.build.branch.promotionLevel(name = "GOLD")
-            val promotionConfig = SlotAdmissionRuleConfig(
+            val pl1 = pipeline.build.branch.promotionLevel(name = "GOLD")
+            val promotion1Config = SlotAdmissionRuleConfig(
                 slot = pipeline.slot,
                 name = "GoldPromotion",
                 description = null,
                 ruleId = PromotionSlotAdmissionRule.ID,
-                ruleConfig = PromotionSlotAdmissionRuleConfig(promotion = pl.name).asJson(),
+                ruleConfig = PromotionSlotAdmissionRuleConfig(promotion = pl1.name).asJson(),
             )
             slotService.addAdmissionRuleConfig(
-                config = promotionConfig,
+                config = promotion1Config,
             )
-            // Adds a validation rule to the slot
-            val vs = pipeline.build.branch.validationStamp(name = "ready")
-            val validationConfig = SlotAdmissionRuleConfig(
+            // Adds another promotion rule to the slot
+            val pl2 = pipeline.build.branch.promotionLevel(name = "DIAMOND")
+            val promotion2Config = SlotAdmissionRuleConfig(
                 slot = pipeline.slot,
-                name = "ValidationReady",
+                name = "DiamondPromotion",
                 description = null,
-                ruleId = ValidationSlotAdmissionRule.ID,
-                ruleConfig = ValidationSlotAdmissionRuleConfig(validation = vs.name).asJson(),
+                ruleId = PromotionSlotAdmissionRule.ID,
+                ruleConfig = PromotionSlotAdmissionRuleConfig(promotion = pl2.name).asJson(),
             )
             slotService.addAdmissionRuleConfig(
-                config = validationConfig,
+                config = promotion2Config,
             )
-            // Build is promoted, not validated
-            pipeline.build.promote(pl)
+            // Build is promoted for 1, not for 2
+            pipeline.build.promote(pl1)
             // Dry-run to start the build deployment
             var deploymentStatus = slotService.startDeployment(pipeline, dryRun = true)
             // Deployment not started
@@ -119,25 +121,25 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
                 listOf(
                     SlotPipelineDeploymentCheck(
                         check = DeployableCheck(
-                            status = true,
-                            reason = "Build promoted"
+                            status = false,
+                            reason = "Build not promoted"
                         ),
-                        config = promotionConfig,
+                        config = promotion2Config,
                         ruleData = null,
                     ),
                     SlotPipelineDeploymentCheck(
                         check = DeployableCheck(
-                            status = false,
-                            reason = "Build not validated"
+                            status = true,
+                            reason = "Build promoted"
                         ),
-                        config = validationConfig,
+                        config = promotion1Config,
                         ruleData = null,
                     ),
                 ),
                 deploymentStatus.checks
             )
-            // Passing the validation
-            pipeline.build.validate(vs)
+            // Passing the second promotion
+            pipeline.build.promote(pl2)
             deploymentStatus = slotService.startDeployment(pipeline, dryRun = true)
             assertTrue(deploymentStatus.status, "Deployment possible")
             // Reasons
@@ -148,15 +150,15 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
                             status = true,
                             reason = "Build promoted"
                         ),
-                        config = promotionConfig,
+                        config = promotion2Config,
                         ruleData = null,
                     ),
                     SlotPipelineDeploymentCheck(
                         check = DeployableCheck(
                             status = true,
-                            reason = "Build validated"
+                            reason = "Build promoted"
                         ),
-                        config = validationConfig,
+                        config = promotion1Config,
                         ruleData = null,
                     ),
                 ),
