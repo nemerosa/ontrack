@@ -86,7 +86,7 @@ export default function SlotView({id}) {
                             <Row gutter={[16, 16]} wrap>
                                 <Col span={24}>
                                     <PageSection
-                                        title="Slot"
+                                        title="Slot details"
                                         padding={true}
                                     >
                                         <SlotDetails slot={slot}/>

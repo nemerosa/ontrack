@@ -10,6 +10,7 @@ export default function SlotEligibleBuildsSection({slot, onChange}) {
     return (
         <>
             <PageSection
+                id="slotBuilds"
                 title="Builds"
                 padding={false}
                 extra={

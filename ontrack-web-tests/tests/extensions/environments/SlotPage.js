@@ -1,6 +1,7 @@
 import {ui} from "@ontrack/connection";
 import {expect} from "@playwright/test";
 import {confirmBox} from "../../support/confirm";
+import {SlotBuilds} from "./SlotBuilds";
 
 export class SlotPage {
     constructor(page, slot) {
@@ -42,5 +43,11 @@ export class SlotPage {
         await expect(button).toBeVisible()
         await button.click()
         await confirmBox(this.page, "Deleting slot", {okText: "Delete"})
+    }
+
+    async getSlotBuilds() {
+        const slotBuildsSection = this.page.getByTestId("slotBuilds")
+        await expect(slotBuildsSection).toBeVisible()
+        return new SlotBuilds(this.page, this.slot)
     }
 }

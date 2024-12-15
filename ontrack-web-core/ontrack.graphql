@@ -7074,6 +7074,8 @@ type Slot implements Authorizable {
     eligibleBuild: Build
     "Paginated list of eligible builds"
     eligibleBuilds(
+        "If true, restricts the list of builds to the ones which can actually be deployed."
+        deployable: Boolean,
         "Offset for the page"
         offset: Int = 0,
         "Size of the page"

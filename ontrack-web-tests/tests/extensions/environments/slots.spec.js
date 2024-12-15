@@ -49,3 +49,31 @@ test('deleting a slot', async ({page}) => {
     const environmentsPage = new EnvironmentsPage(page)
     await environmentsPage.checkEnvironmentIsVisible(slot.environment.name)
 })
+
+test('eligible and deployable builds for a slot', async ({page}) => {
+    const {project, slot} = await createSlot(ontrack())
+    // Promotion admission rule
+    await ontrack().environments.addPromotionRule({slot, promotion: "BRONZE"})
+    // Branch for the project
+    const branch = await project.createBranch()
+    const bronze = await branch.createPromotionLevel("BRONZE")
+    // Build not promoted
+    const build1 = await branch.createBuild()
+    // Build, promoted
+    const build2 = await branch.createBuild()
+    await build2.promote(bronze)
+
+    // Login & going to the slot page
+    await login(page)
+    const slotPage = new SlotPage(page, slot)
+    await slotPage.goTo()
+
+    // Gets the section about builds
+    const slotBuilds = await slotPage.getSlotBuilds()
+    await slotBuilds.checkBuildPresent(build2)
+    await slotBuilds.checkBuildNotPresent(build1)
+    // Selecting all eligible builds
+    await slotBuilds.selectAllBuilds()
+    await slotBuilds.checkBuildPresent(build2)
+    await slotBuilds.checkBuildPresent(build1)
+})
