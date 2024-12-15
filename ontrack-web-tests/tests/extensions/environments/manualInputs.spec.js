@@ -2,12 +2,7 @@ import {test} from "@playwright/test";
 import {ontrack} from "@ontrack/ontrack";
 import {login} from "../../core/login";
 import {PipelinePage} from "./PipelinePage";
-import {manualApprovalInEnvironmentsPage} from "./manualApprovalFixtures";
 import {createSlot} from "./slotFixtures";
-
-test('manual approval on the environments page', async ({page}) => {
-    await manualApprovalInEnvironmentsPage(page)
-})
 
 test('manual approval on the pipeline page', async ({page}) => {
     const {project, slot} = await createSlot(ontrack())

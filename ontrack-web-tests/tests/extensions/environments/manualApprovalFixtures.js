@@ -1,10 +1,10 @@
 import {ontrack} from "@ontrack/ontrack";
 import {login} from "../../core/login";
-import {EnvironmentsPage} from "./Environments";
 import {expect} from "@playwright/test";
 import {createSlot} from "./slotFixtures";
+import {PipelinePage} from "./PipelinePage";
 
-export const manualApprovalInEnvironmentsPage = async (page) => {
+export const manualApprovalInPipelinePage = async (page) => {
     const {project, slot} = await createSlot(ontrack())
     await ontrack().environments.addManualApproval({slot})
 
@@ -15,10 +15,10 @@ export const manualApprovalInEnvironmentsPage = async (page) => {
 
     await login(page)
 
-    const environmentsPage = new EnvironmentsPage(page)
-    await environmentsPage.goTo()
+    const pipelinePage = new PipelinePage(page, pipeline)
+    await pipelinePage.goTo()
 
-    const {pipelineActions} = await environmentsPage.checkPipelineCard(pipeline)
+    const pipelineActions = await pipelinePage.checkPipelineActions()
     await pipelineActions.expectManualInputButton()
     await pipelineActions.expectStatusProgress({value: 0})
 

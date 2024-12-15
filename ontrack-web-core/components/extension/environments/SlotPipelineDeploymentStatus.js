@@ -15,11 +15,11 @@ import {useReloadState} from "@components/common/StateUtils";
 import PageSection from "@components/common/PageSection";
 import SlotPipelineWorkflowsTable from "@components/extension/environments/SlotPipelineWorkflowsTable";
 
-export default function SlotPipelineDeploymentStatus({pipeline}) {
+export default function SlotPipelineDeploymentStatus({pipeline, onChange}) {
 
     const client = useGraphQLClient()
 
-    const [reloadState, reload] = useReloadState()
+    const [reloadState, reload] = useReloadState({callback: onChange})
 
     const [loading, setLoading] = useState(true)
     const [items, setItems] = useState([])
@@ -70,7 +70,7 @@ export default function SlotPipelineDeploymentStatus({pipeline}) {
                         info={true}
                         linkInfo={false}
                         actions={true}
-                        // TODO Refreshes the page on change
+                        onChange={reload}
                     />,
                     span: 4,
                 })

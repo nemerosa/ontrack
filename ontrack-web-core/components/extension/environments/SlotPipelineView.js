@@ -13,11 +13,13 @@ import {
 import {slotBreadcrumbs, slotTitle, slotUri} from "@components/extension/environments/EnvironmentsLinksUtils";
 import {CloseCommand} from "@components/common/Commands";
 import SlotPipelineDeploymentStatus from "@components/extension/environments/SlotPipelineDeploymentStatus";
+import {useReloadState} from "@components/common/StateUtils";
 
 export default function SlotPipelineView({id}) {
 
     const client = useGraphQLClient()
 
+    const [reloadState, reload] = useReloadState()
     const [loading, setLoading] = useState(true)
     const [title, setTitle] = useState('')
     const [pipelinePageTitle, setPipelinePageTitle] = useState('')
@@ -64,7 +66,7 @@ export default function SlotPipelineView({id}) {
                 setLoading(false)
             })
         }
-    }, [client, id])
+    }, [client, id, reloadState])
 
     return (
         <>
@@ -81,6 +83,7 @@ export default function SlotPipelineView({id}) {
                         pipeline &&
                         <SlotPipelineDeploymentStatus
                             pipeline={pipeline}
+                            onChange={reload}
                         />
                     }
                 </LoadingContainer>

@@ -6,14 +6,18 @@ export default function ValidationStampViewTitle({validationStamp, link = false}
     return (
         <>
             {
-                link && <ValidationStampLink validationStamp={validationStamp}/>
-            }
-            {
-                !link &&
-                <Space>
-                    <ValidationStampImage validationStamp={validationStamp}/>
-                    {validationStamp.name}
-                </Space>
+                validationStamp && <>
+                    {
+                        link && <ValidationStampLink validationStamp={validationStamp}/>
+                    }
+                    {
+                        !link &&
+                        <Space>
+                            <ValidationStampImage validationStamp={validationStamp}/>
+                            {validationStamp.name}
+                        </Space>
+                    }
+                </>
             }
         </>
     )

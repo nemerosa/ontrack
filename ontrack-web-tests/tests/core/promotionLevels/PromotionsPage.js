@@ -29,7 +29,7 @@ export class PromotionsPage {
     }
 
     async checkPromotionLevel({name}) {
-        await expect(this.page.getByRole('link', {name: name, exact: true})).toBeVisible()
+        await expect(this.page.getByRole('link', {name: name})).toBeVisible()
     }
 
 }

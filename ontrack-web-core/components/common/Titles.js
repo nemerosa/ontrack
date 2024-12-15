@@ -59,7 +59,7 @@ export function validationStampTitleName(validationStamp, what) {
 }
 
 export function validationStampTitle(validationStamp) {
-    return title(validationStampTitleName(validationStamp))
+    return validationStamp ? title(validationStampTitleName(validationStamp)) : ''
 }
 
 export function title(text) {

@@ -45,7 +45,7 @@ export class EnvironmentsPage {
     }
 
     async checkSlotIsVisible(environment, projectName, qualifier) {
-        const row = this.page.getByTestId(`environment-row-${environment.id}`)
+        const row = this.page.getByTestId(`environment-${environment.id}`)
         await expect(row.getByText(projectName, {exact: true})).toBeVisible()
     }
 

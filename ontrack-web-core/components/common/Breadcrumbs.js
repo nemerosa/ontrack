@@ -65,5 +65,5 @@ export function promotionLevelBreadcrumbs(promotionLevel) {
 }
 
 export function validationStampBreadcrumbs(validationStamp) {
-    return downToBranchBreadcrumbs(validationStamp)
+    return validationStamp ? downToBranchBreadcrumbs(validationStamp) : []
 }

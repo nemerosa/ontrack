@@ -36,7 +36,7 @@ export default function ValidationStampView({id}) {
     const client = useGraphQLClient()
 
     const [loading, setLoading] = useState(true)
-    const [validationStamp, setValidationStamp] = useState({branch: {project: {}}})
+    const [validationStamp, setValidationStamp] = useState()
     const [commands, setCommands] = useState([])
 
     const chartLeadTime = "chart-lead-time"
@@ -191,7 +191,7 @@ export default function ValidationStampView({id}) {
                     commands={commands}
                     description={
                         <Space direction="vertical">
-                            {validationStamp.description}
+                            {validationStamp?.description}
                             {/* Validation stamp data config */}
                             {
                                 validationStamp && validationStamp.dataType &&

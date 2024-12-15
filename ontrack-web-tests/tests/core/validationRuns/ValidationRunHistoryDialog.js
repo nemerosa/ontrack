@@ -7,7 +7,7 @@ export class ValidationRunHistoryDialog {
     }
 
     async waitFor() {
-        await expect(this.page.getByText(`Runs for ${this.run.validationStamp.name} in build ${this.run.build.name}`)).toBeVisible()
+        await expect(this.page.getByText(`${this.run.validationStamp.name} in build ${this.run.build.name}`)).toBeVisible()
     }
 
     async selectStatus(status) {

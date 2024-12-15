@@ -1,12 +1,12 @@
 import {test} from "@playwright/test";
-import {manualApprovalInEnvironmentsPage} from "./manualApprovalFixtures";
+import {manualApprovalInPipelinePage} from "./manualApprovalFixtures";
 
 test('pipeline status refreshed when inputs completed', async ({page}) => {
-    await manualApprovalInEnvironmentsPage(page)
+    await manualApprovalInPipelinePage(page)
 })
 
 test('pipeline marked as deploying', async ({page}) => {
-    const {pipelineActions} = await manualApprovalInEnvironmentsPage(page)
+    const {pipelineActions} = await manualApprovalInPipelinePage(page)
     // Pipeline is now ready to be set in "deploying" mode
     await pipelineActions.checkDeployingAction()
     await pipelineActions.deploying()
