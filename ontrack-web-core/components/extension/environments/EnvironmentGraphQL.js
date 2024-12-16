@@ -77,10 +77,6 @@ export const gqlSlotPipelineData = gql`
         build {
             ...SlotPipelineBuildData
         }
-        slot {
-            ...SlotData
-        }
     }
     ${gqlSlotPipelineBuildData}
-    ${gqlSlotData}
 `;

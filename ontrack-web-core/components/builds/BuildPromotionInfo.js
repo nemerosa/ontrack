@@ -5,7 +5,7 @@ import {gql} from "graphql-request";
 import {Steps} from "antd";
 import buildPromotionInfoItem from "@components/builds/BuildPromotionInfoItem";
 import {useReloadState} from "@components/common/StateUtils";
-import {gqlSlotPipelineData} from "@components/extension/environments/EnvironmentGraphQL";
+import {gqlSlotData, gqlSlotPipelineData} from "@components/extension/environments/EnvironmentGraphQL";
 
 export default function BuildPromotionInfo({build}) {
 
@@ -20,11 +20,15 @@ export default function BuildPromotionInfo({build}) {
             setLoading(true)
             client.request(
                 gql`
+                    ${gqlSlotData}
                     ${gqlSlotPipelineData}
                     fragment BuildPromotionInfoItemDataContent on BuildPromotionInfoItemData {
                         __typename
                         ... on SlotPipeline {
                             ...SlotPipelineData
+                            slot {
+                                ...SlotData
+                            }
                         }
                         ... on EnvironmentBuildCount {
                             id
