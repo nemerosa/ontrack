@@ -154,6 +154,13 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         return project
     }
 
+    fun project(name: String, init: Project.() -> Unit = {}): Project {
+        return project(
+            NameDescription.nd(name, ""),
+            init
+        )
+    }
+
     fun <T> project(init: Project.() -> T): T {
         val project = doCreateProject()
         return asAdmin().call {
@@ -236,6 +243,19 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         val build = doCreateBuild(this, NameDescription.nd(name, ""))
         return build.init()
     }
+
+    /**
+     * Updating the signature of a [Project].
+     */
+    fun Project.updateProjectSignature(
+        user: String? = null,
+        time: LocalDateTime? = null
+    ) =
+        structureService.saveProject(
+            withSignature(
+                Signature(time ?: signature.time, user?.let { User(user) } ?: signature.user)
+            )
+        )
 
     /**
      * Updating the signature of a [Branch].

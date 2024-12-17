@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service
 
+import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.security.BuildEdit
 import net.nemerosa.ontrack.model.security.ProjectEdit
@@ -7,6 +8,7 @@ import net.nemerosa.ontrack.model.structure.BuildSearchForm
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.structure.Signature
 import net.nemerosa.ontrack.test.TestUtils
+import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.security.access.AccessDeniedException
@@ -271,36 +273,64 @@ class StructureServiceIT : AbstractDSLTestSupport() {
     @Test
     fun `Last active projects must include projects without builds`() {
         asAdmin {
-            val pa = project()
-            val pb = project()
-            val pc = project()
-            val pd = project()
+
+            val ref = Time.now().minusHours(1)
+
+            val pa = project(name = uid("a-")) {
+                updateProjectSignature(time = ref.plusSeconds(10))
+            }
+            val pb = project(name = uid("b-")) {
+                updateProjectSignature(time = ref.plusSeconds(20))
+            }
+            val pc = project(name = uid("c-")) {
+                updateProjectSignature(time = ref.plusSeconds(30))
+            }
+            val pd = project(name = uid("d-")) {
+                updateProjectSignature(time = ref.plusSeconds(40))
+            }
 
             pa.apply {
                 branch {
-                    build()
+                    updateBranchSignature(time = ref.plusSeconds(65))
+                    build {
+                        updateBuildSignature(time = ref.plusSeconds(70))
+                    }
                 }
             }
 
             pb.apply {
                 branch {
-                    build()
+                    updateBranchSignature(time = ref.plusSeconds(75))
+                    build {
+                        updateBuildSignature(time = ref.plusSeconds(80))
+                    }
                 }
             }
 
             pc.apply {
                 branch {
-                    build()
+                    updateBranchSignature(time = ref.plusSeconds(85))
+                    build {
+                        updateBuildSignature(time = ref.plusSeconds(90))
+                    }
                 }
             }
 
             pa.apply {
                 branch {
-                    build()
+                    updateBranchSignature(time = ref.plusSeconds(95))
+                    build {
+                        updateBuildSignature(time = ref.plusSeconds(100))
+                    }
                 }
             }
 
             val projects = structureService.lastActiveProjects(4)
+
+            projects.forEach {
+                println("${it.name} -> ${it.signature.time}")
+            }
+
             assertEquals(
                 listOf(
                     pa.name,

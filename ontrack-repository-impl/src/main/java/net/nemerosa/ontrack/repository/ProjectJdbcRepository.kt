@@ -36,7 +36,7 @@ class ProjectJdbcRepository(dataSource: DataSource) : AbstractJdbcRepository(dat
                          LEFT JOIN branches b ON b.projectid = p.id
                          LEFT JOIN builds bl ON bl.branchid = b.id
                 GROUP BY p.id
-                ORDER BY MAX(COALESCE(bl.creation, p.creation)) DESC; 
+                ORDER BY MAX(COALESCE(bl.creation, b.creation, p.creation)) DESC; 
             """
         ) { rs, _ ->
             toProject(rs)

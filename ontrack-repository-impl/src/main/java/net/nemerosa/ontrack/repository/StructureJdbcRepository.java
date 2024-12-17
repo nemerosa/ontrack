@@ -117,10 +117,12 @@ public class StructureJdbcRepository extends AbstractJdbcRepository implements S
     public void saveProject(Project project) {
         try {
             getNamedParameterJdbcTemplate().update(
-                    "UPDATE PROJECTS SET NAME = :name, DESCRIPTION = :description, DISABLED = :disabled WHERE ID = :id",
+                    "UPDATE PROJECTS SET NAME = :name, DESCRIPTION = :description, DISABLED = :disabled, CREATION = :creation, CREATOR = :creator  WHERE ID = :id",
                     params("name", project.getName())
                             .addValue("description", project.getDescription())
                             .addValue("disabled", project.isDisabled())
+                            .addValue("creation", dateTimeForDB(project.getSignature().getTime()))
+                            .addValue("creator", project.getSignature().getUser().getName())
                             .addValue("id", project.getId().getValue())
             );
         } catch (DuplicateKeyException ex) {
