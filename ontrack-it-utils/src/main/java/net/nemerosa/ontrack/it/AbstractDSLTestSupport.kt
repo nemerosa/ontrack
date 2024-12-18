@@ -22,6 +22,8 @@ import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.PlatformTransactionManager
+import org.springframework.transaction.TransactionDefinition
+import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDateTime
 import kotlin.reflect.KClass
 import kotlin.test.assertEquals
@@ -73,6 +75,17 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     }
 
     protected fun <T : Any> inNewTransaction(code: () -> T): T = transactionHelper.inNewTransaction(code)
+
+    protected fun inNewTransactionAndRollback(code: () -> Unit) {
+        val transactionTemplate = TransactionTemplate(platformTransactionManager)
+        transactionTemplate.propagationBehavior = TransactionDefinition.PROPAGATION_REQUIRES_NEW
+        val status = platformTransactionManager.getTransaction(transactionTemplate)
+        try {
+            code()
+        } finally {
+            platformTransactionManager.rollback(status)
+        }
+    }
 
     protected inner class Then<T : Any>(private val initial: T) {
         infix fun then(code: (T) -> Unit) {
@@ -143,6 +156,15 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
             code()
         } finally {
             ontrackConfigProperties.configurationTest = configurationTest
+        }
+    }
+
+    fun withCleanProjects(code: () -> Unit) {
+        asAdmin {
+            inNewTransactionAndRollback {
+                deleteAllProjects()
+                code()
+            }
         }
     }
 
