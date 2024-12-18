@@ -230,31 +230,54 @@ class StructureServiceIT : AbstractDSLTestSupport() {
     @Test
     fun `Last active projects`() {
         asAdmin {
-            val pa = project()
-            val pb = project()
-            val pc = project()
+
+            deleteAllProjects()
+
+            val ref = Time.now().minusHours(1)
+
+            val pa = project(name = uid("a-")) {
+                updateProjectSignature(time = ref.plusSeconds(10))
+            }
+            val pb = project(name = uid("b-")) {
+                updateProjectSignature(time = ref.plusSeconds(20))
+            }
+            val pc = project(name = uid("c-")) {
+                updateProjectSignature(time = ref.plusSeconds(30))
+            }
 
             pa.apply {
                 branch {
-                    build()
+                    updateBranchSignature(time = ref.plusSeconds(65))
+                    build {
+                        updateBuildSignature(time = ref.plusSeconds(70))
+                    }
                 }
             }
 
             pb.apply {
                 branch {
-                    build()
+                    updateBranchSignature(time = ref.plusSeconds(75))
+                    build {
+                        updateBuildSignature(time = ref.plusSeconds(80))
+                    }
                 }
             }
 
             pc.apply {
                 branch {
-                    build()
+                    updateBranchSignature(time = ref.plusSeconds(85))
+                    build {
+                        updateBuildSignature(time = ref.plusSeconds(90))
+                    }
                 }
             }
 
             pa.apply {
                 branch {
-                    build()
+                    updateBranchSignature(time = ref.plusSeconds(95))
+                    build {
+                        updateBuildSignature(time = ref.plusSeconds(100))
+                    }
                 }
             }
 
@@ -273,6 +296,8 @@ class StructureServiceIT : AbstractDSLTestSupport() {
     @Test
     fun `Last active projects must include projects without builds`() {
         asAdmin {
+
+            deleteAllProjects()
 
             val ref = Time.now().minusHours(1)
 
