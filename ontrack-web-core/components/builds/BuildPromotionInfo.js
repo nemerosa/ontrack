@@ -33,6 +33,18 @@ export default function BuildPromotionInfo({build}) {
                         ... on EnvironmentBuildCount {
                             id
                             count
+                            build {
+                                id
+                                name
+                                branch {
+                                    id
+                                    name
+                                    project {
+                                        id
+                                        name
+                                    }
+                                }
+                            }
                         }
                         ... on PromotionLevel {
                             id

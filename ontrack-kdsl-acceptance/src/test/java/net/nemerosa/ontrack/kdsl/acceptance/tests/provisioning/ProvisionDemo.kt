@@ -115,6 +115,12 @@ class ProvisionDemo : AbstractACCDSLTestSupport() {
                                     - release
                                     - production
                                     - pilot
+                                - name: production-demo
+                                  order: 300
+                                  tags:
+                                    - release
+                                    - production
+                                    - demo
                                 - name: production-live
                                   order: 350
                                   tags:
@@ -165,6 +171,11 @@ class ProvisionDemo : AbstractACCDSLTestSupport() {
                                         - ruleId: environment
                                           ruleConfig:
                                             environmentName: acceptance-live
+                                    - name: production-demo
+                                      admissionRules:
+                                        - ruleId: promotion
+                                          ruleConfig:
+                                            promotion: DIAMOND
                                     - name: production-live
                                       admissionRules:
                                         - ruleId: manual

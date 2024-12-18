@@ -1930,6 +1930,8 @@ type Environment {
 
 "Number of environments where a build is deployed"
 type EnvironmentBuildCount {
+    "Associated build"
+    build: Build!
     "Number of environments where a build is deployed"
     count: Int
     "ID of the count (build ID)"
@@ -4892,6 +4894,11 @@ type Project implements Authorizable & ProjectEntity {
     scmCatalogEntry: SCMCatalogEntry
     "List of saved SCM file filters for the project"
     scmFileChangeFilters: SCMFileChangeFilters!
+    "Graph of environment slots for a project"
+    slotGraph(
+        "Qualifier for the slots"
+        qualifier: String = ""
+    ): SlotGraph!
     "Association with a SonarQube project."
     sonarQubeProperty: Property
     "Allows to disable or delete stale branches"
@@ -7138,10 +7145,24 @@ type SlotAdmissionRuleInput {
     config: SlotAdmissionRuleConfig!
 }
 
+"Graph of slots for a project"
+type SlotGraph {
+    "slotNodes field"
+    slotNodes: [SlotNode!]!
+}
+
 "Holds a list of slots"
 type SlotList {
     "Holds a list of slots"
     slots: [Slot!]!
+}
+
+"Node for a slot in a graph"
+type SlotNode {
+    "parents field"
+    parents: [Slot!]!
+    "slot field"
+    slot: Slot!
 }
 
 "Pipeline for a slot"

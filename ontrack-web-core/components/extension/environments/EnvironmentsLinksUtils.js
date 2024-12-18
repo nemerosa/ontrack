@@ -15,6 +15,8 @@ export const slotUri = ({id}) => `/extension/environments/slot/${id}`
 
 export const environmentsUri = `/extension/environments/environments`
 
+export const projectEnvironmentsUri = ({id}) => `/extension/environments/projects/${id}`
+
 export const restEnvironmentImageUri = ({id}) => `/rest/extension/environments/environments/${id}/image`
 
 export const environmentsBreadcrumbs = () => [

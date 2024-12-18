@@ -137,33 +137,6 @@ export default function EnvironmentList() {
                                     key={environment.id}
                                     environment={environment}
                                 />
-                                // <Row data-testid={`environment-row-${environment.id}`} gutter={[16, 16]}
-                                //      key={environment.id}
-                                //      wrap={false}>
-                                //     <Col span={4}>
-                                //         <EnvironmentCard environment={environment}/>
-                                //     </Col>
-                                //     {
-                                //         environment.slots.map(slot => (
-                                //             <Col key={slot.id} span={6}>
-                                //                 <Card
-                                //                     style={{height: '100%'}}
-                                //                 >
-                                //                     <Flex justify="space-between" align="center">
-                                //                         <SlotTitle
-                                //                             slot={slot}
-                                //                             showLastDeployed={true}
-                                //                         />
-                                //                         <SlotLink
-                                //                             slot={slot}
-                                //                             text="Settings"
-                                //                         />
-                                //                     </Flex>
-                                //                 </Card>
-                                //             </Col>
-                                //         ))
-                                //     }
-                                // </Row>
                             ))
                         }
                     </>

@@ -23,6 +23,8 @@ export const gqlSlotData = gql`
             id
             name
             order
+            image
+            tags
         }
     }
 

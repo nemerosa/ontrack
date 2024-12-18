@@ -3,12 +3,12 @@ import {useEffect, useState} from "react";
 import {getGraphQLErrors} from "@components/services/graphql-utils";
 import {useReloadState} from "@components/common/StateUtils";
 
-export const useQuery = (query, {variables} = {}) => {
+export const useQuery = (query, {variables, initialData} = {}) => {
     const client = useGraphQLClient()
 
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
-    const [data, setData] = useState()
+    const [data, setData] = useState(initialData)
 
     const [reloadState, reload] = useReloadState()
 

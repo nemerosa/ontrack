@@ -1,5 +1,5 @@
 import EnvironmentIcon from "@components/extension/environments/EnvironmentIcon";
-import {environmentsUri, slotPipelineUri} from "@components/extension/environments/EnvironmentsLinksUtils";
+import {projectEnvironmentsUri, slotPipelineUri} from "@components/extension/environments/EnvironmentsLinksUtils";
 import Link from "next/link";
 import {Popover, Space} from "antd";
 import TimestampText from "@components/common/TimestampText";
@@ -25,8 +25,7 @@ export default function SlotPipelineBuildPromotionInfoItemDot({item}) {
                     </>
                 }
             >
-                {/* TODO https://trello.com/c/LYl0s5dH/151-environment-page-as-control-board */}
-                <Link href={environmentsUri}>
+                <Link href={projectEnvironmentsUri(item.slot.project)}>
                     <EnvironmentIcon environmentId={item.slot.environment.id} showTooltip={false}/>
                 </Link>
             </Popover>

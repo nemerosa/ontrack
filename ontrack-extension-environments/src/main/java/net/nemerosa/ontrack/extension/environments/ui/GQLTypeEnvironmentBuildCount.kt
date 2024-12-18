@@ -5,6 +5,7 @@ import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.extension.environments.promotions.EnvironmentBuildCount
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
+import net.nemerosa.ontrack.graphql.support.field
 import net.nemerosa.ontrack.graphql.support.getTypeDescription
 import net.nemerosa.ontrack.graphql.support.intField
 import net.nemerosa.ontrack.graphql.support.toNotNull
@@ -29,6 +30,7 @@ class GQLTypeEnvironmentBuildCount : GQLType {
                     }
             }
             .intField(EnvironmentBuildCount::count)
+            .field(EnvironmentBuildCount::build)
             .build()
 
 }
