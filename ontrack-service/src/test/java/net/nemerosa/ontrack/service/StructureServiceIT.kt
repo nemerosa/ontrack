@@ -231,140 +231,144 @@ class StructureServiceIT : AbstractDSLTestSupport() {
     fun `Last active projects`() {
         asAdmin {
 
-            deleteAllProjects()
+            inNewTransaction {
 
-            val ref = Time.now().minusHours(1)
+                deleteAllProjects()
 
-            val pa = project(name = uid("a-")) {
-                updateProjectSignature(time = ref.plusSeconds(10))
-            }
-            val pb = project(name = uid("b-")) {
-                updateProjectSignature(time = ref.plusSeconds(20))
-            }
-            val pc = project(name = uid("c-")) {
-                updateProjectSignature(time = ref.plusSeconds(30))
-            }
+                val ref = Time.now().minusHours(1)
 
-            pa.apply {
-                branch {
-                    updateBranchSignature(time = ref.plusSeconds(65))
-                    build {
-                        updateBuildSignature(time = ref.plusSeconds(70))
+                val pa = project(name = uid("a-")) {
+                    updateProjectSignature(time = ref.plusSeconds(10))
+                }
+                val pb = project(name = uid("b-")) {
+                    updateProjectSignature(time = ref.plusSeconds(20))
+                }
+                val pc = project(name = uid("c-")) {
+                    updateProjectSignature(time = ref.plusSeconds(30))
+                }
+
+                pa.apply {
+                    branch {
+                        updateBranchSignature(time = ref.plusSeconds(65))
+                        build {
+                            updateBuildSignature(time = ref.plusSeconds(70))
+                        }
                     }
                 }
-            }
 
-            pb.apply {
-                branch {
-                    updateBranchSignature(time = ref.plusSeconds(75))
-                    build {
-                        updateBuildSignature(time = ref.plusSeconds(80))
+                pb.apply {
+                    branch {
+                        updateBranchSignature(time = ref.plusSeconds(75))
+                        build {
+                            updateBuildSignature(time = ref.plusSeconds(80))
+                        }
                     }
                 }
-            }
 
-            pc.apply {
-                branch {
-                    updateBranchSignature(time = ref.plusSeconds(85))
-                    build {
-                        updateBuildSignature(time = ref.plusSeconds(90))
+                pc.apply {
+                    branch {
+                        updateBranchSignature(time = ref.plusSeconds(85))
+                        build {
+                            updateBuildSignature(time = ref.plusSeconds(90))
+                        }
                     }
                 }
-            }
 
-            pa.apply {
-                branch {
-                    updateBranchSignature(time = ref.plusSeconds(95))
-                    build {
-                        updateBuildSignature(time = ref.plusSeconds(100))
+                pa.apply {
+                    branch {
+                        updateBranchSignature(time = ref.plusSeconds(95))
+                        build {
+                            updateBuildSignature(time = ref.plusSeconds(100))
+                        }
                     }
                 }
-            }
 
-            val projects = structureService.lastActiveProjects(3)
-            assertEquals(
-                listOf(
-                    pa.name,
-                    pc.name,
-                    pb.name,
-                ),
-                projects.map { it.name }
-            )
+                val projects = structureService.lastActiveProjects(3)
+                assertEquals(
+                    listOf(
+                        pa.name,
+                        pc.name,
+                        pb.name,
+                    ),
+                    projects.map { it.name }
+                )
+            }
         }
     }
 
     @Test
     fun `Last active projects must include projects without builds`() {
         asAdmin {
+            inNewTransaction {
+                deleteAllProjects()
 
-            deleteAllProjects()
+                val ref = Time.now().minusHours(1)
 
-            val ref = Time.now().minusHours(1)
+                val pa = project(name = uid("a-")) {
+                    updateProjectSignature(time = ref.plusSeconds(10))
+                }
+                val pb = project(name = uid("b-")) {
+                    updateProjectSignature(time = ref.plusSeconds(20))
+                }
+                val pc = project(name = uid("c-")) {
+                    updateProjectSignature(time = ref.plusSeconds(30))
+                }
+                val pd = project(name = uid("d-")) {
+                    updateProjectSignature(time = ref.plusSeconds(40))
+                }
 
-            val pa = project(name = uid("a-")) {
-                updateProjectSignature(time = ref.plusSeconds(10))
-            }
-            val pb = project(name = uid("b-")) {
-                updateProjectSignature(time = ref.plusSeconds(20))
-            }
-            val pc = project(name = uid("c-")) {
-                updateProjectSignature(time = ref.plusSeconds(30))
-            }
-            val pd = project(name = uid("d-")) {
-                updateProjectSignature(time = ref.plusSeconds(40))
-            }
-
-            pa.apply {
-                branch {
-                    updateBranchSignature(time = ref.plusSeconds(65))
-                    build {
-                        updateBuildSignature(time = ref.plusSeconds(70))
+                pa.apply {
+                    branch {
+                        updateBranchSignature(time = ref.plusSeconds(65))
+                        build {
+                            updateBuildSignature(time = ref.plusSeconds(70))
+                        }
                     }
                 }
-            }
 
-            pb.apply {
-                branch {
-                    updateBranchSignature(time = ref.plusSeconds(75))
-                    build {
-                        updateBuildSignature(time = ref.plusSeconds(80))
+                pb.apply {
+                    branch {
+                        updateBranchSignature(time = ref.plusSeconds(75))
+                        build {
+                            updateBuildSignature(time = ref.plusSeconds(80))
+                        }
                     }
                 }
-            }
 
-            pc.apply {
-                branch {
-                    updateBranchSignature(time = ref.plusSeconds(85))
-                    build {
-                        updateBuildSignature(time = ref.plusSeconds(90))
+                pc.apply {
+                    branch {
+                        updateBranchSignature(time = ref.plusSeconds(85))
+                        build {
+                            updateBuildSignature(time = ref.plusSeconds(90))
+                        }
                     }
                 }
-            }
 
-            pa.apply {
-                branch {
-                    updateBranchSignature(time = ref.plusSeconds(95))
-                    build {
-                        updateBuildSignature(time = ref.plusSeconds(100))
+                pa.apply {
+                    branch {
+                        updateBranchSignature(time = ref.plusSeconds(95))
+                        build {
+                            updateBuildSignature(time = ref.plusSeconds(100))
+                        }
                     }
                 }
+
+                val projects = structureService.lastActiveProjects(4)
+
+                projects.forEach {
+                    println("${it.name} -> ${it.signature.time}")
+                }
+
+                assertEquals(
+                    listOf(
+                        pa.name,
+                        pc.name,
+                        pb.name,
+                        pd.name,
+                    ),
+                    projects.map { it.name }
+                )
             }
-
-            val projects = structureService.lastActiveProjects(4)
-
-            projects.forEach {
-                println("${it.name} -> ${it.signature.time}")
-            }
-
-            assertEquals(
-                listOf(
-                    pa.name,
-                    pc.name,
-                    pb.name,
-                    pd.name,
-                ),
-                projects.map { it.name }
-            )
         }
     }
 
