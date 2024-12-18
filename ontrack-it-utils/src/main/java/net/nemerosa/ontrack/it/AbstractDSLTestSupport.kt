@@ -159,15 +159,6 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         }
     }
 
-    fun withCleanProjects(code: () -> Unit) {
-        asAdmin {
-            inNewTransactionAndRollback {
-                deleteAllProjects()
-                code()
-            }
-        }
-    }
-
     fun project(name: NameDescription = nameDescription(), init: Project.() -> Unit = {}): Project {
         val project = doCreateProject(name)
         securityService.asAdmin {

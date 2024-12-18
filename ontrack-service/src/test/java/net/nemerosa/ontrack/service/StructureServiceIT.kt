@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.NewTxRollbacked
 import net.nemerosa.ontrack.model.security.BuildEdit
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.structure.BuildSearchForm
@@ -228,8 +229,10 @@ class StructureServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    @NewTxRollbacked
     fun `Last active projects`() {
-        withCleanProjects {
+        asAdmin {
+            deleteAllProjects()
             val ref = Time.now().minusHours(1)
 
             val pa = project(name = uid("a-")) {
@@ -291,8 +294,10 @@ class StructureServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    @NewTxRollbacked
     fun `Last active projects must include projects without builds`() {
-        withCleanProjects {
+        asAdmin {
+            deleteAllProjects()
             val ref = Time.now().minusHours(1)
 
             val pa = project(name = uid("a-")) {

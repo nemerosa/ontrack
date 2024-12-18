@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowService
 import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowTestFixtures
 import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowTrigger
 import net.nemerosa.ontrack.extension.scm.service.TestSCMExtension
+import net.nemerosa.ontrack.it.NewTxRollbacked
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.test.TestUtils.resourceBytes
 import net.nemerosa.ontrack.test.TestUtils.uid
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
 
+@NewTxRollbacked
 class EnvironmentsCascContextIT : AbstractCascTestSupport() {
 
     @Autowired
