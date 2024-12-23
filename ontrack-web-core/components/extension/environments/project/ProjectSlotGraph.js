@@ -1,10 +1,11 @@
 import {applyNodeChanges, Background, Controls, MarkerType, ReactFlow} from "reactflow";
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useContext, useEffect, useState} from "react";
 import SlotGraphNode from "@components/extension/environments/project/SlotGraphNode";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
 import {autoLayout} from "@components/links/GraphUtils";
 import {gqlSlotData, gqlSlotPipelineData} from "@components/extension/environments/EnvironmentGraphQL";
+import {EventsContext} from "@components/common/EventsContext";
 
 const nodeTypes = {
     slotNode: SlotGraphNode,
@@ -96,6 +97,17 @@ export default function ProjectSlotGraph({id, qualifier = ""}) {
         (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
         [],
     )
+
+    const eventsContext = useContext(EventsContext)
+    eventsContext.subscribeToEvent("slot.selected", ({id}) => {
+        setNodes(nodes => nodes.map(node => ({
+            ...node,
+            data: {
+                ...node.data,
+                selected: node.data.slot.id === id,
+            }
+        })))
+    })
 
     return (
         <>

@@ -5,7 +5,13 @@ import SlotCurrentPipeline from "@components/extension/environments/SlotCurrentP
 import useSlotState from "@components/extension/environments/SlotState";
 import SlotLink from "@components/extension/environments/SlotLink";
 
-export default function SlotCard({slot, title, showLastDeployed = false, showLastDeployedInTitle = false}) {
+export default function SlotCard({
+                                     slot,
+                                     title,
+                                     showLastDeployed = false,
+                                     showLastDeployedInTitle = false,
+                                     showEligible = true,
+                                 }) {
 
     const [slotState, onSlotStateChanged] = useSlotState()
 
@@ -33,10 +39,13 @@ export default function SlotCard({slot, title, showLastDeployed = false, showLas
                         slotState={slotState}
                         showLastDeployed={showLastDeployed}
                     />
-                    <SlotEligibleBuild
-                        slot={slot}
-                        onStart={onSlotStateChanged}
-                    />
+                    {
+                        showEligible &&
+                        <SlotEligibleBuild
+                            slot={slot}
+                            onStart={onSlotStateChanged}
+                        />
+                    }
                 </Space>
             </Card>
         </>

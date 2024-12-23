@@ -62,6 +62,7 @@ export default function ProjectSlotSelection() {
                 slot &&
                 <SlotCard
                     slot={slot}
+                    showEligible={false}
                     title={
                         <EnvironmentTitle environment={slot.environment} tags={false}/>
                     }

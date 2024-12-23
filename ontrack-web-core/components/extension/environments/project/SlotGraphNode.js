@@ -24,7 +24,8 @@ export default function SlotGraphNode({data}) {
             <Card
                 hoverable={true}
                 style={{
-                    border: 'solid 2px black'
+                    border: data.selected ? 'solid 4px black' : 'solid 2px gray',
+                    filter: data.selected ? undefined : 'opacity(33%)',
                 }}
             >
                 <Space direction="vertical">
