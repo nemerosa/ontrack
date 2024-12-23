@@ -294,7 +294,7 @@ class SlotServiceImpl(
     override fun findSlotByProjectAndEnvironment(environment: Environment, project: Project, qualifier: String): Slot? =
         slotRepository.findSlotByProjectAndEnvironment(environment, project, qualifier)
 
-    override fun findLastDeployedSlotPipelinesByBuild(build: Build): Set<SlotPipeline> {
+    override fun findHighestDeployedSlotPipelinesByBuildAndQualifier(build: Build): Set<SlotPipeline> {
         // Finds the slots for the corresponding project
         val slots: Set<Slot> = findSlotsByProject(build.project)
         // For each slot, gets the last DEPLOYED pipeline and uses it
@@ -313,6 +313,21 @@ class SlotServiceImpl(
         }.toMap()
         // Returning the pipelines
         return highestPipelinePerQualifier.values.toSet()
+    }
+
+    override fun findCurrentDeployments(build: Build, qualifier: String): List<SlotPipeline> {
+        // Finds the slots for the corresponding project & qualifier
+        val slots: Set<Slot> = findSlotsByProject(build.project, qualifier = qualifier)
+        // For each slot, gets the last DEPLOYED pipeline and uses it
+        // if for the given build
+        val lastDeployedPipelines: List<SlotPipeline> = slots.mapNotNull { slot ->
+            getLastDeployedPipeline(slot)
+        }.filter {
+            // Keeping only the pipelines for the given build
+            it.build.id() == build.id()
+        }
+        // Sorting by environment
+        return lastDeployedPipelines.sortedByDescending { it.slot.environment.order }
     }
 
     override fun findPipelines(slot: Slot, offset: Int, size: Int): PaginatedList<SlotPipeline> {

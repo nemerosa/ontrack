@@ -19,7 +19,7 @@ class BuildEnvironmentsDecorations(
 
     override fun getDecorations(entity: ProjectEntity): List<Decoration<List<BuildEnvironmentsDecorationsData>>> =
         if (entity is Build) {
-            val pipelines = slotService.findLastDeployedSlotPipelinesByBuild(entity)
+            val pipelines = slotService.findHighestDeployedSlotPipelinesByBuildAndQualifier(entity)
             if (pipelines.isNotEmpty()) {
                 listOf(
                     Decoration.of(

@@ -636,6 +636,11 @@ type Build implements Authorizable & ProjectEntity {
     "Link to the GitHub Workflow Run which created this build."
     buildGitHubWorkflowRunProperty: Property
     creation: Signature
+    "Gets the list of slots where this build is actually deployed"
+    currentDeployments(
+        "Qualifier to use"
+        qualifier: String = ""
+    ): [SlotPipeline!]!
     "List of decorations"
     decorations(
         "Fully qualified name of the decoration type"
@@ -703,7 +708,12 @@ type Build implements Authorizable & ProjectEntity {
     "Run info associated with this build"
     runInfo: RunInfo
     "List of pipelines this build is associated with"
-    slotPipelines: [SlotPipeline!]!
+    slotPipelines(
+        "Sorting by decreasing environment order"
+        sortedByEnvironment: Boolean,
+        "Filtering on the pipeline status"
+        status: SlotPipelineStatus
+    ): [SlotPipeline!]!
     "List of builds using this one."
     usedBy(
         "Keeps only links targeted from this branch. `project` argument is also required."

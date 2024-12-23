@@ -98,8 +98,7 @@ export default function ProjectSlotGraph({id, qualifier = ""}) {
         [],
     )
 
-    const eventsContext = useContext(EventsContext)
-    eventsContext.subscribeToEvent("slot.selected", ({id}) => {
+    const selectSlot = (id) => {
         setNodes(nodes => nodes.map(node => ({
             ...node,
             data: {
@@ -107,7 +106,16 @@ export default function ProjectSlotGraph({id, qualifier = ""}) {
                 selected: node.data.slot.id === id,
             }
         })))
+    }
+
+    const eventsContext = useContext(EventsContext)
+    eventsContext.subscribeToEvent("slot.selected", ({id}) => {
+        selectSlot(id)
     })
+
+    const onPaneClick = () => {
+        eventsContext.fireEvent("slot.selected", {id: ''})
+    }
 
     return (
         <>
@@ -118,6 +126,7 @@ export default function ProjectSlotGraph({id, qualifier = ""}) {
                     fitView={true}
                     nodeTypes={nodeTypes}
                     onNodesChange={onNodesChange}
+                    onPaneClick={onPaneClick}
                 >
                     <Background/>
                     <Controls/>

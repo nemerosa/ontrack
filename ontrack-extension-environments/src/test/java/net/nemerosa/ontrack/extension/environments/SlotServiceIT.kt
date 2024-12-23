@@ -225,7 +225,7 @@ class SlotServiceIT : AbstractDSLTestSupport() {
             // Finishing the deployment
             slotService.finishDeployment(pipeline)
             // Getting the pipelines for the build
-            val pipelines = slotService.findLastDeployedSlotPipelinesByBuild(pipeline.build)
+            val pipelines = slotService.findHighestDeployedSlotPipelinesByBuildAndQualifier(pipeline.build)
             assertEquals(
                 listOf(
                     pipeline.id
@@ -248,7 +248,7 @@ class SlotServiceIT : AbstractDSLTestSupport() {
                     val other = build()
                     slotService.startPipeline(slot, other)
 
-                    val pipelines = slotService.findLastDeployedSlotPipelinesByBuild(build)
+                    val pipelines = slotService.findHighestDeployedSlotPipelinesByBuildAndQualifier(build)
                     assertEquals(
                         listOf(
                             deployedPipeline.id
@@ -273,7 +273,7 @@ class SlotServiceIT : AbstractDSLTestSupport() {
                         val demoPipeline = slotService.startPipeline(demoSlot, build).apply {
                             slotTestSupport.startAndDeployPipeline(this)
                         }
-                        val pipelines = slotService.findLastDeployedSlotPipelinesByBuild(build)
+                        val pipelines = slotService.findHighestDeployedSlotPipelinesByBuildAndQualifier(build)
                         assertEquals(
                             setOf(
                                 defaultPipeline.id,

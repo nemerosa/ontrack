@@ -11,6 +11,10 @@ import ProjectSlotGraph from "@components/extension/environments/project/Project
 import {Card, Col, Row, Space, Typography} from "antd";
 import ProjectSlotSelection from "@components/extension/environments/project/ProjectSlotSelection";
 import ProjectLink from "@components/projects/ProjectLink";
+import ProjectEnvironmentsBuilds from "@components/extension/environments/project/ProjectEnvironmentsBuilds";
+import {useContext, useState} from "react";
+import {EventsContext} from "@components/common/EventsContext";
+import ProjectEnvironmentActions from "@components/extension/environments/project/ProjectEnvironmentActions";
 
 export default function ProjectEnvironmentsView({id}) {
 
@@ -30,6 +34,12 @@ export default function ProjectEnvironmentsView({id}) {
             initialData: {project: {}}
         }
     )
+
+    const eventsContext = useContext(EventsContext)
+    const [slotId, setSlotId] = useState('')
+    eventsContext.subscribeToEvent("slot.selected", ({id}) => {
+        setSlotId(id)
+    })
 
     return (
         <>
@@ -62,12 +72,11 @@ export default function ProjectEnvironmentsView({id}) {
                                     </Space>
                                 </Card>
                             </Col>
-                            <Col span={20}>
-                                <Card
-                                    style={{height: "100%"}}
-                                >
-                                    TODO List of builds
-                                </Card>
+                            <Col span={16}>
+                                <ProjectEnvironmentsBuilds projectName={data.project.name} slotId={slotId}/>
+                            </Col>
+                            <Col span={4}>
+                                <ProjectEnvironmentActions/>
                             </Col>
                         </Row>
                         <Row gutter={16}>

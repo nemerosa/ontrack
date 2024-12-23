@@ -30,7 +30,7 @@ export default function SlotGraphNode({data}) {
             >
                 <Space direction="vertical">
                     <div className="ot-action" onClick={onSlotSelected}>
-                        <EnvironmentTitle environment={data.slot.environment} tags={false}/>
+                        <EnvironmentTitle environment={data.slot.environment} tags={false} editable={false}/>
                     </div>
                     {
                         data.slot.lastDeployedPipeline &&

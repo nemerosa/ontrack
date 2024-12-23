@@ -5,7 +5,7 @@ import EnvironmentIconDialog, {
     useEnvironmentIconDialog
 } from "@components/extension/environments/EnvironmentIconDialog";
 
-export default function EnvironmentEditableIcon({environment}) {
+export default function EnvironmentEditableIcon({environment, editable = true}) {
 
     const user = useContext(UserContext)
 
@@ -20,12 +20,21 @@ export default function EnvironmentEditableIcon({environment}) {
             {
                 user.authorizations.environment?.edit &&
                 <>
-                    <EnvironmentIcon
-                        environmentId={environment.id}
-                        onClick={editIcon}
-                        tooltipText="Edit environment icon"
-                    />
-                    <EnvironmentIconDialog dialog={dialog}/>
+                    {
+                        editable && <>
+                            <EnvironmentIcon
+                                environmentId={environment.id}
+                                onClick={editIcon}
+                                tooltipText="Edit environment icon"
+                            />
+                            <EnvironmentIconDialog dialog={dialog}/>
+                        </>
+                    }
+                    {
+                        !editable && <EnvironmentIcon
+                            environmentId={environment.id}
+                        />
+                    }
                 </>
             }
             {

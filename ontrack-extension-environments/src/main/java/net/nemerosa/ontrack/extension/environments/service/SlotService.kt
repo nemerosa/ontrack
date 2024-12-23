@@ -147,10 +147,15 @@ interface SlotService {
     fun findAdmissionRuleConfigById(id: String): SlotAdmissionRuleConfig?
 
     /**
-     * Given one build, gets the list of slots where it's actually deployed (ie. the current deployed pipeline
-     * on a slot points to the build)
+     * Given one build, per qualifier, gets the highest deployed slot. If a build is deployed
+     * more than once (for several qualifiers), several pipelines are returned.
      */
-    fun findLastDeployedSlotPipelinesByBuild(build: Build): Set<SlotPipeline>
+    fun findHighestDeployedSlotPipelinesByBuildAndQualifier(build: Build): Set<SlotPipeline>
+
+    /**
+     * Given one build and one qualifier, gets the list of currently deployed pipelines for this build.
+     */
+    fun findCurrentDeployments(build: Build, qualifier: String): List<SlotPipeline>
 
     /**
      * Finds all the slots for the given project and optional qualifier.
