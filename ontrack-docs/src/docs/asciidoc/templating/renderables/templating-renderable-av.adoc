@@ -1,5 +1,5 @@
 [[templating-renderable-av]]
-==== Auto-versioning context (av)
+===== Auto-versioning context (av)
 
 The `av` context can be used in templates in the PR title & body templates, in order to access information about the auto-versioning request.
 

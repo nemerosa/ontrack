@@ -55,9 +55,11 @@ For example, when using <<notifications,notifications>>, it all depends on the _
 
 To see the list of possible events and their contexts, see <<appendix-events>>.
 
-The next sections list the available sources, functions and filters.
+The next sections list the available sources, functions, contexts and filters.
 
 There are also special objects, known as _templating renderable_, which are specific to some contexts, like <<auto-versioning>> or <<workflows>>.
+
+include::templating/contexts/index.adoc[]
 
 include::templating/sources/index.adoc[]
 

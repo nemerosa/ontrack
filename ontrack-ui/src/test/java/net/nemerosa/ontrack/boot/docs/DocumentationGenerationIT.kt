@@ -65,7 +65,7 @@ class DocumentationGenerationIT : AbstractDocumentationGenerationTestSupport() {
 
             directoryContext.writeFile(
                 fileId = fileId,
-                level = 4,
+                level = 5,
                 title = getTRDTitle(trd),
                 header = description,
                 fields = emptyList(),

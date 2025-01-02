@@ -35,11 +35,23 @@ class AutoVersioningTemplatingServiceImpl(
                 ?: throw ProjectNotFoundException(order.sourceProject)
         }
 
+        val sourceBuild: Build? by lazy {
+            order.sourceBuildId?.let {
+                structureService.getBuild(ID.of(it))
+            }
+        }
+
         val sourcePromotionRun: PromotionRun? by lazy {
             order.sourcePromotionRunId?.let {
                 structureService.getPromotionRun(ID.of(it))
             }
         }
+
+        /**
+         * When adding new entries, please also update the documentation at
+         *
+         * ontrack-docs/src/docs/asciidoc/templating/contexts/auto-versioning-context.adoc
+         */
 
         val context: Map<String, Any> by lazy {
             val tmp = mutableMapOf(
@@ -52,6 +64,9 @@ class AutoVersioningTemplatingServiceImpl(
                 "VERSION" to order.targetVersion,
                 "av" to AutoVersioningOrderTemplatingRenderable(order, currentVersions, sourceProject),
             )
+            if (sourceBuild != null) {
+                tmp["sourceBuild"] = sourceBuild!!
+            }
             if (sourcePromotionRun != null) {
                 tmp["sourcePromotionRun"] = sourcePromotionRun!!
             }

@@ -7,7 +7,7 @@ Context:
 
 * `project` - project - Target project
 * `branch` - branch - Target branch
-* `xProject` - project - Dependency/source project
+* `xPromotionRun` - promotion run - Source promotion run
 * `VERSION` - string - Version being set
 * `MESSAGE` - string - Auto versioning message
 * `PR_NAME` - string - Title of the PR having been created

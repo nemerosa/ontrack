@@ -1,0 +1,10 @@
+[[appendix-templating-contexts-index]]
+==== Execution contexts
+
+Different root contexts are available for the template expressions, depending on the context in which the template is executed.
+
+For a notification, the template is always executed in regard to an _event_. Each event provides its own list of root contexts. See the <<appendix-event-index,list of events>>.
+
+There are several specific contexts:
+
+include::auto-versioning-context.adoc[]
