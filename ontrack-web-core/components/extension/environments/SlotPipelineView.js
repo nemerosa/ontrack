@@ -14,6 +14,7 @@ import {slotBreadcrumbs, slotTitle, slotUri} from "@components/extension/environ
 import {CloseCommand} from "@components/common/Commands";
 import SlotPipelineDeploymentStatus from "@components/extension/environments/SlotPipelineDeploymentStatus";
 import {useReloadState} from "@components/common/StateUtils";
+import EnvironmentsWarning from "@components/extension/environments/EnvironmentsWarning";
 
 export default function SlotPipelineView({id}) {
 
@@ -75,6 +76,7 @@ export default function SlotPipelineView({id}) {
             </Head>
             <MainPage
                 title={title}
+                warning={<EnvironmentsWarning/>}
                 breadcrumbs={breadcrumbs}
                 commands={commands}
             >

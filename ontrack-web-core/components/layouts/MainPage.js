@@ -7,7 +7,7 @@ import MainGlobalMessages from "@components/layouts/MainGlobalMessages";
 
 const {Content} = Layout;
 
-export default function MainPage({title, breadcrumbs, commands, description, children}) {
+export default function MainPage({title, breadcrumbs, commands, description, warning, children}) {
 
     const {
         token: {colorBgContainer},
@@ -40,6 +40,7 @@ export default function MainPage({title, breadcrumbs, commands, description, chi
                     }
                     <Space direction="vertical" className="ot-line">
                         <MainWarning/>
+                        {warning}
                         <MainGlobalMessages/>
                         {children}
                     </Space>

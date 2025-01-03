@@ -7,6 +7,7 @@ import MainPage from "@components/layouts/MainPage";
 import EnvironmentCreateCommand from "@components/extension/environments/EnvironmentCreateCommand";
 import EnvironmentList from "@components/extension/environments/EnvironmentList";
 import SlotCreateCommand from "@components/extension/environments/SlotCreateCommand";
+import EnvironmentsWarning from "@components/extension/environments/EnvironmentsWarning";
 
 export default function EnvironmentsView() {
     return (
@@ -16,6 +17,7 @@ export default function EnvironmentsView() {
             </Head>
             <MainPage
                 title="Environments"
+                warning={<EnvironmentsWarning/>}
                 breadcrumbs={homeBreadcrumbs()}
                 commands={[
                     <EnvironmentCreateCommand key="create-environment"/>,

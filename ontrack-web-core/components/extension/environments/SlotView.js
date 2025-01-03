@@ -21,6 +21,7 @@ import SlotAdmissionRulesTable from "@components/extension/environments/SlotAdmi
 import SlotWorkflowsTable from "@components/extension/environments/SlotWorkflowsTable";
 import DeleteSlotCommand from "@components/extension/environments/DeleteSlotCommand";
 import SlotEligibleBuildsSection from "@components/extension/environments/SlotEligibleBuildsSection";
+import EnvironmentsWarning from "@components/extension/environments/EnvironmentsWarning";
 
 export default function SlotView({id}) {
 
@@ -77,6 +78,7 @@ export default function SlotView({id}) {
             </Head>
             <MainPage
                 title={title}
+                warning={<EnvironmentsWarning/>}
                 breadcrumbs={environmentsBreadcrumbs()}
                 commands={commands}
             >

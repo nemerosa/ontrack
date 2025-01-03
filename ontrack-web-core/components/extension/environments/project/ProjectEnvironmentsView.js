@@ -15,6 +15,7 @@ import ProjectEnvironmentsBuilds from "@components/extension/environments/projec
 import {useContext, useState} from "react";
 import {EventsContext} from "@components/common/EventsContext";
 import ProjectEnvironmentActions from "@components/extension/environments/project/ProjectEnvironmentActions";
+import EnvironmentsWarning from "@components/extension/environments/EnvironmentsWarning";
 
 export default function ProjectEnvironmentsView({id}) {
 
@@ -48,6 +49,7 @@ export default function ProjectEnvironmentsView({id}) {
             </Head>
             <MainPage
                 title="Environments"
+                warning={<EnvironmentsWarning/>}
                 breadcrumbs={downToProjectBreadcrumbs(data)}
                 commands={[
                     <CloseCommand key="close" href={projectUri(data?.project)}/>,
