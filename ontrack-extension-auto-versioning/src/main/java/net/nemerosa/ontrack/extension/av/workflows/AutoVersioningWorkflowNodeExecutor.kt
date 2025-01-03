@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
 import net.nemerosa.ontrack.extension.workflows.execution.AbstractTypedWorkflowNodeExecutor
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorResult
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
@@ -38,6 +39,10 @@ class AutoVersioningWorkflowNodeExecutor(
     displayName = "Auto-versioning",
     dataType = AutoVersioningWorkflowNodeExecutorData::class,
 ) {
+
+    override fun validate(data: JsonNode) {
+        data.parse<AutoVersioningWorkflowNodeExecutorData>()
+    }
 
     override fun execute(
         workflowInstance: WorkflowInstance,

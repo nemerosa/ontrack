@@ -18,6 +18,9 @@ class PauseWorkflowNodeExecutor(
     "Pause",
     PauseWorkflowNodeExecutorData::class
 ) {
+
+    override fun validate(data: JsonNode) {}
+
     override fun execute(
         workflowInstance: WorkflowInstance,
         data: PauseWorkflowNodeExecutorData,

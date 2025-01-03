@@ -24,6 +24,8 @@ class SlotPipelineDeployedWorkflowNodeExecutor(
     override val id: String = "slot-pipeline-deployed"
     override val displayName: String = "Deployed pipeline"
 
+    override fun validate(data: JsonNode) {}
+
     override suspend fun execute(
         workflowInstance: WorkflowInstance,
         workflowNodeId: String,

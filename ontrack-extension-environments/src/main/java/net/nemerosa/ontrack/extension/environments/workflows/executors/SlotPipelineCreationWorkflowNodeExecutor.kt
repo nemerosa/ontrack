@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.extension.environments.service.getPipelineById
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutor
+import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorConfigException
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorResult
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
@@ -31,6 +32,13 @@ class SlotPipelineCreationWorkflowNodeExecutor(
 
     override val id: String = "slot-pipeline-creation"
     override val displayName: String = "Pipeline creation"
+
+    override fun validate(data: JsonNode) {
+        val parsed = data.parse<SlotPipelineCreationWorkflowNodeExecutorData>()
+        if (parsed.environment.isBlank()) {
+            throw WorkflowNodeExecutorConfigException("Missing required environment name for slot pipeline creation")
+        }
+    }
 
     override suspend fun execute(
         workflowInstance: WorkflowInstance,
