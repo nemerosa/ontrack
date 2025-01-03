@@ -20,7 +20,7 @@ class EndToEndPromotionsJdbcHelper(
         private const val QUERY = """
             with recursive links as (
 	
-                select 1 as depth, p.name as ref_project, b.name as ref_branch, n.name as ref_build, n.creation as ref_build_creation, pl.id as ref_promotion_id, pl.name as ref_promotion, pr.creation as ref_promotion_creation, n.id as build_id, p.name as project, b.name as branch, n.name as build, n.creation as build_creation, pl.id as promotion_id, pl.name as promotion, pr.creation as promotion_creation
+                select 1 as depth, p.name as ref_project, b.name as ref_branch, n.name as ref_build, n.creation as ref_build_creation, pl.id as ref_promotion_id, pl.name as ref_promotion, pr.creation as ref_promotion_creation, n.id as build_id, p.name as project, b.name as branch, n.name as build, n.creation as build_creation, pl.id as promotion_id, pl.name as promotion, pr.creation as promotion_creation, array[n.id] as visited
                 from builds n
                 inner join branches b on b.id = n.branchid
                 inner join projects p on p.id = b.projectid
@@ -29,7 +29,7 @@ class EndToEndPromotionsJdbcHelper(
                 
                 union
                 
-                select links.depth + 1 as depth, links.ref_project, links.ref_branch, links.ref_build, links.ref_build_creation, links.ref_promotion_id, links.ref_promotion, links.ref_promotion_creation, n.id as build_id, p.name as project, b.name as branch, n.name as build, n.creation as build_creation, pl.id as promotion_id, pl.name as promotion, pr.creation as promotion_creation
+                select links.depth + 1 as depth, links.ref_project, links.ref_branch, links.ref_build, links.ref_build_creation, links.ref_promotion_id, links.ref_promotion, links.ref_promotion_creation, n.id as build_id, p.name as project, b.name as branch, n.name as build, n.creation as build_creation, pl.id as promotion_id, pl.name as promotion, pr.creation as promotion_creation, visited || n.id
                 from build_links l
                 inner join links on links.build_id = l.targetbuildid
                 inner join builds n on l.buildid = n.id
@@ -37,6 +37,7 @@ class EndToEndPromotionsJdbcHelper(
                 inner join projects p on p.id = b.projectid
                 inner join promotion_levels pl on pl.branchid = b.id
                 left join promotion_runs pr on pr.buildid = n.id and pr.promotionlevelid = pl.id
+                where not (n.id = any (visited))
                 
             )
             select *
