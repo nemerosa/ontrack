@@ -1,5 +1,8 @@
 package net.nemerosa.ontrack.extension.notifications.subscriptions
 
+import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannelRegistry
+import net.nemerosa.ontrack.extension.notifications.channels.getChannel
+import net.nemerosa.ontrack.extension.notifications.channels.throwException
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.pagination.spanningPaginatedList
@@ -14,14 +17,28 @@ class DefaultEventSubscriptionService(
     private val entitySubscriptionStore: EntitySubscriptionStore,
     private val securityService: SecurityService,
     private val structureService: StructureService,
+    private val notificationChannelRegistry: NotificationChannelRegistry,
 ) : EventSubscriptionService {
 
     override fun subscribe(subscription: EventSubscription) {
         // Record to save
         val record = subscription.toSubscriptionRecord()
+
+        // Control
+        fun control() {
+            // Getting the channel for this subscription
+            val channel = notificationChannelRegistry.getChannel(record.channel)
+            // Controlling the configuration for this subscription
+            val validation = channel.validate(record.channelConfig)
+            if (!validation.isOk()) {
+                validation.throwException()
+            }
+        }
         if (subscription.projectEntity != null) {
             // Checking the ACL
             securityService.checkProjectFunction(subscription.projectEntity, ProjectSubscriptionsWrite::class.java)
+            // Controlling
+            control()
             // Saving the subscription
             entitySubscriptionStore.save(
                 entity = subscription.projectEntity,
@@ -29,6 +46,8 @@ class DefaultEventSubscriptionService(
             )
         } else {
             securityService.checkGlobalFunction(GlobalSubscriptionsManage::class.java)
+            // Controlling
+            control()
             // Saving the subscription
             globalSubscriptionStore.save(record)
         }

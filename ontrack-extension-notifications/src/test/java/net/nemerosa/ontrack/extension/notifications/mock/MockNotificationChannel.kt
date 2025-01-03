@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.it.waitUntil
+import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventRendererRegistry
@@ -24,6 +25,12 @@ class MockNotificationChannel(
     AbstractNotificationChannel<MockNotificationChannelConfig, MockNotificationChannelOutput>(
         MockNotificationChannelConfig::class
     ) {
+
+    override fun validateParsedConfig(config: MockNotificationChannelConfig) {
+        if (config.target.isBlank()) {
+            throw EventSubscriptionConfigException("Target cannot be blank")
+        }
+    }
 
     /**
      * List of messages received, indexed by target.

@@ -10,9 +10,12 @@ abstract class AbstractNotificationChannel<C : Any, R>(
 
     override fun validate(channelConfig: JsonNode): ValidatedNotificationChannelConfig<C> = try {
         val config = channelConfig.parseInto(configClass)
+        validateParsedConfig(config)
         ValidatedNotificationChannelConfig.config(config)
     } catch (ex: Exception) {
         ValidatedNotificationChannelConfig.error(ex)
     }
+
+    protected abstract fun validateParsedConfig(config: C)
 
 }

@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.jira.JIRAConfigurationService
 import net.nemerosa.ontrack.extension.jira.tx.JIRASessionFactory
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
+import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.transform
 import net.nemerosa.ontrack.model.annotations.APIDescription
@@ -17,8 +18,6 @@ import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.multiStrings
 import net.nemerosa.ontrack.model.form.textField
 import net.nemerosa.ontrack.model.form.yesNoField
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
 @Component
@@ -34,7 +33,14 @@ class JiraCreationNotificationChannel(
     JiraCreationNotificationChannelConfig::class
 ) {
 
-    private val logger: Logger = LoggerFactory.getLogger(JiraCreationNotificationChannel::class.java)
+    override fun validateParsedConfig(config: JiraCreationNotificationChannelConfig) {
+        if (config.configName.isBlank()) {
+            throw EventSubscriptionConfigException("Jira config name is required")
+        } else {
+            jiraConfigurationService.findConfiguration(config.configName)
+                ?: throw EventSubscriptionConfigException("Jira config configuration ${config.configName} does not exist")
+        }
+    }
 
     override fun publish(
         recordId: String,

@@ -15,7 +15,12 @@ import org.springframework.stereotype.Component
 class OtherMockNotificationChannel(
     private val eventTemplatingService: EventTemplatingService,
 ) :
-    AbstractNotificationChannel<MockNotificationChannelConfig, MockNotificationChannelOutput>(MockNotificationChannelConfig::class) {
+    AbstractNotificationChannel<MockNotificationChannelConfig, MockNotificationChannelOutput>(
+        MockNotificationChannelConfig::class
+    ) {
+
+    override fun validateParsedConfig(config: MockNotificationChannelConfig) {
+    }
 
     /**
      * List of messages received, indexed by target.
@@ -26,7 +31,7 @@ class OtherMockNotificationChannel(
         recordId: String,
         config: MockNotificationChannelConfig,
         event: Event,
-        context: Map<String,Any>,
+        context: Map<String, Any>,
         template: String?,
         outputProgressCallback: (current: MockNotificationChannelOutput) -> MockNotificationChannelOutput
     ): NotificationResult<MockNotificationChannelOutput> {

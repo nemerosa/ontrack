@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.notifications.inmemory
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
+import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.events.Event
@@ -31,6 +32,12 @@ class InMemoryNotificationChannel(
     AbstractNotificationChannel<InMemoryNotificationChannelConfig, InMemoryNotificationChannelOutput>(
         InMemoryNotificationChannelConfig::class
     ) {
+
+    override fun validateParsedConfig(config: InMemoryNotificationChannelConfig) {
+        if (config.group.isBlank()) {
+            throw EventSubscriptionConfigException("Group cannot be blank")
+        }
+    }
 
     private val messages = mutableMapOf<String, MutableList<String>>()
 

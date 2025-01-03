@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.notifications.core
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
+import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
@@ -30,6 +31,12 @@ class OntrackValidationNotificationChannel(
 ) : AbstractNotificationChannel<OntrackValidationNotificationChannelConfig, OntrackValidationNotificationChannelOutput>(
     OntrackValidationNotificationChannelConfig::class
 ) {
+
+    override fun validateParsedConfig(config: OntrackValidationNotificationChannelConfig) {
+        if (config.validation.isBlank()) {
+            throw EventSubscriptionConfigException("Validation stamp name cannot be blank.")
+        }
+    }
 
     override fun publish(
         recordId: String,

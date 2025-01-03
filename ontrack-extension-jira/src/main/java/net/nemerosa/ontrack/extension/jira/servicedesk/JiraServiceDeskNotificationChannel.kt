@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.extension.jira.tx.JIRASessionFactory
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NoTemplate
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
+import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
 import net.nemerosa.ontrack.json.transform
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
@@ -35,6 +36,14 @@ class JiraServiceDeskNotificationChannel(
 ) : AbstractNotificationChannel<JiraServiceDeskNotificationChannelConfig, JiraServiceDeskNotificationChannelOutput>(
     JiraServiceDeskNotificationChannelConfig::class
 ) {
+    override fun validateParsedConfig(config: JiraServiceDeskNotificationChannelConfig) {
+        if (config.configName.isBlank()) {
+            throw EventSubscriptionConfigException("Jira config name is required")
+        } else {
+            jiraConfigurationService.findConfiguration(config.configName)
+                ?: throw EventSubscriptionConfigException("Jira config configuration ${config.configName} does not exist")
+        }
+    }
 
     override val type: String = "jira-service-desk"
 

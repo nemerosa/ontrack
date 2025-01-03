@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.slack.notifications
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
+import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
 import net.nemerosa.ontrack.extension.slack.SlackSettings
 import net.nemerosa.ontrack.extension.slack.service.SlackService
 import net.nemerosa.ontrack.json.asJson
@@ -31,6 +32,12 @@ class SlackNotificationChannel(
     SlackNotificationChannelConfig::class
 ) {
 
+    override fun validateParsedConfig(config: SlackNotificationChannelConfig) {
+        if (config.channel.isBlank()) {
+            throw EventSubscriptionConfigException("Slack channel cannot be blank")
+        }
+    }
+
     override fun publish(
         recordId: String,
         config: SlackNotificationChannelConfig,
@@ -56,12 +63,13 @@ class SlackNotificationChannel(
         }
     }
 
-    private fun format(event: Event, context: Map<String, Any>, template: String?): String = eventTemplatingService.renderEvent(
-        event = event,
-        context = context,
-        template = template,
-        renderer = slackNotificationEventRenderer,
-    )
+    private fun format(event: Event, context: Map<String, Any>, template: String?): String =
+        eventTemplatingService.renderEvent(
+            event = event,
+            context = context,
+            template = template,
+            renderer = slackNotificationEventRenderer,
+        )
 
     override fun toSearchCriteria(text: String): JsonNode =
         mapOf(SlackNotificationChannelConfig::channel.name to text).asJson()

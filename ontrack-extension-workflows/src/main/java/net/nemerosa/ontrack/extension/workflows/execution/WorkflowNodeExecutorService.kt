@@ -6,4 +6,6 @@ interface WorkflowNodeExecutorService {
 
     fun getExecutor(executorId: String): WorkflowNodeExecutor
 
+    fun findExecutor(executorId: String): WorkflowNodeExecutor?
+
 }

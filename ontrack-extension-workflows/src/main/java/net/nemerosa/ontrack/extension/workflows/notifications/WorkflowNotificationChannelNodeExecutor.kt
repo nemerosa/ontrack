@@ -1,7 +1,10 @@
 package net.nemerosa.ontrack.extension.workflows.notifications
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannelRegistry
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResultType
+import net.nemerosa.ontrack.extension.notifications.channels.getChannel
+import net.nemerosa.ontrack.extension.notifications.channels.throwException
 import net.nemerosa.ontrack.extension.notifications.processing.NotificationProcessingService
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.extension.workflows.WorkflowsExtensionFeature
@@ -42,6 +45,7 @@ class WorkflowNotificationChannelNodeExecutor(
     workflowsExtensionFeature: WorkflowsExtensionFeature,
     private val notificationProcessingService: NotificationProcessingService,
     private val workflowNotificationItemConverter: WorkflowNotificationItemConverter,
+    private val notificationChannelRegistry: NotificationChannelRegistry,
     private val securityService: SecurityService,
 ) : AbstractExtension(workflowsExtensionFeature), WorkflowNodeExecutor {
 
@@ -51,6 +55,15 @@ class WorkflowNotificationChannelNodeExecutor(
 
     override val id: String = ID
     override val displayName: String = "Notification"
+
+    override fun validate(data: JsonNode) {
+        val (channelType, channelConfig) = data.parse<WorkflowNotificationChannelNodeData>()
+        val channel = notificationChannelRegistry.getChannel(channelType)
+        val validation = channel.validate(channelConfig)
+        if (!validation.isOk()) {
+            validation.throwException()
+        }
+    }
 
     override suspend fun execute(
         workflowInstance: WorkflowInstance,

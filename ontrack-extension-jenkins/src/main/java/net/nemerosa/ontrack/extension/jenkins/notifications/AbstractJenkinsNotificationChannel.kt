@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.jenkins.client.JenkinsBuild
 import net.nemerosa.ontrack.extension.jenkins.client.JenkinsClient
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
+import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
@@ -19,6 +20,19 @@ abstract class AbstractJenkinsNotificationChannel(
 ) : AbstractNotificationChannel<JenkinsNotificationChannelConfig, JenkinsNotificationChannelOutput>(
     JenkinsNotificationChannelConfig::class
 ) {
+
+    override fun validateParsedConfig(config: JenkinsNotificationChannelConfig) {
+        if (config.config.isBlank()) {
+            throw EventSubscriptionConfigException("Jenkins configuration name is required")
+        } else {
+            jenkinsConfigurationService.findConfiguration(config.config)
+                ?: throw EventSubscriptionConfigException("Jenkins configuration ${config.config} could not be found")
+        }
+        if (config.job.isBlank()) {
+            throw EventSubscriptionConfigException("Jenkins job is required")
+        }
+    }
+
     override fun publish(
         recordId: String,
         config: JenkinsNotificationChannelConfig,
@@ -59,7 +73,12 @@ abstract class AbstractJenkinsNotificationChannel(
         // Running the job
         val (error, buildUrl) = when (config.callMode) {
             JenkinsNotificationChannelConfigCallMode.ASYNC -> launchAsync(jenkinsClient, job, parameters)
-            JenkinsNotificationChannelConfigCallMode.SYNC -> launchSync(jenkinsClient, job, config.timeout, parameters) { build ->
+            JenkinsNotificationChannelConfigCallMode.SYNC -> launchSync(
+                jenkinsClient,
+                job,
+                config.timeout,
+                parameters
+            ) { build ->
                 output = outputProgressCallback(
                     output.withBuildUrl(build.url)
                 )

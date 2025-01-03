@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.jira.JIRAConfigurationService
 import net.nemerosa.ontrack.extension.jira.tx.JIRASessionFactory
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
+import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
@@ -27,6 +28,24 @@ class JiraLinkNotificationChannel(
 ) : AbstractNotificationChannel<JiraLinkNotificationChannelConfig, JiraLinkNotificationChannelOutput>(
     JiraLinkNotificationChannelConfig::class
 ) {
+
+    override fun validateParsedConfig(config: JiraLinkNotificationChannelConfig) {
+        if (config.configName.isBlank()) {
+            throw EventSubscriptionConfigException("Jira config name is required")
+        } else {
+            jiraConfigurationService.findConfiguration(config.configName)
+                ?: throw EventSubscriptionConfigException("Jira config configuration ${config.configName} does not exist")
+        }
+        if (config.sourceQuery.isBlank()) {
+            throw EventSubscriptionConfigException("Jira source query is required")
+        }
+        if (config.targetQuery.isBlank()) {
+            throw EventSubscriptionConfigException("Jira target query is required")
+        }
+        if (config.linkName.isBlank()) {
+            throw EventSubscriptionConfigException("Jira link name is required")
+        }
+    }
 
     override fun publish(
         recordId: String,

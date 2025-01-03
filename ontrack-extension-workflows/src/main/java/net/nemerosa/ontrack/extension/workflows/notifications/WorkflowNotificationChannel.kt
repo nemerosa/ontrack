@@ -5,8 +5,13 @@ import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificatio
 import net.nemerosa.ontrack.extension.notifications.channels.NoTemplate
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.notifications.recording.NotificationRecord
+import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
+import net.nemerosa.ontrack.extension.workflows.definition.WorkflowNode
+import net.nemerosa.ontrack.extension.workflows.definition.WorkflowValidation
+import net.nemerosa.ontrack.extension.workflows.engine.WorkflowContext
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowEngine
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceStatus
+import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorService
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getTextField
 import net.nemerosa.ontrack.model.annotations.APIDescription
@@ -26,10 +31,28 @@ import org.springframework.stereotype.Component
 class WorkflowNotificationChannel(
     private val workflowEngine: WorkflowEngine,
     private val eventTemplatingService: EventTemplatingService,
+    private val workflowNodeExecutorService: WorkflowNodeExecutorService,
     private val serializableEventService: SerializableEventService,
 ) : AbstractNotificationChannel<WorkflowNotificationChannelConfig, WorkflowNotificationChannelOutput>(
     WorkflowNotificationChannelConfig::class
 ) {
+
+    override fun validateParsedConfig(config: WorkflowNotificationChannelConfig) {
+        // Basic controls
+        WorkflowValidation.validateWorkflow(config.workflow).throwErrorIfAny()
+        // Controlling each node
+        config.workflow.nodes.forEach { node ->
+            validationWorkflowNode(node)
+        }
+    }
+
+    private fun validationWorkflowNode(node: WorkflowNode) {
+        val executor = workflowNodeExecutorService.findExecutor(node.executorId)
+            ?: throw EventSubscriptionConfigException(
+                "Workflow node executor ID ${node.executorId} not found"
+            )
+        executor.validate(node.data)
+    }
 
     override fun publish(
         recordId: String,

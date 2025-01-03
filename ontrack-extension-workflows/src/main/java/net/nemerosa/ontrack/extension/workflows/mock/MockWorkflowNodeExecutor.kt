@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.extension.workflows.WorkflowsExtensionFeature
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutor
+import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorConfigException
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorResult
 import net.nemerosa.ontrack.extension.workflows.templating.WorkflowTemplatingContext
 import net.nemerosa.ontrack.json.asJson
@@ -54,6 +55,20 @@ class MockWorkflowNodeExecutor(
 
     fun getTextsByInstanceId(instanceId: String): List<String> = texts[instanceId] ?: emptyList()
 
+    private fun parseData(data: JsonNode): MockNodeData =
+        if (data.isTextual) {
+            MockNodeData(data.asText())
+        } else {
+            data.parse<MockNodeData>()
+        }
+
+    override fun validate(data: JsonNode) {
+        val parsed = parseData(data)
+        if (parsed.text.isBlank()) {
+            throw WorkflowNodeExecutorConfigException("Text is required for mock node executor")
+        }
+    }
+
     override suspend fun execute(
         workflowInstance: WorkflowInstance,
         workflowNodeId: String,
@@ -61,11 +76,7 @@ class MockWorkflowNodeExecutor(
     ): WorkflowNodeExecutorResult {
         // Gets the node & its data
         val nodeRawData = workflowInstance.workflow.getNode(workflowNodeId).data
-        val nodeData = if (nodeRawData.isTextual) {
-            MockNodeData(nodeRawData.asText())
-        } else {
-            nodeRawData.parse<MockNodeData>()
-        }
+        val nodeData = parseData(nodeRawData)
         // Error?
         if (nodeData.error) {
             error("Error in $workflowNodeId node")

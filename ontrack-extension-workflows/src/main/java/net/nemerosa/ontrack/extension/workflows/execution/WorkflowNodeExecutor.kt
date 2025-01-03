@@ -20,6 +20,11 @@ interface WorkflowNodeExecutor : Extension {
     val displayName: String
 
     /**
+     * Validation of the configuration for this executor
+     */
+    fun validate(data: JsonNode)
+
+    /**
      * Runs some action for a given workflow node.
      *
      * @param workflowInstance Workflow to run

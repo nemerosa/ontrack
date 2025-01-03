@@ -12,8 +12,11 @@ class WorkflowNodeExecutorServiceImpl(
         extensionManager.getExtensions(WorkflowNodeExecutor::class.java).sortedBy { it.displayName }
     }
 
-    override fun getExecutor(executorId: String): WorkflowNodeExecutor =
+    override fun findExecutor(executorId: String): WorkflowNodeExecutor? =
         executors.find { it.id == executorId }
+
+    override fun getExecutor(executorId: String): WorkflowNodeExecutor =
+        findExecutor(executorId)
             ?: throw WorkflowNodeExecutorNotFoundException(executorId)
 
 }

@@ -21,18 +21,31 @@ data class WorkflowValidation(
         fun validateWorkflow(workflow: Workflow): WorkflowValidation {
             // Name is required
             if (workflow.name.isBlank()) {
-                return WorkflowValidation.error("Workflow name is required.")
+                return error("Workflow name is required.")
             }
             // One node required
             if (workflow.nodes.isEmpty()) {
-                return WorkflowValidation.error("At least one node is required.")
+                return error("At least one node is required.")
+            }
+            // All parents must be known
+            val nodeIds = workflow.nodes.map { it.id }.toSet()
+            workflow.nodes.forEach { node ->
+                node.parents.forEach { parent ->
+                    if (parent.id !in nodeIds) {
+                        return error("Parent ID ${parent.id} is not a valid node ID.")
+                    }
+                }
             }
             // Cycle detection
             if (isCyclic(workflow.nodes)) {
-                return WorkflowValidation.error("The workflow contains at least one cycle.")
+                return error("The workflow contains at least one cycle.")
+            }
+            // At least one starting node
+            if (workflow.nodes.none { it.parents.isEmpty() }) {
+                return error("The workflow must have at least one starting node.")
             }
             // OK
-            return WorkflowValidation.ok()
+            return ok()
         }
 
         private fun isCyclic(nodes: List<WorkflowNode>): Boolean {

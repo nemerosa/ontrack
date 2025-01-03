@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.notifications.mail
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
+import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
@@ -27,7 +28,9 @@ class MailNotificationChannel(
     private val mailService: MailService,
     private val htmlNotificationEventRenderer: HtmlNotificationEventRenderer,
     private val eventTemplatingService: EventTemplatingService,
-) : AbstractNotificationChannel<MailNotificationChannelConfig, MailNotificationChannelOutput>(MailNotificationChannelConfig::class) {
+) : AbstractNotificationChannel<MailNotificationChannelConfig, MailNotificationChannelOutput>(
+    MailNotificationChannelConfig::class
+) {
 
     private val logger: Logger = LoggerFactory.getLogger(MailNotificationChannel::class.java)
 
@@ -38,6 +41,15 @@ class MailNotificationChannel(
     @PostConstruct
     fun log() {
         logger.info("Mail notification channel enabled.")
+    }
+
+    override fun validateParsedConfig(config: MailNotificationChannelConfig) {
+        if (config.to.isBlank()) {
+            throw EventSubscriptionConfigException("Recipients (to) cannot be blank")
+        }
+        if (config.subject.isBlank()) {
+            throw EventSubscriptionConfigException("Subject cannot be blank")
+        }
     }
 
     override fun toSearchCriteria(text: String): JsonNode =
