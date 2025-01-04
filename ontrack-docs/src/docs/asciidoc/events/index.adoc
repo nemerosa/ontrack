@@ -16,8 +16,12 @@
 * <<event-disable_project,disable_project>>
 * <<event-enable_branch,enable_branch>>
 * <<event-enable_project,enable_project>>
+* <<event-environment-creation,environment-creation>>
+* <<event-environment-deleted,environment-deleted>>
+* <<event-environment-updated,environment-updated>>
 * <<event-image_promotion_level,image_promotion_level>>
 * <<event-image_validation_stamp,image_validation_stamp>>
+* <<event-mock,mock>>
 * <<event-new_branch,new_branch>>
 * <<event-new_build,new_build>>
 * <<event-new_configuration,new_configuration>>
@@ -31,6 +35,15 @@
 * <<event-property_delete,property_delete>>
 * <<event-reorder_promotion_level,reorder_promotion_level>>
 * <<event-reorder_validation_stamp,reorder_validation_stamp>>
+* <<event-slot-creation,slot-creation>>
+* <<event-slot-deleted,slot-deleted>>
+* <<event-slot-pipeline-cancelled,slot-pipeline-cancelled>>
+* <<event-slot-pipeline-creation,slot-pipeline-creation>>
+* <<event-slot-pipeline-deployed,slot-pipeline-deployed>>
+* <<event-slot-pipeline-deploying,slot-pipeline-deploying>>
+* <<event-slot-pipeline-status-changed,slot-pipeline-status-changed>>
+* <<event-slot-pipeline-status-overridden,slot-pipeline-status-overridden>>
+* <<event-slot-updated,slot-updated>>
 * <<event-update_branch,update_branch>>
 * <<event-update_build,update_build>>
 * <<event-update_configuration,update_configuration>>
@@ -38,6 +51,7 @@
 * <<event-update_promotion_level,update_promotion_level>>
 * <<event-update_validation_run_status_comment,update_validation_run_status_comment>>
 * <<event-update_validation_stamp,update_validation_stamp>>
+* <<event-worflow_standalone,worflow_standalone>>
 
 include::event-auto-versioning-error.adoc[]
 include::event-auto-versioning-post-processing-error.adoc[]
@@ -54,8 +68,12 @@ include::event-disable_branch.adoc[]
 include::event-disable_project.adoc[]
 include::event-enable_branch.adoc[]
 include::event-enable_project.adoc[]
+include::event-environment-creation.adoc[]
+include::event-environment-deleted.adoc[]
+include::event-environment-updated.adoc[]
 include::event-image_promotion_level.adoc[]
 include::event-image_validation_stamp.adoc[]
+include::event-mock.adoc[]
 include::event-new_branch.adoc[]
 include::event-new_build.adoc[]
 include::event-new_configuration.adoc[]
@@ -69,6 +87,15 @@ include::event-property_change.adoc[]
 include::event-property_delete.adoc[]
 include::event-reorder_promotion_level.adoc[]
 include::event-reorder_validation_stamp.adoc[]
+include::event-slot-creation.adoc[]
+include::event-slot-deleted.adoc[]
+include::event-slot-pipeline-cancelled.adoc[]
+include::event-slot-pipeline-creation.adoc[]
+include::event-slot-pipeline-deployed.adoc[]
+include::event-slot-pipeline-deploying.adoc[]
+include::event-slot-pipeline-status-changed.adoc[]
+include::event-slot-pipeline-status-overridden.adoc[]
+include::event-slot-updated.adoc[]
 include::event-update_branch.adoc[]
 include::event-update_build.adoc[]
 include::event-update_configuration.adoc[]
@@ -76,3 +103,4 @@ include::event-update_project.adoc[]
 include::event-update_promotion_level.adoc[]
 include::event-update_validation_run_status_comment.adoc[]
 include::event-update_validation_stamp.adoc[]
+include::event-worflow_standalone.adoc[]

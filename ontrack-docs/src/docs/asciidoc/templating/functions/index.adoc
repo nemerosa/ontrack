@@ -4,9 +4,13 @@
 * <<templating-function-datetime,datetime>>
 * <<templating-function-lastPromotion,lastPromotion>>
 * <<templating-function-link,link>>
+* <<templating-function-pipeline,pipeline>>
 * <<templating-function-since,since>>
+* <<templating-function-slot,slot>>
 
 include::templating-function-datetime.adoc[]
 include::templating-function-lastPromotion.adoc[]
 include::templating-function-link.adoc[]
+include::templating-function-pipeline.adoc[]
 include::templating-function-since.adoc[]
+include::templating-function-slot.adoc[]

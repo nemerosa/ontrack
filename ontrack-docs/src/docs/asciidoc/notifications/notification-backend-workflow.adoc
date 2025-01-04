@@ -9,6 +9,8 @@ _This channel does not use the custom template._
 
 Configuration:
 
+* **pauseMs** - Long - required - (used for test only) Short pause before launching the workflow
+
 * **workflow** - Object - required - Workflow to run
 
 ** **name** - String - required - Display name for the workflow
