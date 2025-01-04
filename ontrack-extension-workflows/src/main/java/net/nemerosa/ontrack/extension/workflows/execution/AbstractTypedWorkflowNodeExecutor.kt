@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.workflows.execution
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
 import net.nemerosa.ontrack.json.parseInto
+import net.nemerosa.ontrack.model.docs.DocumentationIgnore
 import net.nemerosa.ontrack.model.extension.ExtensionFeature
 import kotlin.reflect.KClass
 
@@ -12,6 +13,7 @@ import kotlin.reflect.KClass
  * @param D Type for the data
  */
 abstract class AbstractTypedWorkflowNodeExecutor<D : Any>(
+    @DocumentationIgnore
     override val feature: ExtensionFeature,
     override val id: String,
     override val displayName: String,

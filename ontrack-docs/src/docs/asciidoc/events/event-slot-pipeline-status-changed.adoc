@@ -1,0 +1,23 @@
+[[event-slot-pipeline-status-changed]]
+===== slot-pipeline-status-changed
+
+When a slot pipeline status is updated
+
+Context:
+
+* `ENVIRONMENT_ID` - string - ID of the environment
+* `ENVIRONMENT_NAME` - string - Name of the environment
+* `project` - project - Project of the build in the pipeline
+* `SLOT_ID` - string - ID of the slot
+* `SLOT_QUALIFIER` - string - Qualifier of the slot
+* `PIPELINE_ID` - string - ID of the pipeline
+* `branch` - branch - Branch of the build in the pipeline
+* `build` - build - Build in the pipeline
+
+Default template:
+
+[source]
+----
+Pipeline ${#.pipeline} status has been updated.
+----
+

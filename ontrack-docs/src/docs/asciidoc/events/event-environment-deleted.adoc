@@ -1,0 +1,16 @@
+[[event-environment-deleted]]
+===== environment-deleted
+
+When an environment is deleted
+
+Context:
+
+* `ENVIRONMENT_NAME` - string - Name of the environment
+
+Default template:
+
+[source]
+----
+Environment ${ENVIRONMENT_NAME} has been deleted.
+----
+
