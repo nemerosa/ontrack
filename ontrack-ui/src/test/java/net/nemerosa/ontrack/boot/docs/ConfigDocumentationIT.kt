@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.docs
 
+import net.nemerosa.ontrack.model.annotations.getAPITypeName
 import net.nemerosa.ontrack.model.docs.DocumentationIgnore
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -34,6 +35,17 @@ class ConfigDocumentationIT : AbstractDocumentationGenerationTestSupport() {
         configuration: Any
     ) {
         println("Generation docs for configuration $configuration")
+
+        val id = configuration::class.jvmName
+        val name = getAPITypeName(configuration::class)
+
+        directoryContext.writeFile(
+            fileId = id,
+            level = 4,
+            title = name,
+        ) {
+            // TODO
+        }
     }
 
 }

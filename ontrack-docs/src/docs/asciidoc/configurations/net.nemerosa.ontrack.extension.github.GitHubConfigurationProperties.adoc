@@ -1,0 +1,3 @@
+[[net.nemerosa.ontrack.extension.github.GitHubConfigurationProperties]]
+==== GitHubConfigurationProperties
+

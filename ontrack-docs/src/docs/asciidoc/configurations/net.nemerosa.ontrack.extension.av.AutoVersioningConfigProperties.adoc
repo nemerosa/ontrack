@@ -1,0 +1,3 @@
+[[net.nemerosa.ontrack.extension.av.AutoVersioningConfigProperties]]
+==== AutoVersioningConfigProperties
+
