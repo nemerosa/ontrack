@@ -1,3 +1,19 @@
 [[net.nemerosa.ontrack.extension.license.LicenseConfigurationProperties]]
-==== LicenseConfigurationProperties
+==== License configuration
 
+
+|===
+| Name | Environment | Description | Default value | Notes
+
+|`ontrack.config.license.provider`
+|`ONTRACK_CONFIG_LICENSE_PROVIDER`
+|License provider
+|`none`
+|
+
+|`ontrack.config.license.warning`
+|`ONTRACK_CONFIG_LICENSE_WARNING`
+|Duration before the expiry date, when to emit a warning (expressed by defaults in days)
+|`PT336H`
+|
+|===

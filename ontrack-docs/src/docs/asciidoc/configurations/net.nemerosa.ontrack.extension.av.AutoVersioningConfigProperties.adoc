@@ -1,3 +1,36 @@
 [[net.nemerosa.ontrack.extension.av.AutoVersioningConfigProperties]]
-==== AutoVersioningConfigProperties
+==== Auto-versioning configuration
 
+
+Configuration of the auto-versioning
+
+|===
+| Name | Environment | Description | Default value | Notes
+
+|`ontrack.extension.auto-versioning.queue.async`
+|`ONTRACK_EXTENSION_AUTO_VERSIONING_QUEUE_ASYNC`
+|
+            By default, Ontrack uses RabbitMQ queue to manage the auto versioning processes.
+            Disabling this mechanism is not recommended and is used only for internal testing.
+        
+|`true`
+|
+
+|`ontrack.extension.auto-versioning.queue.cancelling`
+|`ONTRACK_EXTENSION_AUTO_VERSIONING_QUEUE_CANCELLING`
+|Cancelling the previous orders for the same source and same target if a new order comes in
+|`true`
+|
+
+|`ontrack.extension.auto-versioning.queue.projects.<0>`
+|`ONTRACK_EXTENSION_AUTO_VERSIONING_QUEUE_PROJECTS_<0>`
+|List of projects which must have dedicated queues
+|`_Empty list_`
+|
+
+|`ontrack.extension.auto-versioning.queue.scale`
+|`ONTRACK_EXTENSION_AUTO_VERSIONING_QUEUE_SCALE`
+|Default number of RabbitMQ queues to use
+|`1`
+|
+|===

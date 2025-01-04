@@ -32,24 +32,34 @@ abstract class AbstractDocumentationGenerationTestSupport : AbstractDSLTestSuppo
     ) {
 
         fun writeFile(
+            fileName: String,
+            code: (s: StringBuilder) -> Unit,
+        ) {
+            val file = File(dir, "${fileName}.adoc")
+
+            val s = StringBuilder()
+            code(s)
+
+            file.writeText(s.toString())
+        }
+
+        fun writeFile(
             fileId: String,
             fileName: String = fileId,
             level: Int,
             title: String,
             code: (s: StringBuilder) -> Unit,
         ) {
-            val file = File(dir, "${fileName}.adoc")
+            writeFile(
+                fileName = fileName,
+            ) { s ->
+                val fileTitle = "${(1..level).joinToString("") { "=" }} $title"
 
-            val s = StringBuilder()
+                s.append("[[").append(fileId).append("]]\n")
+                s.append(fileTitle).append("\n").append("\n")
 
-            val fileTitle = "${(1..level).joinToString("") { "=" }} $title"
-
-            s.append("[[").append(fileId).append("]]\n")
-            s.append(fileTitle).append("\n").append("\n")
-
-            code(s)
-
-            file.writeText(s.toString())
+                code(s)
+            }
         }
 
         fun writeIndex(

@@ -1,3 +1,45 @@
 [[net.nemerosa.ontrack.extension.github.ingestion.IngestionConfigProperties]]
-==== IngestionConfigProperties
+==== GitHub Ingestion configuration
 
+
+Configuration of the ingestion of GitHub workflows
+
+|===
+| Name | Environment | Description | Default value | Notes
+
+|`ontrack.extension.github.ingestion.hook.signature.disabled`
+|`ONTRACK_EXTENSION_GITHUB_INGESTION_HOOK_SIGNATURE_DISABLED`
+|Set to `true` to disable the signature checks (OK for testing, NOT for production)
+|`false`
+|
+
+|`ontrack.extension.github.ingestion.processing.async`
+|`ONTRACK_EXTENSION_GITHUB_INGESTION_PROCESSING_ASYNC`
+|By default, true, using a RabbitMQ engine. Set to false to use a direct processing (synchronous)
+|`true`
+|
+
+|`ontrack.extension.github.ingestion.processing.repositories.<*>`
+|`-`
+|List of specific bindings. Each entry is indexed by the name of the configuration (just a key).
+|_Empty_
+|
+
+|`ontrack.extension.github.ingestion.processing.repositories.<*>.owner`
+|`ONTRACK_EXTENSION_GITHUB_INGESTION_PROCESSING_REPOSITORIES_<*>_OWNER`
+|Regex for the repository owner, null for match all
+|``
+|
+
+|`ontrack.extension.github.ingestion.processing.repositories.<*>.repository`
+|`ONTRACK_EXTENSION_GITHUB_INGESTION_PROCESSING_REPOSITORIES_<*>_REPOSITORY`
+|Regex for the repository name, null for match all
+|``
+|
+
+|`ontrack.extension.github.ingestion.processing.scale`
+|`ONTRACK_EXTENSION_GITHUB_INGESTION_PROCESSING_SCALE`
+|Extending the number of default queues to spread the load
+|`1`
+|
+|===

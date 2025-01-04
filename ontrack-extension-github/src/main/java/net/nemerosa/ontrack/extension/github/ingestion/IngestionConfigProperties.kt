@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.github.ingestion
 
+import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.annotations.APIName
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component
 
@@ -10,6 +12,8 @@ import org.springframework.stereotype.Component
  */
 @Component
 @ConfigurationProperties(prefix = IngestionConfigProperties.PREFIX)
+@APIName("GitHub Ingestion configuration")
+@APIDescription("Configuration of the ingestion of GitHub workflows")
 class IngestionConfigProperties(
     var hook: HookConfig = HookConfig(),
     var processing: ProcessingConfig = ProcessingConfig(),
@@ -29,6 +33,7 @@ class IngestionConfigProperties(
      * @property disabled Set to `true` to disable the signature checks (OK for testing, NOT for production)
      */
     class HookSignatureConfig(
+        @APIDescription("Set to `true` to disable the signature checks (OK for testing, NOT for production)")
         var disabled: Boolean = false,
     )
 
@@ -40,8 +45,11 @@ class IngestionConfigProperties(
      * @property repositories List of specific bindings
      */
     class ProcessingConfig(
+        @APIDescription("By default, true, using a RabbitMQ engine. Set to false to use a direct processing (synchronous)")
         var async: Boolean = true,
+        @APIDescription("Extending the number of default queues to spread the load")
         var scale: Int = 1,
+        @APIDescription("List of specific bindings. Each entry is indexed by the name of the configuration (just a key).")
         var repositories: Map<String, RepositoryQueueConfig> = emptyMap(),
     )
 
@@ -52,7 +60,9 @@ class IngestionConfigProperties(
      * @property repository Regex for the repository name, null for match all
      */
     class RepositoryQueueConfig(
+        @APIDescription("Regex for the repository owner, null for match all")
         var owner: String? = null,
+        @APIDescription("Regex for the repository name, null for match all")
         var repository: String? = null,
     ) {
         fun matches(owner: String, repository: String) =

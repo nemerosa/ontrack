@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.artifactory
 
+import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.annotations.APIName
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component
 
@@ -8,9 +10,9 @@ import org.springframework.stereotype.Component
  */
 @Component
 @ConfigurationProperties(prefix = "ontrack.extension.artifactory")
+@APIName("Artifactory configuration")
+@APIDescription("Configuration of the Artifactory extension")
 class ArtifactoryConfProperties {
-    /**
-     * Disabling the build sync jobs?
-     */
+    @APIDescription("Disabling the build sync jobs?")
     var buildSyncDisabled = false
 }

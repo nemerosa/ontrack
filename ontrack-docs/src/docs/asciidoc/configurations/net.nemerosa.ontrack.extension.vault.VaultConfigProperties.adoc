@@ -1,3 +1,27 @@
 [[net.nemerosa.ontrack.extension.vault.VaultConfigProperties]]
-==== VaultConfigProperties
+==== Vault configuration
 
+
+Ontrack can be configured to use Vault to store the encryption keys.
+
+|===
+| Name | Environment | Description | Default value | Notes
+
+|`ontrack.config.vault.prefix`
+|`ONTRACK_CONFIG_VAULT_PREFIX`
+|Prefix to be used to store the keys
+|`ontrack/keys`
+|
+
+|`ontrack.config.vault.token`
+|`ONTRACK_CONFIG_VAULT_TOKEN`
+|Token for the authentication
+|`test`
+|
+
+|`ontrack.config.vault.uri`
+|`ONTRACK_CONFIG_VAULT_URI`
+|URI to the Vault end point
+|`http://localhost:8200`
+|
+|===

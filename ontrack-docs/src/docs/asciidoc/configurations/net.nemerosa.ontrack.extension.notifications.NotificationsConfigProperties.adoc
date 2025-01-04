@@ -1,3 +1,51 @@
 [[net.nemerosa.ontrack.extension.notifications.NotificationsConfigProperties]]
-==== NotificationsConfigProperties
+==== Notifications configuration
 
+
+General configuration for the notifications.
+
+|===
+| Name | Environment | Description | Default value | Notes
+
+|`ontrack.config.extension.notifications.dispatching.queue.async`
+|`ONTRACK_CONFIG_EXTENSION_NOTIFICATIONS_DISPATCHING_QUEUE_ASYNC`
+|Is asynchronous processing of notifications enabled?
+|`true`
+|
+
+|`ontrack.config.extension.notifications.enabled`
+|`ONTRACK_CONFIG_EXTENSION_NOTIFICATIONS_ENABLED`
+|Are the notifications enabled?
+|`false`
+|
+
+|`ontrack.config.extension.notifications.in-memory.enabled`
+|`ONTRACK_CONFIG_EXTENSION_NOTIFICATIONS_INMEMORY_ENABLED`
+|Is the in-memory notification channel enabled? Used for testing only.
+|`false`
+|
+
+|`ontrack.config.extension.notifications.mail.from`
+|`ONTRACK_CONFIG_EXTENSION_NOTIFICATIONS_MAIL_FROM`
+|From address for the email notifications
+|`no-reply@localhost`
+|
+
+|`ontrack.config.extension.notifications.processing.queue.concurrency`
+|`ONTRACK_CONFIG_EXTENSION_NOTIFICATIONS_PROCESSING_QUEUE_CONCURRENCY`
+|Maximum parallel processing of queues
+|`10`
+|
+
+|`ontrack.config.extension.notifications.processing.queue.async`
+|`ONTRACK_CONFIG_EXTENSION_NOTIFICATIONS_PROCESSING_QUEUE_ASYNC`
+|Is asynchronous processing of notifications enabled?
+|`true`
+|
+
+|`ontrack.config.extension.notifications.webhook.internal.enabled`
+|`ONTRACK_CONFIG_EXTENSION_NOTIFICATIONS_WEBHOOK_INTERNAL_ENABLED`
+|Are internal webhooks enabled?
+|`false`
+|
+|===

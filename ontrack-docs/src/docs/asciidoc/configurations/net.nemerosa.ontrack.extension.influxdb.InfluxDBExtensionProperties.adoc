@@ -1,3 +1,86 @@
 [[net.nemerosa.ontrack.extension.influxdb.InfluxDBExtensionProperties]]
-==== InfluxDBExtensionProperties
+==== InfluxDB configuration
 
+
+Configuration of the connection to InfluxDB for the export of metrics.
+
+|===
+| Name | Environment | Description | Default value | Notes
+
+|`ontrack.influxdb.create`
+|`ONTRACK_INFLUXDB_CREATE`
+|If the database must be created automatically
+|`true`
+|
+
+|`ontrack.influxdb.db`
+|`ONTRACK_INFLUXDB_DB`
+|Name of the InfluxDB database where to send the metrics
+|`ontrack`
+|
+
+|`ontrack.influxdb.enabled`
+|`ONTRACK_INFLUXDB_ENABLED`
+|Enabling the export of metrics to InfluxDB
+|`false`
+|
+
+|`ontrack.influxdb.log`
+|`ONTRACK_INFLUXDB_LOG`
+|Log level of the InfluxDB commands
+|`NONE`
+|
+
+|`ontrack.influxdb.password`
+|`ONTRACK_INFLUXDB_PASSWORD`
+|Password used to connect to InfluxDB
+|`root`
+|
+
+|`ontrack.influxdb.prefix`
+|`ONTRACK_INFLUXDB_PREFIX`
+|
+            Prefix to add before the metric name.
+            
+            For example, if prefix = `ontrack`
+            
+            * `validation_data` becomes `ontrack_validation_data`
+            * `ontrack_metric` becomes `ontrack_metric` (no change)
+            
+            For example, if prefix = `ontrack_acceptance`
+            
+            * `validation_data` becomes `ontrack_acceptance_validation_data`
+            * `ontrack_metric` becomes `ontrack_acceptance_metric`
+            
+            For example, if prefix = `instance`
+            
+            * `validation_data` becomes `instance_validation_data`
+            * `ontrack_metric` becomes `instance_metric`
+        
+|`ontrack`
+|
+
+|`ontrack.influxdb.ssl.host-check`
+|`ONTRACK_INFLUXDB_SSL_HOSTCHECK`
+|If the SSL connection must be valid
+|`true`
+|
+
+|`ontrack.influxdb.uri`
+|`ONTRACK_INFLUXDB_URI`
+|URL of the InfluxDB instance
+|`http://localhost:8086`
+|
+
+|`ontrack.influxdb.username`
+|`ONTRACK_INFLUXDB_USERNAME`
+|Username used to connect to InfluxDB
+|`root`
+|
+
+|`ontrack.influxdb.validity`
+|`ONTRACK_INFLUXDB_VALIDITY`
+|Duration after which the connection to InfluxDB is checked for validity and renewed if necessary.
+|`PT15M`
+|
+|===

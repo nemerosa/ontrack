@@ -1,3 +1,13 @@
 [[net.nemerosa.ontrack.extension.license.embedded.EmbeddedLicenseConfigurationProperties]]
-==== EmbeddedLicenseConfigurationProperties
+==== Embedded license configuration
 
+
+|===
+| Name | Environment | Description | Default value | Notes
+
+|`ontrack.config.license.embedded.key`
+|`ONTRACK_CONFIG_LICENSE_EMBEDDED_KEY`
+|License key
+|``
+|
+|===

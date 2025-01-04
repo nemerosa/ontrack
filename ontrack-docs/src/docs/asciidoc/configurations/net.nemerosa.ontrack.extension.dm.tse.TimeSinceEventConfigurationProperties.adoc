@@ -1,3 +1,21 @@
 [[net.nemerosa.ontrack.extension.dm.tse.TimeSinceEventConfigurationProperties]]
-==== TimeSinceEventConfigurationProperties
+==== Time since event metrics configuration
 
+
+Configuration of the export of the metrics of the "Time since events" (TSE).
+
+|===
+| Name | Environment | Description | Default value | Notes
+
+|`ontrack.extension.delivery-metrics.tse.enabled`
+|`ONTRACK_EXTENSION_DELIVERY_METRICS_TSE_ENABLED`
+|Is the "time since event" metric enabled?
+|`true`
+|
+
+|`ontrack.extension.delivery-metrics.tse.interval`
+|`ONTRACK_EXTENSION_DELIVERY_METRICS_TSE_INTERVAL`
+|Interval between two scans for "time since events" (expressed by default in minutes)
+|`PT30M`
+|
+|===

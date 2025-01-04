@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.indicators
 
+import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.annotations.APIName
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component
 import org.springframework.validation.annotation.Validated
@@ -10,6 +12,8 @@ import org.springframework.validation.annotation.Validated
 @Component
 @ConfigurationProperties(prefix = "ontrack.extension.indicators")
 @Validated
+@APIName("Indicators configuration")
+@APIDescription("Configuration of the indicators")
 class IndicatorConfigProperties {
 
     /**
@@ -26,9 +30,7 @@ class IndicatorConfigProperties {
      * Import configuration
      */
     class ImportConfig {
-        /**
-         * When a category/type does not exist any longer for a given import ID, must it be deleted?
-         */
+        @APIDescription("When a category/type does not exist any longer for a given import ID, must it be deleted?")
         var deleting: Boolean = false
     }
 
@@ -36,14 +38,11 @@ class IndicatorConfigProperties {
      * Metrics configuration
      */
     class MetricsConfig {
-        /**
-         * Enabling the scheduled export of metrics (a manual job is always available)
-         */
+
+        @APIDescription("Enabling the scheduled export of metrics (a manual job is always available)")
         var enabled: Boolean = true
 
-        /**
-         * Schedule
-         */
+        @APIDescription("Cron for the scheduled export of metrics")
         var cron: String = "@daily"
     }
 

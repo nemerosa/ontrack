@@ -1,3 +1,19 @@
 [[net.nemerosa.ontrack.extension.license.remote.stripe.StripeLicenseConfigurationProperties]]
 ==== StripeLicenseConfigurationProperties
 
+
+|===
+| Name | Environment | Description | Default value | Notes
+
+|`ontrack.config.license.stripe.subscription`
+|`ONTRACK_CONFIG_LICENSE_STRIPE_SUBSCRIPTION`
+|subscription field
+|``
+|
+
+|`ontrack.config.license.stripe.token`
+|`ONTRACK_CONFIG_LICENSE_STRIPE_TOKEN`
+|token field
+|``
+|
+|===

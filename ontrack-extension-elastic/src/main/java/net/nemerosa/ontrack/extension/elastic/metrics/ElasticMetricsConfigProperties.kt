@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.elastic.metrics
 
+import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.annotations.APIName
 import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchProperties
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.convert.DurationUnit
@@ -9,6 +11,8 @@ import java.time.temporal.ChronoUnit
 
 @ConfigurationProperties(prefix = ElasticMetricsConfigProperties.ELASTIC_METRICS_PREFIX)
 @Component
+@APIName("ElasticSearch metrics configuration")
+@APIDescription("Configuration of the export of metrics into ElasticSearch")
 class ElasticMetricsConfigProperties {
 
     companion object {
@@ -18,19 +22,23 @@ class ElasticMetricsConfigProperties {
         const val ELASTIC_METRICS_PREFIX = "ontrack.extension.elastic.metrics"
     }
 
-    /**
-     * Is the export of metrics to Elastic enabled?
-     */
+    @APIDescription("Is the export of metrics to Elastic enabled?")
     var enabled: Boolean = false
 
-    /**
-     * Must we trace the behaviour of the export of the metrics in the logs?
-     */
+    @APIDescription("Must we trace the behaviour of the export of the metrics in the logs?")
     var debug: Boolean = false
 
-    /**
-     * Defines where the Elastic metrics should be sent.
-     */
+    @APIDescription(
+        """
+            Defines where the Elastic metrics should be sent.
+            
+            Possible values are:
+            * MAIN - When this option is selected, the ES instance used
+            by Ontrack for the regular search will be used.
+            * CUSTOM -When this option is selected, the ES instance defined
+            by the metrics properties will be used.
+        """
+    )
     var target: ElasticMetricsTarget = ElasticMetricsTarget.MAIN
 
     /**
@@ -38,22 +46,35 @@ class ElasticMetricsConfigProperties {
      */
     var index = IndexConfigProperties()
 
-    /**
-     * Custom connection
-     */
+    @APIDescription(
+        """
+            If the `target` property is set to `CUSTOM`, the following properties
+            will be used to setup the Elastic instance to use for the export
+            of the metrics.
+            
+            See https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/autoconfigure/elasticsearch/ElasticsearchProperties.html
+            for the list of available properties.
+            
+            Example:
+            
+            ```
+            ontrack.extension.elastic.metrics.custom.uris = http://localhost:9200
+            ```
+        """
+    )
     var custom = ElasticsearchProperties()
 
-    /**
-     * Set to true to enable the API Compatibility mode when accessing a 8.x ES server.
-     *
-     * See https://www.elastic.co/guide/en/elasticsearch/client/java-rest/7.17/java-rest-high-compatibility.html
-     */
     @Deprecated("Ontrack is now used the Java ES client and the compatibility mode is always enabled")
+    @APIDescription(
+        """
+            Set to true to enable the API Compatibility mode when accessing a 8.x ES server.
+            
+            See https://www.elastic.co/guide/en/elasticsearch/client/java-rest/7.17/java-rest-high-compatibility.html
+        """
+    )
     var apiCompatibilityMode: Boolean = false
 
-    /**
-     * Set to false to disable the possibility to clear the index in case of re-indexation
-     */
+    @APIDescription("Set to false to disable the deletion of the index when performing a re-indexation")
     var allowDrop: Boolean = true
 
     /**
@@ -61,15 +82,18 @@ class ElasticMetricsConfigProperties {
      */
     class IndexConfigProperties {
 
-        /**
-         * Name of the index to contains all Ontrack metrics
-         */
+        @APIDescription("Name of the index to contains all Ontrack metrics")
         var name = "ontrack_metrics"
 
-        /**
-         * Flag to enable immediate re-indexation after items are added into the index (used mostly
-         * for testing).
-         */
+        @APIDescription(
+            """
+                Flag to enable immediate re-indexation after items are added
+                into the index (used mostly for testing. It should not be
+                used in production.
+                If set to true, this overrides the asynchronous processing
+                of the metrics
+            """
+        )
         var immediate = false
 
     }
@@ -84,19 +108,29 @@ class ElasticMetricsConfigProperties {
      */
     class QueueConfigProperties {
 
-        /**
-         * Maximum capacity for the queue
-         */
+        @APIDescription(
+            """
+                Maximum capacity for the queue.
+                If the queue exceeds this capacity, new events will be on hold.
+            """
+        )
         var capacity: UInt = 1024U
 
-        /**
-         * Maximum buffer for the queue before flushing
-         */
+        @APIDescription(
+            """
+                Bulk update capacity.
+                When the number of metrics reaches this amount, the metrics
+                are sent to Elastic.
+            """
+        )
         var buffer: UInt = 512U
 
-        /**
-         * Interval between the regular flushing of the queue of events
-         */
+        @APIDescription(
+            """
+                Every such interval, the current buffer of metrics is flushed
+                to Elastic (expressed by default in minutes)
+            """
+        )
         @DurationUnit(ChronoUnit.MINUTES)
         var flushing: Duration = Duration.ofMinutes(1)
 

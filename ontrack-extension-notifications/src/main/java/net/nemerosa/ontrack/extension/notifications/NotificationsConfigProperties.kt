@@ -1,14 +1,17 @@
 package net.nemerosa.ontrack.extension.notifications
 
+import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.annotations.APIName
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component
 
 @Component
 @ConfigurationProperties(prefix = NotificationsConfigProperties.PREFIX)
+@APIName("Notifications configuration")
+@APIDescription("General configuration for the notifications.")
 class NotificationsConfigProperties {
-    /**
-     * Are the notifications enabled?
-     */
+
+    @APIDescription("Are the notifications enabled?")
     var enabled: Boolean = false
 
     /**
@@ -40,9 +43,7 @@ class NotificationsConfigProperties {
      * Mail configuration properties
      */
     class MailProperties {
-        /**
-         * From address
-         */
+        @APIDescription("From address for the email notifications")
         var from = "no-reply@localhost"
     }
 
@@ -65,6 +66,7 @@ class NotificationsConfigProperties {
         /**
          * Enabled?
          */
+        @APIDescription("Are internal webhooks enabled?")
         var enabled = false
     }
 
@@ -75,6 +77,7 @@ class NotificationsConfigProperties {
         /**
          * Enabled?
          */
+        @APIDescription("Is the in-memory notification channel enabled? Used for testing only.")
         var enabled = false
     }
 
@@ -105,6 +108,7 @@ class NotificationsConfigProperties {
         /**
          * Async processing enabled?
          */
+        @APIDescription("Is asynchronous processing of notifications enabled?")
         var async: Boolean = true
     }
 
@@ -120,6 +124,7 @@ class NotificationsConfigProperties {
         /**
          * Maximum parallel processing of queues
          */
+        @APIDescription("Maximum parallel processing of queues")
         var concurrency: Int = 10
     ) : AbstractQueuingProperties()
 

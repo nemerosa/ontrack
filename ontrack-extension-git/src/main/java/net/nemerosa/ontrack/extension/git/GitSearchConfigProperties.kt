@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.git
 
 import net.nemerosa.ontrack.job.Schedule
+import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.annotations.APIName
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.convert.DurationUnit
@@ -10,6 +12,8 @@ import java.time.temporal.ChronoUnit
 
 @Component
 @ConfigurationProperties(prefix = GitSearchConfigProperties.GIT_SEARCH_PROPERTY_PREFIX)
+@APIName("Git Search configuration")
+@APIDescription("Configuration of the search for Git objects.")
 class GitSearchConfigProperties {
 
     companion object {
@@ -28,15 +32,11 @@ class GitSearchConfigProperties {
      * Commit search configuration properties
      */
     class GitCommitSearchConfigProperties {
-        /**
-         * Interval between two indexations, in minutes
-         */
         @DurationUnit(ChronoUnit.MINUTES)
+        @APIDescription("Interval between two indexations, in minutes.")
         var schedule: Duration = Duration.ofHours(1)
 
-        /**
-         * Enabling auto indexation
-         */
+        @APIDescription("Enabling auto indexation")
         var scheduled: Boolean = true
 
         /**

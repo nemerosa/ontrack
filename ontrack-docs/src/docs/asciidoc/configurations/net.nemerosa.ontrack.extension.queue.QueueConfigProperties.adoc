@@ -1,3 +1,39 @@
 [[net.nemerosa.ontrack.extension.queue.QueueConfigProperties]]
-==== QueueConfigProperties
+==== Queues configuration
 
+
+General configuration for the RabbitMQ queues.
+
+|===
+| Name | Environment | Description | Default value | Notes
+
+|`ontrack.extension.queue.general.warn-if-async`
+|`ONTRACK_EXTENSION_QUEUE_GENERAL_WARNIFASYNC`
+|Emits a warning if the queues are not asynchronous (careful: the property name is a misnomer and will be renamed at one point into warnIfSync
+|`true`
+|
+
+|`ontrack.extension.queue.general.async`
+|`ONTRACK_EXTENSION_QUEUE_GENERAL_ASYNC`
+|async field
+|`true`
+|
+
+|`ontrack.extension.queue.specific.<*>`
+|`-`
+|specific field
+|_Empty_
+|
+
+|`ontrack.extension.queue..specific.<*>.scale`
+|`ONTRACK_EXTENSION_QUEUE__SPECIFIC_<*>_SCALE`
+|Number of queues
+|`1`
+|
+
+|`ontrack.extension.queue..specific.<*>.async`
+|`ONTRACK_EXTENSION_QUEUE__SPECIFIC_<*>_ASYNC`
+|async field
+|`true`
+|
+|===

@@ -1,3 +1,111 @@
 [[net.nemerosa.ontrack.extension.git.GitConfigProperties]]
-==== GitConfigProperties
+==== Git configuration
 
+
+Configuration of the connections to Git.
+
+|===
+| Name | Environment | Description | Default value | Notes
+
+|`ontrack.config.extension.git.indexation.cleanup.cron`
+|`ONTRACK_CONFIG_EXTENSION_GIT_INDEXATION_CLEANUP_CRON`
+|Cron for the job (empty to let it run manually)
+|``
+|
+
+|`ontrack.config.extension.git.indexation.cleanup.enabled`
+|`ONTRACK_CONFIG_EXTENSION_GIT_INDEXATION_CLEANUP_ENABLED`
+|Cleanup of Git indexations working directories
+|`true`
+|
+
+|`ontrack.config.extension.git.indexation.timeout`
+|`ONTRACK_CONFIG_EXTENSION_GIT_INDEXATION_TIMEOUT`
+|Timeout for the Git indexations (expressed by default in minutes)
+|`PT30M`
+|
+
+|`ontrack.config.extension.git.pull-requests.cache.duration`
+|`ONTRACK_CONFIG_EXTENSION_GIT_PULLREQUESTS_CACHE_DURATION`
+|
+                Caching duration for pull requests. Time before a new connection is needed to get information
+                about the PR from the SCM.
+            
+|`PT6H`
+|
+
+|`ontrack.config.extension.git.pull-requests.cache.enabled`
+|`ONTRACK_CONFIG_EXTENSION_GIT_PULLREQUESTS_CACHE_ENABLED`
+|Is the cache for pull requests enabled?
+|`true`
+|
+
+|`ontrack.config.extension.git.pull-requests.cleanup.deleting`
+|`ONTRACK_CONFIG_EXTENSION_GIT_PULLREQUESTS_CLEANUP_DELETING`
+|Days before deleting a PR branch after it's been closed or merged
+|`7`
+|
+
+|`ontrack.config.extension.git.pull-requests.cleanup.disabling`
+|`ONTRACK_CONFIG_EXTENSION_GIT_PULLREQUESTS_CLEANUP_DISABLING`
+|Days before disabling a PR branch after it's been closed or merged
+|`1`
+|
+
+|`ontrack.config.extension.git.pull-requests.cleanup.enabled`
+|`ONTRACK_CONFIG_EXTENSION_GIT_PULLREQUESTS_CLEANUP_ENABLED`
+|Auto cleanup of pull requests
+|`true`
+|
+
+|`ontrack.config.extension.git.pull-requests.enabled`
+|`ONTRACK_CONFIG_EXTENSION_GIT_PULLREQUESTS_ENABLED`
+|Is the support for pull requests enabled?
+|`true`
+|Deprecated: Will be removed in V5. Support for pull requests will be transformed in V5.
+
+|`ontrack.config.extension.git.pull-requests.timeout`
+|`ONTRACK_CONFIG_EXTENSION_GIT_PULLREQUESTS_TIMEOUT`
+|Timeout before giving up on PR check
+|`PT5S`
+|Deprecated: Will be removed in V5. Support for pull requests will be transformed in V5.
+
+|`ontrack.config.extension.git.remote.interval`
+|`ONTRACK_CONFIG_EXTENSION_GIT_REMOTE_INTERVAL`
+|
+                Interval between retries (by default in seconds
+                and set to 30 seconds by default).
+            
+|`PT30S`
+|Deprecated: Will be removed in V5. No fetch nor clone of Git repository will be done by Ontrack any longer.
+
+|`ontrack.config.extension.git.remote.max-no-remote`
+|`ONTRACK_CONFIG_EXTENSION_GIT_REMOTE_MAXNOREMOTE`
+|
+                Number of times we accept a "no remote" exception is thrown before deactivating the project in Ontrack.
+                
+                If <= 0, we always retry and never disable the project.
+            
+|`3`
+|Deprecated: Will be removed in V5. No fetch nor clone of Git repository will be done by Ontrack any longer.
+
+|`ontrack.config.extension.git.remote.operation-timeout`
+|`ONTRACK_CONFIG_EXTENSION_GIT_REMOTE_OPERATIONTIMEOUT`
+|
+                Timeout (by default in minutes) for a given remote operation to _complete_ (like fetch & clone)
+                
+                Set to 10 minutes by default.
+            
+|`PT10M`
+|Deprecated: Will be removed in V5. No fetch nor clone of Git repository will be done by Ontrack any longer.
+
+|`ontrack.config.extension.git.remote.timeout`
+|`ONTRACK_CONFIG_EXTENSION_GIT_REMOTE_TIMEOUT`
+|
+                Timeout (by default in seconds) for a given remote operation to start (like fetch & clone).
+                Leave 0 to use the default system value. Set to 60 seconds by default.
+                This timeout is used for the _connection_ part, not the total duration of the operation.
+            
+|`PT1M`
+|Deprecated: Will be removed in V5. No fetch nor clone of Git repository will be done by Ontrack any longer.
+|===
