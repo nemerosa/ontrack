@@ -1,0 +1,55 @@
+[[net.nemerosa.ontrack.extension.casc.CascConfigurationProperties]]
+==== CasC configuration
+
+
+Configuration of the "Configuration as Code".
+
+|===
+| Name | Environment | Description | Default value | Notes
+
+|`ontrack.config.casc.enabled`
+|`ONTRACK_CONFIG_CASC_ENABLED`
+|Is the configuration as code enabled?
+|`true`
+|
+
+|`ontrack.config.casc.locations.<0>`
+|`ONTRACK_CONFIG_CASC_LOCATIONS_<0>`
+|List of resources to load and to monitor for changes
+|`_Empty list_`
+|
+
+|`ontrack.config.casc.reloading.cron`
+|`ONTRACK_CONFIG_CASC_RELOADING_CRON`
+|Cron schedule for the reloading. Leave blank or empty to disable the automated reloading.
+|``
+|
+
+|`ontrack.config.casc.reloading.enabled`
+|`ONTRACK_CONFIG_CASC_RELOADING_ENABLED`
+|Enables the creation of a job to reload the CasC.
+|`false`
+|
+
+|`ontrack.config.casc.secrets.directory`
+|`ONTRACK_CONFIG_CASC_SECRETS_DIRECTORY`
+|Directory used to store the secret files (used only when type == "file"
+|``
+|
+
+|`ontrack.config.casc.secrets.type`
+|`ONTRACK_CONFIG_CASC_SECRETS_TYPE`
+|
+                Source for the secrets.
+                
+                Either "env" (default) or "file"
+            
+|`env`
+|
+
+|`ontrack.config.casc.upload.enabled`
+|`ONTRACK_CONFIG_CASC_UPLOAD_ENABLED`
+|Is the upload of Casc YAML file enabeld?
+|`false`
+|
+|===

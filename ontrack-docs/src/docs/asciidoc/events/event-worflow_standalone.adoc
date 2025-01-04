@@ -1,0 +1,15 @@
+[[event-worflow_standalone]]
+===== worflow_standalone
+
+Event created when launching a standalone workflow
+
+Context:
+
+
+Default template:
+
+[source]
+----
+Started a standalone workflow
+----
+

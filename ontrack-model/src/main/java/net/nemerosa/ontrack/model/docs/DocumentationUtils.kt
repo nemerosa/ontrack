@@ -6,13 +6,14 @@ import net.nemerosa.ontrack.model.annotations.getPropertyName
 import java.time.LocalDateTime
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
+import kotlin.reflect.KVisibility
 import kotlin.reflect.full.*
 
 
 fun getFieldsForDocumentationClass(documentationClass: KClass<*>): List<FieldDocumentation> {
     val fields = mutableListOf<FieldDocumentation>()
     documentationClass.memberProperties.forEach { property ->
-        if (!property.hasAnnotation<DocumentationIgnore>()) {
+        if (property.visibility == KVisibility.PUBLIC && !property.hasAnnotation<DocumentationIgnore>()) {
 
             val name = getPropertyName(property)
             val description =

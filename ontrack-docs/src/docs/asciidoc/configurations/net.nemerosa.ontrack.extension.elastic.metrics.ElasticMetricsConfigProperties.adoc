@@ -1,0 +1,78 @@
+[[net.nemerosa.ontrack.extension.elastic.metrics.ElasticMetricsConfigProperties]]
+==== ElasticSearch metrics configuration
+
+
+Configuration of the export of metrics into ElasticSearch
+
+|===
+| Name | Environment | Description | Default value | Notes
+
+|`ontrack.extension.elastic.metrics.allow-drop`
+|`ONTRACK_EXTENSION_ELASTIC_METRICS_ALLOWDROP`
+|Set to false to disable the deletion of the index when performing a re-indexation
+|`true`
+|
+
+|`ontrack.extension.elastic.metrics.api-compatibility-mode`
+|`ONTRACK_EXTENSION_ELASTIC_METRICS_APICOMPATIBILITYMODE`
+|
+            Set to true to enable the API Compatibility mode when accessing a 8.x ES server.
+            
+            See https://www.elastic.co/guide/en/elasticsearch/client/java-rest/7.17/java-rest-high-compatibility.html
+        
+|`false`
+|
+
+|`ontrack.extension.elastic.metrics.debug`
+|`ONTRACK_EXTENSION_ELASTIC_METRICS_DEBUG`
+|Must we trace the behaviour of the export of the metrics in the logs?
+|`false`
+|
+
+|`ontrack.extension.elastic.metrics.enabled`
+|`ONTRACK_EXTENSION_ELASTIC_METRICS_ENABLED`
+|Is the export of metrics to Elastic enabled?
+|`false`
+|
+
+|`ontrack.extension.elastic.metrics.index.immediate`
+|`ONTRACK_EXTENSION_ELASTIC_METRICS_INDEX_IMMEDIATE`
+|
+                Flag to enable immediate re-indexation after items are added
+                into the index (used mostly for testing. It should not be
+                used in production.
+                If set to true, this overrides the asynchronous processing
+                of the metrics
+            
+|`false`
+|
+
+|`ontrack.extension.elastic.metrics.index.name`
+|`ONTRACK_EXTENSION_ELASTIC_METRICS_INDEX_NAME`
+|Name of the index to contains all Ontrack metrics
+|`ontrack_metrics`
+|
+
+|`ontrack.extension.elastic.metrics.queue.flushing`
+|`ONTRACK_EXTENSION_ELASTIC_METRICS_QUEUE_FLUSHING`
+|
+                Every such interval, the current buffer of metrics is flushed
+                to Elastic (expressed by default in minutes)
+            
+|`PT1M`
+|
+
+|`ontrack.extension.elastic.metrics.target`
+|`ONTRACK_EXTENSION_ELASTIC_METRICS_TARGET`
+|
+            Defines where the Elastic metrics should be sent.
+            
+            Possible values are:
+            * MAIN - When this option is selected, the ES instance used
+            by Ontrack for the regular search will be used.
+            * CUSTOM -When this option is selected, the ES instance defined
+            by the metrics properties will be used.
+        
+|`MAIN`
+|
+|===

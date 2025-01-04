@@ -1,0 +1,15 @@
+[[net.nemerosa.ontrack.extension.artifactory.ArtifactoryConfProperties]]
+==== Artifactory configuration
+
+
+Configuration of the Artifactory extension
+
+|===
+| Name | Environment | Description | Default value | Notes
+
+|`ontrack.extension.artifactory.build-sync-disabled`
+|`ONTRACK_EXTENSION_ARTIFACTORY_BUILDSYNCDISABLED`
+|Disabling the build sync jobs?
+|`false`
+|
+|===

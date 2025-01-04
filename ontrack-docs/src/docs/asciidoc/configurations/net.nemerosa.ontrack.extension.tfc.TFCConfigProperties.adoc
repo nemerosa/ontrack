@@ -1,0 +1,15 @@
+[[net.nemerosa.ontrack.extension.tfc.TFCConfigProperties]]
+==== Terraform Cloud configuration
+
+
+Configuration of the TFC hooks.
+
+|===
+| Name | Environment | Description | Default value | Notes
+
+|`ontrack.extension.tfc.hook.signature.disabled`
+|`ONTRACK_EXTENSION_TFC_HOOK_SIGNATURE_DISABLED`
+|Set to `true` to disable the signature checks (OK for testing, NOT for production)
+|`false`
+|
+|===

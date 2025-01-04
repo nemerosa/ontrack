@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.model.support
 
+import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.annotations.APIName
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.context.properties.ConfigurationProperties
@@ -22,23 +24,19 @@ import javax.validation.constraints.Min
 @Component
 @ConfigurationProperties(prefix = OntrackConfigProperties.PREFIX)
 @Validated
+@APIName("General configuration")
+@APIDescription("General configuration of Ontrack.")
 class OntrackConfigProperties {
 
     private val logger: Logger = LoggerFactory.getLogger(OntrackConfigProperties::class.java)
 
-    /**
-     * Root URL for this Ontrack location.
-     */
+    @APIDescription("Root URL for this Ontrack installation, used for notifications")
     var url: String = "http://localhost:8080"
 
-    /**
-     * Maximum number of days to keep the log entries
-     */
+    @APIDescription("Maximum number of days to keep the log entries")
     var applicationLogRetentionDays = 7
 
-    /**
-     * Disabling the collection of log entries in the application.
-     */
+    @APIDescription("Disabling the collection of log entries in the application")
     var applicationLogEnabled = true
 
     /**
@@ -47,22 +45,17 @@ class OntrackConfigProperties {
      * @see ApplicationLogEntryLevel.FATAL
      */
     @Min(1)
+    @APIDescription("Maximum number of errors to display as notifications in the GUI")
     var applicationLogInfoMax = 10
 
-    /**
-     * Maximum number of builds which can be returned by a build filter
-     */
     @Min(1)
+    @APIDescription("# Maximum number of builds which can be returned by a build filter. Any number above is truncated down to this value")
     var buildFilterCountMax = 200
 
-    /**
-     * Home directory
-     */
+    @APIDescription("Directory which contains all the working files of Ontrack. It is usually set by the installation.")
     var applicationWorkingDir = "work/files"
 
-    /**
-     * Testing the configurations of external configurations
-     */
+    @APIDescription("Testing the configurations of external configurations. Used only for internal testing, to disable the checks when creating external configurations.")
     var configurationTest = true
 
     /**
@@ -71,9 +64,7 @@ class OntrackConfigProperties {
     @Valid
     var jobs: JobConfigProperties = JobConfigProperties()
 
-    /**
-     * Label provider collection job activation
-     */
+    @APIDescription("Activation of the provided labels collection job")
     var jobLabelProviderEnabled = false
 
     /**
@@ -105,6 +96,12 @@ class OntrackConfigProperties {
      * Templating settings
      */
     var templating = TemplatingProperties()
+
+    /**
+     * Key-store type
+     */
+    @APIDescription("Key store type to use to store encryption keys")
+    var keyStore: String = "file"
 
     @PostConstruct
     fun log() {
@@ -142,9 +139,8 @@ class OntrackConfigProperties {
      */
     class FileKeyStoreProperties {
         /**
-         * Directory where to store the secret files.
-         *
-         * If empty, the [applicationWorkingDir] will be used as a root instead.
+         * Directory to use for the `file` confidential store
+         * Optional. If not filled in, will use a subdirectory of the working directory
          */
         var directory: String = ""
     }

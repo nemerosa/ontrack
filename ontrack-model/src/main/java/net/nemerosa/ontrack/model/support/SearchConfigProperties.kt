@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.model.support
 
+import net.nemerosa.ontrack.model.annotations.APIDescription
+
 /**
  * Configuration properties for the search
  */
@@ -11,28 +13,20 @@ class SearchConfigProperties {
     var index = SearchIndexProperties()
 
     class SearchIndexProperties {
-        /**
-         * Flag to enable immediate re-indexation after items are added into the search index (used mostly
-         * for testing).
-         */
+
+        @APIDescription("By default, indexation is ElasticSearch is done after some time after the index has been requested. The flag below forces the index to be refreshed immediately. This SHOULD NOT be used in production but is very useful when testing Ontrack search capabilities")
         var immediate = false
-        /**
-         * Number of items to include in a batch when re-indexing a whole collection.
-         *
-         * Note that this can be overridden by the individual search indexers.
-         */
+
+        @APIDescription("When performing full indexation, the indexation is performed by batch. The parameter below allows to set the size of this batch processing. Note: this is a default batch size. Custom indexers can override it.")
         var batch = 1000
-        /**
-         * Logging mode for batch indexing (only actual actions are shown)
-         */
+
+        @APIDescription("When performing full indexation, the indexation is performed by batch. The parameter below allows to generate additional logging when indexing actions are actually taken.")
         var logging = false
-        /**
-         * Tracing mode for batch indexing (generates an awful lot of logging at DEBUG level)
-         */
+
+        @APIDescription("When performing full indexation, the indexation is performed by batch. The parameter below allows to generate additional deep level logging for all actions on Git issues. Note: if set to `true` this generates a lot of information at DEBUG level.")
         var tracing = false
-        /**
-         * Option to ignore errors when creating indexes. For test only, allowing for concurrent testing.
-         */
+
+        @APIDescription("Option to ignore errors when creating indexes. For test only, allowing for concurrent testing.")
         var ignoreExisting = false
     }
 }

@@ -1,0 +1,20 @@
+[[event-slot-updated]]
+===== slot-updated
+
+When a slot is updated
+
+Context:
+
+* `ENVIRONMENT_ID` - string - ID of the environment
+* `ENVIRONMENT_NAME` - string - Name of the environment
+* `project` - project - Project for the slot
+* `SLOT_ID` - string - ID of the slot
+* `SLOT_QUALIFIER` - string - Qualifier of the slot
+
+Default template:
+
+[source]
+----
+Slot ${#.slot} for environment ${ENVIRONMENT_NAME} has been updated.
+----
+

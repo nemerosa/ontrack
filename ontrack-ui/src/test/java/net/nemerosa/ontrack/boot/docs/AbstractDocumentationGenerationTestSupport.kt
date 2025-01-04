@@ -3,16 +3,45 @@ package net.nemerosa.ontrack.boot.docs
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.docs.DocumentationLink
 import net.nemerosa.ontrack.model.docs.FieldDocumentation
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.ApplicationContext
 import java.io.File
+import kotlin.reflect.KClass
 
 /**
  * Generation of the documentation
  */
 abstract class AbstractDocumentationGenerationTestSupport : AbstractDSLTestSupport() {
 
+    @Autowired
+    private lateinit var applicationContext: ApplicationContext
+
+    protected fun findAllBeansAnnotatedWith(annotationClass: KClass<out Annotation>): List<Any> {
+        val beanNames = applicationContext.beanDefinitionNames
+        val annotatedBeanNames = beanNames.filter { beanName ->
+            val beanType = applicationContext.getType(beanName)
+            beanType?.isAnnotationPresent(annotationClass.java) == true
+        }
+        return annotatedBeanNames.map { beanName ->
+            applicationContext.getBean(beanName)
+        }
+    }
+
     protected class DirectoryContext(
         val dir: File,
     ) {
+
+        fun writeFile(
+            fileName: String,
+            code: (s: StringBuilder) -> Unit,
+        ) {
+            val file = File(dir, "${fileName}.adoc")
+
+            val s = StringBuilder()
+            code(s)
+
+            file.writeText(s.toString())
+        }
 
         fun writeFile(
             fileId: String,
@@ -21,18 +50,16 @@ abstract class AbstractDocumentationGenerationTestSupport : AbstractDSLTestSuppo
             title: String,
             code: (s: StringBuilder) -> Unit,
         ) {
-            val file = File(dir, "${fileName}.adoc")
+            writeFile(
+                fileName = fileName,
+            ) { s ->
+                val fileTitle = "${(1..level).joinToString("") { "=" }} $title"
 
-            val s = StringBuilder()
+                s.append("[[").append(fileId).append("]]\n")
+                s.append(fileTitle).append("\n").append("\n")
 
-            val fileTitle = "${(1..level).joinToString("") { "=" }} $title"
-
-            s.append("[[").append(fileId).append("]]\n")
-            s.append(fileTitle).append("\n").append("\n")
-
-            code(s)
-
-            file.writeText(s.toString())
+                code(s)
+            }
         }
 
         fun writeIndex(

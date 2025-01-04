@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.casc
 
+import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.annotations.APIName
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component
 
@@ -8,16 +10,14 @@ import org.springframework.stereotype.Component
  */
 @Component
 @ConfigurationProperties(prefix = "ontrack.config.casc")
+@APIName("CasC configuration")
+@APIDescription("""Configuration of the "Configuration as Code".""")
 class CascConfigurationProperties {
 
-    /**
-     * Is the configuration as code enabled?
-     */
+    @APIDescription("Is the configuration as code enabled?")
     var enabled = true
 
-    /**
-     * List of resources to load and to monitor for changes
-     */
+    @APIDescription("List of resources to load and to monitor for changes")
     var locations: List<String> = emptyList()
 
     /**
@@ -39,14 +39,10 @@ class CascConfigurationProperties {
      * Reloading configuration
      */
     class CascReloadingConfigurationProperties {
-        /**
-         * Enables the creation of a job to reload the CasC.
-         */
+        @APIDescription("Enables the creation of a job to reload the CasC.")
         var enabled = false
 
-        /**
-         * Cron schedule for the reloading. Leave blank or empty to disable the automated reloading.
-         */
+        @APIDescription("Cron schedule for the reloading. Leave blank or empty to disable the automated reloading.")
         var cron = ""
     }
 
@@ -54,15 +50,16 @@ class CascConfigurationProperties {
      * Secrets configurations
      */
     class CascSecretConfigurationProperties {
-        /**
-         * Source for the secrets.
-         *
-         * Either "env" (default) or "file"
-         */
+        @APIDescription(
+            """
+                Source for the secrets.
+                
+                Either "env" (default) or "file"
+            """
+        )
         var type: String = "env"
-        /**
-         * Directory used to store the secret files (used only when type == "file"
-         */
+
+        @APIDescription("""Directory used to store the secret files (used only when type == "file"""")
         var directory = ""
     }
 
@@ -70,9 +67,7 @@ class CascConfigurationProperties {
      * Upload end point
      */
     class CascUploadConfigurationProperties {
-        /**
-         * Is the upload endpoint enabled?
-         */
+        @APIDescription("Is the upload of Casc YAML file enabeld?")
         var enabled = false
     }
 

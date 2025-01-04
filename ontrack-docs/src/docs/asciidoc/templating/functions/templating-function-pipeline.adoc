@@ -1,0 +1,19 @@
+[[templating-function-pipeline]]
+===== pipeline
+
+Renders a slot pipeline using its ID
+
+Configuration:
+
+* **id** - String - optional - ID of the slot pipeline. Defaults to PIPELINE_ID
+
+Example:
+
+[source]
+----
+#.pipeline
+
+or
+
+#.pipeline?id=workflow.pipeline.targetPipelineId
+----
