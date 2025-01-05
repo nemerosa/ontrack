@@ -43,7 +43,7 @@ export function useBuildPromoteDialog(config) {
 export default function BuildPromoteDialog({buildPromoteDialog}) {
     return (
         <>
-            <FormDialog dialog={buildPromoteDialog}>
+            <FormDialog id="promotion-run-create-dialog" dialog={buildPromoteDialog}>
                 <Form.Item
                     name="promotionLevel"
                     label="Promotion level to promote to"

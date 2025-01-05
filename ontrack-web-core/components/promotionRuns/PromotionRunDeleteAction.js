@@ -47,7 +47,7 @@ export default function PromotionRunDeleteAction({promotionRun, onDeletion}) {
                     {
                         deleting ?
                             <Spin size="small"/> :
-                            <FaTrashAlt className="ot-command"/>
+                            <FaTrashAlt data-testid={`build-promotion-delete-${promotionRun.id}`} className="ot-command"/>
                     }
 
                 </Popconfirm>

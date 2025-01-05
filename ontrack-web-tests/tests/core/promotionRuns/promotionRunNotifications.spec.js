@@ -2,7 +2,7 @@ const {test, expect} = require('@playwright/test');
 const {ontrack} = require("@ontrack/ontrack");
 const {login} = require("../login");
 const {generate} = require("@ontrack/utils");
-const {PromotionRunPage} = require("./promotionRun");
+const {PromotionRunPage} = require("./PromotionRunPage");
 
 test('notifications are visible on the promotion run page', async ({page}) => {
     // Provisioning

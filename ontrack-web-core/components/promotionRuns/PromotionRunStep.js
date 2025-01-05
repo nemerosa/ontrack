@@ -21,42 +21,44 @@ export default function PromotionRunStep({run, onChange}) {
     return (
         <>
             <Popover
-                title={<PromotionLevelLink promotionLevel={run.promotionLevel}/>}
                 content={
-                    <Space direction="vertical">
-                        <Typography.Text>Promoted by {run.creation.user}</Typography.Text>
-                        <TimestampText value={run.creation.time}/>
-                        <AnnotatedDescription entity={run}/>
-                        <EntityNotificationsBadge
-                            entityType="PROMOTION_RUN"
-                            entityId={run.id}
-                            href={promotionRunUri(run)}
-                            showText={true}
-                        />
-                        <Space>
-                            {/* Repromoting */}
-                            {
-                                isAuthorized(run, 'build', 'promote') ?
-                                    <BuildPromoteAction
-                                        build={run.build}
-                                        promotionLevel={run.promotionLevel}
-                                        onPromotion={onChange}
-                                    /> : undefined
+                    <div data-testid={`promotion-run-popover-${run.id}`}>
+                        <Space direction="vertical">
+                            <PromotionLevelLink promotionLevel={run.promotionLevel}/>
+                            <Typography.Text>Promoted by {run.creation.user}</Typography.Text>
+                            <TimestampText value={run.creation.time}/>
+                            <AnnotatedDescription entity={run}/>
+                            <EntityNotificationsBadge
+                                entityType="PROMOTION_RUN"
+                                entityId={run.id}
+                                href={promotionRunUri(run)}
+                                showText={true}
+                            />
+                            <Space>
+                                {/* Repromoting */}
+                                {
+                                    isAuthorized(run, 'build', 'promote') ?
+                                        <BuildPromoteAction
+                                            build={run.build}
+                                            promotionLevel={run.promotionLevel}
+                                            onPromotion={onChange}
+                                        /> : undefined
 
-                            }
-                            {/* Deleting the promotion */}
-                            {
-                                isAuthorized(run, 'promotion_run', 'delete') ?
-                                    <PromotionRunDeleteAction
-                                        promotionRun={run}
-                                        onDeletion={onChange}
-                                    /> : undefined
-                            }
+                                }
+                                {/* Deleting the promotion */}
+                                {
+                                    isAuthorized(run, 'promotion_run', 'delete') ?
+                                        <PromotionRunDeleteAction
+                                            promotionRun={run}
+                                            onDeletion={onChange}
+                                        /> : undefined
+                                }
+                            </Space>
                         </Space>
-                    </Space>
+                    </div>
                 }
             >
-                <Link href={promotionRunUri(run)}>
+                <Link href={promotionRunUri(run)} className={`promotion-run-pl-${run.promotionLevel.id}`} data-testid={`promotion-run-link-${run.id}`}>
                     <EntityNotificationsBadge
                         entityType="PROMOTION_RUN"
                         entityId={run.id}

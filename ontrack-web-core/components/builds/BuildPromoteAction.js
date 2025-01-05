@@ -19,7 +19,7 @@ export default function BuildPromoteAction({build, promotionLevel, tooltip, onPr
     return (
         <>
             <Popover content={actualTooltip}>
-                <FaRegThumbsUp className="ot-command" onClick={onPromote}/>
+                <FaRegThumbsUp data-testid={`build-promote-${build.id}-${promotionLevel.id}`} className="ot-command" onClick={onPromote}/>
             </Popover>
             <BuildPromoteDialog buildPromoteDialog={dialog}/>
         </>

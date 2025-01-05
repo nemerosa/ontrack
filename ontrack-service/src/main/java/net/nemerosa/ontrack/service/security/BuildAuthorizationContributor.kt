@@ -11,6 +11,9 @@ class BuildAuthorizationContributor(
 
     companion object {
         const val BUILD = "build"
+
+        const val ACTION_PROMOTE = "promote"
+        const val ACTION_VALIDATE = "validate"
     }
 
     override fun appliesTo(context: Any): Boolean = context is Build
@@ -20,12 +23,12 @@ class BuildAuthorizationContributor(
             listOf(
                 Authorization(
                     BUILD,
-                    "promote",
+                    ACTION_PROMOTE,
                     securityService.isProjectFunctionGranted<PromotionRunCreate>(build)
                 ),
                 Authorization(
                     BUILD,
-                    "validate",
+                    ACTION_VALIDATE,
                     securityService.isProjectFunctionGranted<ValidationRunCreate>(build)
                 ),
             )

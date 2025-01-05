@@ -16,6 +16,15 @@ class PromotionRunAuthorizationContributor(
     override fun appliesTo(context: Any): Boolean = context is PromotionRun
 
     override fun getAuthorizations(user: OntrackAuthenticatedUser, context: Any): List<Authorization> = listOf(
-        Authorization(PROMOTION_RUN, Authorization.DELETE, securityService.isProjectFunctionGranted<PromotionRunDelete>(context as PromotionRun))
+        Authorization(
+            PROMOTION_RUN,
+            Authorization.DELETE,
+            securityService.isProjectFunctionGranted<PromotionRunDelete>(context as PromotionRun)
+        ),
+        Authorization(
+            BuildAuthorizationContributor.BUILD,
+            BuildAuthorizationContributor.ACTION_PROMOTE,
+            securityService.isProjectFunctionGranted<PromotionRunCreate>(context)
+        )
     )
 }
