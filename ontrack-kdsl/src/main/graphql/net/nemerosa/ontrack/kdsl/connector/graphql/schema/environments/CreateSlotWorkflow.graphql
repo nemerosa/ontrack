@@ -1,6 +1,6 @@
 mutation CreateSlotWorkflow(
     $slotId: String!,
-    $trigger: SlotWorkflowTrigger!,
+    $trigger: SlotPipelineStatus!,
     $workflowYaml: String!,
 ) {
     addSlotWorkflow(input: {

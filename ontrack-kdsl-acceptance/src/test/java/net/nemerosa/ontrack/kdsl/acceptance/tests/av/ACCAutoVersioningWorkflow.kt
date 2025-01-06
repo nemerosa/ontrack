@@ -4,7 +4,6 @@ import net.nemerosa.ontrack.kdsl.acceptance.tests.scm.withMockScmRepository
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.SlotPipelineStatus
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.SlotWorkflowTrigger
 import net.nemerosa.ontrack.kdsl.spec.extension.av.autoVersioning
 import net.nemerosa.ontrack.kdsl.spec.extension.environments.environments
 import net.nemerosa.ontrack.kdsl.spec.extension.environments.workflows.addWorkflow
@@ -42,7 +41,7 @@ class ACCAutoVersioningWorkflow : AbstractACCAutoVersioningTestSupport() {
 
                         // Adding a workflow to this slot
                         slot.addWorkflow(
-                            trigger = SlotWorkflowTrigger.DEPLOYING,
+                            trigger = SlotPipelineStatus.RUNNING,
                             workflowYaml = """
                                 name: Deployment
                                 nodes:
@@ -74,7 +73,7 @@ class ACCAutoVersioningWorkflow : AbstractACCAutoVersioningTestSupport() {
                             timeout = 10_000,
                             interval = 1_000,
                         ) {
-                            ontrack.environments.findPipelineById(pipeline.id)?.status == SlotPipelineStatus.DEPLOYED
+                            ontrack.environments.findPipelineById(pipeline.id)?.status == SlotPipelineStatus.DONE
                         }
 
                         // We expect the GitOps repository to contain the new version

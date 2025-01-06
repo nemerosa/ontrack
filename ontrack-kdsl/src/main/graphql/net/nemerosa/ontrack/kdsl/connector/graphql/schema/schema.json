@@ -678,7 +678,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "ENUM",
-                  "name": "SlotWorkflowTrigger",
+                  "name": "SlotPipelineStatus",
                   "ofType": null
                 }
               },
@@ -5398,7 +5398,62 @@
             {
               "name": "slotPipelines",
               "description": "List of pipelines this build is associated with",
-              "args": [],
+              "args": [
+                {
+                  "name": "status",
+                  "description": "Filtering on the pipeline status",
+                  "type": {
+                    "kind": "ENUM",
+                    "name": "SlotPipelineStatus",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
+                  "name": "sortedByEnvironment",
+                  "description": "Sorting by decreasing environment order",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Boolean",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "SlotPipeline"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "currentDeployments",
+              "description": "Gets the list of slots where this build is actually deployed",
+              "args": [
+                {
+                  "name": "qualifier",
+                  "description": "Qualifier to use",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": "\"\""
+                }
+              ],
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -6719,12 +6774,12 @@
             },
             {
               "kind": "OBJECT",
-              "name": "Slot",
+              "name": "SlotPipeline",
               "ofType": null
             },
             {
               "kind": "OBJECT",
-              "name": "SlotPipeline",
+              "name": "EnvironmentBuildCount",
               "ofType": null
             }
           ]
@@ -15117,6 +15172,64 @@
         },
         {
           "kind": "INPUT_OBJECT",
+          "name": "DeleteSlotInput",
+          "description": "Input type for the deleteSlot mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "slotId",
+              "description": "slotId field",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "DeleteSlotPayload",
+          "description": "Output type for the deleteSlot mutation.",
+          "fields": [
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
           "name": "DeleteSlotWorkflowInput",
           "description": "Input type for the deleteSlotWorkflow mutation.",
           "fields": null,
@@ -16951,6 +17064,18 @@
               "deprecationReason": null
             },
             {
+              "name": "image",
+              "description": "image field",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "slots",
               "description": "List of slots for this environment",
               "args": [
@@ -16987,6 +17112,61 @@
                       "name": "Slot"
                     }
                   }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "EnvironmentBuildCount",
+          "description": "Number of environments where a build is deployed",
+          "fields": [
+            {
+              "name": "id",
+              "description": "ID of the count (build ID)",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "count",
+              "description": "Number of environments where a build is deployed",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "build",
+              "description": "Associated build",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "Build",
+                  "ofType": null
                 }
               },
               "isDeprecated": false,
@@ -26112,6 +26292,72 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "data",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "LicensedFeatureData"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "LicensedFeatureData",
+          "description": null,
+          "fields": [
+            {
+              "name": "name",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "value",
+              "description": null,
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "inputFields": null,
@@ -32349,6 +32595,29 @@
               "deprecationReason": null
             },
             {
+              "name": "deleteSlot",
+              "description": "Deletes a slot using its ID",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "DeleteSlotInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "DeleteSlotPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "startSlotPipeline",
               "description": "Starts a pipeline for a slot and a build",
               "args": [
@@ -34303,6 +34572,11 @@
             },
             {
               "kind": "OBJECT",
+              "name": "DeleteSlotPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
               "name": "DeleteSlotWorkflowPayload",
               "ofType": null
             },
@@ -36154,6 +36428,33 @@
                 "kind": "SCALAR",
                 "name": "String",
                 "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "slotGraph",
+              "description": "Graph of environment slots for a project",
+              "args": [
+                {
+                  "name": "qualifier",
+                  "description": "Qualifier for the slots",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": "\"\""
+                }
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "SlotGraph",
+                  "ofType": null
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -41874,6 +42175,33 @@
               "deprecationReason": null
             },
             {
+              "name": "environmentById",
+              "description": "Getting an environment using its ID",
+              "args": [
+                {
+                  "name": "id",
+                  "description": "ID of the environment",
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "Environment",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "environmentByName",
               "description": "Getting an environment using its name",
               "args": [
@@ -45732,7 +46060,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "ENUM",
-                  "name": "SlotWorkflowTrigger",
+                  "name": "SlotPipelineStatus",
                   "ofType": null
                 }
               },
@@ -56158,6 +56486,16 @@
                     "ofType": null
                   },
                   "defaultValue": "20"
+                },
+                {
+                  "name": "deployable",
+                  "description": "If true, restricts the list of builds to the ones which can actually be deployed.",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Boolean",
+                    "ofType": null
+                  },
+                  "defaultValue": null
                 }
               ],
               "type": {
@@ -56411,6 +56749,61 @@
         },
         {
           "kind": "OBJECT",
+          "name": "SlotAdmissionRuleData",
+          "description": null,
+          "fields": [
+            {
+              "name": "user",
+              "description": "user field",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "timestamp",
+              "description": "timestamp field",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "LocalDateTime",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "data",
+              "description": "data field",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "JSON",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
           "name": "SlotAdmissionRuleInput",
           "description": "Input for an admission rule",
           "fields": [
@@ -56438,12 +56831,151 @@
         },
         {
           "kind": "OBJECT",
+          "name": "SlotAdmissionRuleOverride",
+          "description": null,
+          "fields": [
+            {
+              "name": "user",
+              "description": "user field",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "timestamp",
+              "description": "timestamp field",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "LocalDateTime",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "message",
+              "description": "message field",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "JSON",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "SlotGraph",
+          "description": "Graph of slots for a project",
+          "fields": [
+            {
+              "name": "slotNodes",
+              "description": "slotNodes field",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "SlotNode"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
           "name": "SlotList",
           "description": "Holds a list of slots",
           "fields": [
             {
               "name": "slots",
               "description": "Holds a list of slots",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "Slot"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "SlotNode",
+          "description": "Node for a slot in a graph",
+          "fields": [
+            {
+              "name": "slot",
+              "description": "slot field",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "Slot",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "parents",
+              "description": "parents field",
               "args": [],
               "type": {
                 "kind": "NON_NULL",
@@ -56716,44 +57248,12 @@
               "deprecationReason": null
             },
             {
-              "name": "timestamp",
-              "description": "timestamp field",
-              "args": [],
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "LocalDateTime",
-                  "ofType": null
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "user",
-              "description": "user field",
-              "args": [],
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
               "name": "data",
               "description": "data field",
               "args": [],
               "type": {
-                "kind": "SCALAR",
-                "name": "JSON",
+                "kind": "OBJECT",
+                "name": "SlotAdmissionRuleData",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -56764,21 +57264,25 @@
               "description": "override field",
               "args": [],
               "type": {
-                "kind": "SCALAR",
-                "name": "Boolean",
+                "kind": "OBJECT",
+                "name": "SlotAdmissionRuleOverride",
                 "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
-              "name": "overrideMessage",
-              "description": "overrideMessage field",
+              "name": "overridden",
+              "description": "Flag to check if the rule has been overridden",
               "args": [],
               "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -56875,16 +57379,32 @@
               "description": "message field",
               "args": [],
               "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "dataChanged",
+              "description": "dataChanged field",
+              "args": [],
+              "type": {
                 "kind": "SCALAR",
-                "name": "String",
+                "name": "Boolean",
                 "ofType": null
               },
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
-              "name": "override",
-              "description": "override field",
+              "name": "overridden",
+              "description": "overridden field",
               "args": [],
               "type": {
                 "kind": "SCALAR",
@@ -57006,8 +57526,24 @@
               "args": [],
               "type": {
                 "kind": "OBJECT",
-                "name": "SlotPipelineAdmissionRuleStatus",
+                "name": "SlotAdmissionRuleOverride",
                 "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "overridden",
+              "description": "Flag to check if the rule has been overridden",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -57257,13 +57793,13 @@
           "interfaces": null,
           "enumValues": [
             {
-              "name": "ONGOING",
+              "name": "CANDIDATE",
               "description": null,
               "isDeprecated": false,
               "deprecationReason": null
             },
             {
-              "name": "DEPLOYING",
+              "name": "RUNNING",
               "description": null,
               "isDeprecated": false,
               "deprecationReason": null
@@ -57275,7 +57811,7 @@
               "deprecationReason": null
             },
             {
-              "name": "DEPLOYED",
+              "name": "DONE",
               "description": null,
               "isDeprecated": false,
               "deprecationReason": null
@@ -57329,7 +57865,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "ENUM",
-                  "name": "SlotWorkflowTrigger",
+                  "name": "SlotPipelineStatus",
                   "ofType": null
                 }
               },
@@ -57447,35 +57983,6 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
-          "possibleTypes": null
-        },
-        {
-          "kind": "ENUM",
-          "name": "SlotWorkflowTrigger",
-          "description": "List of triggers for the slot workflows",
-          "fields": null,
-          "inputFields": null,
-          "interfaces": null,
-          "enumValues": [
-            {
-              "name": "CREATION",
-              "description": null,
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "DEPLOYING",
-              "description": null,
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "DEPLOYED",
-              "description": null,
-              "isDeprecated": false,
-              "deprecationReason": null
-            }
-          ],
           "possibleTypes": null
         },
         {
