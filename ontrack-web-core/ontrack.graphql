@@ -7149,10 +7149,28 @@ type SlotAdmissionRuleConfig {
     ruleId: String!
 }
 
+type SlotAdmissionRuleData {
+    "data field"
+    data: JSON
+    "timestamp field"
+    timestamp: LocalDateTime!
+    "user field"
+    user: String!
+}
+
 "Input for an admission rule"
 type SlotAdmissionRuleInput {
     "config field"
     config: SlotAdmissionRuleConfig!
+}
+
+type SlotAdmissionRuleOverride {
+    "message field"
+    message: JSON
+    "timestamp field"
+    timestamp: LocalDateTime!
+    "user field"
+    user: String!
 }
 
 "Graph of slots for a project"
@@ -7208,27 +7226,25 @@ type SlotPipeline {
 "Stored state for an admission rule in a pipeline"
 type SlotPipelineAdmissionRuleStatus {
     "data field"
-    data: JSON
+    data: SlotAdmissionRuleData
     "id field"
     id: String!
+    "Flag to check if the rule has been overridden"
+    overridden: Boolean!
     "override field"
-    override: Boolean
-    "overrideMessage field"
-    overrideMessage: String
-    "timestamp field"
-    timestamp: LocalDateTime!
-    "user field"
-    user: String!
+    override: SlotAdmissionRuleOverride
 }
 
 "Change happening to a pipeline"
 type SlotPipelineChange {
+    "dataChanged field"
+    dataChanged: Boolean
     "id field"
     id: String!
     "message field"
-    message: String
-    "override field"
-    override: Boolean
+    message: String!
+    "overridden field"
+    overridden: Boolean
     "overrideMessage field"
     overrideMessage: String
     "pipeline field"
@@ -7249,8 +7265,10 @@ type SlotPipelineDeploymentCheck {
     check: DeployableCheck!
     "config field"
     config: SlotAdmissionRuleConfig!
+    "Flag to check if the rule has been overridden"
+    overridden: Boolean!
     "override field"
-    override: SlotPipelineAdmissionRuleStatus
+    override: SlotAdmissionRuleOverride
     "ruleData field"
     ruleData: JSON
 }

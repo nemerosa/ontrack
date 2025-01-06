@@ -38,4 +38,11 @@ interface SlotWorkflowService {
     fun deleteSlotWorkflow(slotWorkflow: SlotWorkflow)
     fun updateSlotWorkflow(slotWorkflow: SlotWorkflow)
 
+    fun overrideSlotWorkflowInstance(
+        pipeline: SlotPipeline,
+        slotWorkflowId: String,
+        slotWorkflowInstanceId: String,
+        message: String,
+    )
+
 }

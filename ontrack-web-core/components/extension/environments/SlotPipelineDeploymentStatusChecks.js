@@ -23,12 +23,11 @@ export default function SlotPipelineDeploymentStatusChecks({pipeline, onChange})
                                 status
                                 reason
                             }
+                            overridden
                             override {
-                                override
-                                overrideMessage
+                                message
                                 user
                                 timestamp
-                                data
                             }
                             config {
                                 id
@@ -77,22 +76,21 @@ export default function SlotPipelineDeploymentStatusChecks({pipeline, onChange})
                     title="Overridden"
                     render={
                         (_, item) => <Space>
-                            <YesNo id={`overridden-${item.config.name}`} value={item.override?.override}/>
+                            <YesNo id={`overridden-${item.config.name}`} value={item.overridden}/>
                             <SlotPipelineOverrideRuleButton
                                 pipeline={pipeline}
                                 check={item}
                                 onChange={onChange}
                             />
                             <PopoverInfoIcon
-                                condition={item.override?.override === true}
+                                condition={item.overridden}
                                 icon={<FaExclamationTriangle color="orange"/>}
                                 title="This check has been overridden"
                                 content={
                                     <Space direction="vertical">
                                         <Typography.Text
-                                            type="secondary">{item.check.override?.overrideMessage}</Typography.Text>
+                                            type="secondary">{item.check.override?.message}</Typography.Text>
                                         {/* TODO User & timestamp */}
-                                        {/* TODO Override data? */}
                                     </Space>
                                 }
                             />

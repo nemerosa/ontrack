@@ -67,7 +67,7 @@ class EnvironmentSlotAdmissionRule(
         pipeline: SlotPipeline,
         admissionRuleConfig: SlotAdmissionRuleConfig,
         ruleConfig: EnvironmentSlotAdmissionRuleConfig,
-        ruleData: SlotPipelineAdmissionRuleData<Any>?
+        ruleData: SlotAdmissionRuleTypedData<Any>?
     ): DeployableCheck {
         // Gets the previous slot
         val previousSlot = findPreviousSlot(pipeline.build, ruleConfig)

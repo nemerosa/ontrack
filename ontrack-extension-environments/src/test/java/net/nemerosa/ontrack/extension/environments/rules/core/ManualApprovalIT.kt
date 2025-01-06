@@ -38,13 +38,13 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
                 val state =
                     slotService.findPipelineAdmissionRuleStatusByAdmissionRuleConfigId(pipeline, admissionRuleConfig.id)
                 assertNotNull(state, "Manual approval state stored") {
-                    assertEquals("admin", it.user)
+                    assertEquals("admin", it.data?.user)
                     assertEquals(
                         ManualApprovalSlotAdmissionRuleData(
                             approval = true,
                             message = "With pleasure"
                         ),
-                        it.data?.parse()
+                        it.data?.data?.parse()
                     )
                 }
             }
@@ -73,13 +73,13 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
                 val state =
                     slotService.findPipelineAdmissionRuleStatusByAdmissionRuleConfigId(pipeline, admissionRuleConfig.id)
                 assertNotNull(state, "Manual approval state stored") {
-                    assertEquals("admin", it.user)
+                    assertEquals("admin", it.data?.user)
                     assertEquals(
                         ManualApprovalSlotAdmissionRuleData(
                             approval = false,
                             message = "No way"
                         ),
-                        it.data?.parse()
+                        it.data?.data?.parse()
                     )
                 }
             }
@@ -153,20 +153,19 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
                 assertFalse(check.check.status, "Manual approval rejected")
                 assertNotNull(check.override, "Manual rejection overridden") {
                     assertEquals("admin", it.user)
-                    assertTrue(it.override, "Overridden")
-                    assertEquals("Because I want to", it.overrideMessage)
+                    assertEquals("Because I want to", it.message)
                 }
 
                 val state =
                     slotService.findPipelineAdmissionRuleStatusByAdmissionRuleConfigId(pipeline, admissionRuleConfig.id)
                 assertNotNull(state, "Manual approval state stored") {
-                    assertEquals("admin", it.user)
+                    assertEquals("admin", it.data?.user)
                     assertEquals(
                         ManualApprovalSlotAdmissionRuleData(
                             approval = false,
                             message = "No way"
                         ),
-                        it.data?.parse()
+                        it.data?.data?.parse()
                     )
                 }
             }
@@ -212,7 +211,7 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
                     admissionRuleConfig.id
                 )
             assertNotNull(state, "Manual approval state stored") {
-                assertEquals(name, it.user)
+                assertEquals(name, it.data?.user)
             }
         }
     }

@@ -196,7 +196,7 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
             assertNotNull(change) {
                 assertEquals(SlotPipelineStatus.DEPLOYED, it.status)
                 assertEquals("Deployment finished", it.message)
-                assertEquals(false, it.override)
+                assertEquals(false, it.overridden)
                 assertEquals(null, it.overrideMessage)
             }
         }
@@ -221,8 +221,8 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
             assertNotNull(change) {
                 assertEquals(SlotPipelineStatus.DEPLOYED, it.status)
                 assertEquals("Deployment forced", it.message)
-                assertEquals(true, it.override)
-                assertEquals("Deployment was marked manually.", it.overrideMessage)
+                assertEquals(true, it.overridden)
+                assertEquals("Deployment was marked done manually.", it.overrideMessage)
             }
         }
     }
@@ -262,8 +262,9 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
                 "Admission rule status found"
             ) {
                 assertNull(it.data, "No stored status for this rule")
-                assertTrue(it.override, "Rule was overridden")
-                assertEquals("Because I want to", it.overrideMessage)
+                assertNotNull(it.override, "Rule was overridden") { override ->
+                    assertEquals("Because I want to", override.message)
+                }
             }
         }
     }
@@ -330,7 +331,7 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
                     .find { it.admissionRuleConfig.id == config.id }
 
             assertNotNull(ruleStatus, "Rule status data") {
-                val data = it.data?.parse<ManualApprovalSlotAdmissionRuleData>()
+                val data = it.data?.data?.parse<ManualApprovalSlotAdmissionRuleData>()
                 assertEquals(
                     ManualApprovalSlotAdmissionRuleData(
                         approval = true,

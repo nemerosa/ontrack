@@ -22,7 +22,8 @@ class GQLTypeSlotPipelineChange : GQLType {
             .localDateTimeField(SlotPipelineChange::timestamp)
             .enumField(SlotPipelineChange::status)
             .stringField(SlotPipelineChange::message)
-            .booleanField(SlotPipelineChange::override)
+            .booleanField(SlotPipelineChange::dataChanged)
+            .booleanField(SlotPipelineChange::overridden)
             .stringField(SlotPipelineChange::overrideMessage)
             .build()
 

@@ -53,7 +53,7 @@ interface SlotAdmissionRule<C, D> {
         pipeline: SlotPipeline,
         admissionRuleConfig: SlotAdmissionRuleConfig,
         ruleConfig: C,
-        ruleData: SlotPipelineAdmissionRuleData<D>?,
+        ruleData: SlotAdmissionRuleTypedData<D>?,
     ): DeployableCheck
 
     /**

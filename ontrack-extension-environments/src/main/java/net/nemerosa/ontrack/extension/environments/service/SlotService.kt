@@ -96,7 +96,7 @@ interface SlotService {
     /**
      * Gets the current status for a pipeline
      */
-    fun status(pipeline: SlotPipeline, skipWorkflowId: String? = null): SlotPipelineDeploymentStatus
+    fun status(pipelineId: String, skipWorkflowId: String? = null): SlotPipelineDeploymentStatus
 
     /**
      * Starts a deployment

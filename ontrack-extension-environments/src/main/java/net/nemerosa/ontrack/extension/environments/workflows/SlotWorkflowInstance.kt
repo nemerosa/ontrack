@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.environments.workflows
 
 import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.extension.environments.SlotAdmissionRuleOverride
 import net.nemerosa.ontrack.extension.environments.SlotPipeline
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
 import java.time.LocalDateTime
@@ -12,4 +13,5 @@ data class SlotWorkflowInstance(
     val pipeline: SlotPipeline,
     val slotWorkflow: SlotWorkflow,
     val workflowInstance: WorkflowInstance,
+    val override: SlotAdmissionRuleOverride? = null,
 )

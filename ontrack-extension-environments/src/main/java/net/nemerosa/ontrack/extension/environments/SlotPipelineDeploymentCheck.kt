@@ -6,9 +6,9 @@ data class SlotPipelineDeploymentCheck(
     val check: DeployableCheck,
     val config: SlotAdmissionRuleConfig,
     val ruleData: JsonNode?,
-    val override: SlotPipelineAdmissionRuleStatus? = null,
+    val override: SlotAdmissionRuleOverride? = null,
 ) {
-    fun withOverride(override: SlotPipelineAdmissionRuleStatus) = SlotPipelineDeploymentCheck(
+    fun withOverride(override: SlotAdmissionRuleOverride) = SlotPipelineDeploymentCheck(
         check = check,
         config = config,
         ruleData = ruleData,

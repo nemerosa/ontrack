@@ -1,9 +1,7 @@
 package net.nemerosa.ontrack.extension.environments.storage
 
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.extension.environments.SlotAdmissionRuleConfig
-import net.nemerosa.ontrack.extension.environments.SlotPipeline
-import net.nemerosa.ontrack.extension.environments.SlotPipelineAdmissionRuleStatus
+import net.nemerosa.ontrack.extension.environments.*
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
@@ -18,18 +16,19 @@ class SlotPipelineAdmissionRuleStatusRepository(
     fun saveStatus(slotPipelineAdmissionRuleStatus: SlotPipelineAdmissionRuleStatus) {
         namedParameterJdbcTemplate!!.update(
             """
-                INSERT INTO ENV_SLOT_PIPELINE_ADMISSION_RULE_STATUS(ID, PIPELINE_ID, ADMISSION_RULE_CONFIG_ID, "USER", TIMESTAMP, DATA, OVERRIDE, OVERRIDE_MESSAGE)
-                VALUES(:id, :pipelineId, :admissionRuleConfigId, :user, :timestamp, CAST(:data AS JSONB), :override, :overrideMessage)
+                INSERT INTO ENV_SLOT_PIPELINE_ADMISSION_RULE_STATUS(ID, PIPELINE_ID, ADMISSION_RULE_CONFIG_ID, DATA, DATA_USER, DATA_TIMESTAMP, OVERRIDE_USER, OVERRIDE_TIMESTAMP, OVERRIDE_MESSAGE)
+                VALUES(:id, :pipelineId, :admissionRuleConfigId, CAST(:data AS JSONB), :dataUser, :dataTimestamp, :overrideUser, :overrideTimestamp, :overrideMessage)
             """.trimIndent(),
             mapOf(
                 "id" to slotPipelineAdmissionRuleStatus.id,
                 "pipelineId" to slotPipelineAdmissionRuleStatus.pipeline.id,
                 "admissionRuleConfigId" to slotPipelineAdmissionRuleStatus.admissionRuleConfig.id,
-                "user" to slotPipelineAdmissionRuleStatus.user,
-                "timestamp" to Time.store(slotPipelineAdmissionRuleStatus.timestamp),
-                "data" to slotPipelineAdmissionRuleStatus.data?.let { writeJson(it) },
-                "override" to slotPipelineAdmissionRuleStatus.override,
-                "overrideMessage" to slotPipelineAdmissionRuleStatus.overrideMessage,
+                "data" to slotPipelineAdmissionRuleStatus.data?.data?.let { writeJson(it) },
+                "dataUser" to slotPipelineAdmissionRuleStatus.data?.user,
+                "dataTimestamp" to slotPipelineAdmissionRuleStatus.data?.timestamp?.let { Time.store(it) },
+                "overrideUser" to slotPipelineAdmissionRuleStatus.override?.user,
+                "overrideTimestamp" to slotPipelineAdmissionRuleStatus.override?.timestamp?.let { Time.store(it) },
+                "overrideMessage" to slotPipelineAdmissionRuleStatus.override?.message,
             )
         )
     }
@@ -78,11 +77,20 @@ class SlotPipelineAdmissionRuleStatusRepository(
             pipeline.slot,
             rs.getString("ADMISSION_RULE_CONFIG_ID")
         ),
-        override = rs.getBoolean("override"),
-        overrideMessage = rs.getString("override_message"),
-        user = rs.getString("user"),
-        timestamp = Time.fromStorage(rs.getString("timestamp"))!!,
-        data = readJson(rs, "data"),
+        data = readJson(rs, "data")?.let { data ->
+            SlotAdmissionRuleData(
+                user = rs.getString("data_user"),
+                timestamp = dateTimeFromDB(rs.getString("data_timestamp"))!!,
+                data = data,
+            )
+        },
+        override = rs.getString("override_user")?.let { user ->
+            SlotAdmissionRuleOverride(
+                user = user,
+                timestamp = dateTimeFromDB(rs.getString("override_timestamp"))!!,
+                message = rs.getString("override_message"),
+            )
+        },
     )
 
 }

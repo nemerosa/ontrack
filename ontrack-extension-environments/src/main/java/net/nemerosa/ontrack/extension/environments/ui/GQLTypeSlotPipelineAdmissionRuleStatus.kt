@@ -4,9 +4,8 @@ import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.extension.environments.SlotPipelineAdmissionRuleStatus
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
-import net.nemerosa.ontrack.graphql.support.booleanField
-import net.nemerosa.ontrack.graphql.support.jsonField
-import net.nemerosa.ontrack.graphql.support.localDateTimeField
+import net.nemerosa.ontrack.graphql.support.booleanFieldFunction
+import net.nemerosa.ontrack.graphql.support.field
 import net.nemerosa.ontrack.graphql.support.stringField
 import org.springframework.stereotype.Component
 
@@ -19,10 +18,13 @@ class GQLTypeSlotPipelineAdmissionRuleStatus : GQLType {
             .name(typeName)
             .description("Stored state for an admission rule in a pipeline")
             .stringField(SlotPipelineAdmissionRuleStatus::id)
-            .localDateTimeField(SlotPipelineAdmissionRuleStatus::timestamp)
-            .stringField(SlotPipelineAdmissionRuleStatus::user)
-            .jsonField(SlotPipelineAdmissionRuleStatus::data)
-            .booleanField(SlotPipelineAdmissionRuleStatus::override)
-            .stringField(SlotPipelineAdmissionRuleStatus::overrideMessage)
+            .field(SlotPipelineAdmissionRuleStatus::data)
+            .field(SlotPipelineAdmissionRuleStatus::override)
+            .booleanFieldFunction<SlotPipelineAdmissionRuleStatus>(
+                "overridden",
+                "Flag to check if the rule has been overridden"
+            ) {
+                it.override != null
+            }
             .build()
 }

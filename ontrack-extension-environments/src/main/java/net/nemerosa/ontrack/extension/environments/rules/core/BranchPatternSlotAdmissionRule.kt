@@ -54,7 +54,7 @@ class BranchPatternSlotAdmissionRule(
         pipeline: SlotPipeline,
         admissionRuleConfig: SlotAdmissionRuleConfig,
         ruleConfig: BranchPatternSlotAdmissionRuleConfig,
-        ruleData: SlotPipelineAdmissionRuleData<Any>?
+        ruleData: SlotAdmissionRuleTypedData<Any>?
     ): DeployableCheck =
         DeployableCheck.check(
             check = isBuildEligible(

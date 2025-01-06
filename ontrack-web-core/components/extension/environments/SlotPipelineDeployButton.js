@@ -34,8 +34,7 @@ export default function SlotPipelineDeployButton({pipeline, onDeploy, size}) {
                 override {
                     timestamp
                     user
-                    override
-                    overrideMessage
+                    message
                 }
             }
         }

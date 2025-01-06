@@ -48,7 +48,7 @@ export default function SlotPipelineDeploymentStatus({pipeline, onChange}) {
                                 status
                                 user
                                 timestamp
-                                override
+                                overridden
                                 overrideMessage
                             }
                         }

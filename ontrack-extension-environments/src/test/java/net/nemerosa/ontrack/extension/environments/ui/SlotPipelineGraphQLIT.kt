@@ -115,8 +115,7 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                                     override {
                                         timestamp
                                         user
-                                        override
-                                        overrideMessage
+                                        message
                                     }
                                 }
                             }
@@ -167,8 +166,7 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                                     override {
                                         timestamp
                                         user
-                                        override
-                                        overrideMessage
+                                        message
                                     }
                                 }
                             }
@@ -235,8 +233,7 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                                     override {
                                         timestamp
                                         user
-                                        override
-                                        overrideMessage
+                                        message
                                     }
                                 }
                             }
@@ -307,8 +304,7 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                                     ruleData
                                     override {
                                         user
-                                        override
-                                        overrideMessage
+                                        message
                                     }
                                 }
                             }
@@ -337,8 +333,7 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                                         "ruleData" to null,
                                         "override" to mapOf(
                                             "user" to "admin",
-                                            "override" to true,
-                                            "overrideMessage" to "Because I want to"
+                                            "message" to "Because I want to"
                                         ),
                                     )
                                 )
@@ -444,7 +439,7 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                     .find { it.admissionRuleConfig.id == config.id }
 
             assertNotNull(ruleStatus, "Rule status data") {
-                val data = it.data?.parse<ManualApprovalSlotAdmissionRuleData>()
+                val data = it.data?.data?.parse<ManualApprovalSlotAdmissionRuleData>()
                 assertEquals(
                     ManualApprovalSlotAdmissionRuleData(
                         approval = true,

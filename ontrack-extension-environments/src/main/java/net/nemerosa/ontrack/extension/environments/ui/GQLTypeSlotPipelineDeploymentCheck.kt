@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.environments.SlotPipelineDeploymentCheck
 import net.nemerosa.ontrack.extension.environments.security.SlotPipelineOverride
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
+import net.nemerosa.ontrack.graphql.support.booleanFieldFunction
 import net.nemerosa.ontrack.graphql.support.field
 import net.nemerosa.ontrack.graphql.support.jsonField
 import net.nemerosa.ontrack.model.security.SecurityService
@@ -26,6 +27,12 @@ class GQLTypeSlotPipelineDeploymentCheck(
             .field(SlotPipelineDeploymentCheck::config)
             .jsonField(SlotPipelineDeploymentCheck::ruleData)
             .field(SlotPipelineDeploymentCheck::override)
+            .booleanFieldFunction<SlotPipelineDeploymentCheck>(
+                "overridden",
+                "Flag to check if the rule has been overridden"
+            ) {
+                it.override != null
+            }
             .field {
                 it.name("canBeOverridden")
                     .description("True if the user is allowed to override this rule")

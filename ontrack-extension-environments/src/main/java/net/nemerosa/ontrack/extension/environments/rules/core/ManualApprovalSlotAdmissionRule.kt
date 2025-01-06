@@ -49,7 +49,7 @@ class ManualApprovalSlotAdmissionRule(
         pipeline: SlotPipeline,
         admissionRuleConfig: SlotAdmissionRuleConfig,
         ruleConfig: ManualApprovalSlotAdmissionRuleConfig,
-        ruleData: SlotPipelineAdmissionRuleData<ManualApprovalSlotAdmissionRuleData>?
+        ruleData: SlotAdmissionRuleTypedData<ManualApprovalSlotAdmissionRuleData>?
     ): DeployableCheck {
         return if (ruleData?.data != null) {
             if (!ruleData.data.approval) {

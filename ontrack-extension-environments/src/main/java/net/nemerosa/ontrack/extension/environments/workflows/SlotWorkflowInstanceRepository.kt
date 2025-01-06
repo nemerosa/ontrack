@@ -1,11 +1,14 @@
 package net.nemerosa.ontrack.extension.environments.workflows
 
+import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.extension.environments.SlotAdmissionRuleOverride
 import net.nemerosa.ontrack.extension.environments.SlotPipeline
 import net.nemerosa.ontrack.extension.environments.storage.SlotPipelineRepository
 import net.nemerosa.ontrack.extension.workflows.repository.WorkflowInstanceRepository
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
+import java.time.LocalDateTime
 import javax.sql.DataSource
 
 @Repository
@@ -72,6 +75,15 @@ class SlotWorkflowInstanceRepository(
             slotWorkflow = slotWorkflowRepository.getSlotWorkflowById(rs.getString("slot_workflow_id")),
             workflowInstance = workflowInstanceRepository.findWorkflowInstance(workflowInstanceId)
                 ?: error("Cannot find workflow instance with ID: $workflowInstanceId"),
+            override = if (rs.getBoolean("override")) {
+                SlotAdmissionRuleOverride(
+                    user = rs.getString("user"),
+                    timestamp = dateTimeFromDB(rs.getString("timestamp")) ?: Time.now,
+                    message = rs.getString("override_message")
+                )
+            } else {
+                null
+            },
         )
     }
 
@@ -93,5 +105,21 @@ class SlotWorkflowInstanceRepository(
         ) { rs, _ ->
             toSlotWorkflowInstance(rs)
         }.firstOrNull()
+
+    fun override(slotWorkflowInstance: SlotWorkflowInstance, user: String, timestamp: LocalDateTime, message: String) {
+        namedParameterJdbcTemplate!!.update(
+            """
+                UPDATE ENV_SLOT_WORKFLOW_INSTANCES
+                SET "USER" = :user, TIMESTAMP = :timestamp, OVERRIDE = TRUE, OVERRIDE_MESSAGE = :message
+                WHERE ID = :id
+            """.trimIndent(),
+            mapOf(
+                "id" to slotWorkflowInstance.id,
+                "user" to user,
+                "timestamp" to dateTimeForDB(timestamp),
+                "message" to message,
+            )
+        )
+    }
 
 }

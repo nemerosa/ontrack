@@ -53,7 +53,7 @@ class GQLTypeSlotPipeline(
                     .dataFetcher { env ->
                         val pipeline: SlotPipeline = env.getSource()
                         slotService.status(
-                            pipeline = pipeline,
+                            pipelineId = pipeline.id,
                         )
                     }
             }

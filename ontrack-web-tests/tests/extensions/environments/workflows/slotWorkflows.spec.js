@@ -53,9 +53,8 @@ test('API - workflows on creation participate into the pipeline check list', asy
     await expect(check.check.status).toBe(false)
     await expect(check.check.reason).toMatch(/^(Workflow started|Workflow running)$/)
     await expect(check.config.ruleId).toStrictEqual('workflow')
-    await expect(check.config.ruleConfig).toStrictEqual({
-        slotWorkflowId: slotWorkflow.id
-    })
+    await expect(check.config.ruleConfig?.slotWorkflowId).toStrictEqual(slotWorkflow.id)
+    await expect(check.config.ruleConfig?.slotWorkflowInstanceId).toHaveLength(36)
     await expect(check.ruleData?.slotWorkflowInstanceId).toHaveLength(36)
 
     // Waiting for the deployment to be deployable

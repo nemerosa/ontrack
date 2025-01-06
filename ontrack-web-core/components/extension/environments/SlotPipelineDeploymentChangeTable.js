@@ -35,7 +35,7 @@ export default function SlotPipelineDeploymentChangeTable({changes}) {
                     title="Overridden"
                     render={
                         (_, change) => <Space>
-                            <YesNo value={change.override}/>
+                            <YesNo value={change.overridden}/>
                             <Typography.Text>{change.overrideMessage}</Typography.Text>
                         </Space>
                     }

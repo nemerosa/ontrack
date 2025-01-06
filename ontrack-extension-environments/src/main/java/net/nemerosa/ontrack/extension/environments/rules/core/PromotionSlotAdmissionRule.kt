@@ -55,7 +55,7 @@ class PromotionSlotAdmissionRule(
         pipeline: SlotPipeline,
         admissionRuleConfig: SlotAdmissionRuleConfig,
         ruleConfig: PromotionSlotAdmissionRuleConfig,
-        ruleData: SlotPipelineAdmissionRuleData<Any>?
+        ruleData: SlotAdmissionRuleTypedData<Any>?
     ): DeployableCheck {
         val pl = structureService.findPromotionLevelByName(
             pipeline.build.project.name,

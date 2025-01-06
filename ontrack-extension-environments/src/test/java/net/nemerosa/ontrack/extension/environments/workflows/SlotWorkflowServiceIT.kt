@@ -9,7 +9,6 @@ import net.nemerosa.ontrack.extension.queue.QueueNoAsync
 import net.nemerosa.ontrack.extension.workflows.WorkflowTestSupport
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceStatus
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
-import net.nemerosa.ontrack.json.asJson
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
@@ -157,10 +156,8 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
                 assertEquals("Workflow successful", check.check.reason)
                 assertEquals("workflow", check.config.ruleId)
                 assertEquals(
-                    mapOf(
-                        "slotWorkflowId" to slotWorkflow.id
-                    ).asJson(),
-                    check.config.ruleConfig
+                    slotWorkflow.id,
+                    check.config.ruleConfig.path("slotWorkflowId").asText(),
                 )
                 assertEquals(
                     slotWorkflow.workflow.name,
@@ -221,6 +218,57 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
             val end = slotService.finishDeployment(deployingPipeline)
             assertFalse(end.deployed, "Pipeline could not be deployed")
 
+        }
+    }
+
+    @Test
+    fun `Workflow executions can be overridden`() {
+        slotWorkflowTestSupport.withSlotWorkflow(
+            trigger = SlotWorkflowTrigger.DEPLOYING,
+            error = true,
+        ) { slot, _ ->
+            // Creating a pipeline
+            val pipeline = slotTestSupport.createPipeline(slot = slot)
+
+            // Launching the pipeline, this will create a failed workflow
+            val status = slotService.startDeployment(pipeline, dryRun = false)
+            assertTrue(status.status, "Pipeline has started its deployment")
+
+            // Waiting for the pipeline's workflows to finish
+            slotWorkflowTestSupport.waitForSlotWorkflowsToFinish(pipeline, SlotWorkflowTrigger.DEPLOYING)
+
+            // The workflow has failed, and prevents the pipeline completion
+            var end = slotService.finishDeployment(pipeline)
+            assertFalse(end.deployed, "Pipeline could not be deployed")
+
+            // Getting the checks
+            val deploymentStatus = slotService.status(pipeline.id)
+            val workflowCheck = deploymentStatus.checks.find { it.config.ruleId == "workflow" }
+                ?: fail("Missing workflow check")
+            assertNull(workflowCheck.override)
+
+            // Now, we override the workflow status
+            slotService.overrideAdmissionRule(
+                pipeline = pipeline,
+                admissionRuleConfig = workflowCheck.config,
+                message = "The workflow failed, but we want to carry on",
+            )
+
+            // Checks that the workflow has been overridden
+            val newDeploymentStatus = slotService.status(pipeline.id)
+            val newWorkflowCheck = newDeploymentStatus.checks.find { it.config.ruleId == "workflow" }
+                ?: fail("Missing workflow check")
+            assertEquals("admin", newWorkflowCheck.override?.user)
+            assertNotNull(newWorkflowCheck.override?.timestamp)
+            assertEquals("The workflow failed, but we want to carry on", newWorkflowCheck.override?.message)
+
+            // ... and complete the deployment again
+            end = slotService.finishDeployment(pipeline)
+            assertTrue(end.deployed, "Pipeline can now be deployed")
+
+            // Reloading the pipeline's status
+            val deployedPipeline = slotService.getPipelineById(pipeline.id)
+            assertEquals(SlotPipelineStatus.DEPLOYED, deployedPipeline.status)
         }
     }
 

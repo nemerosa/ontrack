@@ -1,7 +1,9 @@
 package net.nemerosa.ontrack.extension.environments.workflows
 
+import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.environments.Slot
 import net.nemerosa.ontrack.extension.environments.SlotPipeline
+import net.nemerosa.ontrack.extension.environments.security.SlotPipelineOverride
 import net.nemerosa.ontrack.extension.environments.security.SlotPipelineWorkflowRun
 import net.nemerosa.ontrack.extension.environments.security.SlotUpdate
 import net.nemerosa.ontrack.extension.environments.security.SlotView
@@ -122,5 +124,32 @@ class SlotWorkflowServiceImpl(
     override fun updateSlotWorkflow(slotWorkflow: SlotWorkflow) {
         securityService.checkSlotAccess<SlotUpdate>(slotWorkflow.slot)
         slotWorkflowRepository.updateSlotWorkflow(slotWorkflow)
+    }
+
+    override fun overrideSlotWorkflowInstance(
+        pipeline: SlotPipeline,
+        slotWorkflowId: String,
+        slotWorkflowInstanceId: String,
+        message: String
+    ) {
+        securityService.checkSlotAccess<SlotUpdate>(pipeline.slot)
+        securityService.checkSlotAccess<SlotPipelineOverride>(pipeline.slot)
+        // Getting the slot workflow instance by ID
+        val slotWorkflowInstance = getSlotWorkflowInstanceById(slotWorkflowInstanceId)
+        // Checks the pipeline is the same
+        if (slotWorkflowInstance.pipeline.id != pipeline.id) {
+            error("Mismatch between slot workflow instance and pipeline")
+        }
+        // Checks the slot workflow is the same
+        if (slotWorkflowInstance.slotWorkflow.id != slotWorkflowId) {
+            error("Mismatch between slot workflow instance and slot workflow")
+        }
+        // Saving the override status
+        slotWorkflowInstanceRepository.override(
+            slotWorkflowInstance = slotWorkflowInstance,
+            user = securityService.currentSignature.user.name,
+            timestamp = Time.now,
+            message = message,
+        )
     }
 }
