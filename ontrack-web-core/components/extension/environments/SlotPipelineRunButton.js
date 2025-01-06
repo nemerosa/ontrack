@@ -6,7 +6,7 @@ import LoadingInline from "@components/common/LoadingInline";
 import {gql} from "graphql-request";
 import {getUserErrors} from "@components/services/graphql-utils";
 
-export default function SlotPipelineDeployButton({pipeline, onDeploy, size}) {
+export default function SlotPipelineRunButton({pipeline, onDeploy, size}) {
 
     const [messageApi, contextHolder] = message.useMessage()
     const client = useGraphQLClient()
@@ -119,15 +119,15 @@ export default function SlotPipelineDeployButton({pipeline, onDeploy, size}) {
                 <LoadingInline loading={loadingDeployable} text="">
                     <Space>
                         {
-                            pipeline.status === 'ONGOING' && deploymentStatus.status &&
+                            pipeline.status === 'CANDIDATE' && deploymentStatus.status &&
                             <Popconfirm
-                                title="Deploying pipeline"
-                                description="Deploying this pipeline may trigger an event to perform an actual deployment. Do you want to continue?"
+                                title="Running deployment"
+                                description="Running this deployment may affect some running services. Do you want to continue?"
                                 onConfirm={deploy}
                             >
                                 <Button
                                     icon={<FaPlay color="green"/>}
-                                    title="Deploys this pipeline"
+                                    title="Runs this deployment"
                                     loading={deploying}
                                     data-testid={`pipeline-deploy-${pipeline.id}`}
                                     size={size}

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.environments.workflows
 
 import net.nemerosa.ontrack.extension.environments.Slot
 import net.nemerosa.ontrack.extension.environments.SlotPipeline
+import net.nemerosa.ontrack.extension.environments.SlotPipelineStatus
 import net.nemerosa.ontrack.extension.environments.SlotTestSupport
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.it.waitUntil
@@ -18,7 +19,7 @@ class SlotWorkflowTestSupport(
 
     fun waitForSlotWorkflowsToFinish(
         pipeline: SlotPipeline,
-        trigger: SlotWorkflowTrigger,
+        trigger: SlotPipelineStatus,
         timeout: Duration = 10.seconds,
     ) {
         val slotWorkflowInstances = slotWorkflowService.getSlotWorkflowInstancesByPipeline(pipeline)
@@ -43,7 +44,7 @@ class SlotWorkflowTestSupport(
     }
 
     fun withSlotWorkflow(
-        trigger: SlotWorkflowTrigger,
+        trigger: SlotPipelineStatus,
         waitMs: Int = 0,
         error: Boolean = false,
         code: (slot: Slot, slotWorkflow: SlotWorkflow) -> Unit

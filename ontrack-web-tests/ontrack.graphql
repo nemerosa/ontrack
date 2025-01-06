@@ -31,7 +31,7 @@ interface ProjectEntity {
 }
 
 "Information about the promotion of a build"
-union BuildPromotionInfoItem = PromotionLevel | PromotionRun | Slot | SlotPipeline
+union BuildPromotionInfoItemData = EnvironmentBuildCount | PromotionLevel | PromotionRun | SlotPipeline
 
 type Account {
     "Source of authentication (builtin, ldap, etc.)"
@@ -636,6 +636,11 @@ type Build implements Authorizable & ProjectEntity {
     "Link to the GitHub Workflow Run which created this build."
     buildGitHubWorkflowRunProperty: Property
     creation: Signature
+    "Gets the list of slots where this build is actually deployed"
+    currentDeployments(
+        "Qualifier to use"
+        qualifier: String = ""
+    ): [SlotPipeline!]!
     "List of decorations"
     decorations(
         "Fully qualified name of the decoration type"
@@ -703,7 +708,12 @@ type Build implements Authorizable & ProjectEntity {
     "Run info associated with this build"
     runInfo: RunInfo
     "List of pipelines this build is associated with"
-    slotPipelines: [SlotPipeline!]!
+    slotPipelines(
+        "Sorting by decreasing environment order"
+        sortedByEnvironment: Boolean,
+        "Filtering on the pipeline status"
+        status: SlotPipelineStatus
+    ): [SlotPipeline!]!
     "List of builds using this one."
     usedBy(
         "Keeps only links targeted from this branch. `project` argument is also required."
@@ -911,10 +921,16 @@ type BuildPaginated {
 
 "Information about the promotions of a build"
 type BuildPromotionInfo {
-    "Items not linked to any promotion"
-    noPromotionItems: [BuildPromotionInfoItem!]!
-    "withPromotionItems field"
-    withPromotionItems: [LinkedBuildPromotionInfoItems!]!
+    "items field"
+    items: [BuildPromotionInfoItem!]!
+}
+
+"Information about the promotions of a build"
+type BuildPromotionInfoItem {
+    "Item's data"
+    data: BuildPromotionInfoItemData!
+    "promotionLevel field"
+    promotionLevel: PromotionLevel
 }
 
 "Output type for the bulkUpdatePromotionLevelById mutation."
@@ -1386,6 +1402,12 @@ type DeleteConfigurationPayload implements Payload {
     errors: [UserError]
 }
 
+"Output type for the deleteEnvironment mutation."
+type DeleteEnvironmentPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
 "Output type for the deleteGenericProperty mutation."
 type DeleteGenericPropertyPayload implements Payload {
     "List of errors"
@@ -1700,6 +1722,18 @@ type DeleteSlotAdmissionRuleConfigPayload implements Payload {
     errors: [UserError]
 }
 
+"Output type for the deleteSlot mutation."
+type DeleteSlotPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
+"Output type for the deleteSlotWorkflow mutation."
+type DeleteSlotWorkflowPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
 "Output type for the deleteSubscription mutation."
 type DeleteSubscriptionPayload implements Payload {
     "List of errors"
@@ -1889,14 +1923,29 @@ type Environment {
     description: String
     "id field"
     id: String!
+    "image field"
+    image: Boolean
     "name field"
     name: String!
     "order field"
     order: Int
     "List of slots for this environment"
-    slots: [Slot!]!
+    slots(
+        "List of project names"
+        projects: [String!]
+    ): [Slot!]!
     "tags field"
     tags: [String!]!
+}
+
+"Number of environments where a build is deployed"
+type EnvironmentBuildCount {
+    "Associated build"
+    build: Build!
+    "Number of environments where a build is deployed"
+    count: Int
+    "ID of the count (build ID)"
+    id: ID!
 }
 
 "EventSubscriptionPayload"
@@ -3186,9 +3235,15 @@ type LicenseResponse {
 }
 
 type LicensedFeature {
+    data: [LicensedFeatureData!]!
     enabled: Boolean!
     id: String!
     name: String!
+}
+
+type LicensedFeatureData {
+    name: String!
+    value: String!
 }
 
 "Output type for the linkBuildById mutation."
@@ -3217,14 +3272,6 @@ type LinkChange {
     qualifier: String!
     "to field"
     to: Build
-}
-
-"Information linked to promotion levels"
-type LinkedBuildPromotionInfoItems {
-    "Items linked to this promotion"
-    items: [BuildPromotionInfoItem!]!
-    "promotionLevel field"
-    promotionLevel: PromotionLevel!
 }
 
 "Output type for the linksBuild mutation."
@@ -3486,6 +3533,11 @@ type Mutation {
     ): DeleteConfigurationPayload
     "Deletes a dashboard"
     deleteDashboard(input: DeleteDashboardInput!): DeletionPayload
+    "Deletes an existing environment"
+    deleteEnvironment(
+        "Input for the mutation"
+        input: DeleteEnvironmentInput
+    ): DeleteEnvironmentPayload
     "Generic deletion for a property and an entity"
     deleteGenericProperty(
         "Input for the mutation"
@@ -3688,11 +3740,21 @@ type Mutation {
         "Input for the mutation"
         input: DeletePromotionRunMetaInfoPropertyByIdInput
     ): DeletePromotionRunMetaInfoPropertyByIdPayload
+    "Deletes a slot using its ID"
+    deleteSlot(
+        "Input for the mutation"
+        input: DeleteSlotInput
+    ): DeleteSlotPayload
     "Deletes an admission rule for a slot"
     deleteSlotAdmissionRuleConfig(
         "Input for the mutation"
         input: DeleteSlotAdmissionRuleConfigInput
     ): DeleteSlotAdmissionRuleConfigPayload
+    "Deletes a workflow from a slot"
+    deleteSlotWorkflow(
+        "Input for the mutation"
+        input: DeleteSlotWorkflowInput
+    ): DeleteSlotWorkflowPayload
     "Deletes an existing subscription using its ID"
     deleteSubscription(
         "Input for the mutation"
@@ -3942,6 +4004,11 @@ type Mutation {
         "Input for the mutation"
         input: SaveSlotAdmissionRuleConfigInput
     ): SaveSlotAdmissionRuleConfigPayload
+    "Add or saves a workflow into an existing slot"
+    saveSlotWorkflow(
+        "Input for the mutation"
+        input: SaveSlotWorkflowInput
+    ): SaveSlotWorkflowPayload
     "Saves a workflow which is defined as YAML"
     saveYamlWorkflow(
         "Input for the mutation"
@@ -4837,6 +4904,11 @@ type Project implements Authorizable & ProjectEntity {
     scmCatalogEntry: SCMCatalogEntry
     "List of saved SCM file filters for the project"
     scmFileChangeFilters: SCMFileChangeFilters!
+    "Graph of environment slots for a project"
+    slotGraph(
+        "Qualifier for the slots"
+        qualifier: String = ""
+    ): SlotGraph!
     "Association with a SonarQube project."
     sonarQubeProperty: Property
     "Allows to disable or delete stale branches"
@@ -4956,6 +5028,13 @@ type ProjectCategoryIndicators {
     ): IndicatorCategoryStats
     "List of indicators"
     indicators: [ProjectIndicator!]!
+}
+
+type ProjectEntityID {
+    "Project entity ID"
+    id: ID
+    "Project entity type"
+    type: ProjectEntityType!
 }
 
 "Information about a project entity"
@@ -5450,6 +5529,11 @@ type Query {
     ): ProjectEntityInformation
     "Collection of entity counts"
     entityCounts: EntityCounts!
+    "Getting an environment using its ID"
+    environmentById(
+        "ID of the environment"
+        id: String!
+    ): Environment
     "Getting an environment using its name"
     environmentByName(
         "Name of the environment"
@@ -6198,6 +6282,14 @@ type SaveSlotAdmissionRuleConfigPayload implements Payload {
     errors: [UserError]
 }
 
+"Output type for the saveSlotWorkflow mutation."
+type SaveSlotWorkflowPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Created or updated slot workflow"
+    slotWorkflow: SlotWorkflow
+}
+
 "Output type for the saveYamlWorkflow mutation."
 type SaveYamlWorkflowPayload implements Payload {
     "List of errors"
@@ -6260,6 +6352,16 @@ type SearchResultType {
 type SelectDashboardPayload implements PayloadInterface {
     "List of errors"
     errors: [PayloadUserError]
+}
+
+"Minimal form for an event"
+type SerializableEvent {
+    "List of entities"
+    entities: [ProjectEntityID!]!
+    "eventType field"
+    eventType: String!
+    "List of arbitrary values"
+    values: [NameValue!]!
 }
 
 "Service configuration or data associated with an ID"
@@ -6997,6 +7099,8 @@ type Slot implements Authorizable {
     eligibleBuild: Build
     "Paginated list of eligible builds"
     eligibleBuilds(
+        "If true, restricts the list of builds to the ones which can actually be deployed."
+        deployable: Boolean,
         "Offset for the page"
         offset: Int = 0,
         "Size of the page"
@@ -7019,6 +7123,8 @@ type Slot implements Authorizable {
     project: Project!
     "qualifier field"
     qualifier: String!
+    "List of workflows for this slot"
+    workflows: [SlotWorkflow!]!
 }
 
 "Admission rule"
@@ -7043,10 +7149,34 @@ type SlotAdmissionRuleConfig {
     ruleId: String!
 }
 
+type SlotAdmissionRuleData {
+    "data field"
+    data: JSON
+    "timestamp field"
+    timestamp: LocalDateTime!
+    "user field"
+    user: String!
+}
+
 "Input for an admission rule"
 type SlotAdmissionRuleInput {
     "config field"
     config: SlotAdmissionRuleConfig!
+}
+
+type SlotAdmissionRuleOverride {
+    "message field"
+    message: JSON
+    "timestamp field"
+    timestamp: LocalDateTime!
+    "user field"
+    user: String!
+}
+
+"Graph of slots for a project"
+type SlotGraph {
+    "slotNodes field"
+    slotNodes: [SlotNode!]!
 }
 
 "Holds a list of slots"
@@ -7055,13 +7185,21 @@ type SlotList {
     slots: [Slot!]!
 }
 
+"Node for a slot in a graph"
+type SlotNode {
+    "parents field"
+    parents: [Slot!]!
+    "slot field"
+    slot: Slot!
+}
+
 "Pipeline for a slot"
 type SlotPipeline {
     "build field"
     build: Build!
     "Changes having occurred to the pipeline"
     changes: [SlotPipelineChange!]!
-    "Deployment status for the pipeline"
+    "Current status for the pipeline"
     deploymentStatus: SlotPipelineDeploymentStatus
     "end field"
     end: LocalDateTime
@@ -7088,27 +7226,25 @@ type SlotPipeline {
 "Stored state for an admission rule in a pipeline"
 type SlotPipelineAdmissionRuleStatus {
     "data field"
-    data: JSON
+    data: SlotAdmissionRuleData
     "id field"
     id: String!
+    "Flag to check if the rule has been overridden"
+    overridden: Boolean!
     "override field"
-    override: Boolean
-    "overrideMessage field"
-    overrideMessage: String
-    "timestamp field"
-    timestamp: LocalDateTime!
-    "user field"
-    user: String!
+    override: SlotAdmissionRuleOverride
 }
 
 "Change happening to a pipeline"
 type SlotPipelineChange {
+    "dataChanged field"
+    dataChanged: Boolean
     "id field"
     id: String!
     "message field"
-    message: String
-    "override field"
-    override: Boolean
+    message: String!
+    "overridden field"
+    overridden: Boolean
     "overrideMessage field"
     overrideMessage: String
     "pipeline field"
@@ -7129,8 +7265,10 @@ type SlotPipelineDeploymentCheck {
     check: DeployableCheck!
     "config field"
     config: SlotAdmissionRuleConfig!
+    "Flag to check if the rule has been overridden"
+    overridden: Boolean!
     "override field"
-    override: SlotPipelineAdmissionRuleStatus
+    override: SlotAdmissionRuleOverride
     "ruleData field"
     ruleData: JSON
 }
@@ -7181,7 +7319,7 @@ type SlotWorkflow {
     "Slot this workflow is registered for"
     slot: Slot!
     "Event which triggers this workflow"
-    trigger: SlotWorkflowTrigger!
+    trigger: SlotPipelineStatus!
     "Workflow to run"
     workflow: Workflow!
 }
@@ -7940,28 +8078,14 @@ type Workflow {
     nodes: [WorkflowNode!]!
 }
 
-"Workflow context, data which is passed to the workflow initially"
-type WorkflowContext {
-    "data field"
-    data: [WorkflowContextData!]!
-}
-
-"Data in a workflow context"
-type WorkflowContextData {
-    "key field"
-    key: String!
-    "value field"
-    value: JSON
-}
-
 "Running workflow instance"
 type WorkflowInstance {
-    "context field"
-    context: WorkflowContext!
     "durationMs field"
     durationMs: Int
     "endTime field"
     endTime: LocalDateTime
+    "event field"
+    event: SerializableEvent!
     "Is the workflow finished?"
     finished: Boolean!
     "id field"
@@ -8229,17 +8353,9 @@ enum SCMChangeLogFileChangeType {
 "List of pipelines for a status"
 enum SlotPipelineStatus {
     CANCELLED
-    DEPLOYED
-    DEPLOYING
-    ERROR
-    ONGOING
-}
-
-"List of triggers for the slot workflows"
-enum SlotWorkflowTrigger {
-    CREATION
-    DEPLOYED
-    DEPLOYING
+    CANDIDATE
+    DONE
+    RUNNING
 }
 
 "Class of tokens"
@@ -8264,11 +8380,12 @@ enum ValidationStampFilterScope {
 
 "Status of a node in a workflow"
 enum WorkflowInstanceNodeStatus {
+    CANCELLED
+    CREATED
     ERROR
-    IDLE
     STARTED
-    STOPPED
     SUCCESS
+    WAITING
 }
 
 "Status of a running workflow"
@@ -8297,7 +8414,7 @@ input AddSlotWorkflowInput {
     "slotId field"
     slotId: String!
     "trigger field"
-    trigger: SlotWorkflowTrigger!
+    trigger: SlotPipelineStatus!
     "workflowYaml field"
     workflowYaml: String!
 }
@@ -8580,14 +8697,14 @@ input CreateConfigurationInput {
 
 "Input type for the createEnvironment mutation."
 input CreateEnvironmentInput {
-    "description field"
-    description: String!
-    "name field"
+    "Description for the environment"
+    description: String
+    "Unique name for the environment"
     name: String!
-    "order field"
+    "Order to the environment, used to sort them from lower environments to higher ones"
     order: Int!
-    "tags field"
-    tags: [String!]!
+    "Tags for the environment"
+    tags: [String!]
 }
 
 "Input type for the createGitHubConfiguration mutation."
@@ -8917,6 +9034,12 @@ input DeleteDashboardInput {
     uuid: String!
 }
 
+"Input type for the deleteEnvironment mutation."
+input DeleteEnvironmentInput {
+    "ID of the environment to delete"
+    id: String!
+}
+
 "Input type for the deleteGenericProperty mutation."
 input DeleteGenericPropertyInput {
     "entityId field"
@@ -9191,6 +9314,18 @@ input DeleteSlotAdmissionRuleConfigInput {
     id: String!
 }
 
+"Input type for the deleteSlot mutation."
+input DeleteSlotInput {
+    "slotId field"
+    slotId: String!
+}
+
+"Input type for the deleteSlotWorkflow mutation."
+input DeleteSlotWorkflowInput {
+    "id field"
+    id: String!
+}
+
 "Input type for the deleteSubscription mutation."
 input DeleteSubscriptionInput {
     "ID of the subscription to delete"
@@ -9340,8 +9475,10 @@ input EnableSubscriptionInput {
 }
 
 input EnvironmentFilter {
+    "projects field"
+    projects: [String!]
     "tags field"
-    tags: [String!]!
+    tags: [String!]
 }
 
 input EventSubscriptionFilter {
@@ -9629,10 +9766,10 @@ input LaunchWorkflowInput {
 }
 
 input LaunchWorkflowInputContext {
-    "key field"
-    key: String!
+    "name field"
+    name: String!
     "value field"
-    value: JSON!
+    value: String!
 }
 
 "Input type for the linkBuildById mutation."
@@ -9893,6 +10030,18 @@ input SaveSlotAdmissionRuleConfigInput {
     ruleId: String!
     "slotId field"
     slotId: String
+}
+
+"Input type for the saveSlotWorkflow mutation."
+input SaveSlotWorkflowInput {
+    "id field"
+    id: String
+    "slotId field"
+    slotId: String!
+    "trigger field"
+    trigger: SlotPipelineStatus!
+    "workflow field"
+    workflow: JSON!
 }
 
 "Input type for the saveYamlWorkflow mutation."

@@ -56,7 +56,7 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                             val pipelineId = pipeline.path("id").asText()
                             assertNotNull(slotService.findPipelineById(pipelineId), "Pipeline found") { pipeline ->
                                 assertEquals(
-                                    SlotPipelineStatus.ONGOING,
+                                    SlotPipelineStatus.CANDIDATE,
                                     pipeline.status
                                 )
                             }

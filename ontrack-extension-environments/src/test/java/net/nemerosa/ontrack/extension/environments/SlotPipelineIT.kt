@@ -27,7 +27,7 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
                     val pipeline = slotService.startPipeline(slot, this)
                     assertNotNull(pipeline.start)
                     assertNull(pipeline.end)
-                    assertEquals(SlotPipelineStatus.ONGOING, pipeline.status)
+                    assertEquals(SlotPipelineStatus.CANDIDATE, pipeline.status)
                     // Getting the pipelines for this slot
                     val pipelines = slotService.findPipelines(slot).pageItems
                     assertEquals(listOf(pipeline.id), pipelines.map { it.id })
@@ -36,7 +36,7 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
                     val changes = slotService.getPipelineChanges(pipeline)
                     assertEquals(1, changes.size)
                     val change = changes.first()
-                    assertEquals(SlotPipelineStatus.ONGOING, change.status)
+                    assertEquals(SlotPipelineStatus.CANDIDATE, change.status)
                 }
             }
         }
@@ -174,7 +174,7 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
             // Gets the pipeline
             val latestPipeline = slotService.getCurrentPipeline(pipeline.slot) ?: fail("Could not find pipeline")
             assertEquals(
-                SlotPipelineStatus.DEPLOYING,
+                SlotPipelineStatus.RUNNING,
                 latestPipeline.status,
             )
         }
@@ -189,12 +189,12 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
             // Gets the pipeline
             val latestPipeline = slotService.getCurrentPipeline(pipeline.slot) ?: fail("Could not find pipeline")
             assertEquals(
-                SlotPipelineStatus.DEPLOYED,
+                SlotPipelineStatus.DONE,
                 latestPipeline.status,
             )
             val change = slotService.getPipelineChanges(pipeline).firstOrNull()
             assertNotNull(change) {
-                assertEquals(SlotPipelineStatus.DEPLOYED, it.status)
+                assertEquals(SlotPipelineStatus.DONE, it.status)
                 assertEquals("Deployment finished", it.message)
                 assertEquals(false, it.overridden)
                 assertEquals(null, it.overrideMessage)
@@ -219,7 +219,7 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
             // Checking the change
             val change = slotService.getPipelineChanges(pipeline).firstOrNull()
             assertNotNull(change) {
-                assertEquals(SlotPipelineStatus.DEPLOYED, it.status)
+                assertEquals(SlotPipelineStatus.DONE, it.status)
                 assertEquals("Deployment forced", it.message)
                 assertEquals(true, it.overridden)
                 assertEquals("Deployment was marked done manually.", it.overrideMessage)
@@ -281,7 +281,7 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
                 }
                 // Checks that the pipeline 2 is active
                 assertNotNull(slotService.findPipelineById(pipeline2.id)) {
-                    assertEquals(SlotPipelineStatus.ONGOING, it.status)
+                    assertEquals(SlotPipelineStatus.CANDIDATE, it.status)
                 }
             }
         }

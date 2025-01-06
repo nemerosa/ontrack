@@ -104,7 +104,7 @@ export default function SlotView({id}) {
                         </Col>
                         <Col span={16}>
                             <PageSection
-                                title="Pipelines"
+                                title="Deployments"
                                 padding={false}
                             >
                                 <SlotPipelinesTable slot={slot} onChange={reload}/>

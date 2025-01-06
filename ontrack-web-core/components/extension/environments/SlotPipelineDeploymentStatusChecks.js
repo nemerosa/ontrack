@@ -62,7 +62,7 @@ export default function SlotPipelineDeploymentStatusChecks({pipeline, onChange})
                             <YesNo id={`deployable-${item.config.id}`} value={item.check.status}/>
                             <PopoverInfoIcon
                                 condition={item.check.reason}
-                                title="Pipeline cannot be deployed"
+                                title="Deployment cannot be completed"
                                 content={
                                     <Typography.Text type="secondary">{item.check.reason}</Typography.Text>
                                 }

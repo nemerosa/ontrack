@@ -43,13 +43,13 @@ export default function SlotPipelineCreateButton({slot, build, size, onStart}) {
     return (
         <>
             <Popconfirm
-                title="Starting pipeline"
-                description="Starting this pipeline will cancel all currently active pipelines for this slot. Are you sure to continue?"
+                title="Candidate deployment"
+                description="Creating a candidate deployment will cancel all currently active deployments for this slot. Are you sure to continue?"
                 onConfirm={onClick}
             >
                 <Button
                     icon={<FaPlay color="green"/>}
-                    title="Starts a pipeline for this build"
+                    title="Creates a candidate deployment for this build"
                     loading={loading}
                     size={size}
                 />

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.environments.workflows
 
 import net.nemerosa.ontrack.extension.environments.Slot
+import net.nemerosa.ontrack.extension.environments.SlotPipelineStatus
 import net.nemerosa.ontrack.extension.environments.storage.SlotRepository
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
@@ -60,7 +61,7 @@ class SlotWorkflowRepository(
         )
     }
 
-    fun getSlotWorkflowsBySlotAndTrigger(slot: Slot, trigger: SlotWorkflowTrigger): List<SlotWorkflow> =
+    fun getSlotWorkflowsBySlotAndTrigger(slot: Slot, trigger: SlotPipelineStatus): List<SlotWorkflow> =
         namedParameterJdbcTemplate!!.query(
             """
                 SELECT *
@@ -93,7 +94,7 @@ class SlotWorkflowRepository(
     private fun toSlotWorkflow(rs: ResultSet) = SlotWorkflow(
         id = rs.getString("id"),
         slot = slotRepository.getSlotById(rs.getString("slot_id")),
-        trigger = SlotWorkflowTrigger.valueOf(rs.getString("trigger")),
+        trigger = SlotPipelineStatus.valueOf(rs.getString("trigger")),
         workflow = readJson(rs, "workflow").parse(),
         pauseMs = rs.getLong("pause_ms"),
     )

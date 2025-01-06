@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.environments.workflows
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.environments.Slot
 import net.nemerosa.ontrack.extension.environments.SlotPipeline
+import net.nemerosa.ontrack.extension.environments.SlotPipelineStatus
 import net.nemerosa.ontrack.extension.environments.security.SlotPipelineOverride
 import net.nemerosa.ontrack.extension.environments.security.SlotPipelineWorkflowRun
 import net.nemerosa.ontrack.extension.environments.security.SlotUpdate
@@ -39,7 +40,7 @@ class SlotWorkflowServiceImpl(
     override fun getSlotWorkflowById(id: String): SlotWorkflow =
         slotWorkflowRepository.getSlotWorkflowById(id)
 
-    override fun getSlotWorkflowsBySlotAndTrigger(slot: Slot, trigger: SlotWorkflowTrigger): List<SlotWorkflow> {
+    override fun getSlotWorkflowsBySlotAndTrigger(slot: Slot, trigger: SlotPipelineStatus): List<SlotWorkflow> {
         securityService.checkSlotAccess<SlotView>(slot)
         return slotWorkflowRepository.getSlotWorkflowsBySlotAndTrigger(slot, trigger)
             .sortedBy { it.workflow.name }
@@ -83,7 +84,7 @@ class SlotWorkflowServiceImpl(
 
     override fun startWorkflowsForPipeline(
         pipeline: SlotPipeline,
-        trigger: SlotWorkflowTrigger,
+        trigger: SlotPipelineStatus,
         event: Event,
     ) {
         securityService.checkSlotAccess<SlotPipelineWorkflowRun>(pipeline.slot)

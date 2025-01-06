@@ -1,16 +1,12 @@
 package net.nemerosa.ontrack.extension.environments.casc
 
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
-import net.nemerosa.ontrack.extension.environments.Environment
-import net.nemerosa.ontrack.extension.environments.Slot
-import net.nemerosa.ontrack.extension.environments.SlotAdmissionRuleTestFixtures
-import net.nemerosa.ontrack.extension.environments.SlotTestSupport
+import net.nemerosa.ontrack.extension.environments.*
 import net.nemerosa.ontrack.extension.environments.service.EnvironmentService
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflow
 import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowService
 import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowTestFixtures
-import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowTrigger
 import net.nemerosa.ontrack.extension.scm.service.TestSCMExtension
 import net.nemerosa.ontrack.it.NewTxRollbacked
 import net.nemerosa.ontrack.json.asJson
@@ -348,7 +344,7 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                 slotWorkflowService.addSlotWorkflow(
                     SlotWorkflow(
                         slot = slot,
-                        trigger = SlotWorkflowTrigger.DEPLOYING,
+                        trigger = SlotPipelineStatus.RUNNING,
                         workflow = workflow,
                     )
                 )
@@ -383,7 +379,7 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                                         ),
                                         "workflows" to listOf(
                                             mapOf(
-                                                "trigger" to "DEPLOYING",
+                                                "trigger" to "RUNNING",
                                                 "name" to workflow.name,
                                                 "nodes" to workflow.nodes,
                                             )
@@ -517,7 +513,7 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                                         - name: production
                                           workflows:
                                             - name: Creation
-                                              trigger: CREATION
+                                              trigger: CANDIDATE
                                               nodes:
                                                 - id: start
                                                   executorId: mock
@@ -530,14 +526,14 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                                                   data:
                                                       text: End
                                             - name: Deploying
-                                              trigger: DEPLOYING
+                                              trigger: RUNNING
                                               nodes:
                                                 - id: deploy
                                                   executorId: mock
                                                   data:
                                                       text: Deploy
                                             - name: Deployed
-                                              trigger: DEPLOYED
+                                              trigger: DONE
                                               nodes:
                                                 - id: deployed
                                                   executorId: mock
@@ -556,19 +552,19 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                 )
             ) { slot ->
                 assertNotNull(
-                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.CREATION)
+                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotPipelineStatus.CANDIDATE)
                         .firstOrNull()
                 ) { sw ->
                     assertEquals("Creation", sw.workflow.name)
                 }
                 assertNotNull(
-                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.DEPLOYING)
+                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotPipelineStatus.RUNNING)
                         .firstOrNull()
                 ) { sw ->
                     assertEquals("Deploying", sw.workflow.name)
                 }
                 assertNotNull(
-                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.DEPLOYED)
+                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotPipelineStatus.DONE)
                         .firstOrNull()
                 ) { sw ->
                     assertEquals("Deployed", sw.workflow.name)
@@ -598,7 +594,7 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                                         - name: production
                                           workflows:
                                             - name: Creation
-                                              trigger: CREATION
+                                              trigger: CANDIDATE
                                               nodes:
                                                 - id: start
                                                   executorId: mock
@@ -611,14 +607,14 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                                                   data:
                                                       text: End
                                             - name: Deploying
-                                              trigger: DEPLOYING
+                                              trigger: RUNNING
                                               nodes:
                                                 - id: deploy
                                                   executorId: mock
                                                   data:
                                                       text: Deploy
                                             - name: Deployed
-                                              trigger: DEPLOYED
+                                              trigger: DONE
                                               nodes:
                                                 - id: deployed
                                                   executorId: mock
@@ -636,19 +632,19 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                 )
             ) { slot ->
                 assertNotNull(
-                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.CREATION)
+                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotPipelineStatus.CANDIDATE)
                         .firstOrNull()
                 ) { sw ->
                     assertEquals("Creation", sw.workflow.name)
                 }
                 assertNotNull(
-                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.DEPLOYING)
+                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotPipelineStatus.RUNNING)
                         .firstOrNull()
                 ) { sw ->
                     assertEquals("Deploying", sw.workflow.name)
                 }
                 assertNotNull(
-                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.DEPLOYED)
+                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotPipelineStatus.DONE)
                         .firstOrNull()
                 ) { sw ->
                     assertEquals("Deployed", sw.workflow.name)
@@ -672,14 +668,14 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                                         - name: production
                                           workflows:
                                             - name: Deploying
-                                              trigger: DEPLOYING
+                                              trigger: RUNNING
                                               nodes:
                                                 - id: deploy
                                                   executorId: mock
                                                   data:
                                                       text: Deploy
                                             - name: Deployed
-                                              trigger: DEPLOYED
+                                              trigger: DONE
                                               nodes:
                                                 - id: deployed
                                                   executorId: mock
@@ -697,18 +693,18 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                 )
             ) { slot ->
                 assertNull(
-                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.CREATION)
+                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotPipelineStatus.CANDIDATE)
                         .firstOrNull(),
                     "Creation workflow is gone"
                 )
                 assertNotNull(
-                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.DEPLOYING)
+                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotPipelineStatus.RUNNING)
                         .firstOrNull()
                 ) { sw ->
                     assertEquals("Deploying", sw.workflow.name)
                 }
                 assertNotNull(
-                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotWorkflowTrigger.DEPLOYED)
+                    slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(slot, SlotPipelineStatus.DONE)
                         .firstOrNull()
                 ) { sw ->
                     assertEquals("Deployed", sw.workflow.name)

@@ -61,7 +61,7 @@ export default function SlotPipelineInputButton({pipeline, onChange, size}) {
                     <Button
                         data-testid="pipeline-input-needed"
                         icon={<FaHandPaper color="orange"/>}
-                        title="Some input is needed for this pipeline"
+                        title="Some input is needed for this deployment"
                         onClick={pipelineInput}
                         size={size}
                     />

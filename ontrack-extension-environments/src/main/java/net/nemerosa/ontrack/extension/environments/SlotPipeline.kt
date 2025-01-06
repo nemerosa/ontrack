@@ -10,7 +10,7 @@ data class SlotPipeline(
     val number: Int = 0,
     val start: LocalDateTime = Time.now,
     val end: LocalDateTime? = null,
-    val status: SlotPipelineStatus = SlotPipelineStatus.ONGOING,
+    val status: SlotPipelineStatus = SlotPipelineStatus.CANDIDATE,
     val slot: Slot,
     val build: Build,
 ) {

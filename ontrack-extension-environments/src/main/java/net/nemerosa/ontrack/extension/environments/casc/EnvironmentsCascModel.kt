@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.environments.casc
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.environments.Slot
-import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowTrigger
+import net.nemerosa.ontrack.extension.environments.SlotPipelineStatus
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowNode
 
 data class EnvironmentsCascModel(
@@ -44,7 +44,7 @@ data class SlotEnvironmentAdmissionRuleCasc(
 }
 
 data class SlotWorkflowCasc(
-    val trigger: SlotWorkflowTrigger,
+    val trigger: SlotPipelineStatus,
     val name: String,
     val nodes: List<WorkflowNode>,
 )

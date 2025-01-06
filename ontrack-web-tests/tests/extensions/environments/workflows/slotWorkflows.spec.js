@@ -16,7 +16,7 @@ import {gqlPipelineData} from "@ontrack/extensions/environments/environments";
 import {waitUntilCondition} from "../../../support/timing";
 
 test('API - workflows on creation participate into the pipeline check list', async ({page}) => {
-    const {slot, project, slotWorkflow} = await withSlotWorkflow({trigger: 'CREATION'})
+    const {slot, project, slotWorkflow} = await withSlotWorkflow({trigger: 'CANDIDATE'})
     const {pipeline} = await createPipeline({project, slot})
 
     // Pipeline was just created, workflow is running into the background
@@ -90,7 +90,7 @@ test('API - workflows on creation participate into the pipeline check list', asy
 })
 
 test('workflows on creation participate into the pipeline check list', async ({page}) => {
-    const {slot, project, slotWorkflow} = await withSlotWorkflow({trigger: 'CREATION'})
+    const {slot, project, slotWorkflow} = await withSlotWorkflow({trigger: 'CANDIDATE'})
     const {pipeline} = await createPipeline({project, slot})
 
     await waitForPipelineToBeDeployable(page, pipeline.id)
@@ -115,7 +115,7 @@ test('workflows on creation participate into the pipeline check list', async ({p
     const pipelineWorkflows = await pipelinePage.getPipelineWorkflows()
     await pipelineWorkflows.checkWorkflow({
         slotWorkflowId: slotWorkflow.id,
-        trigger: 'CREATION',
+        trigger: 'CANDIDATE',
         status: 'Success',
     })
 })
@@ -125,7 +125,7 @@ test('workflows on creation participate into the pipeline progress', async ({pag
     // Adding two workflows, one successful, one with error
     const slotWorkflowSuccess = await addSlotWorkflow({
         slot,
-        trigger: 'CREATION',
+        trigger: 'CANDIDATE',
         workflowYaml: `
             name: Success
             nodes:
@@ -138,7 +138,7 @@ test('workflows on creation participate into the pipeline progress', async ({pag
     })
     const slotWorkflowError = await addSlotWorkflow({
         slot,
-        trigger: 'CREATION',
+        trigger: 'CANDIDATE',
         workflowYaml: `
             name: Error
             nodes:
@@ -232,7 +232,7 @@ test('API - workflow on promotion leading to the deployment of a build', async (
                 {slotId: slot.id}
             )
             pipeline = data.slotById?.currentPipeline
-            return pipeline && pipeline.status === 'DEPLOYED'
+            return pipeline && pipeline.status === 'DONE'
         },
         message: "Pipeline not created or not deployed"
     })
@@ -246,7 +246,7 @@ test('failing workflows on deploying block the deployment completion', async ({p
     // Adding two workflows, one successful, one with error
     const slotWorkflowSuccess = await addSlotWorkflow({
         slot,
-        trigger: 'DEPLOYING',
+        trigger: 'RUNNING',
         workflowYaml: `
             name: Success
             nodes:
@@ -259,7 +259,7 @@ test('failing workflows on deploying block the deployment completion', async ({p
     })
     const slotWorkflowError = await addSlotWorkflow({
         slot,
-        trigger: 'DEPLOYING',
+        trigger: 'RUNNING',
         workflowYaml: `
             name: Error
             nodes:

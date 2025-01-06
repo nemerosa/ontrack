@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.environments.workflows
 
+import net.nemerosa.ontrack.extension.environments.SlotPipelineStatus
 import net.nemerosa.ontrack.extension.environments.SlotTestSupport
 import net.nemerosa.ontrack.extension.queue.QueueNoAsync
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
@@ -48,7 +49,7 @@ class SlotWorkflowServiceGraphQLIT : AbstractQLKTITSupport() {
                     ) {
                         addSlotWorkflow(input: {
                             slotId: "${slot.id}",
-                            trigger: DEPLOYING,
+                            trigger: RUNNING,
                             workflowYaml: ${'$'}workflowYaml,
                         }) {
                             slotWorkflow {
@@ -67,12 +68,12 @@ class SlotWorkflowServiceGraphQLIT : AbstractQLKTITSupport() {
                 checkGraphQLUserErrors(data, "addSlotWorkflow") { node ->
                     val workflows = slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(
                         slot = slot,
-                        trigger = SlotWorkflowTrigger.DEPLOYING,
+                        trigger = SlotPipelineStatus.RUNNING,
                     )
                     assertEquals(1, workflows.size)
                     val slotWorkflow = workflows.first()
                     assertEquals(slot, slotWorkflow.slot)
-                    assertEquals(SlotWorkflowTrigger.DEPLOYING, slotWorkflow.trigger)
+                    assertEquals(SlotPipelineStatus.RUNNING, slotWorkflow.trigger)
                     assertEquals("Test", slotWorkflow.workflow.name)
                 }
             }
@@ -86,7 +87,7 @@ class SlotWorkflowServiceGraphQLIT : AbstractQLKTITSupport() {
             val workflow = SlotWorkflowTestFixtures.testWorkflow()
             val slotWorkflow = SlotWorkflow(
                 slot = slot,
-                trigger = SlotWorkflowTrigger.DEPLOYING,
+                trigger = SlotPipelineStatus.RUNNING,
                 workflow = workflow,
             )
             slotWorkflowService.addSlotWorkflow(slotWorkflow)
@@ -100,7 +101,7 @@ class SlotWorkflowServiceGraphQLIT : AbstractQLKTITSupport() {
                         saveSlotWorkflow(input: {
                             id: "${slotWorkflow.id}",
                             slotId: "${slot.id}",
-                            trigger: DEPLOYING,
+                            trigger: RUNNING,
                             workflow: ${'$'}workflow,
                         }) {
                             slotWorkflow {
@@ -122,7 +123,7 @@ class SlotWorkflowServiceGraphQLIT : AbstractQLKTITSupport() {
                 checkGraphQLUserErrors(data, "saveSlotWorkflow") { node ->
                     val savedSlotWorkflow = slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(
                         slot = slot,
-                        trigger = SlotWorkflowTrigger.DEPLOYING,
+                        trigger = SlotPipelineStatus.RUNNING,
                     ).first()
                     assertEquals(slotWorkflow.id, savedSlotWorkflow.id)
                     assertEquals(newName, savedSlotWorkflow.workflow.name)
@@ -136,7 +137,7 @@ class SlotWorkflowServiceGraphQLIT : AbstractQLKTITSupport() {
     fun `Getting a slot workflow instance by id`() {
 
         slotWorkflowTestSupport.withSlotWorkflow(
-            trigger = SlotWorkflowTrigger.CREATION,
+            trigger = SlotPipelineStatus.CANDIDATE,
             waitMs = 2_000,
         ) { slot, slotWorkflow ->
             // Creating a pipeline (this triggers the workflow)

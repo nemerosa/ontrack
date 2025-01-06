@@ -7319,7 +7319,7 @@ type SlotWorkflow {
     "Slot this workflow is registered for"
     slot: Slot!
     "Event which triggers this workflow"
-    trigger: SlotWorkflowTrigger!
+    trigger: SlotPipelineStatus!
     "Workflow to run"
     workflow: Workflow!
 }
@@ -8353,16 +8353,9 @@ enum SCMChangeLogFileChangeType {
 "List of pipelines for a status"
 enum SlotPipelineStatus {
     CANCELLED
-    DEPLOYED
-    DEPLOYING
-    ONGOING
-}
-
-"List of triggers for the slot workflows"
-enum SlotWorkflowTrigger {
-    CREATION
-    DEPLOYED
-    DEPLOYING
+    CANDIDATE
+    DONE
+    RUNNING
 }
 
 "Class of tokens"
@@ -8421,7 +8414,7 @@ input AddSlotWorkflowInput {
     "slotId field"
     slotId: String!
     "trigger field"
-    trigger: SlotWorkflowTrigger!
+    trigger: SlotPipelineStatus!
     "workflowYaml field"
     workflowYaml: String!
 }
@@ -10046,7 +10039,7 @@ input SaveSlotWorkflowInput {
     "slotId field"
     slotId: String!
     "trigger field"
-    trigger: SlotWorkflowTrigger!
+    trigger: SlotPipelineStatus!
     "workflow field"
     workflow: JSON!
 }

@@ -80,7 +80,7 @@ class EnvironmentSlotAdmissionRule(
             return DeployableCheck.nok("""Pipeline for project = "${pipeline.build.project.name}", environment = ${ruleConfig.environmentName} and qualifier = "${ruleConfig.qualifier}" is for another build.""")
         }
         // Checks it's deployed
-        if (previousPipeline.status != SlotPipelineStatus.DEPLOYED) {
+        if (previousPipeline.status != SlotPipelineStatus.DONE) {
             return DeployableCheck.nok("""Build is in a pipeline for project = "${pipeline.build.project.name}", environment = ${ruleConfig.environmentName} and qualifier = "${ruleConfig.qualifier}" but this pipeline has not been deployed.""")
         }
         // OK
@@ -109,7 +109,7 @@ class EnvironmentSlotAdmissionRule(
                 INNER JOIN ENV_SLOT_PIPELINE PP ON PP.SLOT_ID = S.ID AND PP.BUILD_ID = BD.ID
             """.trimIndent()
             whereDeployable = """
-                AND PP.STATUS = '${SlotPipelineStatus.DEPLOYED.name}'
+                AND PP.STATUS = '${SlotPipelineStatus.DONE.name}'
             """.trimIndent()
         }
 

@@ -4,16 +4,16 @@ enum class SlotPipelineStatus(
     val finished: Boolean,
 ) {
 
-    ONGOING(
+    CANDIDATE(
         finished = false,
     ),
-    DEPLOYING(
+    RUNNING(
         finished = false
     ),
     CANCELLED(
         finished = true,
     ),
-    DEPLOYED(
+    DONE(
         finished = true
     );
 

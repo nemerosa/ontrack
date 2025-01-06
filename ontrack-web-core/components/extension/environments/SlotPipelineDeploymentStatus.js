@@ -145,7 +145,7 @@ export default function SlotPipelineDeploymentStatus({pipeline, onChange}) {
                     key: 'changes',
                     span: 12,
                     children: <PageSection
-                        title="Pipeline change history"
+                        title="Deployment history"
                     >
                         <SlotPipelineDeploymentChangeTable changes={slotPipeline.changes}/>
                     </PageSection>,

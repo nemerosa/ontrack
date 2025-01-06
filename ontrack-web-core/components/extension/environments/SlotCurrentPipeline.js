@@ -67,7 +67,7 @@ export default function SlotCurrentPipeline({
                 !pipeline &&
                 <Card
                     loading={loading}
-                    title={fullCardTitle(titlePrefix, "No pipeline")}
+                    title={fullCardTitle(titlePrefix, "No deployment")}
                 >
                     <Empty description=""/>
                 </Card>

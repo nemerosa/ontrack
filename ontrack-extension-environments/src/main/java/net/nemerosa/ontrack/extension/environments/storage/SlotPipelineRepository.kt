@@ -152,7 +152,7 @@ class SlotPipelineRepository(
                 SELECT *
                 FROM ENV_SLOT_PIPELINE
                 WHERE SLOT_ID = :slotId
-                AND STATUS = 'DEPLOYED'
+                AND STATUS = '${SlotPipelineStatus.DONE}'
                 ORDER BY NUMBER DESC
                 LIMIT 1
             """.trimIndent(),

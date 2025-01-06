@@ -9,7 +9,7 @@ export const addSlotWorkflow = async ({slot, trigger, workflowYaml}) => {
         gql`
             mutation AddSlotWorkflow(
                 $slotId: String!,
-                $trigger: SlotWorkflowTrigger!,
+                $trigger: SlotPipelineStatus!,
                 $workflowYaml: String!,
             ) {
                 addSlotWorkflow(input: {

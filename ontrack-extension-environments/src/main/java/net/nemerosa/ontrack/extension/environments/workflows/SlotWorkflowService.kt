@@ -2,13 +2,14 @@ package net.nemerosa.ontrack.extension.environments.workflows
 
 import net.nemerosa.ontrack.extension.environments.Slot
 import net.nemerosa.ontrack.extension.environments.SlotPipeline
+import net.nemerosa.ontrack.extension.environments.SlotPipelineStatus
 import net.nemerosa.ontrack.model.events.Event
 
 interface SlotWorkflowService {
 
     fun addSlotWorkflow(slotWorkflow: SlotWorkflow)
     fun getSlotWorkflowsBySlot(slot: Slot): List<SlotWorkflow>
-    fun getSlotWorkflowsBySlotAndTrigger(slot: Slot, trigger: SlotWorkflowTrigger): List<SlotWorkflow>
+    fun getSlotWorkflowsBySlotAndTrigger(slot: Slot, trigger: SlotPipelineStatus): List<SlotWorkflow>
 
     fun startWorkflow(
         pipeline: SlotPipeline,
@@ -26,7 +27,7 @@ interface SlotWorkflowService {
 
     fun startWorkflowsForPipeline(
         pipeline: SlotPipeline,
-        trigger: SlotWorkflowTrigger,
+        trigger: SlotPipelineStatus,
         event: Event,
     )
 

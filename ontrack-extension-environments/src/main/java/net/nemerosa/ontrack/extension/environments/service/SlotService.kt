@@ -177,7 +177,7 @@ interface SlotService {
     fun findSlotByProjectAndEnvironment(environment: Environment, project: Project, qualifier: String): Slot?
 
     /**
-     * Finds the last pipeline of this slot marked as [SlotPipelineStatus.DEPLOYED].
+     * Finds the last pipeline of this slot marked as [SlotPipelineStatus.DONE].
      *
      * @param slot Slot where to find the pipeline
      * @return Last deployed pipeline or `null` if none is present

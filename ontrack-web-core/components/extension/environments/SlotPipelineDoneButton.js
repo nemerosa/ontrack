@@ -5,7 +5,7 @@ import {useGraphQLClient} from "@components/providers/ConnectionContextProvider"
 import {gql} from "graphql-request";
 import {getUserErrors} from "@components/services/graphql-utils";
 
-export default function SlotPipelineFinishButton({pipeline, onFinish, size}) {
+export default function SlotPipelineDoneButton({pipeline, onFinish, size}) {
     const [messageApi, contextHolder] = message.useMessage()
     const client = useGraphQLClient()
     const [changing, setChanging] = useState(false)
@@ -64,15 +64,15 @@ export default function SlotPipelineFinishButton({pipeline, onFinish, size}) {
         <>
             {contextHolder}
             {
-                pipeline.status === 'DEPLOYING' &&
+                pipeline.status === 'RUNNING' &&
                 <Popconfirm
-                    title="Deployed pipeline"
-                    description="This will mark this build as being deployed. Do you want to continue?"
+                    title="Deployment done"
+                    description="This will mark this deployment as being done. Do you want to continue?"
                     onConfirm={deployed}
                 >
                     <Button
                         icon={<FaThumbsUp color="green"/>}
-                        title="Marks this pipeline as deployed"
+                        title="Marks this deployment as done"
                         loading={changing}
                         data-testid={`pipeline-finish-${pipeline.id}`}
                         size={size}

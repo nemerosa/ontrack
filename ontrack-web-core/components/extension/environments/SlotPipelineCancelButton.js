@@ -45,7 +45,7 @@ export default function SlotPipelineCancelButton({pipeline, onCancel, size}) {
 
     const [cancelConfirm, cancelComponent] = useConfirmWithReason({
         onConfirm: cancel,
-        question: "Are you sure you want to cancel this pipeline?",
+        question: "Are you sure you want to cancel this deployment?",
     })
 
     return (
@@ -56,7 +56,7 @@ export default function SlotPipelineCancelButton({pipeline, onCancel, size}) {
                 !pipeline.finished &&
                 <Button
                     icon={<FaStop color="red"/>}
-                    title="Cancels this pipeline"
+                    title="Cancels this deployment"
                     loading={cancelling}
                     onClick={cancelConfirm}
                     size={size}

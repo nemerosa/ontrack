@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.environments.workflows
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.extension.environments.SlotPipelineStatus
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.extension.workflows.registry.WorkflowParser
 import net.nemerosa.ontrack.graphql.schema.Mutation
@@ -62,14 +63,14 @@ class GQLSlotWorkflowMutations(
 
 data class AddSlotWorkflowInput(
     val slotId: String,
-    val trigger: SlotWorkflowTrigger,
+    val trigger: SlotPipelineStatus,
     val workflowYaml: String,
 )
 
 data class SaveSlotWorkflowInput(
     val id: String?,
     val slotId: String,
-    val trigger: SlotWorkflowTrigger,
+    val trigger: SlotPipelineStatus,
     val workflow: JsonNode,
 )
 

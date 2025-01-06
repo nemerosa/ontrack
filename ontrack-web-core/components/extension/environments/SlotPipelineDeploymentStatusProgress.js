@@ -56,7 +56,7 @@ export default function SlotPipelineDeploymentStatusProgress({pipeline, link = t
             <LoadingInline loading={loading}>
                 {
                     link &&
-                    <Link href={slotPipelineUri(pipeline.id)} title="Pipeline details">
+                    <Link href={slotPipelineUri(pipeline.id)} title="Deployment details">
                         {progressComponent()}
                     </Link>
                 }

@@ -57,7 +57,7 @@ class SlotPipelineWorkflowNodeExecutorsIT : AbstractNotificationTestSupport() {
                                 SlotWorkflow(
                                     pauseMs = 500,
                                     slot = staging,
-                                    trigger = SlotWorkflowTrigger.DEPLOYED,
+                                    trigger = SlotPipelineStatus.DONE,
                                     workflow = WorkflowParser.parseYamlWorkflow(
                                         """
                                             name: Deployment to production
@@ -93,7 +93,7 @@ class SlotPipelineWorkflowNodeExecutorsIT : AbstractNotificationTestSupport() {
                 val productionPipeline = inNewTransaction {
                     slotService.findPipelines(production!!).pageItems.first()
                 }
-                assertEquals(SlotPipelineStatus.ONGOING, productionPipeline.status)
+                assertEquals(SlotPipelineStatus.CANDIDATE, productionPipeline.status)
             }
 
         }
@@ -309,7 +309,7 @@ class SlotPipelineWorkflowNodeExecutorsIT : AbstractNotificationTestSupport() {
                     interval = 1.seconds,
                 ) {
                     val pipeline = slotService.getCurrentPipeline(slot)
-                    pipeline?.build?.id == build.id && pipeline.status == SlotPipelineStatus.DEPLOYED
+                    pipeline?.build?.id == build.id && pipeline.status == SlotPipelineStatus.DONE
                 }
 
                 // Pipeline

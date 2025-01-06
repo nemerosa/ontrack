@@ -41,18 +41,18 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
             slotWorkflowService.addSlotWorkflow(
                 SlotWorkflow(
                     slot = slot,
-                    trigger = SlotWorkflowTrigger.DEPLOYING,
+                    trigger = SlotPipelineStatus.RUNNING,
                     workflow = testWorkflow,
                 )
             )
             val workflows = slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(
                 slot = slot,
-                trigger = SlotWorkflowTrigger.DEPLOYING,
+                trigger = SlotPipelineStatus.RUNNING,
             )
             assertEquals(1, workflows.size)
             val slotWorkflow = workflows.first()
             assertEquals(slot, slotWorkflow.slot)
-            assertEquals(SlotWorkflowTrigger.DEPLOYING, slotWorkflow.trigger)
+            assertEquals(SlotPipelineStatus.RUNNING, slotWorkflow.trigger)
             assertEquals(testWorkflow.name, slotWorkflow.workflow.name)
         }
     }
@@ -63,7 +63,7 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
             val testWorkflow = SlotWorkflowTestFixtures.testWorkflow()
             val slotWorkflow = SlotWorkflow(
                 slot = pipeline.slot,
-                trigger = SlotWorkflowTrigger.DEPLOYING,
+                trigger = SlotPipelineStatus.RUNNING,
                 workflow = testWorkflow,
             )
             slotWorkflowService.addSlotWorkflow(
@@ -88,7 +88,7 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
 
     @Test
     fun `Running a workflow on pipeline creation`() {
-        slotWorkflowTestSupport.withSlotWorkflow(trigger = SlotWorkflowTrigger.CREATION) { slot, slotWorkflow ->
+        slotWorkflowTestSupport.withSlotWorkflow(trigger = SlotPipelineStatus.CANDIDATE) { slot, slotWorkflow ->
             val pipeline = slotTestSupport.createPipeline(slot = slot)
 
             val slotWorkflowInstance = slotWorkflowService.getSlotWorkflowInstancesByPipeline(pipeline).firstOrNull()
@@ -103,7 +103,7 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
 
     @Test
     fun `Running a workflow on pipeline deploying`() {
-        slotWorkflowTestSupport.withSlotWorkflow(trigger = SlotWorkflowTrigger.DEPLOYING) { slot, slotWorkflow ->
+        slotWorkflowTestSupport.withSlotWorkflow(trigger = SlotPipelineStatus.RUNNING) { slot, slotWorkflow ->
             val pipeline = slotTestSupport.createPipeline(slot = slot)
             slotService.startDeployment(pipeline, dryRun = false)
 
@@ -119,7 +119,7 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
 
     @Test
     fun `Running a workflow on pipeline deployed`() {
-        slotWorkflowTestSupport.withSlotWorkflow(trigger = SlotWorkflowTrigger.DEPLOYED) { slot, _ ->
+        slotWorkflowTestSupport.withSlotWorkflow(trigger = SlotPipelineStatus.DONE) { slot, _ ->
 
             val pipeline = slotTestSupport.createStartAndDeployPipeline(slot = slot)
 
@@ -136,7 +136,7 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
     @Test
     fun `Workflows on creation participate into the pipeline check list`() {
         slotWorkflowTestSupport.withSlotWorkflow(
-            trigger = SlotWorkflowTrigger.CREATION,
+            trigger = SlotPipelineStatus.CANDIDATE,
             waitMs = 2_000,
         ) { slot, slotWorkflow ->
 
@@ -144,7 +144,7 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
             val pipeline = slotTestSupport.createPipeline(slot = slot)
 
             // Waiting for the pipeline's workflows to finish
-            slotWorkflowTestSupport.waitForSlotWorkflowsToFinish(pipeline, SlotWorkflowTrigger.CREATION)
+            slotWorkflowTestSupport.waitForSlotWorkflowsToFinish(pipeline, SlotPipelineStatus.CANDIDATE)
 
             // Checking the pipeline can start its deployment
             val status = slotService.startDeployment(pipeline, dryRun = true)
@@ -179,7 +179,7 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
     @Test
     fun `Cannot start a deployment if not all workflows are successful`() {
         slotWorkflowTestSupport.withSlotWorkflow(
-            trigger = SlotWorkflowTrigger.CREATION,
+            trigger = SlotPipelineStatus.CANDIDATE,
             error = true,
         ) { slot, _ ->
 
@@ -196,7 +196,7 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
     @Test
     fun `Cannot finish a deployment if not all workflows are successful`() {
         slotWorkflowTestSupport.withSlotWorkflow(
-            trigger = SlotWorkflowTrigger.DEPLOYING,
+            trigger = SlotPipelineStatus.RUNNING,
             error = true,
         ) { slot, _ ->
 
@@ -209,10 +209,10 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
 
             // Reloading the pipeline's status
             val deployingPipeline = slotService.getPipelineById(pipeline.id)
-            assertEquals(SlotPipelineStatus.DEPLOYING, deployingPipeline.status)
+            assertEquals(SlotPipelineStatus.RUNNING, deployingPipeline.status)
 
             // Waiting for the pipeline's workflows to finish
-            slotWorkflowTestSupport.waitForSlotWorkflowsToFinish(pipeline, SlotWorkflowTrigger.DEPLOYING)
+            slotWorkflowTestSupport.waitForSlotWorkflowsToFinish(pipeline, SlotPipelineStatus.RUNNING)
 
             // Finish the deployment
             val end = slotService.finishDeployment(deployingPipeline)
@@ -224,7 +224,7 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
     @Test
     fun `Workflow executions can be overridden`() {
         slotWorkflowTestSupport.withSlotWorkflow(
-            trigger = SlotWorkflowTrigger.DEPLOYING,
+            trigger = SlotPipelineStatus.RUNNING,
             error = true,
         ) { slot, _ ->
             // Creating a pipeline
@@ -235,7 +235,7 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
             assertTrue(status.status, "Pipeline has started its deployment")
 
             // Waiting for the pipeline's workflows to finish
-            slotWorkflowTestSupport.waitForSlotWorkflowsToFinish(pipeline, SlotWorkflowTrigger.DEPLOYING)
+            slotWorkflowTestSupport.waitForSlotWorkflowsToFinish(pipeline, SlotPipelineStatus.RUNNING)
 
             // The workflow has failed, and prevents the pipeline completion
             var end = slotService.finishDeployment(pipeline)
@@ -268,7 +268,7 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
 
             // Reloading the pipeline's status
             val deployedPipeline = slotService.getPipelineById(pipeline.id)
-            assertEquals(SlotPipelineStatus.DEPLOYED, deployedPipeline.status)
+            assertEquals(SlotPipelineStatus.DONE, deployedPipeline.status)
         }
     }
 

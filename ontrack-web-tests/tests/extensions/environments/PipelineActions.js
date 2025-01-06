@@ -58,8 +58,8 @@ export class PipelineActions {
         const pipelineActions = this.locatePipelineActions()
         const button = pipelineActions.getByTestId(`pipeline-deploy-${this.pipeline.id}`)
         await button.click()
-        await confirmBox(this.page, "Deploying pipeline")
-        await expect(pipelineActions.getByText("Deploying")).toBeVisible()
+        await confirmBox(this.page, "Running deployment")
+        await expect(pipelineActions.getByText("Running")).toBeVisible()
     }
 
     async checkDeployedAction(config = {visible: true}) {
@@ -72,7 +72,7 @@ export class PipelineActions {
         const pipelineActions = this.locatePipelineActions()
         const button = pipelineActions.getByTestId(`pipeline-finish-${this.pipeline.id}`)
         await button.click()
-        await confirmBox(this.page, "Deployed pipeline")
-        await expect(pipelineActions.getByText("Deployed")).toBeVisible()
+        await confirmBox(this.page, "Deployment done")
+        await expect(pipelineActions.getByText("Done")).toBeVisible()
     }
 }
