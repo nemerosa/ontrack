@@ -4,6 +4,7 @@ import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.extension.environments.Slot
 import net.nemerosa.ontrack.extension.environments.SlotPipeline
+import net.nemerosa.ontrack.extension.environments.SlotPipelineStatus
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflow
 import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowService
@@ -118,8 +119,19 @@ class GQLTypeSlot(
                     }
             }
             // List of workflows
-            .listFieldGetter<Slot, SlotWorkflow>("workflows", "List of workflows for this slot") {
-                slotWorkflowService.getSlotWorkflowsBySlot(it)
+            .field {
+                it.name("workflows")
+                    .description("List of workflows for this slot")
+                    .type(listType(SlotWorkflow::class.toTypeRef()))
+                    .argument(enumArgument<SlotPipelineStatus>("trigger", "Type of trigger to filter on"))
+                    .dataFetcher { env ->
+                        val source: Slot = env.getSource()
+                        val trigger = env.getArgument<String?>("trigger")?.let {
+                            SlotPipelineStatus.valueOf(it)
+                        }
+                        slotWorkflowService.getSlotWorkflowsBySlot(source)
+                            .filter { trigger == null || it.trigger == trigger }
+                    }
             }
             // OK
             .build()

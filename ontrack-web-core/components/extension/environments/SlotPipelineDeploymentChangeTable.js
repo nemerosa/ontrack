@@ -2,6 +2,9 @@ import {Space, Table, Typography} from "antd";
 import SlotPipelineStatus from "@components/extension/environments/SlotPipelineStatus";
 import YesNo from "@components/common/YesNo";
 
+/**
+ * @deprecated To delete
+ */
 export default function SlotPipelineDeploymentChangeTable({changes}) {
     return (
         <>

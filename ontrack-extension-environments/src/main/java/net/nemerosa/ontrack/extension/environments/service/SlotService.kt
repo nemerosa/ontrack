@@ -94,18 +94,23 @@ interface SlotService {
     fun getPipelineChanges(pipeline: SlotPipeline): List<SlotPipelineChange>
 
     /**
-     * Gets the current status for a pipeline
+     * Checks the progress of being able to run the deployment
+     *
+     * @param pipelineId ID of the deployment to check
+     * @return The progress if possible and null if not at all possible (wrong state)
      */
-    fun status(pipelineId: String, skipWorkflowId: String? = null): SlotPipelineDeploymentStatus
+    fun getDeploymentRunActionProgress(
+        pipelineId: String,
+    ): SlotPipelineDeploymentStatusProgress?
 
     /**
-     * Starts a deployment
+     * Starts running a deployment
      */
-    fun startDeployment(
-        pipeline: SlotPipeline,
-        dryRun: Boolean,
+    fun runDeployment(
+        pipelineId: String,
+        dryRun: Boolean = false,
         skipWorkflowId: String? = null
-    ): SlotPipelineDeploymentStatus
+    ): SlotDeploymentActionStatus
 
     /**
      * Gets the latest (current) pipeline for a slot
@@ -113,19 +118,52 @@ interface SlotService {
     fun getCurrentPipeline(slot: Slot): SlotPipeline?
 
     /**
+     * Checks the progress of being able to finish the deployment
+     *
+     * @param pipelineId ID of the deployment to check
+     * @return The progress if possible and null if not at all possible (wrong state)
+     */
+    fun getDeploymentFinishActionProgress(
+        pipelineId: String,
+    ): SlotPipelineDeploymentStatusProgress?
+
+    /**
      * Marking a pipeline as being deployed
      */
     fun finishDeployment(
-        pipeline: SlotPipeline,
+        pipelineId: String,
         skipWorkflowId: String? = null,
         forcing: Boolean = false,
         message: String? = null,
-    ): SlotPipelineDeploymentFinishStatus
+    ): SlotDeploymentActionStatus
 
     /**
      * Gets the stored states of admission rules for a given pipeline.
      */
     fun getPipelineAdmissionRuleStatuses(pipeline: SlotPipeline): List<SlotPipelineAdmissionRuleStatus>
+
+    /**
+     * Gets the status (data, override) of a rule for a given pipeline
+     */
+    fun findPipelineAdmissionRuleStatusByAdmissionRuleConfigId(
+        pipeline: SlotPipeline,
+        id: String
+    ): SlotPipelineAdmissionRuleStatus?
+
+    /**
+     * Getting a check on a rule for a pipeline
+     */
+    fun getAdmissionRuleCheck(
+        ruleStatus: SlotPipelineAdmissionRuleStatus,
+    ): SlotDeploymentCheck
+
+    /**
+     * Given a pipeline and a rule, returns its status
+     */
+    fun getAdmissionRuleCheck(
+        pipeline: SlotPipeline,
+        admissionRule: SlotAdmissionRuleConfig
+    ): SlotDeploymentCheck
 
     /**
      * Overriding an admission rule

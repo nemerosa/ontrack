@@ -121,11 +121,11 @@ class BranchPatternSlotAdmissionRuleIT : AbstractDSLTestSupport() {
                     ).asJson()
                 ),
             )
-            val check = slotService.startDeployment(
-                pipeline = pipeline,
+            val check = slotService.runDeployment(
+                pipelineId = pipeline.id,
                 dryRun = true,
             )
-            assertTrue(check.status, "Build can be deployed")
+            assertTrue(check.ok, "Build can be deployed")
         }
     }
 
@@ -144,11 +144,11 @@ class BranchPatternSlotAdmissionRuleIT : AbstractDSLTestSupport() {
                     ).asJson()
                 ),
             )
-            val check = slotService.startDeployment(
-                pipeline = pipeline,
+            val check = slotService.runDeployment(
+                pipelineId = pipeline.id,
                 dryRun = true,
             )
-            assertFalse(check.status, "Build cannot be deployed")
+            assertFalse(check.ok, "Build cannot be deployed")
         }
     }
 

@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.environments.rules.core
 
 import net.nemerosa.ontrack.extension.environments.Slot
 import net.nemerosa.ontrack.extension.environments.SlotAdmissionRuleTestFixtures
-import net.nemerosa.ontrack.extension.environments.SlotPipelineDeploymentStatus
+import net.nemerosa.ontrack.extension.environments.SlotDeploymentActionStatus
 import net.nemerosa.ontrack.extension.environments.SlotTestSupport
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
@@ -110,9 +110,9 @@ class EnvironmentSlotAdmissionRuleIT : AbstractDSLTestSupport() {
     fun `Build deployed in previous environment default slot is deployable`() {
         withPreviousEnvironment(
             deployPreviousPipeline = true,
-        ) { deploymentStatus ->
+        ) { actionStatus ->
             assertTrue(
-                deploymentStatus.status,
+                actionStatus.ok,
                 "Build is deployable because deployed in previous environment"
             )
         }
@@ -122,9 +122,9 @@ class EnvironmentSlotAdmissionRuleIT : AbstractDSLTestSupport() {
     fun `Build not deployed in previous environment default slot is not deployable`() {
         withPreviousEnvironment(
             deployPreviousPipeline = false,
-        ) { deploymentStatus ->
+        ) { actionStatus ->
             assertFalse(
-                deploymentStatus.status,
+                actionStatus.ok,
                 "Build is NOT deployable because NOT deployed in previous environment"
             )
         }
@@ -135,9 +135,9 @@ class EnvironmentSlotAdmissionRuleIT : AbstractDSLTestSupport() {
         withPreviousEnvironment(
             deployPreviousPipeline = true,
             addPreviousPipeline = true,
-        ) { deploymentStatus ->
+        ) { actionStatus ->
             assertFalse(
-                deploymentStatus.status,
+                actionStatus.ok,
                 "Build is NOT deployable because NOT deployed in previous environment"
             )
         }
@@ -207,8 +207,8 @@ class EnvironmentSlotAdmissionRuleIT : AbstractDSLTestSupport() {
                 // Build deployed in previous environment (deployable)
                 val build2 = branch.build()
                 val pipeline = slotService.startPipeline(previousSlot, build2)
-                slotService.startDeployment(pipeline, dryRun = false)
-                slotService.finishDeployment(pipeline)
+                slotService.runDeployment(pipeline.id, dryRun = false)
+                slotService.finishDeployment(pipeline.id)
 
                 val eligibleBuilds = slotService.getEligibleBuilds(slot = slot)
                 assertEquals(
@@ -229,11 +229,11 @@ class EnvironmentSlotAdmissionRuleIT : AbstractDSLTestSupport() {
         deployPreviousPipeline: Boolean,
         addPreviousPipeline: Boolean = false,
         qualifier: String = Slot.DEFAULT_QUALIFIER,
-        code: (deploymentStatus: SlotPipelineDeploymentStatus) -> Unit,
+        code: (actionStatus: SlotDeploymentActionStatus) -> Unit,
     ) {
         slotTestSupport.withSlotPipeline(qualifier = qualifier) { previousPipeline ->
             if (deployPreviousPipeline) {
-                slotTestSupport.startAndDeployPipeline(previousPipeline)
+                slotTestSupport.runAndFinishDeployment(previousPipeline)
             }
             if (addPreviousPipeline) {
                 // Creating another build
@@ -253,9 +253,9 @@ class EnvironmentSlotAdmissionRuleIT : AbstractDSLTestSupport() {
                     )
                 )
                 val pipeline = slotService.startPipeline(slot, previousPipeline.build)
-                val deploymentStatus = slotService.startDeployment(pipeline, dryRun = true)
+                val actionStatus = slotService.runDeployment(pipeline.id, dryRun = true)
                 code(
-                    deploymentStatus,
+                    actionStatus,
                 )
             }
         }

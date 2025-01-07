@@ -136,6 +136,13 @@ class ProvisionDemo : AbstractACCDSLTestSupport() {
                                           ruleConfig:
                                             promotion: BRONZE
                                       workflows:
+                                        - trigger: CANDIDATE
+                                          name: Message
+                                          nodes:
+                                            - id: msg
+                                              executorId: mock
+                                              data:
+                                                text: Test
                                         - trigger: RUNNING
                                           name: Deployment
                                           nodes:

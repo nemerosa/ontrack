@@ -1,9 +1,7 @@
 package net.nemerosa.ontrack.extension.environments.workflows
 
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.extension.environments.Slot
-import net.nemerosa.ontrack.extension.environments.SlotPipeline
-import net.nemerosa.ontrack.extension.environments.SlotPipelineStatus
+import net.nemerosa.ontrack.extension.environments.*
 import net.nemerosa.ontrack.extension.environments.security.SlotPipelineOverride
 import net.nemerosa.ontrack.extension.environments.security.SlotPipelineWorkflowRun
 import net.nemerosa.ontrack.extension.environments.security.SlotUpdate
@@ -12,6 +10,7 @@ import net.nemerosa.ontrack.extension.environments.service.checkSlotAccess
 import net.nemerosa.ontrack.extension.environments.service.isSlotAccessible
 import net.nemerosa.ontrack.extension.environments.workflows.executors.forSlotWorkflowExecution
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowEngine
+import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceStatus
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.SerializableEventService
 import net.nemerosa.ontrack.model.security.SecurityService
@@ -128,29 +127,75 @@ class SlotWorkflowServiceImpl(
     }
 
     override fun overrideSlotWorkflowInstance(
-        pipeline: SlotPipeline,
-        slotWorkflowId: String,
         slotWorkflowInstanceId: String,
         message: String
-    ) {
-        securityService.checkSlotAccess<SlotUpdate>(pipeline.slot)
-        securityService.checkSlotAccess<SlotPipelineOverride>(pipeline.slot)
-        // Getting the slot workflow instance by ID
+    ): SlotAdmissionRuleOverride {
         val slotWorkflowInstance = getSlotWorkflowInstanceById(slotWorkflowInstanceId)
-        // Checks the pipeline is the same
-        if (slotWorkflowInstance.pipeline.id != pipeline.id) {
-            error("Mismatch between slot workflow instance and pipeline")
-        }
-        // Checks the slot workflow is the same
-        if (slotWorkflowInstance.slotWorkflow.id != slotWorkflowId) {
-            error("Mismatch between slot workflow instance and slot workflow")
-        }
+        securityService.checkSlotAccess<SlotUpdate>(slotWorkflowInstance.pipeline.slot)
+        securityService.checkSlotAccess<SlotPipelineOverride>(slotWorkflowInstance.pipeline.slot)
         // Saving the override status
+        val user = securityService.currentSignature.user.name
+        val timestamp = Time.now
         slotWorkflowInstanceRepository.override(
             slotWorkflowInstance = slotWorkflowInstance,
-            user = securityService.currentSignature.user.name,
-            timestamp = Time.now,
+            user = user,
+            timestamp = timestamp,
             message = message,
         )
+        // OK
+        return SlotAdmissionRuleOverride(
+            user = user,
+            timestamp = timestamp,
+            message = message,
+        )
+    }
+
+    override fun getSlotWorkflowChecks(
+        pipeline: SlotPipeline,
+        trigger: SlotPipelineStatus,
+        skipWorkflowId: String?
+    ): List<SlotDeploymentCheck> {
+        securityService.checkSlotAccess<SlotView>(pipeline.slot)
+        // Gets all the workflows for this trigger
+        val workflows = getSlotWorkflowsBySlotAndTrigger(pipeline.slot, trigger)
+            .filter { skipWorkflowId.isNullOrBlank() || skipWorkflowId != it.id }
+        // Gets the check for each of them
+        return workflows.map { getSlotWorkflowCheck(pipeline, it) }
+    }
+
+    private fun getSlotWorkflowCheck(
+        pipeline: SlotPipeline,
+        slotWorkflow: SlotWorkflow
+    ): SlotDeploymentCheck {
+        // Gets the instance for this workflow (if any)
+        val slotWorkflowInstance = findSlotWorkflowInstanceByPipelineAndSlotWorkflow(
+            pipeline, slotWorkflow
+        )
+        // If present, computing the check
+        return if (slotWorkflowInstance != null) {
+            if (slotWorkflowInstance.override != null) {
+                SlotDeploymentCheck(
+                    ok = true,
+                    overridden = true,
+                    reason = "Workflow was overridden",
+                )
+            } else {
+                when (slotWorkflowInstance.workflowInstance.status) {
+                    WorkflowInstanceStatus.SUCCESS -> SlotDeploymentCheck.ok()
+                    WorkflowInstanceStatus.STARTED -> SlotDeploymentCheck.nok("Workflow has started")
+                    WorkflowInstanceStatus.RUNNING -> SlotDeploymentCheck.nok("Workflow is running")
+                    WorkflowInstanceStatus.STOPPED -> SlotDeploymentCheck.nok("Workflow has been stopped")
+                    WorkflowInstanceStatus.ERROR -> SlotDeploymentCheck.nok("Workflow is in error")
+                }
+            }
+        }
+        // If not present, the workflow has not started at all
+        else {
+            SlotDeploymentCheck(
+                ok = false,
+                overridden = false,
+                reason = "Workflow has not started",
+            )
+        }
     }
 }

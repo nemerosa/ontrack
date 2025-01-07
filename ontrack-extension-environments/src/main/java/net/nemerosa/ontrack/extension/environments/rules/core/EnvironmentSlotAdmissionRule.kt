@@ -68,23 +68,23 @@ class EnvironmentSlotAdmissionRule(
         admissionRuleConfig: SlotAdmissionRuleConfig,
         ruleConfig: EnvironmentSlotAdmissionRuleConfig,
         ruleData: SlotAdmissionRuleTypedData<Any>?
-    ): DeployableCheck {
+    ): SlotDeploymentCheck {
         // Gets the previous slot
         val previousSlot = findPreviousSlot(pipeline.build, ruleConfig)
-            ?: return DeployableCheck.nok("""Cannot find previous slot for project = "${pipeline.build.project.name}", environment = ${ruleConfig.environmentName} and qualifier = "${ruleConfig.qualifier}".""")
+            ?: return SlotDeploymentCheck.nok("""Cannot find previous slot for project = "${pipeline.build.project.name}", environment = ${ruleConfig.environmentName} and qualifier = "${ruleConfig.qualifier}".""")
         // Gets its last pipeline
         val previousPipeline = slotService.getCurrentPipeline(previousSlot)
-            ?: return DeployableCheck.nok("""Slot for project = "${pipeline.build.project.name}", environment = ${ruleConfig.environmentName} and qualifier = "${ruleConfig.qualifier}" has no pipeline.""")
+            ?: return SlotDeploymentCheck.nok("""Slot for project = "${pipeline.build.project.name}", environment = ${ruleConfig.environmentName} and qualifier = "${ruleConfig.qualifier}" has no pipeline.""")
         // Checks it's for the same build
         if (previousPipeline.build.id() != pipeline.build.id()) {
-            return DeployableCheck.nok("""Pipeline for project = "${pipeline.build.project.name}", environment = ${ruleConfig.environmentName} and qualifier = "${ruleConfig.qualifier}" is for another build.""")
+            return SlotDeploymentCheck.nok("""Pipeline for project = "${pipeline.build.project.name}", environment = ${ruleConfig.environmentName} and qualifier = "${ruleConfig.qualifier}" is for another build.""")
         }
         // Checks it's deployed
         if (previousPipeline.status != SlotPipelineStatus.DONE) {
-            return DeployableCheck.nok("""Build is in a pipeline for project = "${pipeline.build.project.name}", environment = ${ruleConfig.environmentName} and qualifier = "${ruleConfig.qualifier}" but this pipeline has not been deployed.""")
+            return SlotDeploymentCheck.nok("""Build is in a pipeline for project = "${pipeline.build.project.name}", environment = ${ruleConfig.environmentName} and qualifier = "${ruleConfig.qualifier}" but this pipeline has not been deployed.""")
         }
         // OK
-        return DeployableCheck.ok()
+        return SlotDeploymentCheck.ok()
     }
 
     /**

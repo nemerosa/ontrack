@@ -72,7 +72,7 @@ class SlotPipelineWorkflowNodeExecutorsIT : AbstractNotificationTestSupport() {
                             )
                             // Creating, starting & finishing a pipeline
                             // This will trigger the workflow
-                            slotTestSupport.createStartAndDeployPipeline(slot = staging)
+                            slotTestSupport.createRunAndFinishDeployment(slot = staging)
                         }
                     }
                 }

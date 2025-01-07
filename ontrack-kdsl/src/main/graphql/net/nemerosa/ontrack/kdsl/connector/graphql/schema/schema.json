@@ -16232,41 +16232,6 @@
           "possibleTypes": null
         },
         {
-          "kind": "OBJECT",
-          "name": "DeployableCheck",
-          "description": "Result for the check of the admission for a pipeline",
-          "fields": [
-            {
-              "name": "status",
-              "description": "status field",
-              "args": [],
-              "type": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "reason",
-              "description": "reason field",
-              "args": [],
-              "type": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            }
-          ],
-          "inputFields": null,
-          "interfaces": [],
-          "enumValues": null,
-          "possibleTypes": null
-        },
-        {
           "kind": "INPUT_OBJECT",
           "name": "DisableAccountInput",
           "description": "Input type for the disableAccount mutation.",
@@ -17883,7 +17848,7 @@
               "args": [],
               "type": {
                 "kind": "OBJECT",
-                "name": "SlotPipelineDeploymentFinishStatus",
+                "name": "SlotDeploymentActionStatus",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -56886,6 +56851,80 @@
         },
         {
           "kind": "OBJECT",
+          "name": "SlotDeploymentActionStatus",
+          "description": "Result for the check of an action on a deployment",
+          "fields": [
+            {
+              "name": "ok",
+              "description": "ok field",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "message",
+              "description": "message field",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "SlotDeploymentCheck",
+          "description": "Result for the check of the admission for a pipeline",
+          "fields": [
+            {
+              "name": "ok",
+              "description": "ok field",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "reason",
+              "description": "reason field",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
           "name": "SlotGraph",
           "description": "Graph of slots for a project",
           "fields": [
@@ -57128,18 +57167,6 @@
               "deprecationReason": null
             },
             {
-              "name": "deploymentStatus",
-              "description": "Current status for the pipeline",
-              "args": [],
-              "type": {
-                "kind": "OBJECT",
-                "name": "SlotPipelineDeploymentStatus",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
               "name": "lastChange",
               "description": "Last change having occurred to the pipeline",
               "args": [],
@@ -57219,6 +57246,53 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "admissionRules",
+              "description": "All the checks for the admission rules for this deployments",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "SlotPipelineAdmissionRuleStatus"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "runAction",
+              "description": "Can this deployment be actioned into a running state?",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "SlotPipelineDeploymentStatusProgress",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "finishAction",
+              "description": "Can this deployment be completed?",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "SlotPipelineDeploymentStatusProgress",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "inputFields": null,
@@ -57232,15 +57306,15 @@
           "description": "Stored state for an admission rule in a pipeline",
           "fields": [
             {
-              "name": "id",
-              "description": "id field",
+              "name": "admissionRuleConfig",
+              "description": "admissionRuleConfig field",
               "args": [],
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
                 "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
+                  "kind": "OBJECT",
+                  "name": "SlotAdmissionRuleConfig",
                   "ofType": null
                 }
               },
@@ -57272,8 +57346,40 @@
               "deprecationReason": null
             },
             {
+              "name": "check",
+              "description": "Status check for this rule",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "SlotDeploymentCheck",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "overridden",
               "description": "Flag to check if the rule has been overridden",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "canBeOverridden",
+              "description": "True if the user is allowed to override this rule",
               "args": [],
               "type": {
                 "kind": "NON_NULL",
@@ -57363,6 +57469,22 @@
               "deprecationReason": null
             },
             {
+              "name": "type",
+              "description": "type field",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "ENUM",
+                  "name": "SlotPipelineChangeType",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "status",
               "description": "status field",
               "args": [],
@@ -57387,30 +57509,6 @@
               "deprecationReason": null
             },
             {
-              "name": "dataChanged",
-              "description": "dataChanged field",
-              "args": [],
-              "type": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "overridden",
-              "description": "overridden field",
-              "args": [],
-              "type": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
               "name": "overrideMessage",
               "description": "overrideMessage field",
               "args": [],
@@ -57426,6 +57524,41 @@
           "inputFields": null,
           "interfaces": [],
           "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "ENUM",
+          "name": "SlotPipelineChangeType",
+          "description": "Type of change in a deployment",
+          "fields": null,
+          "inputFields": null,
+          "interfaces": null,
+          "enumValues": [
+            {
+              "name": "STATUS",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "RULE_DATA",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "RULE_OVERRIDDEN",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "WORKFLOW_OVERRIDDEN",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
           "possibleTypes": null
         },
         {
@@ -57469,60 +57602,16 @@
         },
         {
           "kind": "OBJECT",
-          "name": "SlotPipelineDeploymentCheck",
-          "description": "List of checks for admission for a pipeline",
+          "name": "SlotPipelineDeploymentStatusProgress",
+          "description": "Progress for a deployment status",
           "fields": [
             {
-              "name": "check",
-              "description": "check field",
-              "args": [],
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "OBJECT",
-                  "name": "DeployableCheck",
-                  "ofType": null
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "config",
-              "description": "config field",
-              "args": [],
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "OBJECT",
-                  "name": "SlotAdmissionRuleConfig",
-                  "ofType": null
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "ruleData",
-              "description": "ruleData field",
+              "name": "ok",
+              "description": "Are all the checks OK?",
               "args": [],
               "type": {
                 "kind": "SCALAR",
-                "name": "JSON",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "override",
-              "description": "override field",
-              "args": [],
-              "type": {
-                "kind": "OBJECT",
-                "name": "SlotAdmissionRuleOverride",
+                "name": "Boolean",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -57530,46 +57619,7 @@
             },
             {
               "name": "overridden",
-              "description": "Flag to check if the rule has been overridden",
-              "args": [],
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "Boolean",
-                  "ofType": null
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "canBeOverridden",
-              "description": "True if the user is allowed to override this rule",
-              "args": [],
-              "type": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            }
-          ],
-          "inputFields": null,
-          "interfaces": [],
-          "enumValues": null,
-          "possibleTypes": null
-        },
-        {
-          "kind": "OBJECT",
-          "name": "SlotPipelineDeploymentFinishStatus",
-          "description": "Status returned when finishing a deployment",
-          "fields": [
-            {
-              "name": "deployed",
-              "description": "deployed field",
+              "description": "Was there a check being overridden?",
               "args": [],
               "type": {
                 "kind": "SCALAR",
@@ -57580,109 +57630,8 @@
               "deprecationReason": null
             },
             {
-              "name": "message",
-              "description": "message field",
-              "args": [],
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            }
-          ],
-          "inputFields": null,
-          "interfaces": [],
-          "enumValues": null,
-          "possibleTypes": null
-        },
-        {
-          "kind": "OBJECT",
-          "name": "SlotPipelineDeploymentStatus",
-          "description": "Status for the admission check of a pipeline",
-          "fields": [
-            {
-              "name": "checks",
-              "description": "checks field",
-              "args": [],
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "LIST",
-                  "name": null,
-                  "ofType": {
-                    "kind": "NON_NULL",
-                    "name": null,
-                    "ofType": {
-                      "kind": "OBJECT",
-                      "name": "SlotPipelineDeploymentCheck"
-                    }
-                  }
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "status",
-              "description": "status field",
-              "args": [],
-              "type": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "override",
-              "description": "override field",
-              "args": [],
-              "type": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "progress",
-              "description": "progress field",
-              "args": [],
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "OBJECT",
-                  "name": "SlotPipelineDeploymentStatusProgress",
-                  "ofType": null
-                }
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            }
-          ],
-          "inputFields": null,
-          "interfaces": [],
-          "enumValues": null,
-          "possibleTypes": null
-        },
-        {
-          "kind": "OBJECT",
-          "name": "SlotPipelineDeploymentStatusProgress",
-          "description": "Progress for a deployment status",
-          "fields": [
-            {
-              "name": "ok",
-              "description": "ok field",
+              "name": "successCount",
+              "description": "Number of checks being OK",
               "args": [],
               "type": {
                 "kind": "SCALAR",
@@ -57693,20 +57642,8 @@
               "deprecationReason": null
             },
             {
-              "name": "overridden",
-              "description": "overridden field",
-              "args": [],
-              "type": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              },
-              "isDeprecated": false,
-              "deprecationReason": null
-            },
-            {
-              "name": "total",
-              "description": "total field",
+              "name": "totalCount",
+              "description": "Total number of checks",
               "args": [],
               "type": {
                 "kind": "SCALAR",
@@ -58198,7 +58135,7 @@
               "args": [],
               "type": {
                 "kind": "OBJECT",
-                "name": "SlotPipelineDeploymentStatus",
+                "name": "SlotDeploymentActionStatus",
                 "ofType": null
               },
               "isDeprecated": false,

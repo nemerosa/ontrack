@@ -8,9 +8,8 @@ data class SlotPipelineChange(
     val pipeline: SlotPipeline,
     val user: String,
     val timestamp: LocalDateTime,
+    val type: SlotPipelineChangeType,
     val status: SlotPipelineStatus?,
     val message: String?,
-    val dataChanged: Boolean = false,
-    val overridden: Boolean = false,
     val overrideMessage: String? = null,
 )

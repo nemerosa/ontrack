@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.extension.environments.workflows
 
-import net.nemerosa.ontrack.extension.environments.Slot
-import net.nemerosa.ontrack.extension.environments.SlotPipeline
-import net.nemerosa.ontrack.extension.environments.SlotPipelineStatus
+import net.nemerosa.ontrack.extension.environments.*
 import net.nemerosa.ontrack.model.events.Event
 
 interface SlotWorkflowService {
@@ -40,10 +38,13 @@ interface SlotWorkflowService {
     fun updateSlotWorkflow(slotWorkflow: SlotWorkflow)
 
     fun overrideSlotWorkflowInstance(
-        pipeline: SlotPipeline,
-        slotWorkflowId: String,
         slotWorkflowInstanceId: String,
         message: String,
-    )
+    ): SlotAdmissionRuleOverride
+
+    /**
+     * Gets the check results for all the workflows of a pipeline for a given trigger.
+     */
+    fun getSlotWorkflowChecks(pipeline: SlotPipeline, trigger: SlotPipelineStatus, skipWorkflowId: String?): List<SlotDeploymentCheck>
 
 }

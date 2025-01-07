@@ -1,28 +1,35 @@
 package net.nemerosa.ontrack.extension.environments.ui
 
-import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.environments.SlotAdmissionRuleTestFixtures
+import net.nemerosa.ontrack.extension.environments.SlotPipelineDeploymentStatusProgress
 import net.nemerosa.ontrack.extension.environments.SlotPipelineStatus
 import net.nemerosa.ontrack.extension.environments.SlotTestSupport
 import net.nemerosa.ontrack.extension.environments.rules.core.ManualApprovalSlotAdmissionRuleData
 import net.nemerosa.ontrack.extension.environments.service.SlotService
+import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowService
+import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowTestSupport
+import net.nemerosa.ontrack.extension.queue.QueueNoAsync
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
+@QueueNoAsync
 class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
 
     @Autowired
     private lateinit var slotTestSupport: SlotTestSupport
 
     @Autowired
+    private lateinit var slotWorkflowTestSupport: SlotWorkflowTestSupport
+
+    @Autowired
     private lateinit var slotService: SlotService
+
+    @Autowired
+    private lateinit var slotWorkflowService: SlotWorkflowService
 
     @Test
     fun `Starting a pipeline`() {
@@ -54,10 +61,10 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                                 pipeline.path("number").asInt()
                             )
                             val pipelineId = pipeline.path("id").asText()
-                            assertNotNull(slotService.findPipelineById(pipelineId), "Pipeline found") { pipeline ->
+                            assertNotNull(slotService.findPipelineById(pipelineId), "Pipeline found") {
                                 assertEquals(
                                     SlotPipelineStatus.CANDIDATE,
-                                    pipeline.status
+                                    it.status
                                 )
                             }
                         }
@@ -99,24 +106,32 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                 """
                     {
                         slotPipelineById(id: "${pipeline.id}") {
-                            deploymentStatus {
-                                status
-                                override
-                                checks {
-                                    check {
-                                        status
-                                        reason
-                                    }
-                                    config {
-                                        ruleId
-                                        ruleConfig
-                                    }
-                                    ruleData
-                                    override {
-                                        timestamp
-                                        user
-                                        message
-                                    }
+                            runAction {
+                                ok
+                                overridden
+                                successCount
+                                totalCount
+                                percentage
+                            }
+                            admissionRules {
+                                check {
+                                    ok
+                                    reason
+                                }
+                                admissionRuleConfig {
+                                    ruleId
+                                    ruleConfig
+                                }
+                                data {
+                                    user
+                                    timestamp
+                                    data
+                                }
+                                canBeOverridden
+                                overridden
+                                override {
+                                    user
+                                    message
                                 }
                             }
                         }
@@ -126,11 +141,14 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                 assertEquals(
                     mapOf(
                         "slotPipelineById" to mapOf(
-                            "deploymentStatus" to mapOf(
-                                "status" to true,
-                                "override" to false,
-                                "checks" to emptyList<JsonNode>()
-                            )
+                            "runAction" to mapOf(
+                                "ok" to true,
+                                "overridden" to false,
+                                "successCount" to 0,
+                                "totalCount" to 0,
+                                "percentage" to 100,
+                            ),
+                            "admissionRules" to emptyList<String>()
                         )
                     ).asJson(),
                     data
@@ -150,24 +168,32 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                 """
                     {
                         slotPipelineById(id: "${pipeline.id}") {
-                            deploymentStatus {
-                                status
-                                override
-                                checks {
-                                    check {
-                                        status
-                                        reason
-                                    }
-                                    config {
-                                        ruleId
-                                        ruleConfig
-                                    }
-                                    ruleData
-                                    override {
-                                        timestamp
-                                        user
-                                        message
-                                    }
+                            runAction {
+                                ok
+                                overridden
+                                successCount
+                                totalCount
+                                percentage
+                            }
+                            admissionRules {
+                                check {
+                                    ok
+                                    reason
+                                }
+                                admissionRuleConfig {
+                                    ruleId
+                                    ruleConfig
+                                }
+                                data {
+                                    user
+                                    timestamp
+                                    data
+                                }
+                                canBeOverridden
+                                overridden
+                                override {
+                                    user
+                                    message
                                 }
                             }
                         }
@@ -177,24 +203,29 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                 assertEquals(
                     mapOf(
                         "slotPipelineById" to mapOf(
-                            "deploymentStatus" to mapOf(
-                                "status" to false,
-                                "override" to false,
-                                "checks" to listOf(
-                                    mapOf(
-                                        "check" to mapOf(
-                                            "status" to false,
-                                            "reason" to "Build not promoted"
+                            "runAction" to mapOf(
+                                "ok" to false,
+                                "overridden" to false,
+                                "successCount" to 0,
+                                "totalCount" to 1,
+                                "percentage" to 0,
+                            ),
+                            "admissionRules" to listOf(
+                                mapOf(
+                                    "check" to mapOf(
+                                        "ok" to false,
+                                        "reason" to "Build not promoted",
+                                    ),
+                                    "admissionRuleConfig" to mapOf(
+                                        "ruleId" to "promotion",
+                                        "ruleConfig" to mapOf(
+                                            "promotion" to "GOLD"
                                         ),
-                                        "config" to mapOf(
-                                            "ruleId" to "promotion",
-                                            "ruleConfig" to mapOf(
-                                                "promotion" to "GOLD"
-                                            ),
-                                        ),
-                                        "ruleData" to null,
-                                        "override" to null,
-                                    )
+                                    ),
+                                    "data" to null,
+                                    "canBeOverridden" to true,
+                                    "overridden" to false,
+                                    "override" to null,
                                 )
                             )
                         )
@@ -217,24 +248,32 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                 """
                     {
                         slotPipelineById(id: "${pipeline.id}") {
-                            deploymentStatus {
-                                status
-                                override
-                                checks {
-                                    check {
-                                        status
-                                        reason
-                                    }
-                                    config {
-                                        ruleId
-                                        ruleConfig
-                                    }
-                                    ruleData
-                                    override {
-                                        timestamp
-                                        user
-                                        message
-                                    }
+                            runAction {
+                                ok
+                                overridden
+                                successCount
+                                totalCount
+                                percentage
+                            }
+                            admissionRules {
+                                check {
+                                    ok
+                                    reason
+                                }
+                                admissionRuleConfig {
+                                    ruleId
+                                    ruleConfig
+                                }
+                                data {
+                                    user
+                                    timestamp
+                                    data
+                                }
+                                canBeOverridden
+                                overridden
+                                override {
+                                    user
+                                    message
                                 }
                             }
                         }
@@ -244,24 +283,29 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                 assertEquals(
                     mapOf(
                         "slotPipelineById" to mapOf(
-                            "deploymentStatus" to mapOf(
-                                "status" to true,
-                                "override" to false,
-                                "checks" to listOf(
-                                    mapOf(
-                                        "check" to mapOf(
-                                            "status" to true,
-                                            "reason" to "Build promoted"
+                            "runAction" to mapOf(
+                                "ok" to true,
+                                "overridden" to false,
+                                "successCount" to 1,
+                                "totalCount" to 1,
+                                "percentage" to 100,
+                            ),
+                            "admissionRules" to listOf(
+                                mapOf(
+                                    "check" to mapOf(
+                                        "ok" to true,
+                                        "reason" to "Build promoted",
+                                    ),
+                                    "admissionRuleConfig" to mapOf(
+                                        "ruleId" to "promotion",
+                                        "ruleConfig" to mapOf(
+                                            "promotion" to "GOLD"
                                         ),
-                                        "config" to mapOf(
-                                            "ruleId" to "promotion",
-                                            "ruleConfig" to mapOf(
-                                                "promotion" to "GOLD"
-                                            ),
-                                        ),
-                                        "ruleData" to null,
-                                        "override" to null,
-                                    )
+                                    ),
+                                    "data" to null,
+                                    "canBeOverridden" to true,
+                                    "overridden" to false,
+                                    "override" to null,
                                 )
                             )
                         )
@@ -289,23 +333,32 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                 """
                     {
                         slotPipelineById(id: "${pipeline.id}") {
-                            deploymentStatus {
-                                status
-                                override
-                                checks {
-                                    check {
-                                        status
-                                        reason
-                                    }
-                                    config {
-                                        ruleId
-                                        ruleConfig
-                                    }
-                                    ruleData
-                                    override {
-                                        user
-                                        message
-                                    }
+                            runAction {
+                                ok
+                                overridden
+                                successCount
+                                totalCount
+                                percentage
+                            }
+                            admissionRules {
+                                check {
+                                    ok
+                                    reason
+                                }
+                                admissionRuleConfig {
+                                    ruleId
+                                    ruleConfig
+                                }
+                                data {
+                                    user
+                                    timestamp
+                                    data
+                                }
+                                canBeOverridden
+                                overridden
+                                override {
+                                    user
+                                    message
                                 }
                             }
                         }
@@ -315,27 +368,32 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                 assertEquals(
                     mapOf(
                         "slotPipelineById" to mapOf(
-                            "deploymentStatus" to mapOf(
-                                "status" to true,
-                                "override" to true,
-                                "checks" to listOf(
-                                    mapOf(
-                                        "check" to mapOf(
-                                            "status" to false,
-                                            "reason" to "Build not promoted"
+                            "runAction" to mapOf(
+                                "ok" to true,
+                                "overridden" to true,
+                                "successCount" to 1,
+                                "totalCount" to 1,
+                                "percentage" to 100,
+                            ),
+                            "admissionRules" to listOf(
+                                mapOf(
+                                    "check" to mapOf(
+                                        "ok" to true,
+                                        "reason" to "Rule has been overridden",
+                                    ),
+                                    "admissionRuleConfig" to mapOf(
+                                        "ruleId" to "promotion",
+                                        "ruleConfig" to mapOf(
+                                            "promotion" to "GOLD"
                                         ),
-                                        "config" to mapOf(
-                                            "ruleId" to "promotion",
-                                            "ruleConfig" to mapOf(
-                                                "promotion" to "GOLD"
-                                            ),
-                                        ),
-                                        "ruleData" to null,
-                                        "override" to mapOf(
-                                            "user" to "admin",
-                                            "message" to "Because I want to"
-                                        ),
-                                    )
+                                    ),
+                                    "data" to null,
+                                    "canBeOverridden" to true,
+                                    "overridden" to true,
+                                    "override" to mapOf(
+                                        "user" to "admin",
+                                        "message" to "Because I want to"
+                                    ),
                                 )
                             )
                         )
@@ -447,6 +505,234 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                     ),
                     data
                 )
+            }
+        }
+    }
+
+    @Test
+    fun `Deployment run action not possible if already running`() {
+        slotTestSupport.withSlotPipeline { pipeline ->
+            slotService.runDeployment(pipeline.id, dryRun = false)
+            run(
+                """
+                    {
+                        slotPipelineById(id: "${pipeline.id}") {
+                            runAction {
+                                ok
+                                overridden
+                                successCount
+                                totalCount
+                                percentage
+                            }
+                        }
+                    }
+                """.trimIndent()
+            ) { data ->
+                assertEquals(
+                    mapOf(
+                        "slotPipelineById" to mapOf(
+                            "runAction" to null,
+                        )
+                    ).asJson(),
+                    data
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Deployment finish action not possible if only started`() {
+        slotTestSupport.withSlotPipeline { pipeline ->
+            run(
+                """
+                    {
+                        slotPipelineById(id: "${pipeline.id}") {
+                            finishAction {
+                                ok
+                                overridden
+                                successCount
+                                totalCount
+                                percentage
+                            }
+                        }
+                    }
+                """.trimIndent()
+            ) { data ->
+                assertEquals(
+                    mapOf(
+                        "slotPipelineById" to mapOf(
+                            "finishAction" to null,
+                        )
+                    ).asJson(),
+                    data
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Deployment finish action not possible if already finished`() {
+        slotTestSupport.withFinishedDeployment { pipeline ->
+            run(
+                """
+                    {
+                        slotPipelineById(id: "${pipeline.id}") {
+                            finishAction {
+                                ok
+                                overridden
+                                successCount
+                                totalCount
+                                percentage
+                            }
+                        }
+                    }
+                """.trimIndent()
+            ) { data ->
+                assertEquals(
+                    mapOf(
+                        "slotPipelineById" to mapOf(
+                            "finishAction" to null,
+                        )
+                    ).asJson(),
+                    data
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Deployment finish action OK when running and no workflows`() {
+        slotTestSupport.withRunningDeployment { pipeline ->
+            run(
+                """
+                    {
+                        slotPipelineById(id: "${pipeline.id}") {
+                            finishAction {
+                                ok
+                                overridden
+                                successCount
+                                totalCount
+                                percentage
+                            }
+                        }
+                    }
+                """.trimIndent()
+            ) { data ->
+                assertEquals(
+                    mapOf(
+                        "slotPipelineById" to mapOf(
+                            "finishAction" to mapOf(
+                                "ok" to true,
+                                "overridden" to false,
+                                "successCount" to 0,
+                                "totalCount" to 0,
+                                "percentage" to 100,
+                            ),
+                        )
+                    ).asJson(),
+                    data
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Deployment finish action OK when running and one successful workflow`() {
+        forFinishAction(
+            expectedProgress = SlotPipelineDeploymentStatusProgress(
+                ok = true,
+                overridden = false,
+                successCount = 1,
+                totalCount = 1,
+            )
+        )
+    }
+
+    @Test
+    fun `Deployment finish action OK when running and one errored workflow`() {
+        forFinishAction(
+            error = true,
+            expectedProgress = SlotPipelineDeploymentStatusProgress(
+                ok = false,
+                overridden = false,
+                successCount = 0,
+                totalCount = 1,
+            )
+        )
+    }
+
+    @Test
+    fun `Deployment finish action OK when running and one errored and overridden workflow`() {
+        forFinishAction(
+            error = true,
+            overridden = true,
+            expectedProgress = SlotPipelineDeploymentStatusProgress(
+                ok = true,
+                overridden = true,
+                successCount = 1,
+                totalCount = 1,
+            )
+        )
+    }
+
+    private fun forFinishAction(
+        error: Boolean = false,
+        overridden: Boolean = false,
+        expectedProgress: SlotPipelineDeploymentStatusProgress,
+    ) {
+        slotWorkflowTestSupport.withSlotWorkflow(
+            trigger = SlotPipelineStatus.RUNNING,
+            error = error,
+        ) { slot, slotWorkflow ->
+            slot.project.branch {
+                build {
+                    val pipeline = slotService.startPipeline(slot, this)
+                    val runStatus = slotService.runDeployment(pipeline.id, dryRun = false)
+                    assertTrue(runStatus.ok, "Deployment running")
+                    slotWorkflowTestSupport.waitForSlotWorkflowsToFinish(pipeline, SlotPipelineStatus.RUNNING)
+
+                    if (error && overridden) {
+                        val instance = slotWorkflowService.findSlotWorkflowInstanceByPipelineAndSlotWorkflow(
+                            pipeline,
+                            slotWorkflow,
+                        ) ?: fail("Could not find slot workflow instance")
+                        slotWorkflowService.overrideSlotWorkflowInstance(
+                            slotWorkflowInstanceId = instance.id,
+                            message = "Because this must pass"
+                        )
+                    }
+
+                    run(
+                        """
+                            {
+                                slotPipelineById(id: "${pipeline.id}") {
+                                    finishAction {
+                                        ok
+                                        overridden
+                                        successCount
+                                        totalCount
+                                        percentage
+                                    }
+                                }
+                            }
+                        """.trimIndent()
+                    ) { data ->
+                        assertEquals(
+                            mapOf(
+                                "slotPipelineById" to mapOf(
+                                    "finishAction" to mapOf(
+                                        "ok" to expectedProgress.ok,
+                                        "overridden" to expectedProgress.overridden,
+                                        "successCount" to expectedProgress.successCount,
+                                        "totalCount" to expectedProgress.totalCount,
+                                        "percentage" to expectedProgress.percentage,
+                                    ),
+                                )
+                            ).asJson(),
+                            data
+                        )
+                    }
+                }
             }
         }
     }

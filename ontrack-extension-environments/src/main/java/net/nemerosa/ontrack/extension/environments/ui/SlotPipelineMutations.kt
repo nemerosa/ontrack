@@ -1,9 +1,8 @@
 package net.nemerosa.ontrack.extension.environments.ui
 
+import net.nemerosa.ontrack.extension.environments.SlotDeploymentActionStatus
 import net.nemerosa.ontrack.extension.environments.SlotPipeline
 import net.nemerosa.ontrack.extension.environments.SlotPipelineDataInputValue
-import net.nemerosa.ontrack.extension.environments.SlotPipelineDeploymentFinishStatus
-import net.nemerosa.ontrack.extension.environments.SlotPipelineDeploymentStatus
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.graphql.schema.Mutation
 import net.nemerosa.ontrack.graphql.support.ListRef
@@ -40,15 +39,12 @@ class SlotPipelineMutations(
             input = StartSlotPipelineDeploymentInput::class,
             outputName = "deploymentStatus",
             outputDescription = "Pipeline deployment status",
-            outputType = SlotPipelineDeploymentStatus::class,
+            outputType = SlotDeploymentActionStatus::class,
         ) { input ->
-            val pipeline = slotService.findPipelineById(input.pipelineId)
-            pipeline?.let {
-                slotService.startDeployment(
-                    pipeline = it,
-                    dryRun = false,
-                )
-            }
+            slotService.runDeployment(
+                pipelineId = input.pipelineId,
+                dryRun = false,
+            )
         },
         simpleMutation(
             name = "finishSlotPipelineDeployment",
@@ -56,16 +52,13 @@ class SlotPipelineMutations(
             input = FinishSlotPipelineDeploymentInput::class,
             outputName = "finishStatus",
             outputDescription = "Status of the deployment",
-            outputType = SlotPipelineDeploymentFinishStatus::class,
+            outputType = SlotDeploymentActionStatus::class,
         ) { input ->
-            val pipeline = slotService.findPipelineById(input.pipelineId)
-            pipeline?.let {
-                slotService.finishDeployment(
-                    pipeline = it,
-                    forcing = input.forcing,
-                    message = input.message,
-                )
-            }
+            slotService.finishDeployment(
+                pipelineId = input.pipelineId,
+                forcing = input.forcing,
+                message = input.message,
+            )
         },
         unitMutation(
             name = "cancelSlotPipeline",

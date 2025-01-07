@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.environments.rules.core.ManualApprovalSlot
 import net.nemerosa.ontrack.extension.environments.rules.core.PromotionSlotAdmissionRule
 import net.nemerosa.ontrack.extension.environments.rules.core.PromotionSlotAdmissionRuleConfig
 import net.nemerosa.ontrack.extension.environments.service.SlotService
+import net.nemerosa.ontrack.extension.environments.service.getPipelineAdmissionRuleChecksForAllRules
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
@@ -70,14 +71,14 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
             // Build not promoted yet, pipeline is not deployable
             assertEquals(
                 false,
-                slotService.startDeployment(pipeline, dryRun = true).status,
+                slotService.runDeployment(pipeline.id, dryRun = true).ok,
                 "Build not promoted yet, pipeline is not deployable"
             )
             // Build promoted, pipeline is deployable
             pipeline.build.promote(pl)
             assertEquals(
                 true,
-                slotService.startDeployment(pipeline, dryRun = true).status,
+                slotService.runDeployment(pipeline.id, dryRun = true).ok,
                 "Build promoted, pipeline is deployable"
             )
         }
@@ -113,64 +114,36 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
             // Build is promoted for 1, not for 2
             pipeline.build.promote(pl1)
             // Dry-run to start the build deployment
-            var deploymentStatus = slotService.startDeployment(pipeline, dryRun = true)
+            var deploymentStatus = slotService.runDeployment(pipeline.id, dryRun = true)
             // Deployment not started
-            assertFalse(deploymentStatus.status, "Deployment not possible")
+            assertFalse(deploymentStatus.ok, "Deployment not possible")
             // Reasons
             assertEquals(
                 listOf(
-                    SlotPipelineDeploymentCheck(
-                        check = DeployableCheck(
-                            status = false,
-                            reason = "Build not promoted"
-                        ),
-                        config = promotion2Config,
-                        ruleData = null,
-                    ),
-                    SlotPipelineDeploymentCheck(
-                        check = DeployableCheck(
-                            status = true,
-                            reason = "Build promoted"
-                        ),
-                        config = promotion1Config,
-                        ruleData = null,
-                    ),
+                    SlotDeploymentCheck.nok("Build not promoted"),
+                    SlotDeploymentCheck.ok("Build promoted"),
                 ),
-                deploymentStatus.checks
+                slotService.getPipelineAdmissionRuleChecksForAllRules(pipeline)
             )
             // Passing the second promotion
             pipeline.build.promote(pl2)
-            deploymentStatus = slotService.startDeployment(pipeline, dryRun = true)
-            assertTrue(deploymentStatus.status, "Deployment possible")
+            deploymentStatus = slotService.runDeployment(pipeline.id, dryRun = true)
+            assertTrue(deploymentStatus.ok, "Deployment possible")
             // Reasons
             assertEquals(
                 listOf(
-                    SlotPipelineDeploymentCheck(
-                        check = DeployableCheck(
-                            status = true,
-                            reason = "Build promoted"
-                        ),
-                        config = promotion2Config,
-                        ruleData = null,
-                    ),
-                    SlotPipelineDeploymentCheck(
-                        check = DeployableCheck(
-                            status = true,
-                            reason = "Build promoted"
-                        ),
-                        config = promotion1Config,
-                        ruleData = null,
-                    ),
+                    SlotDeploymentCheck.ok("Build promoted"),
+                    SlotDeploymentCheck.ok("Build promoted"),
                 ),
-                deploymentStatus.checks
+                slotService.getPipelineAdmissionRuleChecksForAllRules(pipeline)
             )
         }
     }
 
     @Test
-    fun `Marking a pipeline as deploying`() {
+    fun `Marking a pipeline as running`() {
         slotTestSupport.withSlotPipeline { pipeline ->
-            slotService.startDeployment(pipeline, dryRun = false)
+            slotService.runDeployment(pipeline.id, dryRun = false)
             // Gets the pipeline
             val latestPipeline = slotService.getCurrentPipeline(pipeline.slot) ?: fail("Could not find pipeline")
             assertEquals(
@@ -183,9 +156,9 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
     @Test
     fun `Marking a pipeline as deployed (only if it was deploying)`() {
         slotTestSupport.withSlotPipeline { pipeline ->
-            assertTrue(slotService.startDeployment(pipeline, dryRun = false).status, "Deployment started")
-            val finishStatus = slotService.finishDeployment(pipeline)
-            assertEquals(true, finishStatus.deployed, "Deployment finished")
+            assertTrue(slotService.runDeployment(pipeline.id, dryRun = false).ok, "Deployment started")
+            val finishStatus = slotService.finishDeployment(pipeline.id)
+            assertEquals(true, finishStatus.ok, "Deployment finished")
             // Gets the pipeline
             val latestPipeline = slotService.getCurrentPipeline(pipeline.slot) ?: fail("Could not find pipeline")
             assertEquals(
@@ -195,8 +168,8 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
             val change = slotService.getPipelineChanges(pipeline).firstOrNull()
             assertNotNull(change) {
                 assertEquals(SlotPipelineStatus.DONE, it.status)
+                assertEquals(SlotPipelineChangeType.STATUS, it.type)
                 assertEquals("Deployment finished", it.message)
-                assertEquals(false, it.overridden)
                 assertEquals(null, it.overrideMessage)
             }
         }
@@ -206,22 +179,22 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
     fun `Overriding the pipeline deployment even if it was not deploying`() {
         slotTestSupport.withSlotPipeline { pipeline ->
             // By default, not possible to mark this pipeline as deployed
-            var finishStatus = slotService.finishDeployment(pipeline)
-            assertFalse(finishStatus.deployed, "Deployment not possible")
+            var finishStatus = slotService.finishDeployment(pipeline.id)
+            assertFalse(finishStatus.ok, "Deployment not possible")
             assertEquals(
                 "Pipeline can be deployed only if deployment has been started first.",
                 finishStatus.message,
                 "Deployment completion not possible"
             )
             // Forcing the deployment
-            finishStatus = slotService.finishDeployment(pipeline, forcing = true, message = "Deployment forced")
-            assertTrue(finishStatus.deployed, "Deployment done")
+            finishStatus = slotService.finishDeployment(pipeline.id, forcing = true, message = "Deployment forced")
+            assertTrue(finishStatus.ok, "Deployment done")
             // Checking the change
             val change = slotService.getPipelineChanges(pipeline).firstOrNull()
             assertNotNull(change) {
                 assertEquals(SlotPipelineStatus.DONE, it.status)
                 assertEquals("Deployment forced", it.message)
-                assertEquals(true, it.overridden)
+                assertEquals(SlotPipelineChangeType.STATUS, it.type)
                 assertEquals("Deployment was marked done manually.", it.overrideMessage)
             }
         }
@@ -243,8 +216,8 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
                 config = admissionRuleConfig,
             )
             // By default, we cannot mark the build for deployment because rule is not complete
-            var status = slotService.startDeployment(pipeline, dryRun = false)
-            assertFalse(status.status, "Pipeline admission not possible")
+            var status = slotService.runDeployment(pipeline.id, dryRun = false)
+            assertFalse(status.ok, "Pipeline admission not possible")
             // Overriding the rule
             slotService.overrideAdmissionRule(
                 pipeline = pipeline,
@@ -252,8 +225,8 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
                 message = "Because I want to",
             )
             // Deployment is now possible
-            status = slotService.startDeployment(pipeline, dryRun = false)
-            assertTrue(status.status, "Pipeline admission is now possible")
+            status = slotService.runDeployment(pipeline.id, dryRun = false)
+            assertTrue(status.ok, "Pipeline admission is now possible")
             // Checking that admission rule status
             val admissionRuleStatus = slotService.getPipelineAdmissionRuleStatuses(pipeline)
                 .find { it.admissionRuleConfig.id == admissionRuleConfig.id }

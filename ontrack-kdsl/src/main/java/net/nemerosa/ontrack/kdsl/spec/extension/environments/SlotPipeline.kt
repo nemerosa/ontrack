@@ -28,7 +28,7 @@ class SlotPipeline(
                 id
             )
         ) { it?.startSlotPipelineDeployment()?.fragments()?.payloadUserErrors()?.convert() }
-            ?.startSlotPipelineDeployment()?.deploymentStatus()?.status()
+            ?.startSlotPipelineDeployment()?.deploymentStatus()?.ok()
             ?: error("Cannot get the deployment status")
         if (!status) error("Deployment could not be started")
         return this

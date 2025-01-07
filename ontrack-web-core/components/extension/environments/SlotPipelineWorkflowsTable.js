@@ -6,6 +6,9 @@ import SlotWorkflowTrigger from "@components/extension/environments/SlotWorkflow
 import TimestampText from "@components/common/TimestampText";
 import WorkflowInstanceLink from "@components/extension/workflows/WorkflowInstanceLink";
 
+/**
+ * @deprecated To delete
+ */
 export default function SlotPipelineWorkflowsTable({pipeline}) {
 
     const client = useGraphQLClient()

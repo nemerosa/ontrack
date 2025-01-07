@@ -17,9 +17,10 @@ class GQLTypeSlotPipelineDeploymentStatusProgress : GQLType {
         GraphQLObjectType.newObject()
             .name(typeName)
             .description("Progress for a deployment status")
-            .intField(SlotPipelineDeploymentStatusProgress::ok)
+            .booleanField(SlotPipelineDeploymentStatusProgress::ok)
             .booleanField(SlotPipelineDeploymentStatusProgress::overridden)
-            .intField(SlotPipelineDeploymentStatusProgress::total)
+            .intField(SlotPipelineDeploymentStatusProgress::successCount)
+            .intField(SlotPipelineDeploymentStatusProgress::totalCount)
             .intField(SlotPipelineDeploymentStatusProgress::percentage)
             .build()
 }

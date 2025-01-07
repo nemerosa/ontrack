@@ -4,7 +4,10 @@ import graphql.schema.GraphQLObjectType
 import net.nemerosa.ontrack.extension.environments.SlotPipelineChange
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
-import net.nemerosa.ontrack.graphql.support.*
+import net.nemerosa.ontrack.graphql.support.enumField
+import net.nemerosa.ontrack.graphql.support.field
+import net.nemerosa.ontrack.graphql.support.localDateTimeField
+import net.nemerosa.ontrack.graphql.support.stringField
 import org.springframework.stereotype.Component
 
 @Component
@@ -20,10 +23,9 @@ class GQLTypeSlotPipelineChange : GQLType {
             .field(SlotPipelineChange::pipeline)
             .stringField(SlotPipelineChange::user)
             .localDateTimeField(SlotPipelineChange::timestamp)
+            .enumField(SlotPipelineChange::type)
             .enumField(SlotPipelineChange::status)
             .stringField(SlotPipelineChange::message)
-            .booleanField(SlotPipelineChange::dataChanged)
-            .booleanField(SlotPipelineChange::overridden)
             .stringField(SlotPipelineChange::overrideMessage)
             .build()
 

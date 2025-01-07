@@ -105,7 +105,7 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
     fun `Running a workflow on pipeline deploying`() {
         slotWorkflowTestSupport.withSlotWorkflow(trigger = SlotPipelineStatus.RUNNING) { slot, slotWorkflow ->
             val pipeline = slotTestSupport.createPipeline(slot = slot)
-            slotService.startDeployment(pipeline, dryRun = false)
+            slotService.runDeployment(pipeline.id, dryRun = false)
 
             val slotWorkflowInstance = slotWorkflowService.getSlotWorkflowInstancesByPipeline(pipeline).firstOrNull()
                 ?: fail("Expecting a slot workflow instance for the pipeline")
@@ -121,7 +121,7 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
     fun `Running a workflow on pipeline deployed`() {
         slotWorkflowTestSupport.withSlotWorkflow(trigger = SlotPipelineStatus.DONE) { slot, _ ->
 
-            val pipeline = slotTestSupport.createStartAndDeployPipeline(slot = slot)
+            val pipeline = slotTestSupport.createRunAndFinishDeployment(slot = slot)
 
             val slotWorkflowInstance = slotWorkflowService.getSlotWorkflowInstancesByPipeline(pipeline).firstOrNull()
                 ?: fail("Expecting a slot workflow instance for the pipeline")
@@ -147,31 +147,15 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
             slotWorkflowTestSupport.waitForSlotWorkflowsToFinish(pipeline, SlotPipelineStatus.CANDIDATE)
 
             // Checking the pipeline can start its deployment
-            val status = slotService.startDeployment(pipeline, dryRun = true)
-            assertTrue(status.status, "Pipeline can start deployment")
+            val status = slotService.runDeployment(pipeline.id, dryRun = true)
+            assertTrue(status.ok, "Pipeline can start deployment")
 
-            // Getting the details of the check
-            assertNotNull(status.checks.firstOrNull(), "There is a check for the workflow") { check ->
-                assertTrue(check.check.status, "Workflow finished")
-                assertEquals("Workflow successful", check.check.reason)
-                assertEquals("workflow", check.config.ruleId)
-                assertEquals(
-                    slotWorkflow.id,
-                    check.config.ruleConfig.path("slotWorkflowId").asText(),
-                )
-                assertEquals(
-                    slotWorkflow.workflow.name,
-                    check.config.name,
-                )
-                assertNotNull(
-                    check.ruleData?.path("slotWorkflowInstanceId")?.asText(),
-                    "slotWorkflowInstanceId is present in the check data"
-                ) { slotWorkflowInstanceId ->
-                    assertTrue(
-                        slotWorkflowInstanceId.isNotBlank(),
-                        "slotWorkflowInstanceId is present in the check data"
-                    )
-                }
+            // Getting the details of the instance
+            assertNotNull(
+                slotWorkflowService.findSlotWorkflowInstanceByPipelineAndSlotWorkflow(pipeline, slotWorkflow),
+                "There is an instance for the workflow"
+            ) { instance ->
+                assertTrue(instance.workflowInstance.status.finished, "Workflow finished")
             }
         }
     }
@@ -187,9 +171,8 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
             val pipeline = slotTestSupport.createPipeline(slot = slot)
 
             // Trying to start the deployment
-            val status = slotService.startDeployment(pipeline, dryRun = false)
-            assertFalse(status.status, "Pipeline can not start its deployment")
-
+            val status = slotService.runDeployment(pipeline.id, dryRun = false)
+            assertFalse(status.ok, "Pipeline can not start its deployment")
         }
     }
 
@@ -204,8 +187,8 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
             val pipeline = slotTestSupport.createPipeline(slot = slot)
 
             // Starting the deployment
-            val status = slotService.startDeployment(pipeline, dryRun = false)
-            assertTrue(status.status, "Pipeline has started its deployment")
+            val status = slotService.runDeployment(pipeline.id, dryRun = false)
+            assertTrue(status.ok, "Pipeline has started its deployment")
 
             // Reloading the pipeline's status
             val deployingPipeline = slotService.getPipelineById(pipeline.id)
@@ -215,8 +198,8 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
             slotWorkflowTestSupport.waitForSlotWorkflowsToFinish(pipeline, SlotPipelineStatus.RUNNING)
 
             // Finish the deployment
-            val end = slotService.finishDeployment(deployingPipeline)
-            assertFalse(end.deployed, "Pipeline could not be deployed")
+            val end = slotService.finishDeployment(deployingPipeline.id)
+            assertFalse(end.ok, "Pipeline could not be deployed")
 
         }
     }
@@ -226,45 +209,47 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
         slotWorkflowTestSupport.withSlotWorkflow(
             trigger = SlotPipelineStatus.RUNNING,
             error = true,
-        ) { slot, _ ->
+        ) { slot, slotWorkflow ->
             // Creating a pipeline
             val pipeline = slotTestSupport.createPipeline(slot = slot)
 
             // Launching the pipeline, this will create a failed workflow
-            val status = slotService.startDeployment(pipeline, dryRun = false)
-            assertTrue(status.status, "Pipeline has started its deployment")
+            val status = slotService.runDeployment(pipeline.id, dryRun = false)
+            assertTrue(status.ok, "Pipeline has started its deployment")
 
             // Waiting for the pipeline's workflows to finish
             slotWorkflowTestSupport.waitForSlotWorkflowsToFinish(pipeline, SlotPipelineStatus.RUNNING)
 
             // The workflow has failed, and prevents the pipeline completion
-            var end = slotService.finishDeployment(pipeline)
-            assertFalse(end.deployed, "Pipeline could not be deployed")
+            var end = slotService.finishDeployment(pipeline.id)
+            assertFalse(end.ok, "Pipeline could not be deployed")
 
-            // Getting the checks
-            val deploymentStatus = slotService.status(pipeline.id)
-            val workflowCheck = deploymentStatus.checks.find { it.config.ruleId == "workflow" }
-                ?: fail("Missing workflow check")
-            assertNull(workflowCheck.override)
+            // Getting the workflow reason
+            val instance = slotWorkflowService.findSlotWorkflowInstanceByPipelineAndSlotWorkflow(pipeline, slotWorkflow)
+                ?: fail("Could not find slot workflow instance")
+            assertEquals(WorkflowInstanceStatus.ERROR, instance.workflowInstance.status)
+            assertNull(instance.override)
 
             // Now, we override the workflow status
-            slotService.overrideAdmissionRule(
-                pipeline = pipeline,
-                admissionRuleConfig = workflowCheck.config,
+            slotWorkflowService.overrideSlotWorkflowInstance(
+                slotWorkflowInstanceId = instance.id,
                 message = "The workflow failed, but we want to carry on",
             )
 
             // Checks that the workflow has been overridden
-            val newDeploymentStatus = slotService.status(pipeline.id)
-            val newWorkflowCheck = newDeploymentStatus.checks.find { it.config.ruleId == "workflow" }
-                ?: fail("Missing workflow check")
-            assertEquals("admin", newWorkflowCheck.override?.user)
-            assertNotNull(newWorkflowCheck.override?.timestamp)
-            assertEquals("The workflow failed, but we want to carry on", newWorkflowCheck.override?.message)
+            val overriddenInstance =
+                slotWorkflowService.findSlotWorkflowInstanceByPipelineAndSlotWorkflow(pipeline, slotWorkflow)
+                    ?: fail("Could not find slot workflow instance")
+            assertEquals(WorkflowInstanceStatus.ERROR, overriddenInstance.workflowInstance.status)
+            assertNotNull(overriddenInstance.override) {
+                assertEquals("The workflow failed, but we want to carry on", it.message)
+                assertEquals("admin", it.user)
+                assertNotNull(it.timestamp, "Timestamp has been set")
+            }
 
             // ... and complete the deployment again
-            end = slotService.finishDeployment(pipeline)
-            assertTrue(end.deployed, "Pipeline can now be deployed")
+            end = slotService.finishDeployment(pipeline.id)
+            assertTrue(end.ok, "Pipeline can now be deployed")
 
             // Reloading the pipeline's status
             val deployedPipeline = slotService.getPipelineById(pipeline.id)

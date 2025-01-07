@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.environments.storage
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.environments.SlotPipeline
 import net.nemerosa.ontrack.extension.environments.SlotPipelineChange
+import net.nemerosa.ontrack.extension.environments.SlotPipelineChangeType
 import net.nemerosa.ontrack.extension.environments.SlotPipelineStatus
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.springframework.stereotype.Repository
@@ -17,18 +18,17 @@ class SlotPipelineChangeRepository(
     fun save(slotPipelineChange: SlotPipelineChange) {
         namedParameterJdbcTemplate!!.update(
             """
-                INSERT INTO ENV_SLOT_PIPELINE_CHANGE (ID, PIPELINE_ID, "USER", TIMESTAMP, STATUS, MESSAGE, DATA_CHANGED, OVERRIDDEN, OVERRIDE_MESSAGE)
-                VALUES (:id, :pipelineId, :user, :timestamp, :status, :message, :dataChanged, :overridden, :overrideMessage)
+                INSERT INTO ENV_SLOT_PIPELINE_CHANGE (ID, PIPELINE_ID, "USER", TIMESTAMP, TYPE, STATUS, MESSAGE, OVERRIDE_MESSAGE)
+                VALUES (:id, :pipelineId, :user, :timestamp, :type, :status, :message, :overrideMessage)
             """,
             mapOf(
                 "id" to slotPipelineChange.id,
                 "pipelineId" to slotPipelineChange.pipeline.id,
                 "user" to slotPipelineChange.user,
                 "timestamp" to Time.store(slotPipelineChange.timestamp),
+                "type" to slotPipelineChange.type.name,
                 "status" to slotPipelineChange.status?.name,
                 "message" to slotPipelineChange.message,
-                "dataChanged" to slotPipelineChange.dataChanged,
-                "overridden" to slotPipelineChange.overridden,
                 "overrideMessage" to slotPipelineChange.overrideMessage,
             )
         )
@@ -51,10 +51,9 @@ class SlotPipelineChangeRepository(
                 pipeline = slotPipelineRepository.getPipelineById(rs.getString("pipeline_id")),
                 user = rs.getString("user"),
                 timestamp = Time.fromStorage(rs.getString("timestamp"))!!,
+                type = SlotPipelineChangeType.valueOf(rs.getString("type")),
                 status = rs.getString("status")?.let { SlotPipelineStatus.valueOf(it) },
                 message = rs.getString("message"),
-                dataChanged = rs.getBoolean("data_changed"),
-                overridden = rs.getBoolean("overridden"),
                 overrideMessage = rs.getString("override_message"),
             )
         }

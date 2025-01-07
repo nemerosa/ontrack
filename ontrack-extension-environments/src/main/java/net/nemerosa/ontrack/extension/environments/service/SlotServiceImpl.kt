@@ -7,8 +7,7 @@ import net.nemerosa.ontrack.extension.environments.events.EnvironmentsEventsFact
 import net.nemerosa.ontrack.extension.environments.rules.SlotAdmissionRuleRegistry
 import net.nemerosa.ontrack.extension.environments.security.*
 import net.nemerosa.ontrack.extension.environments.storage.*
-import net.nemerosa.ontrack.extension.environments.workflows.*
-import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceStatus
+import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowService
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.EventPostService
 import net.nemerosa.ontrack.model.pagination.PaginatedList
@@ -257,6 +256,7 @@ class SlotServiceImpl(
                 pipeline = pipeline,
                 user = securityService.currentSignature.user.name,
                 timestamp = pipeline.start,
+                type = SlotPipelineChangeType.STATUS,
                 status = pipeline.status,
                 message = "Pipeline started",
             )
@@ -338,6 +338,7 @@ class SlotServiceImpl(
         changePipeline(
             pipeline = pipeline,
             status = SlotPipelineStatus.CANCELLED,
+            type = SlotPipelineChangeType.STATUS,
             message = reason,
         )
         eventPostService.post(environmentsEventsFactory.pipelineCancelled(pipeline))
@@ -345,9 +346,9 @@ class SlotServiceImpl(
 
     private fun changePipeline(
         pipeline: SlotPipeline,
+        type: SlotPipelineChangeType,
         status: SlotPipelineStatus,
         message: String,
-        data: SlotAdmissionRuleData? = null,
         override: SlotAdmissionRuleOverride? = null,
     ) {
         val user = securityService.currentSignature.user.name
@@ -357,10 +358,9 @@ class SlotServiceImpl(
                 pipeline = pipeline,
                 user = user,
                 timestamp = timestamp,
+                type = type,
                 status = status,
                 message = message,
-                dataChanged = data != null,
-                overridden = override != null,
                 overrideMessage = override?.message,
             )
         )
@@ -382,50 +382,69 @@ class SlotServiceImpl(
         return slotPipelineChangeRepository.findByPipeline(pipeline)
     }
 
-    override fun status(pipelineId: String, skipWorkflowId: String?): SlotPipelineDeploymentStatus {
+    override fun getDeploymentRunActionProgress(pipelineId: String): SlotPipelineDeploymentStatusProgress? {
         val pipeline = slotPipelineRepository.getPipelineById(pipelineId)
         securityService.checkSlotAccess<SlotView>(pipeline.slot)
 
-        // Collecting all checks
-        val checks = mutableListOf<SlotPipelineDeploymentCheck>()
-
-        // Gets all the admission rules
-        if (pipeline.status == SlotPipelineStatus.CANDIDATE) {
-            val configs = slotAdmissionRuleConfigRepository.getAdmissionRuleConfigs(pipeline.slot)
-            val rulesChecks = configs.map { config ->
-                checkDeployment(pipeline, config)
-            }
-            checks += rulesChecks
+        // Checking the pipeline status
+        if (pipeline.status != SlotPipelineStatus.CANDIDATE) {
+            return null
         }
 
-        // Gets the workflows based on the pipeline status
-        val workflowChecks =
-            getWorkflowPipelineChecks(pipeline, skipWorkflowId)
-        checks += workflowChecks
+        // Admission rules statuses
+        val checks = getPipelineAdmissionRuleChecksForAllRules(pipeline).toMutableList()
 
-        // All rules must assert that the build is OK for being deployed
-        return SlotPipelineDeploymentStatus(checks = checks)
+        // Checking the workflows
+        checks += slotWorkflowService.getSlotWorkflowChecks(pipeline, SlotPipelineStatus.CANDIDATE, skipWorkflowId = null)
+
+        // Progress
+        return deploymentStatusProcessFromChecks(checks)
     }
 
-    override fun startDeployment(
-        pipeline: SlotPipeline,
+    override fun runDeployment(
+        pipelineId: String,
         dryRun: Boolean,
         skipWorkflowId: String?
-    ): SlotPipelineDeploymentStatus {
+    ): SlotDeploymentActionStatus {
+        val pipeline = slotPipelineRepository.getPipelineById(pipelineId)
         securityService.checkSlotAccess<SlotPipelineStart>(pipeline.slot)
+
         // Always checking the project
         if (pipeline.build.project != pipeline.slot.project) {
             throw SlotPipelineProjectException(pipeline)
         }
-        // Getting the pipeline status
-        val status = status(pipeline.id, skipWorkflowId)
+
+        // Checking the pipeline status
+        if (pipeline.status != SlotPipelineStatus.CANDIDATE) {
+            return SlotDeploymentActionStatus.nok("Cannot run a deployment if not a candidate")
+        }
+
+        // Admission rules statuses
+        val admissionRules = slotAdmissionRuleConfigRepository.getAdmissionRuleConfigs(pipeline.slot)
+        val rulesChecks = admissionRules.map { admissionRule ->
+            val ruleStatus = slotPipelineAdmissionRuleStatusRepository.findStatusByPipelineAndAdmissionRuleConfig(
+                pipeline,
+                admissionRule
+            )
+            getAdmissionRuleCheck(pipeline, admissionRule, ruleStatus)
+        }
+        if (rulesChecks.any { !it.ok }) {
+            return SlotDeploymentActionStatus.nok("Some admission rules prevent the deployment to start")
+        }
+
+        val workflowChecks = slotWorkflowService.getSlotWorkflowChecks(pipeline, SlotPipelineStatus.CANDIDATE, skipWorkflowId)
+        if (workflowChecks.any { !it.ok }) {
+            return SlotDeploymentActionStatus.nok("Some workflows prevent the deployment to start")
+        }
+
         // Actual start
-        if (!dryRun && status.status) {
-            // Marks this pipeline as deploying
+        if (!dryRun) {
+            // Marks this pipeline as running
             changePipeline(
                 pipeline = pipeline,
+                type = SlotPipelineChangeType.STATUS,
                 status = SlotPipelineStatus.RUNNING,
-                message = "Deployment started",
+                message = "Deployment running",
             )
             // Workflows
             val event = environmentsEventsFactory.pipelineDeploying(pipeline)
@@ -437,124 +456,127 @@ class SlotServiceImpl(
             eventPostService.post(event)
         }
         // OK
-        return status
+        return SlotDeploymentActionStatus.ok("Deployment running")
     }
 
-    private fun getWorkflowPipelineChecks(
-        pipeline: SlotPipeline,
-        skipWorkflowId: String?,
-    ): List<SlotPipelineDeploymentCheck> {
-        return slotWorkflowService.getSlotWorkflowsBySlotAndTrigger(
-            pipeline.slot,
-            pipeline.status,
+    override fun getAdmissionRuleCheck(
+        ruleStatus: SlotPipelineAdmissionRuleStatus,
+    ): SlotDeploymentCheck =
+        getAdmissionRuleCheck(
+            pipeline = ruleStatus.pipeline,
+            admissionRule = ruleStatus.admissionRuleConfig,
+            ruleStatus = ruleStatus,
         )
-            .filter { skipWorkflowId == null || skipWorkflowId != it.id }
-            .map { slotWorkflow ->
-                val slotWorkflowInstance =
-                    slotWorkflowService.findSlotWorkflowInstanceByPipelineAndSlotWorkflow(pipeline, slotWorkflow)
-                slotWorkflowInstance
-                    ?.let {
-                        getWorkflowDeploymentCheck(it)
-                    }
-                    ?: getWorkflowDeploymentCheckNotFound(pipeline, slotWorkflow)
-            }
+
+    override fun getAdmissionRuleCheck(
+        pipeline: SlotPipeline,
+        admissionRule: SlotAdmissionRuleConfig
+    ): SlotDeploymentCheck {
+        val status = slotPipelineAdmissionRuleStatusRepository.findStatusByPipelineAndAdmissionRuleConfig(
+            pipeline = pipeline,
+            config = admissionRule,
+        )
+        return getAdmissionRuleCheck(
+            pipeline = pipeline,
+            admissionRule = admissionRule,
+            ruleStatus = status,
+        )
     }
 
-    private fun getWorkflowDeploymentCheck(slotWorkflowInstance: SlotWorkflowInstance): SlotPipelineDeploymentCheck =
-        when (slotWorkflowInstance.workflowInstance.status) {
-
-            WorkflowInstanceStatus.STARTED -> getWorkflowDeploymentCheck(
-                slotWorkflowInstance,
-                status = false,
-                reason = "Workflow started"
-            )
-
-            WorkflowInstanceStatus.RUNNING -> getWorkflowDeploymentCheck(
-                slotWorkflowInstance,
-                status = false,
-                reason = "Workflow running"
-            )
-
-            WorkflowInstanceStatus.SUCCESS -> getWorkflowDeploymentCheck(
-                slotWorkflowInstance,
-                status = true,
-                reason = "Workflow successful"
-            )
-
-            WorkflowInstanceStatus.STOPPED -> getWorkflowDeploymentCheck(
-                slotWorkflowInstance,
-                status = false,
-                reason = "Workflow stopped"
-            )
-
-            WorkflowInstanceStatus.ERROR -> getWorkflowDeploymentCheck(
-                slotWorkflowInstance,
-                status = false,
-                reason = "Workflow in error"
+    private fun getAdmissionRuleCheck(
+        pipeline: SlotPipeline,
+        admissionRule: SlotAdmissionRuleConfig,
+        ruleStatus: SlotPipelineAdmissionRuleStatus?
+    ): SlotDeploymentCheck {
+        if (ruleStatus?.override != null) {
+            return SlotDeploymentCheck(
+                ok = true,
+                overridden = true,
+                reason = "Rule has been overridden"
             )
         }
+        val rule = slotAdmissionRuleRegistry.getRule(admissionRule.ruleId)
+        return getAdmissionRuleCheck(
+            pipeline,
+            rule,
+            admissionRule,
+            ruleStatus,
+        )
+    }
 
-    private fun getWorkflowDeploymentCheck(
-        slotWorkflowInstance: SlotWorkflowInstance,
-        status: Boolean,
-        reason: String
-    ) = SlotPipelineDeploymentCheck(
-        check = DeployableCheck.check(status, reason, reason),
-        config = getWorkflowRuleConfig(
-            slotWorkflowInstance.pipeline,
-            slotWorkflowInstance.slotWorkflow,
-            slotWorkflowInstance
-        ),
-        ruleData = WorkflowSlotAdmissionRuleData(slotWorkflowInstanceId = slotWorkflowInstance.id).asJson(),
-        override = slotWorkflowInstance.override,
-    )
+    private fun <C, D> getAdmissionRuleCheck(
+        pipeline: SlotPipeline,
+        rule: SlotAdmissionRule<C, D>,
+        admissionRule: SlotAdmissionRuleConfig,
+        ruleStatus: SlotPipelineAdmissionRuleStatus?
+    ): SlotDeploymentCheck {
+        return rule.isBuildDeployable(
+            pipeline = pipeline,
+            admissionRuleConfig = admissionRule,
+            ruleConfig = rule.parseConfig(admissionRule.ruleConfig),
+            ruleData = ruleStatus?.data?.let {
+                val parsedData = rule.parseData(it.data)
+                SlotAdmissionRuleTypedData(
+                    timestamp = it.timestamp,
+                    user = it.user,
+                    data = parsedData,
+                )
+            }
+        )
+    }
 
-    private fun getWorkflowDeploymentCheckNotFound(pipeline: SlotPipeline, slotWorkflow: SlotWorkflow) =
-        SlotPipelineDeploymentCheck(
-            check = DeployableCheck.nok("Workflow not started"),
-            config = getWorkflowRuleConfig(pipeline, slotWorkflow, null),
-            ruleData = null,
+    override fun getDeploymentFinishActionProgress(pipelineId: String): SlotPipelineDeploymentStatusProgress? {
+        val pipeline = slotPipelineRepository.getPipelineById(pipelineId)
+        securityService.checkSlotAccess<SlotView>(pipeline.slot)
+
+        // Checking the pipeline status
+        if (pipeline.status != SlotPipelineStatus.RUNNING) {
+            return null
+        }
+
+        // Checking the workflows
+        val checks = slotWorkflowService.getSlotWorkflowChecks(pipeline, SlotPipelineStatus.RUNNING, skipWorkflowId = null)
+
+        // Progress
+        return deploymentStatusProcessFromChecks(checks)
+    }
+
+    private fun deploymentStatusProcessFromChecks(checks: List<SlotDeploymentCheck>) =
+        SlotPipelineDeploymentStatusProgress(
+            ok = checks.all { it.ok },
+            overridden = checks.any { it.overridden },
+            successCount = checks.count { it.ok },
+            totalCount = checks.size,
         )
 
-    private fun getWorkflowRuleConfig(
-        pipeline: SlotPipeline,
-        slotWorkflow: SlotWorkflow,
-        slotWorkflowInstance: SlotWorkflowInstance?,
-    ) = SlotAdmissionRuleConfig(
-        id = slotWorkflow.id,
-        slot = pipeline.slot,
-        name = slotWorkflow.workflow.name,
-        description = "Workflow rule",
-        ruleId = WorkflowSlotAdmissionRule.ID,
-        ruleConfig = WorkflowSlotAdmissionRule.getConfig(slotWorkflow, slotWorkflowInstance).asJson(),
-    )
-
     override fun finishDeployment(
-        pipeline: SlotPipeline,
+        pipelineId: String,
         skipWorkflowId: String?,
         forcing: Boolean,
         message: String?
-    ): SlotPipelineDeploymentFinishStatus {
+    ): SlotDeploymentActionStatus {
+        val pipeline = slotPipelineRepository.getPipelineById(pipelineId)
         securityService.checkSlotAccess<SlotPipelineFinish>(pipeline.slot)
         // Only last pipeline can be deployed
         val lastPipeline = getCurrentPipeline(pipeline.slot)
         if (lastPipeline?.id != pipeline.id) {
-            return SlotPipelineDeploymentFinishStatus.nok("Only the last pipeline can be deployed.")
+            return SlotDeploymentActionStatus.nok("Only the last pipeline can be deployed.")
         }
-        // Checking if pipeline is deploying
+        // Checking if pipeline is running
         if (lastPipeline.status != SlotPipelineStatus.RUNNING && !forcing) {
-            return SlotPipelineDeploymentFinishStatus.nok("Pipeline can be deployed only if deployment has been started first.")
+            return SlotDeploymentActionStatus.nok("Pipeline can be deployed only if deployment has been started first.")
         }
-        // Checking the status
-        val status = status(pipeline.id, skipWorkflowId)
-        if (!status.status) {
-            return SlotPipelineDeploymentFinishStatus.nok("Pipeline can not be deployed because some workflows are failing.")
+        // Checking the workflows
+        val workflowChecks = slotWorkflowService.getSlotWorkflowChecks(pipeline, SlotPipelineStatus.RUNNING, skipWorkflowId = skipWorkflowId)
+        if (workflowChecks.any { !it.ok }) {
+            return SlotDeploymentActionStatus.nok("Some workflows prevent the deployment to complete")
         }
         // Actual message
         val actualMessage = message ?: "Deployment finished"
         // Marking the pipeline as deployed
         changePipeline(
             pipeline = pipeline,
+            type = SlotPipelineChangeType.STATUS,
             status = SlotPipelineStatus.DONE,
             message = actualMessage,
             override = if (forcing) {
@@ -577,51 +599,7 @@ class SlotServiceImpl(
         // Event
         eventPostService.post(event)
         // OK
-        return SlotPipelineDeploymentFinishStatus.ok(actualMessage)
-    }
-
-    private fun checkDeployment(
-        pipeline: SlotPipeline,
-        config: SlotAdmissionRuleConfig,
-    ): SlotPipelineDeploymentCheck {
-        // Checking the rule
-        val rule = slotAdmissionRuleRegistry.getRule(config.ruleId)
-        val check = checkDeployment(pipeline, config, rule)
-        // Getting the rule status for this pipeline
-        if (!check.check.status) {
-            val override =
-                slotPipelineAdmissionRuleStatusRepository.findStatusesByPipelineAndAdmissionRuleConfig(pipeline, config)
-                    .firstNotNullOfOrNull { it.override }
-            if (override != null) {
-                return check.withOverride(override)
-            }
-        }
-        // OK
-        return check
-    }
-
-    private fun <C, D> checkDeployment(
-        pipeline: SlotPipeline,
-        config: SlotAdmissionRuleConfig,
-        rule: SlotAdmissionRule<C, D>,
-    ): SlotPipelineDeploymentCheck {
-        // Parsing the config
-        val ruleConfig = rule.parseConfig(config.ruleConfig)
-        // Gets any data associated with this config & pipeline
-        val state = findPipelineAdmissionRuleStatusByAdmissionRuleConfigId(pipeline, config.id)
-        val ruleData = state?.data?.let {
-            SlotAdmissionRuleTypedData(
-                timestamp = it.timestamp,
-                user = it.user,
-                data = rule.parseData(it.data),
-            )
-        }
-        // Checking the rule
-        return SlotPipelineDeploymentCheck(
-            check = rule.isBuildDeployable(pipeline, config, ruleConfig, ruleData),
-            config = config,
-            ruleData = ruleData?.asJson(),
-        )
+        return SlotDeploymentActionStatus.ok(actualMessage)
     }
 
     override fun getCurrentPipeline(slot: Slot): SlotPipeline? {
@@ -634,6 +612,21 @@ class SlotServiceImpl(
         return slotPipelineAdmissionRuleStatusRepository.findStatusesByPipeline(pipeline)
     }
 
+    override fun findPipelineAdmissionRuleStatusByAdmissionRuleConfigId(
+        pipeline: SlotPipeline,
+        id: String
+    ): SlotPipelineAdmissionRuleStatus? {
+        securityService.checkSlotAccess<SlotView>(pipeline.slot)
+        val config = slotAdmissionRuleConfigRepository.getAdmissionRuleConfigById(
+            pipeline.slot,
+            id
+        )
+        return slotPipelineAdmissionRuleStatusRepository.findStatusByPipelineAndAdmissionRuleConfig(
+            pipeline = pipeline,
+            config = config,
+        )
+    }
+
     override fun overrideAdmissionRule(
         pipeline: SlotPipeline,
         admissionRuleConfig: SlotAdmissionRuleConfig,
@@ -642,29 +635,33 @@ class SlotServiceImpl(
         securityService.checkSlotAccess<SlotPipelineOverride>(pipeline.slot)
         // Checking that we are targeting the same slot
         checkSameSlot(pipeline, admissionRuleConfig)
-        // Redirects to specific code for some rules
-        if (admissionRuleConfig.ruleId == WorkflowSlotAdmissionRule.ID) {
-            slotWorkflowService.overrideSlotWorkflowInstance(
+        // Gets the existing status
+        val existing = slotPipelineAdmissionRuleStatusRepository.findStatusByPipelineAndAdmissionRuleConfig(
+            pipeline = pipeline,
+            config = admissionRuleConfig,
+        )
+        // Overriding the rule
+        val override = SlotAdmissionRuleOverride(
+            timestamp = Time.now,
+            user = securityService.currentSignature.user.name,
+            message = message,
+        )
+        slotPipelineAdmissionRuleStatusRepository.saveStatus(
+            SlotPipelineAdmissionRuleStatus(
                 pipeline = pipeline,
                 admissionRuleConfig = admissionRuleConfig,
-                message = message
+                data = existing?.data,
+                override = override,
             )
-        }
-        // Standard behaviour
-        else {
-            // Overriding the rule
-            slotPipelineAdmissionRuleStatusRepository.saveStatus(
-                SlotPipelineAdmissionRuleStatus(
-                    pipeline = pipeline,
-                    admissionRuleConfig = admissionRuleConfig,
-                    override = SlotAdmissionRuleOverride(
-                        timestamp = Time.now,
-                        user = securityService.currentSignature.user.name,
-                        message = message,
-                    )
-                )
-            )
-        }
+        )
+        // Registering the change
+        changePipeline(
+            pipeline = pipeline,
+            type = SlotPipelineChangeType.RULE_OVERRIDDEN,
+            status = pipeline.status,
+            message = "Rule overridden",
+            override = override,
+        )
         eventPostService.post(environmentsEventsFactory.pipelineStatusOverridden(pipeline))
     }
 
@@ -696,6 +693,11 @@ class SlotServiceImpl(
             val rule = slotAdmissionRuleRegistry.getRule(admissionRuleConfig.ruleId)
             // Checks the rule for the new state
             rule.checkData(admissionRuleConfig.ruleConfig, data)
+            // Gets the existing status
+            val existing = slotPipelineAdmissionRuleStatusRepository.findStatusByPipelineAndAdmissionRuleConfig(
+                pipeline = pipeline,
+                config = admissionRuleConfig,
+            )
             // Overriding the rule
             slotPipelineAdmissionRuleStatusRepository.saveStatus(
                 SlotPipelineAdmissionRuleStatus(
@@ -706,7 +708,16 @@ class SlotServiceImpl(
                         user = securityService.currentSignature.user.name,
                         data = data,
                     ),
+                    override = existing?.override,
                 )
+            )
+            // Registering the change
+            changePipeline(
+                pipeline = pipeline,
+                type = SlotPipelineChangeType.RULE_DATA,
+                status = pipeline.status,
+                message = "Rule data changed",
+                override = null,
             )
         } else {
             throw SlotPipelineDataNotOngoingException()

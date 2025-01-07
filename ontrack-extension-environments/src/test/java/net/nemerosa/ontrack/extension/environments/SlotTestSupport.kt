@@ -77,27 +77,38 @@ class SlotTestSupport : AbstractDSLTestSupport() {
             slotService.startPipeline(slot, build)
         }
 
-    fun createStartAndDeployPipeline(
+    fun createRunAndFinishDeployment(
         branchName: String = uid("B"),
         slot: Slot
     ): SlotPipeline =
         createPipeline(branchName, slot).apply {
-            startAndDeployPipeline(this)
+            runAndFinishDeployment(this)
         }
 
-    fun startAndDeployPipeline(pipeline: SlotPipeline) {
-        val status = slotService.startDeployment(pipeline, dryRun = false)
-        assertTrue(status.status, "Pipeline deploying")
-        val result = slotService.finishDeployment(pipeline)
-        assertTrue(result.deployed, "Pipeline deployed")
+    fun runAndFinishDeployment(pipeline: SlotPipeline) {
+        val status = slotService.runDeployment(pipeline.id, dryRun = false)
+        assertTrue(status.ok, "Pipeline deploying")
+        val result = slotService.finishDeployment(pipeline.id)
+        assertTrue(result.ok, "Pipeline deployed")
     }
 
-    fun withDeployedSlotPipeline(
+    fun withRunningDeployment(
         branchName: String = uid("B"),
         code: (pipeline: SlotPipeline) -> Unit,
     ) {
         withSlotPipeline(branchName = branchName) { pipeline ->
-            startAndDeployPipeline(pipeline)
+            val status = slotService.runDeployment(pipeline.id, dryRun = false)
+            assertTrue(status.ok, "Pipeline running")
+            code(pipeline)
+        }
+    }
+
+    fun withFinishedDeployment(
+        branchName: String = uid("B"),
+        code: (pipeline: SlotPipeline) -> Unit,
+    ) {
+        withSlotPipeline(branchName = branchName) { pipeline ->
+            runAndFinishDeployment(pipeline)
             code(pipeline)
         }
     }

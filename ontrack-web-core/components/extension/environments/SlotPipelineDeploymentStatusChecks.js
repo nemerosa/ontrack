@@ -10,6 +10,9 @@ import {gql} from "graphql-request";
 
 const {Column} = Table
 
+/**
+ * @deprecated To delete
+ */
 export default function SlotPipelineDeploymentStatusChecks({pipeline, onChange}) {
 
     const {loading, error, data} = useQuery(

@@ -6,7 +6,7 @@ mutation StartDeployingPipeline(
     }) {
         ...PayloadUserErrors
         deploymentStatus {
-            status
+            ok
         }
     }
 }

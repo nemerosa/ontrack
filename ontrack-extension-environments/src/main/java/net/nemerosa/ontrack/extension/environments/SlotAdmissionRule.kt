@@ -54,7 +54,7 @@ interface SlotAdmissionRule<C, D> {
         admissionRuleConfig: SlotAdmissionRuleConfig,
         ruleConfig: C,
         ruleData: SlotAdmissionRuleTypedData<D>?,
-    ): DeployableCheck
+    ): SlotDeploymentCheck
 
     /**
      * Parsing the stored/client data into typed data for this rule

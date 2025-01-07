@@ -1,12 +1,15 @@
 package net.nemerosa.ontrack.extension.environments.workflows
 
+import net.nemerosa.ontrack.extension.environments.Slot
 import net.nemerosa.ontrack.extension.environments.SlotPipelineStatus
 import net.nemerosa.ontrack.extension.environments.SlotTestSupport
 import net.nemerosa.ontrack.extension.queue.QueueNoAsync
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
+import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceStatus
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.test.TestUtils.uid
+import net.nemerosa.ontrack.test.assertJsonNotNull
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
@@ -176,6 +179,53 @@ class SlotWorkflowServiceGraphQLIT : AbstractQLKTITSupport() {
                 assertTrue(workflowInstanceNode.path("id").asText().isNotBlank())
                 assertEquals("RUNNING", workflowInstanceNode.path("status").asText())
                 assertEquals(slotWorkflow.workflow.name, workflowInstanceNode.path("workflow").path("name").asText())
+            }
+        }
+    }
+
+    @Test
+    fun `Getting the workflow instance for a pipeline and specific trigger`() {
+        slotWorkflowTestSupport.withSlotWorkflow(
+            trigger = SlotPipelineStatus.CANDIDATE,
+        ) { slot: Slot, candidateWorkflow: SlotWorkflow ->
+            // Adding a 2nd workflow
+            val runningWorkflow = SlotWorkflow(
+                slot = slot,
+                trigger = SlotPipelineStatus.RUNNING,
+                workflow = SlotWorkflowTestFixtures.testWorkflow(),
+            )
+            slotWorkflowService.addSlotWorkflow(runningWorkflow)
+
+            // Creating a pipeline
+            val pipeline = slotTestSupport.createPipeline(slot = slot)
+
+            // Waiting for the candidate workflow to be finished
+            slotWorkflowTestSupport.waitForSlotWorkflowsToFinish(pipeline, SlotPipelineStatus.CANDIDATE)
+
+            run(
+                """
+                    {
+                        slotById(id: "${slot.id}") {
+                            workflows(trigger: CANDIDATE) {
+                                slotWorkflowInstanceForPipeline(pipelineId: "${pipeline.id}") {
+                                    workflowInstance {
+                                        status
+                                    }
+                                }
+                            }
+                        }
+                    }
+                """.trimIndent()
+            ) { data ->
+                val workflows = data.path("slotById").path("workflows")
+                assertEquals(1, workflows.size())
+                val workflow = workflows.first()
+                assertJsonNotNull(workflow.path("slotWorkflowInstanceForPipeline")) {
+                    assertEquals(
+                        WorkflowInstanceStatus.SUCCESS.name,
+                        path("workflowInstance").path("status").asText()
+                    )
+                }
             }
         }
     }

@@ -16,11 +16,17 @@ class SlotPipelineAdmissionRuleStatusRepository(
     fun saveStatus(slotPipelineAdmissionRuleStatus: SlotPipelineAdmissionRuleStatus) {
         namedParameterJdbcTemplate!!.update(
             """
-                INSERT INTO ENV_SLOT_PIPELINE_ADMISSION_RULE_STATUS(ID, PIPELINE_ID, ADMISSION_RULE_CONFIG_ID, DATA, DATA_USER, DATA_TIMESTAMP, OVERRIDE_USER, OVERRIDE_TIMESTAMP, OVERRIDE_MESSAGE)
-                VALUES(:id, :pipelineId, :admissionRuleConfigId, CAST(:data AS JSONB), :dataUser, :dataTimestamp, :overrideUser, :overrideTimestamp, :overrideMessage)
-            """.trimIndent(),
+                    INSERT INTO ENV_SLOT_PIPELINE_ADMISSION_RULE_STATUS(PIPELINE_ID, ADMISSION_RULE_CONFIG_ID, DATA, DATA_USER, DATA_TIMESTAMP, OVERRIDE_USER, OVERRIDE_TIMESTAMP, OVERRIDE_MESSAGE)
+                    VALUES(:pipelineId, :admissionRuleConfigId, CAST(:data AS JSONB), :dataUser, :dataTimestamp, :overrideUser, :overrideTimestamp, :overrideMessage)
+                    ON CONFLICT (PIPELINE_ID, ADMISSION_RULE_CONFIG_ID) DO UPDATE SET
+                        DATA = CAST(:data AS JSONB),
+                        DATA_USER = :dataUser,
+                        DATA_TIMESTAMP = :dataTimestamp,
+                        OVERRIDE_USER = :overrideUser,
+                        OVERRIDE_TIMESTAMP = :overrideTimestamp, 
+                        OVERRIDE_MESSAGE = :overrideMessage
+                """.trimIndent(),
             mapOf(
-                "id" to slotPipelineAdmissionRuleStatus.id,
                 "pipelineId" to slotPipelineAdmissionRuleStatus.pipeline.id,
                 "admissionRuleConfigId" to slotPipelineAdmissionRuleStatus.admissionRuleConfig.id,
                 "data" to slotPipelineAdmissionRuleStatus.data?.data?.let { writeJson(it) },
@@ -33,10 +39,10 @@ class SlotPipelineAdmissionRuleStatusRepository(
         )
     }
 
-    fun findStatusesByPipelineAndAdmissionRuleConfig(
+    fun findStatusByPipelineAndAdmissionRuleConfig(
         pipeline: SlotPipeline,
         config: SlotAdmissionRuleConfig
-    ): List<SlotPipelineAdmissionRuleStatus> =
+    ): SlotPipelineAdmissionRuleStatus? =
         namedParameterJdbcTemplate!!.query(
             """
                 SELECT *
@@ -50,7 +56,7 @@ class SlotPipelineAdmissionRuleStatusRepository(
             )
         ) { rs, _ ->
             toSlotPipelineAdmissionRuleStatus(rs, pipeline, config)
-        }
+        }.firstOrNull()
 
     fun findStatusesByPipeline(pipeline: SlotPipeline): List<SlotPipelineAdmissionRuleStatus> =
         namedParameterJdbcTemplate!!.query(
@@ -71,7 +77,6 @@ class SlotPipelineAdmissionRuleStatusRepository(
         pipeline: SlotPipeline,
         admissionRuleConfig: SlotAdmissionRuleConfig? = null,
     ) = SlotPipelineAdmissionRuleStatus(
-        id = rs.getString("id"),
         pipeline = pipeline,
         admissionRuleConfig = admissionRuleConfig ?: slotAdmissionRuleConfigRepository.getAdmissionRuleConfigById(
             pipeline.slot,

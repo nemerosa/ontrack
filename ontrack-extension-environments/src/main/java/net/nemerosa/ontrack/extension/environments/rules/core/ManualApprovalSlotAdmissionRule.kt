@@ -50,15 +50,15 @@ class ManualApprovalSlotAdmissionRule(
         admissionRuleConfig: SlotAdmissionRuleConfig,
         ruleConfig: ManualApprovalSlotAdmissionRuleConfig,
         ruleData: SlotAdmissionRuleTypedData<ManualApprovalSlotAdmissionRuleData>?
-    ): DeployableCheck {
+    ): SlotDeploymentCheck {
         return if (ruleData?.data != null) {
             if (!ruleData.data.approval) {
-                DeployableCheck.nok("Rejected")
+                SlotDeploymentCheck.nok("Rejected")
             } else {
-                DeployableCheck.ok()
+                SlotDeploymentCheck.ok()
             }
         } else {
-            DeployableCheck.nok("No approval")
+            SlotDeploymentCheck.nok("No approval")
         }
     }
 

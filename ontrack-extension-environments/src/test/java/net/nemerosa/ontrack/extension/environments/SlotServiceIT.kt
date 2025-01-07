@@ -182,7 +182,7 @@ class SlotServiceIT : AbstractDSLTestSupport() {
 
     @Test
     fun `Getting the last deployed pipeline for a slot when a pipeline is deployed`() {
-        slotTestSupport.withDeployedSlotPipeline { pipeline ->
+        slotTestSupport.withFinishedDeployment { pipeline ->
             assertEquals(
                 pipeline.id,
                 slotService.getLastDeployedPipeline(pipeline.slot)?.id,
@@ -194,8 +194,8 @@ class SlotServiceIT : AbstractDSLTestSupport() {
     @Test
     fun `Getting the last deployed pipeline for a slot when where several pipelines are deployed`() {
         slotTestSupport.withSlot { slot ->
-            /* val pipeline1 = */ slotTestSupport.createStartAndDeployPipeline(slot = slot)
-            val pipeline2 = slotTestSupport.createStartAndDeployPipeline(slot = slot)
+            /* val pipeline1 = */ slotTestSupport.createRunAndFinishDeployment(slot = slot)
+            val pipeline2 = slotTestSupport.createRunAndFinishDeployment(slot = slot)
             assertEquals(
                 pipeline2.id,
                 slotService.getLastDeployedPipeline(slot)?.id,
@@ -207,7 +207,7 @@ class SlotServiceIT : AbstractDSLTestSupport() {
     @Test
     fun `Getting the last deployed pipeline for a slot when where a pipeline is deployed before an ongoing one`() {
         slotTestSupport.withSlot { slot ->
-            val pipeline1 = slotTestSupport.createStartAndDeployPipeline(slot = slot)
+            val pipeline1 = slotTestSupport.createRunAndFinishDeployment(slot = slot)
             /* val pipeline2 = */ slotTestSupport.createPipeline(slot = slot)
             assertEquals(
                 pipeline1.id,
@@ -221,9 +221,9 @@ class SlotServiceIT : AbstractDSLTestSupport() {
     fun `Finding deployed slot pipelines for a build for a very simple case`() {
         slotTestSupport.withSlotPipeline { pipeline ->
             // Starting the deployment
-            slotService.startDeployment(pipeline, dryRun = false)
+            slotService.runDeployment(pipeline.id, dryRun = false)
             // Finishing the deployment
-            slotService.finishDeployment(pipeline)
+            slotService.finishDeployment(pipeline.id)
             // Getting the pipelines for the build
             val pipelines = slotService.findHighestDeployedSlotPipelinesByBuildAndQualifier(pipeline.build)
             assertEquals(
@@ -242,7 +242,7 @@ class SlotServiceIT : AbstractDSLTestSupport() {
                 branch {
                     val build = build()
                     val deployedPipeline = slotService.startPipeline(slot, build).apply {
-                        slotTestSupport.startAndDeployPipeline(this)
+                        slotTestSupport.runAndFinishDeployment(this)
                     }
 
                     val other = build()
@@ -268,10 +268,10 @@ class SlotServiceIT : AbstractDSLTestSupport() {
                     branch {
                         val build = build()
                         val defaultPipeline = slotService.startPipeline(defaultSlot, build).apply {
-                            slotTestSupport.startAndDeployPipeline(this)
+                            slotTestSupport.runAndFinishDeployment(this)
                         }
                         val demoPipeline = slotService.startPipeline(demoSlot, build).apply {
-                            slotTestSupport.startAndDeployPipeline(this)
+                            slotTestSupport.runAndFinishDeployment(this)
                         }
                         val pipelines = slotService.findHighestDeployedSlotPipelinesByBuildAndQualifier(build)
                         assertEquals(

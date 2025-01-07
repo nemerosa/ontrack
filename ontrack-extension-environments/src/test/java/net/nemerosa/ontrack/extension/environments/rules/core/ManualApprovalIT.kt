@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.extension.environments.SlotAdmissionRuleConfig
 import net.nemerosa.ontrack.extension.environments.SlotPipeline
 import net.nemerosa.ontrack.extension.environments.SlotTestSupport
 import net.nemerosa.ontrack.extension.environments.service.SlotService
-import net.nemerosa.ontrack.extension.environments.service.findPipelineAdmissionRuleStatusByAdmissionRuleConfigId
+import net.nemerosa.ontrack.extension.environments.service.getPipelineAdmissionRuleChecks
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
@@ -26,14 +26,13 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
         withManuallyApprovedPipeline { pipeline, admissionRuleConfig ->
             asAdmin {
                 slotService.approve(pipeline, admissionRuleConfig)
-                val status = slotService.startDeployment(
-                    pipeline,
+                val status = slotService.runDeployment(
+                    pipeline.id,
                     dryRun = true
                 )
-                assertTrue(status.status, "Deployment accepted")
-                val check = status.checks.first()
-                assertTrue(check.check.status, "Manual approval OK")
-                assertNull(check.override, "Manual approval not overridden")
+                assertTrue(status.ok, "Deployment accepted")
+                val check = slotService.getPipelineAdmissionRuleChecks(pipeline).first()
+                assertTrue(check.ok, "Manual approval OK")
 
                 val state =
                     slotService.findPipelineAdmissionRuleStatusByAdmissionRuleConfigId(pipeline, admissionRuleConfig.id)
@@ -61,14 +60,13 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
                     approval = false,
                     message = "No way"
                 )
-                val status = slotService.startDeployment(
-                    pipeline,
+                val status = slotService.runDeployment(
+                    pipeline.id,
                     dryRun = true
                 )
-                assertFalse(status.status, "Deployment rejected")
-                val check = status.checks.first()
-                assertFalse(check.check.status, "Manual approval rejected")
-                assertNull(check.override, "Manual approval not overridden")
+                assertFalse(status.ok, "Deployment rejected")
+                val check = slotService.getPipelineAdmissionRuleChecks(pipeline).first()
+                assertFalse(check.ok, "Manual approval rejected")
 
                 val state =
                     slotService.findPipelineAdmissionRuleStatusByAdmissionRuleConfigId(pipeline, admissionRuleConfig.id)
@@ -144,14 +142,15 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
                     message = "Because I want to",
                 )
 
-                val status = slotService.startDeployment(
-                    pipeline,
+                val status = slotService.runDeployment(
+                    pipeline.id,
                     dryRun = true
                 )
-                assertTrue(status.status, "Deployment accepted")
-                val check = status.checks.first()
-                assertFalse(check.check.status, "Manual approval rejected")
-                assertNotNull(check.override, "Manual rejection overridden") {
+                assertTrue(status.ok, "Deployment accepted")
+                val check = slotService.getPipelineAdmissionRuleChecks(pipeline).first()
+                assertTrue(check.ok, "Manual approval rejected but overridden")
+                val ruleStatus = slotService.getPipelineAdmissionRuleStatuses(pipeline).first()
+                assertNotNull(ruleStatus.override, "Manual rejection overridden") {
                     assertEquals("admin", it.user)
                     assertEquals("Because I want to", it.message)
                 }
@@ -179,12 +178,12 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
                 slotService.approve(pipeline, admissionRuleConfig)
             }
             val status = asAdmin {
-                slotService.startDeployment(
-                    pipeline,
+                slotService.runDeployment(
+                    pipeline.id,
                     dryRun = true
                 )
             }
-            assertTrue(status.status, "Deployment accepted")
+            assertTrue(status.ok, "Deployment accepted")
         }
     }
 
@@ -200,11 +199,11 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
             ) {
                 slotService.approve(pipeline, admissionRuleConfig)
             }
-            val status = slotService.startDeployment(
-                pipeline,
+            val status = slotService.runDeployment(
+                pipeline.id,
                 dryRun = true
             )
-            assertTrue(status.status, "Deployment accepted")
+            assertTrue(status.ok, "Deployment accepted")
             val state =
                 slotService.findPipelineAdmissionRuleStatusByAdmissionRuleConfigId(
                     pipeline,

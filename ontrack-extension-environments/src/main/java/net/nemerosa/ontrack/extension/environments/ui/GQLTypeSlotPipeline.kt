@@ -2,10 +2,7 @@ package net.nemerosa.ontrack.extension.environments.ui
 
 import graphql.Scalars.GraphQLBoolean
 import graphql.schema.GraphQLObjectType
-import net.nemerosa.ontrack.extension.environments.Slot
-import net.nemerosa.ontrack.extension.environments.SlotAdmissionRuleInput
-import net.nemerosa.ontrack.extension.environments.SlotPipeline
-import net.nemerosa.ontrack.extension.environments.SlotPipelineChange
+import net.nemerosa.ontrack.extension.environments.*
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowInstance
 import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowService
@@ -16,7 +13,6 @@ import org.springframework.stereotype.Component
 
 @Component
 class GQLTypeSlotPipeline(
-    private val gqlTypeSlotPipelineDeploymentStatus: GQLTypeSlotPipelineDeploymentStatus,
     private val gqlTypeSlotPipelineChange: GQLTypeSlotPipelineChange,
     private val slotService: SlotService,
     private val slotWorkflowService: SlotWorkflowService,
@@ -43,18 +39,6 @@ class GQLTypeSlotPipeline(
                     .dataFetcher { env ->
                         val pipeline: SlotPipeline = env.getSource()
                         pipeline.status.finished
-                    }
-            }
-            // Deployment status
-            .field {
-                it.name("deploymentStatus")
-                    .description("Current status for the pipeline")
-                    .type(gqlTypeSlotPipelineDeploymentStatus.typeRef)
-                    .dataFetcher { env ->
-                        val pipeline: SlotPipeline = env.getSource()
-                        slotService.status(
-                            pipelineId = pipeline.id,
-                        )
                     }
             }
             // Last change
@@ -87,6 +71,40 @@ class GQLTypeSlotPipeline(
                 description = "List of workflow instances for this pipeline",
             ) { pipeline ->
                 slotWorkflowService.getSlotWorkflowInstancesByPipeline(pipeline)
+            }
+            // All the checks for the admission rules for this deployments
+            .listFieldGetter<SlotPipeline, SlotPipelineAdmissionRuleStatus>(
+                name = "admissionRules",
+                description = "All the checks for the admission rules for this deployments"
+            ) { pipeline ->
+                slotService.getAdmissionRuleConfigs(pipeline.slot).map { rule ->
+                    val status = slotService.findPipelineAdmissionRuleStatusByAdmissionRuleConfigId(
+                        pipeline,
+                        rule.id,
+                    )
+                    status ?: SlotPipelineAdmissionRuleStatus(
+                        pipeline = pipeline,
+                        admissionRuleConfig = rule,
+                        data = null,
+                        override = null,
+                    )
+                }
+            }
+            // Run action
+            .fieldGetter<SlotPipeline, SlotPipelineDeploymentStatusProgress>(
+                name = "runAction",
+                description = "Can this deployment be actioned into a running state?",
+                nullable = true,
+            ) { pipeline, _ ->
+                slotService.getDeploymentRunActionProgress(pipeline.id)
+            }
+            // Finish action
+            .fieldGetter<SlotPipeline, SlotPipelineDeploymentStatusProgress>(
+                name = "finishAction",
+                description = "Can this deployment be completed?",
+                nullable = true,
+            ) { pipeline, _ ->
+                slotService.getDeploymentFinishActionProgress(pipeline.id)
             }
             // OK
             .build()

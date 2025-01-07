@@ -86,7 +86,7 @@ class EnvironmentsBuildPromotionInfoExtensionTestSupport : AbstractDSLTestSuppor
                                     slot = eligibleSlotWithNoPromotionRule,
                                     build = this,
                                 ).apply {
-                                    slotTestSupport.startAndDeployPipeline(this)
+                                    slotTestSupport.runAndFinishDeployment(this)
                                 }
                             } else {
                                 null
@@ -97,7 +97,7 @@ class EnvironmentsBuildPromotionInfoExtensionTestSupport : AbstractDSLTestSuppor
                                     slot = eligibleSlotWithSilverPromotionRule,
                                     build = this,
                                 ).apply {
-                                    slotTestSupport.startAndDeployPipeline(this)
+                                    slotTestSupport.runAndFinishDeployment(this)
                                 }
                             } else {
                                 null

@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.graphql.support
 
 import graphql.Scalars.*
-import graphql.schema.GraphQLNonNull
-import graphql.schema.GraphQLObjectType
-import graphql.schema.GraphQLOutputType
-import graphql.schema.GraphQLTypeReference
+import graphql.schema.*
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.model.annotations.getPropertyDescription
 import net.nemerosa.ontrack.model.annotations.getPropertyName
@@ -181,6 +178,23 @@ fun <T> TypeBuilder.field(
             .description(getPropertyDescription(property, description))
             .type(outputType)
     }
+
+inline fun <P, reified E> TypeBuilder.fieldGetter(
+    name: String,
+    description: String,
+    nullable: Boolean = false,
+    arguments: List<GraphQLArgument>? = emptyList(),
+    noinline code: (source: P, env: DataFetchingEnvironment) -> E?
+): GraphQLObjectType.Builder = field {
+    it.name(name)
+        .description(description)
+        .type(E::class.toTypeRef().nullable(nullable))
+        .arguments(arguments)
+        .dataFetcher { env ->
+            val source: P = env.getSource()
+            code(source, env)
+        }
+}
 
 fun <T> TypeBuilder.listField(
     property: KProperty<List<T>>,

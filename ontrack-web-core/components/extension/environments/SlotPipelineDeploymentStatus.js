@@ -15,6 +15,9 @@ import {useReloadState} from "@components/common/StateUtils";
 import PageSection from "@components/common/PageSection";
 import SlotPipelineWorkflowsTable from "@components/extension/environments/SlotPipelineWorkflowsTable";
 
+/**
+ * @deprecated To delete
+ */
 export default function SlotPipelineDeploymentStatus({pipeline, onChange}) {
 
     const client = useGraphQLClient()

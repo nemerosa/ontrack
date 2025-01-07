@@ -1,11 +1,11 @@
 import {Space} from "antd";
-import SlotPipelineStatusIcon from "@components/extension/environments/SlotPipelineStatusIcon";
+import SlotPipelineStatusLabel from "@components/extension/environments/SlotPipelineStatusLabel";
 
 export default function SlotPipelineStatus({pipeline, showText = true, children}) {
     return (
         <>
             <Space data-testid={`pipeline-actions-${pipeline.id}`}>
-                <SlotPipelineStatusIcon
+                <SlotPipelineStatusLabel
                     status={pipeline.status}
                     showText={showText}
                 />

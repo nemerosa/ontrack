@@ -3,7 +3,6 @@ import {pageTitle} from "@components/common/Titles";
 import MainPage from "@components/layouts/MainPage";
 import {useEffect, useState} from "react";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
-import LoadingContainer from "@components/common/LoadingContainer";
 import {gql} from "graphql-request";
 import {
     gqlEnvironmentData,
@@ -12,9 +11,12 @@ import {
 } from "@components/extension/environments/EnvironmentGraphQL";
 import {slotBreadcrumbs, slotTitle, slotUri} from "@components/extension/environments/EnvironmentsLinksUtils";
 import {CloseCommand} from "@components/common/Commands";
-import SlotPipelineDeploymentStatus from "@components/extension/environments/SlotPipelineDeploymentStatus";
 import {useReloadState} from "@components/common/StateUtils";
 import EnvironmentsWarning from "@components/extension/environments/EnvironmentsWarning";
+import {Space} from "antd";
+import SlotPipelineSummary from "@components/extension/environments/SlotPipelineSummary";
+import PageSection from "@components/common/PageSection";
+import SlotPipelineSteps from "@components/extension/environments/SlotPipelineSteps";
 
 export default function SlotPipelineView({id}) {
 
@@ -53,7 +55,7 @@ export default function SlotPipelineView({id}) {
                 const pipeline = data.slotPipelineById
                 setPipeline(pipeline)
                 // Title
-                setTitle(`Pipeline #${pipeline.number}`)
+                setTitle(`Deployment #${pipeline.number}`)
                 setPipelinePageTitle(`${slotTitle(pipeline.slot)} | #${pipeline.number}`)
                 // Breadcrumbs
                 setBreadcrumbs(slotBreadcrumbs(pipeline.slot))
@@ -80,15 +82,15 @@ export default function SlotPipelineView({id}) {
                 breadcrumbs={breadcrumbs}
                 commands={commands}
             >
-                <LoadingContainer loading={loading}>
-                    {
-                        pipeline &&
-                        <SlotPipelineDeploymentStatus
-                            pipeline={pipeline}
-                            onChange={reload}
-                        />
-                    }
-                </LoadingContainer>
+                <Space direction="vertical">
+                    <SlotPipelineSummary pipelineId={id} reloadState={reloadState}/>
+                    <PageSection
+                        title="Deployment status"
+                        padding={true}
+                    >
+                        <SlotPipelineSteps pipelineId={id} reloadState={reloadState} onChange={reload}/>
+                    </PageSection>
+                </Space>
             </MainPage>
         </>
     )

@@ -231,3 +231,13 @@ fun notNullableType(type: GraphQLOutputType): GraphQLOutputType = nullableType(t
  * Extension function for non nullable types
  */
 fun GraphQLOutputType.toNotNull() = notNullableType(this)
+
+/**
+ * Extension function for non-nullable types based on a flag
+ */
+fun GraphQLOutputType.nullable(nullable: Boolean) =
+    if (nullable) {
+        this
+    } else {
+        notNullableType(this)
+    }

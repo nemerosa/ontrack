@@ -6,8 +6,14 @@ import net.nemerosa.ontrack.extension.environments.storage.SlotPipelineIdNotFoun
 fun SlotService.getPipelineById(id: String) =
     findPipelineById(id) ?: throw SlotPipelineIdNotFoundException(id)
 
-fun SlotService.findPipelineAdmissionRuleStatusByAdmissionRuleConfigId(
-    pipeline: SlotPipeline,
-    id: String
-) =
-    getPipelineAdmissionRuleStatuses(pipeline).find { it.admissionRuleConfig.id == id }
+fun SlotService.getPipelineAdmissionRuleChecks(pipeline: SlotPipeline) =
+    getPipelineAdmissionRuleStatuses(pipeline)
+        .map { getAdmissionRuleCheck(it) }
+
+fun SlotService.getPipelineAdmissionRuleChecksForAllRules(pipeline: SlotPipeline) =
+    getAdmissionRuleConfigs(pipeline.slot).map { rule ->
+        getAdmissionRuleCheck(
+            pipeline = pipeline,
+            admissionRule = rule,
+        )
+    }

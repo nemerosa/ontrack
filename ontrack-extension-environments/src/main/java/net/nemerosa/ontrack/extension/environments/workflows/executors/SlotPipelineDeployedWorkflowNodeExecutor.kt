@@ -38,12 +38,12 @@ class SlotPipelineDeployedWorkflowNodeExecutor(
             val slotWorkflowId = workflowInstance.event.findSlotWorkflowId()
             // Progressing the pipeline
             val status = slotService.finishDeployment(
-                pipeline = pipeline,
+                pipelineId = pipeline.id,
                 // Skipping the check on its own workflow
                 skipWorkflowId = slotWorkflowId,
             )
             // Deployment started
-            val result = if (status.deployed) {
+            val result = if (status.ok) {
                 WorkflowNodeExecutorResult.success(
                     SlotPipelineDeployedWorkflowNodeExecutorOutput(
                         pipelineId = pipeline.id,
