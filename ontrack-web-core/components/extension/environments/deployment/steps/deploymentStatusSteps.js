@@ -1,5 +1,5 @@
 import SlotPipelineStatusIcon from "@components/extension/environments/SlotPipelineStatusIcon";
-import {Space, Typography} from "antd";
+import {List, Typography} from "antd";
 import {slotPipelineStatusLabels} from "@components/extension/environments/SlotPipelineStatusLabel";
 import TimestampText from "@components/common/TimestampText";
 
@@ -19,27 +19,54 @@ function DeploymentStatusSignature({deployment, status}) {
     )
 }
 
-function deploymentStatusStep({deployment, status}) {
-    return {
-        title: <Space>
-            {slotPipelineStatusLabels[status]}
-        </Space>,
-        description: <Space direction="vertical">
-            <DeploymentStatusSignature deployment={deployment} status={status}/>
-        </Space>,
-        status: deployment.status === status ? 'process' : 'finish',
-        icon: <SlotPipelineStatusIcon status={status}/>,
-    }
+export function DeploymentStep({avatar, title, description}) {
+    return (
+        <>
+            <List.Item className="ot-list-item">
+                <List.Item.Meta
+                    avatar={avatar}
+                    title={title}
+                    description={description}
+                />
+            </List.Item>
+        </>
+    )
 }
 
-export function deploymentCandidateStatusStep({deployment}) {
-    return deploymentStatusStep({deployment, status: 'CANDIDATE'})
+function DeploymentStatusStep({deployment, status}) {
+    return (
+        <>
+            <DeploymentStep
+                avatar={
+                    <SlotPipelineStatusIcon status={status}/>
+                }
+                title={
+                    slotPipelineStatusLabels[status]
+                }
+                description={
+                    <DeploymentStatusSignature deployment={deployment} status={status}/>
+                }
+            />
+        </>
+    )
+}
+export function DeploymentCandidateStatusStep({deployment}) {
+    return <DeploymentStatusStep
+        deployment={deployment}
+        status="CANDIDATE"
+    />
 }
 
-export function deploymentRunningStatusStep({deployment}) {
-    return deploymentStatusStep({deployment, status: 'RUNNING'})
+export function DeploymentRunningStatusStep({deployment}) {
+    return <DeploymentStatusStep
+        deployment={deployment}
+        status="RUNNING"
+    />
 }
 
-export function deploymentDoneStatusStep({deployment}) {
-    return deploymentStatusStep({deployment, status: 'DONE'})
+export function DeploymentDoneStatusStep({deployment}) {
+    return <DeploymentStatusStep
+        deployment={deployment}
+        status="DONE"
+    />
 }

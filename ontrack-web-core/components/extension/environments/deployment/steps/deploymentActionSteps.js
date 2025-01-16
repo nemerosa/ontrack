@@ -5,6 +5,7 @@ import {
     useDeploymentFinishAction,
     useDeploymentRunAction
 } from "@components/extension/environments/deployment/steps/deploymentActions";
+import {DeploymentStep} from "@components/extension/environments/deployment/steps/deploymentStatusSteps";
 
 function DeploymentActionProgress({deployment, action}) {
     return (
@@ -20,7 +21,7 @@ function DeploymentActionProgress({deployment, action}) {
     )
 }
 
-function DeploymentActionButton({status, actionEnabled, text, confirmTitle, confirmDescription, onConfirm, loading}) {
+function DeploymentActionButton({actionEnabled, text, confirmTitle, confirmDescription, onConfirm, loading}) {
     return (
         <>
             <Popconfirm
@@ -32,10 +33,7 @@ function DeploymentActionButton({status, actionEnabled, text, confirmTitle, conf
                     disabled={!actionEnabled}
                     loading={loading}
                 >
-                    <Space>
-                        <SlotPipelineStatusIcon status={status}/>
-                        {text}
-                    </Space>
+                    {text}
                 </Button>
             </Popconfirm>
         </>
@@ -62,7 +60,6 @@ function DeploymentRunActionButton({deployment, onChange}) {
         <>
             <DeploymentActionButton
                 deployment={deployment}
-                status="RUNNING"
                 actionEnabled={deployment.runAction.ok}
                 text="Start running the deployment"
                 confirmTitle="Running deployment"
@@ -159,25 +156,49 @@ const deploymentActionButtonStep = ({
     }
 }
 
-export const deploymentRunButtonStep = (deployment, onChange) => {
-    return deploymentActionButtonStep({
-        deployment,
-        actionEnabled: deployment.runAction.ok,
-        actionButton: <DeploymentRunActionButton deployment={deployment} onChange={onChange}/>,
-        icon: <DeploymentActionProgress
-            deployment={deployment}
-            action={deployment.runAction}
-        />,
-    })
+function DeploymentActionButtonStep({indicator, actionButton, icon, description}) {
+    return (
+        <>
+            <DeploymentStep
+                avatar={icon}
+                title={
+                    <Space>
+                        {indicator}
+                        {actionButton}
+                    </Space>
+                }
+                description={description}
+            />
+        </>
+    )
 }
 
-export const deploymentFinishButtonStep = (deployment, onChange) => {
-    return deploymentActionButtonStep({
-        deployment,
-        actionEnabled: deployment.finishAction.ok,
-        actionButton: <DeploymentFinishActionButton deployment={deployment} onChange={onChange}/>,
-        icon: <SlotPipelineStatusIcon status="DONE"/>,
-    })
+export function DeploymentRunButtonStep({deployment, onChange}) {
+    return <DeploymentActionButtonStep
+        actionButton={
+            <DeploymentRunActionButton deployment={deployment} onChange={onChange}/>
+        }
+        icon={
+            <SlotPipelineStatusIcon status="RUNNING"/>
+        }
+        indicator={
+            <DeploymentActionProgress
+                deployment={deployment}
+                action={deployment.runAction}
+            />
+        }
+    />
+}
+
+export function DeploymentFinishButtonStep({deployment, onChange}) {
+    return <DeploymentActionButtonStep
+        actionButton={
+            <DeploymentFinishActionButton deployment={deployment} onChange={onChange}/>
+        }
+        icon={
+            <SlotPipelineStatusIcon status="DONE"/>
+        }
+    />
 }
 
 export const deploymentCancelButtonStep = (deployment, onChange) => {

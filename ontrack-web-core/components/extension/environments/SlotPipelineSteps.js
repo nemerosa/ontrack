@@ -1,63 +1,63 @@
 import {useQuery} from "@components/services/useQuery";
 import {gql} from "graphql-request";
-import {Steps} from "antd";
+import {List} from "antd";
 import {useEffect, useState} from "react";
 import {
-    deploymentCandidateStatusStep,
-    deploymentDoneStatusStep,
-    deploymentRunningStatusStep
+    DeploymentCandidateStatusStep,
+    DeploymentDoneStatusStep,
+    DeploymentRunningStatusStep
 } from "@components/extension/environments/deployment/steps/deploymentStatusSteps";
 import {
-    candidateAdmissionRuleStep
-} from "@components/extension/environments/deployment/steps/candidateAdmissionRuleStep";
-import {deploymentWorkflowStep} from "@components/extension/environments/deployment/steps/deploymentWorkflowStep";
-import {
     deploymentCancelButtonStep,
-    deploymentFinishButtonStep,
-    deploymentRunButtonStep
+    DeploymentFinishButtonStep,
+    DeploymentRunButtonStep
 } from "@components/extension/environments/deployment/steps/deploymentActionSteps";
+import {
+    CandidateAdmissionRuleStep
+} from "@components/extension/environments/deployment/steps/CandidateAdmissionRuleStep";
+import {DeploymentWorkflowStep} from "@components/extension/environments/deployment/steps/DeploymentWorkflowStep";
 
-const candidateStatus = (deployment) => {
-    return deploymentCandidateStatusStep({deployment})
+function CandidateStatus({deployment}) {
+    return <DeploymentCandidateStatusStep deployment={deployment}/>
 }
 
 const candidateAdmissionRules = (pipeline) => {
     return pipeline.admissionRules.map(rule =>
-        candidateAdmissionRuleStep(pipeline, rule)
+        <CandidateAdmissionRuleStep key={rule.admissionRuleConfig.id} rule={rule}/>
     )
 }
 
 const candidateWorkflows = (pipeline) => {
     return pipeline.slot.candidateWorkflows.map(slotWorkflow =>
-        deploymentWorkflowStep(pipeline, slotWorkflow)
+        <DeploymentWorkflowStep key={slotWorkflow.id} slotWorkflow={slotWorkflow}/>
     )
 }
 
 const runButton = (deployment, onChange) => {
-    return deploymentRunButtonStep(deployment, onChange)
+    return <DeploymentRunButtonStep deployment={deployment} onChange={onChange}/>
 }
 
-const runningStatus = (deployment) => {
-    return deploymentRunningStatusStep({deployment})
+function RunningStatus({deployment}) {
+    return <DeploymentRunningStatusStep deployment={deployment}/>
 }
 
 const runningWorkflows = (pipeline) => {
     return pipeline.slot.runningWorkflows.map(slotWorkflow =>
-        deploymentWorkflowStep(pipeline, slotWorkflow)
+        <DeploymentWorkflowStep key={slotWorkflow.id} slotWorkflow={slotWorkflow}/>
     )
 }
 
 const finishButton = (deployment, onChange) => {
-    return deploymentFinishButtonStep(deployment, onChange)
+    return <DeploymentFinishButtonStep deployment={deployment} onChange={onChange}/>
 }
 
-const finishStatus = (deployment) => {
-    return deploymentDoneStatusStep({deployment})
+function FinishStatus({deployment}) {
+    return <DeploymentDoneStatusStep deployment={deployment}/>
 }
 
 const doneWorkflows = (pipeline) => {
     return pipeline.slot.doneWorkflows.map(slotWorkflow =>
-        deploymentWorkflowStep(pipeline, slotWorkflow)
+        <DeploymentWorkflowStep key={slotWorkflow.id} slotWorkflow={slotWorkflow}/>
     )
 }
 
@@ -71,66 +71,53 @@ const generateItems = (pipeline, onChange) => {
 
     if (pipeline.status === 'CANDIDATE') {
         const items = [
-            candidateStatus(pipeline),
+            <CandidateStatus key="status" deployment={pipeline}/>,
             ...candidateAdmissionRules(pipeline),
             ...candidateWorkflows(pipeline),
         ]
         if (pipeline.runAction) {
             items.push(runButton(pipeline, onChange))
         }
-        items.push(cancelButton(pipeline, onChange))
-        return {
-            items: items,
-            current: 0,
-        }
+        // TODO items.push(cancelButton(pipeline, onChange))
+        return items
     }
 
     // 2 - Running
 
     else if (pipeline.status === 'RUNNING') {
         const items = [
-            candidateStatus(pipeline),
+            <CandidateStatus key="status-candidate" deployment={pipeline}/>,
             ...candidateAdmissionRules(pipeline),
             ...candidateWorkflows(pipeline),
-            runningStatus(pipeline),
+            <RunningStatus key="status-running" deployment={pipeline}/>,
             ...runningWorkflows(pipeline),
         ]
         if (pipeline.finishAction) {
             items.push(finishButton(pipeline, onChange))
         }
-        items.push(cancelButton(pipeline, onChange))
-        return {
-            items: items,
-            current: 0,
-        }
+        // TODO items.push(cancelButton(pipeline, onChange))
+        return items
     }
 
     // 3 - Cancelled
 
     else if (pipeline.status === 'CANCELLED') {
         // TODO Previous state taken from the changes
-        return {
-            items: [],
-            current: 0,
-        }
+        return []
     }
 
     // 4 - Done
 
     else if (pipeline.status === 'DONE') {
-        const items = [
-            candidateStatus(pipeline),
+        return [
+            <CandidateStatus key="status-candidate" deployment={pipeline}/>,
             ...candidateAdmissionRules(pipeline),
             ...candidateWorkflows(pipeline),
-            runningStatus(pipeline),
+            <RunningStatus key="status-running" deployment={pipeline}/>,
             ...runningWorkflows(pipeline),
-            finishStatus(pipeline),
+            <FinishStatus key="status-done" deployment={pipeline}/>,
             ...doneWorkflows(pipeline),
-        ];
-        return {
-            items: items,
-            current: items.length - 1,
-        }
+        ]
     }
 
     // Unknown
@@ -244,27 +231,22 @@ export default function SlotPipelineSteps({pipelineId, reloadState, onChange}) {
     )
 
     const [items, setItems] = useState([])
-    const [current, setCurrent] = useState(0)
     useEffect(() => {
         if (data) {
             const pipeline = data.slotPipelineById
-            const {items, current} = generateItems(pipeline, onChange)
+            const items = generateItems(pipeline, onChange)
             setItems(items)
-            setCurrent(current)
         }
     }, [data])
 
     return (
         <>
-            <Steps
+            <List
+                itemLayout="horizontal"
                 loading={loading}
-                items={items}
-                current={current}
-                direction="vertical"
-            />
-            {/*<pre>*/}
-            {/*    {JSON.stringify(data, null, 2)}*/}
-            {/*</pre>*/}
+            >
+                {items}
+            </List>
         </>
     )
 }

@@ -4,6 +4,7 @@ import WorkflowInstanceStatus from "@components/extension/workflows/WorkflowInst
 import WorkflowInstanceLink from "@components/extension/workflows/WorkflowInstanceLink";
 import TimestampText from "@components/common/TimestampText";
 import DurationMs from "@components/common/DurationMs";
+import {DeploymentStep} from "@components/extension/environments/deployment/steps/deploymentStatusSteps";
 
 function DeploymentWorkflowTimings({slotWorkflow}) {
     const slotWorkflowInstance = slotWorkflow.slotWorkflowInstanceForPipeline
@@ -38,27 +39,31 @@ function DeploymentWorkflowStepStatus({slotWorkflow}) {
     }
 }
 
-export const deploymentWorkflowStep = (deployment, slotWorkflow) => {
-    return {
-        title: <Space>
-            {/* Workflow status */}
-            <DeploymentWorkflowStepStatus slotWorkflow={slotWorkflow}/>
-            {/* Workflow name */}
-            {
-                slotWorkflow.slotWorkflowInstanceForPipeline &&
-                <WorkflowInstanceLink
-                    workflowInstanceId={slotWorkflow.slotWorkflowInstanceForPipeline.id}
-                    name={slotWorkflow.workflow.name}
-                />
-            }
-            {
-                !slotWorkflow.slotWorkflowInstanceForPipeline &&
-                <strong>{slotWorkflow.workflow.name}</strong>
-            }
-        </Space>,
-        description: <Space>
-            <DeploymentWorkflowTimings slotWorkflow={slotWorkflow}/>
-        </Space>,
-        icon: <FaProjectDiagram title="Workflow"/>,
-    }
+export function DeploymentWorkflowStep({slotWorkflow}) {
+    return (
+        <>
+            <DeploymentStep
+                avatar={<FaProjectDiagram title="Workflow"/>}
+                title={
+                    <Space>
+                        <DeploymentWorkflowStepStatus slotWorkflow={slotWorkflow}/>
+                        {
+                            slotWorkflow.slotWorkflowInstanceForPipeline &&
+                            <WorkflowInstanceLink
+                                workflowInstanceId={slotWorkflow.slotWorkflowInstanceForPipeline.id}
+                                name={slotWorkflow.workflow.name}
+                            />
+                        }
+                        {
+                            !slotWorkflow.slotWorkflowInstanceForPipeline &&
+                            <strong>{slotWorkflow.workflow.name}</strong>
+                        }
+                    </Space>
+                }
+                description={
+                    <DeploymentWorkflowTimings slotWorkflow={slotWorkflow}/>
+                }
+            />
+        </>
+    )
 }
