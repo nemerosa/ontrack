@@ -1,6 +1,6 @@
 import {expect, test} from "@playwright/test";
 import {
-    waitForPipelineToBeDeployable,
+    waitForPipelineToBeRunnable,
     waitForPipelineWorkflowToBeFinished,
     withSlotWorkflow
 } from "./slotWorkflowsFixtures";
@@ -16,7 +16,7 @@ import {gqlPipelineData} from "@ontrack/extensions/environments/environments";
 import {waitUntilCondition} from "../../../support/timing";
 
 test('API - workflows on creation participate into the pipeline check list', async ({page}) => {
-    const {slot, project, slotWorkflow} = await withSlotWorkflow({trigger: 'CANDIDATE'})
+    const {slot, project} = await withSlotWorkflow({trigger: 'CANDIDATE'})
     const {pipeline} = await createPipeline({project, slot})
 
     // Pipeline was just created, workflow is running into the background
@@ -26,18 +26,16 @@ test('API - workflows on creation participate into the pipeline check list', asy
         gql`
             query PipelineDeploymentStatus($pipelineId: String!) {
                 slotPipelineById(id: $pipelineId) {
-                    deploymentStatus {
-                        status
-                        checks {
-                            check {
-                                status
-                                reason
+                    runAction {
+                        ok
+                    }
+                    slot {
+                        workflows {
+                            slotWorkflowInstanceForPipeline(pipelineId: $pipelineId) {
+                                workflowInstance {
+                                    status
+                                }
                             }
-                            config {
-                                ruleId
-                                ruleConfig
-                            }
-                            ruleData
                         }
                     }
                 }
@@ -47,18 +45,14 @@ test('API - workflows on creation participate into the pipeline check list', asy
             pipelineId: pipeline.id,
         }
     )
-    await expect(data.slotPipelineById.deploymentStatus.status).toBe(false)
-    await expect(data.slotPipelineById.deploymentStatus.checks.length).toBe(1)
-    let check = data.slotPipelineById.deploymentStatus.checks[0]
-    await expect(check.check.status).toBe(false)
-    await expect(check.check.reason).toMatch(/^(Workflow started|Workflow running)$/)
-    await expect(check.config.ruleId).toStrictEqual('workflow')
-    await expect(check.config.ruleConfig?.slotWorkflowId).toStrictEqual(slotWorkflow.id)
-    await expect(check.config.ruleConfig?.slotWorkflowInstanceId).toHaveLength(36)
-    await expect(check.ruleData?.slotWorkflowInstanceId).toHaveLength(36)
+    await expect(data.slotPipelineById.runAction.ok).toBe(false)
+    let slotWorkflows = data.slotPipelineById.slot.workflows
+    await expect(slotWorkflows.length).toBe(1)
+    let slotWorkflowInstance = slotWorkflows[0].slotWorkflowInstanceForPipeline
+    await expect(slotWorkflowInstance.workflowInstance.status).toBe('RUNNING')
 
-    // Waiting for the deployment to be deployable
-    await waitForPipelineToBeDeployable(page, pipeline.id)
+    // Waiting for the deployment to be runnable
+    await waitForPipelineToBeRunnable(page, pipeline.id)
 
     // Checking that the pipeline is now deployable
     data = await graphQLCall(
@@ -66,12 +60,15 @@ test('API - workflows on creation participate into the pipeline check list', asy
         gql`
             query PipelineDeploymentStatus($pipelineId: String!) {
                 slotPipelineById(id: $pipelineId) {
-                    deploymentStatus {
-                        status
-                        checks {
-                            check {
-                                status
-                                reason
+                    runAction {
+                        ok
+                    }
+                    slot {
+                        workflows {
+                            slotWorkflowInstanceForPipeline(pipelineId: $pipelineId) {
+                                workflowInstance {
+                                    status
+                                }
                             }
                         }
                     }
@@ -82,41 +79,32 @@ test('API - workflows on creation participate into the pipeline check list', asy
             pipelineId: pipeline.id,
         }
     )
-    await expect(data.slotPipelineById.deploymentStatus.status).toBe(true)
-    await expect(data.slotPipelineById.deploymentStatus.checks.length).toBe(1)
-    check = data.slotPipelineById.deploymentStatus.checks[0]
-    await expect(check.check.status).toBe(true)
-    await expect(check.check.reason).toStrictEqual('Workflow successful')
+    await expect(data.slotPipelineById.runAction.ok).toBe(true)
+    slotWorkflows = data.slotPipelineById.slot.workflows
+    await expect(slotWorkflows.length).toBe(1)
+    slotWorkflowInstance = slotWorkflows[0].slotWorkflowInstanceForPipeline
+    await expect(slotWorkflowInstance.workflowInstance.status).toBe('SUCCESS')
 })
 
 test('workflows on creation participate into the pipeline check list', async ({page}) => {
     const {slot, project, slotWorkflow} = await withSlotWorkflow({trigger: 'CANDIDATE'})
     const {pipeline} = await createPipeline({project, slot})
 
-    await waitForPipelineToBeDeployable(page, pipeline.id)
+    await waitForPipelineToBeRunnable(page, pipeline.id)
 
     await login(page)
 
     const pipelinePage = new PipelinePage(page, pipeline)
     await pipelinePage.goTo()
 
-    const pipelineActions = await pipelinePage.checkPipelineActions()
-    await pipelineActions.expectStatusProgress({value: 100})
+    await pipelinePage.expectRuleStatusProgress({value: 100})
+    await pipelinePage.checkRunAction({})
 
-    await pipelinePage.checkRuleDeployable({name: slotWorkflow.id})
-    await pipelinePage.checkRuleDetails({
-        configId: slotWorkflow.id,
-        checks: async (details) => {
-            await expect(details.getByText("Test")).toBeVisible()
-            await expect(details.getByText("Success")).toBeVisible()
-        }
-    })
-
-    const pipelineWorkflows = await pipelinePage.getPipelineWorkflows()
-    await pipelineWorkflows.checkWorkflow({
-        slotWorkflowId: slotWorkflow.id,
-        trigger: 'CANDIDATE',
+    // Check workflow state in the UI
+    const pipelineWorkflow = await pipelinePage.getWorkflow(slotWorkflow.id)
+    await pipelineWorkflow.checkState({
         status: 'Success',
+        name: 'Test',
     })
 })
 
@@ -159,8 +147,7 @@ test('workflows on creation participate into the pipeline progress', async ({pag
     const pipelinePage = new PipelinePage(page, pipeline)
     await pipelinePage.goTo()
 
-    const pipelineActions = await pipelinePage.checkPipelineActions()
-    await pipelineActions.expectStatusProgress({value: 50})
+    await pipelinePage.expectRuleStatusProgress({value: 50})
 })
 
 test('API - workflow on promotion leading to the deployment of a build', async ({page}) => {
@@ -283,7 +270,5 @@ test('failing workflows on deploying block the deployment completion', async ({p
     const pipelinePage = new PipelinePage(page, pipeline)
     await pipelinePage.goTo()
 
-    const pipelineActions = await pipelinePage.checkPipelineActions()
-    await pipelineActions.checkDeployedAction() // Deployed action is still visible
-    await pipelineActions.expectStatusProgress({value: 50})
+    await pipelinePage.checkFinishAction({disabled: true})
 })

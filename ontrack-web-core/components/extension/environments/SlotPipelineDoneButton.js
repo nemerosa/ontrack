@@ -1,84 +1,67 @@
-import {FaThumbsUp} from "react-icons/fa";
-import {Button, message, Popconfirm} from "antd";
-import {useState} from "react";
-import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import {message} from "antd";
 import {gql} from "graphql-request";
-import {getUserErrors} from "@components/services/graphql-utils";
+import {useDeploymentFinishAction} from "@components/extension/environments/deployment/steps/deploymentActions";
+import {useQuery} from "@components/services/useQuery";
+import SlotPipelineActionButton from "@components/extension/environments/SlotPipelineActionButton";
 
-export default function SlotPipelineDoneButton({pipeline, onFinish, size}) {
+export default function SlotPipelineDoneButton({
+                                                   pipeline,
+                                                   reloadState,
+                                                   onFinish,
+                                                   size,
+                                                   showDisabledButtonIfNotOk = false,
+                                                   showIcon = true,
+                                                   showText = false,
+                                               }) {
+
     const [messageApi, contextHolder] = message.useMessage()
-    const client = useGraphQLClient()
-    const [changing, setChanging] = useState(false)
 
-    const deployed = async () => {
-        setChanging(true)
-        try {
-            const data = await client.request(
-                gql`
-                    mutation FinishDeployment($id: String!) {
-                        finishSlotPipelineDeployment(input: {
-                            pipelineId: $id,
-                            forcing: false,
-                            message: null,
-                        }) {
-                            finishStatus {
-                                deployed
-                                message
-                            }
-                            errors {
-                                message
-                            }
-                        }
+    const onError = () => {
+        messageApi.error("Could not complete the deployment")
+    }
+
+    const {action, loading: finishing} = useDeploymentFinishAction({
+        deployment: pipeline,
+        onSuccess: onFinish,
+        onError: onError,
+    })
+
+    const {data, loading} = useQuery(
+        gql`
+            query PipelineFinishAction($id: String!) {
+                slotPipelineById(id: $id) {
+                    finishAction {
+                        ok
                     }
-                `,
-                {id: pipeline.id}
-            )
-            // Errors
-            const errors = getUserErrors(data.finishSlotPipelineDeployment)
-            if (errors) {
-                messageApi.error(
-                    `Error triggering the completion of the deployment: ${errors}`
-                )
-            } else {
-                // Status
-                const finishStatus = data.finishSlotPipelineDeployment.finishStatus
-                if (finishStatus) {
-                    if (finishStatus.deployed) {
-                        messageApi.success("Deployment finished")
-                        if (onFinish) onFinish()
-                    } else {
-                        messageApi.success(`Deployment completion failed: ${finishStatus.message}`)
-                    }
-                } else {
-                    messageApi.error(
-                        "Did not receive any completion status"
-                    )
                 }
             }
-        } finally {
-            setChanging(false)
+        `,
+        {
+            variables: {id: pipeline.id},
+            deps: [pipeline.id, reloadState],
+            dataFn: (data) => data.slotPipelineById?.finishAction,
         }
-    }
+    )
 
     return (
         <>
             {contextHolder}
-            {
-                pipeline.status === 'RUNNING' &&
-                <Popconfirm
-                    title="Deployment done"
-                    description="This will mark this deployment as being done. Do you want to continue?"
-                    onConfirm={deployed}
-                >
-                    <Button
-                        icon={<FaThumbsUp color="green"/>}
-                        title="Marks this deployment as done"
-                        loading={changing}
-                        data-testid={`pipeline-finish-${pipeline.id}`}
-                        size={size}
-                    />
-                </Popconfirm>
-            }
+            <SlotPipelineActionButton
+                id={`pipeline-finish-${pipeline.id}`}
+                status="DONE"
+                actionStateData={data}
+                actionStateLoading={loading}
+                confirmTitle="Deployment done"
+                confirmDescription="This will mark this deployment as being done. Do you want to continue?"
+                buttonTitle="Marks this deployment as done"
+                buttonText="Finish the deployment"
+                action={action}
+                actionRunning={finishing}
+                size={size}
+                showDisabledButtonIfNotOk={showDisabledButtonIfNotOk}
+                showIcon={showIcon}
+                showText={showText}
+            />
         </>
     )
 }

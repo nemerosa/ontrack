@@ -1,7 +1,8 @@
 import {ui} from "@ontrack/connection";
 import {expect} from "@playwright/test";
-import {PipelineActions} from "./PipelineActions";
-import {PipelineWorkflows} from "./PipelineWorkflows";
+import {PipelineRule} from "./PipelineRule";
+import {confirmBox} from "../../support/confirm";
+import {PipelineWorkflow} from "./PipelineWorkflow";
 
 export class PipelinePage {
     constructor(page, pipeline) {
@@ -12,57 +13,81 @@ export class PipelinePage {
     async goTo() {
         await this.page.goto(`${ui()}/extension/environments/pipeline/${this.pipeline.id}`)
         await expect(this.page.getByText(`Slot ${this.pipeline.slot.environment.name} - ${this.pipeline.slot.project.name}`)).toBeVisible()
-        await expect(this.page.getByText(`Pipeline #${this.pipeline.number}`)).toBeVisible()
+        await expect(this.page.getByText(`Deployment #${this.pipeline.number}`)).toBeVisible()
     }
 
-    async checkPipelineActions() {
-        await expect(this.page.getByTestId(`pipeline-actions-${this.pipeline.id}`)).toBeVisible()
-        return new PipelineActions(this.page, this.pipeline)
+    async getAdmissionRule(ruleConfigId) {
+        const rule = new PipelineRule(this.page, this.pipeline, ruleConfigId);
+        await rule.expectToBeVisible()
+        return rule
     }
 
-    async checkRuleDeployable({name, deployable = true}) {
-        const text = deployable ? "Yes" : "No"
-        const id = `deployable-${name}`
-        const deployableText = this.page.getByTestId(id)
-        await expect(deployableText).toBeVisible()
-        await expect(deployableText).toContainText(text)
-    }
+    async expectRuleStatusProgress({present = true, value = 0, overridden = false}) {
+        const runStep = this.page.getByTestId(`deployment-run-${this.pipeline.id}`)
+        const pipelineProgress = runStep.getByTestId(`deployment-progress-${this.pipeline.id}`)
+        await expect(pipelineProgress).toBeVisible({visible: present})
+        if (present && value >= 0) {
+            if (value === 100) {
+                await expect(pipelineProgress).toHaveAttribute('aria-valuenow', '100')
+            } else {
+                await expect(pipelineProgress).toContainText(`${value}%`)
+            }
+        }
 
-    async checkRuleOverridden({name, overridden = true}) {
-        const text = overridden ? "Yes" : "No"
-        const id = `overridden-${name}`
-        const overriddenText = this.page.getByTestId(id)
-        await expect(overriddenText).toBeVisible()
-        await expect(overriddenText).toContainText(text)
-    }
-
-    async checkRuleDetails({configId, checks}) {
-        const details = this.page.getByTestId(`details-${configId}`)
-        await expect(details).toBeVisible()
-        if (checks) {
-            await checks(details)
+        const hasOverriddenClass = await pipelineProgress.evaluate((element, className) => {
+            return element.classList.contains(className);
+        }, 'ot-extension-environment-overridden')
+        if (overridden) {
+            await expect(hasOverriddenClass).toBeTruthy()
+        } else {
+            await expect(hasOverriddenClass).toBeFalsy()
         }
     }
 
-    locatorOverrideRuleButton(name) {
-        return this.page.getByTestId(`override-${name}`)
+    /**
+     * Gets a workflow step given the ID of the slot workflow
+     */
+    async getWorkflow(slotWorkflowId) {
+        const workflow = new PipelineWorkflow(this.page, this.pipeline, slotWorkflowId);
+        await workflow.expectToBeVisible()
+        return workflow
     }
 
-    async checkOverrideRuleButton({name, visible = true}) {
-        await expect(this.locatorOverrideRuleButton(name)).toBeVisible({visible})
+    async checkRunAction({visible = true, disabled = false}) {
+        const locator = this.page.getByTestId(`pipeline-deploy-${this.pipeline.id}`)
+        await expect(locator).toBeVisible({visible})
+        if (visible) {
+            if (disabled) {
+                await expect(locator).toBeDisabled()
+            } else {
+                await expect(locator).toBeEnabled()
+            }
+        }
     }
 
-    async overrideRule({name, message}) {
-        await this.locatorOverrideRuleButton(name).click()
-        const messageInput = this.page.getByLabel("Message", {exact: true})
-        await expect(messageInput).toBeVisible()
-        await messageInput.fill(message)
-        await this.page.getByRole("button", {name: "OK"}).click()
+    async running() {
+        const button = this.page.getByTestId(`pipeline-deploy-${this.pipeline.id}`)
+        await button.click()
+        await confirmBox(this.page, "Running deployment")
+        await expect(this.page.getByText("Running", {exact: true})).toBeVisible()
     }
 
-    async getPipelineWorkflows() {
-        const locator = this.page.getByTestId(`pipeline-workflows-table-${this.pipeline.id}`)
-        await expect(locator).toBeVisible()
-        return new PipelineWorkflows(this.page, this.pipeline, locator)
+    async checkFinishAction({visible = true, disabled = false}) {
+        const locator = this.page.getByTestId(`pipeline-finish-${this.pipeline.id}`)
+        await expect(locator).toBeVisible({visible})
+        if (visible) {
+            if (disabled) {
+                await expect(locator).toBeDisabled()
+            } else {
+                await expect(locator).toBeEnabled()
+            }
+        }
+    }
+
+    async finish() {
+        const button = this.page.getByTestId(`pipeline-finish-${this.pipeline.id}`)
+        await button.click()
+        await confirmBox(this.page, "Deployment done")
+        await expect(this.page.getByText("Deployed", {exact: true})).toBeVisible()
     }
 }

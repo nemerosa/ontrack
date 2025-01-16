@@ -70,7 +70,7 @@ export const waitForPipelineWorkflowToBeFinished = async (page, pipelineId, slot
     })
 }
 
-export const waitForPipelineToBeDeployable = async (page, pipelineId) => {
+export const waitForPipelineToBeRunnable = async (page, pipelineId) => {
     await waitUntilCondition({
         page,
         condition: async () => {
@@ -79,8 +79,8 @@ export const waitForPipelineToBeDeployable = async (page, pipelineId) => {
                 gql`
                     query PipelineDeploymentStatus($pipelineId: String!) {
                         slotPipelineById(id: $pipelineId) {
-                            deploymentStatus {
-                                status
+                            runAction {
+                                ok
                             }
                         }
                     }
@@ -89,7 +89,7 @@ export const waitForPipelineToBeDeployable = async (page, pipelineId) => {
                     pipelineId: pipelineId,
                 }
             )
-            return (data.slotPipelineById.deploymentStatus.status === true)
+            return (data.slotPipelineById.runAction.ok === true)
         },
         message: 'Pipeline not ready for deployment within 5 seconds'
     })

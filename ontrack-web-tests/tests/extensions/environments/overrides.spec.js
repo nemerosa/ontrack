@@ -4,26 +4,26 @@ import {login} from "../../core/login";
 import {PipelinePage} from "./PipelinePage";
 
 test('overriding a rule', async ({page}) => {
-    const {pipeline} = await createPipelineWithPromotionRule({})
+    const {pipeline, ruleConfigId} = await createPipelineWithPromotionRule({})
 
     await login(page)
 
     const pipelinePage = new PipelinePage(page, pipeline)
     await pipelinePage.goTo()
 
-    const pipelineActions = await pipelinePage.checkPipelineActions()
     // We cannot deploy because build is not promoted
-    await pipelineActions.checkDeployingAction({visible: false})
+    await pipelinePage.checkRunAction({disabled: true})
 
-    await pipelinePage.checkRuleOverridden({name: "promotion", overridden: false})
-    await pipelinePage.checkOverrideRuleButton({name: "promotion", visible: true})
+    // Overriding the rule
+    const pipelineRule = await pipelinePage.getAdmissionRule(ruleConfigId)
+    await pipelineRule.checkRuleOverridden({overridden: false})
+    await pipelineRule.checkOverrideRuleButton({visible: true})
 
-    await pipelinePage.overrideRule({name: "promotion", message: "We cannot wait"})
-    await pipelinePage.checkRuleOverridden({name: "promotion", overridden: true})
+    await pipelineRule.overrideRule({message: "We cannot wait"})
+    await pipelineRule.checkRuleOverridden({overridden: true})
+    await pipelineRule.checkOverrideRuleButton({visible: false})
 
     // We can now deploy because the rule has been overridden
-    await pipelineActions.checkDeployingAction({visible: true})
-    await pipelineActions.expectStatusProgress({present: true, value: 100, overridden: true})
+    await pipelinePage.checkRunAction({disabled: false})
+    await pipelinePage.expectRuleStatusProgress({present: true, value: 100, overridden: true})
 })
-
-// TODO Cancelling override

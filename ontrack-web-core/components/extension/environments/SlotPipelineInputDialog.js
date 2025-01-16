@@ -6,7 +6,7 @@ import {gql} from "graphql-request";
 import {Space} from "antd";
 import SlotPipelineInput from "@components/extension/environments/SlotPipelineInput";
 
-export const useSlotPipelineInputDialog = () => {
+export const useSlotPipelineInputDialog = (ruleConfigId) => {
 
     const client = useGraphQLClient()
     const [loading, setLoading] = useState(true)
@@ -35,7 +35,10 @@ export const useSlotPipelineInputDialog = () => {
                 `,
                 {id: pipeline.id}
             ).then(data => {
-                const inputs = data.slotPipelineById.requiredInputs;
+                let inputs = data.slotPipelineById.requiredInputs;
+                if (ruleConfigId) {
+                    inputs = inputs.filter(it => it.config.id === ruleConfigId)
+                }
                 setInputs(inputs)
             }).finally(() => {
                 setLoading(false)

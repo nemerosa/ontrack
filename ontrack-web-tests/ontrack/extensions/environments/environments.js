@@ -167,7 +167,7 @@ export class EnvironmentsExtension {
                             message
                         }
                         deploymentStatus {
-                            status
+                            ok
                         }
                     }
                 }
@@ -177,14 +177,14 @@ export class EnvironmentsExtension {
             }
         )
 
-        const status = data.startSlotPipelineDeployment.deploymentStatus?.status
+        const status = data.startSlotPipelineDeployment.deploymentStatus?.ok
         if (!status) {
             throw new Error("Cannot deploy pipeline")
         }
     }
 
     async addAdmissionRule({slot, description = "", ruleId, ruleConfig}) {
-        await graphQLCallMutation(
+        const data = await graphQLCallMutation(
             this.ontrack.connection,
             'saveSlotAdmissionRuleConfig',
             gql`
@@ -200,6 +200,9 @@ export class EnvironmentsExtension {
                         ruleId: $ruleId,
                         ruleConfig: $ruleConfig,
                     }) {
+                        admissionRuleConfig {
+                            id
+                        }
                         errors {
                             message
                         }
@@ -213,10 +216,11 @@ export class EnvironmentsExtension {
                 ruleConfig,
             }
         )
+        return data.saveSlotAdmissionRuleConfig.admissionRuleConfig.id
     }
 
     async addManualApproval({slot}) {
-        await this.addAdmissionRule({
+        return await this.addAdmissionRule({
             slot,
             ruleId: "manual",
             ruleConfig: {
@@ -226,7 +230,7 @@ export class EnvironmentsExtension {
     }
 
     async addPromotionRule({slot, promotion = "GOLD"}) {
-        await this.addAdmissionRule({
+        return await this.addAdmissionRule({
             slot,
             ruleId: "promotion",
             ruleConfig: {

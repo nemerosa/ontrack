@@ -3,12 +3,14 @@ import {gql} from "graphql-request";
 import {List} from "antd";
 import {useEffect, useState} from "react";
 import {
+    DeploymentCancelledStatusStep,
     DeploymentCandidateStatusStep,
     DeploymentDoneStatusStep,
-    DeploymentRunningStatusStep
+    DeploymentRunningStatusStep,
+    findChange
 } from "@components/extension/environments/deployment/steps/deploymentStatusSteps";
 import {
-    deploymentCancelButtonStep,
+    DeploymentCancelButtonStep,
     DeploymentFinishButtonStep,
     DeploymentRunButtonStep
 } from "@components/extension/environments/deployment/steps/deploymentActionSteps";
@@ -21,9 +23,15 @@ function CandidateStatus({deployment}) {
     return <DeploymentCandidateStatusStep deployment={deployment}/>
 }
 
-const candidateAdmissionRules = (pipeline) => {
+const candidateAdmissionRules = (pipeline, disabled = true, onChange) => {
     return pipeline.admissionRules.map(rule =>
-        <CandidateAdmissionRuleStep key={rule.admissionRuleConfig.id} rule={rule}/>
+        <CandidateAdmissionRuleStep
+            key={rule.admissionRuleConfig.id}
+            pipeline={pipeline}
+            rule={rule}
+            disabled={disabled}
+            onChange={onChange}
+        />
     )
 }
 
@@ -33,8 +41,8 @@ const candidateWorkflows = (pipeline) => {
     )
 }
 
-const runButton = (deployment, onChange) => {
-    return <DeploymentRunButtonStep deployment={deployment} onChange={onChange}/>
+const runButton = (deployment, reloadState, onChange) => {
+    return <DeploymentRunButtonStep deployment={deployment} reloadState={reloadState} onChange={onChange}/>
 }
 
 function RunningStatus({deployment}) {
@@ -47,8 +55,8 @@ const runningWorkflows = (pipeline) => {
     )
 }
 
-const finishButton = (deployment, onChange) => {
-    return <DeploymentFinishButtonStep deployment={deployment} onChange={onChange}/>
+const finishButton = (deployment, reloadState, onChange) => {
+    return <DeploymentFinishButtonStep deployment={deployment} reloadState={reloadState} onChange={onChange}/>
 }
 
 function FinishStatus({deployment}) {
@@ -61,24 +69,28 @@ const doneWorkflows = (pipeline) => {
     )
 }
 
-const cancelButton = (deployment, onChange) => {
-    return deploymentCancelButtonStep(deployment, onChange)
+const cancelButton = (deployment, reloadState, onChange) => {
+    return <DeploymentCancelButtonStep deployment={deployment} reloadState={reloadState} onChange={onChange}/>
 }
 
-const generateItems = (pipeline, onChange) => {
+function CancelledStatus({deployment}) {
+    return <DeploymentCancelledStatusStep deployment={deployment}/>
+}
+
+const generateItems = (pipeline, reloadState, onChange) => {
 
     // 1 - Candidate
 
     if (pipeline.status === 'CANDIDATE') {
         const items = [
             <CandidateStatus key="status" deployment={pipeline}/>,
-            ...candidateAdmissionRules(pipeline),
+            ...candidateAdmissionRules(pipeline, false, onChange),
             ...candidateWorkflows(pipeline),
         ]
         if (pipeline.runAction) {
-            items.push(runButton(pipeline, onChange))
+            items.push(runButton(pipeline, reloadState, onChange))
         }
-        // TODO items.push(cancelButton(pipeline, onChange))
+        items.push(cancelButton(pipeline, reloadState, onChange))
         return items
     }
 
@@ -93,17 +105,29 @@ const generateItems = (pipeline, onChange) => {
             ...runningWorkflows(pipeline),
         ]
         if (pipeline.finishAction) {
-            items.push(finishButton(pipeline, onChange))
+            items.push(finishButton(pipeline, reloadState, onChange))
         }
-        // TODO items.push(cancelButton(pipeline, onChange))
+        items.push(cancelButton(pipeline, reloadState, onChange))
         return items
     }
 
     // 3 - Cancelled
 
     else if (pipeline.status === 'CANCELLED') {
-        // TODO Previous state taken from the changes
-        return []
+        const items = [
+            <CandidateStatus key="status-candidate" deployment={pipeline}/>,
+            ...candidateAdmissionRules(pipeline),
+            ...candidateWorkflows(pipeline),
+        ]
+        const runningChange = findChange(pipeline, 'RUNNING')
+        if (runningChange) {
+            items.push(
+                <RunningStatus key="status-running" deployment={pipeline}/>,
+                ...runningWorkflows(pipeline),
+            )
+        }
+        items.push(<CancelledStatus key="status-cancelled" deployment={pipeline}/>,)
+        return items
     }
 
     // 4 - Done
@@ -226,7 +250,7 @@ export default function SlotPipelineSteps({pipelineId, reloadState, onChange}) {
         `,
         {
             variables: {pipelineId},
-            deps: reloadState,
+            deps: [reloadState],
         }
     )
 
@@ -234,7 +258,8 @@ export default function SlotPipelineSteps({pipelineId, reloadState, onChange}) {
     useEffect(() => {
         if (data) {
             const pipeline = data.slotPipelineById
-            const items = generateItems(pipeline, onChange)
+            console.log("Regenerating items...")
+            const items = generateItems(pipeline, reloadState, onChange)
             setItems(items)
         }
     }, [data])

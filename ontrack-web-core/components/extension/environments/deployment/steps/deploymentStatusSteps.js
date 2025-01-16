@@ -3,7 +3,7 @@ import {List, Typography} from "antd";
 import {slotPipelineStatusLabels} from "@components/extension/environments/SlotPipelineStatusLabel";
 import TimestampText from "@components/common/TimestampText";
 
-const findChange = (deployment, status) => deployment.changes.find(it => it.type === 'STATUS' && it.status === status)
+export const findChange = (deployment, status) => deployment.changes.find(it => it.type === 'STATUS' && it.status === status)
 
 function DeploymentStatusSignature({deployment, status}) {
     const change = findChange(deployment, status)
@@ -19,10 +19,10 @@ function DeploymentStatusSignature({deployment, status}) {
     )
 }
 
-export function DeploymentStep({avatar, title, description}) {
+export function DeploymentStep({id, avatar, title, description}) {
     return (
         <>
-            <List.Item className="ot-list-item">
+            <List.Item className="ot-list-item" data-testid={id}>
                 <List.Item.Meta
                     avatar={avatar}
                     title={title}
@@ -50,6 +50,7 @@ function DeploymentStatusStep({deployment, status}) {
         </>
     )
 }
+
 export function DeploymentCandidateStatusStep({deployment}) {
     return <DeploymentStatusStep
         deployment={deployment}
@@ -68,5 +69,12 @@ export function DeploymentDoneStatusStep({deployment}) {
     return <DeploymentStatusStep
         deployment={deployment}
         status="DONE"
+    />
+}
+
+export function DeploymentCancelledStatusStep({deployment}) {
+    return <DeploymentStatusStep
+        deployment={deployment}
+        status="CANCELLED"
     />
 }

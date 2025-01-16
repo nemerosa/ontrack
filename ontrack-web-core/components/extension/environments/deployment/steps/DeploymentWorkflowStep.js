@@ -35,7 +35,7 @@ function DeploymentWorkflowStepStatus({slotWorkflow}) {
     if (!slotWorkflowInstance) {
         return <DeploymentWorkflowStepStatusNotStarted slotWorkflow={slotWorkflow}/>
     } else {
-        return <WorkflowInstanceStatus status={slotWorkflowInstance.workflowInstance.status}/>
+        return <WorkflowInstanceStatus id={`slot-workflow-instance-status-${slotWorkflow.id}`} status={slotWorkflowInstance.workflowInstance.status}/>
     }
 }
 
@@ -43,6 +43,7 @@ export function DeploymentWorkflowStep({slotWorkflow}) {
     return (
         <>
             <DeploymentStep
+                id={`slot-workflow-${slotWorkflow.id}`}
                 avatar={<FaProjectDiagram title="Workflow"/>}
                 title={
                     <Space>
@@ -50,6 +51,7 @@ export function DeploymentWorkflowStep({slotWorkflow}) {
                         {
                             slotWorkflow.slotWorkflowInstanceForPipeline &&
                             <WorkflowInstanceLink
+                                id={`slot-workflow-instance-link-${slotWorkflow.id}`}
                                 workflowInstanceId={slotWorkflow.slotWorkflowInstanceForPipeline.id}
                                 name={slotWorkflow.workflow.name}
                             />

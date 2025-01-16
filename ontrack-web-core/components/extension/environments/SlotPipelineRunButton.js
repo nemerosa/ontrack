@@ -1,142 +1,67 @@
-import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
-import {useEffect, useState} from "react";
-import {Button, message, Popconfirm, Space} from "antd";
-import {FaPlay} from "react-icons/fa";
-import LoadingInline from "@components/common/LoadingInline";
+import {message} from "antd";
 import {gql} from "graphql-request";
-import {getUserErrors} from "@components/services/graphql-utils";
+import {useDeploymentRunAction} from "@components/extension/environments/deployment/steps/deploymentActions";
+import {useQuery} from "@components/services/useQuery";
+import SlotPipelineActionButton from "@components/extension/environments/SlotPipelineActionButton";
 
-export default function SlotPipelineRunButton({pipeline, onDeploy, size}) {
+export default function SlotPipelineRunButton({
+                                                  pipeline,
+                                                  reloadState,
+                                                  onDeploy,
+                                                  size,
+                                                  showDisabledButtonIfNotOk = false,
+                                                  showIcon = true,
+                                                  showText = false,
+                                              }) {
 
     const [messageApi, contextHolder] = message.useMessage()
-    const client = useGraphQLClient()
 
-    const [stateReload, setStateReload] = useState(0)
-    const [loadingDeployable, setLoadingDeployable] = useState(true)
-    const [deploymentStatus, setDeploymentStatus] = useState()
-
-    const [deploying, setDeploying] = useState(false)
-
-    const gqlDeploymentStatus = gql`
-        fragment DeploymentStatusData on SlotPipelineDeploymentStatus {
-            status
-            override
-            checks {
-                check {
-                    status
-                    reason
-                }
-                config {
-                    ruleId
-                    ruleConfig
-                }
-                ruleData
-                override {
-                    timestamp
-                    user
-                    message
-                }
-            }
-        }
-    `
-
-    useEffect(() => {
-        if (client && pipeline) {
-            setLoadingDeployable(true)
-            client.request(
-                gql`
-                    query PipelineDeployable($id: String!) {
-                        slotPipelineById(id: $id) {
-                            deploymentStatus {
-                                ...DeploymentStatusData
-                            }
-                        }
-                    }
-                    ${gqlDeploymentStatus}
-                `,
-                {id: pipeline.id}
-            ).then(data => {
-                setDeploymentStatus(data.slotPipelineById?.deploymentStatus)
-            }).finally(() => {
-                setLoadingDeployable(false)
-            })
-        }
-    }, [client, pipeline, stateReload])
-
-    const deploy = async () => {
-        setDeploying(true)
-        try {
-            const data = await client.request(
-                gql`
-                    mutation DeployPipeline($id: String!) {
-                        startSlotPipelineDeployment(input: {
-                            pipelineId: $id,
-                        }) {
-                            deploymentStatus {
-                                ...DeploymentStatusData
-                            }
-                            errors {
-                                message
-                            }
-                        }
-                    }
-
-                    ${gqlDeploymentStatus}
-                `,
-                {
-                    id: pipeline.id,
-                }
-            )
-            // Errors
-            const errors = getUserErrors(data.startSlotPipelineDeployment)
-            if (errors) {
-                messageApi.error(
-                    `Error triggering the deployment: ${errors}`
-                )
-            } else {
-                // Status
-                const deploymentStatus = data.startSlotPipelineDeployment.deploymentStatus
-                if (deploymentStatus) {
-                    setDeploymentStatus(deploymentStatus)
-                    setStateReload(count => count + 1)
-                    if (onDeploy) onDeploy()
-                } else {
-                    messageApi.error(
-                        "Did not receive any deployment status"
-                    )
-                }
-            }
-        } finally {
-            setDeploying(false)
-        }
+    const onError = async () => {
+        messageApi.error("Could not start the deployment")
     }
+
+    const {action, loading: running} = useDeploymentRunAction({
+        deployment: pipeline,
+        onSuccess: onDeploy,
+        onError: onError,
+    })
+
+    const {data, loading} = useQuery(
+        gql`
+            query PipelineRunAction($id: String!) {
+                slotPipelineById(id: $id) {
+                    runAction {
+                        ok
+                    }
+                }
+            }
+        `,
+        {
+            variables: {id: pipeline.id},
+            deps: [pipeline.id, reloadState],
+            dataFn: (data) => data.slotPipelineById?.runAction,
+        }
+    )
 
     return (
         <>
             {contextHolder}
-            {
-                deploymentStatus &&
-                <LoadingInline loading={loadingDeployable} text="">
-                    <Space>
-                        {
-                            pipeline.status === 'CANDIDATE' && deploymentStatus.status &&
-                            <Popconfirm
-                                title="Running deployment"
-                                description="Running this deployment may affect some running services. Do you want to continue?"
-                                onConfirm={deploy}
-                            >
-                                <Button
-                                    icon={<FaPlay color="green"/>}
-                                    title="Runs this deployment"
-                                    loading={deploying}
-                                    data-testid={`pipeline-deploy-${pipeline.id}`}
-                                    size={size}
-                                />
-                            </Popconfirm>
-                        }
-                    </Space>
-                </LoadingInline>
-            }
+            <SlotPipelineActionButton
+                id={`pipeline-deploy-${pipeline.id}`}
+                status="RUNNING"
+                actionStateData={data}
+                actionStateLoading={loading}
+                confirmTitle="Running deployment"
+                confirmDescription="Running this deployment may affect some running services. Do you want to continue?"
+                buttonTitle="Starts this deployment"
+                buttonText="Start the deployment"
+                action={action}
+                actionRunning={running}
+                size={size}
+                showDisabledButtonIfNotOk={showDisabledButtonIfNotOk}
+                showIcon={showIcon}
+                showText={showText}
+            />
         </>
     )
 }

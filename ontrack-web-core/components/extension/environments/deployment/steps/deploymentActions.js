@@ -7,16 +7,18 @@ const useDeploymentAction = ({deployment, mutation, userNodeName, statusNodeName
     const client = useGraphQLClient()
     const [loading, setLoading] = useState(false)
 
-    const action = async () => {
+    const action = async (config = {variables: {}}) => {
         setLoading(true)
         try {
-            console.log({deployment})
             const data = await client.request(
                 mutation,
-                {id: deployment.id}
+                {
+                    id: deployment.id,
+                    ...config.variables,
+                }
             )
             const errors = getGraphQLErrors(data, userNodeName)
-            if (errors && onError) {
+            if (errors && errors.length > 0 && onError) {
                 onError(errors)
             } else {
                 const userNode = data[userNodeName]
@@ -114,7 +116,7 @@ export const useDeploymentCancelAction = ({deployment, onSuccess, onError}) => {
             }
         `,
         userNodeName: 'cancelSlotPipeline',
-        statusNodeName: '',
+        statusNodeName: undefined,
         onSuccess: onSuccess,
         onError: onError,
     })

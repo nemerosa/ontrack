@@ -1821,14 +1821,6 @@ type DeletionPayload implements PayloadInterface {
     errors: [PayloadUserError]
 }
 
-"Result for the check of the admission for a pipeline"
-type DeployableCheck {
-    "reason field"
-    reason: String
-    "status field"
-    status: Boolean
-}
-
 "Output type for the disableAccount mutation."
 type DisableAccountPayload implements Payload {
     "Updated account"
@@ -2029,7 +2021,7 @@ type FinishSlotPipelineDeploymentPayload implements Payload {
     "List of errors"
     errors: [UserError]
     "Status of the deployment"
-    finishStatus: SlotPipelineDeploymentFinishStatus
+    finishStatus: SlotDeploymentActionStatus
 }
 
 "Output type for the generateToken mutation."
@@ -7124,7 +7116,10 @@ type Slot implements Authorizable {
     "qualifier field"
     qualifier: String!
     "List of workflows for this slot"
-    workflows: [SlotWorkflow!]!
+    workflows(
+        "Type of trigger to filter on"
+        trigger: SlotPipelineStatus
+    ): [SlotWorkflow!]!
 }
 
 "Admission rule"
@@ -7173,6 +7168,22 @@ type SlotAdmissionRuleOverride {
     user: String!
 }
 
+"Result for the check of an action on a deployment"
+type SlotDeploymentActionStatus {
+    "message field"
+    message: String!
+    "ok field"
+    ok: Boolean
+}
+
+"Result for the check of the admission for a pipeline"
+type SlotDeploymentCheck {
+    "ok field"
+    ok: Boolean
+    "reason field"
+    reason: String
+}
+
 "Graph of slots for a project"
 type SlotGraph {
     "slotNodes field"
@@ -7195,14 +7206,16 @@ type SlotNode {
 
 "Pipeline for a slot"
 type SlotPipeline {
+    "All the checks for the admission rules for this deployments"
+    admissionRules: [SlotPipelineAdmissionRuleStatus!]!
     "build field"
     build: Build!
     "Changes having occurred to the pipeline"
     changes: [SlotPipelineChange!]!
-    "Current status for the pipeline"
-    deploymentStatus: SlotPipelineDeploymentStatus
     "end field"
     end: LocalDateTime
+    "Can this deployment be completed?"
+    finishAction: SlotPipelineDeploymentStatusProgress
     "Is the pipeline finished?"
     finished: Boolean!
     "id field"
@@ -7213,6 +7226,8 @@ type SlotPipeline {
     number: Int
     "List of required inputs for the admission rules"
     requiredInputs: [SlotAdmissionRuleInput!]!
+    "Can this deployment be actioned into a running state?"
+    runAction: SlotPipelineDeploymentStatusProgress
     "slot field"
     slot: Slot!
     "List of workflow instances for this pipeline"
@@ -7225,10 +7240,14 @@ type SlotPipeline {
 
 "Stored state for an admission rule in a pipeline"
 type SlotPipelineAdmissionRuleStatus {
+    "admissionRuleConfig field"
+    admissionRuleConfig: SlotAdmissionRuleConfig!
+    "True if the user is allowed to override this rule"
+    canBeOverridden: Boolean!
+    "Status check for this rule"
+    check: SlotDeploymentCheck!
     "data field"
     data: SlotAdmissionRuleData
-    "id field"
-    id: String!
     "Flag to check if the rule has been overridden"
     overridden: Boolean!
     "override field"
@@ -7237,14 +7256,10 @@ type SlotPipelineAdmissionRuleStatus {
 
 "Change happening to a pipeline"
 type SlotPipelineChange {
-    "dataChanged field"
-    dataChanged: Boolean
     "id field"
     id: String!
     "message field"
-    message: String!
-    "overridden field"
-    overridden: Boolean
+    message: String
     "overrideMessage field"
     overrideMessage: String
     "pipeline field"
@@ -7253,56 +7268,24 @@ type SlotPipelineChange {
     status: SlotPipelineStatus
     "timestamp field"
     timestamp: LocalDateTime!
+    "type field"
+    type: SlotPipelineChangeType!
     "user field"
     user: String!
 }
 
-"List of checks for admission for a pipeline"
-type SlotPipelineDeploymentCheck {
-    "True if the user is allowed to override this rule"
-    canBeOverridden: Boolean
-    "check field"
-    check: DeployableCheck!
-    "config field"
-    config: SlotAdmissionRuleConfig!
-    "Flag to check if the rule has been overridden"
-    overridden: Boolean!
-    "override field"
-    override: SlotAdmissionRuleOverride
-    "ruleData field"
-    ruleData: JSON
-}
-
-"Status returned when finishing a deployment"
-type SlotPipelineDeploymentFinishStatus {
-    "deployed field"
-    deployed: Boolean
-    "message field"
-    message: String!
-}
-
-"Status for the admission check of a pipeline"
-type SlotPipelineDeploymentStatus {
-    "checks field"
-    checks: [SlotPipelineDeploymentCheck!]!
-    "override field"
-    override: Boolean
-    "progress field"
-    progress: SlotPipelineDeploymentStatusProgress!
-    "status field"
-    status: Boolean
-}
-
 "Progress for a deployment status"
 type SlotPipelineDeploymentStatusProgress {
-    "ok field"
-    ok: Int
-    "overridden field"
+    "Are all the checks OK?"
+    ok: Boolean
+    "Was there a check being overridden?"
     overridden: Boolean
     "percentage field"
     percentage: Int
-    "total field"
-    total: Int
+    "Number of checks being OK"
+    successCount: Int
+    "Total number of checks"
+    totalCount: Int
 }
 
 type SlotPipelinePaginated {
@@ -7318,6 +7301,11 @@ type SlotWorkflow {
     id: String!
     "Slot this workflow is registered for"
     slot: Slot!
+    "Getting the instance for a given pipeline"
+    slotWorkflowInstanceForPipeline(
+        "ID of the pipeline"
+        pipelineId: String!
+    ): SlotWorkflowInstance
     "Event which triggers this workflow"
     trigger: SlotPipelineStatus!
     "Workflow to run"
@@ -7341,7 +7329,7 @@ type SlotWorkflowInstance {
 "Output type for the startSlotPipelineDeployment mutation."
 type StartSlotPipelineDeploymentPayload implements Payload {
     "Pipeline deployment status"
-    deploymentStatus: SlotPipelineDeploymentStatus
+    deploymentStatus: SlotDeploymentActionStatus
     "List of errors"
     errors: [UserError]
 }
@@ -8348,6 +8336,14 @@ enum SCMChangeLogFileChangeType {
     MODIFIED
     RENAMED
     UNDEFINED
+}
+
+"Type of change in a deployment"
+enum SlotPipelineChangeType {
+    RULE_DATA
+    RULE_OVERRIDDEN
+    STATUS
+    WORKFLOW_OVERRIDDEN
 }
 
 "List of pipelines for a status"

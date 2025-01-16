@@ -13,8 +13,10 @@ export default function StandardTable({
                                           expandable = false,
                                           size = 10,
                                           filter = {},
-                                          onFilterChange = (_) => {},
+                                          onFilterChange = (_) => {
+                                          },
                                           footerExtra = '',
+                                          rowKey,
                                       }) {
 
     const client = useGraphQLClient()
@@ -72,6 +74,7 @@ export default function StandardTable({
                 columns={columns}
                 expandable={expandable}
                 onChange={onTableChange}
+                rowKey={rowKey}
                 footer={() =>
                     <Space>
                         <TablePaginationFooter

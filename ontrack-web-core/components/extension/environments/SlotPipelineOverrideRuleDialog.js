@@ -4,10 +4,10 @@ import {gql} from "graphql-request";
 
 export const useSlotPipelineOverrideRuleDialog = ({onSuccess}) => {
     return useFormDialog({
-        prepareValues: (values, {pipeline, check}) => {
+        prepareValues: (values, {pipeline, rule}) => {
             return {
                 pipelineId: pipeline.id,
-                admissionRuleConfigId: check.config.id,
+                admissionRuleConfigId: rule.admissionRuleConfig.id,
                 message: values.message,
             }
         },

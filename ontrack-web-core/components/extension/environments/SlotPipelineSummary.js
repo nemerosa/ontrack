@@ -28,7 +28,7 @@ export default function SlotPipelineSummary({pipelineId, reloadState}) {
             variables: {
                 id: pipelineId
             },
-            deps: reloadState,
+            deps: [reloadState],
         }
     )
 

@@ -20,20 +20,17 @@ export default function SlotPipelineDeploymentStatusProgress({pipeline, link = t
                 gql`
                     query SlotPipelineDeploymentStatusProgress($id: String!) {
                         slotPipelineById(id: $id) {
-                            deploymentStatus {
-                                progress {
-                                    ok
-                                    overridden
-                                    total
-                                    percentage
-                                }
+                            runAction {
+                                ok
+                                overridden
+                                percentage
                             }
                         }
                     }
                 `,
                 {id: pipeline.id}
             ).then(data => {
-                setProgress(data.slotPipelineById.deploymentStatus.progress)
+                setProgress(data.slotPipelineById.runAction)
             }).finally(() => {
                 setLoading(false)
             })

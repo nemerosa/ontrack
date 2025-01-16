@@ -9,6 +9,9 @@ import SlotPipelineStatusActions from "@components/extension/environments/SlotPi
 import {useReloadState} from "@components/common/StateUtils";
 import Link from "next/link";
 import {slotPipelineUri} from "@components/extension/environments/EnvironmentsLinksUtils";
+import SlotPipelineStatus from "@components/extension/environments/SlotPipelineStatus";
+import SlotPipelineDeploymentStatusProgress
+    from "@components/extension/environments/SlotPipelineDeploymentStatusProgress";
 
 export default function SlotPipelinesTable({slot}) {
 
@@ -17,6 +20,7 @@ export default function SlotPipelinesTable({slot}) {
     return (
         <>
             <StandardTable
+                id={`slot-pipelines-${slot.id}`}
                 query={
                     gql`
                         query SlotPipelines(
@@ -47,6 +51,7 @@ export default function SlotPipelinesTable({slot}) {
                 variables={{
                     id: slot.id,
                 }}
+                rowKey={(item) => item.id}
                 columns={[
                     {
                         key: 'number',
@@ -60,6 +65,24 @@ export default function SlotPipelinesTable({slot}) {
                             <BuildLink build={item.build}/>
                             <PromotionRuns promotionRuns={item.build.promotionRuns}/>
                         </Space>
+                    },
+                    {
+                        key: 'status',
+                        title: 'Status',
+                        render: (_, item) =>
+                            <SlotPipelineStatus pipeline={item}/>
+                    },
+                    {
+                        key: 'progress',
+                        title: 'Progress',
+                        render: (_, item) => {
+                            if (item.status === 'CANDIDATE') {
+                                return <SlotPipelineDeploymentStatusProgress
+                                    pipeline={item}
+                                    link={true}
+                                />
+                            }
+                        }
                     },
                     {
                         key: 'start',
@@ -76,7 +99,10 @@ export default function SlotPipelinesTable({slot}) {
                         title: 'Actions',
                         render: (_, item) => <SlotPipelineStatusActions
                             pipeline={item}
+                            reloadState={reloadState}
                             onChange={reload}
+                            info={false}
+                            showStatus={false}
                         />,
                     }
                 ]}

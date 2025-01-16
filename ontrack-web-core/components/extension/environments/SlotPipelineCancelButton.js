@@ -1,67 +1,80 @@
-import {FaStop} from "react-icons/fa";
-import {Button, message} from "antd";
-import {useState} from "react";
-import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
-import {gql} from "graphql-request";
+import {Button, message, Space} from "antd";
 import {useConfirmWithReason} from "@components/common/ConfirmWithReason";
-import {processGraphQLErrors} from "@components/services/graphql-utils";
+import {useDeploymentCancelAction} from "@components/extension/environments/deployment/steps/deploymentActions";
+import SlotPipelineStatusIcon from "@components/extension/environments/SlotPipelineStatusIcon";
+import {useQuery} from "@components/services/useQuery";
+import {gql} from "graphql-request";
+import LoadingInline from "@components/common/LoadingInline";
 
-export default function SlotPipelineCancelButton({pipeline, onCancel, size}) {
+export default function SlotPipelineCancelButton({
+                                                     deployment,
+                                                     reloadState,
+                                                     onCancel,
+                                                     showIcon = true,
+                                                     showText = false,
+                                                 }) {
+
     const [messageApi, contextHolder] = message.useMessage()
-    const client = useGraphQLClient()
-    const [cancelling, setCancelling] = useState(false)
 
-    const cancel = async (reason) => {
-        setCancelling(true)
-        try {
-            const data = await client.request(
-                gql`
-                    mutation CancelPipeline(
-                        $id: String!,
-                        $reason: String!,
-                    ) {
-                        cancelSlotPipeline(input: {
-                            pipelineId: $id,
-                            reason: $reason,
-                        }) {
-                            errors {
-                                message
-                            }
-                        }
-                    }
-                `,
-                {
-                    id: pipeline.id,
-                    reason: reason ?? 'Cancelled manually',
-                }
-            )
-            if (processGraphQLErrors(data, 'cancelSlotPipeline', messageApi)) {
-                if (onCancel) onCancel()
-            }
-        } finally {
-            setCancelling(false)
-        }
+    const onError = async () => {
+        messageApi.error(`Could not cancel the deployment`)
     }
 
+    const {action, loading: cancelling} = useDeploymentCancelAction({
+        deployment,
+        onSuccess: onCancel,
+        onError,
+    })
+
     const [cancelConfirm, cancelComponent] = useConfirmWithReason({
-        onConfirm: cancel,
+        onConfirm: (reason) => action({variables: {reason}}),
         question: "Are you sure you want to cancel this deployment?",
     })
 
+    const {data, loading} = useQuery(
+        gql`
+            query PipelineActions($id: String!) {
+                slotPipelineById(id: $id) {
+                    runAction {
+                        ok
+                    }
+                    finishAction {
+                        ok
+                    }
+                }
+            }
+        `,
+        {
+            variables: {id: deployment.id},
+            deps: [deployment.id, reloadState],
+        }
+    )
+
     return (
         <>
-            {cancelComponent}
-            {contextHolder}
-            {
-                !pipeline.finished &&
-                <Button
-                    icon={<FaStop color="red"/>}
-                    title="Cancels this deployment"
-                    loading={cancelling}
-                    onClick={cancelConfirm}
-                    size={size}
-                />
-            }
+            <LoadingInline loading={loading} text="">
+                {
+                    (data?.slotPipelineById?.runAction !== null || data?.slotPipelineById?.finishAction !== null) &&
+                    <Button
+                        loading={cancelling}
+                        onClick={cancelConfirm}
+                        title="Cancels this deployment"
+                    >
+                        <Space>
+                            {
+                                showIcon &&
+                                <SlotPipelineStatusIcon status="CANCELLED"/>
+                            }
+                            {
+                                showText &&
+                                "Cancel the deployment"
+                            }
+                        </Space>
+                    </Button>
+                }
+                {contextHolder}
+                {cancelComponent}
+            </LoadingInline>
         </>
     )
 }

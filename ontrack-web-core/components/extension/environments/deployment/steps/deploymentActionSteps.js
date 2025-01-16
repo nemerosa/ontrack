@@ -1,11 +1,9 @@
-import {Button, message, Popconfirm, Progress, Space} from "antd";
+import {Progress, Space} from "antd";
 import SlotPipelineStatusIcon from "@components/extension/environments/SlotPipelineStatusIcon";
-import {
-    useDeploymentCancelAction,
-    useDeploymentFinishAction,
-    useDeploymentRunAction
-} from "@components/extension/environments/deployment/steps/deploymentActions";
 import {DeploymentStep} from "@components/extension/environments/deployment/steps/deploymentStatusSteps";
+import SlotPipelineCancelButton from "@components/extension/environments/SlotPipelineCancelButton";
+import SlotPipelineDoneButton from "@components/extension/environments/SlotPipelineDoneButton";
+import SlotPipelineRunButton from "@components/extension/environments/SlotPipelineRunButton";
 
 function DeploymentActionProgress({deployment, action}) {
     return (
@@ -13,6 +11,9 @@ function DeploymentActionProgress({deployment, action}) {
             <Progress
                 strokeColor={action.overridden ? "orange" : undefined}
                 data-testid={`deployment-progress-${deployment.id}`}
+                className={
+                    action.overridden ? `ot-extension-environment-overridden` : undefined
+                }
                 type="circle"
                 percent={action.percentage}
                 size={32}
@@ -21,145 +22,11 @@ function DeploymentActionProgress({deployment, action}) {
     )
 }
 
-function DeploymentActionButton({actionEnabled, text, confirmTitle, confirmDescription, onConfirm, loading}) {
-    return (
-        <>
-            <Popconfirm
-                title={confirmTitle}
-                description={confirmDescription}
-                onConfirm={onConfirm}
-            >
-                <Button
-                    disabled={!actionEnabled}
-                    loading={loading}
-                >
-                    {text}
-                </Button>
-            </Popconfirm>
-        </>
-    )
-}
-
-function DeploymentRunActionButton({deployment, onChange}) {
-
-    const [messageApi, contextHolder] = message.useMessage()
-
-    const onError = async (errors) => {
-        messageApi.error(`Could not start the deployment: ${errors}`)
-    }
-
-    const onSuccess = async () => {
-        onChange()
-    }
-
-    const {action, loading} = useDeploymentRunAction({
-        deployment,
-    })
-
-    return (
-        <>
-            <DeploymentActionButton
-                deployment={deployment}
-                actionEnabled={deployment.runAction.ok}
-                text="Start running the deployment"
-                confirmTitle="Running deployment"
-                confirmDescription="Running this deployment may affect some running services. Do you want to continue?"
-                onConfirm={action}
-                loading={loading}
-                onSuccess={onSuccess}
-                onError={onError}
-            />
-            {contextHolder}
-        </>
-    )
-}
-
-function DeploymentFinishActionButton({deployment, onChange}) {
-
-    const [messageApi, contextHolder] = message.useMessage()
-
-    const onError = async (errors) => {
-        messageApi.error(`Could not finish the deployment: ${errors}`)
-    }
-
-    const onSuccess = async () => {
-        onChange()
-    }
-
-    const {action, loading} = useDeploymentFinishAction({
-        deployment,
-    })
-
-    return (
-        <>
-            <DeploymentActionButton
-                deployment={deployment}
-                status="DONE"
-                actionEnabled={deployment.finishAction.ok}
-                text="Marks the deployment as complete"
-                confirmTitle="Finish deployment"
-                confirmDescription="This deployment will be marked as complete. Do you want to continue?"
-                onConfirm={action}
-                loading={loading}
-                onSuccess={onSuccess}
-                onError={onError}
-            />
-            {contextHolder}
-        </>
-    )
-}
-
-function DeploymentCancelActionButton({deployment, onChange}) {
-
-    const [messageApi, contextHolder] = message.useMessage()
-
-    const onError = async (errors) => {
-        messageApi.error(`Could not cancel the deployment: ${errors}`)
-    }
-
-    const onSuccess = async () => {
-        onChange()
-    }
-
-    const {action, loading} = useDeploymentCancelAction({
-        deployment,
-    })
-
-    return (
-        <>
-            <DeploymentActionButton
-                deployment={deployment}
-                status="CANCELLED"
-                actionEnabled={true}
-                text="Cancels the deployment"
-                confirmTitle="Cancel deployment"
-                confirmDescription="This deployment will be cancelled. Do you want to continue?"
-                onConfirm={action}
-                loading={loading}
-                onSuccess={onSuccess}
-                onError={onError}
-            />
-            {contextHolder}
-        </>
-    )
-}
-
-const deploymentActionButtonStep = ({
-                                        actionButton,
-                                        actionEnabled,
-                                        icon,
-                                    }) => {
-    return {
-        title: actionButton,
-        disabled: !actionEnabled,
-        icon: icon,
-    }
-}
-
-function DeploymentActionButtonStep({indicator, actionButton, icon, description}) {
+function DeploymentActionButtonStep({id, indicator, actionButton, icon, description}) {
     return (
         <>
             <DeploymentStep
+                id={id}
                 avatar={icon}
                 title={
                     <Space>
@@ -173,10 +40,18 @@ function DeploymentActionButtonStep({indicator, actionButton, icon, description}
     )
 }
 
-export function DeploymentRunButtonStep({deployment, onChange}) {
+export function DeploymentRunButtonStep({deployment, reloadState, onChange}) {
     return <DeploymentActionButtonStep
+        id={`deployment-run-${deployment.id}`}
         actionButton={
-            <DeploymentRunActionButton deployment={deployment} onChange={onChange}/>
+            <SlotPipelineRunButton
+                pipeline={deployment}
+                reloadState={reloadState}
+                onDeploy={onChange}
+                showIcon={false}
+                showText={true}
+                showDisabledButtonIfNotOk={true}
+            />
         }
         icon={
             <SlotPipelineStatusIcon status="RUNNING"/>
@@ -190,10 +65,17 @@ export function DeploymentRunButtonStep({deployment, onChange}) {
     />
 }
 
-export function DeploymentFinishButtonStep({deployment, onChange}) {
+export function DeploymentFinishButtonStep({deployment, reloadState, onChange}) {
     return <DeploymentActionButtonStep
         actionButton={
-            <DeploymentFinishActionButton deployment={deployment} onChange={onChange}/>
+            <SlotPipelineDoneButton
+                pipeline={deployment}
+                reloadState={reloadState}
+                onFinish={onChange}
+                showDisabledButtonIfNotOk={true}
+                showIcon={false}
+                showText={true}
+            />
         }
         icon={
             <SlotPipelineStatusIcon status="DONE"/>
@@ -201,11 +83,13 @@ export function DeploymentFinishButtonStep({deployment, onChange}) {
     />
 }
 
-export const deploymentCancelButtonStep = (deployment, onChange) => {
-    return deploymentActionButtonStep({
-        deployment,
-        actionEnabled: true,
-        actionButton: <DeploymentCancelActionButton deployment={deployment} onChange={onChange}/>,
-        icon: <SlotPipelineStatusIcon status="CANCELLED"/>,
-    })
+export function DeploymentCancelButtonStep({deployment, reloadState, onChange}) {
+    return <DeploymentActionButtonStep
+        actionButton={
+            <SlotPipelineCancelButton deployment={deployment} reloadState={reloadState} onCancel={onChange} showText={true} showIcon={false}/>
+        }
+        icon={
+            <SlotPipelineStatusIcon status="CANCELLED"/>
+        }
+    />
 }

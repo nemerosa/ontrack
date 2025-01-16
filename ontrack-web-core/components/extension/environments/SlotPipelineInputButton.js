@@ -1,20 +1,14 @@
-import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
-import {useEffect, useState} from "react";
 import LoadingInline from "@components/common/LoadingInline";
-import {Button} from "antd";
+import {Button, Space} from "antd";
 import {FaHandPaper} from "react-icons/fa";
 import {gql} from "graphql-request";
 import SlotPipelineInputDialog, {
     useSlotPipelineInputDialog
 } from "@components/extension/environments/SlotPipelineInputDialog";
 import {useReloadState} from "@components/common/StateUtils";
+import {useQuery} from "@components/services/useQuery";
 
 export default function SlotPipelineInputButton({pipeline, onChange, size}) {
-    const client = useGraphQLClient()
-
-    const [loading, setLoading] = useState(true)
-    const [inputNeeded, setInputNeeded] = useState(false)
-
     const [reloadState, reload] = useReloadState()
 
     const onDataChange = () => {
@@ -22,31 +16,29 @@ export default function SlotPipelineInputButton({pipeline, onChange, size}) {
         if (onChange) onChange()
     }
 
-    useEffect(() => {
-        if (client) {
-            setLoading(true)
-            client.request(
-                gql`
-                    query PipelineInput($id: String!) {
-                        slotPipelineById(id: $id) {
-                            requiredInputs {
-                                # Only the list of inputs is needed, not the details
-                                config {
-                                    id
-                                }
-                            }
+    const {data, loading} = useQuery(
+        gql`
+            query PipelineInput($id: String!) {
+                slotPipelineById(id: $id) {
+                    requiredInputs {
+                        # Only the list of inputs is needed, not the details
+                        config {
+                            id
                         }
                     }
-                `,
-                {id: pipeline.id}
-            ).then(data => {
+                }
+            }
+        `,
+        {
+            variables: {id: pipeline.id},
+            // deps: pipeline.id,
+            deps: [pipeline.id, reloadState],
+            dataFn: (data) => {
                 const inputs = data.slotPipelineById.requiredInputs
-                setInputNeeded(inputs && inputs.length > 0)
-            }).finally(() => {
-                setLoading(false)
-            })
+                return inputs && inputs.length > 0
+            }
         }
-    }, [client, pipeline.id, reloadState])
+    )
 
     const dialog = useSlotPipelineInputDialog()
     const pipelineInput = async () => {
@@ -57,14 +49,17 @@ export default function SlotPipelineInputButton({pipeline, onChange, size}) {
         <>
             <LoadingInline loading={loading}>
                 {
-                    inputNeeded &&
+                    data &&
                     <Button
                         data-testid="pipeline-input-needed"
-                        icon={<FaHandPaper color="orange"/>}
                         title="Some input is needed for this deployment"
                         onClick={pipelineInput}
                         size={size}
-                    />
+                    >
+                        <Space>
+                            <FaHandPaper color="orange"/>
+                        </Space>
+                    </Button>
                 }
             </LoadingInline>
             <SlotPipelineInputDialog dialog={dialog}/>

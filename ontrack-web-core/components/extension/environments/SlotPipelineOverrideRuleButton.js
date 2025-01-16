@@ -4,26 +4,27 @@ import SlotPipelineOverrideRuleDialog, {
     useSlotPipelineOverrideRuleDialog
 } from "@components/extension/environments/SlotPipelineOverrideRuleDialog";
 
-export default function SlotPipelineOverrideRuleButton({pipeline, check, onChange}) {
+export default function SlotPipelineOverrideRuleButton({pipeline, rule, onChange}) {
 
     const dialog = useSlotPipelineOverrideRuleDialog({
         onSuccess: onChange,
     })
 
     const onOverride = () => {
-        dialog.start({pipeline, check})
+        dialog.start({pipeline, rule})
     }
 
     return (
         <>
             {
-                !check.override?.override && check.canBeOverridden && <>
+                !rule.check.ok && rule.override === null && rule.canBeOverridden && <>
                     <Button
-                        icon={<FaExclamationCircle color="red"/>}
                         title="Overriding this rule"
-                        data-testid={`override-${check.config.name}`}
+                        data-testid={`override-${rule.admissionRuleConfig.id}`}
                         onClick={onOverride}
-                    />
+                    >
+                        <FaExclamationCircle color="red"/>
+                    </Button>
                     <SlotPipelineOverrideRuleDialog dialog={dialog}/>
                 </>
             }

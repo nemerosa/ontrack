@@ -1,12 +1,11 @@
 import {ontrack} from "@ontrack/ontrack";
 import {login} from "../../core/login";
-import {expect} from "@playwright/test";
 import {createSlot} from "./slotFixtures";
 import {PipelinePage} from "./PipelinePage";
 
-export const manualApprovalInPipelinePage = async (page) => {
+export const prepareManualApprovalInPipelinePage = async (page) => {
     const {project, slot} = await createSlot(ontrack())
-    await ontrack().environments.addManualApproval({slot})
+    const ruleConfigId = await ontrack().environments.addManualApproval({slot})
 
     const branch = await project.createBranch()
     const build = await branch.createBuild()
@@ -18,27 +17,38 @@ export const manualApprovalInPipelinePage = async (page) => {
     const pipelinePage = new PipelinePage(page, pipeline)
     await pipelinePage.goTo()
 
-    const pipelineActions = await pipelinePage.checkPipelineActions()
-    await pipelineActions.expectManualInputButton()
-    await pipelineActions.expectStatusProgress({value: 0})
+    return {
+        project,
+        slot,
+        pipeline,
+        pipelinePage,
+        ruleConfigId,
+    }
+}
 
-    await pipelineActions.manualInput({
+export const manualApprovalInPipelinePage = async (page) => {
+    const {project, slot, pipeline, pipelinePage, ruleConfigId} = await prepareManualApprovalInPipelinePage(page)
+
+    const admissionRule = await pipelinePage.getAdmissionRule(ruleConfigId)
+    await admissionRule.expectManualInputButton()
+    await admissionRule.checkOverrideRuleButton({visible: true})
+    await pipelinePage.expectRuleStatusProgress({value: 0})
+
+    await admissionRule.manualInput({
         actions: async (dialog) => {
-            // dialog.getByLabel('Approval', {exact: true}).click()
-            const manualApprovalSwitch = dialog.getByTestId('manual-approval')
-            await expect(manualApprovalSwitch).toBeVisible()
-            await manualApprovalSwitch.click()
+            await dialog.getByLabel('Approval', {exact: true}).click()
             await dialog.getByLabel('Approval message').fill("OK for me")
         }
     })
 
-    await pipelineActions.expectManualInputButton(false)
-    await pipelineActions.expectStatusProgress({value: 100})
+    await admissionRule.expectManualInputButton(false)
+    await admissionRule.checkOverrideRuleButton({visible: false})
+    await pipelinePage.expectRuleStatusProgress({value: 100})
 
     return {
         project,
         slot,
         pipeline,
-        pipelineActions,
+        pipelinePage,
     }
 }

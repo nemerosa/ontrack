@@ -1,22 +1,36 @@
 import SlotPipelineRunButton from "@components/extension/environments/SlotPipelineRunButton";
+import {Space, Typography} from "antd";
 import SlotPipelineDoneButton from "@components/extension/environments/SlotPipelineDoneButton";
-import SlotPipelineStatus from "@components/extension/environments/SlotPipelineStatus";
 import SlotPipelineCancelButton from "@components/extension/environments/SlotPipelineCancelButton";
-import {Typography} from "antd";
 import SlotPipelineDeploymentStatusProgress
     from "@components/extension/environments/SlotPipelineDeploymentStatusProgress";
+import SlotPipelineStatusLabel from "@components/extension/environments/SlotPipelineStatusLabel";
 import SlotPipelineInputButton from "@components/extension/environments/SlotPipelineInputButton";
-import {useReloadState} from "@components/common/StateUtils";
 
-export default function SlotPipelineStatusActions({pipeline, info = true, linkInfo = true, actions = true, size, showMessageOnCancelled = true, onChange}) {
-
-    const [reloadState, reload] = useReloadState({callback: onChange})
+export default function SlotPipelineStatusActions({
+                                                      pipeline,
+                                                      info = true,
+                                                      linkInfo = true,
+                                                      actions = true,
+                                                      size,
+                                                      showMessageOnCancelled = true,
+                                                      showStatus = true,
+                                                      reloadState,
+                                                      onChange
+                                                  }) {
 
     return (
         <>
-            <SlotPipelineStatus pipeline={pipeline}>
+            <Space data-testid={`pipeline-actions-${pipeline.id}`}>
                 {
-                    info &&
+                    showStatus &&
+                    <SlotPipelineStatusLabel
+                        status={pipeline.status}
+                        showText={true}
+                    />
+                }
+                {
+                    info && pipeline.status === "CANDIDATE" &&
                     <SlotPipelineDeploymentStatusProgress
                         pipeline={pipeline}
                         link={linkInfo}
@@ -26,10 +40,10 @@ export default function SlotPipelineStatusActions({pipeline, info = true, linkIn
                 }
                 {
                     actions && <>
-                        <SlotPipelineInputButton pipeline={pipeline} onChange={reload} size={size}/>
-                        <SlotPipelineRunButton pipeline={pipeline} onDeploy={reload} size={size}/>
-                        <SlotPipelineDoneButton pipeline={pipeline} onFinish={reload} size={size}/>
-                        <SlotPipelineCancelButton pipeline={pipeline} onCancel={reload} size={size}/>
+                        <SlotPipelineInputButton pipeline={pipeline} reloadState={reloadState} onChange={onChange} size={size}/>
+                        <SlotPipelineRunButton pipeline={pipeline} reloadState={reloadState} onDeploy={onChange} size={size}/>
+                        <SlotPipelineDoneButton pipeline={pipeline} reloadState={reloadState} onFinish={onChange} size={size}/>
+                        <SlotPipelineCancelButton deployment={pipeline} reloadState={reloadState} onCancel={onChange} size={size}/>
                     </>
                 }
                 {
@@ -38,7 +52,7 @@ export default function SlotPipelineStatusActions({pipeline, info = true, linkIn
                     pipeline.lastChange?.message &&
                     <Typography.Text type="secondary">{pipeline.lastChange.message}</Typography.Text>
                 }
-            </SlotPipelineStatus>
+            </Space>
         </>
     )
 }

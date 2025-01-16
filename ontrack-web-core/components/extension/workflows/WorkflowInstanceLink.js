@@ -3,13 +3,13 @@ import {Button, Space} from "antd";
 import {FaProjectDiagram} from "react-icons/fa";
 import WorkflowInstanceStatus from "@components/extension/workflows/WorkflowInstanceStatus";
 
-export default function WorkflowInstanceLink({workflowInstanceId, status = undefined, name = "Workflow"}) {
+export default function WorkflowInstanceLink({id, workflowInstanceId, status = undefined, name = "Workflow"}) {
     return (
         <>
             {
                 workflowInstanceId &&
                 <Link href={`/extension/workflows/instances/${workflowInstanceId}`} passHref>
-                    <Button>
+                    <Button data-testid={id}>
                         <Space>
                             <FaProjectDiagram/>
                             {name}

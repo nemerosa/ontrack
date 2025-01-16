@@ -2,6 +2,7 @@ import {ui} from "@ontrack/connection";
 import {expect} from "@playwright/test";
 import {confirmBox} from "../../support/confirm";
 import {SlotBuilds} from "./SlotBuilds";
+import {SlotPipelineTable} from "./SlotPipelineTable";
 
 export class SlotPage {
     constructor(page, slot) {
@@ -49,5 +50,11 @@ export class SlotPage {
         const slotBuildsSection = this.page.getByTestId("slotBuilds")
         await expect(slotBuildsSection).toBeVisible()
         return new SlotBuilds(this.page, this.slot)
+    }
+
+    async getSlotPipelineTable() {
+        const table = new SlotPipelineTable(this.page, this.slot)
+        await table.expectToBeVisible()
+        return table
     }
 }
