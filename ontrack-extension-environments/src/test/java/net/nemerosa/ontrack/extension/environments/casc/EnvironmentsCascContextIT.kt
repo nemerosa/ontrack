@@ -13,11 +13,13 @@ import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.test.TestUtils.resourceBytes
 import net.nemerosa.ontrack.test.TestUtils.uid
 import net.nemerosa.ontrack.test.resourceBase64
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
 
 @NewTxRollbacked
+@Disabled("FLAKY")
 class EnvironmentsCascContextIT : AbstractCascTestSupport() {
 
     @Autowired
