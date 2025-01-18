@@ -73,6 +73,7 @@ export default function UserMenu({userMenu}) {
         'extension/workflows/audit': <FaProjectDiagram/>,
         'extension/environments/environments': <FaServer/>,
         'extension/license/info': <FaCertificate/>,
+        'extension/casc/casc': <FaCode/>,
     }
 
     useEffect(() => {

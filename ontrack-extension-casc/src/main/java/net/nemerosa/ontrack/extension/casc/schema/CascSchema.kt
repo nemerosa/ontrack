@@ -50,10 +50,6 @@ class CascJson : CascType("JSON type") {
     override val __type: String = "JSON"
 }
 
-class CascDuration : CascType("Duration") {
-    override val __type: String = "Duration"
-}
-
 class CascEnum(
     val name: String,
     val values: List<String>,
@@ -66,10 +62,11 @@ sealed class CascScalar(
     description: String,
 ) : CascType(description)
 
-class CascString : CascScalar("string", "String type")
-class CascInt : CascScalar("int", "Int type")
-class CascLong : CascScalar("long", "Long type")
-class CascBoolean : CascScalar("boolean", "Boolean type")
+class CascDuration : CascScalar("duration", "Duration")
+class CascString : CascScalar("string", "String")
+class CascInt : CascScalar("int", "Int")
+class CascLong : CascScalar("long", "Long")
+class CascBoolean : CascScalar("boolean", "Boolean")
 
 val cascString = CascString()
 val cascInt = CascInt()
