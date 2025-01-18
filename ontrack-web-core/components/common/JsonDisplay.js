@@ -1,6 +1,6 @@
 import AceEditor from "react-ace";
 
-export default function JsonDisplay({value, width = "100%"}) {
+export default function JsonDisplay({value, width = "100%", height = "32em", showLineNumbers = false}) {
     return <AceEditor
         mode="json"
         theme="github"
@@ -8,9 +8,10 @@ export default function JsonDisplay({value, width = "100%"}) {
         readOnly={true}
         showPrintMargin={false}
         width={width}
-        height="32em"
+        height={height}
         setOptions={{
-            showLineNumbers: false,
+            showLineNumbers: showLineNumbers,
+            useWorker: false,
         }}
     />
 }

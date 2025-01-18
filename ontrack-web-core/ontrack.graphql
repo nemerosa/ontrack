@@ -5971,6 +5971,8 @@ type QueueRecordHistory {
 type QueueRecording {
     "Actual payload sent to the processing"
     actualPayload: JSON
+    "Duration in ms"
+    durationSeconds: Int!
     "End of processing"
     endTime: LocalDateTime
     "Error on processing"

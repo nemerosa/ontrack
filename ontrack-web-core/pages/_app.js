@@ -12,6 +12,11 @@ import Head from "next/head";
 import {useRouter} from "next/router";
 import {isConnectionLoggingEnabled, isConnectionTracingEnabled, ontrackUiUrl, ontrackUrl} from "@/connection";
 import SearchContextProvider from "@components/search/SearchContext";
+// Ace editors modes & themes
+import 'ace-builds/src-noconflict/ace';
+import 'ace-builds/src-noconflict/mode-yaml';
+import 'ace-builds/src-noconflict/mode-json';
+import 'ace-builds/src-noconflict/theme-github';
 
 export async function getServerSideProps() {
     console.log("[init] Environment ", ontrack)
