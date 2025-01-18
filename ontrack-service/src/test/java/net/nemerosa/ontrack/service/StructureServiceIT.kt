@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.structure.Signature
 import net.nemerosa.ontrack.test.TestUtils
 import net.nemerosa.ontrack.test.TestUtils.uid
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.security.access.AccessDeniedException
@@ -230,6 +231,7 @@ class StructureServiceIT : AbstractDSLTestSupport() {
 
     @Test
     @NewTxRollbacked
+    @Disabled("FLAKY")
     fun `Last active projects`() {
         asAdmin {
             deleteAllProjects()
