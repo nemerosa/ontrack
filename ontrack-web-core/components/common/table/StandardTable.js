@@ -1,7 +1,8 @@
-import {Space, Table} from "antd";
+import {Button, Card, Form, Space, Table} from "antd";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {useEffect, useState} from "react";
 import TablePaginationFooter from "@components/common/table/TablePaginationFooter";
+import {FaBan, FaFilter} from "react-icons/fa";
 
 export default function StandardTable({
                                           id,
@@ -17,9 +18,13 @@ export default function StandardTable({
                                           },
                                           footerExtra = '',
                                           rowKey,
+                                          filterForm = [],
+                                          filterExtraButtons = [],
                                       }) {
 
     const client = useGraphQLClient()
+
+    const [filterFormData, setFilterFormData] = useState({})
 
     const [loading, setLoading] = useState(true)
     const [items, setItems] = useState([])
@@ -39,6 +44,7 @@ export default function StandardTable({
                 {
                     ...variables,
                     ...filter,
+                    ...filterFormData,
                     offset: pagination.offset,
                     size: pagination.size,
                 }
@@ -55,7 +61,7 @@ export default function StandardTable({
                 setLoading(false)
             })
         }
-    }, [client, query, pagination, filter, reloadCount]);
+    }, [client, query, pagination, filter, filterFormData, reloadCount]);
 
     const onTableChange = (_, filters) => {
         if (onFilterChange) {
@@ -63,30 +69,82 @@ export default function StandardTable({
         }
     }
 
+    const [filterFormInstance] = Form.useForm()
+
+    const onFilterFormFinish = (values) => {
+        setFilterFormData(values)
+    }
+
+    const onFilterFormClear = () => {
+        filterFormInstance.resetFields()
+        setFilterFormData({})
+    }
+
     return (
         <>
-            <Table
-                id={id}
-                data-testid={id}
-                loading={loading}
-                dataSource={items}
-                pagination={false}
-                columns={columns}
-                expandable={expandable}
-                onChange={onTableChange}
-                rowKey={rowKey}
-                footer={() =>
-                    <Space>
-                        <TablePaginationFooter
-                            pageInfo={pageInfo}
-                            setPagination={setPagination}
-                        />
-                        {footerExtra}
-                    </Space>
+            <Space direction="vertical" className="ot-line">
+                {
+                    filterForm.length > 0 &&
+                    <Card
+                        size="small"
+                        className="ot-well"
+                    >
+                        <Form
+                            layout="inline"
+                            onFinish={onFilterFormFinish}
+                            form={filterFormInstance}
+                            style={{
+                                rowGap: 16,
+                                columnGap: 8,
+                            }}
+                        >
+                            {filterForm}
+                            {/* Filter */}
+                            <Button
+                                type="primary"
+                                htmlType="submit"
+                            >
+                                <Space>
+                                    <FaFilter/>
+                                    Filter
+                                </Space>
+                            </Button>
+                            {/* Clear */}
+                            <Button
+                                type="link"
+                                onClick={onFilterFormClear}
+                            >
+                                <Space>
+                                    <FaBan/>
+                                    Clear filter
+                                </Space>
+                            </Button>
+                            {/* Extra buttons */}
+                            {filterExtraButtons}
+                        </Form>
+                    </Card>
                 }
-            >
-
-            </Table>
+                <Table
+                    id={id}
+                    data-testid={id}
+                    loading={loading}
+                    dataSource={items}
+                    pagination={false}
+                    columns={columns}
+                    expandable={expandable}
+                    onChange={onTableChange}
+                    rowKey={rowKey}
+                    footer={() =>
+                        <Space>
+                            <TablePaginationFooter
+                                pageInfo={pageInfo}
+                                setPagination={setPagination}
+                            />
+                            {footerExtra}
+                        </Space>
+                    }
+                />
+            </Space>
         </>
     )
 }
