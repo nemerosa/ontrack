@@ -272,3 +272,20 @@ test('failing workflows on deploying block the deployment completion', async ({p
 
     await pipelinePage.checkFinishAction({disabled: true})
 })
+
+test('going to the workflow instance from a pipeline workflow', async ({page}) => {
+    const {slot, project, slotWorkflow} = await withSlotWorkflow({trigger: 'CANDIDATE'})
+    const {pipeline} = await createPipeline({project, slot})
+
+    await waitForPipelineToBeRunnable(page, pipeline.id)
+
+    await login(page)
+
+    const pipelinePage = new PipelinePage(page, pipeline)
+    await pipelinePage.goTo()
+
+    const pipelineWorkflow = await pipelinePage.getWorkflow(slotWorkflow.id)
+    const workflowInstancePage = await pipelineWorkflow.goToWorkflowInstance()
+
+    await workflowInstancePage.checkStatus('Success')
+})

@@ -52,7 +52,7 @@ export function DeploymentWorkflowStep({slotWorkflow}) {
                             slotWorkflow.slotWorkflowInstanceForPipeline &&
                             <WorkflowInstanceLink
                                 id={`slot-workflow-instance-link-${slotWorkflow.id}`}
-                                workflowInstanceId={slotWorkflow.slotWorkflowInstanceForPipeline.id}
+                                workflowInstanceId={slotWorkflow.slotWorkflowInstanceForPipeline.workflowInstance.id}
                                 name={slotWorkflow.workflow.name}
                             />
                         }

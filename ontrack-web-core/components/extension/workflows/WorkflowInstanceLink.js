@@ -8,8 +8,14 @@ export default function WorkflowInstanceLink({id, workflowInstanceId, status = u
         <>
             {
                 workflowInstanceId &&
-                <Link href={`/extension/workflows/instances/${workflowInstanceId}`} passHref>
-                    <Button data-testid={id}>
+                <Link
+                    href={`/extension/workflows/instances/${workflowInstanceId}`}
+                    passHref
+                >
+                    <Button
+                        data-testid={id}
+                        data-workflow-instance-id={workflowInstanceId}
+                    >
                         <Space>
                             <FaProjectDiagram/>
                             {name}

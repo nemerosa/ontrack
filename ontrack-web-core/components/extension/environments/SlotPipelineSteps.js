@@ -167,6 +167,7 @@ export default function SlotPipelineSteps({pipelineId, reloadState, onChange}) {
             fragment SlotWorkflowInstanceContent on SlotWorkflowInstance {
                 id
                 workflowInstance {
+                    id
                     status
                     startTime
                     endTime
