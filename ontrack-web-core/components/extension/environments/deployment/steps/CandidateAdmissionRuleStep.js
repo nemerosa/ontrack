@@ -37,7 +37,9 @@ export function CandidateAdmissionRuleStep({pipeline, rule, disabled, onChange})
                         {/* Overridden */}
                         {
                             <SlotPipelineOverrideIndicator
-                                rule={rule}
+                                container={rule}
+                                id={rule.admissionRuleConfig.id}
+                                message="This rule was overridden"
                             />
                         }
                         {/* Name of the rule */}

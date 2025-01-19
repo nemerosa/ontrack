@@ -47,4 +47,9 @@ interface SlotWorkflowService {
      */
     fun getSlotWorkflowChecks(pipeline: SlotPipeline, trigger: SlotPipelineStatus, skipWorkflowId: String?): List<SlotDeploymentCheck>
 
+    fun getSlotWorkflowCheck(
+        pipeline: SlotPipeline,
+        slotWorkflow: SlotWorkflow
+    ): SlotDeploymentCheck
+
 }

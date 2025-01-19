@@ -35,9 +35,9 @@ const candidateAdmissionRules = (pipeline, disabled = true, onChange) => {
     )
 }
 
-const candidateWorkflows = (pipeline) => {
+const candidateWorkflows = (pipeline, onChange, disabled = false) => {
     return pipeline.slot.candidateWorkflows.map(slotWorkflow =>
-        <DeploymentWorkflowStep key={slotWorkflow.id} slotWorkflow={slotWorkflow}/>
+        <DeploymentWorkflowStep key={slotWorkflow.id} deployment={pipeline} slotWorkflow={slotWorkflow} disabled={disabled} onChange={onChange}/>
     )
 }
 
@@ -49,9 +49,9 @@ function RunningStatus({deployment}) {
     return <DeploymentRunningStatusStep deployment={deployment}/>
 }
 
-const runningWorkflows = (pipeline) => {
+const runningWorkflows = (pipeline, onChange, disabled = false) => {
     return pipeline.slot.runningWorkflows.map(slotWorkflow =>
-        <DeploymentWorkflowStep key={slotWorkflow.id} slotWorkflow={slotWorkflow}/>
+        <DeploymentWorkflowStep key={slotWorkflow.id} deployment={pipeline} slotWorkflow={slotWorkflow} onChange={onChange} disabled={disabled}/>
     )
 }
 
@@ -63,9 +63,9 @@ function FinishStatus({deployment}) {
     return <DeploymentDoneStatusStep deployment={deployment}/>
 }
 
-const doneWorkflows = (pipeline) => {
+const doneWorkflows = (pipeline, onChange) => {
     return pipeline.slot.doneWorkflows.map(slotWorkflow =>
-        <DeploymentWorkflowStep key={slotWorkflow.id} slotWorkflow={slotWorkflow}/>
+        <DeploymentWorkflowStep key={slotWorkflow.id} deployment={pipeline} slotWorkflow={slotWorkflow} onChange={onChange} disabled={true}/>
     )
 }
 
@@ -85,7 +85,7 @@ const generateItems = (pipeline, reloadState, onChange) => {
         const items = [
             <CandidateStatus key="status" deployment={pipeline}/>,
             ...candidateAdmissionRules(pipeline, false, onChange),
-            ...candidateWorkflows(pipeline),
+            ...candidateWorkflows(pipeline, onChange),
         ]
         if (pipeline.runAction) {
             items.push(runButton(pipeline, reloadState, onChange))
@@ -100,9 +100,9 @@ const generateItems = (pipeline, reloadState, onChange) => {
         const items = [
             <CandidateStatus key="status-candidate" deployment={pipeline}/>,
             ...candidateAdmissionRules(pipeline),
-            ...candidateWorkflows(pipeline),
+            ...candidateWorkflows(pipeline, onChange, true),
             <RunningStatus key="status-running" deployment={pipeline}/>,
-            ...runningWorkflows(pipeline),
+            ...runningWorkflows(pipeline, onChange),
         ]
         if (pipeline.finishAction) {
             items.push(finishButton(pipeline, reloadState, onChange))
@@ -117,13 +117,13 @@ const generateItems = (pipeline, reloadState, onChange) => {
         const items = [
             <CandidateStatus key="status-candidate" deployment={pipeline}/>,
             ...candidateAdmissionRules(pipeline),
-            ...candidateWorkflows(pipeline),
+            ...candidateWorkflows(pipeline, onChange, true),
         ]
         const runningChange = findChange(pipeline, 'RUNNING')
         if (runningChange) {
             items.push(
                 <RunningStatus key="status-running" deployment={pipeline}/>,
-                ...runningWorkflows(pipeline),
+                ...runningWorkflows(pipeline, onChange, true),
             )
         }
         items.push(<CancelledStatus key="status-cancelled" deployment={pipeline}/>,)
@@ -136,11 +136,11 @@ const generateItems = (pipeline, reloadState, onChange) => {
         return [
             <CandidateStatus key="status-candidate" deployment={pipeline}/>,
             ...candidateAdmissionRules(pipeline),
-            ...candidateWorkflows(pipeline),
+            ...candidateWorkflows(pipeline, onChange, true),
             <RunningStatus key="status-running" deployment={pipeline}/>,
-            ...runningWorkflows(pipeline),
+            ...runningWorkflows(pipeline, onChange, true),
             <FinishStatus key="status-done" deployment={pipeline}/>,
-            ...doneWorkflows(pipeline),
+            ...doneWorkflows(pipeline, onChange),
         ]
     }
 
@@ -166,6 +166,17 @@ export default function SlotPipelineSteps({pipelineId, reloadState, onChange}) {
 
             fragment SlotWorkflowInstanceContent on SlotWorkflowInstance {
                 id
+                check {
+                    ok
+                    reason
+                }
+                canBeOverridden
+                overridden
+                override {
+                    user
+                    timestamp
+                    message
+                }
                 workflowInstance {
                     id
                     status

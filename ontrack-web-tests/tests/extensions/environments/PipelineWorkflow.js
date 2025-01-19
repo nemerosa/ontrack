@@ -28,6 +28,33 @@ export class PipelineWorkflow {
         }
     }
 
+    async checkWorkflowOverridden({overridden = true}) {
+        const locator = this.locatePipelineWorkflow()
+        const overriddenLocator = locator.getByTestId(`overridden-${this.slotWorkflowId}`)
+        if (overridden) {
+            await expect(overriddenLocator).toBeVisible()
+        } else {
+            await expect(overriddenLocator).not.toBeVisible()
+        }
+    }
+
+    locatorOverrideWorkflowButton() {
+        const locator = this.locatePipelineWorkflow()
+        return locator.getByTestId(`override-${this.slotWorkflowId}`)
+    }
+
+    async checkOverrideWorkflowButton({visible = true}) {
+        await expect(this.locatorOverrideWorkflowButton()).toBeVisible({visible})
+    }
+
+    async overrideWorkflow({message}) {
+        await this.locatorOverrideWorkflowButton().click()
+        const messageInput = this.page.getByLabel("Message", {exact: true})
+        await expect(messageInput).toBeVisible()
+        await messageInput.fill(message)
+        await this.page.getByRole("button", {name: "OK"}).click()
+    }
+
     async goToWorkflowInstance() {
         const locator = this.locatePipelineWorkflow()
         const link = locator.getByTestId(`slot-workflow-instance-link-${this.slotWorkflowId}`)

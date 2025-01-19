@@ -289,3 +289,46 @@ test('going to the workflow instance from a pipeline workflow', async ({page}) =
 
     await workflowInstancePage.checkStatus('Success')
 })
+
+test('a workflow status can be overridden for a pipeline', async ({page}) => {
+    const {slot, project} = await createSlot(ontrack())
+    const slotWorkflowError = await addSlotWorkflow({
+        slot,
+        trigger: 'CANDIDATE',
+        workflowYaml: `
+            name: Workflow not working
+            nodes:
+              - id: test
+                executorId: mock
+                data:
+                    text: Error
+                    error: true
+        `
+    })
+    const {pipeline} = await createPipeline({project, slot})
+    await waitForPipelineWorkflowToBeFinished(page, pipeline.id, slotWorkflowError)
+
+    await login(page)
+    const pipelinePage = new PipelinePage(page, pipeline)
+    await pipelinePage.goTo()
+
+    await pipelinePage.expectRuleStatusProgress({value: 0, overridden: false})
+    await pipelinePage.checkRunAction({disabled: true})
+
+    const pipelineWorkflow = await pipelinePage.getWorkflow(slotWorkflowError.id)
+    await pipelineWorkflow.checkState({
+        status: "Error",
+        name: "Workflow not working"
+    })
+
+    await pipelineWorkflow.checkWorkflowOverridden({overridden: false})
+    await pipelineWorkflow.checkOverrideWorkflowButton({visible: true})
+
+    await pipelineWorkflow.overrideWorkflow({message: "Ignoring the workflow result"})
+
+    await pipelineWorkflow.checkWorkflowOverridden({overridden: true})
+    await pipelineWorkflow.checkOverrideWorkflowButton({visible: false})
+
+    await pipelinePage.expectRuleStatusProgress({value: 100, overridden: true})
+    await pipelinePage.checkRunAction({})
+})

@@ -3,6 +3,8 @@ package net.nemerosa.ontrack.extension.environments.workflows
 import net.nemerosa.ontrack.extension.environments.Slot
 import net.nemerosa.ontrack.extension.environments.SlotPipelineStatus
 import net.nemerosa.ontrack.extension.environments.SlotTestSupport
+import net.nemerosa.ontrack.extension.environments.service.SlotService
+import net.nemerosa.ontrack.extension.environments.service.getPipelineById
 import net.nemerosa.ontrack.extension.queue.QueueNoAsync
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceStatus
@@ -12,9 +14,7 @@ import net.nemerosa.ontrack.test.TestUtils.uid
 import net.nemerosa.ontrack.test.assertJsonNotNull
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
-import kotlin.test.fail
+import kotlin.test.*
 
 @QueueNoAsync
 class SlotWorkflowServiceGraphQLIT : AbstractQLKTITSupport() {
@@ -27,6 +27,9 @@ class SlotWorkflowServiceGraphQLIT : AbstractQLKTITSupport() {
 
     @Autowired
     private lateinit var slotWorkflowService: SlotWorkflowService
+
+    @Autowired
+    private lateinit var slotService: SlotService
 
     @Test
     fun `Registering a workflow on a slot`() {
@@ -227,6 +230,70 @@ class SlotWorkflowServiceGraphQLIT : AbstractQLKTITSupport() {
                     )
                 }
             }
+        }
+    }
+
+    @Test
+    fun `Workflow executions can be overridden`() {
+        slotWorkflowTestSupport.withSlotWorkflow(
+            trigger = SlotPipelineStatus.RUNNING,
+            error = true,
+        ) { slot, slotWorkflow ->
+            // Creating a pipeline
+            val pipeline = slotTestSupport.createPipeline(slot = slot)
+
+            // Launching the pipeline, this will create a failed workflow
+            val status = slotService.runDeployment(pipeline.id, dryRun = false)
+            assertTrue(status.ok, "Pipeline has started its deployment")
+
+            // Waiting for the pipeline's workflows to finish
+            slotWorkflowTestSupport.waitForSlotWorkflowsToFinish(pipeline, SlotPipelineStatus.RUNNING)
+
+            // The workflow has failed, and prevents the pipeline completion
+            var end = slotService.finishDeployment(pipeline.id)
+            assertFalse(end.ok, "Pipeline could not be deployed")
+
+            // Getting the workflow reason
+            val instance = slotWorkflowService.findSlotWorkflowInstanceByPipelineAndSlotWorkflow(pipeline, slotWorkflow)
+                ?: fail("Could not find slot workflow instance")
+            assertEquals(WorkflowInstanceStatus.ERROR, instance.workflowInstance.status)
+            assertNull(instance.override)
+
+            // Now, we override the workflow status
+            run(
+                """
+                    mutation {
+                        overridePipelineWorkflow(input: {
+                            pipelineId: "${pipeline.id}",
+                            slotWorkflowId: "${slotWorkflow.id}",
+                            message: "Ignoring the result of the workflow",
+                        }) {
+                            errors {
+                                message
+                            }
+                        }
+                    }
+                """.trimIndent()
+            )
+
+            // Checks that the workflow has been overridden
+            val overriddenInstance =
+                slotWorkflowService.findSlotWorkflowInstanceByPipelineAndSlotWorkflow(pipeline, slotWorkflow)
+                    ?: fail("Could not find slot workflow instance")
+            assertEquals(WorkflowInstanceStatus.ERROR, overriddenInstance.workflowInstance.status)
+            assertNotNull(overriddenInstance.override) {
+                assertEquals("Ignoring the result of the workflow", it.message)
+                assertEquals("admin", it.user)
+                assertNotNull(it.timestamp, "Timestamp has been set")
+            }
+
+            // ... and complete the deployment again
+            end = slotService.finishDeployment(pipeline.id)
+            assertTrue(end.ok, "Pipeline can now be deployed")
+
+            // Reloading the pipeline's status
+            val deployedPipeline = slotService.getPipelineById(pipeline.id)
+            assertEquals(SlotPipelineStatus.DONE, deployedPipeline.status)
         }
     }
 

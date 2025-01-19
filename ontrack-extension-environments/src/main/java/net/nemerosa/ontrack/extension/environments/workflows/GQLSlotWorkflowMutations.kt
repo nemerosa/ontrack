@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.environments.workflows
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.environments.SlotPipelineStatus
 import net.nemerosa.ontrack.extension.environments.service.SlotService
+import net.nemerosa.ontrack.extension.environments.service.getPipelineById
 import net.nemerosa.ontrack.extension.workflows.registry.WorkflowParser
 import net.nemerosa.ontrack.graphql.schema.Mutation
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
@@ -58,6 +59,24 @@ class GQLSlotWorkflowMutations(
             val slotWorkflow = slotWorkflowService.getSlotWorkflowById(input.id)
             slotWorkflowService.deleteSlotWorkflow(slotWorkflow)
         },
+        unitMutation(
+            name = "overridePipelineWorkflow",
+            description = "Overrides the execution of a workflow for a pipeline",
+            input = OverridePipelineWorkflowInput::class,
+        ) { input ->
+            val pipeline = slotService.getPipelineById(input.pipelineId)
+            val slotWorkflow = slotWorkflowService.getSlotWorkflowById(input.slotWorkflowId)
+            val slotWorkflowInstance = slotWorkflowService.findSlotWorkflowInstanceByPipelineAndSlotWorkflow(
+                pipeline = pipeline,
+                slotWorkflow = slotWorkflow,
+            )
+            if (slotWorkflowInstance != null) {
+                slotWorkflowService.overrideSlotWorkflowInstance(
+                    slotWorkflowInstanceId = slotWorkflowInstance.id,
+                    message = input.message,
+                )
+            }
+        },
     )
 }
 
@@ -76,4 +95,10 @@ data class SaveSlotWorkflowInput(
 
 data class DeleteSlotWorkflowInput(
     val id: String,
+)
+
+data class OverridePipelineWorkflowInput(
+    val pipelineId: String,
+    val slotWorkflowId: String,
+    val message: String,
 )

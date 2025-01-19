@@ -1,21 +1,32 @@
-import {Popover} from "antd";
+import {Popover, Space, Typography} from "antd";
 import {FaExclamationCircle} from "react-icons/fa";
 import TimestampText from "@components/common/TimestampText";
 
-export default function SlotPipelineOverrideIndicator({rule}) {
+export default function SlotPipelineOverrideIndicator({container, id, message}) {
     return (
         <>
             {
-                rule.overridden && rule.override &&
+                container.overridden && container.override &&
                 <Popover
-                    title="This rule was overridden"
+                    title={message}
                     content={
                         <>
-                            By {rule.override.user} at <TimestampText value={rule.override.timestamp}/>
+                            <Space direction="vertical">
+                                <Typography.Text>
+                                    By {container.override.user} at <TimestampText
+                                    value={container.override.timestamp}/>
+                                </Typography.Text>
+                                {
+                                    container.override.message &&
+                                    <Typography.Text type="secondary">
+                                        {container.override.message}
+                                    </Typography.Text>
+                                }
+                            </Space>
                         </>
                     }
                 >
-                    <FaExclamationCircle data-testid={`overridden-${rule.admissionRuleConfig.id}`} color="red"/>
+                    <FaExclamationCircle data-testid={`overridden-${id}`} color="red"/>
                 </Popover>
             }
         </>

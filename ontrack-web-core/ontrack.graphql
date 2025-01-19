@@ -3939,6 +3939,11 @@ type Mutation {
         "Input for the mutation"
         input: OverridePipelineRuleInput
     ): OverridePipelineRulePayload
+    "Overrides the execution of a workflow for a pipeline"
+    overridePipelineWorkflow(
+        "Input for the mutation"
+        input: OverridePipelineWorkflowInput
+    ): OverridePipelineWorkflowPayload
     "Pausing the execution of all jobs"
     pauseAllJobs: JobActionResult!
     "Pauses a job"
@@ -4694,6 +4699,12 @@ type OntrackGitIssueInfo {
 
 "Output type for the overridePipelineRule mutation."
 type OverridePipelineRulePayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
+"Output type for the overridePipelineWorkflow mutation."
+type OverridePipelineWorkflowPayload implements Payload {
     "List of errors"
     errors: [UserError]
 }
@@ -7314,8 +7325,16 @@ type SlotWorkflow {
 
 "Running instance of a workflow for a pipeline"
 type SlotWorkflowInstance {
+    "True if the user is allowed to override this rule"
+    canBeOverridden: Boolean!
+    "Status check for this workflow"
+    check: SlotDeploymentCheck!
     "id field"
     id: String!
+    "Flag to check if the workflow has been overridden"
+    overridden: Boolean!
+    "override field"
+    override: SlotAdmissionRuleOverride
     "pipeline field"
     pipeline: SlotPipeline!
     "slotWorkflow field"
@@ -9846,6 +9865,16 @@ input OverridePipelineRuleInput {
     message: String!
     "pipelineId field"
     pipelineId: String!
+}
+
+"Input type for the overridePipelineWorkflow mutation."
+input OverridePipelineWorkflowInput {
+    "message field"
+    message: String!
+    "pipelineId field"
+    pipelineId: String!
+    "slotWorkflowId field"
+    slotWorkflowId: String!
 }
 
 "Input type for the postQueue mutation."

@@ -5,6 +5,8 @@ import WorkflowInstanceLink from "@components/extension/workflows/WorkflowInstan
 import TimestampText from "@components/common/TimestampText";
 import DurationMs from "@components/common/DurationMs";
 import {DeploymentStep} from "@components/extension/environments/deployment/steps/deploymentStatusSteps";
+import SlotPipelineOverrideWorkflowButton from "@components/extension/environments/SlotPipelineOverrideWorkflowButton";
+import SlotPipelineOverrideIndicator from "@components/extension/environments/SlotPipelineOverrideIndicator";
 
 function DeploymentWorkflowTimings({slotWorkflow}) {
     const slotWorkflowInstance = slotWorkflow.slotWorkflowInstanceForPipeline
@@ -35,11 +37,12 @@ function DeploymentWorkflowStepStatus({slotWorkflow}) {
     if (!slotWorkflowInstance) {
         return <DeploymentWorkflowStepStatusNotStarted slotWorkflow={slotWorkflow}/>
     } else {
-        return <WorkflowInstanceStatus id={`slot-workflow-instance-status-${slotWorkflow.id}`} status={slotWorkflowInstance.workflowInstance.status}/>
+        return <WorkflowInstanceStatus id={`slot-workflow-instance-status-${slotWorkflow.id}`}
+                                       status={slotWorkflowInstance.workflowInstance.status}/>
     }
 }
 
-export function DeploymentWorkflowStep({slotWorkflow}) {
+export function DeploymentWorkflowStep({deployment, slotWorkflow, disabled = false, onChange}) {
     return (
         <>
             <DeploymentStep
@@ -48,6 +51,24 @@ export function DeploymentWorkflowStep({slotWorkflow}) {
                 title={
                     <Space>
                         <DeploymentWorkflowStepStatus slotWorkflow={slotWorkflow}/>
+                        {/* Overriding */}
+                        {
+                            !disabled &&
+                            <SlotPipelineOverrideWorkflowButton
+                                deployment={deployment}
+                                slotWorkflow={slotWorkflow}
+                                slotWorkflowInstance={slotWorkflow.slotWorkflowInstanceForPipeline}
+                                onChange={onChange}
+                            />
+                        }
+                        {/* Overridden */}
+                        {
+                            <SlotPipelineOverrideIndicator
+                                container={slotWorkflow.slotWorkflowInstanceForPipeline}
+                                id={slotWorkflow.id}
+                                message="The result of this workflow was overridden"
+                            />
+                        }
                         {
                             slotWorkflow.slotWorkflowInstanceForPipeline &&
                             <WorkflowInstanceLink

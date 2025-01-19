@@ -163,7 +163,7 @@ class SlotWorkflowServiceImpl(
         return workflows.map { getSlotWorkflowCheck(pipeline, it) }
     }
 
-    private fun getSlotWorkflowCheck(
+    override fun getSlotWorkflowCheck(
         pipeline: SlotPipeline,
         slotWorkflow: SlotWorkflow
     ): SlotDeploymentCheck {
