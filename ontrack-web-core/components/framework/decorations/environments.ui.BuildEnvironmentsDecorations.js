@@ -1,7 +1,5 @@
 import {Space} from "antd";
-import Link from "next/link";
-import {slotUri} from "@components/extension/environments/EnvironmentsLinksUtils";
-import EnvironmentIcon from "@components/extension/environments/EnvironmentIcon";
+import EnvironmentLink from "@components/extension/environments/EnvironmentLink";
 
 export default function BuildEnvironmentsDecorations({decoration}) {
     return (
@@ -9,23 +7,16 @@ export default function BuildEnvironmentsDecorations({decoration}) {
             <Space size={0}>
                 {
                     decoration.data.map((stub, index) => (
-                        <Link
-                            key={index}
-                            href={slotUri({id: stub.slotId})}
-                        >
-                            <EnvironmentIcon
-                                environmentId={stub.environmentId}
-                                tooltipText={
-                                    <>
-                                        Deployed in {stub.environmentName}
-                                        {
-                                            stub.qualifier &&
-                                            ` [${stub.qualifier}]`
-                                        }
-                                    </>
+                        <EnvironmentLink
+                            slot={{
+                                id: stub.slotId,
+                                qualifier: stub.qualifier,
+                                environment: {
+                                    id: stub.environmentId,
+                                    name: stub.environmentName,
                                 }
-                            />
-                        </Link>
+                            }}
+                        />
                     ))
                 }
             </Space>

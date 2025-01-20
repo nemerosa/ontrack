@@ -3,13 +3,12 @@ import React, {useContext, useEffect, useState} from "react";
 import {Popover, Space, Table} from "antd";
 import PromotionRun from "@components/promotionRuns/PromotionRun";
 import {gqlDecorationFragment} from "@components/services/fragments";
-import BuildBox from "@components/builds/BuildBox";
 import {FaBan} from "react-icons/fa";
-import BuildDependency from "@components/builds/BuildDependency";
 import {DashboardWidgetCellContext} from "@components/dashboards/DashboardWidgetCellContextProvider";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import BuildLink from "@components/builds/BuildLink";
 import PromotionRuns from "@components/promotionRuns/PromotionRuns";
+import BuildLastDeployedEnvironment from "@components/extension/environments/BuildLastDeployedEnvironment";
 
 const {Column} = Table;
 
@@ -140,17 +139,8 @@ export default function ProjectPromotionWidget({project, promotions, depth, labe
                             build={run.build}
                             displayTooltip={true}
                         />
-                        <Space size={8}>
-                            {
-                                run.build.promotionRuns.map(promotionRun =>
-                                    <PromotionRun
-                                        key={promotionRun.id}
-                                        promotionRun={promotionRun}
-                                        size={16}
-                                    />
-                                )
-                            }
-                        </Space>
+                        <PromotionRuns promotionRuns={run.build.promotionRuns}/>
+                        <BuildLastDeployedEnvironment build={run.build}/>
                     </Space>}
                 />
                 {
