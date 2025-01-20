@@ -8,6 +8,7 @@ export default function BuildEnvironmentsDecorations({decoration}) {
                 {
                     decoration.data.map((stub, index) => (
                         <EnvironmentLink
+                            key={index}
                             slot={{
                                 id: stub.slotId,
                                 qualifier: stub.qualifier,
