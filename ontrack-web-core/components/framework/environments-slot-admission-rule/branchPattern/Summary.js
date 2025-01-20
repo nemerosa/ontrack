@@ -1,9 +1,13 @@
 import {Space, Tag, Typography} from "antd";
 
-export default function BranchPatternAdmissionRuleSummary({includes, excludes}) {
+export default function BranchPatternAdmissionRuleSummary({lastBranchOnly, includes, excludes}) {
     return (
         <>
             <Space>
+                {
+                    lastBranchOnly &&
+                    <Tag>Last branch only</Tag>
+                }
                 {
                     includes && includes.length > 0 && <>
                         <Typography.Text>Includes</Typography.Text>

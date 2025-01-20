@@ -5,12 +5,17 @@ import net.nemerosa.ontrack.common.FilterHelper
 import net.nemerosa.ontrack.extension.environments.*
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.parseOrNull
+import net.nemerosa.ontrack.model.ordering.BranchOrderingService
+import net.nemerosa.ontrack.model.structure.BranchFilter
+import net.nemerosa.ontrack.model.structure.BranchNamePolicy
 import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
 
 @Component
 class BranchPatternSlotAdmissionRule(
-
+    private val branchOrderingService: BranchOrderingService,
+    private val structureService: StructureService,
 ) : SlotAdmissionRule<BranchPatternSlotAdmissionRuleConfig, Any> {
 
     companion object {
@@ -23,6 +28,7 @@ class BranchPatternSlotAdmissionRule(
     override fun parseConfig(jsonRuleConfig: JsonNode) = jsonRuleConfig.parse<BranchPatternSlotAdmissionRuleConfig>()
 
     override fun isBuildEligible(build: Build, slot: Slot, config: BranchPatternSlotAdmissionRuleConfig): Boolean =
+        // TODO Last branch criteria
         FilterHelper.includes(
             text = build.branch.name,
             includes = config.includes,
@@ -55,16 +61,37 @@ class BranchPatternSlotAdmissionRule(
         admissionRuleConfig: SlotAdmissionRuleConfig,
         ruleConfig: BranchPatternSlotAdmissionRuleConfig,
         ruleData: SlotAdmissionRuleTypedData<Any>?
-    ): SlotDeploymentCheck =
-        SlotDeploymentCheck.check(
-            check = isBuildEligible(
-                build = pipeline.build,
-                config = ruleConfig,
-                slot = pipeline.slot,
-            ),
+    ): SlotDeploymentCheck {
+        val eligibility = isBuildEligible(
+            build = pipeline.build,
+            config = ruleConfig,
+            slot = pipeline.slot,
+        )
+        val check = if (eligibility) {
+            if (ruleConfig.lastBranchOnly) {
+                val ordering = branchOrderingService.getSemVerBranchOrdering(
+                    branchNamePolicy = BranchNamePolicy.NAME_ONLY,
+                )
+                val branches = structureService.filterBranchesForProject(
+                    project = pipeline.slot.project,
+                    filter = BranchFilter(
+                        name = ruleConfig.includes.takeIf { it.isNotEmpty() }?.joinToString("|"),
+                        count = 10, // Arbitrary number
+                    )
+                ).sortedWith(ordering)
+                branches.firstOrNull()?.id == pipeline.build.branch.id
+            } else {
+                true
+            }
+        } else {
+            false
+        }
+        return SlotDeploymentCheck.check(
+            check = check,
             ok = "Build branch is valid",
             nok = "Build branch is not valid",
         )
+    }
 
     override fun parseData(node: JsonNode): Any = ""
 

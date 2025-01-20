@@ -6,6 +6,12 @@ export default function EnvironmentAdmissionRuleCheck({check, ruleConfig, ruleDa
             <Typography.Text>Build branch name must be in:</Typography.Text>
             <ul>
                 {
+                    ruleConfig.lastBranchOnly &&
+                    <li>
+                        Last branch only
+                    </li>
+                }
+                {
                     ruleConfig.includes.length > 0 &&
                     <li>
                         <Space>
