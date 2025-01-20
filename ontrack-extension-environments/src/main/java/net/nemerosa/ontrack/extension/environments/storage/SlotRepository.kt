@@ -136,6 +136,8 @@ class SlotRepository(
 
     fun getEligibleBuilds(
         slot: Slot,
+        offset: Int = 0,
+        size: Int = 10,
         queries: List<String>,
         params: Map<String, Any?>,
     ): List<Build> {
@@ -152,10 +154,16 @@ class SlotRepository(
         query += queries.joinToString("") { " AND ($it)" }
 
         val parameters = params.toMutableMap()
-        parameters["projectId"] = slot.project.id()
+        parameters["offset"] = offset
 
         // Order
-        query += " ORDER BY BD.ID DESC"
+        query += """
+             ORDER BY BD.ID DESC
+            OFFSET :offset
+            LIMIT :limit
+        """.trimIndent()
+        parameters["limit"] = size
+        parameters["projectId"] = slot.project.id()
 
         return namedParameterJdbcTemplate!!.query(
             query,
@@ -164,6 +172,34 @@ class SlotRepository(
             val id = rs.getInt("ID")
             buildJdbcRepositoryAccessor.getBuild(ID.of(id))
         }
+    }
+
+
+    fun getCountEligibleBuilds(
+        slot: Slot,
+        queries: List<String>,
+        params: Map<String, Any?>,
+    ): Int {
+        var query = """
+            SELECT COUNT(DISTINCT (BD.ID))
+            FROM BUILDS BD
+                     INNER JOIN BRANCHES B ON BD.BRANCHID = B.ID
+                     LEFT JOIN PROMOTION_RUNS PR ON BD.ID = PR.BUILDID
+                     LEFT JOIN PROMOTION_LEVELS PL ON B.ID = PL.BRANCHID
+            WHERE B.PROJECTID = :projectId
+            AND B.DISABLED = FALSE
+        """.trimIndent()
+
+        query += queries.joinToString("") { " AND ($it)" }
+
+        val parameters = params.toMutableMap()
+        parameters["projectId"] = slot.project.id()
+
+        return namedParameterJdbcTemplate!!.queryForObject(
+            query,
+            parameters,
+            Int::class.java,
+        ) ?: 0
     }
 
     fun deleteSlot(slot: Slot) {

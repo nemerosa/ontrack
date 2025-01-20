@@ -6,7 +6,7 @@ import java.lang.Integer.min
 /**
  * Asking for a page in a collection.
  */
-class PageRequest(
+data class PageRequest(
         val offset: Int = 0,
         val size: Int = DEFAULT_PAGE_SIZE
 ) {

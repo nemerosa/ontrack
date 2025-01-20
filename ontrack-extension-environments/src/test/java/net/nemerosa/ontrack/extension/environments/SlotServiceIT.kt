@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.environments.storage.SlotAlreadyDefinedExc
 import net.nemerosa.ontrack.extension.environments.storage.SlotIdAlreadyExistsException
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.model.pagination.PageRequest
 import net.nemerosa.ontrack.model.structure.Build
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -375,6 +376,54 @@ class SlotServiceIT : AbstractDSLTestSupport() {
                 ),
                 slots.map { it.id }.toSet()
             )
+        }
+    }
+
+    @Test
+    fun `Pagination of eligible builds for a slot`() {
+        asAdmin {
+            slotTestSupport.withSlot { slot ->
+                val branch = slot.project.branch()
+                val builds = (1..10).map { i ->
+                    branch.build(name = "$i")
+                }.reversed()
+                slotService.getEligibleBuilds(slot, offset = 0, count = 4).apply {
+                    assertEquals(
+                        builds.subList(0, 4),
+                        pageItems
+                    )
+                    assertEquals(
+                        PageRequest(
+                            offset = 4,
+                            size = 4,
+                        ),
+                        pageInfo.nextPage
+                    )
+                }
+                slotService.getEligibleBuilds(slot, offset = 4, count = 4).apply {
+                    assertEquals(
+                        builds.subList(4, 8),
+                        pageItems
+                    )
+                    assertEquals(
+                        PageRequest(
+                            offset = 8,
+                            size = 2,
+                        ),
+                        pageInfo.nextPage
+                    )
+                }
+                slotService.getEligibleBuilds(slot, offset = 8, count = 2).apply {
+                    assertEquals(
+                        builds.subList(8, 10),
+                        pageItems
+                    )
+                    assertEquals(
+                        null,
+                        pageInfo.nextPage
+                    )
+                }
+            }
         }
     }
 }

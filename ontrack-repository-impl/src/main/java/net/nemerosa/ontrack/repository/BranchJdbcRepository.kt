@@ -64,6 +64,13 @@ class BranchJdbcRepository(
             params["name"] = name
         }
 
+        // Filter: excludes
+        val excludes = filter.excludes
+        if (!excludes.isNullOrBlank()) {
+            criterias += "B.NAME !~ :excludes"
+            params["excludes"] = excludes
+        }
+
         // Filter: favorite
         val favorite = filter.favorite
         if (favorite != null && favorite && user != null) {

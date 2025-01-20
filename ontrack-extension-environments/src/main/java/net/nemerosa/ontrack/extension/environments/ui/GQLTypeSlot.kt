@@ -14,7 +14,6 @@ import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.authorizations.GQLInterfaceAuthorizableService
 import net.nemerosa.ontrack.graphql.support.*
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
-import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.structure.Build
 import org.springframework.stereotype.Component
 
@@ -49,7 +48,7 @@ class GQLTypeSlot(
                     .type(GraphQLTypeReference(GQLTypeBuild.BUILD))
                     .dataFetcher { env ->
                         val slot: Slot = env.getSource()
-                        slotService.getEligibleBuilds(slot, count = 1).firstOrNull()
+                        slotService.getEligibleBuilds(slot, count = 1).pageItems.firstOrNull()
                     }
             }
             // Paginated list of eligible builds
@@ -65,14 +64,9 @@ class GQLTypeSlot(
                         )
                     ),
                     itemType = GQLTypeBuild.BUILD,
-                    itemPaginatedListProvider = { env, slot, _, size ->
+                    itemPaginatedListProvider = { env, slot, offset, size ->
                         val deployable: Boolean = env.getArgument("deployable") ?: false
-                        // TODO Pagination of eligible builds
-                        PaginatedList.create(
-                            slotService.getEligibleBuilds(slot, count = size, deployable = deployable),
-                            offset = 0,
-                            pageSize = size
-                        )
+                        slotService.getEligibleBuilds(slot, offset = offset, count = size, deployable = deployable)
                     }
                 )
             )

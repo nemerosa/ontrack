@@ -16,9 +16,11 @@ export default function SlotEligibleBuildsTable({slot, onChange, showEligibleBui
                         query SlotEligibleBuilds(
                             $id: String!,
                             $deployableOnly: Boolean!,
+                            $offset: Int! = 0,
+                            $size: Int! = 5,
                         ) {
                             slotById(id: $id) {
-                                eligibleBuilds(size: 5, deployable: $deployableOnly) {
+                                eligibleBuilds(offset: $offset, size: $size, deployable: $deployableOnly) {
                                     pageInfo {
                                         nextPage {
                                             offset

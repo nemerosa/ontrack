@@ -60,9 +60,10 @@ interface SlotService {
      */
     fun getEligibleBuilds(
         slot: Slot,
+        offset: Int = 0,
         count: Int = 10,
         deployable: Boolean = false,
-    ): List<Build>
+    ): PaginatedList<Build>
 
     /**
      * Starting a pipeline

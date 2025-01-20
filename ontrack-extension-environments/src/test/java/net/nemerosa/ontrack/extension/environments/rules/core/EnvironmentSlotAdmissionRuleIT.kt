@@ -155,7 +155,7 @@ class EnvironmentSlotAdmissionRuleIT : AbstractDSLTestSupport() {
                 )
                 slot.project.branch {
                     val build = build()
-                    val eligibleBuilds = slotService.getEligibleBuilds(slot = slot)
+                    val eligibleBuilds = slotService.getEligibleBuilds(slot = slot).pageItems
                     assertEquals(
                         listOf(build.id),
                         eligibleBuilds.map { it.id },
@@ -179,7 +179,7 @@ class EnvironmentSlotAdmissionRuleIT : AbstractDSLTestSupport() {
                 )
                 slot.project.branch {
                     /* val build = */ build()
-                    val eligibleBuilds = slotService.getEligibleBuilds(slot = slot)
+                    val eligibleBuilds = slotService.getEligibleBuilds(slot = slot).pageItems
                     assertEquals(
                         emptyList(),
                         eligibleBuilds.map { it.id },
@@ -210,13 +210,13 @@ class EnvironmentSlotAdmissionRuleIT : AbstractDSLTestSupport() {
                 slotService.runDeployment(pipeline.id, dryRun = false)
                 slotService.finishDeployment(pipeline.id)
 
-                val eligibleBuilds = slotService.getEligibleBuilds(slot = slot)
+                val eligibleBuilds = slotService.getEligibleBuilds(slot = slot).pageItems
                 assertEquals(
                     listOf(build2.id, build1.id),
                     eligibleBuilds.map { it.id }
                 )
 
-                val deployableBuilds = slotService.getEligibleBuilds(slot = slot, deployable = true)
+                val deployableBuilds = slotService.getEligibleBuilds(slot = slot, deployable = true).pageItems
                 assertEquals(
                     listOf(build2.id),
                     deployableBuilds.map { it.id }

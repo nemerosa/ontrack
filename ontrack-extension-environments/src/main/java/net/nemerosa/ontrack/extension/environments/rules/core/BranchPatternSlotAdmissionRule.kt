@@ -6,10 +6,7 @@ import net.nemerosa.ontrack.extension.environments.*
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.ordering.BranchOrderingService
-import net.nemerosa.ontrack.model.structure.BranchFilter
-import net.nemerosa.ontrack.model.structure.BranchNamePolicy
-import net.nemerosa.ontrack.model.structure.Build
-import net.nemerosa.ontrack.model.structure.StructureService
+import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 
 @Component
@@ -54,6 +51,31 @@ class BranchPatternSlotAdmissionRule(
                 params["exclude$index"] = s
             }
         }
+        if (deployable && config.lastBranchOnly) {
+            // Getting the latest branch on the slot project for the given patterns
+            val lastBranch = findLastBranch(slot.project, config)
+            // We want the branch to be the latest one
+            queries += "B.ID = :lastBranchId"
+            params["lastBranchId"] = lastBranch?.id()
+        }
+    }
+
+    private fun findLastBranch(
+        project: Project,
+        ruleConfig: BranchPatternSlotAdmissionRuleConfig
+    ): Branch? {
+        val ordering = branchOrderingService.getSemVerBranchOrdering(
+            branchNamePolicy = BranchNamePolicy.NAME_ONLY,
+        )
+        val branches = structureService.filterBranchesForProject(
+            project = project,
+            filter = BranchFilter(
+                name = ruleConfig.includes.takeIf { it.isNotEmpty() }?.joinToString("|"),
+                excludes = ruleConfig.excludes.takeIf { it.isNotEmpty() }?.joinToString("|"),
+                count = 100, // Arbitrary number
+            )
+        ).sortedWith(ordering)
+        return branches.firstOrNull()
     }
 
     override fun isBuildDeployable(

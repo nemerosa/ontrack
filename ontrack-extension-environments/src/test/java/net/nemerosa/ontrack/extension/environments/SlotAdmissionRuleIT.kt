@@ -107,7 +107,7 @@ class SlotAdmissionRuleIT : AbstractDSLTestSupport() {
             // Creating another project & branch
             project {
                 branch {
-                    val pl = promotionLevel("GOLD")
+                    promotionLevel("GOLD")
                     build {
                         assertFalse(
                             slotService.isBuildEligible(slot, this),
@@ -139,7 +139,7 @@ class SlotAdmissionRuleIT : AbstractDSLTestSupport() {
                     /* val build21 = */ build()
 
                     // Only the builds of the branches containing the GOLD promotion are eligible
-                    val builds = slotService.getEligibleBuilds(slot)
+                    val builds = slotService.getEligibleBuilds(slot).pageItems
                     assertEquals(
                         listOf(
                             build12,
@@ -169,7 +169,7 @@ class SlotAdmissionRuleIT : AbstractDSLTestSupport() {
                     val build21 = build()
 
                     // Only the builds of the branches containing the GOLD promotion are eligible
-                    val builds = slotService.getEligibleBuilds(slot)
+                    val builds = slotService.getEligibleBuilds(slot).pageItems
                     assertEquals(
                         listOf(
                             build21,

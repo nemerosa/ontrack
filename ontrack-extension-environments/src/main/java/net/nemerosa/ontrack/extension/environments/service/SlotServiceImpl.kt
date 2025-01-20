@@ -168,9 +168,10 @@ class SlotServiceImpl(
 
     override fun getEligibleBuilds(
         slot: Slot,
+        offset: Int,
         count: Int,
         deployable: Boolean,
-    ): List<Build> {
+    ): PaginatedList<Build> {
         securityService.checkSlotAccess<SlotView>(slot)
         // Gets all the admission rules
         val configs = slotAdmissionRuleConfigRepository.getAdmissionRuleConfigs(slot)
@@ -180,8 +181,27 @@ class SlotServiceImpl(
         configs.forEach { config ->
             fillEligibilityCriteria(slot, config, queries, params, deployable = deployable)
         }
-        // Gets all eligible builds
-        return slotRepository.getEligibleBuilds(slot, queries, params)
+        // Gets all eligible builds in the range
+        val range = slotRepository.getEligibleBuilds(
+            slot = slot,
+            offset = offset,
+            size = count,
+            queries = queries,
+            params = params
+        )
+        // Gets the whole count
+        val total = slotRepository.getCountEligibleBuilds(
+            slot = slot,
+            queries = queries,
+            params = params
+        )
+        // OK
+        return PaginatedList.create(
+            items = range,
+            offset = offset,
+            pageSize = count,
+            total = total,
+        )
     }
 
     private fun fillEligibilityCriteria(
@@ -395,7 +415,11 @@ class SlotServiceImpl(
         val checks = getPipelineAdmissionRuleChecksForAllRules(pipeline).toMutableList()
 
         // Checking the workflows
-        checks += slotWorkflowService.getSlotWorkflowChecks(pipeline, SlotPipelineStatus.CANDIDATE, skipWorkflowId = null)
+        checks += slotWorkflowService.getSlotWorkflowChecks(
+            pipeline,
+            SlotPipelineStatus.CANDIDATE,
+            skipWorkflowId = null
+        )
 
         // Progress
         return deploymentStatusProcessFromChecks(checks)
@@ -432,7 +456,8 @@ class SlotServiceImpl(
             return SlotDeploymentActionStatus.nok("Some admission rules prevent the deployment to start")
         }
 
-        val workflowChecks = slotWorkflowService.getSlotWorkflowChecks(pipeline, SlotPipelineStatus.CANDIDATE, skipWorkflowId)
+        val workflowChecks =
+            slotWorkflowService.getSlotWorkflowChecks(pipeline, SlotPipelineStatus.CANDIDATE, skipWorkflowId)
         if (workflowChecks.any { !it.ok }) {
             return SlotDeploymentActionStatus.nok("Some workflows prevent the deployment to start")
         }
@@ -535,7 +560,8 @@ class SlotServiceImpl(
         }
 
         // Checking the workflows
-        val checks = slotWorkflowService.getSlotWorkflowChecks(pipeline, SlotPipelineStatus.RUNNING, skipWorkflowId = null)
+        val checks =
+            slotWorkflowService.getSlotWorkflowChecks(pipeline, SlotPipelineStatus.RUNNING, skipWorkflowId = null)
 
         // Progress
         return deploymentStatusProcessFromChecks(checks)
@@ -567,7 +593,11 @@ class SlotServiceImpl(
             return SlotDeploymentActionStatus.nok("Pipeline can be deployed only if deployment has been started first.")
         }
         // Checking the workflows
-        val workflowChecks = slotWorkflowService.getSlotWorkflowChecks(pipeline, SlotPipelineStatus.RUNNING, skipWorkflowId = skipWorkflowId)
+        val workflowChecks = slotWorkflowService.getSlotWorkflowChecks(
+            pipeline,
+            SlotPipelineStatus.RUNNING,
+            skipWorkflowId = skipWorkflowId
+        )
         if (workflowChecks.any { !it.ok }) {
             return SlotDeploymentActionStatus.nok("Some workflows prevent the deployment to complete")
         }

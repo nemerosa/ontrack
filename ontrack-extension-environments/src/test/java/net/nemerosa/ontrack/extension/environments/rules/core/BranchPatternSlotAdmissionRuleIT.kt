@@ -101,7 +101,7 @@ class BranchPatternSlotAdmissionRuleIT : AbstractDSLTestSupport() {
                 branch("release-1.32") {
                     expectedBuilds += build()
                 }
-                val actualBuilds = slotService.getEligibleBuilds(slot)
+                val actualBuilds = slotService.getEligibleBuilds(slot).pageItems
                 assertEquals(
                     expectedBuilds.reversed(),
                     actualBuilds
@@ -185,10 +185,17 @@ class BranchPatternSlotAdmissionRuleIT : AbstractDSLTestSupport() {
                 val release11 = branch<Build>("release-4.11") {
                     build()
                 }
-                val actualBuilds = slotService.getEligibleBuilds(slot)
+                val eligibleBuilds = slotService.getEligibleBuilds(slot).pageItems
                 assertEquals(
                     listOf(release11, release10, release9),
-                    actualBuilds
+                    eligibleBuilds,
+                    "Eligible builds"
+                )
+                val deployableBuilds = slotService.getEligibleBuilds(slot, deployable = true).pageItems
+                assertEquals(
+                    listOf(release11),
+                    deployableBuilds,
+                    "Deployable builds"
                 )
                 assertEquals(false, slotService.isBuildEligible(slot, masterBuild))
                 assertEquals(true, slotService.isBuildEligible(slot, release9))
