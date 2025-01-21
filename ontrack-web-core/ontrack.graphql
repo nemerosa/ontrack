@@ -1143,6 +1143,14 @@ type CreateJenkinsConfigurationPayload implements Payload {
     errors: [UserError]
 }
 
+"Output type for the createPredefinedPromotionLevel mutation."
+type CreatePredefinedPromotionLevelPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Created predefined promotion level"
+    predefinedPromotionLevel: PredefinedPromotionLevel
+}
+
 "Output type for the createProjectOrGet mutation."
 type CreateProjectOrGetPayload implements Payload {
     "List of errors"
@@ -1422,6 +1430,12 @@ type DeleteJenkinsConfigurationPayload implements Payload {
 
 "Output type for the deleteNotificationRecords mutation."
 type DeleteNotificationRecordsPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
+"Output type for the deletePredefinedPromotionLevel mutation."
+type DeletePredefinedPromotionLevelPayload implements Payload {
     "List of errors"
     errors: [UserError]
 }
@@ -3373,6 +3387,11 @@ type Mutation {
         "Input for the mutation"
         input: CreateJenkinsConfigurationInput
     ): CreateJenkinsConfigurationPayload
+    "Creates a new predefined promotion level"
+    createPredefinedPromotionLevel(
+        "Input for the mutation"
+        input: CreatePredefinedPromotionLevelInput
+    ): CreatePredefinedPromotionLevelPayload
     "Creates a new project"
     createProject(
         "Input for the mutation"
@@ -3547,6 +3566,11 @@ type Mutation {
         "Input for the mutation"
         input: DeleteNotificationRecordsInput
     ): DeleteNotificationRecordsPayload
+    "Deletes an existing predefined promotion level"
+    deletePredefinedPromotionLevel(
+        "Input for the mutation"
+        input: DeletePredefinedPromotionLevelInput
+    ): DeletePredefinedPromotionLevelPayload
     "Deletes an existing project"
     deleteProject(
         "Input for the mutation"
@@ -3966,6 +3990,11 @@ type Mutation {
         "Input for the mutation"
         input: RenameSubscriptionInput
     ): RenameSubscriptionPayload
+    "Reordering the predefining promotion levels"
+    reorderPredefinedPromotionLevelById(
+        "Input for the mutation"
+        input: ReorderPredefinedPromotionLevelByIdInput
+    ): ReorderPredefinedPromotionLevelByIdPayload
     "Reordering the promotion levels in a branch"
     reorderPromotionLevelById(
         "Input for the mutation"
@@ -4547,6 +4576,11 @@ type Mutation {
         "Input for the mutation"
         input: UpdatePipelineDataInput
     ): UpdatePipelineDataPayload
+    "Updates an existing predefined promotion level"
+    updatePredefinedPromotionLevel(
+        "Input for the mutation"
+        input: UpdatePredefinedPromotionLevelInput
+    ): UpdatePredefinedPromotionLevelPayload
     "Updates an existing project"
     updateProject(
         "Input for the mutation"
@@ -5741,11 +5775,21 @@ type Query {
     notificationSettings: NotificationSettings
     "Basic test service"
     ping: String
+    "Predefined promotion level by ID"
+    predefinedPromotionLevelById(
+        "ID"
+        id: Int!
+    ): PredefinedPromotionLevel
     "Predefined promotion level by name"
     predefinedPromotionLevelByName(
         "Name"
         name: String!
     ): PredefinedPromotionLevel
+    "Returns the list of all predefined promotion levels"
+    predefinedPromotionLevels(
+        "Filtering on the predefined promotion level name"
+        name: String
+    ): [PredefinedPromotionLevel!]!
     "Gets a predefined validation stamps by name"
     predefinedValidationStampByName(
         "Name"
@@ -6045,6 +6089,12 @@ type RenameSubscriptionPayload implements Payload {
     errors: [UserError]
     "Renamed subscription"
     subscription: EventSubscriptionPayload
+}
+
+"Output type for the reorderPredefinedPromotionLevelById mutation."
+type ReorderPredefinedPromotionLevelByIdPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
 }
 
 "Output type for the reorderPromotionLevelById mutation."
@@ -7564,6 +7614,14 @@ type UpdatePipelineDataPayload implements Payload {
     errors: [UserError]
 }
 
+"Output type for the updatePredefinedPromotionLevel mutation."
+type UpdatePredefinedPromotionLevelPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Updated predefined promotion level"
+    predefinedPromotionLevel: PredefinedPromotionLevel
+}
+
 "Output type for the updateProject mutation."
 type UpdateProjectPayload implements Payload {
     "List of errors"
@@ -8758,6 +8816,14 @@ input CreateJenkinsConfigurationInput {
     user: String
 }
 
+"Input type for the createPredefinedPromotionLevel mutation."
+input CreatePredefinedPromotionLevelInput {
+    "Description for the predefined promotion level"
+    description: String!
+    "Unique name for the predefined promotion level"
+    name: String!
+}
+
 "Input type for the createProject mutation."
 input CreateProjectInput {
     "Project description"
@@ -9077,6 +9143,12 @@ input DeleteJenkinsConfigurationInput {
 input DeleteNotificationRecordsInput {
     "Retention period, in seconds. 0 or null for all records."
     retentionSeconds: Long
+}
+
+"Input type for the deletePredefinedPromotionLevel mutation."
+input DeletePredefinedPromotionLevelInput {
+    "ID of the predefined promotion level"
+    id: Int!
 }
 
 "Input type for the deleteProjectAutoPromotionLevelPropertyById mutation."
@@ -9925,6 +9997,14 @@ input RenameSubscriptionInput {
     newName: String!
     "Target project entity (null for global events)"
     projectEntity: ProjectEntityIDInput
+}
+
+"Input type for the reorderPredefinedPromotionLevelById mutation."
+input ReorderPredefinedPromotionLevelByIdInput {
+    "Active ID"
+    activeId: Int!
+    "ID being replaced"
+    overId: Int!
 }
 
 "Input type for the reorderPromotionLevelById mutation."
@@ -11455,6 +11535,16 @@ input UpdatePipelineDataInput {
     pipelineId: String!
     "values field"
     values: [SlotPipelineDataInputValue!]!
+}
+
+"Input type for the updatePredefinedPromotionLevel mutation."
+input UpdatePredefinedPromotionLevelInput {
+    "Description for the predefined promotion level"
+    description: String!
+    "ID of the predefined promotion level"
+    id: Int!
+    "Unique name for the predefined promotion level"
+    name: String!
 }
 
 "Input type for the updateProject mutation."

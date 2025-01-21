@@ -41,14 +41,14 @@ public class AutoPromotionLevelPropertyType extends AbstractPropertyType<AutoPro
     @Override
     public Optional<PromotionLevel> getOrCreatePromotionLevel(AutoPromotionLevelProperty value, Branch branch, String promotionLevelName) {
         if (value.isAutoCreate()) {
-            Optional<PredefinedPromotionLevel> oPredefinedPromotionLevel = predefinedPromotionLevelService.findPredefinedPromotionLevelByName(promotionLevelName);
-            if (oPredefinedPromotionLevel.isPresent()) {
+            PredefinedPromotionLevel oPredefinedPromotionLevel = predefinedPromotionLevelService.findPredefinedPromotionLevelByName(promotionLevelName);
+            if (oPredefinedPromotionLevel != null) {
                 // Creates the promotion level
                 return Optional.of(
                         securityService.asAdmin(() ->
                                 structureService.newPromotionLevelFromPredefined(
                                         branch,
-                                        oPredefinedPromotionLevel.get()
+                                        oPredefinedPromotionLevel
                                 )
                         )
                 );

@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.Base64;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -108,8 +109,18 @@ public class PredefinedPromotionLevelController extends AbstractResourceControll
         return predefinedPromotionLevelService.getPredefinedPromotionLevelImage(predefinedPromotionLevelId);
     }
 
+    @PutMapping("predefinedPromotionLevels/{predefinedPromotionLevelId}/image")
+    @ResponseStatus(HttpStatus.OK)
+    public void putPredefinedPromotionLevelImage(@PathVariable ID predefinedPromotionLevelId, @RequestBody String imageBase64) {
+        predefinedPromotionLevelService.setPredefinedPromotionLevelImage(predefinedPromotionLevelId, new Document(
+                "image/png",
+                Base64.getDecoder().decode(imageBase64)
+        ));
+    }
+
     @PostMapping(value = "predefinedPromotionLevels/{predefinedPromotionLevelId}/image")
     @ResponseStatus(HttpStatus.ACCEPTED)
+    @Deprecated(forRemoval = true)
     public void setPromotionLevelImage(@PathVariable ID predefinedPromotionLevelId, @RequestParam MultipartFile file) throws IOException {
         predefinedPromotionLevelService.setPredefinedPromotionLevelImage(predefinedPromotionLevelId, new Document(
                 file.getContentType(),

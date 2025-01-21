@@ -615,7 +615,6 @@ class StructureServiceImpl(
         return securityService.asAdmin {
             val predefined: PredefinedPromotionLevel? =
                 predefinedPromotionLevelService.findPredefinedPromotionLevelByName(promotionLevel.name)
-                    .getOrNull()
             if (predefined != null) {
                 // Description
                 if (promotionLevel.description.isNullOrBlank()) {
@@ -692,7 +691,7 @@ class StructureServiceImpl(
         // Gets any corresponding predefined promotion level
         val ppl = securityService.asAdmin {
             predefinedPromotionLevelService.findPredefinedPromotionLevelByName(promotionLevel.name)
-        }.getOrNull()
+        }
         // Using the predefined description if the input's description is blank or null
         val actualPromotionLevel = if (ppl != null && promotionLevel.description.isNullOrBlank()) {
             promotionLevel.withDescription(ppl.description)
@@ -1177,15 +1176,15 @@ class StructureServiceImpl(
             val promotionLevel = getPromotionLevel(promotionLevelId)
             // Defining or replacing the predefined promotion level
             val o = predefinedPromotionLevelService.findPredefinedPromotionLevelByName(promotionLevel.name)
-            if (o.isPresent) {
+            if (o != null) {
                 // Updating the predefined promotion level description
                 predefinedPromotionLevelService.savePredefinedPromotionLevel(
-                    o.get().withDescription(promotionLevel.description)
+                    o.withDescription(promotionLevel.description)
                 )
                 // Sets its image
                 val image = getPromotionLevelImage(promotionLevelId)
                 predefinedPromotionLevelService.setPredefinedPromotionLevelImage(
-                    o.get().id,
+                    o.id,
                     image
                 )
             } else {

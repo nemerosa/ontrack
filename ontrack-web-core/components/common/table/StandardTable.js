@@ -1,8 +1,8 @@
-import {Button, Card, Form, Space, Table} from "antd";
+import {Space, Table} from "antd";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {useEffect, useState} from "react";
 import TablePaginationFooter from "@components/common/table/TablePaginationFooter";
-import {FaBan, FaFilter} from "react-icons/fa";
+import FilterForm from "@components/common/table/FilterForm";
 
 export default function StandardTable({
                                           id,
@@ -69,60 +69,16 @@ export default function StandardTable({
         }
     }
 
-    const [filterFormInstance] = Form.useForm()
-
-    const onFilterFormFinish = (values) => {
-        setFilterFormData(values)
-    }
-
-    const onFilterFormClear = () => {
-        filterFormInstance.resetFields()
-        setFilterFormData({})
-    }
-
     return (
         <>
             <Space direction="vertical" className="ot-line">
                 {
                     filterForm.length > 0 &&
-                    <Card
-                        size="small"
-                        className="ot-well"
-                    >
-                        <Form
-                            layout="inline"
-                            onFinish={onFilterFormFinish}
-                            form={filterFormInstance}
-                            style={{
-                                rowGap: 16,
-                                columnGap: 8,
-                            }}
-                        >
-                            {filterForm}
-                            {/* Filter */}
-                            <Button
-                                type="primary"
-                                htmlType="submit"
-                            >
-                                <Space>
-                                    <FaFilter/>
-                                    Filter
-                                </Space>
-                            </Button>
-                            {/* Clear */}
-                            <Button
-                                type="link"
-                                onClick={onFilterFormClear}
-                            >
-                                <Space>
-                                    <FaBan/>
-                                    Clear filter
-                                </Space>
-                            </Button>
-                            {/* Extra buttons */}
-                            {filterExtraButtons}
-                        </Form>
-                    </Card>
+                    <FilterForm
+                        filterForm={filterForm}
+                        setFilterFormData={setFilterFormData}
+                        filterExtraButtons={filterExtraButtons}
+                    />
                 }
                 <Table
                     id={id}

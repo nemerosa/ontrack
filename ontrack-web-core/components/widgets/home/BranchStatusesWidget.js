@@ -5,7 +5,6 @@ import {FaBan} from "react-icons/fa";
 import {promotionLevelUri, validationRunUri, validationStampUri} from "@components/common/Links";
 import ValidationRunStatus from "@components/validationRuns/ValidationRunStatus";
 import Timestamp from "@components/common/Timestamp";
-import PredefinedPromotionLevelImage from "@components/promotionLevels/PredefinedPromotionLevelImage";
 import PredefinedValidationStampImage from "@components/validationStamps/PredefinedValidationStampImage";
 import {toMilliSeconds} from "@components/common/SelectInterval";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
@@ -14,6 +13,7 @@ import ProjectLink from "@components/projects/ProjectLink";
 import {DashboardWidgetCellContext} from "@components/dashboards/DashboardWidgetCellContextProvider";
 import Link from "next/link";
 import BuildLink from "@components/builds/BuildLink";
+import PredefinedPromotionLevelImageByName from "@components/promotionLevels/PredefinedPromotionLevelImageByName";
 
 export default function BranchStatusesWidget({promotions, validations, refreshInterval, branches = [], title}) {
 
@@ -157,7 +157,7 @@ export default function BranchStatusesWidget({promotions, validations, refreshIn
                     promotions.forEach(promotionName => {
                         columnsList.push({
                             key: promotionName,
-                            title: <PredefinedPromotionLevelImage name={promotionName}/>,
+                            title: <PredefinedPromotionLevelImageByName name={promotionName}/>,
                             render: (_, branch) => {
                                 if (branch.promotionStatuses) {
                                     const run = branch.promotionStatuses.find(it => it.promotionLevel.name === promotionName)

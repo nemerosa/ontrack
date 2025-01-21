@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.casc.context.core.admin
 
 import net.nemerosa.ontrack.common.Document
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.extension.scm.service.TestSCMExtension
 import net.nemerosa.ontrack.json.asJson
@@ -69,7 +68,7 @@ class PredefinedPromotionLevelsCascIT : AbstractCascTestSupport() {
         )
         // Checks that the new predefined element is created
         assertNotNull(
-            predefinedPromotionLevelService.findPredefinedPromotionLevelByName(name).getOrNull(),
+            predefinedPromotionLevelService.findPredefinedPromotionLevelByName(name),
             "$name predefined PL has been created"
         ) {
             assertEquals("Sample predefined test called $name", it.description)
@@ -100,14 +99,14 @@ class PredefinedPromotionLevelsCascIT : AbstractCascTestSupport() {
         )
         // Checks that the new predefined element is created
         assertNotNull(
-            predefinedPromotionLevelService.findPredefinedPromotionLevelByName(name).getOrNull(),
+            predefinedPromotionLevelService.findPredefinedPromotionLevelByName(name),
             "$name predefined PL has been created"
         ) {
             assertEquals("Sample predefined test called $name", it.description)
         }
         // Checks that the existing PPL is not present any longer
         assertNull(
-            predefinedPromotionLevelService.findPredefinedPromotionLevelByName(existing).getOrNull(),
+            predefinedPromotionLevelService.findPredefinedPromotionLevelByName(existing),
             "Existing PPL have been removed"
         )
     }
@@ -142,7 +141,7 @@ class PredefinedPromotionLevelsCascIT : AbstractCascTestSupport() {
         )
         // Checks that the new predefined element is still there
         assertNotNull(
-            predefinedPromotionLevelService.findPredefinedPromotionLevelByName(existing).getOrNull(),
+            predefinedPromotionLevelService.findPredefinedPromotionLevelByName(existing),
             "$existing predefined PL has been kept"
         ) {
             assertEquals("Sample predefined test called $existing", it.description)
@@ -179,7 +178,7 @@ class PredefinedPromotionLevelsCascIT : AbstractCascTestSupport() {
         )
         // Checks that the new predefined element is created
         assertNotNull(
-            predefinedPromotionLevelService.findPredefinedPromotionLevelByName(name).getOrNull(),
+            predefinedPromotionLevelService.findPredefinedPromotionLevelByName(name),
             "$name predefined PL has been created"
         ) {
             assertEquals("Sample predefined test called $name", it.description)

@@ -1,21 +1,17 @@
 package net.nemerosa.ontrack.service.settings
 
 import net.nemerosa.ontrack.common.Document
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
-import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.exceptions.PredefinedPromotionLevelNameAlreadyDefinedException
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.PromotionLevelEdit
 import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.PredefinedPromotionLevel
-import net.nemerosa.ontrack.model.structure.PromotionLevel
 import net.nemerosa.ontrack.test.TestUtils
-import org.springframework.beans.factory.annotation.Autowired
-
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
 
 class PredefinedPromotionLevelServiceIT : AbstractDSLTestSupport() {
@@ -112,7 +108,7 @@ class PredefinedPromotionLevelServiceIT : AbstractDSLTestSupport() {
 
         // Checks the predefined promotion level has been created
         asAdmin().call {
-            val pl = service.findPredefinedPromotionLevelByName(pl1.name).getOrNull()
+            val pl = service.findPredefinedPromotionLevelByName(pl1.name)
             assertNotNull(pl) {
                 assertEquals("My new description", it.description)
                 assertTrue(it.isImage)
@@ -168,7 +164,7 @@ class PredefinedPromotionLevelServiceIT : AbstractDSLTestSupport() {
 
         // Checks the predefined promotion level has been created
         asAdmin().call {
-            val pl = service.findPredefinedPromotionLevelByName(pl1.name).getOrNull()
+            val pl = service.findPredefinedPromotionLevelByName(pl1.name)
             assertNotNull(pl) {
                 assertEquals("My new description", it.description)
                 assertTrue(it.isImage)
@@ -202,6 +198,51 @@ class PredefinedPromotionLevelServiceIT : AbstractDSLTestSupport() {
                     assertEquals(ppl.description, pl2.description)
                 }
             }
+        }
+    }
+
+    @Test
+    fun `Reordering of predefined promotion levels`() {
+        asAdmin {
+            // Deletes all previous entries
+            predefinedPromotionLevelService.predefinedPromotionLevels.forEach {
+                predefinedPromotionLevelService.deletePredefinedPromotionLevel(it.id)
+            }
+            // Creating some entries
+            val entries = (1..10).map {
+                val entry = PredefinedPromotionLevel.of(
+                    NameDescription.nd(
+                        name = "PL_$it",
+                        description = "Promotion level $it",
+                    )
+                )
+                predefinedPromotionLevelService.newPredefinedPromotionLevel(entry)
+            }
+
+            // Dropping a middle entry to the first one
+            predefinedPromotionLevelService.reorderPromotionLevels(
+                activeId = entries[5].id(),
+                overId = entries[0].id(),
+            )
+
+            // Reloading the entries
+            val reorderedEntries = predefinedPromotionLevelService.predefinedPromotionLevels
+
+            assertEquals(
+                listOf(
+                    entries[5].id(),
+                    entries[0].id(),
+                    entries[1].id(),
+                    entries[2].id(),
+                    entries[3].id(),
+                    entries[4].id(),
+                    entries[6].id(),
+                    entries[7].id(),
+                    entries[8].id(),
+                    entries[9].id(),
+                ),
+                reorderedEntries.map { it.id() }
+            )
         }
     }
 

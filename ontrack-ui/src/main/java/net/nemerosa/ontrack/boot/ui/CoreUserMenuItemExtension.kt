@@ -30,6 +30,12 @@ class CoreUserMenuItemExtension(
 
             if (globalSettings) {
                 items += UserMenuItem(
+                    groupId = CoreUserMenuGroups.CONFIGURATIONS,
+                    extension = "core/config",
+                    id = "predefined-promotion-levels",
+                    name = "Predefined promotion levels",
+                )
+                items += UserMenuItem(
                     groupId = CoreUserMenuGroups.SYSTEM,
                     extension = "core/admin",
                     id = "settings",

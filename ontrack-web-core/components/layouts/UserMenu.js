@@ -17,6 +17,7 @@ import {
     FaList,
     FaMagic,
     FaMailBulk,
+    FaMedal,
     FaPaperPlane,
     FaProjectDiagram,
     FaServer,
@@ -63,6 +64,7 @@ export default function UserMenu({userMenu}) {
     }
 
     const itemIcons = {
+        'core/config/predefined-promotion-levels': <FaMedal/>,
         'core/admin/jobs': <FaCogs/>,
         'core/admin/settings': <FaWrench/>,
         'extension/jenkins/configurations': <FaJenkins/>,

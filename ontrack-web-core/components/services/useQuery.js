@@ -40,6 +40,7 @@ export const useQuery = (query, {variables, initialData, deps = [], dataFn} = {}
         loading,
         error,
         data,
+        setData,
         refetch: reload,
     }
 }
