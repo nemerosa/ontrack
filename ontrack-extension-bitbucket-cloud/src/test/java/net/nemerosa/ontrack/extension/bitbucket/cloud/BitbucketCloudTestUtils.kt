@@ -68,7 +68,7 @@ class TestOnBitbucketCloudCondition {
     companion object {
         @JvmStatic
         fun isTestOnBitbucketCloudEnabled(): Boolean =
-            getOptionalEnv("ontrack.test.extension.bitbucket.cloud.ignore") == "true" ||
+            getOptionalEnv("ontrack.test.extension.bitbucket.cloud.ignore") != "true" &&
                     !getOptionalEnv("ontrack.test.extension.bitbucket.cloud.workspace").isNullOrBlank()
     }
 }
