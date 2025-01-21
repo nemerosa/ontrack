@@ -27,6 +27,11 @@ pipeline {
                 defaultValue: false,
                 description: 'Skipping legacy acceptance tests'
         )
+        booleanParam(
+                name: 'SKIP_BITBUCKET_CLOUD_IT',
+                defaultValue: false,
+                description: 'Skipping integration tests for Bitbucket Cloud'
+        )
     }
 
     agent {
@@ -179,6 +184,8 @@ pipeline {
             steps {
                 sh ''' ./gradlew clean versionDisplay versionFile --no-daemon'''
                 script {
+                    // Additional options
+                    env.ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_IGNORE = params.SKIP_BITBUCKET_CLOUD_IT
                     // Reads version information
                     def props = readProperties(file: 'build/version.properties')
                     env.VERSION = props.VERSION_DISPLAY

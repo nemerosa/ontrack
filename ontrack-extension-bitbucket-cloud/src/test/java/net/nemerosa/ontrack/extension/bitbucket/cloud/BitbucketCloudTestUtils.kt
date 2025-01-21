@@ -1,9 +1,6 @@
 package net.nemerosa.ontrack.extension.bitbucket.cloud
 
 import net.nemerosa.ontrack.extension.bitbucket.cloud.configuration.BitbucketCloudConfiguration
-import net.nemerosa.ontrack.extension.git.GitExtensionFeature
-import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
-import net.nemerosa.ontrack.extension.stale.StaleExtensionFeature
 import net.nemerosa.ontrack.test.TestUtils.uid
 import net.nemerosa.ontrack.test.getEnv
 import net.nemerosa.ontrack.test.getOptionalEnv
@@ -11,6 +8,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.EnabledIf
 
 class BitbucketCloudTestEnv(
+    val ignore: Boolean,
     val workspace: String,
     val user: String,
     val token: String,
@@ -18,12 +16,9 @@ class BitbucketCloudTestEnv(
     val expectedRepository: String,
 )
 
-val bitbucketCloudExtensionFeature: BitbucketCloudExtensionFeature by lazy {
-    BitbucketCloudExtensionFeature(GitExtensionFeature(SCMExtensionFeature(), StaleExtensionFeature()))
-}
-
 val bitbucketCloudTestEnv: BitbucketCloudTestEnv by lazy {
     BitbucketCloudTestEnv(
+        ignore = getOptionalEnv("ontrack.test.extension.bitbucket.cloud.ignore")?.let { it == "true" } ?: false,
         workspace = getEnv("ontrack.test.extension.bitbucket.cloud.workspace"),
         user = getEnv("ontrack.test.extension.bitbucket.cloud.user"),
         token = getEnv("ontrack.test.extension.bitbucket.cloud.token"),
@@ -73,6 +68,7 @@ class TestOnBitbucketCloudCondition {
     companion object {
         @JvmStatic
         fun isTestOnBitbucketCloudEnabled(): Boolean =
-            !getOptionalEnv("ontrack.test.extension.bitbucket.cloud.workspace").isNullOrBlank()
+            getOptionalEnv("ontrack.test.extension.bitbucket.cloud.ignore") == "true" ||
+                    !getOptionalEnv("ontrack.test.extension.bitbucket.cloud.workspace").isNullOrBlank()
     }
 }
