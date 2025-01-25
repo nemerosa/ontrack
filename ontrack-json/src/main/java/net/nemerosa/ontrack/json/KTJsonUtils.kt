@@ -99,7 +99,11 @@ fun JsonNode.format(): String = JsonUtils.toJSONString(this)
  */
 inline fun <reified T> JsonNode.parseOrNull(): T? =
     try {
-        parse()
+        if (this.isNull) {
+            null
+        } else {
+            parse()
+        }
     } catch (_: JsonParseException) {
         null
     }
