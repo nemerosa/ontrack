@@ -3,6 +3,7 @@ import {Space} from "antd";
 import {useEffect, useState} from "react";
 import BuildNode from "@components/links/BuildNode";
 import {FaEllipsisH} from "react-icons/fa";
+import LoadingContainer from "@components/common/LoadingContainer";
 
 export default function BuildGroupNode({data}) {
 
@@ -37,16 +38,18 @@ export default function BuildGroupNode({data}) {
             <Handle type="source" position={Position.Right}/>
             <Handle type="source" position={Position.Top}/>
             <Handle type="source" position={Position.Bottom}/>
-            <Space direction="vertical" size={16} className="ot-line">
-                {/* First build */}
-                <BuildNode data={{build: group.firstBuild}}/>
-                {/* Ellipsis */}
-                {
-                    group.ellipsis && <FaEllipsisH/>
-                }
-                {/* Last build */}
-                <BuildNode data={{build: group.lastBuild}}/>
-            </Space>
+            <LoadingContainer loading={!group.firstBuild}>
+                <Space direction="vertical" size={16} className="ot-line">
+                    {/* First build */}
+                    <BuildNode data={{build: group.firstBuild}}/>
+                    {/* Ellipsis */}
+                    {
+                        group.ellipsis && <FaEllipsisH/>
+                    }
+                    {/* Last build */}
+                    <BuildNode data={{build: group.lastBuild}}/>
+                </Space>
+            </LoadingContainer>
         </>
     )
 }
