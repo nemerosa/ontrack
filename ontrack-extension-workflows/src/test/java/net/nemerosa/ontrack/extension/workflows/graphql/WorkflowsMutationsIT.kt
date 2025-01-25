@@ -7,7 +7,10 @@ import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getRequiredBooleanField
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import kotlin.test.*
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
+import kotlin.test.fail
 
 class WorkflowsMutationsIT : AbstractWorkflowTestSupport() {
 
@@ -126,7 +129,7 @@ class WorkflowsMutationsIT : AbstractWorkflowTestSupport() {
                     val validation = node.path("validation")
                     assertTrue(validation.getRequiredBooleanField("error"))
                     assertEquals(
-                        "The workflow contains at least one cycle.",
+                        "The workflow contains at least one cycle",
                         validation.path("errors").path(0).asText()
                     )
                 }

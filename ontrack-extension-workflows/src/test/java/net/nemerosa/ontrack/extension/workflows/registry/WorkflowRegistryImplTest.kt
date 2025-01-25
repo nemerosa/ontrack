@@ -88,7 +88,7 @@ class WorkflowRegistryImplTest {
         ).asJson()
         val validation = workflowRegistry.validateJsonWorkflow(json)
         assertTrue(validation.error)
-        assertEquals(validation.errors.firstOrNull(), "Workflow name is required.")
+        assertEquals("Workflow name is required", validation.errors.firstOrNull())
     }
 
     @Test
@@ -141,7 +141,7 @@ class WorkflowRegistryImplTest {
         ).asJson()
         val validation = workflowRegistry.validateJsonWorkflow(json)
         assertTrue(validation.error)
-        assertEquals(validation.errors.firstOrNull(), "The workflow contains at least one cycle.")
+        assertEquals("The workflow contains at least one cycle", validation.errors.firstOrNull())
     }
 
     @Test
