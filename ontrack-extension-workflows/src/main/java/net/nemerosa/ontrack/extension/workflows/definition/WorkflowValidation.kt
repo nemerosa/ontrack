@@ -4,12 +4,19 @@ package net.nemerosa.ontrack.extension.workflows.definition
  * Result for the validation of a workflow
  */
 data class WorkflowValidation(
+    val name: String,
     val errors: List<String>,
 ) {
     fun throwErrorIfAny() {
         if (errors.isNotEmpty()) {
+            val message = if (errors.size == 1) {
+                errors.first()
+            } else {
+                errors.joinToString("\n") { "* $it" }
+            }
             throw WorkflowValidationException(
-                "Validation of the workflow returned the following errors:\n${errors.joinToString("\n") { "* $it" }}"
+                name = name,
+                message = message
             )
         }
     }
@@ -21,31 +28,31 @@ data class WorkflowValidation(
         fun validateWorkflow(workflow: Workflow): WorkflowValidation {
             // Name is required
             if (workflow.name.isBlank()) {
-                return error("Workflow name is required.")
+                return error(workflow.name, "Workflow name is required")
             }
             // One node required
             if (workflow.nodes.isEmpty()) {
-                return error("At least one node is required.")
+                return error(workflow.name, "At least one node is required.")
             }
             // All parents must be known
             val nodeIds = workflow.nodes.map { it.id }.toSet()
             workflow.nodes.forEach { node ->
                 node.parents.forEach { parent ->
                     if (parent.id !in nodeIds) {
-                        return error("Parent ID ${parent.id} is not a valid node ID.")
+                        return error(workflow.name, """Parent ID "${parent.id}" is not a valid node ID""")
                     }
                 }
             }
             // Cycle detection
             if (isCyclic(workflow.nodes)) {
-                return error("The workflow contains at least one cycle.")
+                return error(workflow.name, "The workflow contains at least one cycle")
             }
             // At least one starting node
             if (workflow.nodes.none { it.parents.isEmpty() }) {
-                return error("The workflow must have at least one starting node.")
+                return error(workflow.name, "The workflow must have at least one starting node")
             }
             // OK
-            return ok()
+            return ok(name = workflow.name)
         }
 
         private fun isCyclic(nodes: List<WorkflowNode>): Boolean {
@@ -70,15 +77,23 @@ data class WorkflowValidation(
             return nodes.any { dfs(it.id) }
         }
 
-        fun error(message: String) = WorkflowValidation(
+        fun error(name: String, message: String) = WorkflowValidation(
+            name = name,
             errors = listOf(message),
         )
 
-        fun error(ex: Exception) = error(
-            ex.message ?: ex.javaClass.simpleName
+        fun error(name: String, ex: Exception) = error(
+            name = name,
+            message = ex.message ?: ex.javaClass.simpleName
         )
 
-        fun ok() = WorkflowValidation(
+        fun unnamedError(ex: Exception) = error(
+            name = "",
+            message = ex.message ?: ex.javaClass.simpleName
+        )
+
+        fun ok(name: String) = WorkflowValidation(
+            name = name,
             errors = emptyList(),
         )
     }

@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.workflows.registry
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.workflows.acl.WorkflowRegistration
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
-import net.nemerosa.ontrack.extension.workflows.definition.WorkflowNode
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowValidation
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowValidation.Companion.validateWorkflow
 import net.nemerosa.ontrack.model.security.SecurityService
@@ -26,7 +25,12 @@ class WorkflowRegistryImpl(
         val workflowObj: Workflow = try {
             WorkflowParser.parseJsonWorkflow(workflow)
         } catch (ex: Exception) {
-            return WorkflowValidation.error(ex)
+            val name = workflow.path("name").asText()
+            if (name.isNullOrBlank()) {
+                return WorkflowValidation.unnamedError(ex)
+            } else {
+                return WorkflowValidation.error(name, ex)
+            }
         }
         // Validation
         return validateWorkflow(workflowObj)

@@ -1,9 +1,13 @@
 package net.nemerosa.ontrack.json
 
+import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import kotlin.reflect.KClass
+
+private val mapper = ObjectMapperFactory.create()
 
 /**
  * Parses a string as JSON
@@ -44,14 +48,46 @@ fun JsonNode.asJsonString(): String = JsonUtils.toJSONString(this)
 /**
  * Parses any node into an object.
  */
-inline fun <reified T> JsonNode.parse(): T =
-    JsonUtils.parse(this, T::class.java)
+inline fun <reified T : Any> JsonNode.parse(): T =
+    parseInto(T::class)
 
 /**
  * Parses any node into an object.
  */
 fun <T : Any> JsonNode.parseInto(type: KClass<T>): T =
-    JsonUtils.parse(this, type.java)
+    try {
+        mapper.treeToValue(this, type.java)
+    } catch (ex: MismatchedInputException) {
+        throw JsonParseException(
+            userFriendlyMessage(ex)
+        )
+    } catch (ex: JsonProcessingException) {
+        throw JsonParseException(ex)
+    }
+
+fun userFriendlyMessage(ex: MismatchedInputException): String {
+    val pathDescription = ex.path
+        .joinToString(separator = ".") { ref ->
+            // A Reference can point to either a field or an array index
+            // If ref.fieldName is null, we assume it's an array index
+            ref.fieldName ?: "[${ref.index}]"
+        }
+
+    // ex.location might be null in some cases, so check for nullability
+    val location = ex.location
+    val line = location?.lineNr
+    val column = location?.columnNr
+
+    return buildString {
+        append("There was a problem parsing the JSON")
+        if (pathDescription.isNotBlank()) {
+            append(" at path '$pathDescription'")
+        }
+        if (line != null && column != null && line >= 0 && column >= 0) {
+            append(" (line $line, column $column)")
+        }
+    }
+}
 
 /**
  * Formatting a JSON node as a string

@@ -10,8 +10,17 @@ private constructor(
     fun isOk() = config != null && exception == null
 
     companion object {
+
         fun <C> config(value: C) = ValidatedNotificationChannelConfig(value, null, null)
+
+        fun <C> error(message: String) =
+            ValidatedNotificationChannelConfig<C>(null, message, null)
+
         fun <C> error(exception: Exception) =
-            ValidatedNotificationChannelConfig<C>(null, exception.message ?: "Cannot parse channel configuration", exception)
+            ValidatedNotificationChannelConfig<C>(
+                null,
+                exception.message ?: "Cannot parse channel configuration",
+                exception
+            )
     }
 }

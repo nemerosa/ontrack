@@ -34,7 +34,7 @@ abstract class AbstractCascContext : CascContext {
     /**
      * Checked parsing of a JSON array
      */
-    protected inline fun <reified T> JsonNode.mapEachTo(paths: List<String>) =
+    protected inline fun <reified T: Any> JsonNode.mapEachTo(paths: List<String>) =
         mapIndexed { index, child ->
             try {
                 child.parse<T>()

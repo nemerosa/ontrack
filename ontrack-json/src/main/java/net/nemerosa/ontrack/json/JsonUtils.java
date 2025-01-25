@@ -10,6 +10,10 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 
+/**
+ * @deprecated Will be removed in V5. Use the static Kotlin methods instead at KTJsonUtils.
+ */
+@Deprecated
 public final class JsonUtils {
 
     private static final JsonNodeFactory factory = JsonNodeFactory.instance;

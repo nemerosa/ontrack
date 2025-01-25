@@ -8,8 +8,14 @@ fun ValidatedNotificationChannelConfig<*>.throwException(): Nothing {
             exception.message ?: exception::class.java.simpleName
         } else {
             val exceptionMessage = exception.message ?: exception::class.java.simpleName
-            "$message: $exceptionMessage"
+            if (exceptionMessage.trim() != message.trim()) {
+                "$message: $exceptionMessage"
+            } else {
+                message
+            }
         }
+    } else if (!message.isNullOrBlank()) {
+        message
     } else if (config == null) {
         "Could not parse the notification configuration"
     } else {

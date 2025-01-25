@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.events.EventFactory
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
 class WorkflowNotificationChannelValidationIT : AbstractDSLTestSupport() {
@@ -26,7 +27,11 @@ class WorkflowNotificationChannelValidationIT : AbstractDSLTestSupport() {
             project {
                 branch {
                     promotionLevel {
-                        assertFailsWith<EventSubscriptionConfigException> {
+                        assertFailsWithEventSubscriptionConfigException(
+                            """
+                                There was a problem parsing the JSON at path 'workflow.nodes.[1].parents.[0]'
+                            """.trimIndent()
+                        ) {
                             eventSubscriptionService.subscribe(
                                 EventSubscription(
                                     name = "test",
@@ -76,7 +81,11 @@ class WorkflowNotificationChannelValidationIT : AbstractDSLTestSupport() {
             project {
                 branch {
                     promotionLevel {
-                        assertFailsWith<EventSubscriptionConfigException> {
+                        assertFailsWithEventSubscriptionConfigException(
+                            """
+                            Validation of the "Some workflow" workflow returned the following error > Workflow node executor ID "unknown" not found
+                        """.trimIndent()
+                        ) {
                             eventSubscriptionService.subscribe(
                                 name = "test",
                                 channel = workflowNotificationChannel,
@@ -110,7 +119,11 @@ class WorkflowNotificationChannelValidationIT : AbstractDSLTestSupport() {
             project {
                 branch {
                     promotionLevel {
-                        assertFailsWith<EventSubscriptionConfigException> {
+                        assertFailsWithEventSubscriptionConfigException(
+                            """
+                            Validation of the "Some workflow" workflow returned the following error > Parent ID "unknown" is not a valid node ID
+                        """.trimIndent()
+                        ) {
                             eventSubscriptionService.subscribe(
                                 name = "test",
                                 channel = workflowNotificationChannel,
@@ -151,7 +164,11 @@ class WorkflowNotificationChannelValidationIT : AbstractDSLTestSupport() {
             project {
                 branch {
                     promotionLevel {
-                        assertFailsWith<EventSubscriptionConfigException> {
+                        assertFailsWithEventSubscriptionConfigException(
+                            """
+                            Validation of the "Some workflow" workflow returned the following error > The workflow contains at least one cycle
+                        """.trimIndent()
+                        ) {
                             eventSubscriptionService.subscribe(
                                 name = "test",
                                 channel = workflowNotificationChannel,
@@ -194,7 +211,11 @@ class WorkflowNotificationChannelValidationIT : AbstractDSLTestSupport() {
             project {
                 branch {
                     promotionLevel {
-                        assertFailsWith<EventSubscriptionConfigException> {
+                        assertFailsWithEventSubscriptionConfigException(
+                            """
+                                Validation of the "Some workflow" workflow returned the following error > The workflow contains at least one cycle
+                            """.trimIndent()
+                        ) {
                             eventSubscriptionService.subscribe(
                                 name = "test",
                                 channel = workflowNotificationChannel,
@@ -235,7 +256,11 @@ class WorkflowNotificationChannelValidationIT : AbstractDSLTestSupport() {
             project {
                 branch {
                     promotionLevel {
-                        assertFailsWith<EventSubscriptionConfigException> {
+                        assertFailsWithEventSubscriptionConfigException(
+                            """
+                                Text is required for mock node executor
+                            """.trimIndent()
+                        ) {
                             eventSubscriptionService.subscribe(
                                 name = "test",
                                 channel = workflowNotificationChannel,
@@ -270,7 +295,11 @@ class WorkflowNotificationChannelValidationIT : AbstractDSLTestSupport() {
             project {
                 branch {
                     promotionLevel {
-                        assertFailsWith<EventSubscriptionConfigException> {
+                        assertFailsWithEventSubscriptionConfigException(
+                            """
+                            Configuration for the notification in node "start" is not valid > Target cannot be blank
+                        """.trimIndent()
+                        ) {
                             eventSubscriptionService.subscribe(
                                 name = "test",
                                 channel = workflowNotificationChannel,
@@ -299,6 +328,58 @@ class WorkflowNotificationChannelValidationIT : AbstractDSLTestSupport() {
                 }
             }
         }
+    }
+
+    @Test
+    fun `Validation of the workflow before saving, cannot parse configuration in notification node`() {
+        asAdmin {
+            project {
+                branch {
+                    promotionLevel {
+                        assertFailsWithEventSubscriptionConfigException(
+                            """
+                                Configuration for the notification in node "start" is not valid > There was a problem parsing the JSON at path 'target'
+                            """.trimIndent()
+                        ) {
+                            eventSubscriptionService.subscribe(
+                                name = "test",
+                                channel = workflowNotificationChannel,
+                                channelConfig = WorkflowNotificationChannelConfig(
+                                    workflow = WorkflowParser.parseYamlWorkflow(
+                                        """
+                                            name: Some workflow
+                                            nodes:
+                                              - id: start
+                                                executorId: notification
+                                                data:
+                                                  channel: mock
+                                                  channelConfig:
+                                                    unknown: "#target" # <-- cannot be parsed
+                                        """.trimIndent()
+                                    )
+                                ),
+                                projectEntity = this,
+                                keywords = null,
+                                origin = "test",
+                                contentTemplate = null,
+                                EventFactory.NEW_PROMOTION_RUN
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun assertFailsWithEventSubscriptionConfigException(
+        message: String,
+        code: () -> Unit,
+    ) {
+        val ex = assertFailsWith<EventSubscriptionConfigException> { code() }
+        assertEquals(
+            """Configuration for this subscription is not valid > $message""",
+            ex.message
+        )
     }
 
 

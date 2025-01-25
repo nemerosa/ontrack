@@ -12,6 +12,10 @@ class EventSubscriptionNameNotFoundException(projectEntity: ProjectEntity?, name
     }
 )
 
-class EventSubscriptionConfigException(message: String) : InputException(
-    """Configuration for this subscription is not valid: $message."""
+class EventSubscriptionConfigException(
+    val innerMessage: String
+) : InputException(
+    """
+        Configuration for this subscription is not valid > $innerMessage
+    """.trimIndent()
 )

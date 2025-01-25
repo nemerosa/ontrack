@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.json.parse
 import java.time.LocalDateTime
 import kotlin.reflect.KProperty
 
-inline fun <reified T> MutationInput.getInputObject(name: String): T? =
+inline fun <reified T: Any> MutationInput.getInputObject(name: String): T? =
     getInput<Any>(name)?.asJson()?.parse<T>()
 
 /**
