@@ -5,7 +5,7 @@ import {FaBan} from "react-icons/fa";
 import {promotionLevelUri, validationRunUri, validationStampUri} from "@components/common/Links";
 import ValidationRunStatus from "@components/validationRuns/ValidationRunStatus";
 import Timestamp from "@components/common/Timestamp";
-import PredefinedValidationStampImage from "@components/validationStamps/PredefinedValidationStampImage";
+import PredefinedValidationStampImageByName from "@components/validationStamps/PredefinedValidationStampImageByName";
 import {toMilliSeconds} from "@components/common/SelectInterval";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import BranchLink from "@components/branches/BranchLink";
@@ -187,7 +187,7 @@ export default function BranchStatusesWidget({promotions, validations, refreshIn
                     validations.forEach(validationName => {
                         columnsList.push({
                             key: validationName,
-                            title: <PredefinedValidationStampImage name={validationName}/>,
+                            title: <PredefinedValidationStampImageByName name={validationName}/>,
                             render: (_, branch) => {
                                 if (branch.validationStatuses) {
                                     const run = branch.validationStatuses.find(it => it.validationStamp.name === validationName)

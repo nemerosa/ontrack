@@ -896,7 +896,6 @@ class StructureServiceImpl(
         return securityService.asAdmin {
             val predefined: PredefinedValidationStamp? =
                 predefinedValidationStampService.findPredefinedValidationStampByName(validationStamp.name)
-                    .getOrNull()
             if (predefined != null) {
                 // Description
                 if (validationStamp.description.isNullOrBlank()) {
@@ -1026,7 +1025,7 @@ class StructureServiceImpl(
         securityService.checkProjectFunction(validationStamp.projectId(), ValidationStampEdit::class.java)
         // Gets any predefined validation stamp
         val predefined =
-            predefinedValidationStampService.findPredefinedValidationStampByName(validationStamp.name).getOrNull()
+            predefinedValidationStampService.findPredefinedValidationStampByName(validationStamp.name)
         val actualValidationStamp = if (predefined != null) {
             // Adapting the description
             val description = if (validationStamp.description.isNullOrBlank()) {
@@ -1129,17 +1128,17 @@ class StructureServiceImpl(
             val validationStamp = getValidationStamp(validationStampId)
             // Defining or replacing the predefined validation stamp
             val o = predefinedValidationStampService.findPredefinedValidationStampByName(validationStamp.name)
-            if (o.isPresent) {
+            if (o != null) {
                 // Updating the predefined validation stamp description & data type
                 predefinedValidationStampService.savePredefinedValidationStamp(
-                    o.get()
+                    o
                         .withDescription(validationStamp.description)
                         .withDataType(validationStamp.dataType)
                 )
                 // Sets its image
                 val image = getValidationStampImage(validationStampId)
                 predefinedValidationStampService.setPredefinedValidationStampImage(
-                    o.get().id,
+                    o.id,
                     image
                 )
             } else {

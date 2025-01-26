@@ -586,12 +586,12 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
      * Creation of a predefined validation stamp
      */
     protected fun predefinedValidationStamp(
-        name: String,
+        name: String = uid("VS"),
         description: String = "",
         image: Boolean = false,
         dataType: ValidationDataTypeConfig<*>? = null
-    ) {
-        asAdmin {
+    ): PredefinedValidationStamp {
+        return asAdmin {
             val pps = predefinedValidationStampService.newPredefinedValidationStamp(
                 PredefinedValidationStamp.of(
                     NameDescription.nd(name, description)
@@ -604,6 +604,7 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
                     document
                 )
             }
+            pps
         }
     }
 

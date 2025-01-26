@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.service.settings
 
 import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
-import net.nemerosa.ontrack.it.AbstractServiceTestJUnit4Support
+import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.exceptions.PredefinedValidationStampNameAlreadyDefinedException
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ValidationStampBulkUpdate
@@ -13,12 +13,11 @@ import net.nemerosa.ontrack.model.structure.PredefinedValidationStamp
 import net.nemerosa.ontrack.model.structure.config
 import net.nemerosa.ontrack.test.TestUtils
 import net.nemerosa.ontrack.test.TestUtils.uid
-import net.nemerosa.ontrack.test.assertPresent
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
 
-class PredefinedValidationStampServiceIT : AbstractServiceTestJUnit4Support() {
+class PredefinedValidationStampServiceIT : AbstractServiceTestSupport() {
 
     @Autowired
     private lateinit var service: PredefinedValidationStampService
@@ -31,12 +30,12 @@ class PredefinedValidationStampServiceIT : AbstractServiceTestJUnit4Support() {
         val name = uid("PVS")
         val predefinedValidationStamp = asUser().with(GlobalSettings::class.java).call {
             service.newPredefinedValidationStamp(
-                    PredefinedValidationStamp.of(
-                            NameDescription.nd(
-                                    name,
-                                    "Predefined $name"
-                            )
+                PredefinedValidationStamp.of(
+                    NameDescription.nd(
+                        name,
+                        "Predefined $name"
                     )
+                )
             )
         }
         assertNotNull(predefinedValidationStamp) {
@@ -50,18 +49,18 @@ class PredefinedValidationStampServiceIT : AbstractServiceTestJUnit4Support() {
         val name = uid("PVS")
         asUser().with(GlobalSettings::class.java).call {
             service.newPredefinedValidationStamp(
-                    PredefinedValidationStamp.of(
-                            NameDescription.nd(
-                                    name,
-                                    "Predefined $name"
-                            )
-                    ).withDataType(testNumberValidationDataType.config(50))
+                PredefinedValidationStamp.of(
+                    NameDescription.nd(
+                        name,
+                        "Predefined $name"
+                    )
+                ).withDataType(testNumberValidationDataType.config(50))
             )
         }
 
         val predefinedValidationStamp = service.findPredefinedValidationStampByName(name)
 
-        assertPresent(predefinedValidationStamp) {
+        assertNotNull(predefinedValidationStamp) {
             assertTrue(it.id.isSet)
             assertNotNull(it.dataType) {
                 assertEquals(50, it.config as Int)
@@ -75,24 +74,24 @@ class PredefinedValidationStampServiceIT : AbstractServiceTestJUnit4Support() {
         // Once --> OK
         asUser().with(GlobalSettings::class.java).call {
             service.newPredefinedValidationStamp(
-                    PredefinedValidationStamp.of(
-                            NameDescription.nd(
-                                    name,
-                                    "Predefined $name"
-                            )
+                PredefinedValidationStamp.of(
+                    NameDescription.nd(
+                        name,
+                        "Predefined $name"
                     )
+                )
             )
         }
         // Twice --> NOK
         assertFailsWith<PredefinedValidationStampNameAlreadyDefinedException> {
             asUser().with(GlobalSettings::class.java).call {
                 service.newPredefinedValidationStamp(
-                        PredefinedValidationStamp.of(
-                                NameDescription.nd(
-                                        name,
-                                        "Predefined other $name"
-                                )
+                    PredefinedValidationStamp.of(
+                        NameDescription.nd(
+                            name,
+                            "Predefined other $name"
                         )
+                    )
                 )
             }
         }
@@ -111,13 +110,13 @@ class PredefinedValidationStampServiceIT : AbstractServiceTestJUnit4Support() {
         val vs3 = doCreateValidationStamp(branch3, NameDescription.nd(vs2Name, ""))
 
         // Updates the VS1 description and image
-        asUser().with(vs1, ValidationStampEdit::class.java).call {
+        asUser().withProjectFunction(vs1, ValidationStampEdit::class.java).call {
             structureService.saveValidationStamp(
-                    vs1.withDescription("My new description")
+                vs1.withDescription("My new description")
             )
             structureService.setValidationStampImage(
-                    vs1.id,
-                    Document("image/png", TestUtils.resourceBytes("/validationStampImage1.png"))
+                vs1.id,
+                Document("image/png", TestUtils.resourceBytes("/validationStampImage1.png"))
             )
         }
 
@@ -141,7 +140,7 @@ class PredefinedValidationStampServiceIT : AbstractServiceTestJUnit4Support() {
         // Checks the predefined validation stamp has been created
         asAdmin().call {
             val o = service.findPredefinedValidationStampByName(vs1.name)
-            assertPresent(o) {
+            assertNotNull(o) {
                 assertEquals("My new description", it.description)
                 assertTrue(it.isImage)
             }
@@ -158,10 +157,10 @@ class PredefinedValidationStampServiceIT : AbstractServiceTestJUnit4Support() {
         val vs2 = doCreateValidationStamp(branch2, NameDescription.nd(vs1Name, ""))
 
         // Updates the VS2 description and image
-        asUser().with(vs2, ValidationStampEdit::class.java).call {
+        asUser().withProjectFunction(vs2, ValidationStampEdit::class.java).call {
             structureService.setValidationStampImage(
-                    vs2.id,
-                    Document("image/png", TestUtils.resourceBytes("/validationStampImage1.png"))
+                vs2.id,
+                Document("image/png", TestUtils.resourceBytes("/validationStampImage1.png"))
             )
         }
 
@@ -178,7 +177,7 @@ class PredefinedValidationStampServiceIT : AbstractServiceTestJUnit4Support() {
         // Checks the predefined validation stamp has been created, without an image
         asAdmin().call {
             val o = service.findPredefinedValidationStampByName(vs1.name)
-            assertPresent(o) {
+            assertNotNull(o) {
                 assertFalse(it.isImage, "Created predefined validation stamp has no image")
             }
         }
@@ -192,9 +191,12 @@ class PredefinedValidationStampServiceIT : AbstractServiceTestJUnit4Support() {
         val branch1 = doCreateBranch()
         val branch2 = doCreateBranch()
         val branch3 = doCreateBranch()
-        val vs1 = doCreateValidationStamp(branch1, NameDescription.nd(vs1Name, ""), testNumberValidationDataType.config(10))
-        val vs2 = doCreateValidationStamp(branch2, NameDescription.nd(vs1Name, ""), testNumberValidationDataType.config(20))
-        val vs3 = doCreateValidationStamp(branch3, NameDescription.nd(vs2Name, ""), testNumberValidationDataType.config(30))
+        val vs1 =
+            doCreateValidationStamp(branch1, NameDescription.nd(vs1Name, ""), testNumberValidationDataType.config(10))
+        val vs2 =
+            doCreateValidationStamp(branch2, NameDescription.nd(vs1Name, ""), testNumberValidationDataType.config(20))
+        val vs3 =
+            doCreateValidationStamp(branch3, NameDescription.nd(vs2Name, ""), testNumberValidationDataType.config(30))
 
         // Bulk update
         asUser().with(ValidationStampBulkUpdate::class.java).call {
@@ -222,7 +224,7 @@ class PredefinedValidationStampServiceIT : AbstractServiceTestJUnit4Support() {
         // Checks the predefined validation stamp has been created
         asAdmin().call {
             val o = service.findPredefinedValidationStampByName(vs1.name)
-            assertPresent(o) {
+            assertNotNull(o) {
                 assertNotNull(it.dataType) {
                     assertEquals(10, it.config as Int)
                 }
@@ -244,18 +246,18 @@ class PredefinedValidationStampServiceIT : AbstractServiceTestJUnit4Support() {
         // Predefined validation stamp
         val pvs = asAdmin().call {
             service.newPredefinedValidationStamp(
-                    PredefinedValidationStamp.of(NameDescription.nd(vs1Name, ""))
+                PredefinedValidationStamp.of(NameDescription.nd(vs1Name, ""))
             )
         }
 
         // Updates the VS1 description and image
-        asUser().with(vs1, ValidationStampEdit::class.java).call {
+        asUser().withProjectFunction(vs1, ValidationStampEdit::class.java).call {
             structureService.saveValidationStamp(
-                    vs1.withDescription("My new description")
+                vs1.withDescription("My new description")
             )
             structureService.setValidationStampImage(
-                    vs1.id,
-                    Document("image/png", TestUtils.resourceBytes("/validationStampImage1.png"))
+                vs1.id,
+                Document("image/png", TestUtils.resourceBytes("/validationStampImage1.png"))
             )
         }
 
@@ -279,7 +281,7 @@ class PredefinedValidationStampServiceIT : AbstractServiceTestJUnit4Support() {
         // Checks the predefined validation stamp has been created
         asAdmin().call {
             val o = service.findPredefinedValidationStampByName(vs1.name)
-            assertPresent(o) {
+            assertNotNull(o) {
                 assertEquals(pvs.id, it.id)
                 assertEquals("My new description", it.description)
                 assertTrue(it.isImage)

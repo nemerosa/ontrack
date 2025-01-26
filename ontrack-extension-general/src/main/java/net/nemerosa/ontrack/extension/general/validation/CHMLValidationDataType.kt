@@ -2,7 +2,10 @@ package net.nemerosa.ontrack.extension.general.validation
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.general.GeneralExtensionFeature
-import net.nemerosa.ontrack.json.*
+import net.nemerosa.ontrack.json.getIntField
+import net.nemerosa.ontrack.json.getRequiredEnum
+import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.json.toJson
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.selection
 import net.nemerosa.ontrack.model.structure.AbstractValidationDataType
@@ -10,6 +13,12 @@ import net.nemerosa.ontrack.model.structure.MetricsColors
 import net.nemerosa.ontrack.model.structure.NumericValidationDataType
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.springframework.stereotype.Component
+import kotlin.Double
+import kotlin.IllegalArgumentException
+import kotlin.Int
+import kotlin.String
+import kotlin.let
+import kotlin.to
 import net.nemerosa.ontrack.model.form.Int as IntField
 
 /**
@@ -67,11 +76,11 @@ class CHMLValidationDataType(
             CHMLValidationDataTypeConfig(
                 warningLevel = CHMLLevel(
                     node.getRequiredEnum("warningLevel"),
-                    node.getInt("warningValue") ?: 0
+                    node.getIntField("warningValue") ?: 0
                 ),
                 failedLevel = CHMLLevel(
                     node.getRequiredEnum("failedLevel"),
-                    node.getInt("failedValue") ?: 0
+                    node.getIntField("failedValue") ?: 0
                 )
             )
         }

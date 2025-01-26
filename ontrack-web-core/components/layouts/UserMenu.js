@@ -22,6 +22,7 @@ import {
     FaProjectDiagram,
     FaServer,
     FaSignOutAlt,
+    FaStamp,
     FaTag,
     FaUser,
     FaWrench
@@ -65,6 +66,7 @@ export default function UserMenu({userMenu}) {
 
     const itemIcons = {
         'core/config/predefined-promotion-levels': <FaMedal/>,
+        'core/config/predefined-validation-stamps': <FaStamp/>,
         'core/admin/jobs': <FaCogs/>,
         'core/admin/settings': <FaWrench/>,
         'extension/jenkins/configurations': <FaJenkins/>,

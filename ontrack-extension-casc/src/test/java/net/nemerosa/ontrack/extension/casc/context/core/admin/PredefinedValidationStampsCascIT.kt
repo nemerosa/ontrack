@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.casc.context.core.admin
 
 import net.nemerosa.ontrack.common.Document
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.extension.scm.service.TestSCMExtension
 import net.nemerosa.ontrack.json.asJson
@@ -69,7 +68,7 @@ class PredefinedValidationStampsCascIT : AbstractCascTestSupport() {
         )
         // Checks that the new predefined element is created
         assertNotNull(
-            predefinedValidationStampService.findPredefinedValidationStampByName(name).getOrNull(),
+            predefinedValidationStampService.findPredefinedValidationStampByName(name),
             "$name predefined VS has been created"
         ) {
             assertEquals("Sample predefined test called $name", it.description)
@@ -100,14 +99,14 @@ class PredefinedValidationStampsCascIT : AbstractCascTestSupport() {
         )
         // Checks that the new predefined element is created
         assertNotNull(
-            predefinedValidationStampService.findPredefinedValidationStampByName(name).getOrNull(),
+            predefinedValidationStampService.findPredefinedValidationStampByName(name),
             "$name predefined VS has been created"
         ) {
             assertEquals("Sample predefined test called $name", it.description)
         }
         // Checks that the existing PVS is not present any longer
         assertNull(
-            predefinedValidationStampService.findPredefinedValidationStampByName(existing).getOrNull(),
+            predefinedValidationStampService.findPredefinedValidationStampByName(existing),
             "Existing PVS have been removed"
         )
     }
@@ -142,7 +141,7 @@ class PredefinedValidationStampsCascIT : AbstractCascTestSupport() {
         )
         // Checks that the new predefined element is still there
         assertNotNull(
-            predefinedValidationStampService.findPredefinedValidationStampByName(existing).getOrNull(),
+            predefinedValidationStampService.findPredefinedValidationStampByName(existing),
             "$existing predefined VS has been kept"
         ) {
             assertEquals("Sample predefined test called $existing", it.description)
@@ -179,7 +178,7 @@ class PredefinedValidationStampsCascIT : AbstractCascTestSupport() {
         )
         // Checks that the new predefined element is created
         assertNotNull(
-            predefinedValidationStampService.findPredefinedValidationStampByName(name).getOrNull(),
+            predefinedValidationStampService.findPredefinedValidationStampByName(name),
             "$name predefined VS has been created"
         ) {
             assertEquals("Sample predefined test called $name", it.description)

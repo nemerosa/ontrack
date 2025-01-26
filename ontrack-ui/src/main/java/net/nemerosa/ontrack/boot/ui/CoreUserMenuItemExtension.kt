@@ -36,6 +36,12 @@ class CoreUserMenuItemExtension(
                     name = "Predefined promotion levels",
                 )
                 items += UserMenuItem(
+                    groupId = CoreUserMenuGroups.CONFIGURATIONS,
+                    extension = "core/config",
+                    id = "predefined-validation-stamps",
+                    name = "Predefined validation stamps",
+                )
+                items += UserMenuItem(
                     groupId = CoreUserMenuGroups.SYSTEM,
                     extension = "core/admin",
                     id = "settings",

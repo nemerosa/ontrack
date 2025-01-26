@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.boot.ui
 import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Form.Companion.nameAndDescription
 import net.nemerosa.ontrack.model.form.ServiceConfigurator
 import net.nemerosa.ontrack.model.form.textField
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
@@ -17,6 +16,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
+import java.util.*
 import java.util.stream.Collectors
 import javax.validation.Valid
 
@@ -120,8 +120,23 @@ class PredefinedValidationStampController(
         return predefinedValidationStampService.getPredefinedValidationStampImage(predefinedValidationStampId)
     }
 
+    @PutMapping("predefinedValidationStamps/{predefinedValidationStampId}/image")
+    @ResponseStatus(HttpStatus.OK)
+    fun putPredefinedValidationStampImage(
+        @PathVariable predefinedValidationStampId: ID,
+        @RequestBody imageBase64: String?
+    ) {
+        predefinedValidationStampService.setPredefinedValidationStampImage(
+            predefinedValidationStampId, Document(
+                "image/png",
+                Base64.getDecoder().decode(imageBase64)
+            )
+        )
+    }
+
     @PostMapping("predefinedValidationStamps/{predefinedValidationStampId}/image")
     @ResponseStatus(HttpStatus.ACCEPTED)
+    @Deprecated("Will be removed in V5")
     fun setValidationStampImage(@PathVariable predefinedValidationStampId: ID, @RequestParam file: MultipartFile) {
         predefinedValidationStampService.setPredefinedValidationStampImage(predefinedValidationStampId, Document(
             file.contentType!!,

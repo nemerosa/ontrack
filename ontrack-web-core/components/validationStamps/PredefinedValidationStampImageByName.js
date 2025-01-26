@@ -5,7 +5,7 @@ import {restPredefinedValidationStampImageUri} from "@components/common/Links";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import ProxyImage from "@components/common/ProxyImage";
 
-export default function PredefinedValidationStampImage({name, displayName = true, size = 24}) {
+export default function PredefinedValidationStampImageByName({name, displayName = true, size = 24}) {
 
     const client = useGraphQLClient()
 

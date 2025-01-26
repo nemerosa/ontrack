@@ -36,14 +36,14 @@ public class AutoValidationStampPropertyType extends AbstractPropertyType<AutoVa
     @Override
     public Optional<ValidationStamp> getOrCreateValidationStamp(AutoValidationStampProperty value, Branch branch, String validationStampName) {
         if (value.isAutoCreate()) {
-            Optional<PredefinedValidationStamp> oPredefinedValidationStamp = predefinedValidationStampService.findPredefinedValidationStampByName(validationStampName);
-            if (oPredefinedValidationStamp.isPresent()) {
+            PredefinedValidationStamp oPredefinedValidationStamp = predefinedValidationStampService.findPredefinedValidationStampByName(validationStampName);
+            if (oPredefinedValidationStamp != null) {
                 // Creates the validation stamp
                 return Optional.of(
                         securityService.asAdmin(() ->
                                 structureService.newValidationStampFromPredefined(
                                         branch,
-                                        oPredefinedValidationStamp.get()
+                                        oPredefinedValidationStamp
                                 )
                         )
                 );

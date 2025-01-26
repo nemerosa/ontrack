@@ -77,6 +77,18 @@ fun TypeBuilder.idFieldForInt(property: KProperty<Int>, description: String? = n
             .type(GraphQLID)
     }
 
+fun TypeBuilder.idFieldForID(property: KProperty<ID>, description: String? = null): GraphQLObjectType.Builder =
+    field {
+        it.name(getPropertyName(property))
+            .description(getPropertyDescription(property, description))
+            .type(GraphQLID)
+            .dataFetcher { env ->
+                val source = env.getSource<Any>()
+                val id = property.call(source)
+                id.get()
+            }
+    }
+
 fun TypeBuilder.idFieldForString(property: KProperty<String>, description: String? = null): GraphQLObjectType.Builder =
     field {
         it.name(property.name)

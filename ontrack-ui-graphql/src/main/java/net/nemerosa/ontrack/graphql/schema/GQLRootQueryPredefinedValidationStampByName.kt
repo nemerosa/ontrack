@@ -4,7 +4,6 @@ import graphql.schema.GraphQLFieldDefinition
 import net.nemerosa.ontrack.graphql.support.stringArgument
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
 import org.springframework.stereotype.Component
-import kotlin.jvm.optionals.getOrNull
 
 @Component
 class GQLRootQueryPredefinedValidationStampByName(
@@ -21,7 +20,6 @@ class GQLRootQueryPredefinedValidationStampByName(
             .dataFetcher { env ->
                 val name: String = env.getArgument("name")
                 predefinedValidationStampService.findPredefinedValidationStampByName(name)
-                    .getOrNull()
             }
             .build()
 }

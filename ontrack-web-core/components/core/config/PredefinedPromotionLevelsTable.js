@@ -131,7 +131,6 @@ export default function PredefinedPromotionLevelsTable({reloadState}) {
                             key="name"
                             title="Name"
                             render={(_, record) => <Space>
-                                <code>{record.key}</code>
                                 <PredefinedPromotionLevelImage
                                     predefinedPromotionLevel={record}
                                 />

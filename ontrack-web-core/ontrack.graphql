@@ -1151,6 +1151,14 @@ type CreatePredefinedPromotionLevelPayload implements Payload {
     predefinedPromotionLevel: PredefinedPromotionLevel
 }
 
+"Output type for the createPredefinedValidationStamp mutation."
+type CreatePredefinedValidationStampPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Created predefined validation stamp"
+    predefinedValidationStamp: PredefinedValidationStamp
+}
+
 "Output type for the createProjectOrGet mutation."
 type CreateProjectOrGetPayload implements Payload {
     "List of errors"
@@ -1436,6 +1444,12 @@ type DeleteNotificationRecordsPayload implements Payload {
 
 "Output type for the deletePredefinedPromotionLevel mutation."
 type DeletePredefinedPromotionLevelPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
+"Output type for the deletePredefinedValidationStamp mutation."
+type DeletePredefinedValidationStampPayload implements Payload {
     "List of errors"
     errors: [UserError]
 }
@@ -3392,6 +3406,11 @@ type Mutation {
         "Input for the mutation"
         input: CreatePredefinedPromotionLevelInput
     ): CreatePredefinedPromotionLevelPayload
+    "Creates a new predefined validation stamp"
+    createPredefinedValidationStamp(
+        "Input for the mutation"
+        input: CreatePredefinedValidationStampInput
+    ): CreatePredefinedValidationStampPayload
     "Creates a new project"
     createProject(
         "Input for the mutation"
@@ -3571,6 +3590,11 @@ type Mutation {
         "Input for the mutation"
         input: DeletePredefinedPromotionLevelInput
     ): DeletePredefinedPromotionLevelPayload
+    "Deletes an existing predefined validation stamp"
+    deletePredefinedValidationStamp(
+        "Input for the mutation"
+        input: DeletePredefinedValidationStampInput
+    ): DeletePredefinedValidationStampPayload
     "Deletes an existing project"
     deleteProject(
         "Input for the mutation"
@@ -4581,6 +4605,11 @@ type Mutation {
         "Input for the mutation"
         input: UpdatePredefinedPromotionLevelInput
     ): UpdatePredefinedPromotionLevelPayload
+    "Updates an existing predefined validation stamp"
+    updatePredefinedValidationStamp(
+        "Input for the mutation"
+        input: UpdatePredefinedValidationStampInput
+    ): UpdatePredefinedValidationStampPayload
     "Updates an existing project"
     updateProject(
         "Input for the mutation"
@@ -4799,10 +4828,12 @@ type PredefinedPromotionLevel {
 
 "Predefined validation stamp"
 type PredefinedValidationStamp {
+    "dataType field"
+    dataType: ValidationDataTypeConfig
     "description field"
     description: String
     "id field"
-    id: Int
+    id: ID
     "isImage field"
     isImage: Boolean
     "name field"
@@ -5790,11 +5821,21 @@ type Query {
         "Filtering on the predefined promotion level name"
         name: String
     ): [PredefinedPromotionLevel!]!
+    "Predefined validation stamp by ID"
+    predefinedValidationStampById(
+        "ID"
+        id: Int!
+    ): PredefinedValidationStamp
     "Gets a predefined validation stamps by name"
     predefinedValidationStampByName(
         "Name"
         name: String!
     ): PredefinedValidationStamp
+    "Returns the list of all predefined validation stamps"
+    predefinedValidationStamps(
+        "Filtering on the predefined validation stamp name"
+        name: String
+    ): [PredefinedValidationStamp!]!
     "Gets the preferences of the current user"
     preferences: Preferences!
     project(
@@ -7622,6 +7663,14 @@ type UpdatePredefinedPromotionLevelPayload implements Payload {
     predefinedPromotionLevel: PredefinedPromotionLevel
 }
 
+"Output type for the updatePredefinedValidationStamp mutation."
+type UpdatePredefinedValidationStampPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Updated predefined validation stamp"
+    predefinedValidationStamp: PredefinedValidationStamp
+}
+
 "Output type for the updateProject mutation."
 type UpdateProjectPayload implements Payload {
     "List of errors"
@@ -8824,6 +8873,18 @@ input CreatePredefinedPromotionLevelInput {
     name: String!
 }
 
+"Input type for the createPredefinedValidationStamp mutation."
+input CreatePredefinedValidationStampInput {
+    "FQCN of the data type"
+    dataType: String
+    "Configuration of the data type"
+    dataTypeConfig: JSON
+    "Description for the predefined validation stamp"
+    description: String!
+    "Unique name for the predefined validation stamp"
+    name: String!
+}
+
 "Input type for the createProject mutation."
 input CreateProjectInput {
     "Project description"
@@ -9148,6 +9209,12 @@ input DeleteNotificationRecordsInput {
 "Input type for the deletePredefinedPromotionLevel mutation."
 input DeletePredefinedPromotionLevelInput {
     "ID of the predefined promotion level"
+    id: Int!
+}
+
+"Input type for the deletePredefinedValidationStamp mutation."
+input DeletePredefinedValidationStampInput {
+    "ID of the predefined validation stamp"
     id: Int!
 }
 
@@ -11544,6 +11611,20 @@ input UpdatePredefinedPromotionLevelInput {
     "ID of the predefined promotion level"
     id: Int!
     "Unique name for the predefined promotion level"
+    name: String!
+}
+
+"Input type for the updatePredefinedValidationStamp mutation."
+input UpdatePredefinedValidationStampInput {
+    "FQCN of the data type"
+    dataType: String
+    "Configuration of the data type"
+    dataTypeConfig: JSON
+    "Description for the predefined validation stamp"
+    description: String!
+    "ID of the predefined validation stamp"
+    id: Int!
+    "Unique name for the predefined validation stamp"
     name: String!
 }
 

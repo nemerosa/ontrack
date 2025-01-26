@@ -66,7 +66,7 @@ class PredefinedPromotionLevelJdbcRepository(dataSource: DataSource) :
                 ORDER BY ORDERNB
             """,
             mapOf("name" to "%$name%"),
-        ) { rs: ResultSet, rowNum: Int -> toPredefinedPromotionLevel(rs) }
+        ) { rs: ResultSet, _: Int -> toPredefinedPromotionLevel(rs) }
     }
 
     override fun findPredefinedPromotionLevelByName(name: String): PredefinedPromotionLevel? {
