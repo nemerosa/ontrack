@@ -140,6 +140,29 @@ pipeline {
                             ${promotionRun.changelog?title=true}
                             ''',
                 )
+                ontrackCliSetupPromotionLevelNotifications(
+                        name: 'On RELEASE deploy the Demo Beta',
+                        promotion: 'RELEASE',
+                        channel: 'workflow',
+                        channelConfig: [
+                                workflow: [
+                                        name: "Deploy Demo Beta",
+                                        nodes: [
+                                                [
+                                                        id: "start",
+                                                        description: "Start deployment",
+                                                        executorId: "slot-pipeline-creation",
+                                                        data: [
+                                                                environment: "demo-beta",
+                                                        ]
+                                                ]
+                                        ]
+                                ]
+                        ],
+                        events: [
+                                'new_promotion_run',
+                        ],
+                )
             }
         }
 
