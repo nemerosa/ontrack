@@ -91,7 +91,6 @@ pipeline {
                                 'GITHUB.RELEASE',
                             ]
                         ],
-                        PRODUCTION: [:],
                     ]
                 )
                 ontrackCliSetupBranchNotifications(
