@@ -32,7 +32,7 @@ fun <T> T?.toJson(): JsonNode? =
 fun <T> T.asJson(): JsonNode = if (this is JsonNode) {
     this
 } else {
-    JsonUtils.format(this)!!
+    mapper.valueToTree(this)
 }
 
 /**
