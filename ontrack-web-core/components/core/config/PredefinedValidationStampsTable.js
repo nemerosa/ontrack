@@ -31,6 +31,7 @@ export default function PredefinedValidationStampsTable({reloadState}) {
                     dataType {
                         descriptor {
                             id
+                            displayName
                         }
                         config
                     }
@@ -84,8 +85,10 @@ export default function PredefinedValidationStampsTable({reloadState}) {
                     render={(_, record) =>
                         <>
                             {
-                                record.dataType &&
-                                <ValidationDataType dataType={record.dataType}/>
+                                record.dataType && <Space direction="vertical">
+                                    <Typography.Text strong>{record.dataType.descriptor.displayName}</Typography.Text>
+                                    <ValidationDataType dataType={record.dataType}/>
+                                </Space>
                             }
                             {
                                 !record.dataType &&
