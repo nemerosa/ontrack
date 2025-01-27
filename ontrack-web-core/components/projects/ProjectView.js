@@ -30,6 +30,7 @@ import DisabledProjectBanner from "@components/projects/DisabledProjectBanner";
 import {gqlBranchContentFragment} from "@components/branches/BranchGraphQLFragments";
 import NewBranchCommand from "@components/branches/NewBranchCommand";
 import ProjectEnvironmentsCommand from "@components/extension/environments/project/ProjectEnvironmentsCommand";
+import ProjectBuildSearchCommand from "@components/projects/ProjectBuildSearchCommand";
 
 export default function ProjectView({id}) {
 
@@ -134,6 +135,7 @@ export default function ProjectView({id}) {
                 // All the rest of commands
                 commands.push(
                     <ProjectEnvironmentsCommand key="environments" id={project.id}/>,
+                    <ProjectBuildSearchCommand key="search" id={project.id}/>,
                     <UserMenuActions key="userMenuActions" actions={project.userMenuActions}/>,
                     <JumpToBranch key="branch" projectName={project.name}/>,
                     <LegacyLinkCommand

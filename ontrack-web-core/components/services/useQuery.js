@@ -3,17 +3,17 @@ import {useEffect, useState} from "react";
 import {getGraphQLErrors} from "@components/services/graphql-utils";
 import {useReloadState} from "@components/common/StateUtils";
 
-export const useQuery = (query, {variables, initialData, deps = [], dataFn} = {}) => {
+export const useQuery = (query, {variables, skipInitialFetch = false, initialData, deps = [], dataFn} = {}) => {
     const client = useGraphQLClient()
 
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(!skipInitialFetch)
     const [error, setError] = useState('')
     const [data, setData] = useState(initialData)
 
     const [reloadState, reload] = useReloadState()
 
     useEffect(() => {
-        if (client) {
+        if (client && (reloadState > 0 || !skipInitialFetch)) {
             const runQuery = async () => {
                 setError('')
                 setLoading(true)

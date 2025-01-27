@@ -1,6 +1,6 @@
-export default function Well({children}) {
+export default function Well({children, style}) {
     return (
-        <div className="ot-well">
+        <div className="ot-well" style={style}>
             {children}
         </div>
     )

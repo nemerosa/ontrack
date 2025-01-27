@@ -7,6 +7,7 @@ import {CloseToHomeCommand} from "@components/common/Commands";
 
 export default function StandardPage({
                                          pageTitle,
+                                         loading = false,
                                          breadcrumbs = homeBreadcrumbs(),
                                          commands = [
                                              <CloseToHomeCommand key="home"/>,
@@ -21,13 +22,16 @@ export default function StandardPage({
                     {title(pageTitle)}
                 </Head>
                 <MainLayout>
-                    <MainPage
-                        title={pageTitle}
-                        breadcrumbs={breadcrumbs}
-                        commands={[...additionalCommands, ...commands]}
-                    >
-                        {children}
-                    </MainPage>
+                    {
+                        !loading &&
+                        <MainPage
+                            title={pageTitle}
+                            breadcrumbs={breadcrumbs}
+                            commands={[...additionalCommands, ...commands]}
+                        >
+                            {children}
+                        </MainPage>
+                    }
                 </MainLayout>
             </main>
 

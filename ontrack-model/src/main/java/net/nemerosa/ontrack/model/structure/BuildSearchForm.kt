@@ -38,4 +38,7 @@ data class BuildSearchForm(
     @APILabel("Linked to")
     @APIDescription("`project:build` expression, matches against builds being linked to the build to match.")
     val linkedTo: String? = null,
+    @APILabel("Extensions")
+    @APIDescription("Search extensions")
+    val extensions: List<BuildSearchFormExtension>? = null,
 )

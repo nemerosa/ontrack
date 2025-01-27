@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.common.Document
+import net.nemerosa.ontrack.extension.api.BuildSearchExtension
+import net.nemerosa.ontrack.extension.api.BuildSearchExtensionNotFoundException
 import net.nemerosa.ontrack.extension.api.BuildValidationExtension
 import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.model.Ack
@@ -56,6 +58,10 @@ class StructureServiceImpl(
 ) : StructureService {
 
     private val logger = LoggerFactory.getLogger(StructureService::class.java)
+
+    private val buildSearchExtensions: Map<String, BuildSearchExtension> by lazy {
+        extensionManager.getExtensions(BuildSearchExtension::class.java).associateBy { it.id }
+    }
 
     override val projectStatusViews: List<ProjectStatusView>
         get() = projectList
@@ -399,10 +405,34 @@ class StructureServiceImpl(
     override fun buildSearch(projectId: ID, form: BuildSearchForm): List<Build> {
         // Gets the project
         val project = getProject(projectId)
-        // Collects the builds for this project and this form
-        return coreBuildFilterRepository.projectSearch(project, form) { type ->
-            propertyService.getPropertyTypeByName<Any>(type)
+
+        // Creating the helper
+        val helper = object : CoreBuildFilterRepositoryHelper {
+
+            override fun propertyTypeAccessor(type: String): PropertyType<*> =
+                propertyService.getPropertyTypeByName<Any>(type)
+
+            override fun contribute(
+                extension: String,
+                value: String,
+                tables: MutableList<String>,
+                criteria: MutableList<String>,
+                params: MutableMap<String, Any?>
+            ) {
+                val searchExtension = buildSearchExtensions[extension]
+                    ?: throw BuildSearchExtensionNotFoundException(extension)
+                searchExtension.contribute(
+                    value = value,
+                    tables = tables,
+                    criteria = criteria,
+                    params = params
+                )
+            }
+
         }
+
+        // Collects the builds for this project and this form
+        return coreBuildFilterRepository.projectSearch(project, form, helper)
     }
 
     @Deprecated("Use createBuildLink instead")

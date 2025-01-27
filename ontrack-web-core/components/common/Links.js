@@ -12,6 +12,10 @@ export function projectUri(project) {
     return `/project/${project.id}`
 }
 
+export function projectBuildSearchUri(project) {
+    return `/project/search/${project.id}`
+}
+
 export function legacyProjectUri(project) {
     return `#/project/${project.id}`
 }

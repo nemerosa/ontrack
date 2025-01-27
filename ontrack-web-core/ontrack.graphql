@@ -4961,6 +4961,11 @@ type Project implements Authorizable & ProjectEntity {
         "Filter by role name"
         role: String
     ): [ProjectAuthorization!]!
+    "Looking for promotion level names in this project"
+    promotionLevelNames(
+        "Filter by promotion level name"
+        token: String
+    ): [String!]!
     "List of properties"
     properties(
         "Keeps properties having a value"
@@ -8650,6 +8655,8 @@ input BuildSearchForm {
     buildExactMatch: Boolean
     "Regular expression to match against the build name, unless `buildExactMatch` is set to `true`."
     buildName: String
+    "Search extensions"
+    extensions: [BuildSearchFormExtension!]
     "`project:build` expression, matches against builds being linked from the build to match."
     linkedFrom: String
     "`project:build` expression, matches against builds being linked to the build to match."
@@ -8664,6 +8671,14 @@ input BuildSearchForm {
     propertyValue: String
     "Matches a build having at least this validation with PASSED as a status."
     validationStampName: String
+}
+
+"BuildSearchFormExtension"
+input BuildSearchFormExtension {
+    "ID of the extension"
+    extension: String!
+    "Search token for the extension"
+    value: String!
 }
 
 "Input type for the bulkUpdatePromotionLevelById mutation."

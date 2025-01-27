@@ -17,4 +17,10 @@ interface PromotionLevelService {
         count: Int = 10,
     ): List<Branch>
 
+    /**
+     * Given a token, returns a list of promotion levels in the given project whose name
+     * matches this token.
+     */
+    fun findPromotionLevelNamesByProject(project: Project, token: String?): List<String>
+
 }

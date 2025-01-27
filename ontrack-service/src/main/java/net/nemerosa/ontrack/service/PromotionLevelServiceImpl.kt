@@ -15,6 +15,9 @@ class PromotionLevelServiceImpl(
         promotionLevelRepository.findNamesByToken(token)
             .sorted()
 
+    override fun findPromotionLevelNamesByProject(project: Project, token: String?): List<String> =
+        promotionLevelRepository.findPromotionLevelNamesByProject(project, token)
+
     override fun findBranchesWithPromotionLevel(
         project: Project,
         promotionLevelName: String,

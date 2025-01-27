@@ -54,7 +54,7 @@ class GQLRootQueryProperties(
                         description = it.description,
                         supportedEntityTypes = it.supportedEntityTypes.toList()
                     )
-                }
+                }.sortedBy { it.name }
             }
             .build()
 

@@ -41,6 +41,39 @@ class PromotionLevelJdbcRepository(
             )
         }
 
+    override fun findPromotionLevelNamesByProject(project: Project, token: String?): List<String> =
+        if (token.isNullOrBlank()) {
+            namedParameterJdbcTemplate!!.queryForList(
+                """
+                    SELECT DISTINCT(PL.NAME)
+                    FROM PROMOTION_LEVELS PL
+                    INNER JOIN BRANCHES B ON PL.BRANCHID = B.ID
+                    WHERE B.PROJECTID = :projectId
+                    ORDER BY PL.NAME
+                """.trimIndent(),
+                mapOf(
+                    "projectId" to project.id()
+                ),
+                String::class.java
+            )
+        } else {
+            namedParameterJdbcTemplate!!.queryForList(
+                """
+                    SELECT DISTINCT(PL.NAME)
+                    FROM PROMOTION_LEVELS PL
+                    INNER JOIN BRANCHES B ON PL.BRANCHID = B.ID
+                    WHERE B.PROJECTID = :projectId
+                    AND PL.NAME ILIKE :token
+                    ORDER BY PL.NAME
+                """.trimIndent(),
+                mapOf(
+                    "projectId" to project.id(),
+                    "token" to "%${token}%",
+                ),
+                String::class.java
+            )
+        }
+
     override fun findByToken(token: String?): List<PromotionLevel> =
         if (token.isNullOrBlank()) {
             jdbcTemplate!!.query(
