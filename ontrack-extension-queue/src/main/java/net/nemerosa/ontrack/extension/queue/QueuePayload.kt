@@ -14,6 +14,8 @@ class QueuePayload(
     val id: String,
     @APIDescription("ID of the target processor")
     val processor: String,
+    @APIDescription("Identity of the user")
+    val accountName: String,
     @APIDescription("Message body for the processor")
     val body: JsonNode,
 ) {
@@ -21,10 +23,15 @@ class QueuePayload(
         body.parseInto(payloadType)
 
     companion object {
-        fun <T : Any> create(processor: QueueProcessor<T>, body: T) =
+        fun <T : Any> create(
+            processor: QueueProcessor<T>,
+            accountName: String,
+            body: T,
+        ) =
             QueuePayload(
                 id = UUID.randomUUID().toString(),
                 processor = processor.id,
+                accountName = accountName,
                 body = body.asJson()
             )
 

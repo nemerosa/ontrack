@@ -480,6 +480,8 @@ class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
                             )
                         }
                         build {
+                            // Linking to the dependency
+                            linkTo(dep)
                             // Promoting to trigger the workflow
                             promote(pl.name)
 
@@ -509,11 +511,14 @@ class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
 
                             // Checks that a notification was received
                             waitUntil(
-                                timeout = 30_000,
+                                timeout = 5_000,
                                 interval = 500L,
+                                task = "In-memory message"
                             ) {
-                                ontrack.notifications.inMemory.group(group)
-                                    .firstOrNull() == "Build linked to ${dep.name}"
+                                val message = ontrack.notifications.inMemory.group(group)
+                                    .firstOrNull()?.trim()
+                                println("In-memory message: $message")
+                                message == "Build linked to ${dep.name}"
                             }
                         }
                     }

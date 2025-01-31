@@ -13,8 +13,10 @@ import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorSe
 import net.nemerosa.ontrack.extension.workflows.repository.WorkflowInstanceRepository
 import net.nemerosa.ontrack.model.events.SerializableEvent
 import net.nemerosa.ontrack.model.tx.DefaultTransactionHelper
+import net.nemerosa.ontrack.model.utils.launchWithSecurityContext
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import org.springframework.transaction.PlatformTransactionManager
 import java.time.Duration
@@ -79,11 +81,19 @@ class WorkflowEngineImpl(
     }
 
     private fun debug(message: String, instance: WorkflowInstance, nodeId: String) {
-        logger.debug("WORKFLOW {} INSTANCE {} NODE {}: {}", instance.workflow.name, instance.id, nodeId, message)
+        logger.debug(
+            "[{}] WORKFLOW {} INSTANCE {} NODE {}: {}",
+            SecurityContextHolder.getContext().authentication?.name,
+            instance.workflow.name,
+            instance.id,
+            nodeId,
+            message
+        )
     }
 
     private fun error(message: String, instance: WorkflowInstance, nodeId: String, error: Throwable? = null) {
-        val logMessage = "WORKFLOW ${instance.workflow.name} INSTANCE ${instance.id} NODE $nodeId: $message"
+        val logMessage =
+            "[${SecurityContextHolder.getContext().authentication?.name}] WORKFLOW ${instance.workflow.name} INSTANCE ${instance.id} NODE $nodeId: $message"
         if (error != null) {
             logger.error(logMessage, error)
         } else {
@@ -111,18 +121,28 @@ class WorkflowEngineImpl(
             return
         }
         // Starting the job for the node
-        CoroutineScope(Dispatchers.Default).launch {
+        launchWithSecurityContext {
             debug("NODE PROCESSING", instance, workflowNodeId)
             // Changes the node's status to WAITING
             debug("NODE WAITING", instance, workflowNodeId)
             nodeWaiting(workflowInstanceId, workflowNodeId)
             // Waiting for the parent nodes to be OK
             val okToStart = if (node.parents.isNotEmpty()) {
-                val parentJobs = node.parents.map {
-                    createParentJob(this, instance, it)
+                val securityContext = SecurityContextHolder.getContext()
+                val parentStatuses = try {
+                    val parentJobs = node.parents.map {
+                        createParentJob(
+                            coroutineScope = this,
+                            instance = instance,
+                            workflowNodeId = workflowNodeId,
+                            parentDef = it
+                        )
+                    }
+                    debug("NODE WAITING FOR PARENTS", instance, workflowNodeId)
+                    parentJobs.awaitAll()
+                } finally {
+                    SecurityContextHolder.setContext(securityContext)
                 }
-                debug("NODE WAITING FOR PARENTS", instance, workflowNodeId)
-                val parentStatuses = parentJobs.awaitAll()
                 debug("NODE WAITED FOR PARENTS", instance, workflowNodeId)
                 // TODO OK to start depending on the conditions
                 val parentsOK = parentStatuses.all { it.status == WorkflowInstanceNodeStatus.SUCCESS }
@@ -160,23 +180,28 @@ class WorkflowEngineImpl(
     private fun createParentJob(
         coroutineScope: CoroutineScope,
         instance: WorkflowInstance,
+        workflowNodeId: String,
         parentDef: WorkflowParentNode
     ): Deferred<WorkflowParentStatus> {
         val parentNode = instance.workflow.getNode(parentDef.id)
         val parentTimeoutMs = parentNode.timeout * 1_000L
         return coroutineScope.async {
+            debug("NODE PARENT WAIT ${parentDef.id} START", instance, workflowNodeId)
             val status = withTimeoutOrNull(parentTimeoutMs) {
                 var parentFinished = false
                 var parentStatus: WorkflowInstanceNodeStatus? = null
                 while (!parentFinished) {
+                    debug("NODE PARENT WAIT ${parentDef.id} STATUS", instance, workflowNodeId)
                     parentStatus = getNodeStatus(instance.id, parentDef.id)
                         ?: error("Could not find status for parent node: ${instance.id} / ${parentDef.id}")
                     if (parentStatus.finished) {
                         parentFinished = true
                     } else {
+                        debug("NODE PARENT WAIT ${parentDef.id} DELAY", instance, workflowNodeId)
                         delay(workflowConfigurationProperties.parentWaitingInterval.toMillis())
                     }
                 }
+                debug("NODE PARENT WAIT ${parentDef.id} DONE $parentStatus", instance, workflowNodeId)
                 parentStatus
             }
             WorkflowParentStatus(parentDef, status)
@@ -202,7 +227,7 @@ class WorkflowEngineImpl(
 
             // Running the executor
             val result = withTimeoutOrNull(timeout.toMillis()) {
-                val deferred = async {
+                val deferred = async(coroutineContext) {
                     debug("NODE EXECUTING", instance, nodeId)
                     executor.execute(instance, node.id, nodeFeedback)
                 }

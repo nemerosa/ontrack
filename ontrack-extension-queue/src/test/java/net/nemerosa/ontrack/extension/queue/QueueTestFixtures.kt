@@ -11,33 +11,34 @@ import java.util.*
 object QueueTestFixtures {
 
     fun queueRecord(
-            state: QueueRecordState = QueueRecordState.COMPLETED,
-            processor: String = "test",
-            queueName: String? = "queue",
+        state: QueueRecordState = QueueRecordState.COMPLETED,
+        processor: String = "test",
+        queueName: String? = "queue",
     ): QueueRecord {
         val id = UUID.randomUUID().toString()
         val payload = mapOf("message" to "Sample message").asJson()
         val time = Time.now()
         return QueueRecord(
-                state = state,
-                queuePayload = QueuePayload(
-                        id = id,
-                        processor = processor,
-                        body = payload,
-                ),
-                startTime = time,
-                endTime = time,
-                routingKey = "routing",
-                queueName = queueName,
-                actualPayload = payload,
-                exception = null,
-                history = listOf(
-                        QueueRecordHistory(
-                                state = QueueRecordState.COMPLETED,
-                                time = time,
-                        )
-                ),
-                source = TestQueueSourceExtension.instance.createQueueSource("")
+            state = state,
+            queuePayload = QueuePayload(
+                id = id,
+                processor = processor,
+                body = payload,
+                accountName = "admin",
+            ),
+            startTime = time,
+            endTime = time,
+            routingKey = "routing",
+            queueName = queueName,
+            actualPayload = payload,
+            exception = null,
+            history = listOf(
+                QueueRecordHistory(
+                    state = QueueRecordState.COMPLETED,
+                    time = time,
+                )
+            ),
+            source = TestQueueSourceExtension.instance.createQueueSource("")
         )
     }
 

@@ -9,6 +9,8 @@ import net.nemerosa.ontrack.extension.queue.metrics.queueProcessErrored
 import net.nemerosa.ontrack.extension.queue.metrics.queueProcessTime
 import net.nemerosa.ontrack.extension.queue.record.QueueRecordService
 import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.security.AccountOntrackUser
+import net.nemerosa.ontrack.model.security.AccountService
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry
@@ -19,6 +21,9 @@ import org.springframework.amqp.rabbit.config.SimpleRabbitListenerEndpoint
 import org.springframework.amqp.rabbit.listener.RabbitListenerEndpoint
 import org.springframework.amqp.rabbit.listener.RabbitListenerEndpointRegistrar
 import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.context.TransientSecurityContext
 import org.springframework.stereotype.Component
 import java.io.IOException
 
@@ -30,6 +35,7 @@ class QueueListener(
     private val applicationLogService: ApplicationLogService,
     private val queueRecordService: QueueRecordService,
     private val meterRegistry: MeterRegistry,
+    private val accountService: AccountService,
 ) : RabbitListenerConfigurer {
 
     override fun configureRabbitListeners(registrar: RabbitListenerEndpointRegistrar) {
@@ -109,9 +115,30 @@ class QueueListener(
                 // Processing
                 securityService.asAdmin {
                     queueRecordService.processing(qp)
+
+                    // Gets the account to use from the queue payload
+                    val account = accountService.findAccountByName(qp.accountName)
+                        ?: throw QueuePayloadAccountNameNotFoundException(qp)
+
+                    // Sets the security context for expected account
+                    val user = AccountOntrackUser(account)
+                    val authenticatedUser = accountService.withACL(user)
+                    val authentication = UsernamePasswordAuthenticationToken(
+                        authenticatedUser,
+                        "",
+                        user.authorities
+                    )
+                    val oldSecurityContext = SecurityContextHolder.getContext()
+                    val securityContext = TransientSecurityContext(authentication)
+
                     try {
                         meterRegistry.queueProcessTime(qp) {
-                            queueProcessor.process(payload)
+                            try {
+                                SecurityContextHolder.setContext(securityContext)
+                                queueProcessor.process(payload)
+                            } finally {
+                                SecurityContextHolder.setContext(oldSecurityContext)
+                            }
                         }
                         meterRegistry.queueProcessCompleted(qp)
                         queueRecordService.completed(qp)

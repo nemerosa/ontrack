@@ -9,7 +9,6 @@ import net.nemerosa.ontrack.kdsl.connector.graphql.paginate
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.*
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.LinksBuildInputItem
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.ProjectEntityType
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.RunInfoInput
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 import net.nemerosa.ontrack.kdsl.connector.support.PaginatedList
 import net.nemerosa.ontrack.kdsl.connector.support.emptyPaginatedList
@@ -87,6 +86,26 @@ class Build(
     )?.map {
         it.build().fragments().buildFragment().toBuild(this@Build)
     } ?: emptyPaginatedList()
+
+    /**
+     * Links this build to another build
+     */
+    fun linkTo(build: Build) {
+        graphqlConnector.mutate(
+            LinksBuildMutation(
+                branch.project.name,
+                name,
+                listOf(
+                    LinksBuildInputItem.builder()
+                        .project(build.branch.project.name)
+                        .build(build.name)
+                        .build()
+                )
+            )
+        ) {
+            it?.linksBuild()?.fragments()?.payloadUserErrors()?.convert()
+        }
+    }
 
     /**
      * Links this build to other builds using their project names and their names.
