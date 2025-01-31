@@ -428,4 +428,98 @@ class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
         }
     }
 
+    @Test
+    fun `Security context must be passed to the node executions`() {
+        val group = uid("group-")
+        val subName = uid("sub-")
+        withNotGrantProjectViewToAll {
+            withUser(
+                globalRole = "ADMINISTRATOR"
+            ) {
+                // Creating a dependency
+                val dep = project {
+                    branch {
+                        build { this }
+                    }
+                }
+                // Creating a parent project
+                project {
+                    branch {
+                        val pl = promotion().apply {
+                            // Registering a workflow for this promotion
+                            subscribe(
+                                name = subName,
+                                channel = "workflow",
+                                channelConfig = mapOf(
+                                    "workflow" to WorkflowTestSupport.yamlWorkflowToJson(
+                                        """
+                                            name: On promotion
+                                            nodes:
+                                                - id: start
+                                                  executorId: mock
+                                                  data:
+                                                    text: First node in workflow
+                                                - id: notification
+                                                  parents:
+                                                    - id: start
+                                                  executorId: notification
+                                                  data:
+                                                    channel: in-memory
+                                                    channelConfig:
+                                                        group: $group
+                                                    template: |
+                                                        Build linked to ${'$'}{build.linked?project=${dep.branch.project.name}&mode=auto}
+                                                  
+                                        """.trimIndent()
+                                    )
+                                ),
+                                keywords = null,
+                                events = listOf(
+                                    "new_promotion_run",
+                                ),
+                            )
+                        }
+                        build {
+                            // Promoting to trigger the workflow
+                            promote(pl.name)
+
+                            waitUntil(
+                                timeout = 30_000,
+                                interval = 500L,
+                            ) {
+                                val instanceId = getWorkflowInstanceId(subName)
+                                instanceId.isNullOrBlank().not()
+                            }
+
+                            // Getting the instance ID
+                            val instanceId =
+                                getWorkflowInstanceId(subName) ?: fail("Cannot get the workflow instance ID")
+
+                            // Waits until the workflow is finished
+                            val instance =
+                                waitUntilWorkflowFinished(instanceId = instanceId, returnInstanceOnError = true)
+
+                            // We expect the workflow to have failed
+                            assertEquals(WorkflowInstanceStatus.SUCCESS, instance.status)
+
+                            // Checking the node states
+                            val nodeStatuses = instance.nodesExecutions.associate { it.id to it.status }
+                            assertEquals(WorkflowInstanceNodeStatus.SUCCESS, nodeStatuses["start"])
+                            assertEquals(WorkflowInstanceNodeStatus.SUCCESS, nodeStatuses["notification"])
+
+                            // Checks that a notification was received
+                            waitUntil(
+                                timeout = 30_000,
+                                interval = 500L,
+                            ) {
+                                ontrack.notifications.inMemory.group(group)
+                                    .firstOrNull() == "Build linked to ${dep.name}"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }

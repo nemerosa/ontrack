@@ -59,8 +59,22 @@ abstract class AbstractACCTestSupport {
     /**
      * Root Ontrack object
      */
-    protected val ontrack: Ontrack by lazy {
+    private val rootOntrack: Ontrack by lazy {
         Ontrack(connector = connector())
+    }
+
+    private var alternateOntrack: Ontrack? = null
+
+    protected val ontrack: Ontrack get() = alternateOntrack ?: rootOntrack
+
+    protected fun <T> withConnector(connector: Connector, code: () -> T): T {
+        val oldAlternateOntrack = alternateOntrack
+        return try {
+            alternateOntrack = Ontrack(connector = connector)
+            code()
+        } finally {
+            alternateOntrack = oldAlternateOntrack
+        }
     }
 
     /**

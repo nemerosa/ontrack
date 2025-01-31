@@ -2,11 +2,12 @@ package net.nemerosa.ontrack.kdsl.acceptance.tests
 
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
+import net.nemerosa.ontrack.kdsl.connector.support.DefaultConnector
 import net.nemerosa.ontrack.kdsl.spec.Branch
 import net.nemerosa.ontrack.kdsl.spec.Build
 import net.nemerosa.ontrack.kdsl.spec.Project
+import net.nemerosa.ontrack.kdsl.spec.admin.Account
 import net.nemerosa.ontrack.kdsl.spec.admin.admin
-import net.nemerosa.ontrack.kdsl.spec.extension.tfc.tfc
 import net.nemerosa.ontrack.kdsl.spec.settings.security
 import net.nemerosa.ontrack.kdsl.spec.settings.settings
 
@@ -120,11 +121,42 @@ abstract class AbstractACCDSLTestSupport : AbstractACCTestSupport() {
     /**
      * For the duration of the call, Ontrack will be run with a newly generated user with no specific right.
      */
-    protected fun withUser(code: () -> Unit) {
-        // TODO Creating a new user
-        // TODO Setting the user as connection
-        // TODO Running the code
-        TODO()
+    protected fun withUser(
+        globalRole: String? = null,
+        code: () -> Unit,
+    ) {
+        // Creating a new user
+        val user = ontrack.admin.createUser(
+            uid("user-")
+        )
+        // If a global role is given, grants it to the user
+        if (!globalRole.isNullOrBlank()) {
+            ontrack.admin.grantGlobalRoleToAccount(
+                account = user,
+                globalRole = globalRole,
+            )
+        }
+        // Setting the user as connection
+        runWithUser(user, code)
+    }
+
+    /**
+     * Running a piece of code in the context of another user
+     */
+    private fun <T> runWithUser(user: Account, code: () -> T): T {
+        // Getting a token for this user
+        val token = ACCProperties.getOrCreateToken(
+            url = ACCProperties.Connection.url,
+            username = user.name,
+            password = user.password,
+        )
+        // Creating a connector for this user
+        val connector = DefaultConnector(
+            url = ACCProperties.Connection.url,
+            token = token,
+        )
+        // Creating a new temporary Ontrack context
+        return withConnector(connector, code)
     }
 
 }

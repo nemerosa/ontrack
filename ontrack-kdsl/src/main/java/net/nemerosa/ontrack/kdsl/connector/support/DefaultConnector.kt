@@ -24,6 +24,14 @@ class DefaultConnector(
     private val defaultHeaders: Map<String, String> = emptyMap(),
 ) : Connector {
 
+    constructor(
+        url: String,
+        token: String,
+    ) : this(
+        url = url,
+        defaultHeaders = mapOf(X_ONTRACK_TOKEN to token),
+    )
+
     companion object {
         const val X_ONTRACK_TOKEN = "X-Ontrack-Token"
     }

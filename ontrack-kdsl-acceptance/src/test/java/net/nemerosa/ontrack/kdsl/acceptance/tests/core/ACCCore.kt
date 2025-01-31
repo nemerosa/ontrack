@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.kdsl.acceptance.tests.core
 
 import net.nemerosa.ontrack.kdsl.acceptance.tests.AbstractACCDSLTestSupport
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -11,7 +10,6 @@ import kotlin.test.assertNull
 class ACCCore : AbstractACCDSLTestSupport() {
 
     @Test
-    @Disabled("Waiting for withUser to be implemented")
     fun `Branch not found before not authorised`() {
         project {
             branch {

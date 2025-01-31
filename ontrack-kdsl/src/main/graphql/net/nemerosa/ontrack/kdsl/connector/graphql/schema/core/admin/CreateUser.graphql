@@ -1,0 +1,18 @@
+mutation CreateUser(
+    $name: String!,
+    $fullName: String!,
+    $email: String!,
+    $password: String!,
+) {
+    createBuiltInAccount(input: {
+        name: $name,
+        fullName: $fullName,
+        email: $email,
+        password: $password,
+    }) {
+        account {
+            id
+        }
+        ...PayloadUserErrors
+    }
+}

@@ -6889,6 +6889,63 @@
                 "ofType": null
               },
               "defaultValue": null
+            },
+            {
+              "name": "extensions",
+              "description": "Search extensions",
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "BuildSearchFormExtension",
+                    "ofType": null
+                  }
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "BuildSearchFormExtension",
+          "description": "BuildSearchFormExtension",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "extension",
+              "description": "ID of the extension",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "value",
+              "description": "Search token for the extension",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
             }
           ],
           "interfaces": null,
@@ -9097,6 +9154,194 @@
           "name": "CreateJenkinsConfigurationPayload",
           "description": "Output type for the createJenkinsConfiguration mutation.",
           "fields": [
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "CreatePredefinedPromotionLevelInput",
+          "description": "Input type for the createPredefinedPromotionLevel mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "description",
+              "description": "Description for the predefined promotion level",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name",
+              "description": "Unique name for the predefined promotion level",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "CreatePredefinedPromotionLevelPayload",
+          "description": "Output type for the createPredefinedPromotionLevel mutation.",
+          "fields": [
+            {
+              "name": "predefinedPromotionLevel",
+              "description": "Created predefined promotion level",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "PredefinedPromotionLevel",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "CreatePredefinedValidationStampInput",
+          "description": "Input type for the createPredefinedValidationStamp mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "dataType",
+              "description": "FQCN of the data type",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "dataTypeConfig",
+              "description": "Configuration of the data type",
+              "type": {
+                "kind": "SCALAR",
+                "name": "JSON",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "description",
+              "description": "Description for the predefined validation stamp",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name",
+              "description": "Unique name for the predefined validation stamp",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "CreatePredefinedValidationStampPayload",
+          "description": "Output type for the createPredefinedValidationStamp mutation.",
+          "fields": [
+            {
+              "name": "predefinedValidationStamp",
+              "description": "Created predefined validation stamp",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "PredefinedValidationStamp",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
             {
               "name": "errors",
               "description": "List of errors",
@@ -12361,6 +12606,122 @@
           "kind": "OBJECT",
           "name": "DeleteNotificationRecordsPayload",
           "description": "Output type for the deleteNotificationRecords mutation.",
+          "fields": [
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "DeletePredefinedPromotionLevelInput",
+          "description": "Input type for the deletePredefinedPromotionLevel mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "id",
+              "description": "ID of the predefined promotion level",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "DeletePredefinedPromotionLevelPayload",
+          "description": "Output type for the deletePredefinedPromotionLevel mutation.",
+          "fields": [
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "DeletePredefinedValidationStampInput",
+          "description": "Input type for the deletePredefinedValidationStamp mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "id",
+              "description": "ID of the predefined validation stamp",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "DeletePredefinedValidationStampPayload",
+          "description": "Output type for the deletePredefinedValidationStamp mutation.",
           "fields": [
             {
               "name": "errors",
@@ -21197,6 +21558,78 @@
           "possibleTypes": null
         },
         {
+          "kind": "INPUT_OBJECT",
+          "name": "GrantGlobalRoleToAccountInput",
+          "description": "Input type for the grantGlobalRoleToAccount mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "accountId",
+              "description": "accountId field",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "globalRole",
+              "description": "globalRole field",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "GrantGlobalRoleToAccountPayload",
+          "description": "Output type for the grantGlobalRoleToAccount mutation.",
+          "fields": [
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
           "kind": "OBJECT",
           "name": "HomePageSettingsType",
           "description": "Home page settings",
@@ -27396,6 +27829,29 @@
               "deprecationReason": null
             },
             {
+              "name": "grantGlobalRoleToAccount",
+              "description": "Grants a global role to an account",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "GrantGlobalRoleToAccountInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "GrantGlobalRoleToAccountPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "createBranch",
               "description": "Creates a new branch",
               "args": [
@@ -27735,6 +28191,167 @@
               "type": {
                 "kind": "OBJECT",
                 "name": "LinkBuildByIdPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "createPredefinedPromotionLevel",
+              "description": "Creates a new predefined promotion level",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "CreatePredefinedPromotionLevelInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "CreatePredefinedPromotionLevelPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "updatePredefinedPromotionLevel",
+              "description": "Updates an existing predefined promotion level",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "UpdatePredefinedPromotionLevelInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "UpdatePredefinedPromotionLevelPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "deletePredefinedPromotionLevel",
+              "description": "Deletes an existing predefined promotion level",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "DeletePredefinedPromotionLevelInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "DeletePredefinedPromotionLevelPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "reorderPredefinedPromotionLevelById",
+              "description": "Reordering the predefining promotion levels",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ReorderPredefinedPromotionLevelByIdInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ReorderPredefinedPromotionLevelByIdPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "createPredefinedValidationStamp",
+              "description": "Creates a new predefined validation stamp",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "CreatePredefinedValidationStampInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "CreatePredefinedValidationStampPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "updatePredefinedValidationStamp",
+              "description": "Updates an existing predefined validation stamp",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "UpdatePredefinedValidationStampInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "UpdatePredefinedValidationStampPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "deletePredefinedValidationStamp",
+              "description": "Deletes an existing predefined validation stamp",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "DeletePredefinedValidationStampInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "DeletePredefinedValidationStampPayload",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -32790,6 +33407,29 @@
               "deprecationReason": null
             },
             {
+              "name": "overridePipelineWorkflow",
+              "description": "Overrides the execution of a workflow for a pipeline",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "OverridePipelineWorkflowInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "OverridePipelineWorkflowPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "validateJsonWorkflow",
               "description": "Validates a workflow which is defined as JSON",
               "args": [
@@ -33940,6 +34580,92 @@
           "possibleTypes": null
         },
         {
+          "kind": "INPUT_OBJECT",
+          "name": "OverridePipelineWorkflowInput",
+          "description": "Input type for the overridePipelineWorkflow mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "message",
+              "description": "message field",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "pipelineId",
+              "description": "pipelineId field",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "slotWorkflowId",
+              "description": "slotWorkflowId field",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "OverridePipelineWorkflowPayload",
+          "description": "Output type for the overridePipelineWorkflow mutation.",
+          "fields": [
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
           "kind": "OBJECT",
           "name": "PageInfo",
           "description": null,
@@ -34177,6 +34903,16 @@
             },
             {
               "kind": "OBJECT",
+              "name": "CreatePredefinedPromotionLevelPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "CreatePredefinedValidationStampPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
               "name": "CreateProjectOrGetPayload",
               "ofType": null
             },
@@ -34343,6 +35079,16 @@
             {
               "kind": "OBJECT",
               "name": "DeleteNotificationRecordsPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeletePredefinedPromotionLevelPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "DeletePredefinedValidationStampPayload",
               "ofType": null
             },
             {
@@ -34707,6 +35453,11 @@
             },
             {
               "kind": "OBJECT",
+              "name": "GrantGlobalRoleToAccountPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
               "name": "LaunchWorkflowPayload",
               "ofType": null
             },
@@ -34737,6 +35488,11 @@
             },
             {
               "kind": "OBJECT",
+              "name": "OverridePipelineWorkflowPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
               "name": "PostQueuePayload",
               "ofType": null
             },
@@ -34758,6 +35514,11 @@
             {
               "kind": "OBJECT",
               "name": "RenameSubscriptionPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "ReorderPredefinedPromotionLevelByIdPayload",
               "ofType": null
             },
             {
@@ -35332,6 +36093,16 @@
             },
             {
               "kind": "OBJECT",
+              "name": "UpdatePredefinedPromotionLevelPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "UpdatePredefinedValidationStampPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
               "name": "UpdateProjectPayload",
               "ofType": null
             },
@@ -35668,7 +36439,7 @@
               "args": [],
               "type": {
                 "kind": "SCALAR",
-                "name": "Int",
+                "name": "ID",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -35709,6 +36480,18 @@
               "type": {
                 "kind": "SCALAR",
                 "name": "Boolean",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "dataType",
+              "description": "dataType field",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "ValidationDataTypeConfig",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -36281,6 +37064,40 @@
                     "ofType": {
                       "kind": "OBJECT",
                       "name": "PromotionRun"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "promotionLevelNames",
+              "description": "Looking for promotion level names in this project",
+              "args": [
+                {
+                  "name": "token",
+                  "description": "Filter by promotion level name",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String"
                     }
                   }
                 }
@@ -40794,6 +41611,33 @@
               "deprecationReason": null
             },
             {
+              "name": "predefinedPromotionLevelById",
+              "description": "Predefined promotion level by ID",
+              "args": [
+                {
+                  "name": "id",
+                  "description": "ID",
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Int",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "PredefinedPromotionLevel",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "predefinedPromotionLevelByName",
               "description": "Predefined promotion level by name",
               "args": [
@@ -40815,6 +41659,67 @@
               "type": {
                 "kind": "OBJECT",
                 "name": "PredefinedPromotionLevel",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "predefinedPromotionLevels",
+              "description": "Returns the list of all predefined promotion levels",
+              "args": [
+                {
+                  "name": "name",
+                  "description": "Filtering on the predefined promotion level name",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "PredefinedPromotionLevel"
+                    }
+                  }
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "predefinedValidationStampById",
+              "description": "Predefined validation stamp by ID",
+              "args": [
+                {
+                  "name": "id",
+                  "description": "ID",
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Int",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "PredefinedValidationStamp",
                 "ofType": null
               },
               "isDeprecated": false,
@@ -40843,6 +41748,40 @@
                 "kind": "OBJECT",
                 "name": "PredefinedValidationStamp",
                 "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "predefinedValidationStamps",
+              "description": "Returns the list of all predefined validation stamps",
+              "args": [
+                {
+                  "name": "name",
+                  "description": "Filtering on the predefined validation stamp name",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "OBJECT",
+                      "name": "PredefinedValidationStamp"
+                    }
+                  }
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null
@@ -43598,6 +44537,22 @@
               "deprecationReason": null
             },
             {
+              "name": "durationSeconds",
+              "description": "Duration in ms",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "exception",
               "description": "Error on processing",
               "args": [],
@@ -44028,6 +44983,78 @@
               "isDeprecated": false,
               "deprecationReason": null
             },
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "ReorderPredefinedPromotionLevelByIdInput",
+          "description": "Input type for the reorderPredefinedPromotionLevelById mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "activeId",
+              "description": "Active ID",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "overId",
+              "description": "ID being replaced",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "ReorderPredefinedPromotionLevelByIdPayload",
+          "description": "Output type for the reorderPredefinedPromotionLevelById mutation.",
+          "fields": [
             {
               "name": "errors",
               "description": "List of errors",
@@ -56554,7 +57581,18 @@
             {
               "name": "workflows",
               "description": "List of workflows for this slot",
-              "args": [],
+              "args": [
+                {
+                  "name": "trigger",
+                  "description": "Type of trigger to filter on",
+                  "type": {
+                    "kind": "ENUM",
+                    "name": "SlotPipelineStatus",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
               "type": {
                 "kind": "NON_NULL",
                 "name": null,
@@ -57820,6 +58858,33 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "slotWorkflowInstanceForPipeline",
+              "description": "Getting the instance for a given pipeline",
+              "args": [
+                {
+                  "name": "pipelineId",
+                  "description": "ID of the pipeline",
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "SlotWorkflowInstance",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "inputFields": null,
@@ -57906,6 +58971,66 @@
                 "ofType": {
                   "kind": "OBJECT",
                   "name": "WorkflowInstance",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "override",
+              "description": "override field",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "SlotAdmissionRuleOverride",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "check",
+              "description": "Status check for this workflow",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "SlotDeploymentCheck",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "overridden",
+              "description": "Flag to check if the workflow has been overridden",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "canBeOverridden",
+              "description": "True if the user is allowed to override this rule",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
                   "ofType": null
                 }
               },
@@ -60823,6 +61948,222 @@
           "name": "UpdatePipelineDataPayload",
           "description": "Output type for the updatePipelineData mutation.",
           "fields": [
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "UpdatePredefinedPromotionLevelInput",
+          "description": "Input type for the updatePredefinedPromotionLevel mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "description",
+              "description": "Description for the predefined promotion level",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id",
+              "description": "ID of the predefined promotion level",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name",
+              "description": "Unique name for the predefined promotion level",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "UpdatePredefinedPromotionLevelPayload",
+          "description": "Output type for the updatePredefinedPromotionLevel mutation.",
+          "fields": [
+            {
+              "name": "predefinedPromotionLevel",
+              "description": "Updated predefined promotion level",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "PredefinedPromotionLevel",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "UpdatePredefinedValidationStampInput",
+          "description": "Input type for the updatePredefinedValidationStamp mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "dataType",
+              "description": "FQCN of the data type",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "dataTypeConfig",
+              "description": "Configuration of the data type",
+              "type": {
+                "kind": "SCALAR",
+                "name": "JSON",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "description",
+              "description": "Description for the predefined validation stamp",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "id",
+              "description": "ID of the predefined validation stamp",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "name",
+              "description": "Unique name for the predefined validation stamp",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "UpdatePredefinedValidationStampPayload",
+          "description": "Output type for the updatePredefinedValidationStamp mutation.",
+          "fields": [
+            {
+              "name": "predefinedValidationStamp",
+              "description": "Updated predefined validation stamp",
+              "args": [],
+              "type": {
+                "kind": "OBJECT",
+                "name": "PredefinedValidationStamp",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
             {
               "name": "errors",
               "description": "List of errors",

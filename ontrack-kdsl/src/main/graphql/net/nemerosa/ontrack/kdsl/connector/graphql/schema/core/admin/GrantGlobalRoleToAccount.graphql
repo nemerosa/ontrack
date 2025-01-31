@@ -1,0 +1,11 @@
+mutation GrantGlobalRoleToAccount(
+    $accountId: Int!,
+    $globalRole: String!,
+) {
+    grantGlobalRoleToAccount(input: {
+        accountId: $accountId,
+        globalRole: $globalRole,
+    }) {
+        ...PayloadUserErrors
+    }
+}
