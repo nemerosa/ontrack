@@ -12,9 +12,6 @@ import kotlin.test.assertTrue
 class UserContextServiceIT : AbstractDSLTestSupport() {
 
     @Autowired
-    private lateinit var userContextService: UserContextService
-
-    @Autowired
     private lateinit var utils: UserContextServiceTestUtils
 
     @Test

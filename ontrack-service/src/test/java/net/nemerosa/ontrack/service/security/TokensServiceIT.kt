@@ -1,11 +1,10 @@
 package net.nemerosa.ontrack.service.security
 
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.security.Account
 import net.nemerosa.ontrack.model.security.AccountManagement
+import net.nemerosa.ontrack.model.security.currentSpringSecurityContextToUserContext
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.TokenOptions
 import net.nemerosa.ontrack.model.structure.TokenScope
@@ -32,7 +31,10 @@ class TokensServiceIT : AbstractDSLTestSupport() {
     @Test
     fun `Getting the current token when a token is set`() {
         asUser {
-            val token = tokensService.generateNewToken(TokenOptions(name = "test"))
+            val token = tokensService.generateNewToken(
+                userContextService.currentSpringSecurityContextToUserContext(),
+                TokenOptions(name = "test")
+            )
             assertNotNull(tokensService.getCurrentToken("test"), "Could find the token") {
                 assertEquals(token.value, it.value)
                 assertNotNull(it.creation)
@@ -45,7 +47,10 @@ class TokensServiceIT : AbstractDSLTestSupport() {
     fun `Getting the current token with a validity period being set`() {
         asUser {
             withCustomTokenValidityDuration(Duration.ofDays(1)) {
-                tokensService.generateNewToken(TokenOptions(name = "test"))
+                tokensService.generateNewToken(
+                    userContextService.currentSpringSecurityContextToUserContext(),
+                    TokenOptions(name = "test"),
+                )
             }
             assertNotNull(tokensService.getCurrentToken("test")) {
                 assertTrue(it.value.isNotBlank())
@@ -60,7 +65,10 @@ class TokensServiceIT : AbstractDSLTestSupport() {
     @Test
     fun `Revoking a token`() {
         asUser {
-            tokensService.generateNewToken(TokenOptions("test"))
+            tokensService.generateNewToken(
+                userContextService.currentSpringSecurityContextToUserContext(),
+                TokenOptions("test")
+            )
             assertNotNull(tokensService.getCurrentToken("test"))
             tokensService.revokeToken("test")
             assertNull(tokensService.getCurrentToken("test"))
@@ -77,7 +85,10 @@ class TokensServiceIT : AbstractDSLTestSupport() {
     fun `Bound user`() {
         asUser {
             val accountId = securityService.currentAccount!!.id()
-            tokensService.generateNewToken(TokenOptions("test"))
+            tokensService.generateNewToken(
+                userContextService.currentSpringSecurityContextToUserContext(),
+                TokenOptions("test")
+            )
             val token = tokensService.getCurrentToken("test")!!.value
             val t = tokensService.findAccountByToken(token)
             assertNotNull(t, "Token found") {
@@ -92,7 +103,10 @@ class TokensServiceIT : AbstractDSLTestSupport() {
     @Test
     fun `Token not found when invalidated`() {
         asUser {
-            tokensService.generateNewToken(TokenOptions("test"))
+            tokensService.generateNewToken(
+                userContextService.currentSpringSecurityContextToUserContext(),
+                TokenOptions("test")
+            )
             val token = tokensService.getCurrentToken("test")!!.value
             val t = tokensService.findAccountByToken(token)
             assertNotNull(t, "Token found")
@@ -106,7 +120,10 @@ class TokensServiceIT : AbstractDSLTestSupport() {
     @Test
     fun `Get the token of an account`() {
         asUser {
-            val token = tokensService.generateNewToken(TokenOptions("test"))
+            val token = tokensService.generateNewToken(
+                userContextService.currentSpringSecurityContextToUserContext(),
+                TokenOptions("test")
+            )
             // Gets the account ID
             val accountId = securityService.currentAccount!!.id()
             asUserWith<AccountManagement> {
@@ -121,7 +138,10 @@ class TokensServiceIT : AbstractDSLTestSupport() {
     @Test
     fun `Revoke an account`() {
         asUser {
-            tokensService.generateNewToken(TokenOptions("test"))
+            tokensService.generateNewToken(
+                userContextService.currentSpringSecurityContextToUserContext(),
+                TokenOptions("test")
+            )
             val accountId = securityService.currentAccount!!.id()
             asUserWith<AccountManagement> {
                 tokensService.revokeAllTokens(accountId)
@@ -157,7 +177,10 @@ class TokensServiceIT : AbstractDSLTestSupport() {
         withCustomTokenCache(false) {
             asUser {
                 val id = securityService.currentAccount!!.id()
-                val token = tokensService.generateNewToken(TokenOptions("test"))
+                val token = tokensService.generateNewToken(
+                    userContextService.currentSpringSecurityContextToUserContext(),
+                    TokenOptions("test")
+                )
                 assertTrue(tokensService.isValid(token.value), "Token is valid")
                 asAdmin { tokensService.revokeToken(id, "test") }
                 assertFalse(tokensService.isValid(token.value), "Token has been revoked")
@@ -171,7 +194,10 @@ class TokensServiceIT : AbstractDSLTestSupport() {
         withCustomTokenCache(true) {
             asUser {
                 val id = securityService.currentAccount!!.id()
-                val token = tokensService.generateNewToken(TokenOptions("test"))
+                val token = tokensService.generateNewToken(
+                    userContextService.currentSpringSecurityContextToUserContext(),
+                    TokenOptions("test")
+                )
                 assertTrue(tokensService.isValid(token.value), "Token is valid")
                 asAdmin { tokensService.revokeToken(id, "test") }
                 assertFalse(tokensService.isValid(token.value), "Token has been revoked")
@@ -290,7 +316,10 @@ class TokensServiceIT : AbstractDSLTestSupport() {
     @Test
     fun `Getting an account for a given token set the last used date`() {
         asUser {
-            val token = tokensService.generateNewToken(TokenOptions("test"))
+            val token = tokensService.generateNewToken(
+                userContextService.currentSpringSecurityContextToUserContext(),
+                TokenOptions("test")
+            )
             assertNull(token.lastUsed, "Last used date not set on creation")
             // Getting the account for this token
             val tokenAccount = tokensService.findAccountByToken(token.value)
@@ -308,6 +337,7 @@ class TokensServiceIT : AbstractDSLTestSupport() {
         withCustomTokenTransientValidityDuration(Duration.ofHours(2)) {
             asUser {
                 val token = tokensService.generateNewToken(
+                    userContextService.currentSpringSecurityContextToUserContext(),
                     TokenOptions(
                         name = "test",
                         scope = TokenScope.NEXT_UI,
@@ -337,7 +367,10 @@ class TokensServiceIT : AbstractDSLTestSupport() {
 
     private fun accountWithToken(): Account {
         return asUser {
-            tokensService.generateNewToken(TokenOptions("test"))
+            tokensService.generateNewToken(
+                userContextService.currentSpringSecurityContextToUserContext(),
+                TokenOptions("test")
+            )
             val accountId = securityService.currentAccount!!.id()
             asAdmin {
                 accountService.getAccount(ID.of(accountId))

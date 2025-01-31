@@ -36,7 +36,7 @@ interface TokensRepository {
      *
      * Note that the [Token.validUntil] property is always set to `null`.
      */
-    fun getTokenForAccount(account: Account, name: String): Token?
+    fun getTokenForAccount(accountId: Int, name: String): Token?
 
     /**
      * Gets the account ID which is associated with this token, if any.

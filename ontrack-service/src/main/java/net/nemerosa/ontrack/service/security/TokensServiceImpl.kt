@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.service.security
 
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.model.security.Account
-import net.nemerosa.ontrack.model.security.AccountManagement
-import net.nemerosa.ontrack.model.security.AccountService
-import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.TokensService.Companion.DEFAULT_NAME
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
@@ -24,7 +21,7 @@ class TokensServiceImpl(
     private val accountService: AccountService
 ) : TokensService {
 
-    @Deprecated("Use named tokens")
+    @Deprecated("Will be removed in V5. Use named tokens")
     override val currentToken: Token?
         get() = getCurrentToken(DEFAULT_NAME)
 
@@ -33,13 +30,14 @@ class TokensServiceImpl(
         val account = securityService.currentAccount?.account
         // Gets the token of this account
         return account?.let {
-            tokensRepository.getTokenForAccount(account, name)
+            tokensRepository.getTokenForAccount(account.id(), name)
         }
     }
 
-    @Deprecated("Use token with options")
-    override fun generateNewToken(): Token {
+    @Deprecated("Will be removed in V5. Use token with options")
+    override fun generateNewToken(userContext: UserContext): Token {
         return generateNewToken(
+            userContext = userContext,
             options = TokenOptions(
                 name = DEFAULT_NAME,
                 scope = TokenScope.USER,
@@ -47,20 +45,17 @@ class TokensServiceImpl(
         )
     }
 
-    override fun generateNewToken(options: TokenOptions): Token {
-        // Gets the current account
-        val account = securityService.currentAccount?.account
-            ?: throw TokenGenerationNoAccountException()
+    override fun generateNewToken(userContext: UserContext, options: TokenOptions): Token {
         // Checking if a token with the same name already exists
-        val existing = tokensRepository.getTokenForAccount(account, options.name)
+        val existing = tokensRepository.getTokenForAccount(userContext.id, options.name)
         if (existing != null) {
             throw TokenGenerationNameAlreadyExistsException(options.name)
         }
         // Generates a new token
-        return securityService.asAdmin { generateToken(account.id(), options) }
+        return securityService.asAdmin { generateToken(userContext.id, options) }
     }
 
-    @Deprecated("Use named token")
+    @Deprecated("Will be removed in V5. Use named token")
     override fun generateToken(accountId: Int, validity: Duration?, forceUnlimited: Boolean): Token {
         return generateToken(
             accountId,
@@ -111,7 +106,7 @@ class TokensServiceImpl(
         return tokenObject
     }
 
-    @Deprecated("Use named tokens")
+    @Deprecated("Will be removed in V5. Use named tokens")
     override fun revokeToken() {
         revokeToken(DEFAULT_NAME)
     }
@@ -125,10 +120,10 @@ class TokensServiceImpl(
         }
     }
 
-    @Deprecated("Use list of tokens")
+    @Deprecated("Will be removed in V5. Use list of tokens")
     override fun getToken(account: Account): Token? {
         securityService.checkGlobalFunction(AccountManagement::class.java)
-        return tokensRepository.getTokenForAccount(account, DEFAULT_NAME)
+        return tokensRepository.getTokenForAccount(account.id(), DEFAULT_NAME)
     }
 
     override fun getTokens(account: Account): List<Token> {
@@ -136,7 +131,7 @@ class TokensServiceImpl(
         return tokensRepository.getTokens(account)
     }
 
-    @Deprecated("Use list of tokens")
+    @Deprecated("Will be removed in V5. Use list of tokens")
     override fun getToken(accountId: Int): Token? {
         return getToken(accountService.getAccount(ID.of(accountId)))
     }
@@ -177,7 +172,7 @@ class TokensServiceImpl(
         return tokensRepository.revokeAll()
     }
 
-    @Deprecated("Use named tokens")
+    @Deprecated("Will be removed in V5. Use named tokens")
     override fun revokeToken(accountId: Int) {
         revokeToken(accountId, DEFAULT_NAME)
     }

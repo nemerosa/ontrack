@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.boot.support
 
+import net.nemerosa.ontrack.model.security.UserContextService
+import net.nemerosa.ontrack.model.security.currentSpringSecurityContextToUserContext
 import net.nemerosa.ontrack.model.structure.TokenOptions
 import net.nemerosa.ontrack.model.structure.TokenScope
 import net.nemerosa.ontrack.model.structure.TokensService
@@ -9,6 +11,7 @@ import java.net.URLEncoder
 @Component
 class NextUIRedirector(
     private val tokensService: TokensService,
+    private val userContextService: UserContextService
 ) {
 
     companion object {
@@ -36,6 +39,7 @@ class NextUIRedirector(
         }
         // Generates a token for the logged user
         val generatedToken = tokensService.generateNewToken(
+            userContextService.currentSpringSecurityContextToUserContext(),
             TokenOptions(
                 name = tokenCallback,
                 scope = TokenScope.NEXT_UI,

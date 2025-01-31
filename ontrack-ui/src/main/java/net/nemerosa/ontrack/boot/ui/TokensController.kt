@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.boot.ui
 
+import net.nemerosa.ontrack.model.security.UserContextService
+import net.nemerosa.ontrack.model.security.currentSpringSecurityContextToUserContext
 import net.nemerosa.ontrack.model.structure.Token
 import net.nemerosa.ontrack.model.structure.TokenOptions
 import net.nemerosa.ontrack.model.structure.TokensService
@@ -14,7 +16,8 @@ import java.util.concurrent.TimeUnit
 @RestController
 @RequestMapping("/rest/tokens")
 class TokensController(
-    private val tokensService: TokensService
+    private val tokensService: TokensService,
+    private val userContextService: UserContextService,
 ) {
 
     /**
@@ -25,6 +28,7 @@ class TokensController(
         return ResponseEntity.ok(
             TokenResponse(
                 tokensService.generateNewToken(
+                    userContext = userContextService.currentSpringSecurityContextToUserContext(),
                     options = TokenOptions(
                         name = name,
                     )
@@ -40,7 +44,9 @@ class TokensController(
     @Deprecated("Use named token. Will be removed in V5.")
     val currentToken: ResponseEntity<TokenResponse>
         get() =
-            tokensService.getCurrentToken(TokensService.DEFAULT_NAME).let { ResponseEntity.ok(TokenResponse(it)) }
+            tokensService.getCurrentToken(
+                TokensService.DEFAULT_NAME
+            ).let { ResponseEntity.ok(TokenResponse(it)) }
 
     /**
      * Generates a new token for the current user
@@ -51,6 +57,7 @@ class TokensController(
         return ResponseEntity.ok(
             TokenResponse(
                 tokensService.generateNewToken(
+                    userContext = userContextService.currentSpringSecurityContextToUserContext(),
                     options = TokenOptions(
                         name = TokensService.DEFAULT_NAME,
                     )

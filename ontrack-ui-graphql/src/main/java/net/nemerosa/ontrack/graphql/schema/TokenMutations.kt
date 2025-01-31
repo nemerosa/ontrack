@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
+import net.nemerosa.ontrack.model.security.UserContextService
+import net.nemerosa.ontrack.model.security.currentSpringSecurityContextToUserContext
 import net.nemerosa.ontrack.model.structure.Token
 import net.nemerosa.ontrack.model.structure.TokenOptions
 import net.nemerosa.ontrack.model.structure.TokensService
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class TokenMutations(
+    private val userContextService: UserContextService,
     private val tokensService: TokensService,
 ) : TypedMutationProvider() {
     override val mutations: List<Mutation> = listOf(
@@ -20,6 +23,7 @@ class TokenMutations(
             outputType = Token::class,
         ) { input ->
             tokensService.generateNewToken(
+                userContextService.currentSpringSecurityContextToUserContext(),
                 TokenOptions(
                     name = input.name,
                 )

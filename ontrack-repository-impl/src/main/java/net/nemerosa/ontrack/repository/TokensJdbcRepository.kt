@@ -49,10 +49,13 @@ class TokensJdbcRepository(dataSource: DataSource) : AbstractJdbcRepository(data
         )
     }
 
-    override fun getTokenForAccount(account: Account, name: String): Token? {
+    override fun getTokenForAccount(accountId: Int, name: String): Token? {
         return getFirstItem(
             "SELECT * FROM TOKENS WHERE ACCOUNT = :id AND NAME = :name",
-            params("id", account.id()).addValue("name", name)
+            mapOf(
+                "id" to accountId,
+                "name" to name,
+            )
         ) { rs, _ ->
             toToken(rs)
         }

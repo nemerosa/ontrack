@@ -656,7 +656,9 @@ class AdminQLIT : AbstractQLKTITSupport() {
     @Test
     fun `Account token filled in when generated`() {
         asUser {
-            tokensService.generateNewToken()
+            tokensService.generateNewToken(
+                userContextService.currentSpringSecurityContextToUserContext()
+            )
             val id = securityService.currentAccount!!.id()
             asAdmin {
                 val data = run("""{

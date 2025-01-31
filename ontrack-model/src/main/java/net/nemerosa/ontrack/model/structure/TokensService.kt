@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.model.structure
 
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.model.security.Account
+import net.nemerosa.ontrack.model.security.UserContext
 import java.time.Duration
 import java.time.LocalDateTime
 
@@ -14,14 +15,14 @@ interface TokensService {
         /**
          * Default token used for migration of unique tokens
          */
-        @Deprecated("Use named tokens. Will be removed in V5.")
+        @Deprecated("Will be removed in V5. Use named tokens. Will be removed in V5.")
         const val DEFAULT_NAME = "default"
     }
 
     /**
      * Gets the token of the current user
      */
-    @Deprecated("Use named tokens")
+    @Deprecated("Will be removed in V5. Use named tokens")
     val currentToken: Token?
 
     /**
@@ -35,18 +36,18 @@ interface TokensService {
     /**
      * Generates a new token for the current user
      */
-    @Deprecated("Use token with options")
-    fun generateNewToken(): Token
+    @Deprecated("Will be removed in V5. Use token with options")
+    fun generateNewToken(userContext: UserContext): Token
 
     /**
      * Generates a new token for the current user with the given options
      */
-    fun generateNewToken(options: TokenOptions): Token
+    fun generateNewToken(userContext: UserContext, options: TokenOptions): Token
 
     /**
      * Revokes the token of the current user
      */
-    @Deprecated("Use named tokens")
+    @Deprecated("Will be removed in V5. Use named tokens")
     fun revokeToken()
 
     /**
@@ -57,7 +58,7 @@ interface TokensService {
     /**
      * Gets the token of an account
      */
-    @Deprecated("Use list of tokens")
+    @Deprecated("Will be removed in V5. Use list of tokens")
     fun getToken(account: Account): Token?
 
     /**
@@ -68,7 +69,7 @@ interface TokensService {
     /**
      * Gets the token of an account using its ID
      */
-    @Deprecated("Use list of tokens")
+    @Deprecated("Will be removed in V5. Use list of tokens")
     fun getToken(accountId: Int): Token?
 
     /**
@@ -82,7 +83,7 @@ interface TokensService {
      * @param accountId ID of teh account to generate an account for
      * @param forceUnlimited If [validity] is `null`, forces this value
      */
-    @Deprecated("Use named token")
+    @Deprecated("Will be removed in V5. Use named token")
     fun generateToken(accountId: Int, validity: Duration?, forceUnlimited: Boolean): Token
 
     /**
@@ -110,7 +111,7 @@ interface TokensService {
     /**
      * Revokes a token for a given account
      */
-    @Deprecated("Use named tokens")
+    @Deprecated("Will be removed in V5. Use named tokens")
     fun revokeToken(accountId: Int)
 
     /**
