@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.structure.Signature
 import java.util.*
 import kotlin.reflect.KClass
 
+@Deprecated("#1395 Will be replaced by other services starting from 4.12")
 interface SecurityService {
 
     /**
