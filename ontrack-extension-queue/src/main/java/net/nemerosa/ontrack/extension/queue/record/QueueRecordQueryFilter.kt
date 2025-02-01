@@ -13,6 +13,8 @@ data class QueueRecordQueryFilter(
         val routingKey: String? = null,
         @APIDescription("Filtering on the queue name")
         val queueName: String? = null,
+        @APIDescription("Filtering on the username")
+        val username: String? = null,
         @APIDescription("Filtering using some free text in the payload")
         val text: String? = null,
 )

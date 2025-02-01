@@ -2448,6 +2448,12 @@ type GlobalRole {
     name: String!
 }
 
+"Output type for the grantGlobalRoleToAccount mutation."
+type GrantGlobalRoleToAccountPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
 "Home page settings"
 type HomePageSettingsType {
     "Maximum of branches to display per favorite project"
@@ -3955,6 +3961,11 @@ type Mutation {
         "Input for the mutation"
         input: GitHubIngestionValidateDataByRunIdInput
     ): GitHubIngestionValidateDataByRunIdPayload
+    "Grants a global role to an account"
+    grantGlobalRoleToAccount(
+        "Input for the mutation"
+        input: GrantGlobalRoleToAccountInput
+    ): GrantGlobalRoleToAccountPayload
     "Launches a job"
     launchJob(id: Int!): JobActionResult!
     "Launches an existing workflow"
@@ -6044,6 +6055,8 @@ type QueueDispatchResult {
 
 "Payload for a message sent on a queue for processing"
 type QueuePayload {
+    "Identity of the user"
+    accountName: String!
     "Message body for the processor"
     body: JSON!
     "Unique ID of the message"
@@ -6094,6 +6107,8 @@ type QueueRecording {
     startTime: LocalDateTime!
     "State of the queuing"
     state: QueueRecordState!
+    "Username attached to the queue message (admin for administrative account, user for anything else"
+    username: String
 }
 
 type QueueRecordingPaginated {
@@ -9862,6 +9877,14 @@ input GitHubIngestionValidationDataInput {
     type: String!
 }
 
+"Input type for the grantGlobalRoleToAccount mutation."
+input GrantGlobalRoleToAccountInput {
+    "accountId field"
+    accountId: Int!
+    "globalRole field"
+    globalRole: String!
+}
+
 "Recording filter input for hook messages"
 input HookRecordingFilterInput {
     "hook field"
@@ -10069,6 +10092,8 @@ input QueueRecordingFilterInput {
     state: QueueRecordState
     "Filtering using some free text in the payload"
     text: String
+    "Filtering on the username"
+    username: String
 }
 
 "Input type for the renameSubscription mutation."

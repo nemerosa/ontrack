@@ -60,6 +60,11 @@ class QueueRecordingsExtension(
             queryVariables["queueName"] = filter.queueName
         }
 
+        if (!filter.username.isNullOrBlank()) {
+            queries += "data::jsonb->'data'->>'username' = :username"
+            queryVariables["username"] = filter.username
+        }
+
         if (!filter.text.isNullOrBlank()) {
             queries += "(data::jsonb->'data'->'queuePayload'->>'body' LIKE :text) OR (data::jsonb->'data'->>'actualPayload' LIKE :text)"
             queryVariables["text"] = "%${filter.text}%"

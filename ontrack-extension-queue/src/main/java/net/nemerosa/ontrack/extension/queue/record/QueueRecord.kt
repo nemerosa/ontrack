@@ -34,6 +34,8 @@ data class QueueRecord(
     val history: List<QueueRecordHistory>,
     @APIDescription("Source of the message")
     val source: QueueSource?,
+    @APIDescription("Username attached to the queue message (admin for administrative account, user for anything else")
+    val username: String?,
 ) : Recording {
 
     @Suppress("unused")
@@ -62,6 +64,7 @@ data class QueueRecord(
             )
         ) + history,
         source = source,
+        username = username,
     )
 
     fun withRoutingKey(routingKey: String) = QueueRecord(
@@ -75,6 +78,7 @@ data class QueueRecord(
         exception = exception,
         history = history,
         source = source,
+        username = username,
     )
 
     fun withQueue(queueName: String?) = QueueRecord(
@@ -88,6 +92,7 @@ data class QueueRecord(
         exception = exception,
         history = history,
         source = source,
+        username = username,
     )
 
     fun withActualPayload(actualPayload: JsonNode) = QueueRecord(
@@ -101,6 +106,7 @@ data class QueueRecord(
         exception = exception,
         history = history,
         source = source,
+        username = username,
     )
 
     fun withException(exception: String) = QueueRecord(
@@ -114,6 +120,7 @@ data class QueueRecord(
         exception = exception,
         history = history,
         source = source,
+        username = username,
     )
 
     fun withEndTime(endTime: LocalDateTime) = QueueRecord(
@@ -127,6 +134,7 @@ data class QueueRecord(
         exception = exception,
         history = history,
         source = source,
+        username = username,
     )
 
     fun withStartTime(startTime: LocalDateTime) = QueueRecord(
@@ -140,10 +148,11 @@ data class QueueRecord(
         exception = exception,
         history = history,
         source = source,
+        username = username,
     )
 
     companion object {
-        fun create(queuePayload: QueuePayload, source: QueueSource?): QueueRecord {
+        fun create(queuePayload: QueuePayload, source: QueueSource?, username: String?): QueueRecord {
             val time = Time.now()
             return QueueRecord(
                 state = QueueRecordState.STARTED,
@@ -161,6 +170,7 @@ data class QueueRecord(
                     )
                 ),
                 source = source,
+                username = username,
             )
         }
     }

@@ -14,14 +14,20 @@ export default function QueueRecordDetails({record}) {
                     {
                         key: 'routing',
                         label: "Routing",
-                        span: 6,
+                        span: 4,
                         children: <Typography.Text code>{record.routingKey}</Typography.Text>
                     },
                     {
                         key: 'queue',
                         label: "Queue",
-                        span: 6,
+                        span: 4,
                         children: <Typography.Text code>{record.queueName}</Typography.Text>
+                    },
+                    {
+                        key: 'username',
+                        label: "Username",
+                        span: 4,
+                        children: <Typography.Text code>{record.username}</Typography.Text>
                     },
                     {
                         key: 'queuePayload',

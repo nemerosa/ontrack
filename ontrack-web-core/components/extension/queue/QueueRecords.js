@@ -59,6 +59,13 @@ export default function QueueRecords() {
                     >
                         <Input style={{width: "24em"}}/>
                     </Form.Item>,
+                    <Form.Item
+                        key="username"
+                        name="username"
+                        label="Username"
+                    >
+                        <Input style={{width: "8em"}}/>
+                    </Form.Item>,
                 ]}
                 filterExtraButtons={[
                     <QueuePurgeButton key="purge" onDone={reload}/>,
@@ -75,6 +82,7 @@ export default function QueueRecords() {
                             $text: String,
                             $routingKey: String,
                             $queueName: String,
+                            $username: String,
                         ) {
                             queueRecordings(
                                 offset: $offset,
@@ -86,6 +94,7 @@ export default function QueueRecords() {
                                     text: $text,
                                     routingKey: $routingKey,
                                     queueName: $queueName,
+                                    username: $username,
                                 },
                             ) {
                                 pageInfo {
@@ -118,6 +127,7 @@ export default function QueueRecords() {
                                         id
                                         data
                                     }
+                                    username
                                 }
                             }
                         }

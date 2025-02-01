@@ -38,7 +38,8 @@ object QueueTestFixtures {
                     time = time,
                 )
             ),
-            source = TestQueueSourceExtension.instance.createQueueSource("")
+            source = TestQueueSourceExtension.instance.createQueueSource(""),
+            username = "admin",
         )
     }
 

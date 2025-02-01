@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.queue.QueuePayload
 import net.nemerosa.ontrack.extension.queue.source.QueueSource
 import net.nemerosa.ontrack.extension.recordings.RecordingsService
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.model.security.SecurityService
 import org.apache.commons.lang3.exception.ExceptionUtils
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -12,13 +13,22 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional
 class QueueRecordServiceImpl(
-        private val queueRecordingsExtension: QueueRecordingsExtension,
-        private val recordingsService: RecordingsService,
+    private val queueRecordingsExtension: QueueRecordingsExtension,
+    private val recordingsService: RecordingsService,
+    private val securityService: SecurityService,
 ) : QueueRecordService {
 
     override fun start(queuePayload: QueuePayload, source: QueueSource?) {
-        val record = QueueRecord.create(queuePayload, source)
+        val record = QueueRecord.create(
+            queuePayload = queuePayload,
+            source = source,
+            username = obfuscateUsername(),
+        )
         recordingsService.record(queueRecordingsExtension, record)
+    }
+
+    private fun obfuscateUsername() = securityService.currentAccount?.username?.let {
+        if (it == "admin") it else "user"
     }
 
     override fun setRouting(queuePayload: QueuePayload, routingKey: String) {
@@ -60,15 +70,15 @@ class QueueRecordServiceImpl(
     override fun completed(queuePayload: QueuePayload) {
         recordingsService.updateRecord(queueRecordingsExtension, queuePayload.id) {
             it.withState(QueueRecordState.COMPLETED)
-                    .withEndTime(Time.now())
+                .withEndTime(Time.now())
         }
     }
 
     override fun errored(queuePayload: QueuePayload, exception: Exception) {
         recordingsService.updateRecord(queueRecordingsExtension, queuePayload.id) {
             it.withState(QueueRecordState.ERRORED)
-                    .withEndTime(Time.now())
-                    .withException(reducedStackTrace(exception))
+                .withEndTime(Time.now())
+                .withException(reducedStackTrace(exception))
         }
     }
 
@@ -76,7 +86,7 @@ class QueueRecordServiceImpl(
         private const val MAX_STACK_HEIGHT = 20
 
         fun reducedStackTrace(error: Throwable) =
-                ExceptionUtils.getStackFrames(error).take(MAX_STACK_HEIGHT).joinToString("\n")
+            ExceptionUtils.getStackFrames(error).take(MAX_STACK_HEIGHT).joinToString("\n")
     }
 
 }
