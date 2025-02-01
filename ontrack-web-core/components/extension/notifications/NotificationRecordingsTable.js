@@ -1,111 +1,83 @@
-import {useEffect, useState} from "react";
-import {Table} from "antd";
-import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import {Form, Tag} from "antd";
 import {gql} from "graphql-request";
 import NotificationResultType from "@components/extension/notifications/NotificationResultType";
 import NotificationRecordDetails from "@components/extension/notifications/NotificationRecordDetails";
-import TablePaginationFooter from "@components/common/table/TablePaginationFooter";
-import TableColumnFilterDropdown from "@components/common/table/TableColumnFilterDropdown";
-import SelectNotificationResultType from "@components/extension/notifications/SelectNotificationResultType";
-import SelectNotificationChannel from "@components/extension/notifications/SelectNotificationChannel";
 import NotificationSourceData from "@components/extension/notifications/NotificationSourceData";
 import {gqlNotificationRecordContent} from "@components/extension/notifications/NotificationRecordsGraphQLFragments";
 import TimestampText from "@components/common/TimestampText";
 import Link from "next/link";
 import EventEntity from "@components/core/model/EventEntity";
 import NotificationRecordResultLink from "@components/extension/notifications/NotificationRecordResultLink";
-
-const {Column} = Table
+import StandardTable from "@components/common/table/StandardTable";
+import SelectNotificationChannel from "@components/extension/notifications/SelectNotificationChannel";
+import SelectNotificationResultType from "@components/extension/notifications/SelectNotificationResultType";
 
 export default function NotificationRecordingsTable({entity, sourceId}) {
-
-    const client = useGraphQLClient()
-
-    const [loading, setLoading] = useState(true)
-    const [records, setRecords] = useState([])
-
-    const [pagination, setPagination] = useState({
-        offset: 0,
-        size: 10,
-    })
-
-    const [pageInfo, setPageInfo] = useState({})
-
-    const [filter, setFilter] = useState({
-        channel: null,
-        resultType: null,
-    })
-
-    useEffect(() => {
-        if (client) {
-            setLoading(true)
-            client.request(
-                gql`
-                    query NotificationRecords(
-                        $offset: Int!,
-                        $size: Int!,
-                        $channel: String,
-                        $resultType: NotificationResultType,
-                        $eventEntityType: ProjectEntityType,
-                        $eventEntityId: Int,
-                        $sourceId: String,
-                    ) {
-                        notificationRecords(
-                            offset: $offset,
-                            size: $size,
-                            channel: $channel,
-                            resultType: $resultType,
-                            eventEntityType: $eventEntityType,
-                            eventEntityId: $eventEntityId,
-                            sourceId: $sourceId,
-                        ) {
-                            pageInfo {
-                                nextPage {
-                                    offset
-                                    size
+    return (
+        <>
+            <StandardTable
+                filterForm={[
+                    <Form.Item
+                        key="channel"
+                        name="channel"
+                        label="Channel"
+                    >
+                        <SelectNotificationChannel
+                            style={{
+                                width: '15em',
+                            }}
+                            allowClear={true}
+                        />
+                    </Form.Item>,
+                    <Form.Item
+                        key="resultType"
+                        name="resultType"
+                        label="Result"
+                    >
+                        <SelectNotificationResultType/>
+                    </Form.Item>,
+                ]}
+                query={
+                    gql`
+                            query NotificationRecords(
+                                $offset: Int!,
+                                $size: Int!,
+                                $channel: String,
+                                $resultType: NotificationResultType,
+                                $eventEntityType: ProjectEntityType,
+                                $eventEntityId: Int,
+                                $sourceId: String,
+                            ) {
+                                notificationRecords(
+                                    offset: $offset,
+                                    size: $size,
+                                    channel: $channel,
+                                    resultType: $resultType,
+                                    eventEntityType: $eventEntityType,
+                                    eventEntityId: $eventEntityId,
+                                    sourceId: $sourceId,
+                                ) {
+                                    pageInfo {
+                                        nextPage {
+                                            offset
+                                            size
+                                        }
+                                    }
+                                    pageItems {
+                                        ...NotificationRecordContent
+                                    }
                                 }
                             }
-                            pageItems {
-                                ...NotificationRecordContent
-                            }
-                        }
-                    }
-                    ${gqlNotificationRecordContent}
-                `,
-                {
-                    offset: pagination.offset,
-                    size: pagination.size,
+                            ${gqlNotificationRecordContent}
+                    `
+                }
+                variables={{
                     eventEntityType: entity?.type,
                     eventEntityId: entity?.id,
                     sourceId: sourceId,
-                    ...filter,
-                }
-            ).then(data => {
-                setPageInfo(data.notificationRecords.pageInfo)
-                if (pagination.offset > 0) {
-                    setRecords((entries) => [...entries, ...data.notificationRecords.pageItems])
-                } else {
-                    setRecords(data.notificationRecords.pageItems)
-                }
-            }).finally(() => {
-                setLoading(false)
-            })
-        }
-    }, [client, pagination, filter, sourceId, entity]);
-
-    const onTableChange = (_, filters) => {
-        setFilter({
-            channel: filters.channel && filters.channel[0],
-            resultType: filters.result && filters.result[0],
-        })
-    }
-
-    return (
-        <>
-            <Table
-                loading={loading}
-                dataSource={records}
-                pagination={false}
+                }}
+                queryNode="notificationRecords"
+                filter={{}}
                 expandable={{
                     expandedRowRender: (record) => (
                         <>
@@ -113,104 +85,53 @@ export default function NotificationRecordingsTable({entity, sourceId}) {
                         </>
                     )
                 }}
-                footer={() =>
-                    <TablePaginationFooter
-                        pageInfo={pageInfo}
-                        setPagination={setPagination}
-                    />
-                }
-                onChange={onTableChange}
-            >
-
-                <Column
-                    key="timestamp"
-                    title="Timestamp"
-                    render={(_, record) => <Link href={`/extension/notifications/recordings/${record.id}`}>
-                        <TimestampText
-                            value={record.timestamp}
-                            format="YYYY MMM DD, HH:mm:ss"
-                        />
-                    </Link>
-                    }
-                />
-
-                <Column
-                    key="channel"
-                    title="Channel"
-                    render={(_, record) => record.channel}
-                    filterDropdown={({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
-                        <TableColumnFilterDropdown
-                            confirm={confirm}
-                            clearFilters={clearFilters}
-                        >
-                            <SelectNotificationChannel
-                                value={selectedKeys}
-                                onChange={value => setSelectedKeys([value])}
-                                style={{
-                                    width: '15em',
-                                }}
-                                allowClear={true}
+                rowKey={record => record.key}
+                columns={[
+                    {
+                        key: "timestamp",
+                        title: "Timestamp",
+                        render: (_, record) => <Link href={`/extension/notifications/recordings/${record.id}`}>
+                            <TimestampText
+                                value={record.timestamp}
+                                format="YYYY MMM DD, HH:mm:ss"
                             />
-                        </TableColumnFilterDropdown>
-                    }
-                    filteredValue={filter.channel}
-                />
-
-                <Column
-                    key="link"
-                    title="Link"
-                    render={(_, record) => (
-                        <>
-                            <NotificationRecordResultLink channel={record.channel} result={record.result}/>
-                        </>
-                    )}
-                />
-
-                <Column
-                    key="source"
-                    title="Source"
-                    render={(_, record) => (
-                        <>
-                            <NotificationSourceData source={record.source}/>
-                        </>
-                    )}
-                />
-
-                <Column
-                    key="result"
-                    title="Result"
-                    render={(_, record) => <NotificationResultType type={record.result.type}/>}
-                    filterDropdown={({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
-                        <TableColumnFilterDropdown
-                            confirm={confirm}
-                            clearFilters={clearFilters}
-                        >
-                            <SelectNotificationResultType
-                                value={selectedKeys}
-                                onChange={value => setSelectedKeys([value])}
-                            />
-                        </TableColumnFilterDropdown>
-                    }
-                    filteredValue={filter.resultType}
-                />
-
-                <Column
-                    key="event"
-                    title="Event"
-                    render={(_, record) => record.event.eventType.id}
-                />
-
-                <Column
-                    key="entity"
-                    title="Entity"
-                    render={(_, record) => (
-                        <>
-                            <EventEntity event={record.event}/>
-                        </>
-                    )}
-                />
-
-            </Table>
+                        </Link>
+                    },
+                    {
+                        key: "channel",
+                        title: "Channel",
+                        render: (_, record) => <Tag>{record.channel}</Tag>,
+                    },
+                    {
+                        key: "link",
+                        title: "Link",
+                        render: (_, record) => <NotificationRecordResultLink
+                            channel={record.channel}
+                            result={record.result}
+                        />,
+                    },
+                    {
+                        key: "source",
+                        title: "Source",
+                        render: (_, record) => <NotificationSourceData source={record.source}/>,
+                    },
+                    {
+                        key: "result",
+                        title: "Result",
+                        render: (_, record) => <NotificationResultType type={record.result.type}/>,
+                    },
+                    {
+                        key: "event",
+                        title: "Event",
+                        render: (_, record) => <Tag>{record.event.eventType.id}</Tag>,
+                    },
+                    {
+                        key: "entity",
+                        title: "Entity",
+                        render: (_, record) => <EventEntity event={record.event}/>,
+                    },
+                ]}
+            />
         </>
     )
 }

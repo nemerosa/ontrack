@@ -4,6 +4,24 @@ import {useEffect, useState} from "react";
 import TablePaginationFooter from "@components/common/table/TablePaginationFooter";
 import FilterForm from "@components/common/table/FilterForm";
 
+/**
+ * Table whose content is fetched using a GraphQL query.
+ *
+ * @param id HTML ID and `data-testid` to set on the table
+ * @param query GraphQL query to run to get the data
+ * @param queryNode Name of the node which contains a _paginated list_ of item under the `data` GraphQL root node
+ * @param variables Variables to pass to the GraphQL query
+ * @param reloadCount Counter state to use to refresh the table data
+ * @param columns List of Antd Table Column definitions
+ * @param expandable Expandable content of rows (see https://ant.design/components/table)
+ * @param size Default number of items per page
+ * @param filter Filter data to pass to the query
+ * @param onFilterChange Function to call whenever the filter changes
+ * @param footerExtra Extra information to display in the footer
+ * @param rowKey Computing each row key (needed for expandable content)
+ * @param filterForm List of Antd Form items to put in a form on top of the table (not displayed if empty)
+ * @param filterExtraButtons List of extra buttons to put in the form on top of the table
+ */
 export default function StandardTable({
                                           id,
                                           query,

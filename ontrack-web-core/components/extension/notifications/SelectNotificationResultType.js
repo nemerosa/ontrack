@@ -3,7 +3,7 @@ import NotificationResultType, {
     notificationResultTypes
 } from "@components/extension/notifications/NotificationResultType";
 
-export default function SelectNotificationResultType({value, onChange}) {
+export default function SelectNotificationResultType({value, onChange, allowClear = true}) {
 
     const options = notificationResultTypes.map(it => ({
         value: it.key,
@@ -19,6 +19,7 @@ export default function SelectNotificationResultType({value, onChange}) {
                 style={{
                     width: '15em',
                 }}
+                allowClear={allowClear}
             />
         </>
     )
