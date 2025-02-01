@@ -1,19 +1,23 @@
 package net.nemerosa.ontrack.service.security
 
+import io.mockk.mockk
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.test.assertPresent
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import kotlin.test.Test
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class RolesServiceImplTest {
 
     private lateinit var rolesService: RolesServiceImpl
 
-    @Before
+    @BeforeEach
     fun init() {
-        rolesService = RolesServiceImpl(emptyList())
+        rolesService = RolesServiceImpl(
+            roleContributors = emptyList(),
+            cachedSettingsService = mockk(),
+        )
         rolesService.start()
     }
 

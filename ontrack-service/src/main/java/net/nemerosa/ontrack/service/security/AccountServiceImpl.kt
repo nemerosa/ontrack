@@ -38,10 +38,11 @@ class AccountServiceImpl(
         val account = accountRepository.getAccount(ID.of(raw.accountId))
         // Direct account authorisations
         val authorisations = Authorisations()
-            .withProjectFunctions(securityService.autoProjectFunctions)
-            .withGlobalFunctions(securityService.autoGlobalFunctions)
-            .withGlobalRole(roleRepository.findGlobalRoleByAccount(raw.accountId).getOrNull()
-                ?.let { id: String -> rolesService.getGlobalRole(id).getOrNull() })
+            .withProjectFunctions(rolesService.autoProjectFunctions)
+            .withGlobalFunctions(rolesService.autoGlobalFunctions)
+            .withGlobalRole(
+                roleRepository.findGlobalRoleByAccount(raw.accountId).getOrNull()
+                    ?.let { id: String -> rolesService.getGlobalRole(id).getOrNull() })
             .withProjectRoles(roleRepository.findProjectRoleAssociationsByAccount(raw.accountId) { project: Int, roleId: String ->
                 rolesService.getProjectRoleAssociation(
                     project,
@@ -197,10 +198,12 @@ class AccountServiceImpl(
                 securityService.checkGlobalFunction(AccountManagement::class.java)
                 roleRepository.saveGlobalRoleForAccount(id, input.role)
             }
+
             PermissionTargetType.GROUP -> {
                 securityService.checkGlobalFunction(AccountGroupManagement::class.java)
                 roleRepository.saveGlobalRoleForGroup(id, input.role)
             }
+
             else -> Ack.NOK
         }
     }
@@ -225,10 +228,12 @@ class AccountServiceImpl(
                 securityService.checkGlobalFunction(AccountManagement::class.java)
                 roleRepository.deleteGlobalRoleForAccount(id)
             }
+
             PermissionTargetType.GROUP -> {
                 securityService.checkGlobalFunction(AccountGroupManagement::class.java)
                 roleRepository.deleteGlobalRoleForGroup(id)
             }
+
             else -> Ack.NOK
         }
     }

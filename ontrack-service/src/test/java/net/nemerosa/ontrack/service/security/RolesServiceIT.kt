@@ -1,23 +1,24 @@
 package net.nemerosa.ontrack.service.security
 
-import net.nemerosa.ontrack.it.AbstractServiceTestJUnit4Support
+import io.mockk.mockk
+import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.model.security.*
-import org.junit.Assert.*
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import java.lang.IllegalStateException
+import kotlin.test.*
 
 const val newGlobalRole = "NEW_GLOBAL"
 const val extGlobalRole = "EXT_AUTOMATER"
 const val newProjectRole = "NEW_PROJECT"
 const val extProjectRole = "EXT_PARTICIPANT"
 
-class RolesServiceIT : AbstractServiceTestJUnit4Support() {
+class RolesServiceIT : AbstractServiceTestSupport() {
 
     interface TestGlobalFunction : GlobalFunction
     interface TestProject1Function : ProjectFunction
     interface TestProject2Function : ProjectFunction
+
     @CoreFunction
     interface TestProjectCoreFunction : ProjectFunction
 
@@ -27,45 +28,45 @@ class RolesServiceIT : AbstractServiceTestJUnit4Support() {
         fun roleContributor(): RoleContributor {
             return object : RoleContributor {
                 override fun getGlobalRoles(): List<RoleDefinition> = listOf(
-                        RoleDefinition(newGlobalRole, "New global role", "Test for a new global role"),
-                        RoleDefinition(
-                                extGlobalRole,
-                                "Extended automater",
-                                "Automater with extra functions",
-                                Roles.GLOBAL_AUTOMATION
-                        )
+                    RoleDefinition(newGlobalRole, "New global role", "Test for a new global role"),
+                    RoleDefinition(
+                        extGlobalRole,
+                        "Extended automater",
+                        "Automater with extra functions",
+                        Roles.GLOBAL_AUTOMATION
+                    )
                 )
 
                 override fun getProjectRoles(): List<RoleDefinition> = listOf(
-                        RoleDefinition(newProjectRole, "New project", "Test for a new project role"),
-                        RoleDefinition(
-                                extProjectRole,
-                                "Extended participant",
-                                "Participant with extra functions",
-                                Roles.PROJECT_PARTICIPANT
-                        )
+                    RoleDefinition(newProjectRole, "New project", "Test for a new project role"),
+                    RoleDefinition(
+                        extProjectRole,
+                        "Extended participant",
+                        "Participant with extra functions",
+                        Roles.PROJECT_PARTICIPANT
+                    )
                 )
 
                 override fun getGlobalFunctionContributionsForGlobalRoles(): Map<String, List<Class<out GlobalFunction>>> =
-                        mapOf(
-                                Roles.GLOBAL_CONTROLLER to listOf(TestGlobalFunction::class.java),
-                                newGlobalRole to listOf(ProjectCreation::class.java, TestGlobalFunction::class.java),
-                                extGlobalRole to listOf(TestGlobalFunction::class.java)
-                        )
+                    mapOf(
+                        Roles.GLOBAL_CONTROLLER to listOf(TestGlobalFunction::class.java),
+                        newGlobalRole to listOf(ProjectCreation::class.java, TestGlobalFunction::class.java),
+                        extGlobalRole to listOf(TestGlobalFunction::class.java)
+                    )
 
                 override fun getProjectFunctionContributionsForGlobalRoles(): Map<String, List<Class<out ProjectFunction>>> =
-                        mapOf(
-                                Roles.GLOBAL_CREATOR to listOf(TestProject1Function::class.java),
-                                newGlobalRole to listOf(TestProject2Function::class.java),
-                                extGlobalRole to listOf(TestProject1Function::class.java)
-                        )
+                    mapOf(
+                        Roles.GLOBAL_CREATOR to listOf(TestProject1Function::class.java),
+                        newGlobalRole to listOf(TestProject2Function::class.java),
+                        extGlobalRole to listOf(TestProject1Function::class.java)
+                    )
 
                 override fun getProjectFunctionContributionsForProjectRoles(): Map<String, List<Class<out ProjectFunction>>> =
-                        mapOf(
-                                Roles.PROJECT_OWNER to listOf(TestProject2Function::class.java),
-                                newProjectRole to listOf(TestProject2Function::class.java),
-                                extProjectRole to listOf(TestProject1Function::class.java)
-                        )
+                    mapOf(
+                        Roles.PROJECT_OWNER to listOf(TestProject2Function::class.java),
+                        newProjectRole to listOf(TestProject2Function::class.java),
+                        extProjectRole to listOf(TestProject1Function::class.java)
+                    )
             }
         }
     }
@@ -87,12 +88,15 @@ class RolesServiceIT : AbstractServiceTestJUnit4Support() {
 
     @Test
     fun only_non_core_functions_are_allowed() {
-        val service = RolesServiceImpl(listOf(object : RoleContributor {
-            override fun getProjectFunctionContributionsForProjectRoles(): Map<String, List<Class<out ProjectFunction>>> =
+        val service = RolesServiceImpl(
+            roleContributors = listOf(object : RoleContributor {
+                override fun getProjectFunctionContributionsForProjectRoles(): Map<String, List<Class<out ProjectFunction>>> =
                     mapOf(
-                            Roles.PROJECT_OWNER to listOf(TestProjectCoreFunction::class.java)
+                        Roles.PROJECT_OWNER to listOf(TestProjectCoreFunction::class.java)
                     )
-        }))
+            }),
+            cachedSettingsService = mockk(),
+        )
         try {
             service.start()
             fail("It should not have been possible to add a core function to a role.")
@@ -103,12 +107,15 @@ class RolesServiceIT : AbstractServiceTestJUnit4Support() {
 
     @Test
     fun trying_to_add_an_existing_core_function() {
-        val service = RolesServiceImpl(listOf(object : RoleContributor {
-            override fun getProjectFunctionContributionsForProjectRoles(): Map<String, List<Class<out ProjectFunction>>> =
+        val service = RolesServiceImpl(
+            roleContributors = listOf(object : RoleContributor {
+                override fun getProjectFunctionContributionsForProjectRoles(): Map<String, List<Class<out ProjectFunction>>> =
                     mapOf(
-                            Roles.PROJECT_PARTICIPANT to listOf(ProjectConfig::class.java)
+                        Roles.PROJECT_PARTICIPANT to listOf(ProjectConfig::class.java)
                     )
-        }))
+            }),
+            cachedSettingsService = mockk(),
+        )
         try {
             service.start()
             fail("It should not have been possible to add an existing core function to a role.")
@@ -119,10 +126,13 @@ class RolesServiceIT : AbstractServiceTestJUnit4Support() {
 
     @Test
     fun trying_to_override_a_global_role() {
-        val service = RolesServiceImpl(listOf(object : RoleContributor {
-            override fun getGlobalRoles(): List<RoleDefinition> =
+        val service = RolesServiceImpl(
+            roleContributors = listOf(object : RoleContributor {
+                override fun getGlobalRoles(): List<RoleDefinition> =
                     listOf(RoleDefinition(Roles.GLOBAL_CREATOR, "Creator", "Overridden creator role"))
-        }))
+            }),
+            cachedSettingsService = mockk(),
+        )
         try {
             service.start()
             fail("It should not have been possible to override an existing global role.")
@@ -133,10 +143,13 @@ class RolesServiceIT : AbstractServiceTestJUnit4Support() {
 
     @Test
     fun trying_to_override_a_project_role() {
-        val service = RolesServiceImpl(listOf(object : RoleContributor {
-            override fun getProjectRoles(): List<RoleDefinition> =
+        val service = RolesServiceImpl(
+            roleContributors = listOf(object : RoleContributor {
+                override fun getProjectRoles(): List<RoleDefinition> =
                     listOf(RoleDefinition(Roles.PROJECT_OWNER, "Owner", "Overridden owner role"))
-        }))
+            }),
+            cachedSettingsService = mockk(),
+        )
         try {
             service.start()
             fail("It should not have been possible to override an existing project role.")
@@ -236,24 +249,24 @@ class RolesServiceIT : AbstractServiceTestJUnit4Support() {
             assertFalse(securityService.isProjectFunctionGranted(project, TestProject2Function::class.java))
             // Inherited functions
             listOf(
-                    ProjectCreation::class.java,
-                    AccountGroupManagement::class.java
+                ProjectCreation::class.java,
+                AccountGroupManagement::class.java
             ).forEach { fn ->
                 assertTrue(securityService.isGlobalFunctionGranted(fn))
             }
             listOf(
-                    ProjectConfig::class.java,
-                    ProjectAuthorisationMgt::class.java,
-                    BranchCreate::class.java,
-                    PromotionLevelCreate::class.java,
-                    PromotionLevelEdit::class.java,
-                    ValidationStampCreate::class.java,
-                    ValidationStampEdit::class.java,
-                    ProjectView::class.java,
-                    BuildCreate::class.java,
-                    BuildConfig::class.java,
-                    PromotionRunCreate::class.java,
-                    ValidationRunCreate::class.java
+                ProjectConfig::class.java,
+                ProjectAuthorisationMgt::class.java,
+                BranchCreate::class.java,
+                PromotionLevelCreate::class.java,
+                PromotionLevelEdit::class.java,
+                ValidationStampCreate::class.java,
+                ValidationStampEdit::class.java,
+                ProjectView::class.java,
+                BuildCreate::class.java,
+                BuildConfig::class.java,
+                PromotionRunCreate::class.java,
+                ValidationRunCreate::class.java
             ).forEach { fn ->
                 assertTrue(securityService.isProjectFunctionGranted(project, fn))
             }
@@ -270,8 +283,8 @@ class RolesServiceIT : AbstractServiceTestJUnit4Support() {
             assertFalse(securityService.isProjectFunctionGranted(project, TestProject2Function::class.java))
             // Inherited functions
             listOf(
-                    ProjectView::class.java,
-                    ValidationRunStatusChange::class.java
+                ProjectView::class.java,
+                ValidationRunStatusChange::class.java
             ).forEach { fn ->
                 assertTrue(securityService.isProjectFunctionGranted(project, fn))
             }

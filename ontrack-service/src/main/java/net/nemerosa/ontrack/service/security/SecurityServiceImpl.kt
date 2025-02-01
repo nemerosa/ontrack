@@ -1,26 +1,20 @@
 package net.nemerosa.ontrack.service.security
 
-import net.nemerosa.ontrack.model.dashboards.DashboardEdition
-import net.nemerosa.ontrack.model.dashboards.DashboardSharing
-import net.nemerosa.ontrack.model.security.*
-import net.nemerosa.ontrack.model.settings.CachedSettingsService
-import net.nemerosa.ontrack.model.settings.SecuritySettings
+import net.nemerosa.ontrack.model.security.GlobalFunction
+import net.nemerosa.ontrack.model.security.OntrackAuthenticatedUser
+import net.nemerosa.ontrack.model.security.ProjectFunction
+import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Signature
 import net.nemerosa.ontrack.model.structure.Signature.Companion.anonymous
 import net.nemerosa.ontrack.model.structure.Signature.Companion.of
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.context.SecurityContextImpl
 import org.springframework.stereotype.Component
-import kotlin.reflect.KClass
 
 @Component
 class SecurityServiceImpl : SecurityService {
-
-    @Autowired
-    private lateinit var cachedSettingsService: CachedSettingsService
 
     override fun checkAuthenticated() {
         if (!isLogged) {
@@ -53,37 +47,6 @@ class SecurityServiceImpl : SecurityService {
         // Checks
         return user != null && user.isEnabled && user.isGranted(projectId, fn)
     }
-
-    override val autoProjectFunctions: Set<KClass<out ProjectFunction>>
-        get() {
-            val settings = cachedSettingsService.getCachedSettings(SecuritySettings::class.java)
-            return if (settings.isGrantProjectViewToAll) {
-                if (settings.isGrantProjectParticipationToAll) {
-                    setOf(
-                        ProjectView::class,
-                        ValidationRunStatusChange::class,
-                        ValidationRunStatusCommentEditOwn::class
-                    )
-                } else {
-                    setOf(ProjectView::class)
-                }
-            } else {
-                emptySet()
-            }
-        }
-
-    override val autoGlobalFunctions: Set<KClass<out GlobalFunction>>
-        get() {
-            val settings = cachedSettingsService.getCachedSettings(SecuritySettings::class.java)
-            val functions = mutableSetOf<KClass<out GlobalFunction>>()
-            if (settings.grantDashboardEditionToAll) {
-                functions += DashboardEdition::class
-                if (settings.grantDashboardSharingToAll) {
-                    functions += DashboardSharing::class
-                }
-            }
-            return functions.toSet()
-        }
 
     override val currentAccount: OntrackAuthenticatedUser?
         get() {

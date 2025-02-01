@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.model.dashboards.DashboardSharing
 import net.nemerosa.ontrack.model.labels.LabelManagement
 import net.nemerosa.ontrack.model.labels.ProjectLabelManagement
 import java.util.*
+import kotlin.reflect.KClass
 
 /**
  * Management of roles and functions.
@@ -81,6 +82,16 @@ interface RolesService {
      * does not exist
      */
     fun getProjectRoleAssociation(project: Int, roleId: String): Optional<ProjectRoleAssociation>
+
+    /**
+     * List of [global functions][GlobalFunction] which are automatically assigned to authenticated users.
+     */
+    val autoGlobalFunctions: Set<KClass<out GlobalFunction>>
+
+    /**
+     * List of [project functions][ProjectFunction] which are automatically assigned to authenticated users.
+     */
+    val autoProjectFunctions: Set<KClass<out ProjectFunction>>
 
     companion object {
 
