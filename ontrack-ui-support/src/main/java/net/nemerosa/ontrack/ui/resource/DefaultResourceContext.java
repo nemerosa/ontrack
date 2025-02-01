@@ -42,11 +42,6 @@ public class DefaultResourceContext implements ResourceContext {
         return securityService.isGlobalFunctionGranted(fn);
     }
 
-    @Override
-    public boolean isLogged() {
-        return securityService.isLogged();
-    }
-
     protected class DefaultLinksBuilder implements LinksBuilder {
 
         private final Map<String, Link> links = new LinkedHashMap<>();

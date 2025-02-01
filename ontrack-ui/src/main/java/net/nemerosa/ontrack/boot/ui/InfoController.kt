@@ -15,8 +15,8 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 @RestController
 @RequestMapping("/rest/info")
 class InfoController(
-        private val infoService: InfoService,
-        private val applicationInfoService: ApplicationInfoService
+    private val infoService: InfoService,
+    private val applicationInfoService: ApplicationInfoService
 ) : AbstractResourceController() {
 
     /**
@@ -25,13 +25,13 @@ class InfoController(
     @GetMapping("")
     fun info(): Resource<Info> {
         return Resource.of(
-                infoService.info,
-                uri(on(javaClass).info())
+            infoService.info,
+            uri(on(javaClass).info())
         )
-                // API links
-                .with("user", uri(on(UserController::class.java).getCurrentUser()))
-                // Info message
-                .with("_applicationInfo", uri(on(InfoController::class.java).applicationInfo()))
+            // API links
+            .with("user", uri(on(UserController::class.java).getCurrentUser()))
+            // Info message
+            .with("_applicationInfo", uri(on(InfoController::class.java).applicationInfo()))
     }
 
     /**
@@ -40,8 +40,8 @@ class InfoController(
     @GetMapping("application")
     fun applicationInfo(): Resources<ApplicationInfo> {
         return Resources.of(
-                applicationInfoService.applicationInfoList,
-                uri(on(InfoController::class.java).applicationInfo())
+            applicationInfoService.applicationInfoList,
+            uri(on(InfoController::class.java).applicationInfo())
         )
     }
 

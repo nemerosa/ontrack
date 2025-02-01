@@ -8,8 +8,6 @@ import net.nemerosa.ontrack.model.structure.Signature
 
 class MockSecurityService : SecurityService {
 
-    override fun checkAuthenticated() {}
-
     override fun checkGlobalFunction(fn: Class<out GlobalFunction>) {}
 
     override fun isGlobalFunctionGranted(fn: Class<out GlobalFunction>): Boolean = true

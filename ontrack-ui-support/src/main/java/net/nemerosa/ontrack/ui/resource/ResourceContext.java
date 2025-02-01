@@ -38,8 +38,4 @@ public interface ResourceContext {
      */
     boolean isGlobalFunctionGranted(Class<? extends GlobalFunction> fn);
 
-    /**
-     * Checks if the current user is logged.
-     */
-    boolean isLogged();
 }

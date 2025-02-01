@@ -7,11 +7,6 @@ import java.util.*
 @Deprecated("#1395 Will be replaced by other services starting from 4.12")
 interface SecurityService {
 
-    /**
-     * Checks that the current user is authenticated
-     */
-    fun checkAuthenticated()
-
     fun checkGlobalFunction(fn: Class<out GlobalFunction>)
     fun isGlobalFunctionGranted(fn: Class<out GlobalFunction>): Boolean
 
@@ -29,12 +24,6 @@ interface SecurityService {
      * Returns the current logged account or `null` if none is logged.
      */
     val currentAccount: OntrackAuthenticatedUser?
-
-    /**
-     * Is the current user logged?
-     */
-    val isLogged: Boolean
-        get() = currentAccount != null
 
     /**
      * Returns the current logged account as an option

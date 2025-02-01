@@ -79,13 +79,13 @@ class ProjectResourceDecorator(
                 link(
                         "_unfavourite",
                         { project -> on(ProjectController::class.java).unfavouriteProject(project.id) },
-                        { project, resourceContext -> resourceContext.isLogged && projectFavouriteService.isProjectFavourite(project) }
+                        { project, resourceContext -> resourceContext.isProjectFunctionGranted(project, ProjectView::class.java) && projectFavouriteService.isProjectFavourite(project) }
                 ),
                 // Not favourite --> 'favourite'
                 link(
                         "_favourite",
                         { project -> on(ProjectController::class.java).favouriteProject(project.id) },
-                        { project, resourceContext -> resourceContext.isLogged && !projectFavouriteService.isProjectFavourite(project) }
+                        { project, resourceContext -> resourceContext.isProjectFunctionGranted(project, ProjectView::class.java) && !projectFavouriteService.isProjectFavourite(project) }
                 ),
                 // Setting the project labels
                 link(

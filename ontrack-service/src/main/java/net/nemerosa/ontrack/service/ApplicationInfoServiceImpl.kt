@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.service
 
-import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.ApplicationInfo
 import net.nemerosa.ontrack.model.support.ApplicationInfoProvider
 import net.nemerosa.ontrack.model.support.ApplicationInfoService
@@ -9,8 +8,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class ApplicationInfoServiceImpl(
-        private val providers: List<ApplicationInfoProvider>,
-        private val securityService: SecurityService
+    private val providers: List<ApplicationInfoProvider>
 ) : ApplicationInfoService {
 
     private val logger = LoggerFactory.getLogger(ApplicationInfoService::class.java)
@@ -20,10 +18,7 @@ class ApplicationInfoServiceImpl(
     }
 
     override val applicationInfoList: List<ApplicationInfo>
-        get() {
-            securityService.checkAuthenticated()
-            return providers
-                    .flatMap { provider -> provider.applicationInfoList }
-                    .filterNotNull()
-        }
+        get() = providers
+            .flatMap { provider -> provider.applicationInfoList }
+            .filterNotNull()
 }

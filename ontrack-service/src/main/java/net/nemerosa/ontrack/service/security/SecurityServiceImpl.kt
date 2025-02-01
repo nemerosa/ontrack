@@ -16,12 +16,6 @@ import org.springframework.stereotype.Component
 @Component
 class SecurityServiceImpl : SecurityService {
 
-    override fun checkAuthenticated() {
-        if (!isLogged) {
-            throw AccessDeniedException("Authentication is required.")
-        }
-    }
-
     override fun checkGlobalFunction(fn: Class<out GlobalFunction>) {
         if (!isGlobalFunctionGranted(fn)) {
             throw AccessDeniedException("Global function '${fn.simpleName}' is not granted.")

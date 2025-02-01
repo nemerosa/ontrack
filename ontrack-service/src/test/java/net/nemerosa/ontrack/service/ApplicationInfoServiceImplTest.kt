@@ -20,7 +20,7 @@ class ApplicationInfoServiceImplTest {
         // Security mock
         val securityService = mock<SecurityService>()
         // Service
-        val service = ApplicationInfoServiceImpl(listOf(provider), securityService)
+        val service = ApplicationInfoServiceImpl(listOf(provider))
         // Gets the informations
         val infoList = service.applicationInfoList
         assertEquals(1, infoList.size)

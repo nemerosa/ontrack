@@ -2,7 +2,9 @@ package net.nemerosa.ontrack.boot.resources
 
 import net.nemerosa.ontrack.boot.ui.*
 import net.nemerosa.ontrack.model.security.*
-import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.BranchFavouriteService
+import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.ui.resource.*
 import net.nemerosa.ontrack.ui.resource.LinkDefinitions.page
 import org.springframework.stereotype.Component
@@ -113,11 +115,11 @@ class BranchResourceDecorator(
                 },
                 // Favourite --> 'unfavourite'
                 "_unfavourite" linkTo { branch: Branch -> on(BranchController::class.java).unfavouriteBranch(branch.id) }
-                        linkIf { branch, resourceContext -> resourceContext.isLogged && branchFavouriteService.isBranchFavourite(branch) }
+                        linkIf { branch, resourceContext -> resourceContext.isProjectFunctionGranted(branch, ProjectView::class.java) && branchFavouriteService.isBranchFavourite(branch) }
                 ,
                 // Not favourite --> 'favourite'
                 "_favourite" linkTo { branch: Branch -> on(BranchController::class.java).favouriteBranch(branch.id) }
-                        linkIf { branch, resourceContext -> resourceContext.isLogged && !branchFavouriteService.isBranchFavourite(branch) }
+                        linkIf { branch, resourceContext -> resourceContext.isProjectFunctionGranted(branch, ProjectView::class.java) && !branchFavouriteService.isBranchFavourite(branch) }
                 ,
                 // Page
                 page()

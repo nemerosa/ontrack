@@ -31,12 +31,13 @@ abstract class AbstractQLKTITSupport : AbstractBranchLinksTestSupport() {
     ): T {
         // Task to run
         val code = { internalRun(query, variables, responseProcessing) }
-        // Making sure we're at least authenticated
-        return if (securityService.isLogged) {
-            code()
-        } else {
-            asUser().call(code)
-        }
+        // TODO Making sure we're at least authenticated
+        return asUser().call(code)
+//        return if (securityService.isLogged) {
+//            code()
+//        } else {
+//            asUser().call(code)
+//        }
     }
 
     fun run(

@@ -86,15 +86,13 @@ class UserController(
             )
         }
         // Access to the user profile
-        if (securityService.isLogged) {
-            user.add(
-                of(
-                    "user-profile",
-                    "User profile",
-                    "user-profile"
-                )
+        user.add(
+            of(
+                "user-profile",
+                "User profile",
+                "user-profile"
             )
-        }
+        )
         // Account management
         if (securityService.isGlobalFunctionGranted(AccountManagement::class.java) || securityService.isGlobalFunctionGranted(
                 AccountGroupManagement::class.java

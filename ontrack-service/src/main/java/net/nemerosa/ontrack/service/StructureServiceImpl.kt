@@ -78,14 +78,12 @@ class StructureServiceImpl(
             val list = structureRepository.projectList
             return when {
                 securityService.isGlobalFunctionGranted(ProjectList::class.java) -> list
-                securityService.isLogged -> list.filter { p ->
+                else -> list.filter { p ->
                     securityService.isProjectFunctionGranted(
                         p.id(),
                         ProjectView::class.java
                     )
                 }
-
-                else -> throw AccessDeniedException("Authentication is required.")
             }
         }
 
