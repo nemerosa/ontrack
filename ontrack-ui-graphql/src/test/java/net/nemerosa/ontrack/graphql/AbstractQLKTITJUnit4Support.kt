@@ -25,13 +25,12 @@ abstract class AbstractQLKTITJUnit4Support : AbstractBranchLinksTestJUnit4Suppor
     fun run(query: String, variables: Map<String, *> = emptyMap<String, Any>()): JsonNode {
         // Task to run
         val code = { internalRun(query, variables) }
-        // TODO Making sure we're at least authenticated
-        return asUser().call(code)
-//        return if (securityService.isLogged) {
-//            code()
-//        } else {
-//            asUser().call(code)
-//        }
+        // Making sure we're at least authenticated
+        return if (isLogged) {
+            code()
+        } else {
+            asUser().call(code)
+        }
     }
 
     fun run(query: String, variables: Map<String, *> = emptyMap<String, Any>(), code: (data: JsonNode) -> Unit) {

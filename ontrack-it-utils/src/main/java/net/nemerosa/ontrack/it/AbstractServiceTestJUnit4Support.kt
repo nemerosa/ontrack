@@ -258,6 +258,12 @@ abstract class AbstractServiceTestJUnit4Support : AbstractITTestJUnit4Support() 
         }
     }
 
+    protected val isLogged: Boolean
+        get() {
+            val authentication = SecurityContextHolder.getContext().authentication
+            return authentication != null && authentication.isAuthenticated
+        }
+
     protected fun asUser(): UserCall = UserCall()
 
     protected fun asUserWithAuthenticationSource(authenticationSource: AuthenticationSource): UserCall = UserCall(authenticationSource)
