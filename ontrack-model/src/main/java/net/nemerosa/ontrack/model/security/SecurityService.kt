@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.model.security
 
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.Signature
-import java.util.*
 
 @Deprecated("#1395 Will be replaced by other services starting from 4.12")
 interface SecurityService {
@@ -24,14 +23,6 @@ interface SecurityService {
      * Returns the current logged account or `null` if none is logged.
      */
     val currentAccount: OntrackAuthenticatedUser?
-
-    /**
-     * Returns the current logged account as an option
-     *
-     */
-    @get:Deprecated("Use getCurrentAccount directly and check for null")
-    val account: Optional<OntrackAuthenticatedUser>
-        get() = Optional.ofNullable(currentAccount)
 
     val currentSignature: Signature
 
