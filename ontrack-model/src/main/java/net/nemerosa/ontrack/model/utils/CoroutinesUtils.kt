@@ -8,7 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import kotlin.coroutines.CoroutineContext
 
 fun launchWithSecurityContext(
-    context: CoroutineContext = Dispatchers.Default,
+    context: CoroutineContext = Dispatchers.IO,
     code: suspend CoroutineScope.() -> Unit,
 ): Job {
     val securityContext = SecurityContextHolder.getContext()
