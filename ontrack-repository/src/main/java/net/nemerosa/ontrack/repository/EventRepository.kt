@@ -9,7 +9,7 @@ import net.nemerosa.ontrack.model.structure.Signature
 
 interface EventRepository {
 
-    fun post(event: Event)
+    fun post(event: Event): Event
 
     fun query(
         allowedProjects: List<Int>,

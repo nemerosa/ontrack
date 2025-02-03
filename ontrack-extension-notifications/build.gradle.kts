@@ -14,6 +14,8 @@ dependencies {
     implementation(project(":ontrack-extension-casc"))
     implementation(project(":ontrack-repository-support"))
     implementation(project(":ontrack-rabbitmq"))
+    implementation(project(":ontrack-extension-queue"))
+    implementation(project(":ontrack-extension-recordings"))
     implementation("org.springframework:spring-context")
     implementation("org.apache.commons:commons-lang3")
     implementation("org.slf4j:slf4j-api")
@@ -26,6 +28,8 @@ dependencies {
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))
+    testImplementation(project(path = ":ontrack-extension-queue", configuration = "tests"))
+    testImplementation(project(path = ":ontrack-extension-recordings", configuration = "tests"))
     testImplementation(project(":ontrack-extension-general"))
     testImplementation(project(":ontrack-it-utils"))
 

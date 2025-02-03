@@ -4,8 +4,11 @@ import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.extension.notifications.NotificationsConfigProperties
 import net.nemerosa.ontrack.extension.notifications.metrics.NotificationsMetrics
 import net.nemerosa.ontrack.extension.notifications.metrics.incrementForEvent
+import net.nemerosa.ontrack.extension.queue.dispatching.QueueDispatcher
+import net.nemerosa.ontrack.extension.queue.source.createQueueSource
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventListener
+import net.nemerosa.ontrack.model.events.dehydrate
 import org.springframework.stereotype.Component
 
 /**
@@ -14,7 +17,9 @@ import org.springframework.stereotype.Component
  */
 @Component
 class EventSubscriptionsListener(
-    private val eventListeningQueue: EventListeningQueue,
+    private val queueDispatcher: QueueDispatcher,
+    private val notificationListenerQueueProcessor: NotificationListenerQueueProcessor,
+    private val notificationListenerQueueSourceExtension: NotificationListenerQueueSourceExtension,
     private val notificationsConfigProperties: NotificationsConfigProperties,
     private val meterRegistry: MeterRegistry,
 ) : EventListener {
@@ -27,8 +32,25 @@ class EventSubscriptionsListener(
             NotificationsMetrics.event_listening_received,
             event
         )
+        // Serializing the event
+        val serializedEvent = event.dehydrate()
         // Publishes the event on the queue
-        eventListeningQueue.publish(event)
+        queueDispatcher.dispatch(
+            queueProcessor = notificationListenerQueueProcessor,
+            payload = NotificationListenerQueuePayload(
+                serializedEvent = serializedEvent,
+            ),
+            source = notificationListenerQueueSourceExtension.createQueueSource(
+                NotificationListenerQueueSourceData(
+                    eventId = serializedEvent.id,
+                )
+            )
+        )
+        // Metrics
+        meterRegistry.incrementForEvent(
+            NotificationsMetrics.event_listening_queued,
+            event
+        )
     }
 
 }

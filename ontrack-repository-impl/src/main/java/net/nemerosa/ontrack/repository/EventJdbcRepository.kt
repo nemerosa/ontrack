@@ -20,7 +20,7 @@ class EventJdbcRepository(
     dataSource: DataSource,
 ) : AbstractJdbcRepository(dataSource), EventRepository {
 
-    override fun post(event: Event) {
+    override fun post(event: Event): Event {
         val sql = StringBuilder("INSERT INTO EVENTS(EVENT_VALUES, EVENT_TIME, EVENT_USER, EVENT_TYPE, REF")
         val params = MapSqlParameterSource()
         params.addValue("eventValues", writeJson(event.values))
@@ -46,10 +46,11 @@ class EventJdbcRepository(
             params.addValue(typeEntry, entity.id())
         }
         sql.append(")")
-        namedParameterJdbcTemplate!!.update(
+        val id = dbCreate(
             sql.toString(),
-            params
+            params,
         )
+        return event.withId(id)
     }
 
     override fun query(
@@ -188,12 +189,13 @@ class EventJdbcRepository(
         val values = loadValues(rs)
         // OK
         return Event(
-            eventTypeLoader(eventTypeName),
-            signature,
-            entities,
-            extraEntities,
-            refEntity,
-            values
+            id = rs.getInt("id"),
+            eventType = eventTypeLoader(eventTypeName),
+            signature = signature,
+            entities = entities,
+            extraEntities = extraEntities,
+            ref = refEntity,
+            values = values
         )
     }
 

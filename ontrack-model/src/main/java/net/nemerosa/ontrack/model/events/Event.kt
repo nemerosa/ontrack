@@ -2,12 +2,12 @@ package net.nemerosa.ontrack.model.events
 
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.NameValue
-import java.util.regex.Pattern
 
 /**
  * Definition of an event
  */
 class Event(
+    val id: Int = 0,
     val eventType: EventType,
     val signature: Signature?,
     val entities: Map<ProjectEntityType, ProjectEntity>,
@@ -27,13 +27,24 @@ class Event(
     fun <T : ProjectEntity> getEntity(entityType: ProjectEntityType): T =
         entities[entityType] as T? ?: error("Missing entity $entityType in the event.")
 
+    fun withId(id: Int): Event = Event(
+        id = id,
+        eventType = eventType,
+        signature = signature,
+        entities = entities,
+        extraEntities = extraEntities,
+        ref = ref,
+        values = values
+    )
+
     fun withSignature(signature: Signature?): Event = Event(
-        eventType,
-        signature,
-        entities,
-        extraEntities,
-        ref,
-        values
+        id = id,
+        eventType = eventType,
+        signature = signature,
+        entities = entities,
+        extraEntities = extraEntities,
+        ref = ref,
+        values = values
     )
 
     class EventBuilder(private val eventType: EventType) {
@@ -122,12 +133,13 @@ class Event(
         fun build(): Event {
             // Creates the event
             val event = Event(
-                eventType,
-                signature,
-                entities,
-                extraEntities,
-                ref,
-                values
+                id = 0,
+                eventType = eventType,
+                signature = signature,
+                entities = entities,
+                extraEntities = extraEntities,
+                ref = ref,
+                values = values
             )
             // OK
             return event
@@ -135,8 +147,6 @@ class Event(
     }
 
     companion object {
-
-        private val EXPRESSION = Pattern.compile("\\$\\{([:a-zA-Z_-]+)}")
 
         @JvmStatic
         fun of(eventType: EventType): EventBuilder {

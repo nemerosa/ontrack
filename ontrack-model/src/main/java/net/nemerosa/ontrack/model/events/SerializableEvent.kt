@@ -9,6 +9,12 @@ import net.nemerosa.ontrack.model.support.NameValue
  * Event which can be serialized
  */
 data class SerializableEvent(
+
+    /**
+     * ID of the event
+     */
+    val id: Int,
+
     /**
      * Type of the event, as a string
      */
@@ -45,6 +51,7 @@ data class SerializableEvent(
     fun findValue(name: String): String? = values[name]?.value
 
     fun withValue(name: String, value: String) = SerializableEvent(
+        id = id,
         eventType = eventType,
         signature = signature,
         entities = entities,
@@ -56,6 +63,7 @@ data class SerializableEvent(
     fun findEntityId(projectEntityType: ProjectEntityType): Int? = entities[projectEntityType]
 
     fun withEntity(entity: ProjectEntity) = SerializableEvent(
+        id = id,
         eventType = eventType,
         signature = signature,
         entities = entities + (entity.projectEntityType to entity.id()),

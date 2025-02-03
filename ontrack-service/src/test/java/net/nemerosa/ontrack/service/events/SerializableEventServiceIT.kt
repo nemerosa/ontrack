@@ -26,6 +26,7 @@ class SerializableEventServiceIT : AbstractDSLTestSupport() {
                 val dehydratedEvent = serializableEventService.dehydrate(event)
                 assertEquals(
                     SerializableEvent(
+                        id = 0,
                         eventType = "new_branch",
                         signature = event.signature,
                         entities = mapOf(
@@ -47,6 +48,7 @@ class SerializableEventServiceIT : AbstractDSLTestSupport() {
         project {
             branch {
                 val dehydrated = SerializableEvent(
+                    id = 12,
                     eventType = "new_branch",
                     signature = Signature.of("test"),
                     entities = mapOf(
@@ -58,6 +60,7 @@ class SerializableEventServiceIT : AbstractDSLTestSupport() {
                     values = emptyMap(),
                 )
                 val event = serializableEventService.hydrate(dehydrated)
+                assertEquals(12, event.id)
                 assertEquals(EventFactory.NEW_BRANCH, event.eventType)
                 assertEquals(dehydrated.signature, event.signature)
                 assertEquals(

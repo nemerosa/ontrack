@@ -16,6 +16,7 @@ fun SerializableEvent.withProject(project: Project) =
     withEntity(project)
 
 fun SerializableEvent.merge(event: SerializableEvent) = SerializableEvent(
+    id = id,
     eventType = eventType,
     signature = signature,
     entities = entities + event.entities,

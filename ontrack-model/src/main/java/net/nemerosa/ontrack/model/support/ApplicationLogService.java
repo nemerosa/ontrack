@@ -6,7 +6,10 @@ import java.util.List;
  * This service is used to log messages at application level, to be seen by operation and administration people.
  * <p>
  * Having a message here would mean that something is defective in the application or in its configuration.
+ *
+ * @deprecated Will be removed in V5. Use loggers.
  */
+@Deprecated
 public interface ApplicationLogService {
 
     /**

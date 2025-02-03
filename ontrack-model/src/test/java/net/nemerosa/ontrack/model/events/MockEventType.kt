@@ -19,6 +19,7 @@ object MockEventType : EventType {
         .build()
 
     fun serializedMockEvent(text: String) = SerializableEvent(
+        id = 1,
         eventType = id,
         signature = Signature.of("test"),
         entities = emptyMap(),

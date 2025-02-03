@@ -20,11 +20,6 @@ class NotificationsConfigProperties {
     var inMemory = InMemoryChannelProperties()
 
     /**
-     * Dispatching configuration
-     */
-    var dispatching: DispatchingProperties = DispatchingProperties()
-
-    /**
      * Processing configuration
      */
     var processing: ProcessingProperties = ProcessingProperties()
@@ -82,16 +77,6 @@ class NotificationsConfigProperties {
     }
 
     /**
-     * Dispatching configuration
-     */
-    class DispatchingProperties {
-        /**
-         * Queuing configuration
-         */
-        var queue: DispatchingQueuingProperties = DispatchingQueuingProperties()
-    }
-
-    /**
      * Processing configuration
      */
     class ProcessingProperties {
@@ -111,11 +96,6 @@ class NotificationsConfigProperties {
         @APIDescription("Is asynchronous processing of notifications enabled?")
         var async: Boolean = true
     }
-
-    /**
-     * Configuration for dispatching queuing
-     */
-    class DispatchingQueuingProperties : AbstractQueuingProperties()
 
     /**
      * Configuration for processing queuing

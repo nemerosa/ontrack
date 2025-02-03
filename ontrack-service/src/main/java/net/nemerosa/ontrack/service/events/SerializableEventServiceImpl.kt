@@ -17,6 +17,7 @@ class SerializableEventServiceImpl(
 
     override fun hydrate(serialized: SerializableEvent) = serialized.run {
         Event(
+            id = id,
             eventType = eventFactory.toEventType(eventType),
             signature = signature,
             entities = entities.mapValues { (entityType, entityId) ->
