@@ -33453,6 +33453,29 @@
               "deprecationReason": null
             },
             {
+              "name": "saveJsonWorkflow",
+              "description": "Saves a workflow which is defined as JSON",
+              "args": [
+                {
+                  "name": "input",
+                  "description": "Input for the mutation",
+                  "type": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "SaveJsonWorkflowInput",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                }
+              ],
+              "type": {
+                "kind": "OBJECT",
+                "name": "SaveJsonWorkflowPayload",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "saveYamlWorkflow",
               "description": "Saves a workflow which is defined as YAML",
               "args": [
@@ -35544,6 +35567,11 @@
             {
               "kind": "OBJECT",
               "name": "SaveBuildFilterPayload",
+              "ofType": null
+            },
+            {
+              "kind": "OBJECT",
+              "name": "SaveJsonWorkflowPayload",
               "ofType": null
             },
             {
@@ -44257,6 +44285,22 @@
           "description": "Payload for a message sent on a queue for processing",
           "fields": [
             {
+              "name": "accountName",
+              "description": "Identity of the user",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
               "name": "body",
               "description": "Message body for the processor",
               "args": [],
@@ -44654,6 +44698,18 @@
               },
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "username",
+              "description": "Username attached to the queue message (admin for administrative account, user for anything else",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "inputFields": null,
@@ -44720,6 +44776,16 @@
             {
               "name": "text",
               "description": "Filtering using some free text in the payload",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "username",
+              "description": "Filtering on the username",
               "type": {
                 "kind": "SCALAR",
                 "name": "String",
@@ -46808,6 +46874,76 @@
             {
               "kind": "INTERFACE",
               "name": "PayloadInterface",
+              "ofType": null
+            }
+          ],
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "INPUT_OBJECT",
+          "name": "SaveJsonWorkflowInput",
+          "description": "Input type for the saveJsonWorkflow mutation.",
+          "fields": null,
+          "inputFields": [
+            {
+              "name": "workflow",
+              "description": "workflow field",
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "JSON",
+                  "ofType": null
+                }
+              },
+              "defaultValue": null
+            }
+          ],
+          "interfaces": null,
+          "enumValues": null,
+          "possibleTypes": null
+        },
+        {
+          "kind": "OBJECT",
+          "name": "SaveJsonWorkflowPayload",
+          "description": "Output type for the saveJsonWorkflow mutation.",
+          "fields": [
+            {
+              "name": "workflowId",
+              "description": "Saved workflow ID",
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "errors",
+              "description": "List of errors",
+              "args": [],
+              "type": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "UserError",
+                  "ofType": null
+                }
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [
+            {
+              "kind": "INTERFACE",
+              "name": "Payload",
               "ofType": null
             }
           ],

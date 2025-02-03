@@ -33,6 +33,16 @@ class WorkflowsMutations(
             workflowRegistry.validateJsonWorkflow(input.workflow)
         },
         simpleMutation(
+            name = "saveJsonWorkflow",
+            description = "Saves a workflow which is defined as JSON",
+            input = SaveJsonWorkflowInput::class,
+            outputName = "workflowId",
+            outputDescription = "Saved workflow ID",
+            outputType = String::class
+        ) { input ->
+            workflowRegistry.saveJsonWorkflow(input.workflow)
+        },
+        simpleMutation(
             name = "saveYamlWorkflow",
             description = "Saves a workflow which is defined as YAML",
             input = SaveYamlWorkflowInput::class,
@@ -81,6 +91,10 @@ data class ValidateJsonWorkflowInput(
 
 data class SaveYamlWorkflowInput(
     val workflow: String,
+)
+
+data class SaveJsonWorkflowInput(
+    val workflow: JsonNode,
 )
 
 data class LaunchWorkflowInput(

@@ -1,7 +1,10 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.workflows
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.spec.extension.workflows.WorkflowInstanceNodeStatus
 import net.nemerosa.ontrack.kdsl.spec.extension.workflows.WorkflowInstanceStatus
@@ -9,6 +12,7 @@ import net.nemerosa.ontrack.kdsl.spec.extension.workflows.mock.mock
 import net.nemerosa.ontrack.kdsl.spec.extension.workflows.workflows
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 import kotlin.test.fail
 
 class ACCDSLWorkflows : AbstractACCDSLWorkflowsTestSupport() {
@@ -454,6 +458,88 @@ class ACCDSLWorkflows : AbstractACCDSLWorkflowsTestSupport() {
             "Error in end node",
             nodeInError.error
         )
+    }
+
+    /**
+     * To test the saturation, we need to limit the parallelism
+     */
+    @Test
+    fun `Workflow number of executors in parallel`() {
+        val name = uid("w-")
+        // Tries to saturate the server by launching 20 nodes
+        val nodes = mutableListOf(
+            mapOf(
+                "id" to "jenkins-0",
+                "executorId" to "mock",
+                "timeout" to 5, // seconds
+                "data" to mapOf(
+                    "text" to "Jenkins 0",
+                    "waitMs" to 2000,
+                )
+            )
+        )
+        (1..20).forEach {
+            nodes.add(
+                mapOf(
+                    "id" to "jenkins-$it",
+                    "parents" to listOf(
+                        mapOf(
+                            "id" to "jenkins-${it - 1}"
+                        )
+                    ),
+                    "executorId" to "mock",
+                    "timeout" to 5, // seconds
+                    "data" to mapOf(
+                        "text" to "Jenkins $it",
+                        "waitMs" to 2000,
+                    )
+                )
+            )
+        }
+        // Node that does not depend on any other
+        nodes.add(
+            mapOf(
+                "id" to "email",
+                "executorId" to "mock",
+                "timeout" to 5, // seconds
+                "data" to mapOf(
+                    "text" to "Email",
+                )
+            )
+        )
+        val workflow = mutableMapOf(
+            "name" to name,
+            "nodes" to nodes
+        )
+        // Saving the workflow
+        val workflowId = ontrack.workflows.saveJsonWorkflow(
+            workflow = workflow.asJson(),
+        ) ?: fail("Error while saving workflow")
+        // Launches two workflow instances in parallel
+        runBlocking {
+            val jobs = (1..2).map {
+                async {
+                    // Running the workflow
+                    val instanceId = ontrack.workflows.launchWorkflow(
+                        workflowId = workflowId,
+                        context = mapOf("mock" to "Heavy load $it"),
+                    ) ?: fail("Error while launching workflow")
+                    // Waiting for the workflow result
+                    waitUntilWorkflowFinished(
+                        instanceId,
+                        timeout = 120_000L,
+                        returnInstanceOnError = true
+                    )
+                }
+            }
+            val instances = jobs.awaitAll()
+            assertTrue(
+                instances.all {
+                    it.status == WorkflowInstanceStatus.SUCCESS
+                },
+                "All instances are successful"
+            )
+        }
     }
 
 }

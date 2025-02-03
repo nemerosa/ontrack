@@ -1,5 +1,5 @@
 import {Space} from "antd";
-import {FaCheckCircle, FaHourglass, FaSpinner, FaStop, FaTimesCircle} from "react-icons/fa";
+import {FaCheckCircle, FaClock, FaHourglass, FaSpinner, FaStop, FaTimesCircle} from "react-icons/fa";
 
 export default function WorkflowInstanceNodeStatus({status}) {
     return (
@@ -29,6 +29,13 @@ export default function WorkflowInstanceNodeStatus({status}) {
                 status === 'CANCELLED' &&
                 <Space>
                     <FaStop color="red"/>
+                    Stopped
+                </Space>
+            }
+            {
+                status === 'TIMEOUT' &&
+                <Space>
+                    <FaClock color="red"/>
                     Stopped
                 </Space>
             }

@@ -36,18 +36,26 @@ class WorkflowRegistryImpl(
         return validateWorkflow(workflowObj)
     }
 
-    override fun saveYamlWorkflow(workflow: String): String {
-        // Checking the access right
+    override fun saveJsonWorkflow(workflow: JsonNode): String {
         securityService.checkGlobalFunction(WorkflowRegistration::class.java)
-        // Parsing of the workflow
+        val workflowObj: Workflow = WorkflowParser.parseJsonWorkflow(workflow)
+        return saveWorkflow(workflowObj)
+    }
+
+    override fun saveYamlWorkflow(workflow: String): String {
+        securityService.checkGlobalFunction(WorkflowRegistration::class.java)
         val workflowObj: Workflow = WorkflowParser.parseYamlWorkflow(workflow)
+        return saveWorkflow(workflowObj)
+    }
+
+    private fun saveWorkflow(workflow: Workflow): String {
         // Validation
-        validateWorkflow(workflowObj).throwErrorIfAny()
+        validateWorkflow(workflow).throwErrorIfAny()
         // Generating an ID
         val id = UUID.randomUUID().toString()
         // Record to save
         val record = InternalRecord(
-            workflow = workflowObj,
+            workflow = workflow,
         )
         // Saving the record
         storageService.store(STORE, id, record)

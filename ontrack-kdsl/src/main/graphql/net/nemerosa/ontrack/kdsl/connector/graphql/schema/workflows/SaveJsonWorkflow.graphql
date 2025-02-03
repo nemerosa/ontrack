@@ -1,0 +1,10 @@
+mutation SaveJsonWorkflow(
+    $workflow: JSON!,
+) {
+    saveJsonWorkflow(input: {
+        workflow: $workflow,
+    }) {
+        ...PayloadUserErrors
+        workflowId
+    }
+}

@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.workflows.WorkflowConfigurationProperties
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowParentNode
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowValidation
+import net.nemerosa.ontrack.extension.workflows.definition.totalTimeout
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorResultType
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorService
 import net.nemerosa.ontrack.extension.workflows.repository.WorkflowInstanceRepository
@@ -151,6 +152,10 @@ class WorkflowEngineImpl(
                 if (parentsOK) {
                     !getWorkflowInstanceTx(workflowInstanceId).status.finished
                 } else {
+                    val statusSummary = parentStatuses.joinToString(",") {
+                        "${it.parentDef.id}=${it.status}"
+                    }
+                    debug("NODE PARENTS STATUSES: $statusSummary", instance, workflowNodeId)
                     false
                 }
             } else {
@@ -185,7 +190,8 @@ class WorkflowEngineImpl(
         parentDef: WorkflowParentNode
     ): Deferred<WorkflowParentStatus> {
         val parentNode = instance.workflow.getNode(parentDef.id)
-        val parentTimeoutMs = parentNode.timeout * 1_000L
+        val parentTimeoutSeconds = parentNode.totalTimeout(instance.workflow)
+        val parentTimeoutMs = parentTimeoutSeconds * 1_000L
         return coroutineScope.async {
             debug("NODE PARENT WAIT ${parentDef.id} START", instance, workflowNodeId)
             val status = withTimeoutOrNull(parentTimeoutMs) {
@@ -205,7 +211,7 @@ class WorkflowEngineImpl(
                 debug("NODE PARENT WAIT ${parentDef.id} DONE $parentStatus", instance, workflowNodeId)
                 parentStatus
             }
-            WorkflowParentStatus(parentDef, status)
+            WorkflowParentStatus(parentDef, status ?: WorkflowInstanceNodeStatus.TIMEOUT)
         }
     }
 

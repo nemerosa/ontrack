@@ -69,7 +69,7 @@ data class WorkflowInstance(
                 WorkflowInstanceStatus.RUNNING
             } else if (nodes.any { it == WorkflowInstanceNodeStatus.ERROR }) {
                 WorkflowInstanceStatus.ERROR
-            } else if (nodes.any { it == WorkflowInstanceNodeStatus.CANCELLED }) {
+            } else if (nodes.any { it == WorkflowInstanceNodeStatus.CANCELLED || it == WorkflowInstanceNodeStatus.TIMEOUT }) {
                 WorkflowInstanceStatus.STOPPED
             } else if (nodes.all { it == WorkflowInstanceNodeStatus.SUCCESS }) {
                 WorkflowInstanceStatus.SUCCESS
