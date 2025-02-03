@@ -89,7 +89,10 @@ class WorkflowNotificationChannelNodeExecutor(
             workflowNodeExecutorResultFeedback(output?.asJson())
         }
         // Processing
-        val result = notificationProcessingService.process(notification, context, outputFeedback)
+        // TODO #1397 Workaround
+        val result = securityService.asAdmin {
+            notificationProcessingService.process(notification, context, outputFeedback)
+        }
         // Result of the execution
         return if (result != null) {
             when (result.type) {

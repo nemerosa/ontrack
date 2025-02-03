@@ -13,8 +13,11 @@ import net.nemerosa.ontrack.extension.notifications.recording.NotificationRecord
 import net.nemerosa.ontrack.extension.notifications.recording.NotificationRecordingService
 import net.nemerosa.ontrack.extension.notifications.recording.toNotificationRecordResult
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.tx.TransactionHelper
 import org.apache.commons.lang3.exception.ExceptionUtils
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
@@ -26,13 +29,21 @@ class DefaultNotificationProcessingService(
     private val notificationRecordingService: NotificationRecordingService,
     private val meterRegistry: MeterRegistry,
     private val transactionHelper: TransactionHelper,
+    private val securityService: SecurityService,
 ) : NotificationProcessingService {
+
+    private val logger: Logger = LoggerFactory.getLogger(this.javaClass)
 
     override fun process(
         item: Notification,
         context: Map<String, Any>,
         outputFeedback: (output: Any?) -> Unit,
     ): NotificationResult<*>? {
+        logger.debug(
+            "Processing notification (user={}) {}",
+            securityService.currentAccount?.account?.name,
+            item
+        )
         meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_started, item)
         val channel = notificationChannelRegistry.findChannel(item.channel)
         if (channel != null) {
