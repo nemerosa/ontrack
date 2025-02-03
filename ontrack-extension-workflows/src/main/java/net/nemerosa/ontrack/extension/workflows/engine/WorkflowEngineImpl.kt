@@ -1,7 +1,10 @@
 package net.nemerosa.ontrack.extension.workflows.engine
 
 import com.fasterxml.jackson.databind.JsonNode
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withTimeoutOrNull
 import net.nemerosa.ontrack.extension.queue.dispatching.QueueDispatcher
 import net.nemerosa.ontrack.extension.queue.source.createQueueSource
 import net.nemerosa.ontrack.extension.workflows.WorkflowConfigurationProperties
@@ -14,6 +17,7 @@ import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorSe
 import net.nemerosa.ontrack.extension.workflows.repository.WorkflowInstanceRepository
 import net.nemerosa.ontrack.model.events.SerializableEvent
 import net.nemerosa.ontrack.model.tx.DefaultTransactionHelper
+import net.nemerosa.ontrack.model.utils.launchAsyncWithSecurityContext
 import net.nemerosa.ontrack.model.utils.launchWithSecurityContext
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -21,6 +25,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import org.springframework.transaction.PlatformTransactionManager
 import java.time.Duration
+import kotlin.coroutines.CoroutineContext
 
 @Component
 class WorkflowEngineImpl(
@@ -93,6 +98,17 @@ class WorkflowEngineImpl(
         )
     }
 
+    private fun debugParent(message: String, instance: WorkflowInstance, nodeId: String) {
+        logger.debug(
+            // WORKFLOW <instance> <name> <node> <message>
+            "WORKFLOW {} {} {} {}",
+            instance.id,
+            instance.workflow.name,
+            nodeId,
+            message
+        )
+    }
+
     private fun error(message: String, instance: WorkflowInstance, nodeId: String, error: Throwable? = null) {
         val logMessage =
             "[${SecurityContextHolder.getContext().authentication?.name}] WORKFLOW ${instance.workflow.name} INSTANCE ${instance.id} NODE $nodeId: $message"
@@ -104,6 +120,8 @@ class WorkflowEngineImpl(
     }
 
     override fun processNode(workflowInstanceId: String, workflowNodeId: String) {
+        // Call must be authenticated
+        checkAuthentication("Workflow node received not authenticated")
         // Getting the instance
         val instance = getWorkflowInstanceTx(workflowInstanceId)
         val node = instance.workflow.getNode(workflowNodeId)
@@ -124,6 +142,8 @@ class WorkflowEngineImpl(
         }
         // Starting the job for the node
         launchWithSecurityContext {
+            // Call must be authenticated
+            checkAuthentication("Workflow node process not authenticated")
             debug("NODE PROCESSING", instance, workflowNodeId)
             // Changes the node's status to WAITING
             debug("NODE WAITING", instance, workflowNodeId)
@@ -134,7 +154,7 @@ class WorkflowEngineImpl(
                 val parentStatuses = try {
                     val parentJobs = node.parents.map {
                         createParentJob(
-                            coroutineScope = this,
+                            coroutineContext = coroutineContext,
                             instance = instance,
                             workflowNodeId = workflowNodeId,
                             parentDef = it
@@ -155,7 +175,7 @@ class WorkflowEngineImpl(
                     val statusSummary = parentStatuses.joinToString(",") {
                         "${it.parentDef.id}=${it.status}"
                     }
-                    debug("NODE PARENTS STATUSES: $statusSummary", instance, workflowNodeId)
+                    debugParent("NODE PARENTS STATUSES: $statusSummary", instance, workflowNodeId)
                     false
                 }
             } else {
@@ -184,7 +204,7 @@ class WorkflowEngineImpl(
     }
 
     private fun createParentJob(
-        coroutineScope: CoroutineScope,
+        coroutineContext: CoroutineContext,
         instance: WorkflowInstance,
         workflowNodeId: String,
         parentDef: WorkflowParentNode
@@ -192,23 +212,23 @@ class WorkflowEngineImpl(
         val parentNode = instance.workflow.getNode(parentDef.id)
         val parentTimeoutSeconds = parentNode.totalTimeout(instance.workflow)
         val parentTimeoutMs = parentTimeoutSeconds * 1_000L
-        return coroutineScope.async {
-            debug("NODE PARENT WAIT ${parentDef.id} START", instance, workflowNodeId)
+        return launchAsyncWithSecurityContext(context = coroutineContext) {
+            debugParent("NODE PARENT WAIT ${parentDef.id} START", instance, workflowNodeId)
             val status = withTimeoutOrNull(parentTimeoutMs) {
                 var parentFinished = false
                 var parentStatus: WorkflowInstanceNodeStatus? = null
                 while (!parentFinished) {
-                    debug("NODE PARENT WAIT ${parentDef.id} STATUS", instance, workflowNodeId)
+                    debugParent("NODE PARENT WAIT ${parentDef.id} STATUS", instance, workflowNodeId)
                     parentStatus = getNodeStatus(instance.id, parentDef.id)
                         ?: error("Could not find status for parent node: ${instance.id} / ${parentDef.id}")
                     if (parentStatus.finished) {
                         parentFinished = true
                     } else {
-                        debug("NODE PARENT WAIT ${parentDef.id} DELAY", instance, workflowNodeId)
+                        debugParent("NODE PARENT WAIT ${parentDef.id} DELAY", instance, workflowNodeId)
                         delay(workflowConfigurationProperties.parentWaitingInterval.toMillis())
                     }
                 }
-                debug("NODE PARENT WAIT ${parentDef.id} DONE $parentStatus", instance, workflowNodeId)
+                debugParent("NODE PARENT WAIT ${parentDef.id} DONE $parentStatus", instance, workflowNodeId)
                 parentStatus
             }
             WorkflowParentStatus(parentDef, status ?: WorkflowInstanceNodeStatus.TIMEOUT)
@@ -234,8 +254,11 @@ class WorkflowEngineImpl(
 
             // Running the executor
             val result = withTimeoutOrNull(timeout.toMillis()) {
-                val deferred = async(coroutineContext) {
+                val deferred = launchAsyncWithSecurityContext(context = coroutineContext) {
                     debug("NODE EXECUTING", instance, nodeId)
+                    // Call must be authenticated
+                    checkAuthentication("Workflow node execution not authenticated")
+                    // Running the execution
                     executor.execute(instance, node.id, nodeFeedback)
                 }
                 val outcome = deferred.await()
@@ -270,6 +293,13 @@ class WorkflowEngineImpl(
         }
     }
 
+    private fun checkAuthentication(message: String) {
+        val username = SecurityContextHolder.getContext().authentication?.name
+        if (username.isNullOrBlank()) {
+            error(message)
+        }
+    }
+
     private fun getNodeStatus(instanceId: String, nodeId: String): WorkflowInstanceNodeStatus? =
         transactionHelper.inNewTransactionNullable {
             workflowInstanceRepository.getNodeStatus(instanceId, nodeId)
@@ -287,7 +317,11 @@ class WorkflowEngineImpl(
         }
     }
 
-    private fun nodeCancelled(workflowInstanceId: String, workflowNodeId: String, message: String) {
+    private fun nodeCancelled(
+        workflowInstanceId: String,
+        workflowNodeId: String,
+        @Suppress("SameParameterValue") message: String
+    ) {
         transactionHelper.inNewTransaction {
             workflowInstanceRepository.nodeCancelled(workflowInstanceId, workflowNodeId, message)
         }
