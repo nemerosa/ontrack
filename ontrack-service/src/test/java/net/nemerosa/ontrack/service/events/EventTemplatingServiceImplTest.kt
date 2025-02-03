@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service.events
 
 import io.mockk.every
 import io.mockk.mockk
+import net.nemerosa.ontrack.it.MockSecurityService
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.EventVariableService
@@ -49,6 +50,7 @@ class EventTemplatingServiceImplTest {
         eventTemplatingService = EventTemplatingServiceImpl(
             eventVariableService,
             templatingService,
+            MockSecurityService(),
         )
     }
 
