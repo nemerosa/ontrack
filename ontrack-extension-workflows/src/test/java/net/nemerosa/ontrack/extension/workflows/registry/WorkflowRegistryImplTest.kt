@@ -68,7 +68,7 @@ class WorkflowRegistryImplTest {
         ).asJson()
         val validation = workflowRegistry.validateJsonWorkflow(json)
         assertTrue(validation.error)
-        assertEquals(validation.errors.firstOrNull(), "Cannot parse workflow")
+        assertEquals("There was a problem parsing the JSON at path 'name'", validation.errors.firstOrNull())
     }
 
     @Test
