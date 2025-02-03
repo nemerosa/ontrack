@@ -82,11 +82,12 @@ class WorkflowEngineImpl(
 
     private fun debug(message: String, instance: WorkflowInstance, nodeId: String) {
         logger.debug(
-            "[{}] WORKFLOW {} INSTANCE {} NODE {}: {}",
-            SecurityContextHolder.getContext().authentication?.name,
-            instance.workflow.name,
+            // WORKFLOW <instance> <name> <node> <user> <message>
+            "WORKFLOW {} {} {} {} {}",
             instance.id,
+            instance.workflow.name,
             nodeId,
+            SecurityContextHolder.getContext().authentication?.name,
             message
         )
     }
