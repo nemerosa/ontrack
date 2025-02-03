@@ -29,29 +29,31 @@ class WorkflowEngineIT : AbstractWorkflowTestSupport() {
     @OptIn(ExperimentalTime::class)
     @Test
     fun `Simple linear workflow`() {
-        // Defining a workflow
-        val workflow = WorkflowParser.parseYamlWorkflow(WorkflowFixtures.simpleLinearWorkflowYaml)
-        // Event
-        val event = serializableEventService.dehydrate(
-            MockEventType.mockEvent("Linear")
-        )
-        // Running the workflow
-        val instance = workflowEngine.startWorkflow(workflow, event)
-        // Waiting until the workflow is completed (error or success)
-        waitUntil("Waiting until workflow is complete", timeout = 10.seconds) {
-            val workflowInstance = workflowEngine.getWorkflowInstance(instance.id)
-            println("workflowInstance = $workflowInstance")
-            workflowInstance.status.finished
+        asAdmin {
+            // Defining a workflow
+            val workflow = WorkflowParser.parseYamlWorkflow(WorkflowFixtures.simpleLinearWorkflowYaml)
+            // Event
+            val event = serializableEventService.dehydrate(
+                MockEventType.mockEvent("Linear")
+            )
+            // Running the workflow
+            val instance = workflowEngine.startWorkflow(workflow, event)
+            // Waiting until the workflow is completed (error or success)
+            waitUntil("Waiting until workflow is complete", timeout = 10.seconds) {
+                val workflowInstance = workflowEngine.getWorkflowInstance(instance.id)
+                println("workflowInstance = $workflowInstance")
+                workflowInstance.status.finished
+            }
+            // Checks the results
+            val texts = mockWorkflowNodeExecutor.getTextsByInstanceId(instance.id)
+            assertEquals(
+                listOf(
+                    "Processed: Start node for Linear",
+                    "Processed: End node for Linear",
+                ),
+                texts
+            )
         }
-        // Checks the results
-        val texts = mockWorkflowNodeExecutor.getTextsByInstanceId(instance.id)
-        assertEquals(
-            listOf(
-                "Processed: Start node for Linear",
-                "Processed: End node for Linear",
-            ),
-            texts
-        )
     }
 
     @Test
@@ -116,30 +118,32 @@ class WorkflowEngineIT : AbstractWorkflowTestSupport() {
     @OptIn(ExperimentalTime::class)
     @Test
     fun `Parallel with join`() {
-        // Defining a workflow
-        val workflow = WorkflowFixtures.twoParallelAndJoin()
-        // Event
-        val event = serializableEventService.dehydrate(
-            MockEventType.mockEvent("Parallel / Join")
-        )
-        // Running the workflow
-        val instance = workflowEngine.startWorkflow(workflow, event)
-        // Waiting until the workflow is completed (error or success)
-        waitUntil("Waiting until workflow is complete", timeout = 10.seconds) {
-            val workflowInstance = workflowEngine.getWorkflowInstance(instance.id)
-            println("workflowInstance = $workflowInstance")
-            workflowInstance.status.finished
+        asAdmin {
+            // Defining a workflow
+            val workflow = WorkflowFixtures.twoParallelAndJoin()
+            // Event
+            val event = serializableEventService.dehydrate(
+                MockEventType.mockEvent("Parallel / Join")
+            )
+            // Running the workflow
+            val instance = workflowEngine.startWorkflow(workflow, event)
+            // Waiting until the workflow is completed (error or success)
+            waitUntil("Waiting until workflow is complete", timeout = 10.seconds) {
+                val workflowInstance = workflowEngine.getWorkflowInstance(instance.id)
+                println("workflowInstance = $workflowInstance")
+                workflowInstance.status.finished
+            }
+            // Checks the results
+            val texts = mockWorkflowNodeExecutor.getTextsByInstanceId(instance.id)
+            assertEquals(
+                setOf(
+                    "Processed: Start node A for Parallel / Join",
+                    "Processed: Start node B for Parallel / Join",
+                    "Processed: End node for Parallel / Join",
+                ),
+                texts.toSet()
+            )
         }
-        // Checks the results
-        val texts = mockWorkflowNodeExecutor.getTextsByInstanceId(instance.id)
-        assertEquals(
-            setOf(
-                "Processed: Start node A for Parallel / Join",
-                "Processed: Start node B for Parallel / Join",
-                "Processed: End node for Parallel / Join",
-            ),
-            texts.toSet()
-        )
     }
 
     @Test

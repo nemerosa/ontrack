@@ -30,26 +30,28 @@ class WorkflowNotificationChannelIT : AbstractWorkflowTestSupport() {
             .withProject(project)
             .build()
 
-        val result = workflowNotificationChannel.publish(
-            recordId = "1",
-            config = WorkflowNotificationChannelConfig(
-                workflow = Workflow(
-                    name = "For project ${'$'}{project}",
-                    nodes = listOf(
-                        WorkflowNode(
-                            id = "start",
-                            executorId = "mock",
-                            data = mapOf("text" to "Test").asJson(),
-                            parents = emptyList()
+        val result = asAdmin {
+            workflowNotificationChannel.publish(
+                recordId = "1",
+                config = WorkflowNotificationChannelConfig(
+                    workflow = Workflow(
+                        name = "For project ${'$'}{project}",
+                        nodes = listOf(
+                            WorkflowNode(
+                                id = "start",
+                                executorId = "mock",
+                                data = mapOf("text" to "Test").asJson(),
+                                parents = emptyList()
+                            )
                         )
                     )
-                )
-            ),
-            event = event,
-            context = emptyMap(),
-            template = null,
-            outputProgressCallback = { it },
-        )
+                ),
+                event = event,
+                context = emptyMap(),
+                template = null,
+                outputProgressCallback = { it },
+            )
+        }
 
         assertEquals(NotificationResultType.ASYNC, result.type)
         assertNotNull(result.output) { output ->
