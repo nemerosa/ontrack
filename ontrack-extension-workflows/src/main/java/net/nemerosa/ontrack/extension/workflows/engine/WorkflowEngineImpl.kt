@@ -16,6 +16,7 @@ import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorRe
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorService
 import net.nemerosa.ontrack.extension.workflows.repository.WorkflowInstanceRepository
 import net.nemerosa.ontrack.model.events.SerializableEvent
+import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.tx.DefaultTransactionHelper
 import net.nemerosa.ontrack.model.utils.launchAsyncWithSecurityContext
 import net.nemerosa.ontrack.model.utils.launchWithSecurityContext
@@ -35,6 +36,7 @@ class WorkflowEngineImpl(
     private val workflowQueueSourceExtension: WorkflowQueueSourceExtension,
     private val workflowNodeExecutorService: WorkflowNodeExecutorService,
     private val workflowConfigurationProperties: WorkflowConfigurationProperties,
+    private val securityService: SecurityService,
     platformTransactionManager: PlatformTransactionManager,
 ) : WorkflowEngine {
 
@@ -89,7 +91,7 @@ class WorkflowEngineImpl(
     private fun debug(message: String, instance: WorkflowInstance, nodeId: String) {
         logger.debug(
             // WORKFLOW <instance> <name> <node> <user> <message>
-            "WORKFLOW {} {} {} {} {}",
+            "WORKFLOW [{}] [{}] [{}] [{}] [{}]",
             instance.id,
             instance.workflow.name,
             nodeId,
@@ -101,7 +103,7 @@ class WorkflowEngineImpl(
     private fun debugParent(message: String, instance: WorkflowInstance, nodeId: String) {
         logger.debug(
             // WORKFLOW <instance> <name> <node> <message>
-            "WORKFLOW {} {} {} {}",
+            "WORKFLOW [{}] [{}] [{}] [{}]",
             instance.id,
             instance.workflow.name,
             nodeId,
@@ -294,10 +296,7 @@ class WorkflowEngineImpl(
     }
 
     private fun checkAuthentication(message: String) {
-        val username = SecurityContextHolder.getContext().authentication?.name
-        if (username.isNullOrBlank()) {
-            error(message)
-        }
+        securityService.currentAccount ?: error(message)
     }
 
     private fun getNodeStatus(instanceId: String, nodeId: String): WorkflowInstanceNodeStatus? =
