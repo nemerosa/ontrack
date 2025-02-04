@@ -31,7 +31,7 @@ interface WorkflowNodeExecutor : Extension {
      * @param workflowNodeId Workflow node
      * @return Result for the node execution
      */
-    suspend fun execute(
+    fun execute(
         workflowInstance: WorkflowInstance,
         workflowNodeId: String,
         workflowNodeExecutorResultFeedback: (output: JsonNode?) -> Unit,

@@ -26,7 +26,7 @@ class SlotPipelineDeployingWorkflowNodeExecutor(
 
     override fun validate(data: JsonNode) {}
 
-    override suspend fun execute(
+    override fun execute(
         workflowInstance: WorkflowInstance,
         workflowNodeId: String,
         workflowNodeExecutorResultFeedback: (output: JsonNode?) -> Unit

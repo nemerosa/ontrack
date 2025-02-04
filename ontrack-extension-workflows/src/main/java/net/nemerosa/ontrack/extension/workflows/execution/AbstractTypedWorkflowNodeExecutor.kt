@@ -19,7 +19,8 @@ abstract class AbstractTypedWorkflowNodeExecutor<D : Any>(
     override val displayName: String,
     private val dataType: KClass<D>,
 ) : WorkflowNodeExecutor {
-    override suspend fun execute(
+
+    override fun execute(
         workflowInstance: WorkflowInstance,
         workflowNodeId: String,
         workflowNodeExecutorResultFeedback: (output: JsonNode?) -> Unit

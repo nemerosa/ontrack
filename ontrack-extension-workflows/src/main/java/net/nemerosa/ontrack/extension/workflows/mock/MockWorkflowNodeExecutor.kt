@@ -69,7 +69,7 @@ class MockWorkflowNodeExecutor(
         }
     }
 
-    override suspend fun execute(
+    override fun execute(
         workflowInstance: WorkflowInstance,
         workflowNodeId: String,
         workflowNodeExecutorResultFeedback: (output: JsonNode?) -> Unit,
