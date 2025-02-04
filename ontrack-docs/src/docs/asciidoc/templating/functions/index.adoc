@@ -7,6 +7,7 @@
 * <<templating-function-pipeline,pipeline>>
 * <<templating-function-since,since>>
 * <<templating-function-slot,slot>>
+* <<templating-function-user,user>>
 
 include::templating-function-datetime.adoc[]
 include::templating-function-lastPromotion.adoc[]
@@ -14,3 +15,4 @@ include::templating-function-link.adoc[]
 include::templating-function-pipeline.adoc[]
 include::templating-function-since.adoc[]
 include::templating-function-slot.adoc[]
+include::templating-function-user.adoc[]

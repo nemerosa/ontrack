@@ -1,0 +1,15 @@
+[[templating-function-user]]
+===== user
+
+Displays the current user
+
+Configuration:
+
+* **field** - NAME, DISPLAY, EMAIL - optional - Field to display for the user. Defaults to the username.
+
+Example:
+
+[source]
+----
+#.user
+----
