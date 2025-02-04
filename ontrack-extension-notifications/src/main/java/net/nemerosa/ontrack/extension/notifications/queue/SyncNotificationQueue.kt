@@ -14,14 +14,11 @@ import org.springframework.stereotype.Component
 )
 class SyncNotificationQueue(
     private val notificationProcessingService: NotificationProcessingService,
-    private val notificationQueueItemConverter: NotificationQueueItemConverter,
 ) : NotificationQueue {
 
     override fun publish(item: Notification): Boolean {
         notificationProcessingService.process(
-            item = notificationQueueItemConverter.convertFromQueue(
-                notificationQueueItemConverter.convertForQueue(item)
-            ),
+            item = item,
             context = emptyMap()
         ) {}
         // OK

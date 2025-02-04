@@ -117,8 +117,10 @@ class QueueListener(
                     queueRecordService.processing(qp)
 
                     // Gets the account to use from the queue payload
-                    val account = accountService.findAccountByName(qp.accountName)
-                        ?: throw QueuePayloadAccountNameNotFoundException(qp)
+                    val account = securityService.asAdmin {
+                        accountService.findAccountByName(qp.accountName)
+                            ?: throw QueuePayloadAccountNameNotFoundException(qp)
+                    }
 
                     // Sets the security context for expected account
                     val user = AccountOntrackUser(account)

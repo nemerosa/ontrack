@@ -5,6 +5,8 @@ import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResultType
 import net.nemerosa.ontrack.extension.notifications.channels.getChannel
 import net.nemerosa.ontrack.extension.notifications.channels.throwException
+import net.nemerosa.ontrack.extension.notifications.model.Notification
+import net.nemerosa.ontrack.extension.notifications.model.createData
 import net.nemerosa.ontrack.extension.notifications.processing.NotificationProcessingService
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.extension.workflows.WorkflowsExtensionFeature
@@ -17,7 +19,7 @@ import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.docs.DocumentationExampleCode
-import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.events.SerializableEventService
 import org.springframework.stereotype.Component
 
 @Component
@@ -44,9 +46,9 @@ import org.springframework.stereotype.Component
 class WorkflowNotificationChannelNodeExecutor(
     workflowsExtensionFeature: WorkflowsExtensionFeature,
     private val notificationProcessingService: NotificationProcessingService,
-    private val workflowNotificationItemConverter: WorkflowNotificationItemConverter,
     private val notificationChannelRegistry: NotificationChannelRegistry,
-    private val securityService: SecurityService,
+    private val workflowNotificationSource: WorkflowNotificationSource,
+    private val serializableEventService: SerializableEventService,
 ) : AbstractExtension(workflowsExtensionFeature), WorkflowNodeExecutor {
 
     companion object {
@@ -73,15 +75,17 @@ class WorkflowNotificationChannelNodeExecutor(
         // Gets the node's data
         val (channel, channelConfig, template) = workflowInstance.workflow.getNode(workflowNodeId).data.parse<WorkflowNotificationChannelNodeData>()
         // Creating the notification item
-        val notification = securityService.asAdmin {
-            workflowNotificationItemConverter.convertFromQueue(
-                instanceId = workflowInstance.id,
-                channel = channel,
-                channelConfig = channelConfig,
-                template = template,
-                event = workflowInstance.event
-            )
-        }
+        val notification = Notification(
+            source = workflowNotificationSource.createData(
+                WorkflowNotificationSourceDataType(
+                    workflowInstanceId = workflowInstance.id,
+                )
+            ),
+            channel = channel,
+            channelConfig = channelConfig,
+            event = serializableEventService.hydrate(workflowInstance.event),
+            template = template,
+        )
         // Enriches the context
         val context = WorkflowTemplatingContext.createTemplatingContext(workflowInstance)
         // Feedback
@@ -89,10 +93,7 @@ class WorkflowNotificationChannelNodeExecutor(
             workflowNodeExecutorResultFeedback(output?.asJson())
         }
         // Processing
-        // TODO #1397 Workaround
-        val result = securityService.asAdmin {
-            notificationProcessingService.process(notification, context, outputFeedback)
-        }
+        val result = notificationProcessingService.process(notification, context, outputFeedback)
         // Result of the execution
         return if (result != null) {
             when (result.type) {

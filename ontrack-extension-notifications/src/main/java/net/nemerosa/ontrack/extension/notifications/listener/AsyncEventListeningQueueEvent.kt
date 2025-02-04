@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.model.support.NameValue
  * Serializable event
  */
 data class AsyncEventListeningQueueEvent(
+    val accountName: String,
     val eventType: String,
     val signature: Signature?,
     val entities: Map<ProjectEntityType, Int>,
@@ -19,7 +20,8 @@ data class AsyncEventListeningQueueEvent(
     val ref: ProjectEntityType?,
     val values: Map<String, NameValue>,
 ) {
-    constructor(event: Event) : this(
+    constructor(accountName: String, event: Event) : this(
+        accountName = accountName,
         eventType = event.eventType.id,
         signature = event.signature,
         entities = event.entities.mapValues { (_, entity) -> entity.id() },
