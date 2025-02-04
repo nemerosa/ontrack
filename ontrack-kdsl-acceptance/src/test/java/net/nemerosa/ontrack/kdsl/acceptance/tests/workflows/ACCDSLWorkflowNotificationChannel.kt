@@ -435,7 +435,7 @@ class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
         withNotGrantProjectViewToAll {
             withUser(
                 globalRole = "ADMINISTRATOR"
-            ) {
+            ) { user ->
                 // Creating a dependency
                 val dep = project {
                     branch {
@@ -468,7 +468,7 @@ class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
                                                     channelConfig:
                                                         group: $group
                                                     template: |
-                                                        Build linked to ${'$'}{build.linked?project=${dep.branch.project.name}&mode=auto}
+                                                        User ${'$'}{#.user} - build linked to ${'$'}{build.linked?project=${dep.branch.project.name}&mode=auto}
                                                   
                                         """.trimIndent()
                                     )
@@ -518,7 +518,7 @@ class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
                                 val message = ontrack.notifications.inMemory.group(group)
                                     .firstOrNull()?.trim()
                                 println("In-memory message: $message")
-                                message == "Build linked to ${dep.name}"
+                                message == "User ${user.name} - build linked to ${dep.name}"
                             }
                         }
                     }
