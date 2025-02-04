@@ -101,14 +101,14 @@ class WorkflowEngineImpl(
     }
 
     private fun debugParent(message: String, instance: WorkflowInstance, nodeId: String) {
-        logger.debug(
-            // WORKFLOW <instance> <name> <node> <message>
-            "WORKFLOW [{}] [{}] [{}] [{}]",
-            instance.id,
-            instance.workflow.name,
-            nodeId,
-            message
-        )
+//        logger.debug(
+//            // WORKFLOW <instance> <name> <node> <message>
+//            "WORKFLOW [{}] [{}] [{}] [{}]",
+//            instance.id,
+//            instance.workflow.name,
+//            nodeId,
+//            message
+//        )
     }
 
     private fun error(message: String, instance: WorkflowInstance, nodeId: String, error: Throwable? = null) {
