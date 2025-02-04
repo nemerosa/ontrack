@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.extension.notifications.listener
+package net.nemerosa.ontrack.extension.notifications.queue
 
 import net.nemerosa.ontrack.extension.notifications.NotificationsExtensionFeature
 import net.nemerosa.ontrack.extension.queue.source.QueueSourceExtension
@@ -6,10 +6,10 @@ import net.nemerosa.ontrack.extension.support.AbstractExtension
 import org.springframework.stereotype.Component
 
 @Component
-class NotificationListenerQueueSourceExtension(
+class NotificationQueueSourceExtension(
     notificationsExtensionFeature: NotificationsExtensionFeature,
-) : AbstractExtension(notificationsExtensionFeature), QueueSourceExtension<NotificationListenerQueueSourceData> {
+) : AbstractExtension(notificationsExtensionFeature), QueueSourceExtension<NotificationQueueSourceData> {
 
-    override val id: String = "notification-listener"
+    override val id: String = "notification-processing"
 
 }

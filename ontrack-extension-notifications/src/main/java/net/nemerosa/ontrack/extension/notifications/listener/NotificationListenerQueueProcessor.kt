@@ -20,7 +20,7 @@ class NotificationListenerQueueProcessor(
 
     private val logger: Logger = LoggerFactory.getLogger(NotificationListenerQueueProcessor::class.java)
 
-    override val id: String = "notifications-listeners"
+    override val id: String = "notification.listener"
     override val payloadType: KClass<NotificationListenerQueuePayload> = NotificationListenerQueuePayload::class
 
     override fun isCancelled(payload: NotificationListenerQueuePayload): String? = null

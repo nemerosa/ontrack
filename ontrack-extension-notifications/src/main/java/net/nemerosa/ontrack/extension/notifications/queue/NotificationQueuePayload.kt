@@ -8,8 +8,8 @@ import net.nemerosa.ontrack.model.structure.Signature
 import net.nemerosa.ontrack.model.support.NameValue
 
 data class NotificationQueuePayload(
-    val accountName: String,
-    val source: NotificationSourceData?,
+    val id: String,
+    val source: NotificationSourceData,
     val channel: String,
     val channelConfig: JsonNode,
     val serializableEvent: SerializableEvent,
