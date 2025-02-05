@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.notifications.AbstractNotificationTestSupp
 import net.nemerosa.ontrack.extension.notifications.recording.NotificationRecordFilter
 import net.nemerosa.ontrack.extension.notifications.recording.NotificationRecordingService
 import net.nemerosa.ontrack.extension.notifications.subscriptions.subscribe
+import net.nemerosa.ontrack.extension.queue.QueueNoAsync
 import net.nemerosa.ontrack.extension.support.client.MockRestTemplateContext
 import net.nemerosa.ontrack.extension.support.client.MockRestTemplateProvider
 import net.nemerosa.ontrack.extension.support.client.success
@@ -28,6 +29,7 @@ import kotlin.test.assertNotNull
         "ontrack.config.extension.support.client.resttemplate=mock",
     ]
 )
+@QueueNoAsync
 class JiraServiceDeskNotificationChannelIT : AbstractNotificationTestSupport() {
 
     @Autowired
