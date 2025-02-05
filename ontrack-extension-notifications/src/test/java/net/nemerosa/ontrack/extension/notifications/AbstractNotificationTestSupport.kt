@@ -6,22 +6,17 @@ import net.nemerosa.ontrack.extension.notifications.mock.MockNotificationSourceD
 import net.nemerosa.ontrack.extension.notifications.mock.OtherMockNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.model.createData
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionService
+import net.nemerosa.ontrack.extension.queue.QueueNoAsync
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.model.events.EventFactory
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.test.context.TestPropertySource
 
 /**
  * Notification integration test using a mock channel.
  */
-@TestPropertySource(
-    properties = [
-        "ontrack.config.extension.notifications.dispatching.queue.async=false",
-        "ontrack.config.extension.notifications.processing.queue.async=false",
-    ]
-)
+@QueueNoAsync
 abstract class AbstractNotificationTestSupport : AbstractQLKTITSupport() {
 
     @Autowired
