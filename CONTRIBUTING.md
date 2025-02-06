@@ -55,18 +55,6 @@ guidelines when creating commits:
 
 The Ontrack developers reserve their right to accept or deny commits based on their quality.
 
-## Contributor License Agreement
-
-Before we can merge your contributions, you must sign our Contributor License Agreement (CLA).
-
-1. open a Pull Request
-2. once you open the PR, our CLA bot will check if you have signed the CLA
-3. if you haven't signed yet, it will post a comment with a link to sign the agreement
-4. click the link, read the terms, and sign electronically (via GitHub login)
-5. once signed, the bot will confirm, and we can merge your PR.
-
-You can read the full text of the CLA [here](CLA.md).
-
 ### Why do we need this?
 
 This helps protect you and us. The CLA ensures that the community is free to use your contributions under the terms of
