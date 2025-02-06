@@ -1,1 +1,1 @@
-const releases = ['4.11.12','4.11-alpha.25','3.39.6'];
+const releases = ['4.11.19','4.11-alpha.25','3.39.6'];
