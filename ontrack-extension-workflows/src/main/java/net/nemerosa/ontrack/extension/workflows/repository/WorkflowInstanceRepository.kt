@@ -307,6 +307,7 @@ class WorkflowInstanceRepository(dataSource: DataSource) : AbstractJdbcRepositor
                 SELECT *
                 FROM WKF_INSTANCES
                 $where
+                ORDER BY TIMESTAMP DESC
                 LIMIT :limit
                 OFFSET :offset
             """.trimIndent(),

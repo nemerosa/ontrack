@@ -8,7 +8,7 @@ const nodeTypes = {
     workflowNode: WorkflowInstanceGraphNode,
 }
 
-export function WorkflowInstanceGraphFlow({instance, onNodeSelected}) {
+export function WorkflowInstanceGraphFlow({instance, instanceNodeExecutions, onNodeSelected}) {
 
     const workflowNode = (nodeExecution, workflowNodes) => {
         return {
@@ -67,6 +67,25 @@ export function WorkflowInstanceGraphFlow({instance, onNodeSelected}) {
             setLoading(false)
         }
     }, [instance])
+
+    useEffect(() => {
+        if (nodes && !loading) {
+            setNodes(nodes => nodes.map(node => {
+                const nodeExecution = instanceNodeExecutions.find(it => it.id === node.id)
+                if (nodeExecution) {
+                    return {
+                        ...node,
+                        data: {
+                            ...node.data,
+                            nodeExecution,
+                        }
+                    }
+                } else {
+                    return node
+                }
+            }))
+        }
+    }, [instanceNodeExecutions])
 
     const onNodeClick = useCallback((event, node) => {
         if (node && onNodeSelected) {
