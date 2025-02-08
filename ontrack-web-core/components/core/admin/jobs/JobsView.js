@@ -6,14 +6,12 @@ import {homeUri} from "@components/common/Links";
 import MainPage from "@components/layouts/MainPage";
 import StandardTable from "@components/common/table/StandardTable";
 import {gql} from "graphql-request";
-import {Space, Typography} from "antd";
+import {Form, Input, Space, Typography} from "antd";
 import JobState from "@components/core/admin/jobs/JobState";
 import JobActions from "@components/core/admin/jobs/JobActions";
 import JobDetails from "@components/core/admin/jobs/JobDetails";
 import TimestampText from "@components/common/TimestampText";
-import TableColumnFilterDropdownInput from "@components/common/table/TableColumnFilterDropdownInput";
 import {useState} from "react";
-import TableColumnFilterDropdown from "@components/common/table/TableColumnFilterDropdown";
 import SelectJobState from "@components/core/admin/jobs/SelectJobState";
 import JobErrorIndicator from "@components/core/admin/jobs/JobErrorIndicator";
 import SelectJobError from "@components/core/admin/jobs/SelectJobError";
@@ -89,29 +87,15 @@ export default function JobsView() {
         }
     `
 
-    const [filter, setFilter] = useState({
-        description: null,
-        state: null,
-        error: false,
-        timeout: false,
-        category: null,
-        type: null,
-    })
-
-    const onFilterChange = (filters) => {
-        setFilter({
-            description: filters.description && filters.description[0],
-            state: filters.state && filters.state[0],
-            error: filters.error && filters.error[0],
-            timeout: filters.timeout && filters.timeout[0],
-            category: filters.category && (typeof filters.category === 'string' ? filters.category : filters.category[0]),
-            type: filters.category ? filters.type && (typeof filters.type === 'string' ? filters.type : filters.type[0]) : null,
-        })
-    }
-
     const [reloadCount, setReloadCount] = useState(0)
     const refresh = () => {
         setReloadCount(previous => previous + 1)
+    }
+
+    const [category, setCategory] = useState()
+
+    const onFilterFormValuesChanged = (values) => {
+        setCategory(values.category)
     }
 
     return (
@@ -135,8 +119,78 @@ export default function JobsView() {
                                 queryNode="jobs"
                                 size={30}
                                 reloadCount={reloadCount}
-                                filter={filter}
-                                onFilterChange={onFilterChange}
+                                filter={{}}
+                                onFilterFormValuesChanged={onFilterFormValuesChanged}
+                                filterForm={[
+                                    <Form.Item
+                                        key="state"
+                                        name="state"
+                                    >
+                                        <SelectJobState
+                                            style={{
+                                                width: '15em',
+                                            }}
+                                            allowClear={true}
+                                            placeholder="Any state"
+                                        />
+                                    </Form.Item>,
+                                    <Form.Item
+                                        key="category"
+                                        name="category"
+                                    >
+                                        <SelectJobCategory
+                                            style={{
+                                                width: '15em',
+                                            }}
+                                            allowClear={true}
+                                            placeholder="Any category"
+                                        />
+                                    </Form.Item>,
+                                    <Form.Item
+                                        key="type"
+                                        name="type"
+                                    >
+                                        <SelectJobType
+                                            selectedCategory={category}
+                                            style={{
+                                                width: '15em',
+                                            }}
+                                            placeholder="Any type"
+                                        />
+                                    </Form.Item>,
+                                    <Form.Item
+                                        key="error"
+                                        name="error"
+                                    >
+                                        <SelectJobError
+                                            style={{
+                                                width: '15em',
+                                            }}
+                                            allowClear={true}
+                                            placeholder="Any error state"
+                                        />
+                                    </Form.Item>,
+                                    <Form.Item
+                                        key="timeout"
+                                        name="timeout"
+                                    >
+                                        <SelectJobTimeout
+                                            style={{
+                                                width: '15em',
+                                            }}
+                                            allowClear={true}
+                                            placeholder="Any timeout state"
+                                        />
+                                    </Form.Item>,
+                                    <Form.Item
+                                        key="description"
+                                        name="description"
+                                    >
+                                        <Input
+                                            placeholder="Any description"
+                                        />
+                                    </Form.Item>,
+                                ]}
                                 columns={[
                                     {
                                         key: 'id',
@@ -147,42 +201,11 @@ export default function JobsView() {
                                         key: 'category',
                                         title: 'Category',
                                         render: (_, job) => job.jobKey.type.category.name,
-                                        filterDropdown: ({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
-                                            <TableColumnFilterDropdown
-                                                confirm={confirm}
-                                                clearFilters={clearFilters}
-                                            >
-                                                <SelectJobCategory
-                                                    value={selectedKeys}
-                                                    onChange={value => setSelectedKeys([value])}
-                                                    style={{
-                                                        width: '15em',
-                                                    }}
-                                                />
-                                            </TableColumnFilterDropdown>
-                                        ,
-                                        filteredValue: filter.category,
                                     },
                                     {
                                         key: 'type',
                                         title: 'Type',
                                         render: (_, job) => job.jobKey.type.name,
-                                        filterDropdown: ({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
-                                            <TableColumnFilterDropdown
-                                                confirm={confirm}
-                                                clearFilters={clearFilters}
-                                            >
-                                                <SelectJobType
-                                                    selectedCategory={filter.category}
-                                                    value={selectedKeys}
-                                                    onChange={value => setSelectedKeys([value])}
-                                                    style={{
-                                                        width: '15em',
-                                                    }}
-                                                />
-                                            </TableColumnFilterDropdown>
-                                        ,
-                                        filteredValue: filter.type,
                                     },
                                     {
                                         key: 'description',
@@ -192,76 +215,21 @@ export default function JobsView() {
                                                 code>{job.jobKey.type.category.key}/{job.jobKey.type.key}/{job.jobKey.id}</Typography.Text>
                                             <Typography.Text type="secondary">{job.description}</Typography.Text>
                                         </Space>,
-                                        filterDropdown: ({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
-                                            <TableColumnFilterDropdownInput
-                                                confirm={confirm}
-                                                clearFilters={clearFilters}
-                                                selectedKeys={selectedKeys}
-                                                setSelectedKeys={setSelectedKeys}
-                                            />
-                                        ,
-                                        filteredValue: filter.description,
                                     },
                                     {
                                         key: 'state',
                                         title: 'State',
                                         render: (_, job) => <JobState value={job.state}/>,
-                                        filterDropdown: ({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
-                                            <TableColumnFilterDropdown
-                                                confirm={confirm}
-                                                clearFilters={clearFilters}
-                                            >
-                                                <SelectJobState
-                                                    value={selectedKeys}
-                                                    onChange={value => setSelectedKeys([value])}
-                                                    style={{
-                                                        width: '15em',
-                                                    }}
-                                                    allowClear={true}
-                                                />
-                                            </TableColumnFilterDropdown>
-                                        ,
-                                        filteredValue: filter.state,
                                     },
                                     {
                                         key: 'error',
                                         title: "Error",
                                         render: (_, job) => <JobErrorIndicator job={job}/>,
-                                        filterDropdown: ({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
-                                            <TableColumnFilterDropdown
-                                                confirm={confirm}
-                                                clearFilters={clearFilters}
-                                            >
-                                                <SelectJobError
-                                                    value={selectedKeys}
-                                                    onChange={value => setSelectedKeys([value])}
-                                                    style={{
-                                                        width: '15em',
-                                                    }}
-                                                />
-                                            </TableColumnFilterDropdown>
-                                        ,
-                                        filteredValue: filter.error,
                                     },
                                     {
                                         key: 'timeout',
                                         title: "Timeout",
                                         render: (_, job) => <JobTimeoutIndicator job={job}/>,
-                                        filterDropdown: ({setSelectedKeys, selectedKeys, confirm, clearFilters}) =>
-                                            <TableColumnFilterDropdown
-                                                confirm={confirm}
-                                                clearFilters={clearFilters}
-                                            >
-                                                <SelectJobTimeout
-                                                    value={selectedKeys}
-                                                    onChange={value => setSelectedKeys([value])}
-                                                    style={{
-                                                        width: '15em',
-                                                    }}
-                                                />
-                                            </TableColumnFilterDropdown>
-                                        ,
-                                        filteredValue: filter.timeout,
                                     },
                                     {
                                         key: 'actions',

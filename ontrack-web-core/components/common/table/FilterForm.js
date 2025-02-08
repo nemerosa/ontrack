@@ -1,7 +1,7 @@
 import {Button, Card, Form, Space} from "antd";
 import {FaBan, FaFilter} from "react-icons/fa";
 
-export default function FilterForm({setFilterFormData, filterForm, filterExtraButtons}) {
+export default function FilterForm({setFilterFormData, onFilterFormValuesChanged, filterForm, filterExtraButtons}) {
 
     const [filterFormInstance] = Form.useForm()
 
@@ -23,6 +23,7 @@ export default function FilterForm({setFilterFormData, filterForm, filterExtraBu
                 <Form
                     layout="inline"
                     onFinish={onFilterFormFinish}
+                    onValuesChange={onFilterFormValuesChanged}
                     form={filterFormInstance}
                     style={{
                         rowGap: 16,

@@ -2,7 +2,7 @@ import {useContext, useEffect, useState} from "react";
 import {JobCategoriesContext} from "@components/core/admin/jobs/JobCategoriesContext";
 import {Select} from "antd";
 
-export default function SelectJobType({selectedCategory, value, onChange, style, allowClear}) {
+export default function SelectJobType({selectedCategory, value, onChange, style, allowClear, placeholder}) {
     const {categories} = useContext(JobCategoriesContext)
 
     const [options, setOptions] = useState([])
@@ -33,6 +33,7 @@ export default function SelectJobType({selectedCategory, value, onChange, style,
                 onChange={onChange}
                 allowClear={allowClear}
                 style={style}
+                placeholder={placeholder}
             />
         </>
     )
