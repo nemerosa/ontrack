@@ -29,7 +29,7 @@ export const useProjectBuildSearch = ({project}) => {
                         name
                         displayName
                     }
-                    promotionRuns {
+                    promotionRuns(lastPerLevel: true) {
                         id
                         creation {
                             time
