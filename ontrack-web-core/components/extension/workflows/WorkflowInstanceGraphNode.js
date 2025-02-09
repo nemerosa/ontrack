@@ -7,7 +7,7 @@ import DurationMs from "@components/common/DurationMs";
 
 export default function WorkflowInstanceGraphNode({data}) {
 
-    const {nodeExecution, workflowNode, selected} = data
+    const {nodeExecution, workflowNode, selected, showDetails} = data
 
     return (
         <>
@@ -32,23 +32,27 @@ export default function WorkflowInstanceGraphNode({data}) {
                     </Space>
                     <Typography.Text italic>{workflowNode.executorId}</Typography.Text>
                     <WorkflowInstanceNodeStatus status={nodeExecution.status}/>
-                    <Space>
-                        <FaPlay/>
-                        <TimestampText value={nodeExecution.startTime}/>
-                    </Space>
                     {
-                        nodeExecution.endTime &&
-                        <Space>
-                            <FaStop/>
-                            <TimestampText value={nodeExecution.endTime}/>
-                        </Space>
-                    }
-                    {
-                        nodeExecution.endTime &&
-                        <Space>
-                            <FaStopwatch/>
-                            <DurationMs ms={nodeExecution.durationMs}/>
-                        </Space>
+                        showDetails && <>
+                            <Space>
+                                <FaPlay/>
+                                <TimestampText value={nodeExecution.startTime}/>
+                            </Space>
+                            {
+                                nodeExecution.endTime &&
+                                <Space>
+                                    <FaStop/>
+                                    <TimestampText value={nodeExecution.endTime}/>
+                                </Space>
+                            }
+                            {
+                                nodeExecution.endTime &&
+                                <Space>
+                                    <FaStopwatch/>
+                                    <DurationMs ms={nodeExecution.durationMs}/>
+                                </Space>
+                            }
+                        </>
                     }
                 </Space>
             </Card>

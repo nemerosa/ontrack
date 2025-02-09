@@ -1,8 +1,10 @@
 import WorkflowInstanceGraphNode from "@components/extension/workflows/WorkflowInstanceGraphNode";
 import {useCallback, useEffect, useState} from "react";
 import {autoLayout} from "@components/links/GraphUtils";
-import {applyNodeChanges, Background, Controls, ReactFlow} from "reactflow";
+import {applyNodeChanges, Background, ControlButton, Controls, ReactFlow} from "reactflow";
 import {Skeleton} from "antd";
+import {FaEye, FaEyeSlash} from "react-icons/fa";
+import {useLocalWorkflowShowDetails} from "@components/storage/local";
 
 const nodeTypes = {
     workflowNode: WorkflowInstanceGraphNode,
@@ -10,11 +12,29 @@ const nodeTypes = {
 
 export function WorkflowInstanceGraphFlow({instance, instanceNodeExecutions, onNodeSelected}) {
 
+    const {showDetails, toggleShowDetails} = useLocalWorkflowShowDetails()
+
+    useEffect(() => {
+        setNodes(nodes => nodes.map(node => {
+            return {
+                ...node,
+                data: {
+                    ...node.data,
+                    showDetails,
+                }
+            }
+        }))
+    }, [showDetails])
+
     const workflowNode = (nodeExecution, workflowNodes) => {
         return {
             id: nodeExecution.id,
             position: {x: 0, y: 0},
-            data: {nodeExecution, workflowNode: workflowNodes[nodeExecution.id]},
+            data: {
+                nodeExecution,
+                workflowNode: workflowNodes[nodeExecution.id],
+                showDetails,
+            },
             type: 'workflowNode',
         }
     }
@@ -69,7 +89,7 @@ export function WorkflowInstanceGraphFlow({instance, instanceNodeExecutions, onN
     }, [instance])
 
     useEffect(() => {
-        if (nodes && !loading) {
+        if (nodes && !loading && instanceNodeExecutions) {
             setNodes(nodes => nodes.map(node => {
                 const nodeExecution = instanceNodeExecutions.find(it => it.id === node.id)
                 if (nodeExecution) {
@@ -118,7 +138,21 @@ export function WorkflowInstanceGraphFlow({instance, instanceNodeExecutions, onN
                         nodeTypes={nodeTypes}
                     >
                         <Background/>
-                        <Controls/>
+                        <Controls>
+                            <ControlButton
+                                title={
+                                    showDetails ? "Show less information" : "Show more information"
+                                }
+                                onClick={toggleShowDetails}
+                            >
+                                {
+                                    showDetails && <FaEyeSlash/>
+                                }
+                                {
+                                    !showDetails && <FaEye/>
+                                }
+                            </ControlButton>
+                        </Controls>
                     </ReactFlow>
                 </Skeleton>
             </div>

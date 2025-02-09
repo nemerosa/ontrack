@@ -5,7 +5,7 @@ ones can be stored locally, in the
 browser [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage).
 
 Components should not access the `localStorage` API directly but use instead of
-the [`local.js`](../../ontrack-web-core/components/storage/local.js) utility methods.
+the [`local.js`](../../../ontrack-web-core/components/storage/local.js) utility methods.
 
 For example, to check if the user wants to group validation stamps per status in the branch page:
 

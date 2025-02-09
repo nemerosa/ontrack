@@ -6,7 +6,7 @@ import MainPage from "@components/layouts/MainPage";
 import Link from "next/link";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {useContext, useEffect, useState} from "react";
-import {Descriptions, Skeleton, Space} from "antd";
+import {Descriptions, Skeleton, Space, Typography} from "antd";
 import {gql} from "graphql-request";
 import TimestampText from "@components/common/TimestampText";
 import DurationMs from "@components/common/DurationMs";
@@ -112,7 +112,7 @@ export default function WorkflowInstanceView({id}) {
                 {
                     key: 'id',
                     label: 'ID',
-                    children: instance.id,
+                    children: <Typography.Text copyable>{instance.id}</Typography.Text>,
                     span: 4,
                 },
                 {
