@@ -21,7 +21,7 @@ export default function WorkflowInstanceGraph({instance, instanceNodeExecutions}
                     </ReactFlowProvider>
                 </Col>
                 <Col span={8}>
-                    <WorkflowInstanceGraphInfo instance={instance} selectedNode={nodeSelected}/>
+                    <WorkflowInstanceGraphInfo selectedNode={nodeSelected}/>
                 </Col>
             </Row>
         </>
