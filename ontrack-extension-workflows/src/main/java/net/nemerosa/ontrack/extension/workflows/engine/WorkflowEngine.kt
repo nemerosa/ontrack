@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.workflows.engine
 
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 import net.nemerosa.ontrack.model.events.SerializableEvent
+import net.nemerosa.ontrack.model.trigger.TriggerData
 
 /**
  * Engine used to orchestrate the execution of workflows.
@@ -13,12 +14,14 @@ interface WorkflowEngine {
      *
      * @param workflow Workflow to run
      * @param event Execution context
+     * @param triggerData Trigger for this workflow
      * @param pauseMs Pause before launching the workflow (used for tests)
      * @return Initial state of the workflow instance
      */
     fun startWorkflow(
         workflow: Workflow,
         event: SerializableEvent,
+        triggerData: TriggerData,
         pauseMs: Long = 0,
     ): WorkflowInstance
 

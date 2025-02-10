@@ -69,6 +69,7 @@ class WorkflowsMutations(
                 workflowEngine.startWorkflow(
                     workflow = workflowRecord.workflow,
                     event = event,
+                    triggerData = TODO(),
                 ).id
             } else {
                 null

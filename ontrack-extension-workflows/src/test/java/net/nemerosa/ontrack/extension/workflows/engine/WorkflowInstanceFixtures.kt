@@ -16,6 +16,7 @@ object WorkflowInstanceFixtures {
         return createInstance(
             workflow = workflow,
             event = event,
+            triggerData = TODO(),
             timestamp = timestamp,
         )
     }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 import net.nemerosa.ontrack.model.events.SerializableEvent
+import net.nemerosa.ontrack.model.trigger.TriggerData
 import java.time.Duration
 import java.time.LocalDateTime
 
@@ -15,6 +16,7 @@ import java.time.LocalDateTime
  * @property timestamp Last time the instance was updated.
  * @property workflow Associated workflow
  * @property event Serializable event linked to the workflow
+ * @property triggerData Trigger for this workflow
  * @property nodesExecutions Information about the node executions
  * @property status Status of the execution of this workflow
  */
@@ -23,6 +25,7 @@ data class WorkflowInstance(
     val timestamp: LocalDateTime,
     val workflow: Workflow,
     val event: SerializableEvent,
+    val triggerData: TriggerData? = null,
     val nodesExecutions: List<WorkflowInstanceNode>,
 ) {
 
@@ -35,6 +38,7 @@ data class WorkflowInstance(
         timestamp = timestamp,
         workflow = workflow,
         event = event,
+        triggerData = triggerData,
         nodesExecutions = nodesExecutions,
     )
 
@@ -85,6 +89,7 @@ data class WorkflowInstance(
         timestamp = Time.now,
         workflow = workflow,
         event = eventToMerge ?: event,
+        triggerData = triggerData,
         nodesExecutions = nodesExecutions,
     )
 
@@ -94,6 +99,7 @@ data class WorkflowInstance(
             timestamp = Time.now,
             workflow = workflow,
             event = event,
+            triggerData = triggerData,
             nodesExecutions = nodesExecutions.map { node ->
                 if (node.id == nodeId) {
                     update(node)
@@ -155,6 +161,7 @@ data class WorkflowInstance(
             timestamp = timestamp,
             workflow = workflow,
             event = event,
+            triggerData = triggerData,
             nodesExecutions = nodesExecutions.map { nx ->
                 if (nx.status.finished) {
                     nx

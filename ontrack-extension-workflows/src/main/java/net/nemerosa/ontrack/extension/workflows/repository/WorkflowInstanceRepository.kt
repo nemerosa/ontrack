@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.events.SerializableEvent
 import net.nemerosa.ontrack.model.events.merge
 import net.nemerosa.ontrack.model.pagination.PaginatedList
+import net.nemerosa.ontrack.model.trigger.TriggerData
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
@@ -22,14 +23,16 @@ class WorkflowInstanceRepository(dataSource: DataSource) : AbstractJdbcRepositor
     fun createInstance(instance: WorkflowInstance) {
         namedParameterJdbcTemplate!!.update(
             """
-                INSERT INTO WKF_INSTANCES(ID, TIMESTAMP, WORKFLOW, EVENT)
-                VALUES (:id, :timestamp, CAST(:workflow AS JSONB), CAST(:event as JSONB))
+                INSERT INTO WKF_INSTANCES(ID, TIMESTAMP, WORKFLOW, EVENT, TRIGGER_ID, TRIGGER_DATA)
+                VALUES (:id, :timestamp, CAST(:workflow AS JSONB), CAST(:event AS JSONB), :triggerId, CAST(:triggerData AS JSONB))
             """.trimIndent(),
             mapOf(
                 "id" to instance.id,
                 "timestamp" to dateTimeForDB(instance.timestamp),
                 "workflow" to writeJson(instance.workflow),
                 "event" to writeJson(instance.event),
+                "triggerId" to instance.triggerData?.id,
+                "triggerData" to writeJson(instance.triggerData?.data),
             )
         )
         instance.nodesExecutions.forEach { nx ->
@@ -77,11 +80,21 @@ class WorkflowInstanceRepository(dataSource: DataSource) : AbstractJdbcRepositor
         ) { rsn, _ ->
             toWorkflowInstanceNode(rsn)
         }
+        val triggerId = rs.getString("TRIGGER_ID")
+        val triggerData = readJson(rs, "TRIGGER_DATA")
         return WorkflowInstance(
             id = instanceId,
             timestamp = dateTimeFromDB(rs.getString("TIMESTAMP"))!!,
             workflow = readJson(rs, "WORKFLOW").parse(),
             event = readJson(rs, "EVENT").parse(),
+            triggerData = if (triggerId != null && triggerData != null) {
+                TriggerData(
+                    id = triggerId,
+                    data = triggerData,
+                )
+            } else {
+                null
+            },
             nodesExecutions = nodesExecutions,
         )
     }

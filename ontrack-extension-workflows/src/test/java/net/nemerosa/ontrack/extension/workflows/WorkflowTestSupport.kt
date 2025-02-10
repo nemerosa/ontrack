@@ -62,7 +62,11 @@ class WorkflowTestSupport(
 
             // Launching the workflow
             val instance =
-                workflowEngine.startWorkflow(record.workflow, serializableEvent)
+                workflowEngine.startWorkflow(
+                    workflow = record.workflow,
+                    event = serializableEvent,
+                    triggerData = TODO(),
+                )
             // Waiting until the workflow is completed (error or success)
             if (wait) {
                 waitForWorkflowInstance(instance.id)

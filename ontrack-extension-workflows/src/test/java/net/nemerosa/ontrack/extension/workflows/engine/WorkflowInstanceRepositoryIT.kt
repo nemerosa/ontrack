@@ -30,6 +30,7 @@ class WorkflowInstanceRepositoryIT : AbstractDSLTestSupport() {
             event = serializableEventService.dehydrate(
                 MockEventType.mockEvent("Some text")
             ),
+            triggerData = TODO(),
         )
         workflowInstanceRepository.createInstance(instance)
 
@@ -50,6 +51,7 @@ class WorkflowInstanceRepositoryIT : AbstractDSLTestSupport() {
                 event = serializableEventService.dehydrate(
                     MockEventType.mockEvent("Some text")
                 ),
+                triggerData = TODO(),
             ).apply {
                 workflowInstanceRepository.createInstance(this)
             }

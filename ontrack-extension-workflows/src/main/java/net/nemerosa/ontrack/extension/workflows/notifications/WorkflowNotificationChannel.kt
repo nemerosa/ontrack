@@ -6,6 +6,8 @@ import net.nemerosa.ontrack.extension.notifications.channels.NoTemplate
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.notifications.recording.NotificationRecord
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
+import net.nemerosa.ontrack.extension.notifications.trigger.NotificationRecordTrigger
+import net.nemerosa.ontrack.extension.notifications.trigger.NotificationRecordTriggerData
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowNode
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowValidation
@@ -22,6 +24,7 @@ import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.events.SerializableEventService
 import net.nemerosa.ontrack.model.form.Form
+import net.nemerosa.ontrack.model.trigger.createTriggerData
 import org.springframework.stereotype.Component
 
 @Component
@@ -34,6 +37,7 @@ class WorkflowNotificationChannel(
     private val eventTemplatingService: EventTemplatingService,
     private val workflowNodeExecutorService: WorkflowNodeExecutorService,
     private val serializableEventService: SerializableEventService,
+    private val notificationRecordTrigger: NotificationRecordTrigger,
 ) : AbstractNotificationChannel<WorkflowNotificationChannelConfig, WorkflowNotificationChannelOutput>(
     WorkflowNotificationChannelConfig::class
 ) {
@@ -91,6 +95,11 @@ class WorkflowNotificationChannel(
         val instance = workflowEngine.startWorkflow(
             workflow = workflow,
             event = workflowEvent,
+            triggerData = notificationRecordTrigger.createTriggerData(
+                NotificationRecordTriggerData(
+                    recordId = recordId,
+                )
+            ),
             pauseMs = config.pauseMs,
         )
         // Output = just an ID to the workflow instance

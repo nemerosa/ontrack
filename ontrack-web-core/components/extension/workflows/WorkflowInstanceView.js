@@ -14,10 +14,10 @@ import WorkflowInstanceStatus from "@components/extension/workflows/WorkflowInst
 import WorkflowInstanceGraph from "@components/extension/workflows/WorkflowInstanceGraph";
 import PageSection from "@components/common/PageSection";
 import WorkflowNodeExecutorContextProvider from "@components/extension/workflows/WorkflowNodeExecutorContext";
-import WorkflowInstanceContext from "@components/extension/workflows/WorkflowInstanceContext";
 import {UserContext} from "@components/providers/UserProvider";
 import WorkflowInstanceStopButton from "@components/extension/workflows/WorkflowInstanceStopButton";
 import {AutoRefreshButton, AutoRefreshContextProvider} from "@components/common/AutoRefresh";
+import TriggerComponent from "@components/framework/trigger/TriggerComponent";
 
 export default function WorkflowInstanceView({id}) {
 
@@ -71,6 +71,10 @@ export default function WorkflowInstanceView({id}) {
                                     name
                                     value
                                 }
+                            }
+                            triggerData {
+                                id
+                                data
                             }
                             nodesExecutions {
                                 id
@@ -156,9 +160,9 @@ export default function WorkflowInstanceView({id}) {
                     span: 3,
                 },
                 {
-                    key: 'context',
-                    label: 'Context',
-                    children: <WorkflowInstanceContext instance={instance}/>,
+                    key: 'trigger',
+                    label: 'Trigger',
+                    children: <TriggerComponent triggerData={instance.triggerData}/>,
                     span: 12,
                 }
             ])

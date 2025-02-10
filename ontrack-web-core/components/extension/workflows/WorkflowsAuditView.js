@@ -10,7 +10,7 @@ import WorkflowInstanceStatus from "@components/extension/workflows/WorkflowInst
 import TimestampText from "@components/common/TimestampText";
 import DurationMs from "@components/common/DurationMs";
 import Link from "next/link";
-import NotificationRecordLink from "@components/extension/notifications/NotificationRecordLink";
+import TriggerLink from "@components/framework/trigger/TriggerLink";
 
 export default function WorkflowsAuditView() {
 
@@ -40,6 +40,10 @@ export default function WorkflowsAuditView() {
                             name
                             value
                         }
+                    }
+                    triggerData {
+                        id
+                        data
                     }
                     workflow {
                         name
@@ -79,16 +83,14 @@ export default function WorkflowsAuditView() {
                             render: (_, instance) => instance.workflow.name,
                         },
                         {
-                            key: 'notification',
-                            title: "Notification",
-                            render: (_, instance) => {
-                                const notificationRecordId = instance.event.values.find(it => it.name === 'notificationRecordId')?.value
-                                if (notificationRecordId) {
-                                    return <NotificationRecordLink recordId={notificationRecordId}/>
-                                } else {
-                                    return undefined
+                            key: 'trigger',
+                            title: "Trigger",
+                            render: (_, instance) => <>
+                                {
+                                    instance.triggerData &&
+                                    <TriggerLink triggerData={instance.triggerData}/>
                                 }
-                            }
+                            </>
                         },
                         {
                             key: 'status',

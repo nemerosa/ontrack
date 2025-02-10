@@ -71,7 +71,7 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
             )
 
             val event = environmentsEventsFactory.pipelineCreation(pipeline)
-            val startedSlotWorkflowInstance = slotWorkflowService.startWorkflow(pipeline, slotWorkflow, event)
+            val startedSlotWorkflowInstance = slotWorkflowService.startWorkflow(pipeline, slotWorkflow, event, SlotPipelineStatus.CANDIDATE)
 
             workflowTestSupport.waitForWorkflowInstance(startedSlotWorkflowInstance.workflowInstance.id)
 
