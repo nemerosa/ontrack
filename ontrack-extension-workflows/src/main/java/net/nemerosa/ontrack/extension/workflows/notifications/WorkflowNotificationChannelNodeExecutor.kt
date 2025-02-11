@@ -93,40 +93,41 @@ class WorkflowNotificationChannelNodeExecutor(
             workflowNodeExecutorResultFeedback(output?.asJson())
         }
         // Processing
-        val result = notificationProcessingService.process(notification, context, outputFeedback)
+        val processingResult = notificationProcessingService.process(notification, context, outputFeedback)
+        val result = processingResult?.result
         // Result of the execution
-        return if (result != null) {
+        return if (processingResult != null && result != null) {
             when (result.type) {
-                NotificationResultType.OK -> WorkflowNodeExecutorResult.success(result.output?.asJson())
-                NotificationResultType.ASYNC -> WorkflowNodeExecutorResult.success(result.output?.asJson())
-                NotificationResultType.ONGOING -> WorkflowNodeExecutorResult.error(
+                NotificationResultType.OK -> WorkflowNotificationChannelNodeExecutorOutput.success(processingResult)
+                NotificationResultType.ASYNC -> WorkflowNotificationChannelNodeExecutorOutput.success(processingResult)
+                NotificationResultType.ONGOING -> WorkflowNotificationChannelNodeExecutorOutput.error(
                     "Notification is still ongoing",
-                    result.output?.asJson()
+                    processingResult,
                 )
 
-                NotificationResultType.NOT_CONFIGURED -> WorkflowNodeExecutorResult.error(
+                NotificationResultType.NOT_CONFIGURED -> WorkflowNotificationChannelNodeExecutorOutput.error(
                     "Notification is not configured",
-                    result.output?.asJson()
+                    processingResult
                 )
 
-                NotificationResultType.INVALID_CONFIGURATION -> WorkflowNodeExecutorResult.error(
+                NotificationResultType.INVALID_CONFIGURATION -> WorkflowNotificationChannelNodeExecutorOutput.error(
                     "Notification configuration is invalid",
-                    result.output?.asJson()
+                    processingResult
                 )
 
-                NotificationResultType.DISABLED -> WorkflowNodeExecutorResult.error(
+                NotificationResultType.DISABLED -> WorkflowNotificationChannelNodeExecutorOutput.error(
                     "Notification is disabled",
-                    result.output?.asJson()
+                    processingResult
                 )
 
-                NotificationResultType.ERROR -> WorkflowNodeExecutorResult.error(
+                NotificationResultType.ERROR -> WorkflowNotificationChannelNodeExecutorOutput.error(
                     result.message ?: "Unknown error",
-                    result.output?.asJson()
+                    processingResult
                 )
 
-                NotificationResultType.TIMEOUT -> WorkflowNodeExecutorResult.error(
+                NotificationResultType.TIMEOUT -> WorkflowNotificationChannelNodeExecutorOutput.error(
                     "Timeout when running a workflow",
-                    result.output?.asJson()
+                    processingResult
                 )
             }
         } else {

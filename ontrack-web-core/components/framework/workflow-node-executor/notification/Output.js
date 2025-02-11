@@ -1,5 +1,6 @@
 import NotificationRecordOutput from "@components/extension/notifications/NotificationRecordOutput";
 import {Space} from "antd";
+import NotificationRecordLink from "@components/extension/notifications/NotificationRecordLink";
 
 export default function NotificationWorkflowNodeExecutorOutput({data, nodeData}) {
 
@@ -8,11 +9,23 @@ export default function NotificationWorkflowNodeExecutorOutput({data, nodeData})
     return (
         <>
             <Space direction="vertical">
-                <NotificationRecordOutput
-                    channel={channel}
-                    output={data}
-                />
-                {/* TODO Link to the notification record */}
+                {
+                    data.result &&
+                    <NotificationRecordOutput
+                        channel={channel}
+                        output={data.result}
+                    />
+                }
+                {/* Link to the notification record */}
+                {
+                    data.recordId &&
+                    <Space>
+                        <NotificationRecordLink
+                            recordId={data.recordId}
+                            text="Notification details"
+                        />
+                    </Space>
+                }
             </Space>
         </>
     )

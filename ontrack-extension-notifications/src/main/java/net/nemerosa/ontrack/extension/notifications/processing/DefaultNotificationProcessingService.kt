@@ -38,7 +38,7 @@ class DefaultNotificationProcessingService(
         item: Notification,
         context: Map<String, Any>,
         outputFeedback: (output: Any?) -> Unit,
-    ): NotificationResult<*>? {
+    ): NotificationProcessingResult<*>? {
         logger.debug(
             "Processing notification (user={}) {}",
             securityService.currentAccount?.account?.name,
@@ -60,60 +60,25 @@ class DefaultNotificationProcessingService(
         item: Notification,
         context: Map<String, Any>,
         outputFeedback: (output: R) -> Unit,
-    ): NotificationResult<R>? {
+    ): NotificationProcessingResult<R> {
 
         // Unique ID for the record
         val recordId = UUID.randomUUID().toString()
 
         val validatedConfig = channel.validate(item.channelConfig)
         return if (validatedConfig.config != null) {
-            // Current output progress
-            var output: R? = null
-            val outputProgressCallback: (R) -> R = { current ->
-                output = current
-                // Saving the current state of the record
-                recordResult(
-                    recordId = recordId,
-                    item = item,
-                    validatedConfig = validatedConfig.config.asJson(),
-                    result = NotificationResult.ongoing(output),
-                )
-                // Feedback
-                outputFeedback(current)
-                // OK, returning the new value
-                current
-            }
-
-            try {
-                meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_publishing, item)
-
-                val result = channel.publish(
-                    recordId = recordId,
-                    config = validatedConfig.config,
-                    event = item.event,
-                    context = context,
-                    template = item.template,
-                    outputProgressCallback = outputProgressCallback,
-                )
-                meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_result, item, result)
-                recordResult(
-                    recordId = recordId,
-                    item = item,
-                    validatedConfig = validatedConfig.config.asJson(),
-                    result = result,
-                )
-                result
-            } catch (any: Throwable) {
-                meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_error, item)
-                recordError(
-                    recordId = recordId,
-                    item = item,
-                    validatedConfig = validatedConfig.config.asJson(),
-                    error = any,
-                    output = output, // Using the current output, even for errors
-                )
-                NotificationResult.error(any.message ?: any::class.java.name, output)
-            }
+            val channelResult = channelProcess(
+                recordId = recordId,
+                item = item,
+                config = validatedConfig.config,
+                outputFeedback = outputFeedback,
+                channel = channel,
+                context = context
+            )
+            NotificationProcessingResult(
+                recordId = recordId,
+                result = channelResult,
+            )
         } else {
             meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_invalid, item)
             recordInvalidConfig(
@@ -121,7 +86,68 @@ class DefaultNotificationProcessingService(
                 item = item,
                 invalidChannelConfig = item.channelConfig,
             )
-            null
+            NotificationProcessingResult<R>(
+                recordId = recordId,
+                result = null,
+            )
+        }
+    }
+
+    private fun <C, R> channelProcess(
+        recordId: String,
+        item: Notification,
+        config: C,
+        outputFeedback: (output: R) -> Unit,
+        channel: NotificationChannel<C, R>,
+        context: Map<String, Any>
+    ): NotificationResult<R> {
+
+        // Current output progress
+        var output: R? = null
+        val outputProgressCallback: (R) -> R = { current ->
+            output = current
+            // Saving the current state of the record
+            recordResult(
+                recordId = recordId,
+                item = item,
+                validatedConfig = config.asJson(),
+                result = NotificationResult.ongoing(output),
+            )
+            // Feedback
+            outputFeedback(current)
+            // OK, returning the new value
+            current
+        }
+
+        return try {
+            meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_publishing, item)
+
+            val result = channel.publish(
+                recordId = recordId,
+                config = config,
+                event = item.event,
+                context = context,
+                template = item.template,
+                outputProgressCallback = outputProgressCallback,
+            )
+            meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_result, item, result)
+            recordResult(
+                recordId = recordId,
+                item = item,
+                validatedConfig = config.asJson(),
+                result = result,
+            )
+            result
+        } catch (any: Throwable) {
+            meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_error, item)
+            recordError(
+                recordId = recordId,
+                item = item,
+                validatedConfig = config.asJson(),
+                error = any,
+                output = output, // Using the current output, even for errors
+            )
+            NotificationResult.error(any.message ?: any::class.java.name, output)
         }
     }
 
