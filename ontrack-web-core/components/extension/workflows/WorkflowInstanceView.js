@@ -119,7 +119,7 @@ export default function WorkflowInstanceView({id}) {
                     key: 'status',
                     label: 'Status',
                     children: <Space>
-                        <WorkflowInstanceStatus status={refreshableInstanceData.status}/>
+                        <WorkflowInstanceStatus id="workflow-instance-status" status={refreshableInstanceData.status}/>
                         <AutoRefreshButton/>
                         {
                             user.authorizations.workflow?.stop &&

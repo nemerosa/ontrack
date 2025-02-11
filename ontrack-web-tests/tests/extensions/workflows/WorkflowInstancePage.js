@@ -16,6 +16,7 @@ export class WorkflowInstancePage {
 
     async checkStatus(status) {
         const statusField = antdDescriptionsGetCellByLabel(this.page, 'Status')
+            .getByTestId("workflow-instance-status")
         await expect(statusField).toBeVisible()
         await expect(statusField).toHaveText(status)
     }
