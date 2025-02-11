@@ -40,7 +40,7 @@ class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
                     channelConfig:
                         group: "end-$prefixGroupName"
                     template: |
-                        Message for ${'$'}{workflow.start?path=data} in project ${'$'}{project}
+                        Message for ${'$'}{workflow.start?path=result.data} in project ${'$'}{project}
                   parents:
                     - id: start
         """.trimIndent()
@@ -171,7 +171,7 @@ class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
             assertNotNull(instance.getWorkflowInstanceNode("start"), "Node accessed") { node ->
                 assertTrue(!node.error.isNullOrBlank(), "There is an error")
                 assertNotNull(node.output) { output ->
-                    val buildUrl = output.path("buildUrl").asText()
+                    val buildUrl = output.path("result").path("buildUrl").asText()
                     assertTrue(buildUrl.isNotBlank(), "Build URL must not be blank")
                 }
             }
@@ -246,14 +246,14 @@ class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
             waitUntil(interval = 500L, timeout = 2_000L, task = "Waiting for the build URL") {
                 val instance = ontrack.workflows.workflowInstance(instanceId) ?: fail("Instance not found")
                 val output = instance.getExecutionOutput("start") ?: return@waitUntil false
-                val buildUrl = output.path("buildUrl").asText()
+                val buildUrl = output.path("result").path("buildUrl").asText()
                 !buildUrl.isNullOrBlank()
             }
             // Waiting for the workflow result
             val instance = waitUntilWorkflowFinished(instanceId)
             // Checks that the node is marked as success & contains the build URL
             assertNotNull(instance.getExecutionOutput("start"), "Output filled in") { output ->
-                val buildUrl = output.path("buildUrl").asText()
+                val buildUrl = output.path("result").path("buildUrl").asText()
                 assertTrue(buildUrl.isNotBlank(), "Build URL must not be blank")
             }
         }

@@ -41,7 +41,7 @@ class WorkflowNotificationChannelNodeExecutorIT : AbstractWorkflowTestSupport() 
                     channelConfig:
                         target: $targetMail
                     template: |
-                        Ticket created: ${'$'}{workflow.ticket-creation?path=data}
+                        Ticket created: ${'$'}{workflow.ticket-creation?path=result.data}
         """.trimIndent()
 
         project {

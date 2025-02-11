@@ -35,7 +35,7 @@ class NotificationQueueProcessor(
             "event" to notification.event.eventType.id,
             "channel" to notification.channel,
         )
-        notificationProcessingService.process(notification, emptyMap()) {}
+        notificationProcessingService.process(notification, emptyMap()) { _, _ -> }
     }
 
     override fun getRoutingIdentifier(payload: NotificationQueuePayload): String = payload.id

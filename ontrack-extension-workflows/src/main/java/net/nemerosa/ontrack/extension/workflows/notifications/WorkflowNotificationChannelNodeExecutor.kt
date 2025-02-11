@@ -89,8 +89,13 @@ class WorkflowNotificationChannelNodeExecutor(
         // Enriches the context
         val context = WorkflowTemplatingContext.createTemplatingContext(workflowInstance)
         // Feedback
-        val outputFeedback = { output: Any? ->
-            workflowNodeExecutorResultFeedback(output?.asJson())
+        val outputFeedback = { recordId: String, output: Any? ->
+            workflowNodeExecutorResultFeedback(
+                WorkflowNotificationChannelNodeExecutorOutput(
+                    recordId = recordId,
+                    result = output?.asJson(),
+                ).asJson()
+            )
         }
         // Processing
         val processingResult = notificationProcessingService.process(notification, context, outputFeedback)

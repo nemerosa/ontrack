@@ -37,7 +37,7 @@ class DefaultNotificationProcessingService(
     override fun process(
         item: Notification,
         context: Map<String, Any>,
-        outputFeedback: (output: Any?) -> Unit,
+        outputFeedback: (recordId: String, output: Any?) -> Unit,
     ): NotificationProcessingResult<*>? {
         logger.debug(
             "Processing notification (user={}) {}",
@@ -59,7 +59,7 @@ class DefaultNotificationProcessingService(
         channel: NotificationChannel<C, R>,
         item: Notification,
         context: Map<String, Any>,
-        outputFeedback: (output: R) -> Unit,
+        outputFeedback: (recordId: String, output: R) -> Unit,
     ): NotificationProcessingResult<R> {
 
         // Unique ID for the record
@@ -86,7 +86,7 @@ class DefaultNotificationProcessingService(
                 item = item,
                 invalidChannelConfig = item.channelConfig,
             )
-            NotificationProcessingResult<R>(
+            NotificationProcessingResult(
                 recordId = recordId,
                 result = null,
             )
@@ -97,7 +97,7 @@ class DefaultNotificationProcessingService(
         recordId: String,
         item: Notification,
         config: C,
-        outputFeedback: (output: R) -> Unit,
+        outputFeedback: (recordId: String, output: R) -> Unit,
         channel: NotificationChannel<C, R>,
         context: Map<String, Any>
     ): NotificationResult<R> {
@@ -114,7 +114,7 @@ class DefaultNotificationProcessingService(
                 result = NotificationResult.ongoing(output),
             )
             // Feedback
-            outputFeedback(current)
+            outputFeedback(recordId, current)
             // OK, returning the new value
             current
         }

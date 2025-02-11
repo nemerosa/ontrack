@@ -13,7 +13,7 @@ interface NotificationProcessingService {
     fun process(
         item: Notification,
         context: Map<String, Any>,
-        outputFeedback: (output: Any?) -> Unit,
+        outputFeedback: (recordId: String, output: Any?) -> Unit,
     ): NotificationProcessingResult<*>?
 
 }
