@@ -35,7 +35,7 @@ class GQLTypeWorkflowInstanceIT : AbstractQLKTITSupport() {
                               text: This is a test
                     """.trimIndent()),
                     event = event,
-                    triggerData = TODO(),
+                    triggerData = workflowTestSupport.testTriggerData(),
                 )
                 run("""{
                     workflowInstance(id: "${instance.id}") {

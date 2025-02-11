@@ -40,7 +40,7 @@ class WorkflowEngineIT : AbstractWorkflowTestSupport() {
             val instance = workflowEngine.startWorkflow(
                 workflow = workflow,
                 event = event,
-                triggerData = TODO()
+                triggerData = testTriggerData()
             )
             // Waiting until the workflow is completed (error or success)
             waitUntil("Waiting until workflow is complete", timeout = 10.seconds) {
@@ -73,7 +73,7 @@ class WorkflowEngineIT : AbstractWorkflowTestSupport() {
             workflowEngine.startWorkflow(
                 workflow = workflow,
                 event = event,
-                triggerData = TODO(),
+                triggerData = testTriggerData(),
             )
         }
     }
@@ -137,7 +137,7 @@ class WorkflowEngineIT : AbstractWorkflowTestSupport() {
             val instance = workflowEngine.startWorkflow(
                 workflow = workflow,
                 event = event,
-                triggerData = TODO(),
+                triggerData = testTriggerData(),
             )
             // Waiting until the workflow is completed (error or success)
             waitUntil("Waiting until workflow is complete", timeout = 10.seconds) {

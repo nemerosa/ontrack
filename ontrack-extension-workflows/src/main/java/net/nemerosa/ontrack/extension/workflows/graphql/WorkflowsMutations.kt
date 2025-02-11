@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.graphql.support.ListRef
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.model.events.dehydrate
 import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.trigger.UserTrigger
 import org.springframework.stereotype.Component
 
 @Component
@@ -19,6 +20,7 @@ class WorkflowsMutations(
     private val workflowEngine: WorkflowEngine,
     private val securityService: SecurityService,
     private val workflowEventFactory: WorkflowEventFactory,
+    private val userTrigger: UserTrigger,
 ) : TypedMutationProvider() {
 
     override val mutations: List<Mutation> = listOf(
@@ -69,7 +71,7 @@ class WorkflowsMutations(
                 workflowEngine.startWorkflow(
                     workflow = workflowRecord.workflow,
                     event = event,
-                    triggerData = TODO(),
+                    triggerData = userTrigger.createUserTriggerData(),
                 ).id
             } else {
                 null

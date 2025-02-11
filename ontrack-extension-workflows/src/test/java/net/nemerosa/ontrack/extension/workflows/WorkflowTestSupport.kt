@@ -8,6 +8,9 @@ import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.MockEventType
 import net.nemerosa.ontrack.model.events.SerializableEventService
 import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.trigger.TestTrigger
+import net.nemerosa.ontrack.model.trigger.TestTriggerData
+import net.nemerosa.ontrack.model.trigger.createTriggerData
 import org.springframework.stereotype.Component
 import java.util.concurrent.TimeoutException
 import kotlin.test.fail
@@ -21,7 +24,13 @@ class WorkflowTestSupport(
     private val workflowRegistry: WorkflowRegistry,
     private val securityService: SecurityService,
     private val serializableEventService: SerializableEventService,
+    private val testTrigger: TestTrigger,
 ) {
+
+    fun testTriggerData(message: String? = null) =
+        testTrigger.createTriggerData(
+            TestTriggerData(message = message)
+        )
 
     private fun displayInstance(instanceId: String) {
         val workflowInstance = workflowEngine.getWorkflowInstance(instanceId)
@@ -65,7 +74,7 @@ class WorkflowTestSupport(
                 workflowEngine.startWorkflow(
                     workflow = record.workflow,
                     event = serializableEvent,
-                    triggerData = TODO(),
+                    triggerData = testTrigger.createTriggerData(TestTriggerData()),
                 )
             // Waiting until the workflow is completed (error or success)
             if (wait) {

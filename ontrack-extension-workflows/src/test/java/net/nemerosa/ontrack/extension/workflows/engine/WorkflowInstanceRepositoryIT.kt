@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.workflows.engine
 
 import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.extension.workflows.WorkflowTestSupport
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowFixtures
 import net.nemerosa.ontrack.extension.workflows.registry.WorkflowParser
 import net.nemerosa.ontrack.extension.workflows.repository.WorkflowInstanceRepository
@@ -23,6 +24,9 @@ class WorkflowInstanceRepositoryIT : AbstractDSLTestSupport() {
     @Autowired
     private lateinit var serializableEventService: SerializableEventService
 
+    @Autowired
+    private lateinit var workflowTestSupport: WorkflowTestSupport
+
     @Test
     fun `Saving and retrieving one workflow instance from a database`() {
         val instance = createInstance(
@@ -30,7 +34,7 @@ class WorkflowInstanceRepositoryIT : AbstractDSLTestSupport() {
             event = serializableEventService.dehydrate(
                 MockEventType.mockEvent("Some text")
             ),
-            triggerData = TODO(),
+            triggerData = workflowTestSupport.testTriggerData(),
         )
         workflowInstanceRepository.createInstance(instance)
 
@@ -51,7 +55,7 @@ class WorkflowInstanceRepositoryIT : AbstractDSLTestSupport() {
                 event = serializableEventService.dehydrate(
                     MockEventType.mockEvent("Some text")
                 ),
-                triggerData = TODO(),
+                triggerData = workflowTestSupport.testTriggerData(),
             ).apply {
                 workflowInstanceRepository.createInstance(this)
             }

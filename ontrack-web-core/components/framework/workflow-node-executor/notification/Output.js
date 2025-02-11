@@ -1,4 +1,5 @@
 import NotificationRecordOutput from "@components/extension/notifications/NotificationRecordOutput";
+import {Space} from "antd";
 
 export default function NotificationWorkflowNodeExecutorOutput({data, nodeData}) {
 
@@ -6,10 +7,13 @@ export default function NotificationWorkflowNodeExecutorOutput({data, nodeData})
 
     return (
         <>
-            <NotificationRecordOutput
-                channel={channel}
-                output={data}
-            />
+            <Space direction="vertical">
+                <NotificationRecordOutput
+                    channel={channel}
+                    output={data}
+                />
+                {/* TODO Link to the notification record */}
+            </Space>
         </>
     )
 }
