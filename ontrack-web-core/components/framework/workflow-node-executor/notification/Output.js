@@ -9,8 +9,17 @@ export default function NotificationWorkflowNodeExecutorOutput({data, nodeData})
     return (
         <>
             <Space direction="vertical">
+                {/* Backward compatibility */}
                 {
-                    data.result &&
+                    data && !data.result && !data.recordId &&
+                    <NotificationRecordOutput
+                        channel={channel}
+                        output={data}
+                    />
+                }
+                {/* Notification output */}
+                {
+                    data?.result &&
                     <NotificationRecordOutput
                         channel={channel}
                         output={data.result}
@@ -18,13 +27,11 @@ export default function NotificationWorkflowNodeExecutorOutput({data, nodeData})
                 }
                 {/* Link to the notification record */}
                 {
-                    data.recordId &&
-                    <Space>
-                        <NotificationRecordLink
-                            recordId={data.recordId}
-                            text="Notification details"
-                        />
-                    </Space>
+                    data?.recordId &&
+                    <NotificationRecordLink
+                        recordId={data.recordId}
+                        text="Notification details"
+                    />
                 }
             </Space>
         </>

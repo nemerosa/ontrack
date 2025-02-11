@@ -162,7 +162,12 @@ export default function WorkflowInstanceView({id}) {
                 {
                     key: 'trigger',
                     label: 'Trigger',
-                    children: <TriggerComponent triggerData={instance.triggerData}/>,
+                    children: <>
+                        {
+                            instance.triggerData &&
+                            <TriggerComponent triggerData={instance.triggerData}/>
+                        }
+                    </>,
                     span: 12,
                 }
             ])
