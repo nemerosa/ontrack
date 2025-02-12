@@ -119,6 +119,32 @@ class WorkflowInstanceRepositoryIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    fun `Filtering workflows by status`() {
+        val instances = (1..2).map { no ->
+            createInstance(
+                workflow = WorkflowParser.parseYamlWorkflow(WorkflowFixtures.simpleLinearWorkflowYaml)
+                    .rename { uid("w-") },
+                event = serializableEventService.dehydrate(
+                    MockEventType.mockEvent("Some text")
+                ),
+                triggerData = workflowTestSupport.testTriggerData(),
+            ).apply {
+                workflowInstanceRepository.createInstance(this)
+                if (no == 1) {
+                    workflowInstanceRepository.stopInstance(id)
+                }
+            }
+        }
+
+        val found = workflowInstanceRepository.findInstances(
+            WorkflowInstanceFilter(status = WorkflowInstanceStatus.STOPPED)
+        ).pageItems
+
+        assertEquals(1, found.size)
+        assertEquals(instances[0].id, found.first().id)
+    }
+
+    @Test
     fun `Cleaning of workflow instances`() {
         asAdmin {
             // Removing all previous instances for the test

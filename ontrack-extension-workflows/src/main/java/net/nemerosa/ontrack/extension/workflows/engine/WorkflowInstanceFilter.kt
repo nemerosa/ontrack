@@ -5,4 +5,5 @@ data class WorkflowInstanceFilter(
     val size: Int = 10,
     val id: String? = null,
     val name: String? = null,
+    val status: WorkflowInstanceStatus? = null,
 )

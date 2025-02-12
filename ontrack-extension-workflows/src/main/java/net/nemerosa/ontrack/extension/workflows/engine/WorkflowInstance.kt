@@ -26,11 +26,29 @@ data class WorkflowInstance(
     val workflow: Workflow,
     val event: SerializableEvent,
     val triggerData: TriggerData? = null,
+    val status: WorkflowInstanceStatus,
     val nodesExecutions: List<WorkflowInstanceNode>,
 ) {
 
     companion object {
         const val EVENT_INSTANCE_ID = "workflowInstanceId"
+
+        fun computeStatus(nodesExecutions: List<WorkflowInstanceNode>): WorkflowInstanceStatus {
+            val nodes = nodesExecutions.map { it.status }
+            return if (nodes.all { it == WorkflowInstanceNodeStatus.CREATED }) {
+                WorkflowInstanceStatus.STARTED
+            } else if (nodes.any { !it.finished }) {
+                WorkflowInstanceStatus.RUNNING
+            } else if (nodes.any { it == WorkflowInstanceNodeStatus.ERROR }) {
+                WorkflowInstanceStatus.ERROR
+            } else if (nodes.any { it == WorkflowInstanceNodeStatus.CANCELLED || it == WorkflowInstanceNodeStatus.TIMEOUT }) {
+                WorkflowInstanceStatus.STOPPED
+            } else if (nodes.all { it == WorkflowInstanceNodeStatus.SUCCESS }) {
+                WorkflowInstanceStatus.SUCCESS
+            } else {
+                WorkflowInstanceStatus.RUNNING
+            }
+        }
     }
 
     private fun withTimestamp(timestamp: LocalDateTime) = WorkflowInstance(
@@ -39,6 +57,7 @@ data class WorkflowInstance(
         workflow = workflow,
         event = event,
         triggerData = triggerData,
+        status = status,
         nodesExecutions = nodesExecutions,
     )
 
@@ -63,24 +82,8 @@ data class WorkflowInstance(
         }
     }
 
-    @get:JsonIgnore
-    val status: WorkflowInstanceStatus
-        get() {
-            val nodes = nodesExecutions.map { it.status }
-            return if (nodes.all { it == WorkflowInstanceNodeStatus.CREATED }) {
-                WorkflowInstanceStatus.STARTED
-            } else if (nodes.any { !it.finished }) {
-                WorkflowInstanceStatus.RUNNING
-            } else if (nodes.any { it == WorkflowInstanceNodeStatus.ERROR }) {
-                WorkflowInstanceStatus.ERROR
-            } else if (nodes.any { it == WorkflowInstanceNodeStatus.CANCELLED || it == WorkflowInstanceNodeStatus.TIMEOUT }) {
-                WorkflowInstanceStatus.STOPPED
-            } else if (nodes.all { it == WorkflowInstanceNodeStatus.SUCCESS }) {
-                WorkflowInstanceStatus.SUCCESS
-            } else {
-                WorkflowInstanceStatus.RUNNING
-            }
-        }
+    fun computeStatus(): WorkflowInstanceStatus =
+        computeStatus(nodesExecutions)
 
     private fun updateContext(
         eventToMerge: SerializableEvent? = null,
@@ -90,24 +93,31 @@ data class WorkflowInstance(
         workflow = workflow,
         event = eventToMerge ?: event,
         triggerData = triggerData,
+        status = status,
         nodesExecutions = nodesExecutions,
     )
 
-    private fun updateNode(nodeId: String, update: (node: WorkflowInstanceNode) -> WorkflowInstanceNode) =
-        WorkflowInstance(
+    private fun updateNode(
+        nodeId: String,
+        update: (node: WorkflowInstanceNode) -> WorkflowInstanceNode
+    ): WorkflowInstance {
+        val nodesExecutions = nodesExecutions.map { node ->
+            if (node.id == nodeId) {
+                update(node)
+            } else {
+                node
+            }
+        }
+        return WorkflowInstance(
             id = id,
             timestamp = Time.now,
             workflow = workflow,
             event = event,
             triggerData = triggerData,
-            nodesExecutions = nodesExecutions.map { node ->
-                if (node.id == nodeId) {
-                    update(node)
-                } else {
-                    node
-                }
-            },
+            status = computeStatus(nodesExecutions),
+            nodesExecutions = nodesExecutions,
         )
+    }
 
     fun startNode(nodeId: String, time: LocalDateTime = Time.now) = updateNode(nodeId) { node ->
         node.start(time)
@@ -123,53 +133,8 @@ data class WorkflowInstance(
         updateContext(eventToMerge)
     }
 
-    fun errorNode(nodeId: String, throwable: Throwable?, message: String?, output: JsonNode?) =
-        updateNode(nodeId) { node ->
-            node.error(throwable, message, output)
-        }
-
-    fun progressNode(nodeId: String, output: JsonNode) = updateNode(nodeId) { node ->
-        node.progress(output)
-    }
-
     fun getNode(nodeId: String) = nodesExecutions.firstOrNull { it.id == nodeId }
         ?: throw WorkflowNodeNotFoundException(nodeId)
-
-    private fun collectParentsData(results: MutableMap<String, JsonNode?>, workflowNodeId: String, depth: Int) {
-        val instanceNode = getNode(workflowNodeId)
-        val workflowNode = workflow.getNode(workflowNodeId)
-        if (depth > 0) {
-            results[workflowNode.id] = instanceNode.output
-        }
-        workflowNode.parents.forEach { parent ->
-            collectParentsData(results, parent.id, depth + 1)
-        }
-    }
-
-    /**
-     * Starting from a node, gets the index of all its parent's data
-     */
-    fun getParentsData(workflowNodeId: String): Map<String, JsonNode?> {
-        val results = mutableMapOf<String, JsonNode?>()
-        collectParentsData(results, workflowNodeId, 0)
-        return results.toMap()
-    }
-
-    fun stopNodes(): WorkflowInstance =
-        WorkflowInstance(
-            id = id,
-            timestamp = timestamp,
-            workflow = workflow,
-            event = event,
-            triggerData = triggerData,
-            nodesExecutions = nodesExecutions.map { nx ->
-                if (nx.status.finished) {
-                    nx
-                } else {
-                    nx.stop()
-                }
-            }
-        )
 
 }
 
