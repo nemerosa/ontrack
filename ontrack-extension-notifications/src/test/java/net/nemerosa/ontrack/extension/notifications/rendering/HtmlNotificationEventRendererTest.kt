@@ -23,10 +23,50 @@ class HtmlNotificationEventRendererTest {
     }
 
     @Test
+    fun `Value rendering escaped for HTML`() {
+        assertEquals(
+            "<b>Some &lt;real&gt; <i>value</i></b>",
+            htmlNotificationEventRenderer.renderStrong("Some <real> <i>value</i>")
+        )
+    }
+
+    @Test
+    fun `List rendering`() {
+        assertEquals(
+            """
+                <ul>
+                    <li><b>Some value</b></li>
+                    <li>Very &lt;wrong&gt;</li>
+                    <li>Very plain</li>
+                </ul>
+            """.trimIndent().lines().map { it.trim() },
+            htmlNotificationEventRenderer.renderList(
+                listOf(
+                    "<b>Some value</b>",
+                    "Very <wrong>",
+                    "Very plain",
+                )
+            ).lines().map { it.trim() }
+        )
+    }
+
+    @Test
     fun `Link rendering`() {
         val text = htmlNotificationEventRenderer.renderLink("PRJ", "https://ontrack.nemerosa.net/#/project/1")
         assertEquals(
             """<a href="https://ontrack.nemerosa.net/#/project/1">PRJ</a>""",
+            text
+        )
+    }
+
+    @Test
+    fun `Link rendering with text escaped for HTML`() {
+        val text = htmlNotificationEventRenderer.renderLink(
+            "<PRJ> is <i>strong</i>",
+            "https://ontrack.nemerosa.net/#/project/1"
+        )
+        assertEquals(
+            """<a href="https://ontrack.nemerosa.net/#/project/1">&lt;PRJ&gt; is <i>strong</i></a>""",
             text
         )
     }
@@ -65,6 +105,22 @@ class HtmlNotificationEventRendererTest {
             htmlNotificationEventRenderer.renderSection(
                 "My title",
                 "My content"
+            )
+        )
+    }
+
+    @Test
+    fun `Rendering section with escaped HTML`() {
+        assertEquals(
+            """
+                <h3>My title</h3>
+                <div>
+                    My content with a <a href="https://ontrack.test.com">link</a> and something &lt;wrong&gt;
+                </div>
+            """.trimIndent(),
+            htmlNotificationEventRenderer.renderSection(
+                "My title",
+                """My content with a <a href="https://ontrack.test.com">link</a> and something <wrong>"""
             )
         )
     }
