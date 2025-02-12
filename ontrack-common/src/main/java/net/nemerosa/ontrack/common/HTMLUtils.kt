@@ -25,7 +25,7 @@ val String.safeHtml: String?
         val safeList = Safelist.simpleText()
             .addTags("a", "b", "i", "u", "strong", "em")
             .addAttributes("a", "href")
-            .addProtocols("a", "href", "http", "https")
+            .addProtocols("a", "href", "http", "https", "mock")
 
         return Jsoup.clean(preprocessed, safeList)
     }
