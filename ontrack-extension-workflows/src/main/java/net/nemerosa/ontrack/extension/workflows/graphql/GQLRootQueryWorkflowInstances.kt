@@ -23,14 +23,17 @@ class GQLRootQueryWorkflowInstances(
             fieldDescription = "List of workflow instances",
             itemType = gqlTypeWorkflowInstance.typeName,
             arguments = listOf(
-                stringArgument(ARG_NAME, "Name of a workflow")
+                stringArgument(ARG_ID, "ID of a workflow"),
+                stringArgument(ARG_NAME, "Name of a workflow"),
             ),
             itemPaginatedListProvider = { env, _, offset, size ->
+                val id: String? = env.getArgument(ARG_ID)
                 val name: String? = env.getArgument(ARG_NAME)
                 workflowInstanceRepository.findInstances(
                     WorkflowInstanceFilter(
                         offset = offset,
                         size = size,
+                        id = id,
                         name = name,
                     )
                 )
@@ -39,5 +42,6 @@ class GQLRootQueryWorkflowInstances(
 
     companion object {
         private const val ARG_NAME = "name"
+        private const val ARG_ID = "id"
     }
 }

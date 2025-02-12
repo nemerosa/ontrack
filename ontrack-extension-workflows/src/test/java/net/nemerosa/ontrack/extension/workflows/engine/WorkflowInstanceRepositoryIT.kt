@@ -70,6 +70,55 @@ class WorkflowInstanceRepositoryIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    fun `Filtering workflows by ID`() {
+        val instances = (1..2).map {
+            createInstance(
+                workflow = WorkflowParser.parseYamlWorkflow(WorkflowFixtures.simpleLinearWorkflowYaml)
+                    .rename { uid("w-") },
+                event = serializableEventService.dehydrate(
+                    MockEventType.mockEvent("Some text")
+                ),
+                triggerData = workflowTestSupport.testTriggerData(),
+            ).apply {
+                workflowInstanceRepository.createInstance(this)
+            }
+        }
+
+        val found = workflowInstanceRepository.findInstances(
+            WorkflowInstanceFilter(id = instances[1].id)
+        ).pageItems
+
+        assertEquals(1, found.size)
+        assertEquals(instances[1].id, found.first().id)
+    }
+
+    @Test
+    fun `Filtering workflows by ID takes precedence`() {
+        val instances = (1..2).map {
+            createInstance(
+                workflow = WorkflowParser.parseYamlWorkflow(WorkflowFixtures.simpleLinearWorkflowYaml)
+                    .rename { uid("w-") },
+                event = serializableEventService.dehydrate(
+                    MockEventType.mockEvent("Some text")
+                ),
+                triggerData = workflowTestSupport.testTriggerData(),
+            ).apply {
+                workflowInstanceRepository.createInstance(this)
+            }
+        }
+
+        val found = workflowInstanceRepository.findInstances(
+            WorkflowInstanceFilter(
+                id = instances[1].id,
+                name = instances[0].workflow.name,
+            )
+        ).pageItems
+
+        assertEquals(1, found.size)
+        assertEquals(instances[1].id, found.first().id)
+    }
+
+    @Test
     fun `Cleaning of workflow instances`() {
         asAdmin {
             // Removing all previous instances for the test

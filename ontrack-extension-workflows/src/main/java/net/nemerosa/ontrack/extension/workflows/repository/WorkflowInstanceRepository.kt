@@ -294,9 +294,14 @@ class WorkflowInstanceRepository(dataSource: DataSource) : AbstractJdbcRepositor
         val criterias = mutableListOf<String>()
         val params = mutableMapOf<String, Any?>()
 
-        if (!workflowInstanceFilter.name.isNullOrBlank()) {
-            criterias += "WORKFLOW::JSONB->>'name' = :name"
-            params["name"] = workflowInstanceFilter.name
+        if (!workflowInstanceFilter.id.isNullOrBlank()) {
+            criterias += "ID = :id"
+            params["id"] = workflowInstanceFilter.id
+        } else {
+            if (!workflowInstanceFilter.name.isNullOrBlank()) {
+                criterias += "WORKFLOW::JSONB->>'name' = :name"
+                params["name"] = workflowInstanceFilter.name
+            }
         }
 
         val where = if (criterias.isEmpty()) {
