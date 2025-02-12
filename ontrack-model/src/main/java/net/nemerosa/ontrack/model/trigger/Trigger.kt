@@ -24,4 +24,14 @@ interface Trigger<T> {
      */
     val id: String
 
+    /**
+     * Display name for the trigger
+     */
+    val displayName: String
+
+    /**
+     * Adds some SQL criterias to a filter.
+     */
+    fun filterCriteria(token: String, criterias: MutableList<String>, params: MutableMap<String, Any?>)
+
 }

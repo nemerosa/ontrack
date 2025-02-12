@@ -11,6 +11,9 @@ import TimestampText from "@components/common/TimestampText";
 import DurationMs from "@components/common/DurationMs";
 import Link from "next/link";
 import TriggerLink from "@components/framework/trigger/TriggerLink";
+import {Form, Input} from "antd";
+import SelectWorkflowInstanceStatus from "@components/extension/workflows/SelectWorkflowInstanceStatus";
+import SelectTrigger from "@components/core/model/triggers/SelectTrigger";
 
 export default function WorkflowsAuditView() {
 
@@ -18,8 +21,21 @@ export default function WorkflowsAuditView() {
         query WorkflowsInstances(
             $offset: Int!,
             $size: Int!,
+            $id: String,
+            $name: String,
+            $status: WorkflowInstanceStatus,
+            $triggerId: String,
+            $triggerData: String,
         ) {
-            workflowInstances(offset: $offset, size: $size) {
+            workflowInstances(
+                offset: $offset,
+                size: $size,
+                id: $id,
+                name: $name,
+                status: $status,
+                triggerId: $triggerId,
+                triggerData: $triggerData,
+            ) {
                 pageInfo {
                     nextPage {
                         offset
@@ -70,6 +86,43 @@ export default function WorkflowsAuditView() {
                     queryNode="workflowInstances"
                     size={10}
                     filter={{}}
+                    filterForm={[
+                        <Form.Item
+                            key="id"
+                            name="id"
+                            label="ID"
+                        >
+                            <Input style={{width: '16em'}}/>
+                        </Form.Item>,
+                        <Form.Item
+                            key="name"
+                            name="name"
+                            label="Name"
+                        >
+                            <Input style={{width: '16em'}}/>
+                        </Form.Item>,
+                        <Form.Item
+                            key="status"
+                            name="status"
+                            label="Status"
+                        >
+                            <SelectWorkflowInstanceStatus/>
+                        </Form.Item>,
+                        <Form.Item
+                            key="triggerId"
+                            name="triggerId"
+                            label="Trigger"
+                        >
+                            <SelectTrigger/>
+                        </Form.Item>,
+                        <Form.Item
+                            key="triggerData"
+                            name="triggerData"
+                            label="Trigger data"
+                        >
+                            <Input style={{width: '16em'}}/>
+                        </Form.Item>,
+                    ]}
                     columns={[
                         {
                             key: 'id',

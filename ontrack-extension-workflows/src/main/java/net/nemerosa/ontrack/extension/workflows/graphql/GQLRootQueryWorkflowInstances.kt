@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.workflows.graphql
 import graphql.schema.GraphQLFieldDefinition
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceFilter
-import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceNodeStatus
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceStatus
 import net.nemerosa.ontrack.extension.workflows.repository.WorkflowInstanceRepository
 import net.nemerosa.ontrack.graphql.schema.GQLRootQuery
@@ -28,7 +27,9 @@ class GQLRootQueryWorkflowInstances(
             arguments = listOf(
                 stringArgument(ARG_ID, "ID of a workflow"),
                 stringArgument(ARG_NAME, "Name of a workflow"),
-                enumArgument<WorkflowInstanceNodeStatus>(ARG_STATUS, "Status of the workflow")
+                enumArgument<WorkflowInstanceStatus>(ARG_STATUS, "Status of the workflow"),
+                stringArgument(ARG_TRIGGER_ID, "ID of the trigger of the workflow"),
+                stringArgument(ARG_TRIGGER_DATA, "Text to find in the trigger data of the workflow"),
             ),
             itemPaginatedListProvider = { env, _, offset, size ->
                 val id: String? = env.getArgument(ARG_ID)
@@ -36,6 +37,8 @@ class GQLRootQueryWorkflowInstances(
                 val status: WorkflowInstanceStatus? = env.getArgument<String?>(ARG_STATUS)?.let {
                     WorkflowInstanceStatus.valueOf(it)
                 }
+                val triggerId: String? = env.getArgument(ARG_TRIGGER_ID)
+                val triggerData: String? = env.getArgument(ARG_TRIGGER_DATA)
                 workflowInstanceRepository.findInstances(
                     WorkflowInstanceFilter(
                         offset = offset,
@@ -43,6 +46,8 @@ class GQLRootQueryWorkflowInstances(
                         id = id,
                         name = name,
                         status = status,
+                        triggerId = triggerId,
+                        triggerData = triggerData,
                     )
                 )
             }
@@ -52,5 +57,7 @@ class GQLRootQueryWorkflowInstances(
         private const val ARG_NAME = "name"
         private const val ARG_STATUS = "status"
         private const val ARG_ID = "id"
+        private const val ARG_TRIGGER_ID = "triggerId"
+        private const val ARG_TRIGGER_DATA = "triggerData"
     }
 }

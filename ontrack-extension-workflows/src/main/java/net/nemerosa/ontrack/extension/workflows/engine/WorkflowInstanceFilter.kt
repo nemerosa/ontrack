@@ -6,4 +6,6 @@ data class WorkflowInstanceFilter(
     val id: String? = null,
     val name: String? = null,
     val status: WorkflowInstanceStatus? = null,
+    val triggerId: String? = null,
+    val triggerData: String? = null,
 )

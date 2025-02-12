@@ -8,6 +8,8 @@ import net.nemerosa.ontrack.model.events.SerializableEvent
 import net.nemerosa.ontrack.model.events.merge
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.trigger.TriggerData
+import net.nemerosa.ontrack.model.trigger.TriggerRegistry
+import net.nemerosa.ontrack.model.trigger.getTriggerById
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
@@ -17,6 +19,7 @@ import javax.sql.DataSource
 @Repository
 class WorkflowInstanceRepository(
     dataSource: DataSource,
+    val triggerRegistry: TriggerRegistry,
 ) : AbstractJdbcRepository(dataSource) {
 
     fun createInstance(instance: WorkflowInstance) {
@@ -335,6 +338,20 @@ class WorkflowInstanceRepository(
             workflowInstanceFilter.status?.let { status ->
                 criterias += "STATUS = :status"
                 params["status"] = status.name
+            }
+            workflowInstanceFilter.triggerId?.takeIf { it.isNotBlank() }?.let { triggerId ->
+                criterias += "TRIGGER_ID = :triggerId"
+                params["triggerId"] = triggerId
+                workflowInstanceFilter.triggerData?.takeIf { it.isNotBlank() }?.let { triggerData ->
+                    // We need to the trigger
+                    val trigger = triggerRegistry.getTriggerById<Any>(triggerId)
+                    // We need to convert the trigger data into a JSON path in the trigger data JSON
+                    trigger.filterCriteria(
+                        token = triggerData,
+                        criterias = criterias,
+                        params = params,
+                    )
+                }
             }
         }
 

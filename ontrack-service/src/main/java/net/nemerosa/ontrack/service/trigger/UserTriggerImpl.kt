@@ -13,6 +13,7 @@ class UserTriggerImpl(
 ) : UserTrigger {
 
     override val id: String = "user"
+    override val displayName: String = "User"
 
     override fun createUserTriggerData(): TriggerData =
         createTriggerData(
@@ -21,5 +22,10 @@ class UserTriggerImpl(
                     ?: error("Authentication is missing")
             )
         )
+
+    override fun filterCriteria(token: String, criterias: MutableList<String>, params: MutableMap<String, Any?>) {
+        criterias += "TRIGGER_DATA::JSONB->>'username' = :username"
+        params["username"] = token
+    }
 
 }

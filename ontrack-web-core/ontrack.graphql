@@ -6000,6 +6000,8 @@ type Query {
     ): SlotWorkflowInstance
     "Getting the list of template renderers"
     templatingRenderers: [TemplatingRenderer!]!
+    "List of workflow instance statuses"
+    triggerList: [Trigger!]!
     "Gets the current user"
     user: User
     "Gets the current dashboard"
@@ -6035,14 +6037,24 @@ type Query {
         "ID of the workflow instance"
         id: String
     ): WorkflowInstance
+    "List of workflow instance statuses"
+    workflowInstanceStatusList: [WorkflowInstanceStatus!]!
     "List of workflow instances"
     workflowInstances(
+        "ID of a workflow"
+        id: String,
         "Name of a workflow"
         name: String,
         "Offset for the page"
         offset: Int = 0,
         "Size of the page"
-        size: Int = 20
+        size: Int = 20,
+        "Status of the workflow"
+        status: WorkflowInstanceStatus,
+        "Text to find in the trigger data of the workflow"
+        triggerData: String,
+        "ID of the trigger of the workflow"
+        triggerId: String
     ): WorkflowInstancePaginated
     "List of all workflow node executors"
     workflowNodeExecutors: [WorkflowNodeExecutor!]!
@@ -7611,6 +7623,14 @@ type Token {
     validUntil: LocalDateTime
     "Value of the token"
     value: String
+}
+
+"Trigger for something"
+type Trigger {
+    "displayName field"
+    displayName: String!
+    "id field"
+    id: String!
 }
 
 "Data for the trigger of something (notification, workflow, etc.)"

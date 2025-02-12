@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.workflows.repository.WorkflowInstanceRepos
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.events.MockEventType
 import net.nemerosa.ontrack.model.events.SerializableEventService
+import net.nemerosa.ontrack.model.trigger.UserTrigger
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -26,6 +27,9 @@ class WorkflowInstanceRepositoryIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var workflowTestSupport: WorkflowTestSupport
+
+    @Autowired
+    private lateinit var userTrigger: UserTrigger
 
     @Test
     fun `Saving and retrieving one workflow instance from a database`() {
@@ -142,6 +146,77 @@ class WorkflowInstanceRepositoryIT : AbstractDSLTestSupport() {
 
         assertEquals(1, found.size)
         assertEquals(instances[0].id, found.first().id)
+    }
+
+    @Test
+    fun `Filtering workflows by trigger ID`() {
+        workflowInstanceRepository.clearAll()
+        val instances = (1..2).map { no ->
+            createInstance(
+                workflow = WorkflowParser.parseYamlWorkflow(WorkflowFixtures.simpleLinearWorkflowYaml)
+                    .rename { uid("w-") },
+                event = serializableEventService.dehydrate(
+                    MockEventType.mockEvent("Some text")
+                ),
+                triggerData = if (no == 1) {
+                    workflowTestSupport.testTriggerData()
+                } else {
+                    asUser {
+                        userTrigger.createUserTriggerData()
+                    }
+                },
+            ).apply {
+                workflowInstanceRepository.createInstance(this)
+                if (no == 1) {
+                    workflowInstanceRepository.stopInstance(id)
+                }
+            }
+        }
+
+        val found = workflowInstanceRepository.findInstances(
+            WorkflowInstanceFilter(triggerId = userTrigger.id)
+        ).pageItems
+
+        assertEquals(1, found.size, "Only one result")
+        assertEquals(instances[1].id, found.first().id)
+    }
+
+    @Test
+    fun `Filtering workflows by trigger data`() {
+        workflowInstanceRepository.clearAll()
+        asUser {
+            val username = securityService.currentAccount?.username
+            val instances = (1..3).map { no ->
+                createInstance(
+                    workflow = WorkflowParser.parseYamlWorkflow(WorkflowFixtures.simpleLinearWorkflowYaml)
+                        .rename { uid("w-") },
+                    event = serializableEventService.dehydrate(
+                        MockEventType.mockEvent("Some text")
+                    ),
+                    triggerData = if (no == 1) {
+                        workflowTestSupport.testTriggerData()
+                    } else if (no == 2) {
+                        asUser {
+                            userTrigger.createUserTriggerData()
+                        }
+                    } else {
+                        userTrigger.createUserTriggerData()
+                    },
+                ).apply {
+                    workflowInstanceRepository.createInstance(this)
+                }
+            }
+
+            val found = workflowInstanceRepository.findInstances(
+                WorkflowInstanceFilter(
+                    triggerId = userTrigger.id,
+                    triggerData = username,
+                )
+            ).pageItems
+
+            assertEquals(1, found.size, "Only one result")
+            assertEquals(instances[2].id, found.first().id)
+        }
     }
 
     @Test
