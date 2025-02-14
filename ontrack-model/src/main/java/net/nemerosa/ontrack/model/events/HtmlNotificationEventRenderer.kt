@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.model.events
 
+import net.nemerosa.ontrack.common.defaultTags
 import net.nemerosa.ontrack.common.safeHtml
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.springframework.stereotype.Component
@@ -12,17 +13,20 @@ class HtmlNotificationEventRenderer(
     override val id: String = "html"
     override val name: String = "HTML"
 
+    private val allowedTags: Set<String> = defaultTags + ontrackConfigProperties.templating.htmlTags
 
-    override fun renderStrong(value: String): String = "<b>${value.safeHtml}</b>"
+    private val String.escape: String get() = safeHtml(allowedTags)
+
+    override fun renderStrong(value: String): String = "<b>${value.escape}</b>"
 
     override fun renderLink(text: String, href: String): String {
-        return """<a href="$href">${text.safeHtml}</a>"""
+        return """<a href="$href">${text.escape}</a>"""
     }
 
     override fun renderList(list: List<String>): String {
         return """
             <ul>
-                ${list.joinToString("\n") { """    <li>${it.safeHtml}</li>""" }}
+                ${list.joinToString("\n") { """    <li>${it.escape}</li>""" }}
             </ul>
         """.trimIndent()
 
@@ -33,9 +37,9 @@ class HtmlNotificationEventRenderer(
 
     override fun renderSection(title: String, content: String): String =
         """
-            <h3>${title.safeHtml}</h3>
+            <h3>${title.escape}</h3>
             <div>
-                ${content.safeHtml}
+                ${content.escape}
             </div>
         """.trimIndent()
 }

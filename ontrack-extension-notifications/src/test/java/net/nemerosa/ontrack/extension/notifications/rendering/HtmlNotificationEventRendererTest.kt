@@ -125,4 +125,28 @@ class HtmlNotificationEventRendererTest {
         )
     }
 
+    @Test
+    fun `Rendering section with lists`() {
+        assertEquals(
+            """
+                <h3>My title</h3>
+                <div>
+                    <ul>
+                        <li>My content with a <a href="https://ontrack.test.com">link</a> and something &lt;wrong&gt;</li>
+                        <li>Some <b>bold</b> content</li>
+                    </ul>
+                </div>
+            """.trimIndent().lines().map { it.trim() },
+            htmlNotificationEventRenderer.renderSection(
+                "My title",
+                """
+                    <ul>
+                        <li>My content with a <a href="https://ontrack.test.com">link</a> and something <wrong></li>
+                        <li>Some <b>bold</b> content</li>
+                    </ul>
+                """
+            ).lines().map { it.trim() }
+        )
+    }
+
 }
