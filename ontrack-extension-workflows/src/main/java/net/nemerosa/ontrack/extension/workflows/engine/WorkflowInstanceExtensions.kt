@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowNode
 import net.nemerosa.ontrack.model.events.SerializableEvent
+import net.nemerosa.ontrack.model.templating.TemplatingContextData
 import net.nemerosa.ontrack.model.trigger.TriggerData
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -21,6 +22,7 @@ fun createInstance(
     workflow: Workflow,
     event: SerializableEvent,
     triggerData: TriggerData,
+    contexts: Map<String, TemplatingContextData>,
     timestamp: LocalDateTime = Time.now(),
 ): WorkflowInstance {
     val instanceId = createInstanceId(timestamp)
@@ -34,6 +36,7 @@ fun createInstance(
         workflow = workflow,
         event = eventWithInstance,
         triggerData = triggerData,
+        contexts = contexts,
         status = WorkflowInstanceStatus.STARTED,
         nodesExecutions = workflow.nodes.map { it.toStartExecution() },
     )

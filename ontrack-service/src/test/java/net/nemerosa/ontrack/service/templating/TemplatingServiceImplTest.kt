@@ -20,6 +20,8 @@ class TemplatingServiceImplTest {
     private lateinit var ontrackConfigProperties: OntrackConfigProperties
     private lateinit var entityDisplayNameService: EntityDisplayNameService
 
+    private val testTemplatingContextHandler = TestTemplatingContextHandler()
+
     @BeforeEach
     fun init() {
 
@@ -86,6 +88,10 @@ class TemplatingServiceImplTest {
             LinkTemplatingFunction(),
         )
 
+        val templatingContextHandlers = listOf<TemplatingContextHandler<*>>(
+            testTemplatingContextHandler,
+        )
+
         entityDisplayNameService = mockk()
         every { entityDisplayNameService.getEntityDisplayName(any()) } answers {
             val entity = it.invocation.args.first() as ProjectEntity
@@ -96,6 +102,7 @@ class TemplatingServiceImplTest {
             templatingSources = templatingSources,
             templatingFilters = templatingFilters,
             templatingFunctions = templatingFunctions,
+            templatingContextHandlers = templatingContextHandlers,
             ontrackConfigProperties = ontrackConfigProperties,
             entityDisplayNameService = entityDisplayNameService,
         )
@@ -255,6 +262,27 @@ class TemplatingServiceImplTest {
                 This would need some action on your side
                 to fix the repository at https://github.com/nemerosa/ontrack.
             """.trimIndent(),
+            text
+        )
+    }
+
+    @Test
+    fun `Templating context`() {
+        val project = ProjectFixtures.testProject(name = "ontrack")
+        val text = templatingService.render(
+            template = """
+                Project ${'$'}{project} is being deployed by ${'$'}{deployment.url}
+            """.trimIndent(),
+            context = mapOf(
+                "project" to project,
+                "deployment" to testTemplatingContextHandler.createTemplatingContextData(
+                    TestTemplatingContextData(id = "123")
+                )
+            ),
+            renderer = PlainEventRenderer.INSTANCE,
+        )
+        assertEquals(
+            "Project ontrack is being deployed by mock://123",
             text
         )
     }

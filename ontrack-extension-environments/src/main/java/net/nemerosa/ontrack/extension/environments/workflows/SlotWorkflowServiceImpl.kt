@@ -8,6 +8,8 @@ import net.nemerosa.ontrack.extension.environments.security.SlotUpdate
 import net.nemerosa.ontrack.extension.environments.security.SlotView
 import net.nemerosa.ontrack.extension.environments.service.checkSlotAccess
 import net.nemerosa.ontrack.extension.environments.service.isSlotAccessible
+import net.nemerosa.ontrack.extension.environments.templating.DeploymentTemplatingContextData
+import net.nemerosa.ontrack.extension.environments.templating.DeploymentTemplatingContextHandler
 import net.nemerosa.ontrack.extension.environments.trigger.SlotPipelineTrigger
 import net.nemerosa.ontrack.extension.environments.trigger.SlotPipelineTriggerData
 import net.nemerosa.ontrack.extension.environments.workflows.executors.forSlotWorkflowExecution
@@ -16,6 +18,7 @@ import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceStatus
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.SerializableEventService
 import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.templating.createTemplatingContextData
 import net.nemerosa.ontrack.model.trigger.createTriggerData
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -29,6 +32,7 @@ class SlotWorkflowServiceImpl(
     private val workflowEngine: WorkflowEngine,
     private val serializableEventService: SerializableEventService,
     private val slotPipelineTrigger: SlotPipelineTrigger,
+    private val deploymentTemplatingContextHandler: DeploymentTemplatingContextHandler,
 ) : SlotWorkflowService {
 
     override fun addSlotWorkflow(slotWorkflow: SlotWorkflow) {
@@ -76,6 +80,13 @@ class SlotWorkflowServiceImpl(
                 SlotPipelineTriggerData(
                     pipelineId = pipeline.id,
                     status = trigger,
+                )
+            ),
+            contexts = mapOf(
+                "deployment" to deploymentTemplatingContextHandler.createTemplatingContextData(
+                    DeploymentTemplatingContextData(
+                        slotPipelineId = pipeline.id,
+                    )
                 )
             ),
             pauseMs = slotWorkflow.pauseMs,

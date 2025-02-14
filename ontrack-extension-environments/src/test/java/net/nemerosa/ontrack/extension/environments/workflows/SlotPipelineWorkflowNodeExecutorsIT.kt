@@ -32,6 +32,9 @@ class SlotPipelineWorkflowNodeExecutorsIT : AbstractNotificationTestSupport() {
     private lateinit var slotTestSupport: SlotTestSupport
 
     @Autowired
+    private lateinit var slotWorkflowTestSupport: SlotWorkflowTestSupport
+
+    @Autowired
     private lateinit var slotService: SlotService
 
     @Autowired
@@ -330,6 +333,60 @@ class SlotPipelineWorkflowNodeExecutorsIT : AbstractNotificationTestSupport() {
                         """.trimIndent().trim(),
                         """
                             Build <a href="http://localhost:8080/#/build/${build.id}">${build.name}</a> has been deployed at <a href="http://localhost:3000/ui/extension/environments/pipeline/${pipeline.id}">${pipeline.fullName()}</a>
+                        """.trimIndent().trim(),
+                    ),
+                    messages.map { it.trim() }
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Deployment workflow passes a context to notifications`() {
+        asAdmin {
+            val mockChannelTarget = uid("mock-")
+            startNewTransaction {
+                val slot = slotTestSupport.slot()
+                val build = slot.project.branch<Build> {
+                    build()
+                }
+
+                slotWorkflowService.addSlotWorkflow(
+                    SlotWorkflow(
+                        pauseMs = 500,
+                        slot = slot,
+                        trigger = SlotPipelineStatus.DONE,
+                        workflow = WorkflowParser.parseYamlWorkflow(
+                            """
+                                name: Deployment is done
+                                nodes:
+                                    - id: deployed
+                                      executorId: notification
+                                      data:
+                                        channel: mock
+                                        channelConfig:
+                                            target: $mockChannelTarget
+                                        template: |
+                                            Deployment ${'$'}{deployment} (id = ${'$'}{deployment.id}) is done
+                            """.trimIndent()
+                        )
+                    )
+                )
+
+                // Starting and finishing a deployment
+                val pipeline = slotService.startPipeline(slot, build)
+                slotTestSupport.runAndFinishDeployment(pipeline)
+
+                pipeline
+            } then { pipeline ->
+                slotWorkflowTestSupport.waitForSlotWorkflowsToFinish(pipeline, SlotPipelineStatus.DONE)
+
+                // Checks the messages
+                val messages = mockNotificationChannel.targetMessages(mockChannelTarget)
+                assertEquals(
+                    listOf(
+                        """
+                            Deployment ${pipeline.fullName()} (id = ${pipeline.id}) is done
                         """.trimIndent().trim(),
                     ),
                     messages.map { it.trim() }
