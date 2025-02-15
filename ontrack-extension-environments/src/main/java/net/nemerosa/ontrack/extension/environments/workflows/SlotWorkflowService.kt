@@ -13,6 +13,7 @@ interface SlotWorkflowService {
         pipeline: SlotPipeline,
         slotWorkflow: SlotWorkflow,
         event: Event,
+        trigger: SlotPipelineStatus,
     ): SlotWorkflowInstance
 
     fun getSlotWorkflowInstancesByPipeline(pipeline: SlotPipeline): List<SlotWorkflowInstance>

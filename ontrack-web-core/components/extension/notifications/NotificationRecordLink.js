@@ -1,14 +1,18 @@
 import Link from "next/link";
-import {FaLink} from "react-icons/fa";
+import {FaEnvelope} from "react-icons/fa";
+import {Space} from "antd";
 
-export default function NotificationRecordLink({recordId}) {
+export default function NotificationRecordLink({recordId, text}) {
     return (
         <>
             <Link
                 href={`/extension/notifications/recordings/${recordId}`}
                 title="Link to notification record"
             >
-                <FaLink/>
+                <Space>
+                    <FaEnvelope/>
+                    {text}
+                </Space>
             </Link>
         </>
     )

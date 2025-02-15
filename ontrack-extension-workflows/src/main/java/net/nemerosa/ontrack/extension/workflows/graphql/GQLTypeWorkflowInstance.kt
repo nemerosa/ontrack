@@ -33,6 +33,8 @@ class GQLTypeWorkflowInstance(
             }
             // Event
             .field(WorkflowInstance::event)
+            // Trigger
+            .field(WorkflowInstance::triggerData)
             // Node executions
             .field {
                 it.name(WorkflowInstance::nodesExecutions.name)

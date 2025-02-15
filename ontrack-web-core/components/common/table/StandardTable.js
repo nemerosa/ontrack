@@ -17,6 +17,7 @@ import FilterForm from "@components/common/table/FilterForm";
  * @param size Default number of items per page
  * @param filter Filter data to pass to the query
  * @param onFilterChange Function to call whenever the filter changes
+ * @param onFilterFormDataChange Function to call whenever the form filter data changes
  * @param footerExtra Extra information to display in the footer
  * @param rowKey Computing each row key (needed for expandable content)
  * @param filterForm List of Antd Form items to put in a form on top of the table (not displayed if empty)
@@ -33,6 +34,8 @@ export default function StandardTable({
                                           size = 10,
                                           filter = {},
                                           onFilterChange = (_) => {
+                                          },
+                                          onFilterFormValuesChanged = (_) => {
                                           },
                                           footerExtra = '',
                                           rowKey,
@@ -95,6 +98,7 @@ export default function StandardTable({
                     <FilterForm
                         filterForm={filterForm}
                         setFilterFormData={setFilterFormData}
+                        onFilterFormValuesChanged={onFilterFormValuesChanged}
                         filterExtraButtons={filterExtraButtons}
                     />
                 }

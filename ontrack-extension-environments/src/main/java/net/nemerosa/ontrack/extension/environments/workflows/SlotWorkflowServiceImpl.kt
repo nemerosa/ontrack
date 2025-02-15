@@ -8,12 +8,15 @@ import net.nemerosa.ontrack.extension.environments.security.SlotUpdate
 import net.nemerosa.ontrack.extension.environments.security.SlotView
 import net.nemerosa.ontrack.extension.environments.service.checkSlotAccess
 import net.nemerosa.ontrack.extension.environments.service.isSlotAccessible
+import net.nemerosa.ontrack.extension.environments.trigger.SlotPipelineTrigger
+import net.nemerosa.ontrack.extension.environments.trigger.SlotPipelineTriggerData
 import net.nemerosa.ontrack.extension.environments.workflows.executors.forSlotWorkflowExecution
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowEngine
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceStatus
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.SerializableEventService
 import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.trigger.createTriggerData
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -25,6 +28,7 @@ class SlotWorkflowServiceImpl(
     private val slotWorkflowInstanceRepository: SlotWorkflowInstanceRepository,
     private val workflowEngine: WorkflowEngine,
     private val serializableEventService: SerializableEventService,
+    private val slotPipelineTrigger: SlotPipelineTrigger,
 ) : SlotWorkflowService {
 
     override fun addSlotWorkflow(slotWorkflow: SlotWorkflow) {
@@ -55,6 +59,7 @@ class SlotWorkflowServiceImpl(
         pipeline: SlotPipeline,
         slotWorkflow: SlotWorkflow,
         event: Event,
+        trigger: SlotPipelineStatus,
     ): SlotWorkflowInstance {
         securityService.checkSlotAccess<SlotPipelineWorkflowRun>(pipeline.slot)
         if (pipeline.slot.id != slotWorkflow.slot.id) {
@@ -67,6 +72,12 @@ class SlotWorkflowServiceImpl(
         val workflowInstance = workflowEngine.startWorkflow(
             workflow = slotWorkflow.workflow,
             event = workflowEvent,
+            triggerData = slotPipelineTrigger.createTriggerData(
+                SlotPipelineTriggerData(
+                    pipelineId = pipeline.id,
+                    status = trigger,
+                )
+            ),
             pauseMs = slotWorkflow.pauseMs,
         )
         // Slot workflow instance record
@@ -89,7 +100,7 @@ class SlotWorkflowServiceImpl(
         securityService.checkSlotAccess<SlotPipelineWorkflowRun>(pipeline.slot)
         val slotWorkflows = getSlotWorkflowsBySlotAndTrigger(pipeline.slot, trigger)
         slotWorkflows.forEach { slotWorkflow ->
-            startWorkflow(pipeline, slotWorkflow, event)
+            startWorkflow(pipeline, slotWorkflow, event, trigger)
         }
     }
 

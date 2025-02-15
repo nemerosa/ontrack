@@ -7,12 +7,6 @@ General configuration for the notifications.
 |===
 | Name | Environment | Description | Default value | Notes
 
-|`ontrack.config.extension.notifications.dispatching.queue.async`
-|`ONTRACK_CONFIG_EXTENSION_NOTIFICATIONS_DISPATCHING_QUEUE_ASYNC`
-|Is asynchronous processing of notifications enabled?
-|`true`
-|
-
 |`ontrack.config.extension.notifications.enabled`
 |`ONTRACK_CONFIG_EXTENSION_NOTIFICATIONS_ENABLED`
 |Are the notifications enabled?

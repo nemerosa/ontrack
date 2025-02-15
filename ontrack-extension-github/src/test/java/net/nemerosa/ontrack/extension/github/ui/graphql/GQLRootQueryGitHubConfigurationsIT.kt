@@ -16,7 +16,7 @@ class GQLRootQueryGitHubConfigurationsIT : AbstractGitHubTestSupport() {
 
     @Test
     fun `Getting the list of configurations`() {
-        val config = gitHubConfig()
+        val config = gitHubConfiguration()
         run(
             """
             {

@@ -11,7 +11,7 @@ class GitHubProjectConfigurationPropertyMutationProviderIT : AbstractGitHubTestS
     fun `Setting a GitHub configuration on a project identified by ID without any issue service`() {
         asAdmin {
             project {
-                val cfg = gitHubConfig()
+                val cfg = gitHubConfiguration()
                 run("""
                     mutation {
                         setProjectGitHubConfigurationPropertyById(input: {
@@ -46,7 +46,7 @@ class GitHubProjectConfigurationPropertyMutationProviderIT : AbstractGitHubTestS
     fun `Setting a GitHub configuration on a project identified by ID with indexation`() {
         asAdmin {
             project {
-                val cfg = gitHubConfig()
+                val cfg = gitHubConfiguration()
                 run("""
                     mutation {
                         setProjectGitHubConfigurationPropertyById(input: {
@@ -82,7 +82,7 @@ class GitHubProjectConfigurationPropertyMutationProviderIT : AbstractGitHubTestS
     fun `Setting a GitHub configuration on a project identified by ID with an issue service`() {
         asAdmin {
             project {
-                val cfg = gitHubConfig()
+                val cfg = gitHubConfiguration()
                 run("""
                     mutation {
                         setProjectGitHubConfigurationPropertyById(input: {

@@ -128,6 +128,7 @@ class OntrackConfigProperties {
          * Next UI enabled?
          */
         var enabled = false
+
         /**
          * Next UI URL
          */
@@ -184,6 +185,12 @@ class OntrackConfigProperties {
          * How to deal with templating errors?
          */
         var errors: TemplatingErrors = TemplatingErrors.IGNORE
+
+        /**
+         * HTML tags to accept on top of the default ones
+         */
+        @APIDescription("HTML tags to accept on top of the default ones")
+        var htmlTags: List<String> = emptyList()
     }
 
     /**
@@ -194,14 +201,17 @@ class OntrackConfigProperties {
          * Ignoring the errors (default)
          */
         IGNORE,
+
         /**
          * Message in the rendering
          */
         MESSAGE,
+
         /**
          * Logging the errors stacks (ok for testing) and using the message into the rendering
          */
         LOGGING_STACK,
+
         /**
          * Throwing the errors (not recommended)
          */
@@ -231,6 +241,7 @@ class OntrackConfigProperties {
          */
         @DurationUnit(ChronoUnit.DAYS)
         var validity: Duration = Duration.ofDays(0)
+
         /**
          * Default validity duration for the _transient_ tokens.
          *

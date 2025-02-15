@@ -10,7 +10,10 @@ import WorkflowInstanceStatus from "@components/extension/workflows/WorkflowInst
 import TimestampText from "@components/common/TimestampText";
 import DurationMs from "@components/common/DurationMs";
 import Link from "next/link";
-import NotificationRecordLink from "@components/extension/notifications/NotificationRecordLink";
+import TriggerLink from "@components/framework/trigger/TriggerLink";
+import {Form, Input} from "antd";
+import SelectWorkflowInstanceStatus from "@components/extension/workflows/SelectWorkflowInstanceStatus";
+import SelectTrigger from "@components/core/model/triggers/SelectTrigger";
 
 export default function WorkflowsAuditView() {
 
@@ -18,8 +21,21 @@ export default function WorkflowsAuditView() {
         query WorkflowsInstances(
             $offset: Int!,
             $size: Int!,
+            $id: String,
+            $name: String,
+            $status: WorkflowInstanceStatus,
+            $triggerId: String,
+            $triggerData: String,
         ) {
-            workflowInstances(offset: $offset, size: $size) {
+            workflowInstances(
+                offset: $offset,
+                size: $size,
+                id: $id,
+                name: $name,
+                status: $status,
+                triggerId: $triggerId,
+                triggerData: $triggerData,
+            ) {
                 pageInfo {
                     nextPage {
                         offset
@@ -40,6 +56,10 @@ export default function WorkflowsAuditView() {
                             name
                             value
                         }
+                    }
+                    triggerData {
+                        id
+                        data
                     }
                     workflow {
                         name
@@ -66,6 +86,43 @@ export default function WorkflowsAuditView() {
                     queryNode="workflowInstances"
                     size={10}
                     filter={{}}
+                    filterForm={[
+                        <Form.Item
+                            key="id"
+                            name="id"
+                            label="ID"
+                        >
+                            <Input style={{width: '16em'}}/>
+                        </Form.Item>,
+                        <Form.Item
+                            key="name"
+                            name="name"
+                            label="Name"
+                        >
+                            <Input style={{width: '16em'}}/>
+                        </Form.Item>,
+                        <Form.Item
+                            key="status"
+                            name="status"
+                            label="Status"
+                        >
+                            <SelectWorkflowInstanceStatus/>
+                        </Form.Item>,
+                        <Form.Item
+                            key="triggerId"
+                            name="triggerId"
+                            label="Trigger"
+                        >
+                            <SelectTrigger/>
+                        </Form.Item>,
+                        <Form.Item
+                            key="triggerData"
+                            name="triggerData"
+                            label="Trigger data"
+                        >
+                            <Input style={{width: '16em'}}/>
+                        </Form.Item>,
+                    ]}
                     columns={[
                         {
                             key: 'id',
@@ -79,16 +136,14 @@ export default function WorkflowsAuditView() {
                             render: (_, instance) => instance.workflow.name,
                         },
                         {
-                            key: 'notification',
-                            title: "Notification",
-                            render: (_, instance) => {
-                                const notificationRecordId = instance.event.values.find(it => it.name === 'notificationRecordId')?.value
-                                if (notificationRecordId) {
-                                    return <NotificationRecordLink recordId={notificationRecordId}/>
-                                } else {
-                                    return undefined
+                            key: 'trigger',
+                            title: "Trigger",
+                            render: (_, instance) => <>
+                                {
+                                    instance.triggerData &&
+                                    <TriggerLink triggerData={instance.triggerData}/>
                                 }
-                            }
+                            </>
                         },
                         {
                             key: 'status',

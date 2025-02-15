@@ -1,7 +1,7 @@
 import {Select, Space, Typography} from "antd";
 import {FaBan, FaTimesCircle} from "react-icons/fa";
 
-export default function SelectJobError({value, onChange, style}) {
+export default function SelectJobError({value, onChange, style, allowClear, placeholder}) {
     const options = [
         {
             value: "false",
@@ -30,6 +30,8 @@ export default function SelectJobError({value, onChange, style}) {
                 value={value}
                 onChange={onChange}
                 style={style}
+                allowClear={allowClear}
+                placeholder={placeholder}
             />
         </>
     )

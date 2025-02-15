@@ -17,6 +17,7 @@ import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorSe
 import net.nemerosa.ontrack.extension.workflows.repository.WorkflowInstanceRepository
 import net.nemerosa.ontrack.model.events.SerializableEvent
 import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.trigger.TriggerData
 import net.nemerosa.ontrack.model.tx.DefaultTransactionHelper
 import net.nemerosa.ontrack.model.utils.launchAsyncWithSecurityContext
 import net.nemerosa.ontrack.model.utils.launchWithSecurityContext
@@ -47,6 +48,7 @@ class WorkflowEngineImpl(
     override fun startWorkflow(
         workflow: Workflow,
         event: SerializableEvent,
+        triggerData: TriggerData,
         pauseMs: Long,
     ): WorkflowInstance {
         // Checks the workflow consistency (cycles, etc.) - use a public method, usable by extensions
@@ -61,7 +63,11 @@ class WorkflowEngineImpl(
         // TODO Termination node
 
         // Creating the instance
-        val instance = createInstance(workflow = actualWorkflow, event = event)
+        val instance = createInstance(
+            workflow = actualWorkflow,
+            event = event,
+            triggerData = triggerData,
+        )
 
         // Storing the instance
         transactionHelper.inNewTransaction {

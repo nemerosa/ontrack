@@ -2,7 +2,7 @@ import {Select} from "antd";
 import {useRefData} from "@components/providers/RefDataProvider";
 import JobState from "@components/core/admin/jobs/JobState";
 
-export default function SelectJobState({value, onChange, allowClear, style}) {
+export default function SelectJobState({value, onChange, allowClear, style, placeholder}) {
 
     const {jobStates} = useRefData()
 
@@ -19,6 +19,7 @@ export default function SelectJobState({value, onChange, allowClear, style}) {
                 onChange={onChange}
                 allowClear={allowClear}
                 style={style}
+                placeholder={placeholder}
             />
         </>
     )

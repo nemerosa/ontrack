@@ -2,7 +2,7 @@ import {Space} from "antd";
 import SlotPipelineStatusLabel from "@components/extension/environments/SlotPipelineStatusLabel";
 
 /**
- * @deprecated
+ * @deprecated Use SlotPipelineStatusLabel instead
  */
 export default function SlotPipelineStatus({pipeline, showText = true, children}) {
     return (

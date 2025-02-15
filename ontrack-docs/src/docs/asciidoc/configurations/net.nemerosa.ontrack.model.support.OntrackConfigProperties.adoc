@@ -181,6 +181,12 @@ General configuration of Ontrack.
 |`IGNORE`
 |
 
+|`ontrack.config.templating.html-tags.<0>`
+|`ONTRACK_CONFIG_TEMPLATING_HTMLTAGS_<0>`
+|HTML tags to accept on top of the default ones
+|`_Empty list_`
+|
+
 |`ontrack.config.ui.enabled`
 |`ONTRACK_CONFIG_UI_ENABLED`
 |enabled field

@@ -66,8 +66,8 @@ class ACCJiraNotificationsWorkflow : AbstractACCDSLWorkflowsTestSupport() {
                              channel: jira-link
                              channelConfig:
                                 configName: $name
-                                sourceQuery: key = ${'$'}{workflow.creation?path=ticketKey}
-                                targetQuery: key = ${'$'}{workflow.promotion?path=ticketKey}
+                                sourceQuery: key = ${'$'}{workflow.creation?path=result.ticketKey}
+                                targetQuery: key = ${'$'}{workflow.promotion?path=result.ticketKey}
                                 linkName: Relates
                 """.trimIndent()
 
@@ -90,9 +90,11 @@ class ACCJiraNotificationsWorkflow : AbstractACCDSLWorkflowsTestSupport() {
                     val instance = waitUntilWorkflowByNameFinished(name = workflowName)
 
                     // Gets the workflow output to get the ticket keys
-                    val keyCreation = instance.getExecutionOutput("creation")?.path("ticketKey")?.asText()
+                    val keyCreation = instance.getExecutionOutput("creation")
+                        ?.path("result")?.path("ticketKey")?.asText()
                         ?: fail("Could not find ticket key in output")
-                    val keyPromotion = instance.getExecutionOutput("promotion")?.path("ticketKey")?.asText()
+                    val keyPromotion = instance.getExecutionOutput("promotion")
+                        ?.path("result")?.path("ticketKey")?.asText()
                         ?: fail("Could not find ticket key in output")
 
                     // Getting the tickets

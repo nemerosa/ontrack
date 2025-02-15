@@ -4,7 +4,7 @@ import {Col, Row} from "antd";
 import WorkflowInstanceGraphInfo from "@components/extension/workflows/WorkflowInstanceGraphInfo";
 import {useState} from "react";
 
-export default function WorkflowInstanceGraph({instance}) {
+export default function WorkflowInstanceGraph({instance, instanceNodeExecutions}) {
 
     const [nodeSelected, setNodeSelected] = useState()
 
@@ -13,11 +13,15 @@ export default function WorkflowInstanceGraph({instance}) {
             <Row>
                 <Col span={16}>
                     <ReactFlowProvider>
-                        <WorkflowInstanceGraphFlow instance={instance} onNodeSelected={setNodeSelected}/>
+                        <WorkflowInstanceGraphFlow
+                            instance={instance}
+                            instanceNodeExecutions={instanceNodeExecutions}
+                            onNodeSelected={setNodeSelected}
+                        />
                     </ReactFlowProvider>
                 </Col>
                 <Col span={8}>
-                    <WorkflowInstanceGraphInfo instance={instance} selectedNode={nodeSelected}/>
+                    <WorkflowInstanceGraphInfo selectedNode={nodeSelected}/>
                 </Col>
             </Row>
         </>

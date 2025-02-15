@@ -30,35 +30,46 @@ abstract class AbstractGitHubTestSupport : AbstractQLKTITSupport() {
     @Autowired
     private lateinit var gitCommitPropertyCommitLink: GitCommitPropertyCommitLink
 
-    protected fun gitHubConfig(
+    protected fun gitHubConfiguration(
         gitConfigurationName: String = uid("C"),
-        url: String? = null
+        url: String? = null,
+        username: String? = null,
+        password: String? = null,
+        token: String? = null,
+        appId: String? = null,
+        appPrivateKey: String? = null,
+        appInstallationAccountName: String? = null,
     ): GitHubEngineConfiguration {
         return withDisabledConfigurationTest {
             asUser().with(GlobalSettings::class.java).call {
                 gitConfigurationService.newConfiguration(
                     GitHubEngineConfiguration(
-                        gitConfigurationName,
-                        url,
-                        null,
-                        null,
-                        null
+                        name = gitConfigurationName,
+                        url = url,
+                        user = username,
+                        password = password,
+                        oauth2Token = token,
+                        appId = appId,
+                        appPrivateKey = appPrivateKey,
+                        appInstallationAccountName = appInstallationAccountName,
                     )
                 )
             }
         }
     }
 
-    protected fun Project.gitHubConfig(issueServiceConfigurationIdentifier: String?): GitHubProjectConfigurationProperty {
+    protected fun Project.configureGitHub(
+        gitHubConfiguration: GitHubEngineConfiguration = gitHubConfiguration(),
+        issueServiceConfigurationIdentifier: String? = null,
+    ): GitHubProjectConfigurationProperty {
         // Create a Git configuration
-        val gitConfiguration = gitHubConfig()
         val actualIssueServiceConfigurationIdentifier: String? = when (issueServiceConfigurationIdentifier) {
             null -> null
-            "github" -> "github//${gitConfiguration.name}:nemerosa/test"
+            "github" -> "github//${gitHubConfiguration.name}:nemerosa/test"
             else -> issueServiceConfigurationIdentifier
         }
         val property = GitHubProjectConfigurationProperty(
-            gitConfiguration,
+            gitHubConfiguration,
             "nemerosa/test",
             0,
             actualIssueServiceConfigurationIdentifier

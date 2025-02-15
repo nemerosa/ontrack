@@ -26,6 +26,7 @@ class WorkflowInstanceTest {
             timestamp = Time.now,
             workflow = testWorkflow(),
             event = MockEventType.serializedMockEvent("Sample"),
+            status = WorkflowInstanceStatus.ERROR,
             nodesExecutions = listOf(
                 WorkflowInstanceNode(
                     id = "ticket",
@@ -55,7 +56,7 @@ class WorkflowInstanceTest {
         )
         assertEquals(
             WorkflowInstanceStatus.ERROR,
-            workflowInstance.status
+            workflowInstance.computeStatus()
         )
     }
 
@@ -86,12 +87,8 @@ class WorkflowInstanceTest {
         )
     }
 
-    private fun testInstance(lastNodeStatus: WorkflowInstanceNodeStatus) = WorkflowInstance(
-        id = "test",
-        timestamp = Time.now,
-        workflow = testWorkflow(),
-        event = MockEventType.serializedMockEvent("Sample"),
-        nodesExecutions = listOf(
+    private fun testInstance(lastNodeStatus: WorkflowInstanceNodeStatus): WorkflowInstance {
+        val nodesExecutions = listOf(
             WorkflowInstanceNode(
                 id = "ticket",
                 status = WorkflowInstanceNodeStatus.SUCCESS,
@@ -117,7 +114,15 @@ class WorkflowInstanceTest {
                 error = "Cancelled",
             ),
         )
-    )
+        return WorkflowInstance(
+            id = "test",
+            timestamp = Time.now,
+            workflow = testWorkflow(),
+            event = MockEventType.serializedMockEvent("Sample"),
+            status = WorkflowInstance.computeStatus(nodesExecutions),
+            nodesExecutions = nodesExecutions
+        )
+    }
 
     private fun testWorkflow() = WorkflowParser.parseYamlWorkflow(
         """

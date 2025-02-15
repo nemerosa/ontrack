@@ -1,6 +1,7 @@
 /**
  * Utilities to access the local storage
  */
+import {useEffect, useState} from "react";
 
 const selectedBuildFilter = (branchId) => `selected_build_filter_${branchId}`
 const selectedValidationStampFilter = (branchId) => `selected_validation_stamp_filter_${branchId}`
@@ -67,5 +68,22 @@ export function setLocallySelectedValidationStampFilter(branchId, validationStam
         localStorage.removeItem(
             selectedValidationStampFilter((branchId))
         )
+    }
+}
+
+export const useLocalWorkflowShowDetails = () => {
+    const localStorageKey = 'workflow-show-details'
+    const initialValue = localStorage.getItem(localStorageKey);
+    const [stateShowDetails, setStateShowDetails] = useState(initialValue === null || initialValue === 'yes')
+
+    useEffect(() => {
+        localStorage.setItem(localStorageKey, stateShowDetails ? 'yes' : 'no')
+    }, [stateShowDetails])
+
+    return {
+        showDetails: stateShowDetails,
+        toggleShowDetails: () => {
+            setStateShowDetails(value => !value)
+        },
     }
 }

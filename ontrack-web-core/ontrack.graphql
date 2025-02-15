@@ -4058,6 +4058,11 @@ type Mutation {
     ): SaveBuildFilterPayload
     "Saves a dashboard"
     saveDashboard(input: SaveDashboardInput!): SaveDashboardPayload
+    "Saves a workflow which is defined as JSON"
+    saveJsonWorkflow(
+        "Input for the mutation"
+        input: SaveJsonWorkflowInput
+    ): SaveJsonWorkflowPayload
     "Saving some generic settings"
     saveSettings(input: SaveSettingsInput!): SaveSettingsPayload
     "Saves or creates a configured admission rule for a slot"
@@ -5995,6 +6000,8 @@ type Query {
     ): SlotWorkflowInstance
     "Getting the list of template renderers"
     templatingRenderers: [TemplatingRenderer!]!
+    "List of workflow instance statuses"
+    triggerList: [Trigger!]!
     "Gets the current user"
     user: User
     "Gets the current dashboard"
@@ -6030,14 +6037,24 @@ type Query {
         "ID of the workflow instance"
         id: String
     ): WorkflowInstance
+    "List of workflow instance statuses"
+    workflowInstanceStatusList: [WorkflowInstanceStatus!]!
     "List of workflow instances"
     workflowInstances(
+        "ID of a workflow"
+        id: String,
         "Name of a workflow"
         name: String,
         "Offset for the page"
         offset: Int = 0,
         "Size of the page"
-        size: Int = 20
+        size: Int = 20,
+        "Status of the workflow"
+        status: WorkflowInstanceStatus,
+        "Text to find in the trigger data of the workflow"
+        triggerData: String,
+        "ID of the trigger of the workflow"
+        triggerId: String
     ): WorkflowInstancePaginated
     "List of all workflow node executors"
     workflowNodeExecutors: [WorkflowNodeExecutor!]!
@@ -6383,6 +6400,14 @@ type SaveDashboardPayload implements PayloadInterface {
     dashboard: Dashboard
     "List of errors"
     errors: [PayloadUserError]
+}
+
+"Output type for the saveJsonWorkflow mutation."
+type SaveJsonWorkflowPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+    "Saved workflow ID"
+    workflowId: String
 }
 
 type SaveSettingsPayload implements PayloadInterface {
@@ -7600,6 +7625,22 @@ type Token {
     value: String
 }
 
+"Trigger for something"
+type Trigger {
+    "displayName field"
+    displayName: String!
+    "id field"
+    id: String!
+}
+
+"Data for the trigger of something (notification, workflow, etc.)"
+type TriggerData {
+    "Data associated with this trigger"
+    data: JSON
+    "ID of the trigger"
+    id: String!
+}
+
 """
 
 An `ActionLink` refers to a HTTP end point,
@@ -8234,6 +8275,8 @@ type WorkflowInstance {
     status: WorkflowInstanceStatus!
     "timestamp field"
     timestamp: LocalDateTime!
+    "triggerData field"
+    triggerData: TriggerData
     "workflow field"
     workflow: Workflow!
 }
@@ -8529,6 +8572,7 @@ enum WorkflowInstanceNodeStatus {
     ERROR
     STARTED
     SUCCESS
+    TIMEOUT
     WAITING
 }
 
@@ -10221,6 +10265,12 @@ input SaveDashboardInput {
     userScope: DashboardContextUserScope!
     uuid: String
     widgets: [WidgetInstanceInput!]!
+}
+
+"Input type for the saveJsonWorkflow mutation."
+input SaveJsonWorkflowInput {
+    "workflow field"
+    workflow: JSON!
 }
 
 input SaveSettingsInput {

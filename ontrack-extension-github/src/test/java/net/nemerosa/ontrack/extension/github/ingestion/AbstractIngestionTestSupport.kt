@@ -50,7 +50,7 @@ abstract class AbstractIngestionTestSupport : AbstractGitHubTestSupport() {
             // Removing all previous configuration
             noGitHubConfig()
             // Creating one config
-            gitHubConfig()
+            gitHubConfiguration()
         }
 
     protected fun severalGitHubConfigs(sameRoot: Boolean = false): GitHubEngineConfiguration =
@@ -58,14 +58,14 @@ abstract class AbstractIngestionTestSupport : AbstractGitHubTestSupport() {
             // Removing all previous configuration
             noGitHubConfig()
             // Creating two configs, return the last one
-            gitHubConfig(
+            gitHubConfiguration(
                 url = if (sameRoot) {
                     "https://github.enterprise2.com"
                 } else {
                     "https://github.enterprise1.com"
                 }
             )
-            gitHubConfig(url = "https://github.enterprise2.com")
+            gitHubConfiguration(url = "https://github.enterprise2.com")
         }
 
     protected fun noGitHubConfig() {

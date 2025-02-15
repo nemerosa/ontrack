@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.workflows.definition
 
 import com.fasterxml.jackson.databind.node.TextNode
+import net.nemerosa.ontrack.extension.workflows.registry.WorkflowParser
 
 object WorkflowFixtures {
 
@@ -73,37 +74,27 @@ object WorkflowFixtures {
             )
         )
 
-    @Deprecated("Use YAML instead")
     fun twoParallelAndJoin() =
-        Workflow(
-            name = "Parallel with join",
-            nodes = listOf(
-                WorkflowNode(
-                    id = "start-a",
-                    executorId = "mock",
-                    data = TextNode("Start node A"),
-                    parents = emptyList(),
-                ),
-                WorkflowNode(
-                    id = "start-b",
-                    executorId = "mock",
-                    data = TextNode("Start node B"),
-                    parents = emptyList(),
-                ),
-                WorkflowNode(
-                    id = "end",
-                    executorId = "mock",
-                    data = TextNode("End node"),
-                    parents = listOf(
-                        WorkflowParentNode(
-                            id = "start-a",
-                        ),
-                        WorkflowParentNode(
-                            id = "start-b",
-                        ),
-                    ),
-                ),
-            )
+        WorkflowParser.parseYamlWorkflow(
+            """
+                name: Parallel with Join
+                nodes:
+                  - id: start-a
+                    executorId: mock
+                    data:
+                        text: Start node A
+                  - id: start-b
+                    executorId: mock
+                    data:
+                        text: Start node B
+                  - id: end
+                    parents:
+                      - id: start-a
+                      - id: start-b
+                    executorId: mock
+                    data:
+                        text: End node
+            """.trimIndent()
         )
 
 }

@@ -10,7 +10,7 @@ export default function SlackNotificationChannelOutput({message}) {
                         key: 'message',
                         label: 'Message',
                         children: <Space>
-                            <Tag>markdown</Tag>
+                            <Tag>slack</Tag>
                             {message}
                         </Space>,
                         span: 12,

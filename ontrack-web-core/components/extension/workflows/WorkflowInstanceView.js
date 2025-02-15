@@ -6,7 +6,7 @@ import MainPage from "@components/layouts/MainPage";
 import Link from "next/link";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {useContext, useEffect, useState} from "react";
-import {Descriptions, Skeleton, Space} from "antd";
+import {Descriptions, Skeleton, Space, Typography} from "antd";
 import {gql} from "graphql-request";
 import TimestampText from "@components/common/TimestampText";
 import DurationMs from "@components/common/DurationMs";
@@ -14,9 +14,10 @@ import WorkflowInstanceStatus from "@components/extension/workflows/WorkflowInst
 import WorkflowInstanceGraph from "@components/extension/workflows/WorkflowInstanceGraph";
 import PageSection from "@components/common/PageSection";
 import WorkflowNodeExecutorContextProvider from "@components/extension/workflows/WorkflowNodeExecutorContext";
-import WorkflowInstanceContext from "@components/extension/workflows/WorkflowInstanceContext";
 import {UserContext} from "@components/providers/UserProvider";
 import WorkflowInstanceStopButton from "@components/extension/workflows/WorkflowInstanceStopButton";
+import {AutoRefreshButton, AutoRefreshContextProvider} from "@components/common/AutoRefresh";
+import TriggerComponent from "@components/framework/trigger/TriggerComponent";
 
 export default function WorkflowInstanceView({id}) {
 
@@ -31,6 +32,7 @@ export default function WorkflowInstanceView({id}) {
             name: ''
         }
     })
+    const [refreshableInstanceData, setRefreshableInstanceData] = useState(null)
 
     const reload = () => {
         setLoadingCount(count => count + 1)
@@ -70,6 +72,10 @@ export default function WorkflowInstanceView({id}) {
                                     value
                                 }
                             }
+                            triggerData {
+                                id
+                                data
+                            }
                             nodesExecutions {
                                 id
                                 status
@@ -86,69 +92,124 @@ export default function WorkflowInstanceView({id}) {
             ).then(data => {
                 const instance = data.workflowInstance
                 setInstance(instance)
-
-                setItems([
-                    {
-                        key: 'workflow',
-                        label: 'Workflow',
-                        children: instance.workflow.name,
-                        span: 4,
-                    },
-                    {
-                        key: 'id',
-                        label: 'ID',
-                        children: instance.id,
-                        span: 4,
-                    },
-                    {
-                        key: 'status',
-                        label: 'Status',
-                        children: <Space>
-                            <WorkflowInstanceStatus status={instance.status}/>
-                            {
-                                user.authorizations.workflow?.stop &&
-                                (instance.status === 'STARTED' || instance.status === 'RUNNING') &&
-                                <WorkflowInstanceStopButton id={instance.id} onStopped={reload}/>
-                            }
-                        </Space>,
-                        span: 4,
-                    },
-                    {
-                        key: 'startTime',
-                        label: 'Start time',
-                        children: <TimestampText value={instance.startTime} format="YYYY MMM DD, HH:mm:ss"/>,
-                        span: 3,
-                    },
-                    {
-                        key: 'endTime',
-                        label: 'End time',
-                        children: <TimestampText value={instance.endTime} format="YYYY MMM DD, HH:mm:ss"/>,
-                        span: 3,
-                    },
-                    {
-                        key: 'duration',
-                        label: 'Duration',
-                        children: <DurationMs ms={instance.durationMs}/>,
-                        span: 3,
-                    },
-                    {
-                        key: 'timestamp',
-                        label: 'Last update',
-                        children: <TimestampText value={instance.timestamp} format="YYYY MMM DD, HH:mm:ss"/>,
-                        span: 3,
-                    },
-                    {
-                        key: 'context',
-                        label: 'Context',
-                        children: <WorkflowInstanceContext instance={instance}/>,
-                        span: 12,
-                    }
-                ])
+                setRefreshableInstanceData({
+                    endTime: instance.endTime,
+                    durationMs: instance.durationMs,
+                    timestamp: instance.timestamp,
+                    status: instance.status,
+                })
             }).finally(() => {
                 setLoading(false)
             })
         }
-    }, [client, id, loadingCount]);
+    }, [client, id, loadingCount])
+
+    useEffect(() => {
+        if (instance && refreshableInstanceData) {
+            setItems([
+                {
+                    key: 'workflow',
+                    label: 'Workflow',
+                    children: instance.workflow.name,
+                    span: 4,
+                },
+                {
+                    key: 'id',
+                    label: 'ID',
+                    children: <Typography.Text copyable>{instance.id}</Typography.Text>,
+                    span: 4,
+                },
+                {
+                    key: 'status',
+                    label: 'Status',
+                    children: <Space>
+                        <WorkflowInstanceStatus id="workflow-instance-status" status={refreshableInstanceData.status}/>
+                        <AutoRefreshButton/>
+                        {
+                            user.authorizations.workflow?.stop &&
+                            (refreshableInstanceData.status === 'STARTED' || refreshableInstanceData.status === 'RUNNING') &&
+                            <WorkflowInstanceStopButton id={instance.id} onStopped={reload}/>
+                        }
+                    </Space>,
+                    span: 4,
+                },
+                {
+                    key: 'startTime',
+                    label: 'Start time',
+                    children: <TimestampText value={instance.startTime} format="YYYY MMM DD, HH:mm:ss"/>,
+                    span: 3,
+                },
+                {
+                    key: 'endTime',
+                    label: 'End time',
+                    children: <TimestampText value={refreshableInstanceData.endTime}
+                                             format="YYYY MMM DD, HH:mm:ss"/>,
+                    span: 3,
+                },
+                {
+                    key: 'duration',
+                    label: 'Duration',
+                    children: <DurationMs ms={refreshableInstanceData.durationMs}/>,
+                    span: 3,
+                },
+                {
+                    key: 'timestamp',
+                    label: 'Last update',
+                    children: <TimestampText value={refreshableInstanceData.timestamp}
+                                             format="YYYY MMM DD, HH:mm:ss"/>,
+                    span: 3,
+                },
+                {
+                    key: 'trigger',
+                    label: 'Trigger',
+                    children: <>
+                        {
+                            instance.triggerData &&
+                            <TriggerComponent triggerData={instance.triggerData}/>
+                        }
+                    </>,
+                    span: 12,
+                }
+            ])
+        }
+    }, [instance, refreshableInstanceData])
+
+    const [instanceNodeExecutions, setInstanceNodeExecutions] = useState()
+
+    const reloadInstanceNodeExecutions = () => {
+        client.request(
+            gql`
+                query WorkflowInstanceNodeExecutions($workflowInstanceId: String!) {
+                    workflowInstance(id: $workflowInstanceId) {
+                        endTime
+                        durationMs
+                        timestamp
+                        status
+                        nodesExecutions {
+                            id
+                            status
+                            output
+                            error
+                            startTime
+                            endTime
+                            durationMs
+                        }
+                    }
+                }
+            `,
+            {
+                workflowInstanceId: instance.id,
+            }
+        ).then(data => {
+            setInstanceNodeExecutions(data.workflowInstance.nodesExecutions)
+            setRefreshableInstanceData({
+                endTime: data.workflowInstance.endTime,
+                durationMs: data.workflowInstance.durationMs,
+                timestamp: data.workflowInstance.timestamp,
+                status: data.workflowInstance.status,
+            })
+        })
+    }
 
     return (
         <>
@@ -166,21 +227,26 @@ export default function WorkflowInstanceView({id}) {
                     <CloseCommand key="home" href="/extension/workflows/audit"/>
                 ]}
             >
-                <WorkflowNodeExecutorContextProvider>
-                    <Skeleton loading={loading} active>
-                        <Space direction="vertical">
-                            <Descriptions
-                                items={items}
-                                column={12}
-                            />
-                            <PageSection
-                                title={undefined}
-                                padding={false}>
-                                <WorkflowInstanceGraph instance={instance}/>
-                            </PageSection>
-                        </Space>
-                    </Skeleton>
-                </WorkflowNodeExecutorContextProvider>
+                <AutoRefreshContextProvider onRefresh={reloadInstanceNodeExecutions}>
+                    <WorkflowNodeExecutorContextProvider>
+                        <Skeleton loading={loading} active>
+                            <Space direction="vertical">
+                                <Descriptions
+                                    items={items}
+                                    column={12}
+                                />
+                                <PageSection
+                                    title={undefined}
+                                    padding={false}>
+                                    <WorkflowInstanceGraph
+                                        instance={instance}
+                                        instanceNodeExecutions={instanceNodeExecutions}
+                                    />
+                                </PageSection>
+                            </Space>
+                        </Skeleton>
+                    </WorkflowNodeExecutorContextProvider>
+                </AutoRefreshContextProvider>
             </MainPage>
         </>
     )

@@ -3,6 +3,9 @@ package net.nemerosa.ontrack.extension.workflows.engine
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.workflows.definition.WorkflowFixtures
 import net.nemerosa.ontrack.model.events.MockEventType
+import net.nemerosa.ontrack.model.trigger.TestTrigger
+import net.nemerosa.ontrack.model.trigger.TestTriggerData
+import net.nemerosa.ontrack.model.trigger.createTriggerData
 import java.time.LocalDateTime
 
 object WorkflowInstanceFixtures {
@@ -16,6 +19,7 @@ object WorkflowInstanceFixtures {
         return createInstance(
             workflow = workflow,
             event = event,
+            triggerData = TestTrigger().createTriggerData(TestTriggerData()),
             timestamp = timestamp,
         )
     }

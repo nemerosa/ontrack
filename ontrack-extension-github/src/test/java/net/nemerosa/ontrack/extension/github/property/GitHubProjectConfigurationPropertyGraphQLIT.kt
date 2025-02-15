@@ -10,7 +10,7 @@ class GitHubProjectConfigurationPropertyGraphQLIT : AbstractGitHubTestSupport() 
     @Test
     fun `Setting a GitHub configuration on a project identified by name with generic mutation`() {
         asAdmin {
-            val cfg = gitHubConfig()
+            val cfg = gitHubConfiguration()
             project {
                 run("""
                     mutation {
