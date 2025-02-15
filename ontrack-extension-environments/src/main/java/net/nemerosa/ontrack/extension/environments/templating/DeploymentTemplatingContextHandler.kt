@@ -12,9 +12,12 @@ import org.springframework.stereotype.Component
 class DeploymentTemplatingContextHandler(
     private val slotPipelineRepository: SlotPipelineRepository,
     private val uiLocations: UILocations,
+    deploymentTemplatingContextFieldHandlers: List<DeploymentTemplatingContextFieldHandler>,
 ) : AbstractTemplatingContextHandler<DeploymentTemplatingContextData>(
     DeploymentTemplatingContextData::class
 ) {
+
+    private val fieldHandlers = deploymentTemplatingContextFieldHandlers.associateBy { it.field }
 
     override val id: String = "deployment"
 
@@ -26,7 +29,17 @@ class DeploymentTemplatingContextHandler(
     ): String {
         // Loading the deployment
         val deployment = slotPipelineRepository.getPipelineById(data.slotPipelineId)
+        // Gets the field name
+        val fieldName = field?.takeIf { it.isNotBlank() } ?: DeploymentTemplatingContextFieldHandler.DEFAULT_FIELD
+        // Field handler
+        val fieldHandler = fieldHandlers[fieldName]
+            ?: throw TemplatingContextHandlerFieldNotManagedException(this, field)
         // Rendering
+        return fieldHandler.render(
+            deployment = deployment,
+            config = config,
+            renderer = renderer,
+        )
         return when (field) {
             null -> renderDeploymentLink(deployment, config, renderer)
             "" -> renderDeploymentLink(deployment, config, renderer)

@@ -12,3 +12,8 @@ fun Map<String, String>.getListStringsTemplatingParam(key: String): List<String>
         it.trim().takeIf { it.isNotBlank() }
     }
 }
+
+inline fun <reified E : Enum<E>> Map<String, String>.getEnumTemplatingParam(key: String): E? {
+    val value = this[key] ?: return null
+    return enumValueOf<E>(value)
+}

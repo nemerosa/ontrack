@@ -80,6 +80,19 @@ class DeploymentTemplatingContextHandlerTest {
         val handler = DeploymentTemplatingContextHandler(
             slotPipelineRepository = slotPipelineRepository,
             uiLocations = uiLocations,
+            deploymentTemplatingContextFieldHandlers = listOf(
+                DefaultDeploymentTemplatingContextFieldHandler(
+                    linkDeploymentTemplatingContextFieldHandler = LinkDeploymentTemplatingContextFieldHandler(
+                        uiLocations = uiLocations,
+                    ),
+                ),
+                LinkDeploymentTemplatingContextFieldHandler(
+                    uiLocations = uiLocations,
+                ),
+                NameDeploymentTemplatingContextFieldHandler(),
+                IdDeploymentTemplatingContextFieldHandler(),
+                NumberDeploymentTemplatingContextFieldHandler(),
+            )
         )
 
         val text = handler.render(
