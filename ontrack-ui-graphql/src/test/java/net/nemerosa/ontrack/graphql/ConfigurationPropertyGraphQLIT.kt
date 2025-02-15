@@ -5,12 +5,12 @@ import net.nemerosa.ontrack.extension.api.support.TestConfigurationService
 import net.nemerosa.ontrack.extension.api.support.TestProperty
 import net.nemerosa.ontrack.extension.api.support.TestPropertyType
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
+import kotlin.test.assertFalse
 
-class ConfigurationPropertyGraphQLIT : AbstractQLKTITJUnit4Support() {
+class ConfigurationPropertyGraphQLIT : AbstractQLKTITSupport() {
 
     @Autowired
     private lateinit var testConfigurationService: TestConfigurationService
@@ -63,7 +63,7 @@ class ConfigurationPropertyGraphQLIT : AbstractQLKTITJUnit4Support() {
         assertEquals("Test", value["value"].asText())
         assertEquals(configName, value["configuration"]["name"].asText())
         assertEquals("user", value["configuration"]["user"].asText())
-        assertTrue(value["configuration"]["password"].isNull, "Password must have been obfuscated")
+        assertFalse(value["configuration"].has("password"), "Password field must have been removed")
     }
 
 }

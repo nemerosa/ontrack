@@ -16,7 +16,7 @@ class GitHubProjectConfigurationPropertyTypeIT : AbstractGitHubTestSupport() {
     @Test
     fun `Setting GitHub issues as issue service`() {
         asAdmin {
-            val cfg = gitHubConfig()
+            val cfg = gitHubConfiguration()
             project {
                 propertyService.editProperty(this, GitHubProjectConfigurationPropertyType::class.java.name, mapOf(
                     "configuration" to cfg.name,

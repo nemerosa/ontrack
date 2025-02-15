@@ -59,7 +59,7 @@ internal class IngestionImageServiceGitHubIT : AbstractIngestionTestSupport() {
     @Test
     fun `Downloading an image with unknown protocol`() {
         project {
-            gitHubConfig(null)
+            configureGitHub()
             assertFailsWith<IngestionImageProtocolUnsupportedException> {
                 ingestionImageService.downloadImage(
                     this,
@@ -72,7 +72,7 @@ internal class IngestionImageServiceGitHubIT : AbstractIngestionTestSupport() {
     @Test
     fun `Downloading an image with incorrect format`() {
         project {
-            gitHubConfig(null)
+            configureGitHub()
             assertFailsWith<IngestionImageRefFormatException> {
                 ingestionImageService.downloadImage(
                     this,
@@ -85,7 +85,7 @@ internal class IngestionImageServiceGitHubIT : AbstractIngestionTestSupport() {
     @Test
     fun `Downloading an image with incorrect image type`() {
         project {
-            gitHubConfig(null)
+            configureGitHub()
             assertFailsWith<IngestionImagePNGException> {
                 ingestionImageService.downloadImage(
                     this,

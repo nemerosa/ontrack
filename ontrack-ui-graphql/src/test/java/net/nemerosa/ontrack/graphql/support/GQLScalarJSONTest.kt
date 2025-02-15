@@ -8,7 +8,7 @@ import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.test.assertIs
 import org.junit.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
+import kotlin.test.assertFalse
 
 class GQLScalarJSONTest {
 
@@ -96,12 +96,42 @@ class GQLScalarJSONTest {
     @Test
     fun `Obfuscation of password`() {
         // Data with password
-        val data = SampleConfig("user", "secret")
+        val data = SampleConfig(user = "user", password = "secret")
         // As JSON scalar
         val json = GQLScalarJSON.TYPE.coercing.serialize(data) as JsonNode
         // Checks the data
         assertEquals("user", json["user"].asText())
-        assertTrue(json["password"].isNull, "Password field set to null")
+        assertFalse(json.has("password"), "Password field removed")
+    }
+
+    @Test
+    fun `Obfuscation of token`() {
+        // Data with password
+        val data = SampleConfig(token = "token")
+        // As JSON scalar
+        val json = GQLScalarJSON.TYPE.coercing.serialize(data) as JsonNode
+        // Checks the data
+        assertFalse(json.has("token"), "Token field removed")
+    }
+
+    @Test
+    fun `Obfuscation of oauth2Token`() {
+        // Data with password
+        val data = SampleConfig(oauth2Token = "token")
+        // As JSON scalar
+        val json = GQLScalarJSON.TYPE.coercing.serialize(data) as JsonNode
+        // Checks the data
+        assertFalse(json.has("oauth2Token"), "oauth2Token field removed")
+    }
+
+    @Test
+    fun `Obfuscation of appPrivateKey`() {
+        // Data with password
+        val data = SampleConfig(appPrivateKey = "some-key")
+        // As JSON scalar
+        val json = GQLScalarJSON.TYPE.coercing.serialize(data) as JsonNode
+        // Checks the data
+        assertFalse(json.has("appPrivateKey"), "appPrivateKey field removed")
     }
 
     @Test
@@ -113,7 +143,7 @@ class GQLScalarJSONTest {
         // Checks the data
         assertEquals("value", json["value"].asText())
         assertEquals("user", json["config"]["user"].asText())
-        assertTrue(json["config"]["password"].isNull, "Password field set to null")
+        assertFalse(json.path("config").has("password"), "Password field removed")
     }
 
     @Test
@@ -130,12 +160,15 @@ class GQLScalarJSONTest {
         // Checks the data
         assertEquals("value", json["value"].asText())
         assertEquals("user", json["configs"][0]["user"].asText())
-        assertTrue(json["configs"][0]["password"].isNull, "Password set to null")
+        assertFalse(json.path("configs").single().has("password"), "Password field removed")
     }
 
     data class SampleConfig(
-        val user: String,
-        val password: String
+        val user: String? = null,
+        val password: String? = null,
+        val token: String? = null,
+        val oauth2Token: String? = null,
+        val appPrivateKey: String? = null,
     )
 
     data class SampleData(

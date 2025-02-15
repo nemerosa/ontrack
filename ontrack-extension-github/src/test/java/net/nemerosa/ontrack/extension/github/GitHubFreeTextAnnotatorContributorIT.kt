@@ -16,7 +16,7 @@ class GitHubFreeTextAnnotatorContributorIT : AbstractGitHubTestSupport() {
     @Test
     fun `GitHub configuration without any issue service`() {
         project {
-            gitHubConfig(issueServiceConfigurationIdentifier = null)
+            configureGitHub(issueServiceConfigurationIdentifier = null)
             expects("Text with #123" to """Text with <a href="https://github.com/nemerosa/test/issues/123">#123</a>""")
         }
     }
@@ -24,7 +24,7 @@ class GitHubFreeTextAnnotatorContributorIT : AbstractGitHubTestSupport() {
     @Test
     fun `GitHub configuration with full issue service`() {
         project {
-            gitHubConfig(issueServiceConfigurationIdentifier = "self")
+            configureGitHub(issueServiceConfigurationIdentifier = "self")
             expects("Text with #123" to """Text with <a href="https://github.com/nemerosa/test/issues/123">#123</a>""")
         }
     }
@@ -32,7 +32,7 @@ class GitHubFreeTextAnnotatorContributorIT : AbstractGitHubTestSupport() {
     @Test
     fun `GitHub configuration with own full issue service`() {
         project {
-            gitHubConfig(issueServiceConfigurationIdentifier = "github")
+            configureGitHub(issueServiceConfigurationIdentifier = "github")
             expects("Text with #123" to """Text with <a href="https://github.com/nemerosa/test/issues/123">#123</a>""")
         }
     }
@@ -40,7 +40,7 @@ class GitHubFreeTextAnnotatorContributorIT : AbstractGitHubTestSupport() {
     @Test
     fun `GitHub configuration with an issue service`() {
         project {
-            gitHubConfig(issueServiceConfigurationIdentifier = TestIssueServiceConfiguration.INSTANCE.toIdentifier()
+            configureGitHub(issueServiceConfigurationIdentifier = TestIssueServiceConfiguration.INSTANCE.toIdentifier()
                 .format())
             expects("Text with #123" to """Text with <a href="http://issue/123">#123</a>""")
         }
