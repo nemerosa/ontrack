@@ -1,33 +1,16 @@
-import {Descriptions} from "antd";
-import {useEffect, useState} from "react";
-import NotificationRecordSummary from "@components/extension/notifications/NotificationRecordSummary";
+import {Dynamic} from "@components/common/Dynamic";
+import {Space, Tag} from "antd";
 
-export default function WorkflowInstanceContext({instance}) {
-
-    const [items, setItems] = useState([])
-
-    useEffect(() => {
-        const index = {}
-        instance.event.values.forEach((name, value) => {
-            index[name] = value
-        })
-
-        const items = []
-
-        if (index.notificationRecordId) {
-            items.push({
-                key: 'notificationRecord',
-                label: "Notification",
-                children: <NotificationRecordSummary recordId={index.notificationRecordId}/>
-            })
-        }
-
-        setItems(items)
-    }, [instance.event.values])
-
+export default function WorkflowInstanceContext({context}) {
     return (
         <>
-            <Descriptions items={items} layout="vertical"/>
+            <Space size={4}>
+                <Tag>{context.name}</Tag>
+                <Dynamic
+                    path={`framework/templating-context/${context.contextData.id}/Component`}
+                    props={{...context.contextData.data}}
+                />
+            </Space>
         </>
     )
 }

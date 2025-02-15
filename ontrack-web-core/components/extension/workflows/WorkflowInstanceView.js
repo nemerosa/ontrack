@@ -18,6 +18,7 @@ import {UserContext} from "@components/providers/UserProvider";
 import WorkflowInstanceStopButton from "@components/extension/workflows/WorkflowInstanceStopButton";
 import {AutoRefreshButton, AutoRefreshContextProvider} from "@components/common/AutoRefresh";
 import TriggerComponent from "@components/framework/trigger/TriggerComponent";
+import WorkflowInstanceContexts from "@components/extension/workflows/WorkflowInstanceContexts";
 
 export default function WorkflowInstanceView({id}) {
 
@@ -75,6 +76,13 @@ export default function WorkflowInstanceView({id}) {
                             triggerData {
                                 id
                                 data
+                            }
+                            contexts {
+                                name
+                                contextData {
+                                    id
+                                    data
+                                }
                             }
                             nodesExecutions {
                                 id
@@ -166,6 +174,17 @@ export default function WorkflowInstanceView({id}) {
                         {
                             instance.triggerData &&
                             <TriggerComponent triggerData={instance.triggerData}/>
+                        }
+                    </>,
+                    span: 12,
+                },
+                {
+                    key: 'contexts',
+                    label: 'Contexts',
+                    children: <>
+                        {
+                            instance.contexts && instance.contexts.length > 0 &&
+                            <WorkflowInstanceContexts contexts={instance.contexts} />
                         }
                     </>,
                     span: 12,
