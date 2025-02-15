@@ -112,4 +112,4 @@ Check also the blog articles at https://nemerosa.ghost.io/
 
 ## Contributions
 
-[Contributions](https://static.nemerosa.net/ontrack/release/latest/docs/doc/index.html#contributing) are welcome!
+[Contributions](CONTRIBUTING.md) are welcome!
