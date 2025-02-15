@@ -2,9 +2,11 @@
 ==== List of special templating objects
 
 * <<templating-renderable-av,Auto-versioning context (av)>>
+* <<templating-renderable-deployment,Deployment context (deployment)>>
 * <<templating-renderable-workflow,Information about the workflow (workflow)>>
 * <<templating-renderable-workflowInfo,Global information about the workflow (workflowInfo)>>
 
 include::templating-renderable-av.adoc[]
+include::templating-renderable-deployment.adoc[]
 include::templating-renderable-workflow.adoc[]
 include::templating-renderable-workflowInfo.adoc[]

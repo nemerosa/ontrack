@@ -5,11 +5,15 @@ import net.nemerosa.ontrack.extension.environments.SlotPipelineStatus
 import net.nemerosa.ontrack.extension.environments.storage.SlotPipelineRepository
 import net.nemerosa.ontrack.extension.scm.changelog.ChangeLogTemplatingService
 import net.nemerosa.ontrack.extension.scm.changelog.ChangeLogTemplatingServiceConfig
+import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.EventRenderer
 import net.nemerosa.ontrack.model.templating.getEnumTemplatingParam
 import org.springframework.stereotype.Component
 
 @Component
+@Documentation(ChangelogDeploymentTemplatingContextConfig::class)
+@APIDescription("Getting the changelog since a previous deployment")
 class ChangelogDeploymentTemplatingContextFieldHandler(
     private val slotPipelineRepository: SlotPipelineRepository,
     private val changeLogTemplatingService: ChangeLogTemplatingService,
