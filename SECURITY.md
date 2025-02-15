@@ -12,7 +12,7 @@ They will be fixed in the latest release (1)
 
 ## Reporting a Vulnerability
 
-To report a security vulnerability, please contact ontrack@nemerosa.com
+To report a security vulnerability, please contact ontrack@nemerosa.com or report it directly at https://github.com/nemerosa/ontrack/security
 
 Please mention:
 
