@@ -28,6 +28,22 @@ function createConnectionConfig(environment, token) {
 
 export const useConnection = () => useContext(ConnectionContext)
 
+export const useFullRestUri = (uri) => {
+
+    const connection = useConnection()
+    const [fullUri, setFullUri] = useState('')
+
+    useEffect(() => {
+        if (connection.config) {
+            setFullUri(`${connection.config.url}${uri}`)
+        }
+    }, [uri, connection])
+
+    return {
+        fullUri,
+    }
+}
+
 export const useGraphQLClient = () => {
     const connection = useConnection()
     const [client, setClient] = useState()

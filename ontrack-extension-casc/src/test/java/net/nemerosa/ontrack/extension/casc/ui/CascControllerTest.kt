@@ -5,6 +5,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import net.nemerosa.ontrack.extension.casc.CascConfigurationProperties
 import net.nemerosa.ontrack.extension.casc.CascLoadingService
+import net.nemerosa.ontrack.extension.casc.schema.json.CascJsonSchemaService
 import net.nemerosa.ontrack.extension.casc.upload.CascUploadService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -24,7 +25,13 @@ class CascControllerTest {
         loadingService = mockk(relaxed = true)
         uploadService = mockk(relaxed = true)
         configurationProperties = CascConfigurationProperties()
-        controller = CascController(loadingService, configurationProperties, uploadService)
+        val cascJsonSchemaService = mockk<CascJsonSchemaService>()
+        controller = CascController(
+            cascLoadingService = loadingService,
+            cascConfigurationProperties = configurationProperties,
+            cascUploadService = uploadService,
+            cascJsonSchemaService = cascJsonSchemaService,
+        )
     }
 
     @Test
