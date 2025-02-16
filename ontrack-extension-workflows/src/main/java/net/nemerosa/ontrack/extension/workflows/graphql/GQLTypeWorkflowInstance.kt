@@ -35,6 +35,18 @@ class GQLTypeWorkflowInstance(
             .field(WorkflowInstance::event)
             // Trigger
             .field(WorkflowInstance::triggerData)
+            // Context data
+            .listFieldGetter<WorkflowInstance, WorkflowInstanceContextData>(
+                name = "contexts",
+                description = "List of templating contexts linked to this instance",
+            ) { instance ->
+                instance.contexts.map { (name, contextData) ->
+                    WorkflowInstanceContextData(
+                        name = name,
+                        contextData = contextData,
+                    )
+                }
+            }
             // Node executions
             .field {
                 it.name(WorkflowInstance::nodesExecutions.name)

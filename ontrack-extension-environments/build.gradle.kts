@@ -15,6 +15,7 @@ dependencies {
     implementation(project(":ontrack-extension-casc"))
     implementation(project(":ontrack-extension-notifications"))
     implementation(project(":ontrack-extension-workflows"))
+    implementation(project(":ontrack-extension-scm"))
     implementation(project(":ontrack-repository"))
     implementation(project(":ontrack-repository-support"))
 

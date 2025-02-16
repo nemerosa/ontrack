@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.events.SerializableEvent
 import net.nemerosa.ontrack.model.events.merge
 import net.nemerosa.ontrack.model.pagination.PaginatedList
+import net.nemerosa.ontrack.model.templating.TemplatingContextData
 import net.nemerosa.ontrack.model.trigger.TriggerData
 import net.nemerosa.ontrack.model.trigger.TriggerRegistry
 import net.nemerosa.ontrack.model.trigger.getTriggerById
@@ -37,6 +38,20 @@ class WorkflowInstanceRepository(
                 "triggerData" to writeJson(instance.triggerData?.data),
             )
         )
+        instance.contexts.forEach { (contextName, contextData) ->
+            namedParameterJdbcTemplate!!.update(
+                """
+                    INSERT INTO WKF_INSTANCE_CONTEXT(INSTANCE_ID, CONTEXT_ID, HANDLER_ID, DATA)
+                    VALUES (:instanceId, :contextId, :handlerId, CAST(:data AS JSONB))
+                """.trimIndent(),
+                mapOf(
+                    "instanceId" to instance.id,
+                    "contextId" to contextName,
+                    "handlerId" to contextData.id,
+                    "data" to writeJson(contextData.data),
+                )
+            )
+        }
         instance.nodesExecutions.forEach { nx ->
             namedParameterJdbcTemplate!!.update(
                 """
@@ -82,6 +97,21 @@ class WorkflowInstanceRepository(
         ) { rsn, _ ->
             toWorkflowInstanceNode(rsn)
         }
+        val contexts = namedParameterJdbcTemplate!!.query(
+            """
+                SELECT *
+                FROM WKF_INSTANCE_CONTEXT
+                WHERE INSTANCE_ID = :instanceId
+            """.trimIndent(),
+            mapOf(
+                "instanceId" to instanceId,
+            )
+        ) { rsn, _ ->
+            rsn.getString("CONTEXT_ID")!! to TemplatingContextData(
+                id = rsn.getString("HANDLER_ID"),
+                data = readJson(rsn, "DATA"),
+            )
+        }.toMap()
         val triggerId = rs.getString("TRIGGER_ID")
         val triggerData = readJson(rs, "TRIGGER_DATA")
         return WorkflowInstance(
@@ -97,6 +127,7 @@ class WorkflowInstanceRepository(
             } else {
                 null
             },
+            contexts = contexts,
             status = rs.getString("STATUS")
                 ?.takeIf { it.isNotBlank() }?.let {
                     WorkflowInstanceStatus.valueOf(it)

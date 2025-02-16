@@ -27,6 +27,7 @@ class WorkflowInstanceTest {
             workflow = testWorkflow(),
             event = MockEventType.serializedMockEvent("Sample"),
             status = WorkflowInstanceStatus.ERROR,
+            contexts = emptyMap(),
             nodesExecutions = listOf(
                 WorkflowInstanceNode(
                     id = "ticket",
@@ -120,7 +121,8 @@ class WorkflowInstanceTest {
             workflow = testWorkflow(),
             event = MockEventType.serializedMockEvent("Sample"),
             status = WorkflowInstance.computeStatus(nodesExecutions),
-            nodesExecutions = nodesExecutions
+            nodesExecutions = nodesExecutions,
+            contexts = emptyMap(),
         )
     }
 

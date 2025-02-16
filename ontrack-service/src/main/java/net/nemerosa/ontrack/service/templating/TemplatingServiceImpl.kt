@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service.templating
 
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.SimpleExpand
 import net.nemerosa.ontrack.model.events.EventRenderer
 import net.nemerosa.ontrack.model.structure.EntityDisplayNameService
@@ -14,6 +15,7 @@ class TemplatingServiceImpl(
     templatingSources: List<TemplatingSource>,
     templatingFilters: List<TemplatingFilter>,
     templatingFunctions: List<TemplatingFunction>,
+    templatingContextHandlers: List<TemplatingContextHandler<*>>,
     private val ontrackConfigProperties: OntrackConfigProperties,
     private val entityDisplayNameService: EntityDisplayNameService,
 ) : TemplatingService {
@@ -26,6 +28,8 @@ class TemplatingServiceImpl(
 
     private val filtersById = templatingFilters.associateBy { it.id }
     private val functionsById = templatingFunctions.associateBy { it.id }
+
+    private val contextHandlers = templatingContextHandlers.associateBy { it.id }
 
     private val regexExpressions =
         "\\$\\{([^\\}]+)\\}".toRegex()
@@ -157,6 +161,15 @@ class TemplatingServiceImpl(
             val configMap = parseConfigMap(config)
             contextValue.render(field, configMap, renderer)
         }
+        // Context data
+        else if (contextValue is TemplatingContextData) {
+            renderContextData(
+                contextData = contextValue,
+                field = field,
+                config = config,
+                renderer = renderer,
+            )
+        }
         // Else, we render as a string (if no field, config)
         else if (field.isNullOrBlank() && config.isNullOrBlank()) {
             contextValue.toString()
@@ -206,6 +219,39 @@ class TemplatingServiceImpl(
             parseTemplatingConfig(config)
         }
         return configMap
+    }
+
+    private fun renderContextData(
+        contextData: TemplatingContextData,
+        field: String?,
+        config: String?,
+        renderer: EventRenderer,
+    ): String {
+        val handler = contextHandlers[contextData.id]
+            ?: throw TemplatingContextHandlerNotFoundException(contextData.id)
+        return renderContextData(
+            handler = handler,
+            data = contextData.data,
+            field = field,
+            config = config,
+            renderer = renderer,
+        )
+    }
+
+    private fun <T : TemplatingContext> renderContextData(
+        handler: TemplatingContextHandler<T>,
+        data: JsonNode,
+        field: String?,
+        config: String?,
+        renderer: EventRenderer,
+    ): String {
+        val parsedData = handler.deserialize(data)
+        return handler.render(
+            data = parsedData,
+            field = field,
+            config = parseConfigMap(config),
+            renderer = renderer,
+        )
     }
 
 }

@@ -1,0 +1,35 @@
+[[templating-renderable-deployment]]
+===== Deployment context (deployment)
+
+The `deployment` context is injected into workflows triggered by deployments being started, run or completed.
+
+Context: Environments
+
+Available fields:
+
+* `changelog`: Getting the changelog since a previous deployment
+
+** **allQualifiers** - Boolean - required - Loop over all qualifiers for the last level of `dependencies`, including the default one. Qualifiers at `dependencies` take precedence.
+
+** **commitsOption** - NONE, OPTIONAL, ALWAYS - required - Defines how to render commits for a change log
+
+** **defaultQualifierFallback** - Boolean - required - If a qualifier has no previous link, uses the default qualifier (empty) qualifier.
+
+** **dependencies** - List - required - Comma-separated list of project links to follow one by one for a get deep change log. Each item in the list is either a project name, or a project name and qualifier separated by a colon (:).
+
+** **empty** - String - required - String to use to render an empty or non existent change log
+
+** **since** - CANDIDATE, RUNNING, CANCELLED, DONE - required - Status to use when looking for the previous deployment
+
+** **title** - Boolean - required - Include a title for the change log
+
+* `default`: Displays a link to the deployment
+
+* `id`: Displays the ID of the deployment
+
+* `link`: Displays a link to the deployment
+
+* `name`: Displays the name of the deployment
+
+* `number`: Displays the number of the deployment
+

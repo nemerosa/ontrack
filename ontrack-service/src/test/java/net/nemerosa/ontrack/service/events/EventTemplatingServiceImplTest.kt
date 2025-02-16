@@ -43,6 +43,7 @@ class EventTemplatingServiceImplTest {
             templatingSources = emptyList(),
             templatingFilters = emptyList(),
             templatingFunctions = emptyList(),
+            templatingContextHandlers = emptyList(),
             ontrackConfigProperties = OntrackConfigProperties(),
             entityDisplayNameService = entityDisplayNameService,
         )

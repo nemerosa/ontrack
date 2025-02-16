@@ -7581,6 +7581,14 @@ type SubscribeValidationStampToEventsPayload implements Payload {
     subscription: EventSubscriptionPayload
 }
 
+"Data to be rendered in a template"
+type TemplatingContextData {
+    "Data associated with the context, used by the handler associated with the ID"
+    data: JSON
+    "ID of the templating context handler in charge to rendering this data"
+    id: String!
+}
+
 "Definition of a renderer"
 type TemplatingRenderer {
     "Technical ID for the renderer"
@@ -8257,6 +8265,8 @@ type Workflow {
 
 "Running workflow instance"
 type WorkflowInstance {
+    "List of templating contexts linked to this instance"
+    contexts: [WorkflowInstanceContextData!]!
     "durationMs field"
     durationMs: Int
     "endTime field"
@@ -8279,6 +8289,14 @@ type WorkflowInstance {
     triggerData: TriggerData
     "workflow field"
     workflow: Workflow!
+}
+
+"Templating context data associated with a workflow instance"
+type WorkflowInstanceContextData {
+    "Context data and reference to its handler"
+    contextData: TemplatingContextData!
+    "Name linked to this context"
+    name: String!
 }
 
 "Status of a node execution in a workflow"
