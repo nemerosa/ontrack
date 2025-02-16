@@ -19,6 +19,7 @@ dependencies {
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation(project(":ontrack-extension-casc"))
     implementation(project(":ontrack-repository-support"))
+    implementation("org.springframework.boot:spring-boot-starter-web")
 
     testImplementation(project(path = ":ontrack-model", configuration = "tests"))
     testImplementation(project(path = ":ontrack-ui-support", configuration = "tests"))
@@ -29,6 +30,7 @@ dependencies {
     testImplementation(project(path = ":ontrack-extension-queue", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-recordings", configuration = "tests"))
     testImplementation(project(":ontrack-it-utils"))
+    testImplementation("com.networknt:json-schema-validator")
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))

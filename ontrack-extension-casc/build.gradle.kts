@@ -22,7 +22,7 @@ dependencies {
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-scm", configuration = "tests"))
-    testImplementation("com.networknt:json-schema-validator:1.5.5")
+    testImplementation("com.networknt:json-schema-validator")
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))
