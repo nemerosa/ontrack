@@ -14,6 +14,7 @@ import TriggerLink from "@components/framework/trigger/TriggerLink";
 import {Form, Input} from "antd";
 import SelectWorkflowInstanceStatus from "@components/extension/workflows/SelectWorkflowInstanceStatus";
 import SelectTrigger from "@components/core/model/triggers/SelectTrigger";
+import WorkflowDownloadJSONSchema from "@components/extension/workflows/WorkflowDownloadJSONSchema";
 
 export default function WorkflowsAuditView() {
 
@@ -78,6 +79,7 @@ export default function WorkflowsAuditView() {
                 title="Workflows audit"
                 breadcrumbs={homeBreadcrumbs()}
                 commands={[
+                    <WorkflowDownloadJSONSchema key="schema-json"/>,
                     <CloseCommand key="home" href={homeUri()}/>
                 ]}
             >

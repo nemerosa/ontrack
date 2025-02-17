@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.extension.workflows.schema
 
-import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 import javax.servlet.http.HttpServletResponse
 
-@Controller
+@RestController
 @RequestMapping("/extension/workflows")
 class WorkflowSchemaController(
     private val workflowSchemaService: WorkflowSchemaService,

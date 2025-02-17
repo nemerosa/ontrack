@@ -10,11 +10,13 @@ import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutor
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorResult
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.SerializableEvent
 import net.nemerosa.ontrack.model.security.SecurityService
 import org.springframework.stereotype.Component
 
 @Component
+@Documentation(SlotPipelineDeployedWorkflowNodeExecutorData::class)
 class SlotPipelineDeployedWorkflowNodeExecutor(
     extensionFeature: EnvironmentsExtensionFeature,
     private val slotService: SlotService,

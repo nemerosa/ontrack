@@ -102,4 +102,6 @@ class WorkflowsMgt(connector: Connector) : Connected(connector) {
         }
     }
 
+    fun downloadJsonSchema() = connector.get("/extension/workflows/download/schema/json").body.asJson()
+
 }

@@ -3,9 +3,10 @@ package net.nemerosa.ontrack.extension.notifications.mock
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
-import net.nemerosa.ontrack.it.waitUntil
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
+import net.nemerosa.ontrack.it.waitUntil
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventRendererRegistry
 import net.nemerosa.ontrack.model.events.EventTemplatingService
@@ -18,6 +19,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
 @Component
+@Documentation(MockNotificationChannelConfig::class)
 class MockNotificationChannel(
     private val eventTemplatingService: EventTemplatingService,
     private val eventRendererRegistry: EventRendererRegistry,
