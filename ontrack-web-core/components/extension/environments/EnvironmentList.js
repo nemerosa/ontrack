@@ -17,6 +17,7 @@ export default function EnvironmentList() {
     const [environments, setEnvironments] = useState([])
 
     const environmentCreated = useEventForRefresh("environment.created")
+    const environmentDeleted = useEventForRefresh("environment.deleted")
     const slotCreated = useEventForRefresh("slot.created")
 
     const [filter, setFilter] = useState({
@@ -61,7 +62,7 @@ export default function EnvironmentList() {
                 setLoading(false)
             })
         }
-    }, [client, environmentCreated, slotCreated, filter])
+    }, [client, environmentCreated, environmentDeleted, slotCreated, filter])
 
     const [form] = Form.useForm()
 
