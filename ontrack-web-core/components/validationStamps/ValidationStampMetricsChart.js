@@ -1,5 +1,4 @@
 import {gql} from "graphql-request";
-import PercentageChart from "@components/charts/PercentageChart";
 import MetricsChart from "@components/charts/MetricsChart";
 
 export default function ValidationStampMetricsChart({validationStamp, interval = "3m", period = "1w"}) {
@@ -8,7 +7,7 @@ export default function ValidationStampMetricsChart({validationStamp, interval =
             <MetricsChart
                 query={
                     gql`
-                        query ValidationStampStabilityChart($parameters: JSON!, $interval: String!, $period: String!) {
+                        query ValidationStampMetricsChart($parameters: JSON!, $interval: String!, $period: String!) {
                             getChart(input: {
                                 name: "validation-stamp-metrics",
                                 options: {

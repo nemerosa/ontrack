@@ -204,7 +204,7 @@ export default function ValidationStampView({id}) {
                 >
                     <Skeleton loading={loading} active>
                         <StoredGridLayout
-                            id="page-validation-stamp-layout"
+                            id={`page-validation-stamp-layout-${id}`}
                             defaultLayout={defaultLayout}
                             items={items}
                             rowHeight={30}
