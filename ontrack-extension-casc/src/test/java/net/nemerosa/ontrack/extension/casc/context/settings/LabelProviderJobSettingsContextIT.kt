@@ -1,17 +1,57 @@
 package net.nemerosa.ontrack.extension.casc.context.settings
 
-import net.nemerosa.ontrack.extension.casc.AbstractCascTestJUnit4Support
+import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.model.settings.LabelProviderJobSettings
-import org.junit.Test
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
-class LabelProviderJobSettingsContextIT : AbstractCascTestJUnit4Support() {
+class LabelProviderJobSettingsContextIT : AbstractCascTestSupport() {
+
+    @Autowired
+    private lateinit var labelProviderJobSettingsContext: LabelProviderJobSettingsContext
+
+    @Test
+    fun `CasC schema type`() {
+        val type = labelProviderJobSettingsContext.jsonType
+        assertEquals(
+            """
+                {
+                  "title": "LabelProviderJobSettings",
+                  "description": null,
+                  "properties": {
+                    "enabled": {
+                      "description": "Check to enable the automated collection of labels for all projects. This can generate a high level activity in the background.",
+                      "type": "boolean"
+                    },
+                    "interval": {
+                      "description": "Interval (in minutes) between each label scan.",
+                      "type": "integer"
+                    },
+                    "perProject": {
+                      "description": "Check to have one distinct label collection job per project.",
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "enabled"
+                  ],
+                  "additionalProperties": false,
+                  "type": "object"
+                }
+            """.trimIndent().parseAsJson(),
+            type.asJson()
+        )
+    }
 
     @Test
     fun `Label provider job settings as CasC`() {
         asAdmin {
             withSettings<LabelProviderJobSettings> {
-                casc("""
+                casc(
+                    """
                     ontrack:
                         config:
                             settings:
@@ -19,7 +59,8 @@ class LabelProviderJobSettingsContextIT : AbstractCascTestJUnit4Support() {
                                     enabled: true
                                     interval: 120
                                     perProject: true
-                """.trimIndent())
+                """.trimIndent()
+                )
                 val settings = cachedSettingsService.getCachedSettings(LabelProviderJobSettings::class.java)
                 assertEquals(true, settings.enabled)
                 assertEquals(120, settings.interval)

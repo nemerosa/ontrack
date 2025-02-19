@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.tfc.config
 
 import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.annotations.APIIgnore
 import net.nemerosa.ontrack.model.annotations.APILabel
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.CredentialsConfiguration
@@ -18,6 +19,7 @@ open class TFCConfiguration(
     val token: String,
 ) : CredentialsConfiguration<TFCConfiguration> {
 
+    @APIIgnore
     override val descriptor = ConfigurationDescriptor(
         name,
         "$name ($url)"

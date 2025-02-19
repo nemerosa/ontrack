@@ -6,10 +6,13 @@ import net.nemerosa.ontrack.extension.bitbucket.cloud.configuration.BitbucketClo
 import net.nemerosa.ontrack.extension.bitbucket.cloud.configuration.BitbucketCloudConfigurationService
 import net.nemerosa.ontrack.extension.casc.context.AbstractCascContext
 import net.nemerosa.ontrack.extension.casc.context.SubConfigContext
-import net.nemerosa.ontrack.extension.casc.schema.*
 import net.nemerosa.ontrack.json.JsonParseException
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getRequiredTextField
+import net.nemerosa.ontrack.model.json.schema.JsonArrayType
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.json.schema.toType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -17,23 +20,19 @@ import org.springframework.stereotype.Component
 @Component
 class BitbucketCloudConfigurationCascContext(
     private val bitbucketCloudConfigurationService: BitbucketCloudConfigurationService,
+    private val jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractCascContext(), SubConfigContext {
 
     private val logger: Logger = LoggerFactory.getLogger(BitbucketCloudConfigurationCascContext::class.java)
 
     override val field: String = "bitbucket-cloud"
 
-    override val type: CascType
-        get() = cascArray(
-            "List of Bitbucket Cloud configurations",
-            cascObject(
-                "Bitbucket Cloud configuration",
-                cascField("name", cascString, "Unique name for the configuration", true),
-                cascField("workspace", cascString, "Bitbucket Cloud workspace to connect to", true),
-                cascField("user", cascString, "Bitbucket Cloud user", true),
-                cascField("password", cascString, "Bitbucket Cloud app password", true),
-            )
+    override val jsonType: JsonType by lazy {
+        JsonArrayType(
+            description = "List of Bitbucket Cloud configurations",
+            items = jsonTypeBuilder.toType(BitbucketCloudConfiguration::class)
         )
+    }
 
     override fun run(node: JsonNode, paths: List<String>) {
         val items = node.mapIndexed { index, child ->

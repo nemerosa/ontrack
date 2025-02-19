@@ -5,17 +5,16 @@ import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import java.time.Duration
 import kotlin.test.assertEquals
 
-class SampleDurationSettingsCascIT : AbstractCascTestSupport() {
+class HomePageSettingsContextIT : AbstractCascTestSupport() {
 
     @Autowired
-    private lateinit var sampleDurationSettingsCasc: SampleDurationSettingsCasc
+    private lateinit var homePageSettingsContext: HomePageSettingsContext
 
     @Test
     fun `CasC schema type`() {
-        val type = sampleDurationSettingsCasc.jsonType
+        val type = homePageSettingsContext.jsonType
         assertEquals(
             """
                 {
@@ -40,23 +39,4 @@ class SampleDurationSettingsCascIT : AbstractCascTestSupport() {
             type.asJson()
         )
     }
-
-    @Test
-    fun `Casc duration`() {
-        withSettings<SampleDurationSettings> {
-            settingsRepository.deleteAll(SampleDurationSettings::class.java)
-            casc(
-                """
-                    ontrack:
-                        config:
-                            settings:
-                                sample-duration:
-                                    duration: 1209600
-                """.trimIndent()
-            )
-            val settings = settingsService.getCachedSettings(SampleDurationSettings::class.java)
-            assertEquals(Duration.ofDays(14), settings.duration)
-        }
-    }
-
 }

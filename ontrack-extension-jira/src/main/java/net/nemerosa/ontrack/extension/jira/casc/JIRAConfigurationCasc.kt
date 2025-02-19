@@ -4,14 +4,16 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.syncForward
 import net.nemerosa.ontrack.extension.casc.context.AbstractCascContext
 import net.nemerosa.ontrack.extension.casc.context.SubConfigContext
-import net.nemerosa.ontrack.extension.casc.schema.*
 import net.nemerosa.ontrack.extension.jira.JIRAConfiguration
 import net.nemerosa.ontrack.extension.jira.JIRAConfigurationService
 import net.nemerosa.ontrack.json.JsonParseException
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getListStringField
 import net.nemerosa.ontrack.json.getRequiredTextField
-import net.nemerosa.ontrack.model.annotations.getPropertyDescription
+import net.nemerosa.ontrack.model.json.schema.JsonArrayType
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.json.schema.toType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -22,41 +24,19 @@ import org.springframework.stereotype.Component
 @Component
 class JIRAConfigurationCasc(
     private val jiraConfigurationService: JIRAConfigurationService,
+    private val jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractCascContext(), SubConfigContext {
 
     private val logger: Logger = LoggerFactory.getLogger(JIRAConfigurationCasc::class.java)
 
     override val field: String = "jira"
 
-    override val type: CascType
-        get() = cascArray(
-            "List of JIRA configurations",
-            cascObject(
-                "JIRA configuration",
-                cascField("name", cascString, "Unique name for the configuration", required = true),
-                cascField("url", cascString, "JIRA root URL", required = true),
-                cascField("user", cascString, "JIRA user", required = true),
-                cascField("password", cascString, "JIRA password or token", required = true),
-                cascField(
-                    name = JIRAConfiguration::include.name,
-                    type = cascArray(
-                        "List of regular expressions",
-                        cascString
-                    ),
-                    description = getPropertyDescription(JIRAConfiguration::include),
-                    required = false,
-                ),
-                cascField(
-                    name = JIRAConfiguration::exclude.name,
-                    type = cascArray(
-                        "List of regular expressions",
-                        cascString
-                    ),
-                    description = getPropertyDescription(JIRAConfiguration::exclude),
-                    required = false,
-                ),
-            )
+    override val jsonType: JsonType by lazy {
+        JsonArrayType(
+            description = "List of JIRA configurations",
+            items = jsonTypeBuilder.toType(JIRAConfiguration::class)
         )
+    }
 
     override fun run(node: JsonNode, paths: List<String>) {
         val items = node.mapIndexed { index, child ->

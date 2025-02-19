@@ -1,22 +1,93 @@
 package net.nemerosa.ontrack.extension.oidc.casc
 
-import net.nemerosa.ontrack.extension.casc.AbstractCascTestJUnit4Support
+import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.extension.oidc.settings.OIDCSettingsService
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class OIDCConfigurationAsCodeIT : AbstractCascTestJUnit4Support() {
+class OIDCConfigurationAsCodeIT : AbstractCascTestSupport() {
 
     @Autowired
     private lateinit var oidcSettingsService: OIDCSettingsService
 
+    @Autowired
+    private lateinit var oidcCascContext: OIDCCascContext
+
+    @Test
+    fun `OIDC CasC schema type`() {
+        val type = oidcCascContext.jsonType
+        assertEquals(
+            """
+                {
+                  "items": {
+                    "title": "OntrackOIDCProvider",
+                    "description": null,
+                    "properties": {
+                      "clientId": {
+                        "description": "OIDC client ID",
+                        "type": "string"
+                      },
+                      "clientSecret": {
+                        "description": "OIDC client secret",
+                        "type": "string"
+                      },
+                      "description": {
+                        "description": "Tooltip for this provider",
+                        "type": "string"
+                      },
+                      "disabled": {
+                        "description": "If true, this provider is disabled and won't be active",
+                        "type": "boolean"
+                      },
+                      "forceHttps": {
+                        "description": "Check to force the protocol to HTTPS for the Redirect URI",
+                        "type": "boolean"
+                      },
+                      "groupFilter": {
+                        "description": "Regular expression used to filter groups associated with the OIDC user",
+                        "type": "string"
+                      },
+                      "id": {
+                        "description": "Unique ID for this provider",
+                        "type": "string"
+                      },
+                      "issuerId": {
+                        "description": "OIDC issueId URL",
+                        "type": "string"
+                      },
+                      "name": {
+                        "description": "Display name for this provider",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "clientId",
+                      "clientSecret",
+                      "id",
+                      "issuerId",
+                      "name"
+                    ],
+                    "additionalProperties": false,
+                    "type": "object"
+                  },
+                  "description": "List of OIDC providers",
+                  "type": "array"
+                }
+            """.trimIndent().parseAsJson(),
+            type.asJson()
+        )
+    }
+
     @Test
     fun `OIDC provider registration`() {
         val id = uid("O")
-        casc("""
+        casc(
+            """
             ontrack:
                 config:
                     oidc:
@@ -26,7 +97,8 @@ class OIDCConfigurationAsCodeIT : AbstractCascTestJUnit4Support() {
                           issuerId: some-issuer-id
                           clientId: some-client-id
                           groupFilter: ontrack-.*
-        """.trimIndent())
+        """.trimIndent()
+        )
         // Checks the OIDC provider has been registered
         asAdmin {
             assertNotNull(oidcSettingsService.getProviderById(id)) {
@@ -44,7 +116,8 @@ class OIDCConfigurationAsCodeIT : AbstractCascTestJUnit4Support() {
     @Test
     fun `OIDC provider registration without a group filter`() {
         val id = uid("O")
-        casc("""
+        casc(
+            """
             ontrack:
                 config:
                     oidc:
@@ -53,7 +126,8 @@ class OIDCConfigurationAsCodeIT : AbstractCascTestJUnit4Support() {
                           description: My Keycloak instance
                           issuerId: some-issuer-id
                           clientId: some-client-id
-        """.trimIndent())
+        """.trimIndent()
+        )
         // Checks the OIDC provider has been registered
         asAdmin {
             assertNotNull(oidcSettingsService.getProviderById(id)) {
@@ -115,7 +189,8 @@ class OIDCConfigurationAsCodeIT : AbstractCascTestJUnit4Support() {
     fun `OIDC provider registration with update`() {
         val id = uid("O")
         // Once
-        casc("""
+        casc(
+            """
             ontrack:
                 config:
                     oidc:
@@ -124,7 +199,8 @@ class OIDCConfigurationAsCodeIT : AbstractCascTestJUnit4Support() {
                           description: My Keycloak instance
                           issuerId: some-issuer-id
                           clientId: some-client-id
-        """.trimIndent())
+        """.trimIndent()
+        )
         // Checks the OIDC provider has been registered
         asAdmin {
             assertNotNull(oidcSettingsService.getProviderById(id)) {
@@ -138,7 +214,8 @@ class OIDCConfigurationAsCodeIT : AbstractCascTestJUnit4Support() {
             }
         }
         // With some changes
-        casc("""
+        casc(
+            """
             ontrack:
                 config:
                     oidc:
@@ -147,7 +224,8 @@ class OIDCConfigurationAsCodeIT : AbstractCascTestJUnit4Support() {
                           description: My Keycloak instance
                           issuerId: some-issuer-id
                           clientId: another-client-id
-        """.trimIndent())
+        """.trimIndent()
+        )
         // Checks the OIDC provider is still registered with the new values
         asAdmin {
             assertNotNull(oidcSettingsService.getProviderById(id)) {
@@ -166,7 +244,8 @@ class OIDCConfigurationAsCodeIT : AbstractCascTestJUnit4Support() {
     fun `Registering a list of providers`() {
         val id = uid("O")
         // Once
-        casc("""
+        casc(
+            """
             ontrack:
                 config:
                     oidc:
@@ -180,7 +259,8 @@ class OIDCConfigurationAsCodeIT : AbstractCascTestJUnit4Support() {
                           description: My Keycloak instance 2
                           issuerId: some-issuer-id-2
                           clientId: some-client-id-2
-        """.trimIndent())
+        """.trimIndent()
+        )
         // Checks the OIDC providers have been registered
         asAdmin {
             (1..2).forEach { no ->
@@ -201,7 +281,8 @@ class OIDCConfigurationAsCodeIT : AbstractCascTestJUnit4Support() {
     fun `Removing from a list of providers removes the provider`() {
         val id = uid("O")
         // Once with two providers
-        casc("""
+        casc(
+            """
             ontrack:
                 config:
                     oidc:
@@ -215,7 +296,8 @@ class OIDCConfigurationAsCodeIT : AbstractCascTestJUnit4Support() {
                           description: My Keycloak instance 2
                           issuerId: some-issuer-id-2
                           clientId: some-client-id-2
-        """.trimIndent())
+        """.trimIndent()
+        )
         // Checks the OIDC providers have been registered
         asAdmin {
             assertEquals(2, oidcSettingsService.providers.size)
@@ -232,7 +314,8 @@ class OIDCConfigurationAsCodeIT : AbstractCascTestJUnit4Support() {
             }
         }
         // Removes a provider from the list...
-        casc("""
+        casc(
+            """
             ontrack:
                 config:
                     oidc:
@@ -241,7 +324,8 @@ class OIDCConfigurationAsCodeIT : AbstractCascTestJUnit4Support() {
                           description: My Keycloak instance 2
                           issuerId: some-issuer-id-2
                           clientId: some-client-id-2
-        """.trimIndent())
+        """.trimIndent()
+        )
         // Checks the OIDC provider has been removed
         asAdmin {
             assertEquals(1, oidcSettingsService.providers.size)

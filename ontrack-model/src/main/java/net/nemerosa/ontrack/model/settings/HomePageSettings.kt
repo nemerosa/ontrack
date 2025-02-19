@@ -12,9 +12,9 @@ import net.nemerosa.ontrack.model.annotations.APIDescription
 @Deprecated("Used only for the legacy UI. Will be removed in V5.")
 class HomePageSettings(
     @APIDescription("Maximum of branches to display per favorite project")
-    val maxBranches: Int,
+    val maxBranches: Int = DEFAULT_HOME_PAGE_SETTINGS_MAX_BRANCHES,
     @APIDescription("Maximum of projects starting from which we need to switch to a search mode")
-    val maxProjects: Int
+    val maxProjects: Int = DEFAULT_HOME_PAGE_SETTINGS_MAX_PROJECTS,
 )
 
 /**

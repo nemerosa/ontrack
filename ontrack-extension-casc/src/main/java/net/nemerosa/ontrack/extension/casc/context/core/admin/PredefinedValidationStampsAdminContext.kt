@@ -3,14 +3,14 @@ package net.nemerosa.ontrack.extension.casc.context.core.admin
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.syncForward
 import net.nemerosa.ontrack.extension.casc.context.AbstractCascContext
-import net.nemerosa.ontrack.extension.casc.schema.CascType
-import net.nemerosa.ontrack.extension.casc.schema.cascArray
-import net.nemerosa.ontrack.extension.casc.schema.cascField
-import net.nemerosa.ontrack.extension.casc.schema.cascObject
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.files.FileRefService
 import net.nemerosa.ontrack.model.files.downloadDocument
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.json.schema.toType
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.NameDescription
@@ -23,25 +23,16 @@ import org.springframework.stereotype.Component
 class PredefinedValidationStampsAdminContext(
     private val predefinedValidationStampService: PredefinedValidationStampService,
     private val scmRefService: FileRefService,
+    private val jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractCascContext(), SubAdminContext {
 
     private val logger: Logger = LoggerFactory.getLogger(PredefinedValidationStampsAdminContext::class.java)
 
     override val field: String = "predefined-validation-stamps"
 
-    override val type: CascType = cascObject(
-        description = "Predefined validation stamps",
-        cascField(PredefinedValidationStampsAdminContextType::replace),
-        cascField(
-            name = "list",
-            description = "List of validation stamps",
-            required = true,
-            type = cascArray(
-                description = "List of validation stamps",
-                type = cascObject(PredefinedValidationStampsAdminContextTypeItem::class),
-            )
-        )
-    )
+    override val jsonType: JsonType by lazy {
+        jsonTypeBuilder.toType(PredefinedValidationStampsAdminContextType::class)
+    }
 
     override fun run(node: JsonNode, paths: List<String>) {
         val config = node.parse<PredefinedValidationStampsAdminContextType>()
@@ -106,12 +97,17 @@ class PredefinedValidationStampsAdminContext(
 }
 
 data class PredefinedValidationStampsAdminContextType(
-    val replace: Boolean,
+    @APIDescription("Is the list authoritative?")
+    val replace: Boolean = false,
+    @APIDescription("List of validation stamps to predefine")
     val list: List<PredefinedValidationStampsAdminContextTypeItem>,
 )
 
 data class PredefinedValidationStampsAdminContextTypeItem(
+    @APIDescription("Name of the validation stamp")
     val name: String,
-    val description: String,
+    @APIDescription("Description of the validation stamp")
+    val description: String = "",
+    @APIDescription("Path to the validation stamp image")
     val image: String?,
 )

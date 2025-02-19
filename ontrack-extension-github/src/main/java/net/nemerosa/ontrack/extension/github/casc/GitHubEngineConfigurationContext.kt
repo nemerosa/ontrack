@@ -4,13 +4,16 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.syncForward
 import net.nemerosa.ontrack.extension.casc.context.AbstractCascContext
 import net.nemerosa.ontrack.extension.casc.context.SubConfigContext
-import net.nemerosa.ontrack.extension.casc.schema.*
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
 import net.nemerosa.ontrack.json.JsonParseException
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.json.getTextField
+import net.nemerosa.ontrack.model.json.schema.JsonArrayType
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.json.schema.toType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -21,27 +24,19 @@ import org.springframework.stereotype.Component
 @Component
 class GitHubEngineConfigurationContext(
     private val gitHubConfigurationService: GitHubConfigurationService,
+    private val jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractCascContext(), SubConfigContext {
 
     private val logger: Logger = LoggerFactory.getLogger(GitHubEngineConfigurationContext::class.java)
 
     override val field: String = "github"
 
-    override val type: CascType
-        get() = cascArray(
-            "List of GitHub configurations",
-            cascObject("GitHub configuration",
-                cascField("name", cascString,"Unique name for the configuration", required = true),
-                cascField("url", cascString,"GitHub root URL", required = false),
-                cascField("user", cascString, "GitHub user (for user/password authentication)", required = false),
-                cascField("password", cascString, "GitHub password (for user/password authentication)", required = false),
-                cascField("token", cascString, "GitHub OAuth2 token (for OAuth2 authentication)", required = false),
-                cascField("app-id", cascString, "GitHub App ID (for GitHub App authentication)", required = false),
-                cascField("app-private-key", cascString, "GitHub App Private Key (for GitHub App authentication)", required = false),
-                cascField("app-installation", cascString, "Name of the account of the GitHub App installation (for GitHub App authentication)", required = false),
-                cascField("auto-merge-token", cascString, "Token for an account used to approve pull requests for auto approval processes", required = false),
-            )
+    override val jsonType: JsonType by lazy {
+        JsonArrayType(
+            description = "List of GitHub configurations",
+            items = jsonTypeBuilder.toType(GitHubEngineConfiguration::class)
         )
+    }
 
     override fun run(node: JsonNode, paths: List<String>) {
         val items = node.mapIndexed { index, child ->

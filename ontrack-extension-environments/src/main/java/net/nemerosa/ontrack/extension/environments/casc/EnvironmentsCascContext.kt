@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.syncForward
 import net.nemerosa.ontrack.extension.casc.context.AbstractCascContext
 import net.nemerosa.ontrack.extension.casc.context.SubConfigContext
-import net.nemerosa.ontrack.extension.casc.schema.CascType
-import net.nemerosa.ontrack.extension.casc.schema.cascObject
 import net.nemerosa.ontrack.extension.environments.Environment
 import net.nemerosa.ontrack.extension.environments.Slot
 import net.nemerosa.ontrack.extension.environments.SlotAdmissionRuleConfig
@@ -18,6 +16,9 @@ import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.files.FileRef
 import net.nemerosa.ontrack.model.files.FileRefService
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.json.schema.toType
 import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.support.ImageHelper
 import org.slf4j.LoggerFactory
@@ -33,13 +34,16 @@ class EnvironmentsCascContext(
     private val slotService: SlotService,
     private val slotWorkflowService: SlotWorkflowService,
     private val fileRefService: FileRefService,
+    private val jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractCascContext(), SubConfigContext {
 
     private val logger = LoggerFactory.getLogger(EnvironmentsCascContext::class.java)
 
     override val field: String = "environments"
 
-    override val type: CascType = cascObject(EnvironmentsCascModel::class)
+    override val jsonType: JsonType by lazy {
+        jsonTypeBuilder.toType(EnvironmentsCascModel::class)
+    }
 
     override fun run(node: JsonNode, paths: List<String>) {
         val model: EnvironmentsCascModel = node.parse()

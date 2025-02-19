@@ -2,43 +2,54 @@ package net.nemerosa.ontrack.model.json.schema
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.hasDefaultValue
+import net.nemerosa.ontrack.model.annotations.APIIgnore
+import net.nemerosa.ontrack.model.annotations.APIOptional
 import net.nemerosa.ontrack.model.annotations.getPropertyDescription
+import net.nemerosa.ontrack.model.annotations.getPropertyName
+import org.springframework.context.ApplicationContext
+import org.springframework.stereotype.Component
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
-import kotlin.reflect.full.findAnnotation
-import kotlin.reflect.full.isSubclassOf
-import kotlin.reflect.full.memberProperties
-import kotlin.reflect.full.starProjectedType
+import kotlin.reflect.full.*
 import kotlin.reflect.jvm.jvmName
 
-fun jsonSchema(
-    ref: String,
-    id: String,
-    title: String,
-    description: String,
-    root: KClass<*>,
-    clsGetter: (cls: KClass<out DynamicJsonSchemaProvider>) -> DynamicJsonSchemaProvider,
-): JsonSchema {
+@Component
+class JsonSchemaBuilderService(
+    private val applicationContext: ApplicationContext,
+): JsonTypeBuilder {
+    fun createSchema(
+        ref: String,
+        id: String,
+        title: String,
+        description: String,
+        root: KClass<*>
+    ): JsonSchema {
+        val defs = mutableMapOf<String, JsonType>()
+        val builder = createSchemaBuilder(defs)
+        val rootType = builder.toRoot(root, description)
+        return JsonSchema(
+            ref = ref,
+            id = id,
+            title = title,
+            description = description,
+            defs = defs,
+            root = rootType,
+        )
+    }
 
-    val defs = mutableMapOf<String, JsonType>()
-    val builder = JsonSchemaBuilder(
-        clsGetter = clsGetter,
-        defs = defs,
-    )
-    val rootType = builder.toRoot(root, description)
+    override fun toType(type: KType, description: String?): JsonType {
+        val defs = mutableMapOf<String, JsonType>()
+        val builder = createSchemaBuilder(defs)
+        return builder.toType(type, description)
+    }
 
-    return JsonSchema(
-        ref = ref,
-        id = id,
-        title = title,
-        description = description,
-        defs = defs,
-        root = rootType,
-    )
-}
-
-interface JsonTypeBuilder {
-    fun toType(type: KType, description: String? = null): JsonType
+    private fun createSchemaBuilder(defs: MutableMap<String, JsonType>) =
+        JsonSchemaBuilder(
+            clsGetter = { cls ->
+                applicationContext.getBeansOfType(cls.java).values.single()
+            },
+            defs = defs,
+        )
 }
 
 private class JsonSchemaBuilder(
@@ -90,20 +101,21 @@ private class JsonSchemaBuilder(
         val oRequired = mutableListOf<String>()
         val properties = cls.memberProperties
         for (property in properties) {
-            if (property.name !in excludedProperties) {
+            if (property.name !in excludedProperties && !property.hasAnnotation<APIIgnore>()) {
+                val propertyName = getPropertyName(property)
                 val propertyReturnType = property.returnType
                 val schemaRef = property.findAnnotation<JsonSchemaRef>()
                 if (schemaRef != null) {
-                    oProperties[property.name] = JsonRefType(
+                    oProperties[propertyName] = JsonRefType(
                         ref = schemaRef.value,
                         description = getPropertyDescription(property),
                     )
                 } else {
                     val propertyType = toType(propertyReturnType, getPropertyDescription(property))
-                    oProperties[property.name] = propertyType
+                    oProperties[propertyName] = propertyType
                 }
-                if (!property.returnType.isMarkedNullable && !property.hasDefaultValue(cls)) {
-                    oRequired += property.name
+                if (!property.returnType.isMarkedNullable && !property.hasDefaultValue(cls) && !property.hasAnnotation<APIOptional>()) {
+                    oRequired += propertyName
                 }
             }
         }

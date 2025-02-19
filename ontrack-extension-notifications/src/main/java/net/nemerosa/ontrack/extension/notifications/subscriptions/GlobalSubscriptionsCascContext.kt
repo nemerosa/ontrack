@@ -2,33 +2,30 @@ package net.nemerosa.ontrack.extension.notifications.subscriptions
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.casc.context.AbstractCascContext
-import net.nemerosa.ontrack.extension.casc.schema.*
 import net.nemerosa.ontrack.extension.notifications.casc.NotificationsSubCascContext
 import net.nemerosa.ontrack.json.JsonParseException
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.model.json.schema.JsonArrayType
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.json.schema.toType
 import org.springframework.stereotype.Component
 
 @Component
 class GlobalSubscriptionsCascContext(
     private val eventSubscriptionService: EventSubscriptionService,
+    private val jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractCascContext(), NotificationsSubCascContext {
 
     override val field: String = "global-subscriptions"
 
-    override val type: CascType = cascArray(
-        "List of global subscriptions",
-        cascObject(
-            "Global subscription",
-            cascField(SubscriptionsCascContextData::events, type = cascArray("List of event types", cascString)),
-            cascField(SubscriptionsCascContextData::keywords),
-            cascField(SubscriptionsCascContextData::name),
-            cascField(SubscriptionsCascContextData::channel),
-            cascField(SubscriptionsCascContextData::channelConfig),
-            cascField(SubscriptionsCascContextData::disabled),
-            cascField(SubscriptionsCascContextData::contentTemplate),
+    override val jsonType: JsonType by lazy {
+        JsonArrayType(
+            description = "List of global subscriptions",
+            items = jsonTypeBuilder.toType(SubscriptionsCascContextData::class)
         )
-    )
+    }
 
     override fun run(node: JsonNode, paths: List<String>) {
         val items = node.mapIndexed { index, child ->

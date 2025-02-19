@@ -15,6 +15,9 @@ internal class WebhooksCascConfigContextIT : AbstractCascTestSupport() {
     @Autowired
     private lateinit var webhookAdminService: WebhookAdminService
 
+    @Autowired
+    private lateinit var webhooksCascConfigContext: WebhooksCascConfigContext
+
     @Test
     fun `Creating a webhook using CasC`() {
         asAdmin {
@@ -124,6 +127,28 @@ internal class WebhooksCascConfigContextIT : AbstractCascTestSupport() {
             assertNotNull(webhookAdminService.findWebhookByName(newName), "New webhook is available")
             assertNull(webhookAdminService.findWebhookByName(oldName), "Old webhook is no longer available")
         }
+    }
+
+    @Test
+    fun `Checking the Webhook Casc type`() {
+        val type = webhooksCascConfigContext.jsonType
+        assertEquals(
+            mapOf(
+                "type" to "array"
+            ).asJson(),
+            type.asJson()
+        )
+//        val type = cascObject(WebhooksCascConfigContext.CascWebhook::class)
+//        assertIs<CascObject>(type) { webhook ->
+//            assertNotNull(webhook.fields.find { it.name == "authentication" }) { authenticationField ->
+//                assertTrue(authenticationField.required, "Authentication field is required")
+//                assertIs<CascObject>(authenticationField.type) { authentication ->
+//                    assertNotNull(authentication.fields.find { it.name == "config" }) { configField ->
+//                        assertEquals("JSON", configField.type.__type)
+//                    }
+//                }
+//            }
+//        }
     }
 
 }

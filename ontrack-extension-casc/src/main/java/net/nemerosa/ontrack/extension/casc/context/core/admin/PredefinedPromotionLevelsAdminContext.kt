@@ -3,14 +3,14 @@ package net.nemerosa.ontrack.extension.casc.context.core.admin
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.syncForward
 import net.nemerosa.ontrack.extension.casc.context.AbstractCascContext
-import net.nemerosa.ontrack.extension.casc.schema.CascType
-import net.nemerosa.ontrack.extension.casc.schema.cascArray
-import net.nemerosa.ontrack.extension.casc.schema.cascField
-import net.nemerosa.ontrack.extension.casc.schema.cascObject
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.files.FileRefService
 import net.nemerosa.ontrack.model.files.downloadDocument
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.json.schema.toType
 import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.NameDescription
@@ -23,25 +23,16 @@ import org.springframework.stereotype.Component
 class PredefinedPromotionLevelsAdminContext(
     private val predefinedPromotionLevelService: PredefinedPromotionLevelService,
     private val scmRefService: FileRefService,
+    private val jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractCascContext(), SubAdminContext {
 
     private val logger: Logger = LoggerFactory.getLogger(PredefinedPromotionLevelsAdminContext::class.java)
 
     override val field: String = "predefined-promotion-levels"
 
-    override val type: CascType = cascObject(
-        description = "Predefined promotion levels",
-        cascField(PredefinedPromotionLevelsAdminContextType::replace),
-        cascField(
-            name = "list",
-            description = "List of promotion levels",
-            required = true,
-            type = cascArray(
-                description = "List of promotion levels",
-                type = cascObject(PredefinedPromotionLevelsAdminContextTypeItem::class),
-            )
-        )
-    )
+    override val jsonType: JsonType by lazy {
+        jsonTypeBuilder.toType(PredefinedPromotionLevelsAdminContextType::class)
+    }
 
     override fun run(node: JsonNode, paths: List<String>) {
         val config = node.parse<PredefinedPromotionLevelsAdminContextType>()
@@ -106,12 +97,17 @@ class PredefinedPromotionLevelsAdminContext(
 }
 
 data class PredefinedPromotionLevelsAdminContextType(
-    val replace: Boolean,
+    @APIDescription("Is the list authoritative?")
+    val replace: Boolean = false,
+    @APIDescription("List of promotion levels to predefine")
     val list: List<PredefinedPromotionLevelsAdminContextTypeItem>,
 )
 
 data class PredefinedPromotionLevelsAdminContextTypeItem(
+    @APIDescription("Name of the promotion level")
     val name: String,
-    val description: String,
+    @APIDescription("Description of the promotion level")
+    val description: String = "",
+    @APIDescription("Path to the promotion level image")
     val image: String?,
 )

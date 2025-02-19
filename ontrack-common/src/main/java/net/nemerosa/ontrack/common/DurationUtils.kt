@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.common
 
 import org.apache.commons.lang3.time.DurationFormatUtils
 import java.time.Duration
-import java.time.temporal.ChronoUnit
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.toDuration

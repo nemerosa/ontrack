@@ -2,11 +2,12 @@ package net.nemerosa.ontrack.extension.casc.context.settings
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.casc.context.AbstractCascContext
-import net.nemerosa.ontrack.extension.casc.schema.CascType
-import net.nemerosa.ontrack.extension.casc.schema.cascObject
 import net.nemerosa.ontrack.json.JsonParseException
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseInto
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.json.schema.toType
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.settings.SettingsManagerService
 import kotlin.reflect.KClass
@@ -16,10 +17,12 @@ abstract class AbstractSubSettingsContext<T : Any>(
     private val settingsClass: KClass<T>,
     private val settingsManagerService: SettingsManagerService,
     private val cachedSettingsService: CachedSettingsService,
+    private val jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractCascContext(), SubSettingsContext {
 
-    override val type: CascType
-        get() = cascObject(settingsClass)
+    override val jsonType: JsonType by lazy {
+        jsonTypeBuilder.toType(settingsClass)
+    }
 
     override fun run(node: JsonNode, paths: List<String>) {
         // Parsing to the settings node

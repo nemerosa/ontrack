@@ -2,20 +2,19 @@ package net.nemerosa.ontrack.extension.notifications.subscriptions
 
 import net.nemerosa.ontrack.extension.casc.CascService
 import net.nemerosa.ontrack.extension.notifications.AbstractNotificationTestSupport
-import net.nemerosa.ontrack.it.NewTxRollbacked
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getRequiredTextField
+import net.nemerosa.ontrack.model.json.schema.JsonArrayType
+import net.nemerosa.ontrack.model.json.schema.JsonObjectType
+import net.nemerosa.ontrack.model.json.schema.JsonStringType
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import net.nemerosa.ontrack.model.structure.toProjectEntityID
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
 
-@NewTxRollbacked
-@Disabled("FLAKY")
 class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
 
     @Autowired
@@ -231,6 +230,7 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                 channelConfig = mapOf("target" to "$target-gold").asJson(),
                 contentTemplate = null,
             )
+
             // Rendering
             fun checkRendering() {
                 val json = entitySubscriptionsCascContext.render()
@@ -992,6 +992,16 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                 assertEquals(listOf(newTarget), subscriptions)
             }
         }
+    }
+
+    @Test
+    fun `Ignoring the storage key when generating the Casc model for EntitySubscriptionData`() {
+        val type = entitySubscriptionsCascContext.jsonType
+        val list = assertIs<JsonArrayType>(type)
+        val itemProperties = (list.items as JsonObjectType).properties
+        val entityProperties = (itemProperties["entity"] as JsonObjectType).properties
+        assertIs<JsonStringType>(entityProperties["project"])
+        assertNull(entityProperties["storageKey"])
     }
 
     /**
