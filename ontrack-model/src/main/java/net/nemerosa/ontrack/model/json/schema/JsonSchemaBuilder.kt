@@ -6,8 +6,10 @@ import net.nemerosa.ontrack.model.annotations.getPropertyDescription
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.starProjectedType
+import kotlin.reflect.jvm.jvmName
 
 fun jsonSchema(
     ref: String,
@@ -47,17 +49,25 @@ private class JsonSchemaBuilder(
     fun toRoot(type: KClass<*>, description: String? = null): JsonObjectType =
         toObject(type.starProjectedType, description)
 
-    override fun toType(type: KType, description: String?): JsonType =
-        when {
-            type.classifier == String::class -> JsonStringType(description)
-            type.classifier == Int::class -> JsonIntType(description)
-            type.classifier == Long::class -> JsonLongType(description)
-            type.classifier == Boolean::class -> JsonBooleanType(description)
-            type.classifier == List::class -> toList(type, description)
-            type.classifier == JsonNode::class -> JsonRawJsonType(description)
-            type.toString().startsWith("net.nemerosa.ontrack.") -> toObject(type, description)
+    override fun toType(type: KType, description: String?): JsonType {
+        val cls = type.classifier as KClass<*>
+        return when {
+            cls == String::class -> JsonStringType(description)
+            cls == Int::class -> JsonIntType(description)
+            cls == Long::class -> JsonLongType(description)
+            cls == Boolean::class -> JsonBooleanType(description)
+            cls == List::class -> toList(type, description)
+            cls == JsonNode::class -> JsonRawJsonType(description)
+            cls.isSubclassOf(Enum::class) -> toEnumType(cls, description)
+            cls.jvmName.startsWith("net.nemerosa.ontrack.") -> toObject(type, description)
             else -> error("$type is not supported")
         }
+    }
+
+    private fun toEnumType(cls: KClass<*>, description: String?) = JsonEnumType(
+        values = cls.java.enumConstants.map { it.toString() },
+        description = description,
+    )
 
     private fun toList(type: KType, description: String? = null): JsonArrayType {
         val itemType = type.arguments.firstOrNull()?.type
