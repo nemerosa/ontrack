@@ -5,6 +5,9 @@ import net.nemerosa.ontrack.extension.environments.rules.core.PromotionSlotAdmis
 import net.nemerosa.ontrack.extension.environments.rules.core.PromotionSlotAdmissionRuleConfig
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.extension.environments.service.getPipelineAdmissionRuleChecksForAllRules
+import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflow
+import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowService
+import net.nemerosa.ontrack.extension.workflows.registry.WorkflowParser
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
@@ -19,6 +22,9 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var slotService: SlotService
+
+    @Autowired
+    private lateinit var slotWorkflowService: SlotWorkflowService
 
     @Test
     fun `Starting a new pipeline for a build`() {
@@ -324,6 +330,102 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
                 slotService.findPipelineById(pipeline.id),
                 "Deployment has been deleted"
             )
+        }
+    }
+
+    @Test
+    fun `Starting a pipeline in forced DONE status must not run the workflows`() {
+        slotTestSupport.withSlot { slot ->
+            // Registering workflows for each status
+            slotWorkflowService.addSlotWorkflow(
+                SlotWorkflow(
+                    slot = slot,
+                    trigger = SlotPipelineStatus.CANDIDATE,
+                    workflow = WorkflowParser.parseYamlWorkflow(
+                        """
+                            name: On candidate
+                            nodes:
+                              - id: start
+                                executorId: mock
+                                data:
+                                  text: Candidate
+                        """.trimIndent()
+                    )
+                )
+            )
+            slotWorkflowService.addSlotWorkflow(
+                SlotWorkflow(
+                    slot = slot,
+                    trigger = SlotPipelineStatus.RUNNING,
+                    workflow = WorkflowParser.parseYamlWorkflow(
+                        """
+                            name: On running
+                            nodes:
+                              - id: start
+                                executorId: mock
+                                data:
+                                  text: Running
+                        """.trimIndent()
+                    )
+                )
+            )
+            slotWorkflowService.addSlotWorkflow(
+                SlotWorkflow(
+                    slot = slot,
+                    trigger = SlotPipelineStatus.DONE,
+                    workflow = WorkflowParser.parseYamlWorkflow(
+                        """
+                            name: On done
+                            nodes:
+                              - id: start
+                                executorId: mock
+                                data:
+                                  text: Done
+                        """.trimIndent()
+                    )
+                )
+            )
+            // Creating a pipeline in done mode
+            slot.project.branch {
+                build {
+                    val pipeline = slotService.startPipeline(
+                        slot = slot,
+                        build = this,
+                        forceDone = true,
+                        forceDoneMessage = "Forcing a done pipeline",
+                    )
+                    assertEquals(
+                        SlotPipelineStatus.DONE,
+                        pipeline.status,
+                        "Pipeline done"
+                    )
+                    // Checks that no workflow in candidate or running has run
+                    val instances = slotWorkflowService.getSlotWorkflowInstancesByPipeline(pipeline)
+                    assertEquals(
+                        0,
+                        instances.count { it.slotWorkflow.trigger == SlotPipelineStatus.CANDIDATE },
+                        "No workflow on candidate"
+                    )
+                    assertEquals(
+                        0,
+                        instances.count { it.slotWorkflow.trigger == SlotPipelineStatus.RUNNING },
+                        "No workflow on running"
+                    )
+                    assertEquals(
+                        1,
+                        instances.count { it.slotWorkflow.trigger == SlotPipelineStatus.DONE },
+                        "1 workflow on done"
+                    )
+                    // Checks the force message
+                    val change = slotService.getPipelineChanges(pipeline).firstOrNull()
+                    assertNotNull(change) {
+                        assertEquals(SlotPipelineStatus.DONE, it.status)
+                        assertEquals("Forcing a done pipeline", it.message)
+                        assertEquals(SlotPipelineChangeType.STATUS, it.type)
+                        assertEquals("Deployment was marked done manually.", it.overrideMessage)
+                    }
+                }
+            }
         }
     }
 

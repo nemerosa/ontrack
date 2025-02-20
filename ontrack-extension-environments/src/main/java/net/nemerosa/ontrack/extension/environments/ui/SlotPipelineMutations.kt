@@ -31,6 +31,8 @@ class SlotPipelineMutations(
             slotService.startPipeline(
                 slot = slot,
                 build = build,
+                forceDone = input.forceDone ?: false,
+                forceDoneMessage = input.forceDoneMessage,
             )
         },
         simpleMutation(
@@ -117,6 +119,8 @@ class SlotPipelineMutations(
 data class StartSlotPipelineInput(
     val slotId: String,
     val buildId: Int,
+    val forceDone: Boolean? = false,
+    val forceDoneMessage: String? = null,
 )
 
 data class StartSlotPipelineDeploymentInput(

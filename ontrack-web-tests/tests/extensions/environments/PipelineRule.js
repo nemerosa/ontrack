@@ -18,6 +18,12 @@ export class PipelineRule {
         await expect(locator).toBeVisible()
     }
 
+    async expectToBeUnchecked() {
+        const locator = this.locatePipelineRule()
+        const check = locator.getByTestId(`pipeline-rule-${this.ruleConfigId}-check-nok`)
+        await expect(check).toBeVisible()
+    }
+
     async expectManualInputButton(present = true) {
         const locator = this.locatePipelineRule()
         const inputNeededButton = locator.getByTestId(`pipeline-rule-input-${this.ruleConfigId}`)

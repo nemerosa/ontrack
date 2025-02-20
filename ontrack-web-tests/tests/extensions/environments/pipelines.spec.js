@@ -1,4 +1,4 @@
-import {test} from "@playwright/test";
+import {expect, test} from "@playwright/test";
 import {manualApprovalInPipelinePage} from "./manualApprovalFixtures";
 import {createSlot} from "./slotFixtures";
 import {ontrack} from "@ontrack/ontrack";
@@ -6,6 +6,7 @@ import {createPipeline} from "./pipelineFixtures";
 import {PipelinePage} from "./PipelinePage";
 import {login} from "../../core/login";
 import {SlotPage} from "./SlotPage";
+import {addSlotWorkflow} from "@ontrack/extensions/environments/workflows";
 
 test('pipeline status refreshed when inputs completed', async ({page}) => {
     await manualApprovalInPipelinePage(page)
@@ -58,5 +59,104 @@ test('pipeline lifecycle from the slot page', async ({page}) => {
     await slotPipelineRow.checkFinishAction({})
     await slotPipelineRow.finish()
     await slotPipelineRow.checkFinishAction({visible: false})
+
+})
+
+test('starting a pipeline in forced DONE', async ({page}) => {
+    const {slot, project} = await createSlot(ontrack())
+
+    const promotionRuleId = await ontrack().environments.addPromotionRule({slot, promotion: "BRONZE"})
+
+    const candidateWorkflow = await addSlotWorkflow({
+        slot,
+        trigger: 'CANDIDATE',
+        workflowYaml: `
+             name: On candidate
+             nodes:
+               - id: start
+                 executorId: mock
+                 data:
+                   text: Candidate
+        `
+    })
+
+    const runningWorkflow = await addSlotWorkflow({
+        slot,
+        trigger: 'RUNNING',
+        workflowYaml: `
+             name: On running
+             nodes:
+               - id: start
+                 executorId: mock
+                 data:
+                   text: Running
+        `
+    })
+
+    const doneWorkflow = await addSlotWorkflow({
+        slot,
+        trigger: 'DONE',
+        workflowYaml: `
+             name: On done
+             nodes:
+               - id: start
+                 executorId: mock
+                 data:
+                   text: Done
+        `
+    })
+
+    // Creating a pipeline in DONE state
+    const {pipeline} = await createPipeline({
+        project,
+        slot,
+        forceDone: true,
+        forceDoneMessage: "Created pipeline as done",
+        branchSetup: async (branch) => {
+            await branch.createPromotionLevel("BRONZE")
+        }
+    })
+
+    await expect(pipeline).not.toBeNull()
+
+    // Going to the pipeline page
+    await login(page)
+    const pipelinePage = new PipelinePage(page, pipeline)
+    await pipelinePage.goTo()
+
+    // Pipeline is done
+    await pipelinePage.checkRunAction({visible: false})
+    await pipelinePage.checkFinishAction({visible: false})
+
+    // Checks the admission rule
+
+    const promotionRule = await pipelinePage.getAdmissionRule(promotionRuleId)
+    await promotionRule.expectToBeVisible()
+    await promotionRule.expectToBeUnchecked()
+
+    // Checks the workflows
+
+    const candidateWorkflowInstance = await pipelinePage.getWorkflow(candidateWorkflow.id)
+    await candidateWorkflowInstance.checkState({
+        status: "Not started",
+        name: "On candidate"
+    })
+
+    const runningWorkflowInstance = await pipelinePage.getWorkflow(runningWorkflow.id)
+    await runningWorkflowInstance.checkState({
+        status: "Not started",
+        name: "On running"
+    })
+
+    const doneWorkflowInstance = await pipelinePage.getWorkflow(doneWorkflow.id)
+    await doneWorkflowInstance.checkState({
+        status: "Success",
+        name: "On done"
+    })
+
+    // Checks the forcing message
+
+    const doneStatus = await pipelinePage.getDoneStatus()
+    await doneStatus.expectForcingMessage("Created pipeline as done")
 
 })

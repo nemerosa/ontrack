@@ -264,7 +264,12 @@ class SlotServiceImpl(
         }
     }
 
-    override fun startPipeline(slot: Slot, build: Build): SlotPipeline {
+    override fun startPipeline(
+        slot: Slot,
+        build: Build,
+        forceDone: Boolean,
+        forceDoneMessage: String?,
+    ): SlotPipeline {
         securityService.checkSlotAccess<SlotPipelineCreate>(slot)
         // Build must be eligible
         if (!isBuildEligible(slot, build)) {
@@ -289,14 +294,36 @@ class SlotServiceImpl(
                 message = "Pipeline started",
             )
         )
-        // Workflow triggers
+        // Event linked to the creation of this pipeline
         val event = environmentsEventsFactory.pipelineCreation(pipeline)
-        slotWorkflowService.startWorkflowsForPipeline(
-            pipeline,
-            SlotPipelineStatus.CANDIDATE,
-            event
-        )
+        // Workflow triggers
+        if (!forceDone) {
+            slotWorkflowService.startWorkflowsForPipeline(
+                pipeline,
+                SlotPipelineStatus.CANDIDATE,
+                event
+            )
+        }
+        // Posting the creation of the pipeline
         eventPostService.post(event)
+        // Forcing the DONE status
+        if (forceDone) {
+            // Forcing the deployment in RUNNING state
+            runDeployment(
+                pipelineId = pipeline.id,
+                dryRun = false,
+                force = true,
+            )
+            // Forcing the deployment in DONE state
+            val message = forceDoneMessage
+                ?.takeIf { it.isNotBlank() }
+                ?: "Deployment is forced to done."
+            finishDeployment(
+                pipelineId = pipeline.id,
+                forcing = true,
+                message = message,
+            )
+        }
         // OK
         return findPipelineById(pipeline.id) ?: throw SlotPipelineIdNotFoundException(pipeline.id)
     }
@@ -436,7 +463,8 @@ class SlotServiceImpl(
     override fun runDeployment(
         pipelineId: String,
         dryRun: Boolean,
-        skipWorkflowId: String?
+        skipWorkflowId: String?,
+        force: Boolean,
     ): SlotDeploymentActionStatus {
         val pipeline = slotPipelineRepository.getPipelineById(pipelineId)
         securityService.checkSlotAccess<SlotPipelineStart>(pipeline.slot)
@@ -451,23 +479,28 @@ class SlotServiceImpl(
             return SlotDeploymentActionStatus.nok("Cannot run a deployment if not a candidate")
         }
 
-        // Admission rules statuses
-        val admissionRules = slotAdmissionRuleConfigRepository.getAdmissionRuleConfigs(pipeline.slot)
-        val rulesChecks = admissionRules.map { admissionRule ->
-            val ruleStatus = slotPipelineAdmissionRuleStatusRepository.findStatusByPipelineAndAdmissionRuleConfig(
-                pipeline,
-                admissionRule
-            )
-            getAdmissionRuleCheck(pipeline, admissionRule, ruleStatus)
-        }
-        if (rulesChecks.any { !it.ok }) {
-            return SlotDeploymentActionStatus.nok("Some admission rules prevent the deployment to start")
-        }
+        // Skipping the controls when forcing
+        if (!force) {
 
-        val workflowChecks =
-            slotWorkflowService.getSlotWorkflowChecks(pipeline, SlotPipelineStatus.CANDIDATE, skipWorkflowId)
-        if (workflowChecks.any { !it.ok }) {
-            return SlotDeploymentActionStatus.nok("Some workflows prevent the deployment to start")
+            // Admission rules statuses
+            val admissionRules = slotAdmissionRuleConfigRepository.getAdmissionRuleConfigs(pipeline.slot)
+            val rulesChecks = admissionRules.map { admissionRule ->
+                val ruleStatus = slotPipelineAdmissionRuleStatusRepository.findStatusByPipelineAndAdmissionRuleConfig(
+                    pipeline,
+                    admissionRule
+                )
+                getAdmissionRuleCheck(pipeline, admissionRule, ruleStatus)
+            }
+            if (rulesChecks.any { !it.ok }) {
+                return SlotDeploymentActionStatus.nok("Some admission rules prevent the deployment to start")
+            }
+
+            val workflowChecks =
+                slotWorkflowService.getSlotWorkflowChecks(pipeline, SlotPipelineStatus.CANDIDATE, skipWorkflowId)
+            if (workflowChecks.any { !it.ok }) {
+                return SlotDeploymentActionStatus.nok("Some workflows prevent the deployment to start")
+            }
+
         }
 
         // Actual start
@@ -479,13 +512,16 @@ class SlotServiceImpl(
                 status = SlotPipelineStatus.RUNNING,
                 message = "Deployment running",
             )
-            // Workflows
+            // Event linked to the pipeline running
             val event = environmentsEventsFactory.pipelineDeploying(pipeline)
-            slotWorkflowService.startWorkflowsForPipeline(
-                pipeline,
-                SlotPipelineStatus.RUNNING,
-                event
-            )
+            if (!force) {
+                // Workflows
+                slotWorkflowService.startWorkflowsForPipeline(
+                    pipeline,
+                    SlotPipelineStatus.RUNNING,
+                    event
+                )
+            }
             eventPostService.post(event)
         }
         // OK
@@ -601,13 +637,15 @@ class SlotServiceImpl(
             return SlotDeploymentActionStatus.nok("Pipeline can be deployed only if deployment has been started first.")
         }
         // Checking the workflows
-        val workflowChecks = slotWorkflowService.getSlotWorkflowChecks(
-            pipeline,
-            SlotPipelineStatus.RUNNING,
-            skipWorkflowId = skipWorkflowId
-        )
-        if (workflowChecks.any { !it.ok }) {
-            return SlotDeploymentActionStatus.nok("Some workflows prevent the deployment to complete")
+        if (!forcing) {
+            val workflowChecks = slotWorkflowService.getSlotWorkflowChecks(
+                pipeline,
+                SlotPipelineStatus.RUNNING,
+                skipWorkflowId = skipWorkflowId
+            )
+            if (workflowChecks.any { !it.ok }) {
+                return SlotDeploymentActionStatus.nok("Some workflows prevent the deployment to complete")
+            }
         }
         // Actual message
         val actualMessage = message ?: "Deployment finished"
@@ -621,7 +659,7 @@ class SlotServiceImpl(
                 SlotAdmissionRuleOverride(
                     user = securityService.currentSignature.user.name,
                     timestamp = Time.now,
-                    message = "Deployment was marked done manually."
+                    message = message ?: "Deployment was marked done manually."
                 )
             } else {
                 null
