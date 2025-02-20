@@ -104,6 +104,13 @@ class SlotPipelineMutations(
                 )
             }
         },
+        unitMutation(
+            name = "deleteDeployment",
+            description = "Deletes a deployment",
+            input = DeleteDeploymentInput::class
+        ) { input ->
+            slotService.deleteDeployment(input.deploymentId)
+        },
     )
 }
 
@@ -137,4 +144,8 @@ data class OverridePipelineRuleInput(
     val pipelineId: String,
     val admissionRuleConfigId: String,
     val message: String,
+)
+
+data class DeleteDeploymentInput(
+    val deploymentId: String,
 )

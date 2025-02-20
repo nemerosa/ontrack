@@ -16,6 +16,7 @@ class SlotsAuthorizationContributor(
 
     companion object {
         private const val SLOT = "slot"
+        private const val PIPELINE = "pipeline"
     }
 
     override fun appliesTo(context: Any): Boolean = context is Slot
@@ -43,10 +44,16 @@ class SlotsAuthorizationContributor(
                         securityService.isProjectFunctionGranted(slot.project, SlotUpdate::class.java)
             ),
             Authorization(
-                name = "pipeline",
-                action = "create",
+                name = PIPELINE,
+                action = Authorization.CREATE,
                 authorized = environmentFeatureEnabled &&
                         securityService.isProjectFunctionGranted(slot.project, SlotPipelineCreate::class.java)
+            ),
+            Authorization(
+                name = PIPELINE,
+                action = Authorization.DELETE,
+                authorized = environmentFeatureEnabled &&
+                        securityService.isProjectFunctionGranted(slot.project, SlotPipelineDelete::class.java)
             ),
         )
     }

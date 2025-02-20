@@ -105,6 +105,14 @@ class SlotServiceImpl(
         }
     }
 
+    override fun deleteDeployment(id: String) {
+        val deployment = findPipelineById(id)
+        if (deployment != null) {
+            securityService.checkSlotAccess<SlotPipelineDelete>(deployment.slot)
+            slotPipelineRepository.deleteDeployment(id)
+        }
+    }
+
     private fun <C, D> getRequiredInput(
         pipeline: SlotPipeline,
         config: SlotAdmissionRuleConfig,

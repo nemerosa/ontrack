@@ -316,4 +316,15 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
         }
     }
 
+    @Test
+    fun `Deleting a pipeline`() {
+        slotTestSupport.withSlotPipeline { pipeline ->
+            slotService.deleteDeployment(pipeline.id)
+            assertNull(
+                slotService.findPipelineById(pipeline.id),
+                "Deployment has been deleted"
+            )
+        }
+    }
+
 }

@@ -29,6 +29,7 @@ class EnvironmentsRoleContributor : RoleContributor {
             SlotPipelineData::class.java,
             SlotPipelineOverride::class.java,
             SlotPipelineWorkflowRun::class.java,
+            SlotPipelineDelete::class.java,
         )
     }
 

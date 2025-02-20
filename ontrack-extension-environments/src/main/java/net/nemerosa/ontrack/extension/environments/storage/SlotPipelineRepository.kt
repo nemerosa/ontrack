@@ -198,4 +198,14 @@ class SlotPipelineRepository(
             toPipeline(rs)
         }
 
+    fun deleteDeployment(id: String) {
+        namedParameterJdbcTemplate!!.update(
+            """
+                DELETE FROM ENV_SLOT_PIPELINE
+                WHERE ID = :id
+            """.trimIndent(),
+            mapOf("id" to id)
+        )
+    }
+
 }

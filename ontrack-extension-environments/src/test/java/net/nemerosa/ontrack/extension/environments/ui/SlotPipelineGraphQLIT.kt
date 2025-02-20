@@ -737,4 +737,27 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
         }
     }
 
+    @Test
+    fun `Deleting a pipeline`() {
+        slotTestSupport.withSlotPipeline { pipeline ->
+            run(
+                """
+                    mutation {
+                        deleteDeployment(input: {deploymentId: "${pipeline.id}"}) {
+                            errors {
+                                message
+                            }
+                        }
+                    }
+                """.trimIndent()
+            ) { data ->
+                checkGraphQLUserErrors(data, "deleteDeployment")
+                assertNull(
+                    slotService.findPipelineById(pipeline.id),
+                    "Deployment has been deleted"
+                )
+            }
+        }
+    }
+
 }

@@ -249,4 +249,9 @@ interface SlotService {
      */
     fun findSlotPipelinesWhereBuildIsLastDeployed(build: Build): List<SlotPipeline>
 
+    /**
+     * Deletes a deployment using its ID.
+     */
+    fun deleteDeployment(id: String)
+
 }

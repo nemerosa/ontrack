@@ -17,6 +17,7 @@ import {Space} from "antd";
 import SlotPipelineSummary from "@components/extension/environments/SlotPipelineSummary";
 import PageSection from "@components/common/PageSection";
 import SlotPipelineSteps from "@components/extension/environments/SlotPipelineSteps";
+import DeleteDeploymentCommand from "@components/extension/environments/DeleteDeploymentCommand";
 
 export default function SlotPipelineView({id}) {
 
@@ -40,6 +41,11 @@ export default function SlotPipelineView({id}) {
                             ...SlotPipelineData
                             slot {
                                 ...SlotData
+                                authorizations {
+                                    name
+                                    action
+                                    authorized
+                                }
                                 environment {
                                     ...EnvironmentData
                                 }
@@ -62,6 +68,7 @@ export default function SlotPipelineView({id}) {
                 // Commands
                 const commands = []
                 commands.push(
+                    <DeleteDeploymentCommand key="delete" deployment={pipeline}/>,
                     <CloseCommand key="close" href={slotUri(pipeline.slot)}/>
                 )
                 setCommands(commands)
