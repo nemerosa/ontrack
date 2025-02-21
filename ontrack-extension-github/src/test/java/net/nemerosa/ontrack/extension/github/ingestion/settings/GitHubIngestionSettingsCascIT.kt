@@ -1,10 +1,69 @@
 package net.nemerosa.ontrack.extension.github.ingestion.settings
 
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parseAsJson
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
 class GitHubIngestionSettingsCascIT : AbstractCascTestSupport() {
+
+    @Autowired
+    private lateinit var gitHubIngestionSettingsCasc: GitHubIngestionSettingsCasc
+
+    @Test
+    fun `CasC schema type`() {
+        val type = gitHubIngestionSettingsCasc.jsonType
+        assertEquals(
+            """
+                {
+                  "title": "GitHubIngestionSettings",
+                  "description": null,
+                  "properties": {
+                    "enabled": {
+                      "description": "Is the ingestion of the GitHub events enabled?",
+                      "type": "boolean"
+                    },
+                    "indexationInterval": {
+                      "description": "Default indexation interval when configuring the GitHub projects",
+                      "type": "integer"
+                    },
+                    "issueServiceIdentifier": {
+                      "description": "Identifier of the issue service to use by default. For example `self` for GitHub issues or `jira//config`.",
+                      "type": "string"
+                    },
+                    "orgProjectPrefix": {
+                      "description": "Must the organization name be used as a project name prefix?",
+                      "type": "boolean"
+                    },
+                    "repositoryExcludes": {
+                      "description": "Regular expression to exclude repositories",
+                      "type": "string"
+                    },
+                    "repositoryIncludes": {
+                      "description": "Regular expression to include repositories",
+                      "type": "string"
+                    },
+                    "retentionDays": {
+                      "description": "Number of days to keep the received payloads (0 = forever)",
+                      "type": "integer"
+                    },
+                    "token": {
+                      "description": "Secret token sent by the GitHub hook and signing the payload",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "token"
+                  ],
+                  "additionalProperties": false,
+                  "type": "object"
+                }
+            """.trimIndent().parseAsJson(),
+            type.asJson()
+        )
+    }
 
     @Test
     fun `Minimal parameters`() {

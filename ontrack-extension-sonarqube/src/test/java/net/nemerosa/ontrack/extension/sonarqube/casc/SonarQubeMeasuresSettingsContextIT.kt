@@ -1,11 +1,56 @@
 package net.nemerosa.ontrack.extension.sonarqube.casc
 
-import net.nemerosa.ontrack.extension.casc.AbstractCascTestJUnit4Support
+import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.extension.sonarqube.measures.SonarQubeMeasuresSettings
-import org.junit.Test
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parseAsJson
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
-class SonarQubeMeasuresSettingsContextIT : AbstractCascTestJUnit4Support() {
+class SonarQubeMeasuresSettingsContextIT : AbstractCascTestSupport() {
+
+    @Autowired
+    private lateinit var sonarQubeMeasuresSettingsContext: SonarQubeMeasuresSettingsContext
+
+    @Test
+    fun `CasC schema type`() {
+        val type = sonarQubeMeasuresSettingsContext.jsonType
+        assertEquals(
+            """
+                {
+                  "title": "SonarQubeMeasuresSettings",
+                  "description": null,
+                  "properties": {
+                    "blockerThreshold": {
+                      "description": "blockerThreshold field",
+                      "type": "integer"
+                    },
+                    "coverageThreshold": {
+                      "description": "coverageThreshold field",
+                      "type": "integer"
+                    },
+                    "disabled": {
+                      "description": "disabled field",
+                      "type": "boolean"
+                    },
+                    "measures": {
+                      "items": {
+                        "description": "measures field",
+                        "type": "string"
+                      },
+                      "description": "measures field",
+                      "type": "array"
+                    }
+                  },
+                  "required": [],
+                  "additionalProperties": false,
+                  "type": "object"
+                }
+            """.trimIndent().parseAsJson(),
+            type.asJson()
+        )
+    }
 
     @Test
     fun `Minimal parameters`() {
@@ -19,7 +64,8 @@ class SonarQubeMeasuresSettingsContextIT : AbstractCascTestJUnit4Support() {
                         blockerThreshold = 1,
                     )
                 )
-                casc("""
+                casc(
+                    """
                     ontrack:
                         config:
                             settings:
@@ -28,7 +74,8 @@ class SonarQubeMeasuresSettingsContextIT : AbstractCascTestJUnit4Support() {
                                         - blocker_violations
                                         - coverage
                                         - security_hotspots
-                """.trimIndent())
+                """.trimIndent()
+                )
                 val settings = cachedSettingsService.getCachedSettings(SonarQubeMeasuresSettings::class.java)
                 assertEquals(
                     listOf(
@@ -57,7 +104,8 @@ class SonarQubeMeasuresSettingsContextIT : AbstractCascTestJUnit4Support() {
                         blockerThreshold = 1,
                     )
                 )
-                casc("""
+                casc(
+                    """
                     ontrack:
                         config:
                             settings:
@@ -69,7 +117,8 @@ class SonarQubeMeasuresSettingsContextIT : AbstractCascTestJUnit4Support() {
                                     disabled: false
                                     coverageThreshold: 80
                                     blockerThreshold: 10
-                """.trimIndent())
+                """.trimIndent()
+                )
                 val settings = cachedSettingsService.getCachedSettings(SonarQubeMeasuresSettings::class.java)
                 assertEquals(
                     listOf(

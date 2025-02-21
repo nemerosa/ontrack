@@ -7,13 +7,13 @@ import java.time.Duration
 data class NotificationRecordingSettings(
     @APIDescription("Is the recording of notifications enabled?")
     @APILabel("Enabled")
-    val enabled: Boolean,
+    val enabled: Boolean = DEFAULT_ENABLED,
     @APIDescription("Number of seconds to keep the recordings")
     @APILabel("Retention time")
-    val retentionSeconds: Long,
+    val retentionSeconds: Long = DEFAULT_RETENTION_SECONDS,
     @APIDescription("Interval between each cleanup of the recordings")
     @APILabel("Cleanup interval")
-    val cleanupIntervalSeconds: Long,
+    val cleanupIntervalSeconds: Long = DEFAULT_CLEANUP_INTERVAL_SECONDS,
 ) {
     companion object {
         const val DEFAULT_ENABLED = true

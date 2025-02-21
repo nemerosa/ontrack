@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowTestFix
 import net.nemerosa.ontrack.extension.scm.service.TestSCMExtension
 import net.nemerosa.ontrack.it.NewTxRollbacked
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.test.TestUtils.resourceBytes
 import net.nemerosa.ontrack.test.TestUtils.uid
 import net.nemerosa.ontrack.test.resourceBase64
@@ -39,6 +40,310 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
 
     @Autowired
     private lateinit var testSCMExtension: TestSCMExtension
+
+    @Test
+    fun `CasC schema type`() {
+        val type = environmentsCascContext.jsonType
+        assertEquals(
+            """
+                {
+                  "title": "EnvironmentsCascModel",
+                  "description": null,
+                  "properties": {
+                    "environments": {
+                      "items": {
+                        "title": "EnvironmentCasc",
+                        "description": "environments field",
+                        "properties": {
+                          "description": {
+                            "description": "description field",
+                            "type": "string"
+                          },
+                          "image": {
+                            "description": "image field",
+                            "type": "string"
+                          },
+                          "name": {
+                            "description": "name field",
+                            "type": "string"
+                          },
+                          "order": {
+                            "description": "order field",
+                            "type": "integer"
+                          },
+                          "tags": {
+                            "items": {
+                              "description": "tags field",
+                              "type": "string"
+                            },
+                            "description": "tags field",
+                            "type": "array"
+                          }
+                        },
+                        "required": [
+                          "name",
+                          "order"
+                        ],
+                        "additionalProperties": false,
+                        "type": "object"
+                      },
+                      "description": "environments field",
+                      "type": "array"
+                    },
+                    "keepEnvironments": {
+                      "description": "keepEnvironments field",
+                      "type": "boolean"
+                    },
+                    "slots": {
+                      "items": {
+                        "title": "SlotCasc",
+                        "description": "slots field",
+                        "properties": {
+                          "description": {
+                            "description": "description field",
+                            "type": "string"
+                          },
+                          "environments": {
+                            "items": {
+                              "title": "SlotEnvironmentCasc",
+                              "description": "environments field",
+                              "properties": {
+                                "admissionRules": {
+                                  "items": {
+                                    "title": "SlotEnvironmentAdmissionRuleCasc",
+                                    "description": "admissionRules field",
+                                    "properties": {
+                                      "actualName": {
+                                        "description": "actualName field",
+                                        "type": "string"
+                                      },
+                                      "description": {
+                                        "description": "description field",
+                                        "type": "string"
+                                      },
+                                      "name": {
+                                        "description": "name field",
+                                        "type": "string"
+                                      },
+                                      "ruleConfig": {
+                                        "description": "ruleConfig field",
+                                        "type": {}
+                                      },
+                                      "ruleId": {
+                                        "description": "ruleId field",
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "actualName",
+                                      "ruleConfig",
+                                      "ruleId"
+                                    ],
+                                    "additionalProperties": false,
+                                    "type": "object"
+                                  },
+                                  "description": "admissionRules field",
+                                  "type": "array"
+                                },
+                                "name": {
+                                  "description": "name field",
+                                  "type": "string"
+                                },
+                                "workflows": {
+                                  "items": {
+                                    "title": "SlotWorkflowCasc",
+                                    "description": "workflows field",
+                                    "properties": {
+                                      "name": {
+                                        "description": "name field",
+                                        "type": "string"
+                                      },
+                                      "nodes": {
+                                        "items": {
+                                          "title": "WorkflowNode",
+                                          "description": "nodes field",
+                                          "properties": {
+                                            "description": {
+                                              "description": "Description of the node in its workflow.",
+                                              "type": "string"
+                                            },
+                                            "id": {
+                                              "description": "Unique ID of the node in its workflow.",
+                                              "type": "string"
+                                            },
+                                            "parents": {
+                                              "items": {
+                                                "title": "WorkflowParentNode",
+                                                "description": "List of the IDs of the parents for this node",
+                                                "properties": {
+                                                  "id": {
+                                                    "description": "ID of the parent node",
+                                                    "type": "string"
+                                                  }
+                                                },
+                                                "required": [
+                                                  "id"
+                                                ],
+                                                "additionalProperties": false,
+                                                "type": "object"
+                                              },
+                                              "description": "List of the IDs of the parents for this node",
+                                              "type": "array"
+                                            },
+                                            "timeout": {
+                                              "description": "Timeout in seconds (5 minutes by default)",
+                                              "type": "integer"
+                                            },
+                                            "executorId": {
+                                              "enum": [
+                                                "mock",
+                                                "notification",
+                                                "pause",
+                                                "slot-pipeline-creation",
+                                                "slot-pipeline-deployed",
+                                                "slot-pipeline-deploying"
+                                              ],
+                                              "description": "ID of the executor to use",
+                                              "type": "string",
+                                              "title": "Enum"
+                                            }
+                                          },
+                                          "required": [
+                                            "id",
+                                            "data",
+                                            "executorId"
+                                          ],
+                                          "additionalProperties": false,
+                                          "oneOf": [
+                                            {
+                                              "properties": {
+                                                "executorId": {
+                                                  "const": "mock"
+                                                },
+                                                "data": {
+                                                  "${'$'}ref": "#/${'$'}defs/workflow-node-executor-mock"
+                                                }
+                                              }
+                                            },
+                                            {
+                                              "properties": {
+                                                "executorId": {
+                                                  "const": "notification"
+                                                },
+                                                "data": {
+                                                  "${'$'}ref": "#/${'$'}defs/workflow-node-executor-notification"
+                                                }
+                                              }
+                                            },
+                                            {
+                                              "properties": {
+                                                "executorId": {
+                                                  "const": "pause"
+                                                },
+                                                "data": {
+                                                  "${'$'}ref": "#/${'$'}defs/workflow-node-executor-pause"
+                                                }
+                                              }
+                                            },
+                                            {
+                                              "properties": {
+                                                "executorId": {
+                                                  "const": "slot-pipeline-creation"
+                                                },
+                                                "data": {
+                                                  "${'$'}ref": "#/${'$'}defs/workflow-node-executor-slot-pipeline-creation"
+                                                }
+                                              }
+                                            },
+                                            {
+                                              "properties": {
+                                                "executorId": {
+                                                  "const": "slot-pipeline-deployed"
+                                                },
+                                                "data": {
+                                                  "${'$'}ref": "#/${'$'}defs/workflow-node-executor-slot-pipeline-deployed"
+                                                }
+                                              }
+                                            },
+                                            {
+                                              "properties": {
+                                                "executorId": {
+                                                  "const": "slot-pipeline-deploying"
+                                                },
+                                                "data": {
+                                                  "${'$'}ref": "#/${'$'}defs/workflow-node-executor-slot-pipeline-deploying"
+                                                }
+                                              }
+                                            }
+                                          ],
+                                          "type": "object"
+                                        },
+                                        "description": "nodes field",
+                                        "type": "array"
+                                      },
+                                      "trigger": {
+                                        "enum": [
+                                          "CANDIDATE",
+                                          "RUNNING",
+                                          "CANCELLED",
+                                          "DONE"
+                                        ],
+                                        "description": "trigger field",
+                                        "type": "string",
+                                        "title": "Enum"
+                                      }
+                                    },
+                                    "required": [
+                                      "name",
+                                      "nodes",
+                                      "trigger"
+                                    ],
+                                    "additionalProperties": false,
+                                    "type": "object"
+                                  },
+                                  "description": "workflows field",
+                                  "type": "array"
+                                }
+                              },
+                              "required": [
+                                "name"
+                              ],
+                              "additionalProperties": false,
+                              "type": "object"
+                            },
+                            "description": "environments field",
+                            "type": "array"
+                          },
+                          "project": {
+                            "description": "project field",
+                            "type": "string"
+                          },
+                          "qualifier": {
+                            "description": "qualifier field",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "environments",
+                          "project"
+                        ],
+                        "additionalProperties": false,
+                        "type": "object"
+                      },
+                      "description": "slots field",
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "environments"
+                  ],
+                  "additionalProperties": false,
+                  "type": "object"
+                }
+            """.trimIndent().parseAsJson(),
+            type.asJson()
+        )
+    }
 
     @Test
     fun `Defining environments keeps existing environments by default`() {
