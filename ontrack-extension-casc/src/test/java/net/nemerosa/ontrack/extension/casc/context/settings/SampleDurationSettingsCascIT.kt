@@ -19,19 +19,17 @@ class SampleDurationSettingsCascIT : AbstractCascTestSupport() {
         assertEquals(
             """
                 {
-                  "title": "HomePageSettings",
+                  "title": "SampleDurationSettings",
                   "description": null,
                   "properties": {
-                    "maxBranches": {
-                      "description": "Maximum of branches to display per favorite project",
-                      "type": "integer"
-                    },
-                    "maxProjects": {
-                      "description": "Maximum of projects starting from which we need to switch to a search mode",
-                      "type": "integer"
+                    "duration": {
+                      "description": "duration field",
+                      "type": "string",
+                      "pattern": "^\\d+|P(?:\\d+Y)?(?:\\d+M)?(?:\\d+D)?(?:T(?:\\d+H)?(?:\\d+M)?(?:\\d+S)?)?|(\\d+)([smhdwMy])${'$'}"
                     }
                   },
                   "required": [
+                    "duration"
                   ],
                   "additionalProperties": false,
                   "type": "object"
@@ -42,7 +40,7 @@ class SampleDurationSettingsCascIT : AbstractCascTestSupport() {
     }
 
     @Test
-    fun `Casc duration`() {
+    fun `Casc duration using seconds`() {
         withSettings<SampleDurationSettings> {
             settingsRepository.deleteAll(SampleDurationSettings::class.java)
             casc(
@@ -52,6 +50,42 @@ class SampleDurationSettingsCascIT : AbstractCascTestSupport() {
                             settings:
                                 sample-duration:
                                     duration: 1209600
+                """.trimIndent()
+            )
+            val settings = settingsService.getCachedSettings(SampleDurationSettings::class.java)
+            assertEquals(Duration.ofDays(14), settings.duration)
+        }
+    }
+
+    @Test
+    fun `Casc duration using shorthand`() {
+        withSettings<SampleDurationSettings> {
+            settingsRepository.deleteAll(SampleDurationSettings::class.java)
+            casc(
+                """
+                    ontrack:
+                        config:
+                            settings:
+                                sample-duration:
+                                    duration: 14d
+                """.trimIndent()
+            )
+            val settings = settingsService.getCachedSettings(SampleDurationSettings::class.java)
+            assertEquals(Duration.ofDays(14), settings.duration)
+        }
+    }
+
+    @Test
+    fun `Casc duration using iso`() {
+        withSettings<SampleDurationSettings> {
+            settingsRepository.deleteAll(SampleDurationSettings::class.java)
+            casc(
+                """
+                    ontrack:
+                        config:
+                            settings:
+                                sample-duration:
+                                    duration: P14D
                 """.trimIndent()
             )
             val settings = settingsService.getCachedSettings(SampleDurationSettings::class.java)

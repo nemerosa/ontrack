@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.general.links
 
-import net.nemerosa.ontrack.common.formatDuration
+import net.nemerosa.ontrack.common.formatDurationForHumans
 import net.nemerosa.ontrack.extension.api.BranchLinksDecorationExtension
 import net.nemerosa.ontrack.extension.general.GeneralExtensionFeature
 import net.nemerosa.ontrack.extension.support.AbstractExtension
@@ -39,6 +39,6 @@ class TimeBranchLinksDecorationProvider(
         val start = source.signature.time
         val end = target.signature.time
         val duration = Duration.between(start, end).abs()
-        return formatDuration(duration)
+        return formatDurationForHumans(duration)
     }
 }

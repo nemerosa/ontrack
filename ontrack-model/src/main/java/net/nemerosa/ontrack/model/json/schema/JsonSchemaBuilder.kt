@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.model.annotations.getPropertyDescription
 import net.nemerosa.ontrack.model.annotations.getPropertyName
 import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Component
+import java.time.Duration
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.full.*
@@ -69,6 +70,7 @@ private class JsonSchemaBuilder(
             cls == Boolean::class -> JsonBooleanType(description)
             cls == List::class -> toList(type, description)
             cls == JsonNode::class -> JsonRawJsonType(description)
+            cls == Duration::class -> JsonDurationType(description)
             cls.isSubclassOf(Enum::class) -> toEnumType(cls, description)
             cls.jvmName.startsWith("net.nemerosa.ontrack.") -> toObject(type, description)
             else -> error("$type is not supported")
