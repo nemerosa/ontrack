@@ -636,6 +636,10 @@ class SlotServiceImpl(
         if (lastPipeline.status != SlotPipelineStatus.RUNNING && !forcing) {
             return SlotDeploymentActionStatus.nok("Pipeline can be deployed only if deployment has been started first.")
         }
+        // Checking right to force
+        if (forcing) {
+            securityService.checkSlotAccess<SlotPipelineOverride>(pipeline.slot)
+        }
         // Checking the workflows
         if (!forcing) {
             val workflowChecks = slotWorkflowService.getSlotWorkflowChecks(

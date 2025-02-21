@@ -101,4 +101,16 @@ export class PipelinePage {
     async getDoneStatus() {
         return await this.getStatus('DONE')
     }
+
+    async forceDone({message}) {
+        const forceCommand = this.page.getByRole('button', {name: "Force deployment"})
+        await expect(forceCommand).toBeVisible()
+        await forceCommand.click()
+
+        const forceMessage = this.page.getByLabel('Message')
+        await expect(forceMessage).toBeVisible()
+        await forceMessage.fill(message)
+        const okButton = this.page.getByRole('button', {name: 'OK'});
+        await okButton.click()
+    }
 }

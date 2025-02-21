@@ -55,6 +55,12 @@ class SlotsAuthorizationContributor(
                 authorized = environmentFeatureEnabled &&
                         securityService.isProjectFunctionGranted(slot.project, SlotPipelineDelete::class.java)
             ),
+            Authorization(
+                name = PIPELINE,
+                action = "override",
+                authorized = environmentFeatureEnabled &&
+                        securityService.isProjectFunctionGranted(slot.project, SlotPipelineOverride::class.java)
+            ),
         )
     }
 

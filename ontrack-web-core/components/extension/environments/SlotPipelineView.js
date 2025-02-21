@@ -18,6 +18,7 @@ import SlotPipelineSummary from "@components/extension/environments/SlotPipeline
 import PageSection from "@components/common/PageSection";
 import SlotPipelineSteps from "@components/extension/environments/SlotPipelineSteps";
 import DeleteDeploymentCommand from "@components/extension/environments/DeleteDeploymentCommand";
+import ForceDeploymentCommand from "@components/extension/environments/ForceDeploymentCommand";
 
 export default function SlotPipelineView({id}) {
 
@@ -68,6 +69,7 @@ export default function SlotPipelineView({id}) {
                 // Commands
                 const commands = []
                 commands.push(
+                    <ForceDeploymentCommand key="force" deployment={pipeline} onForced={reload}/>,
                     <DeleteDeploymentCommand key="delete" deployment={pipeline}/>,
                     <CloseCommand key="close" href={slotUri(pipeline.slot)}/>
                 )

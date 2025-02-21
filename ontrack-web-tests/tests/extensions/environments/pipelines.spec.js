@@ -63,6 +63,86 @@ test('pipeline lifecycle from the slot page', async ({page}) => {
 })
 
 test('starting a pipeline in forced DONE', async ({page}) => {
+    const {
+        slot,
+        project,
+        promotionRuleId,
+        candidateWorkflow,
+        doneWorkflow,
+        runningWorkflow
+    } = await preparePipelineForForcedDeployment()
+
+    // Creating a pipeline in DONE state
+    const {pipeline} = await createPipeline({
+        project,
+        slot,
+        forceDone: true,
+        forceDoneMessage: "Created pipeline as done",
+        branchSetup: async (branch) => {
+            await branch.createPromotionLevel("BRONZE")
+        }
+    })
+
+    await expect(pipeline).not.toBeNull()
+
+    // Going to the pipeline page
+    await login(page)
+    const pipelinePage = new PipelinePage(page, pipeline)
+    await pipelinePage.goTo()
+
+    // Checks the pipeline is marked as DONE
+    await checkForcedPipeline({
+        pipelinePage,
+        promotionRuleId,
+        candidateWorkflow,
+        runningWorkflow,
+        doneWorkflow,
+        expectedMessage: "Created pipeline as done",
+    })
+})
+
+test('forcing a pipeline in forced DONE', async ({page}) => {
+    const {
+        slot,
+        project,
+        promotionRuleId,
+        doneWorkflow,
+        runningWorkflow
+    } = await preparePipelineForForcedDeployment()
+
+    // Creating a pipeline in normal state
+    const {pipeline} = await createPipeline({
+        project,
+        slot,
+        branchSetup: async (branch) => {
+            await branch.createPromotionLevel("BRONZE")
+        }
+    })
+
+    await expect(pipeline).not.toBeNull()
+
+    // Going to the pipeline page
+    await login(page)
+    const pipelinePage = new PipelinePage(page, pipeline)
+    await pipelinePage.goTo()
+
+    // Forcing the pipeline as DONE
+    await pipelinePage.forceDone({
+        message: "Deployment was done by other means"
+    })
+
+    // Checks the pipeline is marked as DONE
+    await checkForcedPipeline({
+        pipelinePage,
+        promotionRuleId,
+        candidateWorkflow: null, // The candidate workflow may have been run or not depending on the timing
+        runningWorkflow,
+        doneWorkflow,
+        expectedMessage: "Deployment was done by other means",
+    })
+})
+
+const preparePipelineForForcedDeployment = async () => {
     const {slot, project} = await createSlot(ontrack())
 
     const promotionRuleId = await ontrack().environments.addPromotionRule({slot, promotion: "BRONZE"})
@@ -106,23 +186,24 @@ test('starting a pipeline in forced DONE', async ({page}) => {
         `
     })
 
-    // Creating a pipeline in DONE state
-    const {pipeline} = await createPipeline({
-        project,
+    return {
         slot,
-        forceDone: true,
-        forceDoneMessage: "Created pipeline as done",
-        branchSetup: async (branch) => {
-            await branch.createPromotionLevel("BRONZE")
-        }
-    })
+        project,
+        promotionRuleId,
+        candidateWorkflow,
+        runningWorkflow,
+        doneWorkflow,
+    }
+}
 
-    await expect(pipeline).not.toBeNull()
-
-    // Going to the pipeline page
-    await login(page)
-    const pipelinePage = new PipelinePage(page, pipeline)
-    await pipelinePage.goTo()
+const checkForcedPipeline = async ({
+                                       pipelinePage,
+                                       promotionRuleId,
+                                       candidateWorkflow,
+                                       runningWorkflow,
+                                       doneWorkflow,
+                                       expectedMessage,
+                                   }) => {
 
     // Pipeline is done
     await pipelinePage.checkRunAction({visible: false})
@@ -136,11 +217,13 @@ test('starting a pipeline in forced DONE', async ({page}) => {
 
     // Checks the workflows
 
-    const candidateWorkflowInstance = await pipelinePage.getWorkflow(candidateWorkflow.id)
-    await candidateWorkflowInstance.checkState({
-        status: "Not started",
-        name: "On candidate"
-    })
+    if (candidateWorkflow) {
+        const candidateWorkflowInstance = await pipelinePage.getWorkflow(candidateWorkflow.id)
+        await candidateWorkflowInstance.checkState({
+            status: "Not started",
+            name: "On candidate"
+        })
+    }
 
     const runningWorkflowInstance = await pipelinePage.getWorkflow(runningWorkflow.id)
     await runningWorkflowInstance.checkState({
@@ -157,6 +240,6 @@ test('starting a pipeline in forced DONE', async ({page}) => {
     // Checks the forcing message
 
     const doneStatus = await pipelinePage.getDoneStatus()
-    await doneStatus.expectForcingMessage("Created pipeline as done")
+    await doneStatus.expectForcingMessage(expectedMessage)
 
-})
+}
