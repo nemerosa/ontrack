@@ -865,7 +865,7 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
                                 assertEquals(SlotPipelineStatus.DONE, it.status)
                                 assertEquals("Direct done", it.message)
                                 assertEquals(SlotPipelineChangeType.STATUS, it.type)
-                                assertEquals("Deployment was marked done manually.", it.overrideMessage)
+                                assertEquals("Direct done", it.overrideMessage)
                             }
                         }
                     }

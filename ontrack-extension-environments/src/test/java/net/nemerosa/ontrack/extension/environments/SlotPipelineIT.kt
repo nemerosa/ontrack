@@ -201,7 +201,7 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
                 assertEquals(SlotPipelineStatus.DONE, it.status)
                 assertEquals("Deployment forced", it.message)
                 assertEquals(SlotPipelineChangeType.STATUS, it.type)
-                assertEquals("Deployment was marked done manually.", it.overrideMessage)
+                assertEquals("Deployment forced", it.overrideMessage)
             }
         }
     }
@@ -422,7 +422,7 @@ class SlotPipelineIT : AbstractDSLTestSupport() {
                         assertEquals(SlotPipelineStatus.DONE, it.status)
                         assertEquals("Forcing a done pipeline", it.message)
                         assertEquals(SlotPipelineChangeType.STATUS, it.type)
-                        assertEquals("Deployment was marked done manually.", it.overrideMessage)
+                        assertEquals("Forcing a done pipeline", it.overrideMessage)
                     }
                 }
             }
