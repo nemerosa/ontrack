@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.notifications.webhooks
 
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,6 +18,70 @@ internal class WebhooksCascConfigContextIT : AbstractCascTestSupport() {
 
     @Autowired
     private lateinit var webhooksCascConfigContext: WebhooksCascConfigContext
+
+    @Test
+    fun `CasC schema type`() {
+        val type = webhooksCascConfigContext.jsonType
+        assertEquals(
+            """
+                {
+                  "items": {
+                    "title": "CascWebhook",
+                    "description": null,
+                    "properties": {
+                      "authentication": {
+                        "title": "CascWebhookAuthentication",
+                        "description": "Webhook authentication",
+                        "properties": {
+                          "config": {
+                            "description": "Authentication configuration (JSON)",
+                            "type": {}
+                          },
+                          "type": {
+                            "description": "Authentication type: basic, header, bearer, ...",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "config",
+                          "type"
+                        ],
+                        "additionalProperties": false,
+                        "type": "object"
+                      },
+                      "enabled": {
+                        "description": "Webhook enabled or not",
+                        "type": "boolean"
+                      },
+                      "name": {
+                        "description": "Webhook unique name",
+                        "type": "string"
+                      },
+                      "timeoutSeconds": {
+                        "description": "Webhook execution timeout (in seconds)",
+                        "type": "integer"
+                      },
+                      "url": {
+                        "description": "Webhook endpoint",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "authentication",
+                      "name",
+                      "timeoutSeconds",
+                      "url"
+                    ],
+                    "additionalProperties": false,
+                    "type": "object"
+                  },
+                  "description": "List of webhooks",
+                  "type": "array"
+                }
+            """.trimIndent().parseAsJson(),
+            type.asJson()
+        )
+    }
 
     @Test
     fun `Creating a webhook using CasC`() {
@@ -127,28 +192,6 @@ internal class WebhooksCascConfigContextIT : AbstractCascTestSupport() {
             assertNotNull(webhookAdminService.findWebhookByName(newName), "New webhook is available")
             assertNull(webhookAdminService.findWebhookByName(oldName), "Old webhook is no longer available")
         }
-    }
-
-    @Test
-    fun `Checking the Webhook Casc type`() {
-        val type = webhooksCascConfigContext.jsonType
-        assertEquals(
-            mapOf(
-                "type" to "array"
-            ).asJson(),
-            type.asJson()
-        )
-//        val type = cascObject(WebhooksCascConfigContext.CascWebhook::class)
-//        assertIs<CascObject>(type) { webhook ->
-//            assertNotNull(webhook.fields.find { it.name == "authentication" }) { authenticationField ->
-//                assertTrue(authenticationField.required, "Authentication field is required")
-//                assertIs<CascObject>(authenticationField.type) { authentication ->
-//                    assertNotNull(authentication.fields.find { it.name == "config" }) { configField ->
-//                        assertEquals("JSON", configField.type.__type)
-//                    }
-//                }
-//            }
-//        }
     }
 
 }

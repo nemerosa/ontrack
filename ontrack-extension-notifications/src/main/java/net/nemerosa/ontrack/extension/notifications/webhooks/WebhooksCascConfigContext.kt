@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.notifications.webhooks
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.syncForward
 import net.nemerosa.ontrack.extension.casc.context.AbstractCascContext
@@ -112,7 +112,7 @@ class WebhooksCascConfigContext(
         @APIDescription("Webhook endpoint")
         val url: String,
         @APIDescription("Webhook execution timeout (in seconds)")
-        @JsonProperty("timeout-seconds")
+        @JsonAlias("timeout-seconds")
         val timeoutSeconds: Int,
         @APIDescription("Webhook authentication")
         val authentication: CascWebhookAuthentication,

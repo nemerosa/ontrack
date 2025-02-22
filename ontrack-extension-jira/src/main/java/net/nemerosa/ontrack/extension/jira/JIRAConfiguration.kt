@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.jira
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
+import net.nemerosa.ontrack.model.annotations.APIIgnore
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Form.Companion.defaultNameField
 import net.nemerosa.ontrack.model.form.Password
@@ -31,10 +32,12 @@ open class JIRAConfiguration(
     val exclude: List<String> = emptyList(),
 ) : UserPasswordConfiguration<JIRAConfiguration>(name, user, password), IssueServiceConfiguration {
 
+    @APIIgnore
     private val includeRegexes: List<Regex> by lazy {
         include.map { adjustRegexForProject(it).toRegex() }
     }
 
+    @APIIgnore
     private val excludeRegexes: List<Regex> by lazy {
         exclude.map { adjustRegexForProject(it).toRegex() }
     }
@@ -82,8 +85,10 @@ open class JIRAConfiguration(
         )
     }
 
+    @APIIgnore
     override val descriptor: ConfigurationDescriptor get() = ConfigurationDescriptor(name, name)
 
+    @APIIgnore
     override val serviceId: String = JIRAServiceExtension.SERVICE
 
     fun getIssueURL(key: String): String {

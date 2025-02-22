@@ -8,8 +8,7 @@ import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
 import net.nemerosa.ontrack.json.JsonParseException
 import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.json.getRequiredTextField
-import net.nemerosa.ontrack.json.getTextField
+import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.json.schema.JsonArrayType
 import net.nemerosa.ontrack.model.json.schema.JsonType
 import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
@@ -41,7 +40,7 @@ class GitHubEngineConfigurationContext(
     override fun run(node: JsonNode, paths: List<String>) {
         val items = node.mapIndexed { index, child ->
             try {
-                child.parseItem()
+                child.parse<GitHubEngineConfiguration>()
             } catch (ex: JsonParseException) {
                 throw IllegalStateException(
                     "Cannot parse into ${GitHubEngineConfiguration::class.qualifiedName}: ${path(paths + index.toString())}",
@@ -78,17 +77,4 @@ class GitHubEngineConfigurationContext(
         .configurations
         .map(GitHubEngineConfiguration::obfuscate)
         .asJson()
-
-    private fun JsonNode.parseItem(): GitHubEngineConfiguration =
-        GitHubEngineConfiguration(
-            name = getRequiredTextField("name"),
-            url = getTextField("url"),
-            user = getTextField("user"),
-            password = getTextField("password"),
-            oauth2Token = getTextField("token"),
-            appId = getTextField("app-id"),
-            appPrivateKey = getTextField("app-private-key"),
-            appInstallationAccountName = getTextField("app-installation"),
-            autoMergeToken = getTextField("auto-merge-token"),
-        )
 }

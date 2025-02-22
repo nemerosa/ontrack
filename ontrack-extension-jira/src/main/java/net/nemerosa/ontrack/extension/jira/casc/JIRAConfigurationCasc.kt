@@ -8,8 +8,7 @@ import net.nemerosa.ontrack.extension.jira.JIRAConfiguration
 import net.nemerosa.ontrack.extension.jira.JIRAConfigurationService
 import net.nemerosa.ontrack.json.JsonParseException
 import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.json.getListStringField
-import net.nemerosa.ontrack.json.getRequiredTextField
+import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.json.schema.JsonArrayType
 import net.nemerosa.ontrack.model.json.schema.JsonType
 import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
@@ -41,7 +40,7 @@ class JIRAConfigurationCasc(
     override fun run(node: JsonNode, paths: List<String>) {
         val items = node.mapIndexed { index, child ->
             try {
-                child.parseItem()
+                child.parse<JIRAConfiguration>()
             } catch (ex: JsonParseException) {
                 throw IllegalStateException(
                     "Cannot parse into ${JIRAConfiguration::class.qualifiedName}: ${path(paths + index.toString())}",
@@ -78,15 +77,5 @@ class JIRAConfigurationCasc(
         .configurations
         .map(JIRAConfiguration::obfuscate)
         .asJson()
-
-    private fun JsonNode.parseItem(): JIRAConfiguration =
-        JIRAConfiguration(
-            name = getRequiredTextField("name"),
-            url = getRequiredTextField("url"),
-            user = getRequiredTextField("user"),
-            password = getRequiredTextField("password"),
-            include = getListStringField("include") ?: emptyList(),
-            exclude = getListStringField("exclude") ?: emptyList(),
-        )
 
 }

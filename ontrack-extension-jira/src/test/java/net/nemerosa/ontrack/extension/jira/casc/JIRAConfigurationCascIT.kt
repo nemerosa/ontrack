@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.extension.jira.casc
 
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.extension.jira.JIRAConfigurationService
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.test.TestUtils
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -11,6 +13,67 @@ class JIRAConfigurationCascIT : AbstractCascTestSupport() {
 
     @Autowired
     private lateinit var jiraConfigurationService: JIRAConfigurationService
+
+    @Autowired
+    private lateinit var jiraConfigurationCasc: JIRAConfigurationCasc
+
+    @Test
+    fun `CasC schema type`() {
+        val type = jiraConfigurationCasc.jsonType
+        assertEquals(
+            """
+                {
+                  "items": {
+                    "title": "JIRAConfiguration",
+                    "description": null,
+                    "properties": {
+                      "exclude": {
+                        "items": {
+                          "description": "exclude field",
+                          "type": "string"
+                        },
+                        "description": "exclude field",
+                        "type": "array"
+                      },
+                      "include": {
+                        "items": {
+                          "description": "include field",
+                          "type": "string"
+                        },
+                        "description": "include field",
+                        "type": "array"
+                      },
+                      "url": {
+                        "description": "url field",
+                        "type": "string"
+                      },
+                      "name": {
+                        "description": "name field",
+                        "type": "string"
+                      },
+                      "password": {
+                        "description": "password field",
+                        "type": "string"
+                      },
+                      "user": {
+                        "description": "user field",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "url",
+                      "name"
+                    ],
+                    "additionalProperties": false,
+                    "type": "object"
+                  },
+                  "description": "List of JIRA configurations",
+                  "type": "array"
+                }
+            """.trimIndent().parseAsJson(),
+            type.asJson()
+        )
+    }
 
     @Test
     fun `Defining a JIRA configuration`() {

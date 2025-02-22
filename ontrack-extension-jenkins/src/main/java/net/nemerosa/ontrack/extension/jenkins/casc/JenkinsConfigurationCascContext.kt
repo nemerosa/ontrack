@@ -8,8 +8,7 @@ import net.nemerosa.ontrack.extension.jenkins.JenkinsConfiguration
 import net.nemerosa.ontrack.extension.jenkins.JenkinsConfigurationService
 import net.nemerosa.ontrack.json.JsonParseException
 import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.json.getRequiredTextField
-import net.nemerosa.ontrack.json.getTextField
+import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.json.schema.JsonArrayType
 import net.nemerosa.ontrack.model.json.schema.JsonType
@@ -39,7 +38,7 @@ class JenkinsConfigurationCascContext(
     override fun run(node: JsonNode, paths: List<String>) {
         val items = node.mapIndexed { index, child ->
             try {
-                child.parseItem()
+                child.parse<JenkinsConfigurationCasc>()
             } catch (ex: JsonParseException) {
                 throw IllegalStateException(
                     "Cannot parse into ${JenkinsConfiguration::class.qualifiedName}: ${path(paths + index.toString())}",
@@ -59,11 +58,11 @@ class JenkinsConfigurationCascContext(
             equality { a, b -> a.name == b.name }
             onCreation { item ->
                 logger.info("Creating Jenkins configuration: ${item.name}")
-                jenkinsConfigurationService.newConfiguration(item)
+                jenkinsConfigurationService.newConfiguration(item.toConfiguration())
             }
             onModification { item, _ ->
                 logger.info("Updating Jenkins configuration: ${item.name}")
-                jenkinsConfigurationService.updateConfiguration(item.name, item)
+                jenkinsConfigurationService.updateConfiguration(item.name, item.toConfiguration())
             }
             onDeletion { existing ->
                 logger.info("Deleting Jenkins configuration: ${existing.name}")
@@ -77,14 +76,6 @@ class JenkinsConfigurationCascContext(
         .map(JenkinsConfiguration::obfuscate)
         .asJson()
 
-    private fun JsonNode.parseItem(): JenkinsConfiguration =
-        JenkinsConfiguration(
-            name = getRequiredTextField(JenkinsConfigurationCasc::name.name),
-            url = getRequiredTextField(JenkinsConfigurationCasc::url.name),
-            user = getTextField(JenkinsConfigurationCasc::user.name),
-            password = getTextField(JenkinsConfigurationCasc::password.name),
-        )
-
     @APIDescription("Jenkins configuration")
     data class JenkinsConfigurationCasc(
         @APIDescription("Unique name for this configuration")
@@ -95,5 +86,12 @@ class JenkinsConfigurationCascContext(
         val user: String?,
         @APIDescription("Password used to connect to Jenkins")
         val password: String?,
-    )
+    ) {
+        fun toConfiguration() = JenkinsConfiguration(
+            name = name,
+            url = url,
+            user = user,
+            password = password,
+        )
+    }
 }

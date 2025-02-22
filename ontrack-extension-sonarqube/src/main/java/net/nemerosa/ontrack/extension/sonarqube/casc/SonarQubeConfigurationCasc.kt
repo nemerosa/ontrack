@@ -8,7 +8,8 @@ import net.nemerosa.ontrack.extension.sonarqube.configuration.SonarQubeConfigura
 import net.nemerosa.ontrack.extension.sonarqube.configuration.SonarQubeConfigurationService
 import net.nemerosa.ontrack.json.JsonParseException
 import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.json.getRequiredTextField
+import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.json.schema.JsonArrayType
 import net.nemerosa.ontrack.model.json.schema.JsonType
 import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
@@ -33,14 +34,14 @@ class SonarQubeConfigurationCasc(
     override val jsonType: JsonType by lazy {
         JsonArrayType(
             description = "List of SonarQube configurations",
-            items = jsonTypeBuilder.toType(SonarQubeConfiguration::class)
+            items = jsonTypeBuilder.toType(SonarQubeConfigurationCascData::class)
         )
     }
 
     override fun run(node: JsonNode, paths: List<String>) {
         val items = node.mapIndexed { index, child ->
             try {
-                child.parseItem()
+                child.parse<SonarQubeConfigurationCascData>()
             } catch (ex: JsonParseException) {
                 throw IllegalStateException(
                     "Cannot parse into ${SonarQubeConfiguration::class.qualifiedName}: ${path(paths + index.toString())}",
@@ -60,11 +61,11 @@ class SonarQubeConfigurationCasc(
             equality { a, b -> a.name == b.name }
             onCreation { item ->
                 logger.info("Creating SonarQube configuration: ${item.name}")
-                sonarQubeConfigurationService.newConfiguration(item)
+                sonarQubeConfigurationService.newConfiguration(item.toConfiguration())
             }
             onModification { item, _ ->
                 logger.info("Updating SonarQube configuration: ${item.name}")
-                sonarQubeConfigurationService.updateConfiguration(item.name, item)
+                sonarQubeConfigurationService.updateConfiguration(item.name, item.toConfiguration())
             }
             onDeletion { existing ->
                 logger.info("Deleting SonarQube configuration: ${existing.name}")
@@ -78,10 +79,18 @@ class SonarQubeConfigurationCasc(
         .map(SonarQubeConfiguration::obfuscate)
         .asJson()
 
-    private fun JsonNode.parseItem(): SonarQubeConfiguration =
-        SonarQubeConfiguration(
-            name = getRequiredTextField("name"),
-            url = getRequiredTextField("url"),
-            password = getRequiredTextField("password"),
+    data class SonarQubeConfigurationCascData(
+        @APIDescription("Name of the configuration")
+        val name: String,
+        @APIDescription("URL to SonarQube")
+        val url: String,
+        @APIDescription("Token for the authentication")
+        val password: String?,
+    ) {
+        fun toConfiguration() = SonarQubeConfiguration(
+            name = name,
+            url = url,
+            password = password,
         )
+    }
 }

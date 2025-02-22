@@ -10,5 +10,5 @@ data class SystemMessageSettings(
     val content: String?,
     @APIDescription("Message type")
     @APILabel("Message type")
-    val type: MessageType,
+    val type: MessageType = MessageType.INFO,
 )
