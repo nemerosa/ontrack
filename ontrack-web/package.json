@@ -33,7 +33,7 @@
     "echarts": "5.4.3"
   },
   "devDependencies": {
-    "gulp": "^4.0.2",
+    "gulp": "^5.0.0",
     "gulp-less": "^5.0.0",
     "gulp-minify-css": "^1.2.4",
     "gulp-concat": "^2.6.1",
