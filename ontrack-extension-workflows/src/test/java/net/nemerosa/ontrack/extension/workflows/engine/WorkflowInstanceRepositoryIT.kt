@@ -38,6 +38,7 @@ class WorkflowInstanceRepositoryIT : AbstractDSLTestSupport() {
             event = serializableEventService.dehydrate(
                 MockEventType.mockEvent("Some text")
             ),
+            contexts = emptyMap(),
             triggerData = workflowTestSupport.testTriggerData(),
         )
         workflowInstanceRepository.createInstance(instance)
@@ -59,6 +60,7 @@ class WorkflowInstanceRepositoryIT : AbstractDSLTestSupport() {
                 event = serializableEventService.dehydrate(
                     MockEventType.mockEvent("Some text")
                 ),
+                contexts = emptyMap(),
                 triggerData = workflowTestSupport.testTriggerData(),
             ).apply {
                 workflowInstanceRepository.createInstance(this)
@@ -82,6 +84,7 @@ class WorkflowInstanceRepositoryIT : AbstractDSLTestSupport() {
                 event = serializableEventService.dehydrate(
                     MockEventType.mockEvent("Some text")
                 ),
+                contexts = emptyMap(),
                 triggerData = workflowTestSupport.testTriggerData(),
             ).apply {
                 workflowInstanceRepository.createInstance(this)
@@ -105,6 +108,7 @@ class WorkflowInstanceRepositoryIT : AbstractDSLTestSupport() {
                 event = serializableEventService.dehydrate(
                     MockEventType.mockEvent("Some text")
                 ),
+                contexts = emptyMap(),
                 triggerData = workflowTestSupport.testTriggerData(),
             ).apply {
                 workflowInstanceRepository.createInstance(this)
@@ -131,6 +135,7 @@ class WorkflowInstanceRepositoryIT : AbstractDSLTestSupport() {
                 event = serializableEventService.dehydrate(
                     MockEventType.mockEvent("Some text")
                 ),
+                contexts = emptyMap(),
                 triggerData = workflowTestSupport.testTriggerData(),
             ).apply {
                 workflowInstanceRepository.createInstance(this)
@@ -158,6 +163,7 @@ class WorkflowInstanceRepositoryIT : AbstractDSLTestSupport() {
                 event = serializableEventService.dehydrate(
                     MockEventType.mockEvent("Some text")
                 ),
+                contexts = emptyMap(),
                 triggerData = if (no == 1) {
                     workflowTestSupport.testTriggerData()
                 } else {
@@ -193,6 +199,7 @@ class WorkflowInstanceRepositoryIT : AbstractDSLTestSupport() {
                     event = serializableEventService.dehydrate(
                         MockEventType.mockEvent("Some text")
                     ),
+                    contexts = emptyMap(),
                     triggerData = if (no == 1) {
                         workflowTestSupport.testTriggerData()
                     } else if (no == 2) {

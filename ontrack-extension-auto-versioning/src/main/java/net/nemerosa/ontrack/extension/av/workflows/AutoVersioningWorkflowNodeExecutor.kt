@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.extension.workflows.execution.AbstractTypedWorkflowN
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorResult
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
@@ -25,6 +26,7 @@ import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
 @Component
+@Documentation(AutoVersioningWorkflowNodeExecutorData::class)
 class AutoVersioningWorkflowNodeExecutor(
     extensionFeature: AutoVersioningExtensionFeature,
     private val autoVersioningProcessingService: AutoVersioningProcessingService,

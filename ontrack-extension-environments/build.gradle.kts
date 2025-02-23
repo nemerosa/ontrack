@@ -15,6 +15,7 @@ dependencies {
     implementation(project(":ontrack-extension-casc"))
     implementation(project(":ontrack-extension-notifications"))
     implementation(project(":ontrack-extension-workflows"))
+    implementation(project(":ontrack-extension-scm"))
     implementation(project(":ontrack-repository"))
     implementation(project(":ontrack-repository-support"))
 
@@ -22,6 +23,7 @@ dependencies {
     testImplementation(project(path = ":ontrack-model", configuration = "tests"))
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))
+    testImplementation("com.networknt:json-schema-validator")
     testImplementation(project(path = ":ontrack-extension-notifications", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-workflows", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-queue", configuration = "tests"))

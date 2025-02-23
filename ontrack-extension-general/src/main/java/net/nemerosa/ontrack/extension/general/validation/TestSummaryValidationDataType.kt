@@ -101,7 +101,7 @@ class TestSummaryValidationDataType(
             "passed", "skipped", "failed", "total"
     )
 
-    override fun getMetricColors(): List<String>? = listOf(
+    override fun getMetricColors(): List<String> = listOf(
             MetricsColors.SUCCESS,
             MetricsColors.WARNING,
             MetricsColors.FAILURE,

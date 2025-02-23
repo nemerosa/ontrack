@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
@@ -12,6 +13,7 @@ import net.nemerosa.ontrack.model.form.Text
 import org.springframework.stereotype.Component
 
 @Component
+@Documentation(MockNotificationChannelConfig::class)
 class OtherMockNotificationChannel(
     private val eventTemplatingService: EventTemplatingService,
 ) :

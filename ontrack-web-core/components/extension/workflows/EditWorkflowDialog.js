@@ -1,4 +1,4 @@
-import {Input, Modal, Space} from "antd";
+import {Col, Input, Modal, Row, Space} from "antd";
 import {useState} from "react";
 import WorkflowGraph from "@components/extension/workflows/WorkflowGraph";
 import {useReactFlow} from "reactflow";
@@ -6,6 +6,7 @@ import FormErrors from "@components/form/FormErrors";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
 import {getUserErrors} from "@components/services/graphql-utils";
+import WorkflowDownloadJSONSchema from "@components/extension/workflows/WorkflowDownloadJSONSchema";
 
 export const useEditWorkflowDialog = ({onSuccess}) => {
 
@@ -148,11 +149,18 @@ export default function EditWorkflowDialog({dialog}) {
                 <Space direction="vertical" className="ot-line">
                     <FormErrors errors={formErrors}/>
                     {/* Workflow name */}
-                    <Input
-                        placeholder="Workflow name"
-                        value={dialog.workflow.name}
-                        onChange={onNameChange}
-                    />
+                    <Row>
+                        <Col span={18}>
+                            <Input
+                                placeholder="Workflow name"
+                                value={dialog.workflow.name}
+                                onChange={onNameChange}
+                            />
+                        </Col>
+                        <Col span={6}>
+                            <WorkflowDownloadJSONSchema/>
+                        </Col>
+                    </Row>
                     {/* Workflow nodes in edition mode */}
                     <WorkflowGraph
                         workflowNodes={dialog.workflow.nodes}

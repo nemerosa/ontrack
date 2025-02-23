@@ -2,11 +2,13 @@ package net.nemerosa.ontrack.extension.casc.ui
 
 import net.nemerosa.ontrack.extension.casc.CascConfigurationProperties
 import net.nemerosa.ontrack.extension.casc.CascLoadingService
+import net.nemerosa.ontrack.extension.casc.schema.json.CascJsonSchemaService
 import net.nemerosa.ontrack.extension.casc.upload.CascUploadConstants
 import net.nemerosa.ontrack.extension.casc.upload.CascUploadService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
+import javax.servlet.http.HttpServletResponse
 
 @RestController
 @RequestMapping("/extension/casc")
@@ -14,6 +16,7 @@ class CascController(
     private val cascLoadingService: CascLoadingService,
     private val cascConfigurationProperties: CascConfigurationProperties,
     private val cascUploadService: CascUploadService,
+    private val cascJsonSchemaService: CascJsonSchemaService,
 ) {
 
     /**
@@ -42,6 +45,24 @@ class CascController(
         } else {
             throw CascUploadNotEnabledException()
         }
+    }
+
+    /**
+     * Downloading the Casc JSON schema
+     */
+    @GetMapping("download/schema/json")
+    fun downloadJSONSchema(response: HttpServletResponse) {
+        val json = cascJsonSchemaService.createCascJsonSchema()
+            .toPrettyString()
+            .toByteArray(Charsets.UTF_8)
+
+        response.contentType = "application/json"
+        response.setHeader("Content-Disposition", "attachment; filename=ontrack-casc-schema.json")
+        response.characterEncoding = "UTF-8"
+
+        // Write JSON content to response output stream
+        response.outputStream.write(json)
+        response.outputStream.flush()
     }
 
 }

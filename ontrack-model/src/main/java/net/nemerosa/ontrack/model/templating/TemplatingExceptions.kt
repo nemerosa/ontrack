@@ -60,4 +60,13 @@ class TemplatingRenderableFieldRequiredException : TemplatingException(
     """Templating field is required"""
 )
 
+class TemplatingContextHandlerNotFoundException(id: String) : TemplatingException(
+    """Templating context handler not found: $id"""
+)
+
+class TemplatingContextHandlerFieldNotManagedException(tch: TemplatingContextHandler<*>, field: String?) :
+    TemplatingException(
+        """Templating context handler ${tch.id} does not support this field: $field"""
+    )
+
 class TemplatingGeneralException(message: String) : TemplatingException(message)

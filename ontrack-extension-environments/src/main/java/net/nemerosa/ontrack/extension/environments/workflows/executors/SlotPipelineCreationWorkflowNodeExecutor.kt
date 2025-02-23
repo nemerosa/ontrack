@@ -13,6 +13,7 @@ import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorCo
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorResult
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.SerializableEvent
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Build
@@ -22,6 +23,7 @@ import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
 
 @Component
+@Documentation(SlotPipelineCreationWorkflowNodeExecutorData::class)
 class SlotPipelineCreationWorkflowNodeExecutor(
     extensionFeature: EnvironmentsExtensionFeature,
     private val slotService: SlotService,

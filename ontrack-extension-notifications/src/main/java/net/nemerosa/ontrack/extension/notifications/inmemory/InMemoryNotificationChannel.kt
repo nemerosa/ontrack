@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.Ack
+import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Component
     havingValue = "true",
     matchIfMissing = false,
 )
+@Documentation(InMemoryNotificationChannelConfig::class)
 class InMemoryNotificationChannel(
     private val eventTemplatingService: EventTemplatingService,
 ) :

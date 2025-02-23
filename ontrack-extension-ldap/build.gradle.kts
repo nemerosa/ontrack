@@ -15,6 +15,7 @@ dependencies {
     implementation("javax.validation:validation-api")
 
     testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))
+    testImplementation("com.networknt:json-schema-validator")
     testImplementation(project(":ontrack-it-utils"))
 
     testRuntimeOnly(project(":ontrack-service"))

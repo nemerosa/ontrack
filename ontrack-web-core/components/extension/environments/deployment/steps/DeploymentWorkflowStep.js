@@ -25,8 +25,8 @@ function DeploymentWorkflowTimings({slotWorkflow}) {
     }
 }
 
-function DeploymentWorkflowStepStatusNotStarted({slotWorkflow}) {
-    return <Space>
+function DeploymentWorkflowStepStatusNotStarted({id, slotWorkflow}) {
+    return <Space data-testid={id}>
         <FaRegHourglass/>
         Not started
     </Space>
@@ -35,10 +35,15 @@ function DeploymentWorkflowStepStatusNotStarted({slotWorkflow}) {
 function DeploymentWorkflowStepStatus({slotWorkflow}) {
     const slotWorkflowInstance = slotWorkflow.slotWorkflowInstanceForPipeline
     if (!slotWorkflowInstance) {
-        return <DeploymentWorkflowStepStatusNotStarted slotWorkflow={slotWorkflow}/>
+        return <DeploymentWorkflowStepStatusNotStarted
+            id={`slot-workflow-instance-status-${slotWorkflow.id}`}
+            slotWorkflow={slotWorkflow}
+        />
     } else {
-        return <WorkflowInstanceStatus id={`slot-workflow-instance-status-${slotWorkflow.id}`}
-                                       status={slotWorkflowInstance.workflowInstance.status}/>
+        return <WorkflowInstanceStatus
+            id={`slot-workflow-instance-status-${slotWorkflow.id}`}
+            status={slotWorkflowInstance.workflowInstance.status}
+        />
     }
 }
 
@@ -53,7 +58,7 @@ export function DeploymentWorkflowStep({deployment, slotWorkflow, disabled = fal
                         <DeploymentWorkflowStepStatus slotWorkflow={slotWorkflow}/>
                         {/* Overriding */}
                         {
-                            !disabled &&
+                            !disabled && slotWorkflow.slotWorkflowInstanceForPipeline &&
                             <SlotPipelineOverrideWorkflowButton
                                 deployment={deployment}
                                 slotWorkflow={slotWorkflow}
@@ -63,6 +68,7 @@ export function DeploymentWorkflowStep({deployment, slotWorkflow, disabled = fal
                         }
                         {/* Overridden */}
                         {
+                            slotWorkflow.slotWorkflowInstanceForPipeline &&
                             <SlotPipelineOverrideIndicator
                                 container={slotWorkflow.slotWorkflowInstanceForPipeline}
                                 id={slotWorkflow.id}
@@ -79,7 +85,7 @@ export function DeploymentWorkflowStep({deployment, slotWorkflow, disabled = fal
                         }
                         {
                             !slotWorkflow.slotWorkflowInstanceForPipeline &&
-                            <strong>{slotWorkflow.workflow.name}</strong>
+                            <strong data-testid={`slot-workflow-instance-link-${slotWorkflow.id}`}>{slotWorkflow.workflow.name}</strong>
                         }
                     </Space>
                 }

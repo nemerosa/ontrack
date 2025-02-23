@@ -5,12 +5,15 @@ import net.nemerosa.ontrack.extension.jenkins.JenkinsConfiguration
 import net.nemerosa.ontrack.extension.jenkins.JenkinsConfigurationService
 import net.nemerosa.ontrack.extension.jenkins.client.JenkinsClient
 import net.nemerosa.ontrack.extension.jenkins.notifications.AbstractJenkinsNotificationChannel
+import net.nemerosa.ontrack.extension.jenkins.notifications.JenkinsNotificationChannelConfig
+import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
 @Component
 @Profile(RunProfile.ACC)
+@Documentation(JenkinsNotificationChannelConfig::class)
 class MockJenkinsNotificationChannel(
     jenkinsConfigurationService: JenkinsConfigurationService,
     eventTemplatingService: EventTemplatingService,

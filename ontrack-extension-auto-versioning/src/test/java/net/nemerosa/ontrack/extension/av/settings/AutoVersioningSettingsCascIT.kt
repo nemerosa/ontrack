@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import java.time.Duration
 import kotlin.test.assertEquals
 
-internal class AutoVersioningSettingsCascIT : AbstractCascTestSupport() {
+class AutoVersioningSettingsCascIT : AbstractCascTestSupport() {
 
     @Test
     fun `Minimal set of parameters`() {
@@ -52,6 +52,39 @@ internal class AutoVersioningSettingsCascIT : AbstractCascTestSupport() {
                 assertEquals(false, settings.buildLinks)
             }
         }
+    }
+
+    @Test
+    fun `Validation of auto-versioning settings with valid durations`() {
+        assertValidYaml(
+            """
+                ontrack:
+                  config:
+                    settings:
+                      auto-versioning:
+                        enabled: true
+                        buildLinks: true
+                        auditCleanupDuration: 15d
+                        auditRetentionDuration: "2592000" # second = 30 days
+            """.trimIndent()
+        )
+    }
+
+    @Test
+    fun `Validation of auto-versioning settings with invalid durations`() {
+        assertInvalidYaml(
+            yamlSource = """
+                ontrack:
+                  config:
+                    settings:
+                      auto-versioning:
+                        enabled: true
+                        buildLinks: true
+                        auditCleanupDuration: xxxx
+                        auditRetentionDuration: 30d
+            """.trimIndent(),
+            message = "\$.ontrack.config.settings.auto-versioning.auditCleanupDuration: does not match the regex pattern ^(\\d+)([smhdw])?\$"
+        )
     }
 
 }

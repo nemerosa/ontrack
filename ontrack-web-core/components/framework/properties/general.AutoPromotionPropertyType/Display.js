@@ -10,7 +10,7 @@ export default function Display({property}) {
                     property.value.validationStamps.length > 0 &&
                     <>
                         <Typography.Text strong>Validations</Typography.Text>
-                        <Space>
+                        <Space direction="vertical">
                             {
                                 property.value.validationStamps.map(vs => (
                                     <>
@@ -28,7 +28,7 @@ export default function Display({property}) {
                     property.value.promotionLevels.length > 0 &&
                     <>
                         <Typography.Text strong>Promotions</Typography.Text>
-                        <Space>
+                        <Space direction="vertical">
                             {
                                 property.value.promotionLevels.map(pl => (
                                     <>

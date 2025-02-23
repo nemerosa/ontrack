@@ -12,6 +12,7 @@ dependencies {
     implementation(project(":ontrack-extension-scm"))
     implementation(project(":ontrack-ui-graphql"))
     implementation("org.slf4j:slf4j-api")
+    implementation("org.springframework.boot:spring-boot-starter-web")
 
     implementation("org.springframework:spring-tx")
     implementation("org.springframework.boot:spring-boot")
@@ -21,6 +22,7 @@ dependencies {
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-scm", configuration = "tests"))
+    testImplementation("com.networknt:json-schema-validator")
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))

@@ -14,7 +14,7 @@ interface NumericValidationDataType<C, T> : ValidationDataType<C, T> {
      *
      * @return Color palette for the metrics (if not a default)
      */
-    fun getMetricColors(): List<String>? = null
+    fun getMetricColors(): List<String> = listOf(MetricsColors.NEUTRAL)
 
     /**
      * Gets some metrics about this data.

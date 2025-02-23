@@ -31,6 +31,8 @@ class SlotPipelineMutations(
             slotService.startPipeline(
                 slot = slot,
                 build = build,
+                forceDone = input.forceDone ?: false,
+                forceDoneMessage = input.forceDoneMessage,
             )
         },
         simpleMutation(
@@ -104,12 +106,21 @@ class SlotPipelineMutations(
                 )
             }
         },
+        unitMutation(
+            name = "deleteDeployment",
+            description = "Deletes a deployment",
+            input = DeleteDeploymentInput::class
+        ) { input ->
+            slotService.deleteDeployment(input.deploymentId)
+        },
     )
 }
 
 data class StartSlotPipelineInput(
     val slotId: String,
     val buildId: Int,
+    val forceDone: Boolean? = false,
+    val forceDoneMessage: String? = null,
 )
 
 data class StartSlotPipelineDeploymentInput(
@@ -137,4 +148,8 @@ data class OverridePipelineRuleInput(
     val pipelineId: String,
     val admissionRuleConfigId: String,
     val message: String,
+)
+
+data class DeleteDeploymentInput(
+    val deploymentId: String,
 )

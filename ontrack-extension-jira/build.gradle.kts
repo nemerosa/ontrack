@@ -20,6 +20,7 @@ dependencies {
     testImplementation(project(":ontrack-extension-recordings"))
     testImplementation(project(path = ":ontrack-extension-support", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))
+    testImplementation("com.networknt:json-schema-validator")
     testImplementation(project(path = ":ontrack-extension-scm", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-notifications", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-queue", configuration = "tests"))

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 import net.nemerosa.ontrack.model.events.SerializableEvent
+import net.nemerosa.ontrack.model.templating.TemplatingContextData
 import net.nemerosa.ontrack.model.trigger.TriggerData
 import java.time.Duration
 import java.time.LocalDateTime
@@ -17,6 +18,7 @@ import java.time.LocalDateTime
  * @property workflow Associated workflow
  * @property event Serializable event linked to the workflow
  * @property triggerData Trigger for this workflow
+ * @property contexts List of contexts linked to this instance
  * @property nodesExecutions Information about the node executions
  * @property status Status of the execution of this workflow
  */
@@ -26,6 +28,7 @@ data class WorkflowInstance(
     val workflow: Workflow,
     val event: SerializableEvent,
     val triggerData: TriggerData? = null,
+    val contexts: Map<String, TemplatingContextData>,
     val status: WorkflowInstanceStatus,
     val nodesExecutions: List<WorkflowInstanceNode>,
 ) {
@@ -57,6 +60,7 @@ data class WorkflowInstance(
         workflow = workflow,
         event = event,
         triggerData = triggerData,
+        contexts = contexts,
         status = status,
         nodesExecutions = nodesExecutions,
     )
@@ -93,6 +97,7 @@ data class WorkflowInstance(
         workflow = workflow,
         event = eventToMerge ?: event,
         triggerData = triggerData,
+        contexts = contexts,
         status = status,
         nodesExecutions = nodesExecutions,
     )
@@ -114,6 +119,7 @@ data class WorkflowInstance(
             workflow = workflow,
             event = event,
             triggerData = triggerData,
+            contexts = contexts,
             status = computeStatus(nodesExecutions),
             nodesExecutions = nodesExecutions,
         )

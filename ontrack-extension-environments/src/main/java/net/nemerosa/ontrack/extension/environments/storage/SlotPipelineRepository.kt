@@ -89,6 +89,30 @@ class SlotPipelineRepository(
         }
     }
 
+    fun findLastPipelineBySlotAndStatusExcludingOne(
+        slot: Slot,
+        status: SlotPipelineStatus,
+        excludedPipeline: SlotPipeline,
+    ): SlotPipeline? {
+        return namedParameterJdbcTemplate!!.query(
+            """
+                SELECT *
+                FROM ENV_SLOT_PIPELINE
+                WHERE SLOT_ID = :slotId
+                AND ID <> :excludedPipelineId
+                AND STATUS = :status
+                ORDER BY NUMBER DESC
+            """.trimIndent(),
+            mapOf(
+                "slotId" to slot.id,
+                "status" to status.name,
+                "excludedPipelineId" to excludedPipeline.id,
+            )
+        ) { rs, _ ->
+            toPipeline(rs)
+        }.firstOrNull()
+    }
+
     fun findPipelines(slot: Slot, offset: Int, size: Int): PaginatedList<SlotPipeline> {
         val count = namedParameterJdbcTemplate!!.queryForObject(
             """
@@ -173,5 +197,15 @@ class SlotPipelineRepository(
         ) { rs, _ ->
             toPipeline(rs)
         }
+
+    fun deleteDeployment(id: String) {
+        namedParameterJdbcTemplate!!.update(
+            """
+                DELETE FROM ENV_SLOT_PIPELINE
+                WHERE ID = :id
+            """.trimIndent(),
+            mapOf("id" to id)
+        )
+    }
 
 }

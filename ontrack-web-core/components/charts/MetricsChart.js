@@ -68,7 +68,7 @@ export default function MetricsChart({query, variables}) {
                                 <Line type="monotone"
                                       connectNulls={true}
                                       dataKey={metricName}
-                                      stroke={chart.metricColors[metricIndex]}
+                                      stroke={chart.metricColors && chart.metricColors[metricIndex]}
                                       hide={inactiveSeries.includes(metricName)}
                                 />
                             </>

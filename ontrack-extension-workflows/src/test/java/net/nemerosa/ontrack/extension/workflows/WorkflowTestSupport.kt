@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.MockEventType
 import net.nemerosa.ontrack.model.events.SerializableEventService
 import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.templating.TemplatingContextData
 import net.nemerosa.ontrack.model.trigger.TestTrigger
 import net.nemerosa.ontrack.model.trigger.TestTriggerData
 import net.nemerosa.ontrack.model.trigger.createTriggerData
@@ -50,6 +51,7 @@ class WorkflowTestSupport(
         yaml: String,
         workflowContextName: String? = null,
         event: Event? = null,
+        contexts: Map<String, TemplatingContextData> = emptyMap(),
         display: Boolean = false,
         wait: Boolean = true,
     ): String {
@@ -74,6 +76,7 @@ class WorkflowTestSupport(
                 workflowEngine.startWorkflow(
                     workflow = record.workflow,
                     event = serializableEvent,
+                    contexts = contexts,
                     triggerData = testTrigger.createTriggerData(TestTriggerData()),
                 )
             // Waiting until the workflow is completed (error or success)

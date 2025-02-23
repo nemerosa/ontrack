@@ -280,6 +280,7 @@ configure(coreProjects) p@{
             dependency("com.opencsv:opencsv:5.2")
             dependency("org.testcontainers:testcontainers:1.16.2")
             dependency("org.jetbrains.kotlin:kotlin-test:${Versions.kotlinVersion}")
+            dependency("com.networknt:json-schema-validator:1.5.5")
             // JWT
             dependency("io.jsonwebtoken:jjwt-api:${Versions.jjwtVersion}")
             dependency("io.jsonwebtoken:jjwt-impl:${Versions.jjwtVersion}")

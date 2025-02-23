@@ -1,9 +1,11 @@
 package net.nemerosa.ontrack.extension.workflows.definition
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.extension.workflows.schema.WorkflowDynamicJsonSchemaProvider
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.DocumentationList
 import net.nemerosa.ontrack.model.docs.SelfDocumented
+import net.nemerosa.ontrack.model.json.schema.DynamicJsonSchema
 
 /**
  * Definition of a node in a workflow.
@@ -15,6 +17,11 @@ import net.nemerosa.ontrack.model.docs.SelfDocumented
  * @property parents List of the IDs of the parents for this node
  */
 @SelfDocumented
+@DynamicJsonSchema(
+    discriminatorProperty = "executorId",
+    configurationProperty = "data",
+    provider = WorkflowDynamicJsonSchemaProvider::class,
+)
 data class WorkflowNode(
     @APIDescription("Unique ID of the node in its workflow.")
     val id: String,

@@ -1,7 +1,9 @@
 [[casc]]
 === Configuration as Code
 
-Ontrack supports to be configured as code by default. It uses a set of YAML resources defined as comma-separated list of locations by the `ontrack.config.casc.locations` configuration property. For example, when using the environment variables:
+Ontrack supports to be configured as code by default.
+It uses a set of YAML resources defined as comma-separated list of locations by the `ontrack.config.casc.locations` configuration property.
+For example, when using the environment variables:
 
 [source]
 ----
@@ -13,7 +15,8 @@ All YAML resources defined by those locations are merged together according to t
 * right-most files take precedence for single values
 * arrays are always concatenated to each other
 
-The list of locations can contain path to folders on a file system. In this case, Ontrack will use all the files in this folder.
+The list of locations can contain path to folders on a file system.
+In this case, Ontrack will use all the files in this folder.
 
 [[casc-secrets]]
 ==== [experimental] Casc secrets
@@ -32,7 +35,8 @@ For example:
 some-secret-field: {{ secret.my-secret.my-property }}
 ----
 
-By default, this is interpolated and evaluated using the `SECRET_<BASE>_<NAME>` environment variable,  `SECRET_MY_SECRET_MY_PROPERTY` for the example above. If this environment variable value is `my-password`, the final Casc file will be:
+By default, this is interpolated and evaluated using the `SECRET_<BASE>_<NAME>` environment variable,  `SECRET_MY_SECRET_MY_PROPERTY` for the example above.
+If this environment variable value is `my-password`, the final Casc file will be:
 
 [source,yaml]
 ----
@@ -47,13 +51,15 @@ In the example above, the value of the `{{ secret.my-secret.my-property }}` expr
 
 [NOTE]
 ====
-The `file` secret mapping is particularly well suited for Kubernetes deployments. See the https://github.com/nemerosa/ontrack-chart[`ontrack-chart`] for more information.
+The `file` secret mapping is particularly well suited for Kubernetes deployments.
+See the https://github.com/nemerosa/ontrack-chart[`ontrack-chart`] for more information.
 ====
 
 [[casc-schema]]
 ==== Casc schema
 
-All those files must comply with the Ontrack CasC format. This schema is available in the UI in the user menu at _Configuration as code_, and by clicking on the _Show_ button right of the _CasC schema_ section:
+All those files must comply with the Ontrack CasC format.
+This schema is available in the UI in the user menu at _Configuration as code_, and by clicking on the _Show_ button right of the _CasC schema_ section:
 
 image::images/casc-schema-show.png[CasC Schema show button,200]
 
@@ -147,7 +153,8 @@ The default Casc setup relies on files (or URL) available from the Ontrack appli
 
 A CasC upload endpoint can be enabled to allow users to upload their own Casc configuration, by using the `ontrack.config.casc.upload.enabled` <<configuration-properties-casc,configuration property>> or `ONTRACK_CONFIG_CASC_UPLOAD_ENABLED` environment property.
 
-When done, it becomes possible to upload a YAML file, which is will be picked up next time the Casc is reloaded. For example, given a `casc.yaml` file:
+When done, it becomes possible to upload a YAML file, which is will be picked up next time the Casc is reloaded.
+For example, given a `casc.yaml` file:
 
 [source,bash]
 ----
@@ -160,3 +167,29 @@ curl --user $USER:$TOKEN \
 ====
 The user must have the _Global settings_ user rights (typically an administrator).
 ====
+
+[[casc-json-schema]]
+==== Using a JSON schema to edit Casc YAML files
+
+You can download a [JSON Schema](https://json-schema.org/) that can be used to edit Casc YAML files.
+
+First, download this schema locally by navigating to _System_ > _Configuration as Code_.
+Select _Schema_ and click on _JSON Schema_.
+
+This offers to download an `ontrack-casc-schema.json` file: save it locally.
+
+[NOTE]
+====
+The Ontrack Casc JSON schema is versioned using the Ontrack version you download it from.
+====
+
+To use it for the edition of a Casc YAML file, you can do the following in Intellij IDEA:
+
+* in the _Settings_, select _Languages & Frameworks_ > _Schema & DTDs_ > _JSON Schema Mappings_
+* in _Schema file or URL_, click on the folder icon and select the downloaded `ontrack-casc-schema.json` file
+* apply and save the settings
+
+Open a YAML file.
+To associate it with the Ontrack Casc schema, click on the _Schema_ component in the bottom right corner of the file and select `ontrack-casc`.
+
+You should now have auto-completion and validation.

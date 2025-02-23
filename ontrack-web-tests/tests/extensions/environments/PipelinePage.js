@@ -3,6 +3,7 @@ import {expect} from "@playwright/test";
 import {PipelineRule} from "./PipelineRule";
 import {confirmBox} from "../../support/confirm";
 import {PipelineWorkflow} from "./PipelineWorkflow";
+import {PipelineStatus} from "./PipelineStatus";
 
 export class PipelinePage {
     constructor(page, pipeline) {
@@ -89,5 +90,27 @@ export class PipelinePage {
         await button.click()
         await confirmBox(this.page, "Deployment done")
         await expect(this.page.getByText("Deployed", {exact: true})).toBeVisible()
+    }
+
+    async getStatus(status) {
+        const statusComponent = this.page.getByTestId(`${this.pipeline.id}-status-${status}`)
+        await expect(statusComponent).toBeVisible()
+        return new PipelineStatus(this.page, this.pipeline, status, statusComponent)
+    }
+
+    async getDoneStatus() {
+        return await this.getStatus('DONE')
+    }
+
+    async forceDone({message}) {
+        const forceCommand = this.page.getByRole('button', {name: "Force deployment"})
+        await expect(forceCommand).toBeVisible()
+        await forceCommand.click()
+
+        const forceMessage = this.page.getByLabel('Message')
+        await expect(forceMessage).toBeVisible()
+        await forceMessage.fill(message)
+        const okButton = this.page.getByRole('button', {name: 'OK'});
+        await okButton.click()
     }
 }

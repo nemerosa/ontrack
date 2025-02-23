@@ -15,7 +15,7 @@ export function CandidateAdmissionRuleStep({pipeline, rule, disabled, onChange})
                 avatar={<FaTasks/>}
                 title={
                     <Space>
-                        <CheckIcon value={rule.check.ok}/>
+                        <CheckIcon id={`pipeline-rule-${rule.admissionRuleConfig.id}-check`} value={rule.check.ok}/>
                         {/* Input */}
                         {
                             !disabled &&

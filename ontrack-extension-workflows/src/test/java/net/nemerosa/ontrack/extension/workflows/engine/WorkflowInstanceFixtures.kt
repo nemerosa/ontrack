@@ -20,6 +20,7 @@ object WorkflowInstanceFixtures {
             workflow = workflow,
             event = event,
             triggerData = TestTrigger().createTriggerData(TestTriggerData()),
+            contexts = emptyMap(),
             timestamp = timestamp,
         )
     }

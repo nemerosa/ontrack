@@ -2,6 +2,7 @@ import {Card, Flex, Space} from "antd";
 import EnvironmentTitle from "@components/extension/environments/EnvironmentTitle";
 import SlotTitle from "@components/extension/environments/SlotTitle";
 import SlotLink from "@components/extension/environments/SlotLink";
+import DeleteEnvironmentButton from "@components/extension/environments/DeleteEnvironmentButton";
 
 export default function EnvironmentCard({environment, showSlots = true}) {
     return (
@@ -17,6 +18,9 @@ export default function EnvironmentCard({environment, showSlots = true}) {
                 data-testid={`environment-${environment.id}`}
                 title={
                     <EnvironmentTitle environment={environment}/>
+                }
+                extra={
+                    <DeleteEnvironmentButton environment={environment}/>
                 }
             >
                 {

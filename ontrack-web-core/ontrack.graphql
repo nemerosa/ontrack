@@ -1418,6 +1418,12 @@ type DeleteConfigurationPayload implements Payload {
     errors: [UserError]
 }
 
+"Output type for the deleteDeployment mutation."
+type DeleteDeploymentPayload implements Payload {
+    "List of errors"
+    errors: [UserError]
+}
+
 "Output type for the deleteEnvironment mutation."
 type DeleteEnvironmentPayload implements Payload {
     "List of errors"
@@ -3569,6 +3575,11 @@ type Mutation {
     ): DeleteConfigurationPayload
     "Deletes a dashboard"
     deleteDashboard(input: DeleteDashboardInput!): DeletionPayload
+    "Deletes a deployment"
+    deleteDeployment(
+        "Input for the mutation"
+        input: DeleteDeploymentInput
+    ): DeleteDeploymentPayload
     "Deletes an existing environment"
     deleteEnvironment(
         "Input for the mutation"
@@ -7581,6 +7592,14 @@ type SubscribeValidationStampToEventsPayload implements Payload {
     subscription: EventSubscriptionPayload
 }
 
+"Data to be rendered in a template"
+type TemplatingContextData {
+    "Data associated with the context, used by the handler associated with the ID"
+    data: JSON
+    "ID of the templating context handler in charge to rendering this data"
+    id: String!
+}
+
 "Definition of a renderer"
 type TemplatingRenderer {
     "Technical ID for the renderer"
@@ -8257,6 +8276,8 @@ type Workflow {
 
 "Running workflow instance"
 type WorkflowInstance {
+    "List of templating contexts linked to this instance"
+    contexts: [WorkflowInstanceContextData!]!
     "durationMs field"
     durationMs: Int
     "endTime field"
@@ -8279,6 +8300,14 @@ type WorkflowInstance {
     triggerData: TriggerData
     "workflow field"
     workflow: Workflow!
+}
+
+"Templating context data associated with a workflow instance"
+type WorkflowInstanceContextData {
+    "Context data and reference to its handler"
+    contextData: TemplatingContextData!
+    "Name linked to this context"
+    name: String!
 }
 
 "Status of a node execution in a workflow"
@@ -9250,6 +9279,12 @@ input DeleteConfigurationInput {
 input DeleteDashboardInput {
     "UUID of the dashboard to delete"
     uuid: String!
+}
+
+"Input type for the deleteDeployment mutation."
+input DeleteDeploymentInput {
+    "deploymentId field"
+    deploymentId: String!
 }
 
 "Input type for the deleteEnvironment mutation."

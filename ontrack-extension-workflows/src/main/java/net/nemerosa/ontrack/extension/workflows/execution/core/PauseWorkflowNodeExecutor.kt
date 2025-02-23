@@ -7,9 +7,11 @@ import net.nemerosa.ontrack.extension.workflows.WorkflowsExtensionFeature
 import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
 import net.nemerosa.ontrack.extension.workflows.execution.AbstractTypedWorkflowNodeExecutor
 import net.nemerosa.ontrack.extension.workflows.execution.WorkflowNodeExecutorResult
+import net.nemerosa.ontrack.model.docs.Documentation
 import org.springframework.stereotype.Component
 
 @Component
+@Documentation(PauseWorkflowNodeExecutorData::class)
 class PauseWorkflowNodeExecutor(
     feature: WorkflowsExtensionFeature,
 ) : AbstractTypedWorkflowNodeExecutor<PauseWorkflowNodeExecutorData>(

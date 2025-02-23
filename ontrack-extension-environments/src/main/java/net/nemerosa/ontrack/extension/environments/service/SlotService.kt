@@ -67,8 +67,16 @@ interface SlotService {
 
     /**
      * Starting a pipeline
+     *
+     * @param forceDone If true, creates the pipeline and puts it directly in DONE status
+     * @param forceDoneMessage Associated message for the forcing (if null, a default message will be generated)
      */
-    fun startPipeline(slot: Slot, build: Build): SlotPipeline
+    fun startPipeline(
+        slot: Slot,
+        build: Build,
+        forceDone: Boolean = false,
+        forceDoneMessage: String? = null,
+    ): SlotPipeline
 
     /**
      *
@@ -106,11 +114,15 @@ interface SlotService {
 
     /**
      * Starts running a deployment
+     *
+     * @param force If true, no workflow linked to this deployment is launched
+     * and no rule is controlled
      */
     fun runDeployment(
         pipelineId: String,
         dryRun: Boolean = false,
-        skipWorkflowId: String? = null
+        skipWorkflowId: String? = null,
+        force: Boolean = false,
     ): SlotDeploymentActionStatus
 
     /**
@@ -248,5 +260,10 @@ interface SlotService {
      * Gets all the slot pipelines where the given [build] is the last being deployed.
      */
     fun findSlotPipelinesWhereBuildIsLastDeployed(build: Build): List<SlotPipeline>
+
+    /**
+     * Deletes a deployment using its ID.
+     */
+    fun deleteDeployment(id: String)
 
 }

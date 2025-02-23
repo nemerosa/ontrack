@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.workflows.engine
 
 import net.nemerosa.ontrack.extension.workflows.definition.Workflow
 import net.nemerosa.ontrack.model.events.SerializableEvent
+import net.nemerosa.ontrack.model.templating.TemplatingContextData
 import net.nemerosa.ontrack.model.trigger.TriggerData
 
 /**
@@ -15,6 +16,7 @@ interface WorkflowEngine {
      * @param workflow Workflow to run
      * @param event Execution context
      * @param triggerData Trigger for this workflow
+     * @param contexts List of contexts to pass
      * @param pauseMs Pause before launching the workflow (used for tests)
      * @return Initial state of the workflow instance
      */
@@ -22,6 +24,7 @@ interface WorkflowEngine {
         workflow: Workflow,
         event: SerializableEvent,
         triggerData: TriggerData,
+        contexts: Map<String, TemplatingContextData> = emptyMap(),
         pauseMs: Long = 0,
     ): WorkflowInstance
 

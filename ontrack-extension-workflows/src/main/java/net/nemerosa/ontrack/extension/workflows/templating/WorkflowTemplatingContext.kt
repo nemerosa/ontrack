@@ -7,6 +7,6 @@ object WorkflowTemplatingContext {
     fun createTemplatingContext(workflowInstance: WorkflowInstance) = mapOf(
         "workflow" to WorkflowTemplatingRenderable(workflowInstance),
         "workflowInfo" to WorkflowInfoTemplatingRenderable(workflowInstance),
-    )
+    ) + workflowInstance.contexts
 
 }

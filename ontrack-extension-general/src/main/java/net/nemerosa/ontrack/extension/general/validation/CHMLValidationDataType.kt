@@ -13,12 +13,7 @@ import net.nemerosa.ontrack.model.structure.MetricsColors
 import net.nemerosa.ontrack.model.structure.NumericValidationDataType
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.springframework.stereotype.Component
-import kotlin.Double
-import kotlin.IllegalArgumentException
 import kotlin.Int
-import kotlin.String
-import kotlin.let
-import kotlin.to
 import net.nemerosa.ontrack.model.form.Int as IntField
 
 /**
@@ -150,7 +145,7 @@ class CHMLValidationDataType(
 
     override fun getMetricNames(): List<String> = CHML.values().map { it.name.lowercase() }
 
-    override fun getMetricColors(): List<String>? = listOf(
+    override fun getMetricColors(): List<String> = listOf(
             MetricsColors.FAILURE,
             MetricsColors.WARNING,
             MetricsColors.NEUTRAL,

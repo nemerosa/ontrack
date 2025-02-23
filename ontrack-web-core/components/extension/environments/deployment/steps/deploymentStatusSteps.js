@@ -1,7 +1,8 @@
 import SlotPipelineStatusIcon from "@components/extension/environments/SlotPipelineStatusIcon";
-import {List, Typography} from "antd";
+import {List, Space, Typography} from "antd";
 import {slotPipelineStatusLabels} from "@components/extension/environments/SlotPipelineStatusLabel";
 import TimestampText from "@components/common/TimestampText";
+import {FaExclamationTriangle} from "react-icons/fa";
 
 export const findChange = (deployment, status) => deployment.changes.find(it => it.type === 'STATUS' && it.status === status)
 
@@ -14,6 +15,23 @@ function DeploymentStatusSignature({deployment, status}) {
                 <Typography.Text type="secondary">
                     <TimestampText value={change.timestamp}/> by {change.user}
                 </Typography.Text>
+            }
+        </>
+    )
+}
+
+function DeploymentStatusMessage({deployment, status}) {
+    const change = findChange(deployment, status)
+    return (
+        <>
+            {
+                change && change.overrideMessage &&
+                <Space>
+                    <FaExclamationTriangle color="red"/>
+                    <Typography.Text strong italic data-testid={`${deployment.id}-status-message-${status}`}>
+                        {change.overrideMessage}
+                    </Typography.Text>
+                </Space>
             }
         </>
     )
@@ -37,6 +55,7 @@ function DeploymentStatusStep({deployment, status}) {
     return (
         <>
             <DeploymentStep
+                id={`${deployment.id}-status-${status}`}
                 avatar={
                     <SlotPipelineStatusIcon status={status}/>
                 }
@@ -44,7 +63,10 @@ function DeploymentStatusStep({deployment, status}) {
                     slotPipelineStatusLabels[status]
                 }
                 description={
-                    <DeploymentStatusSignature deployment={deployment} status={status}/>
+                    <Space>
+                        <DeploymentStatusSignature deployment={deployment} status={status}/>
+                        <DeploymentStatusMessage deployment={deployment} status={status}/>
+                    </Space>
                 }
             />
         </>
