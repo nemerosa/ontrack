@@ -53,30 +53,30 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                     "environments": {
                       "items": {
                         "title": "EnvironmentCasc",
-                        "description": "environments field",
+                        "description": "List of environments",
                         "properties": {
                           "description": {
-                            "description": "description field",
+                            "description": "Description of the environment",
                             "type": "string"
                           },
                           "image": {
-                            "description": "image field",
+                            "description": "Image for this environment",
                             "type": "string"
                           },
                           "name": {
-                            "description": "name field",
+                            "description": "Name of the environment. Must be unique.",
                             "type": "string"
                           },
                           "order": {
-                            "description": "order field",
+                            "description": "Numerical order for the environment. This allows environments to be sorted in the different views.",
                             "type": "integer"
                           },
                           "tags": {
                             "items": {
-                              "description": "tags field",
+                              "description": "List of tags for this environment",
                               "type": "string"
                             },
-                            "description": "tags field",
+                            "description": "List of tags for this environment",
                             "type": "array"
                           }
                         },
@@ -87,81 +87,121 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                         "additionalProperties": false,
                         "type": "object"
                       },
-                      "description": "environments field",
+                      "description": "List of environments",
                       "type": "array"
                     },
                     "keepEnvironments": {
-                      "description": "keepEnvironments field",
+                      "description": "If true (default), this list defines the exhaustive list of environments. Any existing environment which is not in this list will be deleted.",
                       "type": "boolean"
                     },
                     "slots": {
                       "items": {
                         "title": "SlotCasc",
-                        "description": "slots field",
+                        "description": "List of deployments slots (associated of a project and an environment)",
                         "properties": {
                           "description": {
-                            "description": "description field",
+                            "description": "Description for this slot",
                             "type": "string"
                           },
                           "environments": {
                             "items": {
                               "title": "SlotEnvironmentCasc",
-                              "description": "environments field",
+                              "description": "Configuration of environments for this slot",
                               "properties": {
                                 "admissionRules": {
                                   "items": {
                                     "title": "SlotEnvironmentAdmissionRuleCasc",
-                                    "description": "admissionRules field",
+                                    "description": "List of admission rules for this slot",
                                     "properties": {
-                                      "actualName": {
-                                        "description": "actualName field",
-                                        "type": "string"
-                                      },
                                       "description": {
-                                        "description": "description field",
+                                        "description": "Description for this rule",
                                         "type": "string"
                                       },
                                       "name": {
-                                        "description": "name field",
+                                        "description": "Optional name for this rule",
                                         "type": "string"
-                                      },
-                                      "ruleConfig": {
-                                        "description": "ruleConfig field",
-                                        "type": {}
                                       },
                                       "ruleId": {
-                                        "description": "ruleId field",
-                                        "type": "string"
+                                        "enum": [
+                                          "branchPattern",
+                                          "environment",
+                                          "manual",
+                                          "promotion"
+                                        ],
+                                        "description": "ID of the rule to use",
+                                        "type": "string",
+                                        "title": "Enum"
                                       }
                                     },
                                     "required": [
-                                      "actualName",
                                       "ruleConfig",
                                       "ruleId"
                                     ],
                                     "additionalProperties": false,
+                                    "oneOf": [
+                                      {
+                                        "properties": {
+                                          "ruleId": {
+                                            "const": "branchPattern"
+                                          },
+                                          "ruleConfig": {
+                                            "${'$'}ref": "#/${'$'}defs/slot-admission-rule-branchPattern"
+                                          }
+                                        }
+                                      },
+                                      {
+                                        "properties": {
+                                          "ruleId": {
+                                            "const": "environment"
+                                          },
+                                          "ruleConfig": {
+                                            "${'$'}ref": "#/${'$'}defs/slot-admission-rule-environment"
+                                          }
+                                        }
+                                      },
+                                      {
+                                        "properties": {
+                                          "ruleId": {
+                                            "const": "manual"
+                                          },
+                                          "ruleConfig": {
+                                            "${'$'}ref": "#/${'$'}defs/slot-admission-rule-manual"
+                                          }
+                                        }
+                                      },
+                                      {
+                                        "properties": {
+                                          "ruleId": {
+                                            "const": "promotion"
+                                          },
+                                          "ruleConfig": {
+                                            "${'$'}ref": "#/${'$'}defs/slot-admission-rule-promotion"
+                                          }
+                                        }
+                                      }
+                                    ],
                                     "type": "object"
                                   },
-                                  "description": "admissionRules field",
+                                  "description": "List of admission rules for this slot",
                                   "type": "array"
                                 },
                                 "name": {
-                                  "description": "name field",
+                                  "description": "Name of the environment. It must exist.",
                                   "type": "string"
                                 },
                                 "workflows": {
                                   "items": {
                                     "title": "SlotWorkflowCasc",
-                                    "description": "workflows field",
+                                    "description": "List of workflows for this slot",
                                     "properties": {
                                       "name": {
-                                        "description": "name field",
+                                        "description": "Name of the workflow",
                                         "type": "string"
                                       },
                                       "nodes": {
                                         "items": {
                                           "title": "WorkflowNode",
-                                          "description": "nodes field",
+                                          "description": "List of workflow nodes",
                                           "properties": {
                                             "description": {
                                               "description": "Description of the node in its workflow.",
@@ -278,7 +318,7 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                                           ],
                                           "type": "object"
                                         },
-                                        "description": "nodes field",
+                                        "description": "List of workflow nodes",
                                         "type": "array"
                                       },
                                       "trigger": {
@@ -288,7 +328,7 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                                           "CANCELLED",
                                           "DONE"
                                         ],
-                                        "description": "trigger field",
+                                        "description": "Trigger used for this workflow",
                                         "type": "string",
                                         "title": "Enum"
                                       }
@@ -301,7 +341,7 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                                     "additionalProperties": false,
                                     "type": "object"
                                   },
-                                  "description": "workflows field",
+                                  "description": "List of workflows for this slot",
                                   "type": "array"
                                 }
                               },
@@ -311,15 +351,15 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                               "additionalProperties": false,
                               "type": "object"
                             },
-                            "description": "environments field",
+                            "description": "Configuration of environments for this slot",
                             "type": "array"
                           },
                           "project": {
-                            "description": "project field",
+                            "description": "Name of the project",
                             "type": "string"
                           },
                           "qualifier": {
-                            "description": "qualifier field",
+                            "description": "Optional qualifier for this slot",
                             "type": "string"
                           }
                         },
@@ -330,7 +370,7 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                         "additionalProperties": false,
                         "type": "object"
                       },
-                      "description": "slots field",
+                      "description": "List of deployments slots (associated of a project and an environment)",
                       "type": "array"
                     }
                   },

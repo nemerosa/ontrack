@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.environments
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.model.structure.Build
+import kotlin.reflect.KClass
 
 /**
  * This service is responsible for checking the eligibility of a build into a slot pipeline.
@@ -9,7 +10,7 @@ import net.nemerosa.ontrack.model.structure.Build
  * @param C Type of the configuration for the rule.
  * @param D Type of the data for the rule.
  */
-interface SlotAdmissionRule<C, D> {
+interface SlotAdmissionRule<C: Any, D> {
 
     /**
      * Unique ID for this rule
@@ -20,6 +21,11 @@ interface SlotAdmissionRule<C, D> {
      * Display name for this rule
      */
     val name: String
+
+    /**
+     * Type for the configuration
+     */
+    val configType: KClass<C>
 
     /**
      * Parsing a configuration

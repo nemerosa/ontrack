@@ -113,7 +113,7 @@ class SlotServiceImpl(
         }
     }
 
-    private fun <C, D> getRequiredInput(
+    private fun <C: Any, D> getRequiredInput(
         pipeline: SlotPipeline,
         config: SlotAdmissionRuleConfig,
         rule: SlotAdmissionRule<C, D>
@@ -223,7 +223,7 @@ class SlotServiceImpl(
         fillEligibilityCriteria(slot, rule, config.ruleConfig, queries, params, deployable)
     }
 
-    private fun <C, D> fillEligibilityCriteria(
+    private fun <C: Any, D> fillEligibilityCriteria(
         slot: Slot,
         rule: SlotAdmissionRule<C, D>,
         jsonRuleConfig: JsonNode,
@@ -246,7 +246,7 @@ class SlotServiceImpl(
         return isBuildEligible(slot, rule, config.ruleConfig, build)
     }
 
-    private fun <C, D> isBuildEligible(
+    private fun <C: Any, D> isBuildEligible(
         slot: Slot,
         rule: SlotAdmissionRule<C, D>,
         jsonRuleConfig: JsonNode,
@@ -573,7 +573,7 @@ class SlotServiceImpl(
         )
     }
 
-    private fun <C, D> getAdmissionRuleCheck(
+    private fun <C: Any, D> getAdmissionRuleCheck(
         pipeline: SlotPipeline,
         rule: SlotAdmissionRule<C, D>,
         admissionRule: SlotAdmissionRuleConfig,

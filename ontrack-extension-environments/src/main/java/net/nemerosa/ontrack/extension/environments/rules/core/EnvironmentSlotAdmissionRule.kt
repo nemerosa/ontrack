@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.structure.Build
 import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Component
+import kotlin.reflect.KClass
 
 @Component
 class EnvironmentSlotAdmissionRule(
@@ -30,6 +31,8 @@ class EnvironmentSlotAdmissionRule(
 
     override val id: String = ID
     override val name: String = "Deployed in environment slot"
+
+    override val configType: KClass<EnvironmentSlotAdmissionRuleConfig> = EnvironmentSlotAdmissionRuleConfig::class
 
     override fun parseConfig(jsonRuleConfig: JsonNode): EnvironmentSlotAdmissionRuleConfig =
         jsonRuleConfig.parse()
