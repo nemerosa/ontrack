@@ -22,7 +22,6 @@ import org.springframework.stereotype.Component
 @Component
 class AccountGroupsAdminContext(
     private val accountService: AccountService,
-    private val jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractCascContext(), SubAdminContext {
 
     companion object {
@@ -35,8 +34,8 @@ class AccountGroupsAdminContext(
 
     override val priority: Int = PRIORITY
 
-    override val jsonType: JsonType by lazy {
-        JsonArrayType(
+    override fun jsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType {
+        return JsonArrayType(
             items = jsonTypeBuilder.toType(AccountGroupInput::class),
             description = "List of account groups",
         )

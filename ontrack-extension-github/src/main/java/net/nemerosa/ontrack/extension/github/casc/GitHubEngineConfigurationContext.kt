@@ -23,15 +23,14 @@ import org.springframework.stereotype.Component
 @Component
 class GitHubEngineConfigurationContext(
     private val gitHubConfigurationService: GitHubConfigurationService,
-    private val jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractCascContext(), SubConfigContext {
 
     private val logger: Logger = LoggerFactory.getLogger(GitHubEngineConfigurationContext::class.java)
 
     override val field: String = "github"
 
-    override val jsonType: JsonType by lazy {
-        JsonArrayType(
+    override fun jsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType {
+        return JsonArrayType(
             description = "List of GitHub configurations",
             items = jsonTypeBuilder.toType(GitHubEngineConfiguration::class)
         )

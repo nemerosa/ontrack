@@ -24,15 +24,14 @@ import org.springframework.stereotype.Component
 @Component
 class BitbucketServerConfigurationContext(
     private val stashConfigurationService: StashConfigurationService,
-    private val jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractCascContext(), SubConfigContext {
 
     private val logger: Logger = LoggerFactory.getLogger(BitbucketServerConfigurationContext::class.java)
 
     override val field: String = "bitbucketServer"
 
-    override val jsonType: JsonType by lazy {
-        JsonArrayType(
+    override fun jsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType {
+        return JsonArrayType(
             description = "List of Bitbucket Server configurations",
             items = jsonTypeBuilder.toType(StashConfiguration::class)
         )

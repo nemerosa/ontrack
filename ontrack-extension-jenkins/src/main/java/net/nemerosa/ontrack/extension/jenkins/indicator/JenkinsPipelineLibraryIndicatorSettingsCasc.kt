@@ -18,13 +18,12 @@ import org.springframework.stereotype.Component
 class JenkinsPipelineLibraryIndicatorSettingsCasc(
     private val cachedSettingsService: CachedSettingsService,
     private val settingsManagerService: SettingsManagerService,
-    private val jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractCascContext(), SubSettingsContext {
 
     override val field: String = "jenkins-pipeline-library-indicator"
 
-    override val jsonType: JsonType by lazy {
-        JsonArrayType(
+    override fun jsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType {
+        return JsonArrayType(
             description = "List of library versions requirements",
             items = jsonTypeBuilder.toType(JenkinsPipelineLibraryIndicatorLibrarySettings::class)
         )

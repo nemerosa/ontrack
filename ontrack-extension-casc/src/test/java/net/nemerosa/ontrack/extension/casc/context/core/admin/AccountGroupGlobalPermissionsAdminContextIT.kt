@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.model.security.AccountGroupInput
 import net.nemerosa.ontrack.model.security.PermissionInput
 import net.nemerosa.ontrack.model.security.PermissionTargetType
@@ -18,9 +19,12 @@ internal class AccountGroupGlobalPermissionsAdminContextIT : AbstractCascTestSup
     @Autowired
     private lateinit var accountGroupGlobalPermissionsAdminContext: AccountGroupGlobalPermissionsAdminContext
 
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
     @Test
     fun `CasC schema type`() {
-        val type = accountGroupGlobalPermissionsAdminContext.jsonType
+        val type = accountGroupGlobalPermissionsAdminContext.jsonType(jsonTypeBuilder)
         assertEquals(
             """
                 {

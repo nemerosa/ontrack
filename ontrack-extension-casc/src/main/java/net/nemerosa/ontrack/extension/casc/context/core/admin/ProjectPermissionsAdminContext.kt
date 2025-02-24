@@ -26,15 +26,14 @@ class ProjectPermissionsAdminContext(
     private val structureService: StructureService,
     private val accountService: AccountService,
     private val rolesService: RolesService,
-    private val jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractCascContext(), SubAdminContext {
 
     private val logger: Logger = LoggerFactory.getLogger(ProjectPermissionsAdminContext::class.java)
 
     override val field: String = "project-permissions"
 
-    override val jsonType: JsonType by lazy {
-        JsonArrayType(
+    override fun jsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType {
+        return JsonArrayType(
             description = "List of permissions per group",
             items = jsonTypeBuilder.toType(ProjectPermission::class)
         )

@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.notifications.webhooks
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,9 +20,12 @@ internal class WebhooksCascConfigContextIT : AbstractCascTestSupport() {
     @Autowired
     private lateinit var webhooksCascConfigContext: WebhooksCascConfigContext
 
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
     @Test
     fun `CasC schema type`() {
-        val type = webhooksCascConfigContext.jsonType
+        val type = webhooksCascConfigContext.jsonType(jsonTypeBuilder)
         assertEquals(
             """
                 {

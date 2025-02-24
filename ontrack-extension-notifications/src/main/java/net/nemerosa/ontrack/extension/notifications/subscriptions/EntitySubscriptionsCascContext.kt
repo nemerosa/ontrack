@@ -29,15 +29,14 @@ class EntitySubscriptionsCascContext(
     private val eventSubscriptionService: EventSubscriptionService,
     private val storageService: StorageService,
     private val structureService: StructureService,
-    private val jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractCascContext(), NotificationsSubCascContext {
 
     private val logger: Logger = LoggerFactory.getLogger(EntitySubscriptionsCascContext::class.java)
 
     override val field: String = "entity-subscriptions"
 
-    override val jsonType: JsonType by lazy {
-        JsonArrayType(
+    override fun jsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType {
+        return JsonArrayType(
             description = "List of entity-level subscriptions",
             items = jsonTypeBuilder.toType(EntitySubscriptionCascContextData::class)
         )

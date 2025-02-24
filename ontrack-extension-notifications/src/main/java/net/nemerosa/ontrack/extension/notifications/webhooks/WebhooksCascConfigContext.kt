@@ -21,15 +21,14 @@ import java.time.Duration
 @Component
 class WebhooksCascConfigContext(
     private val webhookAdminService: WebhookAdminService,
-    private val jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractCascContext(), SubConfigContext {
 
     private val logger: Logger = LoggerFactory.getLogger(WebhooksCascConfigContext::class.java)
 
     override val field: String = "webhooks"
 
-    override val jsonType: JsonType by lazy {
-        JsonArrayType(
+    override fun jsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType {
+        return JsonArrayType(
             description = "List of webhooks",
             items = jsonTypeBuilder.toType(CascWebhook::class),
         )

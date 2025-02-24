@@ -25,7 +25,6 @@ import kotlin.jvm.optionals.getOrNull
 class AccountGroupGlobalPermissionsAdminContext(
     private val accountService: AccountService,
     private val rolesService: RolesService,
-    private val jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractCascContext(), SubAdminContext {
 
     companion object {
@@ -38,8 +37,8 @@ class AccountGroupGlobalPermissionsAdminContext(
 
     override val priority: Int = PRIORITY
 
-    override val jsonType: JsonType by lazy {
-        JsonArrayType(
+    override fun jsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType {
+        return JsonArrayType(
             items = jsonTypeBuilder.toType(CascAccountGroupPermission::class),
             description = "List of account groups global permissions (old permissions are preserved)",
         )

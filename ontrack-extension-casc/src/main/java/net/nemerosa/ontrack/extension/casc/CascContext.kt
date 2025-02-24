@@ -1,15 +1,9 @@
 package net.nemerosa.ontrack.extension.casc
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeProvider
 
-interface CascContext {
-
-    /**
-     * JSON Schema type for this context.
-     */
-    val jsonType: JsonType
-
+interface CascContext : JsonTypeProvider {
     /**
      * Given a JSON node associated with this context, takes all the mentioned
      * subpaths and registers their content in Ontrack.

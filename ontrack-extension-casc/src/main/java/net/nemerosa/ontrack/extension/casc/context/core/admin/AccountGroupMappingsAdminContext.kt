@@ -24,7 +24,6 @@ class AccountGroupMappingsAdminContext(
     private val accountGroupMappingService: AccountGroupMappingService,
     private val authenticationSourceRepository: AuthenticationSourceRepository,
     private val accountService: AccountService,
-    private val jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractCascContext(), SubAdminContext {
 
     private val logger: Logger = LoggerFactory.getLogger(AccountGroupMappingsAdminContext::class.java)
@@ -36,12 +35,11 @@ class AccountGroupMappingsAdminContext(
      */
     override val priority: Int = AccountGroupsAdminContext.PRIORITY - 5
 
-    override val jsonType: JsonType by lazy {
+    override fun jsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType =
         JsonArrayType(
             items = jsonTypeBuilder.toType(CascMapping::class),
             description = "List of group mappings",
         )
-    }
 
     override fun run(node: JsonNode, paths: List<String>) {
         // Items to provision

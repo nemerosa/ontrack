@@ -17,7 +17,8 @@ import kotlin.reflect.jvm.jvmName
 @Component
 class JsonSchemaBuilderService(
     private val applicationContext: ApplicationContext,
-): JsonTypeBuilder {
+) : JsonTypeBuilder {
+
     fun createSchema(
         ref: String,
         id: String,
@@ -36,6 +37,30 @@ class JsonSchemaBuilderService(
             defs = defs,
             root = rootType,
         )
+    }
+
+    fun createSchema(
+        ref: String,
+        id: String,
+        title: String,
+        description: String,
+        root: JsonTypeProvider,
+    ): JsonSchema {
+        val defs = mutableMapOf<String, JsonType>()
+        val builder = createSchemaBuilder(defs)
+        val rootType = root.jsonType(builder)
+        return if (rootType is JsonObjectType) {
+            JsonSchema(
+                ref = ref,
+                id = id,
+                title = title,
+                description = description,
+                defs = defs,
+                root = rootType,
+            )
+        } else {
+            error("Root type must be an object")
+        }
     }
 
     override fun toType(type: KType, description: String?): JsonType {
@@ -169,6 +194,9 @@ private class JsonSchemaBuilder(
             values = discriminatorValues,
             description = getPropertyDescription(discriminatorProperty),
         )
+
+        // Placeholder for the configuration
+        oProperties[dynamicJsonSchema.configurationProperty] = JsonEmptyType.INSTANCE
 
         // All definitions
         defs += provider.getConfigurationTypes(this).mapKeys { (id, _) ->

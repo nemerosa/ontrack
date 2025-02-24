@@ -23,15 +23,14 @@ import org.springframework.stereotype.Component
 @Component
 class JIRAConfigurationCasc(
     private val jiraConfigurationService: JIRAConfigurationService,
-    private val jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractCascContext(), SubConfigContext {
 
     private val logger: Logger = LoggerFactory.getLogger(JIRAConfigurationCasc::class.java)
 
     override val field: String = "jira"
 
-    override val jsonType: JsonType by lazy {
-        JsonArrayType(
+    override fun jsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType {
+        return JsonArrayType(
             description = "List of JIRA configurations",
             items = jsonTypeBuilder.toType(JIRAConfiguration::class)
         )

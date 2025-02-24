@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.bitbucket.cloud.configuration.BitbucketClo
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.test.TestUtils.uid
 import net.nemerosa.ontrack.test.assertNotPresent
 import org.junit.jupiter.api.BeforeEach
@@ -20,9 +21,12 @@ class BitbucketCloudConfigurationCascContextIT : AbstractCascTestSupport() {
     @Autowired
     private lateinit var bitbucketCloudConfigurationCascContext: BitbucketCloudConfigurationCascContext
 
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
     @Test
     fun `CasC schema type`() {
-        val type = bitbucketCloudConfigurationCascContext.jsonType
+        val type = bitbucketCloudConfigurationCascContext.jsonType(jsonTypeBuilder)
         assertEquals(
             """
                 {

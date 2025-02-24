@@ -21,15 +21,14 @@ import org.springframework.stereotype.Component
 @Component
 class OIDCCascContext(
     private val oidcSettingsService: OIDCSettingsService,
-    private val jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractCascContext(), SubConfigContext {
 
     private val logger: Logger = LoggerFactory.getLogger(OIDCCascContext::class.java)
 
     override val field: String = "oidc"
 
-    override val jsonType: JsonType by lazy {
-        JsonArrayType(
+    override fun jsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType {
+        return JsonArrayType(
             description = "List of OIDC providers",
             items = jsonTypeBuilder.toType(OntrackOIDCProvider::class)
         )

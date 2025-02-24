@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.general.message
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.model.message.GlobalMessageService
 import net.nemerosa.ontrack.model.message.Message
 import net.nemerosa.ontrack.model.message.MessageType
@@ -19,9 +20,12 @@ class SystemMessageSettingsCascIT : AbstractCascTestSupport() {
     @Autowired
     private lateinit var systemMessageSettingsCasc: SystemMessageSettingsCasc
 
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
     @Test
     fun `CasC schema type`() {
-        val type = systemMessageSettingsCasc.jsonType
+        val type = systemMessageSettingsCasc.jsonType(jsonTypeBuilder)
         assertEquals(
             """
                 {

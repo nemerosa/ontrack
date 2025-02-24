@@ -17,12 +17,10 @@ abstract class AbstractSubSettingsContext<T : Any>(
     private val settingsClass: KClass<T>,
     private val settingsManagerService: SettingsManagerService,
     private val cachedSettingsService: CachedSettingsService,
-    private val jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractCascContext(), SubSettingsContext {
 
-    override val jsonType: JsonType by lazy {
+    override fun jsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType =
         jsonTypeBuilder.toType(settingsClass)
-    }
 
     override fun run(node: JsonNode, paths: List<String>) {
         // Parsing to the settings node

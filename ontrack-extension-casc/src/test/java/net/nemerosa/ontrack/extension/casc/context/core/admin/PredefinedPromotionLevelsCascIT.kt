@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.extension.scm.service.TestSCMExtension
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.PredefinedPromotionLevel
 import net.nemerosa.ontrack.test.TestUtils.resourceBytes
@@ -21,9 +22,12 @@ class PredefinedPromotionLevelsCascIT : AbstractCascTestSupport() {
     @Autowired
     private lateinit var predefinedPromotionLevelsAdminContext: PredefinedPromotionLevelsAdminContext
 
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
     @Test
     fun `CasC schema type`() {
-        val type = predefinedPromotionLevelsAdminContext.jsonType
+        val type = predefinedPromotionLevelsAdminContext.jsonType(jsonTypeBuilder)
         assertEquals(
             """
                 {

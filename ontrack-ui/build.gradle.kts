@@ -47,9 +47,11 @@ dependencies {
     testImplementation(project(":ontrack-extension-general"))
     testImplementation(project(":ontrack-extension-casc"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
+    testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))
     testImplementation(project(path = ":ontrack-model", configuration = "tests"))
     testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
     testImplementation(project(path = ":ontrack-ui-support", configuration = "tests"))
+    testImplementation("com.networknt:json-schema-validator")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
     // List of extensions needed for the documentation generation

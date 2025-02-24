@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.casc.context.core.admin
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.model.security.AccountGroupInput
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
@@ -15,9 +16,12 @@ class AccountGroupsAdminContextIT : AbstractCascTestSupport() {
     @Autowired
     private lateinit var accountGroupsAdminContext: AccountGroupsAdminContext
 
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
     @Test
     fun `CasC schema type`() {
-        val type = accountGroupsAdminContext.jsonType
+        val type = accountGroupsAdminContext.jsonType(jsonTypeBuilder)
         assertEquals(
             """
                 {

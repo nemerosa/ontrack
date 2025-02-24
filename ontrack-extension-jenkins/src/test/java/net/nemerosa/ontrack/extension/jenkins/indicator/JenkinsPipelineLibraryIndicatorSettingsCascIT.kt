@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.jenkins.indicator
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
@@ -12,9 +13,12 @@ class JenkinsPipelineLibraryIndicatorSettingsCascIT : AbstractCascTestSupport() 
     @Autowired
     private lateinit var casc: JenkinsPipelineLibraryIndicatorSettingsCasc
 
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
     @Test
     fun `CasC schema type`() {
-        val type = casc.jsonType
+        val type = casc.jsonType(jsonTypeBuilder)
         assertEquals(
             """
                 {

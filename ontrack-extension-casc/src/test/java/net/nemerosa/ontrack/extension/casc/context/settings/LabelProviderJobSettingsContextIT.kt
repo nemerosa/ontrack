@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.casc.context.settings
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.model.settings.LabelProviderJobSettings
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,9 +14,12 @@ class LabelProviderJobSettingsContextIT : AbstractCascTestSupport() {
     @Autowired
     private lateinit var labelProviderJobSettingsContext: LabelProviderJobSettingsContext
 
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
     @Test
     fun `CasC schema type`() {
-        val type = labelProviderJobSettingsContext.jsonType
+        val type = labelProviderJobSettingsContext.jsonType(jsonTypeBuilder)
         assertEquals(
             """
                 {

@@ -23,15 +23,14 @@ import org.springframework.stereotype.Component
 class PredefinedValidationStampsAdminContext(
     private val predefinedValidationStampService: PredefinedValidationStampService,
     private val scmRefService: FileRefService,
-    private val jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractCascContext(), SubAdminContext {
 
     private val logger: Logger = LoggerFactory.getLogger(PredefinedValidationStampsAdminContext::class.java)
 
     override val field: String = "predefined-validation-stamps"
 
-    override val jsonType: JsonType by lazy {
-        jsonTypeBuilder.toType(PredefinedValidationStampsAdminContextType::class)
+    override fun jsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType {
+        return jsonTypeBuilder.toType(PredefinedValidationStampsAdminContextType::class)
     }
 
     override fun run(node: JsonNode, paths: List<String>) {

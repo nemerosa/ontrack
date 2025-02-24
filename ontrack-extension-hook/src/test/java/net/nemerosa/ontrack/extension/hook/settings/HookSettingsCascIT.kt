@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.hook.settings
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.Duration
@@ -13,9 +14,12 @@ class HookSettingsCascIT : AbstractCascTestSupport() {
     @Autowired
     private lateinit var hookSettingsCasc: HookSettingsCasc
 
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
     @Test
     fun `CasC schema type`() {
-        val type = hookSettingsCasc.jsonType
+        val type = hookSettingsCasc.jsonType(jsonTypeBuilder)
         assertEquals(
             """
                 {

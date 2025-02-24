@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.slack
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
@@ -13,9 +14,12 @@ class SlackSettingsCascIT : AbstractCascTestSupport() {
     @Autowired
     private lateinit var slackSettingsCascContext: SlackSettingsCascContext
 
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
     @Test
     fun `CasC schema type`() {
-        val type = slackSettingsCascContext.jsonType
+        val type = slackSettingsCascContext.jsonType(jsonTypeBuilder)
         assertEquals(
             """
                 {

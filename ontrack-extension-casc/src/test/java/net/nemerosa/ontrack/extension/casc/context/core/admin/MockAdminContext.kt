@@ -11,16 +11,14 @@ import net.nemerosa.ontrack.model.json.schema.toType
 import org.springframework.stereotype.Component
 
 @Component
-class MockAdminContext(
-    private val jsonTypeBuilder: JsonTypeBuilder,
-) : AbstractCascContext(), SubAdminContext {
+class MockAdminContext : AbstractCascContext(), SubAdminContext {
 
     var data: MockData? = null
 
     override val field: String = "mock"
 
-    override val jsonType: JsonType by lazy {
-        jsonTypeBuilder.toType(MockData::class)
+    override fun jsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType {
+        return jsonTypeBuilder.toType(MockData::class)
     }
 
     override fun run(node: JsonNode, paths: List<String>) {

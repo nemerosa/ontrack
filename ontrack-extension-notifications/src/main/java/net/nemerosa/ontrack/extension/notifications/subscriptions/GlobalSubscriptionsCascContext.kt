@@ -15,13 +15,12 @@ import org.springframework.stereotype.Component
 @Component
 class GlobalSubscriptionsCascContext(
     private val eventSubscriptionService: EventSubscriptionService,
-    private val jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractCascContext(), NotificationsSubCascContext {
 
     override val field: String = "global-subscriptions"
 
-    override val jsonType: JsonType by lazy {
-        JsonArrayType(
+    override fun jsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType {
+        return JsonArrayType(
             description = "List of global subscriptions",
             items = jsonTypeBuilder.toType(SubscriptionsCascContextData::class)
         )

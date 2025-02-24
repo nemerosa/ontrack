@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.notifications.recording
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
@@ -13,9 +14,12 @@ internal class NotificationRecordingSettingsCascContextIT : AbstractCascTestSupp
     @Autowired
     private lateinit var notificationRecordingSettingsCascContext: NotificationRecordingSettingsCascContext
 
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
     @Test
     fun `CasC schema type`() {
-        val type = notificationRecordingSettingsCascContext.jsonType
+        val type = notificationRecordingSettingsCascContext.jsonType(jsonTypeBuilder)
         assertEquals(
             """
                 {

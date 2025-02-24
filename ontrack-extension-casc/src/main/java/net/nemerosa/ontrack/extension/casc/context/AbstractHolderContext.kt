@@ -4,18 +4,19 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.json.schema.JsonObjectType
 import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 
 abstract class AbstractHolderContext<T : SubCascContext>(
     private val subContexts: List<T>,
     private val description: String,
 ) : AbstractCascContext() {
 
-    override val jsonType: JsonType by lazy {
-        JsonObjectType(
+    override fun jsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType {
+        return JsonObjectType(
             title = this::class.java.simpleName,
             description = description,
             properties = subContexts.associate { ctx ->
-                ctx.field to ctx.jsonType
+                ctx.field to ctx.jsonType(jsonTypeBuilder)
             },
             required = emptyList(),
         )

@@ -1,18 +1,15 @@
 package net.nemerosa.ontrack.boot.schema.json
 
-import net.nemerosa.ontrack.extension.casc.schema.json.CascJsonSchemaService
-import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
+import net.nemerosa.ontrack.test.TestUtils
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
+import java.io.File
 import kotlin.test.assertTrue
 
 /**
  * Testing the generation of the Casc JSON schema at the highest level.
  */
-class CascJsonSchemaIT : AbstractDSLTestSupport() {
-
-    @Autowired
-    private lateinit var cascJsonSchemaService: CascJsonSchemaService
+class CascJsonSchemaIT : AbstractCascTestSupport() {
 
     @Test
     fun `Casc schema generation`() {
@@ -36,6 +33,16 @@ class CascJsonSchemaIT : AbstractDSLTestSupport() {
         for (expectedDef in expectedDefs) {
             assertTrue(defs.has(expectedDef), "Expecting def $expectedDef")
         }
+        // Writing the JSON schema locally
+        File("ontrack-casc-schema.json").writeText(
+            schema.toPrettyString()
+        )
+    }
+
+    @Test
+    fun `Casc schema validation`() {
+        val yaml = TestUtils.resourceString("/schema/json/casc-environments.yaml")
+        assertValidYaml(yaml)
     }
 
 }

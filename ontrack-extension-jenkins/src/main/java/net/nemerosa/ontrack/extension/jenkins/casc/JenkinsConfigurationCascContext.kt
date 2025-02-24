@@ -21,15 +21,14 @@ import org.springframework.stereotype.Component
 @Component
 class JenkinsConfigurationCascContext(
     private val jenkinsConfigurationService: JenkinsConfigurationService,
-    private val jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractCascContext(), SubConfigContext {
 
     private val logger: Logger = LoggerFactory.getLogger(JenkinsConfigurationCascContext::class.java)
 
     override val field: String = "jenkins"
 
-    override val jsonType: JsonType by lazy {
-        JsonArrayType(
+    override fun jsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType {
+        return JsonArrayType(
             description = "List of Jenkins configurations",
             items = jsonTypeBuilder.toType(JenkinsConfigurationCasc::class),
         )

@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.ldap.LDAPSettings
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
@@ -14,9 +15,12 @@ class LDAPSettingsContextIT : AbstractCascTestSupport() {
     @Autowired
     private lateinit var ldapSettingsContext: LDAPSettingsContext
 
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
     @Test
     fun `CasC schema type`() {
-        val type = ldapSettingsContext.jsonType
+        val type = ldapSettingsContext.jsonType(jsonTypeBuilder)
         assertEquals(
             """
                 {

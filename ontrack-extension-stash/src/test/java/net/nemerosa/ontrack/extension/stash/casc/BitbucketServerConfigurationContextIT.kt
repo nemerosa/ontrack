@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.stash.service.StashConfigurationService
 import net.nemerosa.ontrack.extension.stash.settings.BitbucketServerSettingsCasc
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.test.TestUtils
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,9 +19,12 @@ class BitbucketServerConfigurationContextIT : AbstractCascTestSupport() {
     @Autowired
     private lateinit var bitbucketServerSettingsCasc: BitbucketServerSettingsCasc
 
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
     @Test
     fun `CasC schema type`() {
-        val type = bitbucketServerSettingsCasc.jsonType
+        val type = bitbucketServerSettingsCasc.jsonType(jsonTypeBuilder)
         assertEquals(
             """
                 {

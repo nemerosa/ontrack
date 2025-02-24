@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.test.TestUtils
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,9 +18,12 @@ class GitHubEngineConfigurationCascIT : AbstractCascTestSupport() {
     @Autowired
     private lateinit var gitHubEngineConfigurationContext: GitHubEngineConfigurationContext
 
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
     @Test
     fun `CasC schema type`() {
-        val type = gitHubEngineConfigurationContext.jsonType
+        val type = gitHubEngineConfigurationContext.jsonType(jsonTypeBuilder)
         assertEquals(
             """
                 {

@@ -21,15 +21,14 @@ import org.springframework.stereotype.Component
 @Component
 class TFCConfigurationCasc(
     private val tfcConfigurationService: TFCConfigurationService,
-    private val jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractCascContext(), SubConfigContext {
 
     private val logger: Logger = LoggerFactory.getLogger(TFCConfigurationCasc::class.java)
 
     override val field: String = "tfc"
 
-    override val jsonType: JsonType by lazy {
-        JsonArrayType(
+    override fun jsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType {
+        return JsonArrayType(
             description = "List of TFC configurations",
             items = jsonTypeBuilder.toType(TFCConfiguration::class)
         )

@@ -24,15 +24,14 @@ import org.springframework.stereotype.Component
 @Component
 class SonarQubeConfigurationCasc(
     private val sonarQubeConfigurationService: SonarQubeConfigurationService,
-    private val jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractCascContext(), SubConfigContext {
 
     private val logger: Logger = LoggerFactory.getLogger(SonarQubeConfigurationCasc::class.java)
 
     override val field: String = "sonarqube"
 
-    override val jsonType: JsonType by lazy {
-        JsonArrayType(
+    override fun jsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType {
+        return JsonArrayType(
             description = "List of SonarQube configurations",
             items = jsonTypeBuilder.toType(SonarQubeConfigurationCascData::class)
         )

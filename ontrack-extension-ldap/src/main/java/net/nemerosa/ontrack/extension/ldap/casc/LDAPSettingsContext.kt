@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.ldap.casc
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.casc.context.settings.AbstractSubSettingsContext
 import net.nemerosa.ontrack.extension.ldap.LDAPSettings
-import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.settings.SettingsManagerService
 import org.springframework.stereotype.Component
@@ -12,13 +11,11 @@ import org.springframework.stereotype.Component
 class LDAPSettingsContext(
     settingsManagerService: SettingsManagerService,
     cachedSettingsService: CachedSettingsService,
-    jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractSubSettingsContext<LDAPSettings>(
     "ldap",
     LDAPSettings::class,
     settingsManagerService,
     cachedSettingsService,
-    jsonTypeBuilder,
 ) {
 
     override fun adjustNodeBeforeParsing(node: JsonNode): JsonNode = node.ifMissing(

@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.casc.context.core.admin
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
@@ -12,9 +13,12 @@ class PredefinedValidationStampsAdminContextIT : AbstractCascTestSupport() {
     @Autowired
     private lateinit var predefinedValidationStampsAdminContext: PredefinedValidationStampsAdminContext
 
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
     @Test
     fun `CasC schema type`() {
-        val type = predefinedValidationStampsAdminContext.jsonType
+        val type = predefinedValidationStampsAdminContext.jsonType(jsonTypeBuilder)
         assertEquals(
             """
                 {

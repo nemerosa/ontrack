@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.model.json.schema.JsonArrayType
 import net.nemerosa.ontrack.model.json.schema.JsonObjectType
 import net.nemerosa.ontrack.model.json.schema.JsonStringType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import net.nemerosa.ontrack.model.structure.toProjectEntityID
@@ -26,9 +27,12 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
     @Autowired
     private lateinit var entitySubscriptionsCascContext: EntitySubscriptionsCascContext
 
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
     @Test
     fun `CasC schema type`() {
-        val type = entitySubscriptionsCascContext.jsonType
+        val type = entitySubscriptionsCascContext.jsonType(jsonTypeBuilder)
         assertEquals(
             """
                 {
@@ -1101,7 +1105,7 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
 
     @Test
     fun `Ignoring the storage key when generating the Casc model for EntitySubscriptionData`() {
-        val type = entitySubscriptionsCascContext.jsonType
+        val type = entitySubscriptionsCascContext.jsonType(jsonTypeBuilder)
         val list = assertIs<JsonArrayType>(type)
         val itemProperties = (list.items as JsonObjectType).properties
         val entityProperties = (itemProperties["entity"] as JsonObjectType).properties

@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.casc.context.core.admin
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.model.security.PermissionInput
 import net.nemerosa.ontrack.model.security.PermissionTargetType
 import net.nemerosa.ontrack.model.security.Roles
@@ -18,9 +19,12 @@ class ProjectPermissionsAdminContextIT : AbstractCascTestSupport() {
     @Autowired
     private lateinit var context: ProjectPermissionsAdminContext
 
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
     @Test
     fun `CasC schema type`() {
-        val type = context.jsonType
+        val type = context.jsonType(jsonTypeBuilder)
         assertEquals(
             """
                 {

@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.tfc.config
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.model.json.schema.JsonArrayType
 import net.nemerosa.ontrack.model.json.schema.JsonObjectType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.test.TestUtils
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -16,6 +17,9 @@ class TFCConfigurationContextIT : AbstractCascTestSupport() {
 
     @Autowired
     private lateinit var tfcConfigurationCasc: TFCConfigurationCasc
+
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
 
     @Test
     fun `Defining a TFC configuration`() {
@@ -45,7 +49,7 @@ class TFCConfigurationContextIT : AbstractCascTestSupport() {
 
     @Test
     fun `Generated JSON schema must not include the descriptor`() {
-        val type = tfcConfigurationCasc.jsonType
+        val type = tfcConfigurationCasc.jsonType(jsonTypeBuilder)
         assertNull(
             ((type as JsonArrayType).items as JsonObjectType).properties["descriptor"]
         )

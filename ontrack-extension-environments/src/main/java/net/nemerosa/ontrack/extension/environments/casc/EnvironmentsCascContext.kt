@@ -34,16 +34,14 @@ class EnvironmentsCascContext(
     private val slotService: SlotService,
     private val slotWorkflowService: SlotWorkflowService,
     private val fileRefService: FileRefService,
-    private val jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractCascContext(), SubConfigContext {
 
     private val logger = LoggerFactory.getLogger(EnvironmentsCascContext::class.java)
 
     override val field: String = "environments"
 
-    override val jsonType: JsonType by lazy {
+    override fun jsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType =
         jsonTypeBuilder.toType(EnvironmentsCascModel::class)
-    }
 
     override fun run(node: JsonNode, paths: List<String>) {
         val model: EnvironmentsCascModel = node.parse()

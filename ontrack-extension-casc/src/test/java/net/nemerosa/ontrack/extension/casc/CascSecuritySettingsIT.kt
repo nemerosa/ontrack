@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.casc
 import net.nemerosa.ontrack.extension.casc.context.settings.SecuritySettingsContext
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.model.settings.SecuritySettings
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -15,9 +16,12 @@ class CascSecuritySettingsIT : AbstractCascTestSupport() {
     @Autowired
     private lateinit var securitySettingsContext: SecuritySettingsContext
 
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
     @Test
     fun `CasC schema type`() {
-        val type = securitySettingsContext.jsonType
+        val type = securitySettingsContext.jsonType(jsonTypeBuilder)
         assertEquals(
             """
                 {

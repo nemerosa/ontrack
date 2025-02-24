@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.extension.scm.service.TestSCMExtension
 import net.nemerosa.ontrack.it.NewTxRollbacked
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.test.TestUtils.resourceBytes
 import net.nemerosa.ontrack.test.TestUtils.uid
 import net.nemerosa.ontrack.test.resourceBase64
@@ -41,9 +42,12 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
     @Autowired
     private lateinit var testSCMExtension: TestSCMExtension
 
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
     @Test
     fun `CasC schema type`() {
-        val type = environmentsCascContext.jsonType
+        val type = environmentsCascContext.jsonType(jsonTypeBuilder)
         assertEquals(
             """
                 {

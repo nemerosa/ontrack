@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.tfc.settings
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
@@ -12,9 +13,12 @@ class TFCSettingsCascIT : AbstractCascTestSupport() {
     @Autowired
     private lateinit var tfcSettingsCasc: TFCSettingsCasc
 
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
     @Test
     fun `CasC schema type`() {
-        val type = tfcSettingsCasc.jsonType
+        val type = tfcSettingsCasc.jsonType(jsonTypeBuilder)
         assertEquals(
             """
                 {

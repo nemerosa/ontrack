@@ -2,11 +2,12 @@ package net.nemerosa.ontrack.extension.casc.context
 
 import net.nemerosa.ontrack.model.json.schema.JsonObjectType
 import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import org.springframework.stereotype.Component
 
 @Component
 class ConfigContext(
-    subContexts: List<SubConfigContext>,
+    private val subContexts: List<SubConfigContext>,
 ) : AbstractHolderContext<SubConfigContext>(
     subContexts,
     "List of configurations"
@@ -18,12 +19,12 @@ class ConfigContext(
 
     override val priority: Int = PRIORITY
 
-    override val jsonType: JsonType by lazy {
-        JsonObjectType(
+    override fun jsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType {
+        return JsonObjectType(
             title = "Configurations",
             description = "List of configurations",
             properties = subContexts.associate {
-                it.field to it.jsonType
+                it.field to it.jsonType(jsonTypeBuilder)
             },
             required = emptyList(),
             additionalProperties = false,

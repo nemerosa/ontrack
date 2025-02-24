@@ -23,15 +23,14 @@ import org.springframework.stereotype.Component
 class PredefinedPromotionLevelsAdminContext(
     private val predefinedPromotionLevelService: PredefinedPromotionLevelService,
     private val scmRefService: FileRefService,
-    private val jsonTypeBuilder: JsonTypeBuilder,
 ) : AbstractCascContext(), SubAdminContext {
 
     private val logger: Logger = LoggerFactory.getLogger(PredefinedPromotionLevelsAdminContext::class.java)
 
     override val field: String = "predefined-promotion-levels"
 
-    override val jsonType: JsonType by lazy {
-        jsonTypeBuilder.toType(PredefinedPromotionLevelsAdminContextType::class)
+    override fun jsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType {
+        return jsonTypeBuilder.toType(PredefinedPromotionLevelsAdminContextType::class)
     }
 
     override fun run(node: JsonNode, paths: List<String>) {

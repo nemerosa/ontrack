@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.sonarqube.configuration.SonarQubeConfigura
 import net.nemerosa.ontrack.extension.sonarqube.configuration.SonarQubeConfigurationService
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.test.TestUtils
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,9 +19,12 @@ class SonarQubeConfigurationCascIT : AbstractCascTestSupport() {
     @Autowired
     private lateinit var sonarQubeConfigurationCasc: SonarQubeConfigurationCasc
 
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
     @Test
     fun `CasC schema type`() {
-        val type = sonarQubeConfigurationCasc.jsonType
+        val type = sonarQubeConfigurationCasc.jsonType(jsonTypeBuilder)
         assertEquals(
             """
                 {

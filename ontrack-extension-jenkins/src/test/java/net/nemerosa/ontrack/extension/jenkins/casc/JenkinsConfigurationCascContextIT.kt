@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.extension.jenkins.JenkinsConfiguration
 import net.nemerosa.ontrack.extension.jenkins.JenkinsConfigurationService
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -20,9 +21,12 @@ internal class JenkinsConfigurationCascContextIT : AbstractCascTestSupport() {
     @Autowired
     private lateinit var jenkinsConfigurationCascContext: JenkinsConfigurationCascContext
 
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
     @Test
     fun `CasC schema type`() {
-        val type = jenkinsConfigurationCascContext.jsonType
+        val type = jenkinsConfigurationCascContext.jsonType(jsonTypeBuilder)
         assertEquals(
             """
                 {

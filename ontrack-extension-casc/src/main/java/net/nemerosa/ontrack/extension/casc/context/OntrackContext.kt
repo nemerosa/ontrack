@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.casc.context.extensions.ExtensionsContext
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.json.schema.JsonObjectType
 import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import org.springframework.stereotype.Component
 
 @Component
@@ -24,14 +25,14 @@ class OntrackContext(
         )
     }
 
-    override val jsonType: JsonType by lazy {
-        JsonObjectType(
+    override fun jsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType {
+        return JsonObjectType(
             title = "Ontrack Casc",
             description = "Ontrack Casc root object",
             properties = mapOf(
-                "config" to configContext.jsonType,
-                "admin" to adminContext.jsonType,
-                "extensions" to extensionsContext.jsonType,
+                "config" to configContext.jsonType(jsonTypeBuilder),
+                "admin" to adminContext.jsonType(jsonTypeBuilder),
+                "extensions" to extensionsContext.jsonType(jsonTypeBuilder),
             ),
             required = emptyList(),
             additionalProperties = false,
