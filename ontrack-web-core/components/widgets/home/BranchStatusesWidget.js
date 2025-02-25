@@ -1,4 +1,4 @@
-import {useContext, useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {gql} from "graphql-request";
 import {Space, Table, Typography} from "antd";
 import {FaBan} from "react-icons/fa";
@@ -14,8 +14,18 @@ import {DashboardWidgetCellContext} from "@components/dashboards/DashboardWidget
 import Link from "next/link";
 import BuildLink from "@components/builds/BuildLink";
 import PredefinedPromotionLevelImageByName from "@components/promotionLevels/PredefinedPromotionLevelImageByName";
+import ValidationRunData from "@components/framework/validation-run-data/ValidationRunData";
+import RunInfo from "@components/common/RunInfo";
 
-export default function BranchStatusesWidget({promotions, validations, refreshInterval, branches = [], title}) {
+export default function BranchStatusesWidget({
+                                                 promotions,
+                                                 validations,
+                                                 displayValidationResults,
+                                                 displayValidationRun,
+                                                 refreshInterval,
+                                                 branches = [],
+                                                 title
+                                             }) {
 
     const client = useGraphQLClient()
 
@@ -115,6 +125,22 @@ export default function BranchStatusesWidget({promotions, validations, refreshIn
                                                 name
                                             }
                                         }
+                                        runInfo {
+                                            runTime
+                                            sourceType
+                                            sourceUri
+                                            triggerType
+                                            triggerData
+                                        }
+                                        data {
+                                            descriptor {
+                                                feature {
+                                                    id
+                                                }
+                                                id
+                                            }
+                                            data
+                                        }
                                         build {
                                             id
                                             name
@@ -209,6 +235,14 @@ export default function BranchStatusesWidget({promotions, validations, refreshIn
                                                         <Typography.Text type="secondary">[history]</Typography.Text>
                                                     </Link>
                                                 </Space>
+                                            }
+                                            {
+                                                displayValidationResults && run.data &&
+                                                <ValidationRunData data={run.data}/>
+                                            }
+                                            {
+                                                displayValidationRun && run.runInfo &&
+                                                <RunInfo info={run.runInfo} mode="minimal"/>
                                             }
                                             <Timestamp value={run.lastStatus.creation.time}/>
                                         </Space>

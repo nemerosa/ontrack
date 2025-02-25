@@ -1,4 +1,4 @@
-import {Button, Form, Input, Space} from "antd";
+import {Button, Form, Input, Space, Switch} from "antd";
 import {useContext} from "react";
 import SelectMultiplePromotionLevelNames from "@components/promotionLevels/SelectMultiplePromotionLevelNames";
 import SelectMultipleValidationStampsNames from "@components/validationStamps/SelectMultipleValidationStampsNames";
@@ -9,7 +9,15 @@ import {DashboardWidgetCellContext} from "@components/dashboards/DashboardWidget
 import SortableList, {SortableItem} from "react-easy-sort";
 import {formFieldArraySwap} from "@components/form/formUtils";
 
-export default function BranchStatusesWidgetForm({promotions, validations, refreshInterval, branches, title}) {
+export default function BranchStatusesWidgetForm({
+                                                     promotions,
+                                                     validations,
+                                                     displayValidationResults,
+                                                     displayValidationRun,
+                                                     refreshInterval,
+                                                     branches,
+                                                     title
+                                                 }) {
 
     const {widgetEditionForm} = useContext(DashboardWidgetCellContext)
 
@@ -43,6 +51,20 @@ export default function BranchStatusesWidgetForm({promotions, validations, refre
                     initialValue={validations}
                 >
                     <SelectMultipleValidationStampsNames/>
+                </Form.Item>
+                <Form.Item
+                    name="displayValidationResults"
+                    label="If checked, displays additional results with each validation, like test summary, etc."
+                    initialValue={displayValidationResults}
+                >
+                    <Switch/>
+                </Form.Item>
+                <Form.Item
+                    name="displayValidationRun"
+                    label="If checked, displays run info"
+                    initialValue={displayValidationRun}
+                >
+                    <Switch/>
                 </Form.Item>
                 <Form.List name="branches" initialValue={branches}>
                     {(fields, {add, remove}) => (
