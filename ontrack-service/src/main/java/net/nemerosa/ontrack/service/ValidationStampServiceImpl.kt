@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.security.isProjectFunctionGranted
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Project
+import net.nemerosa.ontrack.model.structure.ValidationStamp
 import net.nemerosa.ontrack.model.structure.ValidationStampService
 import net.nemerosa.ontrack.repository.ValidationStampRepository
 import org.springframework.stereotype.Service
@@ -26,4 +27,6 @@ class ValidationStampServiceImpl(
         validationStampRepository.findBranchesWithValidationStamp(project, validation)
             .take(size)
 
+    override fun findValidationStampsForNames(branch: Branch, validationStamps: List<String>): List<ValidationStamp> =
+        validationStampRepository.findValidationStampsForNames(branch, validationStamps)
 }

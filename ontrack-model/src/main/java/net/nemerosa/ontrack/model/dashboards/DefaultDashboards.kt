@@ -18,7 +18,7 @@ object DefaultDashboards {
                     x = 0,
                     y = 0,
                     w = 12,
-                    h = 4,
+                    h = 20,
                 )
             )
         )

@@ -793,7 +793,9 @@ type Build implements Authorizable & ProjectEntity {
         "Size of the page"
         size: Int = 20,
         "Name of the validation stamp"
-        validationStamp: String
+        validationStamp: String,
+        "List of validation stamps"
+        validationStamps: [String!]
     ): [Validation!]!
 }
 
@@ -957,7 +959,7 @@ type CasC {
     json: JSON
     "List of resources needed to define the configuration as code"
     locations: [String!]!
-    "CasC schema as JSON"
+    "CasC JSON Schema"
     schema: JSON
     "Renders the current settings as YAML"
     yaml: String!
@@ -11461,6 +11463,10 @@ input StartSlotPipelineDeploymentInput {
 input StartSlotPipelineInput {
     "buildId field"
     buildId: Int!
+    "forceDone field"
+    forceDone: Boolean
+    "forceDoneMessage field"
+    forceDoneMessage: String
     "slotId field"
     slotId: String!
 }

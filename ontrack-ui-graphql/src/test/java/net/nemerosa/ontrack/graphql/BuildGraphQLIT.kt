@@ -4,8 +4,6 @@ import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.api.support.TestSimpleProperty
 import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType
 import net.nemerosa.ontrack.json.*
-import net.nemerosa.ontrack.model.exceptions.BranchNotFoundException
-import net.nemerosa.ontrack.model.exceptions.ProjectNotFoundException
 import net.nemerosa.ontrack.model.security.BuildCreate
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
@@ -18,7 +16,10 @@ import net.nemerosa.ontrack.test.assertJsonNull
 import org.junit.jupiter.api.Test
 import org.springframework.graphql.execution.ErrorType
 import java.time.LocalDateTime
-import kotlin.test.*
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
+import kotlin.test.fail
 
 /**
  * Integration tests around the `builds` root query.
@@ -1473,6 +1474,46 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                 doTest(this, "1", null, "2")
                 doTest(this, "2", "1", "3")
                 doTest(this, "3", "2", null)
+            }
+        }
+    }
+
+    @Test
+    fun `Finding validations from a list of names`() {
+        project {
+            branch {
+                val vs1 = validationStamp()
+                val vs2 = validationStamp()
+                val vs3 = validationStamp()
+
+                val build = build {
+                    validate(vs1)
+                    validate(vs2)
+                    validate(vs3)
+                }
+
+                run(
+                    """
+                        query ValidationStampsByName(${'$'}validationStamps: [String!]!) {
+                            build(id: ${build.id}) {
+                                validations(validationStamps: ${'$'}validationStamps) {
+                                    validationStamp {
+                                        id
+                                    }
+                                }
+                            }
+                        }
+                    """.trimIndent(),
+                    mapOf("validationStamps" to listOf(vs1.name, vs3.name))
+                ) { data ->
+                    val vsIds = data.path("build").path("validations").map { run ->
+                        run.path("validationStamp").path("id").asInt()
+                    }
+                    assertEquals(
+                        listOf(vs1, vs3).sortedBy { it.name }.map { it.id() },
+                        vsIds
+                    )
+                }
             }
         }
     }
