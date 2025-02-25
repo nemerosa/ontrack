@@ -8,5 +8,5 @@ class PromotionTTRChartWidget : AbstractWidget<PromotionChartWidgetConfig>(
     name = "Time to recovery to promotion",
     description = "Chart displaying the time to recovery to promotion.",
     defaultConfig = PromotionChartWidgetConfig(project = null, branch = null, promotionLevel = null),
-    preferredHeight = 6,
+    preferredHeight = 30,
 )

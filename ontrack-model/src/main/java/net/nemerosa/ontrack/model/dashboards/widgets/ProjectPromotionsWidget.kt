@@ -8,7 +8,7 @@ class ProjectPromotionsWidget : AbstractWidget<ProjectPromotionsWidget.ProjectPr
     name = "Project promotions",
     description = "For a list of promotions inside the same project, displays the last build per promotion, its own promotions, decorations and its list of dependencies, filtered by label",
     defaultConfig = ProjectPromotionsWidgetConfig(project = null),
-    preferredHeight = 6,
+    preferredHeight = 30,
 ) {
     data class ProjectPromotionsWidgetConfig(
         val project: String?,

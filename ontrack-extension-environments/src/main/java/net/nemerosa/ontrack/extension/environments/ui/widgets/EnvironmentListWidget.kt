@@ -9,5 +9,5 @@ class EnvironmentListWidget : AbstractWidget<EnvironmentListWidgetConfig>(
     name = "Environments list",
     description = "List of environments, their slots & their deployed pipelines",
     defaultConfig = EnvironmentListWidgetConfig.default(),
-    preferredHeight = 8,
+    preferredHeight = 40,
 )

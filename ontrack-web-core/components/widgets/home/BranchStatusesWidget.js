@@ -274,6 +274,7 @@ export default function BranchStatusesWidget({
                 dataSource={dataSource}
                 columns={columns}
                 pagination={false}
+                size="small"
             />
         </>
     )
