@@ -269,6 +269,7 @@ class SlotServiceImpl(
         build: Build,
         forceDone: Boolean,
         forceDoneMessage: String?,
+        skipWorkflows: Boolean,
     ): SlotPipeline {
         securityService.checkSlotAccess<SlotPipelineCreate>(slot)
         // Build must be eligible
@@ -322,6 +323,7 @@ class SlotServiceImpl(
                 pipelineId = pipeline.id,
                 forcing = true,
                 message = message,
+                skipWorkflows = skipWorkflows,
             )
         }
         // OK
@@ -623,7 +625,8 @@ class SlotServiceImpl(
         pipelineId: String,
         skipWorkflowId: String?,
         forcing: Boolean,
-        message: String?
+        message: String?,
+        skipWorkflows: Boolean,
     ): SlotDeploymentActionStatus {
         val pipeline = slotPipelineRepository.getPipelineById(pipelineId)
         securityService.checkSlotAccess<SlotPipelineFinish>(pipeline.slot)
@@ -671,11 +674,13 @@ class SlotServiceImpl(
         )
         // Workflows
         val event = environmentsEventsFactory.pipelineDeployed(pipeline)
-        slotWorkflowService.startWorkflowsForPipeline(
-            pipeline,
-            SlotPipelineStatus.DONE,
-            event
-        )
+        if (!skipWorkflows) {
+            slotWorkflowService.startWorkflowsForPipeline(
+                pipeline,
+                SlotPipelineStatus.DONE,
+                event
+            )
+        }
         // Event
         eventPostService.post(event)
         // OK

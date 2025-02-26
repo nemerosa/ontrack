@@ -874,4 +874,119 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
         }
     }
 
+    @Test
+    fun `Starting a pipeline in forced DONE status must not run the workflows included the DONE ones`() {
+        slotTestSupport.withSlot { slot ->
+            // Registering workflows for each status
+            slotWorkflowService.addSlotWorkflow(
+                SlotWorkflow(
+                    slot = slot,
+                    trigger = SlotPipelineStatus.CANDIDATE,
+                    workflow = WorkflowParser.parseYamlWorkflow(
+                        """
+                            name: On candidate
+                            nodes:
+                              - id: start
+                                executorId: mock
+                                data:
+                                  text: Candidate
+                        """.trimIndent()
+                    )
+                )
+            )
+            slotWorkflowService.addSlotWorkflow(
+                SlotWorkflow(
+                    slot = slot,
+                    trigger = SlotPipelineStatus.RUNNING,
+                    workflow = WorkflowParser.parseYamlWorkflow(
+                        """
+                            name: On running
+                            nodes:
+                              - id: start
+                                executorId: mock
+                                data:
+                                  text: Running
+                        """.trimIndent()
+                    )
+                )
+            )
+            slotWorkflowService.addSlotWorkflow(
+                SlotWorkflow(
+                    slot = slot,
+                    trigger = SlotPipelineStatus.DONE,
+                    workflow = WorkflowParser.parseYamlWorkflow(
+                        """
+                            name: On done
+                            nodes:
+                              - id: start
+                                executorId: mock
+                                data:
+                                  text: Done
+                        """.trimIndent()
+                    )
+                )
+            )
+            // Creating a pipeline in done mode
+            slot.project.branch {
+                build {
+                    run(
+                        """
+                            mutation {
+                                startSlotPipeline(input: {
+                                    slotId: "${slot.id}",
+                                    buildId: $id,
+                                    forceDone: true,
+                                    forceDoneMessage: "Direct done",
+                                    skipWorkflows: true,
+                                }) {
+                                    pipeline {
+                                        id
+                                    }
+                                    errors {
+                                        message
+                                    }
+                                }
+                            }
+                        """.trimIndent()
+                    ) { data ->
+                        checkGraphQLUserErrors(data, "startSlotPipeline") { node ->
+                            val id = node.path("pipeline")
+                                .path("id").asText()
+                            val pipeline = slotService.getPipelineById(id)
+                            assertEquals(
+                                SlotPipelineStatus.DONE,
+                                pipeline.status,
+                                "Pipeline done"
+                            )
+                            // Checks that no workflow in candidate or running has run
+                            val instances = slotWorkflowService.getSlotWorkflowInstancesByPipeline(pipeline)
+                            assertEquals(
+                                0,
+                                instances.count { it.slotWorkflow.trigger == SlotPipelineStatus.CANDIDATE },
+                                "No workflow on candidate"
+                            )
+                            assertEquals(
+                                0,
+                                instances.count { it.slotWorkflow.trigger == SlotPipelineStatus.RUNNING },
+                                "No workflow on running"
+                            )
+                            assertEquals(
+                                0,
+                                instances.count { it.slotWorkflow.trigger == SlotPipelineStatus.DONE },
+                                "No workflow on done"
+                            )
+                            val change = slotService.getPipelineChanges(pipeline).firstOrNull()
+                            assertNotNull(change) {
+                                assertEquals(SlotPipelineStatus.DONE, it.status)
+                                assertEquals("Direct done", it.message)
+                                assertEquals(SlotPipelineChangeType.STATUS, it.type)
+                                assertEquals("Direct done", it.overrideMessage)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }

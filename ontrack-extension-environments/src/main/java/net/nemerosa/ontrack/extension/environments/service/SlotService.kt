@@ -70,12 +70,14 @@ interface SlotService {
      *
      * @param forceDone If true, creates the pipeline and puts it directly in DONE status
      * @param forceDoneMessage Associated message for the forcing (if null, a default message will be generated)
+     * @param skipWorkflows Option to skip the workflows on DONE
      */
     fun startPipeline(
         slot: Slot,
         build: Build,
         forceDone: Boolean = false,
         forceDoneMessage: String? = null,
+        skipWorkflows: Boolean = false,
     ): SlotPipeline
 
     /**
@@ -148,6 +150,7 @@ interface SlotService {
         skipWorkflowId: String? = null,
         forcing: Boolean = false,
         message: String? = null,
+        skipWorkflows: Boolean = false,
     ): SlotDeploymentActionStatus
 
     /**
