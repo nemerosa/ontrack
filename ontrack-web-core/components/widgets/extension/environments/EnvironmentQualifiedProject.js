@@ -2,7 +2,6 @@ import {Space, Typography} from "antd";
 import {FaBan} from "react-icons/fa";
 import SlotLink from "@components/extension/environments/SlotLink";
 import BuildLink from "@components/builds/BuildLink";
-import SlotPipelineLink from "@components/extension/environments/SlotPipelineLink";
 import PromotionRuns from "@components/promotionRuns/PromotionRuns";
 
 export default function EnvironmentQualifiedProject({environment, qualifiedProject}) {
@@ -20,10 +19,10 @@ export default function EnvironmentQualifiedProject({environment, qualifiedProje
                         <Space>
                             {
                                 slot.lastDeployedPipeline && <>
-                                    <SlotPipelineLink
-                                        pipelineId={slot.lastDeployedPipeline.id}
-                                        numberOnly={true}
-                                    />
+                                    {/*<SlotPipelineLink*/}
+                                    {/*    pipelineId={slot.lastDeployedPipeline.id}*/}
+                                    {/*    numberOnly={true}*/}
+                                    {/*/>*/}
                                     <BuildLink build={slot.lastDeployedPipeline.build}/>
                                 </>
                             }
