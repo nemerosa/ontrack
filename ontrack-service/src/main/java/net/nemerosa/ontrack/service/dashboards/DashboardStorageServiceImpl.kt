@@ -57,6 +57,20 @@ class DashboardStorageServiceImpl(
         storageService.delete(STORE, uuid)
     }
 
+    override fun migrateDashboards(migration: (Dashboard) -> Dashboard) {
+        storageService.updateAll(
+            store = STORE,
+            type = StoredDashboard::class,
+        ) { _, item ->
+            val dashboard = item.dashboard
+            val migrated = migration(dashboard)
+            StoredDashboard(
+                userId = item.userId,
+                dashboard = migrated,
+            )
+        }
+    }
+
     /**
      * Stored dashboard
      *

@@ -16,4 +16,12 @@ data class WidgetInstance(
     val key: String,
     val config: JsonNode,
     val layout: WidgetLayout,
-)
+) {
+    fun adaptLayout(migration: (WidgetLayout) -> WidgetLayout) =
+        WidgetInstance(
+            uuid = uuid,
+            key = key,
+            config = config,
+            layout = migration(layout),
+        )
+}
