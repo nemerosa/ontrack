@@ -19,7 +19,12 @@ export const getUserErrors = (node) => {
  */
 export const getGraphQLErrors = (data, userNodeName) => {
     const errors = []
-    // TODO Getting the errors at top level
+    // Getting the errors at top level
+    if (data.errors && data.errors.length > 0) {
+        data.errors.forEach(error => {
+            errors.push(error.message)
+        })
+    }
     // Errors at user node level
     if (userNodeName) {
         const userNode = data[userNodeName]
@@ -44,7 +49,7 @@ export const getGraphQLErrors = (data, userNodeName) => {
 export const processGraphQLErrors = (data, userNode, messageApi) => {
     const errors = getGraphQLErrors(data, userNode)
     if (errors && errors.length > 0) {
-        const message = errors[0].message
+        const message = errors[0]
         messageApi.error(message)
         return false
     } else {

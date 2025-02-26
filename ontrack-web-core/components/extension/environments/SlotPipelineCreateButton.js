@@ -3,9 +3,12 @@ import {FaPlay} from "react-icons/fa";
 import {useState} from "react";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
+import {processGraphQLErrors} from "@components/services/graphql-utils";
+import {useMessageApi} from "@components/providers/MessageProvider";
 
 export default function SlotPipelineCreateButton({slot, build, size, onStart}) {
 
+    const messageApi = useMessageApi()
     const client = useGraphQLClient()
 
     const [loading, setLoading] = useState(false)
@@ -13,7 +16,7 @@ export default function SlotPipelineCreateButton({slot, build, size, onStart}) {
     const onClick = async () => {
         setLoading(true)
         try {
-            await client.request(
+            const data = await client.request(
                 gql`
                     mutation StartPipeline(
                         $slotId: String!,
@@ -34,7 +37,9 @@ export default function SlotPipelineCreateButton({slot, build, size, onStart}) {
                     buildId: build.id,
                 }
             )
-            if (onStart) onStart()
+            if (processGraphQLErrors(data, 'startSlotPipeline', messageApi)) {
+                if (onStart) onStart()
+            }
         } finally {
             setLoading(false)
         }

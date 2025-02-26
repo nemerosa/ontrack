@@ -17,6 +17,7 @@ import 'ace-builds/src-noconflict/ace';
 import 'ace-builds/src-noconflict/mode-yaml';
 import 'ace-builds/src-noconflict/mode-json';
 import 'ace-builds/src-noconflict/theme-github';
+import MessageContextProvider from "@components/providers/MessageProvider";
 
 export async function getServerSideProps() {
     console.log("[init] Environment ", ontrack)
@@ -55,19 +56,21 @@ export default function App({Component, environment, pageProps}) {
             <Head>
                 <link rel="shortcut icon" href={`${router.basePath}/favicon.ico`}/>
             </Head>
-            <ConnectionContextProvider environment={environment}>
-                <UserContextProvider>
-                    <PreferencesContextProvider>
-                        <RefDataContextProvider>
-                            <SearchContextProvider>
-                                <EventsContextProvider>
-                                    <Component {...pageProps} />
-                                </EventsContextProvider>
-                            </SearchContextProvider>
-                        </RefDataContextProvider>
-                    </PreferencesContextProvider>
-                </UserContextProvider>
-            </ConnectionContextProvider>
+            <MessageContextProvider>
+                <ConnectionContextProvider environment={environment}>
+                    <UserContextProvider>
+                        <PreferencesContextProvider>
+                            <RefDataContextProvider>
+                                <SearchContextProvider>
+                                    <EventsContextProvider>
+                                        <Component {...pageProps} />
+                                    </EventsContextProvider>
+                                </SearchContextProvider>
+                            </RefDataContextProvider>
+                        </PreferencesContextProvider>
+                    </UserContextProvider>
+                </ConnectionContextProvider>
+            </MessageContextProvider>
         </>
     )
 }
