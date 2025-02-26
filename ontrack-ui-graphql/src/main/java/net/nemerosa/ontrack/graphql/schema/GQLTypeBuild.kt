@@ -448,12 +448,14 @@ class GQLTypeBuild(
             val size = environment.getArgument<Int>(GQLPaginatedListFactory.ARG_SIZE) ?: 10
 
             // Gets the list of validation stamps
-            val actualValidationStampNames = if (validationStampNames != null) {
+            val actualValidationStampNames = if (!validationStampNames.isNullOrEmpty()) {
                 if (!validationStampName.isNullOrBlank()) {
                     validationStampNames + validationStampName
                 } else {
                     validationStampNames
                 }
+            } else if (!validationStampName.isNullOrBlank()) {
+                listOf(validationStampName)
             } else {
                 null
             }
