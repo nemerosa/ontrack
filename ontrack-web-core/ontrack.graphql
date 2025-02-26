@@ -5562,6 +5562,13 @@ type Query {
         "ID of the branch to look for"
         id: Int!
     ): Branch!
+    "Getting a branch using its name"
+    branchByName(
+        "Name of the branch"
+        name: String,
+        "Name of the project"
+        project: String
+    ): Branch
     branches(
         "Keeps only branches listed as favourute"
         favourite: Boolean,

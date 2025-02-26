@@ -8,12 +8,40 @@ import {FaInfoCircle} from "react-icons/fa";
 import Timestamp from "@components/common/Timestamp";
 import RunInfo from "@components/common/RunInfo";
 import ValidationRunData from "@components/framework/validation-run-data/ValidationRunData";
+import BuildLink from "@components/builds/BuildLink";
+import PromotionRuns from "@components/promotionRuns/PromotionRuns";
 
-export default function ValidationRunTable({validationRuns, pagination = false, onChange, filtering}) {
+export default function ValidationRunTable({
+                                               validationRuns,
+                                               pagination = false,
+                                               onChange,
+                                               filtering,
+                                               displayBuild = false,
+                                               displayPromotionRuns = false,
+                                           }) {
 
     // Definition of the columns
 
-    const columns = [
+    const columns = []
+
+    if (displayBuild) {
+        columns.push(
+            {
+                title: "Build",
+                render: (_, run) => <BuildLink build={run.build}/>,
+            }
+        )
+        if (displayPromotionRuns) {
+            columns.push(
+                {
+                    title: "Promotions",
+                    render: (_, run) => <PromotionRuns promotionRuns={run.build.promotionRuns}/>
+                }
+            )
+        }
+    }
+
+    columns.push(
         {
             title: "Validation",
             key: 'validation',
@@ -68,7 +96,7 @@ export default function ValidationRunTable({validationRuns, pagination = false, 
             key: 'data',
             render: (_, run) => <ValidationRunData data={run.data}/>
         }
-    ]
+    )
 
     return (
         <>
