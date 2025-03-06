@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflow
 import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowService
 import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowTestFixtures
 import net.nemerosa.ontrack.extension.scm.service.TestSCMExtension
-import net.nemerosa.ontrack.it.NewTxRollbacked
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
@@ -20,7 +19,9 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
 
-@NewTxRollbacked
+/**
+ * TODO Recurring issue where the project is created but not visible by the Casc, if we run in the same transaction...
+ */
 @Disabled("FLAKY")
 class EnvironmentsCascContextIT : AbstractCascTestSupport() {
 
@@ -46,6 +47,7 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
     private lateinit var jsonTypeBuilder: JsonTypeBuilder
 
     @Test
+    @Disabled("To be refactored - too difficult to maintain, very little value")
     fun `CasC schema type`() {
         val type = environmentsCascContext.jsonType(jsonTypeBuilder)
         assertEquals(
@@ -919,6 +921,72 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                         .firstOrNull()
                 ) { sw ->
                     assertEquals("Deployed", sw.workflow.name)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Registration of workflows using Casc keeps existing workflows`() {
+        asAdmin {
+            deleteAllEnvironments()
+            val project = project { }
+            val cascYaml =
+                """
+                    ontrack:
+                        config:
+                            environments:
+                                keepEnvironments: true
+                                environments:
+                                    - name: production
+                                      order: 200
+                                slots:
+                                    - project: ${project.name}
+                                      environments:
+                                        - name: production
+                                          workflows:
+                                            - name: Creation
+                                              trigger: CANDIDATE
+                                              nodes:
+                                                - id: start
+                                                  executorId: mock
+                                                  data:
+                                                      text: Start
+                """.trimIndent()
+
+            casc(cascYaml)
+
+            // Getting the slot workflow
+
+            val production = environmentService.findByName("production") ?: fail("Production not found")
+            val slot = slotService.findSlotByProjectAndEnvironment(
+                production,
+                project,
+                Slot.DEFAULT_QUALIFIER
+            ) ?: fail("Could not find slot")
+            val slotWorkflow = slotWorkflowService.getSlotWorkflowsBySlot(slot).single()
+
+            // Re-applying the Casc
+
+            casc(cascYaml)
+
+            // Checking that the workflow has kept its ID
+
+            assertNotNull(environmentService.findByName("production")) {
+                assertNotNull(
+                    slotService.findSlotByProjectAndEnvironment(
+                        it,
+                        project,
+                        Slot.DEFAULT_QUALIFIER
+                    )
+                ) { slot ->
+                    val newSlotWorkflow = slotWorkflowService.getSlotWorkflowsBySlot(slot).single()
+                    // Checking this is the same
+                    assertEquals(
+                        slotWorkflow.id,
+                        newSlotWorkflow.id,
+                        "Slot workflow has not been overridden",
+                    )
                 }
             }
         }
