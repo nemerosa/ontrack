@@ -69,7 +69,7 @@ class EnvironmentsCascContext(
                     onCreation { a ->
                         val environment = environmentService.findByName(a.name)
                         if (environment != null) {
-                            logger.info("[casc][slot] Creating slot ${project}[$qualifier] -> ${a.name}")
+                            logger.info("[casc][slot] Creating slot ${project.name}[$qualifier] -> ${a.name}")
                             val slot = Slot(
                                 environment = environment,
                                 project = project,
@@ -81,16 +81,16 @@ class EnvironmentsCascContext(
                             runSlotAdmissionRules(slot, a)
                             runSlotWorkflows(slot, a)
                         } else {
-                            logger.warn("[casc][slot] Slot ${project}[$qualifier] environment not found -> ${a.name}")
+                            logger.warn("[casc][slot] Slot ${project.name}[$qualifier] environment not found -> ${a.name}")
                         }
                     }
                     onModification { a, existing ->
-                        logger.info("[casc][slot] Existing slot ${project}[$qualifier] -> ${a.name}")
+                        logger.info("[casc][slot] Existing slot ${project.name}[$qualifier] -> ${a.name}")
                         runSlotAdmissionRules(existing, a)
                         runSlotWorkflows(existing, a)
                     }
                     onDeletion { existing ->
-                        logger.info("[casc][slot] Deleting slot ${project}[$qualifier] -> ${existing.environment.name}")
+                        logger.info("[casc][slot] Deleting slot ${project.name}[$qualifier] -> ${existing.environment.name}")
                         slotService.deleteSlot(existing)
                     }
                 }
@@ -154,7 +154,7 @@ class EnvironmentsCascContext(
                 a.actualName == b.name
             }
             onCreation { a ->
-                logger.info("[casc][slot-workflow] Creating slot rule ${slot.project.name}[${slot.qualifier}] -> ${slot.environment.name}: ${a.actualName}")
+                logger.info("[casc][slot-rule] Creating slot rule ${slot.project.name}[${slot.qualifier}] -> ${slot.environment.name}: ${a.actualName}")
                 slotService.addAdmissionRuleConfig(
                     config = SlotAdmissionRuleConfig(
                         slot = slot,
@@ -166,7 +166,7 @@ class EnvironmentsCascContext(
                 )
             }
             onModification { a, existing ->
-                logger.info("[casc][slot-workflow] Updating slot rule ${slot.project.name}[${slot.qualifier}] -> ${slot.environment.name}: ${a.actualName}")
+                logger.info("[casc][slot-rule] Updating slot rule ${slot.project.name}[${slot.qualifier}] -> ${slot.environment.name}: ${a.actualName}")
                 slotService.saveAdmissionRuleConfig(
                     existing
                         .withDescription(a.description)
@@ -174,7 +174,7 @@ class EnvironmentsCascContext(
                 )
             }
             onDeletion { a ->
-                logger.info("[casc][slot-workflow] Deleting slot rule ${slot.project.name}[${slot.qualifier}] -> ${slot.environment.name}: ${a.name}")
+                logger.info("[casc][slot-rule] Deleting slot rule ${slot.project.name}[${slot.qualifier}] -> ${slot.environment.name}: ${a.name}")
                 slotService.deleteAdmissionRuleConfig(a)
             }
         }
