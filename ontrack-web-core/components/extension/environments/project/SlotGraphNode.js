@@ -5,15 +5,16 @@ import Link from "next/link";
 import {slotPipelineUri} from "@components/extension/environments/EnvironmentsLinksUtils";
 import BuildLink from "@components/builds/BuildLink";
 import PromotionRuns from "@components/promotionRuns/PromotionRuns";
-import {EventsContext} from "@components/common/EventsContext";
-import {useContext} from "react";
+import {
+    useProjectEnvironmentsContext
+} from "@components/extension/environments/project/ProjectEnvironmentsContextProvider";
 
 export default function SlotGraphNode({data}) {
 
-    const eventsContext = useContext(EventsContext)
+    const {selectedSlot, setSelectedSlot} = useProjectEnvironmentsContext()
 
     const onSlotSelected = () => {
-        eventsContext.fireEvent("slot.selected", {id: data.slot.id})
+        setSelectedSlot(data.slot)
     }
 
     return (
@@ -24,8 +25,8 @@ export default function SlotGraphNode({data}) {
             <Card
                 hoverable={true}
                 style={{
-                    border: data.selected ? 'solid 4px black' : 'solid 2px gray',
-                    filter: data.selected ? undefined : 'opacity(33%)',
+                    border: selectedSlot?.id === data.slot.id ? 'solid 4px black' : 'solid 2px gray',
+                    filter: selectedSlot?.id === data.slot.id ? undefined : 'opacity(33%)',
                 }}
             >
                 <Space direction="vertical">

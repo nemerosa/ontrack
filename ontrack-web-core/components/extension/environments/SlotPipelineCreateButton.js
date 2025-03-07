@@ -6,7 +6,7 @@ import {gql} from "graphql-request";
 import {processGraphQLErrors} from "@components/services/graphql-utils";
 import {useMessageApi} from "@components/providers/MessageProvider";
 
-export default function SlotPipelineCreateButton({slot, build, size, onStart}) {
+export default function SlotPipelineCreateButton({slot, build, size, onStart, text}) {
 
     const messageApi = useMessageApi()
     const client = useGraphQLClient()
@@ -57,7 +57,9 @@ export default function SlotPipelineCreateButton({slot, build, size, onStart}) {
                     title="Creates a candidate deployment for this build"
                     loading={loading}
                     size={size}
-                />
+                >
+                    {text}
+                </Button>
             </Popconfirm>
         </>
     )

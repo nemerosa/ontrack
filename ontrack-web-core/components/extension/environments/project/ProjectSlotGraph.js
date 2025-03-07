@@ -1,24 +1,61 @@
-import {applyNodeChanges, Background, Controls, MarkerType, ReactFlow} from "reactflow";
-import {useCallback, useContext, useEffect, useState} from "react";
 import SlotGraphNode from "@components/extension/environments/project/SlotGraphNode";
-import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
-import {autoLayout} from "@components/links/GraphUtils";
 import {gqlSlotData, gqlSlotPipelineData} from "@components/extension/environments/EnvironmentGraphQL";
-import {EventsContext} from "@components/common/EventsContext";
+import {useQuery} from "@components/services/useQuery";
+import {
+    useProjectEnvironmentsContext
+} from "@components/extension/environments/project/ProjectEnvironmentsContextProvider";
+import {useCallback, useEffect, useState} from "react";
+import {autoLayout} from "@components/links/GraphUtils";
+import {applyNodeChanges, Background, ControlButton, Controls, MarkerType, ReactFlow} from "reactflow";
+import {FaProjectDiagram} from "react-icons/fa";
 
 const nodeTypes = {
     slotNode: SlotGraphNode,
 }
 
-export default function ProjectSlotGraph({id, qualifier = ""}) {
+export default function ProjectSlotGraph() {
 
-    const client = useGraphQLClient()
+    const {project, qualifier, selectedSlot, setSelectedSlot} = useProjectEnvironmentsContext()
 
-    const [loading, setLoading] = useState(true)
+    const {data: slotGraph, loading} = useQuery(
+        gql`
+            ${gqlSlotData}
+            ${gqlSlotPipelineData}
+            query ProjectSlotGraph(
+                $id: Int!,
+                $qualifier: String!,
+            ) {
+                project(id: $id) {
+                    slotGraph(qualifier: $qualifier) {
+                        slotNodes {
+                            slot {
+                                ...SlotData
+                                lastDeployedPipeline {
+                                    ...SlotPipelineData
+                                }
+                            }
+                            parents {
+                                id
+                            }
+                        }
+                    }
+                }
+            }
+        `,
+        {
+            variables: {
+                id: project?.id,
+                qualifier,
+            },
+            condition: project,
+            deps: [project, qualifier],
+            dataFn: data => data.project.slotGraph,
+        }
+    )
+
     const [nodes, setNodes] = useState([])
     const [edges, setEdges] = useState([])
-
     const setGraph = (nodes, edges) => {
         autoLayout({
             nodes,
@@ -29,97 +66,52 @@ export default function ProjectSlotGraph({id, qualifier = ""}) {
             setEdges,
         })
     }
-
     useEffect(() => {
-        if (client && id) {
-            setLoading(true)
-            client.request(
-                gql`
-                    ${gqlSlotData}
-                    ${gqlSlotPipelineData}
-                    query ProjectSlotGraph(
-                        $id: Int!,
-                        $qualifier: String!,
-                    ) {
-                        project(id: $id) {
-                            slotGraph(qualifier: $qualifier) {
-                                slotNodes {
-                                    slot {
-                                        ...SlotData
-                                        lastDeployedPipeline {
-                                            ...SlotPipelineData
-                                        }
-                                    }
-                                    parents {
-                                        id
-                                    }
-                                }
-                            }
-                        }
-                    }
-                `,
-                {id, qualifier}
-            ).then(data => {
-                const graph = data.project.slotGraph
+        if (slotGraph) {
+            const nodes = slotGraph.slotNodes.map(slotNode => ({
+                id: slotNode.slot.id,
+                position: {x: 0, y: 0},
+                data: {...slotNode},
+                type: 'slotNode',
+            }))
 
-                const nodes = graph.slotNodes.map(slotNode => ({
-                    id: slotNode.slot.id,
-                    position: {x: 0, y: 0},
-                    data: {...slotNode},
-                    type: 'slotNode',
-                }))
-
-                const edges = []
-                graph.slotNodes.forEach(slotNode => {
-                    slotNode.parents?.forEach(({id}) => {
-                        edges.push({
-                            id: `${id}-${slotNode.slot.id}`,
-                            target: slotNode.slot.id,
-                            source: id,
-                            type: 'smoothstep',
-                            markerEnd: {
-                                type: MarkerType.ArrowClosed,
-                                width: 20,
-                                height: 20,
-                            },
-                        })
+            const edges = []
+            slotGraph.slotNodes.forEach(slotNode => {
+                slotNode.parents?.forEach(({id}) => {
+                    edges.push({
+                        id: `${id}-${slotNode.slot.id}`,
+                        target: slotNode.slot.id,
+                        source: id,
+                        type: 'smoothstep',
+                        markerEnd: {
+                            type: MarkerType.ArrowClosed,
+                            width: 20,
+                            height: 20,
+                        },
                     })
                 })
-
-                setGraph(nodes, edges)
-            }).finally(() => {
-                setLoading(false)
             })
+
+            setGraph(nodes, edges)
         }
-    }, [client, id, qualifier])
+    }, [slotGraph])
 
     const onNodesChange = useCallback(
         (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
         [],
     )
 
-    const selectSlot = (id) => {
-        setNodes(nodes => nodes.map(node => ({
-            ...node,
-            data: {
-                ...node.data,
-                selected: node.data.slot.id === id,
-            }
-        })))
+    const onPaneClick = () => {
+        setSelectedSlot(null)
     }
 
-    const eventsContext = useContext(EventsContext)
-    eventsContext.subscribeToEvent("slot.selected", ({id}) => {
-        selectSlot(id)
-    })
-
-    const onPaneClick = () => {
-        eventsContext.fireEvent("slot.selected", {id: ''})
+    const relayout = () => {
+        setGraph(nodes, edges)
     }
 
     return (
         <>
-            <div style={{height: '600px', width: '100%', border: 'solid 1px lightgray'}}>
+            <div style={{height: '600px', width: '100%'}}>
                 <ReactFlow
                     nodes={nodes}
                     edges={edges}
@@ -129,7 +121,11 @@ export default function ProjectSlotGraph({id, qualifier = ""}) {
                     onPaneClick={onPaneClick}
                 >
                     <Background/>
-                    <Controls/>
+                    <Controls>
+                        <ControlButton title="Adjust the layout" onClick={relayout}>
+                            <FaProjectDiagram/>
+                        </ControlButton>
+                    </Controls>
                 </ReactFlow>
             </div>
         </>
