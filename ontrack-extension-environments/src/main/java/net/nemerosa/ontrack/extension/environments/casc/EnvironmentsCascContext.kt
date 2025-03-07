@@ -55,6 +55,22 @@ class EnvironmentsCascContext(
 
     private fun runSlots(slots: List<SlotCasc>) {
         slots.forEach { slotCasc ->
+
+            // Checking that there is no double declaration of environments
+            val duplicateNames = slotCasc.environments
+                .groupBy { it.name }
+                .mapValues { (_, list) -> list.size }
+                .filterValues { it > 1 }
+                .map { (name, count) -> "* $name: $count" }
+            if (duplicateNames.isNotEmpty()) {
+                throw EnvironmentsCascException(
+                    """
+                        Duplicate environment names found in slot ${slotCasc.project}[${slotCasc.qualifier}]:
+                        ${duplicateNames.joinToString("\n")}
+                    """.trimIndent()
+                )
+            }
+
             val qualifier = slotCasc.qualifier
             val project = structureService.findProjectByName(slotCasc.project).getOrNull()
             if (project != null) {
@@ -181,6 +197,22 @@ class EnvironmentsCascContext(
     }
 
     private fun runEnvironments(model: EnvironmentsCascModel) {
+
+        // Checking that there is no double declaration of environments
+        val duplicateNames = model.environments
+            .groupBy { it.name }
+            .mapValues { (_, list) -> list.size }
+            .filterValues { it > 1 }
+            .map { (name, count) -> "* $name: $count" }
+        if (duplicateNames.isNotEmpty()) {
+            throw EnvironmentsCascException(
+                """
+                        Duplicate environment names:
+                        ${duplicateNames.joinToString("\n")}
+                    """.trimIndent()
+            )
+        }
+
         val existingEnvs = environmentService.findAll()
         syncForward(
             from = model.environments,

@@ -993,6 +993,60 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
     }
 
     @Test
+    fun `Environments must not be declared twice`() {
+        asAdmin {
+            deleteAllEnvironments()
+            val cascYaml =
+                """
+                    ontrack:
+                        config:
+                            environments:
+                                keepEnvironments: true
+                                environments:
+                                    - name: staging
+                                      order: 100
+                                    - name: production
+                                      order: 200
+                                    - name: production
+                                      order: 300
+                """.trimIndent()
+            assertFailsWith<EnvironmentsCascException> {
+                casc(cascYaml)
+            }
+        }
+    }
+
+    @Test
+    fun `Environments must not be declared twice in a slot`() {
+        asAdmin {
+            deleteAllEnvironments()
+            val project = project { }
+            val cascYaml =
+                """
+                    ontrack:
+                        config:
+                            environments:
+                                environments:
+                                    - name: staging
+                                      order: 100
+                                    - name: production
+                                      order: 200
+                                slots:
+                                    - project: ${project.name}
+                                      environments:
+                                        - name: staging
+                                        - name: staging
+                                        - name: production
+                """.trimIndent()
+
+            assertFailsWith<EnvironmentsCascException> {
+                casc(cascYaml)
+            }
+
+        }
+    }
+
+    @Test
     fun `Deletion of workflows using Casc`() {
         asAdmin {
             deleteAllEnvironments()
