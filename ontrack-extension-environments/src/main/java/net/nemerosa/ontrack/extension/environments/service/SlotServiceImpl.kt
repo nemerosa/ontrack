@@ -50,6 +50,11 @@ class SlotServiceImpl(
         eventPostService.post(environmentsEventsFactory.slotCreation(slot))
     }
 
+    override fun saveSlot(slot: Slot) {
+        securityService.checkSlotAccess<SlotUpdate>(slot)
+        slotRepository.saveSlot(slot)
+    }
+
     override fun findSlotsByEnvironment(environment: Environment): List<Slot> =
         if (securityService.isGlobalFunctionGranted(EnvironmentList::class.java)) {
             securityService.asAdmin {

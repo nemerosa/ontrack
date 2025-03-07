@@ -90,7 +90,7 @@ class EnvironmentsCascContext(
                                 environment = environment,
                                 project = project,
                                 qualifier = slotCasc.qualifier,
-                                description = slotCasc.description,
+                                description = generateSlotDescription(slotCasc, a),
                             ).apply {
                                 slotService.addSlot(this)
                             }
@@ -102,6 +102,11 @@ class EnvironmentsCascContext(
                     }
                     onModification { a, existing ->
                         logger.info("[casc][slot] Existing slot ${project.name}[$qualifier] -> ${a.name}")
+                        val description = generateSlotDescription(slotCasc, a)
+                        if (existing.description != description) {
+                            logger.info("[casc][slot] Existing slot ${project.name}[$qualifier] -> ${a.name} - updating description")
+                            slotService.saveSlot(existing.withDescription(description))
+                        }
                         runSlotAdmissionRules(existing, a)
                         runSlotWorkflows(existing, a)
                     }
@@ -115,6 +120,20 @@ class EnvironmentsCascContext(
             }
         }
     }
+
+    private fun generateSlotDescription(slotCasc: SlotCasc, slotEnvironmentCasc: SlotEnvironmentCasc): String? =
+        if (slotEnvironmentCasc.description.isNotBlank()) {
+            slotEnvironmentCasc.description
+        } else if (slotCasc.description.isNotBlank()) {
+            val s = StringBuilder(slotCasc.description)
+            s.append(" ${slotCasc.project}")
+            if (slotCasc.qualifier.isNotBlank()) {
+                s.append("[${slotCasc.qualifier}]")
+            }
+            s.toString()
+        } else {
+            null
+        }
 
     private fun runSlotWorkflows(slot: Slot, slotEnvironmentCasc: SlotEnvironmentCasc) {
         val cascWorkflows = slotEnvironmentCasc.workflows

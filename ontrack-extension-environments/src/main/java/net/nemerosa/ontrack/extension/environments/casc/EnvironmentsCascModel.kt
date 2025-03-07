@@ -40,7 +40,7 @@ data class SlotCasc(
     val project: String,
     @APIDescription("Optional qualifier for this slot")
     val qualifier: String = Slot.DEFAULT_QUALIFIER,
-    @APIDescription("Description for this slot")
+    @APIDescription("Prefix for the description for the slots (can be overridden by description at environment level)")
     val description: String = "",
     @APIDescription("Configuration of environments for this slot")
     val environments: List<SlotEnvironmentCasc>,
@@ -50,6 +50,8 @@ data class SlotCasc(
 data class SlotEnvironmentCasc(
     @APIDescription("Name of the environment. It must exist.")
     val name: String,
+    @APIDescription("Description for the slot")
+    val description: String = "",
     @APIDescription("List of admission rules for this slot")
     val admissionRules: List<SlotEnvironmentAdmissionRuleCasc> = emptyList(),
     @APIDescription("List of workflows for this slot")
