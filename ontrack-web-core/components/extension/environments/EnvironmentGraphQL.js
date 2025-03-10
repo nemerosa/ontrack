@@ -34,6 +34,7 @@ export const gqlSlotData = gql`
         }
     }
     ${gqlProjectContentFragment}
+    ${gqlSlotDataNoProject}
 `;
 
 export const gqlSlotPipelineBuildData = gql`
@@ -92,4 +93,5 @@ export const gqlSlotPipelineData = gql`
         }
     }
     ${gqlSlotPipelineBuildData}
+    ${gqlSlotPipelineDataNoBuild}
 `;
