@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {gql} from "graphql-request";
 import {Popover, Space, Timeline, Typography} from "antd";
 import dayjs from "dayjs";
@@ -14,7 +14,6 @@ import {FaCog} from "react-icons/fa";
 import EntityNotificationsBadge from "@components/extension/notifications/EntityNotificationsBadge";
 import {promotionLevelUri, promotionRunUri} from "@components/common/Links";
 import Link from "next/link";
-import {UserContext} from "@components/providers/UserProvider";
 import TimestampText from "@components/common/TimestampText";
 
 /**
@@ -22,7 +21,6 @@ import TimestampText from "@components/common/TimestampText";
  */
 export default function BuildContentPromotions({build}) {
 
-    const user = useContext(UserContext)
     const client = useGraphQLClient()
 
     const [loading, setLoading] = useState(true)
@@ -188,16 +186,11 @@ export default function BuildContentPromotions({build}) {
     return (
         <>
             <GridCell id="promotions" title="Promotions" loading={loading} padding={true}>
-                <Space direction="vertical" className="ot-line">
-                    <Timeline
-                        style={{
-                            paddingTop: user.authorizations.environment?.view ? 0 : 16,
-                        }}
-                        mode="right"
-                        reverse={true}
-                        items={promotionRunItems}
-                    />
-                </Space>
+                <Timeline
+                    mode="right"
+                    reverse={true}
+                    items={promotionRunItems}
+                />
             </GridCell>
         </>
     )
