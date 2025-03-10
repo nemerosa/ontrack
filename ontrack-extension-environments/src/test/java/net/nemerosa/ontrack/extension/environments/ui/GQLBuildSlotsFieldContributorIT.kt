@@ -39,4 +39,34 @@ class GQLBuildSlotsFieldContributorIT : AbstractQLKTITSupport() {
         }
     }
 
+    @Test
+    fun `List of slots for a build filtered by environment`() {
+        slotTestSupport.withSlot { slot1 ->
+            /*val slot2 = */ slotTestSupport.slot(project = slot1.project) // Another environment
+            /*val slot3 = */ slotTestSupport.slot(environment = slot1.environment) // Another project
+            slot1.project.branch {
+                build {
+                    run(
+                        """
+                            {
+                                build(id: $id) {
+                                    slots(environment: "${slot1.environment.name}") {
+                                        id
+                                    }
+                                }
+                            }
+                        """.trimIndent()
+                    ) { data ->
+                        val slotId = data.path("build").path("slots")
+                            .single().path("id").asText()
+                        assertEquals(
+                            slot1.id,
+                            slotId
+                        )
+                    }
+                }
+            }
+        }
+    }
+
 }

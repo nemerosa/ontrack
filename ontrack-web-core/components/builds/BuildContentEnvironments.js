@@ -6,17 +6,21 @@ import {
     gqlSlotPipelineBuildData,
     gqlSlotPipelineDataNoBuild
 } from "@components/extension/environments/EnvironmentGraphQL";
-import {Flex, List, Typography} from "antd";
+import {Flex, List, Space, Typography} from "antd";
 import EnvironmentIcon from "@components/extension/environments/EnvironmentIcon";
 import {isAuthorized} from "@components/common/authorizations";
 import SlotPipelineCreateButton from "@components/extension/environments/SlotPipelineCreateButton";
 import {useRefresh} from "@components/common/RefreshUtils";
 import BuildDeploymentListItem from "@components/builds/environments/BuildDeploymentListItem";
 import BuildSlotInfo from "@components/builds/environments/BuildSlotInfo";
+import SelectEnvironmentName from "@components/extension/environments/SelectEnvironmentName";
+import {useState} from "react";
 
 export default function BuildContentEnvironments({build}) {
 
     const [refreshState, refresh] = useRefresh()
+
+    const [environmentName, setEnvironmentName] = useState()
 
     const {data, loading} = useQuery(
         gql`
@@ -25,9 +29,15 @@ export default function BuildContentEnvironments({build}) {
             ${gqlSlotPipelineBuildData}
             query BuildEnvironments(
                 $id: Int!,
+                $environment: String,
             ) {
                 build(id: $id) {
-                    slots {
+                    branch {
+                        project {
+                            name
+                        }
+                    }
+                    slots(environment: $environment) {
                         ...SlotData
                         lastDeployedPipeline {
                             build {
@@ -55,14 +65,33 @@ export default function BuildContentEnvironments({build}) {
             }
         `,
         {
-            variables: {id: build.id},
-            deps: [refreshState],
+            variables: {
+                id: build.id,
+                environment: environmentName,
+            },
+            deps: [refreshState, environmentName],
         }
     )
 
     return (
         <>
-            <GridCell id="environments" title="Environments" loading={loading} padding={true}>
+            <GridCell id="environments"
+                      title="Environments"
+                      loading={loading}
+                      padding={true}
+                      extra={
+                          <Space>
+                              {
+                                  data?.build?.branch?.project?.name &&
+                                  <SelectEnvironmentName
+                                      projects={[data.build.branch.project.name]}
+                                      value={environmentName}
+                                      onChange={setEnvironmentName}
+                                  />
+                              }
+                          </Space>
+                      }
+            >
                 <List
                     itemLayout="vertical"
                     size="default"

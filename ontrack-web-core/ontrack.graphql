@@ -716,6 +716,8 @@ type Build implements Authorizable & ProjectEntity {
     ): [SlotPipeline!]!
     "List of deployment slots this build is associated with"
     slots(
+        "Name of the environment"
+        environment: String,
         "Qualifier for the project"
         qualifier: String
     ): [Slot!]!

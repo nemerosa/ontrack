@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
 
-export default function SelectEnvironmentName({id = "environment", value, onChange}) {
+export default function SelectEnvironmentName({id = "environment", projects = [], value, onChange}) {
 
     const client = useGraphQLClient()
 
@@ -15,12 +15,15 @@ export default function SelectEnvironmentName({id = "environment", value, onChan
             setLoading(true)
             client.request(
                 gql`
-                    query SelectEnvironments {
-                        environments {
+                    query SelectEnvironments(
+                        $projects: [String!],
+                    ) {
+                        environments(filter: {projects: $projects}) {
                             name
                         }
                     }
-                `
+                `,
+                {projects}
             ).then(data => {
                 setEnvironments(data.environments.map(env => ({
                     value: env.name,
