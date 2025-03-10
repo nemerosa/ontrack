@@ -94,7 +94,7 @@ export default function BuildContentEnvironments({build}) {
             >
                 <List
                     itemLayout="vertical"
-                    size="default"
+                    size="small"
                     dataSource={data?.build?.slots}
                     renderItem={(slot) =>
                         <>
