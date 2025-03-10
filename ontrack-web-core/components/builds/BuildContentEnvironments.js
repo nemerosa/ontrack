@@ -15,6 +15,7 @@ import BuildDeploymentListItem from "@components/builds/environments/BuildDeploy
 import BuildSlotInfo from "@components/builds/environments/BuildSlotInfo";
 import SelectEnvironmentName from "@components/extension/environments/SelectEnvironmentName";
 import {useState} from "react";
+import {AutoRefreshButton, AutoRefreshContextProvider} from "@components/common/AutoRefresh";
 
 export default function BuildContentEnvironments({build}) {
 
@@ -75,91 +76,94 @@ export default function BuildContentEnvironments({build}) {
 
     return (
         <>
-            <GridCell id="environments"
-                      title="Environments"
-                      loading={loading}
-                      padding={true}
-                      extra={
-                          <Space>
-                              {
-                                  data?.build?.branch?.project?.name &&
-                                  <SelectEnvironmentName
-                                      projects={[data.build.branch.project.name]}
-                                      value={environmentName}
-                                      onChange={setEnvironmentName}
-                                  />
-                              }
-                          </Space>
-                      }
-            >
-                <List
-                    itemLayout="vertical"
-                    size="small"
-                    dataSource={data?.build?.slots}
-                    renderItem={(slot) =>
-                        <>
-                            <List.Item
-                                key={slot.id}
-                            >
-                                <Flex gap={16}>
-                                    <Flex vertical={true} justify="flex-start">
-                                        <EnvironmentIcon environmentId={slot.environment.id}/>
-                                    </Flex>
-                                    <Flex vertical={true} justify="flex-start" align="flex-start" gap={8} flex={1}>
-                                        <BuildSlotInfo slot={slot} build={build}/>
-                                    </Flex>
-                                    <Flex vertical={true} justify="flex-start" gap={8} flex={3}>
-                                        {
-                                            isAuthorized(slot, "pipeline", "create") &&
-                                            <SlotPipelineCreateButton
-                                                slot={slot}
-                                                build={build}
-                                                onStart={refresh}
-                                                text="Create candidate deployment"
-                                            />
-                                        }
-                                        {
-                                            slot.currentPipeline && !slot.currentPipeline.finished && slot.currentPipeline.build.id !== build.id &&
-                                            <>
-                                                <Typography.Text type="secondary">
-                                                    Another build is being deployed
-                                                </Typography.Text>
-                                                <BuildDeploymentListItem
-                                                    deployment={slot.currentPipeline}
-                                                    build={slot.currentPipeline.build}
-                                                    refresh={refresh}
+            <AutoRefreshContextProvider onRefresh={refresh}>
+                <GridCell id="environments"
+                          title="Environments"
+                          loading={loading}
+                          padding={true}
+                          extra={
+                              <Space>
+                                  {
+                                      data?.build?.branch?.project?.name &&
+                                      <SelectEnvironmentName
+                                          projects={[data.build.branch.project.name]}
+                                          value={environmentName}
+                                          onChange={setEnvironmentName}
+                                      />
+                                  }
+                                  <AutoRefreshButton/>
+                              </Space>
+                          }
+                >
+                    <List
+                        itemLayout="vertical"
+                        size="small"
+                        dataSource={data?.build?.slots}
+                        renderItem={(slot) =>
+                            <>
+                                <List.Item
+                                    key={slot.id}
+                                >
+                                    <Flex gap={16}>
+                                        <Flex vertical={true} justify="flex-start">
+                                            <EnvironmentIcon environmentId={slot.environment.id}/>
+                                        </Flex>
+                                        <Flex vertical={true} justify="flex-start" align="flex-start" gap={8} flex={1}>
+                                            <BuildSlotInfo slot={slot} build={build}/>
+                                        </Flex>
+                                        <Flex vertical={true} justify="flex-start" gap={8} flex={3}>
+                                            {
+                                                isAuthorized(slot, "pipeline", "create") &&
+                                                <SlotPipelineCreateButton
+                                                    slot={slot}
+                                                    build={build}
+                                                    onStart={refresh}
+                                                    text="Create candidate deployment"
                                                 />
-                                            </>
-                                        }
-                                        {
-                                            slot.pipelines.pageItems.length === 0 &&
-                                            <Typography.Text type="secondary">This build was not deployed
-                                                yet</Typography.Text>
-                                        }
-                                        {
-                                            slot.pipelines.pageItems.length > 0 &&
-                                            <>
-                                                <Typography.Text type="secondary">Deployments for this
-                                                    build</Typography.Text>
-                                                <List
-                                                    size="small"
-                                                    dataSource={slot.pipelines.pageItems}
-                                                    renderItem={(deployment) =>
-                                                        <BuildDeploymentListItem
-                                                            deployment={deployment}
-                                                            refresh={refresh}
-                                                        />
-                                                    }
-                                                />
-                                            </>
-                                        }
+                                            }
+                                            {
+                                                slot.currentPipeline && !slot.currentPipeline.finished && slot.currentPipeline.build.id !== build.id &&
+                                                <>
+                                                    <Typography.Text type="secondary">
+                                                        Another build is being deployed
+                                                    </Typography.Text>
+                                                    <BuildDeploymentListItem
+                                                        deployment={slot.currentPipeline}
+                                                        build={slot.currentPipeline.build}
+                                                        refresh={refresh}
+                                                    />
+                                                </>
+                                            }
+                                            {
+                                                slot.pipelines.pageItems.length === 0 &&
+                                                <Typography.Text type="secondary">This build was not deployed
+                                                    yet</Typography.Text>
+                                            }
+                                            {
+                                                slot.pipelines.pageItems.length > 0 &&
+                                                <>
+                                                    <Typography.Text type="secondary">Deployments for this
+                                                        build</Typography.Text>
+                                                    <List
+                                                        size="small"
+                                                        dataSource={slot.pipelines.pageItems}
+                                                        renderItem={(deployment) =>
+                                                            <BuildDeploymentListItem
+                                                                deployment={deployment}
+                                                                refresh={refresh}
+                                                            />
+                                                        }
+                                                    />
+                                                </>
+                                            }
+                                        </Flex>
                                     </Flex>
-                                </Flex>
-                            </List.Item>
-                        </>
-                    }
-                />
-            </GridCell>
+                                </List.Item>
+                            </>
+                        }
+                    />
+                </GridCell>
+            </AutoRefreshContextProvider>
         </>
     )
 }

@@ -17,9 +17,9 @@ export default function BuildContent({build}) {
     let layoutName = ''
     if (user.authorizations.environment?.view) {
         defaultLayout = [
-            {i: "promotions", x: 0, y: 0, w: 4, h: 6},
-            {i: "environments", x: 0, y: 6, w: 4, h: 9},
-            {i: "validations", x: 4, y: 0, w: 8, h: 15},
+            {i: "promotions", x: 0, y: 0, w: 5, h: 6},
+            {i: "environments", x: 0, y: 6, w: 5, h: 9},
+            {i: "validations", x: 5, y: 0, w: 7, h: 15},
             {i: "using", x: 0, y: 15, w: 6, h: 9},
             {i: "usedBy", x: 6, y: 24, w: 6, h: 9},
             {i: "notifications", x: 0, y: 33, w: 12, h: 9},
