@@ -92,6 +92,7 @@ interface SlotService {
         slot: Slot,
         offset: Int = 0,
         size: Int = 10,
+        buildId: Int? = null,
     ): PaginatedList<SlotPipeline>
 
     /**

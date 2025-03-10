@@ -11,12 +11,9 @@ export const gqlEnvironmentData = gql`
     }
 `;
 
-export const gqlSlotData = gql`
-    fragment SlotData on Slot {
+export const gqlSlotDataNoProject = gql`
+    fragment SlotDataNoProject on Slot {
         id
-        project {
-            ...ProjectContent
-        }
         qualifier
         description
         environment {
@@ -27,7 +24,15 @@ export const gqlSlotData = gql`
             tags
         }
     }
+`;
 
+export const gqlSlotData = gql`
+    fragment SlotData on Slot {
+        ...SlotDataNoProject
+        project {
+            ...ProjectContent
+        }
+    }
     ${gqlProjectContentFragment}
 `;
 
@@ -65,8 +70,8 @@ export const gqlSlotPipelineBuildData = gql`
     }
 `;
 
-export const gqlSlotPipelineData = gql`
-    fragment SlotPipelineData on SlotPipeline {
+export const gqlSlotPipelineDataNoBuild = gql`
+    fragment SlotPipelineDataNoBuild on SlotPipeline {
         id
         number
         start
@@ -76,6 +81,12 @@ export const gqlSlotPipelineData = gql`
         lastChange {
             message
         }
+    }
+`;
+
+export const gqlSlotPipelineData = gql`
+    fragment SlotPipelineData on SlotPipeline {
+        ...SlotPipelineDataNoBuild
         build {
             ...SlotPipelineBuildData
         }

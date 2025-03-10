@@ -714,6 +714,11 @@ type Build implements Authorizable & ProjectEntity {
         "Filtering on the pipeline status"
         status: SlotPipelineStatus
     ): [SlotPipeline!]!
+    "List of deployment slots this build is associated with"
+    slots(
+        "Qualifier for the project"
+        qualifier: String
+    ): [Slot!]!
     "List of builds using this one."
     usedBy(
         "Keeps only links targeted from this branch. `project` argument is also required."
@@ -7275,6 +7280,8 @@ type Slot implements Authorizable {
     lastDeployedPipeline: SlotPipeline
     "Paginated list of pipelines"
     pipelines(
+        "Filtering on a build"
+        buildId: Int,
         "Offset for the page"
         offset: Int = 0,
         "Size of the page"
@@ -11474,6 +11481,8 @@ input StartSlotPipelineInput {
     forceDone: Boolean
     "forceDoneMessage field"
     forceDoneMessage: String
+    "Option to skip the workflows on DONE when forcing the deployment"
+    skipWorkflows: Boolean
     "slotId field"
     slotId: String!
 }

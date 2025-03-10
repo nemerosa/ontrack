@@ -390,9 +390,14 @@ class SlotServiceImpl(
         return lastDeployedPipelines.sortedByDescending { it.slot.environment.order }
     }
 
-    override fun findPipelines(slot: Slot, offset: Int, size: Int): PaginatedList<SlotPipeline> {
+    override fun findPipelines(slot: Slot, offset: Int, size: Int, buildId: Int?): PaginatedList<SlotPipeline> {
         securityService.checkSlotAccess<SlotView>(slot)
-        return slotPipelineRepository.findPipelines(slot, offset, size)
+        return slotPipelineRepository.findPipelines(
+            slot = slot,
+            offset = offset,
+            size = size,
+            buildId = buildId,
+        )
     }
 
     override fun cancelPipeline(pipeline: SlotPipeline, reason: String) {

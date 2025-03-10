@@ -354,4 +354,33 @@ class SlotGraphQLIT : AbstractQLKTITSupport() {
         }
     }
 
+    @Test
+    fun `List of deployments for a slot filtered by build`() {
+        slotTestSupport.withSlot { slot ->
+            slotTestSupport.createRunAndFinishDeployment(slot = slot)
+            val deployment = slotTestSupport.createRunAndFinishDeployment(slot = slot)
+            run(
+                """
+                    {
+                        slotById(id: "${slot.id}") {
+                            pipelines(buildId: ${deployment.build.id}) {
+                                pageItems {
+                                    id
+                                }
+                            }
+                        }
+                    }
+                """.trimIndent()
+            ) { data ->
+                val deploymentId = data.path("slotById").path("pipelines")
+                    .path("pageItems").single()
+                    .path("id").asText()
+                assertEquals(
+                    deployment.id,
+                    deploymentId
+                )
+            }
+        }
+    }
+
 }

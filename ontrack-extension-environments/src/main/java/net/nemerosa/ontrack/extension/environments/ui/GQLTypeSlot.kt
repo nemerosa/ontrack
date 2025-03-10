@@ -96,9 +96,18 @@ class GQLTypeSlot(
                     cache = cache,
                     fieldName = "pipelines",
                     fieldDescription = "Paginated list of pipelines",
+                    arguments = listOf(
+                        intArgument("buildId", "Filtering on a build"),
+                    ),
                     itemType = gqlTypeSlotPipeline.typeName,
-                    itemPaginatedListProvider = { _, slot, offset, size ->
-                        slotService.findPipelines(slot, offset, size)
+                    itemPaginatedListProvider = { env, slot, offset, size ->
+                        val buildId: Int? = env.getArgument("buildId")
+                        slotService.findPipelines(
+                            slot = slot,
+                            offset = offset,
+                            size = size,
+                            buildId = buildId,
+                        )
                     }
                 )
             )
