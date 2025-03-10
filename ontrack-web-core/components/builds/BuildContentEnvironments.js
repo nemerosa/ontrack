@@ -19,8 +19,12 @@ import SlotPipelineStatusIcon from "@components/extension/environments/SlotPipel
 import TimestampText from "@components/common/TimestampText";
 import {isAuthorized} from "@components/common/authorizations";
 import SlotPipelineCreateButton from "@components/extension/environments/SlotPipelineCreateButton";
+import {useRefresh} from "@components/common/RefreshUtils";
+import BuildDeploymentListItem from "@components/builds/environments/BuildDeploymentListItem";
 
 export default function BuildContentEnvironments({build}) {
+
+    const [refreshState, refresh] = useRefresh()
 
     const {data, loading} = useQuery(
         gql`
@@ -34,6 +38,12 @@ export default function BuildContentEnvironments({build}) {
                     slots {
                         ...SlotData
                         lastDeployedPipeline {
+                            build {
+                                ...SlotPipelineBuildData
+                            }
+                        }
+                        currentPipeline {
+                            ...SlotPipelineDataNoBuild
                             build {
                                 ...SlotPipelineBuildData
                             }
@@ -54,6 +64,7 @@ export default function BuildContentEnvironments({build}) {
         `,
         {
             variables: {id: build.id},
+            deps: [refreshState],
         }
     )
 
@@ -102,18 +113,31 @@ export default function BuildContentEnvironments({build}) {
                                             <SlotPipelineCreateButton
                                                 slot={slot}
                                                 build={build}
-                                                // TODO onStart={onChange}
+                                                onStart={refresh}
                                                 text="Create candidate deployment"
                                             />
                                         }
                                         {
+                                            slot.currentPipeline && !slot.currentPipeline.finished && slot.currentPipeline.build.id !== build.id &&
+                                            <>
+                                                <Typography.Text type="secondary">
+                                                    Another build is being deployed
+                                                </Typography.Text>
+                                                <BuildDeploymentListItem
+                                                    deployment={slot.currentPipeline}
+                                                />
+                                            </>
+                                        }
+                                        {
                                             slot.pipelines.pageItems.length === 0 &&
-                                            <Typography.Text type="secondary">This build was not deployed yet</Typography.Text>
+                                            <Typography.Text type="secondary">This build was not deployed
+                                                yet</Typography.Text>
                                         }
                                         {
                                             slot.pipelines.pageItems.length > 0 &&
                                             <>
-                                                <Typography.Text type="secondary">Deployments for this build</Typography.Text>
+                                                <Typography.Text type="secondary">Deployments for this
+                                                    build</Typography.Text>
                                                 <List
                                                     size="small"
                                                     dataSource={slot.pipelines.pageItems}
