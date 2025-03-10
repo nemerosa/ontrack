@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useState} from "react";
 import {gql} from "graphql-request";
-import {Divider, Popover, Space, Timeline, Typography} from "antd";
+import {Popover, Space, Timeline, Typography} from "antd";
 import dayjs from "dayjs";
 import AnnotatedDescription from "@components/common/AnnotatedDescription";
 import PromotionLevel from "@components/promotionLevels/PromotionLevel";
@@ -15,14 +15,10 @@ import EntityNotificationsBadge from "@components/extension/notifications/Entity
 import {promotionLevelUri, promotionRunUri} from "@components/common/Links";
 import Link from "next/link";
 import {UserContext} from "@components/providers/UserProvider";
-import BuildEnvironments from "@components/extension/environments/BuildEnvironments";
 import TimestampText from "@components/common/TimestampText";
 
 /**
- * Not used directly any longer. Replaced by BuildPromotionInfo.
- * @param build
- * @return {Element}
- * @constructor
+ * Listing the promotions and only the promotions of a build.
  */
 export default function BuildContentPromotions({build}) {
 
@@ -30,7 +26,6 @@ export default function BuildContentPromotions({build}) {
     const client = useGraphQLClient()
 
     const [loading, setLoading] = useState(true)
-    const [title, setTitle] = useState("Promotions")
     const [promotionRunItems, setPromotionRunItems] = useState([])
 
     const [reloadCount, setReloadCount] = useState(0)
@@ -92,11 +87,6 @@ export default function BuildContentPromotions({build}) {
                     promotionLevel.runs = runs.filter(run => run.promotionLevel.id === promotionLevel.id)
                         .sort((a, b) => a.creation.time.localeCompare(b.creation.time))
                 })
-
-                // Title depends on if the environments are accessible
-                if (user.authorizations.environment?.view) {
-                    setTitle("Promotions & Environments")
-                }
 
                 // Converting the list of promotion levels and their runs into a timeline
                 const items = []
@@ -197,15 +187,8 @@ export default function BuildContentPromotions({build}) {
 
     return (
         <>
-            <GridCell id="promotions" title={title} loading={loading} padding={true}>
+            <GridCell id="promotions" title="Promotions" loading={loading} padding={true}>
                 <Space direction="vertical" className="ot-line">
-                    {
-                        user.authorizations.environment?.view &&
-                        <>
-                            <BuildEnvironments build={build}/>
-                            <Divider/>
-                        </>
-                    }
                     <Timeline
                         style={{
                             paddingTop: user.authorizations.environment?.view ? 0 : 16,

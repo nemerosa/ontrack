@@ -3,22 +3,22 @@ import BuildContentLinksUsing from "@components/builds/BuildContentLinksUsing";
 import StoredGridLayout from "@components/grid/StoredGridLayout";
 import BuildContentLinksUsedBy from "@components/builds/BuildContentLinksUsedBy";
 import BuildContentNotifications from "@components/builds/BuildContentNotifications";
-import BuildPromotionInfo from "@components/builds/BuildPromotionInfo";
+import BuildContentPromotions from "@components/builds/BuildContentPromotions";
 
 export default function BuildContent({build}) {
 
     const defaultLayout = [
-        {i: "promotions", x: 0, y: 0, w: 12, h: 4},
-        {i: "validations", x: 0, y: 4, w: 12, h: 9},
-        {i: "using", x: 0, y: 13, w: 6, h: 9},
-        {i: "usedBy", x: 6, y: 13, w: 6, h: 9},
-        {i: "notifications", x: 0, y: 22, w: 12, h: 9},
+        {i: "promotions", x: 0, y: 0, w: 4, h: 9},
+        {i: "validations", x: 6, y: 0, w: 8, h: 9},
+        {i: "using", x: 0, y: 9, w: 6, h: 9},
+        {i: "usedBy", x: 6, y: 9, w: 6, h: 9},
+        {i: "notifications", x: 0, y: 18, w: 12, h: 9},
     ]
 
     const items = [
         {
             id: "promotions",
-            content: <BuildPromotionInfo
+            content: <BuildContentPromotions
                 build={build}
             />,
         },
@@ -51,7 +51,7 @@ export default function BuildContent({build}) {
     return (
         <>
             <StoredGridLayout
-                id="page-build-layout-v3"
+                id="page-build-layout-v4"
                 defaultLayout={defaultLayout}
                 items={items}
                 rowHeight={30}
