@@ -6,21 +6,13 @@ import {
     gqlSlotPipelineBuildData,
     gqlSlotPipelineDataNoBuild
 } from "@components/extension/environments/EnvironmentGraphQL";
-import {Flex, List, Space, Typography} from "antd";
+import {Flex, List, Typography} from "antd";
 import EnvironmentIcon from "@components/extension/environments/EnvironmentIcon";
-import {slotNameWithoutProject} from "@components/extension/environments/SlotName";
-import Link from "next/link";
-import {slotUri} from "@components/extension/environments/EnvironmentsLinksUtils";
-import {FaArrowUp, FaPlay, FaStop} from "react-icons/fa";
-import BuildLink from "@components/builds/BuildLink";
-import PromotionRuns from "@components/promotionRuns/PromotionRuns";
-import SlotPipelineLink from "@components/extension/environments/SlotPipelineLink";
-import SlotPipelineStatusIcon from "@components/extension/environments/SlotPipelineStatusIcon";
-import TimestampText from "@components/common/TimestampText";
 import {isAuthorized} from "@components/common/authorizations";
 import SlotPipelineCreateButton from "@components/extension/environments/SlotPipelineCreateButton";
 import {useRefresh} from "@components/common/RefreshUtils";
 import BuildDeploymentListItem from "@components/builds/environments/BuildDeploymentListItem";
+import BuildSlotInfo from "@components/builds/environments/BuildSlotInfo";
 
 export default function BuildContentEnvironments({build}) {
 
@@ -85,27 +77,7 @@ export default function BuildContentEnvironments({build}) {
                                         <EnvironmentIcon environmentId={slot.environment.id}/>
                                     </Flex>
                                     <Flex vertical={true} justify="flex-start" align="flex-start" gap={8} flex={1}>
-                                        <Link href={slotUri(slot)}>
-                                            <Typography.Text strong>
-                                                {slotNameWithoutProject(slot)}
-                                            </Typography.Text>
-                                        </Link>
-                                        {
-                                            slot.lastDeployedPipeline &&
-                                            <Space direction="vertical">
-                                                <Typography.Text type="secondary">
-                                                    <Space>
-                                                        <FaArrowUp/>
-                                                        Deployed
-                                                    </Space>
-                                                </Typography.Text>
-                                                <Space>
-                                                    <BuildLink build={slot.lastDeployedPipeline.build}/>
-                                                    <PromotionRuns
-                                                        promotionRuns={slot.lastDeployedPipeline.build.promotionRuns}/>
-                                                </Space>
-                                            </Space>
-                                        }
+                                        <BuildSlotInfo slot={slot} build={build}/>
                                     </Flex>
                                     <Flex vertical={true} justify="flex-start" gap={8} flex={3}>
                                         {
@@ -142,45 +114,7 @@ export default function BuildContentEnvironments({build}) {
                                                     size="small"
                                                     dataSource={slot.pipelines.pageItems}
                                                     renderItem={(deployment) =>
-                                                        <List.Item
-                                                            key={deployment.id}
-                                                        >
-                                                            <List.Item.Meta
-                                                                avatar={
-                                                                    <SlotPipelineStatusIcon
-                                                                        status={deployment.status}
-                                                                    />
-                                                                }
-                                                                title={
-                                                                    <Space>
-                                                                        Pipeline
-                                                                        <SlotPipelineLink
-                                                                            pipelineId={deployment.id}
-                                                                            numberOnly={true}
-                                                                        />
-                                                                    </Space>
-                                                                }
-                                                                description={
-                                                                    <Space direction="vertical">
-                                                                        {
-                                                                            deployment.end &&
-                                                                            <Space>
-                                                                                <FaStop/>
-                                                                                <TimestampText value={deployment.end}/>
-                                                                            </Space>
-                                                                        }
-                                                                        {
-                                                                            !deployment.end &&
-                                                                            <Space>
-                                                                                <FaPlay/>
-                                                                                <TimestampText
-                                                                                    value={deployment.start}/>
-                                                                            </Space>
-                                                                        }
-                                                                    </Space>
-                                                                }
-                                                            />
-                                                        </List.Item>
+                                                        <BuildDeploymentListItem deployment={deployment}/>
                                                     }
                                                 />
                                             </>
