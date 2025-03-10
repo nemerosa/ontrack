@@ -97,6 +97,8 @@ export default function BuildContentEnvironments({build}) {
                                                 </Typography.Text>
                                                 <BuildDeploymentListItem
                                                     deployment={slot.currentPipeline}
+                                                    build={slot.currentPipeline.build}
+                                                    refresh={refresh}
                                                 />
                                             </>
                                         }
@@ -114,7 +116,10 @@ export default function BuildContentEnvironments({build}) {
                                                     size="small"
                                                     dataSource={slot.pipelines.pageItems}
                                                     renderItem={(deployment) =>
-                                                        <BuildDeploymentListItem deployment={deployment}/>
+                                                        <BuildDeploymentListItem
+                                                            deployment={deployment}
+                                                            refresh={refresh}
+                                                        />
                                                     }
                                                 />
                                             </>
