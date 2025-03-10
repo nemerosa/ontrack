@@ -94,7 +94,7 @@ export default function BuildContentPromotions({build}) {
                         // This promotion has at least 1 run
                         runs.forEach(run => {
                             items.push({
-                                label: <Space>
+                                label: <Space className={`promotion-run-pl-${run.promotionLevel.id}`}>
                                     {/* Information about the promotion */}
                                     <Popover content={
                                         <Space direction="vertical">
