@@ -31,6 +31,11 @@ class BuildAuthorizationContributor(
                     ACTION_VALIDATE,
                     securityService.isProjectFunctionGranted<ValidationRunCreate>(build)
                 ),
+                Authorization(
+                    BUILD,
+                    Authorization.EDIT,
+                    securityService.isProjectFunctionGranted<BuildEdit>(build)
+                ),
             )
         }
 }

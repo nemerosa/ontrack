@@ -11719,8 +11719,12 @@ input UnshareSCMFileChangeFilterInput {
 input UpdateBuildInput {
     "Creation timestamp to update"
     creation: LocalDateTime
+    "Description for the build"
+    description: String
     "ID of the build to update"
     id: Int!
+    "Name for the build"
+    name: String
 }
 
 "Input type for the updateConfiguration mutation."

@@ -1,25 +1,27 @@
 import FormDialog, {useFormDialog} from "@components/form/FormDialog";
-import {gql} from "graphql-request";
 import BuildNameFormItem from "@components/builds/BuildNameFormItem";
 import BuildDescriptionFormItem from "@components/builds/BuildDescriptionFormItem";
+import {gql} from "graphql-request";
 
-export const useNewBuildDialog = ({onSuccess}) => {
+export const useEditBuildDialog = ({onSuccess}) => {
     return useFormDialog({
-        onSuccess,
-        prepareValues: (values, {branch}) => {
+        init: (form, {build}) => {
+            form.setFieldsValue(build)
+        },
+        prepareValues: (values, {build}) => {
             return {
                 ...values,
-                branchId: branch.id,
+                buildId: build.id,
             }
         },
         query: gql`
-            mutation CreateBuild(
-                $branchId: Int!,
+            mutation EditBuild(
+                $buildId: Int!,
                 $name: String!,
                 $description: String,
             ) {
-                createBuild(input: {
-                    branchId: $branchId,
+                updateBuild(input: {
+                    id: $buildId,
                     name: $name,
                     description: $description,
                 }) {
@@ -29,11 +31,12 @@ export const useNewBuildDialog = ({onSuccess}) => {
                 }
             }
         `,
-        userNode: 'createBuild',
+        userNode: 'updateBuild',
+        onSuccess,
     })
 }
 
-export default function NewBuildDialog({dialog}) {
+export default function EditBuildDialog({dialog}) {
     return (
         <>
             <FormDialog dialog={dialog}>

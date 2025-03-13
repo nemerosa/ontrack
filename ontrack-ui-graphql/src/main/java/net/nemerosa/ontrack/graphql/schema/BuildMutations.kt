@@ -65,6 +65,16 @@ class BuildMutations(
                 )
                 changed = true
             }
+            // Name
+            if (!input.name.isNullOrBlank()) {
+                build = build.withName(input.name)
+                changed = true
+            }
+            // Description
+            if (input.description != null) {
+                build = build.withDescription(input.description)
+                changed = true
+            }
             // Saving it
             if (changed) {
                 build = structureService.saveBuild(build)
@@ -250,6 +260,10 @@ data class UpdateBuildInput(
     val id: Int,
     @APIDescription("Creation timestamp to update")
     val creation: LocalDateTime? = null,
+    @APIDescription("Name for the build")
+    val name: String? = null,
+    @APIDescription("Description for the build")
+    val description: String? = null,
 )
 
 data class CreateBuildOrGetInput(
