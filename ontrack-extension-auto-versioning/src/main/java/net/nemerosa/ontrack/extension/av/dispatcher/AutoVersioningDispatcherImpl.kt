@@ -71,7 +71,6 @@ class AutoVersioningDispatcherImpl(
                             autoVersioningAuditService.onQueuing(
                                 order,
                                 routingKey,
-                                cancelling = autoVersioningConfigProperties.queue.cancelling
                             )
                             metrics.onQueuing(order, routingKey)
                         }

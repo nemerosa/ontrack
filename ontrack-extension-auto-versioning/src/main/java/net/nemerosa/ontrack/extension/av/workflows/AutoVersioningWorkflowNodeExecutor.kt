@@ -60,7 +60,7 @@ class AutoVersioningWorkflowNodeExecutor(
         workflowNodeExecutorResultFeedback(output.asJson())
 
         // Starting the audit trail
-        autoVersioningAuditService.onQueuing(order, routing = "", cancelling = false)
+        autoVersioningAuditService.onQueuing(order, routing = "")
 
         // Actual auto-versioning process
         val outcome = autoVersioningProcessingService.process(order)

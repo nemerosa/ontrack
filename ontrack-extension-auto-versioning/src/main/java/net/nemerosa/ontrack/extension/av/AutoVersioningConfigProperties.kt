@@ -32,12 +32,6 @@ class AutoVersioningConfigProperties {
         @APIDescription("Default number of RabbitMQ queues to use")
         var scale: Int = 10
 
-        @APIDescription("Minimum number of concurrent listeners for a given queue")
-        var minConcurrency: Int = 2
-
-        @APIDescription("Maximum number of concurrent listeners for a given queue")
-        var maxConcurrency: Int = 5
-
         @APIDescription("List of projects which must have dedicated queues")
         @Deprecated("Will be removed in V5. Not used any longer: queues are dispatched and load-balanced automatically.")
         var projects: List<String> = emptyList()

@@ -32,9 +32,6 @@ class AutoVersioningQueueProcessor(
 
     override val defaultScale: Int? = autoVersioningConfigProperties.queue.scale
 
-    override val minConcurrency: Int = autoVersioningConfigProperties.queue.minConcurrency
-    override val maxConcurrency: Int = autoVersioningConfigProperties.queue.maxConcurrency
-
     /**
      * Always ack the auto-versioning requests.
      */
@@ -44,7 +41,7 @@ class AutoVersioningQueueProcessor(
         val order = payload.order
         val entry = autoVersioningAuditQueryService.findByUUID(order.branch, order.uuid)
         return if (entry == null) {
-            return "No audit entry found upon receiving the processing order"
+            "No audit entry found upon receiving the processing order"
         } else if (!entry.mostRecentState.state.isRunning) {
             logger.debug("Cancelled: {}", entry)
             "Cancelled order, not processing"
@@ -67,6 +64,6 @@ class AutoVersioningQueueProcessor(
     }
 
     override fun getRoutingIdentifier(payload: AutoVersioningQueuePayload): String =
-        payload.order.uuid
+        payload.routingIdentifier()
 
 }
