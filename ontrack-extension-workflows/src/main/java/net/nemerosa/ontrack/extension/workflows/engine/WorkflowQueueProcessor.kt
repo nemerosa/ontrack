@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.workflows.engine
 
 import net.nemerosa.ontrack.extension.queue.QueueAckMode
+import net.nemerosa.ontrack.extension.queue.QueueMetadata
 import net.nemerosa.ontrack.extension.queue.QueueProcessor
 import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Component
@@ -30,7 +31,7 @@ class WorkflowQueueProcessor(
 
     override fun isCancelled(payload: WorkflowQueuePayload): String? = null
 
-    override fun process(payload: WorkflowQueuePayload) {
+    override fun process(payload: WorkflowQueuePayload, queueMetadata: QueueMetadata?) {
         workflowEngine.processNode(
             workflowInstanceId = payload.workflowInstanceId,
             workflowNodeId = payload.workflowNodeId,

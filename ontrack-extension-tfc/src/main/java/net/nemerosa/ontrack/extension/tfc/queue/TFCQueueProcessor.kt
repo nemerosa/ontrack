@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.tfc.queue
 
+import net.nemerosa.ontrack.extension.queue.QueueMetadata
 import net.nemerosa.ontrack.extension.queue.QueueProcessor
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.extension.tfc.TFCExtensionFeature
@@ -23,7 +24,7 @@ class TFCQueueProcessor(
 
     override fun isCancelled(payload: RunPayload): String? = null
 
-    override fun process(payload: RunPayload) {
+    override fun process(payload: RunPayload, queueMetadata: QueueMetadata?) {
         val status = when (payload.trigger) {
             "run:completed" -> when (payload.runStatus) {
                 "applied" -> ValidationRunStatusID.STATUS_PASSED

@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.av
 
-import net.nemerosa.ontrack.extension.av.queue.AutoVersioningQueueStats
+import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditQueryFilter
+import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditQueryService
+import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditState
 import net.nemerosa.ontrack.extension.av.validation.AutoVersioningValidationData
 import net.nemerosa.ontrack.extension.av.validation.AutoVersioningValidationService
 import net.nemerosa.ontrack.model.structure.ID
@@ -13,8 +15,8 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 @RestController
 @RequestMapping("/extension/auto-versioning")
 class AutoVersioningController(
-    private val queueStats: AutoVersioningQueueStats,
     private val structureService: StructureService,
+    private val autoVersioningAuditQueryService: AutoVersioningAuditQueryService,
     private val autoVersioningValidationService: AutoVersioningValidationService,
 ) : AbstractResourceController() {
     /**
@@ -24,7 +26,11 @@ class AutoVersioningController(
     fun getStats(): Resource<AutoVersioningStats> =
         Resource.of(
             AutoVersioningStats(
-                pendingOrders = queueStats.pendingOrders,
+                pendingOrders = autoVersioningAuditQueryService.countByFilter(
+                    filter = AutoVersioningAuditQueryFilter(
+                        states = setOf(AutoVersioningAuditState.CREATED),
+                    )
+                )
             ),
             uri(MvcUriComponentsBuilder.on(AutoVersioningController::class.java).getStats())
         )

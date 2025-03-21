@@ -12,9 +12,8 @@ import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.model.security.AccountOntrackUser
 import net.nemerosa.ontrack.model.security.AccountService
 import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.model.structure.NameDescription
-import net.nemerosa.ontrack.model.support.ApplicationLogEntry
-import net.nemerosa.ontrack.model.support.ApplicationLogService
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.amqp.core.Message
 import org.springframework.amqp.rabbit.annotation.RabbitListenerConfigurer
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerEndpoint
@@ -32,11 +31,12 @@ class QueueListener(
     private val queueConfigProperties: QueueConfigProperties,
     private val queueProcessors: List<QueueProcessor<*>>,
     private val securityService: SecurityService,
-    private val applicationLogService: ApplicationLogService,
     private val queueRecordService: QueueRecordService,
     private val meterRegistry: MeterRegistry,
     private val accountService: AccountService,
 ) : RabbitListenerConfigurer {
+
+    private val logger: Logger = LoggerFactory.getLogger(javaClass)
 
     override fun configureRabbitListeners(registrar: RabbitListenerEndpointRegistrar) {
         queueProcessors.forEach { queueProcessor ->
@@ -71,7 +71,7 @@ class QueueListener(
     ): SimpleRabbitListenerEndpoint {
         id = queue
         setQueueNames(queue)
-        concurrency = "1-1" // No concurrency, we want the events to be processed in turn for a given queue
+        concurrency = "${queueProcessor.minConcurrency}-${queueProcessor.maxConcurrency}"
         messageListener = createMessageListener(queueProcessor)
         return this
     }
@@ -90,7 +90,7 @@ class QueueListener(
             }
 
             try {
-                val queue = message.messageProperties.consumerQueue
+                val queue: String = message.messageProperties.consumerQueue
                 val body = message.body.toString(Charsets.UTF_8).parseAsJson()
                 val qp = QueuePayload.parse(body)
                 meterRegistry.queueMessageReceived(qp)
@@ -137,7 +137,12 @@ class QueueListener(
                         meterRegistry.queueProcessTime(qp) {
                             try {
                                 SecurityContextHolder.setContext(securityContext)
-                                queueProcessor.process(payload)
+                                queueProcessor.process(
+                                    payload = payload,
+                                    queueMetadata = QueueMetadata(
+                                        queueName = queue,
+                                    )
+                                )
                             } finally {
                                 SecurityContextHolder.setContext(oldSecurityContext)
                             }
@@ -151,16 +156,7 @@ class QueueListener(
                     }
                 }
             } catch (any: Throwable) {
-                applicationLogService.log(
-                    ApplicationLogEntry.error(
-                        any,
-                        NameDescription.nd(
-                            "queue-error",
-                            "Catch-all error in queue processing"
-                        ),
-                        "Uncaught error during the queue processing"
-                    ).withDetail("id", queueProcessor.id)
-                )
+                logger.error("Uncaught error during the queue processing (processor = ${queueProcessor.id})", any)
             } finally {
                 if (queueProcessor.ackMode == QueueAckMode.END) {
                     ackMessage(message, channel)
@@ -181,13 +177,8 @@ class QueueListener(
         }
 
         private fun logAckError(e: IOException) {
-            applicationLogService.log(
-                ApplicationLogEntry.error(
-                    e,
-                    NameDescription.nd("queue-ack-error", "Message could not be acked."),
-                    "Message could not be acked: ${e.message}"
-                ).withDetail("message", e.message)
-                    .withDetail("queue.processor", queueProcessor.id)
+            logger.error(
+                "Message could not be acked (processor: ${queueProcessor.id}): ${e.message}", e
             )
         }
 
