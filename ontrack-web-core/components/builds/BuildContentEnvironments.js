@@ -6,16 +6,12 @@ import {
     gqlSlotPipelineBuildData,
     gqlSlotPipelineDataNoBuild
 } from "@components/extension/environments/EnvironmentGraphQL";
-import {Flex, List, Space, Typography} from "antd";
-import EnvironmentIcon from "@components/extension/environments/EnvironmentIcon";
-import {isAuthorized} from "@components/common/authorizations";
-import SlotPipelineCreateButton from "@components/extension/environments/SlotPipelineCreateButton";
+import {List, Space} from "antd";
 import {useRefresh} from "@components/common/RefreshUtils";
-import BuildDeploymentListItem from "@components/builds/environments/BuildDeploymentListItem";
-import BuildSlotInfo from "@components/builds/environments/BuildSlotInfo";
 import SelectEnvironmentName from "@components/extension/environments/SelectEnvironmentName";
 import {useState} from "react";
 import {AutoRefreshButton, AutoRefreshContextProvider} from "@components/common/AutoRefresh";
+import BuildEnvironment from "@components/builds/environments/BuildEnvironment";
 
 export default function BuildContentEnvironments({build}) {
 
@@ -104,60 +100,7 @@ export default function BuildContentEnvironments({build}) {
                                 <List.Item
                                     key={slot.id}
                                 >
-                                    <Flex gap={16}>
-                                        <Flex vertical={true} justify="flex-start">
-                                            <EnvironmentIcon environmentId={slot.environment.id}/>
-                                        </Flex>
-                                        <Flex vertical={true} justify="flex-start" align="flex-start" gap={8} flex={1}>
-                                            <BuildSlotInfo slot={slot} build={build}/>
-                                        </Flex>
-                                        <Flex vertical={true} justify="flex-start" gap={8} flex={3}>
-                                            {
-                                                isAuthorized(slot, "pipeline", "create") &&
-                                                <SlotPipelineCreateButton
-                                                    slot={slot}
-                                                    build={build}
-                                                    onStart={refresh}
-                                                    text="Create candidate deployment"
-                                                />
-                                            }
-                                            {
-                                                slot.currentPipeline && !slot.currentPipeline.finished && slot.currentPipeline.build.id !== build.id &&
-                                                <>
-                                                    <Typography.Text type="secondary">
-                                                        Another build is being deployed
-                                                    </Typography.Text>
-                                                    <BuildDeploymentListItem
-                                                        deployment={slot.currentPipeline}
-                                                        build={slot.currentPipeline.build}
-                                                        refresh={refresh}
-                                                    />
-                                                </>
-                                            }
-                                            {
-                                                slot.pipelines.pageItems.length === 0 &&
-                                                <Typography.Text type="secondary">This build was not deployed
-                                                    yet</Typography.Text>
-                                            }
-                                            {
-                                                slot.pipelines.pageItems.length > 0 &&
-                                                <>
-                                                    <Typography.Text type="secondary">Deployments for this
-                                                        build</Typography.Text>
-                                                    <List
-                                                        size="small"
-                                                        dataSource={slot.pipelines.pageItems}
-                                                        renderItem={(deployment) =>
-                                                            <BuildDeploymentListItem
-                                                                deployment={deployment}
-                                                                refresh={refresh}
-                                                            />
-                                                        }
-                                                    />
-                                                </>
-                                            }
-                                        </Flex>
-                                    </Flex>
+                                    <BuildEnvironment slot={slot} build={build} refresh={refresh}/>
                                 </List.Item>
                             </>
                         }
