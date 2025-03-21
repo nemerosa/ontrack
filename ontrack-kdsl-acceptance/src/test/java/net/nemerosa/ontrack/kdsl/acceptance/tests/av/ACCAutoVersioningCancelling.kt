@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.av
 
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.kdsl.acceptance.tests.scm.withMockScmRepository
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
@@ -38,7 +40,7 @@ class ACCAutoVersioningCancelling : AbstractACCAutoVersioningTestSupport() {
                                     postProcessing = "mock",
                                     postProcessingConfig = mapOf(
                                         "postProcessingStamp" to uid("ps_"),
-                                        "durationMs" to 1_000L, // Forcing a delay in processing
+                                        "durationMs" to 1_000L, // Forcing a delay in post-processing
                                     ).asJson()
                                 )
                             )
@@ -50,6 +52,9 @@ class ACCAutoVersioningCancelling : AbstractACCAutoVersioningTestSupport() {
                                 build(name = "1.0.$no") {
                                     promote("IRON")
                                 }
+                            }
+                            runBlocking {
+                                delay(200)
                             }
                         }
 
@@ -63,7 +68,9 @@ class ACCAutoVersioningCancelling : AbstractACCAutoVersioningTestSupport() {
 
                         // Checks the first order has been processed
                         waitUntil(
-                            task = "1.0.1 has been merged"
+                            task = "1.0.1 has been merged",
+                            timeout = 10_000L,
+                            interval = 1_000L,
                         ) {
                             val entry = ontrack.autoVersioning.audit.entries(
                                 source = dependency.project.name,
@@ -78,6 +85,8 @@ class ACCAutoVersioningCancelling : AbstractACCAutoVersioningTestSupport() {
                         (2..4).forEach { no ->
                             waitUntil(
                                 task = "1.0.$no has been cancelled",
+                                timeout = 10_000L,
+                                interval = 1_000L,
                                 onTimeout = {
                                     println("Entries:")
                                     ontrack.autoVersioning.audit.entries(
@@ -101,7 +110,9 @@ class ACCAutoVersioningCancelling : AbstractACCAutoVersioningTestSupport() {
 
                         // Checks the last order has been processed
                         waitUntil(
-                            task = "1.0.5 has been merged"
+                            task = "1.0.5 has been merged",
+                            timeout = 10_000L,
+                            interval = 1_000L,
                         ) {
                             val entry = ontrack.autoVersioning.audit.entries(
                                 source = dependency.project.name,

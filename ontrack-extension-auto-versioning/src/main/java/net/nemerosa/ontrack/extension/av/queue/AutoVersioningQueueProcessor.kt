@@ -9,6 +9,8 @@ import net.nemerosa.ontrack.extension.queue.QueueAckMode
 import net.nemerosa.ontrack.extension.queue.QueueMetadata
 import net.nemerosa.ontrack.extension.queue.QueueProcessor
 import net.nemerosa.ontrack.model.security.SecurityService
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import kotlin.reflect.KClass
 
@@ -21,6 +23,8 @@ class AutoVersioningQueueProcessor(
     private val autoVersioningAuditService: AutoVersioningAuditService,
     private val autoVersioningProcessingService: AutoVersioningProcessingService,
 ) : QueueProcessor<AutoVersioningQueuePayload> {
+
+    private val logger: Logger = LoggerFactory.getLogger(AutoVersioningQueueProcessor::class.java)
 
     override val id: String = "auto-versioning"
 
@@ -42,6 +46,7 @@ class AutoVersioningQueueProcessor(
         return if (entry == null) {
             return "No audit entry found upon receiving the processing order"
         } else if (!entry.mostRecentState.state.isRunning) {
+            logger.debug("Cancelled: {}", entry)
             "Cancelled order, not processing"
         } else {
             null
