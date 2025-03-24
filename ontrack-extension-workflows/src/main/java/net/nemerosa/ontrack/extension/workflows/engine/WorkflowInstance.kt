@@ -37,6 +37,9 @@ data class WorkflowInstance(
     companion object {
         const val EVENT_INSTANCE_ID = "workflowInstanceId"
 
+        /**
+         * See [WorkflowInstanceRepository][net.nemerosa.ontrack.extension.workflows.repository.WorkflowInstanceRepository]
+         */
         fun computeStatus(nodesExecutions: List<WorkflowInstanceNode>): WorkflowInstanceStatus {
             val nodes = nodesExecutions.map { it.status }
             return if (nodes.all { it == WorkflowInstanceNodeStatus.CREATED }) {
