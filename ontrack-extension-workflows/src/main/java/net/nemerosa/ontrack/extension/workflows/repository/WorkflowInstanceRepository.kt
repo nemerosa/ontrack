@@ -2,7 +2,10 @@ package net.nemerosa.ontrack.extension.workflows.repository
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.extension.workflows.engine.*
+import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
+import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceFilter
+import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceNode
+import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceNodeStatus
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.events.SerializableEvent
 import net.nemerosa.ontrack.model.events.merge
@@ -128,10 +131,6 @@ class WorkflowInstanceRepository(
                 null
             },
             contexts = contexts,
-            status = rs.getString("STATUS")
-                ?.takeIf { it.isNotBlank() }?.let {
-                    WorkflowInstanceStatus.valueOf(it)
-                } ?: WorkflowInstanceStatus.STARTED,
             nodesExecutions = nodesExecutions,
         )
     }
@@ -144,26 +143,6 @@ class WorkflowInstanceRepository(
         output = readJson(rsn, "OUTPUT"),
         error = rsn.getString("ERROR"),
     )
-
-    private fun instanceStatusUpdate(instanceId: String) {
-        // Loads the instance
-        val instance = findWorkflowInstance(instanceId)
-            ?: throw WorkflowInstanceNotFoundException(instanceId)
-        // Computing its new status
-        val status = instance.computeStatus()
-        // Saving its status
-        namedParameterJdbcTemplate!!.update(
-            """
-                UPDATE WKF_INSTANCES
-                SET STATUS = :status
-                WHERE ID = :id
-            """.trimIndent(),
-            mapOf(
-                "id" to instanceId,
-                "status" to status.name,
-            )
-        )
-    }
 
     fun nodeWaiting(instanceId: String, nodeId: String) {
         namedParameterJdbcTemplate!!.update(
@@ -179,7 +158,6 @@ class WorkflowInstanceRepository(
                 "status" to WorkflowInstanceNodeStatus.WAITING.name,
             )
         )
-        instanceStatusUpdate(instanceId)
     }
 
     fun nodeStarted(instanceId: String, nodeId: String) {
@@ -197,7 +175,6 @@ class WorkflowInstanceRepository(
                 "startTime" to dateTimeForDB(Time.now),
             )
         )
-        instanceStatusUpdate(instanceId)
     }
 
     fun nodeSuccess(instanceId: String, nodeId: String, output: JsonNode?, event: SerializableEvent?) {
@@ -219,7 +196,6 @@ class WorkflowInstanceRepository(
                 "endTime" to dateTimeForDB(Time.now),
             )
         )
-        instanceStatusUpdate(instanceId)
     }
 
     private fun mergeInstanceEvent(instanceId: String, event: SerializableEvent) {
@@ -267,7 +243,6 @@ class WorkflowInstanceRepository(
                 "output" to writeJson(output),
             )
         )
-        instanceStatusUpdate(instanceId)
     }
 
     fun nodeError(instanceId: String, nodeId: String, message: String?, output: JsonNode?) {
@@ -288,7 +263,6 @@ class WorkflowInstanceRepository(
                 "endTime" to dateTimeForDB(Time.now),
             )
         )
-        instanceStatusUpdate(instanceId)
     }
 
     fun nodeCancelled(instanceId: String, nodeId: String, message: String) {
@@ -307,7 +281,6 @@ class WorkflowInstanceRepository(
                 "endTime" to dateTimeForDB(Time.now),
             )
         )
-        instanceStatusUpdate(instanceId)
     }
 
     fun getNodeStatus(instanceId: String, nodeId: String) =
@@ -447,33 +420,6 @@ class WorkflowInstanceRepository(
                 "timestamp" to timestamp,
             )
         )
-    }
-
-    fun migrateStatuses(): Int {
-        var count = 0
-        jdbcTemplate!!.query(
-            """
-                SELECT *
-                FROM WKF_INSTANCES
-                WHERE STATUS = ''
-            """.trimIndent()
-        ) { rs ->
-            count++
-            val instance = toWorkflowInstance(rs)
-            val status = instance.computeStatus()
-            namedParameterJdbcTemplate!!.update(
-                """
-                    UPDATE WKF_INSTANCES
-                    SET STATUS = :status
-                    WHERE ID = :id
-                """.trimIndent(),
-                mapOf(
-                    "id" to instance.id,
-                    "status" to status.name,
-                )
-            )
-        }
-        return count
     }
 
 }
