@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.model.trigger.TriggerData
 import net.nemerosa.ontrack.model.trigger.TriggerRegistry
 import net.nemerosa.ontrack.model.trigger.getTriggerById
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
+import org.springframework.dao.DeadlockLoserDataAccessException
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
 import java.time.LocalDateTime
@@ -151,6 +152,17 @@ class WorkflowInstanceRepository(
             ?: throw WorkflowInstanceNotFoundException(instanceId)
         // Computing its new status
         val status = instance.computeStatus()
+        // Locking the row
+        namedParameterJdbcTemplate!!.query(
+            """
+                SELECT * FROM WKF_INSTANCES 
+                WHERE ID = :id 
+                FOR UPDATE
+            """.trimIndent(),
+            mapOf(
+                "id" to instanceId,
+            )
+        ) { rs, _ -> rs.getString("ID") }
         // Saving its status
         namedParameterJdbcTemplate!!.update(
             """
@@ -292,6 +304,19 @@ class WorkflowInstanceRepository(
     }
 
     fun nodeCancelled(instanceId: String, nodeId: String, message: String) {
+        namedParameterJdbcTemplate!!.query(
+            """
+                SELECT *
+                FROM WKF_INSTANCE_NODES
+                WHERE INSTANCE_ID = :instanceId
+                AND NODE_ID = :nodeId
+                FOR UPDATE
+            """.trimIndent(),
+            mapOf(
+                "instanceId" to instanceId,
+                "nodeId" to nodeId,
+            )
+        ) { rs, _ -> rs.getString("STATUS") }
         namedParameterJdbcTemplate!!.update(
             """
                 UPDATE WKF_INSTANCE_NODES
@@ -346,10 +371,28 @@ class WorkflowInstanceRepository(
             // Marking each unfinished node as cancelled
             instance.nodesExecutions.forEach { nx ->
                 if (!nx.status.finished) {
-                    nodeCancelled(instanceId, nx.id, "Instance stopped")
+                    deadlockRetries {
+                        nodeCancelled(instanceId, nx.id, "Instance stopped")
+                    }
                 }
             }
             // Updates the instance status
+        }
+    }
+
+    private fun deadlockRetries(code: () -> Unit) {
+        val maxRetries = 5
+        repeat(maxRetries) { attempt ->
+            try {
+                code()
+                return
+            } catch (ex: DeadlockLoserDataAccessException) {
+                if (attempt < maxRetries - 1) {
+                    Thread.sleep(100)
+                } else {
+                    throw ex
+                }
+            }
         }
     }
 
