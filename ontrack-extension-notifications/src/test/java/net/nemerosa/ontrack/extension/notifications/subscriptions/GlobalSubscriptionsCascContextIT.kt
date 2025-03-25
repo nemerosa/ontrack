@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.extension.notifications.subscriptions
 
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -11,6 +13,71 @@ class GlobalSubscriptionsCascContextIT : AbstractCascTestSupport() {
 
     @Autowired
     private lateinit var eventSubscriptionService: EventSubscriptionService
+
+    @Autowired
+    private lateinit var globalSubscriptionsCascContext: GlobalSubscriptionsCascContext
+
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
+    @Test
+    fun `CasC schema type`() {
+        val type = globalSubscriptionsCascContext.jsonType(jsonTypeBuilder)
+        assertEquals(
+            """
+                {
+                  "items": {
+                    "title": "SubscriptionsCascContextData",
+                    "description": null,
+                    "properties": {
+                      "channel": {
+                        "description": "Channel to send notifications to",
+                        "type": "string"
+                      },
+                      "channelConfig": {
+                        "description": "Configuration of the channel",
+                        "type": {}
+                      },
+                      "contentTemplate": {
+                        "description": "Optional template to use for the message",
+                        "type": "string"
+                      },
+                      "disabled": {
+                        "description": "Is this channel disabled?",
+                        "type": "boolean"
+                      },
+                      "events": {
+                        "items": {
+                          "description": "List of events to listen to",
+                          "type": "string"
+                        },
+                        "description": "List of events to listen to",
+                        "type": "array"
+                      },
+                      "keywords": {
+                        "description": "Keywords to filter the events",
+                        "type": "string"
+                      },
+                      "name": {
+                        "description": "Name of the subscription. Will be required in V5.",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "channel",
+                      "channelConfig",
+                      "events"
+                    ],
+                    "additionalProperties": false,
+                    "type": "object"
+                  },
+                  "description": "List of global subscriptions",
+                  "type": "array"
+                }
+            """.trimIndent().parseAsJson(),
+            type.asJson()
+        )
+    }
 
     @Test
     fun `Creates a global subscription as code`() {

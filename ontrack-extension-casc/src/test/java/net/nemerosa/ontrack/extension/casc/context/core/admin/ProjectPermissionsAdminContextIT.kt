@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.extension.casc.context.core.admin
 
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.model.security.PermissionInput
 import net.nemerosa.ontrack.model.security.PermissionTargetType
 import net.nemerosa.ontrack.model.security.Roles
@@ -16,6 +18,52 @@ class ProjectPermissionsAdminContextIT : AbstractCascTestSupport() {
 
     @Autowired
     private lateinit var context: ProjectPermissionsAdminContext
+
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
+    @Test
+    fun `CasC schema type`() {
+        val type = context.jsonType(jsonTypeBuilder)
+        assertEquals(
+            """
+                {
+                  "items": {
+                    "title": "ProjectPermission",
+                    "description": null,
+                    "properties": {
+                      "group": {
+                        "description": "Name of the group",
+                        "type": "string"
+                      },
+                      "projects": {
+                        "items": {
+                          "description": "List of projects",
+                          "type": "string"
+                        },
+                        "description": "List of projects",
+                        "type": "array"
+                      },
+                      "role": {
+                        "description": "Name of the role to assign",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "group",
+                      "projects",
+                      "role"
+                    ],
+                    "additionalProperties": false,
+                    "type": "object"
+                  },
+                  "description": "List of permissions per group",
+                  "type": "array"
+                }
+            """.trimIndent().parseAsJson(),
+            type.asJson()
+        )
+    }
 
     @Test
     fun `Rendering of permissions`() {

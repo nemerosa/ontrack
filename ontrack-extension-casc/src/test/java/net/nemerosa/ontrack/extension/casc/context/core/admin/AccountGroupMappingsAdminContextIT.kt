@@ -1,6 +1,9 @@
 package net.nemerosa.ontrack.extension.casc.context.core.admin
 
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.model.security.AccountGroupMappingService
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
@@ -13,6 +16,56 @@ class AccountGroupMappingsAdminContextIT : AbstractCascTestSupport() {
 
     @Autowired
     private lateinit var accountGroupMappingService: AccountGroupMappingService
+
+    @Autowired
+    private lateinit var accountGroupMappingsAdminContext: AccountGroupMappingsAdminContext
+
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
+    @Test
+    fun `CasC schema type`() {
+        val type = accountGroupMappingsAdminContext.jsonType(jsonTypeBuilder)
+        assertEquals(
+            """
+                {
+                  "items": {
+                    "title": "CascMapping",
+                    "description": null,
+                    "properties": {
+                      "group": {
+                        "description": "Name of the group in Ontrack",
+                        "type": "string"
+                      },
+                      "provider": {
+                        "description": "ID of the authentication provider: oidc, ldap, ...",
+                        "type": "string"
+                      },
+                      "providerGroup": {
+                        "description": "Name of the group in the provider",
+                        "type": "string"
+                      },
+                      "providerKey": {
+                        "description": "Identifier of the exact provider source (name of the OIDC provider, leave blank for LDAP)",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "group",
+                      "provider",
+                      "providerGroup",
+                      "providerKey"
+                    ],
+                    "additionalProperties": false,
+                    "type": "object"
+                  },
+                  "description": "List of group mappings",
+                  "type": "array"
+                }
+            """.trimIndent().parseAsJson(),
+            type.asJson()
+        )
+    }
 
     @Test
     fun `Creation of new mappings`() {

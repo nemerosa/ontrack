@@ -214,4 +214,18 @@ class SlotRepository(
         )
     }
 
+    fun saveSlot(slot: Slot) {
+        namedParameterJdbcTemplate!!.update(
+            """
+                UPDATE ENV_SLOTS
+                SET DESCRIPTION = :description
+                WHERE ID = :id
+            """.trimIndent(),
+            mapOf(
+                "id" to slot.id,
+                "description" to slot.description,
+            )
+        )
+    }
+
 }

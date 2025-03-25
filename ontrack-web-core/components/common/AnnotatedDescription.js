@@ -3,6 +3,7 @@ import SafeHTMLComponent from "@components/common/SafeHTMLComponent";
 
 export default function AnnotatedDescription({
                                                  entity,
+                                                 type,
                                                  disabled = true,
                                                  editable = false,
                                                  onChange,
@@ -12,14 +13,14 @@ export default function AnnotatedDescription({
         onChange: onChange,
     } : undefined
     return entity.annotatedDescription ?
-        <Typography.Text disabled={disabled} editable={editableConfig}>
+        <Typography.Text type={type} disabled={disabled} editable={editableConfig}>
             <SafeHTMLComponent
                 htmlContent={entity.annotatedDescription}/>
         </Typography.Text> :
         (
             entity.description ?
-                <Typography.Text disabled={disabled} editable={editableConfig}>{entity.description}</Typography.Text> :
-                <Typography.Text disabled={disabled} editable={editableConfig}></Typography.Text>
+                <Typography.Text type={type} disabled={disabled} editable={editableConfig}>{entity.description}</Typography.Text> :
+                <Typography.Text type={type} disabled={disabled} editable={editableConfig}></Typography.Text>
         )
 
 }

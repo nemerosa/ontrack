@@ -22,6 +22,9 @@ import StoredGridLayoutResetCommand from "@components/grid/StoredGridLayoutReset
 import StoredGridLayoutContextProvider from "@components/grid/StoredGridLayoutContext";
 import {FaProjectDiagram} from "react-icons/fa";
 import UserMenuActions from "@components/entities/UserMenuActions";
+import EditBuildCommand from "@components/builds/EditBuildCommand";
+import AnnotatedDescription from "@components/common/AnnotatedDescription";
+import {useRefresh} from "@components/common/RefreshUtils";
 
 export default function BuildView({id}) {
 
@@ -30,6 +33,8 @@ export default function BuildView({id}) {
     const [loadingBuild, setLoadingBuild] = useState(true)
     const [build, setBuild] = useState({branch: {project: {}}})
     const [commands, setCommands] = useState([])
+
+    const [refreshState, refresh] = useRefresh()
 
     useEffect(() => {
         if (client && id) {
@@ -40,6 +45,8 @@ export default function BuildView({id}) {
                         build(id: $id) {
                             id
                             name
+                            description
+                            annotatedDescription
                             creation {
                                 user
                                 time
@@ -67,6 +74,11 @@ export default function BuildView({id}) {
                                     name
                                 }
                             }
+                            authorizations {
+                                name
+                                action
+                                authorized
+                            }
                         }
                     }
 
@@ -91,6 +103,11 @@ export default function BuildView({id}) {
                         text="Links"
                         title="Displays downstream and upstream dependencies"
                     />,
+                    <EditBuildCommand
+                        build={data.build}
+                        onSuccess={refresh}
+                        key="edit"
+                    />,
                     <LegacyLinkCommand
                         key="legacy"
                         href={buildLegacyUri(data.build)}
@@ -102,7 +119,7 @@ export default function BuildView({id}) {
                 ])
             })
         }
-    }, [client, id])
+    }, [client, id, refreshState])
 
     return (
         <>
@@ -115,6 +132,7 @@ export default function BuildView({id}) {
                         <Space>
                             {build.name}
                             <Decorations entity={build}/>
+                            <AnnotatedDescription entity={build} type="secondary" disabled={false}/>
                         </Space>
                     }
                     breadcrumbs={buildBreadcrumbs(build)}

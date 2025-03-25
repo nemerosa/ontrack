@@ -3,8 +3,9 @@ package net.nemerosa.ontrack.extension.ldap.casc
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.extension.ldap.LDAPSettings
 import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.json.getRequiredJsonField
 import net.nemerosa.ontrack.json.getRequiredTextField
+import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
@@ -13,6 +14,82 @@ class LDAPSettingsContextIT : AbstractCascTestSupport() {
 
     @Autowired
     private lateinit var ldapSettingsContext: LDAPSettingsContext
+
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
+    @Test
+    fun `CasC schema type`() {
+        val type = ldapSettingsContext.jsonType(jsonTypeBuilder)
+        assertEquals(
+            """
+                {
+                  "title": "LDAPSettings",
+                  "description": null,
+                  "properties": {
+                    "emailAttribute": {
+                      "description": "emailAttribute field",
+                      "type": "string"
+                    },
+                    "fullNameAttribute": {
+                      "description": "fullNameAttribute field",
+                      "type": "string"
+                    },
+                    "groupAttribute": {
+                      "description": "groupAttribute field",
+                      "type": "string"
+                    },
+                    "groupFilter": {
+                      "description": "groupFilter field",
+                      "type": "string"
+                    },
+                    "groupNameAttribute": {
+                      "description": "groupNameAttribute field",
+                      "type": "string"
+                    },
+                    "groupSearchBase": {
+                      "description": "groupSearchBase field",
+                      "type": "string"
+                    },
+                    "groupSearchFilter": {
+                      "description": "groupSearchFilter field",
+                      "type": "string"
+                    },
+                    "enabled": {
+                      "description": "Is LDAP authentication enabled?",
+                      "type": "boolean"
+                    },
+                    "password": {
+                      "description": "password field",
+                      "type": "string"
+                    },
+                    "searchBase": {
+                      "description": "searchBase field",
+                      "type": "string"
+                    },
+                    "searchFilter": {
+                      "description": "searchFilter field",
+                      "type": "string"
+                    },
+                    "url": {
+                      "description": "url field",
+                      "type": "string"
+                    },
+                    "user": {
+                      "description": "user field",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "enabled"
+                  ],
+                  "additionalProperties": false,
+                  "type": "object"
+                }
+            """.trimIndent().parseAsJson(),
+            type.asJson()
+        )
+    }
 
     @Test
     fun `Obfuscation of the password`() {

@@ -19,4 +19,12 @@ data class Slot(
     }"
 
     override fun toString(): String = fullName()
+    fun withDescription(description: String?) = Slot(
+        id = id,
+        environment = environment,
+        description = description,
+        project = project,
+        qualifier = qualifier
+    )
+
 }

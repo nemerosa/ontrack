@@ -113,7 +113,15 @@ class SlotPipelineRepository(
         }.firstOrNull()
     }
 
-    fun findPipelines(slot: Slot, offset: Int, size: Int): PaginatedList<SlotPipeline> {
+    fun findPipelines(slot: Slot, offset: Int, size: Int, buildId: Int?): PaginatedList<SlotPipeline> {
+        return if (buildId != null) {
+            findPipelinesForBuild(slot, offset, size, buildId)
+        } else {
+            findAllPipelines(slot, offset, size)
+        }
+    }
+
+    private fun findAllPipelines(slot: Slot, offset: Int, size: Int): PaginatedList<SlotPipeline> {
         val count = namedParameterJdbcTemplate!!.queryForObject(
             """
                 SELECT COUNT(*)
@@ -138,6 +146,42 @@ class SlotPipelineRepository(
                 "slotId" to slot.id,
                 "offset" to offset,
                 "size" to size,
+            )
+        ) { rs, _ ->
+            toPipeline(rs)
+        }
+        return PaginatedList.create(items = list, offset = offset, pageSize = size, total = count)
+    }
+
+    private fun findPipelinesForBuild(slot: Slot, offset: Int, size: Int, buildId: Int): PaginatedList<SlotPipeline> {
+        val count = namedParameterJdbcTemplate!!.queryForObject(
+            """
+                SELECT COUNT(*)
+                FROM ENV_SLOT_PIPELINE
+                WHERE SLOT_ID = :slotId
+                AND BUILD_ID = :buildId
+            """.trimIndent(),
+            mapOf(
+                "slotId" to slot.id,
+                "buildId" to buildId,
+            ),
+            Int::class.java
+        ) ?: 0
+        val list = namedParameterJdbcTemplate!!.query(
+            """
+                SELECT *
+                FROM ENV_SLOT_PIPELINE
+                WHERE SLOT_ID = :slotId
+                AND BUILD_ID = :buildId
+                ORDER BY NUMBER DESC
+                LIMIT :size
+                OFFSET :offset
+            """.trimIndent(),
+            mapOf(
+                "slotId" to slot.id,
+                "offset" to offset,
+                "size" to size,
+                "buildId" to buildId,
             )
         ) { rs, _ ->
             toPipeline(rs)

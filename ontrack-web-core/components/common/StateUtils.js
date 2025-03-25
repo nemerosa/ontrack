@@ -1,5 +1,8 @@
 import {useState} from "react";
 
+/**
+ * @deprecated Use useRefresh()
+ */
 export const useReloadState = (config = {callback: undefined}) => {
     const [reloadCount, setReloadCount] = useState(0)
 

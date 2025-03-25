@@ -13,5 +13,5 @@ class NotificationRecordingSettingsCascContext(
     "notification-recordings",
     NotificationRecordingSettings::class,
     settingsManagerService,
-    cachedSettingsService
+    cachedSettingsService,
 )

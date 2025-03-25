@@ -1,7 +1,5 @@
 package net.nemerosa.ontrack.model.dashboards
 
-import com.fasterxml.jackson.databind.JsonNode
-
 /**
  * A _dashboard_ is a _layout_ associated to a list of widgets.
  *
@@ -23,4 +21,15 @@ data class Dashboard(
         userScope = DashboardContextUserScope.SHARED,
         widgets = widgets
     )
+
+    /**
+     * Migrating all the widgets
+     */
+    fun migrateWidgets(migration: (WidgetInstance) -> WidgetInstance) =
+        Dashboard(
+            uuid = uuid,
+            name = name,
+            userScope = userScope,
+            widgets = widgets.map { migration(it) },
+        )
 }

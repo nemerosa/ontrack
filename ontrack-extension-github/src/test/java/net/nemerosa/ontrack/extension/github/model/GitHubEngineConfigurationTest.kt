@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.github.model
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.test.TestUtils
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 

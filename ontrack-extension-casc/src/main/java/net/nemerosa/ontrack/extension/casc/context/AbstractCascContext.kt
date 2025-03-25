@@ -3,10 +3,10 @@ package net.nemerosa.ontrack.extension.casc.context
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import net.nemerosa.ontrack.extension.casc.CascContext
-import net.nemerosa.ontrack.extension.casc.schema.cascFieldName
 import net.nemerosa.ontrack.json.JsonParseException
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.model.annotations.getPropertyName
 import kotlin.reflect.KProperty
 
 abstract class AbstractCascContext : CascContext {
@@ -34,7 +34,7 @@ abstract class AbstractCascContext : CascContext {
     /**
      * Checked parsing of a JSON array
      */
-    protected inline fun <reified T: Any> JsonNode.mapEachTo(paths: List<String>) =
+    protected inline fun <reified T : Any> JsonNode.mapEachTo(paths: List<String>) =
         mapIndexed { index, child ->
             try {
                 child.parse<T>()
@@ -106,7 +106,7 @@ abstract class AbstractCascContext : CascContext {
      */
     protected fun JsonNode.ifMissing(vararg mappings: Pair<KProperty<*>, Any>): JsonNode {
         mappings.forEach { (property, value) ->
-            val name = cascFieldName(property)
+            val name = getPropertyName(property)
             if (this is ObjectNode && !has(name)) {
                 set<JsonNode>(name, value.asJson())
             }

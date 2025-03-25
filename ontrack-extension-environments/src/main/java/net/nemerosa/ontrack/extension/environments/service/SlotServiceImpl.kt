@@ -50,6 +50,11 @@ class SlotServiceImpl(
         eventPostService.post(environmentsEventsFactory.slotCreation(slot))
     }
 
+    override fun saveSlot(slot: Slot) {
+        securityService.checkSlotAccess<SlotUpdate>(slot)
+        slotRepository.saveSlot(slot)
+    }
+
     override fun findSlotsByEnvironment(environment: Environment): List<Slot> =
         if (securityService.isGlobalFunctionGranted(EnvironmentList::class.java)) {
             securityService.asAdmin {
@@ -113,7 +118,7 @@ class SlotServiceImpl(
         }
     }
 
-    private fun <C, D> getRequiredInput(
+    private fun <C: Any, D> getRequiredInput(
         pipeline: SlotPipeline,
         config: SlotAdmissionRuleConfig,
         rule: SlotAdmissionRule<C, D>
@@ -223,7 +228,7 @@ class SlotServiceImpl(
         fillEligibilityCriteria(slot, rule, config.ruleConfig, queries, params, deployable)
     }
 
-    private fun <C, D> fillEligibilityCriteria(
+    private fun <C: Any, D> fillEligibilityCriteria(
         slot: Slot,
         rule: SlotAdmissionRule<C, D>,
         jsonRuleConfig: JsonNode,
@@ -246,7 +251,7 @@ class SlotServiceImpl(
         return isBuildEligible(slot, rule, config.ruleConfig, build)
     }
 
-    private fun <C, D> isBuildEligible(
+    private fun <C: Any, D> isBuildEligible(
         slot: Slot,
         rule: SlotAdmissionRule<C, D>,
         jsonRuleConfig: JsonNode,
@@ -269,6 +274,7 @@ class SlotServiceImpl(
         build: Build,
         forceDone: Boolean,
         forceDoneMessage: String?,
+        skipWorkflows: Boolean,
     ): SlotPipeline {
         securityService.checkSlotAccess<SlotPipelineCreate>(slot)
         // Build must be eligible
@@ -322,6 +328,7 @@ class SlotServiceImpl(
                 pipelineId = pipeline.id,
                 forcing = true,
                 message = message,
+                skipWorkflows = skipWorkflows,
             )
         }
         // OK
@@ -383,9 +390,14 @@ class SlotServiceImpl(
         return lastDeployedPipelines.sortedByDescending { it.slot.environment.order }
     }
 
-    override fun findPipelines(slot: Slot, offset: Int, size: Int): PaginatedList<SlotPipeline> {
+    override fun findPipelines(slot: Slot, offset: Int, size: Int, buildId: Int?): PaginatedList<SlotPipeline> {
         securityService.checkSlotAccess<SlotView>(slot)
-        return slotPipelineRepository.findPipelines(slot, offset, size)
+        return slotPipelineRepository.findPipelines(
+            slot = slot,
+            offset = offset,
+            size = size,
+            buildId = buildId,
+        )
     }
 
     override fun cancelPipeline(pipeline: SlotPipeline, reason: String) {
@@ -573,7 +585,7 @@ class SlotServiceImpl(
         )
     }
 
-    private fun <C, D> getAdmissionRuleCheck(
+    private fun <C: Any, D> getAdmissionRuleCheck(
         pipeline: SlotPipeline,
         rule: SlotAdmissionRule<C, D>,
         admissionRule: SlotAdmissionRuleConfig,
@@ -623,7 +635,8 @@ class SlotServiceImpl(
         pipelineId: String,
         skipWorkflowId: String?,
         forcing: Boolean,
-        message: String?
+        message: String?,
+        skipWorkflows: Boolean,
     ): SlotDeploymentActionStatus {
         val pipeline = slotPipelineRepository.getPipelineById(pipelineId)
         securityService.checkSlotAccess<SlotPipelineFinish>(pipeline.slot)
@@ -671,11 +684,13 @@ class SlotServiceImpl(
         )
         // Workflows
         val event = environmentsEventsFactory.pipelineDeployed(pipeline)
-        slotWorkflowService.startWorkflowsForPipeline(
-            pipeline,
-            SlotPipelineStatus.DONE,
-            event
-        )
+        if (!skipWorkflows) {
+            slotWorkflowService.startWorkflowsForPipeline(
+                pipeline,
+                SlotPipelineStatus.DONE,
+                event
+            )
+        }
         // Event
         eventPostService.post(event)
         // OK

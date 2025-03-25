@@ -8,10 +8,10 @@ import org.springframework.stereotype.Component
 @Component
 class TFCSettingsCasc(
     settingsManagerService: SettingsManagerService,
-    cachedSettingsService: CachedSettingsService
+    cachedSettingsService: CachedSettingsService,
 ) : AbstractSubSettingsContext<TFCSettings>(
     "tfc",
     TFCSettings::class,
     settingsManagerService,
-    cachedSettingsService
+    cachedSettingsService,
 )

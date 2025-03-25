@@ -1,21 +1,22 @@
 package net.nemerosa.ontrack.extension.casc.context.core.admin
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.common.syncForward
 import net.nemerosa.ontrack.extension.casc.context.AbstractCascContext
-import net.nemerosa.ontrack.extension.casc.schema.CascType
-import net.nemerosa.ontrack.extension.casc.schema.cascArray
-import net.nemerosa.ontrack.extension.casc.schema.cascObject
 import net.nemerosa.ontrack.json.JsonParseException
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.json.schema.JsonArrayType
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.json.schema.toType
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.ID
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import kotlin.jvm.optionals.getOrNull
 
 /**
  * Global permissions for the account groups.
@@ -36,11 +37,12 @@ class AccountGroupGlobalPermissionsAdminContext(
 
     override val priority: Int = PRIORITY
 
-    override val type: CascType
-        get() = cascArray(
-            "List of account groups global permissions (old permissions are preserved)",
-            cascObject(CascAccountGroupPermission::class)
+    override fun jsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType {
+        return JsonArrayType(
+            items = jsonTypeBuilder.toType(CascAccountGroupPermission::class),
+            description = "List of account groups global permissions (old permissions are preserved)",
         )
+    }
 
     override fun run(node: JsonNode, paths: List<String>) {
         // Items to provision

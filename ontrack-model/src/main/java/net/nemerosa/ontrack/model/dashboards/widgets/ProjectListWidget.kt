@@ -8,7 +8,7 @@ class ProjectListWidget : AbstractWidget<ProjectListWidget.ProjectListWidgetConf
     name = "Project list",
     description = "Fixed list of projects, suitable to easily a list of projects in a dashboard.",
     defaultConfig = ProjectListWidgetConfig(),
-    preferredHeight = 6,
+    preferredHeight = 30,
 ) {
 
     data class ProjectListWidgetConfig(

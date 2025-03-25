@@ -1,8 +1,7 @@
 import StandardPage from "@components/layouts/StandardPage";
-import {CloseToHomeCommand, Command} from "@components/common/Commands";
-import {FaSitemap} from "react-icons/fa";
-import {cascSchemaUri} from "@components/extension/casc/CascLinks";
+import {CloseToHomeCommand} from "@components/common/Commands";
 import Casc from "@components/extension/casc/Casc";
+import CascDownloadJSONSchema from "@components/extension/casc/CascDownloadJSONSchema";
 
 export default function CascPage() {
     return (
@@ -10,7 +9,7 @@ export default function CascPage() {
             <StandardPage
                 pageTitle="Configuration as Code"
                 commands={[
-                    <Command key="schema" icon={<FaSitemap/>} href={cascSchemaUri} text="Schema"/>,
+                    <CascDownloadJSONSchema key="schema-json"/>,
                     <CloseToHomeCommand key="home"/>,
                 ]}
             >

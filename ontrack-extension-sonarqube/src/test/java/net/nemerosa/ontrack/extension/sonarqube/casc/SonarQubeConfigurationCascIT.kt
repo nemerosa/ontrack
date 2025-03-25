@@ -4,6 +4,8 @@ import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.extension.sonarqube.configuration.SonarQubeConfiguration
 import net.nemerosa.ontrack.extension.sonarqube.configuration.SonarQubeConfigurationService
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.test.TestUtils
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -16,6 +18,47 @@ class SonarQubeConfigurationCascIT : AbstractCascTestSupport() {
 
     @Autowired
     private lateinit var sonarQubeConfigurationCasc: SonarQubeConfigurationCasc
+
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
+    @Test
+    fun `CasC schema type`() {
+        val type = sonarQubeConfigurationCasc.jsonType(jsonTypeBuilder)
+        assertEquals(
+            """
+                {
+                  "items": {
+                    "title": "SonarQubeConfigurationCascData",
+                    "description": null,
+                    "properties": {
+                      "name": {
+                        "description": "Name of the configuration",
+                        "type": "string"
+                      },
+                      "password": {
+                        "description": "Token for the authentication",
+                        "type": "string"
+                      },
+                      "url": {
+                        "description": "URL to SonarQube",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "url"
+                    ],
+                    "additionalProperties": false,
+                    "type": "object"
+                  },
+                  "description": "List of SonarQube configurations",
+                  "type": "array"
+                }
+            """.trimIndent().parseAsJson(),
+            type.asJson()
+        )
+    }
 
     @Test
     fun `Defining a SonarQube configuration`() {

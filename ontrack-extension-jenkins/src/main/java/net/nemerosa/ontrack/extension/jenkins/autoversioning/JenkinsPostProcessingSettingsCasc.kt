@@ -13,6 +13,5 @@ class JenkinsPostProcessingSettingsCasc(
     "auto-versioning-jenkins",
     JenkinsPostProcessingSettings::class,
     settingsManagerService,
-    cachedSettingsService
-) {
-}
+    cachedSettingsService,
+)

@@ -3,10 +3,14 @@ package net.nemerosa.ontrack.extension.casc.context.core.admin
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.casc.context.AbstractCascContext
-import net.nemerosa.ontrack.extension.casc.schema.*
 import net.nemerosa.ontrack.json.JsonParseException
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.json.schema.JsonArrayType
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.json.schema.toType
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.StructureService
@@ -28,23 +32,12 @@ class ProjectPermissionsAdminContext(
 
     override val field: String = "project-permissions"
 
-    override val type: CascType = cascArray(
-        "List of permissions per group",
-        cascObject(
-            "Association of a group, a role and a list of projects",
-            cascField("group", cascString, "Name of the group", true),
-            cascField("role", cascString, "Name of the role to assign", true),
-            cascField(
-                name = "projects",
-                type = cascArray(
-                    "List of projects",
-                    cascString
-                ),
-                description = "List of projects",
-                required = true,
-            )
+    override fun jsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType {
+        return JsonArrayType(
+            description = "List of permissions per group",
+            items = jsonTypeBuilder.toType(ProjectPermission::class)
         )
-    )
+    }
 
     override fun run(node: JsonNode, paths: List<String>) {
         val permissions = node.mapIndexed { index, child ->
@@ -128,8 +121,11 @@ class ProjectPermissionsAdminContext(
     }
 
     data class ProjectPermission(
+        @APIDescription("Name of the group")
         val group: String,
+        @APIDescription("Name of the role to assign")
         val role: String,
+        @APIDescription("List of projects")
         val projects: List<String>,
     )
 

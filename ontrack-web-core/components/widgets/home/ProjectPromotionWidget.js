@@ -124,6 +124,7 @@ export default function ProjectPromotionWidget({project, promotions, depth, labe
             <Table
                 dataSource={runs}
                 pagination={false}
+                size="small"
             >
                 <Column
                     title="Promotion"

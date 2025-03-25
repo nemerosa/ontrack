@@ -3,12 +3,13 @@ package net.nemerosa.ontrack.extension.casc.context.core.admin
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.syncForward
 import net.nemerosa.ontrack.extension.casc.context.AbstractCascContext
-import net.nemerosa.ontrack.extension.casc.schema.CascType
-import net.nemerosa.ontrack.extension.casc.schema.cascArray
-import net.nemerosa.ontrack.extension.casc.schema.cascObject
 import net.nemerosa.ontrack.json.JsonParseException
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.model.json.schema.JsonArrayType
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.json.schema.toType
 import net.nemerosa.ontrack.model.security.AccountGroupInput
 import net.nemerosa.ontrack.model.security.AccountService
 import org.slf4j.Logger
@@ -33,11 +34,12 @@ class AccountGroupsAdminContext(
 
     override val priority: Int = PRIORITY
 
-    override val type: CascType
-        get() = cascArray(
-            "List of account groups",
-            cascObject(AccountGroupInput::class)
+    override fun jsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType {
+        return JsonArrayType(
+            items = jsonTypeBuilder.toType(AccountGroupInput::class),
+            description = "List of account groups",
         )
+    }
 
     override fun run(node: JsonNode, paths: List<String>) {
         // Items to provision

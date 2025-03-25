@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.model.structure.PromotionLevel
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
 import kotlin.jvm.optionals.getOrNull
+import kotlin.reflect.KClass
 
 @Component
 class PromotionSlotAdmissionRule(
@@ -23,6 +24,8 @@ class PromotionSlotAdmissionRule(
 
     override val id: String = ID
     override val name: String = "Promotion"
+
+    override val configType: KClass<PromotionSlotAdmissionRuleConfig> = PromotionSlotAdmissionRuleConfig::class
 
     /**
      * Getting builds where their branch contains the configured promotion.

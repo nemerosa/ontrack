@@ -15,5 +15,5 @@ class E2ELeadTimeChartWidget : AbstractWidget<E2EChartWidgetConfig>(
         targetBranch = null,
         targetPromotionLevel = null
     ),
-    preferredHeight = 6,
+    preferredHeight = 30,
 )

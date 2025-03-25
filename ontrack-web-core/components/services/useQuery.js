@@ -3,7 +3,14 @@ import {useEffect, useState} from "react";
 import {getGraphQLErrors} from "@components/services/graphql-utils";
 import {useReloadState} from "@components/common/StateUtils";
 
-export const useQuery = (query, {variables, skipInitialFetch = false, initialData, deps = [], dataFn} = {}) => {
+export const useQuery = (query, {
+    variables,
+    skipInitialFetch = false,
+    initialData,
+    condition = true,
+    deps = [],
+    dataFn
+} = {}) => {
     const client = useGraphQLClient()
 
     const [loading, setLoading] = useState(!skipInitialFetch)
@@ -13,7 +20,7 @@ export const useQuery = (query, {variables, skipInitialFetch = false, initialDat
     const [reloadState, reload] = useReloadState()
 
     useEffect(() => {
-        if (client && (reloadState > 0 || !skipInitialFetch)) {
+        if (client && condition && (reloadState > 0 || !skipInitialFetch)) {
             const runQuery = async () => {
                 setError('')
                 setLoading(true)
@@ -34,7 +41,7 @@ export const useQuery = (query, {variables, skipInitialFetch = false, initialDat
             // noinspection JSIgnoredPromiseFromCall
             runQuery()
         }
-    }, [client, reloadState, ...deps])
+    }, [client, condition, reloadState, ...deps])
 
     return {
         loading,

@@ -13,6 +13,5 @@ class GitHubPostProcessingSettingsCasc(
     "github-av-post-processing",
     GitHubPostProcessingSettings::class,
     settingsManagerService,
-    cachedSettingsService
-) {
-}
+    cachedSettingsService,
+)

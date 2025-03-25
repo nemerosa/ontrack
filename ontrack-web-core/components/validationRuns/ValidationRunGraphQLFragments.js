@@ -51,3 +51,46 @@ export const gqlValidationRunContent = gql`
         }
     }
 `
+
+export const gqlValidationRunTableContent = gql`
+    fragment ValidationRunTableContent on ValidationRun {
+        id
+        key: id
+        runOrder
+        runInfo {
+            runTime
+            sourceType
+            sourceUri
+            triggerType
+            triggerData
+        }
+        lastStatus {
+            creation {
+                time
+                user
+            }
+            description
+            annotatedDescription
+            statusID {
+                id
+                name
+            }
+        }
+        validationStamp {
+            id
+            name
+            image
+            description
+            annotatedDescription
+        }
+        data {
+            descriptor {
+                feature {
+                    id
+                }
+                id
+            }
+            data
+        }
+    }
+`

@@ -1,5 +1,5 @@
 import {expect} from "@playwright/test";
-import {PromotionRunPopover} from "../promotionRuns/PromotionRunPopover";
+import {PromotionRunDialog} from "../promotionRuns/PromotionRunDialog";
 
 export class PromotionInfoSection {
 
@@ -9,14 +9,12 @@ export class PromotionInfoSection {
         this.build = build
     }
 
-    async showPromotionRun(run) {
-        const runLink = this.section.getByTestId(`promotion-run-link-${run.id}`)
+    async repromote(run) {
+        const runLink = this.section.getByTestId(`build-promote-${this.build.id}-${run.promotionLevel.id}`)
         await expect(runLink).toBeVisible()
-        await runLink.hover()
-
-        const promotionRunPopover = new PromotionRunPopover(this.page, run)
-        await promotionRunPopover.checkContent()
-        return promotionRunPopover
+        await runLink.click()
+        const dialog = new PromotionRunDialog(this.page)
+        await dialog.createPromotionRun()
     }
 
     async checkPromotionRunCount(promotionLevel, expectedCount) {

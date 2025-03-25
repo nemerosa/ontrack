@@ -16,4 +16,6 @@ class CascMgt(connector: Connector) : Connected(connector) {
         )
     }
 
+    fun downloadJsonSchema() = connector.get("/extension/casc/download/schema/json").body.asJson()
+
 }

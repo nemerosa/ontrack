@@ -2,15 +2,59 @@ package net.nemerosa.ontrack.extension.casc.context.core.admin
 
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.model.security.AccountGroupInput
 import net.nemerosa.ontrack.model.security.PermissionInput
 import net.nemerosa.ontrack.model.security.PermissionTargetType
 import net.nemerosa.ontrack.model.security.Roles
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
 internal class AccountGroupGlobalPermissionsAdminContextIT : AbstractCascTestSupport() {
+
+    @Autowired
+    private lateinit var accountGroupGlobalPermissionsAdminContext: AccountGroupGlobalPermissionsAdminContext
+
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
+    @Test
+    fun `CasC schema type`() {
+        val type = accountGroupGlobalPermissionsAdminContext.jsonType(jsonTypeBuilder)
+        assertEquals(
+            """
+                {
+                  "items": {
+                    "title": "CascAccountGroupPermission",
+                    "description": null,
+                    "properties": {
+                      "group": {
+                        "description": "Name of the group",
+                        "type": "string"
+                      },
+                      "role": {
+                        "description": "ID of the role",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "group",
+                      "role"
+                    ],
+                    "additionalProperties": false,
+                    "type": "object"
+                  },
+                  "description": "List of account groups global permissions (old permissions are preserved)",
+                  "type": "array"
+                }
+            """.trimIndent().parseAsJson(),
+            type.asJson()
+        )
+    }
 
     @Test
     fun `Adding new group roles`() {

@@ -82,6 +82,7 @@ export default function EnvironmentListWidget({title = '', tags = [], projects =
                 loading={loading}
                 dataSource={environments}
                 pagination={false}
+                size="small"
             >
 
                 <Table.Column

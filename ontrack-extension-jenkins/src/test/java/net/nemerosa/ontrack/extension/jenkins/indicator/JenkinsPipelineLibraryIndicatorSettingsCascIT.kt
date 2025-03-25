@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.extension.jenkins.indicator
 
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
@@ -10,6 +12,54 @@ class JenkinsPipelineLibraryIndicatorSettingsCascIT : AbstractCascTestSupport() 
 
     @Autowired
     private lateinit var casc: JenkinsPipelineLibraryIndicatorSettingsCasc
+
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
+    @Test
+    fun `CasC schema type`() {
+        val type = casc.jsonType(jsonTypeBuilder)
+        assertEquals(
+            """
+                {
+                  "items": {
+                    "title": "JenkinsPipelineLibraryIndicatorLibrarySettings",
+                    "description": null,
+                    "properties": {
+                      "lastDeprecated": {
+                        "description": "Last deprecated version",
+                        "type": "string"
+                      },
+                      "lastSupported": {
+                        "description": "Last supported version",
+                        "type": "string"
+                      },
+                      "lastUnsupported": {
+                        "description": "Last unsupported version",
+                        "type": "string"
+                      },
+                      "library": {
+                        "description": "Name of the library",
+                        "type": "string"
+                      },
+                      "required": {
+                        "description": "Is the library required?",
+                        "type": "boolean"
+                      }
+                    },
+                    "required": [
+                      "library"
+                    ],
+                    "additionalProperties": false,
+                    "type": "object"
+                  },
+                  "description": "List of library versions requirements",
+                  "type": "array"
+                }
+            """.trimIndent().parseAsJson(),
+            type.asJson()
+        )
+    }
 
     @Test
     fun `Defining library settings as code`() {

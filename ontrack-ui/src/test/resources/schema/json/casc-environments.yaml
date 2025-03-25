@@ -1,0 +1,96 @@
+ontrack:
+  config:
+    environments:
+      keepEnvironments: false
+      environments:
+        - name: demo-beta
+          order: 100
+          tags:
+            - release
+        - name: production
+          order: 200
+          tags:
+            - release
+      slots:
+        - project: ontrack
+          environments:
+            - name: demo-beta
+              admissionRules:
+                - ruleId: promotion
+                  ruleConfig:
+                    promotion: RELEASE
+              workflows:
+                - trigger: "CANDIDATE"
+                  name: "Auto-deployment"
+                  nodes:
+                    - id: "running"
+                      description: "Starting the deployment"
+                      executorId: "slot-pipeline-deploying"
+                      data: {}
+                    - id: "auto-versioning"
+                      parents:
+                        - id: "running"
+                      description: "Updating the version"
+                      executorId: "auto-versioning"
+                      data:
+                        targetProject: ontrack-pro-argocd-production-environments
+                        targetBranch: main
+                        targetVersion: ${build}
+                        targetPath: beta/ontrack-demo-beta/config.yaml
+                        targetProperty: "#root[0].version"
+                        targetPropertyType: yaml
+                        autoApproval: true
+                    - id: "deploy"
+                      parents:
+                        - id: "auto-versioning"
+                      description: Marking the deployment as finished
+                      executorId: "slot-pipeline-deployed"
+                      data: {}
+                    - id: "end"
+                      parents:
+                        - id: "deploy"
+                      description: Notification
+                      executorId: "notification"
+                      data:
+                        channel: "slack"
+                        channelConfig:
+                          type: "INFO"
+                          channel: "#notifications"
+                        template: Deployment of ${build} in Demo Beta is finished
+            - name: production
+              admissionRules:
+                - ruleId: promotion
+                  ruleConfig:
+                    promotion: RELEASE
+              workflows:
+                - trigger: "RUNNING"
+                  name: "Deploying"
+                  nodes:
+                    - id: "auto-versioning"
+                      description: Updating version
+                      executorId: "auto-versioning"
+                      data:
+                        targetProject: ontrack-pro-argocd-production-environments
+                        targetBranch: main
+                        targetVersion: ${build}
+                        targetPath: production/ontrack/config.yaml
+                        targetProperty: "#root[0].version"
+                        targetPropertyType: yaml
+                        autoApproval: true
+                    - id: "deploy"
+                      parents:
+                        - id: "auto-versioning"
+                      description: Marking the deployment as finished
+                      executorId: "slot-pipeline-deployed"
+                      data: {}
+                    - id: "end"
+                      parents:
+                        - id: "deploy"
+                      description: Notification
+                      executorId: "notification"
+                      data:
+                        channel: "slack"
+                        channelConfig:
+                          type: "INFO"
+                          channel: "#notifications"
+                        template: Deployment of ${build} in Production is finished

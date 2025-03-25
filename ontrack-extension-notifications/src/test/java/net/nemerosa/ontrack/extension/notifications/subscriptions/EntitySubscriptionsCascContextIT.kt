@@ -2,9 +2,13 @@ package net.nemerosa.ontrack.extension.notifications.subscriptions
 
 import net.nemerosa.ontrack.extension.casc.CascService
 import net.nemerosa.ontrack.extension.notifications.AbstractNotificationTestSupport
-import net.nemerosa.ontrack.it.NewTxRollbacked
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getRequiredTextField
+import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.json.schema.JsonArrayType
+import net.nemerosa.ontrack.model.json.schema.JsonObjectType
+import net.nemerosa.ontrack.model.json.schema.JsonStringType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import net.nemerosa.ontrack.model.structure.toProjectEntityID
@@ -14,7 +18,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
 
-@NewTxRollbacked
 @Disabled("FLAKY")
 class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
 
@@ -23,6 +26,111 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
 
     @Autowired
     private lateinit var entitySubscriptionsCascContext: EntitySubscriptionsCascContext
+
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
+    @Test
+    fun `CasC schema type`() {
+        val type = entitySubscriptionsCascContext.jsonType(jsonTypeBuilder)
+        assertEquals(
+            """
+                {
+                  "items": {
+                    "title": "EntitySubscriptionCascContextData",
+                    "description": null,
+                    "properties": {
+                      "entity": {
+                        "title": "EntitySubscriptionData",
+                        "description": "Entity to subscribe to",
+                        "properties": {
+                          "branch": {
+                            "description": "Branch name",
+                            "type": "string"
+                          },
+                          "project": {
+                            "description": "Project name",
+                            "type": "string"
+                          },
+                          "promotion": {
+                            "description": "Promotion level name",
+                            "type": "string"
+                          },
+                          "validation": {
+                            "description": "Validation stamp name",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "project"
+                        ],
+                        "additionalProperties": false,
+                        "type": "object"
+                      },
+                      "subscriptions": {
+                        "items": {
+                          "title": "SubscriptionsCascContextData",
+                          "description": "List of subscriptions for this entity",
+                          "properties": {
+                            "channel": {
+                              "description": "Channel to send notifications to",
+                              "type": "string"
+                            },
+                            "channelConfig": {
+                              "description": "Configuration of the channel",
+                              "type": {}
+                            },
+                            "contentTemplate": {
+                              "description": "Optional template to use for the message",
+                              "type": "string"
+                            },
+                            "disabled": {
+                              "description": "Is this channel disabled?",
+                              "type": "boolean"
+                            },
+                            "events": {
+                              "items": {
+                                "description": "List of events to listen to",
+                                "type": "string"
+                              },
+                              "description": "List of events to listen to",
+                              "type": "array"
+                            },
+                            "keywords": {
+                              "description": "Keywords to filter the events",
+                              "type": "string"
+                            },
+                            "name": {
+                              "description": "Name of the subscription. Will be required in V5.",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "channel",
+                            "channelConfig",
+                            "events"
+                          ],
+                          "additionalProperties": false,
+                          "type": "object"
+                        },
+                        "description": "List of subscriptions for this entity",
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "entity",
+                      "subscriptions"
+                    ],
+                    "additionalProperties": false,
+                    "type": "object"
+                  },
+                  "description": "List of entity-level subscriptions",
+                  "type": "array"
+                }
+            """.trimIndent().parseAsJson(),
+            type.asJson()
+        )
+    }
 
     @Test
     fun `Subscription for a project`() {
@@ -231,6 +339,7 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                 channelConfig = mapOf("target" to "$target-gold").asJson(),
                 contentTemplate = null,
             )
+
             // Rendering
             fun checkRendering() {
                 val json = entitySubscriptionsCascContext.render()
@@ -249,7 +358,7 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                                     "events" to listOf("new_promotion_run"),
                                     "keywords" to "SILVER",
                                     "channel" to "mock",
-                                    "channel-config" to mapOf(
+                                    "channelConfig" to mapOf(
                                         "target" to "$target-silver"
                                     ),
                                     "disabled" to false,
@@ -260,7 +369,7 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                                     "events" to listOf("new_promotion_run"),
                                     "keywords" to "GOLD",
                                     "channel" to "mock",
-                                    "channel-config" to mapOf(
+                                    "channelConfig" to mapOf(
                                         "target" to "$target-gold"
                                     ),
                                     "disabled" to false,
@@ -322,7 +431,7 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                                 "events" to listOf("new_promotion_run"),
                                 "keywords" to "SILVER",
                                 "channel" to "mock",
-                                "channel-config" to mapOf(
+                                "channelConfig" to mapOf(
                                     "target" to "$target-silver"
                                 ),
                                 "disabled" to false,
@@ -992,6 +1101,16 @@ class EntitySubscriptionsCascContextIT : AbstractNotificationTestSupport() {
                 assertEquals(listOf(newTarget), subscriptions)
             }
         }
+    }
+
+    @Test
+    fun `Ignoring the storage key when generating the Casc model for EntitySubscriptionData`() {
+        val type = entitySubscriptionsCascContext.jsonType(jsonTypeBuilder)
+        val list = assertIs<JsonArrayType>(type)
+        val itemProperties = (list.items as JsonObjectType).properties
+        val entityProperties = (itemProperties["entity"] as JsonObjectType).properties
+        assertIs<JsonStringType>(entityProperties["project"])
+        assertNull(entityProperties["storageKey"])
     }
 
     /**

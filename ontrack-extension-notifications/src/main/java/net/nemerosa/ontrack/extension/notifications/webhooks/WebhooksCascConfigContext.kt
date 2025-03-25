@@ -1,18 +1,18 @@
 package net.nemerosa.ontrack.extension.notifications.webhooks
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.syncForward
 import net.nemerosa.ontrack.extension.casc.context.AbstractCascContext
 import net.nemerosa.ontrack.extension.casc.context.SubConfigContext
-import net.nemerosa.ontrack.extension.casc.schema.CascNested
-import net.nemerosa.ontrack.extension.casc.schema.CascType
-import net.nemerosa.ontrack.extension.casc.schema.cascArray
-import net.nemerosa.ontrack.extension.casc.schema.cascObject
 import net.nemerosa.ontrack.json.JsonParseException
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.json.schema.JsonArrayType
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.json.schema.toType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -27,10 +27,12 @@ class WebhooksCascConfigContext(
 
     override val field: String = "webhooks"
 
-    override val type: CascType = cascArray(
-        "List of webhooks",
-        cascObject(CascWebhook::class)
-    )
+    override fun jsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType {
+        return JsonArrayType(
+            description = "List of webhooks",
+            items = jsonTypeBuilder.toType(CascWebhook::class),
+        )
+    }
 
     override fun run(node: JsonNode, paths: List<String>) {
         val items = node.mapIndexed { index, child ->
@@ -109,10 +111,9 @@ class WebhooksCascConfigContext(
         @APIDescription("Webhook endpoint")
         val url: String,
         @APIDescription("Webhook execution timeout (in seconds)")
-        @JsonProperty("timeout-seconds")
+        @JsonAlias("timeout-seconds")
         val timeoutSeconds: Int,
         @APIDescription("Webhook authentication")
-        @CascNested
         val authentication: CascWebhookAuthentication,
     )
 

@@ -13,5 +13,5 @@ class LabelProviderJobSettingsContext(
     "label-provider-job",
     LabelProviderJobSettings::class,
     settingsManagerService,
-    cachedSettingsService
+    cachedSettingsService,
 )

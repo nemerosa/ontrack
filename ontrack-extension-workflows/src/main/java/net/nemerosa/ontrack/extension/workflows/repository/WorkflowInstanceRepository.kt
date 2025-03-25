@@ -2,7 +2,10 @@ package net.nemerosa.ontrack.extension.workflows.repository
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.extension.workflows.engine.*
+import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstance
+import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceFilter
+import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceNode
+import net.nemerosa.ontrack.extension.workflows.engine.WorkflowInstanceNodeStatus
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.events.SerializableEvent
 import net.nemerosa.ontrack.model.events.merge
@@ -128,10 +131,6 @@ class WorkflowInstanceRepository(
                 null
             },
             contexts = contexts,
-            status = rs.getString("STATUS")
-                ?.takeIf { it.isNotBlank() }?.let {
-                    WorkflowInstanceStatus.valueOf(it)
-                } ?: WorkflowInstanceStatus.STARTED,
             nodesExecutions = nodesExecutions,
         )
     }
@@ -144,26 +143,6 @@ class WorkflowInstanceRepository(
         output = readJson(rsn, "OUTPUT"),
         error = rsn.getString("ERROR"),
     )
-
-    private fun instanceStatusUpdate(instanceId: String) {
-        // Loads the instance
-        val instance = findWorkflowInstance(instanceId)
-            ?: throw WorkflowInstanceNotFoundException(instanceId)
-        // Computing its new status
-        val status = instance.computeStatus()
-        // Saving its status
-        namedParameterJdbcTemplate!!.update(
-            """
-                UPDATE WKF_INSTANCES
-                SET STATUS = :status
-                WHERE ID = :id
-            """.trimIndent(),
-            mapOf(
-                "id" to instanceId,
-                "status" to status.name,
-            )
-        )
-    }
 
     fun nodeWaiting(instanceId: String, nodeId: String) {
         namedParameterJdbcTemplate!!.update(
@@ -179,7 +158,6 @@ class WorkflowInstanceRepository(
                 "status" to WorkflowInstanceNodeStatus.WAITING.name,
             )
         )
-        instanceStatusUpdate(instanceId)
     }
 
     fun nodeStarted(instanceId: String, nodeId: String) {
@@ -197,7 +175,6 @@ class WorkflowInstanceRepository(
                 "startTime" to dateTimeForDB(Time.now),
             )
         )
-        instanceStatusUpdate(instanceId)
     }
 
     fun nodeSuccess(instanceId: String, nodeId: String, output: JsonNode?, event: SerializableEvent?) {
@@ -219,7 +196,6 @@ class WorkflowInstanceRepository(
                 "endTime" to dateTimeForDB(Time.now),
             )
         )
-        instanceStatusUpdate(instanceId)
     }
 
     private fun mergeInstanceEvent(instanceId: String, event: SerializableEvent) {
@@ -267,7 +243,6 @@ class WorkflowInstanceRepository(
                 "output" to writeJson(output),
             )
         )
-        instanceStatusUpdate(instanceId)
     }
 
     fun nodeError(instanceId: String, nodeId: String, message: String?, output: JsonNode?) {
@@ -288,7 +263,6 @@ class WorkflowInstanceRepository(
                 "endTime" to dateTimeForDB(Time.now),
             )
         )
-        instanceStatusUpdate(instanceId)
     }
 
     fun nodeCancelled(instanceId: String, nodeId: String, message: String) {
@@ -307,7 +281,6 @@ class WorkflowInstanceRepository(
                 "endTime" to dateTimeForDB(Time.now),
             )
         )
-        instanceStatusUpdate(instanceId)
     }
 
     fun getNodeStatus(instanceId: String, nodeId: String) =
@@ -353,37 +326,129 @@ class WorkflowInstanceRepository(
         }
     }
 
+    private fun buildFilter(
+        workflowInstanceFilter: WorkflowInstanceFilter,
+        criterias: MutableList<String>,
+        params: MutableMap<String, Any?>,
+    ) {
+        if (!workflowInstanceFilter.name.isNullOrBlank()) {
+            criterias += "i.WORKFLOW::JSONB->>'name' = :name"
+            params["name"] = workflowInstanceFilter.name
+        }
+        workflowInstanceFilter.triggerId?.takeIf { it.isNotBlank() }?.let { triggerId ->
+            criterias += "i.TRIGGER_ID = :triggerId"
+            params["triggerId"] = triggerId
+            workflowInstanceFilter.triggerData?.takeIf { it.isNotBlank() }?.let { triggerData ->
+                // We need to the trigger
+                val trigger = triggerRegistry.getTriggerById<Any>(triggerId)
+                // We need to convert the trigger data into a JSON path in the trigger data JSON
+                trigger.filterCriteria(
+                    token = triggerData,
+                    criterias = criterias,
+                    params = params,
+                )
+            }
+        }
+    }
+
+    private fun findInstancesWithStatus(workflowInstanceFilter: WorkflowInstanceFilter): PaginatedList<WorkflowInstance> {
+        val criterias = mutableListOf<String>()
+        val params = mutableMapOf<String, Any?>()
+
+        // Instance level criterias
+        buildFilter(workflowInstanceFilter, criterias, params)
+
+        // Node level criterias
+        params["status"] = workflowInstanceFilter.status?.name
+
+        // Where clause
+        val where = if (criterias.isEmpty()) {
+            ""
+        } else {
+            "WHERE " + criterias.joinToString(" AND ") { "($it)" }
+        }
+
+        /**
+         * See [WorkflowInstance.computeStatus]
+         */
+        val subQuery = """
+            SELECT i.*,
+            CASE 
+                WHEN COUNT(*) = SUM(CASE WHEN n.status = 'CREATED' THEN 1 ELSE 0 END)
+                     THEN 'STARTED'
+                WHEN SUM(
+                     CASE WHEN n.status IN ('ERROR','CANCELLED','TIMEOUT','SUCCESS') 
+                          THEN 0 
+                          ELSE 1 
+                     END
+                   ) > 0
+                     THEN 'RUNNING'
+                WHEN SUM(CASE WHEN n.status = 'ERROR' THEN 1 ELSE 0 END) > 0
+                     THEN 'ERROR'
+                WHEN SUM(CASE WHEN n.status IN ('CANCELLED','TIMEOUT') THEN 1 ELSE 0 END) > 0
+                     THEN 'STOPPED'
+                WHEN COUNT(*) = SUM(CASE WHEN n.status = 'SUCCESS' THEN 1 ELSE 0 END)
+                     THEN 'SUCCESS'
+                ELSE 'RUNNING'
+            END AS computed_status
+            FROM wkf_instances i
+            JOIN wkf_instance_nodes n ON i.id = n.instance_id
+            GROUP BY i.id
+        """.trimIndent()
+
+        val count = namedParameterJdbcTemplate!!.queryForObject(
+            """
+                SELECT COUNT(*)
+                FROM (
+                    $subQuery
+                    $where
+                ) AS sub
+                WHERE sub.computed_status = :status
+            """.trimIndent(),
+            params,
+            Int::class.java
+        ) ?: 0
+
+        val items = namedParameterJdbcTemplate!!.query(
+            """
+                SELECT sub.*
+                FROM (
+                    $subQuery
+                    $where
+                ) AS sub
+                WHERE sub.computed_status = :status
+                ORDER BY sub.TIMESTAMP DESC
+                LIMIT :limit
+                OFFSET :offset
+            """.trimIndent(),
+            params + mapOf(
+                "limit" to workflowInstanceFilter.size,
+                "offset" to workflowInstanceFilter.offset
+            )
+        ) { rs, _ ->
+            toWorkflowInstance(rs)
+        }
+
+        return PaginatedList.create(
+            items = items,
+            offset = workflowInstanceFilter.offset,
+            pageSize = workflowInstanceFilter.size,
+            total = count
+        )
+    }
+
     fun findInstances(workflowInstanceFilter: WorkflowInstanceFilter): PaginatedList<WorkflowInstance> {
 
         val criterias = mutableListOf<String>()
         val params = mutableMapOf<String, Any?>()
 
         if (!workflowInstanceFilter.id.isNullOrBlank()) {
-            criterias += "ID = :id"
+            criterias += "i.ID = :id"
             params["id"] = workflowInstanceFilter.id
+        } else if (workflowInstanceFilter.status != null) {
+            return findInstancesWithStatus(workflowInstanceFilter)
         } else {
-            if (!workflowInstanceFilter.name.isNullOrBlank()) {
-                criterias += "WORKFLOW::JSONB->>'name' = :name"
-                params["name"] = workflowInstanceFilter.name
-            }
-            workflowInstanceFilter.status?.let { status ->
-                criterias += "STATUS = :status"
-                params["status"] = status.name
-            }
-            workflowInstanceFilter.triggerId?.takeIf { it.isNotBlank() }?.let { triggerId ->
-                criterias += "TRIGGER_ID = :triggerId"
-                params["triggerId"] = triggerId
-                workflowInstanceFilter.triggerData?.takeIf { it.isNotBlank() }?.let { triggerData ->
-                    // We need to the trigger
-                    val trigger = triggerRegistry.getTriggerById<Any>(triggerId)
-                    // We need to convert the trigger data into a JSON path in the trigger data JSON
-                    trigger.filterCriteria(
-                        token = triggerData,
-                        criterias = criterias,
-                        params = params,
-                    )
-                }
-            }
+            buildFilter(workflowInstanceFilter, criterias, params)
         }
 
         val where = if (criterias.isEmpty()) {
@@ -395,7 +460,7 @@ class WorkflowInstanceRepository(
         val count = namedParameterJdbcTemplate!!.queryForObject(
             """
                 SELECT COUNT(*)
-                FROM WKF_INSTANCES
+                FROM WKF_INSTANCES i
                 $where
             """.trimIndent(),
             params,
@@ -405,9 +470,9 @@ class WorkflowInstanceRepository(
         val items = namedParameterJdbcTemplate!!.query(
             """
                 SELECT *
-                FROM WKF_INSTANCES
+                FROM WKF_INSTANCES i
                 $where
-                ORDER BY TIMESTAMP DESC
+                ORDER BY i.TIMESTAMP DESC
                 LIMIT :limit
                 OFFSET :offset
             """.trimIndent(),
@@ -447,33 +512,6 @@ class WorkflowInstanceRepository(
                 "timestamp" to timestamp,
             )
         )
-    }
-
-    fun migrateStatuses(): Int {
-        var count = 0
-        jdbcTemplate!!.query(
-            """
-                SELECT *
-                FROM WKF_INSTANCES
-                WHERE STATUS = ''
-            """.trimIndent()
-        ) { rs ->
-            count++
-            val instance = toWorkflowInstance(rs)
-            val status = instance.computeStatus()
-            namedParameterJdbcTemplate!!.update(
-                """
-                    UPDATE WKF_INSTANCES
-                    SET STATUS = :status
-                    WHERE ID = :id
-                """.trimIndent(),
-                mapOf(
-                    "id" to instance.id,
-                    "status" to status.name,
-                )
-            )
-        }
-        return count
     }
 
 }

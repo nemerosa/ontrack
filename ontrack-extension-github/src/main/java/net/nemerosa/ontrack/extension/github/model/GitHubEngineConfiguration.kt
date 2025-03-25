@@ -1,8 +1,9 @@
 package net.nemerosa.ontrack.extension.github.model
 
+import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import net.nemerosa.ontrack.extension.github.app.GitHubApp
-import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.annotations.APIIgnore
 import net.nemerosa.ontrack.model.docs.DocumentationIgnore
 import net.nemerosa.ontrack.model.docs.SelfDocumented
 import net.nemerosa.ontrack.model.form.Form
@@ -32,10 +33,15 @@ open class GitHubEngineConfiguration(
     url: String?,
     val user: String? = null,
     val password: String? = null,
+    @JsonAlias("token")
     val oauth2Token: String? = null,
+    @JsonAlias("app-id")
     val appId: String? = null,
+    @JsonAlias("app-private-key")
     val appPrivateKey: String? = null,
+    @JsonAlias("app-installation")
     val appInstallationAccountName: String? = null,
+    @JsonAlias("auto-merge-token")
     val autoMergeToken: String? = null,
 ) : CredentialsConfiguration<GitHubEngineConfiguration> {
 
@@ -43,6 +49,7 @@ open class GitHubEngineConfiguration(
      * Authentication type
      */
     @DocumentationIgnore
+    @APIIgnore
     val authenticationType: GitHubAuthenticationType
         get() = when {
             !appId.isNullOrBlank() -> GitHubAuthenticationType.APP
@@ -62,6 +69,7 @@ open class GitHubEngineConfiguration(
     val url: String = if (url.isNullOrBlank()) GITHUB_COM else url
 
     @DocumentationIgnore
+    @APIIgnore
     override val descriptor: ConfigurationDescriptor
         get() = ConfigurationDescriptor(
             name,
@@ -210,10 +218,6 @@ open class GitHubEngineConfiguration(
                 throw GitHubEngineConfigurationIncorrectAppPrivateKeyException(any.message ?: "")
             }
         }
-    }
-
-    override fun toString(): String {
-        return "GitHubEngineConfiguration(name='$name', user=$user, password=$password, oauth2Token=$oauth2Token, appId=$appId, appPrivateKey=$appPrivateKey, appInstallationAccountName=$appInstallationAccountName, url='$url', autoMergeToken=$autoMergeToken)"
     }
 
     companion object {

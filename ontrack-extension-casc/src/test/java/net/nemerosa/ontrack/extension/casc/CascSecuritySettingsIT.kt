@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.extension.casc
 
 import net.nemerosa.ontrack.extension.casc.context.settings.SecuritySettingsContext
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.model.settings.SecuritySettings
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,6 +15,49 @@ class CascSecuritySettingsIT : AbstractCascTestSupport() {
 
     @Autowired
     private lateinit var securitySettingsContext: SecuritySettingsContext
+
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
+    @Test
+    fun `CasC schema type`() {
+        val type = securitySettingsContext.jsonType(jsonTypeBuilder)
+        assertEquals(
+            """
+                {
+                  "title": "SecuritySettings",
+                  "description": null,
+                  "properties": {
+                    "builtInAuthenticationEnabled": {
+                      "description": "Enabling the built-in authentication",
+                      "type": "boolean"
+                    },
+                    "grantDashboardEditionToAll": {
+                      "description": "Grants dashboard creation rights to all",
+                      "type": "boolean"
+                    },
+                    "grantDashboardSharingToAll": {
+                      "description": "Grants dashboard sharing rights to all",
+                      "type": "boolean"
+                    },
+                    "grantProjectParticipationToAll": {
+                      "description": "Grants project participation to all",
+                      "type": "boolean"
+                    },
+                    "grantProjectViewToAll": {
+                      "description": "Grants project view to all",
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                  ],
+                  "additionalProperties": false,
+                  "type": "object"
+                }
+            """.trimIndent().parseAsJson(),
+            type.asJson()
+        )
+    }
 
     @Test
     fun `Security settings`() {
@@ -114,8 +159,8 @@ class CascSecuritySettingsIT : AbstractCascTestSupport() {
 
                 // Checks the new settings
                 val settings = cachedSettingsService.getCachedSettings(SecuritySettings::class.java)
-                assertFalse(settings.isGrantProjectViewToAll)
-                assertFalse(settings.isGrantProjectParticipationToAll)
+                assertTrue(settings.isGrantProjectViewToAll)
+                assertTrue(settings.isGrantProjectParticipationToAll)
                 assertFalse(settings.builtInAuthenticationEnabled)
 
             }

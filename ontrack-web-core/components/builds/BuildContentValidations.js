@@ -1,19 +1,14 @@
 import React, {useEffect, useState} from "react";
 import {gql} from "graphql-request";
-import {Button, Popover, Space, Table, Typography} from "antd";
-import ValidationStamp from "@components/validationStamps/ValidationStamp";
-import ValidationRunLink from "@components/validationRuns/ValidationRunLink";
-import ValidationRunStatus from "@components/validationRuns/ValidationRunStatus";
-import Timestamp from "@components/common/Timestamp";
-import {FaEraser, FaGavel, FaInfoCircle} from "react-icons/fa";
-import AnnotatedDescription from "@components/common/AnnotatedDescription";
-import ValidationRunData from "@components/framework/validation-run-data/ValidationRunData";
+import {Button, Space, Typography} from "antd";
+import {FaEraser, FaGavel} from "react-icons/fa";
 import ValidationRunSortingMode from "@components/validationRuns/ValidationRunSortingMode";
 import BuildValidateAction from "@components/builds/BuildValidateAction";
 import {isAuthorized} from "@components/common/authorizations";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import GridCell from "@components/grid/GridCell";
-import RunInfo from "@components/common/RunInfo";
+import {gqlValidationRunTableContent} from "@components/validationRuns/ValidationRunGraphQLFragments";
+import ValidationRunTable from "@components/validationRuns/ValidationRunTable";
 
 export default function BuildContentValidations({build}) {
 
@@ -109,6 +104,7 @@ export default function BuildContentValidations({build}) {
             setLoading(true)
             client.request(
                 gql`
+                    ${gqlValidationRunTableContent}
                     query BuildValidations(
                         $buildId: Int!,
                         $offset: Int!,
@@ -139,44 +135,7 @@ export default function BuildContentValidations({build}) {
                                     }
                                 }
                                 pageItems {
-                                    id
-                                    key: id
-                                    runOrder
-                                    runInfo {
-                                        runTime
-                                        sourceType
-                                        sourceUri
-                                        triggerType
-                                        triggerData
-                                    }
-                                    lastStatus {
-                                        creation {
-                                            time
-                                            user
-                                        }
-                                        description
-                                        annotatedDescription
-                                        statusID {
-                                            id
-                                            name
-                                        }
-                                    }
-                                    validationStamp {
-                                        id
-                                        name
-                                        image
-                                        description
-                                        annotatedDescription
-                                    }
-                                    data {
-                                        descriptor {
-                                            feature {
-                                                id
-                                            }
-                                            id
-                                        }
-                                        data
-                                    }
+                                    ...ValidationRunTableContent
                                 }
                             }
                         }
@@ -203,65 +162,6 @@ export default function BuildContentValidations({build}) {
             })
         }
     }, [client, build, pageRequest, filteredInfo, sortingMode, reloadCount]);
-
-    // Definition of the columns
-
-    const columns = [
-        {
-            title: "Validation",
-            key: 'validation',
-            render: (_, run) => <ValidationStamp validationStamp={run.validationStamp} tooltipPlacement="rightBottom"/>,
-            filters: validationStamps,
-            filterSearch: true,
-            filterMultiple: false,
-            filteredValue: filteredInfo.validation || null,
-        },
-        {
-            title: "Run",
-            key: 'run',
-            render: (_, run) => <ValidationRunLink run={run}/>
-        },
-        {
-            title: "Status",
-            key: 'status',
-            render: (_, run) => <ValidationRunStatus status={run.lastStatus}/>,
-            filters: statuses,
-            filterSearch: true,
-            filteredValue: filteredInfo.status || null,
-        },
-        {
-            title: "Description",
-            key: 'description',
-            render: (_, run) => <AnnotatedDescription entity={run.lastStatus}/>,
-        },
-        {
-            title: "Creation",
-            key: 'creation',
-            render: (_, run) => <Popover
-                content={
-                    <Space direction="vertical">
-                        <Typography.Text>Created by {run.lastStatus.creation.user}</Typography.Text>
-                        <AnnotatedDescription entity={run.lastStatus}/>
-                    </Space>
-                }
-            >
-                <Space>
-                    <FaInfoCircle/>
-                    <Timestamp value={run.lastStatus.creation.time} fontSize="100%"></Timestamp>
-                </Space>
-            </Popover>
-        },
-        {
-            title: "Run info",
-            key: 'run-info',
-            render: (_, run) => run.runInfo ? <RunInfo info={run.runInfo} mode="minimal"/> : undefined
-        },
-        {
-            title: "Data",
-            key: 'data',
-            render: (_, run) => <ValidationRunData data={run.data}/>
-        }
-    ]
 
     return (
         <>
@@ -302,12 +202,15 @@ export default function BuildContentValidations({build}) {
                           </>
                       }
             >
-                <Table
-                    dataSource={validationRuns}
-                    columns={columns}
+                <ValidationRunTable
+                    validationRuns={validationRuns}
                     pagination={pagination}
                     onChange={onTableChange}
-                    size="small"
+                    filtering={{
+                        validationStamps,
+                        statuses,
+                        filteredInfo,
+                    }}
                 />
             </GridCell>
         </>

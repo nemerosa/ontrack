@@ -1,0 +1,11 @@
+@startuml
+
+participant Queue
+participant WorkflowEngine
+participant Executor
+
+Queue -> WorkflowEngine: processNode
+WorkflowEngine -\ WorkflowEngine: nodeExecution
+WorkflowEngine -> Executor: execute
+
+@enduml

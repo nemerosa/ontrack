@@ -12,6 +12,7 @@ import SlotPipelineCreateButton from "@components/extension/environments/SlotPip
 import SlotPipelineLink from "@components/extension/environments/SlotPipelineLink";
 import SlotPipelineStatusActions from "@components/extension/environments/SlotPipelineStatusActions";
 import TimestampText from "@components/common/TimestampText";
+import {slotName} from "@components/extension/environments/SlotName";
 
 /**
  * For a given build, displays:
@@ -81,7 +82,7 @@ export default function BuildEnvironments({build}) {
                     children: <Space>
                         <FaServer/>
                         <Link href={slotUri(slot)}>
-                            {slot.environment.name}/{slot.project.name}{slot.qualifier ? `/${slot.qualifier}` : ''}
+                            {slotName(slot)}
                         </Link>
                     </Space>,
                 })

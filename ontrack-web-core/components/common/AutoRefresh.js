@@ -87,7 +87,7 @@ export function AutoRefreshContextProvider({children, onRefresh}) {
     )
 }
 
-export function AutoRefreshButton() {
+export function AutoRefreshButton({size = undefined}) {
 
     const autoRefresh = useContext(AutoRefreshContext)
 
@@ -125,6 +125,7 @@ export function AutoRefreshButton() {
 
     return (
         <Dropdown.Button
+            size={size}
             menu={menuProps}
             onClick={onButtonClick}
             className={autoRefresh.autoRefreshEnabled ? "ot-auto-refresh ot-auto-refresh-enabled" : "ot-auto-refresh"}

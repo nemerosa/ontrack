@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.ordering.BranchOrderingService
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
+import kotlin.reflect.KClass
 
 @Component
 class BranchPatternSlotAdmissionRule(
@@ -21,6 +22,8 @@ class BranchPatternSlotAdmissionRule(
 
     override val id: String = ID
     override val name: String = "Branch pattern"
+
+    override val configType: KClass<BranchPatternSlotAdmissionRuleConfig> = BranchPatternSlotAdmissionRuleConfig::class
 
     override fun parseConfig(jsonRuleConfig: JsonNode) = jsonRuleConfig.parse<BranchPatternSlotAdmissionRuleConfig>()
 

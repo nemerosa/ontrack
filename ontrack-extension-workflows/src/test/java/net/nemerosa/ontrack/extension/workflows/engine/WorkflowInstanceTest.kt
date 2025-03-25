@@ -26,7 +26,6 @@ class WorkflowInstanceTest {
             timestamp = Time.now,
             workflow = testWorkflow(),
             event = MockEventType.serializedMockEvent("Sample"),
-            status = WorkflowInstanceStatus.ERROR,
             contexts = emptyMap(),
             nodesExecutions = listOf(
                 WorkflowInstanceNode(
@@ -57,7 +56,7 @@ class WorkflowInstanceTest {
         )
         assertEquals(
             WorkflowInstanceStatus.ERROR,
-            workflowInstance.computeStatus()
+            workflowInstance.status
         )
     }
 
@@ -120,7 +119,6 @@ class WorkflowInstanceTest {
             timestamp = Time.now,
             workflow = testWorkflow(),
             event = MockEventType.serializedMockEvent("Sample"),
-            status = WorkflowInstance.computeStatus(nodesExecutions),
             nodesExecutions = nodesExecutions,
             contexts = emptyMap(),
         )

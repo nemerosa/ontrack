@@ -3,13 +3,14 @@ package net.nemerosa.ontrack.extension.casc.context.core.admin
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.syncForward
 import net.nemerosa.ontrack.extension.casc.context.AbstractCascContext
-import net.nemerosa.ontrack.extension.casc.schema.CascType
-import net.nemerosa.ontrack.extension.casc.schema.cascArray
-import net.nemerosa.ontrack.extension.casc.schema.cascObject
 import net.nemerosa.ontrack.json.JsonParseException
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.json.schema.JsonArrayType
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.json.schema.toType
 import net.nemerosa.ontrack.model.security.AccountGroupMappingInput
 import net.nemerosa.ontrack.model.security.AccountGroupMappingService
 import net.nemerosa.ontrack.model.security.AccountService
@@ -34,10 +35,10 @@ class AccountGroupMappingsAdminContext(
      */
     override val priority: Int = AccountGroupsAdminContext.PRIORITY - 5
 
-    override val type: CascType
-        get() = cascArray(
-            "List of group mappings",
-            cascObject(CascMapping::class)
+    override fun jsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType =
+        JsonArrayType(
+            items = jsonTypeBuilder.toType(CascMapping::class),
+            description = "List of group mappings",
         )
 
     override fun run(node: JsonNode, paths: List<String>) {

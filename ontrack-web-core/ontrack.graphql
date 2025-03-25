@@ -714,6 +714,13 @@ type Build implements Authorizable & ProjectEntity {
         "Filtering on the pipeline status"
         status: SlotPipelineStatus
     ): [SlotPipeline!]!
+    "List of deployment slots this build is associated with"
+    slots(
+        "Name of the environment"
+        environment: String,
+        "Qualifier for the project"
+        qualifier: String
+    ): [Slot!]!
     "List of builds using this one."
     usedBy(
         "Keeps only links targeted from this branch. `project` argument is also required."
@@ -793,7 +800,9 @@ type Build implements Authorizable & ProjectEntity {
         "Size of the page"
         size: Int = 20,
         "Name of the validation stamp"
-        validationStamp: String
+        validationStamp: String,
+        "List of validation stamps"
+        validationStamps: [String!]
     ): [Validation!]!
 }
 
@@ -957,7 +966,7 @@ type CasC {
     json: JSON
     "List of resources needed to define the configuration as code"
     locations: [String!]!
-    "CasC schema as JSON"
+    "CasC JSON Schema"
     schema: JSON
     "Renders the current settings as YAML"
     yaml: String!
@@ -5560,6 +5569,13 @@ type Query {
         "ID of the branch to look for"
         id: Int!
     ): Branch!
+    "Getting a branch using its name"
+    branchByName(
+        "Name of the branch"
+        name: String,
+        "Name of the project"
+        project: String
+    ): Branch
     branches(
         "Keeps only branches listed as favourute"
         favourite: Boolean,
@@ -7266,6 +7282,8 @@ type Slot implements Authorizable {
     lastDeployedPipeline: SlotPipeline
     "Paginated list of pipelines"
     pipelines(
+        "Filtering on a build"
+        buildId: Int,
         "Offset for the page"
         offset: Int = 0,
         "Size of the page"
@@ -11461,6 +11479,12 @@ input StartSlotPipelineDeploymentInput {
 input StartSlotPipelineInput {
     "buildId field"
     buildId: Int!
+    "forceDone field"
+    forceDone: Boolean
+    "forceDoneMessage field"
+    forceDoneMessage: String
+    "Option to skip the workflows on DONE when forcing the deployment"
+    skipWorkflows: Boolean
     "slotId field"
     slotId: String!
 }
@@ -11695,8 +11719,12 @@ input UnshareSCMFileChangeFilterInput {
 input UpdateBuildInput {
     "Creation timestamp to update"
     creation: LocalDateTime
+    "Description for the build"
+    description: String
     "ID of the build to update"
     id: Int!
+    "Name for the build"
+    name: String
 }
 
 "Input type for the updateConfiguration mutation."

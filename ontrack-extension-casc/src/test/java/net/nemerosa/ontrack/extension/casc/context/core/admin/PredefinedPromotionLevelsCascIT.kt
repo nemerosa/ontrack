@@ -4,6 +4,8 @@ import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.extension.scm.service.TestSCMExtension
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.PredefinedPromotionLevel
 import net.nemerosa.ontrack.test.TestUtils.resourceBytes
@@ -19,6 +21,61 @@ class PredefinedPromotionLevelsCascIT : AbstractCascTestSupport() {
 
     @Autowired
     private lateinit var predefinedPromotionLevelsAdminContext: PredefinedPromotionLevelsAdminContext
+
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
+    @Test
+    fun `CasC schema type`() {
+        val type = predefinedPromotionLevelsAdminContext.jsonType(jsonTypeBuilder)
+        assertEquals(
+            """
+                {
+                  "title": "PredefinedPromotionLevelsAdminContextType",
+                  "description": null,
+                  "properties": {
+                    "list": {
+                      "items": {
+                        "title": "PredefinedPromotionLevelsAdminContextTypeItem",
+                        "description": "List of promotion levels to predefine",
+                        "properties": {
+                          "description": {
+                            "description": "Description of the promotion level",
+                            "type": "string"
+                          },
+                          "image": {
+                            "description": "Path to the promotion level image",
+                            "type": "string"
+                          },
+                          "name": {
+                            "description": "Name of the promotion level",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "name"
+                        ],
+                        "additionalProperties": false,
+                        "type": "object"
+                      },
+                      "description": "List of promotion levels to predefine",
+                      "type": "array"
+                    },
+                    "replace": {
+                      "description": "Is the list authoritative?",
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "list"
+                  ],
+                  "additionalProperties": false,
+                  "type": "object"
+                }
+            """.trimIndent().parseAsJson(),
+            type.asJson()
+        )
+    }
 
     @Test
     fun `Rendering existing predefined promotion levels`() {

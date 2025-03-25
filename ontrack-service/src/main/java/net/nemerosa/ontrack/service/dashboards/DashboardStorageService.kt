@@ -17,4 +17,9 @@ interface DashboardStorageService {
 
     fun ownDashboard(uuid: String, userId: ID): Boolean
 
+    /**
+     * Migrating all existing dashboards
+     */
+    fun migrateDashboards(migration: (Dashboard) -> Dashboard)
+
 }

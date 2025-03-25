@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Build
 import org.springframework.stereotype.Component
+import kotlin.reflect.KClass
 
 @Component
 class ManualApprovalSlotAdmissionRule(
@@ -19,6 +20,8 @@ class ManualApprovalSlotAdmissionRule(
 
     override val id: String = ID
     override val name: String = "Manual approval"
+
+    override val configType: KClass<ManualApprovalSlotAdmissionRuleConfig> = ManualApprovalSlotAdmissionRuleConfig::class
 
     override fun parseConfig(jsonRuleConfig: JsonNode): ManualApprovalSlotAdmissionRuleConfig = jsonRuleConfig.parse()
 

@@ -51,11 +51,28 @@ class ValidationStampJdbcRepository(
             branchJdbcRepositoryAccessor.getBranch(id(rs), project)
         }
 
-    override fun toValidationStamp(rs: ResultSet) = ValidationStamp(
+    override fun findValidationStampsForNames(branch: Branch, validationStamps: List<String>): List<ValidationStamp> =
+        namedParameterJdbcTemplate!!.query(
+            """
+                SELECT *
+                FROM VALIDATION_STAMPS VS
+                WHERE VS.BRANCHID = :branchId
+                AND VS.NAME IN (:validations)
+                ORDER BY VS.NAME
+            """.trimIndent(),
+            mapOf(
+                "branchId" to branch.id(),
+                "validations" to validationStamps,
+            )
+        ) { rs, _ ->
+            toValidationStamp(rs, branch = branch)
+        }
+
+    override fun toValidationStamp(rs: ResultSet, branch: Branch?) = ValidationStamp(
         id = id(rs),
         name = rs.getString("name"),
         description = rs.getString("description"),
-        branch = branchJdbcRepositoryAccessor.getBranch(id(rs, "branchid")),
+        branch = branch ?: branchJdbcRepositoryAccessor.getBranch(id(rs, "branchid")),
         isImage = !rs.getString("imagetype").isNullOrBlank(),
         signature = readSignature(rs),
         dataType = validationDataTypeConfigRepository.readValidationDataTypeConfig<Any>(rs),

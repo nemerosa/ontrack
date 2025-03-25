@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.oidc.settings
 
 import net.nemerosa.ontrack.model.annotations.APIDescription
+import net.nemerosa.ontrack.model.annotations.APIOptional
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 
@@ -27,6 +28,7 @@ data class OntrackOIDCProvider(
     @APIDescription("Display name for this provider")
     val name: String,
     @APIDescription("Tooltip for this provider")
+    @APIOptional
     val description: String,
     @APIDescription("OIDC issueId URL")
     val issuerId: String,
@@ -37,8 +39,10 @@ data class OntrackOIDCProvider(
     @APIDescription("Regular expression used to filter groups associated with the OIDC user")
     val groupFilter: String?,
     @APIDescription("Check to force the protocol to HTTPS for the Redirect URI")
+    @APIOptional
     val forceHttps: Boolean,
     @APIDescription("If true, this provider is disabled and won't be active")
+    @APIOptional
     val disabled: Boolean,
 ) {
 

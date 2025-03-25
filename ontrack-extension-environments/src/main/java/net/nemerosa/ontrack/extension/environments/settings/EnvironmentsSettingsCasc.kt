@@ -8,10 +8,10 @@ import org.springframework.stereotype.Component
 @Component
 class EnvironmentsSettingsCasc(
     settingsManagerService: SettingsManagerService,
-    cachedSettingsService: CachedSettingsService
+    cachedSettingsService: CachedSettingsService,
 ) : AbstractSubSettingsContext<EnvironmentsSettings>(
     "environments",
     EnvironmentsSettings::class,
     settingsManagerService,
-    cachedSettingsService
+    cachedSettingsService,
 )

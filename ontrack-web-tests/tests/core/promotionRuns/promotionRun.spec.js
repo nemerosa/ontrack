@@ -18,11 +18,8 @@ test('repromoting a promotion run', async ({page}) => {
     // Management of promotions
     const promotionInfoSection = await buildPage.getPromotionInfoSection()
 
-    // Hovering the promotion run & checking that the popover is present and complete
-    const promotionRunPopover = await promotionInfoSection.showPromotionRun(run)
-
-    // Re-promotion
-    await promotionRunPopover.repromote()
+    // Repromoting the build
+    await promotionInfoSection.repromote(run)
 
     // Checking that we have two promotions now
     await promotionInfoSection.checkPromotionRunCount(pl, 2)

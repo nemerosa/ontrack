@@ -13,5 +13,5 @@ class SlackSettingsCascContext(
     "slack",
     SlackSettings::class,
     settingsManagerService,
-    cachedSettingsService
+    cachedSettingsService,
 )

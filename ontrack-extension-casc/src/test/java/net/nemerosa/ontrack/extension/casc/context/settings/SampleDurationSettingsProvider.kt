@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.casc.context.settings
 
+import net.nemerosa.ontrack.common.parseDuration
 import net.nemerosa.ontrack.model.settings.SettingsProvider
 import net.nemerosa.ontrack.model.support.SettingsRepository
 import org.springframework.stereotype.Component
@@ -17,7 +18,7 @@ class SampleDurationSettingsProvider(
             ""
         )
             ?.takeIf { it.isNotBlank() }
-            ?.let { Duration.parse(it) }
+            ?.let { parseDuration(it) }
             ?: Duration.ofSeconds(10)
     )
 

@@ -1,22 +1,32 @@
 package net.nemerosa.ontrack.extension.tfc.config
 
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
+import net.nemerosa.ontrack.model.json.schema.JsonArrayType
+import net.nemerosa.ontrack.model.json.schema.JsonObjectType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.test.TestUtils
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class TFCConfigurationContextIT : AbstractCascTestSupport() {
 
     @Autowired
     private lateinit var tfcConfigurationService: TFCConfigurationService
 
+    @Autowired
+    private lateinit var tfcConfigurationCasc: TFCConfigurationCasc
+
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
     @Test
     fun `Defining a TFC configuration`() {
         val name = TestUtils.uid("TFC_")
         withDisabledConfigurationTest {
             casc(
-                    """
+                """
                     ontrack:
                         config:
                             tfc:
@@ -35,6 +45,14 @@ class TFCConfigurationContextIT : AbstractCascTestSupport() {
             assertEquals("https://app.terraform.io", configuration.url)
             assertEquals("my-secret-token", configuration.token)
         }
+    }
+
+    @Test
+    fun `Generated JSON schema must not include the descriptor`() {
+        val type = tfcConfigurationCasc.jsonType(jsonTypeBuilder)
+        assertNull(
+            ((type as JsonArrayType).items as JsonObjectType).properties["descriptor"]
+        )
     }
 
 }

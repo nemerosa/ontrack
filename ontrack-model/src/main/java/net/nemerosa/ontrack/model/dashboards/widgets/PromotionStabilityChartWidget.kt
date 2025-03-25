@@ -8,5 +8,5 @@ class PromotionStabilityChartWidget: AbstractWidget<PromotionChartWidgetConfig>(
     name = "Promotion stability",
     description = "Chart displaying the percentage of builds being promoted.",
     defaultConfig = PromotionChartWidgetConfig(project = null, branch = null, promotionLevel = null),
-    preferredHeight = 6,
+    preferredHeight = 30,
 )

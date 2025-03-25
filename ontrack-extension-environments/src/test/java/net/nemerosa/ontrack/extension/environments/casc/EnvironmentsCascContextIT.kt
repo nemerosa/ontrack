@@ -8,8 +8,8 @@ import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflow
 import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowService
 import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowTestFixtures
 import net.nemerosa.ontrack.extension.scm.service.TestSCMExtension
-import net.nemerosa.ontrack.it.NewTxRollbacked
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.test.TestUtils.resourceBytes
 import net.nemerosa.ontrack.test.TestUtils.uid
 import net.nemerosa.ontrack.test.resourceBase64
@@ -18,7 +18,9 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
 
-@NewTxRollbacked
+/**
+ * TODO Recurring issue where the project is created but not visible by the Casc, if we run in the same transaction...
+ */
 @Disabled("FLAKY")
 class EnvironmentsCascContextIT : AbstractCascTestSupport() {
 
@@ -39,6 +41,9 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
 
     @Autowired
     private lateinit var testSCMExtension: TestSCMExtension
+
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
 
     @Test
     fun `Defining environments keeps existing environments by default`() {
@@ -371,6 +376,7 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                                 "environments" to listOf(
                                     mapOf(
                                         "name" to slot.environment.name,
+                                        "description" to "",
                                         "admissionRules" to listOf(
                                             mapOf(
                                                 "name" to rule.name,
@@ -572,6 +578,126 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
                     assertEquals("Deployed", sw.workflow.name)
                 }
             }
+        }
+    }
+
+    @Test
+    fun `Registration of workflows using Casc keeps existing workflows`() {
+        asAdmin {
+            deleteAllEnvironments()
+            val project = project { }
+            val cascYaml =
+                """
+                    ontrack:
+                        config:
+                            environments:
+                                keepEnvironments: true
+                                environments:
+                                    - name: production
+                                      order: 200
+                                slots:
+                                    - project: ${project.name}
+                                      environments:
+                                        - name: production
+                                          workflows:
+                                            - name: Creation
+                                              trigger: CANDIDATE
+                                              nodes:
+                                                - id: start
+                                                  executorId: mock
+                                                  data:
+                                                      text: Start
+                """.trimIndent()
+
+            casc(cascYaml)
+
+            // Getting the slot workflow
+
+            val production = environmentService.findByName("production") ?: fail("Production not found")
+            val slot = slotService.findSlotByProjectAndEnvironment(
+                production,
+                project,
+                Slot.DEFAULT_QUALIFIER
+            ) ?: fail("Could not find slot")
+            val slotWorkflow = slotWorkflowService.getSlotWorkflowsBySlot(slot).single()
+
+            // Re-applying the Casc
+
+            casc(cascYaml)
+
+            // Checking that the workflow has kept its ID
+
+            assertNotNull(environmentService.findByName("production")) {
+                assertNotNull(
+                    slotService.findSlotByProjectAndEnvironment(
+                        it,
+                        project,
+                        Slot.DEFAULT_QUALIFIER
+                    )
+                ) { slot ->
+                    val newSlotWorkflow = slotWorkflowService.getSlotWorkflowsBySlot(slot).single()
+                    // Checking this is the same
+                    assertEquals(
+                        slotWorkflow.id,
+                        newSlotWorkflow.id,
+                        "Slot workflow has not been overridden",
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Environments must not be declared twice`() {
+        asAdmin {
+            deleteAllEnvironments()
+            val cascYaml =
+                """
+                    ontrack:
+                        config:
+                            environments:
+                                keepEnvironments: true
+                                environments:
+                                    - name: staging
+                                      order: 100
+                                    - name: production
+                                      order: 200
+                                    - name: production
+                                      order: 300
+                """.trimIndent()
+            assertFailsWith<EnvironmentsCascException> {
+                casc(cascYaml)
+            }
+        }
+    }
+
+    @Test
+    fun `Environments must not be declared twice in a slot`() {
+        asAdmin {
+            deleteAllEnvironments()
+            val project = project { }
+            val cascYaml =
+                """
+                    ontrack:
+                        config:
+                            environments:
+                                environments:
+                                    - name: staging
+                                      order: 100
+                                    - name: production
+                                      order: 200
+                                slots:
+                                    - project: ${project.name}
+                                      environments:
+                                        - name: staging
+                                        - name: staging
+                                        - name: production
+                """.trimIndent()
+
+            assertFailsWith<EnvironmentsCascException> {
+                casc(cascYaml)
+            }
+
         }
     }
 
@@ -811,6 +937,133 @@ class EnvironmentsCascContextIT : AbstractCascTestSupport() {
 
             val production = environmentService.findByName("production") ?: fail("Production not found")
             assertTrue(production.image, "The production environment has an image")
+        }
+    }
+
+    @Test
+    fun `Slot description is not set by default`() {
+        asAdmin {
+            deleteAllEnvironments()
+            project {
+                casc(
+                    """
+                        ontrack:
+                            config:
+                                environments:
+                                  environments:
+                                    - name: staging
+                                  slots:
+                                    - project: $name
+                                      environments:
+                                        - name: staging
+                                
+                    """.trimIndent()
+                )
+                assertNotNull(environmentService.findByName("staging")) { environment ->
+                    assertNotNull(slotService.findSlotByProjectAndEnvironment(environment, this, "")) { slot ->
+                        assertNull(slot.description, "Slot description not set")
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Slot description set by prefix`() {
+        asAdmin {
+            deleteAllEnvironments()
+            project {
+                casc(
+                    """
+                        ontrack:
+                            config:
+                                environments:
+                                  environments:
+                                    - name: staging
+                                  slots:
+                                    - project: $name
+                                      description: Release
+                                      environments:
+                                        - name: staging
+                                
+                    """.trimIndent()
+                )
+                assertNotNull(environmentService.findByName("staging")) { environment ->
+                    assertNotNull(slotService.findSlotByProjectAndEnvironment(environment, this, "")) { slot ->
+                        assertEquals(
+                            slot.description,
+                            "Release $name"
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Slot with qualifier description set by prefix`() {
+        asAdmin {
+            deleteAllEnvironments()
+            project {
+                casc(
+                    """
+                        ontrack:
+                            config:
+                                environments:
+                                  environments:
+                                    - name: staging
+                                  slots:
+                                    - project: $name
+                                      qualifier: demo
+                                      description: Release
+                                      environments:
+                                        - name: staging
+                                
+                    """.trimIndent()
+                )
+                assertNotNull(environmentService.findByName("staging")) { environment ->
+                    assertNotNull(slotService.findSlotByProjectAndEnvironment(environment, this, "demo")) { slot ->
+                        assertEquals(
+                            slot.description,
+                            "Release $name[demo]"
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Slot description overridden by environment`() {
+        asAdmin {
+            deleteAllEnvironments()
+            project {
+                casc(
+                    """
+                        ontrack:
+                            config:
+                                environments:
+                                  environments:
+                                    - name: staging
+                                  slots:
+                                    - project: $name
+                                      qualifier: demo
+                                      description: Release
+                                      environments:
+                                        - name: staging
+                                          description: Staging environment
+                                
+                    """.trimIndent()
+                )
+                assertNotNull(environmentService.findByName("staging")) { environment ->
+                    assertNotNull(slotService.findSlotByProjectAndEnvironment(environment, this, "demo")) { slot ->
+                        assertEquals(
+                            slot.description,
+                            "Staging environment"
+                        )
+                    }
+                }
+            }
         }
     }
 

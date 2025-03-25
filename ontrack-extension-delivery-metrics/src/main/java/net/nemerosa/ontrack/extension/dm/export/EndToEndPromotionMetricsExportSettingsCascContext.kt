@@ -13,5 +13,5 @@ class EndToEndPromotionMetricsExportSettingsCascContext(
     "e2e-promotion-metrics",
     EndToEndPromotionMetricsExportSettings::class,
     settingsManagerService,
-    cachedSettingsService
+    cachedSettingsService,
 )

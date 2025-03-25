@@ -12,7 +12,7 @@ import java.time.Duration
  * @property autoMergeInterval Number of milliseconds to wait between each auto merge control
  */
 data class GitHubSCMCatalogSettings(
-    val orgs: List<String>,
+    val orgs: List<String> = emptyList(),
     @APILabel("Auto merge timeout")
     @APIDescription("Number of milliseconds to wait for an auto merge to be done")
     val autoMergeTimeout: Long = DEFAULT_AUTO_MERGE_TIMEOUT,

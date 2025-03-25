@@ -9,10 +9,9 @@ import org.springframework.stereotype.Component
 class AutoVersioningSettingsCasc(
     settingsManagerService: SettingsManagerService,
     cachedSettingsService: CachedSettingsService,
-
-    ) : AbstractSubSettingsContext<AutoVersioningSettings>(
+) : AbstractSubSettingsContext<AutoVersioningSettings>(
     "auto-versioning",
     AutoVersioningSettings::class,
     settingsManagerService,
-    cachedSettingsService
+    cachedSettingsService,
 )

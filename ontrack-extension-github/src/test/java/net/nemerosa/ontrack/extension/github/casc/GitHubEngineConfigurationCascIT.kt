@@ -2,6 +2,9 @@ package net.nemerosa.ontrack.extension.github.casc
 
 import net.nemerosa.ontrack.extension.casc.AbstractCascTestSupport
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
 import net.nemerosa.ontrack.test.TestUtils
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -11,6 +14,74 @@ class GitHubEngineConfigurationCascIT : AbstractCascTestSupport() {
 
     @Autowired
     private lateinit var gitHubConfigurationService: GitHubConfigurationService
+
+    @Autowired
+    private lateinit var gitHubEngineConfigurationContext: GitHubEngineConfigurationContext
+
+    @Autowired
+    private lateinit var jsonTypeBuilder: JsonTypeBuilder
+
+    @Test
+    fun `CasC schema type`() {
+        val type = gitHubEngineConfigurationContext.jsonType(jsonTypeBuilder)
+        assertEquals(
+            """
+                {
+                  "items": {
+                    "title": "GitHubEngineConfiguration",
+                    "description": null,
+                    "properties": {
+                      "appId": {
+                        "description": "appId field",
+                        "type": "string"
+                      },
+                      "appInstallationAccountName": {
+                        "description": "appInstallationAccountName field",
+                        "type": "string"
+                      },
+                      "appPrivateKey": {
+                        "description": "appPrivateKey field",
+                        "type": "string"
+                      },
+                      "autoMergeToken": {
+                        "description": "autoMergeToken field",
+                        "type": "string"
+                      },
+                      "name": {
+                        "description": "name field",
+                        "type": "string"
+                      },
+                      "oauth2Token": {
+                        "description": "oauth2Token field",
+                        "type": "string"
+                      },
+                      "password": {
+                        "description": "password field",
+                        "type": "string"
+                      },
+                      "url": {
+                        "description": "url field",
+                        "type": "string"
+                      },
+                      "user": {
+                        "description": "user field",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "url"
+                    ],
+                    "additionalProperties": false,
+                    "type": "object"
+                  },
+                  "description": "List of GitHub configurations",
+                  "type": "array"
+                }
+            """.trimIndent().parseAsJson(),
+            type.asJson()
+        )
+    }
 
     @Test
     fun `Defining a GitHub configuration using a user and password`() {

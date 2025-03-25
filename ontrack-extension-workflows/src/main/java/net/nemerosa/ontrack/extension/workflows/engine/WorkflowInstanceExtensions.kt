@@ -37,7 +37,6 @@ fun createInstance(
         event = eventWithInstance,
         triggerData = triggerData,
         contexts = contexts,
-        status = WorkflowInstanceStatus.STARTED,
         nodesExecutions = workflow.nodes.map { it.toStartExecution() },
     )
 }

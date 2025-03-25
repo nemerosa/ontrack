@@ -9,7 +9,10 @@ import WidgetSelectionDialog, {useWidgetSelectionDialog} from "@components/dashb
 
 export default function DashboardView() {
 
-    const rowHeight = 50
+    /**
+     * Height of a row when it comes to align scale the widgets vertically
+     */
+    const rowHeight = 10
 
     const {
         dashboard,

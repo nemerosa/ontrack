@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import graphql.Scalars.*
-import graphql.language.IntValue
 import graphql.schema.*
 import graphql.schema.GraphQLArgument.newArgument
 import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
@@ -15,6 +14,7 @@ import net.nemerosa.ontrack.graphql.support.intArgument
 import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
 import net.nemerosa.ontrack.graphql.support.stringArgument
+import net.nemerosa.ontrack.graphql.support.stringListArgument
 import net.nemerosa.ontrack.model.labels.Label
 import net.nemerosa.ontrack.model.labels.LabelManagementService
 import net.nemerosa.ontrack.model.labels.LabelNotFoundException
@@ -38,6 +38,7 @@ class GQLTypeBuild(
     private val runInfoService: RunInfoService,
     private val paginatedListFactory: GQLPaginatedListFactory,
     private val labelManagementService: LabelManagementService,
+    private val validationStampService: ValidationStampService,
     private val projectLabelManagementService: ProjectLabelManagementService,
     creation: GQLTypeCreation,
     projectEntityFieldContributors: List<GQLProjectEntityFieldContributor>,
@@ -206,6 +207,13 @@ class GQLTypeBuild(
                             .description("Name of the validation stamp")
                             .type(GraphQLString)
                             .build()
+                    )
+                    .argument(
+                        stringListArgument(
+                            name = ARG_VALIDATION_STAMPS,
+                            description = "List of validation stamps",
+                            nullable = true,
+                        )
                     )
                     .argument {
                         it.name(GQLPaginatedListFactory.ARG_OFFSET)
@@ -435,31 +443,38 @@ class GQLTypeBuild(
             val build: Build = environment.getSource()
             // Filter on validation stamp
             val validationStampName: String? = environment.getArgument(ARG_VALIDATION_STAMP)
+            val validationStampNames: List<String>? = environment.getArgument(ARG_VALIDATION_STAMPS)
             val offset = environment.getArgument<Int>(GQLPaginatedListFactory.ARG_OFFSET) ?: 0
             val size = environment.getArgument<Int>(GQLPaginatedListFactory.ARG_SIZE) ?: 10
-            if (validationStampName != null) {
-                val validationStamp: ValidationStamp? =
-                    structureService.findValidationStampByName(
-                        build.project.name,
-                        build.branch.name,
-                        validationStampName
-                    ).orElse(null)
-                if (validationStamp != null) {
-                    listOf(
-                        buildValidation(
-                            validationStamp, build, offset, size
-                        )
-                    )
+
+            // Gets the list of validation stamps
+            val actualValidationStampNames = if (!validationStampNames.isNullOrEmpty()) {
+                if (!validationStampName.isNullOrBlank()) {
+                    validationStampNames + validationStampName
                 } else {
-                    emptyList()
+                    validationStampNames
                 }
+            } else if (!validationStampName.isNullOrBlank()) {
+                listOf(validationStampName)
             } else {
-                // Gets the validation stamps of the branch
-                val validationStamps = structureService.getValidationStampListForBranch(build.branch.id)
-                // Use the build & cached validation stamps to get the validations
-                validationStamps.map { validationStamp ->
-                    buildValidation(validationStamp, build, offset, size)
-                }
+                null
+            }
+
+            // Using the validation stamp names
+            val validationStamps = if (!actualValidationStampNames.isNullOrEmpty()) {
+                validationStampService.findValidationStampsForNames(
+                    branch = build.branch,
+                    validationStamps = actualValidationStampNames,
+                )
+            }
+            // Using all the validation stamps
+            else {
+                structureService.getValidationStampListForBranch(build.branch.id)
+            }
+
+            // Collecting the validations
+            validationStamps.map { validationStamp ->
+                buildValidation(validationStamp, build, offset, size)
             }
         }
 
@@ -577,6 +592,11 @@ class GQLTypeBuild(
          * Filter on the validation runs
          */
         const val ARG_VALIDATION_STAMP = "validationStamp"
+
+        /**
+         * Filter on a list of validation stamp names
+         */
+        const val ARG_VALIDATION_STAMPS = "validationStamps"
 
         /**
          * Count argument

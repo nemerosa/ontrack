@@ -7,13 +7,13 @@ import net.nemerosa.ontrack.model.annotations.APIDescription
  */
 data class EndToEndPromotionMetricsExportSettings(
     @APIDescription("Export enabled")
-    val enabled: Boolean,
+    val enabled: Boolean = DEFAULT_ENABLED,
     @APIDescription("Regex for the branches eligible for the export")
-    val branches: String,
+    val branches: String = DEFAULT_BRANCHES,
     @APIDescription("Number of days in the past when looking for event metrics")
-    val pastDays: Int,
+    val pastDays: Int = DEFAULT_PAST_DAYS,
     @APIDescription("Number of days in the past to restore")
-    val restorationDays: Int,
+    val restorationDays: Int = DEFAULT_RESTORATION_DAYS,
 ) {
 
     companion object {

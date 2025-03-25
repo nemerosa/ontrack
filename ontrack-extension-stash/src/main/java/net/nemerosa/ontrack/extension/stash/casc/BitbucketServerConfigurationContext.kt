@@ -4,13 +4,16 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.common.syncForward
 import net.nemerosa.ontrack.extension.casc.context.AbstractCascContext
 import net.nemerosa.ontrack.extension.casc.context.SubConfigContext
-import net.nemerosa.ontrack.extension.casc.schema.*
 import net.nemerosa.ontrack.extension.stash.model.StashConfiguration
 import net.nemerosa.ontrack.extension.stash.service.StashConfigurationService
 import net.nemerosa.ontrack.json.JsonParseException
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.json.getTextField
+import net.nemerosa.ontrack.model.json.schema.JsonArrayType
+import net.nemerosa.ontrack.model.json.schema.JsonType
+import net.nemerosa.ontrack.model.json.schema.JsonTypeBuilder
+import net.nemerosa.ontrack.model.json.schema.toType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -27,19 +30,12 @@ class BitbucketServerConfigurationContext(
 
     override val field: String = "bitbucketServer"
 
-    override val type: CascType
-        get() = cascArray(
-            "List of Bitbucket Server configurations",
-            cascObject(
-                "Bitbucket Server configuration",
-                cascField("name", cascString, "Unique name for the configuration", required = true),
-                cascField("url", cascString, "Bitbucket Server root URL", required = true),
-                cascField("user", cascString, "Bitbucket Server user", required = true),
-                cascField("password", cascString, "Bitbucket Server password or token", required = true),
-                cascField("autoMergeUser", cascString, "Slug of the user approving pull requests for the auto merge operations", required = false),
-                cascField("autoMergeToken", cascString, "Token used for approving pull requests for the auto merge operations", required = false),
-            )
+    override fun jsonType(jsonTypeBuilder: JsonTypeBuilder): JsonType {
+        return JsonArrayType(
+            description = "List of Bitbucket Server configurations",
+            items = jsonTypeBuilder.toType(StashConfiguration::class)
         )
+    }
 
     override fun run(node: JsonNode, paths: List<String>) {
         val items = node.mapIndexed { index, child ->

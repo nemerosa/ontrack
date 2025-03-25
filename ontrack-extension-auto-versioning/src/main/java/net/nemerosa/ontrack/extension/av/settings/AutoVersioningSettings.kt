@@ -1,20 +1,24 @@
 package net.nemerosa.ontrack.extension.av.settings
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import net.nemerosa.ontrack.json.SimpleDurationDeserializer
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APILabel
+import net.nemerosa.ontrack.model.json.DurationDeserializer
+import net.nemerosa.ontrack.model.json.DurationSerializer
 import java.time.Duration
 
 @APIDescription("Auto versioning settings")
 data class AutoVersioningSettings(
     @APIDescription("""The "Auto versioning on promotion" feature is enabled only if this flag is set to `true`.""")
-    val enabled: Boolean,
+    val enabled: Boolean = DEFAULT_ENABLED,
     @APIDescription("Maximum time to keep audit entries for non-running auto versioning requests")
-    @JsonDeserialize(using = SimpleDurationDeserializer::class)
+    @JsonDeserialize(using = DurationDeserializer::class)
+    @JsonSerialize(using = DurationSerializer::class)
     val auditRetentionDuration: Duration = DEFAULT_AUDIT_RETENTION_DURATION,
     @APIDescription("Maximum time to keep audit entries for all kinds of auto versioning requests (counted _after_ the audit retention)")
-    @JsonDeserialize(using = SimpleDurationDeserializer::class)
+    @JsonDeserialize(using = DurationDeserializer::class)
+    @JsonSerialize(using = DurationSerializer::class)
     val auditCleanupDuration: Duration = DEFAULT_AUDIT_CLEANUP_DURATION,
     @APIDescription("Creation of the build link on auto version check")
     @APILabel("Build links on auto versioning check")

@@ -12,5 +12,5 @@ class SampleDurationSettingsCasc(
     "sample-duration",
     SampleDurationSettings::class,
     settingsManagerService,
-    cachedSettingsService
+    cachedSettingsService,
 )

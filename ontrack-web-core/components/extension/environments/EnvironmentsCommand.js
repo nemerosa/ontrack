@@ -4,7 +4,7 @@ import {UserContext} from "@components/providers/UserProvider";
 import {useContext} from "react";
 import {environmentsUri} from "@components/extension/environments/EnvironmentsLinksUtils";
 
-export default function EnvironmentsCommand() {
+export default function EnvironmentsCommand({text = "Environments"}) {
     const user = useContext(UserContext)
     return (
         <>
@@ -12,7 +12,7 @@ export default function EnvironmentsCommand() {
                 user.authorizations.environment?.view &&
                 <Command
                     icon={<FaServer/>}
-                    text="Environments"
+                    text={text}
                     title="Access to the environments"
                     href={environmentsUri}
                 />

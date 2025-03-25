@@ -1,12 +1,13 @@
-import {Space, Typography} from "antd";
+import {Space} from "antd";
+import {CountTag} from "@components/framework/validation-run-data/CountTag";
 
 export default function TestSummaryValidationDataType({passed, skipped, failed, total}) {
     return (
-        <Space>
-            <span>Passed: <Typography.Text strong>{passed}</Typography.Text></span>
-            <span>Skipped: <Typography.Text strong>{skipped}</Typography.Text></span>
-            <span>Failed: <Typography.Text strong>{failed}</Typography.Text></span>
-            <span>Total: <Typography.Text strong>{total}</Typography.Text></span>
+        <Space size={0}>
+            <CountTag count={passed} color="success" title="# of passed tests"/>
+            <CountTag count={skipped} color="warning" title="# of skipped tests"/>
+            <CountTag count={failed} color="red" title="# of failed tests"/>
+            <CountTag count={total} color="default" title="Total # of tests"/>
         </Space>
     )
 }

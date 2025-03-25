@@ -16,10 +16,10 @@ import net.nemerosa.ontrack.model.form.yesNoField
 class SecuritySettings(
     @get:JsonProperty("grantProjectViewToAll")
     @APIDescription("Grants project view to all")
-    val isGrantProjectViewToAll: Boolean,
+    val isGrantProjectViewToAll: Boolean = true,
     @get:JsonProperty("grantProjectParticipationToAll")
     @APIDescription("Grants project participation to all")
-    val isGrantProjectParticipationToAll: Boolean,
+    val isGrantProjectParticipationToAll: Boolean = true,
     @APIDescription("Enabling the built-in authentication")
     val builtInAuthenticationEnabled: Boolean = DEFAULT_BUILTIN_AUTHENTICATION_ENABLED,
     @APIDescription("Grants dashboard creation rights to all")

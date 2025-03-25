@@ -29,13 +29,17 @@ data class WorkflowInstance(
     val event: SerializableEvent,
     val triggerData: TriggerData? = null,
     val contexts: Map<String, TemplatingContextData>,
-    val status: WorkflowInstanceStatus,
     val nodesExecutions: List<WorkflowInstanceNode>,
 ) {
+
+    val status: WorkflowInstanceStatus = computeStatus(nodesExecutions)
 
     companion object {
         const val EVENT_INSTANCE_ID = "workflowInstanceId"
 
+        /**
+         * See [WorkflowInstanceRepository][net.nemerosa.ontrack.extension.workflows.repository.WorkflowInstanceRepository]
+         */
         fun computeStatus(nodesExecutions: List<WorkflowInstanceNode>): WorkflowInstanceStatus {
             val nodes = nodesExecutions.map { it.status }
             return if (nodes.all { it == WorkflowInstanceNodeStatus.CREATED }) {
@@ -61,7 +65,6 @@ data class WorkflowInstance(
         event = event,
         triggerData = triggerData,
         contexts = contexts,
-        status = status,
         nodesExecutions = nodesExecutions,
     )
 
@@ -86,9 +89,6 @@ data class WorkflowInstance(
         }
     }
 
-    fun computeStatus(): WorkflowInstanceStatus =
-        computeStatus(nodesExecutions)
-
     private fun updateContext(
         eventToMerge: SerializableEvent? = null,
     ) = WorkflowInstance(
@@ -98,7 +98,6 @@ data class WorkflowInstance(
         event = eventToMerge ?: event,
         triggerData = triggerData,
         contexts = contexts,
-        status = status,
         nodesExecutions = nodesExecutions,
     )
 
@@ -120,7 +119,6 @@ data class WorkflowInstance(
             event = event,
             triggerData = triggerData,
             contexts = contexts,
-            status = computeStatus(nodesExecutions),
             nodesExecutions = nodesExecutions,
         )
     }

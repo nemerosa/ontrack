@@ -13,5 +13,5 @@ class PreviousPromotionConditionSettingsContext(
     "previous-promotion-condition",
     PreviousPromotionConditionSettings::class,
     settingsManagerService,
-    cachedSettingsService
+    cachedSettingsService,
 )

@@ -13,5 +13,5 @@ class WebhookSettingsCascContext(
     "webhooks",
     WebhookSettings::class,
     settingsManagerService,
-    cachedSettingsService
+    cachedSettingsService,
 )

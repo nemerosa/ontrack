@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.graphql.schema.Mutation
 import net.nemerosa.ontrack.graphql.support.ListRef
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
+import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
@@ -33,6 +34,7 @@ class SlotPipelineMutations(
                 build = build,
                 forceDone = input.forceDone ?: false,
                 forceDoneMessage = input.forceDoneMessage,
+                skipWorkflows = input.skipWorkflows ?: false,
             )
         },
         simpleMutation(
@@ -121,6 +123,8 @@ data class StartSlotPipelineInput(
     val buildId: Int,
     val forceDone: Boolean? = false,
     val forceDoneMessage: String? = null,
+    @APIDescription("Option to skip the workflows on DONE when forcing the deployment")
+    val skipWorkflows: Boolean? = false,
 )
 
 data class StartSlotPipelineDeploymentInput(

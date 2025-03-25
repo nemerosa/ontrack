@@ -12,6 +12,7 @@ export default function SlotPipelineCancelButton({
                                                      onCancel,
                                                      showIcon = true,
                                                      showText = false,
+                                                     size,
                                                  }) {
 
     const [messageApi, contextHolder] = message.useMessage()
@@ -59,6 +60,7 @@ export default function SlotPipelineCancelButton({
                         loading={cancelling}
                         onClick={cancelConfirm}
                         title="Cancels this deployment"
+                        size={size}
                     >
                         <Space>
                             {

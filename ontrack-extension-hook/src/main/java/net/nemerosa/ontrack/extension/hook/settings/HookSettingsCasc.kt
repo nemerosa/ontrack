@@ -7,12 +7,11 @@ import org.springframework.stereotype.Component
 
 @Component
 class HookSettingsCasc(
-        settingsManagerService: SettingsManagerService,
-        cachedSettingsService: CachedSettingsService,
-
-        ) : AbstractSubSettingsContext<HookSettings>(
-        "hook",
-        HookSettings::class,
-        settingsManagerService,
-        cachedSettingsService
+    settingsManagerService: SettingsManagerService,
+    cachedSettingsService: CachedSettingsService,
+) : AbstractSubSettingsContext<HookSettings>(
+    "hook",
+    HookSettings::class,
+    settingsManagerService,
+    cachedSettingsService,
 )

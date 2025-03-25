@@ -10,4 +10,12 @@ interface ValidationStampRepository {
 
     fun findBranchesWithValidationStamp(project: Project, validation: String): List<Branch>
 
+    /**
+     * Given a branch, collects the list of validation stamps using the provided names
+     */
+    fun findValidationStampsForNames(
+        branch: Branch,
+        validationStamps: List<String>
+    ): List<ValidationStamp>
+
 }

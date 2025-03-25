@@ -7,12 +7,12 @@ import net.nemerosa.ontrack.model.form.Form
 import java.time.LocalDateTime
 
 data class Build(
-        override val id: ID,
-        val name: String,
-        override val description: String?,
-        override val signature: Signature,
-        @JsonView(value = [Build::class, BuildView::class, PromotionRun::class, ValidationRun::class, BuildDiff::class])
-        val branch: Branch
+    override val id: ID,
+    val name: String,
+    override val description: String?,
+    override val signature: Signature,
+    @JsonView(value = [Build::class, BuildView::class, PromotionRun::class, ValidationRun::class, BuildDiff::class])
+    val branch: Branch
 ) : RunnableEntity {
 
     @JsonIgnore
@@ -24,8 +24,8 @@ data class Build(
     override val runMetricTags: Map<String, String>
         @JsonIgnore
         get() = mapOf(
-                "project" to branch.project.name,
-                "branch" to branch.name
+            "project" to branch.project.name,
+            "branch" to branch.name
         )
 
     override val runTime: LocalDateTime
@@ -44,19 +44,22 @@ data class Build(
 
     fun withSignature(signature: Signature) = Build(id, name, description, signature, branch)
 
+    fun withName(name: String) = Build(id, name, description, signature, branch)
+    fun withDescription(description: String) = Build(id, name, description, signature, branch)
+
     fun withId(id: ID) = Build(id, name, description, signature, branch)
 
     companion object {
 
         @JvmStatic
         fun of(branch: Branch, nameDescription: NameDescription, signature: Signature) =
-                Build(
-                        ID.NONE,
-                        nameDescription.name,
-                        nameDescription.description,
-                        signature,
-                        branch
-                )
+            Build(
+                ID.NONE,
+                nameDescription.name,
+                nameDescription.description,
+                signature,
+                branch
+            )
 
         @JvmStatic
         fun form(): Form = Form.nameAndDescription()
@@ -64,15 +67,15 @@ data class Build(
     }
 
     fun asForm(): Form = form()
-            .fill("name", name)
-            .fill("description", description)
+        .fill("name", name)
+        .fill("description", description)
 
     fun update(nameDescription: NameDescription): Build = Build(
-            id,
-            nameDescription.name,
-            nameDescription.description,
-            signature,
-            branch
+        id,
+        nameDescription.name,
+        nameDescription.description,
+        signature,
+        branch
     )
 
     override fun equals(other: Any?): Boolean {
