@@ -123,12 +123,16 @@ val copyWebResources by tasks.registering {
 
 tasks.named<Jar>("jar") {
     enabled = true
-    dependsOn(copyWebResources)
+    if (!project.hasProperty("dev")) {
+        dependsOn(copyWebResources)
+    }
     dependsOn("bootBuildInfo")
 }
 
 tasks.named<ProcessResources>("processResources") {
-    dependsOn(copyWebResources)
+    if (project.hasProperty("dev")) {
+        dependsOn(copyWebResources)
+    }
     dependsOn("bootBuildInfo")
 }
 

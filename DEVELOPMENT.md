@@ -6,8 +6,9 @@ To start developing with Ontrack, follow these instructions.
 
 You need:
 
-* a JDK 11
-* Docker running
+* a JDK 17
+* Docker
+* `docker-compose`
 
 ## Getting the code
 
