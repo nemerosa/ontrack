@@ -1,0 +1,19 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Application" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+    <option name="ACTIVE_PROFILES" value="dev" />
+    <envs>
+      <env name="ONTRACK_CONFIG_CONFIGURATION_TEST" value="false" />
+      <env name="ONTRACK_CONFIG_EXTENSION_NOTIFICATIONS_ENABLED" value="true" />
+      <env name="ONTRACK_CONFIG_EXTENSION_NOTIFICATIONS_IN_MEMORY_ENABLED" value="true" />
+      <env name="ONTRACK_CONFIG_KEY_STORE" value="jdbc" />
+      <env name="ONTRACK_CONFIG_TEMPLATING_ERRORS" value="MESSAGE" />
+      <env name="ONTRACK_CONFIG_UI_ENABLED" value="true" />
+      <env name="ONTRACK_EXTENSION_TFC_HOOK_SIGNATURE_DISABLED" value="true" />
+    </envs>
+    <module name="ontrack.ontrack-ui.main" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="net.nemerosa.ontrack.boot.Application" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
