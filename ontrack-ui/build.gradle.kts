@@ -108,11 +108,13 @@ tasks.named<Delete>("clean") {
  */
 
 val copyWebResources by tasks.registering {
-    dependsOn(":ontrack-web:prod")
-    doLast {
-        project.copy {
-            from(project(":ontrack-web").file("build/web/prod"))
-            into("src/main/resources/static")
+    if (!project.hasProperty("dev")) {
+        dependsOn(":ontrack-web:prod")
+        doLast {
+            project.copy {
+                from(project(":ontrack-web").file("build/web/prod"))
+                into("src/main/resources/static")
+            }
         }
     }
 }
@@ -123,16 +125,12 @@ val copyWebResources by tasks.registering {
 
 tasks.named<Jar>("jar") {
     enabled = true
-    if (!project.hasProperty("dev")) {
-        dependsOn(copyWebResources)
-    }
+    dependsOn(copyWebResources)
     dependsOn("bootBuildInfo")
 }
 
 tasks.named<ProcessResources>("processResources") {
-    if (project.hasProperty("dev")) {
-        dependsOn(copyWebResources)
-    }
+    dependsOn(copyWebResources)
     dependsOn("bootBuildInfo")
 }
 
@@ -141,7 +139,7 @@ tasks.named<BootRun>("bootRun") {
     dependsOn(":ontrack-web:dev")
 
     // Running with `dev` profile by default with `bootRun`
-    args("--spring.profiles.active=dev")
+    args("--spring.profiles.active=dev", "--ontrack.dev.web=${rootDir}/ontrack-web")
 }
 
 /**
