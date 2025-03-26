@@ -163,6 +163,7 @@ class AutoVersioningAuditServiceIT : AbstractAutoVersioningTestSupport() {
                         entry,
                         audit(
                             AutoVersioningAuditState.ERROR,
+                            "message" to "test",
                             "error" to reducedStackTrace(error)
                         ),
                         audit(AutoVersioningAuditState.PR_CREATING, "branch" to "feature/version-2.0.0"),
