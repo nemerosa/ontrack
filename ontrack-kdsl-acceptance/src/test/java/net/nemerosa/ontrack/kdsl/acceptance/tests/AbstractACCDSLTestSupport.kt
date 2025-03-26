@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests
 
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
-import net.nemerosa.ontrack.kdsl.acceptance.tests.support.waitUntil
 import net.nemerosa.ontrack.kdsl.connector.support.DefaultConnector
 import net.nemerosa.ontrack.kdsl.spec.Branch
 import net.nemerosa.ontrack.kdsl.spec.Build
@@ -84,28 +83,6 @@ abstract class AbstractACCDSLTestSupport : AbstractACCTestSupport() {
         description = description,
         runTime = runTime
     ).code()
-
-    /**
-     * Checks that a given message has been logged as error in Ontrack.
-     */
-    protected fun checkErrorMessageLogged(
-        message: String,
-        timeout: Long = 120_000L,
-        interval: Long = 5_000L,
-    ) {
-        waitUntil(
-            task = "Logged message = $message",
-            timeout = timeout,
-            interval = interval,
-        ) {
-            ontrack.admin.logEntries().find {
-                it.detailList.any { detail ->
-                    val description = detail.description
-                    detail.name == "message" && description != null && message in description
-                }
-            } != null
-        }
-    }
 
     /**
      * For the duration of call, sets Ontrack to that authorization to see ALL projects is withdrawn.

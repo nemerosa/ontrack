@@ -31,6 +31,7 @@ abstract class AbstractAutoVersioningAuditService(
             null,
             null,
             AutoVersioningAuditState.ERROR,
+            "message" to (error.message ?: error::class.java.name),
             "error" to stack
         )
     }

@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.kdsl.spec.extension.av.AutoVersioningSourceConfig
 import net.nemerosa.ontrack.kdsl.spec.extension.av.setAutoVersioningConfig
 import net.nemerosa.ontrack.kdsl.spec.extension.general.buildLinkDisplayUseLabel
 import net.nemerosa.ontrack.kdsl.spec.extension.general.label
-import org.apache.commons.codec.digest.DigestUtils
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
@@ -173,11 +172,13 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         }
 
-                        checkErrorMessageLogged("""Path at not-existing.properties for branch main was not found or has no content.""")
                         checkMostRecentStateOfAutoVersioningAuditForSourceAndTargetBranch(
-                            dependency.project,
-                            this,
-                            "ERROR"
+                            sourceProject = dependency.project,
+                            targetBranch = this,
+                            expectedMostRecentState = "ERROR",
+                            expectedData = mapOf(
+                                "message" to """Path at not-existing.properties for branch main was not found or has no content."""
+                            )
                         )
 
                     }
@@ -996,11 +997,13 @@ class ACCAutoVersioningCore : AbstractACCAutoVersioningTestSupport() {
 
                         }
 
-                        checkErrorMessageLogged("""Cannot find version in "gradle.properties"""")
                         checkMostRecentStateOfAutoVersioningAuditForSourceAndTargetBranch(
-                            dependency.project,
-                            this,
-                            "ERROR"
+                            sourceProject = dependency.project,
+                            targetBranch = this,
+                            expectedMostRecentState = "ERROR",
+                            expectedData = mapOf(
+                                "message" to """Cannot find version in "gradle.properties"""",
+                            )
                         )
 
                     }
