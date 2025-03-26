@@ -67,9 +67,6 @@ services:
       ONTRACK_CONFIG_EXTENSION_NOTIFICATIONS_IN_MEMORY_ENABLED: "true"
       ONTRACK_CONFIG_EXTENSION_NOTIFICATIONS_WEBHOOK_INTERNAL_ENABLED: "true"
       SPRING_MAIL_HOST: "mock" # Need to enable mail notifications, but actually, MockMailService is enabled
-      # ... auto versioning
-      ONTRACK_EXTENSION_AUTOVERSIONING_QUEUE_PROJECTS: "test-av-routing"
-      ONTRACK_EXTENSION_AUTOVERSIONING_QUEUE_SCALE: 10
       # ... workflows
       ONTRACK_EXTENSION_QUEUE_SPECIFIC_WORKFLOWS_SCALE: 10
       # ... TFC hook signature check disabled
