@@ -20,6 +20,10 @@ class AutoVersioningAuditServiceImpl(
         logger.info("[auto-versioning] Using production auto versioning audit service")
     }
 
+    override fun cancelQueuedOrders(order: AutoVersioningOrder) {
+        super.cancelQueuedOrders(order)
+    }
+
     override fun onQueuing(order: AutoVersioningOrder, routing: String) {
         super.onQueuing(order, routing)
     }

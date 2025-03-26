@@ -1,7 +1,5 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.av
 
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.kdsl.acceptance.tests.scm.withMockScmRepository
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
@@ -52,9 +50,6 @@ class ACCAutoVersioningCancelling : AbstractACCAutoVersioningTestSupport() {
                                 build(name = "1.0.$no") {
                                     promote("IRON")
                                 }
-                            }
-                            runBlocking {
-                                delay(200)
                             }
                         }
 

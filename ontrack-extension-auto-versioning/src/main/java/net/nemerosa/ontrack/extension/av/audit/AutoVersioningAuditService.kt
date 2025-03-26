@@ -21,6 +21,12 @@ import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
 interface AutoVersioningAuditService {
 
     /**
+     * Cancelling all current orders whose processing has not started yet. Only requests
+     * targeting the exact same [branch][AutoVersioningOrder.branch] are cancelled.
+     */
+    fun cancelQueuedOrders(order: AutoVersioningOrder)
+
+    /**
      * The [order] was just queued. It's the first event in the story of this auto versioning order.
      *
      * @param order Auto versioning order

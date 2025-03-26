@@ -53,6 +53,11 @@ class AutoVersioningDispatcherImpl(
                                 it.withOrder(branchTrail, order)
                             }
 
+                            // Cancelling any previous order
+                            if (autoVersioningConfigProperties.queue.cancelling) {
+                                autoVersioningAuditService.cancelQueuedOrders(order)
+                            }
+
                             // Sending the request on the queue
                             val result = queueDispatcher.dispatch(
                                 queueProcessor = queueProcessor,

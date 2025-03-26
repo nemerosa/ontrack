@@ -11,6 +11,10 @@ abstract class AbstractAutoVersioningAuditService(
 
     protected val logger: Logger = LoggerFactory.getLogger(AutoVersioningAuditService::class.java)
 
+    override fun cancelQueuedOrders(order: AutoVersioningOrder) {
+        store.cancelQueuedOrders(order)
+    }
+
     override fun onQueuing(order: AutoVersioningOrder, routing: String) {
         store.create(order, routing)
     }
