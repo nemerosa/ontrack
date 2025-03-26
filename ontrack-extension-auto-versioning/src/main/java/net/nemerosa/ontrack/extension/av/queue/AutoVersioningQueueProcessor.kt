@@ -43,7 +43,6 @@ class AutoVersioningQueueProcessor(
         return if (entry == null) {
             "No audit entry found upon receiving the processing order"
         } else if (!entry.mostRecentState.state.isRunning) {
-            logger.debug("Cancelled: {}", entry)
             "Cancelled order, not processing"
         } else {
             null

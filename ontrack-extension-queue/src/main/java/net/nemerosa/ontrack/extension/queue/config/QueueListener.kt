@@ -14,6 +14,7 @@ import net.nemerosa.ontrack.model.security.AccountService
 import net.nemerosa.ontrack.model.security.SecurityService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.amqp.core.AcknowledgeMode
 import org.springframework.amqp.core.Message
 import org.springframework.amqp.rabbit.annotation.RabbitListenerConfigurer
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerEndpoint
@@ -73,11 +74,14 @@ class QueueListener(
         setQueueNames(queue)
         concurrency = "${queueProcessor.minConcurrency}-${queueProcessor.maxConcurrency}"
         messageListener = createMessageListener(queueProcessor)
+        if (queueProcessor.ackMode != QueueAckMode.AUTO) {
+            setAckMode(AcknowledgeMode.MANUAL)
+        }
         return this
     }
 
     private fun <T : Any> createMessageListener(queueProcessor: QueueProcessor<T>) =
-        QPMessageListener<T>(queueProcessor)
+        QPMessageListener(queueProcessor)
 
     private inner class QPMessageListener<T : Any>(
         private val queueProcessor: QueueProcessor<T>
@@ -103,11 +107,13 @@ class QueueListener(
 
                 // Parsing the payload
                 val payload = qp.parse(queueProcessor.payloadType)
+                logger.debug("Received: {}", payload)
                 queueRecordService.parsed(qp, payload)
 
                 // Check for processing
                 val cancelReason = queueProcessor.isCancelled(payload)
                 if (cancelReason != null) {
+                    logger.debug("Cancelled: {}", payload)
                     queueRecordService.cancelled(qp, cancelReason)
                     return
                 }
@@ -137,6 +143,7 @@ class QueueListener(
                         meterRegistry.queueProcessTime(qp) {
                             try {
                                 SecurityContextHolder.setContext(securityContext)
+                                logger.debug("Processing: {}", payload)
                                 queueProcessor.process(
                                     payload = payload,
                                     queueMetadata = QueueMetadata(
@@ -168,6 +175,7 @@ class QueueListener(
             if (channel != null) {
                 // Always acknowledge the message to prevent re-delivery
                 try {
+                    logger.debug("Ack received message {}", message)
                     channel.basicAck(message.messageProperties.deliveryTag, false)
                 } catch (e: IOException) {
                     // Log failing to acknowledge the message
