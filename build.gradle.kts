@@ -295,7 +295,7 @@ configure(coreProjects) p@{
         "implementation"("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlinVersion}")
         "implementation"("org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlinVersion}")
         "implementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.kotlinCoroutinesVersion}")
-        "implementation"("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:${Versions.kotlinCoroutinesVersion}")
+        "implementation"("org.jetbrains.kotlinx:kotlinx-coroutines-jdk9:${Versions.kotlinCoroutinesVersion}")
         // Lombok
         "compileOnly"("org.projectlombok:lombok:1.18.26")
         "annotationProcessor"("org.projectlombok:lombok:1.18.26")
