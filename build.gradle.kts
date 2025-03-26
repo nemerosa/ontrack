@@ -270,15 +270,15 @@ configure(coreProjects) p@{
             }
         }
         dependencies {
-            dependency("commons-io:commons-io:2.6")
-            dependency("org.apache.commons:commons-text:1.8")
-            dependency("net.jodah:failsafe:1.1.1")
-            dependency("commons-logging:commons-logging:1.2")
+            dependency("commons-io:commons-io:2.18.0")
+            dependency("org.apache.commons:commons-text:1.9") // Compatible with org.apache.commons:commons-lang3:3.12.0 provided by Spring Boot
+            // TODO Check dependency("net.jodah:failsafe:1.1.1")
+            // TODO Check dependency("commons-logging:commons-logging:1.2")
             dependency("org.apache.commons:commons-math3:3.6.1")
-            dependency("args4j:args4j:2.33")
-            dependency("org.jgrapht:jgrapht-core:1.3.0")
-            dependency("com.opencsv:opencsv:5.2")
-            dependency("org.testcontainers:testcontainers:1.16.2")
+            dependency("args4j:args4j:2.37")
+            dependency("org.jgrapht:jgrapht-core:1.5.2")
+            dependency("com.opencsv:opencsv:5.10")
+            dependency("org.testcontainers:testcontainers:1.20.6")
             dependency("org.jetbrains.kotlin:kotlin-test:${Versions.kotlinVersion}")
             dependency("com.networknt:json-schema-validator:1.5.5")
             // JWT
@@ -297,17 +297,17 @@ configure(coreProjects) p@{
         "implementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.kotlinCoroutinesVersion}")
         "implementation"("org.jetbrains.kotlinx:kotlinx-coroutines-jdk9:${Versions.kotlinCoroutinesVersion}")
         // Lombok
-        "compileOnly"("org.projectlombok:lombok:1.18.26")
-        "annotationProcessor"("org.projectlombok:lombok:1.18.26")
-        "testCompileOnly"("org.projectlombok:lombok:1.18.26")
-        "testAnnotationProcessor"("org.projectlombok:lombok:1.18.26")
+        "compileOnly"("org.projectlombok:lombok:1.18.26") // TODO V5 Remove dependency on Lombok
+        "annotationProcessor"("org.projectlombok:lombok:1.18.26") // TODO V5 Remove dependency on Lombok
+        "testCompileOnly"("org.projectlombok:lombok:1.18.26") // TODO V5 Remove dependency on Lombok
+        "testAnnotationProcessor"("org.projectlombok:lombok:1.18.26") // TODO V5 Remove dependency on Lombok
         // Testing
         "testImplementation"("org.springframework.boot:spring-boot-starter-test")
         "testImplementation"("org.junit.vintage:junit-vintage-engine") {
             exclude(group = "org.hamcrest", module = "hamcrest-core")
         }
-        "testImplementation"("org.mockito:mockito-core")
-        "testImplementation"("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
+        "testImplementation"("org.mockito:mockito-core") // TODO V5 Remove dependency on Mockito
+        "testImplementation"("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0") // TODO V5 Remove dependency on Mockito
         "testImplementation"("io.mockk:mockk:${Versions.mockkVersion}")
         "testImplementation"("io.mockk:mockk-dsl:${Versions.mockkVersion}")
         "testImplementation"("io.mockk:mockk-dsl-jvm:${Versions.mockkVersion}")
