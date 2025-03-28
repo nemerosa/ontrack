@@ -554,14 +554,6 @@ val prepareGitHubRelease by tasks.registering(Copy::class) {
         include("ontrack-dsl-shell-${version}-executable.jar")
         rename { "ontrack-dsl-shell.jar" }
     }
-    from("build/distributions") {
-        include("ontrack*.deb")
-        rename { "ontrack.deb" }
-    }
-    from("build/distributions") {
-        include("ontrack*.rpm")
-        rename { "ontrack.rpm" }
-    }
     from("ontrack-ui/build") {
         include("graphql.json")
     }
@@ -590,8 +582,6 @@ githubRelease {
             "build/release/ontrack-dsl-shell.jar",
             "build/release/ontrack-postgresql-migration.jar",
             "build/release/ontrack.pdf",
-            "build/release/ontrack.deb",
-            "build/release/ontrack.rpm",
             "build/release/graphql.json"
     )
     body {
