@@ -23,7 +23,7 @@ services:
 
    # Rabbit MQ
    rabbitmq:
-      image: rabbitmq:3.8.25-management
+      image: rabbitmq:3.13.7-management
       hostname: rabbit
       environment:
          RABBITMQ_DEFAULT_USER: ontrack
