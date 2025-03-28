@@ -1,9 +1,6 @@
 import com.avast.gradle.dockercompose.ComposeExtension
 import com.avast.gradle.dockercompose.tasks.ComposeUp
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
-import com.netflix.gradle.plugins.deb.Deb
-import com.netflix.gradle.plugins.packaging.SystemPackagingTask
-import com.netflix.gradle.plugins.rpm.Rpm
 import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
 import net.nemerosa.ontrack.gradle.OntrackChangeLog
 import net.nemerosa.ontrack.gradle.OntrackLastReleases
@@ -13,7 +10,6 @@ import net.nemerosa.versioning.VersioningPlugin
 import org.ajoberstar.gradle.git.publish.GitPublishExtension
 import org.jetbrains.kotlin.allopen.gradle.AllOpenExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.redline_rpm.header.Os
 import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 buildscript {
@@ -38,8 +34,6 @@ val ossrhPassword: String by project
 plugins {
     java
     id("net.nemerosa.versioning") version "3.0.0" apply false
-    id("nebula.deb") version "8.1.0"
-    id("nebula.rpm") version "8.1.0"
     id("org.sonarqube") version "2.5"
     id("com.avast.gradle.docker-compose") version "0.16.12"
     id("com.bmuschko.docker-remote-api") version "9.3.1"
@@ -378,61 +372,6 @@ if (project.hasProperty("documentation")) {
             include("**")
         }
     }
-}
-
-/**
- * Packaging for OS
- *
- * The package version does not accept versions like the ones generated
- * from the Versioning plugin for the feature branches for example.
- */
-
-val packageVersion: String = if (version.toString().matches("\\d+\\.\\d+\\.\\d+".toRegex())) {
-    version.toString().replace("[^0-9\\.-_]".toRegex(), "")
-} else {
-    "0.0.0"
-}
-println("Using package version = $packageVersion")
-
-val debPackage by tasks.registering(Deb::class) {
-    dependsOn(":ontrack-ui:bootJar")
-
-    link("/etc/init.d/ontrack", "/opt/ontrack/bin/ontrack.sh")
-}
-
-val rpmPackage by tasks.registering(Rpm::class) {
-    dependsOn(":ontrack-ui:bootJar")
-
-    user = "ontrack"
-    link("/etc/init.d/ontrack", "/opt/ontrack/bin/ontrack.sh")
-}
-
-tasks.withType(SystemPackagingTask::class) {
-
-    packageName = "ontrack"
-    release = "1"
-    version = packageVersion
-    os = Os.LINUX // only applied to RPM
-
-    preInstall(file("gradle/os-package/preInstall.sh"))
-    postInstall(file("gradle/os-package/postInstall.sh"))
-
-    from(project(":ontrack-ui").file("build/libs"), closureOf<CopySpec> {
-        include("ontrack-ui-${project.version}-app.jar")
-        into("/opt/ontrack/lib")
-        rename(".*", "ontrack.jar")
-    })
-
-    from("gradle/os-package", closureOf<CopySpec> {
-        include("ontrack.sh")
-        into("/opt/ontrack/bin")
-        fileMode = 0x168 // 0550
-    })
-}
-
-val osPackages by tasks.registering {
-    dependsOn(rpmPackage)
-    dependsOn(debPackage)
 }
 
 /**
