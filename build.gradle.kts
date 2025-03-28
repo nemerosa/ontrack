@@ -298,7 +298,7 @@ configure(coreProjects) p@{
             dependency("com.icegreen:greenmail:$greenMailVersion")
             dependency("com.icegreen:greenmail-spring:$greenMailVersion")
             // Vault support
-            dependency("org.springframework.vault:spring-vault-core:3.1.2")
+            dependency("org.springframework.vault:spring-vault-core:2.3.4")
             // Git repository support TODO Will be removed in V5
             dependency("org.eclipse.jgit:org.eclipse.jgit:6.6.1.202309021850-r")
             // Log JSON
