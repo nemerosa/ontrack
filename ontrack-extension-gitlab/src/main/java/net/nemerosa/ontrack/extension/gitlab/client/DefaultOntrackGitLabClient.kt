@@ -35,7 +35,7 @@ class DefaultOntrackGitLabClient(
 
     override fun getIssue(repository: String, id: Int): GitLabIssueWrapper {
         return try {
-            val issue = api.issuesApi.getIssue(repository, id)
+            val issue = api.issuesApi.getIssue(repository, id.toLong())
             // Milestone URL
             var milestoneUrl: String? = null
             if (issue.milestone != null) {
@@ -51,7 +51,7 @@ class DefaultOntrackGitLabClient(
     override fun getPullRequest(repository: String, id: Int): GitPullRequest? {
         return try {
             try {
-                val pr = api.mergeRequestApi.getMergeRequest(repository, id)
+                val pr = api.mergeRequestApi.getMergeRequest(repository, id.toLong())
                 GitPullRequest(
                         id,
                         "#$id",

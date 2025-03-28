@@ -240,6 +240,8 @@ configure(exportedProjects) p@ {
 
 }
 
+val greenMailVersion: String by project
+
 configure(coreProjects) p@{
 
     /**
@@ -284,6 +286,21 @@ configure(coreProjects) p@{
             dependency("jakarta.json:jakarta.json-api:2.1.2")
             // Used for safe HTML
             dependency("org.jsoup:jsoup:1.19.1")
+            // For TOML (see also #1156)
+            dependency("cc.ekblad:4koma:1.2.0")
+            // JSON schema suppport
+            dependency("com.networknt:json-schema-validator:1.5.5")
+            // SCM support
+            dependency("org.gitlab4j:gitlab4j-api:5.8.0")
+            // LDAP support
+            dependency("com.unboundid:unboundid-ldapsdk:7.0.2")
+            // Testing mail
+            dependency("com.icegreen:greenmail:$greenMailVersion")
+            dependency("com.icegreen:greenmail-spring:$greenMailVersion")
+            // Vault support
+            dependency("org.springframework.vault:spring-vault-core:3.1.2")
+            // Git repository support TODO Will be removed in V5
+            dependency("org.eclipse.jgit:org.eclipse.jgit:6.6.1.202309021850-r")
         }
     }
 

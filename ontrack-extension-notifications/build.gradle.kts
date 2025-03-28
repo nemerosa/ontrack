@@ -34,8 +34,8 @@ dependencies {
     testImplementation(project(":ontrack-extension-general"))
     testImplementation(project(":ontrack-it-utils"))
 
-    testImplementation("com.icegreen:greenmail:1.6.8")
-    testImplementation("com.icegreen:greenmail-spring:1.6.8")
+    testImplementation("com.icegreen:greenmail")
+    testImplementation("com.icegreen:greenmail-spring")
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))
