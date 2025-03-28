@@ -236,7 +236,6 @@ pipeline {
                                 test \\
                                 build \\
                                 integrationTest \\
-                                osPackages \\
                                 dockerBuild \\
                                 javadocPackage \\
                                 -Pdocumentation \\
