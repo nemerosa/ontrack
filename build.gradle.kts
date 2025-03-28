@@ -301,6 +301,8 @@ configure(coreProjects) p@{
             dependency("org.springframework.vault:spring-vault-core:3.1.2")
             // Git repository support TODO Will be removed in V5
             dependency("org.eclipse.jgit:org.eclipse.jgit:6.6.1.202309021850-r")
+            // Log JSON
+            dependency("net.logstash.logback:logstash-logback-encoder:8.0")
         }
     }
 
