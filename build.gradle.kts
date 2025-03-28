@@ -282,6 +282,8 @@ configure(coreProjects) p@{
             // Spring Boot brings jakarta-json-api version 1.1.6
             // and Elastic Search 7.17.15. But this one relies on jakarta-json-api version 2.1.2
             dependency("jakarta.json:jakarta.json-api:2.1.2")
+            // Used for safe HTML
+            dependency("org.jsoup:jsoup:1.19.1")
         }
     }
 
