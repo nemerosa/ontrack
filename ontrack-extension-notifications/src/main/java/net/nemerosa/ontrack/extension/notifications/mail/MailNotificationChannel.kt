@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.notifications.mail
 
 import com.fasterxml.jackson.databind.JsonNode
+import jakarta.annotation.PostConstruct
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
@@ -17,7 +18,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.stereotype.Component
-import javax.annotation.PostConstruct
 
 @Component
 @APIDescription("Sending a message by mail. The notification template is used for the body of the mail.")

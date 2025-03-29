@@ -2,8 +2,8 @@ package net.nemerosa.ontrack.extension.av.audit
 
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Tag
+import jakarta.annotation.PostConstruct
 import org.springframework.stereotype.Component
-import javax.annotation.PostConstruct
 
 @Component
 class AutoVersioningAuditMetricsCollection(

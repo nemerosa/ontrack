@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.resources;
 
+import jakarta.annotation.PostConstruct;
 import net.nemerosa.ontrack.common.RunProfile;
 import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
@@ -7,8 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
 
 /**
  * Removing the version of extensions in DEV mode

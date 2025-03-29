@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.support
 
+import jakarta.annotation.PostConstruct
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import net.nemerosa.ontrack.ui.resource.ResourceModule
@@ -12,7 +13,6 @@ import org.springframework.http.converter.HttpMessageConverter
 import org.springframework.http.converter.StringHttpMessageConverter
 import org.springframework.web.filter.ShallowEtagHeaderFilter
 import org.springframework.web.servlet.config.annotation.*
-import javax.annotation.PostConstruct
 import javax.servlet.DispatcherType
 
 @Configuration

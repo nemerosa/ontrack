@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.notifications.mail
 
+import jakarta.mail.Message
+import jakarta.mail.internet.InternetAddress
 import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.notifications.NotificationsConfigProperties
 import net.nemerosa.ontrack.model.structure.NameDescription
@@ -11,8 +13,6 @@ import org.springframework.context.annotation.Profile
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMessagePreparator
 import org.springframework.stereotype.Component
-import javax.mail.Message
-import javax.mail.internet.InternetAddress
 
 
 @Component

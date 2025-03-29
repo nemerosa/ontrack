@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.notifications.webhooks
 
 import com.fasterxml.jackson.databind.JsonNode
+import jakarta.annotation.PostConstruct
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.common.BaseException
@@ -14,7 +15,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.web.bind.annotation.*
 import java.util.*
-import javax.annotation.PostConstruct
 
 /**
  * Internal endpoint for simulating a webhook.
