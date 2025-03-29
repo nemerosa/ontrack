@@ -13,6 +13,7 @@ dependencies {
     implementation(project(":ontrack-ui-graphql"))
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.apache.commons:commons-lang3")
+    implementation("commons-codec:commons-codec")
     implementation(project(":ontrack-repository-support"))
     implementation("io.micrometer:micrometer-core")
     implementation("com.opencsv:opencsv")
