@@ -1,38 +1,37 @@
-package net.nemerosa.ontrack.ui.resource;
+package net.nemerosa.ontrack.ui.resource
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import org.junit.Test;
+import net.nemerosa.ontrack.json.asJson
+import org.junit.jupiter.api.Test
+import java.net.URI
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
-import java.net.URI;
-
-import static net.nemerosa.ontrack.json.JsonUtils.object;
-import static org.junit.Assert.assertEquals;
-
-public class ResourceTest extends AbstractResourceTest {
-
+class ResourceTest : AbstractResourceTest() {
     @Test
-    public void resource_to_json() throws JsonProcessingException {
-        Dummy info = new Dummy("1.0.0");
-        Resource<Dummy> resource = Resource.of(info, URI.create("http://host/dummy")).with("connectors", URI.create("http://host/dummy/test"));
+    fun resource_to_json() {
+        val info = Dummy("1.0.0")
+        val resource =
+            Resource.of(info, URI.create("http://host/dummy")).with("connectors", URI.create("http://host/dummy/test"))
         assertResourceJson(
-                mapper,
-                object()
-                        .with("_self", "http://host/dummy")
-                        .with("version", "1.0.0")
-                        .with("connectors", "http://host/dummy/test")
-                        .end(),
-                resource
-        );
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void resource_not_null() {
-        Resource.<String>of(null, URI.create(""));
+            mapper,
+            mapOf(
+                "_self" to "http://host/dummy",
+                "version" to "1.0.0",
+                "connectors" to "http://host/dummy/test",
+            ).asJson(),
+            resource
+        )
     }
 
     @Test
-    public void container_first() {
-        assertEquals(String.class, Resource.of("Test", URI.create("")).getViewType());
+    fun resource_not_null() {
+        assertFailsWith<NullPointerException> {
+            Resource.of<String?>(null, URI.create(""))
+        }
     }
 
+    @Test
+    fun container_first() {
+        assertEquals(String::class.java, Resource.of("Test", URI.create("")).viewType)
+    }
 }

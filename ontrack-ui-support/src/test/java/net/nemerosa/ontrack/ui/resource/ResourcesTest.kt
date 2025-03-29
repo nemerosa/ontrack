@@ -1,85 +1,80 @@
-package net.nemerosa.ontrack.ui.resource;
+package net.nemerosa.ontrack.ui.resource
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import net.nemerosa.ontrack.json.ObjectMapperFactory;
-import net.nemerosa.ontrack.model.structure.Branch;
-import net.nemerosa.ontrack.model.structure.NameDescription;
-import net.nemerosa.ontrack.model.structure.Project;
-import org.junit.Test;
+import net.nemerosa.ontrack.json.ObjectMapperFactory.create
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.Branch.Companion.of
+import net.nemerosa.ontrack.model.structure.NameDescription
+import net.nemerosa.ontrack.model.structure.Project.Companion.of
+import net.nemerosa.ontrack.model.structure.TestFixtures
+import net.nemerosa.ontrack.model.structure.TestFixtures.SIGNATURE_OBJECT
+import org.junit.jupiter.api.Test
+import java.net.URI
+import java.util.*
 
-import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
-
-import static net.nemerosa.ontrack.json.JsonUtils.array;
-import static net.nemerosa.ontrack.json.JsonUtils.object;
-import static net.nemerosa.ontrack.model.structure.TestFixtures.SIGNATURE;
-import static net.nemerosa.ontrack.model.structure.TestFixtures.SIGNATURE_OBJECT;
-
-public class ResourcesTest extends AbstractResourceTest {
+class ResourcesTest : AbstractResourceTest() {
 
     @Test
-    public void to_json() throws JsonProcessingException {
-        Resources<Dummy> collection = Resources.of(
-                Arrays.asList(
-                        new Dummy("1"),
-                        new Dummy("2")
-                ),
-                URI.create("http://host/dummy")
-        );
+    fun to_json() {
+        val collection = Resources.of(
+            listOf(
+                Dummy("1"),
+                Dummy("2")
+            ),
+            URI.create("http://host/dummy")
+        )
         assertResourceJson(
-                mapper,
-                object()
-                        .with("_self", "http://host/dummy")
-                        .with("resources", array()
-                                .with(object()
-                                        .with("version", "1")
-                                        .end())
-                                .with(object()
-                                        .with("version", "2")
-                                        .end())
-                                .end())
-                        .end(),
-                ObjectMapperFactory.create().valueToTree(collection)
-        );
+            mapper,
+            mapOf(
+                "_self" to "http://host/dummy",
+                "resources" to listOf(
+                    mapOf(
+                        "version" to "1"
+                    ),
+                    mapOf(
+                        "version" to "2"
+                    )
+                )
+            ).asJson(),
+            create().valueToTree(collection)
+        )
     }
 
     @Test
-    public void resource_collection_with_filtering() throws JsonProcessingException {
-        Project project = Project.of(new NameDescription("PRJ", "Project"));
-        List<Branch> branches = Arrays.asList(
-                Branch.of(project, new NameDescription("B1", "Branch 1")).withSignature(SIGNATURE),
-                Branch.of(project, new NameDescription("B2", "Branch 2")).withSignature(SIGNATURE)
-        );
-        Resources<Branch> resourceCollection = Resources.of(
-                branches,
-                URI.create("urn:branch")
-        );
+    fun resource_collection_with_filtering() {
+        val project = of(NameDescription("PRJ", "Project"))
+        val branches = Arrays.asList<Branch>(
+            of(project, NameDescription("B1", "Branch 1")).withSignature(TestFixtures.SIGNATURE),
+            of(project, NameDescription("B2", "Branch 2")).withSignature(TestFixtures.SIGNATURE)
+        )
+        val resourceCollection = Resources.of(
+            branches,
+            URI.create("urn:branch")
+        )
 
         assertResourceJson(
-                mapper,
-                object()
-                        .with("_self", "urn:branch")
-                        .with("resources", array()
-                                .with(object()
-                                        .with("id", 0)
-                                        .with("name", "B1")
-                                        .with("description", "Branch 1")
-                                        .with("disabled", false)
-                                        .with("signature", SIGNATURE_OBJECT)
-                                        .end())
-                                .with(object()
-                                        .with("id", 0)
-                                        .with("name", "B2")
-                                        .with("description", "Branch 2")
-                                        .with("disabled", false)
-                                        .with("signature", SIGNATURE_OBJECT)
-                                        .end())
-                                .end())
-                        .end(),
-                resourceCollection,
-                Resources.class
-        );
+            mapper,
+            mapOf(
+                "_self" to "urn:branch",
+                "resources" to listOf(
+                    mapOf(
+                        "id" to 0,
+                        "name" to "B1",
+                        "description" to "Branch 1",
+                        "disabled" to false,
+                        "signature" to SIGNATURE_OBJECT
+                    ),
+                    mapOf(
+                        "id" to 0,
+                        "name" to "B2",
+                        "description" to "Branch 2",
+                        "disabled" to false,
+                        "signature" to SIGNATURE_OBJECT,
+                    )
+                )
+            ).asJson(),
+            resourceCollection,
+            Resources::class.java
+        )
     }
-
 }

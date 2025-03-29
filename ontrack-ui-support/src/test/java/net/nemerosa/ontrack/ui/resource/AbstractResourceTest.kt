@@ -1,41 +1,38 @@
-package net.nemerosa.ontrack.ui.resource;
+package net.nemerosa.ontrack.ui.resource
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import net.nemerosa.ontrack.model.security.SecurityService;
-import net.nemerosa.ontrack.ui.controller.MockURIBuilder;
-import org.junit.Before;
-import org.mockito.Mockito;
+import com.fasterxml.jackson.databind.JsonNode
+import io.mockk.mockk
+import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.ui.controller.MockURIBuilder
+import org.junit.jupiter.api.BeforeEach
+import kotlin.test.assertEquals
 
-import java.util.Collections;
+abstract class AbstractResourceTest {
+    protected lateinit var mapper: ResourceObjectMapper
+    protected lateinit var securityService: SecurityService
 
-import static org.junit.Assert.assertEquals;
-
-public abstract class AbstractResourceTest {
-
-    protected ResourceObjectMapper mapper;
-    protected SecurityService securityService;
-
-    @Before
-    public void before() {
-        securityService = Mockito.mock(SecurityService.class);
-        mapper = new ResourceObjectMapperFactory().resourceObjectMapper(
-                Collections.emptyList(),
-                new DefaultResourceContext(new MockURIBuilder(), securityService)
-        );
+    @BeforeEach
+    fun before() {
+        securityService = mockk<SecurityService>()
+        mapper = ResourceObjectMapperFactory().resourceObjectMapper(
+            emptyList(),
+            DefaultResourceContext(MockURIBuilder(), securityService)
+        )
     }
 
-    public static void assertResourceJson(ResourceObjectMapper mapper, JsonNode expectedJson, Object o) throws JsonProcessingException {
-        assertEquals(
-                mapper.getObjectMapper().writeValueAsString(expectedJson),
+    companion object {
+        fun assertResourceJson(mapper: ResourceObjectMapper, expectedJson: JsonNode?, o: Any?) {
+            assertEquals(
+                mapper.objectMapper.writeValueAsString(expectedJson),
                 mapper.write(o)
-        );
-    }
+            )
+        }
 
-    public static void assertResourceJson(ResourceObjectMapper mapper, JsonNode expectedJson, Object o, Class<?> view) throws JsonProcessingException {
-        assertEquals(
-                mapper.getObjectMapper().writeValueAsString(expectedJson),
+        fun assertResourceJson(mapper: ResourceObjectMapper, expectedJson: JsonNode?, o: Any?, view: Class<*>?) {
+            assertEquals(
+                mapper.objectMapper.writeValueAsString(expectedJson),
                 mapper.write(o, view)
-        );
+            )
+        }
     }
 }

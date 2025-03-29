@@ -1,24 +1,23 @@
-package net.nemerosa.ontrack.model.structure;
+package net.nemerosa.ontrack.model.structure
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.model.structure.Signature.Companion.of
+import java.time.LocalDateTime
 
-import java.time.LocalDateTime;
+object TestFixtures {
 
-import static net.nemerosa.ontrack.json.JsonUtils.object;
+    @JvmField
+    val SIGNATURE_OBJECT: JsonNode = mapOf(
+        "time" to "2016-12-27T21:10:00Z",
+        "user" to mapOf(
+            "name" to "test"
+        )
+    ).asJson()
 
-public abstract class TestFixtures {
-
-    public static final ObjectNode SIGNATURE_OBJECT = object()
-            .with("time", "2016-12-27T21:10:00Z")
-            .with("user", object()
-                    .with("name", "test")
-                    .end()
-            )
-            .end();
-
-    public static final Signature SIGNATURE = Signature.of(
-            LocalDateTime.of(2016, 12, 27, 21, 10),
-            "test"
-    );
-
+    @JvmField
+    val SIGNATURE: Signature = of(
+        LocalDateTime.of(2016, 12, 27, 21, 10),
+        "test"
+    )
 }
