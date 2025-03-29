@@ -23,7 +23,7 @@ class GQLTypeIndicatorTypeStats(
                                 .type(indicatorType.typeRef)
                                 .dataFetcher { env ->
                                     ProjectIndicatorType(
-                                            env.getSource<IndicatorTypeStats>().type
+                                            env.getSource<IndicatorTypeStats>()!!.type
                                     )
                                 }
                     }

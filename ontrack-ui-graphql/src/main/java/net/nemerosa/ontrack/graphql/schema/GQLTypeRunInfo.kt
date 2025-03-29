@@ -42,6 +42,6 @@ class GQLTypeRunInfo(
 
 inline fun <reified T : RunnableEntity> GraphQLFieldDefinition.Builder.runInfoFetcher(noinline fn: (T) -> RunInfo?): GraphQLFieldDefinition.Builder =
     dataFetcher { env ->
-        val source: T = env.getSource()
+        val source: T = env.getSource()!!
         fn(source)
     }

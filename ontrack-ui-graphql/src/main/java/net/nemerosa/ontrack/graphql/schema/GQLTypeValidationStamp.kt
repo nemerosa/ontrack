@@ -169,7 +169,7 @@ class GQLTypeValidationStamp(
 
     private fun validationStampValidationRunsFetcher() =
             DataFetcher { environment ->
-                val validationStamp: ValidationStamp = environment.getSource()
+                val validationStamp: ValidationStamp = environment.getSource()!!
                 // Gets all the validation runs
                 return@DataFetcher structureService.getValidationRunsForValidationStamp(
                         validationStamp,

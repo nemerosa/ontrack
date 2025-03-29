@@ -21,7 +21,7 @@ class GQLRootQueryBuild(
                 intArgument("id", "ID of the build to look for", nullable = false)
             )
             .dataFetcher { env ->
-                val id: Int = env.getArgument("id")
+                val id: Int = env.getArgument("id")!!
                 structureService.getBuild(of(id))
             }
             .build()

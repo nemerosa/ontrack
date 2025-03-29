@@ -31,7 +31,7 @@ class GQLTypeIndicatorPortfolioOfPortfolios(
                                 .deprecate("Use indicator views")
                                 .type(listType(indicatorCategory.typeRef))
                                 .dataFetcher { env ->
-                                    val pp = env.getSource<IndicatorPortfolioOfPortfolios>()
+                                    val pp = env.getSource<IndicatorPortfolioOfPortfolios>()!!
                                     pp.categories.mapNotNull { id ->
                                         indicatorCategoryService.findCategoryById(id)
                                     }

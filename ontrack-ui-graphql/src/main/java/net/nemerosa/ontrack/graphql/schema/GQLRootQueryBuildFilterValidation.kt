@@ -5,6 +5,7 @@ import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLNonNull
 import graphql.schema.GraphQLObjectType
+import net.nemerosa.ontrack.graphql.support.intArgument
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.StructureService
@@ -22,11 +23,9 @@ class GQLRootQueryBuildFilterValidation(
     override fun getFieldDefinition(): GraphQLFieldDefinition {
         return GraphQLFieldDefinition.newFieldDefinition()
                 .name("buildFilterValidation")
-                .argument {
-                    it.name("branchId")
-                            .description("ID of the branch to look for")
-                            .type(GraphQLNonNull(GraphQLInt))
-                }
+                .argument(
+                    intArgument("branchId", "ID of the branch to look for", nullable = false)
+                )
                 .argument {
                     it.name("filter")
                             .description("Generic filter based on a configured filter")
@@ -44,7 +43,7 @@ class GQLRootQueryBuildFilterValidation(
                                 .build()
                 )
                 .dataFetcher { environment ->
-                    val branchId: Int = environment.getArgument("branchId")
+                    val branchId: Int = environment.getArgument("branchId")!!
                     val branch = structureService.getBranch(ID.of(branchId))
                     val genericFilter: Any? = environment.getArgument<Any>("filter")
                     val filterType = inputBuildGenericFilter.getFilterType(genericFilter)

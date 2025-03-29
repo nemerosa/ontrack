@@ -27,8 +27,8 @@ class GQLProjectLastBuildsWithPromotionsFieldContributor(
                     .type(listType(GraphQLTypeReference(GQLTypePromotionRun.PROMOTION_RUN)))
                     .argument(stringListArgument("promotions", "List of promotion names"))
                     .dataFetcher { env ->
-                        val project: Project = env.getSource()
-                        val promotionNames: List<String> = env.getArgument("promotions")
+                        val project: Project = env.getSource()!!
+                        val promotionNames: List<String> = env.getArgument("promotions") ?: emptyList()
                         promotionNames.mapNotNull { promotionName ->
                             promotionRunService.getLastPromotionRunForProject(project, promotionName)
                         }

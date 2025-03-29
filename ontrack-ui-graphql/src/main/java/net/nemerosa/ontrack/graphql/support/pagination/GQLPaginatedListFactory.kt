@@ -55,7 +55,7 @@ class GQLPaginatedListFactory(
                     arguments,
                     additionalFields,
             ).dataFetcher { environment ->
-                val source: P = environment.getSource()
+                val source: P = environment.getSource()!!
                 val offset = environment.getArgument<Int>(ARG_OFFSET) ?: 0
                 val size = environment.getArgument<Int>(ARG_SIZE) ?: PageRequest.DEFAULT_PAGE_SIZE
                 itemPaginatedListProvider(
@@ -93,7 +93,7 @@ class GQLPaginatedListFactory(
             createBasePaginatedListField(
                     cache, fieldName, fieldDescription, deprecation, itemType, arguments
             ).dataFetcher { environment ->
-                val source: P = environment.getSource()
+                val source: P = environment.getSource()!!
                 val offset = environment.getArgument<Int>(ARG_OFFSET) ?: 0
                 val size = environment.getArgument<Int>(ARG_SIZE) ?: PageRequest.DEFAULT_PAGE_SIZE
                 val total = itemListCounter(environment, source)

@@ -24,7 +24,7 @@ class GQLTypeUIActionLink : GQLType {
                                 .description("Link description")
                                 .type(nullableType(GraphQLString, false))
                                 .dataFetcher { env ->
-                                    env.getSource<UIActionLinkContext<*>>().link.description
+                                    env.getSource<UIActionLinkContext<*>>()!!.link.description
                                 }
                     }
                     .field {
@@ -32,7 +32,7 @@ class GQLTypeUIActionLink : GQLType {
                                 .description("HTTP method to use")
                                 .type(nullableType(GraphQLString, false))
                                 .dataFetcher { env ->
-                                    env.getSource<UIActionLinkContext<*>>().link.method.name
+                                    env.getSource<UIActionLinkContext<*>>()!!.link.method.name()
                                 }
                     }
                     .field {
@@ -40,7 +40,7 @@ class GQLTypeUIActionLink : GQLType {
                                 .description("Is this end point enabled, according to authorizations and state.")
                                 .type(nullableType(Scalars.GraphQLBoolean, false))
                                 .dataFetcher { env ->
-                                    env.getSource<UIActionLinkContext<*>>().enabled
+                                    env.getSource<UIActionLinkContext<*>>()!!.enabled
                                 }
                     }
                     .field {
@@ -48,7 +48,7 @@ class GQLTypeUIActionLink : GQLType {
                                 .description("End point URI")
                                 .type(GraphQLString)
                                 .dataFetcher { env ->
-                                    env.getSource<UIActionLinkContext<*>>().uri?.toString()
+                                    env.getSource<UIActionLinkContext<*>>()!!.uri?.toString()
                                 }
                     }
                     .build()
@@ -57,6 +57,7 @@ class GQLTypeUIActionLink : GQLType {
 
 }
 
+@Deprecated("Will be removed in V5")
 class UIActionLinkContext<T : Any>(
         val link: UIActionLink<T>,
         val target: T?

@@ -35,7 +35,7 @@ class GQLTypeSettings(
                     .type(gqlTypeSettingsEntry.typeRef)
                     .argument(stringArgument("id", "ID of the settings to get", nullable = false))
                     .dataFetcher { env ->
-                        val id: String = env.getArgument("id")
+                        val id: String = env.getArgument("id")!!
                         settingsManagers.find { settingsManager ->
                             settingsManager.id == id
                         }

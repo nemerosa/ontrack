@@ -28,7 +28,7 @@ fun <T> TypeBuilder.booleanFieldFunction(
             .description(description)
             .type(GraphQLBoolean.toNotNull())
             .dataFetcher { env ->
-                val source: T = env.getSource()
+                val source: T = env.getSource()!!
                 fn(source)
             }
     }
@@ -203,7 +203,7 @@ inline fun <P, reified E> TypeBuilder.fieldGetter(
         .type(E::class.toTypeRef().nullable(nullable))
         .arguments(arguments)
         .dataFetcher { env ->
-            val source: P = env.getSource()
+            val source: P = env.getSource()!!
             code(source, env)
         }
 }
@@ -235,7 +235,7 @@ inline fun <P, reified E> TypeBuilder.listFieldGetter(
         .description(description)
         .type(listType(GraphQLTypeReference(E::class.java.simpleName)))
         .dataFetcher { env ->
-            val source: P = env.getSource()
+            val source: P = env.getSource()!!
             code(source)
         }
 }

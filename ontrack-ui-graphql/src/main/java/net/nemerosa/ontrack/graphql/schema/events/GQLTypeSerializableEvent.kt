@@ -26,7 +26,7 @@ class GQLTypeSerializableEvent : GQLType {
                     .description("List of entities")
                     .type(listType(ProjectEntityID::class.java.simpleName))
                     .dataFetcher { env ->
-                        val se: SerializableEvent = env.getSource()
+                        val se: SerializableEvent = env.getSource()!!
                         se.entities.map { ProjectEntityID(it.key, it.value) }.sortedBy { it.type }
                     }
             }
@@ -35,7 +35,7 @@ class GQLTypeSerializableEvent : GQLType {
                     .description("List of arbitrary values")
                     .type(listType(NameValue::class.java.simpleName))
                     .dataFetcher { env ->
-                        val se: SerializableEvent = env.getSource()
+                        val se: SerializableEvent = env.getSource()!!
                         se.values.values.sortedBy { it.name }
                     }
             }

@@ -21,7 +21,7 @@ class GQLInterfaceAuthorizableService(
     ) {
         apply(builder) { env ->
             // Gets the current context
-            val context = env.getSource<X>()
+            val context = env.getSource<X>()!!
             val data = contextConverter(context)
             // Gets the authorizations for this context
             authorizationService.getAuthorizations(data)
@@ -34,7 +34,7 @@ class GQLInterfaceAuthorizableService(
     ) {
         apply(builder) { env ->
             // Gets the current context
-            val context = env.getSource<T>()
+            val context = env.getSource<T>()!!
             // Gets the authorizations for this context
             authorizationService.getAuthorizations(context)
         }

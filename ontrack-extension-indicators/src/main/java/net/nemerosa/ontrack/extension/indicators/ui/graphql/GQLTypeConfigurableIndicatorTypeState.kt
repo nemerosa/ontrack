@@ -34,7 +34,7 @@ class GQLTypeConfigurableIndicatorTypeState(
                     .description("Associated category")
                     .type(gqlIndicatorComputedCategory.typeRef.toNotNull())
                     .dataFetcher { env ->
-                        val typeState: ConfigurableIndicatorTypeState<*, *> = env.getSource()
+                        val typeState: ConfigurableIndicatorTypeState<*, *> = env.getSource()!!
                         typeState.type.category
                     }
             }
@@ -44,7 +44,7 @@ class GQLTypeConfigurableIndicatorTypeState(
                     .description("Indicator type ID")
                     .type(GraphQLString)
                     .dataFetcher { env ->
-                        val typeState: ConfigurableIndicatorTypeState<*, *> = env.getSource()
+                        val typeState: ConfigurableIndicatorTypeState<*, *> = env.getSource()!!
                         typeState.type.id
                     }
             }
@@ -54,7 +54,7 @@ class GQLTypeConfigurableIndicatorTypeState(
                     .description("Indicator type name")
                     .type(GraphQLString)
                     .dataFetcher { env ->
-                        val typeState: ConfigurableIndicatorTypeState<*, *> = env.getSource()
+                        val typeState: ConfigurableIndicatorTypeState<*, *> = env.getSource()!!
                         typeState.type.name
                     }
             }
@@ -64,7 +64,7 @@ class GQLTypeConfigurableIndicatorTypeState(
                     .description("List of attributes for this type")
                     .type(listType(gqlConfigurableIndicatorAttribute.typeRef))
                     .dataFetcher { env ->
-                        val typeState: ConfigurableIndicatorTypeState<*, *> = env.getSource()
+                        val typeState: ConfigurableIndicatorTypeState<*, *> = env.getSource()!!
                         typeState.type.attributes
                     }
             }

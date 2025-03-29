@@ -54,7 +54,7 @@ class GQLTypeProjectIndicator(
                         .description("Compliance for the indicator")
                         .type(GraphQLInt)
                         .dataFetcher { env ->
-                            env.getSource<ProjectIndicator>().compliance?.value
+                            env.getSource<ProjectIndicator>()!!.compliance?.value
                         }
             }
             .field {
@@ -67,7 +67,7 @@ class GQLTypeProjectIndicator(
                         .type(GraphQLString)
                         .description("Comment with links.")
                         .dataFetcher { env ->
-                            val projectIndicator = env.getSource<ProjectIndicator>()
+                            val projectIndicator = env.getSource<ProjectIndicator>()!!
                             val comment = projectIndicator.comment
                             if (comment.isNullOrBlank()) {
                                 comment
@@ -88,7 +88,7 @@ class GQLTypeProjectIndicator(
                         .description("Time elapsed (in seconds) since the indicator value was set.")
                         .type(GraphQLInt)
                         .dataFetcher { env ->
-                            val projectIndicator = env.getSource<ProjectIndicator>()
+                            val projectIndicator = env.getSource<ProjectIndicator>()!!
                             val time = projectIndicator.signature.time
                             (Duration.between(time, Time.now()).toMillis() / 1000).toInt()
                         }
@@ -99,7 +99,7 @@ class GQLTypeProjectIndicator(
                         .description("Rating for this indicator")
                         .type(GraphQLString)
                         .dataFetcher { env ->
-                            env.getSource<ProjectIndicator>().compliance?.let { compliance ->
+                            env.getSource<ProjectIndicator>()!!.compliance?.let { compliance ->
                                 Rating.asRating(compliance.value)
                             }
                         }
@@ -110,7 +110,7 @@ class GQLTypeProjectIndicator(
                         .description("Previous value for this indicator")
                         .type(GraphQLTypeReference(typeName))
                         .dataFetcher { env ->
-                            val projectIndicator = env.getSource<ProjectIndicator>()
+                            val projectIndicator = env.getSource<ProjectIndicator>()!!
                             projectIndicatorService.getPreviousIndicator(projectIndicator)
                         }
             }
@@ -120,7 +120,7 @@ class GQLTypeProjectIndicator(
                         .description("Trend since the previous value (if any)")
                         .type(GraphQLString)
                         .dataFetcher { env ->
-                            val projectIndicator = env.getSource<ProjectIndicator>()
+                            val projectIndicator = env.getSource<ProjectIndicator>()!!
                             val previousIndicator = projectIndicatorService.getPreviousIndicator(projectIndicator)
                             trendBetween(
                                     previousIndicator.compliance,

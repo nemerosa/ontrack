@@ -42,7 +42,7 @@ class GQLTypeIndicatorCategory(
                 .description("List of indicator types belonging to this category.")
                 .type(listType(indicatorType.typeRef))
                 .dataFetcher { env ->
-                    val category = env.getSource<IndicatorCategory>()
+                    val category = env.getSource<IndicatorCategory>()!!
                     indicatorTypeService.findByCategory(category).map {
                         ProjectIndicatorType(it)
                     }
@@ -55,7 +55,7 @@ class GQLTypeIndicatorCategory(
                 .type(GraphQLNonNull(indicatorCategoryReportType.typeRef))
                 .arguments(indicatorReportingService.arguments)
                 .dataFetcher { env ->
-                    val category = env.getSource<IndicatorCategory>()
+                    val category = env.getSource<IndicatorCategory>()!!
                     indicatorCategoryReportType.report(category, env)
                 }
         }

@@ -39,7 +39,7 @@ class GQLTypeIndicatorView(
                     .description("Selected categories for this view")
                     .type(listType(indicatorCategory.typeRef))
                     .dataFetcher { env ->
-                        val view: IndicatorView = env.getSource()
+                        val view: IndicatorView = env.getSource()!!
                         view.categories.mapNotNull { id ->
                             indicatorCategoryService.findCategoryById(id)
                         }
@@ -54,7 +54,7 @@ class GQLTypeIndicatorView(
                     .durationArgument()
                     .rateArgument()
                     .dataFetcher { env ->
-                        val view: IndicatorView = env.getSource()
+                        val view: IndicatorView = env.getSource()!!
                         // Gets the trending duration
                         val duration = env.getDurationArgument()
                         // Gets the rate condition

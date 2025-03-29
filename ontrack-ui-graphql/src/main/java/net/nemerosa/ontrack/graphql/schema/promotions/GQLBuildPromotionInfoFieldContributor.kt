@@ -25,7 +25,7 @@ class GQLBuildPromotionInfoFieldContributor(
                     .description("Information about the promotions of this build")
                     .type(GraphQLTypeReference(BuildPromotionInfo::class.java.simpleName))
                     .dataFetcher { env ->
-                        val build: Build = env.getSource()
+                        val build: Build = env.getSource()!!
                         buildPromotionInfoService.getBuildPromotionInfo(build)
                     }
                     .build()

@@ -39,7 +39,7 @@ class GQLTypeIndicatorPortfolio(
                                 .description("Label for this portfolio")
                                 .type(label.typeRef)
                                 .dataFetcher { env ->
-                                    val portfolio: IndicatorPortfolio = env.getSource()
+                                    val portfolio: IndicatorPortfolio = env.getSource()!!
                                     indicatorPortfolioService.getPortfolioLabel(portfolio)
                                 }
                     }
@@ -49,7 +49,7 @@ class GQLTypeIndicatorPortfolio(
                                 .description("Indicator categories being shown for this portfolio")
                                 .type(listType(indicatorCategory.typeRef))
                                 .dataFetcher { env ->
-                                    val portfolio: IndicatorPortfolio = env.getSource()
+                                    val portfolio: IndicatorPortfolio = env.getSource()!!
                                     portfolio.categories.mapNotNull { id ->
                                         indicatorCategoryService.findCategoryById(id)
                                     }
@@ -61,7 +61,7 @@ class GQLTypeIndicatorPortfolio(
                                 .description("List of projects associated with this portfolio")
                                 .type(listType(GraphQLTypeReference(GQLTypeProject.PROJECT)))
                                 .dataFetcher { env ->
-                                    val portfolio: IndicatorPortfolio = env.getSource()
+                                    val portfolio: IndicatorPortfolio = env.getSource()!!
                                     indicatorPortfolioService.getPortfolioProjects(portfolio)
                                 }
                     }
@@ -74,7 +74,7 @@ class GQLTypeIndicatorPortfolio(
                                 .durationArgument()
                                 .dataFetcher { env ->
                                     val duration = env.getDurationArgument()
-                                    val portfolio: IndicatorPortfolio = env.getSource()
+                                    val portfolio: IndicatorPortfolio = env.getSource()!!
                                     indicatorStatsService.getStatsPortfolio(portfolio, duration)
                                 }
                     }
@@ -88,7 +88,7 @@ class GQLTypeIndicatorPortfolio(
                                 .durationArgument()
                                 .dataFetcher { env ->
                                     val duration = env.getDurationArgument()
-                                    val portfolio: IndicatorPortfolio = env.getSource()
+                                    val portfolio: IndicatorPortfolio = env.getSource()!!
                                     indicatorStatsService.getGlobalStats(portfolio, duration)
                                 }
                     }
@@ -104,7 +104,7 @@ class GQLTypeIndicatorPortfolio(
                             }
                             .type(GraphQLList(GraphQLNonNull(indicatorCategoryStats.typeRef)))
                             .dataFetcher { env ->
-                                val portfolio: IndicatorPortfolio = env.getSource()
+                                val portfolio: IndicatorPortfolio = env.getSource()!!
                                 val duration = env.getDurationArgument()
                                 val id: String? = env.getArgument<String?>("id")?.takeIf { it.isNotBlank() }
                                 val view = if (id != null) {

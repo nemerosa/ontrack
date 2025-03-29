@@ -24,7 +24,7 @@ constructor(
                     .description("List of other branches in the same project")
                     .type(listType(GraphQLTypeReference(GQLTypeBranch.BRANCH)))
                     .dataFetcher { env ->
-                        val branch: Branch = env.getSource()
+                        val branch: Branch = env.getSource()!!
                         structureService.filterBranchesForProject(
                                 project = branch.project,
                                 filter = BranchFilter(

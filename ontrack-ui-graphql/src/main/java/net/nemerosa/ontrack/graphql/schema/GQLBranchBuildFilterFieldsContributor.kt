@@ -22,7 +22,7 @@ class GQLBranchBuildFilterFieldsContributor(
                                 .description("List of forms for the build filters (for the creation of new filters)")
                                 .type(listType(gqlTypeBuildFilterForm.typeRef))
                                 .dataFetcher { env ->
-                                    val branch: Branch = env.getSource()
+                                    val branch: Branch = env.getSource()!!
                                     buildFilterService.getBuildFilterForms(branch.id)
                                 }
                                 .build(),
@@ -31,7 +31,7 @@ class GQLBranchBuildFilterFieldsContributor(
                                 .description("List of shared build filters for this branch")
                                 .type(listType(gqlTypeBuildFilterResource.typeRef))
                                 .dataFetcher { env ->
-                                    val branch: Branch = env.getSource()
+                                    val branch: Branch = env.getSource()!!
                                     buildFilterService.getBuildFilters(branch.id)
                                 }
                                 .build(),

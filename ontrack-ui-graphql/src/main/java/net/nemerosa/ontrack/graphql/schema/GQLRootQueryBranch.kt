@@ -21,7 +21,7 @@ class GQLRootQueryBranch(
                 intArgument("id", "ID of the branch to look for", nullable = false)
             )
             .dataFetcher { env ->
-                val id: Int = env.getArgument("id")
+                val id: Int = env.getArgument("id")!!
                 structureService.getBranch(of(id))
             }
             .build()

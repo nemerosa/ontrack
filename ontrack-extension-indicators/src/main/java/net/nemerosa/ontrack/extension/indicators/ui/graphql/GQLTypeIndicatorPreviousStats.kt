@@ -24,7 +24,7 @@ class GQLTypeIndicatorPreviousStats(
                                 .description("Time (in seconds) since the indicator values were computed or entered.")
                                 .type(GraphQLInt)
                                 .dataFetcher { env ->
-                                    val source = env.getSource<IndicatorPreviousStats>()
+                                    val source = env.getSource<IndicatorPreviousStats>()!!
                                     (source.period.toMillis() / 1000).toInt()
                                 }
                     }

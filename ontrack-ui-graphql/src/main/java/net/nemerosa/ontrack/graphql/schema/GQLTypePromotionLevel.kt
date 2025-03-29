@@ -124,7 +124,7 @@ class GQLTypePromotionLevel(
 
     private fun promotionLevelPromotionRunsFetcher(): DataFetcher<List<PromotionRun>> =
             DataFetcher { environment: DataFetchingEnvironment ->
-                val promotionLevel = environment.getSource<PromotionLevel>()
+                val promotionLevel = environment.getSource<PromotionLevel>()!!
                 // Gets all the promotion runs
                 val promotionRuns = structureService.getPromotionRunsForPromotionLevel(promotionLevel.id)
                 // Filters according to the arguments

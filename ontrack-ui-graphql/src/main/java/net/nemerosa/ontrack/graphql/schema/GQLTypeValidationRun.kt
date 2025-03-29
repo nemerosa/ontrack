@@ -79,7 +79,7 @@ class GQLTypeValidationRun(
                         )
                     )
                     .dataFetcher { environment ->
-                        val validationRun = environment.getSource<ValidationRun>()
+                        val validationRun = environment.getSource<ValidationRun>()!!
                         val lastOnly = environment.getArgument<Boolean>("lastOnly") ?: false
                         val statuses = if (lastOnly) {
                             validationRun.validationRunStatuses.take(1)
@@ -100,7 +100,7 @@ class GQLTypeValidationRun(
                         .description("Last validation status for this run")
                         .type(validationRunStatus.typeRef.toNotNull())
                         .dataFetcher { env ->
-                            val validationRun: ValidationRun = env.getSource()
+                            val validationRun: ValidationRun = env.getSource()!!
                             GQLTypeValidationRunStatus.Data(
                                 validationRun,
                                 validationRun.lastStatus

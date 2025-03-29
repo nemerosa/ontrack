@@ -23,7 +23,7 @@ class GQLRootQueryConfigurations(
             .argument(stringArgument(ARG_CONFIGURATION_TYPE, "Configuration type", nullable = false))
             .type(listType(gqlTypeConfiguration.typeRef))
             .dataFetcher { env ->
-                val configurationType: String = env.getArgument(ARG_CONFIGURATION_TYPE)
+                val configurationType: String = env.getArgument(ARG_CONFIGURATION_TYPE)!!
                 val configurationService = configurationServiceFactory.findConfigurationService(configurationType)
                 configurationService?.let {
                     getConfigurationDataList(configurationService)

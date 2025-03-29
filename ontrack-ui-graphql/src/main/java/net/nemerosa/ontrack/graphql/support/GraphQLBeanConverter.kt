@@ -18,11 +18,12 @@ import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 import kotlin.jvm.internal.Reflection
-import kotlin.reflect.*
+import kotlin.reflect.KClass
+import kotlin.reflect.KProperty1
+import kotlin.reflect.KType
 import kotlin.reflect.full.findAnnotation
-import kotlin.reflect.full.isSuperclassOf
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.javaType
 
@@ -207,7 +208,7 @@ object GraphQLBeanConverter {
                     val typeRef = property.findAnnotation<TypeRef>()
                     if (jsonType != null) {
                         field.dataFetcher { env ->
-                            val source = env.getSource<Any>()
+                            val source = env.getSource<Any>()!!
                             @Suppress("UNCHECKED_CAST")
                             val value = (property as KProperty1<Any,Any?>).get(source)
                             value?.asJson()

@@ -25,7 +25,7 @@ class GQLTypeLabel(
                     .description("List of associated projects")
                     .type(listType(GraphQLTypeReference(GQLTypeProject.PROJECT)))
                     .dataFetcher { environment ->
-                        val label: Label = environment.getSource()
+                        val label: Label = environment.getSource()!!
                         val projectIds = projectLabelManagementService.getProjectsForLabel(label)
                         projectIds.map { id ->
                             structureService.getProject(id)

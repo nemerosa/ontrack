@@ -63,7 +63,7 @@ class GQLTypeAccount(
                     .description("Authentication token, if any, linked to this account.")
                     .type(token.typeRef)
                     .dataFetcher { env ->
-                        val account: Account = env.getSource()
+                        val account: Account = env.getSource()!!
                         securityService.asAdmin {
                             tokensService.getToken(account.id())
                         }
@@ -74,7 +74,7 @@ class GQLTypeAccount(
                     .description("List of authentication tokens linked to this account.")
                     .type(listType(token.typeRef))
                     .dataFetcher { env ->
-                        val account: Account = env.getSource()
+                        val account: Account = env.getSource()!!
                         securityService.asAdmin {
                             tokensService.getTokens(account.id()).map { t ->
                                 t.obfuscate()
@@ -90,7 +90,7 @@ class GQLTypeAccount(
                     .description("List of groups contributed to this account. Some groups are available only after the user has logged in.")
                     .type(listType(GraphQLTypeReference(GQLTypeAccountGroup.ACCOUNT_GROUP)))
                     .dataFetcher { env ->
-                        val account: Account = env.getSource()
+                        val account: Account = env.getSource()!!
                         securityService.asAdmin {
                             accountGroupContributors.flatMap { contributor -> contributor.collectGroups(account) }
                         }
@@ -102,7 +102,7 @@ class GQLTypeAccount(
                     .description("List of groups provided to this account. Some groups are available only after the user has logged in.")
                     .type(listType(GraphQLString))
                     .dataFetcher { env ->
-                        val account: Account = env.getSource()
+                        val account: Account = env.getSource()!!
                         securityService.asAdmin {
                             providedGroupsService.getProvidedGroups(account.id(), account.authenticationSource).toList()
                                 .sorted()
@@ -116,17 +116,17 @@ class GQLTypeAccount(
     }
 
     private fun accountAuthorizedProjectsFetcher() = DataFetcher<Collection<ProjectRoleAssociation>> { env ->
-        val account: Account = env.getSource()
+        val account: Account = env.getSource()!!
         accountService.getProjectPermissionsForAccount(account)
     }
 
     private fun accountGlobalRoleFetcher() = DataFetcher { env ->
-        val account: Account = env.getSource()
+        val account: Account = env.getSource()!!
         accountService.getGlobalRoleForAccount(account).orElse(null)
     }
 
     private fun accountAccountGroupsFetcher() = DataFetcher<List<AccountGroup>> { env ->
-        val id = env.getSource<Account>().id
+        val id = env.getSource<Account>()!!.id
         accountService.getGroupsForAccount(id)
     }
 

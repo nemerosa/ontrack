@@ -18,7 +18,7 @@ class GQLRootQueryPredefinedValidationStampByName(
             .type(gqlTypePredefinedValidationStamp.typeRef)
             .argument(stringArgument("name", "Name", nullable = false))
             .dataFetcher { env ->
-                val name: String = env.getArgument("name")
+                val name: String = env.getArgument("name")!!
                 predefinedValidationStampService.findPredefinedValidationStampByName(name)
             }
             .build()

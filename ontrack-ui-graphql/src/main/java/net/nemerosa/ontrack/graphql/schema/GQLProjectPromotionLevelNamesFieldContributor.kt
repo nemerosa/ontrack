@@ -30,7 +30,7 @@ class GQLProjectPromotionLevelNamesFieldContributor(
                     .type(listType(GraphQLString))
                     .argument(stringArgument("token", "Filter by promotion level name"))
                     .dataFetcher { env ->
-                        val project: Project = env.getSource()
+                        val project: Project = env.getSource()!!
                         val token: String? = env.getArgument<String>("token")
                         promotionLevelService.findPromotionLevelNamesByProject(project, token)
                     }

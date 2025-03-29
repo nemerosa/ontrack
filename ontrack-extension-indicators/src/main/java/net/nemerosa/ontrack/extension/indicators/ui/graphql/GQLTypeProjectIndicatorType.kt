@@ -41,7 +41,7 @@ class GQLTypeProjectIndicatorType(
                 .description("Source for this type")
                 .type(indicatorSource.typeRef)
                 .dataFetcher { env ->
-                    val typeRef = env.getSource<ProjectIndicatorType>()
+                    val typeRef = env.getSource<ProjectIndicatorType>()!!
                     val type = indicatorTypeService.getTypeById(typeRef.id)
                     type.source
                 }
@@ -58,7 +58,7 @@ class GQLTypeProjectIndicatorType(
                 .description("Value type")
                 .type(indicatorValueType.typeRef)
                 .dataFetcher { env ->
-                    val typeRef = env.getSource<ProjectIndicatorType>()
+                    val typeRef = env.getSource<ProjectIndicatorType>()!!
                     val type = indicatorTypeService.getTypeById(typeRef.id)
                     type.valueType
                 }
@@ -69,7 +69,7 @@ class GQLTypeProjectIndicatorType(
                 .description("Configuration for the value type")
                 .type(GQLScalarJSON.INSTANCE)
                 .dataFetcher { env ->
-                    val typeRef = env.getSource<ProjectIndicatorType>()
+                    val typeRef = env.getSource<ProjectIndicatorType>()!!
                     val type = indicatorTypeService.getTypeById(typeRef.id)
                     type.toConfigClientJson()
                 }
@@ -82,7 +82,7 @@ class GQLTypeProjectIndicatorType(
                 .arguments(indicatorReportingService.arguments)
                 .rateArgument()
                 .dataFetcher { env ->
-                    val typeRef = env.getSource<ProjectIndicatorType>()
+                    val typeRef = env.getSource<ProjectIndicatorType>()!!
                     val type = indicatorTypeService.getTypeById(typeRef.id)
                     indicators(type, env)
                 }

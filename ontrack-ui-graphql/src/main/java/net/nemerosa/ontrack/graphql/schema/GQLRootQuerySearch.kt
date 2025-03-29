@@ -36,7 +36,7 @@ class GQLRootQuerySearch(
                         GraphQLArgument.newArgument().name(ARG_SEARCH_TYPE).description("Result type").type(GraphQLString).build()
                 ),
                 itemPaginatedListProvider = { env, _: Any?, offset, size ->
-                    val token: String = env.getArgument(ARG_SEARCH_TOKEN)
+                    val token: String = env.getArgument(ARG_SEARCH_TOKEN)!!
                     val type: String? = env.getArgument(ARG_SEARCH_TYPE)
                     val request = SearchRequest(token, type, offset, size)
                     val results = searchService.paginatedSearch(request)

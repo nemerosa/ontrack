@@ -30,8 +30,8 @@ class GQLBranchPromotionStatusesFieldContributor(
                     }
                     .type(listType(GraphQLTypeReference(GQLTypePromotionRun.PROMOTION_RUN)))
                     .dataFetcher { env ->
-                        val branch: Branch = env.getSource()
-                        val names: List<String> = env.getArgument("names")
+                        val branch: Branch = env.getSource()!!
+                        val names: List<String> = env.getArgument("names") ?: emptyList()
                         val runs = mutableListOf<PromotionRun>()
                         names.forEach { name ->
                             val pl = structureService.findPromotionLevelByName(branch.project.name, branch.name, name)

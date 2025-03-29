@@ -30,7 +30,7 @@ constructor(
                     .description("Actions to get a diff on builds of the branch")
                     .type(listType(gqlTypeAction.typeRef))
                     .dataFetcher { env ->
-                        val branch: Branch = env.getSource()
+                        val branch: Branch = env.getSource()!!
                         extensionManager.getExtensions(BuildDiffExtension::class.java)
                             .filter { extension -> extension.apply(branch.project) }
                             .map { uriBuilder.resolveActionWithExtension(it, it.action) }

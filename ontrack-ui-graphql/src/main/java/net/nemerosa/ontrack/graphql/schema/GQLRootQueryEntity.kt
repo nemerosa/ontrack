@@ -25,10 +25,10 @@ class GQLRootQueryEntity(
                 .description("Type of the entity")
                 .type(nullableInputType(gqlEnumProjectEntityType.getTypeRef(), false))
         }
-        .argument(intArgument("id", "ID of the entity"))
+        .argument(intArgument("id", "ID of the entity", nullable = false))
         .dataFetcher { env ->
-            val type: ProjectEntityType = ProjectEntityType.valueOf(env.getArgument("type"))
-            val id: Int = env.getArgument("id")
+            val type: ProjectEntityType = ProjectEntityType.valueOf(env.getArgument("type")!!)
+            val id: Int = env.getArgument("id")!!
             val entity: ProjectEntity? = type.getFindEntityFn(structureService).apply(ID.of(id))
             entity?.run {
                 GQLTypeProjectEntityInformation.Data(

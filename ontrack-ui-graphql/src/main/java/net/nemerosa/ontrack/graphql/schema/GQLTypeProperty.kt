@@ -26,7 +26,7 @@ class GQLTypeProperty(
                                 .description("Property type")
                                 .type(propertyType.typeRef)
                                 .dataFetcher { env ->
-                                    val property: Property<*> = env.getSource()
+                                    val property: Property<*> = env.getSource()!!
                                     property.typeDescriptor
                                 }
                                 .build()
@@ -44,7 +44,7 @@ class GQLTypeProperty(
                                 .description("True is the field is editable")
                                 .type(Scalars.GraphQLBoolean)
                                 .dataFetcher { env ->
-                                    val property: Property<*> = env.getSource()
+                                    val property: Property<*> = env.getSource()!!
                                     property.isEditable
                                 }
                                 .build()

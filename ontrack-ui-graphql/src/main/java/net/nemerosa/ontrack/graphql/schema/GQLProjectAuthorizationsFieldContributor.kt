@@ -39,7 +39,7 @@ class GQLProjectAuthorizationsFieldContributor(
     }
 
     private fun projectAuthorizationsFetcher() = DataFetcher { env ->
-        val project: Project = env.getSource()
+        val project: Project = env.getSource()!!
         val role: String? = env.getArgument("role")
         rolesService.projectRoles
                 .filter { projectRole ->

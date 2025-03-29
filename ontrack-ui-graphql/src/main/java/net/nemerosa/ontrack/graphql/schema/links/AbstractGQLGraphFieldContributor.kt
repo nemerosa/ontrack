@@ -7,10 +7,8 @@ import net.nemerosa.ontrack.graphql.support.nullableOutputType
 import net.nemerosa.ontrack.model.links.BranchLinksDirection
 import net.nemerosa.ontrack.model.links.BranchLinksNode
 import net.nemerosa.ontrack.model.links.BranchLinksService
-import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
-import org.springframework.stereotype.Component
 
 @Deprecated(GraphFieldContributorConstants.DEPRECATION)
 abstract class AbstractGQLGraphFieldContributor<T : ProjectEntity>(
@@ -39,8 +37,8 @@ abstract class AbstractGQLGraphFieldContributor<T : ProjectEntity>(
                     }
                     .type(nullableOutputType(gqlTypeBranchLinksNode.typeRef, false))
                     .dataFetcher { env ->
-                        val entity: T = env.getSource()
-                        val direction: BranchLinksDirection = env.getArgument<String>(ARG_DIRECTION).let {
+                        val entity: T = env.getSource()!!
+                        val direction: BranchLinksDirection = env.getArgument<String>(ARG_DIRECTION)!!.let {
                             BranchLinksDirection.valueOf(it)
                         }
                         fetcher(entity, direction)

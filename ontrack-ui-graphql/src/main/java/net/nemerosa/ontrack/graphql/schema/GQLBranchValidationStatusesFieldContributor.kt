@@ -30,8 +30,8 @@ class GQLBranchValidationStatusesFieldContributor(
                     }
                     .type(listType(GraphQLTypeReference(GQLTypeValidationRun.VALIDATION_RUN)))
                     .dataFetcher { env ->
-                        val branch: Branch = env.getSource()
-                        val names: List<String> = env.getArgument("names")
+                        val branch: Branch = env.getSource()!!
+                        val names: List<String> = env.getArgument("names") ?: emptyList()
                         val runs = mutableListOf<ValidationRun>()
                         names.forEach { name ->
                             val vs = structureService.findValidationStampByName(branch.project.name, branch.name, name)

@@ -39,7 +39,7 @@ class GQLTypeIndicatorStats : GQLType {
                         .description(description)
                         .type(GraphQLInt)
                         .dataFetcher { env ->
-                            val stats = env.getSource<IndicatorStats>()
+                            val stats = env.getSource<IndicatorStats>()!!
                             property.get(stats)?.value
                         }
             }
@@ -50,7 +50,7 @@ class GQLTypeIndicatorStats : GQLType {
                         .description(description)
                         .type(GraphQLString)
                         .dataFetcher { env ->
-                            val stats = env.getSource<IndicatorStats>()
+                            val stats = env.getSource<IndicatorStats>()!!
                             property.get(stats)?.let { compliance ->
                                 Rating.asRating(compliance.value)
                             }

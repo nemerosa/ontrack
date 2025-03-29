@@ -31,7 +31,7 @@ class ValidationRunStatusIssuesGraphQLFieldContributor(
                                             .type(GraphQLString)
                                 }
                                 .dataFetcher { env ->
-                                    val validationRunStatus: GQLTypeValidationRunStatus.Data = env.getSource()
+                                    val validationRunStatus: GQLTypeValidationRunStatus.Data = env.getSource()!!
                                     val status: String? = env.getArgument("status")
                                     val issues = getIssueList(validationRunStatus.delegate)
                                     issues.filter {

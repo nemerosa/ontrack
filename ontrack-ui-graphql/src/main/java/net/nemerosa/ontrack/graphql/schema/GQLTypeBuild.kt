@@ -395,7 +395,7 @@ class GQLTypeBuild(
                     .description("Previous build")
                     .type(GraphQLTypeReference(BUILD))
                     .dataFetcher { env ->
-                        val build: Build = env.getSource()
+                        val build: Build = env.getSource()!!
                         structureService.getPreviousBuild(build.id)
                     }
             }
@@ -405,7 +405,7 @@ class GQLTypeBuild(
                     .description("Next build")
                     .type(GraphQLTypeReference(BUILD))
                     .dataFetcher { env ->
-                        val build: Build = env.getSource()
+                        val build: Build = env.getSource()!!
                         structureService.getNextBuild(build.id)
                     }
             }
@@ -440,7 +440,7 @@ class GQLTypeBuild(
 
     private fun buildValidationsFetcher() =
         DataFetcher { environment ->
-            val build: Build = environment.getSource()
+            val build: Build = environment.getSource()!!
             // Filter on validation stamp
             val validationStampName: String? = environment.getArgument(ARG_VALIDATION_STAMP)
             val validationStampNames: List<String>? = environment.getArgument(ARG_VALIDATION_STAMPS)
@@ -497,7 +497,7 @@ class GQLTypeBuild(
 
     private fun buildValidationRunsFetcher() =
         DataFetcher { environment ->
-            val build: Build = environment.getSource()
+            val build: Build = environment.getSource()!!
             // Filter
             val count: Int = environment.getArgument(ARG_COUNT) ?: 50
             val validation: String? = environment.getArgument(ARG_VALIDATION_STAMP)
@@ -541,7 +541,7 @@ class GQLTypeBuild(
 
     private fun buildPromotionRunsFetcher() =
         DataFetcher<List<PromotionRun>> { environment ->
-            val build: Build = environment.getSource()
+            val build: Build = environment.getSource()!!
             // Last per promotion filter?
             val lastPerLevel: Boolean = environment.getArgument(ARG_LAST_PER_LEVEL) ?: false
             // Promotion filter

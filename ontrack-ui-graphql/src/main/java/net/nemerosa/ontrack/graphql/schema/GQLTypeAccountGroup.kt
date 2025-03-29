@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.graphql.schema
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLTypeReference
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.graphql.support.descriptionField
 import net.nemerosa.ontrack.graphql.support.idField
 import net.nemerosa.ontrack.graphql.support.listType
@@ -13,6 +12,7 @@ import net.nemerosa.ontrack.model.security.AccountGroup
 import net.nemerosa.ontrack.model.security.AccountGroupMappingService
 import net.nemerosa.ontrack.model.security.AccountService
 import org.springframework.stereotype.Component
+import kotlin.jvm.optionals.getOrNull
 
 /**
  * @see AccountGroup
@@ -40,7 +40,7 @@ class GQLTypeAccountGroup(private val accountService: AccountService,
                             .description("List of associated accounts")
                             .type(listType(GraphQLTypeReference(GQLTypeAccount.ACCOUNT)))
                             .dataFetcher { env ->
-                                    val accountGroup: AccountGroup = env.getSource()
+                                    val accountGroup: AccountGroup = env.getSource()!!
                                     getAccountsForGroup(accountGroup)
                             }
                 } // Global role
@@ -49,7 +49,7 @@ class GQLTypeAccountGroup(private val accountService: AccountService,
                             .description("Global role for the account group")
                             .type(globalRole.typeRef)
                             .dataFetcher { env ->
-                                val accountGroup: AccountGroup = env.getSource()
+                                val accountGroup: AccountGroup = env.getSource()!!
                                 accountService.getGlobalRoleForAccountGroup(accountGroup).getOrNull()
                             }
                 } // Authorised projects
@@ -58,7 +58,7 @@ class GQLTypeAccountGroup(private val accountService: AccountService,
                             .description("List of authorized projects")
                             .type(listType(authorizedProject.typeRef))
                             .dataFetcher { env ->
-                                val accountGroup: AccountGroup = env.getSource()
+                                val accountGroup: AccountGroup = env.getSource()!!
                                 accountService.getProjectPermissionsForAccountGroup(accountGroup)
                             }
                 } // Mappings
@@ -67,7 +67,7 @@ class GQLTypeAccountGroup(private val accountService: AccountService,
                             .description("Mappings for this group")
                             .type(listType(accountGroupMapping.typeRef))
                             .dataFetcher { env ->
-                                val accountGroup: AccountGroup = env.getSource()
+                                val accountGroup: AccountGroup = env.getSource()!!
                                 accountGroupMappingService.getMappingsForGroup(accountGroup)
                             }
                 }

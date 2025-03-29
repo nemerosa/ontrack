@@ -27,7 +27,7 @@ class GQLBranchDisplayNameFieldContributor(
                     .description("Display name for this branch or the branch's name if not available")
                     .type(GraphQLNonNull(GraphQLString))
                     .dataFetcher { env ->
-                        val branch: Branch = env.getSource()
+                        val branch: Branch = env.getSource()!!
                         branchDisplayNameService.getBranchDisplayName(branch)
                     }
                     .build()

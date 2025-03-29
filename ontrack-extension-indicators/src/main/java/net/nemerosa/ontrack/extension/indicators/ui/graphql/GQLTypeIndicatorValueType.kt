@@ -23,7 +23,7 @@ class GQLTypeIndicatorValueType(
                         .description("FQCN of the value type")
                         .type(GraphQLString)
                         .dataFetcher { env ->
-                            env.getSource<IndicatorValueType<*, *>>().id
+                            env.getSource<IndicatorValueType<*, *>>()!!.id
                         }
             }
             .stringField(IndicatorValueType<*, *>::name, "Display name of the value type")

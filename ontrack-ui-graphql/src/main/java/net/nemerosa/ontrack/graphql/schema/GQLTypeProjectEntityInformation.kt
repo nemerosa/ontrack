@@ -49,7 +49,7 @@ class GQLTypeProjectEntityInformation(
                 .type(listType(gqlTypeProperty.typeRef))
                 .argument(booleanArgument(ARG_HAS_VALUE, "Keeps only properties which have a value"))
                 .dataFetcher { env ->
-                    val data: Data = env.getSource()
+                    val data: Data = env.getSource()!!
                     val hasValue: Boolean = env.getArgument<Boolean?>("hasValue") ?: false
                     propertyService.getProperties(data.entity)
                         .filter { property ->

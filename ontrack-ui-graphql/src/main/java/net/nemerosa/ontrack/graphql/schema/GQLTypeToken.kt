@@ -27,7 +27,7 @@ class GQLTypeToken : GQLType {
                     .description("Is this token managed?")
                     .type(GraphQLBoolean.toNotNull())
                     .dataFetcher { env ->
-                        val token: Token = env.getSource()
+                        val token: Token = env.getSource()!!
                         token.scope.transient
                     }
             }

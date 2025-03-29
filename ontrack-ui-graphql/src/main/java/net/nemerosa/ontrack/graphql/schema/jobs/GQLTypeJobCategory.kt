@@ -29,7 +29,7 @@ class GQLTypeJobCategory(
                     .description("All job types for this category")
                     .type(listType(gqlTypeJobType.typeRef))
                     .dataFetcher { env ->
-                        val category: JobCategory = env.getSource()
+                        val category: JobCategory = env.getSource()!!
                         val types = jobScheduler.allJobKeys
                             .map { key -> key.type }
                             .distinctBy { type -> type.key }

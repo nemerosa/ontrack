@@ -69,7 +69,7 @@ class GQLTypeProject(
                             .description("Is this project a favourite of the current user?")
                             .type(GraphQLBoolean)
                             .dataFetcher { env ->
-                                val project: Project = env.getSource()
+                                val project: Project = env.getSource()!!
                                 projectFavouriteService.isProjectFavourite(project)
                             }
                 }
@@ -114,7 +114,7 @@ class GQLTypeProject(
                             .description("Labels for this project")
                             .type(listType(label.typeRef))
                             .dataFetcher { environment ->
-                                val project: Project = environment.getSource()
+                                val project: Project = environment.getSource()!!
                                 projectLabelManagementService.getLabelsForProject(project)
                             }
                 }

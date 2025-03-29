@@ -74,7 +74,7 @@ class BranchValidationIssuesGraphQLFieldContributor(
                                             .type(GraphQLString)
                                 }
                                 .dataFetcher { env ->
-                                    val branch: Branch = env.getSource()
+                                    val branch: Branch = env.getSource()!!
                                     val passed: Boolean? = env.getArgument("passed")
                                     val status: List<String>? = env.getArgument("status")
                                     val count: Int = env.getArgument(ARG_COUNT) ?: DEFAULT_COUNT
