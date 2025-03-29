@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.common;
 
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -11,7 +11,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class FutureUtilsTest {
 
@@ -57,9 +58,11 @@ public class FutureUtilsTest {
             new BasicThreadFactory.Builder().daemon(true).build()
     );
 
-    @Test(expected = TaskNotScheduledException.class)
+    @Test
     public void taskOptionalEmpty() {
-        FutureUtils.wait("Test ok", Optional.empty());
+        assertThrows(TaskNotScheduledException.class, () ->
+                FutureUtils.wait("Test ok", Optional.empty())
+        );
     }
 
     @Test
@@ -78,28 +81,30 @@ public class FutureUtilsTest {
         assertEquals("OK", value);
     }
 
-    @Test(expected = TaskTimeoutException.class)
+    @Test
     public void taskTimeout() {
         TestTask task = new TestTask("timeout", 2000);
         Future<String> future = executor.submit(task);
-        FutureUtils.wait("Test timeout", future, 1);
+        assertThrows(TaskTimeoutException.class, () -> FutureUtils.wait("exception", future, 1));
     }
 
-    @Test(expected = TestException.class)
+    @Test
     public void taskBaseException() {
         TestTask task = new TestTask("exception", 500, TestException::new);
         Future<String> future = executor.submit(task);
-        FutureUtils.wait("exception", future, 1);
+        assertThrows(TestException.class, () -> FutureUtils.wait("Test exception", future, 1));
     }
 
-    @Test(expected = TaskExecutionException.class)
+    @Test
     public void taskCheckedException() {
         TestTask task = new TestTask("exception", 500, IOException::new);
         Future<String> future = executor.submit(task);
-        FutureUtils.wait("exception", future, 1);
+        assertThrows(TaskExecutionException.class, () ->
+                FutureUtils.wait("exception", future, 1)
+        );
     }
 
-    @Test(expected = TaskCancelledException.class)
+    @Test
     public void taskCancelled() {
         TestTask task = new TestTask("cancelled", 2000);
         Future<String> future = executor.submit(task);
@@ -113,7 +118,9 @@ public class FutureUtilsTest {
             future.cancel(true);
         });
         // Waits for the cancellation
-        FutureUtils.wait("Test cancelled", future, 3);
+        assertThrows(TaskCancelledException.class, () ->
+                FutureUtils.wait("Test cancelled", future, 3)
+        );
     }
 
 }

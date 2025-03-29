@@ -1,6 +1,7 @@
 /**
  * List of versions to use
  */
+@Deprecated("Remove")
 object Versions {
     const val springBootVersion = "3.4.4"
     const val kotlinVersion = "2.1.20"

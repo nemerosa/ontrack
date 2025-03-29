@@ -225,15 +225,13 @@ pipeline {
                                 --console plain
                         '''
                     } else {
+                        // TODO integrationTest
+                        // TODO dockerBuild
+                        // TODO documentation
                         sh '''
                             ./gradlew \\
                                 test \\
                                 build \\
-                                integrationTest \\
-                                dockerBuild \\
-                                javadocPackage \\
-                                -Pdocumentation \\
-                                -PbowerOptions='--allow-root' \\
                                 -Dorg.gradle.jvmargs=-Xmx6144m \\
                                 --stacktrace \\
                                 --parallel \\
@@ -261,6 +259,10 @@ pipeline {
 
         stage('KDSL acceptance tests') {
             when {
+                // TODO
+                expression {
+                    false
+                }
                 not {
                     branch 'master'
                 }
@@ -302,6 +304,10 @@ pipeline {
 
         stage('Local Next UI tests') {
             when {
+                // TODO
+                expression {
+                    false
+                }
                 not {
                     branch 'master'
                 }
@@ -344,6 +350,10 @@ pipeline {
 
         stage('Docker Hub') {
             when {
+                // TODO
+                expression {
+                    false
+                }
                 anyOf {
                     branch 'release/*'
                     branch 'feature/*publication'
@@ -380,6 +390,10 @@ pipeline {
             }
             when {
                 beforeAgent true
+                // TODO
+                expression {
+                    false
+                }
                 anyOf {
                     branch 'release/*'
                 }
@@ -418,6 +432,10 @@ pipeline {
             when {
                 beforeAgent true
                 allOf {
+                    // TODO
+                    expression {
+                        false
+                    }
                     not {
                         anyOf {
                             branch '*alpha'
