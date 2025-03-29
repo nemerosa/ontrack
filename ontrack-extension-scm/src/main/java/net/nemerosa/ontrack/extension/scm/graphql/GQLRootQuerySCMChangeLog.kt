@@ -38,8 +38,8 @@ class GQLRootQuerySCMChangeLog(
         )
         .type(gqlTypeSCMChangeLog.typeRef)
         .dataFetcher { env ->
-            val from: Int = env.getArgument(ARG_FROM)
-            val to: Int = env.getArgument(ARG_TO)
+            val from: Int = env.getArgument(ARG_FROM)!!
+            val to: Int = env.getArgument(ARG_TO)!!
             val projects: List<String>? = env.getArgument(ARG_PROJECTS)
             val buildFrom = structureService.getBuild(ID.of(from))
             val buildTo = structureService.getBuild(ID.of(to))

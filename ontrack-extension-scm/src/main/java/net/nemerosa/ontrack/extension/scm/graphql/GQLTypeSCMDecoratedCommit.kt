@@ -14,7 +14,6 @@ import net.nemerosa.ontrack.graphql.support.getTypeDescription
 import net.nemerosa.ontrack.graphql.support.toNotNull
 import net.nemerosa.ontrack.model.support.MessageAnnotationUtils
 import org.springframework.stereotype.Component
-import kotlin.jvm.optionals.getOrNull
 
 @Component
 class GQLTypeSCMDecoratedCommit(
@@ -35,7 +34,7 @@ class GQLTypeSCMDecoratedCommit(
                     .description("Annotated message with links")
                     .type(GraphQLString.toNotNull())
                     .dataFetcher { env ->
-                        val (project, commit) = env.getSource<SCMDecoratedCommit>()
+                        val (project, commit) = env.getSource<SCMDecoratedCommit>()!!
                         val scm = scmDetector.getSCM(project)
                         if (scm != null && scm is SCMChangeLogEnabled) {
                             val annotator = scm.getConfiguredIssueService()?.messageAnnotator
@@ -55,7 +54,7 @@ class GQLTypeSCMDecoratedCommit(
                     .description("Any build linked to this commit")
                     .type(GraphQLTypeReference(GQLTypeBuild.BUILD))
                     .dataFetcher { env ->
-                        val (project, commit) = env.getSource<SCMDecoratedCommit>()
+                        val (project, commit) = env.getSource<SCMDecoratedCommit>()!!
                         val scm = scmDetector.getSCM(project)
                         if (scm != null && scm is SCMChangeLogEnabled) {
                             val build = scm.findBuildByCommit(project, commit.id)

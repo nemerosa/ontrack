@@ -31,7 +31,7 @@ class GQLTypeSCMFileChangeFilters(
                     .description("List of filters")
                     .type(listType(gqlTypeSCMFileChangeFilter.typeRef))
                     .dataFetcher { env ->
-                        env.getSource<SCMFileChangeFiltersWithProject>().filters.filters
+                        env.getSource<SCMFileChangeFiltersWithProject>()!!.filters.filters
                     }
             }
             // Flag indicating if filters can be shared by the current user
@@ -40,7 +40,7 @@ class GQLTypeSCMFileChangeFilters(
                     .description("True if the user can manage shared filters")
                     .type(GraphQLBoolean.toNotNull())
                     .dataFetcher { env ->
-                        val project = env.getSource<SCMFileChangeFiltersWithProject>().project
+                        val project = env.getSource<SCMFileChangeFiltersWithProject>()!!.project
                         securityService.isProjectFunctionGranted(project, ProjectConfig::class.java)
                     }
             }

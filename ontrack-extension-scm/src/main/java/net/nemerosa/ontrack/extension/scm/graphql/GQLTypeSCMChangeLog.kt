@@ -6,12 +6,14 @@ import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLog
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogExportInput
 import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogExportService
-import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogService
 import net.nemerosa.ontrack.extension.scm.service.SCMDetector
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.GQLTypeLinkChange
-import net.nemerosa.ontrack.graphql.support.*
+import net.nemerosa.ontrack.graphql.support.field
+import net.nemerosa.ontrack.graphql.support.getTypeDescription
+import net.nemerosa.ontrack.graphql.support.listType
+import net.nemerosa.ontrack.graphql.support.parseOptionalArgument
 import net.nemerosa.ontrack.model.annotations.getPropertyDescription
 import net.nemerosa.ontrack.model.structure.LinkChangeService
 import org.springframework.stereotype.Component
@@ -49,7 +51,7 @@ class GQLTypeSCMChangeLog(
                     .description("URL to get the file diff between the two builds")
                     .type(GraphQLString)
                     .dataFetcher { env ->
-                        val changeLog = env.getSource<SCMChangeLog>()
+                        val changeLog = env.getSource<SCMChangeLog>()!!
                         val project = changeLog.from.project
                         scmDetector.getSCM(project)?.getDiffLink(changeLog.fromCommit, changeLog.toCommit)
                     }
@@ -60,7 +62,7 @@ class GQLTypeSCMChangeLog(
                     .description("All dependency changes")
                     .type(listType(gqlTypeLinkChange.typeRef))
                     .dataFetcher { env ->
-                        val changeLog = env.getSource<SCMChangeLog>()
+                        val changeLog = env.getSource<SCMChangeLog>()!!
                         linkChangeService.linkChanges(
                             changeLog.from,
                             changeLog.to,
