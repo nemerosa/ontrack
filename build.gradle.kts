@@ -38,6 +38,9 @@ subprojects {
             dependency("org.jsoup:jsoup:1.19.1")
             dependency("org.apache.commons:commons-math3:3.6.1")
             dependency("org.apache.commons:commons-text:1.13.0")
+
+            // Git repository support TODO Will be removed in V5
+            dependency("org.eclipse.jgit:org.eclipse.jgit:6.6.1.202309021850-r")
         }
     }
 
