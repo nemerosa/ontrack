@@ -73,7 +73,7 @@ class GQLTypeSCMCatalogEntry(
                                 .description("Project linked to this SCM catalog entry. Might be null")
                                 .type(GraphQLTypeReference(GQLTypeProject.PROJECT))
                                 .dataFetcher { env ->
-                                    val entry = env.getSource<SCMCatalogEntry>()
+                                    val entry = env.getSource<SCMCatalogEntry>()!!
                                     catalogLinkService.getLinkedProject(entry)!!
                                 }
                     }
