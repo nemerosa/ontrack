@@ -27,7 +27,7 @@ class GQLTypeEventSubscriptionPayload(
                 .deprecate("Will be removed in V5. Use `name` instead.")
                 .type(GraphQLString)
                 .dataFetcher { env ->
-                    env.getSource<EventSubscriptionPayload>().name
+                    env.getSource<EventSubscriptionPayload>()!!.name
                 }
         }
         .stringField(EventSubscriptionPayload::name)
@@ -42,7 +42,7 @@ class GQLTypeEventSubscriptionPayload(
                 .description("Textual description of the channel configuration")
                 .type(GraphQLString.toNotNull())
                 .dataFetcher { env ->
-                    val payload = env.getSource<EventSubscriptionPayload>()
+                    val payload = env.getSource<EventSubscriptionPayload>()!!
                     notificationChannelRegistry.findChannel(payload.channel)?.run {
                         channelConfigText(this, payload.channelConfig)
                     }

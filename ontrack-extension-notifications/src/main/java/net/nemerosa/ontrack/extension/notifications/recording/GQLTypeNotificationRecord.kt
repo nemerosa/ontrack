@@ -35,7 +35,7 @@ class GQLTypeNotificationRecord(
                     .description(getPropertyDescription(NotificationRecord::channelConfig))
                     .type(GQLScalarJSON.INSTANCE.toNotNull())
                     .dataFetcher { env ->
-                        env.getSource<NotificationRecord>().channelConfig.asJson()
+                        env.getSource<NotificationRecord>()!!.channelConfig.asJson()
                     }
             }
             .field {
@@ -43,7 +43,7 @@ class GQLTypeNotificationRecord(
                     .description(getPropertyDescription(NotificationRecord::event))
                     .type(GQLScalarJSON.INSTANCE.toNotNull())
                     .dataFetcher { env ->
-                        env.getSource<NotificationRecord>().event.asJson()
+                        env.getSource<NotificationRecord>()!!.event.asJson()
                     }
             }
             .field {
@@ -51,7 +51,7 @@ class GQLTypeNotificationRecord(
                     .description(getPropertyDescription(NotificationRecord::result))
                     .type(gqlTypeNotificationRecordResult.typeRef.toNotNull())
                     .dataFetcher { env ->
-                        val record: NotificationRecord = env.getSource()
+                        val record: NotificationRecord = env.getSource()!!
                         getNotificationRecordResult(record)
                     }
             }

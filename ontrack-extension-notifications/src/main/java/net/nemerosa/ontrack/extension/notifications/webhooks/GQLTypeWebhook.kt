@@ -35,7 +35,7 @@ class GQLTypeWebhook(
                     .description(getPropertyDescription(Webhook::timeout))
                     .type(GraphQLInt)
                     .dataFetcher { env ->
-                        val webhook: Webhook = env.getSource()
+                        val webhook: Webhook = env.getSource()!!
                         webhook.timeout.toSeconds()
                     }
             }
@@ -44,7 +44,7 @@ class GQLTypeWebhook(
                     .description("Webhook authentication")
                     .type(GraphQLString)
                     .dataFetcher { env ->
-                        val webhook: Webhook = env.getSource()
+                        val webhook: Webhook = env.getSource()!!
                         webhook.authentication.type
                     }
             }
