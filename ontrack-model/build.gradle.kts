@@ -5,7 +5,6 @@ plugins {
 dependencies {
     api(project(":ontrack-json"))
     api(project(":ontrack-common"))
-    api("javax.validation:validation-api")
     api("org.springframework:spring-tx")
 
     implementation(project(":ontrack-job"))
