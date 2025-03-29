@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.model.labels
 
+import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Pattern
 import net.nemerosa.ontrack.common.RGB_COLOR_REGEX
-import javax.validation.constraints.NotNull
-import javax.validation.constraints.Pattern
 
 data class LabelForm(
         @get:Pattern(regexp = LABEL_REGEX, message = "The category must comply with format $LABEL_REGEX")

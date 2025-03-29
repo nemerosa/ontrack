@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.ui.support
 
 import com.fasterxml.jackson.databind.JsonNode
+import jakarta.servlet.http.HttpServletResponse
 import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.json.JsonUtils
 import org.springframework.http.CacheControl
 import org.springframework.web.context.request.WebRequest
 import java.util.concurrent.TimeUnit
-import javax.servlet.http.HttpServletResponse
 
 object UIUtils {
 

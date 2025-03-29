@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.model.structure
 
+import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.Size
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APILabel
-import javax.validation.constraints.Min
-import javax.validation.constraints.Size
 
 data class BuildSearchForm(
     @Min(1)

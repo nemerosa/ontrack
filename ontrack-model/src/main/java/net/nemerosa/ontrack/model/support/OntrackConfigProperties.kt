@@ -1,5 +1,8 @@
 package net.nemerosa.ontrack.model.support
 
+import jakarta.annotation.PostConstruct
+import jakarta.validation.Valid
+import jakarta.validation.constraints.Min
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APIName
 import org.slf4j.Logger
@@ -13,9 +16,6 @@ import org.springframework.util.unit.DataUnit
 import org.springframework.validation.annotation.Validated
 import java.time.Duration
 import java.time.temporal.ChronoUnit
-import javax.annotation.PostConstruct
-import javax.validation.Valid
-import javax.validation.constraints.Min
 
 
 /**

@@ -304,6 +304,7 @@ configure(coreProjects) p@{
     }
 
     dependencies {
+        implementation("jakarta.validation:jakarta.validation-api")
         "implementation"("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlinVersion}")
         "implementation"("org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlinVersion}")
         "implementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.kotlinCoroutinesVersion}")

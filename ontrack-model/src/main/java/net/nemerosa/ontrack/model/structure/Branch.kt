@@ -3,9 +3,9 @@ package net.nemerosa.ontrack.model.structure
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonView
+import jakarta.validation.constraints.Size
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.YesNo
-import javax.validation.constraints.Size
 
 /**
  * Representation of a branch inside a [Project]. They are usually associated

@@ -1,12 +1,10 @@
 package net.nemerosa.ontrack.model.structure;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import org.jetbrains.annotations.Nullable;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-
-import static net.nemerosa.ontrack.model.structure.NameDescription.NAME;
 import static net.nemerosa.ontrack.model.structure.NameDescription.NAME_MESSAGE_SUFFIX;
 
 @Data
