@@ -14,6 +14,7 @@ dependencies {
     implementation(project(":ontrack-extension-casc"))
     implementation(project(":ontrack-extension-general"))
     implementation("io.micrometer:micrometer-core")
+    implementation("commons-codec:commons-codec")
     implementation("org.slf4j:slf4j-api")
     implementation("jakarta.annotation:jakarta.annotation-api")
 
