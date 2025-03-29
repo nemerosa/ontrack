@@ -24,7 +24,7 @@ class GQLGitHubIngestionConfigBranchFieldContributor(
                 .description("Registered GitHub ingestion configuration")
                 .type(gqlTypeGitHubIngestionConfig.typeRef)
                 .dataFetcher { env ->
-                    val branch: Branch = env.getSource()
+                    val branch: Branch = env.getSource()!!
                     configService.findConfig(branch)
                 }
                 .build()

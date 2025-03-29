@@ -53,7 +53,7 @@ class GQLTypeGitHubEngineConfiguration(
                 .description("Rate limits for this configuration")
                 .type(gqlTypeGitHubRateLimit.typeRef)
                 .dataFetcher { env ->
-                    val config: GitHubEngineConfiguration = env.getSource()
+                    val config: GitHubEngineConfiguration = env.getSource()!!
                     val client = gitHubClientFactory.create(config)
                     client.getRateLimit()
                 }
@@ -63,7 +63,7 @@ class GQLTypeGitHubEngineConfiguration(
                 .description("Authentication type")
                 .type(GraphQLString)
                 .dataFetcher { env ->
-                    val config: GitHubEngineConfiguration = env.getSource()
+                    val config: GitHubEngineConfiguration = env.getSource()!!
                     config.authenticationType.name
                 }
         }
@@ -72,7 +72,7 @@ class GQLTypeGitHubEngineConfiguration(
                 .description("GitHub App token information")
                 .type(gqlTypeGitHubAppToken.typeRef)
                 .dataFetcher { env ->
-                    val config: GitHubEngineConfiguration = env.getSource()
+                    val config: GitHubEngineConfiguration = env.getSource()!!
                     if (config.authenticationType == GitHubAuthenticationType.APP) {
                         gitHubAppTokenService.getAppInstallationTokenInformation(config)
                     } else {
