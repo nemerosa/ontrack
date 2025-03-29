@@ -38,6 +38,7 @@ subprojects {
             dependency("org.jsoup:jsoup:1.19.1")
             dependency("org.apache.commons:commons-math3:3.6.1")
             dependency("org.apache.commons:commons-text:1.13.0")
+            dependency("org.jgrapht:jgrapht-core:1.5.2")
 
             // Git repository support TODO Will be removed in V5
             dependency("org.eclipse.jgit:org.eclipse.jgit:6.6.1.202309021850-r")
@@ -82,6 +83,8 @@ configure(javaProjects) {
         implementation(kotlin("stdlib"))
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
         implementation("jakarta.validation:jakarta.validation-api")
+
+        runtimeOnly("org.hibernate.validator:hibernate-validator")
 
         testImplementation("org.springframework.boot:spring-boot-starter-test")
         testImplementation("org.jetbrains.kotlin:kotlin-test")

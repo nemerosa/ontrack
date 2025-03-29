@@ -1,21 +1,20 @@
 package net.nemerosa.ontrack.service.elasticsearch
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders.multiMatch
+import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.structure.*
-import org.elasticsearch.client.RequestOptions
-import org.elasticsearch.client.RestHighLevelClient
-import org.elasticsearch.index.query.MultiMatchQueryBuilder
-import org.elasticsearch.search.builder.SearchSourceBuilder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
-typealias ESSearchRequest = org.elasticsearch.action.search.SearchRequest
+typealias ESSearchRequestBuilder = co.elastic.clients.elasticsearch.core.SearchRequest.Builder
 
 @Service
 @Transactional
 class ElasticSearchServiceImpl(
-    private val client: RestHighLevelClient,
+    private val client: ElasticsearchClient,
     private val searchIndexers: List<SearchIndexer<*>>,
     private val searchIndexService: SearchIndexService
 ) : SearchService {
@@ -50,35 +49,39 @@ class ElasticSearchServiceImpl(
         offset: Int,
         size: Int,
     ): SearchNodeResults {
-        val esRequest = ESSearchRequest().source(
-            SearchSourceBuilder().query(
-                MultiMatchQueryBuilder(token).type(MultiMatchQueryBuilder.Type.BEST_FIELDS)
-            ).from(
-                offset
-            ).size(
-                size
-            )
-        ).run {
-            indexName?.let {
-                indices(indexName)
-            } ?: this
-        }
+
+        val searchRequest = ESSearchRequestBuilder().apply {
+            if (indexName != null) {
+                index(indexName)
+            }
+            from(offset)
+            size(size)
+            multiMatch()
+                .query(token)
+                .type(TextQueryType.BestFields)
+        }.build()
 
         // Getting the result of the search
-        val response = client.search(esRequest, RequestOptions.DEFAULT)
+        val response = client.search(searchRequest, Map::class.java)
 
         // Pagination information
-        val responseHits = response.hits
-        val totalHits = responseHits.totalHits?.value ?: 0
+        val responseHits = response.hits()
+        val totalHits = responseHits.total()?.value() ?: 0
 
         // Hits as JSON nodes
-        val hits = responseHits.hits.map {
-            SearchResultNode(
-                it.index,
-                it.id,
-                it.score.toDouble(),
-                it.sourceAsMap
-            )
+        @Suppress("UNCHECKED_CAST")
+        val hits = responseHits.hits().mapNotNull { hit ->
+            val id = hit.id()
+            if (id != null) {
+                SearchResultNode(
+                    index = hit.index(),
+                    id = id,
+                    score = hit.score() ?: 0.0,
+                    source = hit.source() as Map<String, Any?>
+                )
+            } else {
+                null
+            }
         }
 
         // Transforming into search results

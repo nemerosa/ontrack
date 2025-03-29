@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.security.AuthenticationSourceProvider
 import net.nemerosa.ontrack.model.security.AuthenticationSourceRepository
 import org.springframework.stereotype.Service
 
+@Deprecated("To remove")
 @Service
 class AuthenticationSourceRepositoryImpl(/* providers: Collection<AuthenticationSourceProvider> */) : AuthenticationSourceRepository {
 

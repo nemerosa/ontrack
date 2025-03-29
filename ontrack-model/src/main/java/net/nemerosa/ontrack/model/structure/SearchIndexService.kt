@@ -1,8 +1,5 @@
 package net.nemerosa.ontrack.model.structure
 
-import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.model.search.SearchQuery
-
 /**
  * This service is used to manage the search indexes when they are available.
  */
@@ -26,8 +23,6 @@ interface SearchIndexService {
     fun <T : SearchItem> deleteSearchIndex(indexer: SearchIndexer<T>, id: String)
 
     fun <T : SearchItem> batchSearchIndex(indexer: SearchIndexer<T>, items: Collection<T>, mode: BatchIndexMode): BatchIndexResults
-
-    fun <T : SearchItem> query(indexer: SearchIndexer<T>, size: Int, query: SearchQuery, handler: (source: JsonNode) -> Unit)
 
 }
 

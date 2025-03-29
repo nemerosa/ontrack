@@ -105,7 +105,7 @@ class PropertyServiceImpl(
         // If existing, deletes it
         return if (value != null) {
             val ack = propertyRepository.deleteProperty(propertyType.javaClass.name, entity.projectEntityType, entity.id)
-            if (ack.isSuccess) {
+            if (ack.success) {
                 // Property deletion event
                 eventPostService.post(eventFactory.propertyDelete(entity, propertyType))
                 // Listener

@@ -24,9 +24,9 @@ dependencies {
     runtimeOnly("org.hibernate.validator:hibernate-validator")
 
     testImplementation(project(":ontrack-it-utils"))
-    testImplementation(project(path = ":ontrack-common", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-model", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
+    // TODO testImplementation(project(path = ":ontrack-common", configuration = "tests"))
+    // TODO testImplementation(project(path = ":ontrack-model", configuration = "tests"))
+    // TODO testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
 
     testRuntimeOnly(project(":ontrack-repository-impl"))
     testRuntimeOnly("io.micrometer:micrometer-registry-prometheus")
