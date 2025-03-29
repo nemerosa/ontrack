@@ -2,13 +2,13 @@ package net.nemerosa.ontrack.client;
 
 import net.nemerosa.ontrack.common.Document;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.*;
-import org.apache.http.client.methods.*;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.*;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 
 import java.io.IOException;
 import java.net.URL;
@@ -118,7 +118,7 @@ public class OTHttpClientImpl implements OTHttpClient {
                 }
                 // OK
                 return new Document(
-                        entity.getContentType().getValue(),
+                        entity.getContentType(),
                         bytes
                 );
             });
@@ -126,13 +126,18 @@ public class OTHttpClientImpl implements OTHttpClient {
     }
 
     @Override
-    public <T> T request(HttpRequestBase request, final ResponseParser<T> responseParser) {
+    public <T> T request(HttpUriRequestBase request, final ResponseParser<T> responseParser) {
         return request(
                 request,
                 (request1, response, entity) -> baseHandleResponse(request1, response, entity,
                         entity1 -> {
                             // Gets the content as a string
-                            String content = entity1 != null ? EntityUtils.toString(entity1, "UTF-8") : null;
+                            String content;
+                            try {
+                                content = entity1 != null ? EntityUtils.toString(entity1, "UTF-8") : null;
+                            } catch (ParseException e) {
+                                throw new RuntimeException(e);
+                            }
                             // Parses the response
                             return responseParser.parse(content);
                         })
@@ -154,17 +159,19 @@ public class OTHttpClientImpl implements OTHttpClient {
         return httpContext;
     }
 
-    protected <T> T request(HttpRequestBase request, ResponseHandler<T> responseHandler) {
+    protected <T> T request(HttpUriRequestBase request, ResponseHandler<T> responseHandler) {
         clientLogger.trace("[request] " + request);
         // Executes the call
         try {
             try (CloseableHttpClient http = httpClientSupplier.get()) {
-                HttpResponse response = http.execute(host, request, httpContext);
+                CloseableHttpResponse response = http.execute(host, request, httpContext);
                 clientLogger.trace("[response] " + response);
                 // Entity response
                 HttpEntity entity = response.getEntity();
                 try {
                     return responseHandler.handleResponse(request, response, entity);
+                } catch (ParseException e) {
+                    throw new ClientGeneralException(request, e);
                 } finally {
                     EntityUtils.consume(entity);
                 }
@@ -172,12 +179,12 @@ public class OTHttpClientImpl implements OTHttpClient {
         } catch (IOException e) {
             throw new ClientGeneralException(request, e);
         } finally {
-            request.releaseConnection();
+            request.cancel();
         }
     }
 
-    protected <T> T handleErrorCode(HttpRequestBase request, HttpResponse response, Supplier<T> supplier) throws IOException {
-        int statusCode = response.getStatusLine().getStatusCode();
+    protected <T> T handleErrorCode(HttpUriRequestBase request, HttpResponse response, Supplier<T> supplier) throws IOException {
+        int statusCode = response.getCode();
         if (statusCode == HttpStatus.SC_OK ||
                 statusCode == HttpStatus.SC_CREATED ||
                 statusCode == HttpStatus.SC_ACCEPTED) {
@@ -201,18 +208,18 @@ public class OTHttpClientImpl implements OTHttpClient {
                 throw new ClientServerException(
                         request,
                         statusCode,
-                        response.getStatusLine().getReasonPhrase());
+                        response.getReasonPhrase());
             }
         } else {
             // Generic error
             throw new ClientServerException(
                     request,
                     statusCode,
-                    response.getStatusLine().getReasonPhrase());
+                    response.getReasonPhrase());
         }
     }
 
-    protected <T> T baseHandleResponse(HttpRequestBase request, HttpResponse response, HttpEntity entity,
+    protected <T> T baseHandleResponse(HttpUriRequestBase request, HttpResponse response, HttpEntity entity,
                                        EntityParser<T> entityParser) throws ParseException, IOException {
         return handleErrorCode(request, response, () -> {
             try {
@@ -224,7 +231,15 @@ public class OTHttpClientImpl implements OTHttpClient {
     }
 
     private static String getMessage(HttpResponse response) throws IOException {
-        return EntityUtils.toString(response.getEntity(), "UTF-8");
+        if (response instanceof CloseableHttpResponse) {
+            try {
+                return EntityUtils.toString(((CloseableHttpResponse) response).getEntity(), "UTF-8");
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            throw new RuntimeException("Response is not a CloseableHttpResponse");
+        }
     }
 
     @FunctionalInterface
@@ -237,7 +252,7 @@ public class OTHttpClientImpl implements OTHttpClient {
     @FunctionalInterface
     protected static interface ResponseHandler<T> {
 
-        T handleResponse(HttpRequestBase request, HttpResponse response, HttpEntity entity) throws ParseException, IOException;
+        T handleResponse(HttpUriRequestBase request, HttpResponse response, HttpEntity entity) throws ParseException, IOException;
 
     }
 }

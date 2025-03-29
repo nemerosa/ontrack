@@ -1,14 +1,18 @@
 package net.nemerosa.ontrack.client;
 
 import net.nemerosa.ontrack.common.Document;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpHost;
 
 import java.net.URL;
 
+/**
+ * @deprecated Will be removed in V5. Use the Spring REST Template.
+ */
+@Deprecated
 public interface OTHttpClient {
 
     URL getUrl();
@@ -37,7 +41,7 @@ public interface OTHttpClient {
      */
     Document download(String path, Object... parameters);
 
-    <T> T request(HttpRequestBase request, final ResponseParser<T> responseParser);
+    <T> T request(HttpUriRequestBase request, final ResponseParser<T> responseParser);
 
     /**
      * Underlying HTTP client

@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.common.Document;
-import org.apache.http.HttpEntity;
+import org.apache.hc.core5.http.HttpEntity;
 
 /**
  * @deprecated Will be removed in V5. Use the Spring Rest Template instead.

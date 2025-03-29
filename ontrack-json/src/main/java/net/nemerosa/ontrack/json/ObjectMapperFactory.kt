@@ -19,6 +19,7 @@ object ObjectMapperFactory {
         "ontrack-json"
     )
 
+    @JvmStatic
     fun create(): ObjectMapper {
         val mapper = ObjectMapper()
         // Support for JDK 8 times

@@ -1,22 +1,27 @@
 package net.nemerosa.ontrack.client;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.AuthCache;
-import org.apache.http.client.CookieStore;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.config.Registry;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.*;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.auth.AuthCache;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.cookie.BasicCookieStore;
+import org.apache.hc.client5.http.cookie.CookieStore;
+import org.apache.hc.client5.http.impl.auth.BasicAuthCache;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.client5.http.impl.auth.BasicScheme;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
+import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.http.config.Registry;
+import org.apache.hc.core5.http.config.RegistryBuilder;
+import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +38,10 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.function.Supplier;
 
+/**
+ * @deprecated Will be removed in V5. Use the Spring REST Template instead.
+ */
+@Deprecated
 public class OTHttpClientBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(OTHttpClient.class);
@@ -57,9 +66,9 @@ public class OTHttpClientBuilder {
             throw new ClientURLException(url, e);
         }
         this.host = new HttpHost(
+                this.url.getProtocol(),
                 this.url.getHost(),
-                this.url.getPort(),
-                this.url.getProtocol()
+                this.url.getPort()
         );
     }
 
@@ -87,10 +96,10 @@ public class OTHttpClientBuilder {
         // Basic authentication
         if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
 
-            CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+            BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
             credentialsProvider.setCredentials(
                     new AuthScope(host),
-                    new UsernamePasswordCredentials(username, password)
+                    new UsernamePasswordCredentials(username, password.toCharArray())
             );
 
             AuthCache authCache = new BasicAuthCache();
@@ -131,7 +140,7 @@ public class OTHttpClientBuilder {
 
             sslSocketFactory = new SSLConnectionSocketFactory(
                     ctx,
-                    SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER
+                    NoopHostnameVerifier.INSTANCE
             );
         } else {
             sslSocketFactory = SSLConnectionSocketFactory.getSocketFactory();
@@ -144,9 +153,9 @@ public class OTHttpClientBuilder {
 
         // Timeout settings
         RequestConfig.Builder requestConfig = RequestConfig.custom();
-        requestConfig.setConnectTimeout(timeoutSeconds * 1000);
-        requestConfig.setConnectionRequestTimeout(timeoutSeconds * 1000);
-        requestConfig.setSocketTimeout(timeoutSeconds * 1000);
+        requestConfig.setConnectTimeout(Timeout.ofSeconds(timeoutSeconds));
+        requestConfig.setConnectionRequestTimeout(Timeout.ofSeconds(timeoutSeconds));
+        requestConfig.setResponseTimeout(Timeout.ofSeconds(timeoutSeconds));
 
         Supplier<CloseableHttpClient> httpClientSupplier = () -> {
             // Defaults
