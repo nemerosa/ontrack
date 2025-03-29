@@ -21,7 +21,7 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 import java.util.*
 import java.util.stream.Collectors
 import javax.servlet.http.HttpServletResponse
-import javax.validation.Valid
+import jakarta.validation.Valid
 
 @RestController
 @RequestMapping("/rest/structure")

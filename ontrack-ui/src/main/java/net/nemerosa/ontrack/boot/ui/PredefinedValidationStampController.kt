@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
 import java.util.*
 import java.util.stream.Collectors
-import javax.validation.Valid
+import jakarta.validation.Valid
 
 /**
  * Access to the list of predefined validation stamps.

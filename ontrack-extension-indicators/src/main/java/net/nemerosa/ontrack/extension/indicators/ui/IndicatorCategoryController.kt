@@ -16,7 +16,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 import javax.servlet.http.HttpServletResponse
-import javax.validation.Valid
+import jakarta.validation.Valid
 
 /**
  * Controller for the management of categories.

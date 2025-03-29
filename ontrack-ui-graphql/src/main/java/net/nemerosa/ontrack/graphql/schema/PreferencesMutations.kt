@@ -6,7 +6,7 @@ import net.nemerosa.ontrack.model.preferences.Preferences
 import net.nemerosa.ontrack.model.preferences.PreferencesService
 import net.nemerosa.ontrack.model.security.SecurityService
 import org.springframework.stereotype.Component
-import javax.validation.Validator
+import jakarta.validation.Validator
 
 /**
  * Settings the current's user preferences.

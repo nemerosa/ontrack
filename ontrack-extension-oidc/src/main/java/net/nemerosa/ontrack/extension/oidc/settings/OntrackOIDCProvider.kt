@@ -2,8 +2,8 @@ package net.nemerosa.ontrack.extension.oidc.settings
 
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APIOptional
-import javax.validation.constraints.NotNull
-import javax.validation.constraints.Pattern
+import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Pattern
 
 /**
  * Definition of an OIDC provider so that it's useable by Ontrack.

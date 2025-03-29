@@ -8,7 +8,7 @@ import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.labels.*
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import org.springframework.web.bind.annotation.*
-import javax.validation.Valid
+import jakarta.validation.Valid
 
 @RestController
 @RequestMapping("/rest/labels")

@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.indicators.model
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.exceptions.InputException
 import net.nemerosa.ontrack.model.exceptions.NotFoundException
-import javax.validation.constraints.Pattern
+import jakarta.validation.constraints.Pattern
 
 interface IndicatorCategoryService {
 

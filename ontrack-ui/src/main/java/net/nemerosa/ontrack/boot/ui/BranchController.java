@@ -18,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.*;
 import java.util.stream.Collectors;
 

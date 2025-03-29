@@ -11,7 +11,7 @@ import net.nemerosa.ontrack.ui.resource.Link
 import net.nemerosa.ontrack.ui.resource.Resources
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
-import javax.validation.Valid
+import jakarta.validation.Valid
 
 /**
  * Management of accounts

@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.graphql.schema;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLTypeReference;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 public interface GQLType {
 

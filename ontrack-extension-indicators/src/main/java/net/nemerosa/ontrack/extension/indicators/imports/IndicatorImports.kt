@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.indicators.imports
 
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorConstants
-import javax.validation.constraints.Pattern
+import jakarta.validation.constraints.Pattern
 
 /**
  * Structure which defines categories & type to import.

@@ -7,8 +7,8 @@ import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Text
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import javax.validation.Valid
-import javax.validation.constraints.Pattern
+import jakarta.validation.Valid
+import jakarta.validation.constraints.Pattern
 
 @RestController
 @RequestMapping("/extension/indicators/portfolios")

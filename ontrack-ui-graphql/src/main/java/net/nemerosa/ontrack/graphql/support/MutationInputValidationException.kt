@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.graphql.support
 
 import net.nemerosa.ontrack.graphql.schema.UserError
 import net.nemerosa.ontrack.model.exceptions.InputException
-import javax.validation.ConstraintViolation
+import jakarta.validation.ConstraintViolation
 
 class MutationInputValidationException(
         val violations: Set<ConstraintViolation<*>>

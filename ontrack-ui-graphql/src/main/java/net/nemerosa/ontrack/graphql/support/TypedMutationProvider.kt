@@ -8,9 +8,9 @@ import net.nemerosa.ontrack.graphql.schema.Mutation
 import net.nemerosa.ontrack.graphql.schema.MutationProvider
 import net.nemerosa.ontrack.graphql.support.GraphQLBeanConverter.asInputFields
 import org.springframework.beans.factory.annotation.Autowired
-import javax.validation.ConstraintViolation
-import javax.validation.Validation
-import javax.validation.Validator
+import jakarta.validation.ConstraintViolation
+import jakarta.validation.Validation
+import jakarta.validation.Validator
 import kotlin.reflect.KClass
 
 abstract class TypedMutationProvider protected constructor(
