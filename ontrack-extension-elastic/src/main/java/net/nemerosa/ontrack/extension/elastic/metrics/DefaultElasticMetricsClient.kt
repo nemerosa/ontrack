@@ -277,13 +277,15 @@ class DefaultElasticMetricsClient(
         val totalHits = responseHits.total()?.value() ?: 0
 
         // Hits as JSON nodes
-        val hits = responseHits.hits().map {
-            SearchResultNode(
-                    it.index(),
-                    it.id(),
-                    it.score() ?: 0.0,
-                    it.source()?.toJsonMap() ?: emptyMap(),
-            )
+        val hits = responseHits.hits().mapNotNull { hit ->
+            hit.id()?.let {
+                SearchResultNode(
+                    hit.index(),
+                    it,
+                    hit.score() ?: 0.0,
+                    hit.source()?.toJsonMap() ?: emptyMap(),
+                )
+            }
         }
 
         // Transforming into search results
