@@ -13,6 +13,7 @@ dependencies {
     implementation("io.micrometer:micrometer-core")
     implementation("org.slf4j:slf4j-api")
     implementation("org.apache.commons:commons-lang3")
+    implementation("commons-codec:commons-codec")
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation(project(":ontrack-ui-graphql"))
     implementation(project(":ontrack-extension-casc"))
