@@ -1,40 +1,21 @@
-package net.nemerosa.ontrack.json;
+package net.nemerosa.ontrack.json
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Test;
+import net.nemerosa.ontrack.json.ObjectMapperFactory.create
+import org.hamcrest.CoreMatchers
+import org.hamcrest.MatcherAssert
+import org.junit.jupiter.api.Test
 
-import java.io.IOException;
+class ConstructorPropertiesAnnotationIntrospectorTest {
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
+    private data class ImmutablePojo(val name: String, val value: Int)
 
-public class ConstructorPropertiesAnnotationIntrospectorTest {
-
-    private static class ImmutablePojo {
-        private final String name;
-        private final int value;
-
-        private ImmutablePojo(String name, int value) {
-            this.name = name;
-            this.value = value;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public int getValue() {
-            return value;
-        }
-    }
-
-    private final ImmutablePojo instance = new ImmutablePojo("foobar", 42);
+    private val instance = ImmutablePojo("foobar", 42)
 
     @Test
-    public void testJacksonAbleToDeserialize() throws IOException {
-        ObjectMapper mapper = ObjectMapperFactory.create();
-        String json = mapper.writeValueAsString(instance);
-        ImmutablePojo output = mapper.readValue(json, ImmutablePojo.class);
-        assertThat(output, equalTo(instance));
+    fun testJacksonAbleToDeserialize() {
+        val mapper = create()
+        val json = mapper.writeValueAsString(instance)
+        val output = mapper.readValue(json, ImmutablePojo::class.java)
+        MatcherAssert.assertThat(output, CoreMatchers.equalTo(instance))
     }
 }
