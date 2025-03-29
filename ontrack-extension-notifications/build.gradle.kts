@@ -18,6 +18,7 @@ dependencies {
     implementation(project(":ontrack-extension-recordings"))
     implementation("org.springframework:spring-context")
     implementation("org.apache.commons:commons-lang3")
+    implementation("commons-codec:commons-codec")
     implementation("org.slf4j:slf4j-api")
     implementation("io.micrometer:micrometer-core")
     implementation("jakarta.annotation:jakarta.annotation-api")
