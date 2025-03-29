@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.graphql.schema
 
 import graphql.Scalars
 import graphql.schema.GraphQLFieldDefinition
-import graphql.schema.GraphQLTypeReference
 import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.extension.api.ProjectEntityUserMenuItemExtension
 import net.nemerosa.ontrack.graphql.support.descriptionField
@@ -61,7 +60,7 @@ abstract class AbstractGQLProjectEntity<T : ProjectEntity>(
             .description("List of actions available for this entity")
             .type(listType(GQLTypeUserMenuAction.TYPE))
             .dataFetcher { env ->
-                val entity: T = env.getSource()
+                val entity: T = env.getSource()!!
                 projectEntityUserMenuItemExtensions.flatMap { extension ->
                     extension.getItems(entity)
                 }
@@ -74,7 +73,7 @@ abstract class AbstractGQLProjectEntity<T : ProjectEntity>(
             .type(Scalars.GraphQLString)
             .description("Description with links.")
             .dataFetcher { env ->
-                val entity: T = env.getSource()
+                val entity: T = env.getSource()!!
                 val description: String? = entity.description
                 if (description.isNullOrBlank()) {
                     ""
@@ -90,7 +89,7 @@ abstract class AbstractGQLProjectEntity<T : ProjectEntity>(
             .name("creation")
             .type(creation.typeRef)
             .dataFetcher { env ->
-                val entity: T = env.getSource()
+                val entity: T = env.getSource()!!
                 val signature = getSignature(entity)
                 signature?.let {
                     GQLTypeCreation.getCreationFromSignature(it)
