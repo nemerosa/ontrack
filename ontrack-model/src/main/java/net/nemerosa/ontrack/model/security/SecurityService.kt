@@ -68,11 +68,6 @@ interface SecurityService {
 
     fun <T> asAdmin(supplier: () -> T): T
 
-    // For Java compatibility
-    fun asAdmin(code: Runnable): Unit = asAdmin {
-        code.run()
-    }
-
 
     /**
      * In some asynchronous operations, we need to run a task with the same credentials that initiated the operation.

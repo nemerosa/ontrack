@@ -7,13 +7,13 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties
-import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientPropertiesRegistrationAdapter
 import org.springframework.security.oauth2.client.registration.ClientRegistration
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.stereotype.Component
 import java.util.concurrent.ConcurrentHashMap
 
 @Component
+@Deprecated("To be replaced by the external authentication")
 final class OntrackClientRegistrationRepository(
         private val oidcSettingsService: OIDCSettingsService,
         private val securityService: SecurityService
@@ -33,7 +33,7 @@ final class OntrackClientRegistrationRepository(
             val map = securityService.asAdmin {
                 toRegistrations(oidcSettingsService.cachedProviders)
             }
-            logger.debug("Loading OIDC registrations from OIDC settings: ${map.keys}")
+            logger.debug("Loading OIDC registrations from OIDC settings: {}", map.keys)
             map
         }
 
@@ -62,7 +62,8 @@ final class OntrackClientRegistrationRepository(
                 }
             }
         }
-        return OAuth2ClientPropertiesRegistrationAdapter.getClientRegistrations(properties)
+        TODO("Not used any longer")
+        // return OAuth2ClientPropertiesRegistrationAdapter.getClientRegistrations(properties)
     }
 
     override fun findByRegistrationId(registrationId: String): ClientRegistration? {
