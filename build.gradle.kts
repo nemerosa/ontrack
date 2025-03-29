@@ -37,6 +37,7 @@ subprojects {
             dependency("commons-io:commons-io:2.18.0")
             dependency("org.jsoup:jsoup:1.19.1")
             dependency("org.apache.commons:commons-math3:3.6.1")
+            dependency("org.apache.commons:commons-text:1.13.0")
         }
     }
 
@@ -77,6 +78,7 @@ configure(javaProjects) {
     dependencies {
         implementation(kotlin("stdlib"))
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
+        implementation("jakarta.validation:jakarta.validation-api")
 
         testImplementation("org.springframework.boot:spring-boot-starter-test")
         testImplementation("org.jetbrains.kotlin:kotlin-test")
@@ -87,6 +89,12 @@ configure(javaProjects) {
         testImplementation("io.mockk:mockk:${mockkVersion}")
         testImplementation("io.mockk:mockk-dsl:${mockkVersion}")
         testImplementation("io.mockk:mockk-dsl-jvm:${mockkVersion}")
+
+        // Lombok
+        compileOnly("org.projectlombok:lombok:1.18.26") // TODO V5 Remove dependency on Lombok
+        annotationProcessor("org.projectlombok:lombok:1.18.26") // TODO V5 Remove dependency on Lombok
+        testCompileOnly("org.projectlombok:lombok:1.18.26") // TODO V5 Remove dependency on Lombok
+        testAnnotationProcessor("org.projectlombok:lombok:1.18.26") // TODO V5 Remove dependency on Lombok
     }
 
 }

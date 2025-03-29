@@ -3,7 +3,7 @@ rootProject.name = "ontrack"
 include(":ontrack-common")
 include(":ontrack-json")
 include(":ontrack-test-utils")
-// TODO include(":ontrack-model")
+include(":ontrack-model")
 include(":ontrack-client")
 include(":ontrack-job")
 // TODO include(":ontrack-git")

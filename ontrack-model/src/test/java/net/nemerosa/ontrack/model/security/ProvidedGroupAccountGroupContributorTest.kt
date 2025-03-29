@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.model.security
 
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import io.mockk.every
+import io.mockk.mockk
 import net.nemerosa.ontrack.model.structure.ID
 import org.junit.Before
 import org.junit.Test
@@ -15,58 +15,61 @@ class ProvidedGroupAccountGroupContributorTest {
     private lateinit var contributor: ProvidedGroupAccountGroupContributor
 
     private val adminGroup = AccountGroup(
-            ID.of(1), "Administrators", ""
+        ID.of(1), "Administrators", ""
     )
     private val readOnlyGroup = AccountGroup(
-            ID.of(2), "Read-Only", ""
+        ID.of(2), "Read-Only", ""
     )
     private val participantGroup = AccountGroup(
-            ID.of(3), "Participant", ""
+        ID.of(3), "Participant", ""
     )
 
     @Before
     fun prepare() {
-        providedGroupsService = mock()
-        accountGroupMappingService = mock()
+        providedGroupsService = mockk()
+        accountGroupMappingService = mockk()
         contributor = ProvidedGroupAccountGroupContributor(providedGroupsService, accountGroupMappingService)
     }
 
     @Test
     fun `Getting the groups`() {
         val authenticationSource = AuthenticationSource(
-                provider = "test",
-                key = "",
-                name = "Testing",
-                isEnabled = true,
-                isGroupMappingSupported = true,
-                isAllowingPasswordChange = false
+            provider = "test",
+            key = "",
+            name = "Testing",
+            isEnabled = true,
+            isGroupMappingSupported = true,
+            isAllowingPasswordChange = false
         )
         val account = createAccount(authenticationSource)
-        whenever(providedGroupsService.getProvidedGroups(1, authenticationSource)).thenReturn(setOf("org-admins", "org-users"))
-        whenever(accountGroupMappingService.getGroups(authenticationSource, "org-admins")).thenReturn(
-                setOf(adminGroup)
+        every { providedGroupsService.getProvidedGroups(1, authenticationSource) } returns setOf(
+            "org-admins",
+            "org-users"
         )
-        whenever(accountGroupMappingService.getGroups(authenticationSource, "org-users")).thenReturn(
-                setOf(readOnlyGroup, participantGroup)
-        )
+        every {
+            accountGroupMappingService.getGroups(authenticationSource, "org-admins")
+        } returns setOf(adminGroup)
+        every {
+            accountGroupMappingService.getGroups(authenticationSource, "org-users")
+        } returns setOf(readOnlyGroup, participantGroup)
 
         val groups = contributor.collectGroups(account)
 
         assertEquals(
-                setOf(adminGroup, readOnlyGroup, participantGroup),
-                groups.toSet()
+            setOf(adminGroup, readOnlyGroup, participantGroup),
+            groups.toSet()
         )
     }
 
     @Test
     fun `Getting the groups when not enabled`() {
         val authenticationSource = AuthenticationSource(
-                provider = "test",
-                key = "",
-                name = "Testing",
-                isEnabled = false,
-                isGroupMappingSupported = true,
-                isAllowingPasswordChange = false
+            provider = "test",
+            key = "",
+            name = "Testing",
+            isEnabled = false,
+            isGroupMappingSupported = true,
+            isAllowingPasswordChange = false
         )
         val account = createAccount(authenticationSource)
         val groups = contributor.collectGroups(account)
@@ -76,12 +79,12 @@ class ProvidedGroupAccountGroupContributorTest {
     @Test
     fun `Getting the groups when mapping not supported`() {
         val authenticationSource = AuthenticationSource(
-                provider = "test",
-                key = "",
-                name = "Testing",
-                isEnabled = true,
-                isGroupMappingSupported = false,
-                isAllowingPasswordChange = false
+            provider = "test",
+            key = "",
+            name = "Testing",
+            isEnabled = true,
+            isGroupMappingSupported = false,
+            isAllowingPasswordChange = false
         )
         val account = createAccount(authenticationSource)
         val groups = contributor.collectGroups(account)
@@ -90,9 +93,9 @@ class ProvidedGroupAccountGroupContributorTest {
 
     private fun createAccount(authenticationSource: AuthenticationSource): Account {
         return Account(
-                ID.of(1), "user", "User", "user@test.com", authenticationSource, SecurityRole.USER,
-                disabled = false,
-                locked = false,
+            ID.of(1), "user", "User", "user@test.com", authenticationSource, SecurityRole.USER,
+            disabled = false,
+            locked = false,
         )
     }
 
