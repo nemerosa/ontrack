@@ -29,7 +29,6 @@ include(":ontrack-ui-support")
 include(":ontrack-web")
 include(":ontrack-web-core")
 include(":ontrack-web-tests")
-include(":ontrack-acceptance")
 include(":ontrack-docs")
 
 // KDSL

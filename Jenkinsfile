@@ -23,11 +23,6 @@ pipeline {
                 description: 'Skipping legacy acceptance tests'
         )
         booleanParam(
-                name: 'SKIP_LEGACY_ACCEPTANCE',
-                defaultValue: false,
-                description: 'Skipping legacy acceptance tests'
-        )
-        booleanParam(
                 name: 'SKIP_BITBUCKET_CLOUD_IT',
                 defaultValue: false,
                 description: 'Skipping integration tests for Bitbucket Cloud'
@@ -82,7 +77,6 @@ pipeline {
                             validations: [
                                 'BUILD',
                                 'KDSL.ACCEPTANCE',
-                                'ACCEPTANCE',
                             ],
                         ],
                         RELEASE: [
@@ -340,40 +334,6 @@ pipeline {
                     }
                     archiveArtifacts(artifacts: "ontrack-kdsl-acceptance/build/logs-ui/**", allowEmptyArchive: true)
                     archiveArtifacts(artifacts: "ontrack-web-tests/reports/html/**", allowEmptyArchive: true)
-                }
-            }
-        }
-
-        stage('Local acceptance tests') {
-            when {
-                not {
-                    branch 'master'
-                }
-                expression {
-                    return !params.SKIP_LEGACY_ACCEPTANCE && !params.JUST_BUILD_AND_PUSH
-                }
-            }
-            steps {
-                timeout(time: 30, unit: 'MINUTES') {
-                    sh '''
-                        ./gradlew \\
-                            -Dorg.gradle.jvmargs=-Xmx3072m \\
-                            --stacktrace \\
-                            --console plain \\
-                            --parallel \\
-                            :ontrack-acceptance:acceptanceTest
-                        '''
-                }
-            }
-            post {
-                always {
-                    ontrackCliValidateTests(
-                            stamp: 'ACCEPTANCE',
-                            pattern: 'ontrack-acceptance/build/test-results/**/*.xml',
-                    )
-                }
-                failure {
-                    archiveArtifacts(artifacts: "ontrack-acceptance/build/logs/**", allowEmptyArchive: true)
                 }
             }
         }

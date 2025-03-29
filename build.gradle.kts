@@ -4,7 +4,6 @@ import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
 import net.nemerosa.ontrack.gradle.OntrackChangeLog
 import net.nemerosa.ontrack.gradle.OntrackLastReleases
-import net.nemerosa.ontrack.gradle.RemoteAcceptanceTest
 import net.nemerosa.versioning.VersioningExtension
 import net.nemerosa.versioning.VersioningPlugin
 import org.ajoberstar.gradle.git.publish.GitPublishExtension
@@ -117,13 +116,9 @@ val javaProjects = subprojects.filter {
             it.path != ":ontrack-web-core"
 }
 
-val exportedProjects = javaProjects.filter {
-    it.path != ":ontrack-acceptance"
-}
+val exportedProjects = javaProjects
 
-val coreProjects = javaProjects.filter {
-    it.path != ":ontrack-dsl-v4"
-}
+val coreProjects = javaProjects
 
 configure(javaProjects) p@{
 
@@ -415,7 +410,7 @@ val dockerBuild by tasks.registering(DockerBuildImage::class) {
 }
 
 /**
- * Acceptance tasks running from the JAR
+ * Launching Ontrack
  */
 
 dockerCompose {
@@ -435,37 +430,7 @@ tasks.named<ComposeUp>("localComposeUp") {
         val port = servicesInfos["ontrack"]?.firstContainer?.tcpPort!!
         val url = "http://$host:$port"
         val ontrackUrl: String by rootProject.extra(url)
-        logger.info("Pre acceptance test Ontrack URL = $ontrackUrl")
     }
-}
-
-tasks.register("localAcceptanceTest", RemoteAcceptanceTest::class) {
-    acceptanceUrlFn = {
-        rootProject.extra["ontrackUrl"] as String
-    }
-    disableSsl = true
-    acceptanceTimeout = 300
-    acceptanceImplicitWait = 30
-    dependsOn("localComposeUp")
-    dependsOn(":ontrack-acceptance:assemble")
-    finalizedBy("localComposeDown")
-}
-
-/**
- * Acceptance tests running as Docker Compose
- */
-
-dockerCompose {
-    createNested("acceptance").apply {
-        useComposeFiles.set(listOf("ontrack-acceptance/src/main/compose/docker-compose.yml"))
-        setProjectName("acceptance")
-        tcpPortsToIgnoreWhenWaiting.set(listOf(8083, 8086))
-    }
-}
-
-tasks.named<ComposeUp>("acceptanceComposeUp") {
-    dependsOn(":ontrack-acceptance:dockerBuild")
-    dependsOn(":dockerBuild")
 }
 
 /**
@@ -569,14 +534,6 @@ val prepareGitHubRelease by tasks.registering(Copy::class) {
         include("ontrack-ui-${version}-app.jar")
         rename { "ontrack.jar" }
     }
-    from("ontrack-postgresql-migration/build/libs") {
-        include("ontrack-postgresql-migration-${version}.jar")
-        rename { "ontrack-postgresql-migration.jar" }
-    }
-    from("ontrack-dsl-shell/build/libs") {
-        include("ontrack-dsl-shell-${version}-executable.jar")
-        rename { "ontrack-dsl-shell.jar" }
-    }
     from("ontrack-ui/build") {
         include("graphql.json")
     }
@@ -602,8 +559,6 @@ githubRelease {
     overwrite(true)
     releaseAssets(
             "build/release/ontrack.jar",
-            "build/release/ontrack-dsl-shell.jar",
-            "build/release/ontrack-postgresql-migration.jar",
             "build/release/ontrack.pdf",
             "build/release/graphql.json"
     )
