@@ -18,7 +18,7 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation("org.jgrapht:jgrapht-core")
     implementation("com.github.ben-manes.caffeine:caffeine")
-    implementation("org.elasticsearch.client:elasticsearch-rest-high-level-client")
+    implementation("co.elastic.clients:elasticsearch-java")
     implementation("org.flywaydb:flyway-core")
 
     runtimeOnly("org.hibernate.validator:hibernate-validator")
