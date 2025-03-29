@@ -21,6 +21,7 @@ dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml") // TODO Remove when removing the Yaml class
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.apache.commons:commons-lang3")
+    implementation("commons-codec:commons-codec")
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation(project(":ontrack-extension-notifications"))
     implementation(project(":ontrack-extension-workflows"))
