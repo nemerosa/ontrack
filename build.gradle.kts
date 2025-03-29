@@ -257,6 +257,8 @@ configure(coreProjects) p@{
         annotation("net.nemerosa.ontrack.model.structure.OpenEntity")
     }
 
+    ext["spring-security.version"] = "5.8.16"
+
     configure<DependencyManagementExtension> {
         imports {
             mavenBom(SpringBootPlugin.BOM_COORDINATES) {
