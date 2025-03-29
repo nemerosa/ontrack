@@ -81,6 +81,9 @@ configure(javaProjects) {
         testImplementation("org.springframework.boot:spring-boot-starter-test")
         testImplementation("org.jetbrains.kotlin:kotlin-test")
         testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+        testImplementation("org.junit.vintage:junit-vintage-engine") {
+            exclude(group = "org.hamcrest", module = "hamcrest-core")
+        }
         testImplementation("io.mockk:mockk:${mockkVersion}")
         testImplementation("io.mockk:mockk-dsl:${mockkVersion}")
         testImplementation("io.mockk:mockk-dsl-jvm:${mockkVersion}")
