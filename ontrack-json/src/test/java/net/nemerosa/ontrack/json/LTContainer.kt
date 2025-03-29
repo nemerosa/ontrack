@@ -1,12 +1,7 @@
-package net.nemerosa.ontrack.json;
+package net.nemerosa.ontrack.json
 
-import lombok.Data;
+import java.time.LocalTime
 
-import java.time.LocalTime;
-
-@Data
-public class LTContainer {
-
-    private final LocalTime time;
-
-}
+data class LTContainer(
+    val time: LocalTime
+)

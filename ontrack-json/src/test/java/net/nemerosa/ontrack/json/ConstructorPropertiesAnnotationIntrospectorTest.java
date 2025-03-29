@@ -1,20 +1,31 @@
 package net.nemerosa.ontrack.json;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Data;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class ConstructorPropertiesAnnotationIntrospectorTest {
 
-    @Data
     private static class ImmutablePojo {
         private final String name;
         private final int value;
+
+        private ImmutablePojo(String name, int value) {
+            this.name = name;
+            this.value = value;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int getValue() {
+            return value;
+        }
     }
 
     private final ImmutablePojo instance = new ImmutablePojo("foobar", 42);
