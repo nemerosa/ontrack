@@ -23,7 +23,7 @@ class GQLTypeGitUICommit(
                     .description("Build associated with this commit")
                     .type(GraphQLTypeReference(GQLTypeBuild.BUILD))
                     .dataFetcher { env ->
-                        val gitUICommit: GitUICommit = env.getSource()
+                        val gitUICommit: GitUICommit = env.getSource()!!
                         recursiveChangeLogService.getBuildByCommit(gitUICommit.id)
                     }
             }

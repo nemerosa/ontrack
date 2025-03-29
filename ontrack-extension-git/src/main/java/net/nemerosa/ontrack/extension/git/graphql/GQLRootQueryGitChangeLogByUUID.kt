@@ -28,7 +28,7 @@ class GQLRootQueryGitChangeLogByUUID(
         .build()
 
     private fun gitChangeLogFetcher() = DataFetcher { environment ->
-        val uuid: String = environment.getArgument("uuid")
+        val uuid: String = environment.getArgument("uuid")!!
         gitChangeLogCache.getRequired(uuid)
     }
 }

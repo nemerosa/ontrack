@@ -19,7 +19,7 @@ class GQLRootQuerySlotWorkflowInstanceById(
                 stringArgument("id", "Slot workflow instance if", nullable = false),
             )
         ) { env ->
-            val id = env.getArgument<String>("id")
+            val id = env.getArgument<String>("id")!!
             slotWorkflowService.findSlotWorkflowInstanceById(id)
         }
 }

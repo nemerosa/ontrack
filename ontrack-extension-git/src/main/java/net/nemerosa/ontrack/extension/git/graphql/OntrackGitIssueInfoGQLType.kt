@@ -36,7 +36,7 @@ class OntrackGitIssueInfoGQLType(
                                 .description("JSON representation of the issue")
                                 .type(GQLScalarJSON.INSTANCE)
                                 .dataFetcher { environment ->
-                                    val gitIssueInfo = environment.getSource<OntrackGitIssueInfo>()
+                                    val gitIssueInfo = environment.getSource<OntrackGitIssueInfo>()!!
                                     gitIssueInfo.issue.toJson()
                                 }
                     }

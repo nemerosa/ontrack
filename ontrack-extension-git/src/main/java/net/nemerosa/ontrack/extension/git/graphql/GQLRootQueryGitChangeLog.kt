@@ -36,8 +36,8 @@ class GQLRootQueryGitChangeLog(
         .build()
 
     private fun gitChangeLogFetcher() = DataFetcher { environment ->
-        val from: Int = environment.getArgument("from")
-        val to: Int = environment.getArgument("to")
+        val from: Int = environment.getArgument("from")!!
+        val to: Int = environment.getArgument("to")!!
         gitService.changeLog(
             BuildDiffRequest(
                 of(from),

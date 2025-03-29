@@ -37,7 +37,7 @@ class GQLBuildSlotsFieldContributor(
                     .argument(stringArgument(ARG_ENVIRONMENT, "Name of the environment"))
                     .type(listType(Slot::class.toTypeRef()))
                     .dataFetcher { env ->
-                        val build: Build = env.getSource()
+                        val build: Build = env.getSource()!!
                         val qualifier: String? = env.getArgument(ARG_QUALIFIER)
                         val environment: String? = env.getArgument(ARG_ENVIRONMENT)
                         slotService.findSlotsByProject(

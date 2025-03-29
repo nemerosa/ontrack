@@ -49,9 +49,9 @@ class AutoVersioningGQLBuildFieldContributor(
 
                         // Local branch
                         val localBranch = if (projectEntityType == ProjectEntityType.BRANCH) {
-                            env.getSource<Branch>()
+                            env.getSource<Branch>()!!
                         } else {
-                            env.getSource<Build>().branch
+                            env.getSource<Build>()!!.branch
                         }
 
                         // Reference branch

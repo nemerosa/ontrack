@@ -32,7 +32,7 @@ class GQLTypeSlotWorkflowInstance(
                     .description("Status check for this workflow")
                     .type(SlotDeploymentCheck::class.toTypeRef().toNotNull())
                     .dataFetcher { env ->
-                        val slotWorkflowInstance: SlotWorkflowInstance = env.getSource()
+                        val slotWorkflowInstance: SlotWorkflowInstance = env.getSource()!!
                         slotWorkflowService.getSlotWorkflowCheck(
                             pipeline = slotWorkflowInstance.pipeline,
                             slotWorkflow = slotWorkflowInstance.slotWorkflow,

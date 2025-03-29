@@ -29,7 +29,7 @@ class GitChangeLogIssueGQLType(
                 .description("Issue representation as JSON")
                 .type(GQLScalarJSON.INSTANCE)
                 .dataFetcher { env ->
-                    val gitChangeLogIssue: GitChangeLogIssue = env.getSource()
+                    val gitChangeLogIssue: GitChangeLogIssue = env.getSource()!!
                     gitChangeLogIssue.issue.asJson()
                 }
         }

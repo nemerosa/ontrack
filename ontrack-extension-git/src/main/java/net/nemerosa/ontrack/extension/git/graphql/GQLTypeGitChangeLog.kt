@@ -52,7 +52,7 @@ class GQLTypeGitChangeLog(
                     .description("Project linked to the change log")
                     .type(GraphQLTypeReference(GQLTypeProject.PROJECT).toNotNull())
                     .dataFetcher { env ->
-                        env.getSource<GitChangeLog>().from.build.project
+                        env.getSource<GitChangeLog>()!!.from.build.project
                     }
             }
             // Sync error
@@ -63,7 +63,7 @@ class GQLTypeGitChangeLog(
                     .description("From build")
                     .type(GraphQLTypeReference(GQLTypeBuild.BUILD).toNotNull())
                     .dataFetcher { env ->
-                        env.getSource<GitChangeLog>().from.build
+                        env.getSource<GitChangeLog>()!!.from.build
                     }
             }
             .field {
@@ -71,7 +71,7 @@ class GQLTypeGitChangeLog(
                     .description("To build")
                     .type(GraphQLTypeReference(GQLTypeBuild.BUILD).toNotNull())
                     .dataFetcher { env ->
-                        env.getSource<GitChangeLog>().to.build
+                        env.getSource<GitChangeLog>()!!.to.build
                     }
             }
             // Link to a diff
@@ -80,7 +80,7 @@ class GQLTypeGitChangeLog(
                     .description("Link to a diff between the two builds")
                     .type(GraphQLString)
                     .dataFetcher { env ->
-                        val gitChangeLog: GitChangeLog = env.getSource()
+                        val gitChangeLog: GitChangeLog = env.getSource()!!
                         gitService.getDiffLink(gitChangeLog)
                     }
             }
@@ -90,7 +90,7 @@ class GQLTypeGitChangeLog(
                     .description("All dependency changes")
                     .type(listType(gqlTypeLinkChange.typeRef))
                     .dataFetcher { env ->
-                        val gitChangeLog: GitChangeLog = env.getSource()
+                        val gitChangeLog: GitChangeLog = env.getSource()!!
                         linkChangeService.linkChanges(
                             gitChangeLog.from.build,
                             gitChangeLog.to.build,
@@ -103,7 +103,7 @@ class GQLTypeGitChangeLog(
                     .description("List of commits as a plot")
                     .type(GQLScalarJSON.INSTANCE)
                     .dataFetcher { env ->
-                        val gitChangeLog: GitChangeLog = env.getSource()
+                        val gitChangeLog: GitChangeLog = env.getSource()!!
                         gitChangeLog.loadCommits {
                             gitService.getChangeLogCommits(gitChangeLog)
                         }.log.plot.asJson()
@@ -115,7 +115,7 @@ class GQLTypeGitChangeLog(
                     .description("List of commits in the change log")
                     .type(listType(gitUICommitGQLType.typeRef))
                     .dataFetcher { env ->
-                        val gitChangeLog: GitChangeLog = env.getSource()
+                        val gitChangeLog: GitChangeLog = env.getSource()!!
                         gitChangeLog.loadCommits {
                             gitService.getChangeLogCommits(gitChangeLog)
                         }.commits
@@ -127,7 +127,7 @@ class GQLTypeGitChangeLog(
                     .description("Checking if a change log can have issues")
                     .type(GraphQLBoolean.toNotNull())
                     .dataFetcher { env ->
-                        val gitChangeLog: GitChangeLog = env.getSource()
+                        val gitChangeLog: GitChangeLog = env.getSource()!!
                         gitService.getProjectConfiguration(gitChangeLog.project) != null
                     }
             }
@@ -137,7 +137,7 @@ class GQLTypeGitChangeLog(
                     .description("List of issues in the change log")
                     .type(gitChangeLogIssuesGQLType.typeRef)
                     .dataFetcher { env ->
-                        val gitChangeLog: GitChangeLog = env.getSource()
+                        val gitChangeLog: GitChangeLog = env.getSource()!!
                         gitService.getChangeLogIssues(gitChangeLog)
                     }
             }
@@ -147,7 +147,7 @@ class GQLTypeGitChangeLog(
                     .description("List of files changes")
                     .type(gqlTypeGitChangeLogFiles.typeRef.toNotNull())
                     .dataFetcher { env ->
-                        val gitChangeLog: GitChangeLog = env.getSource()
+                        val gitChangeLog: GitChangeLog = env.getSource()!!
                         gitService.getChangeLogFiles(gitChangeLog)
                     }
             }
@@ -162,7 +162,7 @@ class GQLTypeGitChangeLog(
                             .type(issueChangeLogExportRequestGQLInputType.typeRef)
                     }
                     .dataFetcher { env ->
-                        val gitChangeLog: GitChangeLog = env.getSource()
+                        val gitChangeLog: GitChangeLog = env.getSource()!!
                         // Parses the request
                         val request = parseExportRequest(env)
                         // Build boundaries
@@ -198,8 +198,8 @@ class GQLTypeGitChangeLog(
                     .type(GraphQLTypeReference(typeName)) // Recursive
                     .argument(stringArgument(DEP_CHANGE_LOG_PROJECT, "Name of the project to follow", nullable = false))
                     .dataFetcher { env ->
-                        val projectName: String = env.getArgument(DEP_CHANGE_LOG_PROJECT)
-                        val baseChangeLog: GitChangeLog = env.getSource()
+                        val projectName: String = env.getArgument(DEP_CHANGE_LOG_PROJECT)!!
+                        val baseChangeLog: GitChangeLog = env.getSource()!!
                         val buildFrom: Build = baseChangeLog.scmBuildFrom.buildView.build
                         val buildTo: Build = baseChangeLog.scmBuildTo.buildView.build
                         // Dependency change log

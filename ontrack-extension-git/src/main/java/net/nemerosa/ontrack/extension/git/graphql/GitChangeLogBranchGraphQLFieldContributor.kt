@@ -44,9 +44,9 @@ class GitChangeLogBranchGraphQLFieldContributor(
                     }
                     .type(gitChangeLogGQLType.typeRef)
                     .dataFetcher { env ->
-                        val branch: Branch = env.getSource()
-                        val from: String = env.getArgument("from")
-                        val to: String = env.getArgument("to")
+                        val branch: Branch = env.getSource()!!
+                        val from: String = env.getArgument("from")!!
+                        val to: String = env.getArgument("to")!!
                         // Looking for the builds
                         val buildFrom = structureService.findBuildByName(branch.project.name, branch.name, from)
                             .getOrNull()

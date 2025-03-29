@@ -18,7 +18,7 @@ class GQLRootQuerySlotById(
             .type(gqlTypeSlot.typeRef)
             .argument(stringArgument(name = "id", description = "ID of the slot", nullable = false))
             .dataFetcher { env ->
-                val id: String = env.getArgument("id")
+                val id: String = env.getArgument("id")!!
                 slotService.getSlotById(id)
             }
             .build()

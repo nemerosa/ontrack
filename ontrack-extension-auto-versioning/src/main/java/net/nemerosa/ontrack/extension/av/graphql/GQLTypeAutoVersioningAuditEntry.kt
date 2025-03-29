@@ -64,7 +64,7 @@ class GQLTypeAutoVersioningAuditEntry(
                     .description("Promotion which triggered the auto-versioning")
                     .type(GraphQLTypeReference(GQLTypePromotionRun.PROMOTION_RUN))
                     .dataFetcher { env ->
-                        val entry: AutoVersioningAuditEntry = env.getSource()
+                        val entry: AutoVersioningAuditEntry = env.getSource()!!
                         val promotionRunId = entry.order.sourcePromotionRunId
                         promotionRunId?.let {
                             structureService.findPromotionRunByID(ID.of(it))

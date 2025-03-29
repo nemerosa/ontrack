@@ -38,7 +38,7 @@ class GitChangeLogBuildGraphQLFieldContributor(
                     }
                     .type(gitChangeLogGQLType.typeRef)
                     .dataFetcher { env ->
-                        val buildFrom: Build = env.getSource()
+                        val buildFrom: Build = env.getSource()!!
                         val to: String? = env.getArgument("to")
                         // Looking for the next build
                         val buildTo: Build = if (to.isNullOrBlank()) {

@@ -37,8 +37,8 @@ class GitIssueInfoProjectGraphQLFieldContributor(
                                 }
                                 .type(ontrackGitIssueInfoGQLType.typeRef)
                                 .dataFetcher { environment ->
-                                    val project: Project = environment.getSource()
-                                    val token: String = environment.getArgument("token")
+                                    val project: Project = environment.getSource()!!
+                                    val token: String = environment.getArgument("token")!!
                                     val first: Boolean? = environment.getArgument("first")
                                     val gitIssueInfo = gitService.getIssueProjectInfo(project.id, token)
                                     if (first != null && first) {

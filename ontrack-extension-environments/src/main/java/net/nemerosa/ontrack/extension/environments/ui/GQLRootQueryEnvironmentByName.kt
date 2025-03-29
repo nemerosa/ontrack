@@ -21,7 +21,7 @@ class GQLRootQueryEnvironmentByName(
             )
             .type(gqlTypeEnvironment.typeRef)
             .dataFetcher { env ->
-                val name: String = env.getArgument(ARG_NAME)
+                val name: String = env.getArgument(ARG_NAME)!!
                 environmentService.findByName(name)
             }
             .build()

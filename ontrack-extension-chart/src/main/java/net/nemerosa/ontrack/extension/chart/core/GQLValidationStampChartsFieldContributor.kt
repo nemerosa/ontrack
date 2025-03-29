@@ -27,7 +27,7 @@ class GQLValidationStampChartsFieldContributor(
                     .description("List of charts exposed by the validation stamp")
                     .type(listType(gqlTypeChartDefinition.typeRef))
                     .dataFetcher { env ->
-                        val vs: ValidationStamp = env.getSource()
+                        val vs: ValidationStamp = env.getSource()!!
                         val providers = chartRegistry.getProvidersForSubjectClass(ValidationStamp::class)
                         providers.mapNotNull { provider ->
                             provider.getChartDefinition(vs)

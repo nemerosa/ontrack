@@ -35,7 +35,7 @@ class OntrackGitCommitInfoGQLType(
                                 .description("Associated branch info per types of branches")
                                 .type(listType(branchInfosGQLType.typeRef))
                                 .dataFetcher { environment ->
-                                    val gitCommitInfo = environment.getSource<OntrackGitCommitInfo>()
+                                    val gitCommitInfo = environment.getSource<OntrackGitCommitInfo>()!!
                                     BranchInfos.toList(gitCommitInfo.branchInfos)
                                 }
                     }

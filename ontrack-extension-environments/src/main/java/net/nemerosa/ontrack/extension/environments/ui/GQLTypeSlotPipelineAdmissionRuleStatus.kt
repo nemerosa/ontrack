@@ -33,7 +33,7 @@ class GQLTypeSlotPipelineAdmissionRuleStatus(
                     .description("Status check for this rule")
                     .type(SlotDeploymentCheck::class.toTypeRef().toNotNull())
                     .dataFetcher { env ->
-                        val ruleStatus: SlotPipelineAdmissionRuleStatus = env.getSource()
+                        val ruleStatus: SlotPipelineAdmissionRuleStatus = env.getSource()!!
                         slotService.getAdmissionRuleCheck(
                             ruleStatus = ruleStatus,
                         )

@@ -22,7 +22,7 @@ class GitPullRequestBranchGraphQLFieldContributor(
                                 .description("Pull request (if any) linked to the branch")
                                 .type(gitPullRequestGQLType.typeRef)
                                 .dataFetcher { env ->
-                                    val branch: Branch = env.getSource()
+                                    val branch: Branch = env.getSource()!!
                                     gitService.getBranchAsPullRequest(branch)
                                             ?.let { pr ->
                                                 GitPullRequestGQLType.Data(branch, pr)

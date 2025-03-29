@@ -24,7 +24,7 @@ class AutoVersioningGQLTypeBranchLinkExtension(
             .description("Auto versioning information for this link, in regards to the relationship from the source branch to the target branch.")
             .type(gqlTypeBuildAutoVersioning.typeRef)
             .dataFetcher { env ->
-                val link: BranchLink = env.getSource()
+                val link: BranchLink = env.getSource()!!
                 val source = link.sourceBuild.branch
                 val target = link.targetBuild.branch
 

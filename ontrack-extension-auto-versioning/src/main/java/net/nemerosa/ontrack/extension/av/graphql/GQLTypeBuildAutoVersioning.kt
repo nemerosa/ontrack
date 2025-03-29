@@ -38,7 +38,7 @@ class GQLTypeBuildAutoVersioning(
                     .description("Last auto versioning entry for this dependency.")
                     .type(gqlTypeAutoVersioningAuditEntry.typeRef)
                     .dataFetcher { env ->
-                        val context: Context = env.getSource()
+                        val context: Context = env.getSource()!!
                         getLastAuditEntry(context)
                     }
             }
@@ -48,7 +48,7 @@ class GQLTypeBuildAutoVersioning(
                     .description("Last eligible build for this AV config")
                     .type(GraphQLTypeReference(GQLTypeBuild.BUILD))
                     .dataFetcher { env ->
-                        val context: Context = env.getSource()
+                        val context: Context = env.getSource()!!
                         getLastEligibleBuild(context)
                     }
             }

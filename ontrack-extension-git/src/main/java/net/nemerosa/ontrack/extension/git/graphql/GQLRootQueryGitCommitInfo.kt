@@ -34,7 +34,7 @@ class GQLRootQueryGitCommitInfo(
                     .build()
 
     private fun getOntrackGitCommitInfo(env: DataFetchingEnvironment): OntrackGitCommitInfo? {
-        val commit: String = env.getArgument(ARG_COMMIT)
+        val commit: String = env.getArgument(ARG_COMMIT)!!
         // Looking for the project based on the commit only
         val results = searchService.paginatedSearch(SearchRequest(
                 token = commit,

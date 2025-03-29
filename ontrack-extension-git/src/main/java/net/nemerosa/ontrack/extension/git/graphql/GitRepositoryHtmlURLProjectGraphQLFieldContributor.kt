@@ -29,7 +29,7 @@ class GitRepositoryHtmlURLProjectGraphQLFieldContributor(
                     .description("URL to the HTML page of the Git repository associated with this project")
                     .type(GraphQLString)
                     .dataFetcher { env ->
-                        val project: Project = env.getSource()
+                        val project: Project = env.getSource()!!
                         scmDetector.getSCM(project)?.repositoryHtmlURL
                     }
                     .build()

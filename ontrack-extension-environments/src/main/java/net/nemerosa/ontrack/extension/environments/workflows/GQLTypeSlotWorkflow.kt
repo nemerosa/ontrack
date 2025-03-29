@@ -33,7 +33,7 @@ class GQLTypeSlotWorkflow(
                     stringArgument("pipelineId", "ID of the pipeline", nullable = false),
                 )
             ) { workflow, env ->
-                val pipelineId: String = env.getArgument("pipelineId")
+                val pipelineId: String = env.getArgument("pipelineId")!!
                 val pipeline = slotService.getPipelineById(pipelineId)
                 slotWorkflowService.findSlotWorkflowInstanceByPipelineAndSlotWorkflow(
                     pipeline = pipeline,

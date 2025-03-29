@@ -25,7 +25,7 @@ class GQLTypeEnvironmentBuildCount : GQLType {
                     .description("ID of the count (build ID)")
                     .type(GraphQLID.toNotNull())
                     .dataFetcher { env ->
-                        val count = env.getSource<EnvironmentBuildCount>()
+                        val count = env.getSource<EnvironmentBuildCount>()!!
                         count.build.id()
                     }
             }

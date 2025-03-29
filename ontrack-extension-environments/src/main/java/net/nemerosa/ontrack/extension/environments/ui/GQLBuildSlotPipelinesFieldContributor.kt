@@ -38,7 +38,7 @@ class GQLBuildSlotPipelinesFieldContributor(
                     .argument(booleanArgument(ARG_SORTED_BY_ENVIRONMENT, "Sorting by decreasing environment order"))
                     .type(listType(SlotPipeline::class.toTypeRef()))
                     .dataFetcher { env ->
-                        val build: Build = env.getSource()
+                        val build: Build = env.getSource()!!
                         val status = env.getArgument<String>(ARG_STATUS)?.let {
                             SlotPipelineStatus.valueOf(it)
                         }
@@ -58,7 +58,7 @@ class GQLBuildSlotPipelinesFieldContributor(
                     .argument(stringArgument(ARG_QUALIFIER, "Qualifier to use", defaultValue = Slot.DEFAULT_QUALIFIER))
                     .type(listType(SlotPipeline::class.toTypeRef()))
                     .dataFetcher { env ->
-                        val build: Build = env.getSource()
+                        val build: Build = env.getSource()!!
                         val qualifier = env.getArgument<String>(ARG_QUALIFIER) ?: Slot.DEFAULT_QUALIFIER
                         slotService.findCurrentDeployments(build, qualifier)
                     }
