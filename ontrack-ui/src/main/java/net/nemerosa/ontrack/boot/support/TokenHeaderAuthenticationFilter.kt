@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.boot.support
 
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import net.nemerosa.ontrack.model.security.TokenAuthenticationToken
 import net.nemerosa.ontrack.model.structure.TokensService
 import org.springframework.security.authentication.AuthenticationManager
@@ -10,8 +12,6 @@ import org.springframework.security.web.authentication.NullRememberMeServices
 import org.springframework.security.web.authentication.RememberMeServices
 import org.springframework.web.filter.OncePerRequestFilter
 import javax.servlet.FilterChain
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
 
 /**
  * Processes a HTTP request `X-Ontrack-Token` header.

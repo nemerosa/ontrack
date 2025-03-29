@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.scm.catalog.ui
 
+import jakarta.servlet.http.HttpServletResponse
 import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalog
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogEntry
@@ -10,7 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
-import javax.servlet.http.HttpServletResponse
 
 @RestController
 @RequestMapping("extension/scm/catalog")

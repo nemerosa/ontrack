@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.extension.oidc.settings
 
+import jakarta.servlet.http.HttpServletResponse
+import jakarta.validation.Valid
 import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.form.*
@@ -12,8 +14,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
-import javax.servlet.http.HttpServletResponse
-import jakarta.validation.Valid
 
 @RestController
 @RequestMapping("/extension/oidc/providers")

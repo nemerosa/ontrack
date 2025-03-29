@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.casc.ui
 
+import jakarta.servlet.http.HttpServletResponse
 import net.nemerosa.ontrack.extension.casc.CascConfigurationProperties
 import net.nemerosa.ontrack.extension.casc.CascLoadingService
 import net.nemerosa.ontrack.extension.casc.schema.json.CascJsonSchemaService
@@ -8,7 +9,6 @@ import net.nemerosa.ontrack.extension.casc.upload.CascUploadService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
-import javax.servlet.http.HttpServletResponse
 
 @RestController
 @RequestMapping("/extension/casc")

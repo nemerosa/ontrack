@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.extension.indicators.ui
 
 import com.opencsv.CSVWriter
+import jakarta.servlet.http.HttpServletResponse
+import jakarta.validation.Valid
 import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.extension.indicators.acl.IndicatorTypeManagement
 import net.nemerosa.ontrack.extension.indicators.model.*
@@ -18,8 +20,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 import java.io.StringWriter
-import javax.servlet.http.HttpServletResponse
-import jakarta.validation.Valid
 
 /**
  * Controller for the management of types.

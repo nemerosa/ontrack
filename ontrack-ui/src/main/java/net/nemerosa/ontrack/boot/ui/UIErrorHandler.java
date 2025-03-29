@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import jakarta.servlet.http.HttpServletRequest;
 import net.nemerosa.ontrack.model.exceptions.InputException;
 import net.nemerosa.ontrack.model.exceptions.NotFoundException;
 import net.nemerosa.ontrack.model.structure.NameDescription;
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
