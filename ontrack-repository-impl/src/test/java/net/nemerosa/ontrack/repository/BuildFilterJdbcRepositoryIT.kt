@@ -57,7 +57,7 @@ class BuildFilterJdbcRepositoryIT : AbstractRepositoryJUnit4TestSupport() {
                 "TestFilterType",
                 JsonUtils.`object`().with("test", 1).end()
         )
-        Assert.assertTrue(ack.isSuccess)
+        Assert.assertTrue(ack.success)
         // Gets the list for this branch AND account
         var list = repository.findForBranch(OptionalInt.of(account.id()), branch.id())
         Assert.assertEquals(
@@ -110,7 +110,7 @@ class BuildFilterJdbcRepositoryIT : AbstractRepositoryJUnit4TestSupport() {
                 "TestFilterType",
                 JsonUtils.`object`().with("test", 1).end()
         )
-        Assert.assertTrue(ack.isSuccess)
+        Assert.assertTrue(ack.success)
         // Gets the list for this branch AND account
         var list = repository.findForBranch(OptionalInt.of(account.id()), branch.id())
         Assert.assertEquals(
@@ -163,7 +163,7 @@ class BuildFilterJdbcRepositoryIT : AbstractRepositoryJUnit4TestSupport() {
                 "TestFilterType",
                 JsonUtils.`object`().with("test", 1).end()
         )
-        Assert.assertTrue(ack.isSuccess)
+        Assert.assertTrue(ack.success)
         ack = repository.save(
                 OptionalInt.of(account.id()),
                 branch.id(),
@@ -171,7 +171,7 @@ class BuildFilterJdbcRepositoryIT : AbstractRepositoryJUnit4TestSupport() {
                 "TestFilterType",
                 JsonUtils.`object`().with("test", 1).end()
         )
-        Assert.assertTrue(ack.isSuccess)
+        Assert.assertTrue(ack.success)
         // Gets the list for this branch AND account
         var list = repository.findForBranch(OptionalInt.of(account.id()), branch.id())
         Assert.assertEquals(

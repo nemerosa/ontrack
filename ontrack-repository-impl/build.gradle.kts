@@ -16,5 +16,6 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
 
     testImplementation(project(":ontrack-it-utils"))
-    testRuntimeOnly(project(":ontrack-service"))
+
+    // TODO testRuntimeOnly(project(":ontrack-service"))
 }
