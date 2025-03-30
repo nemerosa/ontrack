@@ -1,8 +1,8 @@
-package net.nemerosa.ontrack.model.settings;
+package net.nemerosa.ontrack.model.settings
 
-public interface CachedSettingsService {
+interface CachedSettingsService {
 
-    <T> T getCachedSettings(Class<T> type);
+    fun <T> getCachedSettings(type: Class<T>): T
+    fun <T> invalidate(type: Class<T>)
 
-    <T> void invalidate(Class<T> type);
 }
