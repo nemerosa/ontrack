@@ -16,7 +16,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.*;
 import org.springframework.core.convert.converter.ConverterRegistry;
 import org.springframework.core.convert.support.DefaultConversionService;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
@@ -48,7 +47,7 @@ public abstract class AbstractITTestSupport {
     protected DataSource dataSource;
 
     /**
-     * Named Jdbc template for tests that need a direct access to the database
+     * Named Jdbc template for tests that need direct access to the database
      */
     protected @NotNull
     NamedParameterJdbcTemplate getNamedParameterJdbcTemplate() {
@@ -77,11 +76,11 @@ public abstract class AbstractITTestSupport {
         @Primary
         public DataSourceProperties dataSourceProperties() {
             // Configuration using system properties
-            String dbURL = System.getProperty("spring.datasource.url", "jdbc:postgresql://localhost/ontrack");
+            String dbURL = System.getProperty("spring.datasource.url", "jdbc:postgresql://localhost:5432/ontrack");
             String dbUser = System.getProperty("spring.datasource.username", "ontrack");
             String dbPassword = System.getProperty("spring.datasource.password", "ontrack");
             // Logging
-            logger.info("[test][jdbc] URL = " + dbURL);
+            logger.info("[test][jdbc] URL = {}", dbURL);
             // Properties
             DataSourceProperties properties = new DataSourceProperties();
             properties.setDriverClassName("org.postgresql.Driver");

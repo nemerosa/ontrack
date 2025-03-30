@@ -26,7 +26,7 @@ class UserServiceImplTest {
     @Before
     fun before() {
         securityService = mockk()
-        accountRepository = mockk()
+        accountRepository = mockk(relaxed = true)
         passwordEncoder = mockk()
         user = mockk()
         service = UserServiceImpl(

@@ -225,12 +225,11 @@ pipeline {
                                 --console plain
                         '''
                     } else {
-                        // TODO integrationTest
                         // TODO dockerBuild
                         // TODO documentation
                         sh '''
                             ./gradlew \\
-                                test \\
+                                check \\
                                 build \\
                                 -Dorg.gradle.jvmargs=-Xmx6144m \\
                                 --stacktrace \\
