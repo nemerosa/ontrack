@@ -29,8 +29,11 @@ RUN mv docker/* /usr/bin/
 RUN chmod +x /usr/bin/docker
 
 # Installs Docker Compose
-RUN curl --fail --silent -L https://github.com/docker/compose/releases/download/v2.34.0/docker-compose-`uname -s`-`uname -m` > /usr/bin/docker-compose
-RUN chmod +x /usr/bin/docker-compose
+# See https://docs.docker.com/compose/install/linux/#install-the-plugin-manually
+RUN DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker} \
+    && mkdir -p $DOCKER_CONFIG/cli-plugins \
+    && curl -SL https://github.com/docker/compose/releases/download/v2.34.0/docker-compose-linux-x86_64 -o $DOCKER_CONFIG/cli-plugins/docker-compose \
+    && chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
 
 # Git configuration
 RUN git config --global user.email "jenkins@nemerosa.net" \
