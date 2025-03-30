@@ -7,7 +7,7 @@ import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.structure.PromotionRunRequest
 import net.nemerosa.ontrack.model.structure.PropertyCreationRequest
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -26,7 +26,7 @@ class PromotionRunControllerIT : AbstractWebTestSupport() {
                     // Promotion run request
                     val request = PromotionRunRequest(pl.id(), "", Time.now(), "Run", emptyList())
                     // Call
-                    val run = asUser().with(pl, ProjectEdit::class.java).call {
+                    val run = asUser().withProjectFunction(pl, ProjectEdit::class.java).call {
                         controller.newPromotionRun(id, request)
                     }
                     // Checks
@@ -44,24 +44,24 @@ class PromotionRunControllerIT : AbstractWebTestSupport() {
                 build {
                     // Promotion run request
                     val request = PromotionRunRequest(
-                            pl.id(),
-                            "",
-                            Time.now(),
-                            "Run",
-                            listOf(
-                                    PropertyCreationRequest(
-                                            TestSimplePropertyType::class.java.name,
-                                            mapOf("value" to "Message").asJson()
-                                    )
+                        pl.id(),
+                        "",
+                        Time.now(),
+                        "Run",
+                        listOf(
+                            PropertyCreationRequest(
+                                TestSimplePropertyType::class.java.name,
+                                mapOf("value" to "Message").asJson()
                             )
+                        )
                     )
                     // Call
-                    val run = asUser().with(pl, ProjectEdit::class.java).call {
+                    val run = asUser().withProjectFunction(pl, ProjectEdit::class.java).call {
                         controller.newPromotionRun(id, request)
-                    }
+                    }.body
                     // Checks
                     assertNotNull(run) {
-                        val property: TestSimpleProperty? = getProperty(run, TestSimplePropertyType::class.java)
+                        val property: TestSimpleProperty? = getProperty(it, TestSimplePropertyType::class.java)
                         assertEquals("Message", property?.value)
                     }
                 }

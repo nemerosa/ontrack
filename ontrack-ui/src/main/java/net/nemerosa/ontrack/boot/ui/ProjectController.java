@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import jakarta.validation.Valid;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.annotations.API;
 import net.nemerosa.ontrack.model.annotations.APIMethod;
@@ -15,9 +16,8 @@ import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import jakarta.validation.Valid;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -42,18 +42,18 @@ public class ProjectController extends AbstractResourceController {
     @RequestMapping(value = "", method = RequestMethod.GET)
     public Resources<Project> getProjectList() {
         return Resources.of(
-                structureService.getProjectList(),
-                uri(on(ProjectController.class).getProjectList())
-        )
+                        structureService.getProjectList(),
+                        uri(on(ProjectController.class).getProjectList())
+                )
                 .with(Link.CREATE, uri(on(ProjectController.class).newProject(null)), securityService.isGlobalFunctionGranted(ProjectCreation.class));
     }
 
     @RequestMapping(value = "view", method = RequestMethod.GET)
     public Resources<ProjectStatusView> getProjectStatusViews() {
         return Resources.of(
-                structureService.getProjectStatusViews(),
-                uri(on(ProjectController.class).getProjectStatusViews())
-        )
+                        structureService.getProjectStatusViews(),
+                        uri(on(ProjectController.class).getProjectStatusViews())
+                )
                 .forView(ProjectStatusView.class)
                 .with(Link.CREATE, uri(on(ProjectController.class).newProject(null)), securityService.isGlobalFunctionGranted(ProjectCreation.class));
     }
@@ -65,21 +65,21 @@ public class ProjectController extends AbstractResourceController {
 
     @RequestMapping(value = "create", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public Project newProject(@RequestBody @Valid NameDescriptionState nameDescription) {
+    public ResponseEntity<Project> newProject(@RequestBody @Valid NameDescriptionState nameDescription) {
         // Creates a new project instance
         Project project = Project.of(nameDescription);
         // Saves it into the repository
         project = structureService.newProject(project);
         // OK
-        return project;
+        return ResponseEntity.ok(project);
     }
 
     @RequestMapping(value = "{projectId}/view", method = RequestMethod.GET)
     public Resources<BranchStatusView> getBranchStatusViews(@PathVariable ID projectId) {
         return Resources.of(
-                structureService.getBranchStatusViews(projectId),
-                uri(on(ProjectController.class).getBranchStatusViews(projectId))
-        )
+                        structureService.getBranchStatusViews(projectId),
+                        uri(on(ProjectController.class).getBranchStatusViews(projectId))
+                )
                 .forView(BranchStatusView.class)
                 .with(
                         Link.CREATE,
@@ -89,13 +89,13 @@ public class ProjectController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "{projectId}", method = RequestMethod.GET)
-    public Project getProject(@PathVariable ID projectId) {
-        return structureService.getProject(projectId);
+    public ResponseEntity<Project> getProject(@PathVariable ID projectId) {
+        return ResponseEntity.ok(structureService.getProject(projectId));
     }
 
     @RequestMapping(value = "{projectId}", method = RequestMethod.DELETE)
-    public Ack deleteProject(@PathVariable ID projectId) {
-        return structureService.deleteProject(projectId);
+    public ResponseEntity<Ack> deleteProject(@PathVariable ID projectId) {
+        return ResponseEntity.ok(structureService.deleteProject(projectId));
     }
 
     @RequestMapping(value = "{projectId}/update", method = RequestMethod.GET)
@@ -106,7 +106,7 @@ public class ProjectController extends AbstractResourceController {
 
     @RequestMapping(value = "{projectId}/update", method = RequestMethod.PUT)
     @APIMethod(value = "Updates project")
-    public Project saveProject(@PathVariable ID projectId, @RequestBody @Valid NameDescriptionState nameDescription) {
+    public ResponseEntity<Project> saveProject(@PathVariable ID projectId, @RequestBody @Valid NameDescriptionState nameDescription) {
         // Gets from the repository
         Project project = structureService.getProject(projectId);
         // Updates
@@ -114,23 +114,23 @@ public class ProjectController extends AbstractResourceController {
         // Saves in repository
         structureService.saveProject(project);
         // As resource
-        return project;
+        return ResponseEntity.ok(project);
     }
 
     @RequestMapping(value = "{projectId}/enable", method = RequestMethod.PUT)
-    public Project enableProject(@PathVariable ID projectId) {
+    public ResponseEntity<Project> enableProject(@PathVariable ID projectId) {
         // Gets from the repository
         Project project = structureService.getProject(projectId);
         // Saves in repository
-        return structureService.enableProject(project);
+        return ResponseEntity.ok(structureService.enableProject(project));
     }
 
     @RequestMapping(value = "{projectId}/disable", method = RequestMethod.PUT)
-    public Project disableProject(@PathVariable ID projectId) {
+    public ResponseEntity<Project> disableProject(@PathVariable ID projectId) {
         // Gets from the repository
         Project project = structureService.getProject(projectId);
         // Saves in repository
-        return structureService.disableProject(project);
+        return ResponseEntity.ok(structureService.disableProject(project));
     }
 
     /**
@@ -155,25 +155,25 @@ public class ProjectController extends AbstractResourceController {
      * Clones this project into another one.
      */
     @RequestMapping(value = "{projectId}/clone", method = RequestMethod.POST)
-    public Project clone(@PathVariable ID projectId, @RequestBody ProjectCloneRequest request) {
+    public ResponseEntity<Project> clone(@PathVariable ID projectId, @RequestBody ProjectCloneRequest request) {
         // Gets the project
         Project project = structureService.getProject(projectId);
         // Performs the clone
-        return copyService.cloneProject(project, request);
+        return ResponseEntity.ok(copyService.cloneProject(project, request));
     }
 
     @RequestMapping(value = "{projectId}/favourite", method = RequestMethod.PUT)
-    public Project favouriteProject(@PathVariable ID projectId) {
+    public ResponseEntity<Project> favouriteProject(@PathVariable ID projectId) {
         Project project = structureService.getProject(projectId);
         projectFavouriteService.setProjectFavourite(project, true);
-        return project;
+        return ResponseEntity.ok(project);
     }
 
     @RequestMapping(value = "{projectId}/unfavourite", method = RequestMethod.PUT)
-    public Project unfavouriteProject(@PathVariable ID projectId) {
+    public ResponseEntity<Project> unfavouriteProject(@PathVariable ID projectId) {
         Project project = structureService.getProject(projectId);
         projectFavouriteService.setProjectFavourite(project, false);
-        return project;
+        return ResponseEntity.ok(project);
     }
 
 }

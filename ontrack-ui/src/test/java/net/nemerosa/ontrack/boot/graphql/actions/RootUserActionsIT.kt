@@ -1,10 +1,10 @@
 package net.nemerosa.ontrack.boot.graphql.actions
 
-import net.nemerosa.ontrack.graphql.AbstractQLKTITJUnit4Support
-import org.junit.Test
+import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-class RootUserActionsIT: AbstractQLKTITJUnit4Support() {
+class RootUserActionsIT: AbstractQLKTITSupport() {
 
     @Test
     fun `Creation of a project being allowed`() {

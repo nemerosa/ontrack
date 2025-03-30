@@ -26,7 +26,7 @@ class GQLRootQuerySearch(
     }
 
     override fun getFieldDefinition(): GraphQLFieldDefinition {
-        return paginatedListFactory.createPaginatedField(
+        return paginatedListFactory.createRootPaginatedField(
                 cache = GQLTypeCache(),
                 fieldName = "search",
                 fieldDescription = "Performs a search in Ontrack",
@@ -35,7 +35,7 @@ class GQLRootQuerySearch(
                         GraphQLArgument.newArgument().name(ARG_SEARCH_TOKEN).description("Query string").type(GraphQLNonNull(GraphQLString)).build(),
                         GraphQLArgument.newArgument().name(ARG_SEARCH_TYPE).description("Result type").type(GraphQLString).build()
                 ),
-                itemPaginatedListProvider = { env, _: Any?, offset, size ->
+                itemPaginatedListProvider = { env, offset, size ->
                     val token: String = env.getArgument(ARG_SEARCH_TOKEN)!!
                     val type: String? = env.getArgument(ARG_SEARCH_TYPE)
                     val request = SearchRequest(token, type, offset, size)

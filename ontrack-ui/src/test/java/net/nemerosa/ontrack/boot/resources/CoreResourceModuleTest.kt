@@ -2,25 +2,23 @@ package net.nemerosa.ontrack.boot.resources
 
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.JsonNode
+import io.mockk.every
+import io.mockk.mockk
 import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.json.JsonUtils.array
+import net.nemerosa.ontrack.json.JsonUtils.`object`
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.structure.TestFixtures.SIGNATURE
+import net.nemerosa.ontrack.model.structure.TestFixtures.SIGNATURE_OBJECT
 import net.nemerosa.ontrack.ui.controller.MockURIBuilder
 import net.nemerosa.ontrack.ui.resource.*
-import org.junit.Before
-import org.junit.Test
-
+import org.junit.Assert.assertEquals
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import java.io.IOException
 import java.net.URI
 import java.time.LocalDateTime
-
-import net.nemerosa.ontrack.json.JsonUtils.array
-import net.nemerosa.ontrack.json.JsonUtils.`object`
-import net.nemerosa.ontrack.model.structure.TestFixtures.SIGNATURE
-import net.nemerosa.ontrack.model.structure.TestFixtures.SIGNATURE_OBJECT
-import org.junit.Assert.assertEquals
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.`when`
 
 class CoreResourceModuleTest {
 
@@ -30,13 +28,13 @@ class CoreResourceModuleTest {
     private lateinit var projectFavouriteService: ProjectFavouriteService
     private lateinit var branchFavouriteService: BranchFavouriteService
 
-    @Before
+    @BeforeEach
     fun before() {
-        securityService = mock(SecurityService::class.java)
-        structureService = mock(StructureService::class.java)
-        val resourceDecorationContributorService = mock(ResourceDecorationContributorService::class.java)
-        projectFavouriteService = mock(ProjectFavouriteService::class.java)
-        branchFavouriteService = mock(BranchFavouriteService::class.java)
+        securityService = mockk<SecurityService>(relaxed = true)
+        structureService = mockk<StructureService>(relaxed = true)
+        val resourceDecorationContributorService = mockk<ResourceDecorationContributorService>(relaxed = true)
+        projectFavouriteService = mockk<ProjectFavouriteService>(relaxed = true)
+        branchFavouriteService = mockk<BranchFavouriteService>(relaxed = true)
         mapper = ResourceObjectMapperFactory().resourceObjectMapper(
                 listOf<ResourceModule>(DefaultResourceModule(
                         listOf(
@@ -62,10 +60,9 @@ class CoreResourceModuleTest {
     }
 
     @Test
-    @Throws(JsonProcessingException::class)
     fun project_granted_for_update() {
         val p = Project.of(NameDescription("P", "Project")).withId(ID.of(1)).withSignature(SIGNATURE)
-        `when`(securityService.isProjectFunctionGranted(1, ProjectEdit::class.java)).thenReturn(true)
+        every { securityService.isProjectFunctionGranted(1, ProjectEdit::class.java) } returns true
         assertResourceJson(
                 mapper,
                 `object`()
@@ -97,7 +94,7 @@ class CoreResourceModuleTest {
     fun project_not_favourite() {
         val p = Project.of(NameDescription("P", "Project")).withId(ID.of(1))
                 .withSignature(SIGNATURE)
-        `when`(securityService.isLogged).thenReturn(true)
+        every { securityService.isLogged } returns true
         assertResourceJson(
                 mapper,
                 `object`()
@@ -157,8 +154,8 @@ class CoreResourceModuleTest {
     fun project_favourite() {
         val p = Project.of(NameDescription("P", "Project")).withId(ID.of(1))
                 .withSignature(SIGNATURE)
-        `when`(securityService.isLogged).thenReturn(true)
-        `when`(projectFavouriteService.isProjectFavourite(p)).thenReturn(true)
+        every { securityService.isLogged } returns true
+        every { projectFavouriteService.isProjectFavourite(p) } returns true
         assertResourceJson(
                 mapper,
                 `object`()
@@ -189,7 +186,7 @@ class CoreResourceModuleTest {
     fun project_granted_for_update_and_disabled() {
         val p = Project.of(NameDescription("P", "Project")).withId(ID.of(1)).withDisabled(true)
                 .withSignature(SIGNATURE)
-        `when`(securityService.isProjectFunctionGranted(1, ProjectEdit::class.java)).thenReturn(true)
+        every { securityService.isProjectFunctionGranted(1, ProjectEdit::class.java) } returns true
         assertResourceJson(
                 mapper,
                 `object`()
@@ -572,7 +569,7 @@ class CoreResourceModuleTest {
     @Test
     @Throws(JsonProcessingException::class)
     fun account_group_links() {
-        `when`(securityService.isGlobalFunctionGranted(AccountManagement::class.java)).thenReturn(true)
+        every { securityService.isGlobalFunctionGranted(AccountManagement::class.java) } returns true
         assertResourceJson(
                 mapper,
                 `object`()
@@ -597,7 +594,7 @@ class CoreResourceModuleTest {
         val build = Build.of(b, NameDescription.nd("1", "Build 1"), Signature.of("test")).withId(ID.of(1))
         val run = PromotionRun.of(build, pl, Signature.of("test"), "Run").withId(ID.of(1))
         // Security
-        `when`(securityService.isProjectFunctionGranted(1, PromotionRunDelete::class.java)).thenReturn(true)
+        every { securityService.isProjectFunctionGranted(1, PromotionRunDelete::class.java) } returns true
         // Serialization
         val node = mapper.objectMapper.readTree(mapper.write(run))
         // Checks the _delete link is present

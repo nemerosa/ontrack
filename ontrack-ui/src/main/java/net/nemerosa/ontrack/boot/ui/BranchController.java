@@ -1,12 +1,16 @@
 package net.nemerosa.ontrack.boot.ui;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.validation.Valid;
 import net.nemerosa.ontrack.extension.api.BuildDiffExtension;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
-import net.nemerosa.ontrack.model.form.*;
+import net.nemerosa.ontrack.model.form.Form;
+import net.nemerosa.ontrack.model.form.Replacements;
+import net.nemerosa.ontrack.model.form.Selection;
+import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.security.BranchCreate;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
@@ -15,11 +19,11 @@ import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
-import jakarta.validation.Valid;
-import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static net.nemerosa.ontrack.ui.support.UIUtils.requestParametersToJson;
@@ -55,9 +59,9 @@ public class BranchController extends AbstractResourceController {
     @RequestMapping(value = "projects/{projectId}/branches", method = RequestMethod.GET)
     public Resources<Branch> getBranchListForProject(@PathVariable ID projectId) {
         return Resources.of(
-                structureService.getBranchesForProject(projectId),
-                uri(on(BranchController.class).getBranchListForProject(projectId))
-        )
+                        structureService.getBranchesForProject(projectId),
+                        uri(on(BranchController.class).getBranchListForProject(projectId))
+                )
                 // Create
                 .with(
                         Link.CREATE,
@@ -76,7 +80,7 @@ public class BranchController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "projects/{projectId}/branches/create", method = RequestMethod.POST)
-    public Branch newBranch(@PathVariable ID projectId, @RequestBody @Valid NameDescriptionState nameDescription) {
+    public ResponseEntity<Branch> newBranch(@PathVariable ID projectId, @RequestBody @Valid NameDescriptionState nameDescription) {
         // Gets the project
         Project project = structureService.getProject(projectId);
         // Creates a new branch instance
@@ -84,17 +88,17 @@ public class BranchController extends AbstractResourceController {
         // Saves it into the repository
         branch = structureService.newBranch(branch);
         // OK
-        return branch;
+        return ResponseEntity.ok(branch);
     }
 
     @RequestMapping(value = "branches/{branchId}", method = RequestMethod.GET)
-    public Branch getBranch(@PathVariable ID branchId) {
-        return structureService.getBranch(branchId);
+    public ResponseEntity<Branch> getBranch(@PathVariable ID branchId) {
+        return ResponseEntity.ok(structureService.getBranch(branchId));
     }
 
     @RequestMapping(value = "branches/{branchId}", method = RequestMethod.DELETE)
-    public Ack deleteBranch(@PathVariable ID branchId) {
-        return structureService.deleteBranch(branchId);
+    public ResponseEntity<Ack> deleteBranch(@PathVariable ID branchId) {
+        return ResponseEntity.ok(structureService.deleteBranch(branchId));
     }
 
     @RequestMapping(value = "branches/{branchId}/update", method = RequestMethod.GET)
@@ -104,38 +108,38 @@ public class BranchController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "branches/{branchId}/update", method = RequestMethod.PUT)
-    public Branch updateBranch(@PathVariable ID branchId, @RequestBody @Valid NameDescriptionState form) {
+    public ResponseEntity<Branch> updateBranch(@PathVariable ID branchId, @RequestBody @Valid NameDescriptionState form) {
         // Loads and updates branch
         Branch branch = structureService.getBranch(branchId).update(form);
         // Saves the branch
         structureService.saveBranch(branch);
         // OK
-        return branch;
+        return ResponseEntity.ok(branch);
     }
 
     @RequestMapping(value = "branches/{branchId}/enable", method = RequestMethod.PUT)
-    public Branch enableBranch(@PathVariable ID branchId) {
+    public ResponseEntity<Branch> enableBranch(@PathVariable ID branchId) {
         // Loads and updates branch
         Branch branch = structureService.getBranch(branchId);
         // Saves the branch
-        return structureService.enableBranch(branch);
+        return ResponseEntity.ok(structureService.enableBranch(branch));
     }
 
     @RequestMapping(value = "branches/{branchId}/disable", method = RequestMethod.PUT)
-    public Branch disableBranch(@PathVariable ID branchId) {
+    public ResponseEntity<Branch> disableBranch(@PathVariable ID branchId) {
         // Loads and updates branch
         Branch branch = structureService.getBranch(branchId).withDisabled(true);
         // Disables the branch
-        return structureService.disableBranch(branch);
+        return ResponseEntity.ok(structureService.disableBranch(branch));
     }
 
     @RequestMapping(value = "branches/{branchId}/status", method = RequestMethod.GET)
-    public BranchStatusView getBranchStatusView(@PathVariable ID branchId) {
-        return structureService.getBranchStatusView(structureService.getBranch(branchId));
+    public ResponseEntity<BranchStatusView> getBranchStatusView(@PathVariable ID branchId) {
+        return ResponseEntity.ok(structureService.getBranchStatusView(structureService.getBranch(branchId)));
     }
 
     @RequestMapping(value = "branches/{branchId}/view", method = RequestMethod.GET)
-    public BranchBuildView buildView(@PathVariable ID branchId) {
+    public ResponseEntity<BranchBuildView> buildView(@PathVariable ID branchId) {
         return buildViewWithFilter(
                 branchId,
                 buildFilterService.defaultFilterProviderData()
@@ -144,7 +148,7 @@ public class BranchController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "branches/{branchId}/view/{filterType:.*}", method = RequestMethod.GET)
-    public <T> BranchBuildView buildViewWithFilter(@PathVariable ID branchId, @PathVariable String filterType, WebRequest request) {
+    public <T> ResponseEntity<BranchBuildView> buildViewWithFilter(@PathVariable ID branchId, @PathVariable String filterType, WebRequest request) {
         JsonNode jsonParameters = requestParametersToJson(request);
         // Gets the filter provider
         BuildFilterProviderData<T> buildFilterProvider = buildFilterService.getBuildFilterProviderData(filterType, jsonParameters);
@@ -183,11 +187,11 @@ public class BranchController extends AbstractResourceController {
      * Copies the configuration from a branch into this one.
      */
     @RequestMapping(value = "branches/{branchId}/copy", method = RequestMethod.PUT)
-    public Branch copy(@PathVariable ID branchId, @RequestBody BranchCopyRequest request) {
+    public ResponseEntity<Branch> copy(@PathVariable ID branchId, @RequestBody BranchCopyRequest request) {
         // Gets the branch
         Branch branch = structureService.getBranch(branchId);
         // Performs the copy
-        return copyService.copy(branch, request);
+        return ResponseEntity.ok(copyService.copy(branch, request));
     }
 
     /**
@@ -207,11 +211,11 @@ public class BranchController extends AbstractResourceController {
      * Bulk update for a branch.
      */
     @RequestMapping(value = "branches/{branchId}/update/bulk", method = RequestMethod.PUT)
-    public Branch bulkUpdate(@PathVariable ID branchId, @RequestBody BranchBulkUpdateRequest request) {
+    public ResponseEntity<Branch> bulkUpdate(@PathVariable ID branchId, @RequestBody BranchBulkUpdateRequest request) {
         // Gets the branch
         Branch branch = structureService.getBranch(branchId);
         // Performs the update
-        return copyService.update(branch, request);
+        return ResponseEntity.ok(copyService.update(branch, request));
     }
 
     /**
@@ -236,15 +240,15 @@ public class BranchController extends AbstractResourceController {
      * Clones this branch into another one.
      */
     @RequestMapping(value = "branches/{branchId}/clone", method = RequestMethod.POST)
-    public Branch clone(@PathVariable ID branchId, @RequestBody BranchCloneRequest request) {
+    public ResponseEntity<Branch> clone(@PathVariable ID branchId, @RequestBody BranchCloneRequest request) {
         // Gets the branch
         Branch branch = structureService.getBranch(branchId);
         // Performs the clone
-        return copyService.cloneBranch(branch, request);
+        return ResponseEntity.ok(copyService.cloneBranch(branch, request));
     }
 
-    private <T> BranchBuildView buildViewWithFilter(ID branchId,
-                                                    BuildFilterProviderData<T> buildFilterProviderData) {
+    private <T> ResponseEntity<BranchBuildView> buildViewWithFilter(ID branchId,
+                                                                    BuildFilterProviderData<T> buildFilterProviderData) {
         // Gets the branch
         Branch branch = structureService.getBranch(branchId);
         // Gets the list of builds
@@ -256,26 +260,28 @@ public class BranchController extends AbstractResourceController {
                 .map(this::resolveExtensionAction)
                 .collect(Collectors.toList());
         // Gets the views for each build
-        return new BranchBuildView(
-                builds.stream()
-                        .map(build -> structureService.getBuildView(build, true))
-                        .collect(Collectors.toList()),
-                buildDiffActions
+        return ResponseEntity.ok(
+                new BranchBuildView(
+                        builds.stream()
+                                .map(build -> structureService.getBuildView(build, true))
+                                .collect(Collectors.toList()),
+                        buildDiffActions
+                )
         );
     }
 
     @RequestMapping(value = "branches/{branchId}/favourite", method = RequestMethod.PUT)
-    public Branch favouriteBranch(@PathVariable ID branchId) {
+    public ResponseEntity<Branch> favouriteBranch(@PathVariable ID branchId) {
         Branch branch = structureService.getBranch(branchId);
         branchFavouriteService.setBranchFavourite(branch, true);
-        return branch;
+        return ResponseEntity.ok(branch);
     }
 
     @RequestMapping(value = "branches/{branchId}/unfavourite", method = RequestMethod.PUT)
-    public Branch unfavouriteBranch(@PathVariable ID branchId) {
+    public ResponseEntity<Branch> unfavouriteBranch(@PathVariable ID branchId) {
         Branch branch = structureService.getBranch(branchId);
         branchFavouriteService.setBranchFavourite(branch, false);
-        return branch;
+        return ResponseEntity.ok(branch);
     }
 
 }

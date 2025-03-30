@@ -14,6 +14,7 @@ import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -69,7 +70,7 @@ public class PromotionLevelController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "branches/{branchId}/promotionLevels/create", method = RequestMethod.POST)
-    public PromotionLevel newPromotionLevel(@PathVariable ID branchId, @RequestBody @Valid NameDescription nameDescription) {
+    public ResponseEntity<PromotionLevel> newPromotionLevel(@PathVariable ID branchId, @RequestBody @Valid NameDescription nameDescription) {
         // Gets the holding branch
         Branch branch = structureService.getBranch(branchId);
         // Creates a new promotion level
@@ -77,12 +78,12 @@ public class PromotionLevelController extends AbstractResourceController {
         // Saves it into the repository
         promotionLevel = structureService.newPromotionLevel(promotionLevel);
         // OK
-        return promotionLevel;
+        return ResponseEntity.ok(promotionLevel);
     }
 
     @RequestMapping(value = "promotionLevels/{promotionLevelId}", method = RequestMethod.GET)
-    public PromotionLevel getPromotionLevel(@PathVariable ID promotionLevelId) {
-        return structureService.getPromotionLevel(promotionLevelId);
+    public ResponseEntity<PromotionLevel> getPromotionLevel(@PathVariable ID promotionLevelId) {
+        return ResponseEntity.ok(structureService.getPromotionLevel(promotionLevelId));
     }
 
     @RequestMapping(value = "promotionLevels/{promotionLevelId}/update", method = RequestMethod.GET)
@@ -91,7 +92,7 @@ public class PromotionLevelController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "promotionLevels/{promotionLevelId}/update", method = RequestMethod.PUT)
-    public PromotionLevel updatePromotionLevel(@PathVariable ID promotionLevelId, @RequestBody @Valid NameDescription nameDescription) {
+    public ResponseEntity<PromotionLevel> updatePromotionLevel(@PathVariable ID promotionLevelId, @RequestBody @Valid NameDescription nameDescription) {
         // Gets from the repository
         PromotionLevel promotionLevel = structureService.getPromotionLevel(promotionLevelId);
         // Updates
@@ -99,12 +100,12 @@ public class PromotionLevelController extends AbstractResourceController {
         // Saves in repository
         structureService.savePromotionLevel(promotionLevel);
         // As resource
-        return promotionLevel;
+        return ResponseEntity.ok(promotionLevel);
     }
 
     @RequestMapping(value = "promotionLevels/{promotionLevelId}", method = RequestMethod.DELETE)
-    public Ack deletePromotionLevel(@PathVariable ID promotionLevelId) {
-        return structureService.deletePromotionLevel(promotionLevelId);
+    public ResponseEntity<Ack> deletePromotionLevel(@PathVariable ID promotionLevelId) {
+        return ResponseEntity.ok(structureService.deletePromotionLevel(promotionLevelId));
     }
 
     @RequestMapping(value = "promotionLevels/{promotionLevelId}/image", method = RequestMethod.GET)
@@ -155,8 +156,8 @@ public class PromotionLevelController extends AbstractResourceController {
      * @return Result of the update
      */
     @PutMapping("promotionLevels/{promotionLevelId}/bulk")
-    public Ack bulkUpdate(@PathVariable ID promotionLevelId) {
-        return structureService.bulkUpdatePromotionLevels(promotionLevelId);
+    public ResponseEntity<Ack> bulkUpdate(@PathVariable ID promotionLevelId) {
+        return ResponseEntity.ok(structureService.bulkUpdatePromotionLevels(promotionLevelId));
     }
 
 }

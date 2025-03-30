@@ -22,6 +22,7 @@ dependencies {
     api(project(":ontrack-extension-support"))
 
     implementation(project(":ontrack-job"))
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.apache.commons:commons-lang3")
     implementation("org.apache.commons:commons-text")
     implementation("commons-io:commons-io")
@@ -30,92 +31,90 @@ dependencies {
     runtimeOnly(project(":ontrack-service"))
     runtimeOnly(project(":ontrack-repository-impl"))
     runtimeOnly(project(":ontrack-rabbitmq"))
-    runtimeOnly("org.postgresql:postgresql")
-    runtimeOnly("org.flywaydb:flyway-core")
+    runtimeOnly(project(":ontrack-database"))
 
     // Metric runtimes
-    runtimeOnly("io.micrometer:micrometer-registry-influx")
+    // TODO runtimeOnly("io.micrometer:micrometer-registry-influx")
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
-    runtimeOnly("io.micrometer:micrometer-registry-elastic")
+    // TODO runtimeOnly("io.micrometer:micrometer-registry-elastic")
 
-    // Logging extensions
+    // TODO Logging extensions
     runtimeOnly("net.logstash.logback:logstash-logback-encoder")
 
-    testImplementation(project(path = ":ontrack-ui-support", configuration = "tests"))
-    testImplementation(project(":ontrack-test-utils"))
+    testImplementation(testFixtures(project(":ontrack-ui-support")))
+//    testImplementation(project(":ontrack-test-utils"))
     testImplementation(project(":ontrack-it-utils"))
-    testImplementation(project(":ontrack-extension-general"))
-    testImplementation(project(":ontrack-extension-casc"))
-    testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-model", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-ui-support", configuration = "tests"))
-    testImplementation("com.networknt:json-schema-validator")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+//    testImplementation(project(":ontrack-extension-general"))
+//    testImplementation(project(":ontrack-extension-casc"))
+//    testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))
+    testImplementation(testFixtures(project(":ontrack-model")))
+    testImplementation(testFixtures(project(":ontrack-ui-graphql")))
+    testImplementation(testFixtures(project(":ontrack-extension-api")))
+//    testImplementation("com.networknt:json-schema-validator")
+//    testImplementation("org.springframework.boot:spring-boot-starter-test")
 
     // List of extensions needed for the documentation generation
-    testImplementation(project(":ontrack-extension-notifications"))
-    testImplementation(project(":ontrack-extension-workflows"))
+//    testImplementation(project(":ontrack-extension-notifications"))
+//    testImplementation(project(":ontrack-extension-workflows"))
     testImplementation("org.junit.platform:junit-platform-suite-api")
     testImplementation("org.junit.platform:junit-platform-suite-engine")
 
     // List of extensions to include in core
-    runtimeOnly(project(":ontrack-extension-general"))
-    runtimeOnly(project(":ontrack-extension-ldap"))
-    runtimeOnly(project(":ontrack-extension-oidc"))
-    runtimeOnly(project(":ontrack-extension-jenkins"))
-    runtimeOnly(project(":ontrack-extension-jira"))
-    runtimeOnly(project(":ontrack-extension-artifactory"))
-    runtimeOnly(project(":ontrack-extension-git"))
-    runtimeOnly(project(":ontrack-extension-github"))
-    runtimeOnly(project(":ontrack-extension-gitlab"))
-    runtimeOnly(project(":ontrack-extension-stash"))
-    runtimeOnly(project(":ontrack-extension-bitbucket-cloud"))
-    runtimeOnly(project(":ontrack-extension-combined"))
-    runtimeOnly(project(":ontrack-extension-stale"))
-    runtimeOnly(project(":ontrack-extension-vault"))
-    runtimeOnly(project(":ontrack-extension-influxdb"))
-    runtimeOnly(project(":ontrack-extension-sonarqube"))
-    runtimeOnly(project(":ontrack-extension-indicators"))
-    runtimeOnly(project(":ontrack-extension-casc"))
-    runtimeOnly(project(":ontrack-extension-elastic"))
-    runtimeOnly(project(":ontrack-extension-slack"))
-    runtimeOnly(project(":ontrack-extension-chart"))
-    runtimeOnly(project(":ontrack-extension-delivery-metrics"))
-    runtimeOnly(project(":ontrack-extension-auto-versioning"))
-    runtimeOnly(project(":ontrack-extension-license"))
-    runtimeOnly(project(":ontrack-extension-tfc"))
-    runtimeOnly(project(":ontrack-extension-recordings"))
-    runtimeOnly(project(":ontrack-extension-notifications"))
-    runtimeOnly(project(":ontrack-extension-hook"))
-    runtimeOnly(project(":ontrack-extension-queue"))
-    runtimeOnly(project(":ontrack-extension-workflows"))
-    runtimeOnly(project(":ontrack-extension-environments"))
+    // TODO runtimeOnly(project(":ontrack-extension-general"))
+    // TODO runtimeOnly(project(":ontrack-extension-ldap"))
+    // TODO runtimeOnly(project(":ontrack-extension-oidc"))
+    // TODO runtimeOnly(project(":ontrack-extension-jenkins"))
+    // TODO runtimeOnly(project(":ontrack-extension-jira"))
+    // TODO runtimeOnly(project(":ontrack-extension-artifactory"))
+    // TODO runtimeOnly(project(":ontrack-extension-git"))
+    // TODO runtimeOnly(project(":ontrack-extension-github"))
+    // TODO runtimeOnly(project(":ontrack-extension-gitlab"))
+    // TODO runtimeOnly(project(":ontrack-extension-stash"))
+    // TODO runtimeOnly(project(":ontrack-extension-bitbucket-cloud"))
+    // TODO runtimeOnly(project(":ontrack-extension-combined"))
+    // TODO runtimeOnly(project(":ontrack-extension-stale"))
+    // TODO runtimeOnly(project(":ontrack-extension-vault"))
+    // TODO runtimeOnly(project(":ontrack-extension-influxdb"))
+    // TODO runtimeOnly(project(":ontrack-extension-sonarqube"))
+    // TODO runtimeOnly(project(":ontrack-extension-indicators"))
+    // TODO runtimeOnly(project(":ontrack-extension-casc"))
+    // TODO runtimeOnly(project(":ontrack-extension-elastic"))
+    // TODO runtimeOnly(project(":ontrack-extension-slack"))
+    // TODO runtimeOnly(project(":ontrack-extension-chart"))
+    // TODO runtimeOnly(project(":ontrack-extension-delivery-metrics"))
+    // TODO runtimeOnly(project(":ontrack-extension-auto-versioning"))
+    // TODO runtimeOnly(project(":ontrack-extension-license"))
+    // TODO runtimeOnly(project(":ontrack-extension-tfc"))
+    // TODO runtimeOnly(project(":ontrack-extension-recordings"))
+    // TODO runtimeOnly(project(":ontrack-extension-notifications"))
+    // TODO runtimeOnly(project(":ontrack-extension-hook"))
+    // TODO runtimeOnly(project(":ontrack-extension-queue"))
+    // TODO runtimeOnly(project(":ontrack-extension-workflows"))
+    // TODO runtimeOnly(project(":ontrack-extension-environments"))
 }
 
 /**
  * Cleaning the Web resources
  */
 
-tasks.named<Delete>("clean") {
-    delete("src/main/resources/application.properties")
-    delete("src/main/resources/static")
-}
+//tasks.named<Delete>("clean") {
+//    delete("src/main/resources/application.properties")
+//    delete("src/main/resources/static")
+//}
 
 /**
  * Copy of Web resources before packaging
  */
 
-val copyWebResources by tasks.registering {
-    dependsOn(":ontrack-web:prod")
-    doLast {
-        project.copy {
-            from(project(":ontrack-web").file("build/web/prod"))
-            into("src/main/resources/static")
-        }
-    }
-}
+//val copyWebResources by tasks.registering {
+//    dependsOn(":ontrack-web:prod")
+//    doLast {
+//        project.copy {
+//            from(project(":ontrack-web").file("build/web/prod"))
+//            into("src/main/resources/static")
+//        }
+//    }
+//}
 
 /**
  * Dependencies
@@ -123,18 +122,18 @@ val copyWebResources by tasks.registering {
 
 tasks.named<Jar>("jar") {
     enabled = true
-    dependsOn(copyWebResources)
+    // dependsOn(copyWebResources)
     dependsOn("bootBuildInfo")
 }
 
 tasks.named<ProcessResources>("processResources") {
-    dependsOn(copyWebResources)
+    // dependsOn(copyWebResources)
     dependsOn("bootBuildInfo")
 }
 
 tasks.named<BootRun>("bootRun") {
     dependsOn("bootJar")
-    dependsOn(":ontrack-web:dev")
+    // dependsOn(":ontrack-web:dev")
 
     // Running with `dev` profile by default with `bootRun`
     args("--spring.profiles.active=dev")
@@ -167,30 +166,4 @@ val bootJar = tasks.getByName<BootJar>("bootJar") {
     manifest {
         attributes("Main-Class" to "org.springframework.boot.loader.PropertiesLauncher")
     }
-}
-
-/**
- * Publication of artifacts
- */
-
-publishing {
-    publications {
-        named<MavenPublication>("mavenCustom") {
-            artifact(bootJar) {
-                classifier = "app"
-            }
-            artifact("build/graphql.json") {
-                classifier = "graphql.json"
-            }
-        }
-    }
-}
-
-/**
- * Publication of artifacts, mostly the one of the `graphql.json` file, depends
- * on the integration tests having run.
- */
-
-tasks.withType(AbstractPublishToMaven::class.java) {
-    dependsOn("integrationTest")
 }

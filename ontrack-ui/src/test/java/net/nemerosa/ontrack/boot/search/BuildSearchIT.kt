@@ -4,10 +4,10 @@ import net.nemerosa.ontrack.boot.BUILD_SEARCH_INDEX
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.SearchRequest
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertTrue
 
-class BuildSearchIT : AbstractSearchJUnit4TestSupport() {
+class BuildSearchIT : AbstractSearchTestSupport() {
 
     @Test
     fun `Searching builds`() {

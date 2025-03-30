@@ -1,11 +1,15 @@
 package net.nemerosa.ontrack.boot.ui
 
+import jakarta.validation.Valid
 import net.nemerosa.ontrack.extension.api.BuildDiffExtension
 import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException
-import net.nemerosa.ontrack.model.form.*
+import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.Form.Companion.create
+import net.nemerosa.ontrack.model.form.intField
+import net.nemerosa.ontrack.model.form.selectionOfString
+import net.nemerosa.ontrack.model.form.textField
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.Build.Companion.form
@@ -19,7 +23,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
 import java.util.stream.Collectors
-import jakarta.validation.Valid
 
 @RestController
 @RequestMapping("/rest/structure")
@@ -104,7 +107,7 @@ class BuildController(
     }
 
     @PostMapping("branches/{branchId}/builds/create")
-    fun newBuild(@PathVariable branchId: ID, @RequestBody request: @Valid BuildRequest?): Build {
+    fun newBuild(@PathVariable branchId: ID, @RequestBody request: @Valid BuildRequest?): ResponseEntity<Build> {
         // Gets the holding branch
         val branch = structureService.getBranch(branchId)
         // Build signature
@@ -122,19 +125,21 @@ class BuildController(
             )
         }
         // OK
-        return build
+        return ResponseEntity.ok(build)
     }
 
     /**
      * Looking for a build using its exact name on a branch.
      */
     @GetMapping("branches/{branchId}/builds/{name:[A-Za-z0-9_.-]+}")
-    fun getBuildByBranchAndName(@PathVariable branchId: ID, @PathVariable name: String): Build {
+    fun getBuildByBranchAndName(@PathVariable branchId: ID, @PathVariable name: String): ResponseEntity<Build> {
         // Gets the holding branch
         val (_, name1, _, _, project) = structureService.getBranch(branchId)
         // Gets the build by name
-        return structureService.findBuildByName(project.name, name1, name)
-            .orElseThrow { BuildNotFoundException(project.name, name1, name) }
+        return ResponseEntity.ok(
+            structureService.findBuildByName(project.name, name1, name)
+                .orElseThrow { BuildNotFoundException(project.name, name1, name) }
+        )
     }
 
     @GetMapping("builds/{buildId}/update")
@@ -143,7 +148,10 @@ class BuildController(
     }
 
     @PutMapping("builds/{buildId}/update")
-    fun updateBuild(@PathVariable buildId: ID, @RequestBody nameDescription: @Valid NameDescription): Build {
+    fun updateBuild(
+        @PathVariable buildId: ID,
+        @RequestBody nameDescription: @Valid NameDescription
+    ): ResponseEntity<Build> {
         // Gets from the repository
         var build = structureService.getBuild(buildId)
         // Updates
@@ -151,7 +159,7 @@ class BuildController(
         // Saves in repository
         structureService.saveBuild(build)
         // As resource
-        return build
+        return ResponseEntity.ok(build)
     }
 
     /**
@@ -168,7 +176,7 @@ class BuildController(
      * Update the build signature
      */
     @PutMapping("builds/{buildId}/signature")
-    fun updateBuildSignature(@PathVariable buildId: ID, @RequestBody request: SignatureRequest): Build {
+    fun updateBuildSignature(@PathVariable buildId: ID, @RequestBody request: SignatureRequest): ResponseEntity<Build> {
         // Gets from the repository
         var build = structureService.getBuild(buildId)
         // Updates
@@ -178,17 +186,17 @@ class BuildController(
         // Saves in repository
         structureService.saveBuild(build)
         // As resource
-        return build
+        return ResponseEntity.ok(build)
     }
 
     @DeleteMapping("builds/{buildId}")
-    fun deleteBuild(@PathVariable buildId: ID): Ack {
-        return structureService.deleteBuild(buildId)
+    fun deleteBuild(@PathVariable buildId: ID): ResponseEntity<Ack> {
+        return ResponseEntity.ok(structureService.deleteBuild(buildId))
     }
 
     @GetMapping("builds/{buildId}")
-    fun getBuild(@PathVariable buildId: ID): Build {
-        return structureService.getBuild(buildId)
+    fun getBuild(@PathVariable buildId: ID): ResponseEntity<Build> {
+        return ResponseEntity.ok(structureService.getBuild(buildId))
     }
 
     /**
@@ -270,10 +278,10 @@ class BuildController(
      * @return List of builds
      */
     @PutMapping("builds/{buildId}/links/edit")
-    fun createBuildLinkFromForm(@PathVariable buildId: ID, @RequestBody form: BuildLinkForm?): Build {
+    fun createBuildLinkFromForm(@PathVariable buildId: ID, @RequestBody form: BuildLinkForm?): ResponseEntity<Build> {
         val build = structureService.getBuild(buildId)
         structureService.editBuildLinks(build, form ?: BuildLinkForm())
-        return build
+        return ResponseEntity.ok(build)
     }
 
     /**
@@ -284,11 +292,11 @@ class BuildController(
      * @return List of builds
      */
     @PutMapping("builds/{buildId}/links/{targetBuildId}")
-    fun addBuildLink(@PathVariable buildId: ID, @PathVariable targetBuildId: ID): Build {
+    fun addBuildLink(@PathVariable buildId: ID, @PathVariable targetBuildId: ID): ResponseEntity<Build> {
         val build = structureService.getBuild(buildId)
         val targetBuild = structureService.getBuild(targetBuildId)
         structureService.createBuildLink(build, targetBuild, BuildLink.DEFAULT)
-        return build
+        return ResponseEntity.ok(build)
     }
 
     /**
@@ -303,10 +311,10 @@ class BuildController(
         @PathVariable buildId: ID,
         @PathVariable targetBuildId: ID,
         @RequestParam qualifier: String?
-    ): Build {
+    ): ResponseEntity<Build> {
         val build = structureService.getBuild(buildId)
         val targetBuild = structureService.getBuild(targetBuildId)
         structureService.deleteBuildLink(build, targetBuild, qualifier ?: BuildLink.DEFAULT)
-        return build
+        return ResponseEntity.ok(build)
     }
 }

@@ -1,5 +1,6 @@
 plugins {
     `java-library`
+     `java-test-fixtures`
 }
 
 dependencies {
@@ -15,4 +16,8 @@ dependencies {
     testApi(project(":ontrack-it-utils"))
 
     testImplementation(testFixtures(project(":ontrack-model")))
+
+    testFixturesImplementation("org.junit.jupiter:junit-jupiter-api")
+    testFixturesImplementation(project(":ontrack-it-utils"))
+    testFixturesImplementation("org.jetbrains.kotlin:kotlin-test")
 }

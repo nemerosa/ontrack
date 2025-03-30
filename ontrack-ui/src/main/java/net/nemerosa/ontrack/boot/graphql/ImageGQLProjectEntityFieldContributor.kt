@@ -3,8 +3,6 @@ package net.nemerosa.ontrack.boot.graphql
 import graphql.Scalars
 import graphql.schema.DataFetchingEnvironment
 import graphql.schema.GraphQLFieldDefinition
-import net.nemerosa.ontrack.boot.ui.PromotionLevelController
-import net.nemerosa.ontrack.boot.ui.ValidationStampController
 import net.nemerosa.ontrack.graphql.schema.GQLProjectEntityFieldContributor
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
@@ -12,7 +10,6 @@ import net.nemerosa.ontrack.model.structure.PromotionLevel
 import net.nemerosa.ontrack.model.structure.ValidationStamp
 import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import org.springframework.stereotype.Component
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 import java.net.URI
 
 @Component
@@ -28,13 +25,13 @@ class ImageGQLProjectEntityFieldContributor(
         when (projectEntityType) {
             ProjectEntityType.PROMOTION_LEVEL -> listOf(
                 baseImageFieldBuilder { env ->
-                    val pl: PromotionLevel = env.getSource()
+                    val pl: PromotionLevel = env.getSource()!!
                     uriBuilder.url("/rest/structure/promotionLevels/${pl.id}/image")
                 }
             )
             ProjectEntityType.VALIDATION_STAMP -> listOf(
                 baseImageFieldBuilder { env ->
-                    val vs: ValidationStamp = env.getSource()
+                    val vs: ValidationStamp = env.getSource()!!
                     uriBuilder.url("/rest/structure/validationStamps/${vs.id}/image")
                 }
             )

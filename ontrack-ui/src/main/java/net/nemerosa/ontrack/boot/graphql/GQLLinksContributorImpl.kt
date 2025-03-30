@@ -53,7 +53,7 @@ class GQLLinksContributorImpl(
                                             )
                                             .build()
                             )
-                            .dataFetcher { env -> LinksCache(resourceContext, env.getSource(), typeDecorators) }
+                            .dataFetcher { env -> LinksCache(resourceContext, env.getSource()!!, typeDecorators) }
                             .build()
             )
         }
@@ -63,7 +63,7 @@ class GQLLinksContributorImpl(
 
     private fun linkDataFetcher(linkName: String) =
             DataFetcher<String> { environment ->
-                val linksCache = environment.getSource<LinksCache>()
+                val linksCache = environment.getSource<LinksCache>()!!
                 linksCache.getLink(linkName)
             }
 

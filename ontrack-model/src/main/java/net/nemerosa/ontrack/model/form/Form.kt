@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.model.form
 
-@Deprecated("Will be removed in V5. Use Next UI only.")
+@Deprecated("Will be removed in V6. Use Next UI only.")
 open class Form {
 
     private val internalFields: MutableMap<String, Field> = mutableMapOf()

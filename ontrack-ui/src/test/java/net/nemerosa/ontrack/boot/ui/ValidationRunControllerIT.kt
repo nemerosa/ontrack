@@ -10,9 +10,10 @@ import net.nemerosa.ontrack.model.structure.ValidationRunStatusService
 import net.nemerosa.ontrack.model.structure.ValidationStamp
 import net.nemerosa.ontrack.model.structure.config
 import net.nemerosa.ontrack.test.assertIs
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
@@ -44,170 +45,194 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
     @Test
     fun `Stamp with type, computed status, run with data, provided status, valid data`() {
         doTestVS().withType().withComputedStatus(50)
-                .forRun().withData(mapOf("value" to 40)).withStatus("PASSED")
-                .execute()
-                .mustBe("PASSED").withData(40)
+            .forRun().withData(mapOf("value" to 40)).withStatus("PASSED")
+            .execute()
+            .mustBe("PASSED").withData(40)
     }
 
-    @Test(expected = ValidationRunDataFormatException::class)
+    @Test
     fun `Stamp with type, computed status, run with data, provided status, invalid data`() {
-        doTestVS().withType().withComputedStatus(50)
+        assertFailsWith<ValidationRunDataFormatException> {
+            doTestVS().withType().withComputedStatus(50)
                 .forRun().withData("text".toJson()!!).withStatus("PASSED")
                 .execute()
+        }
     }
 
     @Test
     fun `Stamp with type, computed status, run with data, unprovided status, valid data`() {
         doTestVS().withType().withComputedStatus(50)
-                .forRun().withData(mapOf("value" to 40))
-                .execute()
-                .mustBe("FAILED").withData(40)
+            .forRun().withData(mapOf("value" to 40))
+            .execute()
+            .mustBe("FAILED").withData(40)
     }
 
-    @Test(expected = ValidationRunDataInputException::class)
+    @Test
     fun `Stamp with type, computed status, run with data, unprovided status, invalid data`() {
-        doTestVS().withType().withComputedStatus(50)
+        assertFailsWith<ValidationRunDataInputException> {
+            doTestVS().withType().withComputedStatus(50)
                 .forRun().withData("text".toJson()!!)
                 .execute()
+        }
     }
 
     @Test
     fun `Stamp with type, computed status, run without data, provided status`() {
         doTestVS().withType().withComputedStatus(50)
-                .forRun().withStatus("PASSED")
-                .execute()
-                .mustBe("PASSED").withNoData()
+            .forRun().withStatus("PASSED")
+            .execute()
+            .mustBe("PASSED").withNoData()
     }
 
-    @Test(expected = ValidationRunDataStatusRequiredBecauseNoDataException::class)
+    @Test
     fun `Stamp with type, computed status, run without data, unprovided status`() {
-        doTestVS().withType().withComputedStatus(50)
+        assertFailsWith<ValidationRunDataStatusRequiredBecauseNoDataException> {
+            doTestVS().withType().withComputedStatus(50)
                 .forRun()
                 .execute()
+        }
     }
 
     @Test
     fun `Stamp with type, no computed status, run with data, provided status, valid data`() {
         doTestVS().withType()
-                .forRun().withData(mapOf("value" to 40)).withStatus("PASSED")
-                .execute()
-                .mustBe("PASSED").withData(40)
+            .forRun().withData(mapOf("value" to 40)).withStatus("PASSED")
+            .execute()
+            .mustBe("PASSED").withData(40)
     }
 
-    @Test(expected = ValidationRunDataFormatException::class)
+    @Test
     fun `Stamp with type, no computed status, run with data, provided status, invalid data`() {
-        doTestVS().withType()
+        assertFailsWith<ValidationRunDataFormatException> {
+            doTestVS().withType()
                 .forRun().withData("text".toJson()!!).withStatus("PASSED")
                 .execute()
+        }
     }
 
     @Test
     fun `Stamp with type, no computed status, run with data, unprovided status, valid data`() {
         doTestVS().withType()
-                .forRun().withData(mapOf("value" to 40))
-                .execute()
-                .mustBe("PASSED").withData(40)
+            .forRun().withData(mapOf("value" to 40))
+            .execute()
+            .mustBe("PASSED").withData(40)
     }
 
-    @Test(expected = ValidationRunDataFormatException::class)
+    @Test
     fun `Stamp with type, no computed status, run with data, unprovided status, invalid data`() {
-        doTestVS().withType()
+        assertFailsWith<ValidationRunDataFormatException> {
+            doTestVS().withType()
                 .forRun().withData("text".toJson()!!)
                 .execute()
+        }
     }
 
     @Test
     fun `Stamp with type, no computed status, run without data, provided status`() {
         doTestVS().withType()
-                .forRun().withStatus("FAILED")
-                .execute()
-                .mustBe("FAILED").withNoData()
+            .forRun().withStatus("FAILED")
+            .execute()
+            .mustBe("FAILED").withNoData()
     }
 
-    @Test(expected = ValidationRunDataStatusRequiredBecauseNoDataException::class)
+    @Test
     fun `Stamp with type, no computed status, run without data, unprovided status`() {
-        doTestVS().withType()
+        assertFailsWith<ValidationRunDataStatusRequiredBecauseNoDataException> {
+            doTestVS().withType()
                 .forRun()
                 .execute()
+        }
     }
 
     @Test
     fun `Stamp without type, run with data, provided status, valid data`() {
         doTestVS()
-                .forRun().withData(mapOf("value" to 40)).withStatus("FAILED")
-                .execute()
-                .mustBe("FAILED").withData(40)
+            .forRun().withData(mapOf("value" to 40)).withStatus("FAILED")
+            .execute()
+            .mustBe("FAILED").withData(40)
     }
 
-    @Test(expected = ValidationRunDataFormatException::class)
+    @Test
     fun `Stamp without type, run with data, provided status, invalid data`() {
-        doTestVS()
+        assertFailsWith<ValidationRunDataFormatException> {
+            doTestVS()
                 .forRun().withData("text".toJson()!!).withStatus("FAILED")
                 .execute()
+        }
     }
 
-    @Test(expected = ValidationRunDataStatusRequiredBecauseNoDataTypeException::class)
+    @Test
     fun `Stamp without type, run with data, unprovided status, valid data`() {
-        doTestVS()
+        assertFailsWith<ValidationRunDataStatusRequiredBecauseNoDataTypeException> {
+            doTestVS()
                 .forRun().withData("value" to 40)
                 .execute()
+        }
     }
 
-    @Test(expected = ValidationRunDataFormatException::class)
+    @Test
     fun `Stamp without type, run with data, unprovided status, invalid data`() {
-        doTestVS()
+        assertFailsWith<ValidationRunDataFormatException> {
+            doTestVS()
                 .forRun().withData("text".toJson()!!)
                 .execute()
+        }
     }
 
     @Test
     fun `Stamp without type, run without data, provided status`() {
         doTestVS()
-                .forRun().withStatus("FAILED")
-                .execute()
-                .mustBe("FAILED").withNoData()
+            .forRun().withStatus("FAILED")
+            .execute()
+            .mustBe("FAILED").withNoData()
     }
 
-    @Test(expected = ValidationRunDataStatusRequiredBecauseNoDataException::class)
+    @Test
     fun `Stamp without type, run without data, unprovided status`() {
-        doTestVS()
+        assertFailsWith<ValidationRunDataStatusRequiredBecauseNoDataException> {
+            doTestVS()
                 .forRun()
                 .execute()
+        }
     }
 
     // ---
 
-    @Test(expected = ValidationRunDataTypeNotFoundException::class)
+    @Test
     fun `Stamp without type, run with data, unprovided status, unknown type`() {
-        doTestVS()
+        assertFailsWith<ValidationRunDataTypeNotFoundException> {
+            doTestVS()
                 .forRun().withData("value" to 50).withDataType("unknown")
                 .execute()
+        }
     }
 
     // ---
 
-    @Test(expected = ValidationRunDataJSONInputException::class)
+    @Test
     fun `Invalid JSON must be caught as an input exception`() {
-        project {
-            branch {
-                val vs = validationStamp(
+        assertFailsWith<ValidationRunDataJSONInputException> {
+            project {
+                branch {
+                    val vs = validationStamp(
                         "VS",
                         testValidationDataType.config(null)
-                )
-                build<ValidationRun>("1.0.0") {
-                    // Calling the validation run controller
-                    validationRunController.newValidationRun(
+                    )
+                    build<ValidationRun>("1.0.0") {
+                        // Calling the validation run controller
+                        validationRunController.newValidationRun(
                             id,
                             ValidationRunRequestForm(
-                                    description = "",
-                                    validationRunStatusId = null,
-                                    validationStampData = ValidationRunRequestFormData(
-                                            id = vs.name,
-                                            type = testValidationDataType.descriptor.id,
-                                            data = mapOf("CRITICAL" to 1).toJson() // CRITICAL instead of critical
-                                    )
+                                description = "",
+                                validationRunStatusId = null,
+                                validationStampData = ValidationRunRequestFormData(
+                                    id = vs.name,
+                                    type = testValidationDataType.descriptor.id,
+                                    data = mapOf("CRITICAL" to 1).toJson() // CRITICAL instead of critical
+                                )
                             )
-                    )
+                        )
+                    }
                 }
             }
         }
@@ -215,29 +240,31 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
 
     // ---
 
-    @Test(expected = ValidationRunDataMismatchException::class)
+    @Test
     fun `Request type is more important for the parsing than the stamp type`() {
-        project {
-            branch {
-                val vs = validationStamp(
+        assertFailsWith<ValidationRunDataMismatchException> {
+            project {
+                branch {
+                    val vs = validationStamp(
                         "VS",
                         testValidationDataType.config(null)
-                )
-                build<ValidationRun>("1.0.0") {
-                    // Calling the validation run controller
-                    validationRunController.newValidationRun(
+                    )
+                    build<ValidationRun>("1.0.0") {
+                        // Calling the validation run controller
+                        validationRunController.newValidationRun(
                             id,
                             ValidationRunRequestForm(
-                                    description = "",
-                                    validationRunStatusId = null,
-                                    validationStampData = ValidationRunRequestFormData(
-                                            id = vs.name,
-                                            // Sending a number type where a fraction is expected
-                                            type = testNumberValidationDataType.descriptor.id,
-                                            data = mapOf("value" to 42).toJson()
-                                    )
+                                description = "",
+                                validationRunStatusId = null,
+                                validationStampData = ValidationRunRequestFormData(
+                                    id = vs.name,
+                                    // Sending a number type where a fraction is expected
+                                    type = testNumberValidationDataType.descriptor.id,
+                                    data = mapOf("value" to 42).toJson()
+                                )
                             )
-                    )
+                        )
+                    }
                 }
             }
         }
@@ -261,19 +288,19 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
         fun forRun() = VRun(this)
 
         fun <T> withValidationStamp(fn: (ValidationStamp) -> T): T =
-                project<T> {
-                    branch<T> {
-                        val vs = validationStamp(
-                                "VS",
-                                if (typed) {
-                                    testNumberValidationDataType.config(threshold)
-                                } else {
-                                    null
-                                }
-                        )
-                        fn(vs)
-                    }
+            project<T> {
+                branch<T> {
+                    val vs = validationStamp(
+                        "VS",
+                        if (typed) {
+                            testNumberValidationDataType.config(threshold)
+                        } else {
+                            null
+                        }
+                    )
+                    fn(vs)
                 }
+            }
     }
 
     private inner class VRun(private val vs: VS) {
@@ -304,17 +331,17 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
                 it.branch.build<ValidationRun>("1.0.0") {
                     // Calling the validation run controller
                     validationRunController.newValidationRun(
-                            id,
-                            ValidationRunRequestForm(
-                                    description = "",
-                                    validationRunStatusId = status,
-                                    validationStampData = ValidationRunRequestFormData(
-                                            id = it.name,
-                                            type = dataType
-                                                    ?: if (vs.typed) null else testNumberValidationDataType.descriptor.id,
-                                            data = data
-                                    )
+                        id,
+                        ValidationRunRequestForm(
+                            description = "",
+                            validationRunStatusId = status,
+                            validationStampData = ValidationRunRequestFormData(
+                                id = it.name,
+                                type = dataType
+                                    ?: if (vs.typed) null else testNumberValidationDataType.descriptor.id,
+                                data = data
                             )
+                        )
                     )
                 }
             }
@@ -326,8 +353,8 @@ class ValidationRunControllerIT : AbstractWebTestSupport() {
     private class VTest(private val run: ValidationRun) {
         fun mustBe(status: String) = apply {
             assertEquals(
-                    status,
-                    run.lastStatus.statusID.id
+                status,
+                run.lastStatus.statusID.id
             )
         }
 

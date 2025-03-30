@@ -1,5 +1,8 @@
 package net.nemerosa.ontrack.boot.support
 
+import jakarta.servlet.FilterChain
+import jakarta.servlet.ServletRequest
+import jakarta.servlet.ServletResponse
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler
@@ -7,11 +10,8 @@ import org.springframework.security.web.savedrequest.HttpSessionRequestCache
 import org.springframework.security.web.savedrequest.RequestCache
 import org.springframework.security.web.savedrequest.SavedRequest
 import org.springframework.stereotype.Component
-import org.springframework.util.Base64Utils
 import org.springframework.web.filter.GenericFilterBean
-import javax.servlet.FilterChain
-import javax.servlet.ServletRequest
-import javax.servlet.ServletResponse
+import java.util.*
 
 @Component
 class LoginSavedRequestFilter: GenericFilterBean() {
@@ -82,7 +82,7 @@ class LoginSuccessHandler(
             if (cookie.name == COOKIE_HASH_PART) {
                 val value = cookie.value
                 if (!value.isNullOrBlank()) {
-                    val actualValue = String(Base64Utils.decodeFromString(value))
+                    val actualValue = String(Base64.getDecoder().decode(value))
                     targetUrl += actualValue
                 }
                 cookie.maxAge = 0 // Clears cookie as no longer needed

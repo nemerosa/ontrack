@@ -8,7 +8,10 @@ import co.elastic.clients.elasticsearch.core.DeleteRequest
 import co.elastic.clients.elasticsearch.core.GetRequest
 import co.elastic.clients.elasticsearch.core.IndexRequest
 import co.elastic.clients.elasticsearch.core.bulk.BulkOperation
-import co.elastic.clients.elasticsearch.indices.*
+import co.elastic.clients.elasticsearch.indices.CreateIndexRequest
+import co.elastic.clients.elasticsearch.indices.DeleteIndexRequest
+import co.elastic.clients.elasticsearch.indices.ExistsRequest
+import co.elastic.clients.elasticsearch.indices.RefreshRequest
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.slf4j.Logger
@@ -52,17 +55,7 @@ class ElasticSearchIndexService(
     override fun <T : SearchItem> initIndex(indexer: SearchIndexer<T>) {
         logger.info("[elasticsearch][index][${indexer.indexName}] Init")
         val indexExists = client.indices().exists(ExistsRequest.Builder().index(indexer.indexName).build()).value()
-        if (indexExists) {
-            logger.info("[elasticsearch][index][${indexer.indexName}] Already exists")
-            indexer.indexMapping?.let { mapping ->
-                val request = PutMappingRequest.Builder().index(indexer.indexName)
-                    .run {
-                        mappingToSource(this, mapping)
-                    }
-                    .build()
-                client.indices().putMapping(request)
-            }
-        } else {
+        if (!indexExists) {
             logger.info("[elasticsearch][index][${indexer.indexName}] Creating index")
             val request = CreateIndexRequest.Builder().index(indexer.indexName).run {
                 indexer.indexMapping?.let { indexMapping ->
@@ -89,21 +82,6 @@ class ElasticSearchIndexService(
                 }
             }
         }
-    }
-
-    private fun mappingToSource(
-        request: PutMappingRequest.Builder,
-        mapping: SearchIndexMapping
-    ): PutMappingRequest.Builder {
-        mapping.fields
-            .filter { it.types.isNotEmpty() }
-            .forEach { fieldMapping ->
-                // Property mapping
-                request.properties(fieldMapping.name) { propBuilder ->
-                    setupProperty(fieldMapping, propBuilder)
-                }
-            }
-        return request
     }
 
     private fun setupProperty(
@@ -150,21 +128,19 @@ class ElasticSearchIndexService(
                     typeBuilder
                 }
 
-                "object" -> propBuilder.keyword { typeBuilder ->
+                "object" -> propBuilder.`object` { typeBuilder ->
+                    baseBuilderCode(typeBuilder)
+                    typeBuilder
+                }
+
+                "date" -> propBuilder.date { typeBuilder ->
                     type.index?.let { typeBuilder.index(it) }
                     type.scoreBoost?.let { typeBuilder.boost(it) }
                     baseBuilderCode(typeBuilder)
                     typeBuilder
                 }
 
-                "date" -> propBuilder.keyword { typeBuilder ->
-                    type.index?.let { typeBuilder.index(it) }
-                    type.scoreBoost?.let { typeBuilder.boost(it) }
-                    baseBuilderCode(typeBuilder)
-                    typeBuilder
-                }
-
-                "text" -> propBuilder.keyword { typeBuilder ->
+                "text" -> propBuilder.text { typeBuilder ->
                     type.index?.let { typeBuilder.index(it) }
                     type.scoreBoost?.let { typeBuilder.boost(it) }
                     baseBuilderCode(typeBuilder)

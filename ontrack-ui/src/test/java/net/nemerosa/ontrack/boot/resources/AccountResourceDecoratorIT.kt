@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.boot.resources
 
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecoratorTestSupport
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
 class AccountResourceDecoratorIT : AbstractResourceDecoratorTestSupport() {

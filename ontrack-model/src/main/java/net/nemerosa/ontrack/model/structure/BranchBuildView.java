@@ -8,8 +8,11 @@ import java.util.List;
 /**
  * Filtered list of builds for a branch, with all their validation
  * stamps and promotion levels.
+ *
+ * @deprecated Will be removed in V6. Not used by Next UI.
  */
 @Data
+@Deprecated
 public class BranchBuildView implements View {
 
     /**

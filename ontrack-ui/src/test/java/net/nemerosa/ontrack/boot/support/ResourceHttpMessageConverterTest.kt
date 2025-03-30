@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.boot.support
 
-import com.nhaarman.mockitokotlin2.mock
+import io.mockk.mockk
 import net.nemerosa.ontrack.json.ObjectMapperFactory
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.structure.*
@@ -22,7 +22,7 @@ class ResourceHttpMessageConverterTest {
     fun before() {
         converter = ResourceHttpMessageConverter(
                 MockURIBuilder(),
-                mock(),
+                mockk(relaxed = true),
                 listOf(DefaultResourceModule(emptyList()))
         )
     }

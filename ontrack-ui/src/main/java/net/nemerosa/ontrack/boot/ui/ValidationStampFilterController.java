@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.model.support.SelectableString;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -52,18 +53,20 @@ public class ValidationStampFilterController extends AbstractResourceController 
     }
 
     @PostMapping("/branch/{branchId}/create")
-    public ValidationStampFilter createBranchValidationStampFilterForm(@PathVariable ID branchId, @RequestBody NameDescription input) {
+    public ResponseEntity<ValidationStampFilter> createBranchValidationStampFilterForm(@PathVariable ID branchId, @RequestBody NameDescription input) {
         // Gets all validation stamp names
         List<String> vsNames = structureService.getValidationStampListForBranch(branchId).stream()
                 .map(ValidationStamp::getName)
                 .collect(Collectors.toList());
-        return filterService.newValidationStampFilter(
-                new ValidationStampFilter(
-                        ID.NONE,
-                        input.getName(),
-                        vsNames,
-                        null,
-                        structureService.getBranch(branchId)
+        return ResponseEntity.ok(
+                filterService.newValidationStampFilter(
+                        new ValidationStampFilter(
+                                ID.NONE,
+                                input.getName(),
+                                vsNames,
+                                null,
+                                structureService.getBranch(branchId)
+                        )
                 )
         );
     }
@@ -119,7 +122,7 @@ public class ValidationStampFilterController extends AbstractResourceController 
     }
 
     @PutMapping("/{validationStampFilterId}/update")
-    public ValidationStampFilter updateValidationStampFilter(@PathVariable ID validationStampFilterId, @RequestBody ValidationStampFilterInput input) {
+    public ResponseEntity<ValidationStampFilter> updateValidationStampFilter(@PathVariable ID validationStampFilterId, @RequestBody ValidationStampFilterInput input) {
         // Changes the validation stamp filter
         ValidationStampFilter filter = filterService.getValidationStampFilter(validationStampFilterId)
                 .withName(input.getName())
@@ -127,33 +130,39 @@ public class ValidationStampFilterController extends AbstractResourceController 
         // Saves it
         filterService.saveValidationStampFilter(filter);
         // OK
-        return filter;
+        return ResponseEntity.ok(filter);
     }
 
     @DeleteMapping("/{validationStampFilterId}/delete")
-    public Ack deleteValidationStampFilter(@PathVariable ID validationStampFilterId) {
-        return filterService.deleteValidationStampFilter(
-                filterService.getValidationStampFilter(validationStampFilterId)
+    public ResponseEntity<Ack> deleteValidationStampFilter(@PathVariable ID validationStampFilterId) {
+        return ResponseEntity.ok(
+                filterService.deleteValidationStampFilter(
+                        filterService.getValidationStampFilter(validationStampFilterId)
+                )
         );
     }
 
     @PutMapping("/{validationStampFilterId}/share/project")
-    public ValidationStampFilter shareValidationStampFilterAtProject(@PathVariable ID validationStampFilterId) {
+    public ResponseEntity<ValidationStampFilter> shareValidationStampFilterAtProject(@PathVariable ID validationStampFilterId) {
         ValidationStampFilter filter = filterService.getValidationStampFilter(validationStampFilterId);
         if (filter.getBranch() == null) {
             throw new ValidationStampFilterNotShareableException(filter.getName(), "no branch is associated with the filter");
         }
-        return filterService.shareValidationStampFilter(
-                filter,
-                filter.getBranch().getProject()
+        return ResponseEntity.ok(
+                filterService.shareValidationStampFilter(
+                        filter,
+                        filter.getBranch().getProject()
+                )
         );
     }
 
     @PutMapping("/{validationStampFilterId}/share/global")
-    public ValidationStampFilter shareValidationStampFilterAtGlobal(@PathVariable ID validationStampFilterId) {
+    public ResponseEntity<ValidationStampFilter> shareValidationStampFilterAtGlobal(@PathVariable ID validationStampFilterId) {
         ValidationStampFilter filter = filterService.getValidationStampFilter(validationStampFilterId);
-        return filterService.shareValidationStampFilter(
-                filter
+        return ResponseEntity.ok(
+                filterService.shareValidationStampFilter(
+                        filter
+                )
         );
     }
 

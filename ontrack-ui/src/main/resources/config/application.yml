@@ -2,6 +2,11 @@
 
 # Spring configuration
 spring:
+  # TODO Default security settings
+  security:
+    user:
+      name: admin
+      password: admin
   # Default database connection
   datasource:
     url: "jdbc:postgresql://localhost/ontrack"
@@ -46,19 +51,9 @@ management:
         include: "*"
       base-path: "/manage"
   # Default settings for the metrics
-  metrics:
-    export:
-      # Need an explicit enablement
-      defaults:
-        enabled: false
-      # ElasticSearch disabled by default
-      elastic:
-        enabled: false
-      # InfluxDB disabled by default
-      influx:
-        enabled: false
-      # Prometheus enabled by default
-      prometheus:
+  prometheus:
+    metrics:
+      export:
         enabled: true
   # Health indicators
   health:

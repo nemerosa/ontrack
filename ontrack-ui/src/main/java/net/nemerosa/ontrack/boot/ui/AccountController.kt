@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui
 
+import jakarta.validation.Valid
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.form.*
 import net.nemerosa.ontrack.model.form.Form.Companion.create
@@ -9,9 +10,9 @@ import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import net.nemerosa.ontrack.ui.resource.Link
 import net.nemerosa.ontrack.ui.resource.Resources
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
-import jakarta.validation.Valid
 
 /**
  * Management of accounts
@@ -61,16 +62,16 @@ class AccountController(
      * Creation of a built-in account
      */
     @PostMapping("create")
-    fun create(@RequestBody @Valid input: AccountInput): Account {
-        return accountService.create(input)
+    fun create(@RequestBody @Valid input: AccountInput): ResponseEntity<Account> {
+        return ResponseEntity.ok(accountService.create(input))
     }
 
     /**
      * Gets an account by its ID
      */
     @GetMapping("{accountId}")
-    fun getAccount(@PathVariable accountId: ID): Account {
-        return accountService.getAccount(accountId)
+    fun getAccount(@PathVariable accountId: ID): ResponseEntity<Account> {
+        return ResponseEntity.ok(accountService.getAccount(accountId))
     }
 
     /**
@@ -104,16 +105,16 @@ class AccountController(
      * Updating an account
      */
     @PutMapping("{accountId}/update")
-    fun updateAccount(@PathVariable accountId: ID, @RequestBody @Valid input: AccountInput): Account {
-        return accountService.updateAccount(accountId, input)
+    fun updateAccount(@PathVariable accountId: ID, @RequestBody @Valid input: AccountInput): ResponseEntity<Account> {
+        return ResponseEntity.ok(accountService.updateAccount(accountId, input))
     }
 
     /**
      * Deleting an account
      */
     @DeleteMapping("{accountId}")
-    fun deleteAccount(@PathVariable accountId: ID): Ack {
-        return accountService.deleteAccount(accountId)
+fun deleteAccount(@PathVariable accountId: ID): ResponseEntity<Ack> {
+        return ResponseEntity.ok(accountService.deleteAccount(accountId))
     }
 
     /**
@@ -138,16 +139,16 @@ class AccountController(
      * Creation of an account group
      */
     @PostMapping("groups/create")
-    fun create(@RequestBody @Valid input: AccountGroupInput): AccountGroup {
-        return accountService.createGroup(input)
+    fun create(@RequestBody @Valid input: AccountGroupInput): ResponseEntity<AccountGroup> {
+        return ResponseEntity.ok(accountService.createGroup(input))
     }
 
     /**
      * Getting a group
      */
     @GetMapping("groups/{groupId}")
-    fun getGroup(@PathVariable groupId: ID): AccountGroup {
-        return accountService.getAccountGroup(groupId)
+    fun getGroup(@PathVariable groupId: ID): ResponseEntity<AccountGroup> {
+        return ResponseEntity.ok(accountService.getAccountGroup(groupId))
     }
 
     /**
@@ -165,16 +166,16 @@ class AccountController(
      * Updating a group
      */
     @PutMapping("groups/{groupId}/update")
-    fun updateGroup(@PathVariable groupId: ID, @RequestBody @Valid input: AccountGroupInput): AccountGroup {
-        return accountService.updateGroup(groupId, input)
+    fun updateGroup(@PathVariable groupId: ID, @RequestBody @Valid input: AccountGroupInput): ResponseEntity<AccountGroup> {
+        return ResponseEntity.ok(accountService.updateGroup(groupId, input))
     }
 
     /**
      * Deleting a group. This does not delete the associated accounts, only the links to them.
      */
     @DeleteMapping("groups/{groupId}")
-    fun deleteGroup(@PathVariable groupId: ID): Ack {
-        return accountService.deleteGroup(groupId)
+    fun deleteGroup(@PathVariable groupId: ID): ResponseEntity<Ack> {
+        return ResponseEntity.ok(accountService.deleteGroup(groupId))
     }
 
 }

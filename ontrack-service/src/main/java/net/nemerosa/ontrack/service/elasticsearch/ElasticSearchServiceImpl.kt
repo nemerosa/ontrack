@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.service.elasticsearch
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient
-import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders.multiMatch
 import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.Ack
@@ -22,6 +21,8 @@ class ElasticSearchServiceImpl(
     val indexers: Map<String, SearchIndexer<*>> by lazy {
         searchIndexers.associateBy { it.indexName }
     }
+
+    val allIndices = searchIndexers.joinToString(",") { it.indexName }
 
     val indexerByResultType: Map<String, SearchIndexer<*>> by lazy {
         searchIndexers.filter { it.searchResultType != null }.associateBy { it.searchResultType!!.id }
@@ -53,12 +54,18 @@ class ElasticSearchServiceImpl(
         val searchRequest = ESSearchRequestBuilder().apply {
             if (indexName != null) {
                 index(indexName)
+            } else {
+                // Restricting to all known indexes
+                index(allIndices)
             }
             from(offset)
             size(size)
-            multiMatch()
-                .query(token)
-                .type(TextQueryType.BestFields)
+            query { q ->
+                q.multiMatch { m ->
+                    m.query(token)
+                        .type(TextQueryType.BestFields)
+                }
+            }
         }.build()
 
         // Getting the result of the search

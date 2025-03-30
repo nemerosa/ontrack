@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import jakarta.validation.Valid;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterForm;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterInput;
@@ -12,9 +13,8 @@ import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import jakarta.validation.Valid;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
@@ -78,26 +78,32 @@ public class BuildFilterController extends AbstractResourceController {
      * Creating a filter
      */
     @RequestMapping(value = "branches/{branchId}/filters", method = RequestMethod.POST)
-    public Ack createFilter(@PathVariable ID branchId, @RequestBody @Valid BuildFilterInput input) {
-        return buildFilterService.saveFilter(branchId, input.isShared(), input.getName(), input.getType(), input.getData());
+    public ResponseEntity<Ack> createFilter(@PathVariable ID branchId, @RequestBody @Valid BuildFilterInput input) {
+        return ResponseEntity.ok(
+                buildFilterService.saveFilter(branchId, input.isShared(), input.getName(), input.getType(), input.getData())
+        );
     }
 
     /**
      * Saving a filter
      */
     @RequestMapping(value = "branches/{branchId}/filters/{name}", method = RequestMethod.PUT)
-    public Ack saveFilter(@PathVariable ID branchId, @PathVariable String name, @RequestBody @Valid BuildFilterInput input) {
+    public ResponseEntity<Ack> saveFilter(@PathVariable ID branchId, @PathVariable String name, @RequestBody @Valid BuildFilterInput input) {
         if (!StringUtils.equals(name, input.getName())) {
             throw new IllegalArgumentException("The input name must be identical to the one in the URI.");
         }
-        return buildFilterService.saveFilter(branchId, input.isShared(), name, input.getType(), input.getData());
+        return ResponseEntity.ok(
+                buildFilterService.saveFilter(branchId, input.isShared(), name, input.getType(), input.getData())
+        );
     }
 
     /**
      * Deletes a filter
      */
     @RequestMapping(value = "branches/{branchId}/filters/{name}", method = RequestMethod.DELETE)
-    public Ack deleteFilter(@PathVariable ID branchId, @PathVariable String name) {
-        return buildFilterService.deleteFilter(branchId, name);
+    public ResponseEntity<Ack> deleteFilter(@PathVariable ID branchId, @PathVariable String name) {
+        return ResponseEntity.ok(
+                buildFilterService.deleteFilter(branchId, name)
+        );
     }
 }

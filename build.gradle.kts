@@ -45,6 +45,9 @@ subprojects {
 
             // Git repository support TODO Will be removed in V5
             dependency("org.eclipse.jgit:org.eclipse.jgit:6.6.1.202309021850-r")
+
+            // Log JSON TODO Will be removed in V5
+            dependency("net.logstash.logback:logstash-logback-encoder:7.3")
         }
     }
 

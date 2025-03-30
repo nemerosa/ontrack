@@ -67,6 +67,49 @@ class GQLPaginatedListFactory(
             }.build()
 
     /**
+     * Creates a paginated field from a [PaginatedList] provider.
+     *
+     * Suitable for root queries (non source available)
+     *
+     * @param fieldName Name of the field
+     * @param fieldDescription Description of the field
+     * @param deprecation Deprecation reason
+     * @param itemType Type of the items being paginated
+     * @param itemPaginatedListProvider Function to provide the paginated list directly.
+     * @param arguments Optional list of arguments to add to the field
+     * @param additionalFields Optional list of fields to add, additionally to the page info and the page items.
+     *
+     * @param T Type of item in the list
+     */
+    fun <T> createRootPaginatedField(
+            cache: GQLTypeCache,
+            fieldName: String,
+            fieldDescription: String,
+            deprecation: String? = null,
+            itemType: String,
+            itemPaginatedListProvider: (env: DataFetchingEnvironment, offset: Int, size: Int) -> PaginatedList<T>,
+            arguments: List<GraphQLArgument> = emptyList(),
+            additionalFields: List<GraphQLFieldDefinition> = emptyList(),
+    ): GraphQLFieldDefinition =
+            createBasePaginatedListField(
+                    cache,
+                    fieldName,
+                    fieldDescription,
+                    deprecation,
+                    itemType,
+                    arguments,
+                    additionalFields,
+            ).dataFetcher { environment ->
+                val offset = environment.getArgument<Int>(ARG_OFFSET) ?: 0
+                val size = environment.getArgument<Int>(ARG_SIZE) ?: PageRequest.DEFAULT_PAGE_SIZE
+                itemPaginatedListProvider(
+                        environment,
+                        offset,
+                        size
+                )
+            }.build()
+
+    /**
      * Creates a paginated field from a counter and list provider.
      *
      * @param fieldName Name of the field

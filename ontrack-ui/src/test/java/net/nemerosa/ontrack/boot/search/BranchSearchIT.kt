@@ -5,14 +5,14 @@ import net.nemerosa.ontrack.boot.PROJECT_SEARCH_INDEX
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.SearchRequest
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
  * Search indexation for branches
  */
-class BranchSearchIT : AbstractSearchJUnit4TestSupport() {
+class BranchSearchIT : AbstractSearchTestSupport() {
 
     @Test
     fun `Indexation of branches and looking for branches`() {

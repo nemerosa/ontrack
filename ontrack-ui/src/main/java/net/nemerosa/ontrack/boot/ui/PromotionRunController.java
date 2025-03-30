@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import jakarta.validation.Valid;
 import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.form.DateTime;
@@ -11,9 +12,9 @@ import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
 import java.util.Objects;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
@@ -80,14 +81,15 @@ public class PromotionRunController extends AbstractResourceController {
 
     @RequestMapping(value = "builds/{buildId}/promotionRun/create", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public PromotionRun newPromotionRun(@PathVariable ID buildId, @RequestBody @Valid PromotionRunRequest promotionRunRequest) {
+    public ResponseEntity<PromotionRun> newPromotionRun(@PathVariable ID buildId, @RequestBody @Valid PromotionRunRequest promotionRunRequest) {
         // Gets the build
         Build build = structureService.getBuild(buildId);
         // Gets the promotion level
         PromotionLevel promotionLevel = getPromotionLevel(
                 build.getBranch(),
                 promotionRunRequest.getPromotionLevelId(),
-                promotionRunRequest.getPromotionLevelName());
+                promotionRunRequest.getPromotionLevelName()
+        ).getBody();
         // Promotion run to create
         PromotionRun promotionRun = PromotionRun.of(
                 build,
@@ -106,21 +108,21 @@ public class PromotionRunController extends AbstractResourceController {
             );
         }
         // OK
-        return promotionRun;
+        return ResponseEntity.ok(promotionRun);
     }
 
     @RequestMapping(value = "promotionRuns/{promotionRunId}", method = RequestMethod.GET)
-    public PromotionRun getPromotionRun(@PathVariable ID promotionRunId) {
-        return structureService.getPromotionRun(promotionRunId);
+    public ResponseEntity<PromotionRun> getPromotionRun(@PathVariable ID promotionRunId) {
+        return ResponseEntity.ok(structureService.getPromotionRun(promotionRunId));
     }
 
     @RequestMapping(value = "promotionRuns/{promotionRunId}", method = RequestMethod.DELETE)
-    public Ack deletePromotionRun(@PathVariable ID promotionRunId) {
-        return structureService.deletePromotionRun(promotionRunId);
+    public ResponseEntity<Ack> deletePromotionRun(@PathVariable ID promotionRunId) {
+        return ResponseEntity.ok(structureService.deletePromotionRun(promotionRunId));
     }
 
-    protected PromotionLevel getPromotionLevel(Branch branch, Integer promotionLevelId, String promotionLevelName) {
-        return structureService.getOrCreatePromotionLevel(branch, promotionLevelId, promotionLevelName);
+    protected ResponseEntity<PromotionLevel> getPromotionLevel(Branch branch, Integer promotionLevelId, String promotionLevelName) {
+        return ResponseEntity.ok(structureService.getOrCreatePromotionLevel(branch, promotionLevelId, promotionLevelName));
     }
 
 }

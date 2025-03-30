@@ -6,8 +6,11 @@ import java.util.List;
 
 /**
  * Branch with a link to the last available build, and to each promotion view.
+ *
+ * @deprecated Will be removed in V6. Not used by Next UI.
  */
 @Data
+@Deprecated
 public class BranchStatusView implements View {
 
     private final Branch branch;

@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.model.security
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import net.nemerosa.ontrack.model.preferences.Preferences
 import net.nemerosa.ontrack.model.structure.Entity.Companion.isEntityDefined
 import net.nemerosa.ontrack.model.support.Action
@@ -11,6 +12,7 @@ open class ConnectedAccount(
     val nextUIProperties: NextUIProperties = NextUIProperties(enabled = false),
 ) {
 
+    @get:JsonProperty("logged")
     val isLogged: Boolean
         get() = account != null
 
