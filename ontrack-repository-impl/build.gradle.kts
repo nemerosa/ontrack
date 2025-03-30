@@ -19,3 +19,32 @@ dependencies {
 
     testRuntimeOnly(project(":ontrack-service"))
 }
+
+
+val integrationTest by tasks.registering(Test::class) {
+    group = "verification"
+    description = "Integration tests"
+    useJUnitPlatform()
+
+    // Only include classes whose names end with 'IT'
+    include("**/*IT.class")
+    // Set the test classes directory to be the same as the unit tests
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
+
+    shouldRunAfter("test")
+    minHeapSize = "128m"
+    maxHeapSize = "3072m"
+//    dependsOn(":integrationTestComposeUp")
+//    finalizedBy(":integrationTestComposeDown")
+}
+
+// Synchronization with shutting down the database
+rootProject.tasks.named("integrationTestComposeDown") {
+    mustRunAfter(integrationTest)
+}
+
+// Inclusion in lifecycle
+tasks.check {
+    dependsOn(integrationTest)
+}
