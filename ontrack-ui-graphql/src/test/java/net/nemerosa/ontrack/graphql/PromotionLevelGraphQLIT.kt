@@ -1,14 +1,15 @@
 package net.nemerosa.ontrack.graphql
 
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.extension.general.BuildLinkDisplayProperty
-import net.nemerosa.ontrack.extension.general.BuildLinkDisplayPropertyType
-import net.nemerosa.ontrack.extension.general.ReleaseProperty
-import net.nemerosa.ontrack.extension.general.ReleasePropertyType
+//import net.nemerosa.ontrack.extension.general.BuildLinkDisplayProperty
+//import net.nemerosa.ontrack.extension.general.BuildLinkDisplayPropertyType
+//import net.nemerosa.ontrack.extension.general.ReleaseProperty
+//import net.nemerosa.ontrack.extension.general.ReleasePropertyType
 import net.nemerosa.ontrack.json.isNullOrNullNode
 import net.nemerosa.ontrack.model.structure.Signature
 import net.nemerosa.ontrack.test.assertPresent
-import org.junit.Test
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 import java.time.Duration
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -17,7 +18,7 @@ import kotlin.test.assertTrue
 /**
  * Integration tests around the `promotionLevel` root query.
  */
-class PromotionLevelGraphQLIT : AbstractQLKTITJUnit4Support() {
+class PromotionLevelGraphQLIT : AbstractQLKTITSupport() {
 
     @Test
     fun `Creation of a promotion level`() {
@@ -209,55 +210,56 @@ class PromotionLevelGraphQLIT : AbstractQLKTITJUnit4Support() {
     }
 
     @Test
+    @Disabled("Missing General extension")
     fun `Paginated list of promotion runs filter by version name`() {
-        project {
-            property(BuildLinkDisplayPropertyType::class, BuildLinkDisplayProperty(useLabel = true))
-            branch {
-                val pl = promotionLevel()
-                (5..25).forEach { no ->
-                    build(name = "$no") {
-                        property(ReleasePropertyType::class, ReleaseProperty("1.$no"))
-                        promote(pl)
-                    }
-                }
-                // Getting a paginated list of promotion runs, filtered by version name
-                val query = """
-                    query PromotionRuns(${'$'}id: Int!, ${'$'}version: String!) {
-                        promotionLevel(id: ${'$'}id) {
-                            promotionRunsPaginated(version: ${'$'}version, size: 5) {
-                                pageInfo {
-                                    totalSize
-                                    previousPage { offset size }
-                                    nextPage { offset size }
-                                }
-                                pageItems {
-                                    build {
-                                        name
-                                        releaseProperty { value }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                """
-                // Getting the first page
-                run(query, mapOf("id" to pl.id(), "version" to "1\\.1.*")).apply {
-                    val field = path("promotionLevel").path("promotionRunsPaginated")
-                    assertEquals(10, field["pageInfo"]["totalSize"].asInt())
-                    assertTrue(field["pageInfo"]["previousPage"].isNullOrNullNode())
-                    assertNotNull(field["pageInfo"]["nextPage"]) {
-                        assertEquals(5, it["offset"].asInt())
-                        assertEquals(5, it["size"].asInt())
-                    }
-                    val items = field["pageItems"]
-                    assertEquals(5, items.size())
-                    items.forEachIndexed { index, item ->
-                        assertEquals("1.1${9 - index}", item["build"]["releaseProperty"]["value"]["name"].asText())
-                        assertEquals("1${9 - index}", item["build"]["name"].asText())
-                    }
-                }
-            }
-        }
+//        project {
+//            property(BuildLinkDisplayPropertyType::class, BuildLinkDisplayProperty(useLabel = true))
+//            branch {
+//                val pl = promotionLevel()
+//                (5..25).forEach { no ->
+//                    build(name = "$no") {
+//                        property(ReleasePropertyType::class, ReleaseProperty("1.$no"))
+//                        promote(pl)
+//                    }
+//                }
+//                // Getting a paginated list of promotion runs, filtered by version name
+//                val query = """
+//                    query PromotionRuns(${'$'}id: Int!, ${'$'}version: String!) {
+//                        promotionLevel(id: ${'$'}id) {
+//                            promotionRunsPaginated(version: ${'$'}version, size: 5) {
+//                                pageInfo {
+//                                    totalSize
+//                                    previousPage { offset size }
+//                                    nextPage { offset size }
+//                                }
+//                                pageItems {
+//                                    build {
+//                                        name
+//                                        releaseProperty { value }
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                """
+//                // Getting the first page
+//                run(query, mapOf("id" to pl.id(), "version" to "1\\.1.*")).apply {
+//                    val field = path("promotionLevel").path("promotionRunsPaginated")
+//                    assertEquals(10, field["pageInfo"]["totalSize"].asInt())
+//                    assertTrue(field["pageInfo"]["previousPage"].isNullOrNullNode())
+//                    assertNotNull(field["pageInfo"]["nextPage"]) {
+//                        assertEquals(5, it["offset"].asInt())
+//                        assertEquals(5, it["size"].asInt())
+//                    }
+//                    val items = field["pageItems"]
+//                    assertEquals(5, items.size())
+//                    items.forEachIndexed { index, item ->
+//                        assertEquals("1.1${9 - index}", item["build"]["releaseProperty"]["value"]["name"].asText())
+//                        assertEquals("1${9 - index}", item["build"]["name"].asText())
+//                    }
+//                }
+//            }
+//        }
     }
 
     @Test

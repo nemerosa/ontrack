@@ -1,27 +1,22 @@
 package net.nemerosa.ontrack.graphql
 
-import com.fasterxml.jackson.databind.node.TextNode
-import net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationConfig
-import net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType
-import net.nemerosa.ontrack.extension.general.validation.TextValidationDataType
+//import net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationConfig
+//import net.nemerosa.ontrack.extension.general.validation.TestSummaryValidationDataType
+//import net.nemerosa.ontrack.extension.general.validation.TextValidationDataType
 import net.nemerosa.ontrack.json.isNullOrNullNode
-import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
-import net.nemerosa.ontrack.model.structure.config
-import net.nemerosa.ontrack.model.structure.data
-import net.nemerosa.ontrack.test.assertIs
-import org.junit.Test
-import org.springframework.beans.factory.annotation.Autowired
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class ValidationRunGraphQLIT : AbstractQLKTITJUnit4Support() {
+class ValidationRunGraphQLIT : AbstractQLKTITSupport() {
 
-    @Autowired
-    private lateinit var textValidationDataType: TextValidationDataType
-
-    @Autowired
-    private lateinit var testSummaryValidationDataType: TestSummaryValidationDataType
+//    @Autowired
+//    private lateinit var textValidationDataType: TextValidationDataType
+//
+//    @Autowired
+//    private lateinit var testSummaryValidationDataType: TestSummaryValidationDataType
 
     @Test
     fun `Creating a validation run with missing status`() {
@@ -141,135 +136,137 @@ class ValidationRunGraphQLIT : AbstractQLKTITJUnit4Support() {
     }
 
     @Test
+    @Disabled("Missing General extension")
     fun `Creating a validation run with data`() {
-        project {
-            branch {
-                val vs = validationStamp(
-                    validationDataTypeConfig = testSummaryValidationDataType.config(
-                        TestSummaryValidationConfig(warningIfSkipped = false)
-                    )
-                )
-                build {
-                    val data = run("""
-                        mutation CreateValidationRun {
-                            createValidationRunById(input: {
-                                buildId: $id,
-                                validationStamp: "${vs.name}",
-                                dataTypeId: "${TestSummaryValidationDataType::class.java.name}",
-                                data: { passed: 13, skipped: 8, failed: 5 }
-                            }) {
-                                validationRun {
-                                    data {
-                                        descriptor {
-                                            id
-                                        }
-                                        data
-                                    }
-                                    validationRunStatuses {
-                                        statusID {
-                                            id
-                                        }
-                                    }
-                                }
-                                errors {
-                                    message
-                                }
-                            }
-                        }
-                    """)
-                    val node = assertNoUserError(data, "createValidationRunById")
-                    assertEquals(0, node.path("errors").size())
-                    assertEquals(
-                        TestSummaryValidationDataType::class.java.name,
-                        node.path("validationRun").path("data").path("descriptor").path("id").asText()
-                    )
-                    val runData = node.path("validationRun").path("data").path("data")
-                    assertEquals(
-                        13,
-                        runData.path("passed").asInt()
-                    )
-                    assertEquals(
-                        8,
-                        runData.path("skipped").asInt()
-                    )
-                    assertEquals(
-                        5,
-                        runData.path("failed").asInt()
-                    )
-                    assertEquals(
-                        "FAILED",
-                        node.path("validationRun").path("validationRunStatuses").path(0).path("statusID").path("id")
-                            .asText()
-                    )
-                }
-            }
-        }
+//        project {
+//            branch {
+//                val vs = validationStamp(
+//                    validationDataTypeConfig = testSummaryValidationDataType.config(
+//                        TestSummaryValidationConfig(warningIfSkipped = false)
+//                    )
+//                )
+//                build {
+//                    val data = run("""
+//                        mutation CreateValidationRun {
+//                            createValidationRunById(input: {
+//                                buildId: $id,
+//                                validationStamp: "${vs.name}",
+//                                dataTypeId: "${TestSummaryValidationDataType::class.java.name}",
+//                                data: { passed: 13, skipped: 8, failed: 5 }
+//                            }) {
+//                                validationRun {
+//                                    data {
+//                                        descriptor {
+//                                            id
+//                                        }
+//                                        data
+//                                    }
+//                                    validationRunStatuses {
+//                                        statusID {
+//                                            id
+//                                        }
+//                                    }
+//                                }
+//                                errors {
+//                                    message
+//                                }
+//                            }
+//                        }
+//                    """)
+//                    val node = assertNoUserError(data, "createValidationRunById")
+//                    assertEquals(0, node.path("errors").size())
+//                    assertEquals(
+//                        TestSummaryValidationDataType::class.java.name,
+//                        node.path("validationRun").path("data").path("descriptor").path("id").asText()
+//                    )
+//                    val runData = node.path("validationRun").path("data").path("data")
+//                    assertEquals(
+//                        13,
+//                        runData.path("passed").asInt()
+//                    )
+//                    assertEquals(
+//                        8,
+//                        runData.path("skipped").asInt()
+//                    )
+//                    assertEquals(
+//                        5,
+//                        runData.path("failed").asInt()
+//                    )
+//                    assertEquals(
+//                        "FAILED",
+//                        node.path("validationRun").path("validationRunStatuses").path(0).path("statusID").path("id")
+//                            .asText()
+//                    )
+//                }
+//            }
+//        }
     }
 
     @Test
+    @Disabled("Missing General extension")
     fun `Creating a validation run with data warning`() {
-        project {
-            branch {
-                val vs = validationStamp(
-                    validationDataTypeConfig = testSummaryValidationDataType.config(
-                        TestSummaryValidationConfig(warningIfSkipped = true)
-                    )
-                )
-                build {
-                    val data = run("""
-                        mutation CreateValidationRun {
-                            createValidationRunById(input: {
-                                buildId: $id,
-                                validationStamp: "${vs.name}",
-                                dataTypeId: "${TestSummaryValidationDataType::class.java.name}",
-                                data: { passed: 13, skipped: 8, failed: 0 }
-                            }) {
-                                validationRun {
-                                    data {
-                                        descriptor {
-                                            id
-                                        }
-                                        data
-                                    }
-                                    validationRunStatuses {
-                                        statusID {
-                                            id
-                                        }
-                                    }
-                                }
-                                errors {
-                                    message
-                                }
-                            }
-                        }
-                    """)
-                    val node = assertNoUserError(data, "createValidationRunById")
-                    assertEquals(0, node.path("errors").size())
-                    assertEquals(
-                        TestSummaryValidationDataType::class.java.name,
-                        node.path("validationRun").path("data").path("descriptor").path("id").asText()
-                    )
-                    val runData = node.path("validationRun").path("data").path("data")
-                    assertEquals(
-                        13,
-                        runData.path("passed").asInt()
-                    )
-                    assertEquals(
-                        8,
-                        runData.path("skipped").asInt()
-                    )
-                    assertEquals(
-                        0,
-                        runData.path("failed").asInt()
-                    )
-                    assertEquals(
-                        "WARNING",
-                        node.path("validationRun").path("validationRunStatuses").path(0).path("statusID").path("id")
-                            .asText()
-                    )
-                }
-            }
-        }
+//        project {
+//            branch {
+//                val vs = validationStamp(
+//                    validationDataTypeConfig = testSummaryValidationDataType.config(
+//                        TestSummaryValidationConfig(warningIfSkipped = true)
+//                    )
+//                )
+//                build {
+//                    val data = run("""
+//                        mutation CreateValidationRun {
+//                            createValidationRunById(input: {
+//                                buildId: $id,
+//                                validationStamp: "${vs.name}",
+//                                dataTypeId: "${TestSummaryValidationDataType::class.java.name}",
+//                                data: { passed: 13, skipped: 8, failed: 0 }
+//                            }) {
+//                                validationRun {
+//                                    data {
+//                                        descriptor {
+//                                            id
+//                                        }
+//                                        data
+//                                    }
+//                                    validationRunStatuses {
+//                                        statusID {
+//                                            id
+//                                        }
+//                                    }
+//                                }
+//                                errors {
+//                                    message
+//                                }
+//                            }
+//                        }
+//                    """)
+//                    val node = assertNoUserError(data, "createValidationRunById")
+//                    assertEquals(0, node.path("errors").size())
+//                    assertEquals(
+//                        TestSummaryValidationDataType::class.java.name,
+//                        node.path("validationRun").path("data").path("descriptor").path("id").asText()
+//                    )
+//                    val runData = node.path("validationRun").path("data").path("data")
+//                    assertEquals(
+//                        13,
+//                        runData.path("passed").asInt()
+//                    )
+//                    assertEquals(
+//                        8,
+//                        runData.path("skipped").asInt()
+//                    )
+//                    assertEquals(
+//                        0,
+//                        runData.path("failed").asInt()
+//                    )
+//                    assertEquals(
+//                        "WARNING",
+//                        node.path("validationRun").path("validationRunStatuses").path(0).path("statusID").path("id")
+//                            .asText()
+//                    )
+//                }
+//            }
+//        }
     }
 
     @Test
@@ -378,42 +375,43 @@ class ValidationRunGraphQLIT : AbstractQLKTITJUnit4Support() {
     }
 
     @Test
+    @Disabled("Missing General extension")
     fun `Text validation data type`() {
-        val vs = doCreateValidationStamp(textValidationDataType.config(null))
-        val build = doCreateBuild(vs.branch, NameDescription.nd("1", ""))
-        val run = doValidateBuild(
-            build,
-            vs,
-            ValidationRunStatusID.STATUS_PASSED,
-            textValidationDataType.data("Some text")
-        )
-        // Checks the data
-        assertEquals("Some text", run.data?.data)
-
-        // Performs a query
-        val data = asUser().withView(vs).call {
-            run("""
-                {
-                    validationRuns(id: ${run.id}) {
-                        data {
-                            descriptor {
-                                id
-                                feature {
-                                    id
-                                }
-                            }
-                            data
-                        }
-                    }
-                }
-            """.trimIndent())
-        }
-
-        // Gets the data
-        val runData = data["validationRuns"][0]["data"]["data"]
-        assertIs<TextNode>(runData) {
-            assertEquals("Some text", it.asText())
-        }
+//        val vs = doCreateValidationStamp(textValidationDataType.config(null))
+//        val build = doCreateBuild(vs.branch, NameDescription.nd("1", ""))
+//        val run = doValidateBuild(
+//            build,
+//            vs,
+//            ValidationRunStatusID.STATUS_PASSED,
+//            textValidationDataType.data("Some text")
+//        )
+//        // Checks the data
+//        assertEquals("Some text", run.data?.data)
+//
+//        // Performs a query
+//        val data = asUser().withView(vs).call {
+//            run("""
+//                {
+//                    validationRuns(id: ${run.id}) {
+//                        data {
+//                            descriptor {
+//                                id
+//                                feature {
+//                                    id
+//                                }
+//                            }
+//                            data
+//                        }
+//                    }
+//                }
+//            """.trimIndent())
+//        }
+//
+//        // Gets the data
+//        val runData = data["validationRuns"][0]["data"]["data"]
+//        assertIs<TextNode>(runData) {
+//            assertEquals("Some text", it.asText())
+//        }
     }
 
     @Test

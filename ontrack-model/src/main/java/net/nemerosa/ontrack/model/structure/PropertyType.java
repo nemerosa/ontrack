@@ -104,7 +104,7 @@ public interface PropertyType<T> extends Extension {
      * @param replacementFunction Replacement function to used to transform each string into a new one
      * @return Transformed value
      */
-    T replaceValue(T value, Function<String, String> replacementFunction);
+    T replaceValue(@NotNull T value, Function<String, String> replacementFunction);
 
     /**
      * Checks if the property <code>value</code> contains the given search token.
