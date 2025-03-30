@@ -1,9 +1,8 @@
 package net.nemerosa.ontrack.service.security
 
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.times
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import net.nemerosa.ontrack.model.exceptions.UserOldPasswordException
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.ID
@@ -26,105 +25,105 @@ class UserServiceImplTest {
 
     @Before
     fun before() {
-        securityService = mock()
-        accountRepository = mock()
-        passwordEncoder = mock()
-        user = mock()
+        securityService = mockk()
+        accountRepository = mockk()
+        passwordEncoder = mockk()
+        user = mockk()
         service = UserServiceImpl(
-                securityService,
-                accountRepository,
-                passwordEncoder
+            securityService,
+            accountRepository,
+            passwordEncoder
         )
     }
 
     @Test(expected = AccessDeniedException::class)
     fun `Change password denied when not authenticated`() {
-        whenever(securityService.currentAccount).thenReturn(null)
+        every { securityService.currentAccount } returns null
         service.changePassword(PasswordChange("old", "new"))
     }
 
     @Test(expected = AccessDeniedException::class)
     fun `Change password denied when not allowed`() {
         val account = Account.of(
-                "test",
-                "Test user",
-                "test@test.com",
-                SecurityRole.USER,
-                authenticationSourceWithPasswordChangeAllowed(false),
-                disabled = false,
-                locked = false,
+            "test",
+            "Test user",
+            "test@test.com",
+            SecurityRole.USER,
+            authenticationSourceWithPasswordChangeAllowed(false),
+            disabled = false,
+            locked = false,
         )
-        whenever(user.account).thenReturn(account)
-        whenever(securityService.currentAccount).thenReturn(user)
+        every { user.account } returns account
+        every { securityService.currentAccount } returns user
         service.changePassword(PasswordChange("old", "new"))
     }
 
     @Test(expected = AccessDeniedException::class)
     fun `Change password denied when account not found`() {
         val account = Account.of(
-                "test",
-                "Test user",
-                "test@test.com",
-                SecurityRole.USER,
-                authenticationSourceWithPasswordChangeAllowed(true),
-                disabled = false,
-                locked = false,
+            "test",
+            "Test user",
+            "test@test.com",
+            SecurityRole.USER,
+            authenticationSourceWithPasswordChangeAllowed(true),
+            disabled = false,
+            locked = false,
         ).withId(ID.of(1))
-        whenever(user.account).thenReturn(account)
-        whenever(securityService.currentAccount).thenReturn(user)
-        whenever(accountRepository.findBuiltinAccount("test")).thenReturn(null)
+        every { user.account } returns account
+        every { securityService.currentAccount } returns user
+        every { accountRepository.findBuiltinAccount("test") } returns null
         service.changePassword(PasswordChange("old", "new"))
     }
 
     @Test(expected = UserOldPasswordException::class)
     fun `Change password denied when old password incorrect`() {
         val account = Account.of(
-                "test",
-                "Test user",
-                "test@test.com",
-                SecurityRole.USER,
-                authenticationSourceWithPasswordChangeAllowed(true),
-                disabled = false,
-                locked = false,
+            "test",
+            "Test user",
+            "test@test.com",
+            SecurityRole.USER,
+            authenticationSourceWithPasswordChangeAllowed(true),
+            disabled = false,
+            locked = false,
         ).withId(ID.of(1))
         val builtinAccount = BuiltinAccount(account, "old-encoded")
-        whenever(user.account).thenReturn(account)
-        whenever(securityService.currentAccount).thenReturn(user)
-        whenever(accountRepository.findBuiltinAccount("test")).thenReturn(builtinAccount)
-        whenever(passwordEncoder.matches("old", "old-encoded")).thenReturn(false)
+        every { user.account } returns account
+        every { securityService.currentAccount } returns user
+        every { accountRepository.findBuiltinAccount("test") } returns builtinAccount
+        every { passwordEncoder.matches("old", "old-encoded") } returns false
         service.changePassword(PasswordChange("old", "new"))
     }
 
     @Test
     fun `Change password ok when old password is correct`() {
         val account = Account.of(
-                "test",
-                "Test user",
-                "test@test.com",
-                SecurityRole.USER,
-                authenticationSourceWithPasswordChangeAllowed(true),
-                disabled = false,
-                locked = false,
+            "test",
+            "Test user",
+            "test@test.com",
+            SecurityRole.USER,
+            authenticationSourceWithPasswordChangeAllowed(true),
+            disabled = false,
+            locked = false,
         ).withId(ID.of(1))
         val builtinAccount = BuiltinAccount(account, "old-encoded")
-        whenever(user.account).thenReturn(account)
-        whenever(securityService.currentAccount).thenReturn(user)
-        whenever(accountRepository.findBuiltinAccount("test")).thenReturn(builtinAccount)
-        whenever(passwordEncoder.matches("old", "old-encoded")).thenReturn(true)
-        whenever(passwordEncoder.encode("new")).thenReturn("new-encoded")
+        every { user.account } returns account
+        every { securityService.currentAccount } returns user
+        every { accountRepository.findBuiltinAccount("test") } returns builtinAccount
+        every { passwordEncoder.matches("old", "old-encoded") } returns true
+        every { passwordEncoder.encode("new") } returns "new-encoded"
         val ack = service.changePassword(PasswordChange("old", "new"))
-        assertTrue(ack.isSuccess)
-        verify(accountRepository, times(1)).setPassword(1, "new-encoded")
+        assertTrue(ack.success)
+        verify(exactly = 1) { accountRepository.setPassword(1, "new-encoded") }
     }
 
     private fun authenticationSourceWithPasswordChangeAllowed(allowingPasswordChange: Boolean) =
-            AuthenticationSource.none().run {
-                AuthenticationSource(
-                        provider = provider,
-                        key = key,
-                        name = name,
-                        isAllowingPasswordChange = allowingPasswordChange
-                )
-            }
+        AuthenticationSource.none().run {
+            AuthenticationSource(
+                provider = provider,
+                key = key,
+                name = name,
+                isAllowingPasswordChange = allowingPasswordChange
+            )
+        }
 
 }

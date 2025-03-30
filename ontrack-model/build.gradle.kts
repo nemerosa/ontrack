@@ -17,4 +17,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 
     testImplementation(project(":ontrack-test-utils"))
+
+    testFixturesImplementation("org.springframework:spring-context")
 }

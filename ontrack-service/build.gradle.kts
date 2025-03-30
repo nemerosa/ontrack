@@ -24,8 +24,8 @@ dependencies {
     runtimeOnly("org.hibernate.validator:hibernate-validator")
 
     testImplementation(project(":ontrack-it-utils"))
-    // TODO testImplementation(project(path = ":ontrack-common", configuration = "tests"))
-    // TODO testImplementation(project(path = ":ontrack-model", configuration = "tests"))
+    testImplementation(testFixtures(project(":ontrack-common")))
+    testImplementation(testFixtures(project(":ontrack-model")))
     testImplementation(testFixtures(project(":ontrack-extension-api")))
 
     testRuntimeOnly(project(":ontrack-repository-impl"))

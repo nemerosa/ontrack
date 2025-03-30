@@ -35,7 +35,7 @@ class RunInfoServiceIT : AbstractDSLTestSupport() {
         val ack: Ack = asUser().withProjectFunction(build, ProjectEdit::class.java).call {
             runInfoService.deleteRunInfo(build)
         }
-        assertTrue(ack.isSuccess)
+        assertTrue(ack.success)
     }
 
     @Test

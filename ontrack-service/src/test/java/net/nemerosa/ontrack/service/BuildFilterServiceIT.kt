@@ -28,14 +28,14 @@ class BuildFilterServiceIT : AbstractDSLTestSupport() {
         // Creates a predefined filter for this account
         val filterCreated = asFixedAccount(account).call {
             buildFilterService.saveFilter(
-                    branch.id,
-                    false,
-                    "MyFilter",
-                    PromotionLevelBuildFilterProvider::class.java.name,
-                    JsonUtils.`object`().end()
+                branch.id,
+                false,
+                "MyFilter",
+                PromotionLevelBuildFilterProvider::class.java.name,
+                JsonUtils.`object`().end()
             )
         }
-        assertFalse(filterCreated.isSuccess, "A predefined filter cannot be saved")
+        assertFalse(filterCreated.success, "A predefined filter cannot be saved")
     }
 
     /**
@@ -52,17 +52,18 @@ class BuildFilterServiceIT : AbstractDSLTestSupport() {
         // Creates a filter for this account
         var ack = asFixedAccount(account).call {
             buildFilterService.saveFilter(
-                    branch.id,
-                    false,
-                    "MyFilter",
-                    StandardBuildFilterProvider::class.java.name,
-                    objectMapper.valueToTree(StandardBuildFilterData(count = 1))
+                branch.id,
+                false,
+                "MyFilter",
+                StandardBuildFilterProvider::class.java.name,
+                objectMapper.valueToTree(StandardBuildFilterData(count = 1))
             )
         }
-        assertTrue(ack.isSuccess, "Account filter saved")
+        assertTrue(ack.success, "Account filter saved")
 
         // Makes sure we find this filter back when logged
-        var filters = asConfigurableAccount(account).withView(branch).call { buildFilterService.getBuildFilters(branch.id) }
+        var filters =
+            asConfigurableAccount(account).withView(branch).call { buildFilterService.getBuildFilters(branch.id) }
         assertEquals(1, filters.size.toLong())
         var filter = filters.iterator().next()
         assertEquals("MyFilter", filter.name)
@@ -70,24 +71,25 @@ class BuildFilterServiceIT : AbstractDSLTestSupport() {
 
         // ... but it is not available for anybody else
         assertTrue(
-                asConfigurableAccount(otherAccount).withView(branch).call { buildFilterService.getBuildFilters(branch.id).isEmpty() },
-                "Account filter not available for everybody else"
+            asConfigurableAccount(otherAccount).withView(branch)
+                .call { buildFilterService.getBuildFilters(branch.id).isEmpty() },
+            "Account filter not available for everybody else"
         )
 
         // Now, shares a filter with the same name
         ack = asConfigurableAccount(account)
-                .with(branch.projectId(), ProjectView::class.java)
-                .with(branch.projectId(), BranchFilterMgt::class.java)
-                .call {
-                    buildFilterService.saveFilter(
-                            branch.id,
-                            true, // Sharing
-                            "MyFilter",
-                            StandardBuildFilterProvider::class.java.name,
-                            objectMapper.valueToTree(StandardBuildFilterData(count = 1))
-                    )
-                }
-        assertTrue(ack.isSuccess, "Account filter shared")
+            .with(branch.projectId(), ProjectView::class.java)
+            .with(branch.projectId(), BranchFilterMgt::class.java)
+            .call {
+                buildFilterService.saveFilter(
+                    branch.id,
+                    true, // Sharing
+                    "MyFilter",
+                    StandardBuildFilterProvider::class.java.name,
+                    objectMapper.valueToTree(StandardBuildFilterData(count = 1))
+                )
+            }
+        assertTrue(ack.success, "Account filter shared")
 
         // Makes sure we find this filter back when logged
         filters = asFixedAccount(account).call { buildFilterService.getBuildFilters(branch.id) }
@@ -114,17 +116,18 @@ class BuildFilterServiceIT : AbstractDSLTestSupport() {
         // Creates a filter for this account
         val ack = asFixedAccount(account).call {
             buildFilterService.saveFilter(
-                    branch.id,
-                    false,
-                    "MyFilter",
-                    StandardBuildFilterProvider::class.java.name,
-                    objectMapper.valueToTree(StandardBuildFilterData(count = 1))
+                branch.id,
+                false,
+                "MyFilter",
+                StandardBuildFilterProvider::class.java.name,
+                objectMapper.valueToTree(StandardBuildFilterData(count = 1))
             )
         }
-        assertTrue(ack.isSuccess, "Account filter saved")
+        assertTrue(ack.success, "Account filter saved")
 
         // The filter is present
-        var filters = asConfigurableAccount(account).withView(branch).call { buildFilterService.getBuildFilters(branch.id) }
+        var filters =
+            asConfigurableAccount(account).withView(branch).call { buildFilterService.getBuildFilters(branch.id) }
         assertEquals(1, filters.size.toLong())
         val filter = filters.iterator().next()
         assertEquals("MyFilter", filter.name)
@@ -149,14 +152,14 @@ class BuildFilterServiceIT : AbstractDSLTestSupport() {
         val creator = asConfigurableAccount(account).withView(branch).with(branch, BranchFilterMgt::class.java)
         val ack = creator.call {
             buildFilterService.saveFilter(
-                    branch.id,
-                    true, // Shared
-                    "MyFilter",
-                    StandardBuildFilterProvider::class.java.name,
-                    objectMapper.valueToTree(StandardBuildFilterData(count = 1))
+                branch.id,
+                true, // Shared
+                "MyFilter",
+                StandardBuildFilterProvider::class.java.name,
+                objectMapper.valueToTree(StandardBuildFilterData(count = 1))
             )
         }
-        assertTrue(ack.isSuccess, "Account filter saved")
+        assertTrue(ack.success, "Account filter saved")
 
         // The filter is present for this account
         var filters = creator.call { buildFilterService.getBuildFilters(branch.id) }
@@ -195,16 +198,17 @@ class BuildFilterServiceIT : AbstractDSLTestSupport() {
         // Creates a filter for this account
         val filterCreated = asFixedAccount(account).call {
             buildFilterService.saveFilter(
-                    sourceBranch.id,
-                    false,
-                    "MyFilter",
-                    StandardBuildFilterProvider::class.java.name,
-                    JsonUtils.`object`().with("count", 1).end()
+                sourceBranch.id,
+                false,
+                "MyFilter",
+                StandardBuildFilterProvider::class.java.name,
+                JsonUtils.`object`().with("count", 1).end()
             )
         }
-        assertTrue(filterCreated.isSuccess)
+        assertTrue(filterCreated.success)
         // Checks the filter is created
-        var filters = asConfigurableAccount(account).with(sourceBranch.projectId(), ProjectView::class.java).call { buildFilterService.getBuildFilters(sourceBranch.id) }
+        var filters = asConfigurableAccount(account).with(sourceBranch.projectId(), ProjectView::class.java)
+            .call { buildFilterService.getBuildFilters(sourceBranch.id) }
         assertEquals(1, filters.size.toLong())
         var filter = filters.iterator().next()
         assertEquals("MyFilter", filter.name)
@@ -212,20 +216,21 @@ class BuildFilterServiceIT : AbstractDSLTestSupport() {
 
         // Copy of the branch
         asUser()
-                .with(sourceBranch.projectId(), ProjectView::class.java)
-                .with(targetBranch.projectId(), BranchEdit::class.java)
-                .call {
-                    copyService.copy(
-                            targetBranch,
-                            BranchCopyRequest(
-                                    sourceBranch.id,
-                                    emptyList()
-                            )
+            .with(sourceBranch.projectId(), ProjectView::class.java)
+            .with(targetBranch.projectId(), BranchEdit::class.java)
+            .call {
+                copyService.copy(
+                    targetBranch,
+                    BranchCopyRequest(
+                        sourceBranch.id,
+                        emptyList()
                     )
-                }
+                )
+            }
 
         // Gets the filter on the new branch
-        filters = asConfigurableAccount(account).withView(targetBranch).call { buildFilterService.getBuildFilters(targetBranch.id) }
+        filters = asConfigurableAccount(account).withView(targetBranch)
+            .call { buildFilterService.getBuildFilters(targetBranch.id) }
         assertEquals(1, filters.size.toLong())
         filter = filters.iterator().next()
         assertEquals("MyFilter", filter.name)

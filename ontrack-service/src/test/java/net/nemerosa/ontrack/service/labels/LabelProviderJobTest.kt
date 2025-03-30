@@ -1,9 +1,8 @@
 package net.nemerosa.ontrack.service.labels
 
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.never
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import net.nemerosa.ontrack.model.labels.LabelProviderService
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
@@ -12,10 +11,9 @@ import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.service.security.SecurityServiceImpl
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import java.util.concurrent.TimeUnit
-import kotlin.streams.toList
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -33,21 +31,21 @@ class LabelProviderJobTest {
     private val project3: Project = Project.of(NameDescription.nd("P3", "")).withDisabled(true)
     private val projects = listOf(project1, project2, project3)
 
-    @Before
+    @BeforeEach
     fun init() {
-        structureService = mock()
-        whenever(structureService.projectList).thenReturn(projects)
+        structureService = mockk()
+        every { structureService.projectList } returns projects
 
-        labelProviderService = mock()
-        settingsService = mock()
+        labelProviderService = mockk()
+        settingsService = mockk()
 
         securityService = SecurityServiceImpl()
 
         provider = LabelProviderJob(
-                securityService,
-                structureService,
-                labelProviderService,
-                settingsService
+            securityService,
+            structureService,
+            labelProviderService,
+            settingsService
         )
     }
 
@@ -72,9 +70,9 @@ class LabelProviderJobTest {
             assertEquals("label-collection", job.key.id)
             assertEquals("Collection of automated labels for all projects", job.description)
             task.run { println(it) }
-            verify(labelProviderService).collectLabels(project1)
-            verify(labelProviderService).collectLabels(project2)
-            verify(labelProviderService, never()).collectLabels(project3)
+            verify { labelProviderService.collectLabels(project1) }
+            verify { labelProviderService.collectLabels(project2) }
+            verify(exactly = 0) { labelProviderService.collectLabels(project3) }
         }
     }
 
@@ -94,22 +92,23 @@ class LabelProviderJobTest {
                 assertEquals("Collection of automated labels for project ${projects[no].name}", job.description)
                 task.run { println(it) }
                 if (no != 2) {
-                    verify(labelProviderService).collectLabels(projects[no])
+                    verify { labelProviderService.collectLabels(projects[no]) }
                 } else {
-                    verify(labelProviderService, never()).collectLabels(projects[no])
+                    verify(exactly = 0) { labelProviderService.collectLabels(projects[no]) }
                 }
             }
         }
     }
 
     private fun settings(enabled: Boolean, interval: Int, perProject: Boolean) {
-        whenever(settingsService.getCachedSettings(LabelProviderJobSettings::class.java)).thenReturn(
+        every {
+            settingsService.getCachedSettings(LabelProviderJobSettings::class.java)
+        } returns
                 LabelProviderJobSettings(
-                        enabled = enabled,
-                        interval = interval,
-                        perProject = perProject
+                    enabled = enabled,
+                    interval = interval,
+                    perProject = perProject
                 )
-        )
     }
 
 }

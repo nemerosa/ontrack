@@ -17,21 +17,21 @@ class CacheConfigIT : AbstractServiceTestJUnit4Support() {
     fun `Properties are cached`() {
         val project = doCreateProject()
         setProperty(
-                project,
-                TestPropertyType::class.java,
-                TestProperty.of("test")
+            project,
+            TestPropertyType::class.java,
+            TestProperty.of("test")
         )
         // Gets the raw property
         val p = propertyRepository.loadProperty(
-                TestPropertyType::class.java.name,
-                project.projectEntityType,
-                project.id
+            TestPropertyType::class.java.name,
+            project.projectEntityType,
+            project.id
         )
         // Gets it a second time
         val p2 = propertyRepository.loadProperty(
-                TestPropertyType::class.java.name,
-                project.projectEntityType,
-                project.id
+            TestPropertyType::class.java.name,
+            project.projectEntityType,
+            project.id
         )
         // Checks this is the same instance
         assertTrue(p === p2, "Cache enabled")

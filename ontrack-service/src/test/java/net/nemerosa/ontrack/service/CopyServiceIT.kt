@@ -31,7 +31,7 @@ class CopyServiceIT : AbstractServiceTestJUnit4Support() {
                 TestProperty.of("Test")
             )
         }
-        assertTrue(ack.isSuccess)
+        assertTrue(ack.success)
 
         // Clones the branch
         val clonedBranchName = TestUtils.uid("B")

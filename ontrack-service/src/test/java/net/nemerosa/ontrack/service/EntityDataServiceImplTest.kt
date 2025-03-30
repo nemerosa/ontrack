@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.service
 
-import com.nhaarman.mockitokotlin2.whenever
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ID
@@ -8,9 +10,7 @@ import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.support.NameValue
 import net.nemerosa.ontrack.repository.EntityDataRepository
-import org.junit.Before
-import org.junit.Test
-import org.mockito.Mockito.*
+import org.junit.jupiter.api.BeforeEach
 import kotlin.test.*
 
 class EntityDataServiceImplTest {
@@ -20,67 +20,72 @@ class EntityDataServiceImplTest {
     private lateinit var securityService: SecurityService
     private lateinit var project: Project
 
-    @Before
+    @BeforeEach
     fun setup() {
-        repository = mock(EntityDataRepository::class.java)
-        securityService = mock(SecurityService::class.java)
+        repository = mockk<EntityDataRepository>()
+        securityService = mockk<SecurityService>()
         service = EntityDataServiceImpl(repository, securityService)
         project = Project.of(NameDescription.nd("P", "Project")).withId(ID.of(1))
     }
 
     @Test
     fun `Testing if data is associated with a project`() {
-        whenever(repository.hasEntityValue(project, "Key")).thenReturn(false)
+        every { repository.hasEntityValue(project, "Key") } returns false
         assertFalse(service.hasEntityValue(project, "Key"))
-        whenever(repository.hasEntityValue(project, "Key")).thenReturn(true)
+        every { repository.hasEntityValue(project, "Key") } returns true
         assertTrue(service.hasEntityValue(project, "Key"))
     }
 
     @Test
     fun `Getting a false boolean`() {
-        `when`(repository.retrieve(project, "Test")).thenReturn("false")
+        every { repository.retrieve(project, "Test") } returns "false"
         assertNotNull(service.retrieveBoolean(project, "Test")) { assertFalse(it) }
     }
 
     @Test
     fun `Getting a true boolean`() {
-        `when`(repository.retrieve(project, "Test")).thenReturn("true")
+        every { repository.retrieve(project, "Test") } returns "true"
         assertNotNull(service.retrieveBoolean(project, "Test")) { assertTrue(it) }
     }
 
     @Test
     fun `Not getting a boolean`() {
-        `when`(repository.retrieve(project, "Test")).thenReturn(null)
+        every { repository.retrieve(project, "Test") } returns null
         assertNull(service.retrieveBoolean(project, "Test"))
     }
 
     @Test
     fun `Getting an integer`() {
-        `when`(repository.retrieve(project, "Test")).thenReturn("10")
+        every { repository.retrieve(project, "Test") } returns "10"
         assertEquals(10, service.retrieveInteger(project, "Test"))
     }
 
     @Test
     fun `Not getting an integer`() {
-        `when`(repository.retrieve(project, "Test")).thenReturn(null)
+        every { repository.retrieve(project, "Test") } returns null
         assertNull(service.retrieveInteger(project, "Test"))
     }
 
     @Test
     fun `Getting a string`() {
-        `when`(repository.retrieve(project, "Test")).thenReturn("Value")
+        every { repository.retrieve(project, "Test") } returns "Value"
         assertEquals("Value", service.retrieve(project, "Test"))
     }
 
     @Test
     fun `Not getting a string`() {
-        `when`(repository.retrieve(project, "Test")).thenReturn(null)
+        every { repository.retrieve(project, "Test") } returns null
         assertNull(service.retrieve(project, "Test"))
     }
 
     @Test
     fun `Getting a JSON`() {
-        `when`(repository.retrieveJson(project, "Test")).thenReturn(JsonUtils.parseAsNode("""{"name":"Name","value":"Value"}"""))
+        every {
+            repository.retrieveJson(
+                project,
+                "Test"
+            )
+        } returns JsonUtils.parseAsNode("""{"name":"Name","value":"Value"}""")
         val json = JsonUtils.toMap(service.retrieveJson(project, "Test"))
         assertEquals("Name", json["name"])
         assertEquals("Value", json["value"])
@@ -88,13 +93,18 @@ class EntityDataServiceImplTest {
 
     @Test
     fun `Not getting a JSON`() {
-        `when`(repository.retrieve(project, "Test")).thenReturn(null)
+        every { repository.retrieve(project, "Test") } returns null
         assertNull(service.retrieveJson(project, "Test"))
     }
 
     @Test
     fun `Getting an Object`() {
-        `when`(repository.retrieveJson(project, "Test")).thenReturn(JsonUtils.parseAsNode("""{"name":"Name","value":"Value"}"""))
+        every {
+            repository.retrieveJson(
+                project,
+                "Test"
+            )
+        } returns JsonUtils.parseAsNode("""{"name":"Name","value":"Value"}""")
         val o = service.retrieve(project, "Test", NameValue::class.java)
         assertNotNull(o) {
             assertEquals("Name", it.name)
@@ -104,38 +114,48 @@ class EntityDataServiceImplTest {
 
     @Test
     fun `Not getting an Object`() {
-        `when`(repository.retrieve(project, "Test")).thenReturn(null)
+        every { repository.retrieve(project, "Test") } returns null
         assertNull(service.retrieve(project, "Test", NameValue::class.java))
     }
 
     @Test
     fun `Store a boolean`() {
         service.store(project, "Test", true)
-        verify(repository).store(project, "Test", "true")
+        verify {
+            repository.store(project, "Test", "true")
+        }
     }
 
     @Test
     fun `Store an integer`() {
         service.store(project, "Test", 10)
-        verify(repository).store(project, "Test", "10")
+        verify {
+            repository.store(project, "Test", "10")
+        }
     }
 
     @Test
     fun `Store a string`() {
         service.store(project, "Test", "Value")
-        verify(repository).store(project, "Test", "Value")
+        verify {
+            repository.store(project, "Test", "Value")
+        }
     }
 
     @Test
     fun `Store an object`() {
         service.store(project, "Test", NameValue("Name", "Value"))
-        verify(repository).storeJson(project, "Test", JsonUtils.parseAsNode("""{"name":"Name","value":"Value"}"""))
+        verify {
+            repository.storeJson(project, "Test", JsonUtils.parseAsNode("""{"name":"Name","value":"Value"}"""))
+        }
     }
 
     @Test
     fun `Deleting an object`() {
         service.delete(project, "Test")
-        verify(repository).delete(project, "Test")
+        verify {
+            repository.delete(project, "Test")
+        }
     }
 
 }
