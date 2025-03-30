@@ -17,5 +17,5 @@ dependencies {
 
     testImplementation(project(":ontrack-it-utils"))
 
-    // TODO testRuntimeOnly(project(":ontrack-service"))
+    testRuntimeOnly(project(":ontrack-service"))
 }
