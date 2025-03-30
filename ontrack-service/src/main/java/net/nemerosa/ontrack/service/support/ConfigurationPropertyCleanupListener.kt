@@ -9,7 +9,6 @@ import net.nemerosa.ontrack.model.structure.PropertyService
 import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.support.ConfigurationProperty
 import net.nemerosa.ontrack.model.support.ConfigurationPropertyType
-import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
 import org.springframework.stereotype.Component
 
 /**
@@ -40,8 +39,8 @@ class ConfigurationPropertyCleanupListener(
         }
     }
 
-    private fun <C : UserPasswordConfiguration<C>, T : ConfigurationProperty<C>> cleanupType(
-        propertyType: ConfigurationPropertyType<in C, in T>,
+    private fun cleanupType(
+        propertyType: ConfigurationPropertyType<*, *>,
         configurationName: String,
         configurationType: String
     ) {

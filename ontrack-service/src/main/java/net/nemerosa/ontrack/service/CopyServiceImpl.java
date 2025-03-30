@@ -130,7 +130,7 @@ public class CopyServiceImpl implements CopyService {
         return structureService.getBranch(branch.getId());
     }
 
-    protected void doCopy(Branch sourceBranch, Branch targetBranch, Function<String, String> replacementFn, SyncPolicy syncPolicy) {
+    protected boolean doCopy(Branch sourceBranch, Branch targetBranch, Function<String, String> replacementFn, SyncPolicy syncPolicy) {
         // Branch properties
         doCopyProperties(sourceBranch, targetBranch, replacementFn, syncPolicy);
         // Validation stamps and properties
@@ -139,6 +139,8 @@ public class CopyServiceImpl implements CopyService {
         doCopyPromotionLevels(sourceBranch, targetBranch, replacementFn, syncPolicy);
         // User filters
         doCopyUserBuildFilters(sourceBranch, targetBranch);
+        // OK
+        return true;
     }
 
     protected void doCopyUserBuildFilters(Branch sourceBranch, Branch targetBranch) {

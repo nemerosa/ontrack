@@ -26,7 +26,7 @@ dependencies {
     testImplementation(project(":ontrack-it-utils"))
     // TODO testImplementation(project(path = ":ontrack-common", configuration = "tests"))
     // TODO testImplementation(project(path = ":ontrack-model", configuration = "tests"))
-    // TODO testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
+    testImplementation(testFixtures(project(":ontrack-extension-api")))
 
     testRuntimeOnly(project(":ontrack-repository-impl"))
     testRuntimeOnly("io.micrometer:micrometer-registry-prometheus")
