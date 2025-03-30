@@ -13,6 +13,8 @@ class DefaultOntrackAuthenticatedUser(
 
     override val accountGroups: List<AccountGroup> = groups.map { it.group }
 
+    override fun isEnabled(): Boolean = !authorizedAccount.account.disabled
+
     override fun isGranted(fn: Class<out GlobalFunction>) =
         authorizedAccount.isGranted(fn) || groups.any { it.isGranted(fn) }
 
