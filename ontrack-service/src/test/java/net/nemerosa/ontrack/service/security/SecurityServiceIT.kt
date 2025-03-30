@@ -1,14 +1,14 @@
 package net.nemerosa.ontrack.service.security
 
-import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.security.*
 import org.apache.commons.lang3.StringUtils
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.context.SecurityContextHolder
 import kotlin.test.*
 
-class SecurityServiceIT : AbstractDSLTestJUnit4Support() {
+class SecurityServiceIT : AbstractDSLTestSupport() {
 
     @Test
     fun `Disabled accounts cannot access functions in any way`() {

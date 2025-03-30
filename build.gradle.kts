@@ -1,9 +1,12 @@
+import com.avast.gradle.dockercompose.ComposeExtension
+
 plugins {
     kotlin("jvm") version "2.1.20"
     kotlin("plugin.spring") version "2.1.20"
     id("org.springframework.boot") version "3.4.4" apply false
     id("io.spring.dependency-management") version "1.1.7"
     id("net.nemerosa.versioning") version "3.1.0"
+    id("com.avast.gradle.docker-compose") version "0.17.12"
 }
 
 /**
@@ -47,9 +50,20 @@ subprojects {
 
 }
 
-/**
- * For all Java projects
- */
+// ===================================================================================================================
+// Docker compose
+// ===================================================================================================================
+
+configure<ComposeExtension> {
+    createNested("integrationTest").apply {
+        useComposeFiles.addAll(listOf("compose/docker-compose-it.yml"))
+        setProjectName("it")
+    }
+}
+
+// ===================================================================================================================
+// Java projects
+// ===================================================================================================================
 
 val javaProjects = subprojects.filter {
     it.path != ":ontrack-web-core"
@@ -73,8 +87,37 @@ configure(javaProjects) {
         }
     }
 
-    tasks.withType<Test> {
+    tasks.named<Test>("test") {
         useJUnitPlatform()
+        exclude("**/*IT.class")
+    }
+
+    val integrationTest by tasks.registering(Test::class) {
+        group = "verification"
+        description = "Integration tests"
+        useJUnitPlatform()
+
+        // Only include classes whose names end with 'IT'
+        include("**/*IT.class")
+        // Set the test classes directory to be the same as the unit tests
+        testClassesDirs = sourceSets["test"].output.classesDirs
+        classpath = sourceSets["test"].runtimeClasspath
+
+        shouldRunAfter("test")
+        minHeapSize = "128m"
+        maxHeapSize = "3072m"
+        dependsOn(":integrationTestComposeUp")
+        finalizedBy(":integrationTestComposeDown")
+    }
+
+// Synchronization with shutting down the database
+    rootProject.tasks.named("integrationTestComposeDown") {
+        mustRunAfter(integrationTest)
+    }
+
+// Inclusion in lifecycle
+    tasks.check {
+        dependsOn(integrationTest)
     }
 
     val mockkVersion = "1.13.17"
@@ -104,6 +147,20 @@ configure(javaProjects) {
     }
 
 }
+
+// ===================================================================================================================
+// ===================================================================================================================
+// ===================================================================================================================
+// ===================================================================================================================
+// ===================================================================================================================
+
+// OLD BUILD
+
+// ===================================================================================================================
+// ===================================================================================================================
+// ===================================================================================================================
+// ===================================================================================================================
+// ===================================================================================================================
 
 //import com.avast.gradle.dockercompose.ComposeExtension
 //import com.avast.gradle.dockercompose.tasks.ComposeUp
