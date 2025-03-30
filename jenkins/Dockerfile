@@ -1,5 +1,5 @@
 # Base
-FROM azul/zulu-openjdk:17.0.6
+FROM azul/zulu-openjdk:17
 
 # Makes sure all tools for the build are installed
 RUN apt-get update && apt-get install -y \
@@ -23,13 +23,13 @@ RUN curl --fail --silent -L https://github.com/s3tools/s3cmd/releases/download/v
     && python3 setup.py install
 
 # Installing Docker
-RUN curl --fail --silent -L https://download.docker.com/linux/static/stable/x86_64/docker-20.10.7.tgz --output docker.tgz
+RUN curl --fail --silent -L https://download.docker.com/linux/static/stable/x86_64/docker-28.0.4.tgz --output docker.tgz
 RUN tar -xvzf docker.tgz
 RUN mv docker/* /usr/bin/
 RUN chmod +x /usr/bin/docker
 
 # Installs Docker Compose
-RUN curl --fail --silent -L https://github.com/docker/compose/releases/download/v2.18.1/docker-compose-`uname -s`-`uname -m` > /usr/bin/docker-compose
+RUN curl --fail --silent -L https://github.com/docker/compose/releases/download/v2.34.0/docker-compose-`uname -s`-`uname -m` > /usr/bin/docker-compose
 RUN chmod +x /usr/bin/docker-compose
 
 # Git configuration
