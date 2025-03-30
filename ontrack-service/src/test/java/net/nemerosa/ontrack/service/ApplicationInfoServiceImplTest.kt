@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.service
 
 import io.mockk.every
 import io.mockk.mockk
-import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.it.MockSecurityService
 import net.nemerosa.ontrack.model.support.ApplicationInfo
 import net.nemerosa.ontrack.model.support.ApplicationInfoProvider
 import org.junit.jupiter.api.Test
@@ -18,7 +18,7 @@ class ApplicationInfoServiceImplTest {
             ApplicationInfo.error("Test")
         )
         // Security mock
-        val securityService = mockk<SecurityService>()
+        val securityService = MockSecurityService()
         // Service
         val service = ApplicationInfoServiceImpl(listOf(provider), securityService)
         // Gets the informations

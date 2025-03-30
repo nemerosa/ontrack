@@ -36,7 +36,7 @@ class LabelProviderJobTest {
         structureService = mockk()
         every { structureService.projectList } returns projects
 
-        labelProviderService = mockk()
+        labelProviderService = mockk(relaxed = true)
         settingsService = mockk()
 
         securityService = SecurityServiceImpl()
@@ -79,7 +79,7 @@ class LabelProviderJobTest {
     @Test
     fun `Job per projects`() {
         settings(enabled = true, interval = 240, perProject = true)
-        val jobs = provider.collectJobRegistrations().toList()
+        val jobs = provider.jobRegistrations.toList()
         assertEquals(3, jobs.size, "One job is registered per project")
         (0..2).forEach { no ->
             val registration = jobs[no]

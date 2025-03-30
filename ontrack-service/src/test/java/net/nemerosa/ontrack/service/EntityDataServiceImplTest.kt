@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.service
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import net.nemerosa.ontrack.it.MockSecurityService
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ID
@@ -17,13 +18,12 @@ class EntityDataServiceImplTest {
 
     private lateinit var service: EntityDataServiceImpl
     private lateinit var repository: EntityDataRepository
-    private lateinit var securityService: SecurityService
+    private val securityService: SecurityService = MockSecurityService()
     private lateinit var project: Project
 
     @BeforeEach
     fun setup() {
-        repository = mockk<EntityDataRepository>()
-        securityService = mockk<SecurityService>()
+        repository = mockk<EntityDataRepository>(relaxed = true)
         service = EntityDataServiceImpl(repository, securityService)
         project = Project.of(NameDescription.nd("P", "Project")).withId(ID.of(1))
     }
@@ -93,7 +93,7 @@ class EntityDataServiceImplTest {
 
     @Test
     fun `Not getting a JSON`() {
-        every { repository.retrieve(project, "Test") } returns null
+        every { repository.retrieveJson(project, "Test") } returns null
         assertNull(service.retrieveJson(project, "Test"))
     }
 
@@ -114,7 +114,7 @@ class EntityDataServiceImplTest {
 
     @Test
     fun `Not getting an Object`() {
-        every { repository.retrieve(project, "Test") } returns null
+        every { repository.retrieveJson(project, "Test") } returns null
         assertNull(service.retrieve(project, "Test", NameValue::class.java))
     }
 
