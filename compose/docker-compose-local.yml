@@ -51,7 +51,7 @@ services:
 
   # Postgresql database
   postgres:
-    image: postgres:15
+    image: postgres:17
     restart: always
     environment:
       POSTGRES_DB: ontrack
