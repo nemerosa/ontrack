@@ -1,18 +1,16 @@
-import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+//import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 import com.github.gradle.node.NodeExtension
 import com.github.gradle.node.npm.task.NpmTask
 
 plugins {
     base
     id("com.github.node-gradle.node")
-    id("com.bmuschko.docker-remote-api")
+//    id("com.bmuschko.docker-remote-api")
 }
 
-// Node environment
-
 configure<NodeExtension> {
-    version.set("20.2.0")
-    npmVersion.set("9.6.6")
+    version.set("23.7.0")
+    npmVersion.set("10.9.2")
     download.set(true)
 }
 
@@ -33,8 +31,8 @@ tasks.named("build") {
 
 // Docker image
 
-val dockerBuild by tasks.registering(DockerBuildImage::class) {
-    inputDir.set(project.projectDir)
-    images.add("nemerosa/ontrack-ui:$version")
-    images.add("nemerosa/ontrack-ui:latest")
-}
+//val dockerBuild by tasks.registering(DockerBuildImage::class) {
+//    inputDir.set(project.projectDir)
+//    images.add("nemerosa/ontrack-ui:$version")
+//    images.add("nemerosa/ontrack-ui:latest")
+//}

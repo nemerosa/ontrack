@@ -19,6 +19,9 @@ import 'ace-builds/src-noconflict/mode-json';
 import 'ace-builds/src-noconflict/theme-github';
 import MessageContextProvider from "@components/providers/MessageProvider";
 
+/**
+ * @deprecated Loads the configuration on the service side using process.env
+ */
 export async function getServerSideProps() {
     console.log("[init] Environment ", ontrack)
     return {

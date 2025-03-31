@@ -28,6 +28,14 @@ spring:
       printer:
         enabled: true
       locations: "classpath*:graphql/**"
+    cors:
+      allowed-origins: "*"
+      allowed-methods:
+        - GET
+        - POST
+        - OPTIONS
+      max-age: 1800s
+      allowed-headers: "*"
 
 # Compression of web resources
 server:

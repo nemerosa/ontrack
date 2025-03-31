@@ -1,43 +1,49 @@
-import {createContext, useEffect, useState} from "react";
+import {createContext} from "react";
 import {gql} from "graphql-request";
-import {useGraphQLClient, useRestClient} from "@components/providers/ConnectionContextProvider";
+import {useQuery} from "@components/services/GraphQL";
+import LoadingContainer from "@components/common/LoadingContainer";
 
-export const UserContext = createContext({authorizations: {}, userMenuGroups: []});
+export const UserContext = createContext({
+    name: '',
+    authorizations: {},
+    userMenuGroups: []
+})
 
-const UserContextProvider = ({children}) => {
-
-    const gqlClient = useGraphQLClient()
-    const restClient = useRestClient()
-
-    const [user, setUser] = useState({authorizations: {}, userMenuGroups: []});
-
-    let tmpUser = {}
-
-    useEffect(() => {
-        if (restClient && gqlClient) {
-            restClient.get("/rest/user").then(data => {
-                tmpUser = data
-                return gqlClient.request(
-                    gql`
-                        query User {
-                            userMenuItems {
-                                id
-                                name
-                                items {
-                                    extension
-                                    id
-                                    name
-                                }
-                            }
-                            authorizations {
-                                name
-                                action
-                                authorized
-                            }
-                        }
-                    `
-                )
-            }).then(data => {
+export default function UserContextProvider({children}) {
+    const {data: user, loading, error} = useQuery(
+        gql`
+            query UserContext {
+                user {
+                    account {
+                        name
+                    }
+                }
+                userMenuItems {
+                    id
+                    name
+                    items {
+                        extension
+                        id
+                        name
+                    }
+                }
+                authorizations {
+                    name
+                    action
+                    authorized
+                }
+            }
+        `,
+        {
+            initialData: {
+                name: '',
+                authorizations: {},
+                userMenuGroups: [],
+            },
+            dataFn: data => {
+                const tmpUser = {
+                    name: data.user.account.name
+                }
                 // Groups
                 tmpUser.userMenuGroups = data.userMenuItems
                 // Indexing of authorizations
@@ -52,12 +58,17 @@ const UserContextProvider = ({children}) => {
                     domain[authorization.action] = authorization.authorized
                 })
                 // We're done
-                setUser(tmpUser)
-            })
+                return tmpUser
+            }
         }
-    }, [gqlClient, restClient])
+    )
 
-    return <UserContext.Provider value={user}>{children}</UserContext.Provider>
-};
+    return (
+        <>
+            <LoadingContainer loading={loading} error={error}>
+                <UserContext.Provider value={user}>{children}</UserContext.Provider>
+            </LoadingContainer>
+        </>
+    )
 
-export default UserContextProvider;
+}

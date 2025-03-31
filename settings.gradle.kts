@@ -21,7 +21,7 @@ include(":ontrack-ui")
 include(":ontrack-ui-graphql")
 include(":ontrack-ui-support")
 // TODO include(":ontrack-web")
-// TODO include(":ontrack-web-core")
+include(":ontrack-web-core")
 // TODO include(":ontrack-web-tests")
 // TODO include(":ontrack-docs")
 
