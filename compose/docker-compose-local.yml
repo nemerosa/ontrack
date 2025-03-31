@@ -1,4 +1,4 @@
-version: "2.1"
+version: "3.8"
 
 services:
 
@@ -45,7 +45,7 @@ services:
       ONTRACK_CONNECTION_TRACING: "true"
     depends_on:
       ontrack:
-        condition: service_healthy
+        condition: service_started
     ports:
       - "3000:3000"
 
