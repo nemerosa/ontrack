@@ -5,6 +5,7 @@ import {UserContext} from "@components/providers/UserProvider";
 import {FaRegUser} from "react-icons/fa";
 import HomeLink from "@components/common/HomeLink";
 import NavBarSearch from "@components/search/NavBarSearch";
+import Image from "next/image";
 
 const {Text} = Typography;
 
@@ -33,8 +34,8 @@ export default function NavBar() {
                 <Space direction="horizontal" size={16}>
                     <HomeLink
                         text={
-                            <img
-                                src={`/ui/ontrack-128.png`}
+                            <Image
+                                src={`/ontrack-128.png`}
                                 alt="Ontrack Logo"
                                 width={24}
                                 height={24}
