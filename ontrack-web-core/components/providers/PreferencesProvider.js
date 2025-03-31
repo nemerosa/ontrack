@@ -1,6 +1,7 @@
 import {createContext, useContext, useEffect, useState} from "react";
 import {gql} from "graphql-request";
 import {useMutation, useQuery} from "@components/services/GraphQL";
+import LoadingContainer from "@components/common/LoadingContainer";
 
 export const PreferencesContext = createContext({
     branchViewVsGroups: null,
@@ -37,10 +38,10 @@ export default function PreferencesContextProvider({children}) {
     )
 
     useEffect(() => {
-        if (data) {
+        if (data && finished) {
             setPreferencesRecord(data)
         }
-    }, [finished])
+    }, [data, finished])
 
     const {mutate} = useMutation(
         gql`
@@ -70,7 +71,9 @@ export default function PreferencesContextProvider({children}) {
         setPreferences,
     }
 
-    return <PreferencesContext.Provider value={contextValue}>{children}</PreferencesContext.Provider>
+    return <LoadingContainer loading={loading} error={error}>
+        <PreferencesContext.Provider value={contextValue}>{children}</PreferencesContext.Provider>
+    </LoadingContainer>
 }
 
 export function usePreferences() {
