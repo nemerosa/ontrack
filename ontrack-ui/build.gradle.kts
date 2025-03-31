@@ -1,8 +1,3 @@
-import net.nemerosa.versioning.VersioningExtension
-import org.springframework.boot.gradle.dsl.SpringBootExtension
-import org.springframework.boot.gradle.tasks.bundling.BootJar
-import org.springframework.boot.gradle.tasks.run.BootRun
-
 plugins {
     `java-library`
 }
@@ -91,79 +86,4 @@ dependencies {
     // TODO runtimeOnly(project(":ontrack-extension-queue"))
     // TODO runtimeOnly(project(":ontrack-extension-workflows"))
     // TODO runtimeOnly(project(":ontrack-extension-environments"))
-}
-
-/**
- * Cleaning the Web resources
- */
-
-//tasks.named<Delete>("clean") {
-//    delete("src/main/resources/application.properties")
-//    delete("src/main/resources/static")
-//}
-
-/**
- * Copy of Web resources before packaging
- */
-
-//val copyWebResources by tasks.registering {
-//    dependsOn(":ontrack-web:prod")
-//    doLast {
-//        project.copy {
-//            from(project(":ontrack-web").file("build/web/prod"))
-//            into("src/main/resources/static")
-//        }
-//    }
-//}
-
-/**
- * Dependencies
- */
-
-tasks.named<Jar>("jar") {
-    enabled = true
-    // dependsOn(copyWebResources)
-    dependsOn("bootBuildInfo")
-}
-
-tasks.named<ProcessResources>("processResources") {
-    // dependsOn(copyWebResources)
-    dependsOn("bootBuildInfo")
-}
-
-tasks.named<BootRun>("bootRun") {
-    dependsOn("bootJar")
-    // dependsOn(":ontrack-web:dev")
-
-    // Running with `dev` profile by default with `bootRun`
-    args("--spring.profiles.active=dev")
-}
-
-/**
- * Spring boot packaging
- */
-
-configure<SpringBootExtension> {
-    val info = rootProject.extensions.getByName<VersioningExtension>("versioning").info
-    buildInfo {
-        properties {
-            time = null
-            additional = mapOf(
-                "full" to info.full,
-                "branch" to info.branch,
-                "build" to info.build,
-                "commit" to info.commit,
-                "dirty" to info.dirty,
-            )
-        }
-    }
-}
-
-val bootJar = tasks.getByName<BootJar>("bootJar") {
-    // Specific classifier
-    archiveClassifier.set("app")
-    // Allowing the declaration of external extensions, packaged using the Spring Boot Module format
-    manifest {
-        attributes("Main-Class" to "org.springframework.boot.loader.PropertiesLauncher")
-    }
 }
