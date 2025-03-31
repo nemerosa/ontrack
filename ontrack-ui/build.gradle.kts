@@ -1,5 +1,6 @@
 plugins {
     `java-library`
+    id("com.google.cloud.tools.jib")
 }
 
 apply(plugin = "org.springframework.boot")
@@ -86,4 +87,22 @@ dependencies {
     // TODO runtimeOnly(project(":ontrack-extension-queue"))
     // TODO runtimeOnly(project(":ontrack-extension-workflows"))
     // TODO runtimeOnly(project(":ontrack-extension-environments"))
+}
+
+
+jib {
+    to {
+        image = "nemerosa/ontrack"
+        tags = setOf(version as String, "latest")
+    }
+    from {
+        image = "azul/zulu-openjdk-alpine:17"
+    }
+    container {
+        ports = listOf("8080", "8800")
+    }
+}
+
+tasks.named("jibDockerBuild") {
+    shouldRunAfter("integrationTest")
 }

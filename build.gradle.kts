@@ -7,6 +7,8 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
     id("net.nemerosa.versioning") version "3.1.0"
     id("com.avast.gradle.docker-compose") version "0.17.12"
+    id("com.google.cloud.tools.jib") version "3.4.4" apply false
+    id("com.bmuschko.docker-remote-api") version "9.4.0" apply false
 }
 
 /**
@@ -62,6 +64,15 @@ configure<ComposeExtension> {
         useComposeFiles.addAll(listOf("compose/docker-compose-it.yml"))
         setProjectName("it")
     }
+    createNested("local").apply {
+        useComposeFiles.addAll(listOf("compose/docker-compose-local.yml"))
+        setProjectName("local")
+    }
+}
+
+tasks.named("localComposeUp") {
+    dependsOn(":ontrack-ui:jibDockerBuild")
+    dependsOn(":ontrack-web-core:dockerBuild")
 }
 
 // ===================================================================================================================

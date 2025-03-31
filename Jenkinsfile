@@ -217,7 +217,7 @@ pipeline {
                         sh '''
                             ./gradlew \\
                                 dockerBuild \\
-                                -PbowerOptions='--allow-root' \\
+                                jibDockerBuild \\
                                 -Dorg.gradle.jvmargs=-Xmx6144m \\
                                 --stacktrace \\
                                 --parallel \\
@@ -225,12 +225,13 @@ pipeline {
                                 --console plain
                         '''
                     } else {
-                        // TODO dockerBuild
                         // TODO documentation
                         sh '''
                             ./gradlew \\
                                 check \\
                                 build \\
+                                dockerBuild \\
+                                jibDockerBuild \\
                                 -Dorg.gradle.jvmargs=-Xmx6144m \\
                                 --stacktrace \\
                                 --parallel \\
