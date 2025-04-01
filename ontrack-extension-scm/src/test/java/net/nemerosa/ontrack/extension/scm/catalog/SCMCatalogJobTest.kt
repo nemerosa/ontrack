@@ -1,9 +1,8 @@
 package net.nemerosa.ontrack.extension.scm.catalog
 
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import org.junit.Test
+import io.mockk.mockk
+import io.mockk.verify
+import org.junit.jupiter.api.Test
 import java.util.concurrent.TimeUnit
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -12,9 +11,9 @@ class SCMCatalogJobTest {
 
     @Test
     fun `SCM catalog collection job`() {
-        val scmCatalog: SCMCatalog = mock()
+        val scmCatalog: SCMCatalog = mockk(relaxed = true)
         val collectorJob = SCMCatalogJob(
-                scmCatalog = scmCatalog
+            scmCatalog = scmCatalog
         )
         val jobs = collectorJob.startingJobs
         assertEquals(1, jobs.size)
@@ -30,7 +29,7 @@ class SCMCatalogJobTest {
         assertEquals("Collection of SCM Catalog", job.description)
 
         job.task.run { println(it) }
-        verify(scmCatalog).collectSCMCatalog(any())
+        verify { scmCatalog.collectSCMCatalog(any()) }
     }
 
 }
