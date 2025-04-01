@@ -45,6 +45,7 @@ subprojects {
             dependency("org.apache.commons:commons-text:1.13.0")
             dependency("org.jgrapht:jgrapht-core:1.5.2")
             dependency("com.opencsv:opencsv:5.10")
+            dependency("com.networknt:json-schema-validator:1.5.5")
 
             // Git repository support TODO Will be removed in V5
             dependency("org.eclipse.jgit:org.eclipse.jgit:6.6.1.202309021850-r")

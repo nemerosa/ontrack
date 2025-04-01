@@ -1,15 +1,15 @@
 package net.nemerosa.ontrack.extension.casc.graphql
 
 import net.nemerosa.ontrack.extension.casc.CascConfigurationProperties
-import net.nemerosa.ontrack.graphql.AbstractQLKTITJUnit4Support
+import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.model.settings.HomePageSettings
 import net.nemerosa.ontrack.test.assertJsonNotNull
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class CascGraphQLIT : AbstractQLKTITJUnit4Support() {
+class CascGraphQLIT : AbstractQLKTITSupport() {
 
     @Autowired
     private lateinit var cascConfigurationProperties: CascConfigurationProperties
