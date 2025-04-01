@@ -32,7 +32,7 @@ include(":ontrack-web-core")
 // Core extensions
 // TODO include(":ontrack-extension-ldap")
 // TODO include(":ontrack-extension-oidc")
-// TODO include(":ontrack-extension-artifactory")
+include(":ontrack-extension-artifactory")
 include(":ontrack-extension-general")
 include(":ontrack-extension-issues")
 // TODO include(":ontrack-extension-combined")

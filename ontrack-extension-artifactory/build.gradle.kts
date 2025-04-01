@@ -1,10 +1,6 @@
-import net.nemerosa.ontrack.gradle.extension.OntrackExtensionPlugin
-
 plugins {
     `java-library`
 }
-
-apply<OntrackExtensionPlugin>()
 
 dependencies {
     implementation(project(":ontrack-extension-support"))
