@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.indicators.ui
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.indicators.AbstractIndicatorsTestSupport
 import net.nemerosa.ontrack.json.asJson
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.Duration
 import kotlin.test.assertEquals

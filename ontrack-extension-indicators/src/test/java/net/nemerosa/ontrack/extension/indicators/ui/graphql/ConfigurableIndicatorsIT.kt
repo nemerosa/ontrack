@@ -10,7 +10,7 @@ import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueTyp
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import kotlin.test.assertEquals

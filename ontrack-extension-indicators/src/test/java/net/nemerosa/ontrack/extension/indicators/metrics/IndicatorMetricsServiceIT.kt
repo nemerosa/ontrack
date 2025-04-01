@@ -1,12 +1,14 @@
 package net.nemerosa.ontrack.extension.indicators.metrics
 
-import com.nhaarman.mockitokotlin2.*
+import io.mockk.clearMocks
+import io.mockk.mockk
+import io.mockk.verify
 import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.indicators.AbstractIndicatorsTestSupport
 import net.nemerosa.ontrack.job.JobRunListener
 import net.nemerosa.ontrack.model.metrics.MetricsExportService
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -32,34 +34,38 @@ class IndicatorMetricsServiceIT : AbstractIndicatorsTestSupport() {
                 indicator(type, (days % 2 == 0), time = now - Duration.ofDays(days.toLong()))
             }
             // Resetting the mock
-            reset(metricsExportService)
+            clearMocks(metricsExportService)
             // Restoration job
             indicatorMetricsRestorationJob.startingJobs.first().job.task.run(JobRunListener.out())
             // Checks that the metrics for this project were sent back
-            verify(metricsExportService, times(5)).exportMetrics(
-                    metric = eq("ontrack_indicator"),
-                    tags = eq(mapOf(
-                            "project" to name,
-                            "category" to type.category.id,
-                            "type" to type.id
-                    )),
-                    fields = eq(mapOf(
-                            "value" to 100.0
-                    )),
+            verify(exactly = 5) {
+                metricsExportService.exportMetrics(
+                    metric = "ontrack_indicator",
+                    tags = mapOf(
+                        "project" to name,
+                        "category" to type.category.id,
+                        "type" to type.id
+                    ),
+                    fields = mapOf(
+                        "value" to 100.0
+                    ),
                     timestamp = any()
-            )
-            verify(metricsExportService, times(5)).exportMetrics(
-                    metric = eq("ontrack_indicator"),
-                    tags = eq(mapOf(
-                            "project" to name,
-                            "category" to type.category.id,
-                            "type" to type.id
-                    )),
-                    fields = eq(mapOf(
-                            "value" to 50.0
-                    )),
+                )
+            }
+            verify(exactly = 5) {
+                metricsExportService.exportMetrics(
+                    metric = "ontrack_indicator",
+                    tags = mapOf(
+                        "project" to name,
+                        "category" to type.category.id,
+                        "type" to type.id
+                    ),
+                    fields = mapOf(
+                        "value" to 50.0
+                    ),
                     timestamp = any()
-            )
+                )
+            }
         }
     }
 
@@ -68,7 +74,7 @@ class IndicatorMetricsServiceIT : AbstractIndicatorsTestSupport() {
     class IndicatorMetricsServiceITConfig {
         @Bean
         @Primary
-        fun metricsExportService() = mock<MetricsExportService>()
+        fun metricsExportService() = mockk<MetricsExportService>(relaxed = true)
     }
 
 }

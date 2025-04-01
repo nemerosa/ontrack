@@ -8,7 +8,7 @@ import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueTyp
 import net.nemerosa.ontrack.model.structure.Signature
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecoratorTestSupport
 import net.nemerosa.ontrack.ui.resource.Link
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
 class ProjectIndicatorResourceDecoratorIT : AbstractResourceDecoratorTestSupport() {

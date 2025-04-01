@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.extension.indicators.acl.IndicatorPortfolioManagemen
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolioOfPortfolios
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecoratorTestSupport
 import net.nemerosa.ontrack.ui.resource.Link
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
 class IndicatorPortfolioOfPortfoliosResourceDecoratorIT : AbstractResourceDecoratorTestSupport() {

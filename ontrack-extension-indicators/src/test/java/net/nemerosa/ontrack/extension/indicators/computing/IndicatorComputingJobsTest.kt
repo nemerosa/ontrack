@@ -1,16 +1,17 @@
 package net.nemerosa.ontrack.extension.indicators.computing
 
-import com.nhaarman.mockitokotlin2.*
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import net.nemerosa.ontrack.job.JobRunListener
 import net.nemerosa.ontrack.job.Schedule
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.StructureService
-import org.junit.Before
-import org.junit.Test
-import kotlin.streams.toList
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -24,11 +25,11 @@ class IndicatorComputingJobsTest {
 
     private lateinit var computingJobs: IndicatorComputingJobs
 
-    @Before
+    @BeforeEach
     fun before() {
-        structureService = mock()
-        indicatorComputer = mock()
-        indicatorComputingService = mock()
+        structureService = mockk(relaxed = true)
+        indicatorComputer = mockk(relaxed = true)
+        indicatorComputingService = mockk(relaxed = true)
         meterRegistry = SimpleMeterRegistry()
 
         computingJobs = IndicatorComputingJobs(
@@ -36,7 +37,7 @@ class IndicatorComputingJobsTest {
             computers = listOf(indicatorComputer),
             indicatorComputingService = indicatorComputingService,
             meterRegistry = meterRegistry,
-            applicationLogService = mock()
+            applicationLogService = mockk(relaxed = true)
         )
     }
 
@@ -47,16 +48,16 @@ class IndicatorComputingJobsTest {
         }
         val project = projects.first()
 
-        whenever(structureService.projectList).thenReturn(projects)
+        every { structureService.projectList } returns projects
 
-        whenever(indicatorComputer.perProject).thenReturn(true)
-        whenever(indicatorComputer.schedule).thenReturn(Schedule.EVERY_DAY)
-        whenever(indicatorComputer.name).thenReturn("Computer name")
+        every { indicatorComputer.perProject } returns true
+        every { indicatorComputer.schedule } returns Schedule.EVERY_DAY
+        every { indicatorComputer.name } returns "Computer name"
         projects.forEach {
-            whenever(indicatorComputer.isProjectEligible(it)).thenReturn(true)
+            every { indicatorComputer.isProjectEligible(it) } returns true
         }
 
-        val jobs = computingJobs.collectJobRegistrations().toList()
+        val jobs = computingJobs.jobRegistrations.toList()
 
         assertEquals(2, jobs.size, "One job created per project")
         val jobRegistration = jobs.first()
@@ -71,10 +72,9 @@ class IndicatorComputingJobsTest {
 
         job.task.run(JobRunListener.out())
 
-        verify(indicatorComputingService, times(1)).compute(
-                indicatorComputer,
-                project
-        )
+        verify(exactly = 1) {
+            indicatorComputingService.compute(indicatorComputer, project)
+        }
     }
 
     @Test
@@ -83,19 +83,17 @@ class IndicatorComputingJobsTest {
             Project.of(nd("P$it", ""))
         }
 
-        whenever(structureService.projectList).thenReturn(projects)
+        every { structureService.projectList } returns projects
 
-        whenever(indicatorComputer.perProject).thenReturn(true)
-        whenever(indicatorComputer.schedule).thenReturn(Schedule.EVERY_DAY)
-        whenever(indicatorComputer.name).thenReturn("Computer name")
+        every { indicatorComputer.perProject } returns true
+        every { indicatorComputer.schedule } returns Schedule.EVERY_DAY
+        every { indicatorComputer.name } returns "Computer name"
         projects.forEach {
             // Only first project is eligible
-            whenever(indicatorComputer.isProjectEligible(it)).thenReturn(
-                    it == projects[0]
-            )
+            every { indicatorComputer.isProjectEligible(it) } returns (it == projects[0])
         }
 
-        val jobs = computingJobs.collectJobRegistrations().toList()
+        val jobs = computingJobs.jobRegistrations.toList()
 
         assertEquals(1, jobs.size, "Only one job has been created")
         val jobRegistration = jobs.first()
@@ -110,16 +108,16 @@ class IndicatorComputingJobsTest {
             Project.of(nd("P$it", ""))
         }
 
-        whenever(structureService.projectList).thenReturn(projects)
+        every { structureService.projectList } returns projects
 
-        whenever(indicatorComputer.perProject).thenReturn(false)
-        whenever(indicatorComputer.schedule).thenReturn(Schedule.EVERY_DAY)
-        whenever(indicatorComputer.name).thenReturn("Computer name")
+        every { indicatorComputer.perProject } returns false
+        every { indicatorComputer.schedule } returns Schedule.EVERY_DAY
+        every { indicatorComputer.name } returns "Computer name"
         projects.forEach {
-            whenever(indicatorComputer.isProjectEligible(it)).thenReturn(true)
+            every { indicatorComputer.isProjectEligible(it) } returns true
         }
 
-        val jobs = computingJobs.collectJobRegistrations().toList()
+        val jobs = computingJobs.jobRegistrations.toList()
 
         assertEquals(1, jobs.size, "One job created for all projects")
         val jobRegistration = jobs.first()
@@ -135,10 +133,12 @@ class IndicatorComputingJobsTest {
         job.task.run(JobRunListener.out())
 
         projects.forEach { project ->
-            verify(indicatorComputingService, times(1)).compute(
+            verify(exactly = 1) {
+                indicatorComputingService.compute(
                     indicatorComputer,
                     project
-            )
+                )
+            }
         }
     }
 
@@ -148,19 +148,19 @@ class IndicatorComputingJobsTest {
             Project.of(nd("P$it", ""))
         }
 
-        whenever(structureService.projectList).thenReturn(projects)
+        every { structureService.projectList } returns projects
 
-        whenever(indicatorComputer.perProject).thenReturn(false)
-        whenever(indicatorComputer.schedule).thenReturn(Schedule.EVERY_DAY)
-        whenever(indicatorComputer.name).thenReturn("Computer name")
+        every { indicatorComputer.perProject } returns false
+        every { indicatorComputer.schedule } returns Schedule.EVERY_DAY
+        every { indicatorComputer.name } returns "Computer name"
         projects.forEach {
-            whenever(indicatorComputer.isProjectEligible(it)).thenReturn(
-                    // Only first is eligible
-                    it == projects[0]
-            )
+            // Only first is eligible
+            every {
+                indicatorComputer.isProjectEligible(it)
+            } returns (it == projects[0])
         }
 
-        val jobs = computingJobs.collectJobRegistrations().toList()
+        val jobs = computingJobs.jobRegistrations.toList()
 
         assertEquals(1, jobs.size, "One job created for all projects")
         val jobRegistration = jobs.first()
@@ -176,15 +176,15 @@ class IndicatorComputingJobsTest {
         job.task.run(JobRunListener.out())
 
         projects.forEach { project ->
-            val mode = if (project == projects[0]) {
-                times(1)
+            if (project == projects[0]) {
+                verify(exactly = 1) {
+                    indicatorComputingService.compute(indicatorComputer, project)
+                }
             } else {
-                never()
+                verify(exactly = 0) {
+                    indicatorComputingService.compute(indicatorComputer, project)
+                }
             }
-            verify(indicatorComputingService, mode).compute(
-                    indicatorComputer,
-                    project
-            )
         }
     }
 
@@ -192,19 +192,19 @@ class IndicatorComputingJobsTest {
     fun `Computer job for all projects with one being disabled`() {
         val projects = (1..2).map {
             Project.of(nd("P$it", ""))
-                    .withDisabled(it == 2)
+                .withDisabled(it == 2)
         }
 
-        whenever(structureService.projectList).thenReturn(projects)
+        every { structureService.projectList } returns projects
 
-        whenever(indicatorComputer.perProject).thenReturn(false)
-        whenever(indicatorComputer.schedule).thenReturn(Schedule.EVERY_DAY)
-        whenever(indicatorComputer.name).thenReturn("Computer name")
+        every { indicatorComputer.perProject } returns false
+        every { indicatorComputer.schedule } returns Schedule.EVERY_DAY
+        every { indicatorComputer.name } returns "Computer name"
         projects.forEach {
-            whenever(indicatorComputer.isProjectEligible(it)).thenReturn(true)
+            every { indicatorComputer.isProjectEligible(it) } returns true
         }
 
-        val jobs = computingJobs.collectJobRegistrations().toList()
+        val jobs = computingJobs.jobRegistrations.toList()
 
         assertEquals(1, jobs.size, "One job created for all projects")
         val jobRegistration = jobs.first()
@@ -220,15 +220,15 @@ class IndicatorComputingJobsTest {
         job.task.run(JobRunListener.out())
 
         projects.forEach { project ->
-            val mode = if (project == projects[0]) {
-                times(1)
+            if (project == projects[0]) {
+                verify(exactly = 1) {
+                    indicatorComputingService.compute(indicatorComputer, project)
+                }
             } else {
-                never()
+                verify(exactly = 0) {
+                    indicatorComputingService.compute(indicatorComputer, project)
+                }
             }
-            verify(indicatorComputingService, mode).compute(
-                    indicatorComputer,
-                    project
-            )
         }
     }
 
@@ -236,21 +236,21 @@ class IndicatorComputingJobsTest {
     fun `Computer job per  disabled project`() {
         val projects = (1..2).map {
             Project.of(nd("P$it", ""))
-                    .withDisabled(it == 1)
+                .withDisabled(it == 1)
         }
         val project = projects.first()
         assertTrue(project.isDisabled)
 
-        whenever(structureService.projectList).thenReturn(projects)
+        every { structureService.projectList } returns projects
 
-        whenever(indicatorComputer.perProject).thenReturn(true)
-        whenever(indicatorComputer.schedule).thenReturn(Schedule.EVERY_DAY)
-        whenever(indicatorComputer.name).thenReturn("Computer name")
+        every { indicatorComputer.perProject } returns true
+        every { indicatorComputer.schedule } returns Schedule.EVERY_DAY
+        every { indicatorComputer.name } returns "Computer name"
         projects.forEach {
-            whenever(indicatorComputer.isProjectEligible(it)).thenReturn(true)
+            every { indicatorComputer.isProjectEligible(it) } returns true
         }
 
-        val jobs = computingJobs.collectJobRegistrations().toList()
+        val jobs = computingJobs.jobRegistrations.toList()
 
         assertEquals(2, jobs.size, "One job created per project")
         assertTrue(jobs[0].job.isDisabled, "Job disabled because project is")

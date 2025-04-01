@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.extension.indicators.acl.IndicatorTypeManagement
 import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueTypeConfig
 import net.nemerosa.ontrack.model.structure.ServiceConfiguration
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.*
 
 class IndicatorTypeIT : AbstractIndicatorsTestSupport() {
@@ -132,7 +132,7 @@ class IndicatorTypeIT : AbstractIndicatorsTestSupport() {
     fun `Deleting a non existing type`() {
         asAdmin {
             val result = indicatorTypeService.deleteType("xxx")
-            assertFalse(result.isSuccess)
+            assertFalse(result.success)
         }
     }
 
@@ -142,7 +142,7 @@ class IndicatorTypeIT : AbstractIndicatorsTestSupport() {
             val type = category().booleanType(
                 source = source()
             )
-            assertFalse(indicatorTypeService.deleteType(type.id).isSuccess, "Type was not deleted")
+            assertFalse(indicatorTypeService.deleteType(type.id).success, "Type was not deleted")
             assertNotNull(indicatorTypeService.findTypeById(type.id), "Type was not deleted")
         }
     }
@@ -154,7 +154,7 @@ class IndicatorTypeIT : AbstractIndicatorsTestSupport() {
                 source = source(),
                 deprecated = ""
             )
-            assertFalse(indicatorTypeService.deleteType(type.id).isSuccess, "Type was not deleted")
+            assertFalse(indicatorTypeService.deleteType(type.id).success, "Type was not deleted")
             assertNotNull(indicatorTypeService.findTypeById(type.id), "Type was not deleted")
         }
     }
@@ -166,7 +166,7 @@ class IndicatorTypeIT : AbstractIndicatorsTestSupport() {
                 source = source(),
                 deprecated = "Obsolete"
             )
-            assertTrue(indicatorTypeService.deleteType(type.id).isSuccess, "Type was deleted")
+            assertTrue(indicatorTypeService.deleteType(type.id).success, "Type was deleted")
             assertNull(indicatorTypeService.findTypeById(type.id), "Type has been deleted")
         }
     }
@@ -175,7 +175,7 @@ class IndicatorTypeIT : AbstractIndicatorsTestSupport() {
     fun `Category can be deleted if there is no source`() {
         asAdmin {
             val type = category().booleanType()
-            assertTrue(indicatorTypeService.deleteType(type.id).isSuccess, "Type was deleted")
+            assertTrue(indicatorTypeService.deleteType(type.id).success, "Type was deleted")
             assertNull(indicatorTypeService.findTypeById(type.id), "Type has been deleted")
         }
     }

@@ -4,7 +4,7 @@ import net.nemerosa.ontrack.extension.indicators.AbstractIndicatorsTestSupport
 import net.nemerosa.ontrack.extension.indicators.acl.IndicatorRoleContributor.Companion.GLOBAL_INDICATOR_MANAGER
 import net.nemerosa.ontrack.extension.indicators.acl.IndicatorRoleContributor.Companion.GLOBAL_INDICATOR_PORTFOLIO_MANAGER
 import net.nemerosa.ontrack.model.labels.ProjectLabelForm
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertNotNull
 
 /**

@@ -7,7 +7,7 @@ import net.nemerosa.ontrack.extension.indicators.model.IndicatorSource
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorSourceProviderDescription
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecoratorTestSupport
 import net.nemerosa.ontrack.ui.resource.Link
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
 class IndicatorCategoryResourceDecoratorIT : AbstractResourceDecoratorTestSupport() {

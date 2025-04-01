@@ -74,7 +74,7 @@ dependencies {
     // TODO runtimeOnly(project(":ontrack-extension-vault"))
     // TODO runtimeOnly(project(":ontrack-extension-influxdb"))
     // TODO runtimeOnly(project(":ontrack-extension-sonarqube"))
-    // TODO runtimeOnly(project(":ontrack-extension-indicators"))
+    runtimeOnly(project(":ontrack-extension-indicators"))
     // TODO runtimeOnly(project(":ontrack-extension-casc"))
     // TODO runtimeOnly(project(":ontrack-extension-elastic"))
     // TODO runtimeOnly(project(":ontrack-extension-slack"))

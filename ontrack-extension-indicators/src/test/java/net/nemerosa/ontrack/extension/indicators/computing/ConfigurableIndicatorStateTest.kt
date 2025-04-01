@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.indicators.computing
 import net.nemerosa.ontrack.extension.indicators.IndicatorsTestFixtures
 import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueType
 import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueTypeConfig
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class ConfigurableIndicatorStateTest {

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import net.nemerosa.ontrack.ui.resource.Resources
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 
@@ -39,7 +40,7 @@ class IndicatorController(
             @PathVariable projectId: ID,
             @PathVariable typeId: String,
             @RequestBody input: JsonNode
-    ) = projectIndicatorService.updateIndicator(projectId, typeId, input)
+    ) = ResponseEntity.ok(projectIndicatorService.updateIndicator(projectId, typeId, input))
 
     /**
      * Deletes a project indicator
@@ -48,7 +49,7 @@ class IndicatorController(
     fun deleteIndicator(
             @PathVariable projectId: ID,
             @PathVariable typeId: String
-    ) = projectIndicatorService.deleteIndicator(projectId, typeId)
+    ) = ResponseEntity.ok(projectIndicatorService.deleteIndicator(projectId, typeId))
 
 
 }

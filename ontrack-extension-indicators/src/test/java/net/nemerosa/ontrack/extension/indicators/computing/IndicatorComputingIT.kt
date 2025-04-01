@@ -2,7 +2,9 @@ package net.nemerosa.ontrack.extension.indicators.computing
 
 import net.nemerosa.ontrack.extension.indicators.AbstractIndicatorsTestSupport
 import net.nemerosa.ontrack.extension.indicators.IndicatorsTestFixtures
-import net.nemerosa.ontrack.extension.indicators.model.*
+import net.nemerosa.ontrack.extension.indicators.model.IndicatorSource
+import net.nemerosa.ontrack.extension.indicators.model.IndicatorSourceProviderDescription
+import net.nemerosa.ontrack.extension.indicators.model.IndicatorType
 import net.nemerosa.ontrack.extension.indicators.support.Percentage
 import net.nemerosa.ontrack.extension.indicators.support.PercentageThreshold
 import net.nemerosa.ontrack.extension.indicators.support.percent
@@ -13,7 +15,7 @@ import net.nemerosa.ontrack.model.extension.ExtensionFeature
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
 

@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.extension.indicators.ui.graphql
 
 import net.nemerosa.ontrack.extension.indicators.AbstractIndicatorsTestSupport
 import net.nemerosa.ontrack.test.TestUtils
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class GQLRootQueryIndicatorTypesIT : AbstractIndicatorsTestSupport() {

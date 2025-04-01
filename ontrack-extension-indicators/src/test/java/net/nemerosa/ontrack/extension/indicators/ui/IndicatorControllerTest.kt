@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.indicators.ui
 
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCategory
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCompliance
 import net.nemerosa.ontrack.json.asJson
@@ -11,8 +11,8 @@ import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.Signature
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import kotlin.test.assertSame
 
 class IndicatorControllerTest {
@@ -21,16 +21,16 @@ class IndicatorControllerTest {
 
     private lateinit var controller: IndicatorController
 
-    @Before
+    @BeforeEach
     fun before() {
-        projectIndicatorService = mock()
+        projectIndicatorService = mockk(relaxed = true)
         controller = IndicatorController(projectIndicatorService)
     }
 
     @Test
     fun getUpdateFormForIndicator() {
         val form = Form.create()
-        whenever(projectIndicatorService.getUpdateFormForIndicator(ID.of(1), "type")).thenReturn(form)
+        every { projectIndicatorService.getUpdateFormForIndicator(ID.of(1), "type") } returns form
         val returnedForm = controller.getUpdateFormForIndicator(ID.of(1), "type")
         assertSame(form, returnedForm)
     }
@@ -38,31 +38,33 @@ class IndicatorControllerTest {
     @Test
     fun updateIndicator() {
         val value = ProjectIndicator(
-                project = Project.of(nd("P", "")).withId(ID.of(1)),
-                type = ProjectIndicatorType(
-                        id = "type",
-                        name = "Type",
-                        link = null,
-                        category = IndicatorCategory("category", "Category", null),
-                        source = null,
-                        computed = false,
-                        deprecated = null
-                ),
-                value = mapOf("value" to "true").asJson(),
-                compliance = IndicatorCompliance(100),
-                comment = null,
-                signature = Signature.anonymous()
+            project = Project.of(nd("P", "")).withId(ID.of(1)),
+            type = ProjectIndicatorType(
+                id = "type",
+                name = "Type",
+                link = null,
+                category = IndicatorCategory("category", "Category", null),
+                source = null,
+                computed = false,
+                deprecated = null
+            ),
+            value = mapOf("value" to "true").asJson(),
+            compliance = IndicatorCompliance(100),
+            comment = null,
+            signature = Signature.anonymous()
         )
         val input = mapOf("value" to "true").asJson()
-        whenever(projectIndicatorService.updateIndicator(ID.of(1), "type", input)).thenReturn(value)
-        val returned = controller.updateIndicator(ID.of(1), "type", input)
+        every { projectIndicatorService.updateIndicator(ID.of(1), "type", input) } returns value
+        val returned = controller.updateIndicator(ID.of(1), "type", input).body!!
         assertSame(value, returned)
     }
 
     @Test
     fun deleteIndicator() {
         controller.deleteIndicator(ID.of(1), "type")
-        verify(projectIndicatorService).deleteIndicator(ID.of(1), "type")
+        verify {
+            projectIndicatorService.deleteIndicator(ID.of(1), "type")
+        }
     }
 
 }
