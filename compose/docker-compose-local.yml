@@ -21,7 +21,7 @@ services:
       ONTRACK_CONFIG_CONFIGURATION_TEST: "false"
       # Next UI
       ONTRACK_CONFIG_UI_ENABLED: "true"
-      ONTRACK_CONFIG_UI_URL: "http://localhost:3000/ui" # External URL!
+      ONTRACK_CONFIG_UI_URL: "http://localhost:3000" # External URL!
     depends_on:
       postgres:
         condition: service_started
@@ -38,9 +38,8 @@ services:
     image: "nemerosa/ontrack-ui:latest"
     restart: always
     environment:
-      # External URLs!
-      ONTRACK_URL: http://localhost:8080
-      ONTRACK_UI_URL: http://localhost:3000/ui
+      ONTRACK_URL: http://ontrack:8080
+      ONTRACK_UI_URL: http://localhost:3000
       ONTRACK_CONNECTION_LOGGING: "true"
       ONTRACK_CONNECTION_TRACING: "true"
     depends_on:

@@ -1,3 +1,3 @@
 export const backend = {
-    url: process.env.BACKEND_URL ?? "http://localhost:8080"
+    url: process.env.ONTRACK_URL ?? "http://localhost:8080"
 }
