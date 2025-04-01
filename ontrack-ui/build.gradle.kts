@@ -56,7 +56,7 @@ dependencies {
     testImplementation("org.junit.platform:junit-platform-suite-engine")
 
     // List of extensions to include in core
-    // TODO runtimeOnly(project(":ontrack-extension-general"))
+    runtimeOnly(project(":ontrack-extension-general"))
     // TODO runtimeOnly(project(":ontrack-extension-ldap"))
     // TODO runtimeOnly(project(":ontrack-extension-oidc"))
     // TODO runtimeOnly(project(":ontrack-extension-jenkins"))

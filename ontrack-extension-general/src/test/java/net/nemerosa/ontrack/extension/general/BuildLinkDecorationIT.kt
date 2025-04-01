@@ -1,10 +1,10 @@
 package net.nemerosa.ontrack.extension.general
 
-import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
@@ -12,7 +12,7 @@ import kotlin.test.assertEquals
  * In this test, we assume the source project is part of the main labels (see [MainBuildLinksProjectPropertyType])
  * and that it is always displayed.
  */
-class BuildLinkDecorationIT : AbstractDSLTestJUnit4Support() {
+class BuildLinkDecorationIT : AbstractDSLTestSupport() {
 
     private val targetBuildName = "2"
     private val targetLabel = "v2.0.0"

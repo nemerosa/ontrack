@@ -2,13 +2,13 @@ package net.nemerosa.ontrack.extension.general
 
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class BuildLinkDecorationExtensionIT : AbstractGeneralExtensionTestJUnit4Support() {
+class BuildLinkDecorationExtensionIT : AbstractGeneralExtensionTestSupport() {
 
     @Autowired
     private lateinit var extension: BuildLinkDecorationExtension

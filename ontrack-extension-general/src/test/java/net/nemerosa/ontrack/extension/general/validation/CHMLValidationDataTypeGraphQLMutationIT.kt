@@ -1,14 +1,14 @@
 package net.nemerosa.ontrack.extension.general.validation
 
-import net.nemerosa.ontrack.graphql.AbstractQLKTITJUnit4Support
+import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.model.structure.config
 import net.nemerosa.ontrack.test.assertPresent
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class CHMLValidationDataTypeGraphQLMutationIT : AbstractQLKTITJUnit4Support() {
+class CHMLValidationDataTypeGraphQLMutationIT : AbstractQLKTITSupport() {
 
     @Autowired
     private lateinit var chmlValidationDataType: CHMLValidationDataType

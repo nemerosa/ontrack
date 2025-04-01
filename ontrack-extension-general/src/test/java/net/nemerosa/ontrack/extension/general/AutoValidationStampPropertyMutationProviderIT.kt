@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.extension.general
 
-import net.nemerosa.ontrack.graphql.AbstractQLKTITJUnit4Support
-import org.junit.Test
+import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-class AutoValidationStampPropertyMutationProviderIT : AbstractQLKTITJUnit4Support() {
+class AutoValidationStampPropertyMutationProviderIT : AbstractQLKTITSupport() {
 
     @Test
     fun `Setting the auto validation stamp property on a project by ID and then removing it`() {

@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.general
 
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
-class LinkPropertyTypeIT : AbstractPropertyTypeTestJUnit4Support() {
+class LinkPropertyTypeIT : AbstractPropertyTypeTestSupport() {
 
     @Test
     fun `Search by link`() {

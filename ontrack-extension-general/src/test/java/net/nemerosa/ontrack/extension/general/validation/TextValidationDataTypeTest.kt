@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.node.TextNode
 import net.nemerosa.ontrack.extension.general.GeneralExtensionFeature
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.test.assertIs
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class TextValidationDataTypeTest {

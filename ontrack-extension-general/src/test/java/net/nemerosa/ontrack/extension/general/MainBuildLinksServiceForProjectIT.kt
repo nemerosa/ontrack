@@ -1,9 +1,14 @@
 package net.nemerosa.ontrack.extension.general
 
-import org.junit.Test
+import net.nemerosa.ontrack.model.labels.MainBuildLinksService
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
-class MainBuildLinksServiceForProjectIT : AbstractGeneralExtensionTestJUnit4Support() {
+class MainBuildLinksServiceForProjectIT : AbstractGeneralExtensionTestSupport() {
+
+    @Autowired
+    protected lateinit var mainBuildLinksService: MainBuildLinksService
 
     @Test
     fun `Only project settings`() {
@@ -11,16 +16,16 @@ class MainBuildLinksServiceForProjectIT : AbstractGeneralExtensionTestJUnit4Supp
             setMainBuildLinksSettings()
             project {
                 setMainBuildLinksProperty(
-                        listOf(
-                                "type:product", "plugin:pipeline"
-                        )
+                    listOf(
+                        "type:product", "plugin:pipeline"
+                    )
                 )
                 val config = mainBuildLinksService.getMainBuildLinksConfig(this)
                 assertEquals(
-                        setOf(
-                                "type:product", "plugin:pipeline"
-                        ),
-                        config.labels.toSet()
+                    setOf(
+                        "type:product", "plugin:pipeline"
+                    ),
+                    config.labels.toSet()
                 )
             }
         }
@@ -32,16 +37,16 @@ class MainBuildLinksServiceForProjectIT : AbstractGeneralExtensionTestJUnit4Supp
             setMainBuildLinksSettings("type:product", "plugin:pipeline")
             project {
                 setMainBuildLinksProperty(
-                        listOf(
-                                "plugin:pipeline", "plugin:gradle"
-                        )
+                    listOf(
+                        "plugin:pipeline", "plugin:gradle"
+                    )
                 )
                 val config = mainBuildLinksService.getMainBuildLinksConfig(this)
                 assertEquals(
-                        setOf(
-                                "type:product", "plugin:pipeline", "plugin:gradle"
-                        ),
-                        config.labels.toSet()
+                    setOf(
+                        "type:product", "plugin:pipeline", "plugin:gradle"
+                    ),
+                    config.labels.toSet()
                 )
             }
         }
@@ -53,17 +58,17 @@ class MainBuildLinksServiceForProjectIT : AbstractGeneralExtensionTestJUnit4Supp
             setMainBuildLinksSettings("type:product", "plugin:pipeline")
             project {
                 setMainBuildLinksProperty(
-                        overrideGlobal = true,
-                        labels = listOf(
-                                "plugin:pipeline", "plugin:gradle"
-                        )
+                    overrideGlobal = true,
+                    labels = listOf(
+                        "plugin:pipeline", "plugin:gradle"
+                    )
                 )
                 val config = mainBuildLinksService.getMainBuildLinksConfig(this)
                 assertEquals(
-                        setOf(
-                                "plugin:pipeline", "plugin:gradle"
-                        ),
-                        config.labels.toSet()
+                    setOf(
+                        "plugin:pipeline", "plugin:gradle"
+                    ),
+                    config.labels.toSet()
                 )
             }
         }

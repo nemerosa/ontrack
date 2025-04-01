@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.extension.general.links
 
-import net.nemerosa.ontrack.it.links.AbstractBranchLinksTestJUnit4Support
+import net.nemerosa.ontrack.it.links.AbstractBranchLinksTestSupport
 import net.nemerosa.ontrack.model.links.BranchLinksDirection
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class GeneralBranchLinksDecorationsIT : AbstractBranchLinksTestJUnit4Support() {
+class GeneralBranchLinksDecorationsIT : AbstractBranchLinksTestSupport() {
 
     @Test
     fun `Time decoration`() {

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.general
 
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.Project
 
 abstract class AbstractGeneralExtensionTestSupport : AbstractQLKTITSupport() {
 
@@ -16,5 +17,19 @@ abstract class AbstractGeneralExtensionTestSupport : AbstractQLKTITSupport() {
         } else {
             property(ReleasePropertyType::class, null)
         }
+
+    protected fun Project.setMainBuildLinksProperty(
+        labels: List<String>,
+        overrideGlobal: Boolean = false
+    ) {
+        setProperty(
+            this,
+            MainBuildLinksProjectPropertyType::class.java,
+            MainBuildLinksProjectProperty(
+                labels,
+                overrideGlobal
+            )
+        )
+    }
 
 }

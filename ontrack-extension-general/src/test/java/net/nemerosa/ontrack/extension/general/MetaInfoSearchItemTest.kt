@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.general
 
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class MetaInfoSearchItemTest {

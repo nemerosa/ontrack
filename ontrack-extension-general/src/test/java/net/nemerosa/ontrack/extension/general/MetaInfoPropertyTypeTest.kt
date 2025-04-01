@@ -1,23 +1,22 @@
 package net.nemerosa.ontrack.extension.general
 
-import com.nhaarman.mockitokotlin2.mock
+import io.mockk.mockk
 import net.nemerosa.ontrack.extension.general.MetaInfoPropertyItem.Companion.of
 import net.nemerosa.ontrack.ui.controller.MockURIBuilder
 import org.junit.jupiter.api.Test
 import java.util.*
 import kotlin.test.*
-import kotlin.test.assertNull
 
 class MetaInfoPropertyTypeTest {
 
     private val type = MetaInfoPropertyType(
         extensionFeature = GeneralExtensionFeature(),
-        searchIndexService = mock(),
+        searchIndexService = mockk(),
         metaInfoSearchExtension = MetaInfoSearchExtension(
             extensionFeature = GeneralExtensionFeature(),
             uriBuilder = MockURIBuilder(),
-            propertyService = mock(),
-            structureService = mock()
+            propertyService = mockk(),
+            structureService = mockk()
         )
     )
 
@@ -100,7 +99,10 @@ class MetaInfoPropertyTypeTest {
         val args = type.getSearchArguments("/name:value")
         assertNotNull(args, "Search possible") {
             assertEquals("jsonb_array_elements(pp.json->'items') as item", it.jsonContext)
-            assertEquals("item->>'name' = :name and item->>'value' ilike :value and item->>'category' is null", it.jsonCriteria)
+            assertEquals(
+                "item->>'name' = :name and item->>'value' ilike :value and item->>'category' is null",
+                it.jsonCriteria
+            )
             assertEquals(
                 mapOf(
                     "name" to "name",
@@ -116,7 +118,10 @@ class MetaInfoPropertyTypeTest {
         val args = type.getSearchArguments("/name:value*")
         assertNotNull(args, "Search possible") {
             assertEquals("jsonb_array_elements(pp.json->'items') as item", it.jsonContext)
-            assertEquals("item->>'name' = :name and item->>'value' ilike :value and item->>'category' is null", it.jsonCriteria)
+            assertEquals(
+                "item->>'name' = :name and item->>'value' ilike :value and item->>'category' is null",
+                it.jsonCriteria
+            )
             assertEquals(
                 mapOf(
                     "name" to "name",
@@ -132,7 +137,10 @@ class MetaInfoPropertyTypeTest {
         val args = type.getSearchArguments("category/name:value")
         assertNotNull(args, "Search possible") {
             assertEquals("jsonb_array_elements(pp.json->'items') as item", it.jsonContext)
-            assertEquals("item->>'name' = :name and item->>'value' ilike :value and item->>'category' = :category", it.jsonCriteria)
+            assertEquals(
+                "item->>'name' = :name and item->>'value' ilike :value and item->>'category' = :category",
+                it.jsonCriteria
+            )
             assertEquals(
                 mapOf(
                     "name" to "name",
@@ -149,7 +157,10 @@ class MetaInfoPropertyTypeTest {
         val args = type.getSearchArguments("category/name:value*")
         assertNotNull(args, "Search possible") {
             assertEquals("jsonb_array_elements(pp.json->'items') as item", it.jsonContext)
-            assertEquals("item->>'name' = :name and item->>'value' ilike :value and item->>'category' = :category", it.jsonCriteria)
+            assertEquals(
+                "item->>'name' = :name and item->>'value' ilike :value and item->>'category' = :category",
+                it.jsonCriteria
+            )
             assertEquals(
                 mapOf(
                     "name" to "name",

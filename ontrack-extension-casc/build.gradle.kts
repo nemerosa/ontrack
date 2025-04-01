@@ -1,5 +1,6 @@
 plugins {
     `java-library`
+    `java-test-fixtures`
 }
 
 dependencies {
@@ -17,8 +18,10 @@ dependencies {
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(testFixtures(project(":ontrack-extension-scm")))
     testImplementation(testFixtures(project(":ontrack-ui-graphql")))
-    // testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
     testImplementation("com.networknt:json-schema-validator")
+
+    testFixturesImplementation(project(":ontrack-it-utils"))
+    testFixturesImplementation("com.networknt:json-schema-validator")
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))
