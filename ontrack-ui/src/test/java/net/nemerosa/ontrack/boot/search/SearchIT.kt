@@ -12,9 +12,9 @@ class SearchIT : AbstractSearchTestSupport() {
         assertEquals(
             listOf(
                 "Project", "Branch", "Build",
-                // TODO "Build with Release", "Build with Meta Info", "Linked Build",
+                "Build with Release", "Build with Meta Info", "Linked Build",
                 // TODO "Git Branch", "Git Commit", "Git Issue",
-                // TODO "SCM Catalog"
+                "SCM Catalog"
             ),
             names
         )
