@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import net.nemerosa.ontrack.extension.gitlab.model.GitLabConfiguration;
 import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static net.nemerosa.ontrack.json.JsonUtils.object;
 import static net.nemerosa.ontrack.test.TestUtils.assertJsonRead;
