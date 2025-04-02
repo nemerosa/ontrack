@@ -84,7 +84,7 @@ dependencies {
     // TODO runtimeOnly(project(":ontrack-extension-license"))
     // TODO runtimeOnly(project(":ontrack-extension-tfc"))
     runtimeOnly(project(":ontrack-extension-recordings"))
-    // TODO runtimeOnly(project(":ontrack-extension-notifications"))
+    runtimeOnly(project(":ontrack-extension-notifications"))
     // TODO runtimeOnly(project(":ontrack-extension-hook"))
     runtimeOnly(project(":ontrack-extension-queue"))
     // TODO runtimeOnly(project(":ontrack-extension-workflows"))

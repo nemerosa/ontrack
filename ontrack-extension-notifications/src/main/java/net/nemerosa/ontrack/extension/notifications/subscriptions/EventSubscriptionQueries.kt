@@ -26,7 +26,7 @@ class GQLRootQueryEventSubscriptions(
     private val structureService: StructureService,
 ) : GQLRootQuery {
     override fun getFieldDefinition(): GraphQLFieldDefinition =
-        gqlPaginatedListFactory.createPaginatedField<Any?, EventSubscriptionPayload>(
+        gqlPaginatedListFactory.createRootPaginatedField(
             cache = GQLTypeCache(),
             fieldName = "eventSubscriptions",
             fieldDescription = "List of event subscriptions",
@@ -56,7 +56,7 @@ class GQLRootQueryEventSubscriptions(
                     }
                     .build()
             ),
-            itemPaginatedListProvider = { env, _, offset, size ->
+            itemPaginatedListProvider = { env, offset, size ->
                 // Parsing of the filter
                 val filterArgument: Any? = env.getArgument<Any>("filter")
                 val rawFilter = filterArgument

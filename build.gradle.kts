@@ -34,6 +34,8 @@ subprojects {
 
     version = rootProject.version
 
+    val greenMailVersion = "1.6.15"
+
     dependencyManagement {
         imports {
             mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
@@ -46,6 +48,9 @@ subprojects {
             dependency("org.jgrapht:jgrapht-core:1.5.2")
             dependency("com.opencsv:opencsv:5.10")
             dependency("com.networknt:json-schema-validator:1.5.5")
+
+            dependency("com.icegreen:greenmail:$greenMailVersion")
+            dependency("com.icegreen:greenmail-spring:$greenMailVersion")
 
             // Git repository support TODO Will be removed in V5
             dependency("org.eclipse.jgit:org.eclipse.jgit:6.6.1.202309021850-r")
