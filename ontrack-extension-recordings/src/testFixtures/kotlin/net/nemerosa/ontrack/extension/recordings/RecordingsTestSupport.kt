@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class RecordingsTestSupport(
-        private val recordingsService: RecordingsService,
+    private val recordingsService: RecordingsService,
 ) {
 
     fun <R : Recording, F : Any> record(extension: RecordingsExtension<R, F>, recording: R) {
