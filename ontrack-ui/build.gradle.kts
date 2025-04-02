@@ -77,7 +77,7 @@ dependencies {
     runtimeOnly(project(":ontrack-extension-indicators"))
     runtimeOnly(project(":ontrack-extension-casc"))
     runtimeOnly(project(":ontrack-extension-elastic"))
-    // TODO runtimeOnly(project(":ontrack-extension-slack"))
+    runtimeOnly(project(":ontrack-extension-slack"))
     runtimeOnly(project(":ontrack-extension-chart"))
     runtimeOnly(project(":ontrack-extension-delivery-metrics"))
     runtimeOnly(project(":ontrack-extension-auto-versioning"))

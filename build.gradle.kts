@@ -50,6 +50,7 @@ subprojects {
             dependency("com.opencsv:opencsv:5.10")
             dependency("com.networknt:json-schema-validator:1.5.5")
             dependency("org.gitlab4j:gitlab4j-api:5.8.0")
+            dependency("com.slack.api:slack-api-client:1.38.0")
 
             dependency("io.jsonwebtoken:jjwt-api:$jjwtVersion")
             dependency("io.jsonwebtoken:jjwt-impl:$jjwtVersion")
