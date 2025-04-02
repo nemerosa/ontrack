@@ -119,6 +119,7 @@ class MockNotificationChannel(
     override fun toSearchCriteria(text: String): JsonNode =
         mapOf(MockNotificationChannelConfig::target.name to text).asJson()
 
+    @Deprecated("Will be removed in V5. Only Next UI is used.")
     override fun toText(config: MockNotificationChannelConfig): String = config.target
 
     @Deprecated("Will be removed in V5. Only Next UI is used.")

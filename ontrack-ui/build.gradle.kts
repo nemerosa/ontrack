@@ -87,7 +87,7 @@ dependencies {
     runtimeOnly(project(":ontrack-extension-notifications"))
     // TODO runtimeOnly(project(":ontrack-extension-hook"))
     runtimeOnly(project(":ontrack-extension-queue"))
-    // TODO runtimeOnly(project(":ontrack-extension-workflows"))
+    runtimeOnly(project(":ontrack-extension-workflows"))
     // TODO runtimeOnly(project(":ontrack-extension-environments"))
 }
 

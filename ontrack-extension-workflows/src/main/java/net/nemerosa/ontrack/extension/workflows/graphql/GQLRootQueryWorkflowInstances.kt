@@ -19,7 +19,7 @@ class GQLRootQueryWorkflowInstances(
     private val workflowInstanceRepository: WorkflowInstanceRepository,
 ) : GQLRootQuery {
     override fun getFieldDefinition(): GraphQLFieldDefinition =
-        gqlPaginatedListFactory.createPaginatedField<Any?, WorkflowInstance>(
+        gqlPaginatedListFactory.createRootPaginatedField<WorkflowInstance>(
             cache = GQLTypeCache(),
             fieldName = "workflowInstances",
             fieldDescription = "List of workflow instances",
@@ -31,7 +31,7 @@ class GQLRootQueryWorkflowInstances(
                 stringArgument(ARG_TRIGGER_ID, "ID of the trigger of the workflow"),
                 stringArgument(ARG_TRIGGER_DATA, "Text to find in the trigger data of the workflow"),
             ),
-            itemPaginatedListProvider = { env, _, offset, size ->
+            itemPaginatedListProvider = { env, offset, size ->
                 val id: String? = env.getArgument(ARG_ID)
                 val name: String? = env.getArgument(ARG_NAME)
                 val status: WorkflowInstanceStatus? = env.getArgument<String?>(ARG_STATUS)?.let {

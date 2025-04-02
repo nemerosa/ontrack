@@ -1,5 +1,6 @@
 plugins {
     `java-library`
+    `java-test-fixtures`
 }
 
 dependencies {
@@ -32,6 +33,8 @@ dependencies {
 
     testImplementation("com.icegreen:greenmail")
     testImplementation("com.icegreen:greenmail-spring")
+
+    testFixturesImplementation(project(":ontrack-it-utils"))
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))
