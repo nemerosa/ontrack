@@ -67,7 +67,7 @@ dependencies {
     runtimeOnly(project(":ontrack-extension-git"))
     // TODO runtimeOnly(project(":ontrack-extension-github"))
     // TODO runtimeOnly(project(":ontrack-extension-gitlab"))
-    // TODO runtimeOnly(project(":ontrack-extension-stash"))
+    runtimeOnly(project(":ontrack-extension-stash"))
     // TODO runtimeOnly(project(":ontrack-extension-bitbucket-cloud"))
     // TODO runtimeOnly(project(":ontrack-extension-combined"))
     runtimeOnly(project(":ontrack-extension-stale"))
