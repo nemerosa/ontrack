@@ -1,14 +1,15 @@
 package net.nemerosa.ontrack.extension.git.support
 
-import net.nemerosa.ontrack.extension.git.AbstractGitTestJUnit4Support
-import org.junit.Test
+import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 
 
-class GitCommitPropertyCommitLinkIT : AbstractGitTestJUnit4Support() {
+class GitCommitPropertyCommitLinkIT : AbstractGitTestSupport() {
 
-    @Test(expected = NoGitCommitPropertyException::class)
+    @Test
     fun `Commit from build without property`() {
         withRepo { repo ->
             project {
@@ -19,7 +20,9 @@ class GitCommitPropertyCommitLinkIT : AbstractGitTestJUnit4Support() {
                     }
                     val link = gitService.getBranchConfiguration(this)!!.buildCommitLink!!
                     build("1") {
-                        link.getCommitFromBuild(this)
+                        assertFailsWith<NoGitCommitPropertyException> {
+                            link.getCommitFromBuild(this)
+                        }
                     }
                 }
             }
@@ -42,8 +45,8 @@ class GitCommitPropertyCommitLinkIT : AbstractGitTestJUnit4Support() {
                         gitCommitProperty(commits[1]!!)
                         val commit = link.getCommitFromBuild(this)
                         assertEquals(
-                                commits[1],
-                                commit
+                            commits[1],
+                            commit
                         )
                     }
                 }
@@ -74,12 +77,12 @@ class GitCommitPropertyCommitLinkIT : AbstractGitTestJUnit4Support() {
                 }
                 assertNotNull(commitInfo) {
                     assertEquals(
-                            commits[4],
-                            it.uiCommit.commit.id
+                        commits[4],
+                        it.uiCommit.commit.id
                     )
                     assertEquals(
-                            "Commit 4",
-                            it.uiCommit.annotatedMessage
+                        "Commit 4",
+                        it.uiCommit.annotatedMessage
                     )
                 }
             }

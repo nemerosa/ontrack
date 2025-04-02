@@ -2,14 +2,14 @@ package net.nemerosa.ontrack.extension.git
 
 import net.nemerosa.ontrack.extension.git.mocking.GitMockingConfigurator
 import net.nemerosa.ontrack.test.assertIs
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-class GitPullRequestInformationExtensionIT : AbstractGitTestJUnit4Support() {
+class GitPullRequestInformationExtensionIT : AbstractGitTestSupport() {
 
     @Autowired
     private lateinit var gitMockingConfigurator: GitMockingConfigurator
@@ -17,7 +17,7 @@ class GitPullRequestInformationExtensionIT : AbstractGitTestJUnit4Support() {
     @Autowired
     private lateinit var entityInformationExtension: GitPullRequestInformationExtension
 
-    @Before
+    @BeforeEach
     fun init() {
         gitMockingConfigurator.clearPullRequests()
     }

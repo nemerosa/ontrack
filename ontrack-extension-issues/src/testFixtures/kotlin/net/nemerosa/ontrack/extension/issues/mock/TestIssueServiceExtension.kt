@@ -4,15 +4,15 @@ import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
 import net.nemerosa.ontrack.extension.issues.support.AbstractIssueServiceExtension
+import net.nemerosa.ontrack.model.support.LegacyRegexMessageAnnotator
 import net.nemerosa.ontrack.model.support.MessageAnnotation
 import net.nemerosa.ontrack.model.support.MessageAnnotator
-import net.nemerosa.ontrack.model.support.LegacyRegexMessageAnnotator
 import org.springframework.stereotype.Component
 
 @Component
 class TestIssueServiceExtension(
     extensionFeature: TestIssueServiceFeature,
-    private val issueExportServiceFactory: IssueExportServiceFactory,
+    issueExportServiceFactory: IssueExportServiceFactory,
 ) : AbstractIssueServiceExtension(
     extensionFeature,
     "test",

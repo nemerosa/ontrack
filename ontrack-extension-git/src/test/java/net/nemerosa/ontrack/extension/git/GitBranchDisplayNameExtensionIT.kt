@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.extension.git
 
 import net.nemerosa.ontrack.model.structure.BranchDisplayNameService
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
-class GitBranchDisplayNameExtensionIT : AbstractGitTestJUnit4Support() {
+class GitBranchDisplayNameExtensionIT : AbstractGitTestSupport() {
 
     @Autowired
     private lateinit var branchDisplayNameService: BranchDisplayNameService

@@ -4,20 +4,20 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.it.ResourceDecorationContributorTestSupport
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.ui.resource.ResourceObjectMapper
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
-class GitBuildResourceDecorationContributorIT : AbstractGitTestJUnit4Support() {
+class GitBuildResourceDecorationContributorIT : AbstractGitTestSupport() {
 
     @Autowired
     private lateinit var contributor: GitBuildResourceDecorationContributor
 
     private lateinit var resourceObjectMapper: ResourceObjectMapper
 
-    @Before
+    @BeforeEach
     fun setup() {
         resourceObjectMapper = ResourceDecorationContributorTestSupport.createResourceObjectMapper(
                 Build::class.java,

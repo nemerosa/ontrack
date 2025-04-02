@@ -1,16 +1,16 @@
 package net.nemerosa.ontrack.extension.git.branching
 
-import net.nemerosa.ontrack.extension.git.AbstractGitTestJUnit4Support
+import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
 import net.nemerosa.ontrack.model.structure.BranchModelMatcherService
 import net.nemerosa.ontrack.model.support.NameValue
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class GitBranchModelMatcherProviderIT : AbstractGitTestJUnit4Support() {
+class GitBranchModelMatcherProviderIT : AbstractGitTestSupport() {
 
     @Autowired
     private lateinit var branchModelMatcherService: BranchModelMatcherService

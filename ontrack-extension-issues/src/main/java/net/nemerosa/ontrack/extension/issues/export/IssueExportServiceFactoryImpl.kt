@@ -15,7 +15,6 @@ internal class IssueExportServiceFactoryImpl(issueExportServices: Collection<Iss
         return issueExportService ?: throw IssueExportServiceNotFoundException(format)
     }
 
-    override fun getIssueExportServices(): Collection<IssueExportService> {
-        return issueExportServiceMap.values
-    }
+    override val issueExportServices: Collection<IssueExportService>
+        get() = issueExportServiceMap.values
 }

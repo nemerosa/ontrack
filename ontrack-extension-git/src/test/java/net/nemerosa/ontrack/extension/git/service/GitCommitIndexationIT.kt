@@ -1,13 +1,13 @@
 package net.nemerosa.ontrack.extension.git.service
 
-import net.nemerosa.ontrack.extension.git.AbstractGitTestJUnit4Support
+import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
 import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationPropertyType
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-class GitCommitIndexationIT : AbstractGitTestJUnit4Support() {
+class GitCommitIndexationIT : AbstractGitTestSupport() {
 
     @Test
     fun `Indexation job catching up with missing commits`() {

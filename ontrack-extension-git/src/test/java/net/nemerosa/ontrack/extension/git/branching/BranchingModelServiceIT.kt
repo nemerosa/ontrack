@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.extension.git.branching
 
-import net.nemerosa.ontrack.extension.git.AbstractGitTestJUnit4Support
+import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
 import net.nemerosa.ontrack.model.support.NameValue
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
-class BranchingModelServiceIT : AbstractGitTestJUnit4Support() {
+class BranchingModelServiceIT : AbstractGitTestSupport() {
 
     @Autowired
     private lateinit var branchingModelService: BranchingModelService

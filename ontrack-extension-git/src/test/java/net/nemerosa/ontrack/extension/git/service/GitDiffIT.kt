@@ -1,13 +1,13 @@
 package net.nemerosa.ontrack.extension.git.service
 
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
-import net.nemerosa.ontrack.extension.git.AbstractGitTestJUnit4Support
+import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
 import net.nemerosa.ontrack.extension.git.model.GitChangeLog
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFileChangeType
 import org.eclipse.jgit.diff.DiffFormatter
 import org.eclipse.jgit.internal.storage.file.FileRepository
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -15,12 +15,12 @@ import kotlin.test.assertNotNull
 /**
  * Integration tests for getting a diff from a Git change log.
  */
-class GitDiffIT : AbstractGitTestJUnit4Support() {
+class GitDiffIT : AbstractGitTestSupport() {
 
     private lateinit var oldPrefix: String
     private lateinit var newPrefix: String
 
-    @Before
+    @BeforeEach
     fun `Load user git diff config`() {
         val userGitDiffFormat = DiffFormatter(ByteArrayOutputStream())
         userGitDiffFormat.setRepository(FileRepository(""))

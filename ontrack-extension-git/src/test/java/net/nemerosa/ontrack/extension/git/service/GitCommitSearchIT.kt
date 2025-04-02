@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.extension.git.service
 
-import net.nemerosa.ontrack.extension.git.AbstractGitTestJUnit4Support
-import org.junit.Test
+import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
+import org.junit.jupiter.api.Test
 
-class GitCommitSearchIT : AbstractGitTestJUnit4Support() {
+class GitCommitSearchIT : AbstractGitTestSupport() {
 
     @Test
     fun `Commit on one branch with commit property`() {

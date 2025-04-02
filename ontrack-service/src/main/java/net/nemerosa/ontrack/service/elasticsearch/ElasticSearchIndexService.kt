@@ -176,6 +176,7 @@ class ElasticSearchIndexService(
 
     private fun <T : SearchItem> index(indexer: SearchIndexer<T>, items: List<T>) {
         val bulkRequestBuilder = BulkRequest.Builder().index(indexer.indexName)
+        var operationsCount = 0
         items.forEach { item ->
             val operation = BulkOperation.Builder()
                 .index<Any?> { op ->
@@ -185,9 +186,10 @@ class ElasticSearchIndexService(
                         .document(item.fields)
                 }.build()
             bulkRequestBuilder.operations(operation)
+            operationsCount++
         }
-        val bulkRequest = bulkRequestBuilder.build()
-        if (bulkRequest.operations().isNotEmpty()) {
+        if (operationsCount > 0) {
+            val bulkRequest = bulkRequestBuilder.build()
             // Launching the indexation of this batch
             client.bulk(bulkRequest)
             // Refreshes the index

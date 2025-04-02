@@ -1,14 +1,14 @@
 package net.nemerosa.ontrack.extension.git.service
 
-import net.nemerosa.ontrack.extension.git.AbstractGitTestJUnit4Support
+import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
 import net.nemerosa.ontrack.model.security.ProjectConfig
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 /**
  * Integration tests for downloading a file
  */
-class GitDownloadIT : AbstractGitTestJUnit4Support() {
+class GitDownloadIT : AbstractGitTestSupport() {
 
     @Test
     fun `Download files`() {
@@ -34,7 +34,7 @@ class GitDownloadIT : AbstractGitTestJUnit4Support() {
                         buildNameAsCommit()
                     }
                     // Downloads the files for this branch
-                    asUser().with(project, ProjectConfig::class.java).call {
+                    asUser().withProjectFunction(project, ProjectConfig::class.java).call {
                         assertEquals("Content1", gitService.download(project, "branch1", "folder/file1"))
                     }
                 }
@@ -43,7 +43,7 @@ class GitDownloadIT : AbstractGitTestJUnit4Support() {
                         buildNameAsCommit()
                     }
                     // Downloads the files for this branch
-                    asUser().with(project, ProjectConfig::class.java).call {
+                    asUser().withProjectFunction(project, ProjectConfig::class.java).call {
                         assertEquals("Content2", gitService.download(project, "main", "folder/file1"))
                     }
                 }

@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.extension.git.property
 
-import net.nemerosa.ontrack.extension.git.AbstractGitTestJUnit4Support
-import org.junit.Test
+import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class GitBranchConfigurationPropertyMutationProviderIT : AbstractGitTestJUnit4Support() {
+class GitBranchConfigurationPropertyMutationProviderIT : AbstractGitTestSupport() {
 
     @Test
     fun `Setting the Git branch configuration by ID`() {

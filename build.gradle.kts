@@ -152,6 +152,7 @@ configure(javaProjects) {
             exclude(group = "org.hamcrest", module = "hamcrest-core")
         }
         testImplementation("io.mockk:mockk:${mockkVersion}")
+        testImplementation("io.mockk:mockk-jvm:${mockkVersion}")
         testImplementation("io.mockk:mockk-dsl:${mockkVersion}")
         testImplementation("io.mockk:mockk-dsl-jvm:${mockkVersion}")
 
