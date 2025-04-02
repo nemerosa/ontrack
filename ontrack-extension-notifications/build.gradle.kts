@@ -26,15 +26,17 @@ dependencies {
     testImplementation("com.networknt:json-schema-validator")
     testImplementation(project(":ontrack-extension-general"))
     testImplementation(project(":ontrack-it-utils"))
-    testImplementation(testFixtures(project(":ontrack-extension-casc")))
-    testImplementation(testFixtures(project(":ontrack-extension-queue")))
     testImplementation(testFixtures(project(":ontrack-ui-graphql")))
+    testImplementation(testFixtures(project(":ontrack-extension-casc")))
     testImplementation(testFixtures(project(":ontrack-model")))
 
     testImplementation("com.icegreen:greenmail")
     testImplementation("com.icegreen:greenmail-spring")
 
+    testFixturesImplementation("org.springframework.boot:spring-boot-starter-test")
     testFixturesImplementation(project(":ontrack-it-utils"))
+    testFixturesImplementation(testFixtures(project(":ontrack-ui-graphql")))
+    testFixturesImplementation(testFixtures(project(":ontrack-extension-queue")))
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))

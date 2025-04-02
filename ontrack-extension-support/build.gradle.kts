@@ -1,5 +1,6 @@
 plugins {
     `java-library`
+    `java-test-fixtures`
 }
 
 dependencies {
@@ -20,4 +21,6 @@ dependencies {
     // Make sure the following libraries are available for the extension when they need them
     runtimeOnly(project(":ontrack-git"))
     runtimeOnly(project(":ontrack-tx"))
+
+    testFixturesImplementation("org.springframework.boot:spring-boot-starter-test")
 }
