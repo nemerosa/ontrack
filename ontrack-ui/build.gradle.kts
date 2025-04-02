@@ -70,7 +70,7 @@ dependencies {
     // TODO runtimeOnly(project(":ontrack-extension-stash"))
     // TODO runtimeOnly(project(":ontrack-extension-bitbucket-cloud"))
     // TODO runtimeOnly(project(":ontrack-extension-combined"))
-    // TODO runtimeOnly(project(":ontrack-extension-stale"))
+    runtimeOnly(project(":ontrack-extension-stale"))
     // TODO runtimeOnly(project(":ontrack-extension-vault"))
     // TODO runtimeOnly(project(":ontrack-extension-influxdb"))
     // TODO runtimeOnly(project(":ontrack-extension-sonarqube"))
