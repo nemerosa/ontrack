@@ -9,9 +9,7 @@ import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.json.parse
 import org.junit.jupiter.api.Test
 import org.springframework.graphql.execution.ErrorType
-import org.springframework.security.access.AccessDeniedException
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 
 class GQLRootQueryGitHubIngestionHookPayloadsIT : AbstractIngestionTestSupport() {
 

@@ -34,6 +34,7 @@ subprojects {
 
     version = rootProject.version
 
+    val jjwtVersion = "0.12.6"
     val greenMailVersion = "1.6.15"
 
     dependencyManagement {
@@ -48,6 +49,10 @@ subprojects {
             dependency("org.jgrapht:jgrapht-core:1.5.2")
             dependency("com.opencsv:opencsv:5.10")
             dependency("com.networknt:json-schema-validator:1.5.5")
+
+            dependency("io.jsonwebtoken:jjwt-api:$jjwtVersion")
+            dependency("io.jsonwebtoken:jjwt-impl:$jjwtVersion")
+            dependency("io.jsonwebtoken:jjwt-jackson:$jjwtVersion")
 
             dependency("com.icegreen:greenmail:$greenMailVersion")
             dependency("com.icegreen:greenmail-spring:$greenMailVersion")
