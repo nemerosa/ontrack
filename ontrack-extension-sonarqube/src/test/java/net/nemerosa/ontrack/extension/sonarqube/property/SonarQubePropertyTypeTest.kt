@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.sonarqube.property
 
-import com.nhaarman.mockitokotlin2.whenever
+import io.mockk.every
+import io.mockk.mockk
 import net.nemerosa.ontrack.extension.casc.CascExtensionFeature
 import net.nemerosa.ontrack.extension.indicators.IndicatorsExtensionFeature
 import net.nemerosa.ontrack.extension.sonarqube.SonarQubeExtensionFeature
@@ -8,14 +9,13 @@ import net.nemerosa.ontrack.extension.sonarqube.configuration.SonarQubeConfigura
 import net.nemerosa.ontrack.extension.sonarqube.configuration.SonarQubeConfigurationService
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.toJson
-import org.junit.Before
-import org.junit.Test
-import org.mockito.Mockito.mock
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class SonarQubePropertyTypeTest {
 
-    private val configurationService = mock(SonarQubeConfigurationService::class.java)
+    private val configurationService = mockk<SonarQubeConfigurationService>()
     private val configuration = SonarQubeConfiguration(
         "conf-name",
         "https://sonarqube.nemerosa.net",
@@ -27,9 +27,9 @@ class SonarQubePropertyTypeTest {
         configurationService
     )
 
-    @Before
+    @BeforeEach
     fun setup() {
-        whenever(configurationService.getConfiguration("conf-name")).thenReturn(configuration)
+        every { configurationService.getConfiguration("conf-name") } returns configuration
     }
 
     @Test
