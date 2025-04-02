@@ -1,10 +1,6 @@
-import net.nemerosa.ontrack.gradle.extension.OntrackExtensionPlugin
-
 plugins {
     `java-library`
 }
-
-apply<OntrackExtensionPlugin>()
 
 dependencies {
     api(project(":ontrack-extension-support"))
@@ -12,10 +8,9 @@ dependencies {
     implementation(project(":ontrack-ui-graphql"))
     implementation("org.apache.commons:commons-math3")
 
-    testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
-    testImplementation(project(":ontrack-extension-general"))
-    testImplementation(project(path = ":ontrack-extension-general", configuration = "tests"))
     testImplementation(project(":ontrack-it-utils"))
+    testImplementation(project(":ontrack-extension-general"))
+    testImplementation(testFixtures(project(":ontrack-ui-graphql")))
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))
