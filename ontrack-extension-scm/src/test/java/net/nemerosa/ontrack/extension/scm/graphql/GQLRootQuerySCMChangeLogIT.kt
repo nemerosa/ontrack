@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.scm.graphql
 
-import net.nemerosa.ontrack.extension.scm.changelog.SCMChangeLogService
 import net.nemerosa.ontrack.extension.scm.mock.MockSCMTester
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.json.asJson

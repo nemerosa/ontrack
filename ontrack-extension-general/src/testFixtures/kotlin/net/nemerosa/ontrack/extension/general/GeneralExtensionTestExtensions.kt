@@ -11,7 +11,7 @@ fun AbstractDSLTestSupport.autoValidationStampProperty(
 ) {
     setProperty(
         project,
-        AutoValidationStampPropertyType::class.java,
+        net.nemerosa.ontrack.extension.general.AutoValidationStampPropertyType::class.java,
         AutoValidationStampProperty(
             isAutoCreate = autoCreate,
             isAutoCreateIfNotPredefined = autoCreateIfNotPredefined,
@@ -25,7 +25,7 @@ fun AbstractDSLTestSupport.autoPromotionLevelProperty(
 ) {
     setProperty(
         project,
-        AutoPromotionLevelPropertyType::class.java,
+        net.nemerosa.ontrack.extension.general.AutoPromotionLevelPropertyType::class.java,
         AutoPromotionLevelProperty(
             isAutoCreate = autoCreate,
         )
@@ -38,7 +38,7 @@ fun AbstractDSLTestSupport.useLabel(
 ) {
     setProperty(
         project,
-        BuildLinkDisplayPropertyType::class.java,
+        net.nemerosa.ontrack.extension.general.BuildLinkDisplayPropertyType::class.java,
         BuildLinkDisplayProperty(
             useLabel = useLabel,
         )
@@ -52,7 +52,7 @@ fun AbstractDSLTestSupport.releaseProperty(
     build: Build,
     label: String,
 ) {
-    setProperty(build, ReleasePropertyType::class.java, ReleaseProperty(label))
+    setProperty(build, net.nemerosa.ontrack.extension.general.ReleasePropertyType::class.java, ReleaseProperty(label))
 }
 
 /**
@@ -64,7 +64,7 @@ fun AbstractDSLTestSupport.metaInfoProperty(
 ) {
     setProperty(
         build,
-        MetaInfoPropertyType::class.java,
+        net.nemerosa.ontrack.extension.general.MetaInfoPropertyType::class.java,
         MetaInfoProperty(items.toList())
     )
 }

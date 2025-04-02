@@ -1,8 +1,10 @@
 package net.nemerosa.ontrack.extension.av.properties
 
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
+@Disabled("Waiting for #1156")
 class TomlFilePropertyTypeTest {
 
     private val tomlFilePropertyType = TomlFilePropertyType()

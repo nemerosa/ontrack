@@ -1,10 +1,6 @@
-import net.nemerosa.ontrack.gradle.extension.OntrackExtensionPlugin
-
 plugins {
     `java-library`
 }
-
-apply<OntrackExtensionPlugin>()
 
 dependencies {
     api(project(":ontrack-extension-support"))
@@ -26,42 +22,20 @@ dependencies {
     implementation(project(":ontrack-extension-notifications"))
     implementation(project(":ontrack-extension-workflows"))
 
-    implementation("cc.ekblad:4koma")
-
     testImplementation(project(":ontrack-extension-general"))
-    testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-ui-graphql", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-extension-scm", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-extension-general", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))
+    testImplementation(testFixtures(project(":ontrack-model")))
+    testImplementation(testFixtures(project(":ontrack-ui-graphql")))
+    testImplementation(testFixtures(project(":ontrack-extension-casc")))
+    testImplementation(testFixtures(project(":ontrack-extension-general")))
+    testImplementation(testFixtures(project(":ontrack-extension-notifications")))
+    testImplementation(testFixtures(project(":ontrack-extension-scm")))
+    // testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
+    // testImplementation(project(path = ":ontrack-extension-workflows", configuration = "tests"))
+    // testImplementation(project(path = ":ontrack-extension-queue", configuration = "tests"))
+    // testImplementation(project(path = ":ontrack-extension-recordings", configuration = "tests"))
     testImplementation("com.networknt:json-schema-validator")
-    testImplementation(project(path = ":ontrack-extension-notifications", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-extension-workflows", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-extension-queue", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-extension-recordings", configuration = "tests"))
-    testImplementation(project(path = ":ontrack-model", configuration = "tests"))
     testImplementation(project(":ontrack-it-utils"))
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))
 }
-
-val testJar by tasks.registering(Jar::class) {
-    archiveClassifier.set("tests")
-    from(sourceSets["test"].output)
-}
-
-configure<PublishingExtension> {
-    publications {
-        maybeCreate<MavenPublication>("mavenCustom").artifact(tasks["testJar"])
-    }
-}
-
-tasks["assemble"].dependsOn("testJar")
-
-val tests by configurations.creating
-
-artifacts {
-    add("tests", testJar)
-}
-

@@ -19,7 +19,9 @@ dependencies {
     testImplementation(testFixtures(project(":ontrack-model")))
     testImplementation(testFixtures(project(":ontrack-ui-graphql")))
 
+    testFixturesImplementation(project(":ontrack-it-utils"))
     testFixturesImplementation(project(":ontrack-test-utils"))
+    testFixturesImplementation("org.jetbrains.kotlin:kotlin-test")
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))

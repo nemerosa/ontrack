@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.av.graphql
 
 import graphql.schema.GraphQLArgument
 import graphql.schema.GraphQLFieldDefinition
-import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditEntry
 import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditQueryFilter
 import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditQueryService
 import net.nemerosa.ontrack.graphql.schema.GQLRootQuery
@@ -18,18 +17,18 @@ class GQLRootQueryAutoVersioningAuditEntries(
     private val autoVersioningAuditQueryService: AutoVersioningAuditQueryService,
 ) : GQLRootQuery {
     override fun getFieldDefinition(): GraphQLFieldDefinition =
-        paginatedListFactory.createPaginatedField<Any?, AutoVersioningAuditEntry>(
+        paginatedListFactory.createRootPaginatedField(
             cache = GQLTypeCache(),
             fieldName = "autoVersioningAuditEntries",
             fieldDescription = "List of audit entries for auto versioning processing orders",
             itemType = gqlTypeAutoVersioningAuditEntry.typeName,
-            itemListCounter = { env, _ ->
+            itemListCounter = { env ->
                 val filterInput = env.getArgument<Any?>("filter")
                 val filter = filterInput?.let { gqlinputAutoVersioningAuditQueryFilter.convert(it) }
                     ?: AutoVersioningAuditQueryFilter()
                 autoVersioningAuditQueryService.countByFilter(filter)
             },
-            itemListProvider = { env, _, offset, count ->
+            itemListProvider = { env, offset, count ->
                 val filterInput = env.getArgument<Any?>("filter")
                 val filter = (filterInput?.let { gqlinputAutoVersioningAuditQueryFilter.convert(it) }
                     ?: AutoVersioningAuditQueryFilter())
