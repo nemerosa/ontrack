@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.extension.bitbucket.cloud.property
 
-import net.nemerosa.ontrack.extension.bitbucket.cloud.AbstractBitbucketCloudJUnit4TestSupport
+import net.nemerosa.ontrack.extension.bitbucket.cloud.AbstractBitbucketCloudTestSupport
 import net.nemerosa.ontrack.extension.bitbucket.cloud.bitbucketCloudTestConfigMock
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class BitbucketCloudProjectConfigurationPropertyMutationProviderIT : AbstractBitbucketCloudJUnit4TestSupport() {
+class BitbucketCloudProjectConfigurationPropertyMutationProviderIT : AbstractBitbucketCloudTestSupport() {
 
     @Test
     fun `Setting a Bitbucket Cloud configuration on a project identified by ID without any issue service`() {

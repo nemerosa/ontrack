@@ -61,7 +61,7 @@ interface ConfigurationService<T : Configuration<T>> {
      * @param name Name of the configuration to find
      * @return The configuration or empty if not found
      */
-    @Deprecated(message = "Use findConfiguration instead", replaceWith = ReplaceWith("findConfiguration"))
+    @Deprecated(message = "Will be removed in V5. Use findConfiguration instead", replaceWith = ReplaceWith("findConfiguration"))
     fun getOptionalConfiguration(name: String): Optional<T>
 
     /**
