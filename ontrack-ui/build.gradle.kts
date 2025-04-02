@@ -59,7 +59,7 @@ dependencies {
     runtimeOnly(project(":ontrack-extension-general"))
     // TODO runtimeOnly(project(":ontrack-extension-ldap"))
     // TODO runtimeOnly(project(":ontrack-extension-oidc"))
-    // TODO runtimeOnly(project(":ontrack-extension-jenkins"))
+    runtimeOnly(project(":ontrack-extension-jenkins"))
     // TODO runtimeOnly(project(":ontrack-extension-jira"))
     runtimeOnly(project(":ontrack-extension-artifactory"))
     runtimeOnly(project(":ontrack-extension-issues"))
