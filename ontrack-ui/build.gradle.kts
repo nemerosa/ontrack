@@ -79,7 +79,7 @@ dependencies {
     // TODO runtimeOnly(project(":ontrack-extension-elastic"))
     // TODO runtimeOnly(project(":ontrack-extension-slack"))
     runtimeOnly(project(":ontrack-extension-chart"))
-    // TODO runtimeOnly(project(":ontrack-extension-delivery-metrics"))
+    runtimeOnly(project(":ontrack-extension-delivery-metrics"))
     runtimeOnly(project(":ontrack-extension-auto-versioning"))
     // TODO runtimeOnly(project(":ontrack-extension-license"))
     // TODO runtimeOnly(project(":ontrack-extension-tfc"))
