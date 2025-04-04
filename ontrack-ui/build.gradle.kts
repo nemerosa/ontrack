@@ -71,7 +71,7 @@ dependencies {
     runtimeOnly(project(":ontrack-extension-bitbucket-cloud"))
     // TODO runtimeOnly(project(":ontrack-extension-combined"))
     runtimeOnly(project(":ontrack-extension-stale"))
-    // TODO runtimeOnly(project(":ontrack-extension-vault"))
+    runtimeOnly(project(":ontrack-extension-vault"))
     runtimeOnly(project(":ontrack-extension-influxdb"))
     runtimeOnly(project(":ontrack-extension-sonarqube"))
     runtimeOnly(project(":ontrack-extension-indicators"))
