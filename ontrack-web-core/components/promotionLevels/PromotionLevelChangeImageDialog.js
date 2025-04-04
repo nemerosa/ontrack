@@ -5,6 +5,7 @@ import {useContext} from "react";
 import {PromotionLevelImage} from "@components/promotionLevels/PromotionLevelImage";
 import {EventsContext} from "@components/common/EventsContext";
 import ChangeImageDialog, {useChangeImageDialog} from "@components/common/ChangeImageDialog";
+import {restPromotionLevelImageUri} from "@components/common/Links";
 
 export const usePromotionLevelChangeImageDialog = () => {
 
@@ -23,7 +24,7 @@ export const usePromotionLevelChangeImageDialog = () => {
         `,
         queryUserNode: 'promotionLevel',
         imageCallback: (data, id) => {
-            restClient.put(`/rest/structure/promotionLevels/${id}/image`, data).then(() => {
+            restClient.put(restPromotionLevelImageUri({id}), data).then(() => {
                 eventsContext.fireEvent("promotionLevel.image", {id})
             })
         }

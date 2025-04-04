@@ -110,6 +110,10 @@ configure(javaProjects) {
         }
     }
 
+    tasks.withType<JavaCompile> {
+        options.compilerArgs.add("-parameters")
+    }
+
     kotlin {
         compilerOptions {
             freeCompilerArgs.addAll("-Xjsr305=strict")
@@ -139,12 +143,12 @@ configure(javaProjects) {
         finalizedBy(":integrationTestComposeDown")
     }
 
-// Synchronization with shutting down the database
+    // Synchronization with shutting down the database
     rootProject.tasks.named("integrationTestComposeDown") {
         mustRunAfter(integrationTest)
     }
 
-// Inclusion in lifecycle
+    // Inclusion in lifecycle
     tasks.check {
         dependsOn(integrationTest)
     }

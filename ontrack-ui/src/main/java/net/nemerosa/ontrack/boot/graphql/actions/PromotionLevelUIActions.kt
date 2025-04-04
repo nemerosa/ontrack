@@ -15,7 +15,7 @@ class PromotionLevelUIActions(
             downloadUpload(
                     "image",
                     "Promotion level image",
-                    download = { on(PromotionLevelController::class.java).getPromotionLevelImage_(null, it.id) },
+                    download = { on(PromotionLevelController::class.java).getPromotionLevelImage_(null, it.id()) },
                     upload = { on(PromotionLevelController::class.java).setPromotionLevelImage(it.id, null) }
             )
     )

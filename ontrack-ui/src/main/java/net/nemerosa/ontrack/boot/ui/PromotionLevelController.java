@@ -108,9 +108,9 @@ public class PromotionLevelController extends AbstractResourceController {
         return ResponseEntity.ok(structureService.deletePromotionLevel(promotionLevelId));
     }
 
-    @RequestMapping(value = "promotionLevels/{promotionLevelId}/image", method = RequestMethod.GET)
-    public Document getPromotionLevelImage_(HttpServletResponse response, @PathVariable ID promotionLevelId) {
-        Document document = structureService.getPromotionLevelImage(promotionLevelId);
+    @GetMapping("promotionLevels/{promotionLevelId}/image")
+    public Document getPromotionLevelImage_(HttpServletResponse response, @PathVariable int promotionLevelId) {
+        Document document = structureService.getPromotionLevelImage(ID.of(promotionLevelId));
         setupDefaultImageCache(response, document);
         return document;
     }

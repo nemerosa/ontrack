@@ -40,7 +40,7 @@ public class PromotionLevelResourceDecorator extends AbstractLinkResourceDecorat
                 ),
                 link(
                         Link.IMAGE_LINK,
-                        promotionLevel -> on(PromotionLevelController.class).getPromotionLevelImage_(null, promotionLevel.getId())
+                        promotionLevel -> on(PromotionLevelController.class).getPromotionLevelImage_(null, promotionLevel.getId().getValue())
                 ),
                 // Update
                 link(

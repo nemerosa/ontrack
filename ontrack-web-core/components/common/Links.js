@@ -85,7 +85,7 @@ export function validationRunUri(validationRun) {
 }
 
 export function restPromotionLevelImageUri(promotionLevel) {
-    return `/rest/structure/promotionLevels/${promotionLevel.id}/image`
+    return `/api/protected/images/promotionLevels/${promotionLevel.id}`
 }
 
 export function restPredefinedPromotionLevelImageUri(predefinedPromotionLevel) {

@@ -47,7 +47,7 @@ export const useGraphQLClient = () => {
 }
 
 /**
- * @deprecated To be replaced
+ * Performs a REST call to the backend.
  */
 export const useRestClient = () => {
     const connection = useConnection()
