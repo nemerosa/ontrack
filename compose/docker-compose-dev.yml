@@ -51,14 +51,18 @@ services:
 #    ports:
 #      - "8200:8200"
 
-#  keycloak:
-#    image: quay.io/keycloak/keycloak:12.0.4
-#    environment:
-#      KEYCLOAK_USER: admin
-#      KEYCLOAK_PASSWORD: admin
-#      DB_VENDOR: h2
-#    ports:
-#      - 8008:8080
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.1.4
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+    ports:
+      - "8008:8080"
+    command:
+      - start-dev
+      - --import-realm
+    volumes:
+      - ./keycloak:/opt/keycloak/data/import
 
   # Rabbit MQ
   rabbit:
