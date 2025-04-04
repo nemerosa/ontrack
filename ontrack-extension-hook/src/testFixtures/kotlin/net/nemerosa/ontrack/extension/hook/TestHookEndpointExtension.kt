@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component
 
 @Component
 class TestHookEndpointExtension(
-        extension: TestExtensionFeature,
-        private val testHookInfoLinkExtension: TestHookInfoLinkExtension,
+    extension: TestExtensionFeature,
+    private val testHookInfoLinkExtension: TestHookInfoLinkExtension,
 ) : AbstractExtension(extension), HookEndpointExtension {
 
     override var enabled: Boolean = true

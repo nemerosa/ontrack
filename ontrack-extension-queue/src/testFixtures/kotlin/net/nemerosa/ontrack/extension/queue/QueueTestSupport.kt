@@ -8,9 +8,9 @@ import org.springframework.stereotype.Component
 
 @Component
 class QueueTestSupport(
-        private val queueConfigProperties: QueueConfigProperties,
-        private val recordingsTestSupport: RecordingsTestSupport,
-        private val queueRecordingsExtension: QueueRecordingsExtension,
+    private val queueConfigProperties: QueueConfigProperties,
+    private val recordingsTestSupport: RecordingsTestSupport,
+    private val queueRecordingsExtension: QueueRecordingsExtension,
 ) {
 
     fun withSyncQueuing(code: () -> Unit) {

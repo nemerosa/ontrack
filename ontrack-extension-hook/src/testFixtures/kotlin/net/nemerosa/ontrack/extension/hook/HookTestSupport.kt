@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.hook
 import net.nemerosa.ontrack.extension.hook.records.HookRecord
 import net.nemerosa.ontrack.extension.hook.records.HookRecordQueryFilter
 import net.nemerosa.ontrack.extension.hook.records.HookRecordingsExtension
-import net.nemerosa.ontrack.extension.recordings.RecordingsCleanupJobs
 import net.nemerosa.ontrack.extension.recordings.RecordingsCleanupService
 import net.nemerosa.ontrack.extension.recordings.RecordingsQueryService
 import net.nemerosa.ontrack.extension.recordings.RecordingsService
@@ -16,13 +15,13 @@ import kotlin.test.assertNull
 
 @Component
 class HookTestSupport(
-        private val hookController: HookController,
-        private val recordingsQueryService: RecordingsQueryService,
-        private val recordingsCleanupService: RecordingsCleanupService,
-        private val recordingsService: RecordingsService,
-        private val hookRecordingsExtension: HookRecordingsExtension,
-        private val testHookEndpointExtension: TestHookEndpointExtension,
-        private val securityService: SecurityService,
+    private val hookController: HookController,
+    private val recordingsQueryService: RecordingsQueryService,
+    private val recordingsCleanupService: RecordingsCleanupService,
+    private val recordingsService: RecordingsService,
+    private val hookRecordingsExtension: HookRecordingsExtension,
+    private val testHookEndpointExtension: TestHookEndpointExtension,
+    private val securityService: SecurityService,
 ) {
 
     fun hook(

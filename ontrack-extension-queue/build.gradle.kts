@@ -23,6 +23,8 @@ dependencies {
     testImplementation("com.networknt:json-schema-validator")
 
     testFixturesImplementation("org.springframework.boot:spring-boot-starter-test")
+    testFixturesImplementation(testFixtures(project(":ontrack-extension-recordings")))
+    testFixturesImplementation(testFixtures(project(":ontrack-extension-api")))
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))

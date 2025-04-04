@@ -1,5 +1,6 @@
 plugins {
     `java-library`
+    `java-test-fixtures`
 }
 
 dependencies {
@@ -22,6 +23,10 @@ dependencies {
     testImplementation(testFixtures(project(":ontrack-ui-graphql")))
     testImplementation(testFixtures(project(":ontrack-extension-api")))
     testImplementation(testFixtures(project(":ontrack-extension-casc")))
+
+    testFixturesImplementation("org.jetbrains.kotlin:kotlin-test")
+    testFixturesImplementation(project(":ontrack-extension-recordings"))
+    testFixturesImplementation(testFixtures(project(":ontrack-extension-api")))
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))
