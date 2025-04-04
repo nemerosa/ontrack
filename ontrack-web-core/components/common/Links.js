@@ -97,5 +97,5 @@ export function restPredefinedValidationStampImageUri(predefinedValidationStamp)
 }
 
 export function restValidationStampImageUri(validationStamp) {
-    return `/rest/structure/validationStamps/${validationStamp.id}/image`
+    return `/api/protected/images/validationStamps/${validationStamp.id}`
 }

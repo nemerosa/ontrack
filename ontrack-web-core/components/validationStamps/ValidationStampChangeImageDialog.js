@@ -5,6 +5,7 @@ import {useContext} from "react";
 import {EventsContext} from "@components/common/EventsContext";
 import ChangeImageDialog, {useChangeImageDialog} from "@components/common/ChangeImageDialog";
 import ValidationStampImage from "@components/validationStamps/ValidationStampImage";
+import {restValidationStampImageUri} from "@components/common/Links";
 
 export const useValidationStampChangeImageDialog = () => {
 
@@ -23,7 +24,7 @@ export const useValidationStampChangeImageDialog = () => {
         `,
         queryUserNode: 'validationStamp',
         imageCallback: (data, id) => {
-            restClient.put(`/rest/structure/validationStamps/${id}/image`, data).then(() => {
+            restClient.put(restValidationStampImageUri({id}), data).then(() => {
                 eventsContext.fireEvent("validationStamp.image", {id})
             })
         }
