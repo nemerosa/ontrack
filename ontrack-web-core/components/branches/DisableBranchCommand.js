@@ -24,9 +24,9 @@ export default function DisableBranchCommand({branch}) {
                         }
                     }
                 `,
-                {id: branch.id}
+                {id: Number(branch.id)}
             )
-            eventsContext.fireEvent("branch.updated", {id: branch.id})
+            eventsContext.fireEvent("branch.updated", {id: Number(branch.id)})
         } finally {
             setLoading(false)
         }
@@ -45,9 +45,9 @@ export default function DisableBranchCommand({branch}) {
                         }
                     }
                 `,
-                {id: branch.id}
+                {id: Number(branch.id)}
             )
-            eventsContext.fireEvent("branch.updated", {id: branch.id})
+            eventsContext.fireEvent("branch.updated", {id: Number(branch.id)})
         } finally {
             setLoading(false)
         }

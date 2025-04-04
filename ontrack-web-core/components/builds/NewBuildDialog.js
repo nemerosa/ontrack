@@ -9,7 +9,7 @@ export const useNewBuildDialog = ({onSuccess}) => {
         prepareValues: (values, {branch}) => {
             return {
                 ...values,
-                branchId: branch.id,
+                branchId: Number(branch.id),
             }
         },
         query: gql`

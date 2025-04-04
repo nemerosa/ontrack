@@ -4,12 +4,10 @@ import {
     gqlValidationStampFilterFragment
 } from "@components/branches/filters/validationStamps/ValidationStampFilterGraphQLFragments";
 import {getLocallySelectedValidationFilter, setLocallySelectedValidationStampFilter} from "@components/storage/local";
-import NewValidationStampFilterDialog
-    , {
+import NewValidationStampFilterDialog, {
     useNewValidationStampFilterDialog
 } from "@components/branches/filters/validationStamps/NewValidationStampFilterDialog";
-import EditValidationStampFilterDialog
-    , {
+import EditValidationStampFilterDialog, {
     useEditValidationStampFilterDialog
 } from "@components/branches/filters/validationStamps/EditValidationStampFilterDialog";
 import {usePreferences} from "@components/providers/PreferencesProvider";
@@ -73,7 +71,7 @@ export default function ValidationStampFilterContextProvider({branch, children})
 
                     ${gqlValidationStampFilterFragment}
                 `, {
-                    branchId: branch.id,
+                    branchId: Number(branch.id),
                 }
             ).then(data => {
                 setFilters(data.branch.validationStampFilters)

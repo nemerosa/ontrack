@@ -62,7 +62,7 @@ export default function BranchBuilds({
                         }
                     }
                 `,
-                {id: branch.id}
+                {id: Number(branch.id)}
             ).then(data => {
                 setScmChangeLogEnabled(data.branch.scmBranchInfo?.changeLogs)
             })

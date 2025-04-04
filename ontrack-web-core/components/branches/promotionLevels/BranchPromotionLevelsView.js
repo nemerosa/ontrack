@@ -4,7 +4,7 @@ import Head from "next/head";
 import {subBranchTitle} from "@components/common/Titles";
 import {downToBranchBreadcrumbs} from "@components/common/Breadcrumbs";
 import MainPage from "@components/layouts/MainPage";
-import {List, Skeleton, Space, Typography} from "antd";
+import {List, Skeleton, Space} from "antd";
 import {gql} from "graphql-request";
 import {CloseCommand} from "@components/common/Commands";
 import {branchUri} from "@components/common/Links";
@@ -110,7 +110,7 @@ export default function BranchPromotionLevelsView({id}) {
                 }
             `,
             {
-                branchId: branch.id,
+                branchId: Number(branch.id),
                 oldName,
                 newName,
             }

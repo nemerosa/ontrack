@@ -75,7 +75,7 @@ export default function BuildFilterDropdown({branch, selectedBuildFilter, onSele
                         }
                     `,
                     {
-                        branchId: branch.id,
+                        branchId: Number(branch.id),
                         name: editedFilterResource.name,
                         type: editedFilterResource.type,
                         data: editedFilterResource.data,
@@ -133,7 +133,7 @@ export default function BuildFilterDropdown({branch, selectedBuildFilter, onSele
                     }
                 `,
                 {
-                    branchId: branch.id,
+                    branchId: Number(branch.id),
                     name: resource.name,
                     type: resource.type,
                     data: resource.data,
@@ -175,7 +175,7 @@ export default function BuildFilterDropdown({branch, selectedBuildFilter, onSele
                     }
                 `,
                 {
-                    branchId: branch.id,
+                    branchId: Number(branch.id),
                     name: resource.name,
                 }
             ).then(() => {

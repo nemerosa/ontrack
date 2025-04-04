@@ -15,7 +15,7 @@ export const usePromotionLevelCreateDialog = () => {
             return {
                 ...values,
                 description: values.description ?? '',
-                branchId: branch.id,
+                branchId: Number(branch.id),
             }
         },
         query: gql`
