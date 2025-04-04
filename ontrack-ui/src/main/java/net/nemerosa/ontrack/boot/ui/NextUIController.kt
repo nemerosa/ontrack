@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping
  * Controller in charge of redirecting the user to the Next UI app.
  */
 @Controller
+@Deprecated("Will be removed in V5")
 class NextUIController(
     private val ontrackConfigProperties: OntrackConfigProperties,
     private val nextUIRedirector: NextUIRedirector,
@@ -16,7 +17,7 @@ class NextUIController(
 
     @GetMapping("/rest/ui")
     fun redirectToNextUI(): String {
-        val base = ontrackConfigProperties.ui.uri
+        val base = ontrackConfigProperties.url
         val auth = "${base}/auth"
         val uri = nextUIRedirector.redirectURI(
             tokenCallback = auth,

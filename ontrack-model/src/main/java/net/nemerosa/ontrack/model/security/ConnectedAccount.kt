@@ -5,11 +5,11 @@ import net.nemerosa.ontrack.model.preferences.Preferences
 import net.nemerosa.ontrack.model.structure.Entity.Companion.isEntityDefined
 import net.nemerosa.ontrack.model.support.Action
 
+@Deprecated("Will be removed in V5")
 open class ConnectedAccount(
     val account: Account?,
     val preferences: Preferences,
     private val actions: MutableList<Action> = mutableListOf(),
-    val nextUIProperties: NextUIProperties = NextUIProperties(enabled = false),
 ) {
 
     @get:JsonProperty("logged")
@@ -25,7 +25,6 @@ open class ConnectedAccount(
         account = account,
         preferences = preferences,
         actions = actions.filter { it.enabled }.toMutableList(),
-        nextUIProperties = nextUIProperties,
     )
 
     @Suppress("unused")

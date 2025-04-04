@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui
 
+import jakarta.validation.Valid
 import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.extension.api.UserMenuExtension
 import net.nemerosa.ontrack.extension.api.UserMenuExtensionGroups
@@ -12,12 +13,10 @@ import net.nemerosa.ontrack.model.preferences.PreferencesService
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.security.ConnectedAccount.Companion.none
 import net.nemerosa.ontrack.model.support.Action.Companion.of
-import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.model.support.PasswordChange
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
-import jakarta.validation.Valid
 
 @RestController
 @RequestMapping("/rest/user")
@@ -26,7 +25,6 @@ class UserController(
     private val userService: UserService,
     private val extensionManager: ExtensionManager,
     private val preferencesService: PreferencesService,
-    private val ontrackConfigProperties: OntrackConfigProperties,
 ) : AbstractResourceController() {
 
     @GetMapping("")
@@ -40,9 +38,6 @@ class UserController(
                 ConnectedAccount(
                     account = user.account,
                     preferences = preferences,
-                    nextUIProperties = NextUIProperties(
-                        enabled = ontrackConfigProperties.ui.enabled,
-                    ),
                 )
             )
         } else {

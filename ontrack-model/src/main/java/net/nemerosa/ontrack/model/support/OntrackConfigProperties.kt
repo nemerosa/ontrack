@@ -88,11 +88,6 @@ class OntrackConfigProperties {
     var fileKeyStore = FileKeyStoreProperties()
 
     /**
-     * Next UI properties
-     */
-    var ui = UIProperties()
-
-    /**
      * Templating settings
      */
     var templating = TemplatingProperties()
@@ -115,24 +110,7 @@ class OntrackConfigProperties {
         logger.info("[search] Index batch tracing = ${search.index.tracing}")
         logger.info("[search] Index creation error ignoring = ${search.index.ignoreExisting}")
         logger.info("[document] Documents engine = ${documents.engine}")
-        logger.info("[ui] Next UI enabled = ${ui.enabled}")
-        logger.info("[ui] Next UI URI = ${ui.uri}")
         logger.info("[templating] Errors = ${templating.errors}")
-    }
-
-    /**
-     * Next UI properties
-     */
-    class UIProperties {
-        /**
-         * Next UI enabled?
-         */
-        var enabled = false
-
-        /**
-         * Next UI URL
-         */
-        var uri: String = "http://localhost:3000/ui"
     }
 
     /**
