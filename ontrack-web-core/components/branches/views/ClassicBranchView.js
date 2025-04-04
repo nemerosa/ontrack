@@ -76,7 +76,7 @@ export default function ClassicBranchView({branch}) {
         if (client && branch) {
             setLoadingBuilds(true)
             client.request(gqlBuilds, {
-                branchId: branch.id,
+                branchId: Number(branch.id),
                 offset: pagination.offset,
                 size: pagination.size,
                 filterType: selectedBuildFilter?.type,
@@ -139,7 +139,7 @@ export default function ClassicBranchView({branch}) {
                             }
                         }
                     }
-                `, {branchId: branch.id}
+                `, {branchId: Number(branch.id)}
             ).then(data => {
                 setValidationStamps(data.branches[0].validationStamps)
             }).finally(() => {

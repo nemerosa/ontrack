@@ -81,11 +81,11 @@ export const useMutation = (query, {userNodeName, onSuccess}) => {
     }
 }
 
-export function callGraphQL({
-                                query,
-                                variables,
-                            }) {
-    return fetch('/api/protected/graphql', {
+export async function callGraphQL({
+                                      query,
+                                      variables,
+                                  }) {
+    const res = await fetch('/api/protected/graphql', {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -95,12 +95,11 @@ export function callGraphQL({
             query,
             variables,
         })
-    }).then(res => {
-        if (res.ok) {
-            return res.json()
-        } else {
-            console.error(res)
-            throw new Error("Issue with GraphQL call.");
-        }
     })
+    if (res.ok) {
+        return await res.json()
+    } else {
+        console.error(res)
+        throw new Error("Issue with GraphQL call.");
+    }
 }

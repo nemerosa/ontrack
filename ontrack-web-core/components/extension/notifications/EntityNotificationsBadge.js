@@ -36,7 +36,7 @@ export default function EntityNotificationsBadge({entityType, entityId, href, sh
                         }
                     }
                 `,
-                {entityType, entityId}
+                {entityType, entityId: Number(entityId)}
             ).then(data => {
                 const types = data.notificationRecords?.pageItems?.map(record => record.result.type) ?? []
                 let success = 0

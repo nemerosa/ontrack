@@ -345,7 +345,7 @@ export default function BuildFilterDropdown({branch, selectedBuildFilter, onSele
                             }
                         }
                     }
-                `, {branchId: branch.id}
+                `, {branchId: Number(branch.id)}
             ).then(data => {
                 const branch = data.branches[0]
                 setForms(branch.buildFilterForms)

@@ -1,5 +1,5 @@
-import {createContext, useContext, useEffect, useState} from "react";
-import {GraphQLClient} from "graphql-request";
+import {createContext, useContext, useEffect, useMemo, useState} from "react";
+import {callGraphQL} from "@components/services/GraphQL";
 
 function createConnectionConfig(environment) {
     const connectionConfig = {
@@ -39,22 +39,11 @@ export const useFullRestUri = (uri) => {
  * @deprecated Use useQuery / useMutation from GraphQL.js
  */
 export const useGraphQLClient = () => {
-    const connection = useConnection()
-    const [client, setClient] = useState()
-    useEffect(() => {
-        if (connection.config) {
-            const config = connection.config
-            setClient(
-                new GraphQLClient(
-                    `${config.url}/graphql`,
-                    {
-                        headers: config.headers,
-                    }
-                )
-            )
+    return useMemo(() => ({
+        request: async (query, variables = {}) => {
+            return await callGraphQL({query, variables});
         }
-    }, [connection.config])
-    return client
+    }), [])
 }
 
 /**

@@ -76,7 +76,7 @@ export default function BranchPageView({id}) {
         if (id && client) {
             client.request(
                 gqlGetBranch,
-                {id}
+                {id: Number(id)}
             ).then(data => {
                 let branch = data.branches[0];
                 setBranch(branch)

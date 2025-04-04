@@ -303,7 +303,7 @@ function BranchLinksFlow({branch}) {
             setLoading(true)
             client.request(
                 branchQuery,
-                {branchId: branch.id}
+                {branchId: Number(branch.id)}
             ).then(data => {
 
                 // Root branch

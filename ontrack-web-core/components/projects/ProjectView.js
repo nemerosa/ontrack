@@ -108,7 +108,7 @@ export default function ProjectView({id}) {
                     ${gqlProjectContentFragment}
                     ${gqlBranchContentFragment}
                 `,
-                {id}
+                {id: Number(id)}
             ).then(data => {
                 const project = data.project
                 setProject(project)

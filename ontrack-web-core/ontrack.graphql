@@ -5,6 +5,9 @@ schema {
     mutation: Mutation
 }
 
+"Indicates an Input Object is a OneOf Input Object."
+directive @oneOf on INPUT_OBJECT
+
 "Any type which contains authorizations for itself"
 interface Authorizable {
     "Authorizations for this context"
@@ -453,8 +456,6 @@ type Branch implements Authorizable & ProjectEntity {
     messageProperty: Property
     "List of meta information properties"
     metaInfoProperty: Property
-    "Mock SCM used for testing only"
-    mockSCMBranchProperty: Property
     name: String
     "List of other branches in the same project"
     otherBranches: [Branch!]!
@@ -673,8 +674,6 @@ type Build implements Authorizable & ProjectEntity {
     messageProperty: Property
     "List of meta information properties"
     metaInfoProperty: Property
-    "Mock SCM used for testing only"
-    mockSCMBuildCommitProperty: Property
     name: String
     "Next build"
     nextBuild: Build
@@ -701,9 +700,9 @@ type Build implements Authorizable & ProjectEntity {
     "Renders a template for this build"
     render(
         "Format of the rendering"
-        format: String,
+        format: String!,
         "Template for the rendering"
-        template: String
+        template: String!
     ): String!
     "Run info associated with this build"
     runInfo: RunInfo
@@ -4985,8 +4984,6 @@ type Project implements Authorizable & ProjectEntity {
     messageProperty: Property
     "List of meta information properties"
     metaInfoProperty: Property
-    "Mock SCM used for testing only"
-    mockSCMProjectProperty: Property
     name: String
     "Makes a promotion conditional based on the fact that a previous promotion has been granted."
     previousPromotionConditionProperty: Property
@@ -5572,9 +5569,9 @@ type Query {
     "Getting a branch using its name"
     branchByName(
         "Name of the branch"
-        name: String,
+        name: String!,
         "Name of the project"
-        project: String
+        project: String!
     ): Branch
     branches(
         "Keeps only branches listed as favourute"
@@ -5634,12 +5631,12 @@ type Query {
     "Getting the eligible slots for a build"
     eligibleSlotsForBuild(
         "ID of the build"
-        buildId: Int
+        buildId: Int!
     ): [EligibleSlot!]!
     "Getting a project entity using its type and ID."
     entity(
         "ID of the entity"
-        id: Int,
+        id: Int!,
         "Type of the entity"
         type: ProjectEntityType!
     ): ProjectEntityInformation
@@ -5819,11 +5816,6 @@ type Query {
     ): [Project!]!
     "License"
     licenseInfo: LicenseResponse!
-    "Getting a list of texts generated for a mock workflow"
-    mockWorkflowTexts(
-        "ID of the workflow instance"
-        instanceId: String
-    ): [String!]!
     "List of all notification channels"
     notificationChannels: [NotificationChannel!]!
     "Getting a notification record using its ID"
@@ -6062,7 +6054,7 @@ type Query {
     "Gets an existing workflow instance using its ID"
     workflowInstance(
         "ID of the workflow instance"
-        id: String
+        id: String!
     ): WorkflowInstance
     "List of workflow instance statuses"
     workflowInstanceStatusList: [WorkflowInstanceStatus!]!
@@ -6093,6 +6085,8 @@ type QueueDispatchResult {
     id: String
     "Additional information"
     message: String
+    "Routing key used by the message"
+    routingKey: String
     "Result of the dispatching"
     type: QueueDispatchResultType!
 }

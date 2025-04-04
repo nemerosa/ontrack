@@ -30,7 +30,7 @@ export default function BranchFavourite({branch}) {
                             }
                         }
                     }
-                `, {branchId: branch.id}
+                `, {branchId: Number(branch.id)}
             ).then(() => {
                 setFavourite(false)
                 eventsContext.fireEvent("branch.favourite", {id: branch.id, value: false})
@@ -49,7 +49,7 @@ export default function BranchFavourite({branch}) {
                             }
                         }
                     }
-                `, {branchId: branch.id}
+                `, {branchId: Number(branch.id)}
             ).then(() => {
                 setFavourite(true)
                 eventsContext.fireEvent("branch.favourite", {id: branch.id, value: true})

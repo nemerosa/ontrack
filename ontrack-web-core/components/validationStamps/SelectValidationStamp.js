@@ -38,7 +38,7 @@ export default function SelectValidationStamp({
                         }
                     }
                 `,
-                {branchId: branch.id}
+                {branchId: Number(branch.id)}
             ).then(data => {
                 setValidationStamps(data.branches[0].validationStamps)
                 setOptions(data.branches[0].validationStamps.map(vs => {
