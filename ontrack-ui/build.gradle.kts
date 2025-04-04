@@ -38,27 +38,19 @@ dependencies {
     runtimeOnly("net.logstash.logback:logstash-logback-encoder")
 
     testImplementation(testFixtures(project(":ontrack-ui-support")))
-//    testImplementation(project(":ontrack-test-utils"))
     testImplementation(project(":ontrack-it-utils"))
-//    testImplementation(project(":ontrack-extension-general"))
-//    testImplementation(project(":ontrack-extension-casc"))
-//    testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))
     testImplementation(testFixtures(project(":ontrack-model")))
     testImplementation(testFixtures(project(":ontrack-ui-graphql")))
     testImplementation(testFixtures(project(":ontrack-extension-api")))
-//    testImplementation("com.networknt:json-schema-validator")
-//    testImplementation("org.springframework.boot:spring-boot-starter-test")
 
     // List of extensions needed for the documentation generation
-//    testImplementation(project(":ontrack-extension-notifications"))
-//    testImplementation(project(":ontrack-extension-workflows"))
+    testImplementation(project(":ontrack-extension-notifications"))
+    testImplementation(project(":ontrack-extension-workflows"))
     testImplementation("org.junit.platform:junit-platform-suite-api")
     testImplementation("org.junit.platform:junit-platform-suite-engine")
 
     // List of extensions to include in core
     runtimeOnly(project(":ontrack-extension-general"))
-    // TODO runtimeOnly(project(":ontrack-extension-ldap"))
-    // TODO runtimeOnly(project(":ontrack-extension-oidc"))
     runtimeOnly(project(":ontrack-extension-jenkins"))
     runtimeOnly(project(":ontrack-extension-jira"))
     runtimeOnly(project(":ontrack-extension-artifactory"))
@@ -69,7 +61,6 @@ dependencies {
     runtimeOnly(project(":ontrack-extension-gitlab"))
     runtimeOnly(project(":ontrack-extension-stash"))
     runtimeOnly(project(":ontrack-extension-bitbucket-cloud"))
-    // TODO runtimeOnly(project(":ontrack-extension-combined"))
     runtimeOnly(project(":ontrack-extension-stale"))
     runtimeOnly(project(":ontrack-extension-vault"))
     runtimeOnly(project(":ontrack-extension-influxdb"))
@@ -88,7 +79,7 @@ dependencies {
     runtimeOnly(project(":ontrack-extension-hook"))
     runtimeOnly(project(":ontrack-extension-queue"))
     runtimeOnly(project(":ontrack-extension-workflows"))
-    // TODO runtimeOnly(project(":ontrack-extension-environments"))
+    runtimeOnly(project(":ontrack-extension-environments"))
 }
 
 

@@ -1,5 +1,6 @@
 plugins {
     `java-library`
+    `java-test-fixtures`
 }
 
 dependencies {
@@ -26,6 +27,10 @@ dependencies {
     testImplementation("com.networknt:json-schema-validator")
     testImplementation(project(":ontrack-it-utils"))
     testImplementation("com.networknt:json-schema-validator")
+
+    testFixturesImplementation("org.jetbrains.kotlin:kotlin-test")
+    testFixturesImplementation(project(":ontrack-it-utils"))
+    testFixturesImplementation(testFixtures(project(":ontrack-model")))
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))
