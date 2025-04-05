@@ -12,6 +12,7 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter-aop")
     api("org.springframework.boot:spring-boot-starter-jdbc")
     api("org.springframework.boot:spring-boot-starter-thymeleaf")
+    api("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     api(project(":ontrack-ui-support"))
     api(project(":ontrack-ui-graphql"))
     api(project(":ontrack-extension-api"))

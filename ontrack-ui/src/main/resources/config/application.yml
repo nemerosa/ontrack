@@ -4,9 +4,11 @@
 spring:
   # TODO Default security settings
   security:
-    user:
-      name: admin
-      password: admin
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8008/realms/ontrack
+          # audiences: https://nemerosa.com/accounting/api/user
   # Default database connection
   datasource:
     url: "jdbc:postgresql://localhost/ontrack"
