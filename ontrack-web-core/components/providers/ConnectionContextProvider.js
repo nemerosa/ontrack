@@ -1,24 +1,14 @@
 import {createContext, useContext, useEffect, useMemo, useState} from "react";
 import {callGraphQL} from "@components/services/GraphQL";
 
-function createConnectionConfig(environment) {
-    const connectionConfig = {
-        url: environment.ontrack.url,
-    }
-    const username = "admin"
-    const password = "admin"
-
-    const token = btoa(`${username}:${password}`)
-
-    connectionConfig.headers = {
-        Authorization: `Basic ${token}`,
-    }
-
-    return connectionConfig
-}
-
+/**
+ * @deprecated Remove for V5
+ */
 export const useConnection = () => useContext(ConnectionContext)
 
+/**
+ * @deprecated Remove for V5
+ */
 export const useFullRestUri = (uri) => {
 
     const connection = useConnection()
@@ -48,6 +38,7 @@ export const useGraphQLClient = () => {
 
 /**
  * Performs a REST call to the backend.
+ * @deprecated Remove for V5
  */
 export const useRestClient = () => {
     const connection = useConnection()
@@ -92,31 +83,13 @@ export const useRestClient = () => {
     return client
 }
 
-// TODO Logout using Next Auth
-export const useLogout = () => {
-    const connection = useConnection()
-    const [logout, setLogout] = useState()
-    // useEffect(() => {
-    //     if (connection.config) {
-    //         const config = connection.config
-    //         setLogout({
-    //             call: async () => {
-    //                 // Removing the cookie
-    //                 deleteCookie(cookieName, cookieOptions())
-    //                 // Redirecting to the login page
-    //                 console.log("logout", {connection, config})
-    //                 location.href = `${config.url}/login?logout&targetUrl=${connection.environment.ontrack.ui.url}`
-    //             },
-    //         })
-    //     }
-    // }, [connection.config]);
-    return logout
-}
-
+/**
+ * @deprecated Remove for V5
+ */
 export const ConnectionContext = createContext({})
 
 /**
- * @deprecated No need for such a context
+ * @deprecated Remove for V5
  */
 export default function ConnectionContextProvider({environment, children}) {
 

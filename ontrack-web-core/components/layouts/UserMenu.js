@@ -28,7 +28,6 @@ import {
     FaWrench
 } from "react-icons/fa";
 import {MainLayoutContext} from "@components/layouts/MainLayout";
-import {useLogout} from "@components/providers/ConnectionContextProvider";
 import LegacyLink from "@components/common/LegacyLink";
 import UserMenuItemLink from "@components/layouts/UserMenuItemLink";
 import {useRefData} from "@components/providers/RefDataProvider";
@@ -51,8 +50,6 @@ export const groupIcons = {
 }
 
 export default function UserMenu({userMenu}) {
-
-    const logout = useLogout()
 
     const {toggleExpansion} = useContext(MainLayoutContext)
     const {version} = useRefData()
@@ -132,11 +129,8 @@ export default function UserMenu({userMenu}) {
         // Not working in local development mode
         menu.push({
             key: 'logout',
-            label: "Sign out",
+            label: <a href="/api/auth/logout">Sign out</a>,
             icon: <FaSignOutAlt/>,
-            onClick: () => {
-                if (logout) logout.call()
-            },
         })
         // Version
         menu.push({

@@ -1,5 +1,4 @@
 import {Button, Layout, Space} from "antd";
-import Link from "next/link";
 import Image from "next/image";
 
 const {Content} = Layout;
@@ -16,7 +15,7 @@ export default function UserLoginPage() {
                             width={100}
                             height={100}
                         />
-                        <Link href="/api/auth/login" passHref>
+                        <a href="/api/auth/login" passHref>
                             <Button
                                 type="primary"
                                 size="large"
@@ -27,7 +26,7 @@ export default function UserLoginPage() {
                             >
                                 Login
                             </Button>
-                        </Link>
+                        </a>
                     </Space>
                 </Content>
             </Layout>
