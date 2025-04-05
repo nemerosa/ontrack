@@ -31,6 +31,7 @@ import {MainLayoutContext} from "@components/layouts/MainLayout";
 import LegacyLink from "@components/common/LegacyLink";
 import UserMenuItemLink from "@components/layouts/UserMenuItemLink";
 import {useRefData} from "@components/providers/RefDataProvider";
+import {signOut} from "next-auth/react";
 
 export function useUserMenu() {
     const [open, setOpen] = useState(false);
@@ -50,6 +51,8 @@ export const groupIcons = {
 }
 
 export default function UserMenu({userMenu}) {
+
+    const logout = () => signOut()
 
     const {toggleExpansion} = useContext(MainLayoutContext)
     const {version} = useRefData()
@@ -129,8 +132,9 @@ export default function UserMenu({userMenu}) {
         // Not working in local development mode
         menu.push({
             key: 'logout',
-            label: <a href="/api/auth/logout">Sign out</a>,
+            label: "Sign out",
             icon: <FaSignOutAlt/>,
+            onClick: logout,
         })
         // Version
         menu.push({
