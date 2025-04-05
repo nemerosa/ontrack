@@ -1,33 +1,29 @@
 import {createContext} from "react";
-import {useUser} from '@auth0/nextjs-auth0/client';
+import {useSession} from "next-auth/react";
 import UserLoginPage from "@components/providers/UserLoginPage";
 
-export const AuthContext = createContext({user: null})
+export const AuthContext = createContext({session: null})
 
 export default function AuthProvider({children}) {
 
-    const {user, error, isLoading} = useUser()
+    const {data: session, status} = useSession()
 
     const context = {
-        user,
+        session,
     }
 
     return (
         <>
             <AuthContext.Provider value={context}>
                 {
-                    isLoading &&
+                    status === "loading" &&
                     <div>Loading...</div>
                 }
                 {
-                    !isLoading && error &&
-                    <div>{error.message}</div>
+                    status === "unauthenticated" && <UserLoginPage/>
                 }
                 {
-                    !isLoading && !user && <UserLoginPage/>
-                }
-                {
-                    !isLoading && user && children
+                    status === "authenticated" && children
                 }
             </AuthContext.Provider>
         </>
