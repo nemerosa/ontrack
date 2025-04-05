@@ -30,10 +30,10 @@ export const graphQL = async (request, {query, variables = {}}) => {
             response: null,
         }
     } catch (error) {
-        if (error.code === 'ERR_EXPIRED_ACCESS_TOKEN') {
+        if (error.code === 'ERR_EXPIRED_ACCESS_TOKEN' || error.response?.status === 401) {
             return {
                 data: null,
-                response: Response.redirect(`${process.env.NEXTAUTH_URL}/api/auth/logout`)
+                response: NextResponse.json({error: "Unauthorized"}, {status: 401})
             }
         } else {
             console.error("GraphQL", {error})

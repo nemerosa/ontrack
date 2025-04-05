@@ -18,8 +18,9 @@ class CoreAuthorizationContributor : AuthorizationContributor {
 
     override fun appliesTo(context: Any): Boolean = context is GlobalAuthorizationContext
 
-    override fun getAuthorizations(user: OntrackAuthenticatedUser, context: Any): List<Authorization> =
-        listOf(
+    override fun getAuthorizations(user: AuthenticatedUser, context: Any): List<Authorization> {
+        val account = user.account
+        return listOf(
             // Global settings
             Authorization(
                 GLOBAL,
@@ -30,7 +31,7 @@ class CoreAuthorizationContributor : AuthorizationContributor {
             Authorization(
                 USER,
                 "changePassword",
-                !user.account.locked && user.account.authenticationSource.isAllowingPasswordChange
+                account != null && !account.locked && account.authenticationSource.isAllowingPasswordChange
             ),
             // Project
             Authorization(
@@ -51,5 +52,6 @@ class CoreAuthorizationContributor : AuthorizationContributor {
                 user.isGranted(GlobalSettings::class.java)
             ),
         )
+    }
 
 }

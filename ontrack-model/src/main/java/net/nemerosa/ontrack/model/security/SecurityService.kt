@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.model.security
 
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.Signature
-import java.util.*
 import kotlin.reflect.KClass
 
 interface SecurityService {
@@ -28,31 +27,31 @@ interface SecurityService {
     /**
      * List of [project functions][ProjectFunction] which are automatically assigned to authenticated users.
      */
+    @Deprecated("Use AccountACLService")
     val autoProjectFunctions: Set<KClass<out ProjectFunction>>
 
     /**
      * List of [global functions][GlobalFunction] which are automatically assigned to authenticated users.
      */
+    @Deprecated("Use AccountACLService")
     val autoGlobalFunctions: Set<KClass<out GlobalFunction>>
 
     /**
      * Returns the current logged account or `null` if none is logged.
      */
+    @Deprecated("Use currentUser")
     val currentAccount: OntrackAuthenticatedUser?
+
+    /**
+     * Returns the current logged user or null if none is logged.
+     */
+    val currentUser: AuthenticatedUser?
 
     /**
      * Is the current user logged?
      */
     val isLogged: Boolean
         get() = currentAccount != null
-
-    /**
-     * Returns the current logged account as an option
-     *
-     */
-    @get:Deprecated("Use getCurrentAccount directly and check for null")
-    val account: Optional<OntrackAuthenticatedUser>
-        get() = Optional.ofNullable(currentAccount)
 
     val currentSignature: Signature
 

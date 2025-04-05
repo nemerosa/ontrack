@@ -10,9 +10,12 @@ data class Account(
         val name: String,
         val fullName: String,
         val email: String,
+        @Deprecated("Will be removed in v5")
         val authenticationSource: AuthenticationSource,
         val role: SecurityRole,
+        @Deprecated("Will be removed in v5")
         val disabled: Boolean,
+        @Deprecated("Will be removed in v5")
         val locked: Boolean,
 ) : Entity, Serializable {
 

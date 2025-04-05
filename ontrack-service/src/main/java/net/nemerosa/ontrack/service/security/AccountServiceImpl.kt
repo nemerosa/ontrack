@@ -33,6 +33,7 @@ class AccountServiceImpl(
 
     private val passwordEncoder: PasswordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder()
 
+    @Deprecated("Deprecated in Java")
     override fun withACL(raw: OntrackUser): OntrackAuthenticatedUser {
         // Loads the account
         val account = accountRepository.getAccount(ID.of(raw.accountId))

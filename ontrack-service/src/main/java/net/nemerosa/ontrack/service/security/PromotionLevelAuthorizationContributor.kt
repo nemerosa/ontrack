@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.service.security
 
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.PromotionLevel
-import net.nemerosa.ontrack.model.structure.PromotionRun
 import org.springframework.stereotype.Component
 
 @Component
@@ -16,7 +15,7 @@ class PromotionLevelAuthorizationContributor(
 
     override fun appliesTo(context: Any): Boolean = context is PromotionLevel
 
-    override fun getAuthorizations(user: OntrackAuthenticatedUser, context: Any): List<Authorization> = listOf(
+    override fun getAuthorizations(user: AuthenticatedUser, context: Any): List<Authorization> = listOf(
         Authorization(
             PROMOTION_LEVEL,
             Authorization.EDIT,

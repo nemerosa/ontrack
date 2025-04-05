@@ -9,7 +9,7 @@ export default function EnvironmentsCommand({text = "Environments"}) {
     return (
         <>
             {
-                user.authorizations.environment?.view &&
+                user?.authorizations?.environment?.view &&
                 <Command
                     icon={<FaServer/>}
                     text={text}

@@ -11,7 +11,7 @@ class ProjectAuthorizationContributor(
 
     override fun appliesTo(context: Any): Boolean = context is Project
 
-    override fun getAuthorizations(user: OntrackAuthenticatedUser, context: Any): List<Authorization> =
+    override fun getAuthorizations(user: AuthenticatedUser, context: Any): List<Authorization> =
         (context as Project).let { project ->
             listOf(
                 Authorization(

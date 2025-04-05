@@ -1,6 +1,7 @@
 "use client"
 
 import {useEffect, useState} from "react";
+import {signOut} from "next-auth/react";
 
 const createLowLevelError = (ex) => {
     // TODO
@@ -19,10 +20,12 @@ export const useQuery = (query, {
     const [error, setError] = useState()
     const [finished, setFinished] = useState(false)
 
+    const logout = () => signOut()
+
     useEffect(() => {
         if (condition) {
             setLoading(true)
-            callGraphQL({query, variables})
+            callGraphQL({query, variables, logout})
                 .then(data => {
                     setData(dataFn(data))
                     setError(null)
@@ -51,10 +54,12 @@ export const useMutation = (query, {userNodeName, onSuccess}) => {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState()
 
+    const logout = () => signOut()
+
     const mutate = async (variables) => {
         setLoading(true)
         try {
-            const data = await callGraphQL({query, variables})
+            const data = await callGraphQL({query, variables, logout})
             const userNode = data[userNodeName]
             if (userNode) {
                 setData(userNode)
@@ -84,6 +89,7 @@ export const useMutation = (query, {userNodeName, onSuccess}) => {
 export async function callGraphQL({
                                       query,
                                       variables,
+                                      logout,
                                   }) {
     const res = await fetch('/api/protected/graphql', {
         method: 'POST',
@@ -98,6 +104,8 @@ export async function callGraphQL({
     })
     if (res.ok) {
         return await res.json()
+    } else if (res.status === 401) {
+        await signOut()
     } else {
         console.error(res)
         throw new Error("Issue with GraphQL call.");

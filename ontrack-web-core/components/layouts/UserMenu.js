@@ -85,7 +85,7 @@ export default function UserMenu({userMenu}) {
     useEffect(() => {
         const menu = []
         // All groups
-        user.userMenuGroups.forEach(group => {
+        user?.userMenuGroups?.forEach(group => {
             menu.push({
                 key: group.id,
                 label: group.name,

@@ -26,7 +26,7 @@ class GQLTypeUser(
                     // Account representation
                     .field(
                             objectField("account", "Account associated to the user") {
-                                securityService.currentAccount?.account
+                                securityService.currentUser ?.account
                             }
                     )
                     // Actions

@@ -20,6 +20,11 @@ interface AccountRepository {
     fun findAll(): Collection<Account>
 
     /**
+     * Gets account by email
+     */
+    fun findByEmail(email: String): Account?
+
+    /**
      * Creates a new account
      */
     fun newAccount(account: Account): Account
@@ -83,4 +88,9 @@ interface AccountRepository {
      * Locks / unlocks an account
      */
     fun setAccountLocked(id: ID, locked: Boolean)
+
+    /**
+     * Finds or create the account
+     */
+    fun findOrCreateAccount(account: Account): Account
 }

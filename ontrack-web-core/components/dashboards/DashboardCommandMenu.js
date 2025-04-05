@@ -163,7 +163,7 @@ export default function DashboardCommandMenu() {
         }
 
         // Cloning current
-        if (user.authorizations.dashboard?.edit) {
+        if (user?.authorizations?.dashboard?.edit) {
             menu.push({
                 key: 'clone',
                 icon: <FaCopy/>,
@@ -184,7 +184,7 @@ export default function DashboardCommandMenu() {
         }
 
         // New dashboard
-        if (user.authorizations.dashboard?.edit) {
+        if (user?.authorizations?.dashboard?.edit) {
             menu.push({type: 'divider'})
             menu.push({
                 key: 'new',

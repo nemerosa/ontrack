@@ -23,7 +23,7 @@ export default function NewProjectCommand() {
     return (
         <>
             {
-                user.authorizations.project?.create && <>
+                user?.authorizations?.project?.create && <>
                     <NewProjectDialog newProjectDialog={newProjectDialog}/>
                     <Command
                         icon={<FaPlus/>}

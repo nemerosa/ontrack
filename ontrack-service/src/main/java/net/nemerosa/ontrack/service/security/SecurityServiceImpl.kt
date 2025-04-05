@@ -1,14 +1,9 @@
 package net.nemerosa.ontrack.service.security
 
-import net.nemerosa.ontrack.model.dashboards.DashboardEdition
-import net.nemerosa.ontrack.model.dashboards.DashboardSharing
 import net.nemerosa.ontrack.model.security.*
-import net.nemerosa.ontrack.model.settings.CachedSettingsService
-import net.nemerosa.ontrack.model.settings.SecuritySettings
 import net.nemerosa.ontrack.model.structure.Signature
 import net.nemerosa.ontrack.model.structure.Signature.Companion.anonymous
 import net.nemerosa.ontrack.model.structure.Signature.Companion.of
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
@@ -19,8 +14,8 @@ import kotlin.reflect.KClass
 @Component
 class SecurityServiceImpl : SecurityService {
 
-    @Autowired
-    private lateinit var cachedSettingsService: CachedSettingsService
+    @Deprecated("Will be removed in V5")
+    private lateinit var accountACLService: AccountACLService
 
     override fun checkAuthenticated() {
         if (!isLogged) {
@@ -36,9 +31,9 @@ class SecurityServiceImpl : SecurityService {
 
     override fun isGlobalFunctionGranted(fn: Class<out GlobalFunction>): Boolean {
         // Gets the user
-        val user = currentAccount
+        val user = currentUser
         // Checks
-        return user != null && user.isEnabled && user.isGranted(fn)
+        return user != null && user.isGranted(fn)
     }
 
     override fun checkProjectFunction(projectId: Int, fn: Class<out ProjectFunction>) {
@@ -49,48 +44,48 @@ class SecurityServiceImpl : SecurityService {
 
     override fun isProjectFunctionGranted(projectId: Int, fn: Class<out ProjectFunction>): Boolean {
         // Gets the user
-        val user = currentAccount
+        val user = currentUser
         // Checks
-        return user != null && user.isEnabled && user.isGranted(projectId, fn)
+        return user != null && user.isGranted(projectId, fn)
     }
 
+    @Deprecated("Use AccountACLService")
     override val autoProjectFunctions: Set<KClass<out ProjectFunction>>
-        get() {
-            val settings = cachedSettingsService.getCachedSettings(SecuritySettings::class.java)
-            return if (settings.isGrantProjectViewToAll) {
-                if (settings.isGrantProjectParticipationToAll) {
-                    setOf(
-                        ProjectView::class,
-                        ValidationRunStatusChange::class,
-                        ValidationRunStatusCommentEditOwn::class
-                    )
-                } else {
-                    setOf(ProjectView::class)
-                }
-            } else {
-                emptySet()
-            }
-        }
+        get() = accountACLService.autoProjectFunctions
 
+    @Deprecated("Use AccountACLService")
     override val autoGlobalFunctions: Set<KClass<out GlobalFunction>>
-        get() {
-            val settings = cachedSettingsService.getCachedSettings(SecuritySettings::class.java)
-            val functions = mutableSetOf<KClass<out GlobalFunction>>()
-            if (settings.grantDashboardEditionToAll) {
-                functions += DashboardEdition::class
-                if (settings.grantDashboardSharingToAll) {
-                    functions += DashboardSharing::class
-                }
-            }
-            return functions.toSet()
-        }
+        get() = accountACLService.autoGlobalFunctions
 
+    @Deprecated("Use currentUser")
     override val currentAccount: OntrackAuthenticatedUser?
         get() {
             val context = SecurityContextHolder.getContext()
             val authentication = context.authentication
-            return if (authentication != null && authentication.isAuthenticated && authentication.principal is OntrackAuthenticatedUser) {
-                authentication.principal as OntrackAuthenticatedUser
+            return if (authentication != null && authentication.isAuthenticated && authentication.principal is AuthenticatedUserAuthentication) {
+                val authenticatedUser = authentication.principal as AuthenticatedUser
+                val account = authenticatedUser.account ?: RunAsAdminAuthentication.ADMIN
+                DefaultOntrackAuthenticatedUser(
+                    user = AccountOntrackUser(
+                        account = account,
+                    ),
+                    authorizedAccount = AuthorizedAccount(
+                        account = account,
+                        authorisations = authenticatedUser,
+                    ),
+                    groups = emptyList(),
+                )
+            } else {
+                null
+            }
+        }
+
+    override val currentUser: AuthenticatedUser?
+        get() {
+            val context = SecurityContextHolder.getContext()
+            val authentication = context.authentication
+            return if (authentication != null && authentication.isAuthenticated && authentication.principal is AuthenticatedUser) {
+                authentication.principal as AuthenticatedUser
             } else {
                 null
             }
@@ -98,20 +93,18 @@ class SecurityServiceImpl : SecurityService {
 
     override val currentSignature: Signature
         get() {
-            val authenticatedUser = currentAccount
-            return if (authenticatedUser != null) {
-                of(authenticatedUser.account.name)
-            } else {
-                anonymous()
-            }
+            val authenticatedUser = currentUser
+            return authenticatedUser
+                ?.name
+                ?.let { of(it) }
+                ?: anonymous()
         }
 
     override fun <T> runAsAdmin(supplier: () -> T): () -> T {
         // Gets the current account (if any)
-        val account = currentAccount
+        val account = currentUser
         // Creates a temporary admin context
-        val adminContext = SecurityContextImpl()
-        adminContext.authentication = RunAsAdminAuthentication(account)
+        val adminContext = SecurityContextImpl(RunAsAuthenticatedUser.authentication(account))
         // Returns a callable that sets the context before running the target callable
         return withSecurityContext(supplier, adminContext)
     }

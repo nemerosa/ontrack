@@ -6,10 +6,13 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter
 import org.springframework.security.web.SecurityFilterChain
 
 @Configuration
-class WebSecurityConfig {
+class WebSecurityConfig(
+    private val webSecurityFilter: WebSecurityFilter,
+) {
 
     /**
      * Management end points are accessible on a separate port without any authentication needed
@@ -38,6 +41,7 @@ class WebSecurityConfig {
             .oauth2ResourceServer { oauth2 ->
                 oauth2.jwt(Customizer.withDefaults())
             }
+            .addFilterAfter(webSecurityFilter, BearerTokenAuthenticationFilter::class.java)
         return http.build()
     }
 

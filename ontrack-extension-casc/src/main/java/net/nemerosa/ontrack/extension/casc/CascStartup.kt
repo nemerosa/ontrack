@@ -4,12 +4,11 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.StartupService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Component
 
 /**
  * CasC loading at startup
  */
-@Component
+// @Component
 class CascStartup(
     private val cascConfigurationProperties: CascConfigurationProperties,
     private val cascLoadingService: CascLoadingService,

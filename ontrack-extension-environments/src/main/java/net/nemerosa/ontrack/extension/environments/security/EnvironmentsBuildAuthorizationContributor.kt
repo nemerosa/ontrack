@@ -13,7 +13,7 @@ class EnvironmentsBuildAuthorizationContributor(
 
     override fun appliesTo(context: Any): Boolean = context is Build
 
-    override fun getAuthorizations(user: OntrackAuthenticatedUser, context: Any): List<Authorization> {
+    override fun getAuthorizations(user: AuthenticatedUser, context: Any): List<Authorization> {
         val build = context as Build
         val environmentFeatureEnabled = environmentsLicense.environmentFeatureEnabled
         return listOf(

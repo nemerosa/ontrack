@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UserDetails
 /**
  * Representation of an authenticated user, its details and its complete granted ACL.
  */
+@Deprecated("Use AuthenticatedUser")
 interface OntrackAuthenticatedUser : UserDetails, AuthorisationsCheck {
 
     /**

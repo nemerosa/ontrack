@@ -20,8 +20,10 @@ public interface AccountService {
      *
      * @param raw Account without authorisations
      * @return Account with authorisations
+     * @deprecated Will be removed in V5
      */
     @NotNull
+    @Deprecated
     OntrackAuthenticatedUser withACL(@NotNull OntrackUser raw);
 
     /**

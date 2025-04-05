@@ -1,18 +1,20 @@
 package net.nemerosa.ontrack.service.security
 
+import io.mockk.mockk
 import net.nemerosa.ontrack.model.security.ProjectCreation
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.springframework.security.access.AccessDeniedException
+import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class SecurityServiceUnitTest {
 
     private lateinit var securityService: SecurityServiceImpl
 
-    @Before
+    @BeforeEach
     fun before() {
-        securityService = SecurityServiceImpl()
+        securityService = SecurityServiceImpl(mockk(relaxed = true))
     }
 
     private fun protectedCall(): Boolean {
@@ -20,13 +22,15 @@ class SecurityServiceUnitTest {
         return true
     }
 
-    @Test(expected = AccessDeniedException::class)
+    @Test
     fun run_as_admin_not_applied() {
-        protectedCall()
+        assertFailsWith<AccessDeniedException> {
+            protectedCall()
+        }
     }
 
     @Test
     fun run_as_admin() {
-        assertTrue(securityService.runAsAdmin<Boolean> { protectedCall() }())
+        assertTrue(securityService.runAsAdmin { protectedCall() }())
     }
 }

@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.model.security
 import org.springframework.security.core.CredentialsContainer
 import org.springframework.security.core.userdetails.UserDetails
 
+@Deprecated("Will be removed in V5")
 class DefaultOntrackAuthenticatedUser(
     override val user: OntrackUser,
     val authorizedAccount: AuthorizedAccount,

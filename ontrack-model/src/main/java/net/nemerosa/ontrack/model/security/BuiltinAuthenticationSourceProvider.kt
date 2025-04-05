@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.model.settings.SecuritySettings
 import org.springframework.stereotype.Component
 
 @Component
+@Deprecated("Will be removed in V5")
 class BuiltinAuthenticationSourceProvider(
     private val cachedSettingsService: CachedSettingsService,
 ) : AuthenticationSourceProvider {

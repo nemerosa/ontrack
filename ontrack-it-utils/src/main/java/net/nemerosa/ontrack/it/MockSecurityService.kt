@@ -1,9 +1,6 @@
 package net.nemerosa.ontrack.it
 
-import net.nemerosa.ontrack.model.security.GlobalFunction
-import net.nemerosa.ontrack.model.security.OntrackAuthenticatedUser
-import net.nemerosa.ontrack.model.security.ProjectFunction
-import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.Signature
 import kotlin.reflect.KClass
 
@@ -25,7 +22,11 @@ class MockSecurityService : SecurityService {
     override val autoGlobalFunctions: Set<KClass<out GlobalFunction>>
         get() = error("Not available in mock")
 
-    override val currentAccount: OntrackAuthenticatedUser?
+    @Deprecated("Use currentUser")
+    override val currentAccount: OntrackAuthenticatedUser
+        get() = error("Not available in mock")
+
+    override val currentUser: AuthenticatedUser
         get() = error("Not available in mock")
 
     override val currentSignature: Signature = Signature.Companion.of("test")

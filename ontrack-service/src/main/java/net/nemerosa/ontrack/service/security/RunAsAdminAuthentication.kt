@@ -33,6 +33,18 @@ class RunAsAdminAuthentication(
         )
     }
 
+    companion object {
+        val ADMIN = of(
+            "admin",
+            "Run-as Admin",
+            "",
+            SecurityRole.ADMINISTRATOR,
+            BuiltinAuthenticationSourceProvider.runAsSource,
+            disabled = false,
+            locked = false,
+        ).withId(ID.of(1))
+    }
+
     init {
         val account = authenticatedUser?.account
         if (account != null) {
@@ -46,15 +58,7 @@ class RunAsAdminAuthentication(
                     locked = false,
             ).withId(account.id)
         } else {
-            this.account = of(
-                    "admin",
-                    "Run-as Admin",
-                    "",
-                    SecurityRole.ADMINISTRATOR,
-                    BuiltinAuthenticationSourceProvider.runAsSource,
-                    disabled = false,
-                    locked = false,
-            ).withId(ID.of(1))
+            this.account = ADMIN
         }
     }
 

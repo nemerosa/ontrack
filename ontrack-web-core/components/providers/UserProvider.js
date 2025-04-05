@@ -1,4 +1,4 @@
-import {createContext} from "react";
+import {createContext, useEffect, useState} from "react";
 import {gql} from "graphql-request";
 import {useQuery} from "@components/services/GraphQL";
 import LoadingContainer from "@components/common/LoadingContainer";
@@ -10,7 +10,14 @@ export const UserContext = createContext({
 })
 
 export default function UserContextProvider({children}) {
-    const {data: user, loading, error} = useQuery(
+
+    const [user, setUser] = useState({
+        name: '',
+        authorizations: {},
+        userMenuGroups: [],
+    })
+
+    const {data, loading, error, finished} = useQuery(
         gql`
             query UserContext {
                 user {
@@ -33,35 +40,32 @@ export default function UserContextProvider({children}) {
                     authorized
                 }
             }
-        `,
-        {
-            initialData: {
-                name: '',
-                authorizations: {},
-                userMenuGroups: [],
-            },
-            dataFn: data => {
-                const tmpUser = {
-                    name: data.user.account.name
-                }
-                // Groups
-                tmpUser.userMenuGroups = data.userMenuItems
-                // Indexing of authorizations
-                const authorizations = data.authorizations
-                tmpUser.authorizations = {}
-                authorizations.forEach(authorization => {
-                    let domain = tmpUser.authorizations[authorization.name]
-                    if (!domain) {
-                        domain = {}
-                        tmpUser.authorizations[authorization.name] = domain
-                    }
-                    domain[authorization.action] = authorization.authorized
-                })
-                // We're done
-                return tmpUser
-            }
-        }
+        `
     )
+
+    useEffect(() => {
+        if (data && finished) {
+            const tmpUser = {
+                name: data?.user?.account?.name
+            }
+            console.log({data, tmpUser})
+            // Groups
+            tmpUser.userMenuGroups = data.userMenuItems
+            // Indexing of authorizations
+            const authorizations = data.authorizations
+            tmpUser.authorizations = {}
+            authorizations.forEach(authorization => {
+                let domain = tmpUser.authorizations[authorization.name]
+                if (!domain) {
+                    domain = {}
+                    tmpUser.authorizations[authorization.name] = domain
+                }
+                domain[authorization.action] = authorization.authorized
+            })
+            // We're done
+            setUser(tmpUser)
+        }
+    }, [data, finished])
 
     return (
         <>
