@@ -4,7 +4,7 @@ import com.github.gradle.node.npm.task.NpmTask
 
 plugins {
     base
-    id("com.github.node-gradle.node")
+    id("com.github.node-gradle.node") version "7.1.0"
     id("com.bmuschko.docker-remote-api")
 }
 
