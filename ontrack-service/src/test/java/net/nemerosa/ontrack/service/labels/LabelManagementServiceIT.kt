@@ -1,14 +1,14 @@
 package net.nemerosa.ontrack.service.labels
 
-import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.labels.LabelForm
 import net.nemerosa.ontrack.model.labels.LabelManagement
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.security.access.AccessDeniedException
 import kotlin.test.*
 
-class LabelManagementServiceIT : AbstractDSLTestJUnit4Support() {
+class LabelManagementServiceIT : AbstractDSLTestSupport() {
 
     @Test
     fun `Creating, updating and deleting a label`() {
@@ -16,12 +16,12 @@ class LabelManagementServiceIT : AbstractDSLTestJUnit4Support() {
         val name = uid("N")
         asUser().with(LabelManagement::class.java).execute {
             val label = labelManagementService.newLabel(
-                    LabelForm(
-                            category = category,
-                            name = name,
-                            description = null,
-                            color = "#FFFFFF"
-                    )
+                LabelForm(
+                    category = category,
+                    name = name,
+                    description = null,
+                    color = "#FFFFFF"
+                )
             )
             assertTrue(label.id > 0)
             assertEquals(category, label.category)
@@ -31,13 +31,13 @@ class LabelManagementServiceIT : AbstractDSLTestJUnit4Support() {
             assertNull(label.computedBy)
             // Updating the description
             val updatedLabel = labelManagementService.updateLabel(
-                    label.id,
-                    LabelForm(
-                            category = category,
-                            name = name,
-                            description = "New description",
-                            color = "#FFFFFF"
-                    )
+                label.id,
+                LabelForm(
+                    category = category,
+                    name = name,
+                    description = "New description",
+                    color = "#FFFFFF"
+                )
             )
             assertEquals(label.id, updatedLabel.id)
             assertEquals(category, updatedLabel.category)
@@ -64,12 +64,12 @@ class LabelManagementServiceIT : AbstractDSLTestJUnit4Support() {
         val name = uid("N")
         assertFailsWith(AccessDeniedException::class) {
             labelManagementService.newLabel(
-                    LabelForm(
-                            category = category,
-                            name = name,
-                            description = null,
-                            color = "#FFFFFF"
-                    )
+                LabelForm(
+                    category = category,
+                    name = name,
+                    description = null,
+                    color = "#FFFFFF"
+                )
             )
         }
     }
@@ -79,13 +79,13 @@ class LabelManagementServiceIT : AbstractDSLTestJUnit4Support() {
         val label = label()
         assertFailsWith(AccessDeniedException::class) {
             labelManagementService.updateLabel(
-                    label.id,
-                    LabelForm(
-                            category = label.category,
-                            name = label.name,
-                            description = "New description",
-                            color = label.color
-                    )
+                label.id,
+                LabelForm(
+                    category = label.category,
+                    name = label.name,
+                    description = "New description",
+                    color = label.color
+                )
             )
         }
     }
@@ -106,15 +106,15 @@ class LabelManagementServiceIT : AbstractDSLTestJUnit4Support() {
             this.labels = labels.subList(0, 3)
             // Checks the labels of the projects
             assertEquals(
-                    labels.subList(0, 3).map { it.name },
-                    this.labels.map { it.name }
+                labels.subList(0, 3).map { it.name },
+                this.labels.map { it.name }
             )
             // Sets other labels for the projects (with some intersection)
             this.labels = labels.subList(3, 5)
             // Checks the labels of the projects
             assertEquals(
-                    labels.subList(3, 5).map { it.name },
-                    this.labels.map { it.name }
+                labels.subList(3, 5).map { it.name },
+                this.labels.map { it.name }
             )
         }
     }
@@ -128,9 +128,9 @@ class LabelManagementServiceIT : AbstractDSLTestJUnit4Support() {
         // Looking for labels per category
         val labels = labelManagementService.findLabels(category, null)
         assertTrue(
-                labels.all {
-                    it.category == category && it.name.matches("name-\\d".toRegex())
-                }
+            labels.all {
+                it.category == category && it.name.matches("name-\\d".toRegex())
+            }
         )
     }
 
@@ -144,9 +144,9 @@ class LabelManagementServiceIT : AbstractDSLTestJUnit4Support() {
         val labels = labelManagementService.findLabels(null, name)
         assertEquals(5, labels.size)
         assertTrue(
-                labels.all {
-                    it.name == name
-                }
+            labels.all {
+                it.name == name
+            }
         )
     }
 

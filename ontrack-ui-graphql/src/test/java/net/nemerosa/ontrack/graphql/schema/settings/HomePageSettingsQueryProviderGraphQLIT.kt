@@ -1,12 +1,12 @@
 package net.nemerosa.ontrack.graphql.schema.settings
 
-import net.nemerosa.ontrack.graphql.AbstractQLKTITJUnit4Support
+import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.model.security.Roles
 import net.nemerosa.ontrack.model.settings.HomePageSettings
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-class HomePageSettingsQueryProviderGraphQLIT : AbstractQLKTITJUnit4Support() {
+class HomePageSettingsQueryProviderGraphQLIT : AbstractQLKTITSupport() {
 
     @Test
     fun `Settings are accessible in admin mode`() {

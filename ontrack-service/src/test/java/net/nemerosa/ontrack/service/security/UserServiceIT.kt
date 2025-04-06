@@ -1,16 +1,16 @@
 package net.nemerosa.ontrack.service.security
 
-import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.security.Account
 import net.nemerosa.ontrack.model.security.AccountInput
 import net.nemerosa.ontrack.model.security.UserService
 import net.nemerosa.ontrack.model.support.PasswordChange
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
 import kotlin.test.assertFailsWith
 
-class UserServiceIT : AbstractDSLTestJUnit4Support() {
+class UserServiceIT : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var userService: UserService
@@ -29,15 +29,17 @@ class UserServiceIT : AbstractDSLTestJUnit4Support() {
     fun `Password of a locked account can be changed by an admin`() {
         val account = createLockedAccount()
         asAdmin {
-            accountService.updateAccount(account.id, AccountInput(
-                name = account.name,
-                fullName = account.fullName,
-                email = account.email,
-                password = "new-password",
-                groups = emptyList(),
-                disabled = false,
-                locked = false,
-            ))
+            accountService.updateAccount(
+                account.id, AccountInput(
+                    name = account.name,
+                    fullName = account.fullName,
+                    email = account.email,
+                    password = "new-password",
+                    groups = emptyList(),
+                    disabled = false,
+                    locked = false,
+                )
+            )
         }
     }
 

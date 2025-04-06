@@ -10,13 +10,13 @@ import net.nemerosa.ontrack.extension.git.property.GitProjectConfigurationProper
 import net.nemerosa.ontrack.extension.git.support.TagPatternBuildNameGitCommitLink
 import net.nemerosa.ontrack.extension.scm.support.TagPattern
 import net.nemerosa.ontrack.git.support.GitRepo
-import net.nemerosa.ontrack.it.AbstractServiceTestJUnit4Support
+import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.job.JobRunListener
 import net.nemerosa.ontrack.job.orchestrator.JobOrchestrator
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -24,7 +24,7 @@ import kotlin.test.assertTrue
 /**
  * Testing the sync between builds and Git tags.
  */
-class GitBuildSyncIT : AbstractServiceTestJUnit4Support() {
+class GitBuildSyncIT : AbstractServiceTestSupport() {
 
     @Autowired
     private lateinit var gitService: GitService

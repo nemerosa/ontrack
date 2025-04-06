@@ -1,13 +1,13 @@
 package net.nemerosa.ontrack.graphql
 
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 
 /**
  * Testing the integration of GraphQL with transactions and security boundaries.
  */
-class IntegrationGraphQLIT : AbstractQLKTITJUnit4Support() {
+class IntegrationGraphQLIT : AbstractQLKTITSupport() {
 
     /**
      * Here, we check that the security context is propagated into the different branches

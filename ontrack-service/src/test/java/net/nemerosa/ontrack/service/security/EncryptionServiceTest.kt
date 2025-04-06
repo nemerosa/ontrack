@@ -1,10 +1,11 @@
 package net.nemerosa.ontrack.service.security
 
+import io.mockk.mockk
 import org.apache.commons.io.FileUtils
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.io.File
 import kotlin.io.path.createTempDirectory
+import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -17,9 +18,10 @@ class EncryptionServiceTest {
         try {
             // Encryption service
             val encryptionService = EncryptionServiceImpl(
-                    FileConfidentialStore(
-                            dir
-                    )
+                mockk(relaxed = true),
+                FileConfidentialStore(
+                    dir
+                )
             )
             // Asserts master key file is created
             assertTrue(File(dir, "master.key").exists())

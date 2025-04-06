@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.service.security
 
+import io.mockk.mockk
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.junit.jupiter.api.Test
 import java.security.SecureRandom
@@ -33,7 +34,7 @@ internal class SecretFileConfidentialStoreTest {
 
     @Test
     fun `Invalid if directory is not a directory`() {
-        val file = kotlin.io.path.createTempFile()
+        val file = createTempFile()
         val properties = OntrackConfigProperties().apply {
             fileKeyStore.directory = file.absolutePathString()
         }
@@ -81,7 +82,7 @@ internal class SecretFileConfidentialStoreTest {
         }
         val store = SecretFileConfidentialStore(properties)
 
-        val encryptionService = EncryptionServiceImpl(store)
+        val encryptionService = EncryptionServiceImpl(mockk(relaxed = true), store)
         val plain = "some plain text"
         val encrypted = encryptionService.encrypt(plain)
         assertNotNull(encrypted) {

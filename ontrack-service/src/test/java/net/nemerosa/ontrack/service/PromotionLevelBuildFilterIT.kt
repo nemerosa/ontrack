@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.service
 
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
-class PromotionLevelBuildFilterIT : AbstractBuildFilterJUnit4IT() {
+class PromotionLevelBuildFilterIT : AbstractBuildFilterTestSupport() {
 
     /**
      * Tests the following sequence:

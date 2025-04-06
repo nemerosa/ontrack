@@ -1,17 +1,12 @@
 package net.nemerosa.ontrack.graphql
 
 import net.nemerosa.ontrack.model.structure.RunInfoInput
-import net.nemerosa.ontrack.model.structure.RunInfoService
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
-import org.junit.Test
-import org.springframework.beans.factory.annotation.Autowired
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class RunInfoGraphQLIT : AbstractQLKTITJUnit4Support() {
-
-    @Autowired
-    private lateinit var runInfoService: RunInfoService
+class RunInfoGraphQLIT : AbstractQLKTITSupport() {
 
     @Test
     fun `Getting the run info for a build`() {

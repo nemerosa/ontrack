@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.graphql
 
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertTrue
 
-class EntityCountsGraphQLIT: AbstractQLKTITJUnit4Support() {
+class EntityCountsGraphQLIT: AbstractQLKTITSupport() {
 
     @Test
     fun `Project counts`() {

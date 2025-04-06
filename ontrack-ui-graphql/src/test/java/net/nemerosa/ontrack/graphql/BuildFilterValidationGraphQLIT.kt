@@ -3,11 +3,11 @@ package net.nemerosa.ontrack.graphql
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.StandardBuildFilterData
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
-class BuildFilterValidationGraphQLIT : AbstractQLKTITJUnit4Support() {
+class BuildFilterValidationGraphQLIT : AbstractQLKTITSupport() {
 
     @Test
     fun `Filter validation for since promotion field`() {

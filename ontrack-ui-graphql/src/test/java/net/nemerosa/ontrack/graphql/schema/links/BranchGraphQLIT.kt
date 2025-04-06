@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.graphql.schema.links
 
-import net.nemerosa.ontrack.graphql.AbstractQLKTITJUnit4Support
+import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.json.asJson
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-class BranchGraphQLIT : AbstractQLKTITJUnit4Support() {
+class BranchGraphQLIT : AbstractQLKTITSupport() {
 
     @Test
     fun `Two layers`() {

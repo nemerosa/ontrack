@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.service.security
 
 import net.nemerosa.ontrack.common.Document
-import net.nemerosa.ontrack.it.AbstractDSLTestJUnit4Support
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.exceptions.ImageFileSizeException
 import net.nemerosa.ontrack.model.exceptions.ImageTypeNotAcceptedException
 import net.nemerosa.ontrack.model.security.ProjectList
@@ -10,17 +10,19 @@ import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.Entity.Companion.isEntityDefined
 import net.nemerosa.ontrack.model.structure.ID.Companion.of
 import net.nemerosa.ontrack.test.TestUtils
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.security.access.AccessDeniedException
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
-class StructureServiceIT : AbstractDSLTestJUnit4Support() {
+class StructureServiceIT : AbstractDSLTestSupport() {
 
-    @Test(expected = IllegalStateException::class)
+    @Test
     fun `Cannot accept an ID when creating a project`() {
-        asAdmin { structureService.newProject(Project.of(nameDescription()).withId(of(1))) }
+        assertFailsWith<IllegalStateException> {
+            asAdmin { structureService.newProject(Project.of(nameDescription()).withId(of(1))) }
+        }
     }
 
     @Test
@@ -35,7 +37,7 @@ class StructureServiceIT : AbstractDSLTestJUnit4Support() {
     fun `Creation of a branch`() {
         val branch = project<Branch> {
             structureService.newBranch(
-                    Branch.of(this, nameDescription())
+                Branch.of(this, nameDescription())
             )
         }
         val b = asUser().withView(branch).call { structureService.getBranch(branch.id) }
@@ -91,8 +93,8 @@ class StructureServiceIT : AbstractDSLTestJUnit4Support() {
                 structureService.projectList
             }
             assertEquals(
-                    listOf(projects[0], projects[1]),
-                    list
+                listOf(projects[0], projects[1]),
+                list
             )
         }
     }
@@ -197,11 +199,11 @@ class StructureServiceIT : AbstractDSLTestJUnit4Support() {
                     asUser().withView(this).execute {
                         assertFailsWith<AccessDeniedException> {
                             structureService.newValidationRun(
-                                    this,
-                                    ValidationRunRequest(
-                                            vs.name,
-                                            ValidationRunStatusID.STATUS_PASSED
-                                    )
+                                this,
+                                ValidationRunRequest(
+                                    vs.name,
+                                    ValidationRunStatusID.STATUS_PASSED
+                                )
                             )
                         }
                     }
@@ -216,13 +218,13 @@ class StructureServiceIT : AbstractDSLTestJUnit4Support() {
             branch {
                 val vs = validationStamp()
                 build {
-                    asUser().withView(this).with(this, ValidationRunCreate::class.java).execute {
+                    asUser().withView(this).withProjectFunction(this, ValidationRunCreate::class.java).execute {
                         structureService.newValidationRun(
-                                this,
-                                ValidationRunRequest(
-                                        vs.name,
-                                        ValidationRunStatusID.STATUS_PASSED
-                                )
+                            this,
+                            ValidationRunRequest(
+                                vs.name,
+                                ValidationRunStatusID.STATUS_PASSED
+                            )
                         )
                     }
                 }
