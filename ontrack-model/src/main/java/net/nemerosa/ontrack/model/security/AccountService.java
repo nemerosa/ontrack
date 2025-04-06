@@ -16,17 +16,6 @@ import java.util.Optional;
 public interface AccountService {
 
     /**
-     * Completes an account with the list of its authorisations.
-     *
-     * @param raw Account without authorisations
-     * @return Account with authorisations
-     * @deprecated Will be removed in V5
-     */
-    @NotNull
-    @Deprecated
-    OntrackAuthenticatedUser withACL(@NotNull OntrackUser raw);
-
-    /**
      * List of accounts
      */
     List<Account> getAccounts();

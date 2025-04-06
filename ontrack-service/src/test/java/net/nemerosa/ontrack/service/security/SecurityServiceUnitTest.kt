@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.service.security
 
-import io.mockk.mockk
 import net.nemerosa.ontrack.model.security.ProjectCreation
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -14,7 +13,7 @@ class SecurityServiceUnitTest {
 
     @BeforeEach
     fun before() {
-        securityService = SecurityServiceImpl(mockk(relaxed = true))
+        securityService = SecurityServiceImpl()
     }
 
     private fun protectedCall(): Boolean {

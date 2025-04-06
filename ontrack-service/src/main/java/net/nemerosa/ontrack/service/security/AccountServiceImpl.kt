@@ -27,53 +27,10 @@ class AccountServiceImpl(
     private val accountRepository: AccountRepository,
     private val accountGroupRepository: AccountGroupRepository,
     private val securityService: SecurityService,
-    private val accountGroupContributors: List<AccountGroupContributor>,
     private val builtinAuthenticationSourceProvider: BuiltinAuthenticationSourceProvider,
 ) : AccountService {
 
     private val passwordEncoder: PasswordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder()
-
-    @Deprecated("Deprecated in Java")
-    override fun withACL(raw: OntrackUser): OntrackAuthenticatedUser {
-        // Loads the account
-        val account = accountRepository.getAccount(ID.of(raw.accountId))
-        // Direct account authorisations
-        val authorisations = Authorisations()
-            .withProjectFunctions(securityService.autoProjectFunctions)
-            .withGlobalFunctions(securityService.autoGlobalFunctions)
-            .withGlobalRole(roleRepository.findGlobalRoleByAccount(raw.accountId).getOrNull()
-                ?.let { id: String -> rolesService.getGlobalRole(id).getOrNull() })
-            .withProjectRoles(roleRepository.findProjectRoleAssociationsByAccount(raw.accountId) { project: Int, roleId: String ->
-                rolesService.getProjectRoleAssociation(
-                    project,
-                    roleId
-                )
-            })
-        // List of authenticated groups
-        val groups = mutableListOf<AuthorizedGroup>()
-        // Authorisations from groups
-        groups.addAll(
-            accountGroupRepository.findByAccount(raw.accountId).map {
-                AuthorizedGroup(
-                    group = it,
-                    authorisations = getGroupACL(it)
-                )
-            }
-        )
-        // Authorisations from groups contributors
-        groups.addAll(
-            accountGroupContributors.flatMap { contributor ->
-                contributor.collectGroups(account)
-            }.map { group ->
-                AuthorizedGroup(
-                    group = group,
-                    authorisations = getGroupACL(group)
-                )
-            }
-        )
-        // OK
-        return DefaultOntrackAuthenticatedUser(raw, AuthorizedAccount(account, authorisations), groups.toList())
-    }
 
     override fun getAccounts(): List<Account> {
         securityService.checkGlobalFunction(AccountManagement::class.java)

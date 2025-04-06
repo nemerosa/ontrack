@@ -1,13 +1,12 @@
 package net.nemerosa.ontrack.model.security
 
-import net.nemerosa.ontrack.model.security.Account
-import net.nemerosa.ontrack.model.security.OntrackUser
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.AuthorityUtils
 
 /**
  * [Account] based [OntrackUser].
  */
+@Deprecated("Will be removed in V5")
 open class AccountOntrackUser(
         private val account: Account
 ) : OntrackUser {

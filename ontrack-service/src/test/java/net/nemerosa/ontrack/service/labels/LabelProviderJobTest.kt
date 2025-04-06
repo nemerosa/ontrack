@@ -39,7 +39,7 @@ class LabelProviderJobTest {
         labelProviderService = mockk(relaxed = true)
         settingsService = mockk()
 
-        securityService = SecurityServiceImpl(accountACLService = mockk(relaxed = true))
+        securityService = SecurityServiceImpl()
 
         provider = LabelProviderJob(
             securityService,
