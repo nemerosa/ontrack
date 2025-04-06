@@ -56,7 +56,7 @@ export default function NavBar() {
                     <NavBarSearch
                         style={{ display: 'flex', alignItems: 'center' }}
                     />
-                    <NavBarText text={user?.account?.fullName}/>
+                    <NavBarText text={user?.name}/>
                     <Avatar icon={<FaRegUser id="user-menu"/>}
                             onClick={openUserMenu}
                             style={{
