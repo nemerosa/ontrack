@@ -6,15 +6,11 @@ class AccountAuthenticatedUser(
     val groups: List<AuthorizedGroup>,
 ) : AuthenticatedUser {
 
-    override fun isGranted(fn: Class<out GlobalFunction>): Boolean {
-        // TODO
-        return true
-    }
+    override fun isGranted(fn: Class<out GlobalFunction>): Boolean =
+        authorisations.isGranted(fn) || groups.any { it.isGranted(fn) }
 
-    override fun isGranted(projectId: Int, fn: Class<out ProjectFunction>): Boolean {
-        // TODO
-        return true
-    }
+    override fun isGranted(projectId: Int, fn: Class<out ProjectFunction>): Boolean =
+        authorisations.isGranted(projectId, fn) || groups.any { it.isGranted(projectId, fn) }
 
     override fun getName(): String = account.fullName
 
