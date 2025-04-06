@@ -305,7 +305,7 @@ class WorkflowEngineImpl(
     }
 
     private fun checkAuthentication(message: String) {
-        securityService.currentAccount ?: error(message)
+        securityService.currentUser ?: error(message)
     }
 
     private fun getNodeStatus(instanceId: String, nodeId: String): WorkflowInstanceNodeStatus? =

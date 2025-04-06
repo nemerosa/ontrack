@@ -642,7 +642,8 @@ class AdminQLIT : AbstractQLKTITSupport() {
     @Test
     fun `Account token not filled in when not generated`() {
         asUser {
-            val id = securityService.currentAccount!!.id()
+            val id = securityService.currentUser?.account?.id()
+                ?: fail("No current account")
             asAdmin {
                 val data = run("""{
                     accounts(id: $id) {
@@ -663,7 +664,8 @@ class AdminQLIT : AbstractQLKTITSupport() {
     fun `Account token filled in when generated`() {
         asUser {
             tokensService.generateNewToken()
-            val id = securityService.currentAccount!!.id()
+            val id = securityService.currentUser?.account?.id()
+                ?: fail("No current account")
             asAdmin {
                 val data = run("""{
                     accounts(id: $id) {
@@ -683,7 +685,8 @@ class AdminQLIT : AbstractQLKTITSupport() {
     @Test
     fun `List of contributed and provided groups for an account`() {
         asUserWithAuthenticationSource(TestAuthenticationSourceProvider.SOURCE).call {
-            val account = securityService.currentAccount?.account ?: fail("No current account")
+            val account = securityService.currentUser?.account
+                ?: fail("No current account")
             // Registers some provided accounts
             val providedGroupNames = setOf("provided-admin", "provided-user")
             asAdmin {

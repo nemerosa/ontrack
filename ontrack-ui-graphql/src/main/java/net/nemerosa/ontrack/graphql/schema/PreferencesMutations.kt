@@ -1,12 +1,13 @@
 package net.nemerosa.ontrack.graphql.schema
 
+import jakarta.validation.Validator
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.preferences.Preferences
 import net.nemerosa.ontrack.model.preferences.PreferencesService
 import net.nemerosa.ontrack.model.security.SecurityService
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Component
-import jakarta.validation.Validator
 
 /**
  * Settings the current's user preferences.
@@ -28,7 +29,8 @@ class PreferencesMutations(
             outputType = Preferences::class,
         ) { input ->
             // Gets the current account
-            val account = securityService.currentAccount?.account ?: error("Authentication is required.")
+            val account = securityService.currentUser?.account
+                ?: throw AccessDeniedException("Not authenticated")
             // Gets the current preferences
             val current = preferencesService.getPreferences(account)
             // Adapts the preferences

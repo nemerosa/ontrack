@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflow
 import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowService
 import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowTestSupport
 import net.nemerosa.ontrack.extension.notifications.mock.MockNotificationChannel
+import net.nemerosa.ontrack.extension.queue.QueueNoAsync
 import net.nemerosa.ontrack.extension.scm.mock.MockSCMTester
 import net.nemerosa.ontrack.extension.workflows.registry.WorkflowParser
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
+@QueueNoAsync
 class SlotPipelineChangelogIT : AbstractDSLTestSupport() {
 
     @Autowired

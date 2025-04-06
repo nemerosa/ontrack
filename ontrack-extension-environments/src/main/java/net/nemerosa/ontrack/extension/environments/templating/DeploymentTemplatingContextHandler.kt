@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.environments.templating
 
-import net.nemerosa.ontrack.extension.environments.SlotPipeline
 import net.nemerosa.ontrack.extension.environments.storage.SlotPipelineRepository
 import net.nemerosa.ontrack.model.events.EventRenderer
 import net.nemerosa.ontrack.model.templating.AbstractTemplatingContextHandler
@@ -40,24 +39,6 @@ class DeploymentTemplatingContextHandler(
             config = config,
             renderer = renderer,
         )
-        return when (field) {
-            null -> renderDeploymentLink(deployment, config, renderer)
-            "" -> renderDeploymentLink(deployment, config, renderer)
-            "link" -> renderDeploymentLink(deployment, config, renderer)
-            "name" -> deployment.fullName()
-            "id" -> deployment.id
-            "number" -> deployment.number.toString()
-            // TODO Changelog
-            else -> throw TemplatingContextHandlerFieldNotManagedException(this, field)
-        }
     }
 
-    fun renderDeploymentLink(
-        deployment: SlotPipeline,
-        config: Map<String, String>,
-        renderer: EventRenderer
-    ): String {
-        val link = uiLocations.page("/extension/environments/pipeline/${deployment.id}")
-        return renderer.renderLink(deployment.fullName(), link)
-    }
 }

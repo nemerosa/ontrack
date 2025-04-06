@@ -15,6 +15,7 @@ import net.nemerosa.ontrack.model.structure.Signature.Companion.of
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.TestingAuthenticationToken
+import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.context.SecurityContextImpl
@@ -95,7 +96,7 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
 
     protected fun doCreateAccountWithProjectRole(project: Project, role: String): Account {
         val account = doCreateAccount()
-        return asUser().with(project, ProjectAuthorisationMgt::class.java).call {
+        return asUser().withProjectFunction(project, ProjectAuthorisationMgt::class.java).call {
             accountService.saveProjectPermission(
                 project.id,
                 PermissionTargetType.ACCOUNT,
@@ -119,7 +120,7 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
     }
 
     fun <T> setProperty(projectEntity: ProjectEntity, propertyTypeClass: Class<out PropertyType<T>>, data: T) {
-        asUser().with(projectEntity, ProjectEdit::class.java).execute(Runnable {
+        asUser().withProjectFunction(projectEntity, ProjectEdit::class.java).execute(Runnable {
             propertyService.editProperty(
                 projectEntity,
                 propertyTypeClass,
@@ -129,8 +130,8 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
         )
     }
 
-    protected fun <T> deleteProperty(projectEntity: ProjectEntity?, propertyTypeClass: Class<out PropertyType<T>>) {
-        asUser().with(projectEntity!!, ProjectEdit::class.java).execute(Runnable {
+    protected fun <T> deleteProperty(projectEntity: ProjectEntity, propertyTypeClass: Class<out PropertyType<T>>) {
+        asUser().withProjectFunction(projectEntity, ProjectEdit::class.java).execute(Runnable {
             propertyService.deleteProperty(
                 projectEntity,
                 propertyTypeClass
@@ -140,7 +141,7 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
     }
 
     protected fun <T> getProperty(projectEntity: ProjectEntity, propertyTypeClass: Class<out PropertyType<T>>): T {
-        return asUser().with(projectEntity, ProjectEdit::class.java).call {
+        return asUser().withProjectFunction(projectEntity, ProjectEdit::class.java).call {
             propertyService.getProperty(
                 projectEntity,
                 propertyTypeClass
@@ -193,7 +194,7 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
         statusId: ValidationRunStatusID?,
         runData: ValidationRunData<*>? = null
     ): ValidationRun {
-        return asUser().withView(build).with(build, ValidationRunCreate::class.java).call {
+        return asUser().withView(build).withProjectFunction(build, ValidationRunCreate::class.java).call {
             structureService.newValidationRun(
                 build,
                 ValidationRunRequest(
@@ -274,7 +275,7 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
     }
 
     protected fun <T> doSetProperty(entity: ProjectEntity, propertyType: Class<out PropertyType<T>>, data: T) {
-        asUser().with(entity, ProjectEdit::class.java).call {
+        asUser().withProjectFunction(entity, ProjectEdit::class.java).call {
             propertyService.editProperty(
                 entity,
                 propertyType,
@@ -403,23 +404,29 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
         }
     }
 
-    open inner class AccountCall<T : AccountCall<T>>(
-        protected val account: Account
-    ) : AbstractContextCall() {
+    abstract inner class AuthenticatedUserCall : AbstractContextCall() {
 
         override fun contextSetup() {
-            val context: SecurityContext = SecurityContextImpl()
-            val ontrackAuthenticatedUser = createOntrackAuthenticatedUser()
-            val authentication = TestingAuthenticationToken(
-                ontrackAuthenticatedUser,
-                "",
-                account.role.name
+            val user = createOntrackAuthenticatedUser()
+            val authentication = AuthenticatedUserAuthentication(
+                authenticatedUser = user,
+                authorities = AuthorityUtils.createAuthorityList(securityRole.name)
             )
-            context.authentication = authentication
+            val context: SecurityContext = SecurityContextImpl(authentication)
             SecurityContextHolder.setContext(context)
         }
 
-        protected open fun createOntrackAuthenticatedUser(): AuthenticatedUser =
+        protected open val securityRole: SecurityRole = SecurityRole.USER
+
+        protected abstract fun createOntrackAuthenticatedUser(): AuthenticatedUser
+
+    }
+
+    open inner class AccountCall<T : AccountCall<T>>(
+        protected val account: Account
+    ) : AuthenticatedUserCall() {
+
+        override fun createOntrackAuthenticatedUser(): AuthenticatedUser =
             AccountAuthenticatedUser(
                 account = account,
                 authorisations = accountACLService.getAuthorizations(account),
@@ -481,7 +488,7 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
          * Grants the [ProjectView] function to this account and the project designated by the [entity][e].
          */
         fun withView(e: ProjectEntity): ConfigurableAccountCall {
-            return with(e, ProjectView::class.java)
+            return withProjectFunction(e, ProjectView::class.java)
         }
 
         override fun contextSetup() {
@@ -561,11 +568,10 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
         }
     )
 
-    protected inner class AdminCall : AccountCall<AdminCall>(
-        // Loading the predefined admin account
-        securityService.asAdmin {
-            accountService.getAccount(of(1))
-        }
-    )
+    protected inner class AdminCall : AuthenticatedUserCall() {
+        override fun createOntrackAuthenticatedUser(): AuthenticatedUser =
+            RunAsAuthenticatedUser.runAsUser(null)
+
+    }
 }
 

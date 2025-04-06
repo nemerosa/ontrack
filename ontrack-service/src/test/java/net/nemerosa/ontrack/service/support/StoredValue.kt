@@ -1,3 +1,3 @@
 package net.nemerosa.ontrack.service.support
 
-class StoredValue(val value: String)
+data class StoredValue(val value: String)

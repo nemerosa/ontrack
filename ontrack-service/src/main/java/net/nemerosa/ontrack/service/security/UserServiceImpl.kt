@@ -19,20 +19,20 @@ class UserServiceImpl(
 
     override fun changePassword(input: PasswordChange): Ack {
         // Checks the account
-        val user = securityService.currentAccount
-        return if (user == null) {
+        val account = securityService.currentUser?.account
+        return if (account == null) {
             throw AccessDeniedException("Must be logged to change password.")
-        } else if (!user.account.authenticationSource.isAllowingPasswordChange) {
+        } else if (!account.authenticationSource.isAllowingPasswordChange) {
             throw AccessDeniedException("Password change is not allowed.")
-        } else if (user.account.locked) {
+        } else if (account.locked) {
             throw AccessDeniedException("User is locked.")
         } else {
-            val existing = accountRepository.findBuiltinAccount(user.account.name)
-            if (existing != null && existing.account.id() == user.account.id()) {
+            val existing = accountRepository.findBuiltinAccount(account.name)
+            if (existing != null && existing.account.id() == account.id()) {
                 val matchingOldPassword = passwordEncoder.matches(input.oldPassword, existing.password)
                 if (matchingOldPassword) {
                     accountRepository.setPassword(
-                            user.account.id(),
+                            account.id(),
                             passwordEncoder.encode(input.newPassword)
                     )
                     Ack.OK

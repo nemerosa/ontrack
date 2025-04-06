@@ -163,9 +163,9 @@ class StructureServiceImpl(
     override fun filterBranchesForProject(project: Project, filter: BranchFilter): List<Branch> {
         securityService.checkProjectFunction(project, ProjectView::class.java)
         // Getting the current user (used for the favorite filter)
-        val user = securityService.currentAccount?.account?.id
+        val accountId = securityService.currentUser?.account?.id
         // Specific query
-        return branchRepository.filterBranchesForProject(project, user, filter)
+        return branchRepository.filterBranchesForProject(project, accountId, filter)
     }
 
     override fun newBranch(branch: Branch): Branch {

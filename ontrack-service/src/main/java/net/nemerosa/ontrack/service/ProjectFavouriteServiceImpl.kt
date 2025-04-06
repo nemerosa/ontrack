@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.service
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ID
@@ -14,13 +13,13 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional
 class ProjectFavouriteServiceImpl(
-        private val repository: ProjectFavouriteRepository,
-        private val securityService: SecurityService,
-        private val structureService: StructureService
+    private val repository: ProjectFavouriteRepository,
+    private val securityService: SecurityService,
+    private val structureService: StructureService
 ) : ProjectFavouriteService {
 
     override fun getFavouriteProjects(): List<Project> {
-        val accountId = securityService.currentAccount?.id()
+        val accountId = securityService.currentUser?.account?.id()
         return if (accountId != null) {
             val projects = repository.getFavouriteProjects(accountId)
             projects.filter { securityService.isProjectFunctionGranted(it, ProjectView::class.java) }.map {
@@ -32,16 +31,23 @@ class ProjectFavouriteServiceImpl(
     }
 
     override fun isProjectFavourite(project: Project): Boolean {
-        val user = securityService.currentAccount
-        return user?.let {
-            it.isGranted(project.id(), ProjectView::class.java) && repository.isProjectFavourite(it.id(), project.id())
-        } ?: false
+        val user = securityService.currentUser
+        val account = user?.account
+        return if (user != null && account != null) {
+            user.isGranted(project.id(), ProjectView::class.java) &&
+                    repository.isProjectFavourite(
+                        account.id(),
+                        project.id()
+                    )
+        } else {
+            false
+        }
     }
 
     override fun setProjectFavourite(project: Project, favourite: Boolean) {
-        val user = securityService.currentAccount
-        if (user != null) {
-            repository.setProjectFavourite(user.id(), project.id(), favourite)
+        val account = securityService.currentUser?.account
+        if (account != null) {
+            repository.setProjectFavourite(account.id(), project.id(), favourite)
         }
     }
 

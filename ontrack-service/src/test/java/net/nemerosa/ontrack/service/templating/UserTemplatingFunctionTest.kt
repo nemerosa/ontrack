@@ -4,7 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.security.Account
-import net.nemerosa.ontrack.model.security.OntrackAuthenticatedUser
+import net.nemerosa.ontrack.model.security.AuthenticatedUser
 import net.nemerosa.ontrack.model.security.SecurityService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -13,7 +13,7 @@ import kotlin.test.assertEquals
 class UserTemplatingFunctionTest {
 
     private lateinit var account: Account
-    private lateinit var user: OntrackAuthenticatedUser
+    private lateinit var user: AuthenticatedUser
     private lateinit var securityService: SecurityService
     private lateinit var userTemplatingFunction: UserTemplatingFunction
 
@@ -30,7 +30,7 @@ class UserTemplatingFunctionTest {
 
     @Test
     fun `No account`() {
-        every { securityService.currentAccount } returns null
+        every { securityService.currentUser } returns null
         assertEquals(
             "",
             userTemplatingFunction.render(
@@ -45,7 +45,7 @@ class UserTemplatingFunctionTest {
     @Test
     fun `Account username field by default`() {
         every { account.name } returns "test"
-        every { securityService.currentAccount } returns user
+        every { securityService.currentUser } returns user
         assertEquals(
             "test",
             userTemplatingFunction.render(
@@ -60,7 +60,7 @@ class UserTemplatingFunctionTest {
     @Test
     fun `Account username field`() {
         every { account.name } returns "test"
-        every { securityService.currentAccount } returns user
+        every { securityService.currentUser } returns user
         assertEquals(
             "test",
             userTemplatingFunction.render(
@@ -77,7 +77,7 @@ class UserTemplatingFunctionTest {
     @Test
     fun `Account display name field`() {
         every { account.fullName } returns "User Test"
-        every { securityService.currentAccount } returns user
+        every { securityService.currentUser } returns user
         assertEquals(
             "User Test",
             userTemplatingFunction.render(
@@ -94,7 +94,7 @@ class UserTemplatingFunctionTest {
     @Test
     fun `Account email field`() {
         every { account.email } returns "user@test.com"
-        every { securityService.currentAccount } returns user
+        every { securityService.currentUser } returns user
         assertEquals(
             "user@test.com",
             userTemplatingFunction.render(

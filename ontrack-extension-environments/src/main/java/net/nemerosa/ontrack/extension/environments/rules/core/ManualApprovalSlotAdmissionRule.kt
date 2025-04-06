@@ -21,7 +21,8 @@ class ManualApprovalSlotAdmissionRule(
     override val id: String = ID
     override val name: String = "Manual approval"
 
-    override val configType: KClass<ManualApprovalSlotAdmissionRuleConfig> = ManualApprovalSlotAdmissionRuleConfig::class
+    override val configType: KClass<ManualApprovalSlotAdmissionRuleConfig> =
+        ManualApprovalSlotAdmissionRuleConfig::class
 
     override fun parseConfig(jsonRuleConfig: JsonNode): ManualApprovalSlotAdmissionRuleConfig = jsonRuleConfig.parse()
 
@@ -87,8 +88,8 @@ class ManualApprovalSlotAdmissionRule(
         }
         // Controls of the group
         if (c.groups.isNotEmpty()) {
-            val groups = securityService.currentAccount?.accountGroups?.map { it.name } ?: emptyList()
-            if (c.groups.intersect(groups).isEmpty()) {
+            val groups = securityService.currentUser?.groups?.map { it.group.name } ?: emptyList()
+            if (c.groups.intersect(groups.toSet()).isEmpty()) {
                 throw ManualApprovalSlotAdmissionRuleException("Group not authorized to approve")
             }
         }

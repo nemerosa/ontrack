@@ -30,13 +30,13 @@ class UserController(
     @GetMapping("")
     fun getCurrentUser(): ConnectedAccount {
         // Gets the current account
-        val user = securityService.currentAccount
+        val account = securityService.currentUser?.account
         // Account present
-        return if (user != null) {
-            val preferences = preferencesService.getPreferences(user.account)
+        return if (account != null) {
+            val preferences = preferencesService.getPreferences(account)
             userMenu(
                 ConnectedAccount(
-                    account = user.account,
+                    account = account,
                     preferences = preferences,
                 )
             )

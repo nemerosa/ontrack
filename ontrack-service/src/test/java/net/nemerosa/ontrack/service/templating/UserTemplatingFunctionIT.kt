@@ -15,7 +15,7 @@ class UserTemplatingFunctionIT : AbstractDSLTestSupport() {
     @Test
     fun `Current user name by default`() {
         asUser {
-            val name = securityService.currentAccount?.account?.name
+            val name = securityService.currentUser?.account?.name
             assertEquals(
                 "Current user is $name",
                 templatingService.render(
@@ -30,7 +30,7 @@ class UserTemplatingFunctionIT : AbstractDSLTestSupport() {
     @Test
     fun `Current user name`() {
         asUser {
-            val name = securityService.currentAccount?.account?.name
+            val name = securityService.currentUser?.account?.name
             assertEquals(
                 "Current user is $name",
                 templatingService.render(

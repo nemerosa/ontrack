@@ -24,7 +24,8 @@ class PreferencesMutationsIT : AbstractQLKTITSupport() {
     @Test
     fun `Setting all the preferences`() {
         asUser {
-            run("""
+            run(
+                """
                 mutation {
                     setPreferences(input: {
                         branchViewVsNames: true,
@@ -36,7 +37,8 @@ class PreferencesMutationsIT : AbstractQLKTITSupport() {
                         }
                     }
                 }
-            """) { data ->
+            """
+            ) { data ->
                 val preferences = data["setPreferences"]["preferences"]
                 assertEquals(true, preferences.getBooleanField("branchViewVsNames"))
                 assertEquals(true, preferences.getBooleanField("branchViewVsGroups"))
@@ -51,7 +53,8 @@ class PreferencesMutationsIT : AbstractQLKTITSupport() {
     @Test
     fun `Setting only one preference`() {
         asUser {
-            run("""
+            run(
+                """
                 mutation {
                     setPreferences(input: {
                         branchViewVsNames: true,
@@ -62,7 +65,8 @@ class PreferencesMutationsIT : AbstractQLKTITSupport() {
                         }
                     }
                 }
-            """) { data ->
+            """
+            ) { data ->
                 val preferences = data["setPreferences"]["preferences"]
                 assertEquals(true, preferences.getBooleanField("branchViewVsNames"))
                 assertEquals(false, preferences.getBooleanField("branchViewVsGroups"))
@@ -74,7 +78,9 @@ class PreferencesMutationsIT : AbstractQLKTITSupport() {
         }
     }
 
-    private fun getPreferences() = preferencesService.getPreferences(securityService.currentAccount?.account
-        ?: error("Authentication is required"))
+    private fun getPreferences() = preferencesService.getPreferences(
+        securityService.currentUser?.account
+            ?: error("Authentication is required")
+    )
 
 }

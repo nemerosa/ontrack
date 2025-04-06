@@ -1,7 +1,5 @@
 package net.nemerosa.ontrack.service.security
 
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.security.Account
@@ -76,7 +74,8 @@ class TokensServiceIT : AbstractDSLTestSupport() {
     @Test
     fun `Bound user`() {
         asUser {
-            val accountId = securityService.currentAccount!!.id()
+            val accountId = securityService.currentUser?.account?.id()
+                ?: fail("No current account")
             tokensService.generateNewToken(TokenOptions("test"))
             val token = tokensService.getCurrentToken("test")!!.value
             val t = tokensService.findAccountByToken(token)
@@ -108,7 +107,8 @@ class TokensServiceIT : AbstractDSLTestSupport() {
         asUser {
             val token = tokensService.generateNewToken(TokenOptions("test"))
             // Gets the account ID
-            val accountId = securityService.currentAccount!!.id()
+            val accountId = securityService.currentUser?.account?.id()
+                ?: fail("No current account")
             asUserWith<AccountManagement> {
                 val result = tokensService.getTokens(accountId).find { it.name == "test" }
                 assertNotNull(result) {
@@ -122,7 +122,8 @@ class TokensServiceIT : AbstractDSLTestSupport() {
     fun `Revoke an account`() {
         asUser {
             tokensService.generateNewToken(TokenOptions("test"))
-            val accountId = securityService.currentAccount!!.id()
+            val accountId = securityService.currentUser?.account?.id()
+                ?: fail("No current account")
             asUserWith<AccountManagement> {
                 tokensService.revokeAllTokens(accountId)
             }
@@ -156,7 +157,8 @@ class TokensServiceIT : AbstractDSLTestSupport() {
     fun `Checking the validity of a token with cache not enabled`() {
         withCustomTokenCache(false) {
             asUser {
-                val id = securityService.currentAccount!!.id()
+                val id = securityService.currentUser?.account?.id()
+                    ?: fail("No current account")
                 val token = tokensService.generateNewToken(TokenOptions("test"))
                 assertTrue(tokensService.isValid(token.value), "Token is valid")
                 asAdmin { tokensService.revokeToken(id, "test") }
@@ -170,7 +172,8 @@ class TokensServiceIT : AbstractDSLTestSupport() {
     fun `Checking the validity of a token with cache enabled`() {
         withCustomTokenCache(true) {
             asUser {
-                val id = securityService.currentAccount!!.id()
+                val id = securityService.currentUser?.account?.id()
+                    ?: fail("No current account")
                 val token = tokensService.generateNewToken(TokenOptions("test"))
                 assertTrue(tokensService.isValid(token.value), "Token is valid")
                 asAdmin { tokensService.revokeToken(id, "test") }
@@ -182,7 +185,8 @@ class TokensServiceIT : AbstractDSLTestSupport() {
     @Test
     fun `Changing the validity of a token to a shorter one with unlimited defaults`() {
         asUser {
-            val id = securityService.currentAccount!!.id()
+            val id = securityService.currentUser?.account?.id()
+                ?: fail("No current account")
             asAdmin {
                 val t = tokensService.generateToken(
                     accountId = id,
@@ -203,7 +207,8 @@ class TokensServiceIT : AbstractDSLTestSupport() {
     fun `A transient token has always its validity being set`() {
         withCustomTokenTransientValidityDuration(Duration.ofHours(2)) {
             asUser {
-                val id = securityService.currentAccount!!.id()
+                val id = securityService.currentUser?.account?.id()
+                    ?: fail("No current account")
                 asAdmin {
                     val t = tokensService.generateToken(
                         accountId = id,
@@ -225,7 +230,8 @@ class TokensServiceIT : AbstractDSLTestSupport() {
     fun `A transient token has always its validity being overridden`() {
         withCustomTokenTransientValidityDuration(Duration.ofHours(2)) {
             asUser {
-                val id = securityService.currentAccount!!.id()
+                val id = securityService.currentUser?.account?.id()
+                    ?: fail("No current account")
                 asAdmin {
                     val t = tokensService.generateToken(
                         accountId = id,
@@ -249,7 +255,8 @@ class TokensServiceIT : AbstractDSLTestSupport() {
     fun `Generating a token with default duration`() {
         withCustomTokenValidityDuration(Duration.ofDays(14)) {
             asUser {
-                val id = securityService.currentAccount!!.id()
+                val id = securityService.currentUser?.account?.id()
+                    ?: fail("No current account")
                 asAdmin {
                     val t = tokensService.generateToken(
                         accountId = id,
@@ -271,7 +278,8 @@ class TokensServiceIT : AbstractDSLTestSupport() {
     fun `Generating a token with unlimited duration`() {
         withCustomTokenValidityDuration(Duration.ofDays(14)) {
             asUser {
-                val id = securityService.currentAccount!!.id()
+                val id = securityService.currentUser?.account?.id()
+                    ?: fail("No current account")
                 asAdmin {
                     val t = tokensService.generateToken(
                         accountId = id,
@@ -338,9 +346,10 @@ class TokensServiceIT : AbstractDSLTestSupport() {
     private fun accountWithToken(): Account {
         return asUser {
             tokensService.generateNewToken(TokenOptions("test"))
-            val accountId = securityService.currentAccount!!.id()
+            val id = securityService.currentUser?.account?.id()
+                ?: fail("No current account")
             asAdmin {
-                accountService.getAccount(ID.of(accountId))
+                accountService.getAccount(ID.of(id))
             }
         }
     }

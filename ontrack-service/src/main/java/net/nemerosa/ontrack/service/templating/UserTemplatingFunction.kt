@@ -31,13 +31,13 @@ class UserTemplatingFunction(
         val field = configMap[UserTemplatingFunctionParameters::field.name]
             ?.let { UserTemplatingFunctionField.valueOf(it.uppercase()) }
             ?: UserTemplatingFunctionField.NAME
-        val account = securityService.currentAccount
+        val account = securityService.currentUser?.account
         return if (account == null) {
             ""
         } else when (field) {
-            UserTemplatingFunctionField.NAME -> account.account.name
-            UserTemplatingFunctionField.DISPLAY -> account.account.fullName
-            UserTemplatingFunctionField.EMAIL -> account.account.email
+            UserTemplatingFunctionField.NAME -> account.name
+            UserTemplatingFunctionField.DISPLAY -> account.fullName
+            UserTemplatingFunctionField.EMAIL -> account.email
         }
     }
 }

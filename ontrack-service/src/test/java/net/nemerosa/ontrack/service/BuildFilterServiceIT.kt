@@ -149,7 +149,7 @@ class BuildFilterServiceIT : AbstractDSLTestSupport() {
         val account = doCreateAccount()
 
         // Creates a shared filter for this account
-        val creator = asConfigurableAccount(account).withView(branch).with(branch, BranchFilterMgt::class.java)
+        val creator = asConfigurableAccount(account).withView(branch).withProjectFunction(branch, BranchFilterMgt::class.java)
         val ack = creator.call {
             buildFilterService.saveFilter(
                 branch.id,

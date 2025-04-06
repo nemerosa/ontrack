@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.extension.environments.service.getPipelineAdmissionRuleChecksForAllRules
 import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflow
 import net.nemerosa.ontrack.extension.environments.workflows.SlotWorkflowService
+import net.nemerosa.ontrack.extension.queue.QueueNoAsync
 import net.nemerosa.ontrack.extension.workflows.registry.WorkflowParser
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.json.asJson
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
 
+@QueueNoAsync
 class SlotPipelineIT : AbstractDSLTestSupport() {
 
     @Autowired

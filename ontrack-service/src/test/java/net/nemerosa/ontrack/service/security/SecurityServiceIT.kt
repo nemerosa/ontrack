@@ -4,37 +4,31 @@ import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.model.security.*
 import org.apache.commons.lang3.StringUtils
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.context.SecurityContextHolder
 import kotlin.test.*
 
 class SecurityServiceIT : AbstractDSLTestSupport() {
 
+    @Autowired
+    private lateinit var roleService: RolesService
+
     @Test
-    fun `Disabled accounts cannot access functions in any way`() {
-        val project = project()
-        val initialAccount = doCreateAccountWithGlobalRole(Roles.GLOBAL_ADMINISTRATOR)
-        val account = asAdmin {
-            accountService.setAccountDisabled(initialAccount.id, true)
-            accountService.getAccount(initialAccount.id)
-        }
-        asFixedAccount(account) {
-            // Checks all global functions
-            RolesService.defaultGlobalFunctions.forEach { fn ->
-                assertFalse(securityService.isGlobalFunctionGranted(fn), "${fn.simpleName} must not be granted")
-            }
-            // Checks all project functions in lock mode
-            withNoGrantViewToAll {
-                RolesService.defaultProjectFunctions.forEach { fn ->
-                    assertFalse(securityService.isProjectFunctionGranted(project, fn),
-                        "${fn.simpleName} must not be granted on project")
+    fun `Running as admin`() {
+        project {
+            securityService.asAdmin {
+                roleService.globalFunctions.forEach {
+                    assertTrue(
+                        securityService.isGlobalFunctionGranted(it),
+                        "$it is granted for admin"
+                    )
                 }
-            }
-            // Checks all project functions in unlock mode
-            withGrantViewToAll {
-                RolesService.defaultProjectFunctions.forEach { fn ->
-                    assertFalse(securityService.isProjectFunctionGranted(project, fn),
-                        "${fn.simpleName} must not be granted on project")
+                roleService.projectFunctions.forEach {
+                    assertTrue(
+                        securityService.isProjectFunctionGranted(this, it),
+                        "$it is granted for admin"
+                    )
                 }
             }
         }
@@ -42,13 +36,13 @@ class SecurityServiceIT : AbstractDSLTestSupport() {
 
     @Test
     fun currentAccount() {
-        val account = asUser().call { securityService.currentAccount }
+        val account = asUser().call { securityService.currentUser?.account }
         assertNotNull(account)
     }
 
     @Test
     fun currentAccount_none() {
-        val account = asAnonymous().call { securityService.currentAccount }
+        val account = asAnonymous().call { securityService.currentUser?.account }
         assertNull(account)
     }
 

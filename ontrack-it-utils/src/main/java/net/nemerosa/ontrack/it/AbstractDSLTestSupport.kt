@@ -407,7 +407,7 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
         signature: Signature? = null,
         duration: Int? = null,
     ): ValidationRun {
-        return asUser().withView(this).with(this, ValidationRunCreate::class.java).call {
+        return asUser().withView(this).withProjectFunction(this, ValidationRunCreate::class.java).call {
             val run = structureService.newValidationRun(
                 this,
                 ValidationRunRequest(
@@ -480,7 +480,7 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
      * Change of status for a validation run
      */
     fun ValidationRun.validationStatus(status: ValidationRunStatusID, description: String): ValidationRun {
-        return asUser().with(this, ValidationRunStatusChange::class.java).call {
+        return asUser().withProjectFunction(this, ValidationRunStatusChange::class.java).call {
             structureService.newValidationRunStatus(
                 this,
                 ValidationRunStatus(
@@ -548,7 +548,7 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
             projectLabelManagementService.getLabelsForProject(this)
         }
         set(value) {
-            asUser().with(this, ProjectLabelManagement::class.java).execute {
+            asUser().withProjectFunction(this, ProjectLabelManagement::class.java).execute {
                 projectLabelManagementService.associateProjectToLabels(
                     this,
                     ProjectLabelForm(

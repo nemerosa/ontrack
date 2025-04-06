@@ -41,7 +41,7 @@ class DefaultNotificationProcessingService(
     ): NotificationProcessingResult<*>? {
         logger.debug(
             "Processing notification (user={}) {}",
-            securityService.currentAccount?.account?.name,
+            securityService.currentUser?.name,
             item
         )
         meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_started, item)

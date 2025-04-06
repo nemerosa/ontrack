@@ -18,7 +18,7 @@ class UserTriggerImpl(
     override fun createUserTriggerData(): TriggerData =
         createTriggerData(
             data = UserTriggerData(
-                username = securityService.currentAccount?.username
+                username = securityService.currentUser?.name
                     ?: error("Authentication is missing")
             )
         )

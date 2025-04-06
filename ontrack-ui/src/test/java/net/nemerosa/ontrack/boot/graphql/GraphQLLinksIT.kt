@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
+import kotlin.test.fail
 
 class GraphQLLinksIT : AbstractQLKTITSupport() {
 
@@ -20,15 +21,16 @@ class GraphQLLinksIT : AbstractQLKTITSupport() {
                 branch {
                     promotionLevel("IRON")
                     buildFilterService.saveFilter(
-                            id,
-                            true,
-                            "My filter",
-                            "net.nemerosa.ontrack.service.StandardBuildFilterProvider",
-                            mapOf(
-                                    "withPromotionLevel" to "IRON"
-                            ).asJson()
+                        id,
+                        true,
+                        "My filter",
+                        "net.nemerosa.ontrack.service.StandardBuildFilterProvider",
+                        mapOf(
+                            "withPromotionLevel" to "IRON"
+                        ).asJson()
                     )
-                    run("""
+                    run(
+                        """
                         {
                             branches(id: $id) {
                                 buildFilterResources {
@@ -39,7 +41,8 @@ class GraphQLLinksIT : AbstractQLKTITSupport() {
                                 }
                             }
                         }
-                    """) { data ->
+                    """
+                    ) { data ->
                         val branch = data.path("branches").path(0)
                         assertNotNull(branch.getRequiredJsonField("buildFilterResources").find {
                             it.getRequiredTextField("name") == "My filter"
@@ -56,7 +59,8 @@ class GraphQLLinksIT : AbstractQLKTITSupport() {
     @Test
     fun `Validation stamp image link`() {
         val vs = doCreateValidationStamp()
-        val data = run("""{
+        val data = run(
+            """{
             branches (id: ${vs.branch.id}) {
                 validationStamps {
                     links {
@@ -64,17 +68,19 @@ class GraphQLLinksIT : AbstractQLKTITSupport() {
                     }
                 }
             }
-        }""")
+        }"""
+        )
         assertEquals(
-                "urn:test:net.nemerosa.ontrack.boot.ui.ValidationStampController#getValidationStampImage_:,${vs.id}",
-                data["branches"][0]["validationStamps"][0]["links"]["_image"].asText()
+            "urn:test:net.nemerosa.ontrack.boot.ui.ValidationStampController#getValidationStampImage_:,${vs.id}",
+            data["branches"][0]["validationStamps"][0]["links"]["_image"].asText()
         )
     }
 
     @Test
     fun `Promotion level image link`() {
         val pl = doCreatePromotionLevel()
-        val data = run("""{
+        val data = run(
+            """{
             branches (id: ${pl.branch.id}) {
                 promotionLevels {
                     links {
@@ -82,10 +88,11 @@ class GraphQLLinksIT : AbstractQLKTITSupport() {
                     }
                 }
             }
-        }""")
+        }"""
+        )
         assertEquals(
-                "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionLevelImage_:,${pl.id}",
-                data["branches"][0]["promotionLevels"][0]["links"]["_image"].asText()
+            "urn:test:net.nemerosa.ontrack.boot.ui.PromotionLevelController#getPromotionLevelImage_:,${pl.id}",
+            data["branches"][0]["promotionLevels"][0]["links"]["_image"].asText()
         )
     }
 
@@ -105,23 +112,29 @@ class GraphQLLinksIT : AbstractQLKTITSupport() {
             run("{projects(id: ${p.id}) { name links { _update } }}")
         }
         assertEquals(p.name, data["projects"][0]["name"].asText())
-        assertEquals("urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#saveProject:${p.id},", data["projects"][0]["links"]["_update"].asText())
+        assertEquals(
+            "urn:test:net.nemerosa.ontrack.boot.ui.ProjectController#saveProject:${p.id},",
+            data["projects"][0]["links"]["_update"].asText()
+        )
     }
 
     @Test
     fun `Account token links`() {
         asUser {
-            val id = securityService.currentAccount!!.id()
+            val id = securityService.currentUser?.account?.id()
+                ?: fail("No current user")
             asAdmin {
-                val data = run("""{
-                    accounts(id: $id) {
-                        links {
-                            _revokeToken
-                            _generateToken
-                            _token
+                val data = run(
+                    """{
+                        accounts(id: $id) {
+                            links {
+                                _revokeToken
+                                _generateToken
+                                _token
+                            }
                         }
-                    }
-                }""")
+                    }"""
+                )
                 val links = data["accounts"][0]["links"]
                 assertFalse(links["_revokeToken"].isNull)
                 assertFalse(links["_generateToken"].isNull)

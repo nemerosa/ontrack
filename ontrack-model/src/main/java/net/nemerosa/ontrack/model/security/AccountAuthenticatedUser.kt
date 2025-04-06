@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.model.security
 class AccountAuthenticatedUser(
     override val account: Account,
     val authorisations: Authorisations,
-    val groups: List<AuthorizedGroup>,
+    override val groups: List<AuthorizedGroup>,
 ) : AuthenticatedUser {
 
     override fun isGranted(fn: Class<out GlobalFunction>): Boolean =
@@ -12,6 +12,6 @@ class AccountAuthenticatedUser(
     override fun isGranted(projectId: Int, fn: Class<out ProjectFunction>): Boolean =
         authorisations.isGranted(projectId, fn) || groups.any { it.isGranted(projectId, fn) }
 
-    override fun getName(): String = account.fullName
+    override fun getName(): String = account.name
 
 }

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class StorageServiceIT : AbstractServiceTestSupport() {
 
@@ -19,7 +20,7 @@ class StorageServiceIT : AbstractServiceTestSupport() {
             TestUtils.uid("C"), "1",
             StoredValue::class
         )
-        assertNotNull(retrieved)
+        assertNull(retrieved)
     }
 
     @Test

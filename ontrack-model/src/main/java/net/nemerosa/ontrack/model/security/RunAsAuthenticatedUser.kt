@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.model.security
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.authority.AuthorityUtils
 
-class RunAsAuthenticatedUser(
+class RunAsAuthenticatedUser private constructor(
     private val authenticatedUser: AuthenticatedUser?,
 ) : AuthenticatedUser {
 
@@ -13,15 +13,20 @@ class RunAsAuthenticatedUser(
 
     override fun isGranted(projectId: Int, fn: Class<out ProjectFunction>): Boolean = true
 
-    override fun getName(): String = authenticatedUser?.name ?: "RunAsAdmin"
+    override fun getName(): String = authenticatedUser?.name ?: "admin"
+
+    override val groups: List<AuthorizedGroup> =
+        authenticatedUser?.groups ?: emptyList()
 
     companion object {
 
-        fun authentication(authenticatedUser: AuthenticatedUser?): Authentication? {
+        fun runAsUser(authenticatedUser: AuthenticatedUser?) = RunAsAuthenticatedUser(
+            authenticatedUser = authenticatedUser
+        )
+
+        fun authentication(authenticatedUser: AuthenticatedUser?): Authentication {
             return AuthenticatedUserAuthentication(
-                authenticatedUser = RunAsAuthenticatedUser(
-                    authenticatedUser = authenticatedUser
-                ),
+                authenticatedUser = runAsUser(authenticatedUser),
                 authorities = AuthorityUtils.createAuthorityList(SecurityRole.ADMINISTRATOR.name)
             )
         }

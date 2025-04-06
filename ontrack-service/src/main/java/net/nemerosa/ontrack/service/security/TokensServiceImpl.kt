@@ -30,7 +30,7 @@ class TokensServiceImpl(
 
     override fun getCurrentToken(name: String): Token? {
         // Gets the current account
-        val account = securityService.currentAccount?.account
+        val account = securityService.currentUser?.account
         // Gets the token of this account
         return account?.let {
             tokensRepository.getTokenForAccount(account, name)
@@ -49,7 +49,7 @@ class TokensServiceImpl(
 
     override fun generateNewToken(options: TokenOptions): Token {
         // Gets the current account
-        val account = securityService.currentAccount?.account
+        val account = securityService.currentUser?.account
             ?: throw TokenGenerationNoAccountException()
         // Checking if a token with the same name already exists
         val existing = tokensRepository.getTokenForAccount(account, options.name)
@@ -118,7 +118,7 @@ class TokensServiceImpl(
 
     override fun revokeToken(name: String) {
         // Gets the current account
-        val account = securityService.currentAccount?.account
+        val account = securityService.currentUser?.account
         // Revokes its token
         account?.apply {
             tokensRepository.invalidate(id(), name)

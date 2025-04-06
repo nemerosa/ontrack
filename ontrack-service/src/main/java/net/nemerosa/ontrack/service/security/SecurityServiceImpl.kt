@@ -9,13 +9,9 @@ import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.context.SecurityContextImpl
 import org.springframework.stereotype.Component
-import kotlin.reflect.KClass
 
 @Component
 class SecurityServiceImpl : SecurityService {
-
-    @Deprecated("Will be removed in V5")
-    private lateinit var accountACLService: AccountACLService
 
     override fun checkAuthenticated() {
         if (!isLogged) {
@@ -48,37 +44,6 @@ class SecurityServiceImpl : SecurityService {
         // Checks
         return user != null && user.isGranted(projectId, fn)
     }
-
-    @Deprecated("Use AccountACLService")
-    override val autoProjectFunctions: Set<KClass<out ProjectFunction>>
-        get() = accountACLService.autoProjectFunctions
-
-    @Deprecated("Use AccountACLService")
-    override val autoGlobalFunctions: Set<KClass<out GlobalFunction>>
-        get() = accountACLService.autoGlobalFunctions
-
-    @Deprecated("Use currentUser")
-    override val currentAccount: OntrackAuthenticatedUser?
-        get() {
-            val context = SecurityContextHolder.getContext()
-            val authentication = context.authentication
-            return if (authentication != null && authentication.isAuthenticated && authentication.principal is AuthenticatedUserAuthentication) {
-                val authenticatedUser = authentication.principal as AuthenticatedUser
-                val account = authenticatedUser.account ?: RunAsAdminAuthentication.ADMIN
-                DefaultOntrackAuthenticatedUser(
-                    user = AccountOntrackUser(
-                        account = account,
-                    ),
-                    authorizedAccount = AuthorizedAccount(
-                        account = account,
-                        authorisations = authenticatedUser,
-                    ),
-                    groups = emptyList(),
-                )
-            } else {
-                null
-            }
-        }
 
     override val currentUser: AuthenticatedUser?
         get() {
