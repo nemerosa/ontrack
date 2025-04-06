@@ -50,7 +50,7 @@ class ACCDSLSlackNotifications : AbstractACCDSLNotificationsTestSupport() {
                             println("[slack] ${it.markdown}")
                         }
                         messages.any {
-                            it.markdown == """Build <http://localhost:8080/#/build/${id}|$name> has been promoted to <http://localhost:8080/#/promotionLevel/${pl.id}|${pl.name}> for branch <http://localhost:8080/#/branch/${branch.id}|${branch.name}> in <http://localhost:8080/#/project/${project.id}|${project.name}>."""
+                            it.markdown == """Build <http://localhost:3000/build/${id}|$name> has been promoted to <http://localhost:3000/promotionLevel/${pl.id}|${pl.name}> for branch <http://localhost:3000/branch/${branch.id}|${branch.name}> in <http://localhost:3000/project/${project.id}|${project.name}>."""
                         }
                     }
                 }

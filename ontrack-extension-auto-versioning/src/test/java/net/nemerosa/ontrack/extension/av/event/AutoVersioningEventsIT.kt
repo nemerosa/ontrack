@@ -41,7 +41,7 @@ internal class AutoVersioningEventsIT : AbstractDSLTestSupport() {
             )
             assertEquals(
                 """
-                    Auto versioning post-processing of <a href="http://localhost:8080/#/project/${target.project.id}">${target.project.name}</a>/<a href="http://localhost:8080/#/branch/${target.id}">${target.name}</a> for dependency <a href="http://localhost:8080/#/project/${run.project.id}">${run.project.name}</a> version "1.1.0" has failed.
+                    Auto versioning post-processing of <a href="http://localhost:3000/project/${target.project.id}">${target.project.name}</a>/<a href="http://localhost:3000/branch/${target.id}">${target.name}</a> for dependency <a href="http://localhost:3000/project/${run.project.id}">${run.project.name}</a> version "1.1.0" has failed.
 
                     <a href="https://job.link">Post processing error.</a>
                 """.trimIndent(),
@@ -70,7 +70,7 @@ internal class AutoVersioningEventsIT : AbstractDSLTestSupport() {
             )
             assertEquals(
                 """
-                            Auto versioning of <a href="http://localhost:8080/#/project/${target.project.id}">${target.project.name}</a>/<a href="http://localhost:8080/#/branch/${target.id}">${target.name}</a> for dependency <a href="http://localhost:8080/#/project/${run.project.id}">${run.project.name}</a> version "1.1.0" has been done.
+                            Auto versioning of <a href="http://localhost:3000/project/${target.project.id}">${target.project.name}</a>/<a href="http://localhost:3000/branch/${target.id}">${target.name}</a> for dependency <a href="http://localhost:3000/project/${run.project.id}">${run.project.name}</a> version "1.1.0" has been done.
     
                             Created, approved and merged.
                             
@@ -96,7 +96,7 @@ internal class AutoVersioningEventsIT : AbstractDSLTestSupport() {
             )
             assertEquals(
                 """
-                            Auto versioning of <a href="http://localhost:8080/#/project/${target.project.id}">${target.project.name}</a>/<a href="http://localhost:8080/#/branch/${target.id}">${target.name}</a> for dependency <a href="http://localhost:8080/#/project/${run.project.id}">${run.project.name}</a> version "1.1.0" has failed.
+                            Auto versioning of <a href="http://localhost:3000/project/${target.project.id}">${target.project.name}</a>/<a href="http://localhost:3000/branch/${target.id}">${target.name}</a> for dependency <a href="http://localhost:3000/project/${run.project.id}">${run.project.name}</a> version "1.1.0" has failed.
     
                             Processing failed.
                             
@@ -126,7 +126,7 @@ internal class AutoVersioningEventsIT : AbstractDSLTestSupport() {
             )
             assertEquals(
                 """
-                    Auto versioning of <a href="http://localhost:8080/#/project/${target.project.id}">${target.project.name}</a>/<a href="http://localhost:8080/#/branch/${target.id}">${target.name}</a> for dependency <a href="http://localhost:8080/#/project/${run.project.id}">${run.project.name}</a> version "1.1.0" has failed.
+                    Auto versioning of <a href="http://localhost:3000/project/${target.project.id}">${target.project.name}</a>/<a href="http://localhost:3000/branch/${target.id}">${target.name}</a> for dependency <a href="http://localhost:3000/project/${run.project.id}">${run.project.name}</a> version "1.1.0" has failed.
 
                     Timeout while waiting for the PR to be ready to be merged.
                     

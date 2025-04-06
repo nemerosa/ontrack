@@ -38,7 +38,7 @@ class LastPromotionTemplatingFunctionIT : AbstractDSLTestSupport() {
                     )
 
                     assertEquals(
-                        "[${last.name}](http://localhost:8080/#/build/${last.id})",
+                        "[${last.name}](http://localhost:3000/build/${last.id})",
                         text
                     )
                 }
@@ -75,14 +75,14 @@ class LastPromotionTemplatingFunctionIT : AbstractDSLTestSupport() {
                 )
 
                 assertEquals(
-                    "[${last.name}](http://localhost:8080/#/build/${last.id})",
+                    "[${last.name}](http://localhost:3000/build/${last.id})",
                     text
                 )
 
                 // On the project as well
 
                 assertEquals(
-                    "[${lastMain.name}](http://localhost:8080/#/build/${lastMain.id})",
+                    "[${lastMain.name}](http://localhost:3000/build/${lastMain.id})",
                     templatingService.render(
                         "\${#.lastPromotion?project=${project.name}&promotion=BRONZE}",
                         context = emptyMap(),
@@ -114,7 +114,7 @@ class LastPromotionTemplatingFunctionIT : AbstractDSLTestSupport() {
                     )
 
                     assertEquals(
-                        "[${last.name}](http://localhost:8080/#/build/${last.id})",
+                        "[${last.name}](http://localhost:3000/build/${last.id})",
                         text
                     )
                 }
@@ -144,7 +144,7 @@ class LastPromotionTemplatingFunctionIT : AbstractDSLTestSupport() {
                     )
 
                     assertEquals(
-                        "[1.0.0](http://localhost:8080/#/build/${last.id})",
+                        "[1.0.0](http://localhost:3000/build/${last.id})",
                         text
                     )
                 }
@@ -263,7 +263,7 @@ class LastPromotionTemplatingFunctionIT : AbstractDSLTestSupport() {
                     )
 
                     assertEquals(
-                        "[1.0.0](http://localhost:8080/#/build/${last.id})",
+                        "[1.0.0](http://localhost:3000/build/${last.id})",
                         text
                     )
                 }
@@ -293,7 +293,7 @@ class LastPromotionTemplatingFunctionIT : AbstractDSLTestSupport() {
                     )
 
                     assertEquals(
-                        "[${last.name}](http://localhost:8080/#/build/${last.id})",
+                        "[${last.name}](http://localhost:3000/build/${last.id})",
                         text
                     )
                 }

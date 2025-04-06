@@ -44,8 +44,8 @@ class SlackNotificationEventRendererIT : AbstractDSLTestSupport() {
 
                         assertEquals(
                             """
-                                Build 1.0.0 for <http://localhost:8080/#/branch/${branch.id}|${branch.name}> at <http://localhost:8080/#/project/${project.id}|${project.name}>
-                                has been promoted to <http://localhost:8080/#/promotionLevel/${pl.id}|${pl.name}>.
+                                Build 1.0.0 for <http://localhost:3000/branch/${branch.id}|${branch.name}> at <http://localhost:3000/project/${project.id}|${project.name}>
+                                has been promoted to <http://localhost:3000/promotionLevel/${pl.id}|${pl.name}>.
                             """.trimIndent(),
                             text
                         )

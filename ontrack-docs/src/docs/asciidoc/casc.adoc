@@ -63,7 +63,7 @@ This schema is available in the UI in the user menu at _Configuration as code_, 
 
 image::images/casc-schema-show.png[CasC Schema show button,200]
 
-This goes to the page at http://localhost:8080/#/extension/casc/casc-schema :
+This goes to the page at http://localhost:3000/extension/casc/casc-schema :
 
 image::images/casc-schema-page.png[CasC schema page]
 
@@ -115,7 +115,7 @@ ontrack:
 The _Configuration as code_ configuration page is available at:
 
 * _user menu_ > _Configuration as code_
-* directly at http://localhost:8080/#/extension/casc/casc-schema
+* directly at http://localhost:3000/extension/casc/casc-schema
 
 On this page, you can:
 

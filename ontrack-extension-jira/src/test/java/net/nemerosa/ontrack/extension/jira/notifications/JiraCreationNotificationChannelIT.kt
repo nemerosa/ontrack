@@ -127,7 +127,7 @@ class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
                                 ),
                                 "labels" to listOf("test", "v${build.name}"),
                                 "description" to """
-                                    Build [${build.name}|http://localhost:8080/#/build/${build.id}] has been promoted to [${pl.name}|http://localhost:8080/#/promotionLevel/${pl.id}].
+                                    Build [${build.name}|http://localhost:3000/build/${build.id}] has been promoted to [${pl.name}|http://localhost:3000/promotionLevel/${pl.id}].
                                 """.trimIndent(),
                                 "assignee" to mapOf(
                                     "name" to "dcoraboeuf"
@@ -249,7 +249,7 @@ class JiraCreationNotificationChannelIT : AbstractNotificationTestSupport() {
                                 ),
                                 "labels" to listOf("test", "v${build.name}"),
                                 "description" to """
-                                    Build [${build.name}|http://localhost:8080/#/build/${build.id}] has been promoted to [${pl.name}|http://localhost:8080/#/promotionLevel/${pl.id}].
+                                    Build [${build.name}|http://localhost:3000/build/${build.id}] has been promoted to [${pl.name}|http://localhost:3000/promotionLevel/${pl.id}].
                                 """.trimIndent(),
                                 "assignee" to mapOf(
                                     "name" to "dcoraboeuf"

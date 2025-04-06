@@ -131,7 +131,7 @@ class JiraServiceDeskNotificationChannelIT : AbstractNotificationTestSupport() {
                             "requestFieldValues" to mapOf(
                                 "summary" to "Build ${build.name} has been promoted to ${pl.name}",
                                 "description" to """
-                                    Build [${build.name}|http://localhost:8080/#/build/${build.id}] has been promoted to [${pl.name}|http://localhost:8080/#/promotionLevel/${pl.id}].
+                                    Build [${build.name}|http://localhost:3000/build/${build.id}] has been promoted to [${pl.name}|http://localhost:3000/promotionLevel/${pl.id}].
                                 """.trimIndent(),
                                 "duedate" to "2024-04-16",
                                 "customfield_11000" to "Some direct value",

@@ -45,8 +45,8 @@ class HtmlNotificationEventRendererIT : AbstractDSLTestSupport() {
 
                         assertEquals(
                             """
-                                Build 1.0.0 for <a href="http://localhost:8080/#/branch/${branch.id}">${branch.name}</a> at <a href="http://localhost:8080/#/project/${project.id}">${project.name}</a>
-                                has been promoted to <a href="http://localhost:8080/#/promotionLevel/${pl.id}">${pl.name}</a>.
+                                Build 1.0.0 for <a href="http://localhost:3000/branch/${branch.id}">${branch.name}</a> at <a href="http://localhost:3000/project/${project.id}">${project.name}</a>
+                                has been promoted to <a href="http://localhost:3000/promotionLevel/${pl.id}">${pl.name}</a>.
                             """.trimIndent(),
                             text
                         )
