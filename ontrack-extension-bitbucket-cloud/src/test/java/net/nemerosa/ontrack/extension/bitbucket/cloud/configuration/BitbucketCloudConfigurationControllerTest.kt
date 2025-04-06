@@ -2,8 +2,8 @@ package net.nemerosa.ontrack.extension.bitbucket.cloud.configuration
 
 import io.mockk.every
 import io.mockk.mockk
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -13,7 +13,7 @@ class BitbucketCloudConfigurationControllerTest {
     private lateinit var bitbucketCloudConfigurationService: BitbucketCloudConfigurationService
     private lateinit var bitbucketCloudConfigurationController: BitbucketCloudConfigurationController
 
-    @Before
+    @BeforeEach
     fun init() {
         bitbucketCloudConfigurationService = mockk()
         bitbucketCloudConfigurationController = BitbucketCloudConfigurationController(

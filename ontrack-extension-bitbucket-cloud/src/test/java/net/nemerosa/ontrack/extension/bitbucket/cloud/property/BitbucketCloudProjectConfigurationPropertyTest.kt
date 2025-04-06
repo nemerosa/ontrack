@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.extension.bitbucket.cloud.property
 
 import net.nemerosa.ontrack.extension.bitbucket.cloud.bitbucketCloudTestConfigMock
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class BitbucketCloudProjectConfigurationPropertyTest {

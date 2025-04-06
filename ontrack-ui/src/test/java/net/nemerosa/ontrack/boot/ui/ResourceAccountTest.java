@@ -48,9 +48,6 @@ public class ResourceAccountTest {
                                 .withNull("selectedBranchViewKey")
                                 .end())
                         .with("actions", array().end())
-                        .with("nextUIProperties", object()
-                                .with("enabled", false)
-                                .end())
                         .with("logged", true)
                         .end(),
                 Resource.of(
@@ -77,9 +74,6 @@ public class ResourceAccountTest {
                                 .withNull("selectedBranchViewKey")
                                 .end())
                         .with("actions", array().end())
-                        .with("nextUIProperties", object()
-                                .with("enabled", false)
-                                .end())
                         .with("logged", false)
                         .end(),
                 Resource.of(

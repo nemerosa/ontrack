@@ -36,7 +36,7 @@ class MarkdownNotificationEventRendererTest {
         val branch = BranchFixtures.testBranch()
         val text = markdownEventRenderer.render(branch, branch.name)
         assertEquals(
-            """[${branch.name}](https://ontrack.nemerosa.net/#/branch/${branch.id})""",
+            """[${branch.name}](https://ontrack.nemerosa.net/branch/${branch.id})""",
             text
         )
     }
