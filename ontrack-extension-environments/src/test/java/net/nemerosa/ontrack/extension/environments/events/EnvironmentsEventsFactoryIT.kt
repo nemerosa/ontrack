@@ -89,7 +89,7 @@ class EnvironmentsEventsFactoryIT : AbstractDSLTestSupport() {
             val event = environmentsEventsFactory.slotDeleted(slot)
             val text = render(event)
             assertEquals(
-                """Slot <a href="http://localhost:8080/#/project/${slot.project.id}">${slot.project.name}</a> (qualifier = "") for environment ${slot.environment.name} has been deleted.""",
+                """Slot <a href="http://localhost:3000/project/${slot.project.id}">${slot.project.name}</a> (qualifier = "") for environment ${slot.environment.name} has been deleted.""",
                 text
             )
         }
