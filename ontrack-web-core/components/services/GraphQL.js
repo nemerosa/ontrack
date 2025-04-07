@@ -3,11 +3,6 @@
 import {useEffect, useState} from "react";
 import {signOut} from "next-auth/react";
 
-const createLowLevelError = (ex) => {
-    // TODO
-    return ex
-}
-
 export const useQuery = (query, {
     variables = {},
     deps = [],
@@ -20,18 +15,16 @@ export const useQuery = (query, {
     const [error, setError] = useState()
     const [finished, setFinished] = useState(false)
 
-    const logout = () => signOut()
-
     useEffect(() => {
         if (condition) {
             setLoading(true)
-            callGraphQL({query, variables, logout})
+            callGraphQL({query, variables})
                 .then(data => {
                     setData(dataFn(data))
                     setError(null)
                 })
                 .catch((ex) => {
-                    setError(createLowLevelError(ex))
+                    setError(ex.message)
                     setData(null)
                 })
                 .finally(() => {
@@ -54,21 +47,16 @@ export const useMutation = (query, {userNodeName, onSuccess}) => {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState()
 
-    const logout = () => signOut()
-
     const mutate = async (variables) => {
         setLoading(true)
         try {
-            const data = await callGraphQL({query, variables, logout})
+            const data = await callGraphQL({query, variables})
             const userNode = data[userNodeName]
             if (userNode) {
                 setData(userNode)
                 const errors = userNode.errors
                 if (errors && errors.length > 0) {
-                    throw new Error("TODO Management of GraphQL errors")
-                    // setError(
-                    //     createCodeError(code, parameters)
-                    // )
+                    setError(errors[0].message)
                 } else if (onSuccess) {
                     onSuccess(userNode)
                 }
@@ -89,7 +77,6 @@ export const useMutation = (query, {userNodeName, onSuccess}) => {
 export async function callGraphQL({
                                       query,
                                       variables,
-                                      logout,
                                   }) {
     const res = await fetch('/api/protected/graphql', {
         method: 'POST',
