@@ -1,6 +1,5 @@
 import {createContext} from "react";
-import {useSession} from "next-auth/react";
-import UserLoginPage from "@components/providers/UserLoginPage";
+import {signIn, useSession} from "next-auth/react";
 
 export const AuthContext = createContext({session: null})
 
@@ -12,15 +11,17 @@ export default function AuthProvider({children}) {
         session,
     }
 
+    if (status === "unauthenticated") {
+        signIn()
+        return null
+    }
+
     return (
         <>
             <AuthContext.Provider value={context}>
                 {
                     status === "loading" &&
                     <div>Loading...</div>
-                }
-                {
-                    status === "unauthenticated" && <UserLoginPage/>
                 }
                 {
                     status === "authenticated" && children
