@@ -1,12 +1,12 @@
 # Docker Compose file used for a quick start
 
-version: "2.1"
+version: "3.1"
 
 services:
 
   # Ontrack container
   ontrack:
-    image: nemerosa/ontrack:${ONTRACK_VERSION:-5}
+    image: nemerosa/ontrack:${ONTRACK_VERSION:-latest}
     restart: always
     environment:
       PROFILE: prod
@@ -26,20 +26,42 @@ services:
         condition: service_started
       rabbit:
         condition: service_started
+      keycloak:
+        condition: service_started
     volumes:
       - "ontrack_data:/var/ontrack/data"
     ports:
       - "8080:8080"
       - "8800:8800"
 
+  # Ontrack UI
+  ui:
+    image: "nemerosa/ontrack-ui:${ONTRACK_VERSION:-latest}"
+    restart: always
+    environment:
+      ONTRACK_URL: http://ontrack:8080
+      NEXTAUTH_SECRET: f813706eb889ac9349b7127cfe8effdfdd11f847c64f4fb321e6c933079781e7
+      NEXTAUTH_URL: http://localhost:3000
+
+      NEXTAUTH_ISSUER: http://keycloak:8080/realms/ontrack
+      NEXTAUTH_CLIENT_ID: ontrack-client
+      NEXTAUTH_CLIENT_SECRET: ontrack-client-secret
+    depends_on:
+      ontrack:
+        condition: service_started
+      keycloak:
+        condition: service_started
+    ports:
+      - "3000:3000"
+
   # Postgresql database
   postgres:
     image: postgres:17
     restart: always
     environment:
-      POSTGRES_DB: ${ONTRACK_POSTGRES_DB:-ontrack}
-      POSTGRES_USER: ${ONTRACK_POSTGRES_USER:-ontrack}
-      POSTGRES_PASSWORD: ${ONTRACK_POSTGRES_PASSWORD:-ontrack}
+      POSTGRES_DB: ontrack
+      POSTGRES_USER: ontrack
+      POSTGRES_PASSWORD: ontrack
     volumes:
       - "ontrack_postgres:/var/lib/postgresql/data"
 
@@ -51,6 +73,7 @@ services:
       - "discovery.type=single-node"
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "xpack.security.enabled=false"
     ulimits:
       memlock:
         soft: -1
@@ -70,7 +93,42 @@ services:
       - "15672:15672"
       - "5672:5672"
 
+  postgresql-keycloak:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+    ports:
+      - "6543:6543"
+    volumes:
+      - ontrack_keycloak_postgres_data:/var/lib/postgresql/data
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.1.4
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL_HOST: postgresql-keycloak
+      KC_DB_URL_DATABASE: keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+      KC_HOSTNAME: http://localhost:8008
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: true
+    ports:
+      - "8008:8080"
+    command:
+      - start-dev
+      - --import-realm
+    volumes:
+      - ./keycloak:/opt/keycloak/data/import
+    depends_on:
+      postgresql-keycloak:
+        condition: service_started
+
 volumes:
   ontrack_postgres:
   ontrack_elasticsearch:
   ontrack_data:
+  ontrack_keycloak_postgres_data:
