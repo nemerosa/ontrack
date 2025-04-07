@@ -9,6 +9,7 @@ import java.io.Serializable
  * Authentication source for an account or group.
  */
 @APIDescription("Authentication source for an account or group.")
+@Deprecated("Will be removed in V5")
 data class AuthenticationSource(
         @APIDescription("Name of the provider for this authentication source")
         val provider: String,

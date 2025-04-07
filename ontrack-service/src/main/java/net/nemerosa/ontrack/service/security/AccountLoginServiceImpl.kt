@@ -16,8 +16,8 @@ class AccountLoginServiceImpl(
     private val builtinAuthenticationSourceProvider: BuiltinAuthenticationSourceProvider,
 ) : AccountLoginService {
 
-    override fun login(email: String, fullName: String): Account? {
-        return accountRepository.findOrCreateAccount(
+    override fun login(email: String, fullName: String): Account =
+        accountRepository.findOrCreateAccount(
             Account(
                 id = ID.NONE,
                 name = email,
@@ -29,6 +29,5 @@ class AccountLoginServiceImpl(
                 locked = false,
             )
         )
-    }
 
 }

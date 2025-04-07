@@ -195,18 +195,13 @@ class AccountJdbcRepository(
     }
 
     override fun findOrCreateAccount(account: Account): Account {
-        return namedParameterJdbcTemplate!!.queryForObject(
+        return namedParameterJdbcTemplate!!.query(
             """
-                WITH inserted AS (
-                    INSERT INTO ACCOUNTS (NAME, FULLNAME, EMAIL, PROVIDER, SOURCE, PASSWORD, ROLE, DISABLED, LOCKED)
-                    VALUES (:name, :fullName, :email, :provider, :source, :password, :role, :disabled, :locked)
-                    ON CONFLICT (NAME) 
-                    DO NOTHING 
-                    RETURNING *
-                )
-                SELECT * FROM inserted
-                UNION
-                SELECT * FROM ACCOUNTS WHERE NAME = :name;
+                INSERT INTO ACCOUNTS (NAME, FULLNAME, EMAIL, PROVIDER, SOURCE, PASSWORD, ROLE, DISABLED, LOCKED)
+                VALUES (:name, :fullName, :email, :provider, :source, :password, :role, :disabled, :locked)
+                ON CONFLICT (NAME)
+                DO UPDATE SET NAME = EXCLUDED.NAME
+                RETURNING *
             """.trimIndent(),
             account.authenticationSource.asParams()
                 .addValue("name", account.name)
@@ -216,6 +211,8 @@ class AccountJdbcRepository(
                 .addValue("role", account.role.name)
                 .addValue("disabled", account.disabled)
                 .addValue("locked", account.locked)
-        ) { rs, _ -> toAccount(rs) } ?: error("Cannot get or create account")
+        ) { rs, _ -> toAccount(rs) }
+            .firstOrNull()
+            ?: error("Cannot get or create account")
     }
 }
