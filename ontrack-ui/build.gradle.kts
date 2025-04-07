@@ -83,6 +83,7 @@ dependencies {
     runtimeOnly(project(":ontrack-extension-environments"))
 }
 
+val isMacOS = System.getProperty("os.name").lowercase().contains("mac")
 
 jib {
     to {
@@ -91,6 +92,19 @@ jib {
     }
     from {
         image = "azul/zulu-openjdk-alpine:17"
+        platforms {
+            if (isMacOS) {
+                platform {
+                    architecture = "arm64"
+                    os = "linux"
+                }
+            } else {
+                platform {
+                    architecture = "amd64"
+                    os = "linux"
+                }
+            }
+        }
     }
     container {
         ports = listOf("8080", "8800")
