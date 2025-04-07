@@ -2,6 +2,8 @@
   "id": "ontrack",
   "realm": "ontrack",
   "enabled": true,
+  "registrationAllowed": true,
+  "resetPasswordAllowed": true,
   "users": [
     {
       "username": "admin",
