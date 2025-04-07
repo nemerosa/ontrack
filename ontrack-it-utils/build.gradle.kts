@@ -9,6 +9,7 @@ dependencies {
     api(project(":ontrack-test-utils"))
     api("org.springframework:spring-jdbc")
     api("org.springframework.security:spring-security-core")
+    api("org.springframework.security:spring-security-oauth2-jose")
     api("org.jetbrains.kotlin:kotlin-test")
 
     implementation(project(":ontrack-extension-support"))
@@ -19,6 +20,11 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-test")
     implementation("io.micrometer:micrometer-core")
+
+    implementation("io.mockk:mockk")
+    implementation("io.mockk:mockk-jvm")
+    implementation("io.mockk:mockk-dsl")
+    implementation("io.mockk:mockk-dsl-jvm")
 
     runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("org.flywaydb:flyway-core")

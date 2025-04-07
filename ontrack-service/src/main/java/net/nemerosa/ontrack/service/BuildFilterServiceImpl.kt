@@ -240,28 +240,28 @@ class BuildFilterServiceImpl(
     override fun saveFilter(branchId: ID, shared: Boolean, name: String, type: String, parameters: JsonNode): Ack {
         // Checks the account
         if (shared) {
+            // Gets the branch
+            val branch = structureService.getBranch(branchId)
+            // Checks access rights
+            securityService.checkProjectFunction(branch, BranchFilterMgt::class.java)
+            // Deletes any previous filter
             val account = securityService.currentUser?.account
-            return if (account != null) {
-                // Gets the branch
-                val branch = structureService.getBranch(branchId)
-                // Checks access rights
-                securityService.checkProjectFunction(branch, BranchFilterMgt::class.java)
-                // Deletes any previous filter
+            if (account != null) {
                 val currentAccountId = account.id()
                 buildFilterRepository.findByBranchAndName(currentAccountId, branchId.get(), name)?.let {
                     buildFilterRepository.delete(currentAccountId, branchId.get(), name, true)
                 }
-                // No account to be used
-                doSaveFilter(
-                    accountId = null,
-                    branchId = branchId,
-                    name = name,
-                    type = type,
-                    parameters = parameters
-                )
-            } else {
-                Ack.NOK
             }
+            // No account to be used
+            doSaveFilter(
+                accountId = null,
+                branchId = branchId,
+                name = name,
+                type = type,
+                parameters = parameters
+            )
+            // OK
+            return Ack.OK
         } else {
             val account = securityService.currentUser?.account
             return if (account == null) {

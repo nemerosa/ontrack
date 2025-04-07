@@ -33,12 +33,12 @@ class BuildFilterJdbcRepository(
                             " UNION " +
                             "(SELECT NULL AS accountId, * FROM SHARED_BUILD_FILTERS WHERE BRANCHID = :branchId)",
                     params("branchId", branchId).addValue("accountId", accountId)
-                ) { rs: ResultSet, row: Int -> toBuildFilter(rs) })
+                ) { rs, _ -> toBuildFilter(rs) })
         } else {
             namedParameterJdbcTemplate!!.query(
                 "SELECT NULL AS accountId, * FROM SHARED_BUILD_FILTERS WHERE BRANCHID = :branchId ORDER BY NAME",
                 params("branchId", branchId)
-            ) { rs: ResultSet, row: Int -> toBuildFilter(rs) }
+            ) { rs, _ -> toBuildFilter(rs) }
         }
     }
 

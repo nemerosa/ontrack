@@ -36,6 +36,7 @@ subprojects {
 
     val jjwtVersion = "0.12.6"
     val greenMailVersion = "1.6.15"
+    val mockkVersion = "1.13.17"
 
     dependencyManagement {
         imports {
@@ -59,6 +60,11 @@ subprojects {
 
             dependency("com.icegreen:greenmail:$greenMailVersion")
             dependency("com.icegreen:greenmail-spring:$greenMailVersion")
+
+            dependency("io.mockk:mockk:${mockkVersion}")
+            dependency("io.mockk:mockk-jvm:${mockkVersion}")
+            dependency("io.mockk:mockk-dsl:${mockkVersion}")
+            dependency("io.mockk:mockk-dsl-jvm:${mockkVersion}")
 
             // Git repository support TODO Will be removed in V5
             dependency("org.eclipse.jgit:org.eclipse.jgit:6.6.1.202309021850-r")
@@ -153,8 +159,6 @@ configure(javaProjects) {
         dependsOn(integrationTest)
     }
 
-    val mockkVersion = "1.13.17"
-
     dependencies {
         implementation(kotlin("stdlib"))
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
@@ -168,10 +172,10 @@ configure(javaProjects) {
         testImplementation("org.junit.vintage:junit-vintage-engine") {
             exclude(group = "org.hamcrest", module = "hamcrest-core")
         }
-        testImplementation("io.mockk:mockk:${mockkVersion}")
-        testImplementation("io.mockk:mockk-jvm:${mockkVersion}")
-        testImplementation("io.mockk:mockk-dsl:${mockkVersion}")
-        testImplementation("io.mockk:mockk-dsl-jvm:${mockkVersion}")
+        testImplementation("io.mockk:mockk")
+        testImplementation("io.mockk:mockk-jvm")
+        testImplementation("io.mockk:mockk-dsl")
+        testImplementation("io.mockk:mockk-dsl-jvm")
 
         // Lombok
         compileOnly("org.projectlombok:lombok:1.18.26") // TODO V5 Remove dependency on Lombok

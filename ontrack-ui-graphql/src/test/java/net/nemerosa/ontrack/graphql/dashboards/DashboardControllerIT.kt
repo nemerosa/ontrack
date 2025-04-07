@@ -107,25 +107,26 @@ class DashboardControllerIT : AbstractQLKTITSupport() {
     fun `Getting the authorizations on the dashboards`() {
         val name = TestUtils.uid("dash_")
         withNoDashboard {
-            val uuid = dashboardService.saveDashboard(
-                SaveDashboardInput(
-                    uuid = null,
-                    name = name,
-                    userScope = DashboardContextUserScope.PRIVATE,
-                    widgets = listOf(
-                        WidgetInstanceInput(
-                            uuid = null,
-                            key = "home/LastActiveProjects",
-                            config = mapOf("count" to 10).asJson(),
-                            layout = WidgetLayout(x = 0, y = 0, w = 12, h = 1),
-                        )
-                    ),
-                    select = true,
-                )
-            ).uuid
-            // Getting the authorizations
-            run(
-                """
+            asUser {
+                val uuid = dashboardService.saveDashboard(
+                    SaveDashboardInput(
+                        uuid = null,
+                        name = name,
+                        userScope = DashboardContextUserScope.PRIVATE,
+                        widgets = listOf(
+                            WidgetInstanceInput(
+                                uuid = null,
+                                key = "home/LastActiveProjects",
+                                config = mapOf("count" to 10).asJson(),
+                                layout = WidgetLayout(x = 0, y = 0, w = 12, h = 1),
+                            )
+                        ),
+                        select = true,
+                    )
+                ).uuid
+                // Getting the authorizations
+                run(
+                    """
                     {
                         userDashboards {
                             uuid
@@ -137,14 +138,15 @@ class DashboardControllerIT : AbstractQLKTITSupport() {
                         }
                     }
                 """
-            ) { data ->
-                val dashboard = data.path("userDashboards")
-                    .find { it.getRequiredTextField("uuid") == uuid }
-                    ?: fail("Cannot find created dashboard")
-                val authorizations = dashboard.getRequiredJsonField("authorizations")
-                assertEquals(true, authorizations.getRequiredBooleanField("edit"))
-                assertEquals(true, authorizations.getRequiredBooleanField("share"))
-                assertEquals(true, authorizations.getRequiredBooleanField("delete"))
+                ) { data ->
+                    val dashboard = data.path("userDashboards")
+                        .find { it.getRequiredTextField("uuid") == uuid }
+                        ?: fail("Cannot find created dashboard")
+                    val authorizations = dashboard.getRequiredJsonField("authorizations")
+                    assertEquals(true, authorizations.getRequiredBooleanField("edit"))
+                    assertEquals(true, authorizations.getRequiredBooleanField("share"))
+                    assertEquals(true, authorizations.getRequiredBooleanField("delete"))
+                }
             }
         }
     }

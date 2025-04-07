@@ -1,104 +1,104 @@
-package net.nemerosa.ontrack.it;
+package net.nemerosa.ontrack.it
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
-import net.nemerosa.ontrack.common.RunProfile;
-import net.nemerosa.ontrack.json.ObjectMapperFactory;
-import net.nemerosa.ontrack.model.structure.NameDescription;
-import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.*;
-import org.springframework.core.convert.converter.ConverterRegistry;
-import org.springframework.core.convert.support.DefaultConversionService;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.sql.DataSource;
-
-import static net.nemerosa.ontrack.test.TestUtils.uid;
+import com.fasterxml.jackson.databind.ObjectMapper
+import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry
+import io.mockk.mockk
+import net.nemerosa.ontrack.common.RunProfile
+import net.nemerosa.ontrack.it.AbstractITTestSupport.AbstractIntegrationTestConfiguration
+import net.nemerosa.ontrack.json.ObjectMapperFactory.create
+import net.nemerosa.ontrack.model.structure.NameDescription
+import net.nemerosa.ontrack.test.TestUtils
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.*
+import org.springframework.core.convert.converter.ConverterRegistry
+import org.springframework.core.convert.support.DefaultConversionService
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import org.springframework.security.oauth2.jwt.JwtDecoder
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.TestPropertySource
+import org.springframework.transaction.annotation.Transactional
+import javax.sql.DataSource
 
 @Transactional
-@ActiveProfiles(profiles = {RunProfile.UNIT_TEST})
+@ActiveProfiles(profiles = [RunProfile.UNIT_TEST])
 @SpringBootTest(
-        classes = {
-                AbstractITTestSupport.AbstractIntegrationTestConfiguration.class
-        },
-        webEnvironment = SpringBootTest.WebEnvironment.NONE
+    classes = [AbstractIntegrationTestConfiguration::class
+    ], webEnvironment = SpringBootTest.WebEnvironment.NONE
 )
 @TestPropertySource(
-        properties = {
-                "spring.rabbitmq.host=localhost",
-                "spring.rabbitmq.username=ontrack",
-                "spring.rabbitmq.password=ontrack",
-                "spring.graphql.schema.locations=classpath:graphql/",
-        }
+    properties = [
+        "spring.rabbitmq.host=localhost",
+        "spring.rabbitmq.username=ontrack",
+        "spring.rabbitmq.password=ontrack",
+        "spring.graphql.schema.locations=classpath:graphql/"
+    ]
 )
-public abstract class AbstractITTestSupport {
+abstract class AbstractITTestSupport {
 
     @Autowired
-    protected DataSource dataSource;
+    protected lateinit var dataSource: DataSource
 
     /**
      * Named Jdbc template for tests that need direct access to the database
      */
-    protected @NotNull
-    NamedParameterJdbcTemplate getNamedParameterJdbcTemplate() {
-        return new NamedParameterJdbcTemplate(dataSource);
-    }
+    protected val namedParameterJdbcTemplate: NamedParameterJdbcTemplate
+        get() = NamedParameterJdbcTemplate(dataSource!!)
 
     @Configuration
     @Profile(RunProfile.UNIT_TEST)
     @ComponentScan("net.nemerosa.ontrack")
     @EnableAutoConfiguration
-    public static class AbstractIntegrationTestConfiguration {
+    class AbstractIntegrationTestConfiguration {
 
-        private final Logger logger = LoggerFactory.getLogger(AbstractITTestSupport.class);
+        private val logger: Logger = LoggerFactory.getLogger(AbstractITTestSupport::class.java)
 
         @Bean
-        public MeterRegistry meterRegistry() {
-            return new SimpleMeterRegistry();
+        fun jwtDecoder(): JwtDecoder = mockk<JwtDecoder>(relaxed = true)
+
+        @Bean
+        fun meterRegistry(): MeterRegistry {
+            return SimpleMeterRegistry()
         }
 
         @Bean
-        public ConverterRegistry converterRegistry() {
-            return new DefaultConversionService();
+        fun converterRegistry(): ConverterRegistry {
+            return DefaultConversionService()
         }
 
         @Bean
         @Primary
-        public DataSourceProperties dataSourceProperties() {
+        fun dataSourceProperties(): DataSourceProperties {
             // Configuration using system properties
-            String dbURL = System.getProperty("spring.datasource.url", "jdbc:postgresql://localhost:5432/ontrack");
-            String dbUser = System.getProperty("spring.datasource.username", "ontrack");
-            String dbPassword = System.getProperty("spring.datasource.password", "ontrack");
+            val dbURL = System.getProperty("spring.datasource.url", "jdbc:postgresql://localhost:5432/ontrack")
+            val dbUser = System.getProperty("spring.datasource.username", "ontrack")
+            val dbPassword = System.getProperty("spring.datasource.password", "ontrack")
             // Logging
-            logger.info("[test][jdbc] URL = {}", dbURL);
+            logger.info("[test][jdbc] URL = {}", dbURL)
             // Properties
-            DataSourceProperties properties = new DataSourceProperties();
-            properties.setDriverClassName("org.postgresql.Driver");
-            properties.setUrl(dbURL);
-            properties.setUsername(dbUser);
-            properties.setPassword(dbPassword);
-            return properties;
+            val properties = DataSourceProperties()
+            properties.driverClassName = "org.postgresql.Driver"
+            properties.url = dbURL
+            properties.username = dbUser
+            properties.password = dbPassword
+            return properties
         }
     }
 
-    public static NameDescription nameDescription() {
-        String uid = uid("");
-        return new NameDescription(
+    protected val objectMapper: ObjectMapper = create()
+
+    companion object {
+        fun nameDescription(): NameDescription {
+            val uid = TestUtils.uid("")
+            return NameDescription(
                 uid,
                 String.format("%s description", uid)
-        );
+            )
+        }
     }
-
-    protected final ObjectMapper objectMapper = ObjectMapperFactory.create();
-
 }

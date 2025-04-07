@@ -5,7 +5,9 @@ import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getRequiredJsonField
 import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.json.getTextField
+import net.nemerosa.ontrack.model.security.BranchFilterMgt
 import net.nemerosa.ontrack.model.security.ProjectEdit
+import net.nemerosa.ontrack.model.security.ProjectView
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -16,42 +18,45 @@ class GraphQLLinksIT : AbstractQLKTITSupport() {
 
     @Test
     fun `Build filters links`() {
-        asAdmin {
-            project {
-                branch {
-                    promotionLevel("IRON")
-                    buildFilterService.saveFilter(
-                        id,
-                        true,
-                        "My filter",
-                        "net.nemerosa.ontrack.service.StandardBuildFilterProvider",
-                        mapOf(
-                            "withPromotionLevel" to "IRON"
-                        ).asJson()
-                    )
-                    run(
-                        """
-                        {
-                            branches(id: $id) {
-                                buildFilterResources {
-                                    name
-                                    links {
-                                        _update
+        project {
+            branch {
+                promotionLevel("IRON")
+                asUser()
+                    .withProjectFunction(this, ProjectView::class.java)
+                    .withProjectFunction(this, BranchFilterMgt::class.java)
+                    .call {
+                        buildFilterService.saveFilter(
+                            id,
+                            true,
+                            "My filter",
+                            "net.nemerosa.ontrack.service.StandardBuildFilterProvider",
+                            mapOf(
+                                "withPromotionLevel" to "IRON"
+                            ).asJson()
+                        )
+                        run(
+                            """
+                                {
+                                    branches(id: $id) {
+                                        buildFilterResources {
+                                            name
+                                            links {
+                                                _update
+                                            }
+                                        }
                                     }
                                 }
+                            """
+                        ) { data ->
+                            val branch = data.path("branches").path(0)
+                            assertNotNull(branch.getRequiredJsonField("buildFilterResources").find {
+                                it.getRequiredTextField("name") == "My filter"
+                            }) { filter ->
+                                val links = filter.getRequiredJsonField("links")
+                                assertNotNull(links.getTextField("_update"), "Update link is present")
                             }
                         }
-                    """
-                    ) { data ->
-                        val branch = data.path("branches").path(0)
-                        assertNotNull(branch.getRequiredJsonField("buildFilterResources").find {
-                            it.getRequiredTextField("name") == "My filter"
-                        }) { filter ->
-                            val links = filter.getRequiredJsonField("links")
-                            assertNotNull(links.getTextField("_update"), "Update link is present")
-                        }
                     }
-                }
             }
         }
     }

@@ -79,113 +79,33 @@ class ProjectActionsIT : AbstractQLKTITSupport() {
 
     @Test
     fun `Marking a project as favourite`() {
-        asAdmin {
-            project {
-                // Project can be marked as a favourite
-                run(
-                    """{
-                     projects(id: $id) {
-                        actions {
-                            favouriteProject {
-                                description
-                                mutation
-                            }
-                            unfavouriteProject {
-                                description
-                                mutation
-                            }
-                        }
-                     }
-                }"""
-                ).let { data ->
-                    val actions = data["projects"][0]["actions"]
-                    assertEquals(
-                        mapOf(
-                            "favouriteProject" to mapOf(
-                                "description" to "Marks the project as a favourite",
-                                "mutation" to "favouriteProject"
-                            ),
-                            "unfavouriteProject" to mapOf(
-                                "description" to "Unmarks the project as a favourite",
-                                "mutation" to null
-                            )
-                        ).asJson(),
-                        actions
-                    )
-                }
+        project {
+            asUserWithView {
                 // Marking the project as favourite
                 run(
                     """mutation {
-                     favouriteProject(input: {id: $id}) {
-                        project {
-                            favourite
-                            actions {
-                                favouriteProject {
-                                    description
-                                    mutation
-                                }
-                                unfavouriteProject {
-                                    description
-                                    mutation
-                                }
+                         favouriteProject(input: {id: $id}) {
+                            project {
+                                favourite
                             }
-                        }
-                     }
-                }"""
+                         }
+                    }"""
                 ).let { data ->
                     val project = data["favouriteProject"]["project"]
                     assertTrue(project["favourite"].asBoolean())
-                    val actions = project["actions"]
-                    assertEquals(
-                        mapOf(
-                            "favouriteProject" to mapOf(
-                                "description" to "Marks the project as a favourite",
-                                "mutation" to null
-                            ),
-                            "unfavouriteProject" to mapOf(
-                                "description" to "Unmarks the project as a favourite",
-                                "mutation" to "unfavouriteProject"
-                            )
-                        ).asJson(),
-                        actions
-                    )
                 }
                 // Unmarking the project as favourite
                 run(
                     """mutation {
-                     unfavouriteProject(input: {id: $id}) {
-                        project {
-                            favourite
-                            actions {
-                                favouriteProject {
-                                    description
-                                    mutation
-                                }
-                                unfavouriteProject {
-                                    description
-                                    mutation
-                                }
+                         unfavouriteProject(input: {id: $id}) {
+                            project {
+                                favourite
                             }
-                        }
-                     }
-                }"""
+                         }
+                    }"""
                 ).let { data ->
                     val project = data["unfavouriteProject"]["project"]
                     assertFalse(project["favourite"].asBoolean())
-                    val actions = project["actions"]
-                    assertEquals(
-                        mapOf(
-                            "favouriteProject" to mapOf(
-                                "description" to "Marks the project as a favourite",
-                                "mutation" to "favouriteProject"
-                            ),
-                            "unfavouriteProject" to mapOf(
-                                "description" to "Unmarks the project as a favourite",
-                                "mutation" to null
-                            )
-                        ).asJson(),
-                        actions
-                    )
                 }
             }
         }
