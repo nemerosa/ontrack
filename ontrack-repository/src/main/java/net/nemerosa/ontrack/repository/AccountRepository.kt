@@ -20,11 +20,6 @@ interface AccountRepository {
     fun findAll(): Collection<Account>
 
     /**
-     * Gets account by email
-     */
-    fun findByEmail(email: String): Account?
-
-    /**
      * Creates a new account
      */
     fun newAccount(account: Account): Account

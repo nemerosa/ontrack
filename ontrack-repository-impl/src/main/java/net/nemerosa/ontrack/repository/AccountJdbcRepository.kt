@@ -35,18 +35,6 @@ class AccountJdbcRepository(
         }
     }
 
-    override fun findByEmail(email: String): Account? {
-        return namedParameterJdbcTemplate!!.query(
-            """
-                SELECT *
-                FROM ACCOUNTS
-                WHERE EMAIL = :email
-                LIMIT 1
-            """.trimIndent(),
-            mapOf("email" to email)
-        ) { rs, _ -> toAccount(rs) }.firstOrNull()
-    }
-
     private fun toAccount(rs: ResultSet): Account? {
         val authenticationSource = rs.getAuthenticationSource(authenticationSourceRepository)
         return authenticationSource?.let {

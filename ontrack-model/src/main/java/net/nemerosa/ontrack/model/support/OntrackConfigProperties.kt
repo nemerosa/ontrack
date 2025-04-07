@@ -93,6 +93,11 @@ class OntrackConfigProperties {
     var templating = TemplatingProperties()
 
     /**
+     * Authorization settings
+     */
+    var authorization = AuthorizationConfigProperties()
+
+    /**
      * Key-store type
      */
     @APIDescription("Key store type to use to store encryption keys")
@@ -111,6 +116,35 @@ class OntrackConfigProperties {
         logger.info("[search] Index creation error ignoring = ${search.index.ignoreExisting}")
         logger.info("[document] Documents engine = ${documents.engine}")
         logger.info("[templating] Errors = ${templating.errors}")
+    }
+
+    /**
+     * Authorization settings
+     */
+    class AuthorizationConfigProperties {
+        /**
+         * Initial provisioning
+         */
+        var provisioning = true
+        /**
+         * Initial admin properties
+         */
+        var admin = AdminConfigProperties()
+    }
+
+    class AdminConfigProperties {
+        /**
+         * Email
+         */
+        var email = "admin@ontrack.local"
+        /**
+         * Full name
+         */
+        var fullName = "Administrator"
+        /**
+         * Name of the group to assign (must exists or must be blank)
+         */
+        var groupName = "Administrators"
     }
 
     /**
