@@ -200,13 +200,15 @@ pipeline {
                 ONTRACK_TEST_EXTENSION_GITHUB_ISSUES_MILESTONE = 'v1'
             }
             steps {
+                sh '''git status'''
                 sh ''' ./gradlew clean versionDisplay versionFile --no-daemon'''
                 script {
                     // Additional options
                     env.ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_IGNORE = params.SKIP_BITBUCKET_CLOUD_IT
                     // Reads version information
                     def props = readProperties(file: 'build/version.properties')
-                    env.VERSION = props.VERSION_DISPLAY
+                    // TODO Remove the build number when tagging/release is restored
+                    env.VERSION = props.VERSION_DISPLAY + "-" + env.BUILD_NUMBER
                     env.GIT_COMMIT = props.VERSION_COMMIT
                     // Creates a build
                     ontrackCliBuild(name: VERSION)
