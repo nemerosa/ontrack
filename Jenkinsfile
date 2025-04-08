@@ -350,10 +350,6 @@ pipeline {
 
         stage('Docker Hub') {
             when {
-                // TODO
-                expression {
-                    false
-                }
                 anyOf {
                     branch 'release/*'
                     branch 'feature/*publication'
