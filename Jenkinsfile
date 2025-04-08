@@ -203,11 +203,7 @@ pipeline {
                 sh '''git status'''
                 // TODO Remove the build number suffix when ready to tag and release
                 sh '''
-                    ./gradlew \\
-                        versionDisplay \\ 
-                        versionFile \\
-                        "-PversionSuffix=-${BUILD_NUMBER}" \\
-                        --no-daemon
+                    ./gradlew versionDisplay versionFile -PversionSuffix=-${BUILD_NUMBER} --no-daemon
                 '''
                 script {
                     // Additional options
