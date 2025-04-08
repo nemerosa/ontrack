@@ -201,14 +201,20 @@ pipeline {
             }
             steps {
                 sh '''git status'''
-                sh ''' ./gradlew clean versionDisplay versionFile --no-daemon'''
+                // TODO Remove the build number suffix when ready to tag and release
+                sh '''
+                    ./gradlew \\
+                        versionDisplay \\ 
+                        versionFile \\
+                        "-PversionSuffix=-${BUILD_NUMBER}" \\
+                        --no-daemon
+                '''
                 script {
                     // Additional options
                     env.ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_IGNORE = params.SKIP_BITBUCKET_CLOUD_IT
                     // Reads version information
                     def props = readProperties(file: 'build/version.properties')
-                    // TODO Remove the build number when tagging/release is restored
-                    env.VERSION = props.VERSION_DISPLAY + "-" + env.BUILD_NUMBER
+                    env.VERSION = props.VERSION_DISPLAY
                     env.GIT_COMMIT = props.VERSION_COMMIT
                     // Creates a build
                     ontrackCliBuild(name: VERSION)

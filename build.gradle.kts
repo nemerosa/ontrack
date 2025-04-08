@@ -15,8 +15,10 @@ plugins {
  * Meta information
  */
 
+val versionSuffix: String by project
+
 group = "net.nemerosa.ontrack"
-version = versioning.info.full
+version = versioning.info.full + versionSuffix
 
 /**
  * Sharing all Spring Boot dependencies
