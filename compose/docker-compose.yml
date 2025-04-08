@@ -1,6 +1,6 @@
 # Docker Compose file used for a quick start
 
-version: "3.1"
+version: "3.9"
 
 services:
 
@@ -19,6 +19,8 @@ services:
       SPRING_RABBITMQ_HOST: rabbit
       SPRING_RABBITMQ_USERNAME: ontrack
       SPRING_RABBITMQ_PASSWORD: ontrack
+      # Keycloak
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/ontrack
     depends_on:
       postgres:
         condition: service_started
@@ -42,8 +44,8 @@ services:
       ONTRACK_URL: http://ontrack:8080
       NEXTAUTH_SECRET: f813706eb889ac9349b7127cfe8effdfdd11f847c64f4fb321e6c933079781e7
       NEXTAUTH_URL: http://localhost:3000
-
       NEXTAUTH_ISSUER: http://keycloak:8080/realms/ontrack
+      # NEXTAUTH_ISSUER: http://keycloak:8080/realms/ontrack
       NEXTAUTH_CLIENT_ID: ontrack-client
       NEXTAUTH_CLIENT_SECRET: ontrack-client-secret
     depends_on:
@@ -115,7 +117,6 @@ services:
       KC_DB_USERNAME: keycloak
       KC_DB_PASSWORD: keycloak
       KC_HOSTNAME: http://localhost:8008
-      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: true
     ports:
       - "8008:8080"
     command:
@@ -132,3 +133,4 @@ volumes:
   ontrack_elasticsearch:
   ontrack_data:
   ontrack_keycloak_postgres_data:
+
