@@ -222,6 +222,7 @@ pipeline {
                             ./gradlew \\
                                 dockerBuild \\
                                 jibDockerBuild \\
+                                -PversionSuffix=-${BUILD_NUMBER} \\
                                 -Dorg.gradle.jvmargs=-Xmx6144m \\
                                 --stacktrace \\
                                 --parallel \\
@@ -236,6 +237,7 @@ pipeline {
                                 build \\
                                 dockerBuild \\
                                 jibDockerBuild \\
+                                -PversionSuffix=-${BUILD_NUMBER} \\
                                 -Dorg.gradle.jvmargs=-Xmx6144m \\
                                 --stacktrace \\
                                 --parallel \\
@@ -283,6 +285,7 @@ pipeline {
                     sh '''
                         ./gradlew \\
                             -Dorg.gradle.jvmargs=-Xmx2048m \\
+                            -PversionSuffix=-${BUILD_NUMBER} \\
                             --stacktrace \\
                             --console plain \\
                             --parallel \\
@@ -324,6 +327,7 @@ pipeline {
                     sh '''
                         ./gradlew \\
                             -Dorg.gradle.jvmargs=-Xmx3072m \\
+                            -PversionSuffix=-${BUILD_NUMBER} \\
                             --stacktrace \\
                             --console plain \\
                             --parallel \\
