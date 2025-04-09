@@ -9,12 +9,6 @@ import net.nemerosa.ontrack.model.structure.ID
 interface AccountRepository {
 
     /**
-     * Gets a built-in if it exists. The criteria is based on the [username] and on the [mode][Account.authenticationSource]
-     * being stored.
-     */
-    fun findBuiltinAccount(username: String): BuiltinAccount?
-
-    /**
      * Gets the list of all accounts
      */
     fun findAll(): Collection<Account>

@@ -3,7 +3,10 @@ package net.nemerosa.ontrack.repository
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.exceptions.AccountNameAlreadyDefinedException
 import net.nemerosa.ontrack.model.exceptions.AccountNotFoundException
-import net.nemerosa.ontrack.model.security.*
+import net.nemerosa.ontrack.model.security.Account
+import net.nemerosa.ontrack.model.security.AccountGroup
+import net.nemerosa.ontrack.model.security.AuthenticationSource
+import net.nemerosa.ontrack.model.security.SecurityRole
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.ID.Companion.of
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
@@ -17,21 +20,6 @@ import javax.sql.DataSource
 class AccountJdbcRepository(
     dataSource: DataSource
 ) : AbstractJdbcRepository(dataSource), AccountRepository {
-
-    override fun findBuiltinAccount(username: String): BuiltinAccount? {
-        return getFirstItem(
-            "SELECT * FROM ACCOUNTS WHERE PROVIDER = :provider AND NAME = :name",
-            params("name", username)
-                .addValue("provider", BuiltinAuthenticationSourceProvider.ID)
-        ) { rs: ResultSet, _: Int ->
-            toAccount(rs).let { account ->
-                BuiltinAccount(
-                    account,
-                    rs.getString("password")
-                )
-            }
-        }
-    }
 
     private fun toAccount(rs: ResultSet): Account {
         return Account.of(
