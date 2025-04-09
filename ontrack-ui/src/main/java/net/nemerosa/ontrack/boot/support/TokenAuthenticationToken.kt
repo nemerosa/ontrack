@@ -14,4 +14,6 @@ class TokenAuthenticationToken(
     override fun getCredentials(): Any = token
 
     override fun getPrincipal(): Any = account
+
+    override fun isAuthenticated(): Boolean = true
 }
