@@ -255,18 +255,9 @@ class OntrackConfigProperties {
         var validity: Duration = Duration.ofDays(0)
 
         /**
-         * Default validity duration for the _transient_ tokens.
-         *
-         * If set to 0 or negative, the generated tokens do not expire.
-         *
-         * By default, the tokens do not expire.
-         */
-        @DurationUnit(ChronoUnit.MINUTES)
-        var transientValidity: Duration = DEFAULT_TRANSIENT_VALIDITY
-
-        /**
          * Allows the token to be used as passwords.
          */
+        @Deprecated("Will be removed in V5")
         var password: Boolean = true
 
         /**
@@ -274,12 +265,6 @@ class OntrackConfigProperties {
          */
         var cache = TokensCacheProperties()
 
-        companion object {
-            /**
-             * Default duration for the transient tokens
-             */
-            val DEFAULT_TRANSIENT_VALIDITY: Duration = Duration.ofMinutes(30)
-        }
     }
 
     /**

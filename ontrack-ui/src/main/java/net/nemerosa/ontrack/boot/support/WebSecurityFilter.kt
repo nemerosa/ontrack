@@ -25,7 +25,7 @@ class WebSecurityFilter(
         if (authentication != null && authentication.isAuthenticated) {
             val account = when (authentication) {
                 is JwtAuthenticationToken -> accountFromJwt(authentication)
-                // TODO is ApiTokenAuthentication -> authentication.name  // Extracted email from your API token
+                is TokenAuthenticationToken -> accountFromToken(authentication)
                 else -> null
             }
             if (account != null) {
@@ -38,6 +38,9 @@ class WebSecurityFilter(
         }
         filterChain.doFilter(request, response)
     }
+
+    private fun accountFromToken(authentication: TokenAuthenticationToken): Account =
+        authentication.account
 
     private fun createAuthenticatedUser(account: Account): AccountAuthenticatedUser {
         return AccountAuthenticatedUser(

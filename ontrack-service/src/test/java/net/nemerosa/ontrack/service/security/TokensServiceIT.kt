@@ -283,16 +283,6 @@ class TokensServiceIT : AbstractDSLTestSupport() {
         }
     }
 
-    private fun <T> withCustomTokenTransientValidityDuration(duration: Duration, code: () -> T): T {
-        val old = ontrackConfigProperties.security.tokens.transientValidity
-        return try {
-            ontrackConfigProperties.security.tokens.transientValidity = duration
-            code()
-        } finally {
-            ontrackConfigProperties.security.tokens.transientValidity = old
-        }
-    }
-
     private fun <T> withCustomTokenCache(enabled: Boolean, code: () -> T): T {
         val old = ontrackConfigProperties.security.tokens.cache.enabled
         return try {

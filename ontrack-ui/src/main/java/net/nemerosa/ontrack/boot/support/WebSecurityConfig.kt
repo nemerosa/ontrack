@@ -12,6 +12,7 @@ import org.springframework.security.web.SecurityFilterChain
 @Configuration
 class WebSecurityConfig(
     private val webSecurityFilter: WebSecurityFilter,
+    private val tokenSecurityFilter: TokenSecurityFilter,
 ) {
 
     /**
@@ -30,7 +31,9 @@ class WebSecurityConfig(
      * API login
      */
     @Bean
-    fun apiWebSecurity(http: HttpSecurity): SecurityFilterChain {
+    fun apiWebSecurity(
+        http: HttpSecurity
+    ): SecurityFilterChain {
         http
             .authorizeHttpRequests { requests ->
                 requests
@@ -41,7 +44,8 @@ class WebSecurityConfig(
             .oauth2ResourceServer { oauth2 ->
                 oauth2.jwt(Customizer.withDefaults())
             }
-            .addFilterAfter(webSecurityFilter, BearerTokenAuthenticationFilter::class.java)
+            .addFilterAfter(tokenSecurityFilter, BearerTokenAuthenticationFilter::class.java)
+            .addFilterAfter(webSecurityFilter, TokenSecurityFilter::class.java)
         return http.build()
     }
 
