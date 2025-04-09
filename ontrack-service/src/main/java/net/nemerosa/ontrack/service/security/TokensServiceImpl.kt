@@ -42,7 +42,6 @@ class TokensServiceImpl(
         return generateNewToken(
             options = TokenOptions(
                 name = DEFAULT_NAME,
-                scope = TokenScope.USER,
             )
         )
     }
@@ -66,7 +65,6 @@ class TokensServiceImpl(
             accountId,
             TokenOptions(
                 DEFAULT_NAME,
-                TokenScope.USER,
                 validity,
                 forceUnlimited
             )
@@ -83,9 +81,7 @@ class TokensServiceImpl(
         val token = tokenGenerator.generateToken()
         // Validity
         val systemValidity = ontrackConfigProperties.security.tokens.validity
-        val actualValidity = if (options.scope.transient) {
-            transientValidity()
-        } else if (options.forceUnlimited) {
+        val actualValidity = if (options.forceUnlimited) {
             options.validity
         } else {
             options.validity ?: systemValidity
@@ -97,15 +93,14 @@ class TokensServiceImpl(
         } else {
             null
         }
-        val tokenObject = Token(options.name, token, creation, options.scope, validUntil, lastUsed = null)
+        val tokenObject = Token(options.name, token, creation, validUntil, lastUsed = null)
         // Saves the token...
         tokensRepository.save(
-            accountId,
-            options.name,
-            token,
-            options.scope,
-            tokenObject.creation,
-            tokenObject.validUntil
+            id = accountId,
+            name = options.name,
+            token = token,
+            time = tokenObject.creation,
+            until = tokenObject.validUntil
         )
         // ... and returns it
         return tokenObject
@@ -158,10 +153,6 @@ class TokensServiceImpl(
         return result?.let { (accountId, token) ->
             // Updating the "last used" date
             tokensRepository.updateLastUsed(token, refTime)
-            // If transient token, increases the validity
-            if (token.scope.transient) {
-                tokensRepository.updateValidUntil(token, refTime + transientValidity())
-            }
             // OK, returning the account AND the token
             TokenAccount(
                 securityService.asAdmin {

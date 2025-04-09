@@ -1,8 +1,9 @@
 package net.nemerosa.ontrack.graphql.schema
 
-import graphql.Scalars.GraphQLBoolean
 import graphql.schema.GraphQLObjectType
-import net.nemerosa.ontrack.graphql.support.*
+import net.nemerosa.ontrack.graphql.support.booleanField
+import net.nemerosa.ontrack.graphql.support.dateField
+import net.nemerosa.ontrack.graphql.support.stringField
 import net.nemerosa.ontrack.model.structure.Token
 import org.springframework.stereotype.Component
 
@@ -22,16 +23,6 @@ class GQLTypeToken : GQLType {
             .booleanField("valid", "Validity flag, computed in regard to current time.")
             .stringField("name", "Name of the token")
             .stringField("value", "Value of the token")
-            .field {
-                it.name("transient")
-                    .description("Is this token managed?")
-                    .type(GraphQLBoolean.toNotNull())
-                    .dataFetcher { env ->
-                        val token: Token = env.getSource()!!
-                        token.scope.transient
-                    }
-            }
-            .enumField(Token::scope)
             .build()
 
     override fun getTypeName(): String = Token::class.java.simpleName

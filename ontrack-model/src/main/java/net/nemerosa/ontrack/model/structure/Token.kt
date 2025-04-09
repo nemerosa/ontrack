@@ -10,7 +10,6 @@ import java.time.LocalDateTime
  * @param name Token name
  * @param value Token value
  * @param creation Creation timestamp
- * @param scope Scope of this token
  * @param validUntil Indicates until when the token is valid - `null` if forever valid
  * @param lastUsed Indicates when the token was used for the last time
  */
@@ -18,7 +17,6 @@ data class Token(
     val name: String,
     val value: String,
     val creation: LocalDateTime,
-    val scope: TokenScope,
     val validUntil: LocalDateTime?,
     val lastUsed: LocalDateTime?,
 ) {
@@ -26,7 +24,7 @@ data class Token(
     /**
      * Returns an obfuscated version of this token.
      */
-    fun obfuscate() = Token(name, "", creation, scope, validUntil, lastUsed)
+    fun obfuscate() = Token(name, "", creation, validUntil, lastUsed)
 
     /**
      * Returns a new token with same [value] and [creation]
@@ -37,14 +35,11 @@ data class Token(
      * If the scope of the token is transient, the validity period cannot be changed.
      */
     fun validFor(validity: Duration?): Token =
-        if (scope.transient) {
-            this
-        } else if (validity == null || validity.isZero || validity.isNegative) {
+        if (validity == null || validity.isZero || validity.isNegative) {
             Token(
                 name,
                 value,
                 creation,
-                scope,
                 null,
                 lastUsed,
             )
@@ -53,7 +48,6 @@ data class Token(
                 name,
                 value,
                 creation,
-                scope,
                 creation + validity,
                 lastUsed,
             )
@@ -77,7 +71,6 @@ data class Token(
         name = name,
         value = value,
         creation = creation,
-        scope = scope,
         validUntil = validUntil,
         lastUsed = lastUsed,
     )
