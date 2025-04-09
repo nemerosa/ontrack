@@ -62,7 +62,7 @@ services:
       - start-dev
       - --import-realm
     volumes:
-      - ./keycloak:/opt/keycloak/data/import
+      - ./keycloak/import/dev:/opt/keycloak/data/import
     depends_on:
       - postgresql-keycloak
 
