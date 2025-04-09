@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.model.exceptions.AccountNameAlreadyDefinedException
 import net.nemerosa.ontrack.model.exceptions.AccountNotFoundException
 import net.nemerosa.ontrack.model.security.Account
 import net.nemerosa.ontrack.model.security.AccountGroup
-import net.nemerosa.ontrack.model.security.AuthenticationSource
 import net.nemerosa.ontrack.model.security.SecurityRole
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.ID.Companion.of
@@ -92,11 +91,6 @@ class AccountJdbcRepository(
         ) { rs: ResultSet, _ ->
             toAccount(rs)
         } ?: throw AccountNotFoundException(accountId.value)
-    }
-
-    @Deprecated("Will be removed in V5")
-    override fun deleteAccountBySource(source: AuthenticationSource) {
-        error("Authentication sources not supported any longer")
     }
 
     override fun doesAccountIdExist(id: ID): Boolean {

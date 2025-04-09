@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.repository
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.security.Account
 import net.nemerosa.ontrack.model.security.Account.Companion.of
-import net.nemerosa.ontrack.model.security.AuthenticationSource
 import net.nemerosa.ontrack.model.security.SecurityRole
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.test.TestUtils
@@ -30,13 +29,6 @@ class BuildFilterJdbcRepositoryIT : AbstractRepositoryTestSupport() {
     @BeforeEach
     fun create_branch() {
         branch = do_create_branch()
-        // Creates an account
-        val authenticationSource = AuthenticationSource(
-            provider = "test",
-            key = "test",
-            name = "Test authentication source",
-            isAllowingPasswordChange = false
-        )
         accountName = TestUtils.uid("A")
         account = accountRepository.newAccount(
             of(
