@@ -12,7 +12,6 @@ dependencies {
     implementation(project(":ontrack-job"))
     implementation("org.springframework.security:spring-security-core")
     implementation("org.springframework.security:spring-security-config")
-    implementation("org.springframework.security:spring-security-ldap")
     implementation("org.springframework.security:spring-security-oauth2-jose")
     implementation("org.slf4j:slf4j-api")
     implementation("commons-io:commons-io")
