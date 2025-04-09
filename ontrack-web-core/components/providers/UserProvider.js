@@ -5,6 +5,8 @@ import LoadingContainer from "@components/common/LoadingContainer";
 
 export const UserContext = createContext({
     name: '',
+    fullName: '',
+    email: '',
     authorizations: {},
     userMenuGroups: []
 })
@@ -13,6 +15,8 @@ export default function UserContextProvider({children}) {
 
     const [user, setUser] = useState({
         name: '',
+        fullName: '',
+        email: '',
         authorizations: {},
         userMenuGroups: [],
     })
@@ -23,6 +27,8 @@ export default function UserContextProvider({children}) {
                 user {
                     account {
                         name
+                        fullName
+                        email
                     }
                 }
                 userMenuItems {
@@ -46,7 +52,9 @@ export default function UserContextProvider({children}) {
     useEffect(() => {
         if (data && finished) {
             const tmpUser = {
-                name: data?.user?.account?.name
+                name: data?.user?.account?.name,
+                fullName: data?.user?.account?.fullName,
+                email: data?.user?.account?.email,
             }
             console.log({data, tmpUser})
             // Groups

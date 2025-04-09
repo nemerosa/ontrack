@@ -54,9 +54,9 @@ export default function NavBar() {
                 </Space>
                 <Space direction="horizontal" size={8}>
                     <NavBarSearch
-                        style={{ display: 'flex', alignItems: 'center' }}
+                        style={{display: 'flex', alignItems: 'center'}}
                     />
-                    <NavBarText text={user?.name}/>
+                    <NavBarText text={user?.fullName ?? user?.email}/>
                     <Avatar icon={<FaRegUser id="user-menu"/>}
                             onClick={openUserMenu}
                             style={{
