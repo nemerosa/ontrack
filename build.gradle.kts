@@ -18,7 +18,7 @@ plugins {
 val versionSuffix: String by project
 
 group = "net.nemerosa.ontrack"
-version = versioning.info.full + versionSuffix
+version = versioning.info.display + versionSuffix
 
 /**
  * Sharing all Spring Boot dependencies

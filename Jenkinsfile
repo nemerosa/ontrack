@@ -210,7 +210,7 @@ pipeline {
                     env.ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_IGNORE = params.SKIP_BITBUCKET_CLOUD_IT
                     // Reads version information
                     def props = readProperties(file: 'build/version.properties')
-                    env.VERSION = props.VERSION_DISPLAY
+                    env.VERSION = props.VERSION_DISPLAY + "-${env.BUILD_NUMBER}"
                     env.GIT_COMMIT = props.VERSION_COMMIT
                     // Creates a build
                     ontrackCliBuild(name: VERSION)
