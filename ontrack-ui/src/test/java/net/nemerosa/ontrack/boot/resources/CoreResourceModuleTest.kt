@@ -38,7 +38,6 @@ class CoreResourceModuleTest {
         mapper = ResourceObjectMapperFactory().resourceObjectMapper(
                 listOf<ResourceModule>(DefaultResourceModule(
                         listOf(
-                                ConnectedAccountResourceDecorator(),
                                 ProjectResourceDecorator(resourceDecorationContributorService, projectFavouriteService),
                                 BranchResourceDecorator(resourceDecorationContributorService, branchFavouriteService),
                                 PromotionLevelResourceDecorator(),

@@ -51,18 +51,6 @@ class GQLTypeAccount(
                     .dataFetcher(accountAuthorizedProjectsFetcher())
             }
             .field {
-                it.name("token")
-                    .deprecate("Use the list of tokens. Will be removed in V5.")
-                    .description("Authentication token, if any, linked to this account.")
-                    .type(token.typeRef)
-                    .dataFetcher { env ->
-                        val account: Account = env.getSource()!!
-                        securityService.asAdmin {
-                            tokensService.getToken(account.id())
-                        }
-                    }
-            }
-            .field {
                 it.name("tokens")
                     .description("List of authentication tokens linked to this account.")
                     .type(listType(token.typeRef))

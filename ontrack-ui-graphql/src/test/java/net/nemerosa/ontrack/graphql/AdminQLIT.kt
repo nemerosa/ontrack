@@ -2,18 +2,13 @@ package net.nemerosa.ontrack.graphql
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.model.security.*
-import net.nemerosa.ontrack.model.structure.TokensService
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.graphql.execution.ErrorType
 import kotlin.test.*
 
 class AdminQLIT : AbstractQLKTITSupport() {
-
-    @Autowired
-    private lateinit var tokensService: TokensService
 
     private val JsonNode.name: String? get() = get("name").asText()
     private val JsonNode.id: Int get() = get("id").asInt()
@@ -695,30 +690,6 @@ class AdminQLIT : AbstractQLKTITSupport() {
                 )
                 val token = data["accounts"][0]["token"]
                 assertTrue(token.isNull)
-            }
-        }
-    }
-
-    @Test
-    fun `Account token filled in when generated`() {
-        asUser {
-            tokensService.generateNewToken()
-            val id = securityService.currentUser?.account?.id()
-                ?: fail("No current account")
-            asAdmin {
-                val data = run(
-                    """{
-                    accounts(id: $id) {
-                        token {
-                            creation
-                            validUntil
-                            valid
-                        }
-                    }
-                }"""
-                )
-                val token = data["accounts"][0]["token"]
-                assertTrue(token["valid"].booleanValue())
             }
         }
     }

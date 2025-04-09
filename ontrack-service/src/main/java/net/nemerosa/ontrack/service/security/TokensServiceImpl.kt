@@ -6,12 +6,10 @@ import net.nemerosa.ontrack.model.security.AccountManagement
 import net.nemerosa.ontrack.model.security.AccountService
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.model.structure.TokensService.Companion.DEFAULT_NAME
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.repository.TokensRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.Duration
 import java.time.LocalDateTime
 
 @Service
@@ -24,10 +22,6 @@ class TokensServiceImpl(
     private val accountService: AccountService
 ) : TokensService {
 
-    @Deprecated("Use named tokens")
-    override val currentToken: Token?
-        get() = getCurrentToken(DEFAULT_NAME)
-
     override fun getCurrentToken(name: String): Token? {
         // Gets the current account
         val account = securityService.currentUser?.account
@@ -35,15 +29,6 @@ class TokensServiceImpl(
         return account?.let {
             tokensRepository.getTokenForAccount(account, name)
         }
-    }
-
-    @Deprecated("Use token with options")
-    override fun generateNewToken(): Token {
-        return generateNewToken(
-            options = TokenOptions(
-                name = DEFAULT_NAME,
-            )
-        )
     }
 
     override fun generateNewToken(options: TokenOptions): Token {
@@ -58,22 +43,6 @@ class TokensServiceImpl(
         // Generates a new token
         return securityService.asAdmin { generateToken(account.id(), options) }
     }
-
-    @Deprecated("Use named token")
-    override fun generateToken(accountId: Int, validity: Duration?, forceUnlimited: Boolean): Token {
-        return generateToken(
-            accountId,
-            TokenOptions(
-                DEFAULT_NAME,
-                validity,
-                forceUnlimited
-            )
-        )
-    }
-
-    private fun transientValidity() = ontrackConfigProperties.security.tokens.transientValidity
-        .takeIf { !it.isZero }
-        ?: OntrackConfigProperties.TokensProperties.DEFAULT_TRANSIENT_VALIDITY
 
     override fun generateToken(accountId: Int, options: TokenOptions): Token {
         securityService.checkGlobalFunction(AccountManagement::class.java)
@@ -106,11 +75,6 @@ class TokensServiceImpl(
         return tokenObject
     }
 
-    @Deprecated("Use named tokens")
-    override fun revokeToken() {
-        revokeToken(DEFAULT_NAME)
-    }
-
     override fun revokeToken(name: String) {
         // Gets the current account
         val account = securityService.currentUser?.account
@@ -120,20 +84,9 @@ class TokensServiceImpl(
         }
     }
 
-    @Deprecated("Use list of tokens")
-    override fun getToken(account: Account): Token? {
-        securityService.checkGlobalFunction(AccountManagement::class.java)
-        return tokensRepository.getTokenForAccount(account, DEFAULT_NAME)
-    }
-
     override fun getTokens(account: Account): List<Token> {
         securityService.checkGlobalFunction(AccountManagement::class.java)
         return tokensRepository.getTokens(account)
-    }
-
-    @Deprecated("Use list of tokens")
-    override fun getToken(accountId: Int): Token? {
-        return getToken(accountService.getAccount(ID.of(accountId)))
     }
 
     override fun getTokens(accountId: Int): List<Token> {
@@ -166,11 +119,6 @@ class TokensServiceImpl(
     override fun revokeAll(): Int {
         securityService.checkGlobalFunction(AccountManagement::class.java)
         return tokensRepository.revokeAll()
-    }
-
-    @Deprecated("Use named tokens")
-    override fun revokeToken(accountId: Int) {
-        revokeToken(accountId, DEFAULT_NAME)
     }
 
     override fun revokeToken(accountId: Int, name: String) {
