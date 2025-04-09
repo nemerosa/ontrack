@@ -11,7 +11,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.annotation.Transactional
-import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
@@ -45,9 +44,6 @@ class BuildFilterJdbcRepositoryIT : AbstractRepositoryTestSupport() {
                 "Test user",
                 "test@test.com",
                 SecurityRole.USER,
-                authenticationSource,
-                disabled = false,
-                locked = false,
             )
         )
     }
@@ -79,7 +75,7 @@ class BuildFilterJdbcRepositoryIT : AbstractRepositoryTestSupport() {
         // Gets the list for this branch
         list = repository.findForBranch(branch.id())
         assertEquals(
-            Arrays.asList(
+            listOf(
                 TBuildFilter(
                     account.id(),
                     branch.id(),
@@ -119,7 +115,7 @@ class BuildFilterJdbcRepositoryIT : AbstractRepositoryTestSupport() {
         // Gets the list for this branch AND account
         var list = repository.findForBranch(account.id(), branch.id())
         assertEquals(
-            Arrays.asList(
+            listOf(
                 TBuildFilter(
                     null,
                     branch.id(),
@@ -133,7 +129,7 @@ class BuildFilterJdbcRepositoryIT : AbstractRepositoryTestSupport() {
         // Gets the list for this branch
         list = repository.findForBranch(branch.id())
         assertEquals(
-            Arrays.asList(
+            listOf(
                 TBuildFilter(
                     null,
                     branch.id(),
@@ -181,7 +177,7 @@ class BuildFilterJdbcRepositoryIT : AbstractRepositoryTestSupport() {
         // Gets the list for this branch AND account
         var list = repository.findForBranch(account.id(), branch.id())
         assertEquals(
-            Arrays.asList(
+            listOf(
                 TBuildFilter(
                     null,
                     branch.id(),
@@ -202,7 +198,7 @@ class BuildFilterJdbcRepositoryIT : AbstractRepositoryTestSupport() {
         // Gets the list for this branch
         list = repository.findForBranch(branch.id())
         assertEquals(
-            Arrays.asList(
+            listOf(
                 TBuildFilter(
                     null,
                     branch.id(),

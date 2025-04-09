@@ -10,5 +10,6 @@ interface UserService {
     /**
      * Changes his own password.
      */
+    @Deprecated("Will be removed in V5")
     fun changePassword(input: PasswordChange): Ack
 }

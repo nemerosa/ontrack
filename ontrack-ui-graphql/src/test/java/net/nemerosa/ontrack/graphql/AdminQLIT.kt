@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.graphql
 
 import com.fasterxml.jackson.databind.JsonNode
-//import net.nemerosa.ontrack.extension.ldap.LDAPAuthenticationSourceProvider
-import net.nemerosa.ontrack.it.support.TestAuthenticationSourceProvider
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.TokensService
 import net.nemerosa.ontrack.test.TestUtils.uid
@@ -15,13 +13,7 @@ import kotlin.test.*
 class AdminQLIT : AbstractQLKTITSupport() {
 
     @Autowired
-    private lateinit var mappingService: AccountGroupMappingService
-
-    @Autowired
     private lateinit var tokensService: TokensService
-
-    @Autowired
-    private lateinit var providedGroupsService: ProvidedGroupsService
 
     private val JsonNode.name: String? get() = get("name").asText()
     private val JsonNode.id: Int get() = get("id").asInt()
@@ -29,18 +21,18 @@ class AdminQLIT : AbstractQLKTITSupport() {
     @Test
     fun `List of groups needs authorisation`() {
         runWithError(
-                """{ accountGroups { id } }""",
-                errorMessage = "Global function 'AccountGroupManagement' is not granted.",
-                errorClassification = ErrorType.FORBIDDEN,
+            """{ accountGroups { id } }""",
+            errorMessage = "Global function 'AccountGroupManagement' is not granted.",
+            errorClassification = ErrorType.FORBIDDEN,
         )
     }
 
     @Test
     fun `List of accounts needs authorisation`() {
         runWithError(
-                """{ accounts { id } }""",
-                errorMessage = "Global function 'AccountManagement' is not granted.",
-                errorClassification = ErrorType.FORBIDDEN,
+            """{ accounts { id } }""",
+            errorMessage = "Global function 'AccountManagement' is not granted.",
+            errorClassification = ErrorType.FORBIDDEN,
         )
     }
 
@@ -57,11 +49,13 @@ class AdminQLIT : AbstractQLKTITSupport() {
     fun `Account group by ID`() {
         val g = doCreateAccountGroup()
         val data = asUser().with(AccountGroupManagement::class.java).call {
-            run("""{
+            run(
+                """{
                 accountGroups(id: ${g.id}) {
                     id
                 }
-            }""")
+            }"""
+            )
         }
         assertEquals(1, data["accountGroups"].size())
         assertEquals(g.id(), data["accountGroups"].first()["id"].asInt())
@@ -71,11 +65,13 @@ class AdminQLIT : AbstractQLKTITSupport() {
     fun `Account group by name`() {
         val g = doCreateAccountGroup()
         val data = asUser().with(AccountGroupManagement::class.java).call {
-            run("""{
+            run(
+                """{
                 accountGroups(name: "${g.name.substring(1)}") {
                     id
                 }
-            }""")
+            }"""
+            )
         }
         assertEquals(g.id(), data["accountGroups"].first()["id"].asInt())
     }
@@ -87,18 +83,23 @@ class AdminQLIT : AbstractQLKTITSupport() {
         doCreateAccount()
         val a3 = doCreateAccount(g)
         val data = asUser().with(AccountGroupManagement::class.java).call {
-            run("""{
+            run(
+                """{
                 accountGroups(id: ${g.id}) {
                     id
                     accounts {
                         id
                     }
                 }
-            }""")
+            }"""
+            )
         }
         assertEquals(1, data["accountGroups"].size())
         assertEquals(g.id(), data["accountGroups"].first()["id"].asInt())
-        assertEquals(setOf(a1.id(), a3.id()), data["accountGroups"].first()["accounts"].map { it["id"].asInt() }.toSet())
+        assertEquals(
+            setOf(a1.id(), a3.id()),
+            data["accountGroups"].first()["accounts"].map { it["id"].asInt() }.toSet()
+        )
     }
 
     @Test
@@ -133,15 +134,14 @@ class AdminQLIT : AbstractQLKTITSupport() {
         val g = doCreateAccountGroup()
         var a = doCreateAccount()
         asUser().with(AccountManagement::class.java).call {
-            a = accountService.updateAccount(a.id, AccountInput(
+            a = accountService.updateAccount(
+                a.id, AccountInput(
                     a.name,
                     a.fullName,
                     a.email,
-                    "",
                     listOf(g.id()),
-                    disabled = false,
-                    locked = false,
-            ))
+                )
+            )
             val data = run("""{ accounts(group: "${g.name}") { id }}""")
             assertEquals(a.id(), data["accounts"].first()["id"].asInt())
         }
@@ -153,15 +153,14 @@ class AdminQLIT : AbstractQLKTITSupport() {
         val g2 = doCreateAccountGroup()
         var a = doCreateAccount()
         asUser().with(AccountManagement::class.java).call {
-            a = accountService.updateAccount(a.id, AccountInput(
+            a = accountService.updateAccount(
+                a.id, AccountInput(
                     a.name,
                     a.fullName,
                     a.email,
-                    "",
                     listOf(g1.id(), g2.id()),
-                    disabled = false,
-                    locked = false,
-            ))
+                )
+            )
             val data = run("""{ accounts(id: ${a.id}) { groups { name } } }""")
             assertEquals(listOf(g1.name, g2.name), data["accounts"].first()["groups"].map { it.name })
         }
@@ -171,13 +170,15 @@ class AdminQLIT : AbstractQLKTITSupport() {
     fun `Account without global role`() {
         val a = doCreateAccount()
         val data = asUser().with(AccountManagement::class.java).call {
-            run("""{
+            run(
+                """{
                 accounts(id:${a.id}) {
                     globalRole {
                         id name
                     }
                 }
-            }""")
+            }"""
+            )
         }
         assertTrue(data["accounts"].first()["globalRole"].isNull)
     }
@@ -186,13 +187,15 @@ class AdminQLIT : AbstractQLKTITSupport() {
     fun `Account global role`() {
         val a = doCreateAccountWithGlobalRole("CONTROLLER")
         val data = asUser().with(AccountManagement::class.java).call {
-            run("""{
+            run(
+                """{
                 accounts(id:${a.id}) {
                     globalRole {
                         id name
                     }
                 }
-            }""")
+            }"""
+            )
         }
         assertEquals("CONTROLLER", data["accounts"].first()["globalRole"]["id"].asText())
         assertEquals("Controller", data["accounts"].first()["globalRole"].name)
@@ -205,18 +208,19 @@ class AdminQLIT : AbstractQLKTITSupport() {
         val a = doCreateAccount()
         val data = asAdmin().call {
             accountService.saveProjectPermission(
-                    p1.id,
-                    PermissionTargetType.ACCOUNT,
-                    a.id(),
-                    PermissionInput("PARTICIPANT")
+                p1.id,
+                PermissionTargetType.ACCOUNT,
+                a.id(),
+                PermissionInput("PARTICIPANT")
             )
             accountService.saveProjectPermission(
-                    p2.id,
-                    PermissionTargetType.ACCOUNT,
-                    a.id(),
-                    PermissionInput("OWNER")
+                p2.id,
+                PermissionTargetType.ACCOUNT,
+                a.id(),
+                PermissionInput("OWNER")
             )
-            run("""{
+            run(
+                """{
                 accounts(id: ${a.id}) {
                     authorizedProjects {
                         role {
@@ -227,7 +231,8 @@ class AdminQLIT : AbstractQLKTITSupport() {
                         }
                     }
                 }
-            }""")
+            }"""
+            )
         }
         val authorizedProjects = data.path("accounts").first().path("authorizedProjects")
         assertEquals(2, authorizedProjects.size())
@@ -245,17 +250,19 @@ class AdminQLIT : AbstractQLKTITSupport() {
     fun `Account group global role`() {
         val g = doCreateAccountGroupWithGlobalRole("CONTROLLER")
         val data = asUser()
-                .with(AccountManagement::class.java)
-                .with(AccountGroupManagement::class.java).call {
-                    run("""{
+            .with(AccountManagement::class.java)
+            .with(AccountGroupManagement::class.java).call {
+                run(
+                    """{
                 accountGroups(id: ${g.id}) {
                     globalRole {
                         id
                         name
                     }
                 }
-            }""")
-                }
+            }"""
+                )
+            }
         assertEquals("CONTROLLER", data["accountGroups"].first()["globalRole"]["id"].asText())
         assertEquals("Controller", data["accountGroups"].first()["globalRole"].name)
     }
@@ -267,18 +274,19 @@ class AdminQLIT : AbstractQLKTITSupport() {
         val g = doCreateAccountGroup()
         val data = asAdmin().call {
             accountService.saveProjectPermission(
-                    p1.id,
-                    PermissionTargetType.GROUP,
-                    g.id(),
-                    PermissionInput("PARTICIPANT")
+                p1.id,
+                PermissionTargetType.GROUP,
+                g.id(),
+                PermissionInput("PARTICIPANT")
             )
             accountService.saveProjectPermission(
-                    p2.id,
-                    PermissionTargetType.GROUP,
-                    g.id(),
-                    PermissionInput("OWNER")
+                p2.id,
+                PermissionTargetType.GROUP,
+                g.id(),
+                PermissionInput("OWNER")
             )
-            run("""{
+            run(
+                """{
                 accountGroups(id: ${g.id}) {
                     authorizedProjects {
                         role {
@@ -289,7 +297,8 @@ class AdminQLIT : AbstractQLKTITSupport() {
                         }
                     }
                 }
-            }""")
+            }"""
+            )
         }
         val projects = data["accountGroups"].first()["authorizedProjects"]
         assertEquals(2, projects.size())
@@ -490,7 +499,8 @@ class AdminQLIT : AbstractQLKTITSupport() {
         val controllerInGroup = doCreateAccount(controllerGroup)
         val directController = doCreateAccountWithGlobalRole("CONTROLLER")
         asAdmin().execute {
-            val data = run("""{
+            val data = run(
+                """{
                 globalRoles {
                     id
                     groups {
@@ -503,7 +513,8 @@ class AdminQLIT : AbstractQLKTITSupport() {
                         id
                     }
                 }
-            }""")
+            }"""
+            )
             assertNotNull(data["globalRoles"].find { it["id"].asText() == "ADMINISTRATOR" })
             assertNotNull(data["globalRoles"].find { it["id"].asText() == "CONTROLLER" }) { controllerRole ->
                 val g = controllerRole["groups"].find { it.id == controllerGroup.id() }
@@ -521,7 +532,8 @@ class AdminQLIT : AbstractQLKTITSupport() {
         val controllerInGroup = doCreateAccount(controllerGroup)
         val directController = doCreateAccountWithGlobalRole("CONTROLLER")
         asAdmin().execute {
-            val data = run("""{
+            val data = run(
+                """{
                 globalRoles(role: "CONTROLLER") {
                     id
                     groups {
@@ -534,7 +546,8 @@ class AdminQLIT : AbstractQLKTITSupport() {
                         id
                     }
                 }
-            }""")
+            }"""
+            )
             assertNull(data["globalRoles"].find { it["id"].asText() == "ADMINISTRATOR" })
             assertNotNull(data["globalRoles"].find { it["id"].asText() == "CONTROLLER" }) { controllerRole ->
                 val g = controllerRole["groups"].find { it.id == controllerGroup.id() }
@@ -554,10 +567,21 @@ class AdminQLIT : AbstractQLKTITSupport() {
         // Project and authorisations
         val project = doCreateProject()
         asAdmin().execute {
-            accountService.saveProjectPermission(project.id, PermissionTargetType.GROUP, participantGroup.id(), PermissionInput.of("PARTICIPANT"))
-            accountService.saveProjectPermission(project.id, PermissionTargetType.ACCOUNT, directOwner.id(), PermissionInput.of("OWNER"))
+            accountService.saveProjectPermission(
+                project.id,
+                PermissionTargetType.GROUP,
+                participantGroup.id(),
+                PermissionInput.of("PARTICIPANT")
+            )
+            accountService.saveProjectPermission(
+                project.id,
+                PermissionTargetType.ACCOUNT,
+                directOwner.id(),
+                PermissionInput.of("OWNER")
+            )
             // Query
-            val data = run("""{
+            val data = run(
+                """{
                 projects(id: ${project.id}) {
                     name
                     projectRoles {
@@ -573,7 +597,8 @@ class AdminQLIT : AbstractQLKTITSupport() {
                         }
                     }
                 }
-            }""")
+            }"""
+            )
             // Checks
             val p = data["projects"].first()
             assertEquals(project.name, p.name)
@@ -603,10 +628,21 @@ class AdminQLIT : AbstractQLKTITSupport() {
         // Project and authorisations
         val project = doCreateProject()
         asAdmin().execute {
-            accountService.saveProjectPermission(project.id, PermissionTargetType.GROUP, participantGroup.id(), PermissionInput.of("PARTICIPANT"))
-            accountService.saveProjectPermission(project.id, PermissionTargetType.ACCOUNT, directOwner.id(), PermissionInput.of("OWNER"))
+            accountService.saveProjectPermission(
+                project.id,
+                PermissionTargetType.GROUP,
+                participantGroup.id(),
+                PermissionInput.of("PARTICIPANT")
+            )
+            accountService.saveProjectPermission(
+                project.id,
+                PermissionTargetType.ACCOUNT,
+                directOwner.id(),
+                PermissionInput.of("OWNER")
+            )
             // Query
-            val data = run("""{
+            val data = run(
+                """{
                 projects(id: ${project.id}) {
                     name
                     projectRoles(role: "OWNER") {
@@ -622,7 +658,8 @@ class AdminQLIT : AbstractQLKTITSupport() {
                         }
                     }
                 }
-            }""")
+            }"""
+            )
             // Checks
             val p = data["projects"].first()
             assertEquals(project.name, p.name)
@@ -645,7 +682,8 @@ class AdminQLIT : AbstractQLKTITSupport() {
             val id = securityService.currentUser?.account?.id()
                 ?: fail("No current account")
             asAdmin {
-                val data = run("""{
+                val data = run(
+                    """{
                     accounts(id: $id) {
                         token {
                             creation
@@ -653,7 +691,8 @@ class AdminQLIT : AbstractQLKTITSupport() {
                             valid
                         }
                     }
-                }""")
+                }"""
+                )
                 val token = data["accounts"][0]["token"]
                 assertTrue(token.isNull)
             }
@@ -667,7 +706,8 @@ class AdminQLIT : AbstractQLKTITSupport() {
             val id = securityService.currentUser?.account?.id()
                 ?: fail("No current account")
             asAdmin {
-                val data = run("""{
+                val data = run(
+                    """{
                     accounts(id: $id) {
                         token {
                             creation
@@ -675,54 +715,10 @@ class AdminQLIT : AbstractQLKTITSupport() {
                             valid
                         }
                     }
-                }""")
+                }"""
+                )
                 val token = data["accounts"][0]["token"]
                 assertTrue(token["valid"].booleanValue())
-            }
-        }
-    }
-
-    @Test
-    fun `List of contributed and provided groups for an account`() {
-        asUserWithAuthenticationSource(TestAuthenticationSourceProvider.SOURCE).call {
-            val account = securityService.currentUser?.account
-                ?: fail("No current account")
-            // Registers some provided accounts
-            val providedGroupNames = setOf("provided-admin", "provided-user")
-            asAdmin {
-                // Provided groups for this account
-                providedGroupsService.saveProvidedGroups(account.id(), account.authenticationSource, providedGroupNames)
-                // Creates a group and a mapping
-                val adminGroup = doCreateAccountGroupWithGlobalRole(Roles.GLOBAL_ADMINISTRATOR)
-                mappingService.newMapping(account.authenticationSource, AccountGroupMappingInput(
-                        "provided-admin",
-                        adminGroup.id
-                ))
-                // Queries them
-                run(
-                        """
-                        {
-                            accounts(id: ${account.id}) {
-                                contributedGroups {
-                                    name
-                                }
-                                providedGroups
-                            }
-                        }
-                    """
-                ).let { data ->
-                    val accountNode = data.path("accounts").first()
-                    assertEquals(
-                            setOf(adminGroup.name),
-                            accountNode.path("contributedGroups").map { it.path("name").asText() }.toSet(),
-                            "Expected contributed groups"
-                    )
-                    assertEquals(
-                            providedGroupNames,
-                            accountNode.path("providedGroups").map { it.asText() }.toSet(),
-                            "Expected provided groups"
-                    )
-                }
             }
         }
     }

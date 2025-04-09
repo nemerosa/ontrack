@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.repository
 
 import net.nemerosa.ontrack.model.security.Account
-import net.nemerosa.ontrack.model.security.AuthenticationSource
 import net.nemerosa.ontrack.model.security.SecurityRole
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.test.TestUtils.uid
@@ -23,16 +22,7 @@ class AccountJdbcRepositoryIT : AbstractRepositoryTestSupport() {
             name = name,
             fullName = name,
             email = "$name@test.com",
-            authenticationSource = AuthenticationSource(
-                provider = "built-in",
-                key = "",
-                name = "Built-in",
-                isEnabled = true,
-                isAllowingPasswordChange = true,
-            ),
             role = SecurityRole.USER,
-            disabled = false,
-            locked = false,
         )
         val createdAccount = accountRepository.newAccount(account)
 
@@ -50,16 +40,7 @@ class AccountJdbcRepositoryIT : AbstractRepositoryTestSupport() {
             name = name,
             fullName = name,
             email = email,
-            authenticationSource = AuthenticationSource(
-                provider = "built-in",
-                key = "",
-                name = "Built-in",
-                isEnabled = true,
-                isAllowingPasswordChange = true,
-            ),
             role = SecurityRole.USER,
-            disabled = false,
-            locked = false,
         )
 
         // Tries to find it or create it

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component
 /**
  * Contributes a list of groups to an account.
  */
+@Deprecated("Will be removed in V5")
 interface AccountGroupContributor {
 
     /**

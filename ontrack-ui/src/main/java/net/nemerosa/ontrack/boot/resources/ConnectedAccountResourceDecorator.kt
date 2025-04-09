@@ -15,14 +15,6 @@ class ConnectedAccountResourceDecorator : AbstractResourceDecorator<ConnectedAcc
     override fun links(account: ConnectedAccount, resourceContext: ResourceContext): List<Link> {
         return resourceContext.links()
                 .self(on(UserController::class.java).getCurrentUser())
-                // Changing his password allowed for connected users which are built-in
-                .link(
-                        "_changePassword",
-                        on(UserController::class.java).getChangePasswordForm(),
-                        account.isLogged && account.account?.let {
-                             !it.locked && it.authenticationSource.isAllowingPasswordChange
-                        } ?: false
-                )
                 // Getting the token value
                 // TODO Deprecated, will be removed in V5
                 .link(

@@ -20,8 +20,6 @@ class AccountResourceDecorator : AbstractLinkResourceDecorator<Account>(Account:
             // Delete
             Link.DELETE linkTo { account: Account, _ ->
                 on(AccountController::class.java).deleteAccount(account.id)
-            } linkIf { account: Account, _ ->
-                !account.isDefaultAdmin
             },
             // Revoke any token
             "_revokeToken" linkTo { account: Account ->

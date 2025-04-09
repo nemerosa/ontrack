@@ -1,77 +1,63 @@
 package net.nemerosa.ontrack.model.security
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import net.nemerosa.ontrack.model.structure.Entity
 import net.nemerosa.ontrack.model.structure.ID
 import java.io.Serializable
 
 data class Account(
-        override val id: ID,
-        val name: String,
-        val fullName: String,
-        val email: String,
-        @Deprecated("Will be removed in v5")
-        val authenticationSource: AuthenticationSource,
-        val role: SecurityRole,
-        @Deprecated("Will be removed in v5")
-        val disabled: Boolean,
-        @Deprecated("Will be removed in v5")
-        val locked: Boolean,
+    override val id: ID,
+    val name: String,
+    val fullName: String,
+    val email: String,
+    val role: SecurityRole,
 ) : Entity, Serializable {
 
     companion object {
 
+        fun user(name: String, fullName: String, email: String) =
+            Account(
+                id = ID.NONE,
+                name = name,
+                fullName = fullName,
+                email = email,
+                role = SecurityRole.USER,
+            )
+
         @JvmStatic
-        fun of(name: String, fullName: String, email: String, role: SecurityRole, authenticationSource: AuthenticationSource, disabled: Boolean, locked: Boolean) =
-                Account(
-                        ID.NONE,
-                        name,
-                        fullName,
-                        email,
-                        authenticationSource,
-                        role,
-                        disabled = disabled,
-                        locked = locked,
-                )
+        fun of(name: String, fullName: String, email: String, role: SecurityRole) =
+            Account(
+                id = ID.NONE,
+                name = name,
+                fullName = fullName,
+                email = email,
+                role = role,
+            )
 
     }
 
     fun withId(id: ID): Account = Account(
-            id,
-            name,
-            fullName,
-            email,
-            authenticationSource,
-            role,
-            disabled = disabled,
-            locked = locked,
+        id = id,
+        name = name,
+        fullName = fullName,
+        email = email,
+        role = role,
     )
 
     fun update(input: AccountInput) =
-            Account(
-                    id,
-                    input.name,
-                    input.fullName,
-                    input.email,
-                    authenticationSource,
-                    role,
-                    disabled = input.disabled,
-                    locked = input.locked,
-            )
-
-    /**
-     * Default built-in admin?
-     */
-    @get:JsonProperty("defaultAdmin")
-    val isDefaultAdmin
-        get() = "admin" == name
+        Account(
+            id = id,
+            name = input.name,
+            fullName = input.fullName,
+            email = input.email,
+            role = role,
+        )
 
     fun asPermissionTarget() =
-            PermissionTarget(
-                    PermissionTargetType.ACCOUNT,
-                    id(),
-                    name,
-                    fullName
-            )
+        PermissionTarget(
+            type = PermissionTargetType.ACCOUNT,
+            id = id(),
+            name = name,
+            description = fullName
+        )
 
 }

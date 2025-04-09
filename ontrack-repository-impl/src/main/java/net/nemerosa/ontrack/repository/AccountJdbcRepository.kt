@@ -4,7 +4,6 @@ import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.exceptions.AccountNameAlreadyDefinedException
 import net.nemerosa.ontrack.model.exceptions.AccountNotFoundException
 import net.nemerosa.ontrack.model.security.*
-import net.nemerosa.ontrack.model.security.Account.Companion.of
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.ID.Companion.of
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
@@ -16,8 +15,7 @@ import javax.sql.DataSource
 
 @Repository
 class AccountJdbcRepository(
-    dataSource: DataSource,
-    private val authenticationSourceRepository: AuthenticationSourceRepository
+    dataSource: DataSource
 ) : AbstractJdbcRepository(dataSource), AccountRepository {
 
     override fun findBuiltinAccount(username: String): BuiltinAccount? {
@@ -26,7 +24,7 @@ class AccountJdbcRepository(
             params("name", username)
                 .addValue("provider", BuiltinAuthenticationSourceProvider.ID)
         ) { rs: ResultSet, _: Int ->
-            toAccount(rs)?.let { account ->
+            toAccount(rs).let { account ->
                 BuiltinAccount(
                     account,
                     rs.getString("password")
@@ -35,19 +33,14 @@ class AccountJdbcRepository(
         }
     }
 
-    private fun toAccount(rs: ResultSet): Account? {
-        val authenticationSource = rs.getAuthenticationSource(authenticationSourceRepository)
-        return authenticationSource?.let {
-            of(
-                rs.getString("name"),
-                rs.getString("fullName"),
-                rs.getString("email"),
-                getEnum(SecurityRole::class.java, rs, "role"),
-                authenticationSource,
-                disabled = rs.getBoolean("disabled"),
-                locked = rs.getBoolean("locked"),
-            ).withId(id(rs))
-        }
+    private fun toAccount(rs: ResultSet): Account {
+        return Account.of(
+            name = rs.getString("name"),
+            fullName = rs.getString("fullName"),
+            email = rs.getString("email"),
+            // Only USER roles can be loaded from the database
+            role = SecurityRole.USER,
+        ).withId(id(rs))
     }
 
     override fun findAll(): Collection<Account> {
@@ -61,16 +54,11 @@ class AccountJdbcRepository(
     override fun newAccount(account: Account): Account {
         return try {
             val id = dbCreate(
-                "INSERT INTO ACCOUNTS (NAME, FULLNAME, EMAIL, PROVIDER, SOURCE, PASSWORD, ROLE, DISABLED, LOCKED) " +
-                        "VALUES (:name, :fullName, :email, :provider, :source, :password, :role, :disabled, :locked)",
-                account.authenticationSource.asParams()
-                    .addValue("name", account.name)
+                "INSERT INTO ACCOUNTS (NAME, FULLNAME, EMAIL) " +
+                        "VALUES (:name, :fullName, :email)",
+                params("name", account.name)
                     .addValue("fullName", account.fullName)
                     .addValue("email", account.email)
-                    .addValue("password", "")
-                    .addValue("role", account.role.name)
-                    .addValue("disabled", account.disabled)
-                    .addValue("locked", account.locked)
             )
             account.withId(of(id))
         } catch (ex: DuplicateKeyException) {
@@ -81,14 +69,14 @@ class AccountJdbcRepository(
     override fun saveAccount(account: Account) {
         try {
             namedParameterJdbcTemplate!!.update(
-                "UPDATE ACCOUNTS SET NAME = :name, FULLNAME = :fullName, EMAIL = :email, DISABLED = :disabled, LOCKED = :locked " +
-                        "WHERE ID = :id",
+                """
+                    UPDATE ACCOUNTS SET NAME = :name, FULLNAME = :fullName, EMAIL = :email
+                    WHERE ID = :id
+                """,
                 params("id", account.id())
                     .addValue("name", account.name)
                     .addValue("fullName", account.fullName)
                     .addValue("email", account.email)
-                    .addValue("disabled", account.disabled)
-                    .addValue("locked", account.locked)
             )
         } catch (ex: DuplicateKeyException) {
             throw AccountNameAlreadyDefinedException(account.name)
@@ -104,12 +92,9 @@ class AccountJdbcRepository(
         )
     }
 
+    @Deprecated("Will be removed in V5")
     override fun setPassword(accountId: Int, encodedPassword: String) {
-        namedParameterJdbcTemplate!!.update(
-            "UPDATE ACCOUNTS SET PASSWORD = :password WHERE ID = :id",
-            params("id", accountId)
-                .addValue("password", encodedPassword)
-        )
+        error("Account passwords not supported any longer")
     }
 
     override fun getAccount(accountId: ID): Account {
@@ -121,11 +106,9 @@ class AccountJdbcRepository(
         } ?: throw AccountNotFoundException(accountId.value)
     }
 
+    @Deprecated("Will be removed in V5")
     override fun deleteAccountBySource(source: AuthenticationSource) {
-        namedParameterJdbcTemplate!!.update(
-            "DELETE FROM ACCOUNTS WHERE PROVIDER = :provider AND SOURCE = :source",
-            source.asParams()
-        )
+        error("Authentication sources not supported any longer")
     }
 
     override fun doesAccountIdExist(id: ID): Boolean {
@@ -166,39 +149,28 @@ class AccountJdbcRepository(
         }
     }
 
+    @Deprecated("Will be removed in V5")
     override fun setAccountDisabled(id: ID, disabled: Boolean) {
-        namedParameterJdbcTemplate!!.update(
-            "UPDATE ACCOUNTS SET DISABLED = :disabled WHERE ID = :id",
-            params("id", id.get())
-                .addValue("disabled", disabled)
-        )
+        error("Disabling accounts no longer supported")
     }
 
+    @Deprecated("Will be removed in V5")
     override fun setAccountLocked(id: ID, locked: Boolean) {
-        namedParameterJdbcTemplate!!.update(
-            "UPDATE ACCOUNTS SET LOCKED = :locked WHERE ID = :id",
-            params("id", id.get())
-                .addValue("locked", locked)
-        )
+        error("Locked accounts no longer supported")
     }
 
     override fun findOrCreateAccount(account: Account): Account {
         return namedParameterJdbcTemplate!!.query(
             """
-                INSERT INTO ACCOUNTS (NAME, FULLNAME, EMAIL, PROVIDER, SOURCE, PASSWORD, ROLE, DISABLED, LOCKED)
-                VALUES (:name, :fullName, :email, :provider, :source, :password, :role, :disabled, :locked)
+                INSERT INTO ACCOUNTS (NAME, FULLNAME, EMAIL)
+                VALUES (:name, :fullName, :email)
                 ON CONFLICT (NAME)
                 DO UPDATE SET NAME = EXCLUDED.NAME
                 RETURNING *
             """.trimIndent(),
-            account.authenticationSource.asParams()
-                .addValue("name", account.name)
+            params("name", account.name)
                 .addValue("fullName", account.fullName)
                 .addValue("email", account.email)
-                .addValue("password", "")
-                .addValue("role", account.role.name)
-                .addValue("disabled", account.disabled)
-                .addValue("locked", account.locked)
         ) { rs, _ -> toAccount(rs) }
             .firstOrNull()
             ?: error("Cannot get or create account")

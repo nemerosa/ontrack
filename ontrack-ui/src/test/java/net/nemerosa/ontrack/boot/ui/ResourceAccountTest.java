@@ -2,12 +2,11 @@ package net.nemerosa.ontrack.boot.ui;
 
 import net.nemerosa.ontrack.model.preferences.Preferences;
 import net.nemerosa.ontrack.model.security.Account;
-import net.nemerosa.ontrack.model.security.AuthenticationSource;
 import net.nemerosa.ontrack.model.security.ConnectedAccount;
 import net.nemerosa.ontrack.model.security.SecurityRole;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.ui.resource.Resource;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 
@@ -28,18 +27,7 @@ public class ResourceAccountTest {
                                 .with("name", "admin")
                                 .with("fullName", "Administrator")
                                 .with("email", "")
-                                .with("authenticationSource", object()
-                                        .with("provider", "none")
-                                        .with("key", "none")
-                                        .with("name", "Not defined")
-                                        .with("enabled", true)
-                                        .with("allowingPasswordChange", false)
-                                        .with("groupMappingSupported", false)
-                                        .end())
                                 .with("role", "ADMINISTRATOR")
-                                .with("disabled", false)
-                                .with("locked", false)
-                                .with("defaultAdmin", true)
                                 .end())
                         .with("preferences", object()
                                 .with("branchViewVsNames", DEFAULT_BRANCH_VIEW_OPTION)
@@ -52,7 +40,7 @@ public class ResourceAccountTest {
                         .end(),
                 Resource.of(
                         ConnectedAccount.of(
-                                Account.of("admin", "Administrator", "", SecurityRole.ADMINISTRATOR, AuthenticationSource.none(), false, false)
+                                Account.of("admin", "Administrator", "", SecurityRole.ADMINISTRATOR)
                                         .withId(ID.of(1)),
                                 new Preferences()
                         ),

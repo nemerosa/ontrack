@@ -45,18 +45,6 @@ class AccountController(
                     MultiSelection.of("groups").label("Groups")
                             .items(accountService.getAccountGroupsForSelection(ID.NONE))
             )
-            .with(
-                YesNo.of(Account::disabled.name)
-                    .label("Disabled")
-                    .help("Is this account disabled? If disabled, it cannot be used to access Ontrack any longer.")
-                    .value(false)
-            )
-            .with(
-                YesNo.of(Account::locked.name)
-                    .label("Locked")
-                    .help("Is this account locked? If locked, it can be updated only by an administrator.")
-                    .value(false)
-            )
 
     /**
      * Creation of a built-in account
@@ -81,10 +69,6 @@ class AccountController(
     fun getUpdateForm(@PathVariable accountId: ID): Form {
         val account = accountService.getAccount(accountId)
         var form = getCreationForm()
-        // Name in read-only mode for the default admin
-        if (account.isDefaultAdmin) {
-            form = form.with(defaultNameField().readOnly())
-        }
         // Password not filled in, and not required on update
         form = form.with(Password.of("password").label("Password").length(40).help("Password for the account. Leave blank to keep it unchanged.").optional())
         // Groups
@@ -97,8 +81,6 @@ class AccountController(
                 .fill("name", account.name)
                 .fill("fullName", account.fullName)
                 .fill("email", account.email)
-                .fill(Account::disabled.name, account.disabled)
-                .fill(Account::locked.name, account.locked)
     }
 
     /**

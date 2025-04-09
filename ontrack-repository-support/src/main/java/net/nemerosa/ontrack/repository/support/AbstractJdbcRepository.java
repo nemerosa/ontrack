@@ -25,7 +25,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.OptionalInt;
 
 public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSupport {
 
@@ -100,11 +99,6 @@ public abstract class AbstractJdbcRepository extends NamedParameterJdbcDaoSuppor
         return Optional.ofNullable(getFirstItem(sql, criteria, type));
     }
 
-
-    protected OptionalInt optionalInt(ResultSet rs, String column) throws SQLException {
-        int value = rs.getInt(column);
-        return rs.wasNull() ? OptionalInt.empty() : OptionalInt.of(value);
-    }
 
     protected ID id(ResultSet rs) throws SQLException {
         return id(rs, "id");

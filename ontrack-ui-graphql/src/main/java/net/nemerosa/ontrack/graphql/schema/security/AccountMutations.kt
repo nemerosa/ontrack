@@ -1,5 +1,8 @@
 package net.nemerosa.ontrack.graphql.schema.security
 
+import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Pattern
+import jakarta.validation.constraints.Size
 import net.nemerosa.ontrack.graphql.schema.Mutation
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.model.annotations.APIDescription
@@ -8,9 +11,6 @@ import net.nemerosa.ontrack.model.security.AccountInput
 import net.nemerosa.ontrack.model.security.AccountService
 import net.nemerosa.ontrack.model.structure.ID
 import org.springframework.stereotype.Component
-import jakarta.validation.constraints.NotNull
-import jakarta.validation.constraints.Pattern
-import jakarta.validation.constraints.Size
 
 @Component
 class AccountMutations(
@@ -30,10 +30,7 @@ class AccountMutations(
                     name = input.name,
                     fullName = input.fullName,
                     email = input.email,
-                    password = input.password,
                     groups = emptyList(),
-                    disabled = false,
-                    locked = false,
                 )
             )
         },
@@ -111,6 +108,4 @@ data class CreateBuiltInAccountInput(
     @get:NotNull(message = "The account email is required.")
     @get:Size(min = 1, max = 200, message = "The account email must be between 1 and 200 long.")
     val email: String,
-    @get:NotNull(message = "The account password is required.")
-    val password: String,
 )

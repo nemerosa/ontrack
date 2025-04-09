@@ -37,6 +37,7 @@ interface AccountRepository {
     /**
      * Changes the password of an account
      */
+    @Deprecated("Will be removed in V5")
     fun setPassword(accountId: Int, encodedPassword: String)
 
     /**
@@ -72,16 +73,19 @@ interface AccountRepository {
      *
      * @param source Source to delete accounts from
      */
+    @Deprecated("Will be removed in V5")
     fun deleteAccountBySource(source: AuthenticationSource)
 
     /**
      * Disabled / enables an account
      */
+    @Deprecated("Will be removed in V5")
     fun setAccountDisabled(id: ID, disabled: Boolean)
 
     /**
      * Locks / unlocks an account
      */
+    @Deprecated("Will be removed in V5")
     fun setAccountLocked(id: ID, locked: Boolean)
 
     /**

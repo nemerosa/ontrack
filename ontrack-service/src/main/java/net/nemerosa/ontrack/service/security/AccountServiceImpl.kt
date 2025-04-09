@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.service.security
 
 import net.nemerosa.ontrack.model.Ack
-import net.nemerosa.ontrack.model.exceptions.AccountDefaultAdminCannotDeleteException
-import net.nemerosa.ontrack.model.exceptions.AccountDefaultAdminCannotUpdateNameException
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.Entity
 import net.nemerosa.ontrack.model.structure.ID
@@ -10,14 +8,10 @@ import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.repository.AccountGroupRepository
 import net.nemerosa.ontrack.repository.AccountRepository
 import net.nemerosa.ontrack.repository.RoleRepository
-import org.apache.commons.lang3.StringUtils
-import org.springframework.security.crypto.factory.PasswordEncoderFactories
-import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
 import java.util.stream.Collectors
-import kotlin.jvm.optionals.getOrNull
 
 @Service
 @Transactional
@@ -27,10 +21,7 @@ class AccountServiceImpl(
     private val accountRepository: AccountRepository,
     private val accountGroupRepository: AccountGroupRepository,
     private val securityService: SecurityService,
-    private val builtinAuthenticationSourceProvider: BuiltinAuthenticationSourceProvider,
 ) : AccountService {
-
-    private val passwordEncoder: PasswordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder()
 
     override fun getAccounts(): List<Account> {
         securityService.checkGlobalFunction(AccountManagement::class.java)
@@ -38,22 +29,12 @@ class AccountServiceImpl(
     }
 
     override fun create(input: AccountInput): Account {
-        val account = create(input, builtinAuthenticationSourceProvider.source)
-        accountRepository.setPassword(account.id(), passwordEncoder.encode(input.password))
-        return account
-    }
-
-    override fun create(input: AccountInput, authenticationSource: AuthenticationSource): Account {
         securityService.checkGlobalFunction(AccountManagement::class.java)
         // Creates the account
-        var account = Account.of(
-            input.name,
-            input.fullName,
-            input.email,
-            SecurityRole.USER,
-            authenticationSource,
-            disabled = input.disabled,
-            locked = input.locked,
+        var account = Account.user(
+            name = input.name,
+            fullName = input.fullName,
+            email = input.email,
         )
         // Saves it
         account = accountRepository.newAccount(account)
@@ -67,31 +48,18 @@ class AccountServiceImpl(
         securityService.checkGlobalFunction(AccountManagement::class.java)
         // Gets the existing account
         var account = getAccount(accountId)
-        // Checks if default admin
-        if (account.isDefaultAdmin && !StringUtils.equals(account.name, input.name)) {
-            throw AccountDefaultAdminCannotUpdateNameException()
-        }
         // Updates it
         account = account.update(input)
         // Saves it
         accountRepository.saveAccount(account)
-        // Updating the password?
-        if (StringUtils.isNotBlank(input.password)) {
-            accountRepository.setPassword(accountId.value, passwordEncoder.encode(input.password))
-        }
         // Account groups
         accountGroupRepository.linkAccountToGroups(account.id(), input.groups)
         // OK
         return getAccount(accountId)
     }
 
-    override fun deleteAccount(accountId: ID): Ack { // Security check
+    override fun deleteAccount(accountId: ID): Ack {
         securityService.checkGlobalFunction(AccountManagement::class.java)
-        // Check the `admin` account
-        if (getAccount(accountId).isDefaultAdmin) {
-            throw AccountDefaultAdminCannotDeleteException()
-        }
-        // Deletion
         return accountRepository.deleteAccount(accountId)
     }
 
@@ -155,10 +123,12 @@ class AccountServiceImpl(
                 securityService.checkGlobalFunction(AccountManagement::class.java)
                 roleRepository.saveGlobalRoleForAccount(id, input.role)
             }
+
             PermissionTargetType.GROUP -> {
                 securityService.checkGlobalFunction(AccountGroupManagement::class.java)
                 roleRepository.saveGlobalRoleForGroup(id, input.role)
             }
+
             else -> Ack.NOK
         }
     }
@@ -183,10 +153,12 @@ class AccountServiceImpl(
                 securityService.checkGlobalFunction(AccountManagement::class.java)
                 roleRepository.deleteGlobalRoleForAccount(id)
             }
+
             PermissionTargetType.GROUP -> {
                 securityService.checkGlobalFunction(AccountGroupManagement::class.java)
                 roleRepository.deleteGlobalRoleForGroup(id)
             }
+
             else -> Ack.NOK
         }
     }
@@ -372,40 +344,16 @@ class AccountServiceImpl(
         return accountGroupRepository.findAccountGroupByName(name)
     }
 
-    override fun doesAccountIdExist(id: ID): Boolean {
-        securityService.checkGlobalFunction(AccountManagement::class.java)
-        return accountRepository.doesAccountIdExist(id)
-    }
-
-    override fun deleteAccountBySource(source: AuthenticationSource) {
-        securityService.checkGlobalFunction(AccountManagement::class.java)
-        accountRepository.deleteAccountBySource(source)
-    }
-
+    @Deprecated("Deprecated in Java")
     override fun setAccountDisabled(id: ID, disabled: Boolean) {
         securityService.checkGlobalFunction(AccountManagement::class.java)
         accountRepository.setAccountDisabled(id, disabled)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun setAccountLocked(id: ID, locked: Boolean) {
         securityService.checkGlobalFunction(AccountManagement::class.java)
         accountRepository.setAccountLocked(id, locked)
     }
-
-    private fun getGroupACL(group: AccountGroup): Authorisations =
-        Authorisations()
-            // Global role
-            .withGlobalRole(
-                roleRepository.findGlobalRoleByGroup(group.id()).getOrNull()
-                    ?.let { id: String -> rolesService.getGlobalRole(id).getOrNull() }
-            ) // Project roles
-            .withProjectRoles(
-                roleRepository.findProjectRoleAssociationsByGroup(group.id()) { project: Int?, roleId: String? ->
-                    rolesService.getProjectRoleAssociation(
-                        project!!,
-                        roleId!!
-                    )
-                }
-            )
 
 }

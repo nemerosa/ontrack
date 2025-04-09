@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.service.security
 
 import net.nemerosa.ontrack.model.security.Account
-import net.nemerosa.ontrack.model.security.BuiltinAuthenticationSourceProvider
 import net.nemerosa.ontrack.model.security.SecurityRole
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
@@ -17,7 +16,6 @@ class AccountProvisioningStartup(
     private val ontrackConfigProperties: OntrackConfigProperties,
     private val accountRepository: AccountRepository,
     private val accountGroupRepository: AccountGroupRepository,
-    private val builtinAuthenticationSourceProvider: BuiltinAuthenticationSourceProvider,
 ) : StartupService {
 
     private val logger: Logger = LoggerFactory.getLogger(AccountProvisioningStartup::class.java)
@@ -42,10 +40,7 @@ class AccountProvisioningStartup(
                     name = admin.email,
                     fullName = admin.fullName,
                     email = admin.email,
-                    authenticationSource = builtinAuthenticationSourceProvider.source,
                     role = SecurityRole.ADMINISTRATOR,
-                    disabled = false,
-                    locked = false,
                 )
                 val account = accountRepository.newAccount(accountDef)
                 logger.info("[account provisioning] Admin user created with ID = ${account.id}")

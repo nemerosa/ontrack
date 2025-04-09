@@ -8,7 +8,6 @@ class CoreAuthorizationContributor : AuthorizationContributor {
 
     companion object {
         const val GLOBAL = "global"
-        const val USER = "user"
         const val PROJECT = "project"
         const val BRANCH = "branch"
         const val PROMOTION_LEVEL = "promotion_level"
@@ -19,19 +18,12 @@ class CoreAuthorizationContributor : AuthorizationContributor {
     override fun appliesTo(context: Any): Boolean = context is GlobalAuthorizationContext
 
     override fun getAuthorizations(user: AuthenticatedUser, context: Any): List<Authorization> {
-        val account = user.account
         return listOf(
             // Global settings
             Authorization(
                 GLOBAL,
                 Authorization.SETTINGS,
                 user.isGranted(GlobalSettings::class.java)
-            ),
-            // User
-            Authorization(
-                USER,
-                "changePassword",
-                account != null && !account.locked && account.authenticationSource.isAllowingPasswordChange
             ),
             // Project
             Authorization(

@@ -26,14 +26,6 @@ public interface AccountService {
     Account create(AccountInput input);
 
     /**
-     * Creates an account and allows for further customisation
-     *
-     * @param input                Account data
-     * @param authenticationSource Authentication source
-     */
-    Account create(AccountInput input, AuthenticationSource authenticationSource);
-
-    /**
      * Gets an account using its ID
      */
     Account getAccount(ID accountId);
@@ -229,24 +221,18 @@ public interface AccountService {
     AccountGroup findAccountGroupByName(@NotNull String name);
 
     /**
-     * Checks if an account ID exists
-     */
-    boolean doesAccountIdExist(@NotNull ID id);
-
-    /**
-     * Deletes all accounts having the given source.
-     *
-     * @param source Source to delete accounts from
-     */
-    void deleteAccountBySource(@NotNull AuthenticationSource source);
-
-    /**
      * Disabled / enables an account
+     *
+     * @deprecated Will be removed in V5
      */
+    @Deprecated
     void setAccountDisabled(@NotNull ID id, boolean disabled);
 
     /**
      * Locks / unlocks an account
+     *
+     * @deprecated Will be removed in V5
      */
+    @Deprecated
     void setAccountLocked(@NotNull ID id, boolean locked);
 }
