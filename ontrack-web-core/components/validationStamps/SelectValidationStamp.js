@@ -5,10 +5,12 @@ import ValidationStampImage from "@components/validationStamps/ValidationStampIm
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 
 export default function SelectValidationStamp({
+                                                  disabled,
                                                   branch, value, onChange, onValidationStampSelected,
                                                   useName = false,
                                                   allowClear = false,
                                                   multiple = false,
+                                                  width,
                                               }) {
 
     const client = useGraphQLClient()
@@ -70,11 +72,13 @@ export default function SelectValidationStamp({
 
     return (
         <Select
+            disabled={disabled}
             options={options}
             value={value}
             onChange={onLocalChange}
             allowClear={allowClear}
             mode={multiple ? "multiple" : undefined}
+            style={{width}}
         />
     )
 }

@@ -6041,6 +6041,15 @@ type Query {
         "ID of the validation stamp to look for (required)"
         id: Int!
     ): ValidationStamp
+    "Validation stamp by name"
+    validationStampByName(
+        "Branch name"
+        branch: String!,
+        "Validation stamp name"
+        name: String!,
+        "Project name"
+        project: String!
+    ): ValidationStamp
     "Gets a list of existing available validation stamp names"
     validationStampNames(
         "Part of the name to look for"
