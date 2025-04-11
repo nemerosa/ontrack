@@ -1,0 +1,80 @@
+{
+  "id": "ontrack",
+  "realm": "ontrack",
+  "enabled": true,
+  "registrationAllowed": true,
+  "resetPasswordAllowed": true,
+  "users": [
+    {
+      "username": "admin",
+      "enabled": true,
+      "email": "admin@ontrack.local",
+      "firstName": "Admin",
+      "lastName": "User",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin"
+        }
+      ],
+      "realmRoles": [
+        "default-roles-ontrack"
+      ]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "ontrack-client",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "baseUrl": "http://localhost:3000",
+      "redirectUris": [
+        "http://localhost:3000/api/auth/callback/keycloak"
+      ],
+      "webOrigins": [
+        "http://localhost:3000"
+      ],
+      "directAccessGrantsEnabled": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "authorizationServicesEnabled": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "ontrack-client-secret"
+    }
+  ],
+  "components": {
+    "org.keycloak.storage.UserStorageProvider": [
+      {
+        "id": "ldap-users",
+        "name": "ldap-users",
+        "providerId": "ldap",
+        "config": {
+          "enabled": ["true"],
+          "priority": ["0"],
+          "editMode": ["READ_ONLY"],
+          "importEnabled": ["false"],
+          "syncRegistrations": ["false"],
+          "vendor": ["other"],
+          "connectionUrl": ["ldap://ldap:389"],
+          "usersDn": ["ou=users,dc=nemerosa,dc=com"],
+          "bindDn": ["cn=admin,dc=nemerosa,dc=com"],
+          "bindCredential": ["admin"],
+          "useTruststoreSpi": ["ldapsOnly"],
+          "connectionPooling": ["true"],
+          "pagination": ["true"],
+          "batchSizeForSync": ["1000"],
+          "usernameLDAPAttribute": ["uid"],
+          "rdnLDAPAttribute": ["uid"],
+          "uuidLDAPAttribute": ["entryUUID"],
+          "userObjectClasses": ["inetOrgPerson"],
+          "searchScope": ["1"],
+          "validatePasswordPolicy": ["false"],
+          "trustEmail": ["true"]
+        }
+      }
+    ]
+  }
+}
