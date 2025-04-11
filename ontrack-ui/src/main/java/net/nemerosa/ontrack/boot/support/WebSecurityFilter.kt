@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import net.nemerosa.ontrack.model.security.*
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
@@ -12,6 +13,7 @@ import org.springframework.web.filter.OncePerRequestFilter
 
 @Component
 class WebSecurityFilter(
+    private val ontrackConfigProperties: OntrackConfigProperties,
     private val accountLoginService: AccountLoginService,
     private val accountACLService: AccountACLService,
 ) : OncePerRequestFilter() {
@@ -51,7 +53,11 @@ class WebSecurityFilter(
     }
 
     private fun accountFromJwt(jwtAuthenticationToken: JwtAuthenticationToken): Account? {
-        val email = jwtAuthenticationToken.token.getClaim<String>("email")
+        val email = getClaim(
+            jwtAuthenticationToken,
+            defaultClaimName = "email",
+            customClaimName = ontrackConfigProperties.authorization.jwt.claims.email,
+        )
         if (email.isNullOrBlank()) {
             return null
         } else {
@@ -67,6 +73,23 @@ class WebSecurityFilter(
                 fullName = email
             }
             return accountLoginService.login(email, fullName)
+        }
+    }
+
+    private fun getClaim(
+        jwtAuthenticationToken: JwtAuthenticationToken,
+        defaultClaimName: String,
+        customClaimName: String? = null,
+    ): String? {
+        val value: String? = jwtAuthenticationToken.token.getClaim<String>(defaultClaimName)
+        return if (value.isNullOrBlank()) {
+            if (!customClaimName.isNullOrBlank()) {
+                jwtAuthenticationToken.token.getClaim<String>(customClaimName)
+            } else {
+                null
+            }
+        } else {
+            null
         }
     }
 }

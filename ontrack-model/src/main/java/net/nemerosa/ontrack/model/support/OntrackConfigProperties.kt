@@ -130,6 +130,24 @@ class OntrackConfigProperties {
          * Initial admin properties
          */
         var admin = AdminConfigProperties()
+        /**
+         * Custom JWT config
+         */
+        var jwt = JwtConfigProperties()
+    }
+
+    class JwtConfigProperties {
+        /**
+         * Custom claims
+         */
+        var claims = JwtClaimsConfigProperties()
+    }
+
+    class JwtClaimsConfigProperties {
+        /**
+         * Custom claim for the email
+         */
+        var email: String = ""
     }
 
     class AdminConfigProperties {
