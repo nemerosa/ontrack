@@ -8,7 +8,14 @@ export const UserContext = createContext({
     fullName: '',
     email: '',
     authorizations: {},
-    userMenuGroups: []
+    userMenuGroups: [],
+    profile: {
+        auth: {
+            account: {
+                url: ''
+            }
+        }
+    }
 })
 
 export default function UserContextProvider({children}) {
@@ -19,6 +26,13 @@ export default function UserContextProvider({children}) {
         email: '',
         authorizations: {},
         userMenuGroups: [],
+        profile: {
+            auth: {
+                account: {
+                    url: ''
+                }
+            }
+        }
     })
 
     const {data, loading, error, finished} = useQuery(
@@ -49,8 +63,16 @@ export default function UserContextProvider({children}) {
         `
     )
 
+    const [profile, setProfile] = useState()
+
     useEffect(() => {
-        if (data && finished) {
+        fetch('/api/protected/profile')
+            .then(data => data.json())
+            .then(profile => setProfile(profile))
+    }, [])
+
+    useEffect(() => {
+        if (data && profile && finished) {
             const tmpUser = {
                 name: data?.user?.account?.name,
                 fullName: data?.user?.account?.fullName,
@@ -70,10 +92,12 @@ export default function UserContextProvider({children}) {
                 }
                 domain[authorization.action] = authorization.authorized
             })
+            // Profile
+            tmpUser.profile = profile
             // We're done
             setUser(tmpUser)
         }
-    }, [data, finished])
+    }, [data, profile, finished])
 
     return (
         <>
