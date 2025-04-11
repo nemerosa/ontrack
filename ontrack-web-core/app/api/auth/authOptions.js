@@ -1,4 +1,3 @@
-import Auth0Provider from "next-auth/providers/auth0";
 import KeycloakProvider from "next-auth/providers/keycloak";
 
 const providers = []
@@ -29,14 +28,6 @@ if (providerId === "oidc") {
                 };
             },
         },
-    )
-} else if (providerId === "auth0") {
-    providers.push(
-        Auth0Provider({
-            clientId: process.env.NEXTAUTH_CLIENT_ID,
-            clientSecret: process.env.NEXTAUTH_CLIENT_SECRET,
-            issuer: process.env.NEXTAUTH_ISSUER,
-        })
     )
 } else {
     providers.push(
