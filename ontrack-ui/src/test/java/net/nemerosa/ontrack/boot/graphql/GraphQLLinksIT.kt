@@ -10,9 +10,7 @@ import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.security.ProjectView
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
-import kotlin.test.fail
 
 class GraphQLLinksIT : AbstractQLKTITSupport() {
 
@@ -123,28 +121,4 @@ class GraphQLLinksIT : AbstractQLKTITSupport() {
         )
     }
 
-    @Test
-    fun `Account token links`() {
-        asUser {
-            val id = securityService.currentUser?.account?.id()
-                ?: fail("No current user")
-            asAdmin {
-                val data = run(
-                    """{
-                        accounts(id: $id) {
-                            links {
-                                _revokeToken
-                                _generateToken
-                                _token
-                            }
-                        }
-                    }"""
-                )
-                val links = data["accounts"][0]["links"]
-                assertFalse(links["_revokeToken"].isNull)
-                assertFalse(links["_generateToken"].isNull)
-                assertFalse(links["_token"].isNull)
-            }
-        }
-    }
 }
