@@ -17,6 +17,9 @@
           "type": "password",
           "value": "admin"
         }
+      ],
+      "realmRoles": [
+        "default-roles-ontrack"
       ]
     }
   ],
