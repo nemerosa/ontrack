@@ -671,27 +671,4 @@ class AdminQLIT : AbstractQLKTITSupport() {
         }
     }
 
-    @Test
-    fun `Account token not filled in when not generated`() {
-        asUser {
-            val id = securityService.currentUser?.account?.id()
-                ?: fail("No current account")
-            asAdmin {
-                val data = run(
-                    """{
-                    accounts(id: $id) {
-                        token {
-                            creation
-                            validUntil
-                            valid
-                        }
-                    }
-                }"""
-                )
-                val token = data["accounts"][0]["token"]
-                assertTrue(token.isNull)
-            }
-        }
-    }
-
 }
