@@ -145,6 +145,10 @@ class OntrackConfigProperties {
          * Custom claims
          */
         var claims = JwtClaimsConfigProperties()
+        /**
+         * Custom JWT `typ`
+         */
+        var typ: String = ""
     }
 
     class JwtClaimsConfigProperties {
