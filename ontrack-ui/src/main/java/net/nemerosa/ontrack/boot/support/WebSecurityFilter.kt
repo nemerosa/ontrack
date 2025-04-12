@@ -5,6 +5,8 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
@@ -17,6 +19,8 @@ class WebSecurityFilter(
     private val accountLoginService: AccountLoginService,
     private val accountACLService: AccountACLService,
 ) : OncePerRequestFilter() {
+
+    private val log: Logger = LoggerFactory.getLogger(WebSecurityFilter::class.java)
 
     override fun doFilterInternal(
         request: HttpServletRequest,
@@ -53,25 +57,33 @@ class WebSecurityFilter(
     }
 
     private fun accountFromJwt(jwtAuthenticationToken: JwtAuthenticationToken): Account? {
+        val debug = ontrackConfigProperties.authorization.jwt.debug
         val email = getClaim(
             jwtAuthenticationToken,
             defaultClaimName = "email",
             customClaimName = ontrackConfigProperties.authorization.jwt.claims.email,
         )
+        if (debug) log.debug("JWT email {}", email)
         if (email.isNullOrBlank()) {
+            if (debug) log.debug("JWT email not set - not authenticated")
             return null
         } else {
             var fullName = jwtAuthenticationToken.token.getClaim<String>("name")
+            if (debug) log.debug("JWT full name {}", fullName)
             if (fullName.isNullOrBlank()) {
                 val givenName = jwtAuthenticationToken.token.getClaim<String>("given_name")
                 val familyName = jwtAuthenticationToken.token.getClaim<String>("family_name")
+                if (debug) log.debug("JWT given name {}", givenName)
+                if (debug) log.debug("JWT family name {}", familyName)
                 if (!givenName.isNullOrBlank() && !familyName.isNullOrBlank()) {
                     fullName = "$givenName $familyName"
                 }
             }
             if (fullName.isNullOrBlank()) {
+                if (debug) log.debug("JWT no name found - using email")
                 fullName = email
             }
+            if (debug) log.debug("JWT full name {}", fullName)
             return accountLoginService.login(email, fullName)
         }
     }

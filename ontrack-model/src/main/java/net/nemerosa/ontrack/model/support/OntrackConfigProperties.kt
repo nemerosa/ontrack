@@ -138,6 +138,10 @@ class OntrackConfigProperties {
 
     class JwtConfigProperties {
         /**
+         * Debugging
+         */
+        var debug = false
+        /**
          * Custom claims
          */
         var claims = JwtClaimsConfigProperties()
