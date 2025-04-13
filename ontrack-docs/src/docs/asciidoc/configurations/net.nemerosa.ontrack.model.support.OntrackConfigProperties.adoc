@@ -31,6 +31,48 @@ General configuration of Ontrack.
 |`work/files`
 |
 
+|`ontrack.config.authorization.admin.email`
+|`ONTRACK_CONFIG_AUTHORIZATION_ADMIN_EMAIL`
+|email field
+|`admin@ontrack.local`
+|
+
+|`ontrack.config.authorization.admin.full-name`
+|`ONTRACK_CONFIG_AUTHORIZATION_ADMIN_FULLNAME`
+|fullName field
+|`Administrator`
+|
+
+|`ontrack.config.authorization.admin.group-name`
+|`ONTRACK_CONFIG_AUTHORIZATION_ADMIN_GROUPNAME`
+|groupName field
+|`Administrators`
+|
+
+|`ontrack.config.authorization.jwt.claims.email`
+|`ONTRACK_CONFIG_AUTHORIZATION_JWT_CLAIMS_EMAIL`
+|email field
+|``
+|
+
+|`ontrack.config.authorization.jwt.debug`
+|`ONTRACK_CONFIG_AUTHORIZATION_JWT_DEBUG`
+|debug field
+|`false`
+|
+
+|`ontrack.config.authorization.jwt.typ`
+|`ONTRACK_CONFIG_AUTHORIZATION_JWT_TYP`
+|typ field
+|``
+|
+
+|`ontrack.config.authorization.provisioning`
+|`ONTRACK_CONFIG_AUTHORIZATION_PROVISIONING`
+|provisioning field
+|`true`
+|
+
 |`ontrack.config.build-filter-count-max`
 |`ONTRACK_CONFIG_BUILDFILTERCOUNTMAX`
 |# Maximum number of builds which can be returned by a build filter. Any number above is truncated down to this value
@@ -163,12 +205,6 @@ General configuration of Ontrack.
 |`true`
 |
 
-|`ontrack.config.security.tokens.transient-validity`
-|`ONTRACK_CONFIG_SECURITY_TOKENS_TRANSIENTVALIDITY`
-|transientValidity field
-|`PT30M`
-|
-
 |`ontrack.config.security.tokens.validity`
 |`ONTRACK_CONFIG_SECURITY_TOKENS_VALIDITY`
 |validity field
@@ -187,21 +223,9 @@ General configuration of Ontrack.
 |`_Empty list_`
 |
 
-|`ontrack.config.ui.enabled`
-|`ONTRACK_CONFIG_UI_ENABLED`
-|enabled field
-|`false`
-|
-
-|`ontrack.config.ui.uri`
-|`ONTRACK_CONFIG_UI_URI`
-|uri field
-|`http://localhost:3000/ui`
-|
-
 |`ontrack.config.url`
 |`ONTRACK_CONFIG_URL`
 |Root URL for this Ontrack installation, used for notifications
-|`http://localhost:8080`
+|`http://localhost:3000`
 |
 |===

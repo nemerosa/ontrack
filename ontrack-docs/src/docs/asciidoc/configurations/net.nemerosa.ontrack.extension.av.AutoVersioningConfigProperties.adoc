@@ -10,9 +10,9 @@ Configuration of the auto-versioning
 |`ontrack.extension.auto-versioning.queue.async`
 |`ONTRACK_EXTENSION_AUTO_VERSIONING_QUEUE_ASYNC`
 |
-            By default, Ontrack uses RabbitMQ queue to manage the auto versioning processes.
-            Disabling this mechanism is not recommended and is used only for internal testing.
-        
+                By default, Ontrack uses RabbitMQ queue to manage the auto versioning processes.
+                Disabling this mechanism is not recommended and is used only for internal testing.
+            
 |`true`
 |
 
@@ -31,6 +31,6 @@ Configuration of the auto-versioning
 |`ontrack.extension.auto-versioning.queue.scale`
 |`ONTRACK_EXTENSION_AUTO_VERSIONING_QUEUE_SCALE`
 |Default number of RabbitMQ queues to use
-|`1`
+|`10`
 |
 |===
