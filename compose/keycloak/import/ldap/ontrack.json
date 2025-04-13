@@ -4,25 +4,6 @@
   "enabled": true,
   "registrationAllowed": true,
   "resetPasswordAllowed": true,
-  "users": [
-    {
-      "username": "admin",
-      "enabled": true,
-      "email": "admin@ontrack.local",
-      "firstName": "Admin",
-      "lastName": "User",
-      "emailVerified": true,
-      "credentials": [
-        {
-          "type": "password",
-          "value": "admin"
-        }
-      ],
-      "realmRoles": [
-        "default-roles-ontrack"
-      ]
-    }
-  ],
   "clients": [
     {
       "clientId": "ontrack-client",
@@ -51,6 +32,52 @@
         "id": "ldap-users",
         "name": "ldap-users",
         "providerId": "ldap",
+        "subComponents": {
+          "org.keycloak.storage.ldap.mappers.LDAPStorageMapper": [
+            {
+              "name": "email",
+              "providerId": "user-attribute-ldap-mapper",
+              "config": {
+                "ldap.attribute": [
+                  "mail"
+                ],
+                "is.mandatory.in.ldap": [
+                  "true"
+                ],
+                "read.only": [
+                  "true"
+                ],
+                "always.read.value.from.ldap": [
+                  "true"
+                ],
+                "user.model.attribute": [
+                  "email"
+                ]
+              }
+            },
+            {
+              "name": "username",
+              "providerId": "user-attribute-ldap-mapper",
+              "config": {
+                "ldap.attribute": [
+                  "uid"
+                ],
+                "is.mandatory.in.ldap": [
+                  "true"
+                ],
+                "always.read.value.from.ldap": [
+                  "true"
+                ],
+                "read.only": [
+                  "true"
+                ],
+                "user.model.attribute": [
+                  "username"
+                ]
+              }
+            }
+          ]
+        },
         "config": {
           "enabled": ["true"],
           "priority": ["0"],

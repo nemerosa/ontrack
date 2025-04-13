@@ -106,7 +106,7 @@ class WebSecurityFilter(
                 null
             }
         } else {
-            null
+            value
         }
     }
 }

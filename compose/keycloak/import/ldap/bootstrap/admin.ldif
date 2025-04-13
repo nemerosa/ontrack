@@ -9,8 +9,7 @@ objectClass: organizationalPerson
 objectClass: person
 objectClass: top
 uid: admin
-username: admin
 cn: Administrator
 sn: Administrator
 mail: admin@ontrack.local
-userPassword: {SSHA}KTo9V1wBebjK0O8I53Zu5U3kACvXHFiY
+userPassword: {SSHA}cqhYu0IJNPgwklQuoENm6PtzGJLpPkgt
