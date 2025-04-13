@@ -58,6 +58,11 @@ class WebSecurityFilter(
 
     private fun accountFromJwt(jwtAuthenticationToken: JwtAuthenticationToken): Account? {
         val debug = ontrackConfigProperties.security.authorization.jwt.debug
+        if (debug) {
+            jwtAuthenticationToken.token.claims.forEach { (key, value) ->
+                log.debug("JWT claim {}: {}", key, value)
+            }
+        }
         val email = getClaim(
             jwtAuthenticationToken,
             defaultClaimName = "email",
