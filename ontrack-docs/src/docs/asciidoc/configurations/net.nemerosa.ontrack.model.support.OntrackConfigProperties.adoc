@@ -31,48 +31,6 @@ General configuration of Ontrack.
 |`work/files`
 |
 
-|`ontrack.config.authorization.admin.email`
-|`ONTRACK_CONFIG_AUTHORIZATION_ADMIN_EMAIL`
-|email field
-|`admin@ontrack.local`
-|
-
-|`ontrack.config.authorization.admin.full-name`
-|`ONTRACK_CONFIG_AUTHORIZATION_ADMIN_FULLNAME`
-|fullName field
-|`Administrator`
-|
-
-|`ontrack.config.authorization.admin.group-name`
-|`ONTRACK_CONFIG_AUTHORIZATION_ADMIN_GROUPNAME`
-|groupName field
-|`Administrators`
-|
-
-|`ontrack.config.authorization.jwt.claims.email`
-|`ONTRACK_CONFIG_AUTHORIZATION_JWT_CLAIMS_EMAIL`
-|email field
-|``
-|
-
-|`ontrack.config.authorization.jwt.debug`
-|`ONTRACK_CONFIG_AUTHORIZATION_JWT_DEBUG`
-|debug field
-|`false`
-|
-
-|`ontrack.config.authorization.jwt.typ`
-|`ONTRACK_CONFIG_AUTHORIZATION_JWT_TYP`
-|typ field
-|``
-|
-
-|`ontrack.config.authorization.provisioning`
-|`ONTRACK_CONFIG_AUTHORIZATION_PROVISIONING`
-|provisioning field
-|`true`
-|
-
 |`ontrack.config.build-filter-count-max`
 |`ONTRACK_CONFIG_BUILDFILTERCOUNTMAX`
 |# Maximum number of builds which can be returned by a build filter. Any number above is truncated down to this value
@@ -179,6 +137,48 @@ General configuration of Ontrack.
 |`ONTRACK_CONFIG_SEARCH_INDEX_TRACING`
 |When performing full indexation, the indexation is performed by batch. The parameter below allows to generate additional deep level logging for all actions on Git issues. Note: if set to `true` this generates a lot of information at DEBUG level.
 |`false`
+|
+
+|`ontrack.config.security.authorization.admin.email`
+|`ONTRACK_CONFIG_SECURITY_AUTHORIZATION_ADMIN_EMAIL`
+|email field
+|`admin@ontrack.local`
+|
+
+|`ontrack.config.security.authorization.admin.full-name`
+|`ONTRACK_CONFIG_SECURITY_AUTHORIZATION_ADMIN_FULLNAME`
+|fullName field
+|`Administrator`
+|
+
+|`ontrack.config.security.authorization.admin.group-name`
+|`ONTRACK_CONFIG_SECURITY_AUTHORIZATION_ADMIN_GROUPNAME`
+|groupName field
+|`Administrators`
+|
+
+|`ontrack.config.security.authorization.jwt.claims.email`
+|`ONTRACK_CONFIG_SECURITY_AUTHORIZATION_JWT_CLAIMS_EMAIL`
+|email field
+|``
+|
+
+|`ontrack.config.security.authorization.jwt.debug`
+|`ONTRACK_CONFIG_SECURITY_AUTHORIZATION_JWT_DEBUG`
+|debug field
+|`false`
+|
+
+|`ontrack.config.security.authorization.jwt.typ`
+|`ONTRACK_CONFIG_SECURITY_AUTHORIZATION_JWT_TYP`
+|typ field
+|``
+|
+
+|`ontrack.config.security.authorization.provisioning`
+|`ONTRACK_CONFIG_SECURITY_AUTHORIZATION_PROVISIONING`
+|provisioning field
+|`true`
 |
 
 |`ontrack.config.security.tokens.cache.enabled`

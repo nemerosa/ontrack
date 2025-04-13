@@ -57,11 +57,11 @@ class WebSecurityFilter(
     }
 
     private fun accountFromJwt(jwtAuthenticationToken: JwtAuthenticationToken): Account? {
-        val debug = ontrackConfigProperties.authorization.jwt.debug
+        val debug = ontrackConfigProperties.security.authorization.jwt.debug
         val email = getClaim(
             jwtAuthenticationToken,
             defaultClaimName = "email",
-            customClaimName = ontrackConfigProperties.authorization.jwt.claims.email,
+            customClaimName = ontrackConfigProperties.security.authorization.jwt.claims.email,
         )
         if (debug) log.debug("JWT email {}", email)
         if (email.isNullOrBlank()) {

@@ -57,8 +57,8 @@ class WebSecurityConfig(
             sessionManagement { sessionCreationPolicy = SessionCreationPolicy.STATELESS }
             oauth2ResourceServer {
                 jwt {
-                    if (ontrackConfigProperties.authorization.jwt.typ.isNotBlank()) {
-                        this.jwtDecoder = customJwtDecoder(jwtDecoder, ontrackConfigProperties.authorization.jwt.typ)
+                    if (ontrackConfigProperties.security.authorization.jwt.typ.isNotBlank()) {
+                        this.jwtDecoder = customJwtDecoder(jwtDecoder, ontrackConfigProperties.security.authorization.jwt.typ)
                     }
                 }
             }

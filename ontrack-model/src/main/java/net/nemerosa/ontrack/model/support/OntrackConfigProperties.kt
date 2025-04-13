@@ -93,11 +93,6 @@ class OntrackConfigProperties {
     var templating = TemplatingProperties()
 
     /**
-     * Authorization settings
-     */
-    var authorization = AuthorizationConfigProperties()
-
-    /**
      * Key-store type
      */
     @APIDescription("Key store type to use to store encryption keys")
@@ -260,6 +255,10 @@ class OntrackConfigProperties {
      * Security settings
      */
     class SecurityProperties {
+        /**
+         * Authorization settings
+         */
+        var authorization = AuthorizationConfigProperties()
         /**
          * Security token settings
          */

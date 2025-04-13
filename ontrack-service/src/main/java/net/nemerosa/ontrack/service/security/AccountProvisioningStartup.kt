@@ -25,8 +25,8 @@ class AccountProvisioningStartup(
     override fun startupOrder(): Int = StartupService.SYSTEM + 1
 
     override fun start() {
-        if (ontrackConfigProperties.authorization.provisioning) {
-            val admin = ontrackConfigProperties.authorization.admin
+        if (ontrackConfigProperties.security.authorization.provisioning) {
+            val admin = ontrackConfigProperties.security.authorization.admin
             logger.info("[account provisioning] Admin email     : ${admin.email}")
             logger.info("[account provisioning] Admin full name : ${admin.fullName}")
             logger.info("[account provisioning] Admin group name: ${admin.groupName}")
