@@ -79,7 +79,7 @@ object ACCProperties {
         }
     }
 
-    fun getOrCreateToken(url: String, username: String, password: String): String {
+    fun getOrCreateToken(url: String, username: String): String {
         // Unique name for the token
         val tokenName = uid("acc_")
         // Basic authentication

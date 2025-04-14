@@ -124,7 +124,6 @@ abstract class AbstractACCDSLTestSupport : AbstractACCTestSupport() {
         val token = ACCProperties.getOrCreateToken(
             url = ACCProperties.Connection.url,
             username = user.name,
-            password = user.password,
         )
         // Creating a connector for this user
         val connector = DefaultConnector(

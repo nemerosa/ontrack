@@ -27,7 +27,7 @@ include(":ontrack-web-core")
 
 // KDSL
 include(":ontrack-kdsl")
-// TODO include(":ontrack-kdsl-acceptance")
+include(":ontrack-kdsl-acceptance")
 
 // Core extensions
 // TODO include(":ontrack-extension-ldap")
