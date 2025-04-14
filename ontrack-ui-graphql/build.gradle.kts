@@ -12,6 +12,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-graphql")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework:spring-tx")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.security:spring-security-core")

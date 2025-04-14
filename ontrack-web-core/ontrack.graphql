@@ -1,12 +1,34 @@
-# This file was generated. Do not edit manually.
-
 schema {
     query: Query
     mutation: Mutation
 }
 
+"Marks the field, argument, input field or enum value as deprecated"
+directive @deprecated(
+    "The reason for the deprecation"
+    reason: String = "No longer supported"
+) on FIELD_DEFINITION | ARGUMENT_DEFINITION | ENUM_VALUE | INPUT_FIELD_DEFINITION
+
+"Directs the executor to include this field or fragment only when the `if` argument is true"
+directive @include(
+    "Included when true."
+    if: Boolean!
+) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+
 "Indicates an Input Object is a OneOf Input Object."
 directive @oneOf on INPUT_OBJECT
+
+"Directs the executor to skip this field or fragment when the `if` argument is true."
+directive @skip(
+    "Skipped when true."
+    if: Boolean!
+) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+"Exposes a URL that specifies the behaviour of this scalar."
+directive @specifiedBy(
+    "The URL that specifies the behaviour of this scalar."
+    url: String!
+) on SCALAR
 
 "Any type which contains authorizations for itself"
 interface Authorizable {
@@ -37,14 +59,8 @@ interface ProjectEntity {
 union BuildPromotionInfoItemData = EnvironmentBuildCount | PromotionLevel | PromotionRun | SlotPipeline
 
 type Account {
-    "Source of authentication (builtin, ldap, etc.)"
-    authenticationSource: AuthenticationSource
     "List of authorized projects"
     authorizedProjects: [AuthorizedProject!]!
-    "List of groups contributed to this account. Some groups are available only after the user has logged in."
-    contributedGroups: [AccountGroup!]!
-    "Is this account disabled?"
-    disabled: Boolean
     "Email of the account"
     email: String!
     "Full name of the account"
@@ -55,17 +71,11 @@ type Account {
     groups: [AccountGroup!]!
     id: ID!
     "Links"
-    links: AccountLinks @deprecated(reason: "Use the `actions` field instead.")
-    "Is this account locked (meaning that no change can be performed)?"
-    locked: Boolean
+    links: AccountLinks @deprecated(reason : "Use the `actions` field instead.")
     "Unique name for the account"
     name: String
-    "List of groups provided to this account. Some groups are available only after the user has logged in."
-    providedGroups: [String!]!
     "Security role (admin or none)"
     role: String
-    "Authentication token, if any, linked to this account."
-    token: Token @deprecated(reason: "Use the list of tokens. Will be removed in V5.")
     "List of authentication tokens linked to this account."
     tokens: [Token!]!
 }
@@ -80,9 +90,7 @@ type AccountGroup {
     globalRole: GlobalRole
     id: ID!
     "Links"
-    links: AccountGroupLinks @deprecated(reason: "Use the `actions` field instead.")
-    "Mappings for this group"
-    mappings: [AccountGroupMapping!]!
+    links: AccountGroupLinks @deprecated(reason : "Use the `actions` field instead.")
     name: String
 }
 
@@ -93,23 +101,10 @@ type AccountGroupLinks {
     _update: String
 }
 
-type AccountGroupMapping {
-    "Associated authentication source"
-    authenticationSource: AuthenticationSource
-    "Associated group"
-    group: AccountGroup
-    id: ID!
-    "Name of the mapping"
-    name: String
-}
-
 "Account links"
 type AccountLinks {
     _delete: String
-    _generateToken: String
-    _revokeToken: String
     _self: String
-    _token: String
     _update: String
 }
 
@@ -128,22 +123,6 @@ type AddSlotWorkflowPayload implements Payload {
     errors: [UserError]
     "Created slot workflow"
     slotWorkflow: SlotWorkflow
-}
-
-"Authentication source for an account or group."
-type AuthenticationSource {
-    "Is this authentication source allowing to change a password?"
-    allowingPasswordChange: Boolean!
-    "Is this authentication source enabled?"
-    enabled: Boolean!
-    "Does this authentication source support external groups?"
-    groupMappingSupported: Boolean!
-    "Key for this source"
-    key: String!
-    "Display name for this source"
-    name: String!
-    "Name of the provider for this authentication source"
-    provider: String!
 }
 
 "A named authorization"
@@ -272,7 +251,7 @@ type AutoVersioningOrder {
     "Target path(s) for the processing order"
     targetPath: String!
     "Target path(s) for the processing order"
-    targetPaths: String @deprecated(reason: "Deprecated, use `targetPath`")
+    targetPaths: String @deprecated(reason : "Deprecated, use `targetPath`")
     "Property in the target file"
     targetProperty: String
     "Regex used in property value to identify the version"
@@ -442,7 +421,7 @@ type Branch implements Authorizable & ProjectEntity {
     graph(
         "Direction for the dependencies"
         direction: BranchLinksDirection!
-    ): BranchLinksNode! @deprecated(reason: "Graph UI will be dropped in 4.6 and `graph` fields in 5.0.")
+    ): BranchLinksNode! @deprecated(reason : "Graph UI will be dropped in 4.6 and `graph` fields in 5.0.")
     id: ID!
     "List of information components attached to this entity"
     information: [EntityInformation!]!
@@ -451,7 +430,7 @@ type Branch implements Authorizable & ProjectEntity {
     "List of links."
     linkProperty: Property
     "Links"
-    links: BranchLinks @deprecated(reason: "Use the `actions` field instead.")
+    links: BranchLinks @deprecated(reason : "Use the `actions` field instead.")
     "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI."
     messageProperty: Property
     "List of meta information properties"
@@ -618,7 +597,7 @@ type BranchLinksNode {
 
 type Build implements Authorizable & ProjectEntity {
     "Actions for a Build"
-    actions: BuildActions @deprecated(reason: "Will be removed in V5. User `userMenuActions` instead.")
+    actions: BuildActions @deprecated(reason : "Will be removed in V5. User `userMenuActions` instead.")
     "Description with links."
     annotatedDescription: String
     "Authorizations for this context"
@@ -660,7 +639,7 @@ type Build implements Authorizable & ProjectEntity {
     graph(
         "Direction for the dependencies"
         direction: BranchLinksDirection!
-    ): BranchLinksNode! @deprecated(reason: "Graph UI will be dropped in 4.6 and `graph` fields in 5.0.")
+    ): BranchLinksNode! @deprecated(reason : "Graph UI will be dropped in 4.6 and `graph` fields in 5.0.")
     id: ID!
     "List of information components attached to this entity"
     information: [EntityInformation!]!
@@ -669,7 +648,7 @@ type Build implements Authorizable & ProjectEntity {
     "List of links."
     linkProperty: Property
     "Links"
-    links: BuildLinks @deprecated(reason: "Use the `actions` field instead.")
+    links: BuildLinks @deprecated(reason : "Use the `actions` field instead.")
     "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI."
     messageProperty: Property
     "List of meta information properties"
@@ -730,7 +709,7 @@ type Build implements Authorizable & ProjectEntity {
         project: String,
         "Size of the page"
         size: Int = 20
-    ): BuildPaginated @deprecated(reason: "usedByQualified must be used instead")
+    ): BuildPaginated @deprecated(reason : "usedByQualified must be used instead")
     "List of builds using this one."
     usedByQualified(
         "Keeps only links targeted from this branch. `project` argument is also required."
@@ -754,7 +733,7 @@ type Build implements Authorizable & ProjectEntity {
         project: String,
         "Size of the page"
         size: Int = 20
-    ): BuildPaginated @deprecated(reason: "usingQualified must be used instead")
+    ): BuildPaginated @deprecated(reason : "usingQualified must be used instead")
     "List of builds being used by this one."
     usingQualified(
         "Keeps only links targeted from this branch. `project` argument is also required."
@@ -840,7 +819,7 @@ type BuildAutoVersioning {
 "Form to create a new build filter."
 type BuildFilterForm {
     "Form for the filter."
-    form: JSON @deprecated(reason: "Form is only used for the Ontrack legacy UI")
+    form: JSON @deprecated(reason : "Form is only used for the Ontrack legacy UI")
     "If the filter is predefined and cannot be configured."
     isPredefined: Boolean
     "FQCN for the build filter provider"
@@ -858,7 +837,7 @@ type BuildFilterResource {
     "Is this filter shared?"
     isShared: Boolean
     "Links"
-    links: BuildFilterResourceLinks @deprecated(reason: "Use the `actions` field instead.")
+    links: BuildFilterResourceLinks @deprecated(reason : "Use the `actions` field instead.")
     "Name for this filter"
     name: String!
     "FQCN of the build filter provider"
@@ -1053,7 +1032,7 @@ type ConfigurableIndicatorTypeState {
     "Indicator type ID"
     id: String
     "Links"
-    links: ConfigurableIndicatorTypeStateLinks @deprecated(reason: "Use the `actions` field instead.")
+    links: ConfigurableIndicatorTypeStateLinks @deprecated(reason : "Use the `actions` field instead.")
     "Indicator type name"
     name: String
     "Saved stated for this configurable indicator"
@@ -1997,7 +1976,7 @@ type EventSubscriptionPayload {
     "List of events types to subscribe to"
     events: [String!]!
     "Name of the subscription"
-    id: String @deprecated(reason: "Will be removed in V5. Use `name` instead.")
+    id: String @deprecated(reason : "Will be removed in V5. Use `name` instead.")
     "Optional space-separated list of tokens to look for in the events"
     keywords: String
     "Unique name for this subscription"
@@ -2216,7 +2195,7 @@ type GitHubEngineConfiguration {
     "Authentication type"
     authenticationType: String
     "Links"
-    links: GitHubEngineConfigurationLinks @deprecated(reason: "Use the `actions` field instead.")
+    links: GitHubEngineConfigurationLinks @deprecated(reason : "Use the `actions` field instead.")
     "Name of the configuration"
     name: String
     "Rate limits for this configuration"
@@ -2549,7 +2528,7 @@ type IndicatorCategories {
         id: String
     ): [IndicatorCategory!]!
     "Links"
-    links: IndicatorCategoriesLinks @deprecated(reason: "Use the `actions` field instead.")
+    links: IndicatorCategoriesLinks @deprecated(reason : "Use the `actions` field instead.")
 }
 
 "IndicatorCategories links"
@@ -2564,7 +2543,7 @@ type IndicatorCategory {
     "Indicator category ID"
     id: String
     "Links"
-    links: IndicatorCategoryLinks @deprecated(reason: "Use the `actions` field instead.")
+    links: IndicatorCategoryLinks @deprecated(reason : "Use the `actions` field instead.")
     "Indicator category name"
     name: String
     "Reporting the indicators for the types in this category"
@@ -2653,18 +2632,18 @@ type IndicatorPortfolio {
     categoryStats(
         "Number of seconds (> 0) to get indicator trends from."
         duration: Int
-    ): [IndicatorCategoryStats!]! @deprecated(reason: "Use viewStats with viewId = null. This field will be removed in V5.")
+    ): [IndicatorCategoryStats!]! @deprecated(reason : "Use viewStats with viewId = null. This field will be removed in V5.")
     "Global indicator stats"
     globalStats(
         "Number of seconds (> 0) to get indicator trends from."
         duration: Int
-    ): [IndicatorCategoryStats!]! @deprecated(reason: "Use indicator views. This field will be removed in V5.")
+    ): [IndicatorCategoryStats!]! @deprecated(reason : "Use indicator views. This field will be removed in V5.")
     "ID of the portfolio"
     id: String
     "Label for this portfolio"
     label: Label
     "Links"
-    links: IndicatorPortfolioLinks @deprecated(reason: "Use the `actions` field instead.")
+    links: IndicatorPortfolioLinks @deprecated(reason : "Use the `actions` field instead.")
     "Name of the portfolio"
     name: String
     "List of projects associated with this portfolio"
@@ -2687,9 +2666,9 @@ type IndicatorPortfolioLinks {
 "List of portfolios"
 type IndicatorPortfolioOfPortfolios {
     "Global indicator categories"
-    categories: [IndicatorCategory!]! @deprecated(reason: "Use indicator views")
+    categories: [IndicatorCategory!]! @deprecated(reason : "Use indicator views")
     "Links"
-    links: IndicatorPortfolioOfPortfoliosLinks @deprecated(reason: "Use the `actions` field instead.")
+    links: IndicatorPortfolioOfPortfoliosLinks @deprecated(reason : "Use the `actions` field instead.")
     "List of portfolios"
     portfolios: [IndicatorPortfolio!]!
 }
@@ -2765,7 +2744,7 @@ type IndicatorTypeStats {
 "Aggregator of indicator types"
 type IndicatorTypes {
     "Links"
-    links: IndicatorTypesLinks @deprecated(reason: "Use the `actions` field instead.")
+    links: IndicatorTypesLinks @deprecated(reason : "Use the `actions` field instead.")
     "List of indicator types"
     types(
         "ID of the indicator category"
@@ -2797,7 +2776,7 @@ type IndicatorView {
     "Unique ID for this view"
     id: String!
     "Links"
-    links: IndicatorViewLinks @deprecated(reason: "Use the `actions` field instead.")
+    links: IndicatorViewLinks @deprecated(reason : "Use the `actions` field instead.")
     "Name of the view"
     name: String!
     "List of indicator stats per project for all categories in this view"
@@ -2828,7 +2807,7 @@ type IndicatorViewLinks {
 "List of indicator views and management links."
 type IndicatorViewList {
     "Links"
-    links: IndicatorViewListLinks @deprecated(reason: "Use the `actions` field instead.")
+    links: IndicatorViewListLinks @deprecated(reason : "Use the `actions` field instead.")
     "List of indicator views"
     views(
         "ID of the view to put in the list"
@@ -3215,7 +3194,7 @@ type Label {
     "id field"
     id: Int!
     "Links"
-    links: LabelLinks @deprecated(reason: "Use the `actions` field instead.")
+    links: LabelLinks @deprecated(reason : "Use the `actions` field instead.")
     "name field"
     name: String!
     "List of associated projects"
@@ -4889,7 +4868,7 @@ type Preferences {
 
 type Project implements Authorizable & ProjectEntity {
     "Actions for a Project"
-    actions: ProjectActions @deprecated(reason: "Will be removed in V5. User `userMenuActions` instead.")
+    actions: ProjectActions @deprecated(reason : "Will be removed in V5. User `userMenuActions` instead.")
     "Description with links."
     annotatedDescription: String
     "Authorizations for this context"
@@ -4940,7 +4919,7 @@ type Project implements Authorizable & ProjectEntity {
     "Associates the project with a GitHub repository"
     gitHubProjectConfigurationProperty: Property
     "List of formats supported for the export of issues in this project"
-    gitIssueExportFormats: [ExportFormat!]! @deprecated(reason: "List of issue export formats can be taken from the root and is now called issueExportFormats.")
+    gitIssueExportFormats: [ExportFormat!]! @deprecated(reason : "List of issue export formats can be taken from the root and is now called issueExportFormats.")
     "Information about an issue in the project"
     gitIssueInfo(
         "Flag to display only the first branch per type"
@@ -4973,9 +4952,8 @@ type Project implements Authorizable & ProjectEntity {
     "List of links."
     linkProperty: Property
     "Links"
-    links: ProjectLinks @deprecated(reason: "Use the `actions` field instead.")
+    links: ProjectLinks @deprecated(reason : "Use the `actions` field instead.")
     """
-
     List of project labels which describes the list of build links
     to display in a build links decoration.
     """
@@ -5180,7 +5158,7 @@ type ProjectIndicator {
         size: Int = 20
     ): ProjectIndicatorHistoryItemPaginated
     "Links"
-    links: ProjectIndicatorLinks @deprecated(reason: "Use the `actions` field instead.")
+    links: ProjectIndicatorLinks @deprecated(reason : "Use the `actions` field instead.")
     "Previous value for this indicator"
     previousValue: ProjectIndicator
     "Associated project"
@@ -5258,7 +5236,7 @@ type ProjectIndicatorType {
     "Link to the definition of the indicator"
     link: String
     "Links"
-    links: ProjectIndicatorTypeLinks @deprecated(reason: "Use the `actions` field instead.")
+    links: ProjectIndicatorTypeLinks @deprecated(reason : "Use the `actions` field instead.")
     "Name for the indicator type"
     name: String
     "Source for this type"
@@ -5359,7 +5337,7 @@ type PromotionLevel implements Authorizable & ProjectEntity {
     "List of links."
     linkProperty: Property
     "Links"
-    links: PromotionLevelLinks @deprecated(reason: "Use the `actions` field instead.")
+    links: PromotionLevelLinks @deprecated(reason : "Use the `actions` field instead.")
     "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI."
     messageProperty: Property
     "List of meta information properties"
@@ -5375,7 +5353,7 @@ type PromotionLevel implements Authorizable & ProjectEntity {
         first: Int,
         "Number of items to return from the end of the list"
         last: Int
-    ): [PromotionRun!]! @deprecated(reason: "Use the paginated promotion runs with the `promotionRunsPaginated` field.")
+    ): [PromotionRun!]! @deprecated(reason : "Use the paginated promotion runs with the `promotionRunsPaginated` field.")
     "Paginated list of promotion runs"
     promotionRunsPaginated(
         "Keeps only runs after this data / time"
@@ -5443,7 +5421,7 @@ type PromotionRun implements Authorizable & ProjectEntity {
     "List of links."
     linkProperty: Property
     "Links"
-    links: PromotionRunLinks @deprecated(reason: "Use the `actions` field instead.")
+    links: PromotionRunLinks @deprecated(reason : "Use the `actions` field instead.")
     "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI."
     messageProperty: Property
     "List of meta information properties"
@@ -5513,21 +5491,9 @@ type PurgeQueueRecordingsPayload implements Payload {
 }
 
 type Query {
-    accountGroupMappings(
-        "Group name"
-        group: String,
-        "Mapping name"
-        name: String,
-        "Authentication source provider"
-        provider: String,
-        "Authentication source name"
-        source: String
-    ): [AccountGroupMapping!]!
     accountGroups(
         "Searching by ID"
         id: Int,
-        "Searching by looking for a mapping"
-        mapping: String,
         "Searching by looking for a string in the name or the description"
         name: String
     ): [AccountGroup!]
@@ -5539,15 +5505,6 @@ type Query {
         "Searching by looking for a string in the name or the full name"
         name: String
     ): [Account!]
-    "List of all authentication sources."
-    authenticationSources(
-        "Filters on authentication sources which allow the user's password to be changed"
-        allowingPasswordChange: Boolean,
-        "Filters on authentication source which are enabled"
-        enabled: Boolean,
-        "Filters on authentication sources which support group mapping"
-        groupMappingSupported: Boolean
-    ): [AuthenticationSource!]!
     "Getting a list of authorizations for the authenticated user"
     authorizations: [Authorization!]!
     "List of audit entries for auto versioning processing orders"
@@ -5678,12 +5635,12 @@ type Query {
         from: Int!,
         "ID of the build to end the change log with"
         to: Int!
-    ): GitChangeLog @deprecated(reason: "Will be removed in V5. Prefer using the `scmChangeLog` query.")
+    ): GitChangeLog @deprecated(reason : "Will be removed in V5. Prefer using the `scmChangeLog` query.")
     "Gets a change log by its UUID"
     gitChangeLogByUUID(
         "UUID of the change log"
         uuid: String!
-    ): GitChangeLog @deprecated(reason: "Will be removed in V5. Prefer using the `scmChangeLog` query.")
+    ): GitChangeLog @deprecated(reason : "Will be removed in V5. Prefer using the `scmChangeLog` query.")
     "Getting Ontrack information about a Git commit and a project."
     gitCommitInfo(
         "Commit hash (full form) to look for."
@@ -5762,11 +5719,11 @@ type Query {
     "List of indicator views."
     indicatorViewList: IndicatorViewList
     "List of available commands for the management of the indicators"
-    indicatorsManagement: IndicatorsManagement! @deprecated(reason: "Will be removed in 4.6")
+    indicatorsManagement: IndicatorsManagement! @deprecated(reason : "Will be removed in 4.6")
     "Gets information about the application"
     info: Info
     "List of available export formats"
-    issueExportFormats: [IssueExportFormat!]! @deprecated(reason: "Use the templating service")
+    issueExportFormats: [IssueExportFormat!]! @deprecated(reason : "Use the templating service")
     "List of issue services"
     issueServiceConfigurations: [IssueServiceConfigurationRepresentation!]!
     "Getting a Jenkins configuration by name"
@@ -5976,7 +5933,6 @@ type Query {
         "ID of the build from"
         from: Int!,
         """
-
         List of projects to follow one by one for a get deep change log. Each item
         in the list is either a project name, or a project name and qualifier separated
         by a colon (:).
@@ -6492,13 +6448,13 @@ type SearchResult {
     "Description linked to the item being found"
     description: String
     "Web access point"
-    page: String @deprecated(reason: "Will be removed in V5. Use the generic type & data")
+    page: String @deprecated(reason : "Will be removed in V5. Use the generic type & data")
     "Short title"
     title: String
     "Type of result"
     type: SearchResultType
     "API access point"
-    uri: String @deprecated(reason: "Will be removed in V5. Use the generic type & data")
+    uri: String @deprecated(reason : "Will be removed in V5. Use the generic type & data")
 }
 
 type SearchResultPaginated {
@@ -7653,10 +7609,6 @@ type Token {
     lastUsed: LocalDateTime
     "Name of the token"
     name: String
-    "scope field"
-    scope: TokenScope!
-    "Is this token managed?"
-    transient: Boolean!
     "Validity flag, computed in regard to current time."
     valid: Boolean
     "Date until the end of validity."
@@ -7682,7 +7634,6 @@ type TriggerData {
 }
 
 """
-
 An `ActionLink` refers to a HTTP end point,
 having an uri, a HTTP method (like `PUT`
 or `POST`) and a type.
@@ -7809,7 +7760,7 @@ type User {
     "Account associated to the user"
     account: Account
     "Actions for a RootUser"
-    actions: RootUserActions @deprecated(reason: "Will be removed in V5. User `userMenuActions` instead.")
+    actions: RootUserActions @deprecated(reason : "Will be removed in V5. User `userMenuActions` instead.")
 }
 
 "Representation of an error."
@@ -7982,7 +7933,7 @@ type ValidationRun implements Authorizable & ProjectEntity {
     "List of links."
     linkProperty: Property
     "Links"
-    links: ValidationRunLinks @deprecated(reason: "Use the `actions` field instead.")
+    links: ValidationRunLinks @deprecated(reason : "Use the `actions` field instead.")
     "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI."
     messageProperty: Property
     "List of meta information properties"
@@ -8054,7 +8005,7 @@ type ValidationRunStatus implements Authorizable {
         status: String
     ): [Issue!]!
     "Links"
-    links: ValidationRunStatusLinks @deprecated(reason: "Use the `actions` field instead.")
+    links: ValidationRunStatusLinks @deprecated(reason : "Use the `actions` field instead.")
     "Status ID"
     statusID: ValidationRunStatusID
 }
@@ -8107,7 +8058,7 @@ type ValidationStamp implements Authorizable & ProjectEntity {
     "List of links."
     linkProperty: Property
     "Links"
-    links: ValidationStampLinks @deprecated(reason: "Use the `actions` field instead.")
+    links: ValidationStampLinks @deprecated(reason : "Use the `actions` field instead.")
     "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI."
     messageProperty: Property
     "List of meta information properties"
@@ -8147,7 +8098,7 @@ type ValidationStampFilter implements Authorizable {
     "ID of the filter"
     id: Int
     "Links"
-    links: ValidationStampFilterLinks @deprecated(reason: "Use the `actions` field instead.")
+    links: ValidationStampFilterLinks @deprecated(reason : "Use the `actions` field instead.")
     "Name of the filter"
     name: String!
     "Scope of the filter"
@@ -8188,7 +8139,7 @@ type VersionInfo {
     "Git commit"
     commit: String!
     "Creation date"
-    date: LocalDateTime @deprecated(reason: "Date field will be removed in V5")
+    date: LocalDateTime @deprecated(reason : "Date field will be removed in V5")
     "Display version"
     display: String!
     "Full version"
@@ -8275,7 +8226,6 @@ type WidgetInstance {
 }
 
 """
-
 =================================================================================
 Dashboards
 =================================================================================
@@ -8595,12 +8545,6 @@ enum SlotPipelineStatus {
     RUNNING
 }
 
-"Class of tokens"
-enum TokenScope {
-    NEXT_UI
-    USER
-}
-
 "Defines how validation runs should be sorted"
 enum ValidationRunSortingMode {
     ID
@@ -8819,7 +8763,6 @@ input CancelSlotPipelineInput {
 }
 
 """
-
 =================================================================================
 User change password
 =================================================================================
@@ -8929,8 +8872,6 @@ input CreateBuiltInAccountInput {
     fullName: String!
     "name field"
     name: String!
-    "password field"
-    password: String!
 }
 
 "Input type for the createConfiguration mutation."
@@ -9998,7 +9939,6 @@ input HookRecordingFilterInput {
 }
 
 """
-
 Request for the export of a change log.
 
 This request defines how to group issues by type and which format
@@ -10013,7 +9953,6 @@ Note that both the export format and the type of issues are specific notions lin
 """
 input IssueChangeLogExportRequest {
     """
-
     Title of the group to use when an issue does not belong to any group. It defaults to "Other".
     If left empty, any issue not belonging to a group would be excluded from the export. This field
     is not used when no grouping is specified.
@@ -10024,7 +9963,6 @@ input IssueChangeLogExportRequest {
     "Export format, \"text\" by default"
     format: String
     """
-
     Specification for the grouping, none by default.
 
     This specification describes how to group issues using their type. This format is independent from
@@ -10251,7 +10189,6 @@ input RunInfoInput {
 }
 
 """
-
 Request for the export of a change log.
 
 This request defines how to group issues by type and which format
@@ -10266,7 +10203,6 @@ Note that both the export format and the type of issues are specific notions lin
 """
 input SCMChangeLogExportInput {
     """
-
     Title of the group to use when an issue does not belong to any group. It defaults to "Other".
     If left empty, any issue not belonging to a group would be excluded from the export. This field
     is not used when no grouping is specified.
@@ -10276,7 +10212,6 @@ input SCMChangeLogExportInput {
     "Selected format. Defaults to plain text."
     format: String
     """
-
     Specification for the grouping, none by default.
 
     This specification describes how to group issues using their type. This format is independent from
@@ -11435,7 +11370,6 @@ input StandardBuildFilter {
     "Maximum number of builds to display"
     count: Int = 10
     """
-
     The build must be linked FROM the builds selected by the pattern.
     Syntax: PRJ:BLD where PRJ is a project name and BLD a build expression - with * as placeholder
     """
@@ -11443,7 +11377,6 @@ input StandardBuildFilter {
     "The build must be linked FROM a build having this promotion (requires \"linkedFrom\")"
     linkedFromPromotion: String
     """
-
     The build must be linked TO the builds selected by the pattern.
     Syntax: PRJ:BLD where PRJ is a project name and BLD a build expression - with * as placeholder
     """
