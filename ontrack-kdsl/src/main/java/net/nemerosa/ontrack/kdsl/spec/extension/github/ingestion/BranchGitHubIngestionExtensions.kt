@@ -12,6 +12,6 @@ fun Branch.setBranchGitHubIngestionConfig(yaml: String) {
             yaml
         )
     ) {
-        it?.setBranchGitHubIngestionConfig()?.fragments()?.payloadUserErrors()?.convert()
+        it?.setBranchGitHubIngestionConfig?.payloadUserErrors?.convert()
     }
 }

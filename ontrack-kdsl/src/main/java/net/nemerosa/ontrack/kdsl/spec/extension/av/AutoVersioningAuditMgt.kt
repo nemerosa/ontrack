@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.kdsl.spec.extension.av
 
+import com.apollographql.apollo.api.Optional
 import net.nemerosa.ontrack.kdsl.connector.Connected
 import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.AutoVersioningAuditEntriesQuery
@@ -17,8 +18,8 @@ class AutoVersioningAuditMgt(connector: Connector) : Connected(connector) {
     fun findEntryById(uuid: String): AutoVersioningAuditEntry? =
         graphqlConnector.query(
             AutoVersioningAuditEntryByIdQuery(uuid)
-        )?.autoVersioningAuditEntries()?.pageItems()?.firstOrNull()
-            ?.fragments()?.autoVersioningAuditEntryFragment()
+        )?.autoVersioningAuditEntries?.pageItems?.firstOrNull()
+            ?.autoVersioningAuditEntryFragment
             ?.toAutoVersioningAuditEntry()
 
     /**
@@ -31,18 +32,19 @@ class AutoVersioningAuditMgt(connector: Connector) : Connected(connector) {
         project: String,
         branch: String? = null,
         version: String? = null,
-    ): List<AutoVersioningAuditEntry> =
-        graphqlConnector.query(
-            AutoVersioningAuditEntriesQuery.builder()
-                .offset(offset)
-                .size(size)
-                .source(source)
-                .project(project)
-                .branch(branch)
-                .version(version)
-                .build()
-        )?.autoVersioningAuditEntries()?.pageItems()?.map { item ->
-            item.fragments().autoVersioningAuditEntryFragment().toAutoVersioningAuditEntry()
+    ): List<AutoVersioningAuditEntry> {
+        return graphqlConnector.query(
+            AutoVersioningAuditEntriesQuery(
+                offset = Optional.present(offset),
+                size = Optional.present(size),
+                source = Optional.presentIfNotNull(source),
+                project = Optional.present(project),
+                branch = Optional.presentIfNotNull(branch),
+                version = Optional.presentIfNotNull(version),
+            )
+        )?.autoVersioningAuditEntries?.pageItems?.map { item ->
+            item.autoVersioningAuditEntryFragment.toAutoVersioningAuditEntry()
         } ?: emptyList()
+    }
 
 }

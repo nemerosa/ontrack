@@ -17,16 +17,16 @@ class MockQueueMgt(connector: Connector) : Connected(connector) {
      * @return ID of the queue record
      */
     fun post(message: String): String =
-            graphqlConnector.mutate(
-                    PostQueueMutation(
-                            "mock",
-                            mapOf("message" to message).asJson()
-                    )
-            ) {
-                it?.postQueue()?.fragments()?.payloadUserErrors()?.convert()
-            }
-                    ?.checkData { it.postQueue()?.queueDispatchResult() }
-                    ?.id()
-                    ?: error("Could not post on the queue")
+        graphqlConnector.mutate(
+            PostQueueMutation(
+                "mock",
+                mapOf("message" to message).asJson()
+            )
+        ) {
+            it?.postQueue?.payloadUserErrors?.convert()
+        }
+            ?.checkData { it.postQueue?.queueDispatchResult }
+            ?.id
+            ?: error("Could not post on the queue")
 
 }

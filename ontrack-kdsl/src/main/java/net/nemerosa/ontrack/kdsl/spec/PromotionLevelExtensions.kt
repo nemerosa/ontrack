@@ -15,10 +15,10 @@ import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
  */
 fun PromotionLevelFragment.toPromotionLevel(connected: Connected) = PromotionLevel(
     connector = connected.connector,
-    branch = branch()?.fragments()?.branchFragment()?.toBranch(connected) ?: error("Missing parent branch"),
-    id = id().toUInt(),
-    name = name()!!,
-    description = description(),
+    branch = branch?.branchFragment?.toBranch(connected) ?: error("Missing parent branch"),
+    id = id.toUInt(),
+    name = name!!,
+    description = description,
 )
 
 /**
@@ -38,7 +38,7 @@ fun PromotionLevel.setProperty(
             data.asJson()
         )
     ) {
-        it?.setPromotionLevelPropertyById()?.fragments()?.payloadUserErrors()?.convert()
+        it?.setPromotionLevelPropertyById?.payloadUserErrors?.convert()
     }
     return this
 }
@@ -57,7 +57,7 @@ fun PromotionLevel.deleteProperty(
             type
         )
     ) {
-        it?.setPromotionLevelPropertyById()?.fragments()?.payloadUserErrors()?.convert()
+        it?.setPromotionLevelPropertyById?.payloadUserErrors?.convert()
     }
     return this
 }
@@ -73,4 +73,4 @@ fun PromotionLevel.getProperty(
 ): JsonNode? =
     graphqlConnector.query(
         PromotionLevelGetPropertyQuery(id.toInt(), type)
-    )?.promotionLevel()?.properties()?.firstOrNull()?.value()?.asJson()
+    )?.promotionLevel?.properties?.firstOrNull()?.value?.asJson()

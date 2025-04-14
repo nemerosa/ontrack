@@ -4,45 +4,45 @@ import net.nemerosa.ontrack.kdsl.connector.graphql.schema.fragment.AutoVersionin
 
 fun AutoVersioningSourceConfigFragment.toAutoVersioningSourceConfig() =
     AutoVersioningSourceConfig(
-        sourceProject = sourceProject(),
-        sourceBranch = sourceBranch(),
-        sourcePromotion = sourcePromotion(),
-        targetPath = targetPath(),
-        targetRegex = targetRegex(),
-        targetProperty = targetProperty(),
-        targetPropertyRegex = targetPropertyRegex(),
-        targetPropertyType = targetPropertyType(),
-        autoApproval = autoApproval(),
-        upgradeBranchPattern = upgradeBranchPattern(),
-        postProcessing = postProcessing(),
-        postProcessingConfig = postProcessingConfig(),
-        validationStamp = validationStamp(),
-        autoApprovalMode = when (autoApprovalMode()) {
+        sourceProject = sourceProject,
+        sourceBranch = sourceBranch,
+        sourcePromotion = sourcePromotion,
+        targetPath = targetPath,
+        targetRegex = targetRegex,
+        targetProperty = targetProperty,
+        targetPropertyRegex = targetPropertyRegex,
+        targetPropertyType = targetPropertyType,
+        autoApproval = autoApproval,
+        upgradeBranchPattern = upgradeBranchPattern,
+        postProcessing = postProcessing,
+        postProcessingConfig = postProcessingConfig,
+        validationStamp = validationStamp,
+        autoApprovalMode = when (autoApprovalMode) {
             net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.AutoApprovalMode.CLIENT -> AutoApprovalMode.CLIENT
             net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.AutoApprovalMode.SCM -> AutoApprovalMode.SCM
             else -> null
         },
-        notifications = notifications()?.map { n ->
+        notifications = notifications?.map { n ->
             AutoVersioningNotification(
-                channel = n.channel(),
-                config = n.config(),
-                scope = n.scope().map { s ->
+                channel = n.channel,
+                config = n.config,
+                scope = n.scope.map { s ->
                     AutoVersioningNotificationScope.valueOf(s.name)
                 },
-                notificationTemplate = n.notificationTemplate(),
+                notificationTemplate = n.notificationTemplate,
             )
         },
-        prTitleTemplate = prTitleTemplate(),
-        prBodyTemplate = prBodyTemplate(),
-        prBodyTemplateFormat = prBodyTemplateFormat(),
-        additionalPaths = additionalPaths()?.map {
+        prTitleTemplate = prTitleTemplate,
+        prBodyTemplate = prBodyTemplate,
+        prBodyTemplateFormat = prBodyTemplateFormat,
+        additionalPaths = additionalPaths?.map {
             AutoVersioningSourceConfigPath(
-                path = it.path(),
-                regex = it.regex(),
-                property = it.property(),
-                propertyRegex = it.propertyRegex(),
-                propertyType = it.propertyType(),
-                versionSource = it.versionSource(),
+                path = it.path,
+                regex = it.regex,
+                property = it.property,
+                propertyRegex = it.propertyRegex,
+                propertyType = it.propertyType,
+                versionSource = it.versionSource,
             )
         }
     )

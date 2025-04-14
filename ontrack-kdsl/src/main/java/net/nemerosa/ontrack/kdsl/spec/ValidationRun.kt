@@ -28,9 +28,9 @@ class ValidationRun(
     val runInfo: RunInfo?
         get() = graphqlConnector.query(
             ValidationRunRunInfoQuery(id.toInt())
-        )?.validationRuns()?.firstOrNull()?.runInfo()?.run {
+        )?.validationRuns?.firstOrNull()?.runInfo?.run {
             RunInfo(
-                runTime = runTime(),
+                runTime = runTime,
             )
         }
 }

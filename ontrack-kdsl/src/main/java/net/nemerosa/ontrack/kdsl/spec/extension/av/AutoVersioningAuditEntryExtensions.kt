@@ -4,19 +4,19 @@ import net.nemerosa.ontrack.kdsl.connector.graphql.schema.fragment.AutoVersionin
 
 fun AutoVersioningAuditEntryFragment.toAutoVersioningAuditEntry() = AutoVersioningAuditEntry(
     order = AutoVersioningOrder(
-        uuid = order().uuid(),
+        uuid = order.uuid,
     ),
-    running = running() ?: false,
+    running = running ?: false,
     mostRecentState = AutoVersioningAuditEntryState(
-        state = mostRecentState().state().name,
-        data = mostRecentState().data(),
+        state = mostRecentState.state.name,
+        data = mostRecentState.data,
     ),
-    audit = audit().map { auditEntry ->
+    audit = audit.map { auditEntry ->
         AutoVersioningAuditEntryState(
-            state = auditEntry.state().name,
-            data = auditEntry.data(),
+            state = auditEntry.state.name,
+            data = auditEntry.data,
         )
     },
-    routing = routing(),
-    queue = queue(),
+    routing = routing,
+    queue = queue,
 )

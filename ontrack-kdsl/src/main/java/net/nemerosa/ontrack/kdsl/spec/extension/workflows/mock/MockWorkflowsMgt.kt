@@ -9,6 +9,6 @@ class MockWorkflowsMgt(connector: Connector) : Connected(connector) {
     fun getTexts(instanceId: String): List<String> {
         return graphqlConnector.query(
             MockWorkflowTextsQuery(instanceId)
-        )?.mockWorkflowTexts() ?: emptyList()
+        )?.mockWorkflowTexts ?: emptyList()
     }
 }

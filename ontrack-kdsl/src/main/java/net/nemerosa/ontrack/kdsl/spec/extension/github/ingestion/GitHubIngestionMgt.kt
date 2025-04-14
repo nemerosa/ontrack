@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.kdsl.spec.extension.github.ingestion
 
-import com.apollographql.apollo.api.Input
+import com.apollographql.apollo.api.Optional
 import net.nemerosa.ontrack.kdsl.connector.Connected
 import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
@@ -30,27 +30,27 @@ class GitHubIngestionMgt(connector: Connector) : Connected(connector) {
         repository: String? = null,
     ): PaginatedList<GitHubIngestionPayload> = graphqlConnector.query(
         GitHubIngestionPayloadsQuery(
-            Input.fromNullable(offset),
-            Input.fromNullable(size),
-            Input.fromNullable(uuid),
-            Input.fromNullable(
+            Optional.presentIfNotNull(offset),
+            Optional.presentIfNotNull(size),
+            Optional.presentIfNotNull(uuid),
+            Optional.presentIfNotNull(
                 statuses?.map {
                     IngestionHookPayloadStatus.valueOf(it)
                 }
             ),
-            Input.fromNullable(gitHubEvent),
-            Input.fromNullable(repository),
+            Optional.presentIfNotNull(gitHubEvent),
+            Optional.presentIfNotNull(repository),
         )
     )?.paginate(
-        pageInfo = { it.gitHubIngestionHookPayloads()?.pageInfo()?.fragments()?.pageInfoContent() },
-        pageItems = { it.gitHubIngestionHookPayloads()?.pageItems() },
+        pageInfo = { it.gitHubIngestionHookPayloads?.pageInfo?.pageInfoContent },
+        pageItems = { it.gitHubIngestionHookPayloads?.pageItems },
     )?.map {
         GitHubIngestionPayload(
-            uuid = it.uuid()!!,
-            status = it.status().name,
-            message = it.message(),
-            routing = it.routing(),
-            queue = it.queue(),
+            uuid = it.uuid!!,
+            status = it.status.name,
+            message = it.message,
+            routing = it.routing,
+            queue = it.queue,
         )
     } ?: emptyPaginatedList()
 
@@ -66,20 +66,20 @@ class GitHubIngestionMgt(connector: Connector) : Connected(connector) {
         validationStatus: String?,
     ): UUID =
         graphqlConnector.mutate(
-            GitHubIngestionValidateDataByRunIdMutation(
-                owner,
-                repository,
-                runId,
-                validation,
-                net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.GitHubIngestionValidationDataInput.builder()
-                    .data(validationData.data)
-                    .type(validationData.type)
-                    .build(),
-                Input.fromNullable(validationStatus),
+            mutation = GitHubIngestionValidateDataByRunIdMutation(
+                owner = owner,
+                repository = repository,
+                runId = runId,
+                validation = validation,
+                validationData = net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.GitHubIngestionValidationDataInput(
+                    data = validationData.data,
+                    type = validationData.type,
+                ),
+                validationStatus = Optional.presentIfNotNull(validationStatus),
             )
         ) {
-            it?.gitHubIngestionValidateDataByRunId()?.fragments()?.payloadUserErrors()?.convert()
-        }?.gitHubIngestionValidateDataByRunId()?.payload()?.uuid()?.let { UUID.fromString(it) }
+            it?.gitHubIngestionValidateDataByRunId?.payloadUserErrors?.convert()
+        }?.gitHubIngestionValidateDataByRunId?.payload?.uuid?.let { UUID.fromString(it) }
             ?: error("Could not get the UUID of the processed request")
 
     /**
@@ -95,19 +95,19 @@ class GitHubIngestionMgt(connector: Connector) : Connected(connector) {
     ): UUID =
         graphqlConnector.mutate(
             GitHubIngestionValidateDataByBuildNameMutation(
-                owner,
-                repository,
-                buildName,
-                validation,
-                net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.GitHubIngestionValidationDataInput.builder()
-                    .data(validationData.data)
-                    .type(validationData.type)
-                    .build(),
-                Input.fromNullable(validationStatus),
+                owner = owner,
+                repository = repository,
+                buildName = buildName,
+                validation = validation,
+                validationData = net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.GitHubIngestionValidationDataInput(
+                    data = validationData.data,
+                    type = validationData.type,
+                ),
+                validationStatus = Optional.presentIfNotNull(validationStatus),
             )
         ) {
-            it?.gitHubIngestionValidateDataByBuildName()?.fragments()?.payloadUserErrors()?.convert()
-        }?.gitHubIngestionValidateDataByBuildName()?.payload()?.uuid()?.let { UUID.fromString(it) }
+            it?.gitHubIngestionValidateDataByBuildName?.payloadUserErrors?.convert()
+        }?.gitHubIngestionValidateDataByBuildName?.payload?.uuid?.let { UUID.fromString(it) }
             ?: error("Could not get the UUID of the processed request")
 
     /**
@@ -123,19 +123,20 @@ class GitHubIngestionMgt(connector: Connector) : Connected(connector) {
     ): UUID =
         graphqlConnector.mutate(
             GitHubIngestionValidateDataByBuildLabelMutation(
-                owner,
-                repository,
-                buildLabel,
-                validation,
-                net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.GitHubIngestionValidationDataInput.builder()
-                    .data(validationData.data)
-                    .type(validationData.type)
-                    .build(),
-                Input.fromNullable(validationStatus),
+                owner = owner,
+                repository = repository,
+                buildLabel = buildLabel,
+                validation = validation,
+                validationData = net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.GitHubIngestionValidationDataInput(
+                    data = validationData.data,
+                    type = validationData.type,
+                ),
+                validationStatus = Optional.presentIfNotNull(validationStatus),
             )
         ) {
-            it?.gitHubIngestionValidateDataByBuildLabel()?.fragments()?.payloadUserErrors()?.convert()
-        }?.gitHubIngestionValidateDataByBuildLabel()?.payload()?.uuid()?.let { UUID.fromString(it) }
+            it?.gitHubIngestionValidateDataByBuildLabel?.payloadUserErrors?.convert()
+        }
+            ?.gitHubIngestionValidateDataByBuildLabel?.payload?.uuid?.let { UUID.fromString(it) }
             ?: error("Could not get the UUID of the processed request")
 
     /**
@@ -149,19 +150,19 @@ class GitHubIngestionMgt(connector: Connector) : Connected(connector) {
     ): UUID =
         graphqlConnector.mutate(
             GitHubIngestionBuildLinksByRunIdMutation(
-                owner,
-                repository,
-                runId,
-                buildLinks.map { (project, buildRef) ->
-                    GitHubIngestionLink.builder()
-                        .project(project)
-                        .buildRef(buildRef)
-                        .build()
+                owner = owner,
+                repository = repository,
+                runId = runId,
+                buildLinks = buildLinks.map { (project, buildRef) ->
+                    GitHubIngestionLink(
+                        project = project,
+                        buildRef = buildRef,
+                    )
                 },
             )
         ) {
-            it?.gitHubIngestionBuildLinksByRunId()?.fragments()?.payloadUserErrors()?.convert()
-        }?.gitHubIngestionBuildLinksByRunId()?.payload()?.uuid()?.let { UUID.fromString(it) }
+            it?.gitHubIngestionBuildLinksByRunId?.payloadUserErrors?.convert()
+        }?.gitHubIngestionBuildLinksByRunId?.payload?.uuid?.let { UUID.fromString(it) }
             ?: error("Could not get the UUID of the processed request")
 
     /**
@@ -176,20 +177,20 @@ class GitHubIngestionMgt(connector: Connector) : Connected(connector) {
     ): UUID =
         graphqlConnector.mutate(
             GitHubIngestionBuildLinksByBuildNameMutation(
-                owner,
-                repository,
-                buildName,
-                addOnly,
-                buildLinks.map { (project, buildRef) ->
-                    GitHubIngestionLink.builder()
-                        .project(project)
-                        .buildRef(buildRef)
-                        .build()
+                owner = owner,
+                repository = repository,
+                buildName = buildName,
+                addOnly = addOnly,
+                buildLinks = buildLinks.map { (project, buildRef) ->
+                    GitHubIngestionLink(
+                        project = project,
+                        buildRef = buildRef,
+                    )
                 },
             )
         ) {
-            it?.gitHubIngestionBuildLinksByBuildName()?.fragments()?.payloadUserErrors()?.convert()
-        }?.gitHubIngestionBuildLinksByBuildName()?.payload()?.uuid()?.let { UUID.fromString(it) }
+            it?.gitHubIngestionBuildLinksByBuildName?.payloadUserErrors?.convert()
+        }?.gitHubIngestionBuildLinksByBuildName?.payload?.uuid?.let { UUID.fromString(it) }
             ?: error("Could not get the UUID of the processed request")
 
     /**
@@ -203,19 +204,19 @@ class GitHubIngestionMgt(connector: Connector) : Connected(connector) {
     ): UUID =
         graphqlConnector.mutate(
             GitHubIngestionBuildLinksByBuildLabelMutation(
-                owner,
-                repository,
-                buildLabel,
-                buildLinks.map { (project, buildRef) ->
-                    GitHubIngestionLink.builder()
-                        .project(project)
-                        .buildRef(buildRef)
-                        .build()
+                owner = owner,
+                repository = repository,
+                buildLabel = buildLabel,
+                buildLinks = buildLinks.map { (project, buildRef) ->
+                    GitHubIngestionLink(
+                        project = project,
+                        buildRef = buildRef,
+                    )
                 },
             )
         ) {
-            it?.gitHubIngestionBuildLinksByBuildLabel()?.fragments()?.payloadUserErrors()?.convert()
-        }?.gitHubIngestionBuildLinksByBuildLabel()?.payload()?.uuid()?.let { UUID.fromString(it) }
+            it?.gitHubIngestionBuildLinksByBuildLabel?.payloadUserErrors?.convert()
+        }?.gitHubIngestionBuildLinksByBuildLabel?.payload?.uuid?.let { UUID.fromString(it) }
             ?: error("Could not get the UUID of the processed request")
 
 }

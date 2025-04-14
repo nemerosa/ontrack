@@ -11,18 +11,18 @@ fun Ontrack.search(token: String): PaginatedList<SearchResult> =
     graphqlConnector.query(
         SearchQuery(token, 40)
     )?.paginate(
-        pageInfo = { it.search()?.pageInfo()?.fragments()?.pageInfoContent() },
-        pageItems = { it.search()?.pageItems() }
+        pageInfo = { it.search?.pageInfo?.pageInfoContent },
+        pageItems = { it.search?.pageItems }
     )?.map {
         SearchResult(
-            title = it.title() ?: "",
-            description = it.description() ?: "",
-            accuracy = it.accuracy() ?: 0.0,
+            title = it.title ?: "",
+            description = it.description ?: "",
+            accuracy = it.accuracy ?: 0.0,
             type = SearchResultType(
-                feature = it.type()?.feature()?.id() ?: "",
-                id = it.type()?.id() ?: "",
-                name = it.type()?.name() ?: "",
-                description = it.type()?.description() ?: "",
+                feature = it.type?.feature?.id ?: "",
+                id = it.type?.id ?: "",
+                name = it.type?.name ?: "",
+                description = it.type?.description ?: "",
             ),
         )
     } ?: emptyPaginatedList()

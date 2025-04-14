@@ -435,6 +435,8 @@ type Branch implements Authorizable & ProjectEntity {
   messageProperty: Property
   "List of meta information properties"
   metaInfoProperty: Property
+  "Mock SCM used for testing only"
+  mockSCMBranchProperty: Property
   name: String
   "List of other branches in the same project"
   otherBranches: [Branch!]!
@@ -653,6 +655,8 @@ type Build implements Authorizable & ProjectEntity {
   messageProperty: Property
   "List of meta information properties"
   metaInfoProperty: Property
+  "Mock SCM used for testing only"
+  mockSCMBuildCommitProperty: Property
   name: String
   "Next build"
   nextBuild: Build
@@ -4962,6 +4966,8 @@ type Project implements Authorizable & ProjectEntity {
   messageProperty: Property
   "List of meta information properties"
   metaInfoProperty: Property
+  "Mock SCM used for testing only"
+  mockSCMProjectProperty: Property
   name: String
   "Makes a promotion conditional based on the fact that a previous promotion has been granted."
   previousPromotionConditionProperty: Property
@@ -5773,6 +5779,11 @@ type Query {
   ): [Project!]!
   "License"
   licenseInfo: LicenseResponse!
+  "Getting a list of texts generated for a mock workflow"
+  mockWorkflowTexts(
+    "ID of the workflow instance"
+    instanceId: String!
+  ): [String!]!
   "List of all notification channels"
   notificationChannels: [NotificationChannel!]!
   "Getting a notification record using its ID"

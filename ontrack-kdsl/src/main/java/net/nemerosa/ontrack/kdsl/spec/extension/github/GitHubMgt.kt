@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.kdsl.spec.extension.github
 
-import com.apollographql.apollo.api.Input
+import com.apollographql.apollo.api.Optional
 import net.nemerosa.ontrack.kdsl.connector.Connected
 import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.GraphQLMissingDataException
@@ -24,24 +24,24 @@ class GitHubMgt(connector: Connector) : Connected(connector) {
         mutation = config.run {
             CreateGitHubConfigurationMutation(
                 name,
-                Input.fromNullable(url),
-                Input.fromNullable(user),
-                Input.fromNullable(password),
-                Input.fromNullable(oauth2Token),
-                Input.fromNullable(appId),
-                Input.fromNullable(appPrivateKey),
-                Input.fromNullable(appInstallationAccountName),
-                Input.fromNullable(autoMergeToken),
+                Optional.presentIfNotNull(url),
+                Optional.presentIfNotNull(user),
+                Optional.presentIfNotNull(password),
+                Optional.presentIfNotNull(oauth2Token),
+                Optional.presentIfNotNull(appId),
+                Optional.presentIfNotNull(appPrivateKey),
+                Optional.presentIfNotNull(appInstallationAccountName),
+                Optional.presentIfNotNull(autoMergeToken),
             )
         }
     ) {
-        it?.createGitHubConfiguration()?.fragments()?.payloadUserErrors()?.convert()
+        it?.createGitHubConfiguration?.payloadUserErrors?.convert()
     }?.checkData {
-        it.createGitHubConfiguration()?.configuration()
+        it.createGitHubConfiguration?.configuration
     }?.let {
         GitHubConfiguration(
             name = config.name,
-            url = it.url(),
+            url = it.url,
             user = null,
             password = null,
             oauth2Token = null,

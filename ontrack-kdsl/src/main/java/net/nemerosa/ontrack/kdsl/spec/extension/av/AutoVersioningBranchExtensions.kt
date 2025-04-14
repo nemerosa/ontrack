@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.kdsl.spec.extension.av
 
-import com.apollographql.apollo.api.Input
+import com.apollographql.apollo.api.Optional
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.GetBranchAutoVersioningConfigQuery
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.SetAutoVersioningConfigMutation
@@ -17,71 +17,69 @@ fun Branch.setAutoVersioningConfig(
         SetAutoVersioningConfigMutation(
             id.toInt(),
             configurations.map { config ->
-                AutoVersioningSourceConfigInput.builder()
-                    .autoApproval(config.autoApproval)
-                    .autoApprovalMode(
+                AutoVersioningSourceConfigInput(
+                    autoApproval = Optional.presentIfNotNull(config.autoApproval),
+                    autoApprovalMode = Optional.presentIfNotNull(
                         when (config.autoApprovalMode) {
                             AutoApprovalMode.CLIENT -> net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.AutoApprovalMode.CLIENT
                             AutoApprovalMode.SCM -> net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.AutoApprovalMode.SCM
                             null -> net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.AutoApprovalMode.CLIENT
                         }
-                    )
-                    .postProcessing(config.postProcessing)
-                    .postProcessingConfig(config.postProcessingConfig)
-                    .sourceBranch(config.sourceBranch)
-                    .sourceProject(config.sourceProject)
-                    .sourcePromotion(config.sourcePromotion)
-                    .targetPath(config.targetPath)
-                    .targetProperty(config.targetProperty)
-                    .targetPropertyRegex(config.targetPropertyRegex)
-                    .targetPropertyType(config.targetPropertyType)
-                    .targetRegex(config.targetRegex)
-                    .upgradeBranchPattern(config.upgradeBranchPattern)
-                    .validationStamp(config.validationStamp)
-                    .backValidation(config.backValidation)
-                    .versionSource(config.versionSource)
-                    .buildLinkCreation(config.buildLinkCreation)
-                    .reviewers(config.reviewers)
-                    .notifications(
+                    ),
+                    postProcessing = Optional.presentIfNotNull(config.postProcessing),
+                    postProcessingConfig = Optional.presentIfNotNull(config.postProcessingConfig),
+                    sourceBranch = config.sourceBranch,
+                    sourceProject = config.sourceProject,
+                    sourcePromotion = config.sourcePromotion,
+                    targetPath = config.targetPath,
+                    targetProperty = Optional.presentIfNotNull(config.targetProperty),
+                    targetPropertyRegex = Optional.presentIfNotNull(config.targetPropertyRegex),
+                    targetPropertyType = Optional.presentIfNotNull(config.targetPropertyType),
+                    targetRegex = Optional.presentIfNotNull(config.targetRegex),
+                    upgradeBranchPattern = Optional.presentIfNotNull(config.upgradeBranchPattern),
+                    validationStamp = Optional.presentIfNotNull(config.validationStamp),
+                    backValidation = Optional.presentIfNotNull(config.backValidation),
+                    versionSource = Optional.presentIfNotNull(config.versionSource),
+                    buildLinkCreation = Optional.presentIfNotNull(config.buildLinkCreation),
+                    reviewers = Optional.presentIfNotNull(config.reviewers),
+                    notifications = Optional.presentIfNotNull(
                         config.notifications?.map { n ->
-                            AutoVersioningNotificationInput.builder()
-                                .channel(n.channel)
-                                .config(n.config)
-                                .scope(n.scope.map { s ->
+                            AutoVersioningNotificationInput(
+                                channel = n.channel,
+                                config = n.config,
+                                scope = n.scope.map { s ->
                                     net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.AutoVersioningNotificationScope.valueOf(
                                         s.name
                                     )
-                                })
-                                .notificationTemplate(n.notificationTemplate)
-                                .build()
+                                },
+                                notificationTemplate = Optional.presentIfNotNull(n.notificationTemplate),
+                            )
                         }
-                    )
-                    .prTitleTemplate(config.prTitleTemplate)
-                    .prBodyTemplate(config.prBodyTemplate)
-                    .prBodyTemplateFormat(config.prBodyTemplateFormat)
-                    .additionalPathsInput(
-                        Input.optional(
-                            config.additionalPaths?.map { path ->
-                                AutoVersioningSourceConfigPathInput.builder()
-                                    .path(path.path)
-                                    .regex(path.regex)
-                                    .property(path.property)
-                                    .propertyRegex(path.propertyRegex)
-                                    .propertyType(path.propertyType)
-                                    .versionSource(path.versionSource)
-                                    .build()
-                            }
-                        )
-                    )
-                    .build()
+                    ),
+                    prTitleTemplate = Optional.presentIfNotNull(config.prTitleTemplate),
+                    prBodyTemplate = Optional.presentIfNotNull(config.prBodyTemplate),
+                    prBodyTemplateFormat = Optional.presentIfNotNull(config.prBodyTemplateFormat),
+                    additionalPaths = Optional.presentIfNotNull(
+                        config.additionalPaths?.map { path ->
+                            AutoVersioningSourceConfigPathInput(
+                                path = path.path,
+                                regex = Optional.presentIfNotNull(path.regex),
+                                property = Optional.presentIfNotNull(path.property),
+                                propertyRegex = Optional.presentIfNotNull(path.propertyRegex),
+                                propertyType = Optional.presentIfNotNull(path.propertyType),
+                                versionSource = Optional.presentIfNotNull(path.versionSource),
+                            )
+                        }
+                    ),
+                )
             }
         )
-    ) { it?.setAutoVersioningConfig()?.fragments()?.payloadUserErrors()?.convert() }
+    ) { it?.setAutoVersioningConfig?.payloadUserErrors?.convert() }
 }
 
 fun Branch.getAutoVersioningConfig(): List<AutoVersioningSourceConfig> =
     graphqlConnector.query(
         GetBranchAutoVersioningConfigQuery(id.toInt())
-    )?.branches()?.firstOrNull()?.autoVersioningConfig()?.configurations()?.map {
-        it.fragments().autoVersioningSourceConfigFragment().toAutoVersioningSourceConfig()
+    )?.branches?.firstOrNull()?.autoVersioningConfig?.configurations?.map {
+        it.autoVersioningSourceConfigFragment.toAutoVersioningSourceConfig()
     } ?: emptyList()

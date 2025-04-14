@@ -10,18 +10,18 @@ val PromotionRun.autoVersioningTrail: AutoVersioningTrail?
     get() =
         graphqlConnector.query(
             PromotionRunAutoVersioningTrailQuery(id.toInt())
-        )?.promotionRuns()?.firstOrNull()
-            ?.autoVersioningTrail()?.branches()
+        )?.promotionRuns?.firstOrNull()
+            ?.autoVersioningTrail?.branches
             ?.let { branches ->
                 AutoVersioningTrail(
                     branches = branches.map { branch ->
                         AutoVersioningBranchTrail(
                             connector = connector,
-                            branch = branch.branch().fragments().branchFragment().toBranch(this),
-                            configuration = branch.configuration().fragments().autoVersioningSourceConfigFragment()
+                            branch = branch.branch.branchFragment.toBranch(this),
+                            configuration = branch.configuration.autoVersioningSourceConfigFragment
                                 .toAutoVersioningSourceConfig(),
-                            rejectionReason = branch.rejectionReason(),
-                            orderId = branch.orderId(),
+                            rejectionReason = branch.rejectionReason,
+                            orderId = branch.orderId,
                         )
                     }
                 )

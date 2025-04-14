@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.kdsl.spec.extension.notifications.webhooks
 
-import com.apollographql.apollo.api.Input
+import com.apollographql.apollo.api.Optional
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.kdsl.connector.Connected
 import net.nemerosa.ontrack.kdsl.connector.Connector
@@ -39,15 +39,15 @@ class WebhooksMgt(connector: Connector) : Connected(connector) {
     ) {
         graphqlConnector.mutate(
             CreateWebhookMutation(
-                name,
-                enabled,
-                url,
-                timeout.toSeconds(),
-                authenticationType,
-                authenticationConfig.asJson(),
+                name = name,
+                enabled = enabled,
+                url = url,
+                timeoutSeconds = timeout.toSeconds(),
+                authenticationType = authenticationType,
+                authenticationConfig = authenticationConfig.asJson(),
             )
         ) {
-            it?.createWebhook()?.fragments()?.payloadUserErrors()?.convert()
+            it?.createWebhook?.payloadUserErrors?.convert()
         }
     }
 
@@ -72,30 +72,30 @@ class WebhooksMgt(connector: Connector) : Connected(connector) {
     ): PaginatedList<WebhookDelivery> =
         graphqlConnector.query(
             WebhookDeliveriesQuery(
-                Input.fromNullable(offset),
-                Input.fromNullable(size),
-                webhook
+                offset = Optional.presentIfNotNull(offset),
+                size = Optional.presentIfNotNull(size),
+                webhook = webhook
             )
         )?.paginate(
-            pageInfo = { it.webhooks().firstOrNull()?.exchanges()?.pageInfo()?.fragments()?.pageInfoContent() },
-            pageItems = { it.webhooks().firstOrNull()?.exchanges()?.pageItems() }
+            pageInfo = { it.webhooks.firstOrNull()?.exchanges?.pageInfo?.pageInfoContent },
+            pageItems = { it.webhooks.firstOrNull()?.exchanges?.pageItems }
         )?.map {
             WebhookDelivery(
-                uuid = it.uuid(),
-                webhook = it.webhook(),
+                uuid = it.uuid,
+                webhook = it.webhook,
                 request = WebhookRequest(
-                    timestamp = it.request().timestamp(),
-                    type = it.request().type(),
-                    payload = it.request().payload(),
+                    timestamp = it.request.timestamp,
+                    type = it.request.type,
+                    payload = it.request.payload,
                 ),
-                response = it.response()?.run {
+                response = it.response?.run {
                     WebhookResponse(
-                        timestamp = timestamp(),
-                        code = code(),
-                        payload = payload(),
+                        timestamp = timestamp,
+                        code = code,
+                        payload = payload,
                     )
                 },
-                stack = it.stack(),
+                stack = it.stack,
             )
         } ?: emptyPaginatedList()
 
@@ -112,13 +112,13 @@ class WebhooksMgt(connector: Connector) : Connected(connector) {
     fun findWebhookByName(name: String): Webhook? =
         graphqlConnector.query(
             FindWebhookByNameQuery(name)
-        )?.webhooks()?.firstOrNull()?.fragments()?.webhookFragment()?.run {
+        )?.webhooks?.firstOrNull()?.webhookFragment?.run {
             Webhook(
-                name = name(),
-                enabled = enabled(),
-                url = url(),
-                timeoutSeconds = timeoutSeconds(),
-                authenticationType = authenticationType(),
+                name = name,
+                enabled = enabled,
+                url = url,
+                timeoutSeconds = timeoutSeconds,
+                authenticationType = authenticationType,
             )
         }
 

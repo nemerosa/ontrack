@@ -9,19 +9,19 @@ import net.nemerosa.ontrack.kdsl.connector.graphql.schema.fragment.ValidationRun
  */
 fun ValidationRunFragment.toValidationRun(connected: Connected) = ValidationRun(
     connector = connected.connector,
-    id = id().toUInt(),
-    description = description(),
-    data = data()?.let { data ->
+    id = id.toUInt(),
+    description = description,
+    data = data?.let { data ->
         ValidationRunData(
-            type = data.descriptor()!!.id()!!,
-            data = data.data().asJson(),
+            type = data.descriptor!!.id!!,
+            data = data.data.asJson(),
         )
     },
-    statuses = validationRunStatuses().map {
+    statuses = validationRunStatuses.map {
         ValidationRunStatus(
-            id = it.statusID()!!.id()!!,
-            description = it.description() ?: "",
-            annotatedDescription = it.annotatedDescription() ?: "",
+            id = it.statusID!!.id,
+            description = it.description ?: "",
+            annotatedDescription = it.annotatedDescription ?: "",
         )
     }
 )

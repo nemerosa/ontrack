@@ -4,8 +4,8 @@ import net.nemerosa.ontrack.kdsl.connector.Connected
 import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.checkData
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.core.admin.CreateUserMutation
-import net.nemerosa.ontrack.kdsl.connector.graphql.schema.core.admin.GrantGlobalRoleToAccountMutation
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.CreateUserMutation
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.GrantGlobalRoleToAccountMutation
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 import net.nemerosa.ontrack.kdsl.connector.parse
 import java.net.URLEncoder
@@ -41,22 +41,19 @@ class AdminMgt(connector: Connector) : Connected(connector) {
         name: String,
         fullName: String = name,
         email: String = "$name@test.com",
-        password: String = "test",
     ): Account =
         graphqlConnector.mutate(
             CreateUserMutation(
                 name,
                 fullName,
                 email,
-                password
             )
-        ) { it?.createBuiltInAccount()?.fragments()?.payloadUserErrors()?.convert() }
-            ?.checkData { it.createBuiltInAccount()?.account() }
+        ) { it?.createBuiltInAccount?.payloadUserErrors?.convert() }
+            ?.checkData { it.createBuiltInAccount?.account }
             ?.run {
                 Account(
-                    id = id().toInt(),
+                    id = id.toInt(),
                     name = name,
-                    password = password,
                 )
             }
             ?: error("could not create user")
@@ -67,7 +64,7 @@ class AdminMgt(connector: Connector) : Connected(connector) {
                 account.id,
                 globalRole
             )
-        ) { it?.grantGlobalRoleToAccount()?.fragments()?.payloadUserErrors()?.convert() }
+        ) { it?.grantGlobalRoleToAccount?.payloadUserErrors?.convert() }
     }
 
 }

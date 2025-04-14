@@ -6,9 +6,9 @@ import net.nemerosa.ontrack.kdsl.spec.toProject
 
 fun SlotFragment.toSlot(connected: Connected) = Slot(
     connector = connected.connector,
-    id = id(),
-    environment = environment().fragments().environmentFragment().toEnvironment(connected),
-    project = project().fragments().projectFragment().toProject(connected),
-    qualifier = qualifier(),
-    description = description() ?: "",
+    id = id,
+    environment = environment.environmentFragment.toEnvironment(connected),
+    project = project.projectFragment.toProject(connected),
+    qualifier = qualifier,
+    description = description ?: "",
 )

@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.kdsl.spec.extension.notifications
 
-import com.apollographql.apollo.api.Input
+import com.apollographql.apollo.api.Optional
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.kdsl.connector.Connected
 import net.nemerosa.ontrack.kdsl.connector.Connector
@@ -39,17 +39,17 @@ class NotificationsMgt(connector: Connector) : Connected(connector) {
         if (projectEntity != null) {
             graphqlConnector.mutate(
                 SubscribeToEntityEventsMutation(
-                    Input.optional(name),
-                    projectEntity.type,
-                    projectEntity.id.toInt(),
-                    channel,
-                    channelConfig.asJson(),
-                    Input.optional(keywords),
-                    events,
-                    Input.optional(contentTemplate),
+                    name = Optional.presentIfNotNull(name),
+                    entityType = projectEntity.type,
+                    entityId = projectEntity.id.toInt(),
+                    channel = channel,
+                    channelConfig = channelConfig.asJson(),
+                    keywords = Optional.presentIfNotNull(keywords),
+                    events = events,
+                    contentTemplate = Optional.presentIfNotNull(contentTemplate),
                 )
             ) {
-                it?.subscribeToEvents()?.fragments()?.payloadUserErrors()?.convert()
+                it?.subscribeToEvents?.payloadUserErrors?.convert()
             }
         } else {
             TODO("Global subscriptions not supported yet")
@@ -59,20 +59,20 @@ class NotificationsMgt(connector: Connector) : Connected(connector) {
     fun subscriptions(projectEntity: ProjectEntity, offset: Int = 0, size: Int = 10): List<Subscription> =
         graphqlConnector.query(
             SubscriptionsByEntityQuery(
-                projectEntity.type,
-                projectEntity.id.toInt(),
-                offset,
-                size
+                entityType = projectEntity.type,
+                entityId = projectEntity.id.toInt(),
+                offset = Optional.presentIfNotNull(offset),
+                size = Optional.presentIfNotNull(size)
             )
-        )?.eventSubscriptions()?.pageItems()?.map {
+        )?.eventSubscriptions?.pageItems?.map {
             Subscription(
-                name = it.name(),
-                channel = it.channel(),
-                channelConfig = it.channelConfig(),
-                events = it.events(),
-                keywords = it.keywords(),
-                disabled = it.disabled() ?: false,
-                contentTemplate = it.contentTemplate(),
+                name = it.name,
+                channel = it.channel,
+                channelConfig = it.channelConfig,
+                events = it.events,
+                keywords = it.keywords,
+                disabled = it.disabled ?: false,
+                contentTemplate = it.contentTemplate,
             )
         } ?: emptyList()
 
@@ -88,26 +88,26 @@ class NotificationsMgt(connector: Connector) : Connected(connector) {
      */
     fun notificationRecords(channel: String?): List<NotificationRecord> {
         return graphqlConnector.query(
-            NotificationRecordsQuery(Input.fromNullable(channel))
-        )?.notificationRecords()?.pageItems()
+            NotificationRecordsQuery(Optional.presentIfNotNull(channel))
+        )?.notificationRecords?.pageItems
             ?.map {
                 NotificationRecord(
-                    id = it.id(),
-                    source = it.source()?.let { source ->
+                    id = it.id,
+                    source = it.source?.let { source ->
                         NotificationSourceData(
-                            id = source.id(),
-                            data = source.data(),
+                            id = source.id,
+                            data = source.data,
                         )
                     },
-                    timestamp = it.timestamp(),
-                    channel = it.channel(),
-                    channelConfig = it.channelConfig(),
-                    event = it.event(),
-                    result = it.result().let { result ->
+                    timestamp = it.timestamp,
+                    channel = it.channel,
+                    channelConfig = it.channelConfig,
+                    event = it.event,
+                    result = it.result.let { result ->
                         NotificationRecordResult(
-                            type = result.type().name,
-                            message = result.message(),
-                            output = result.output(),
+                            type = result.type.name,
+                            message = result.message,
+                            output = result.output,
                         )
                     }
                 )

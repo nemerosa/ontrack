@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.kdsl.spec
 
-import com.apollographql.apollo.api.Input
+import com.apollographql.apollo.api.Optional
 import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.GraphQLMissingDataException
 import net.nemerosa.ontrack.kdsl.connector.graphql.checkData
@@ -47,13 +47,13 @@ class Build(
             id.toInt(),
             promotion,
             description,
-            Input.optional(dateTime),
+            Optional.presentIfNotNull(dateTime),
         )
     ) {
-        it?.createPromotionRunById()?.fragments()?.payloadUserErrors()?.convert()
+        it?.createPromotionRunById?.payloadUserErrors?.convert()
     }
-        ?.checkData { it.createPromotionRunById()?.promotionRun() }
-        ?.fragments()?.promotionRunFragment()?.toPromotionRun(this)
+        ?.checkData { it.createPromotionRunById?.promotionRun }
+        ?.promotionRunFragment?.toPromotionRun(this)
         ?: throw GraphQLMissingDataException("Did not get back the created promotion run")
 
     /**
@@ -67,9 +67,9 @@ class Build(
         count: Int = 50,
     ): List<ValidationRun> =
         graphqlConnector.query(
-            BuildValidationRunsQuery(id.toInt(), validationStamp, count)
-        )?.builds()?.firstOrNull()?.validationRuns()?.map {
-            it.fragments().validationRunFragment().toValidationRun(this)
+            BuildValidationRunsQuery(id.toInt(), validationStamp, Optional.present(count))
+        )?.builds?.firstOrNull()?.validationRuns?.map {
+            it.validationRunFragment.toValidationRun(this)
         } ?: emptyList()
 
     /**
@@ -79,12 +79,12 @@ class Build(
         offset: Int = 0,
         size: Int = 10,
     ): PaginatedList<Build> = graphqlConnector.query(
-        BuildUsingQuery(id.toInt(), offset, size)
+        BuildUsingQuery(id.toInt(), Optional.present(offset), Optional.present(size))
     )?.paginate(
-        pageInfo = { it.builds()?.firstOrNull()?.usingQualified()?.pageInfo()?.fragments()?.pageInfoContent() },
-        pageItems = { it.builds()?.firstOrNull()?.usingQualified()?.pageItems() }
+        pageInfo = { it.builds?.firstOrNull()?.usingQualified?.pageInfo?.pageInfoContent },
+        pageItems = { it.builds?.firstOrNull()?.usingQualified?.pageItems }
     )?.map {
-        it.build().fragments().buildFragment().toBuild(this@Build)
+        it.build.buildFragment.toBuild(this@Build)
     } ?: emptyPaginatedList()
 
     /**
@@ -96,14 +96,14 @@ class Build(
                 branch.project.name,
                 name,
                 listOf(
-                    LinksBuildInputItem.builder()
-                        .project(build.branch.project.name)
-                        .build(build.name)
-                        .build()
+                    LinksBuildInputItem(
+                        project = build.branch.project.name,
+                        build = build.name
+                    )
                 )
             )
         ) {
-            it?.linksBuild()?.fragments()?.payloadUserErrors()?.convert()
+            it?.linksBuild?.payloadUserErrors?.convert()
         }
     }
 
@@ -121,21 +121,22 @@ class Build(
                     if (project.contains("@")) {
                         val projectName = project.substringBefore("@")
                         val qualifier = project.substringAfter("@")
-                        LinksBuildInputItem.builder()
-                            .project(projectName)
-                            .qualifier(qualifier)
-                            .build(name)
-                            .build()
+                        LinksBuildInputItem(
+                            project = projectName,
+                            qualifier = Optional.presentIfNotNull(qualifier),
+                            build = name,
+                        )
                     } else {
-                        LinksBuildInputItem.builder()
-                            .project(project)
-                            .build(name)
-                            .build()
+                        LinksBuildInputItem(
+                            project = project,
+                            qualifier = Optional.absent(),
+                            build = name,
+                        )
                     }
                 }
             )
         ) {
-            it?.linksBuild()?.fragments()?.payloadUserErrors()?.convert()
+            it?.linksBuild?.payloadUserErrors?.convert()
         }
     }
 
@@ -156,10 +157,10 @@ class Build(
                 time
             )
         ) {
-            it?.updateBuild()?.fragments()?.payloadUserErrors()?.convert()
+            it?.updateBuild?.payloadUserErrors?.convert()
         }
-            ?.checkData { it.updateBuild()?.build() }
-            ?.fragments()?.buildFragment()?.toBuild(this)
+            ?.checkData { it.updateBuild?.build }
+            ?.buildFragment?.toBuild(this)
             ?: throw GraphQLMissingDataException("Did not get back the updated build")
 
 }

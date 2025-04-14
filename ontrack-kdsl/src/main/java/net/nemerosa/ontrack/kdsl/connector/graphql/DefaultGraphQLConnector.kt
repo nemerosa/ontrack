@@ -1,13 +1,16 @@
 package net.nemerosa.ontrack.kdsl.connector.graphql
 
 import com.apollographql.apollo.ApolloClient
+import com.apollographql.apollo.api.ApolloResponse
 import com.apollographql.apollo.api.Mutation
 import com.apollographql.apollo.api.Operation
 import com.apollographql.apollo.api.Query
-import com.apollographql.apollo.api.Response
-import com.apollographql.apollo.coroutines.await
+import com.apollographql.apollo.network.okHttpClient
 import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.kdsl.connector.Connector
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.JSON
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.LocalDateTime
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.UUID
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 
@@ -17,11 +20,11 @@ class DefaultGraphQLConnector(
 ) : GraphQLConnector {
 
     private val apolloClient: ApolloClient =
-        ApolloClient.builder()
+        ApolloClient.Builder()
             .serverUrl("${connector.url}/graphql")
-            .addCustomTypeAdapter(LocalDateTimeCustomTypeAdapter.TYPE, LocalDateTimeCustomTypeAdapter())
-            .addCustomTypeAdapter(UUIDCustomTypeAdapter.TYPE, UUIDCustomTypeAdapter())
-            .addCustomTypeAdapter(JSONCustomTypeAdapter.TYPE, JSONCustomTypeAdapter())
+            .addCustomScalarAdapter(LocalDateTime.type, localDateTimeCustomTypeAdapter)
+            .addCustomScalarAdapter(UUID.type, uuidCustomTypeAdapter)
+            .addCustomScalarAdapter(JSON.type, jsonCustomTypeAdapter)
             .okHttpClient(
                 OkHttpClient.Builder()
                     .addInterceptor(
@@ -34,17 +37,14 @@ class DefaultGraphQLConnector(
             }
             .build()
 
-    override fun <D : Operation.Data, T, V : Operation.Variables> query(query: Query<D, T, V>): T? =
+    override fun <D : Query.Data> query(query: Query<D>): D? =
         runBlocking {
-            apolloClient.query(query).await().checkErrors().data
+            apolloClient.query(query).execute().checkErrors().data
         }
 
-    override fun <D : Operation.Data, T, V : Operation.Variables> mutate(
-        mutation: Mutation<D, T, V>,
-        userErrors: (T?) -> UserErrors?,
-    ): T? =
+    override fun <D : Mutation.Data> mutate(mutation: Mutation<D>, userErrors: (D?) -> UserErrors?): D? =
         runBlocking {
-            val response = apolloClient.mutate(mutation).await().checkErrors()
+            val response = apolloClient.mutation(mutation).execute().checkErrors()
             val data = response.data
             checkErrors(userErrors(data))
             data
@@ -66,9 +66,9 @@ class DefaultGraphQLConnector(
         }
     }
 
-    private fun <T> Response<T>.checkErrors() = apply {
+    private fun <D : Operation.Data> ApolloResponse<D>.checkErrors() = apply {
         val errors = this.errors
-        if (errors != null && errors.isNotEmpty()) {
+        if (!errors.isNullOrEmpty()) {
             throw GraphQLClientException.errors(errors)
         }
     }

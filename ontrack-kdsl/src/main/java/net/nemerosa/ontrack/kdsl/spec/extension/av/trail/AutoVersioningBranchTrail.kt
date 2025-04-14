@@ -21,8 +21,8 @@ class AutoVersioningBranchTrail(
         orderId?.let { auditOrderId ->
             graphqlConnector.query(
                 AutoVersioningAuditEntryByIdQuery(auditOrderId)
-            )?.autoVersioningAuditEntries()?.pageItems()?.firstOrNull()
-                ?.fragments()?.autoVersioningAuditEntryFragment()
+            )?.autoVersioningAuditEntries?.pageItems?.firstOrNull()
+                ?.autoVersioningAuditEntryFragment
                 ?.toAutoVersioningAuditEntry()
         }
     }

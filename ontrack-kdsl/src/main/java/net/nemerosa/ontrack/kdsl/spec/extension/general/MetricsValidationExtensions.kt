@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.kdsl.spec.extension.general
 
-import com.apollographql.apollo.api.Input
+import com.apollographql.apollo.api.Optional
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.ValidateWithMetricsMutation
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.type.MetricsEntryInput
@@ -16,18 +16,18 @@ fun Build.validateWithMetrics(
     graphqlConnector.mutate(
         ValidateWithMetricsMutation(
             id.toInt(),
-            Input.fromNullable(description),
+            Optional.presentIfNotNull(description),
             validation,
-            Input.fromNullable(status),
+            Optional.presentIfNotNull(status),
             metrics.map { (name, value) ->
-                MetricsEntryInput.builder()
-                    .name(name)
-                    .value(value)
-                    .build()
+                MetricsEntryInput(
+                    name = name,
+                    value = value,
+                )
             }
         )
     ) {
-        it?.validateBuildByIdWithMetrics()?.fragments()?.payloadUserErrors()?.convert()
+        it?.validateBuildByIdWithMetrics?.payloadUserErrors?.convert()
     }
 }
 

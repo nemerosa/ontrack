@@ -15,11 +15,11 @@ import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
  */
 fun BranchFragment.toBranch(connected: Connected) = Branch(
     connector = connected.connector,
-    project = project()?.fragments()?.projectFragment()?.toProject(connected) ?: error("Missing parent project"),
-    id = id().toUInt(),
-    name = name()!!,
-    description = description(),
-    disabled = disabled(),
+    project = project?.projectFragment?.toProject(connected) ?: error("Missing parent project"),
+    id = id.toUInt(),
+    name = name!!,
+    description = description,
+    disabled = disabled,
 )
 
 /**
@@ -33,7 +33,7 @@ fun Branch.getProperty(
 ): JsonNode? =
     graphqlConnector.query(
         BranchGetPropertyQuery(id.toInt(), type)
-    )?.branches()?.firstOrNull()?.properties()?.firstOrNull()?.value()?.asJson()
+    )?.branches?.firstOrNull()?.properties?.firstOrNull()?.value?.asJson()
 
 /**
  * Sets a generic property on a [Branch].
@@ -52,7 +52,7 @@ fun Branch.setProperty(
             data.asJson()
         )
     ) {
-        it?.setBranchPropertyById()?.fragments()?.payloadUserErrors()?.convert()
+        it?.setBranchPropertyById?.payloadUserErrors?.convert()
     }
     return this
 }
@@ -71,7 +71,7 @@ fun Branch.deleteProperty(
             type
         )
     ) {
-        it?.setBranchPropertyById()?.fragments()?.payloadUserErrors()?.convert()
+        it?.setBranchPropertyById?.payloadUserErrors?.convert()
     }
     return this
 }
