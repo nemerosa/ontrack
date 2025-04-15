@@ -38,6 +38,7 @@ class WebSecurityConfig(
             .authorizeHttpRequests { requests ->
                 requests.anyRequest().permitAll()
             }
+            .csrf { it.disable() }
         return http.build()
     }
 

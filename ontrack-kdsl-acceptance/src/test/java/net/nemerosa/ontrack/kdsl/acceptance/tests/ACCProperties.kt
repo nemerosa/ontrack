@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.kdsl.acceptance.tests
 
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.connector.support.DefaultConnector
-import java.util.*
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.findAnnotation
@@ -10,17 +9,18 @@ import kotlin.reflect.full.findAnnotation
 object ACCProperties {
 
     object Connection {
+
+        const val DEFAULT_USERNAME = "admin"
+
         @DefaultValue("http://localhost:8080")
         val url: String by fromEnv()
+
         val token: String by lazy {
             obtainToken()
         }
 
         @DefaultValue("admin")
         val username: String? by fromEnv()
-
-        @DefaultValue("admin")
-        val password: String? by fromEnv()
 
         object Mgt {
             @DefaultValue("http://localhost:8800/manage")
@@ -43,6 +43,7 @@ object ACCProperties {
         object Timeouts {
             @DefaultValue("30000")
             val general: Long by longFromEnv()
+
             @DefaultValue("500")
             val interval: Long by longFromEnv()
         }
@@ -72,28 +73,22 @@ object ACCProperties {
         return if (providedToken != null) {
             providedToken
         } else {
-            val url = Connection.url
-            val username = Connection.username ?: error("Username is required to get a token")
-            val password = Connection.username ?: error("Password is required to get a token")
-            getOrCreateToken(url, username, password)
+            getOrCreateToken()
         }
     }
 
-    fun getOrCreateToken(url: String, username: String): String {
+    fun getOrCreateToken(username: String = Connection.username ?: Connection.DEFAULT_USERNAME): String {
         // Unique name for the token
         val tokenName = uid("acc_")
-        // Basic authentication
-        val basic: String = "$username:$password".run {
-            Base64.getEncoder().encodeToString(toByteArray(Charsets.UTF_8))
-        }
-        // Creating a connector for this URl and these credentials
-        val connector = DefaultConnector(
-            url = url,
-            defaultHeaders = mapOf(
-                "Authorization" to "Basic $basic"
+        // Creating a management connector
+        val connector = DefaultConnector(url = Connection.Mgt.url)
+        return connector.post(
+            "/account",
+            body = mapOf(
+                "username" to username,
+                "tokenName" to tokenName,
             )
         )
-        return connector.post("/rest/tokens/create/${tokenName}")
             .apply {
                 if (statusCode != 200) {
                     error("Cannot get a new token")
@@ -101,7 +96,6 @@ object ACCProperties {
             }
             .body.asJson()
             .path("token")
-            .path("value")
             .asText()
     }
 

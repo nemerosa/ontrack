@@ -66,6 +66,9 @@ management:
   endpoint:
     health:
       show-details: always
+    # Getting a token for an account is used only for testing and must be explicitly granted
+    account:
+      access: none
   # Custom URL for the management end points
   endpoints:
     web:
