@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="Application (kdsl)" type="SpringBootApplicationConfigurationType"
+                   factoryName="Spring Boot">
+        <option name="ACTIVE_PROFILES" value="dev"/>
+        <envs>
+            <env name="MANAGEMENT_ENDPOINT_ACCOUNT_ACCESS" value="unrestricted"/>
+            <env name="ONTRACK_CONFIG_CONFIGURATION_TEST" value="false"/>
+        </envs>
+        <module name="ontrack.ontrack-ui.main"/>
+        <option name="PROGRAM_PARAMETERS" value="--debug"/>
+        <option name="SPRING_BOOT_MAIN_CLASS" value="net.nemerosa.ontrack.boot.Application"/>
+        <method v="2">
+            <option name="Make" enabled="true"/>
+        </method>
+    </configuration>
+</component>

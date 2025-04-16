@@ -1,0 +1,13 @@
+mutation CreateConfiguration(
+    $name: String!,
+    $type: String!,
+    $data: JSON!,
+) {
+    createConfiguration(input: {
+        name: $name,
+        type: $type,
+        data: $data,
+    }) {
+        ...PayloadUserErrors
+    }
+}
