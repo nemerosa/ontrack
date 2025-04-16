@@ -8,7 +8,6 @@
       <env name="ONTRACK_EXTENSION_GITHUB_INGESTION_PROCESSING_REPOSITORIES_TEST_REPOSITORY" value="test-routing-repository" />
     </envs>
     <module name="ontrack.ontrack-ui.main" />
-    <option name="PROGRAM_PARAMETERS" value="--debug" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="net.nemerosa.ontrack.boot.Application" />
     <method v="2">
       <option name="Make" enabled="true" />
