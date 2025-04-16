@@ -3,8 +3,7 @@ package net.nemerosa.ontrack.json
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.exc.MismatchedInputException
-import com.fasterxml.jackson.databind.node.ArrayNode
-import com.fasterxml.jackson.databind.node.ObjectNode
+import com.fasterxml.jackson.databind.node.*
 import kotlin.reflect.KClass
 
 private val mapper = ObjectMapperFactory.create()
@@ -38,7 +37,32 @@ fun <T> T.asJson(): JsonNode = if (this is JsonNode) {
 /**
  * To a Map through JSON
  */
+@Deprecated("Use toObject() instead", ReplaceWith("toObject()"))
 fun JsonNode.toJsonMap(): Map<String, *> = JsonUtils.toMap(asJson())
+
+/**
+ * Transforms the JSON node into a regular object (primitive types, list & maps)
+ */
+fun JsonNode?.toObject(): Any? =
+    if (this != null) {
+        when (this) {
+            is NullNode -> null
+            is BooleanNode -> booleanValue()
+            is NumericNode -> numberValue()
+            is BinaryNode -> binaryValue()
+            is TextNode -> textValue()
+
+            is ArrayNode -> map { it.toObject() }
+
+            is ObjectNode -> fields().asSequence().map { (k, v) ->
+                k to v.toObject()
+            }.toMap()
+
+            else -> error("Cannot convert JSON to Object: $this")
+        }
+    } else {
+        null
+    }
 
 /**
  * Format as a string
