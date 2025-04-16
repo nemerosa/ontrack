@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.core
 
-import com.apollographql.apollo.api.BigDecimal
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.kdsl.acceptance.tests.AbstractACCDSLTestSupport
 import net.nemerosa.ontrack.kdsl.spec.PromotionLevel
 import net.nemerosa.ontrack.kdsl.spec.charts.getChart
 import org.junit.jupiter.api.Test
+import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.Month
 import kotlin.test.assertEquals

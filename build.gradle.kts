@@ -76,6 +76,11 @@ subprojects {
         }
     }
 
+    // Kotlin Coroutines
+    // - 1.8.1 for Spring Boot 3.4.4
+    // - 1.9.0 for Apollo (:ontrack-kdsl)
+    extra["kotlin-coroutines.version"] = "1.9.0"
+
 }
 
 // ===================================================================================================================

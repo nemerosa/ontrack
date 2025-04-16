@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests
 
-import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.connector.support.DefaultConnector
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
@@ -10,7 +9,7 @@ object ACCProperties {
 
     object Connection {
 
-        const val DEFAULT_USERNAME = "admin"
+        const val DEFAULT_USERNAME = "admin@ontrack.local"
 
         @DefaultValue("http://localhost:8080")
         val url: String by fromEnv()
@@ -19,11 +18,11 @@ object ACCProperties {
             obtainToken()
         }
 
-        @DefaultValue("admin")
+        @DefaultValue(DEFAULT_USERNAME)
         val username: String? by fromEnv()
 
         object Mgt {
-            @DefaultValue("http://localhost:8800/manage")
+            @DefaultValue("http://localhost:8800")
             val url: String by fromEnv()
         }
 
@@ -78,25 +77,16 @@ object ACCProperties {
     }
 
     fun getOrCreateToken(username: String = Connection.username ?: Connection.DEFAULT_USERNAME): String {
-        // Unique name for the token
-        val tokenName = uid("acc_")
         // Creating a management connector
         val connector = DefaultConnector(url = Connection.Mgt.url)
-        return connector.post(
-            "/account",
-            body = mapOf(
-                "username" to username,
-                "tokenName" to tokenName,
-            )
-        )
+        // return connector.get("/manage/account/${URLEncoder.encode(username, Charsets.UTF_8)}")
+        return connector.get("/manage/account/$username")
             .apply {
                 if (statusCode != 200) {
                     error("Cannot get a new token")
                 }
             }
-            .body.asJson()
-            .path("token")
-            .asText()
+            .body.asText()
     }
 
     private fun fromEnv(): ReadOnlyProperty<Any, String> =

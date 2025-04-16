@@ -12,7 +12,7 @@ dependencies {
     testImplementation("commons-io:commons-io")
     testImplementation("commons-codec:commons-codec")
 
-    // testImplementation("org.influxdb:influxdb-java")
+    testImplementation("org.influxdb:influxdb-java")
 }
 
 // Pre-acceptance tests: starting the environment
