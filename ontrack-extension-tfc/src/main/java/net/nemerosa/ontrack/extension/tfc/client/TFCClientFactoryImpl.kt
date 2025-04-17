@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
 @Component
-@Profile("!${RunProfile.ACC}")
+@Profile(RunProfile.PROD)
 class TFCClientFactoryImpl : TFCClientFactory {
     override fun createClient(config: TFCConfiguration) = TFCClientImpl(
         url = config.url,

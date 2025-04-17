@@ -42,7 +42,7 @@ class ArtifactoryPromotionSyncServiceIT : AbstractDSLTestSupport() {
     private lateinit var artifactoryClient: ArtifactoryClient
 
     @Configuration
-    @Profile(RunProfile.UNIT_TEST)
+    @Profile(RunProfile.DEV)
     class ArtifactoryPromotionSyncServiceITConfiguration {
 
         /**

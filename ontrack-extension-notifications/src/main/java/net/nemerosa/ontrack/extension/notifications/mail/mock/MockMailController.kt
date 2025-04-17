@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
-@Profile(RunProfile.ACC)
+@Profile(RunProfile.DEV)
 @RestController
 @RequestMapping("/extension/notifications/mail/mock")
 class MockMailController(

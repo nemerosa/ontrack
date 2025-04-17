@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
 @Component
-@Profile(RunProfile.ACC)
+@Profile(RunProfile.DEV)
 class MockingTFCClientFactory : TFCClientFactory {
 
     private val logger: Logger = LoggerFactory.getLogger(MockingTFCClientFactory::class.java)

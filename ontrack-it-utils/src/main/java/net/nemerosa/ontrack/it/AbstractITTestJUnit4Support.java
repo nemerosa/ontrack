@@ -1,22 +1,13 @@
 package net.nemerosa.ontrack.it;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import net.nemerosa.ontrack.common.RunProfile;
 import net.nemerosa.ontrack.json.ObjectMapperFactory;
 import net.nemerosa.ontrack.model.structure.NameDescription;
 import org.jetbrains.annotations.NotNull;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.*;
-import org.springframework.core.convert.converter.ConverterRegistry;
-import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
@@ -34,7 +25,7 @@ import static net.nemerosa.ontrack.test.TestUtils.uid;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @Transactional
-@ActiveProfiles(profiles = {RunProfile.UNIT_TEST})
+@ActiveProfiles(profiles = {RunProfile.DEV})
 @SpringBootTest(
         classes = {
                 AbstractITTestSupport.AbstractIntegrationTestConfiguration.class

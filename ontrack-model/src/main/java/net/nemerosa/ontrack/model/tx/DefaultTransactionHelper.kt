@@ -8,7 +8,7 @@ import org.springframework.transaction.TransactionDefinition
 import org.springframework.transaction.support.TransactionTemplate
 
 @Component
-@Profile("!${RunProfile.UNIT_TEST}")
+@Profile(RunProfile.PROD)
 class DefaultTransactionHelper(
     private val platformTransactionManager: PlatformTransactionManager,
 ) : TransactionHelper {

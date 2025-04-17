@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component
 import java.util.concurrent.atomic.AtomicLong
 
 @Component
-@Profile(value = [RunProfile.DEV, RunProfile.ACC, RunProfile.UNIT_TEST])
+@Profile(RunProfile.DEV)
 class MockSCMExtension(
     extensionFeature: SCMExtensionFeature,
     private val propertyService: PropertyService,

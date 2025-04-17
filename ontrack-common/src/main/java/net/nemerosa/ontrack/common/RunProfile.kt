@@ -2,13 +2,11 @@ package net.nemerosa.ontrack.common
 
 /**
  * List of Spring profiles.
+ *
+ * /!\ Do not add other profiles since we consider only DEV or PROD and
+ * existing components rely on this duality.
  */
 object RunProfile {
-    /**
-     * Unit test mode
-     */
-    @Deprecated("Use the DEV mode")
-    const val UNIT_TEST = "unitTest"
 
     /**
      * Development mode.
@@ -16,18 +14,8 @@ object RunProfile {
     const val DEV = "dev"
 
     /**
-     * Acceptance mode
-     */
-    @Deprecated("Use the DEV mode")
-    const val ACC = "acceptance"
-
-    /**
      * Production mode
      */
     const val PROD = "prod"
 
-    /**
-     * Accessory profile to run with CORS enabled
-     */
-    const val CORS = "cors"
 }

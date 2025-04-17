@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component
 
 
 @Component
-@Profile("!${RunProfile.ACC}")
+@Profile(RunProfile.PROD)
 class DefaultMailService(
     private val javaMailSender: JavaMailSender?,
     private val applicationLogService: ApplicationLogService,

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 import java.time.Duration
 
 @Component
-@Profile("!${RunProfile.ACC}")
+@Profile("!${RunProfile.DEV}")
 class DefaultJenkinsClientFactory(
     private val jenkinsConfigurationProperties: JenkinsConfigurationProperties,
 ) : JenkinsClientFactory {

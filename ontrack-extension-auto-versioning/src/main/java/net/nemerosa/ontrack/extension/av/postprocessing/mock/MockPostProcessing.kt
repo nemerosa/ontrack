@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
 @Component
-@Profile(RunProfile.ACC)
+@Profile(RunProfile.DEV)
 class MockPostProcessing(
     extensionFeature: AutoVersioningExtensionFeature,
 ) : AbstractExtension(extensionFeature), PostProcessing<MockPostProcessingConfig> {

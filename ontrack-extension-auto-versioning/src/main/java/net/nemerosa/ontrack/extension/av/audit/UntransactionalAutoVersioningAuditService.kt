@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional
  * @see AutoVersioningAuditServiceImpl
  */
 @Service
-@Profile(RunProfile.UNIT_TEST)
+@Profile(RunProfile.DEV)
 @Transactional(propagation = Propagation.REQUIRED)
 class UntransactionalAutoVersioningAuditService(
     store: AutoVersioningAuditStore,

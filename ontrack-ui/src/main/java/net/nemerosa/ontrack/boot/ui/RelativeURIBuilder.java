@@ -14,7 +14,7 @@ import java.net.URI;
  * This {@link URIBuilder} builds URI relative to the site root (the returned URI start with a <code>/</code>).
  */
 @Component
-@Profile({RunProfile.DEV, RunProfile.ACC, RunProfile.PROD})
+@Profile(RunProfile.PROD)
 @ConditionalOnProperty(prefix = "ontrack.config", name = "uri", havingValue = "relative", matchIfMissing = true)
 public class RelativeURIBuilder extends AbstractEntityURIBuilder {
 

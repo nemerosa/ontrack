@@ -93,20 +93,7 @@ class LicenseControlServiceTest {
     fun `No license in unit test mode, all features enabled`() {
 
         every { licenseService.license } returns null
-        every { envService.profiles } returns RunProfile.UNIT_TEST
-
-        val featureId = uid("f-")
-        assertTrue(
-            licenseControlService.isFeatureEnabled(featureId),
-            "Feature enabled"
-        )
-    }
-
-    @Test
-    fun `No license in acceptance mode, all features enabled`() {
-
-        every { licenseService.license } returns null
-        every { envService.profiles } returns RunProfile.ACC
+        every { envService.profiles } returns RunProfile.DEV
 
         val featureId = uid("f-")
         assertTrue(

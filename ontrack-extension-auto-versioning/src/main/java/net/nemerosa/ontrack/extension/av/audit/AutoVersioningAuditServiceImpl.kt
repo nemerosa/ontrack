@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-@Profile("!${RunProfile.UNIT_TEST}")
+@Profile(RunProfile.PROD)
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 class AutoVersioningAuditServiceImpl(
     store: AutoVersioningAuditStore

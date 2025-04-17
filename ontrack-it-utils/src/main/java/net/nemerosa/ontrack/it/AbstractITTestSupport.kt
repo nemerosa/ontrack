@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional
 import javax.sql.DataSource
 
 @Transactional
-@ActiveProfiles(profiles = [RunProfile.UNIT_TEST])
+@ActiveProfiles(profiles = [RunProfile.DEV])
 @SpringBootTest(
     classes = [AbstractIntegrationTestConfiguration::class
     ], webEnvironment = SpringBootTest.WebEnvironment.NONE
@@ -51,7 +51,7 @@ abstract class AbstractITTestSupport {
         get() = NamedParameterJdbcTemplate(dataSource!!)
 
     @Configuration
-    @Profile(RunProfile.UNIT_TEST)
+    @Profile(RunProfile.DEV)
     @ComponentScan("net.nemerosa.ontrack")
     @EnableAutoConfiguration
     class AbstractIntegrationTestConfiguration {

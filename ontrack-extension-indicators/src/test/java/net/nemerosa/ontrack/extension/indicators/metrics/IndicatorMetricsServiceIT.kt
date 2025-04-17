@@ -70,7 +70,7 @@ class IndicatorMetricsServiceIT : AbstractIndicatorsTestSupport() {
     }
 
     @Configuration
-    @Profile(RunProfile.UNIT_TEST)
+    @Profile(RunProfile.DEV)
     class IndicatorMetricsServiceITConfig {
         @Bean
         @Primary

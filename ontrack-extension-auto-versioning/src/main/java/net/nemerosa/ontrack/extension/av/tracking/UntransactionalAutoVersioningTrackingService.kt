@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-@Profile(RunProfile.UNIT_TEST)
+@Profile(RunProfile.DEV)
 @Transactional(propagation = Propagation.REQUIRED)
 class UntransactionalAutoVersioningTrackingService(
     entityStore: EntityStore,

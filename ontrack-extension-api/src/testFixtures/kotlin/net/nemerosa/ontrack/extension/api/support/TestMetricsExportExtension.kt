@@ -11,7 +11,7 @@ import java.time.temporal.ChronoUnit
 import kotlin.test.assertTrue
 
 @Component
-@Profile(RunProfile.UNIT_TEST)
+@Profile(RunProfile.DEV)
 class TestMetricsExportExtension(
     extensionFeature: TestExtensionFeature
 ) : AbstractExtension(extensionFeature), MetricsExportExtension {

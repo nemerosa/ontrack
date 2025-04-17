@@ -894,7 +894,7 @@ class SonarQubeIT : AbstractDSLTestSupport() {
     private lateinit var testBranchModelMatcherProvider: TestBranchModelMatcherProvider
 
     @Configuration
-    @Profile(RunProfile.UNIT_TEST)
+    @Profile(RunProfile.DEV)
     class SonarQubeITConfiguration {
 
         /**

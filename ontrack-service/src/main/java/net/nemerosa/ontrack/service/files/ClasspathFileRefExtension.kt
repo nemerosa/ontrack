@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component
  * Looking for a file in the classpath
  */
 @Component
-@Profile(RunProfile.UNIT_TEST)
+@Profile(RunProfile.DEV)
 class ClasspathFileRefExtension : AbstractExtension(CoreExtensionFeature.INSTANCE), FileRefExtension {
 
     override val protocol: String = "classpath"

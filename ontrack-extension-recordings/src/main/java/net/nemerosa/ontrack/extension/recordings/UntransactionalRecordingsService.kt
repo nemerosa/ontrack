@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional
  * Used for testing
  */
 @Service
-@Profile(RunProfile.UNIT_TEST)
+@Profile(RunProfile.DEV)
 @Transactional(propagation = Propagation.REQUIRED)
 class UntransactionalRecordingsService(recordingsStore: RecordingsStore) : AbstractRecordingsService(recordingsStore) {
 

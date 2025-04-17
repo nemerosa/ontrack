@@ -13,8 +13,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Configuration
-@Profile("git.mock")
+@Profile(GitMockConfig.PROFILE_GIT_MOCK)
 public class GitMockConfig {
+
+    public static final String PROFILE_GIT_MOCK = "git.mock";
 
     @Bean
     public GitRepositoryClient testGitRepositoryClient() {

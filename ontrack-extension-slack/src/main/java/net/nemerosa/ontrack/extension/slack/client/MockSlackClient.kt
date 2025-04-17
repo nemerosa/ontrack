@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
 @Component
-@Profile(RunProfile.ACC)
+@Profile(RunProfile.DEV)
 class MockSlackClient : SlackClient {
 
     private val messages = mutableListOf<MockSlackMessage>()

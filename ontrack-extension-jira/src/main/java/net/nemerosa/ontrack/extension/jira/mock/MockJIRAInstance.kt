@@ -1,21 +1,16 @@
 package net.nemerosa.ontrack.extension.jira.mock
 
+import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.extension.jira.JIRAConfigurationProperties
 import net.nemerosa.ontrack.extension.jira.model.JIRAIssue
 import net.nemerosa.ontrack.extension.jira.model.JIRALink
 import net.nemerosa.ontrack.extension.jira.model.JIRAStatus
 import net.nemerosa.ontrack.extension.jira.model.JIRAVersion
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
 @Component
-@ConditionalOnProperty(
-    prefix = JIRAConfigurationProperties.JIRA_MOCK_PREFIX,
-    name = [JIRAConfigurationProperties.JIRA_MOCK_ENABLED],
-    havingValue = "true",
-    matchIfMissing = false,
-)
+@Profile(RunProfile.DEV)
 class MockJIRAInstance {
 
     private class JIRAProject(

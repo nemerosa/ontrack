@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.git.service
 import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.api.model.BuildValidationException
 import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
+import net.nemerosa.ontrack.extension.git.GitMockConfig
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
@@ -13,7 +14,7 @@ import kotlin.test.assertFailsWith
 /**
  * Tests for #187 - validation of the build name
  */
-@ActiveProfiles(profiles = [RunProfile.UNIT_TEST, "git.mock"])
+@ActiveProfiles(profiles = [RunProfile.DEV, GitMockConfig.PROFILE_GIT_MOCK])
 class GitBuildValidationIT : AbstractGitTestSupport() {
 
     /**
