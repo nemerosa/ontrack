@@ -5584,6 +5584,13 @@ type Query {
     "Filter the indicators on their type ID"
     type: String
   ): [ConfigurableIndicatorTypeState!]!
+  "Gets a configuration for a given type and name"
+  configurationByName(
+    "Configuration name"
+    name: String!,
+    "Configuration type"
+    type: String!
+  ): Configuration
   "Gets a list of configuration for a given type."
   configurations(
     "Configuration type"

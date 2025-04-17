@@ -6,6 +6,6 @@ import net.nemerosa.ontrack.kdsl.spec.configurations.ConfigurationsMgt
 val ConfigurationsMgt.bitbucketServer: ConfigurationInterface<BitbucketServerConfiguration>
     get() = ConfigurationInterface(
             connector = connector,
-            id = "stash",
+            id = "bitbucket-server",
             type = BitbucketServerConfiguration::class,
     )

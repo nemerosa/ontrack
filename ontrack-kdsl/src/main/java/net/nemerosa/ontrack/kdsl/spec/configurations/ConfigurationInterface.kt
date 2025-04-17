@@ -6,9 +6,10 @@ import net.nemerosa.ontrack.kdsl.connector.Connected
 import net.nemerosa.ontrack.kdsl.connector.Connector
 import net.nemerosa.ontrack.kdsl.connector.graphql.convert
 import net.nemerosa.ontrack.kdsl.connector.graphql.schema.CreateConfigurationMutation
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.DeleteConfigurationMutation
+import net.nemerosa.ontrack.kdsl.connector.graphql.schema.FindConfigurationByNameQuery
 import net.nemerosa.ontrack.kdsl.connector.graphqlConnector
 import net.nemerosa.ontrack.kdsl.spec.Configuration
-import org.springframework.web.client.HttpClientErrorException.NotFound
 import kotlin.reflect.KClass
 
 class ConfigurationInterface<T : Configuration>(
@@ -26,14 +27,20 @@ class ConfigurationInterface<T : Configuration>(
     ) { it?.createConfiguration?.payloadUserErrors?.convert() }
 
     fun delete(name: String) {
-        connector.delete("/extension/$id/configurations/$name")
+        graphqlConnector.mutate(
+            DeleteConfigurationMutation(
+                type = id,
+                name = name,
+            )
+        ) { it?.deleteConfiguration?.payloadUserErrors?.convert() }
     }
 
     fun findByName(name: String): T? =
-        try {
-            connector.get("/extension/$id/configurations/$name").body.asJson().parseInto(type)
-        } catch (ex: NotFound) {
-            null
-        }
+        graphqlConnector.query(
+            FindConfigurationByNameQuery(
+                type = id,
+                name = name
+            )
+        )?.configurationByName?.data?.parseInto(type)
 
 }

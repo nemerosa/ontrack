@@ -1,0 +1,11 @@
+mutation DeleteConfiguration(
+    $type: String!,
+    $name: String!,
+) {
+    deleteConfiguration(input: {
+        type: $type,
+        name: $name,
+    }) {
+        ...PayloadUserErrors
+    }
+}

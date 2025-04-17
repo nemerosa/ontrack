@@ -20,11 +20,6 @@ class NotificationsConfigProperties {
     var processing: ProcessingProperties = ProcessingProperties()
 
     /**
-     * Webhook channel configuration
-     */
-    var webhook = WebhookChannelProperties()
-
-    /**
      * Mail configuration
      */
     var mail = MailProperties()
@@ -35,29 +30,6 @@ class NotificationsConfigProperties {
     class MailProperties {
         @APIDescription("From address for the email notifications")
         var from = "no-reply@localhost"
-    }
-
-    /**
-     * Webhook channel configuration
-     */
-    class WebhookChannelProperties {
-        /**
-         * Internal webhoook
-         */
-        var internal = WebhookInternalEndpointProperties()
-    }
-
-    /**
-     * Webhook internal channel configuration.
-     *
-     * To be used for test only.
-     */
-    class WebhookInternalEndpointProperties {
-        /**
-         * Enabled?
-         */
-        @APIDescription("Are internal webhooks enabled?")
-        var enabled = false
     }
 
     /**
