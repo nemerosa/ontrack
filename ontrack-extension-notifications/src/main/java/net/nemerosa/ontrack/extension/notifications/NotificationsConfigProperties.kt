@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component
 class NotificationsConfigProperties {
 
     @APIDescription("Are the notifications enabled?")
-    var enabled: Boolean = false
+    var enabled: Boolean = true
 
     /**
      * In-memory channel?

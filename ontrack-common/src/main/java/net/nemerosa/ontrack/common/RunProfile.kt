@@ -7,6 +7,7 @@ object RunProfile {
     /**
      * Unit test mode
      */
+    @Deprecated("Use the DEV mode")
     const val UNIT_TEST = "unitTest"
 
     /**
@@ -17,6 +18,7 @@ object RunProfile {
     /**
      * Acceptance mode
      */
+    @Deprecated("Use the DEV mode")
     const val ACC = "acceptance"
 
     /**
