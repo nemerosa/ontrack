@@ -1,15 +1,14 @@
 package net.nemerosa.ontrack.extension.av.audit
 
 import jakarta.annotation.PostConstruct
-import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
-import org.springframework.context.annotation.Profile
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-@Profile(RunProfile.PROD)
+@ConditionalOnWebApplication
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 class AutoVersioningAuditServiceImpl(
     store: AutoVersioningAuditStore
