@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.kdsl.acceptance.tests.AbstractACCDSLTestSupport
 import net.nemerosa.ontrack.kdsl.spec.PromotionLevel
 import net.nemerosa.ontrack.kdsl.spec.charts.getChart
 import org.junit.jupiter.api.Test
-import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.Month
 import kotlin.test.assertEquals
@@ -44,9 +43,9 @@ class ACCE2EPromotions : AbstractACCDSLTestSupport() {
                     "2024-03-22"
                 ),
                 "data" to mapOf(
-                    "mean" to listOf("NaN", "NaN", BigDecimal(432000), "NaN", BigDecimal(108000), "NaN", "NaN", "NaN", "NaN"),
-                    "percentile90" to listOf("NaN", "NaN", BigDecimal(432000), "NaN", BigDecimal(108000), "NaN", "NaN", "NaN", "NaN"),
-                    "maximum" to listOf("NaN", "NaN", BigDecimal(432000), "NaN", BigDecimal(108000), "NaN", "NaN", "NaN", "NaN"),
+                    "mean" to listOf("NaN", "NaN", 432000, "NaN", 108000, "NaN", "NaN", "NaN", "NaN"),
+                    "percentile90" to listOf("NaN", "NaN", 432000, "NaN", 108000, "NaN", "NaN", "NaN", "NaN"),
+                    "maximum" to listOf("NaN", "NaN", 432000, "NaN", 108000, "NaN", "NaN", "NaN", "NaN"),
                 )
             ).asJson()
 
