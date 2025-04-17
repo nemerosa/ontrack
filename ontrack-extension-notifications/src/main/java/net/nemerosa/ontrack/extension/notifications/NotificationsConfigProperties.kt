@@ -15,11 +15,6 @@ class NotificationsConfigProperties {
     var enabled: Boolean = true
 
     /**
-     * In-memory channel?
-     */
-    var inMemory = InMemoryChannelProperties()
-
-    /**
      * Processing configuration
      */
     var processing: ProcessingProperties = ProcessingProperties()
@@ -62,17 +57,6 @@ class NotificationsConfigProperties {
          * Enabled?
          */
         @APIDescription("Are internal webhooks enabled?")
-        var enabled = false
-    }
-
-    /**
-     * In-memory channel configuration
-     */
-    class InMemoryChannelProperties {
-        /**
-         * Enabled?
-         */
-        @APIDescription("Is the in-memory notification channel enabled? Used for testing only.")
         var enabled = false
     }
 

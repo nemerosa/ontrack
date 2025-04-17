@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.notifications.inmemory
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
@@ -12,7 +13,7 @@ import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.textField
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
 /**
@@ -21,12 +22,7 @@ import org.springframework.stereotype.Component
  * For test only, should not be used in production.
  */
 @Component
-@ConditionalOnProperty(
-    prefix = "ontrack.config.extension.notifications.in-memory",
-    name = ["enabled"],
-    havingValue = "true",
-    matchIfMissing = false,
-)
+@Profile(RunProfile.DEV)
 @Documentation(InMemoryNotificationChannelConfig::class)
 class InMemoryNotificationChannel(
     private val eventTemplatingService: EventTemplatingService,
