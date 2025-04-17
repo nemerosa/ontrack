@@ -44,9 +44,9 @@ class ACCE2EPromotions : AbstractACCDSLTestSupport() {
                     "2024-03-22"
                 ),
                 "data" to mapOf(
-                    "mean" to listOf("NaN", "NaN", BigDecimal(4.32E+5), "NaN", BigDecimal(1.08E+5), "NaN", "NaN", "NaN", "NaN"),
-                    "percentile90" to listOf("NaN", "NaN", BigDecimal(4.32E+5), "NaN", BigDecimal(1.08E+5), "NaN", "NaN", "NaN", "NaN"),
-                    "maximum" to listOf("NaN", "NaN", BigDecimal(4.32E+5), "NaN", BigDecimal(1.08E+5), "NaN", "NaN", "NaN", "NaN"),
+                    "mean" to listOf("NaN", "NaN", BigDecimal(432000), "NaN", BigDecimal(108000), "NaN", "NaN", "NaN", "NaN"),
+                    "percentile90" to listOf("NaN", "NaN", BigDecimal(432000), "NaN", BigDecimal(108000), "NaN", "NaN", "NaN", "NaN"),
+                    "maximum" to listOf("NaN", "NaN", BigDecimal(432000), "NaN", BigDecimal(108000), "NaN", "NaN", "NaN", "NaN"),
                 )
             ).asJson()
 
