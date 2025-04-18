@@ -264,10 +264,6 @@ pipeline {
 
         stage('KDSL acceptance tests') {
             when {
-                // TODO
-                expression {
-                    false
-                }
                 not {
                     branch 'master'
                 }
@@ -276,6 +272,9 @@ pipeline {
                 }
             }
             environment {
+                // Non empty is enough to activate the GitHub tests
+                ONTRACK_TEST_EXTENSION_GITHUB_ORGANIZATION = credentials("ontrack-acceptance-github-organization")
+                // Credentials & setup for the GitHub tests
                 ONTRACK_ACCEPTANCE_GITHUB_ORGANIZATION = credentials("ontrack-acceptance-github-organization")
                 ONTRACK_ACCEPTANCE_GITHUB_TOKEN = credentials("ontrack-acceptance-github-token")
             }
