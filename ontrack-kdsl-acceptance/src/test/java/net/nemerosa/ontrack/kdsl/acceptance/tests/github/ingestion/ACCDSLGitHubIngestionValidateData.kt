@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.github.ingestion
 
+import net.nemerosa.ontrack.extension.github.TestOnGitHub
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.resourceAsText
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
+@TestOnGitHub
 class ACCDSLGitHubIngestionValidateData : AbstractACCDSLGitHubIngestionTestSupport() {
 
     /**
