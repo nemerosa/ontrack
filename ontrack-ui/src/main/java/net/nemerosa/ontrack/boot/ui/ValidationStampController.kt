@@ -16,6 +16,7 @@ import net.nemerosa.ontrack.ui.resource.Link
 import net.nemerosa.ontrack.ui.resource.Resources
 import net.nemerosa.ontrack.ui.support.UIUtils.setupDefaultImageCache
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -104,7 +105,7 @@ class ValidationStampController(
     fun newValidationStamp(
         @PathVariable branchId: ID,
         @RequestBody input: @Valid ValidationStampInput
-    ): ValidationStamp {
+    ): ResponseEntity<ValidationStamp> {
         // Gets the holding branch
         val branch = structureService.getBranch(branchId)
         // Validation
@@ -116,12 +117,12 @@ class ValidationStampController(
             input.asNameDescription()
         ).withDataType(config)
         // Saves it into the repository
-        return structureService.newValidationStamp(validationStamp)
+        return ResponseEntity.ok(structureService.newValidationStamp(validationStamp))
     }
 
     @GetMapping("validationStamps/{validationStampId}")
-    fun getValidationStamp(@PathVariable validationStampId: ID): ValidationStamp {
-        return structureService.getValidationStamp(validationStampId)
+    fun getValidationStamp(@PathVariable validationStampId: ID): ResponseEntity<ValidationStamp> {
+        return ResponseEntity.ok(structureService.getValidationStamp(validationStampId))
     }
 
     @GetMapping("validationStamps/{validationStampId}/update")
@@ -139,7 +140,7 @@ class ValidationStampController(
     fun updateValidationStamp(
         @PathVariable validationStampId: ID,
         @RequestBody input: @Valid ValidationStampInput
-    ): ValidationStamp {
+    ): ResponseEntity<ValidationStamp> {
         // Gets from the repository
         var validationStamp = structureService.getValidationStamp(validationStampId)
         // Validation
@@ -150,12 +151,12 @@ class ValidationStampController(
         // Saves in repository
         structureService.saveValidationStamp(validationStamp)
         // As resource
-        return validationStamp
+        return ResponseEntity.ok(validationStamp)
     }
 
     @DeleteMapping("validationStamps/{validationStampId}")
-    fun deleteValidationStamp(@PathVariable validationStampId: ID): Ack {
-        return structureService.deleteValidationStamp(validationStampId)
+    fun deleteValidationStamp(@PathVariable validationStampId: ID): ResponseEntity<Ack> {
+        return ResponseEntity.ok(structureService.deleteValidationStamp(validationStampId))
     }
 
     @GetMapping("validationStamps/{validationStampId}/image")
@@ -197,7 +198,7 @@ class ValidationStampController(
      * @return Result of the update
      */
     @PutMapping("validationStamps/{validationStampId}/bulk")
-    fun bulkUpdate(@PathVariable validationStampId: ID): Ack {
-        return structureService.bulkUpdateValidationStamps(validationStampId)
+    fun bulkUpdate(@PathVariable validationStampId: ID): ResponseEntity<Ack> {
+        return ResponseEntity.ok(structureService.bulkUpdateValidationStamps(validationStampId))
     }
 }
