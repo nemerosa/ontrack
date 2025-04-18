@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.tfc.hook
 
+import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.hook.*
 import net.nemerosa.ontrack.extension.hook.queue.HookQueueSourceData
 import net.nemerosa.ontrack.extension.hook.queue.HookQueueSourceExtension
@@ -20,6 +21,7 @@ import net.nemerosa.ontrack.extension.tfc.settings.TFCSettings
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
 import kotlin.reflect.KProperty0
 
@@ -31,6 +33,7 @@ class TFCHookEndpointExtension(
         private val queueProcessor: TFCQueueProcessor,
         private val queueHookInfoLinkExtension: QueueHookInfoLinkExtension,
         private val hookQueueSourceExtension: HookQueueSourceExtension,
+        private val environment: Environment,
         extensionFeature: TFCExtensionFeature,
 ) : AbstractExtension(extensionFeature), HookEndpointExtension {
 
@@ -42,7 +45,7 @@ class TFCHookEndpointExtension(
         get() = cachedSettingsService.getCachedSettings(TFCSettings::class.java).enabled
 
     override fun checkAccess(request: HookRequest) {
-        if (tfcConfigProperties.hook.signature.disabled) {
+        if (tfcConfigProperties.hook.signature.disabled || RunProfile.DEV in environment.activeProfiles) {
             logger.warn("TFC Hook signature checks are disabled.")
         } else {
             val token = cachedSettingsService.getCachedSettings(TFCSettings::class.java).token
