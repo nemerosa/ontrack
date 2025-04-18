@@ -107,3 +107,4 @@ services:
       # ONTRACK_EXTENSION_GITHUB_INGESTION_PROCESSING_REPOSITORIES_TEST_REPOSITORY: "test-routing-repository"
       # ... InfluxDB specifics
       ONTRACK_INFLUXDB_ENABLED: true
+      ONTRACK_INFLUXDB_URI: http://influxdb:8086
