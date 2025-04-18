@@ -1,5 +1,6 @@
 plugins {
     `java-library`
+    `java-test-fixtures`
 }
 
 dependencies {
@@ -35,6 +36,8 @@ dependencies {
     testImplementation(testFixtures(project(":ontrack-extension-general")))
     testImplementation(testFixtures(project(":ontrack-extension-issues")))
 
+    testFixturesImplementation("org.junit.jupiter:junit-jupiter-api")
+    testFixturesImplementation(project(":ontrack-test-utils"))
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))

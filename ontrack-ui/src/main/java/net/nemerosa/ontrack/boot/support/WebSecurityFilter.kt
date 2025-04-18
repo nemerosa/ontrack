@@ -3,12 +3,13 @@ package net.nemerosa.ontrack.boot.support
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import net.nemerosa.ontrack.model.security.*
+import net.nemerosa.ontrack.model.security.Account
+import net.nemerosa.ontrack.model.security.AccountLoginService
+import net.nemerosa.ontrack.model.security.AuthenticationUserService
 import net.nemerosa.ontrack.model.structure.TokenAuthenticationToken
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.stereotype.Component
@@ -18,7 +19,7 @@ import org.springframework.web.filter.OncePerRequestFilter
 class WebSecurityFilter(
     private val ontrackConfigProperties: OntrackConfigProperties,
     private val accountLoginService: AccountLoginService,
-    private val accountACLService: AccountACLService,
+    private val authenticationUserService: AuthenticationUserService,
 ) : OncePerRequestFilter() {
 
     private val log: Logger = LoggerFactory.getLogger(WebSecurityFilter::class.java)
@@ -36,11 +37,7 @@ class WebSecurityFilter(
                 else -> null
             }
             if (account != null) {
-                val enrichedAuth = AuthenticatedUserAuthentication(
-                    authenticatedUser = createAuthenticatedUser(account),
-                    authorities = AuthorityUtils.createAuthorityList(SecurityRole.USER.name)
-                )
-                SecurityContextHolder.getContext().authentication = enrichedAuth
+                authenticationUserService.asUser(account)
             }
         }
         filterChain.doFilter(request, response)
@@ -48,14 +45,6 @@ class WebSecurityFilter(
 
     private fun accountFromToken(authentication: TokenAuthenticationToken): Account =
         authentication.account
-
-    private fun createAuthenticatedUser(account: Account): AccountAuthenticatedUser {
-        return AccountAuthenticatedUser(
-            account = account,
-            authorisations = accountACLService.getAuthorizations(account),
-            groups = accountACLService.getGroups(account),
-        )
-    }
 
     private fun accountFromJwt(jwtAuthenticationToken: JwtAuthenticationToken): Account? {
         val debug = ontrackConfigProperties.security.authorization.jwt.debug

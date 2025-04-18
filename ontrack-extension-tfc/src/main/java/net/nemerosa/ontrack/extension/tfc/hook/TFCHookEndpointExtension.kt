@@ -18,11 +18,11 @@ import net.nemerosa.ontrack.extension.tfc.service.RunPayload
 import net.nemerosa.ontrack.extension.tfc.service.RunPayloadMissingFieldException
 import net.nemerosa.ontrack.extension.tfc.service.TFCParameters
 import net.nemerosa.ontrack.extension.tfc.settings.TFCSettings
-import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.core.env.Environment
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Component
 import kotlin.reflect.KProperty0
 
@@ -35,7 +35,6 @@ class TFCHookEndpointExtension(
     private val queueHookInfoLinkExtension: QueueHookInfoLinkExtension,
     private val hookQueueSourceExtension: HookQueueSourceExtension,
     private val environment: Environment,
-    private val securityService: SecurityService,
     extensionFeature: TFCExtensionFeature,
 ) : AbstractExtension(extensionFeature), HookEndpointExtension {
 
@@ -46,17 +45,20 @@ class TFCHookEndpointExtension(
     override val enabled: Boolean
         get() = cachedSettingsService.getCachedSettings(TFCSettings::class.java).enabled
 
-    override fun checkAccess(request: HookRequest) {
+    override fun checkAccess(request: HookRequest): String {
+        val token = cachedSettingsService.getCachedSettings(TFCSettings::class.java).token
+            .takeIf { it.isNotBlank() }
+            ?: throw AccessDeniedException("No token is provided in the TFC hook settings")
         if (tfcConfigProperties.hook.signature.disabled || RunProfile.DEV in environment.activeProfiles) {
             logger.warn("TFC Hook signature checks are disabled.")
         } else {
-            val token = cachedSettingsService.getCachedSettings(TFCSettings::class.java).token
             HookSignature.checkSignature(
                 request.body,
                 request.getRequiredHeader("X-TFE-Notification-Signature"),
                 token
             )
         }
+        return token
     }
 
     override fun process(recordId: String, request: HookRequest): HookResponse {

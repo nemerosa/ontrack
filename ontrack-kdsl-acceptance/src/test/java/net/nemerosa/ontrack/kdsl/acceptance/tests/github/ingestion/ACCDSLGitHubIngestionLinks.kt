@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.github.ingestion
 
+import net.nemerosa.ontrack.extension.github.TestOnGitHub
 import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.resourceAsText
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
+@TestOnGitHub
 class ACCDSLGitHubIngestionLinks : AbstractACCDSLGitHubIngestionTestSupport() {
 
     /**
@@ -169,9 +171,11 @@ class ACCDSLGitHubIngestionLinks : AbstractACCDSLGitHubIngestionTestSupport() {
             .createBuild("build-15", "")
 
         // Add links
-        build.linksTo(mapOf(
-            existing to "10.0.0",
-        ))
+        build.linksTo(
+            mapOf(
+                existing to "10.0.0",
+            )
+        )
 
         // Calling the API to simulate the GHA call
         val linksUuid = ontrack.gitHub.ingestion.buildLinksByBuildName(

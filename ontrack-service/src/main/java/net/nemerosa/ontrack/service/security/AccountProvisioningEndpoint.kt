@@ -27,7 +27,7 @@ class AccountProvisioningEndpoint(
     fun provisionAccount(@Selector username: String): String =
         securityService.asAdmin {
             val account = accountService.findAccountByName(username)
-                ?: error("Account with name ${username} not found")
+                ?: error("Account with name $username not found")
             val tokenName = "token-${Time.now().format(DateTimeFormatter.ISO_DATE_TIME)}"
             val token = tokensService.generateToken(
                 accountId = account.id(),

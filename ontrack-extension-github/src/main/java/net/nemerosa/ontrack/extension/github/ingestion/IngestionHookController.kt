@@ -16,6 +16,8 @@ import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.model.metrics.increment
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
+import net.nemerosa.ontrack.model.structure.TokensService
+import net.nemerosa.ontrack.model.structure.checkTokenForSecurityContext
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
@@ -31,6 +33,7 @@ class IngestionHookController(
     private val securityService: SecurityService,
     private val meterRegistry: MeterRegistry,
     private val cachedSettingsService: CachedSettingsService,
+    private val tokensService: TokensService,
     ingestionEventProcessors: List<IngestionEventProcessor>,
 ) {
 
@@ -57,6 +60,7 @@ class IngestionHookController(
             eventProcessors[gitHubEvent] ?: throw GitHubIngestionHookEventNotSupportedException(gitHubEvent)
         // Checking the signature
         val json = when (ingestionHookSignatureService.checkPayloadSignature(body, signature)) {
+
             IngestionHookSignatureCheckResult.MISMATCH -> {
                 meterRegistry.increment(
                     IngestionMetrics.Hook.signatureErrorCount,
@@ -64,9 +68,15 @@ class IngestionHookController(
                 )
                 throw GitHubIngestionHookSignatureMismatchException()
             }
+
             IngestionHookSignatureCheckResult.MISSING_TOKEN -> throw GitHubIngestionSettingsMissingTokenException()
             IngestionHookSignatureCheckResult.OK -> body.parseAsJson()
         }
+        // Setting the user security context
+        tokensService.checkTokenForSecurityContext(
+            token = settings.token,
+            message = "Token is denied"
+        )
         // Getting the repository
         val repository = if (json.has("repository")) {
             json.get("repository").parse<Repository>()
@@ -128,6 +138,7 @@ class IngestionHookController(
                     processing = true,
                 )
             }
+
             IngestionEventPreprocessingCheck.IGNORED -> {
                 meterRegistry.increment(
                     IngestionMetrics.Hook.ignoredCount,

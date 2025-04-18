@@ -16,7 +16,7 @@ import net.nemerosa.ontrack.model.annotations.APILabel
  * @property enabled Is the ingestion of the GitHub events enabled?
  */
 class GitHubIngestionSettings(
-    @APIDescription("Secret token sent by the GitHub hook and signing the payload")
+    @APIDescription("Secret token sent by the GitHub hook and signing the payload. This MUST be a valid Ontrack API token.")
     val token: String,
     @APIDescription("Number of days to keep the received payloads (0 = forever)")
     val retentionDays: Int = DEFAULT_RETENTION_DAYS,

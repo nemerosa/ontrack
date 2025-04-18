@@ -1,14 +1,10 @@
 package net.nemerosa.ontrack.service.security
 
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.model.security.Account
-import net.nemerosa.ontrack.model.security.AccountManagement
-import net.nemerosa.ontrack.model.security.AccountService
-import net.nemerosa.ontrack.model.security.SecurityService
+import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.repository.TokensRepository
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -20,7 +16,8 @@ class TokensServiceImpl(
     private val securityService: SecurityService,
     private val tokenGenerator: TokenGenerator,
     private val ontrackConfigProperties: OntrackConfigProperties,
-    private val accountService: AccountService
+    private val accountService: AccountService,
+    private val authenticationUserService: AuthenticationUserService,
 ) : TokensService {
 
     override fun getCurrentToken(name: String): Token? {
@@ -106,11 +103,7 @@ class TokensServiceImpl(
         return if (tokenAccount == null || !tokenAccount.token.valid) {
             false
         } else {
-            val authentication = TokenAuthenticationToken(
-                token = tokenAccount.token.value,
-                account = tokenAccount.account
-            )
-            SecurityContextHolder.getContext().authentication = authentication
+            authenticationUserService.asUser(tokenAccount.account)
             true
         }
     }

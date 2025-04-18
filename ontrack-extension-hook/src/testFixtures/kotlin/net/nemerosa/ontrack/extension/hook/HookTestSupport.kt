@@ -25,18 +25,19 @@ class HookTestSupport(
 ) {
 
     fun hook(
-            hook: String,
-            body: Any,
-            parameters: Map<String, String>,
-            headers: Map<String, String>,
+        hook: String,
+        body: Any,
+        parameters: Map<String, String>,
+        headers: Map<String, String>,
     ) = hookController.hook(hook, body.asJson().format(), parameters, headers)
 
     fun testHook(
-            enabled: Boolean = true,
-            denied: Boolean = false,
-            error: Boolean = false,
-            body: String = "Any body for now",
-            parameters: Map<String, String> = emptyMap(),
+        enabled: Boolean = true,
+        denied: Boolean = false,
+        error: Boolean = false,
+        body: String = "Any body for now",
+        parameters: Map<String, String> = emptyMap(),
+        token: String? = null,
     ): HookResponse {
         val oldEnabled = testHookEndpointExtension.enabled
         val oldDenied = testHookEndpointExtension.denied
@@ -45,11 +46,14 @@ class HookTestSupport(
             testHookEndpointExtension.enabled = enabled
             testHookEndpointExtension.denied = denied
             testHookEndpointExtension.error = error
+
+            testHookEndpointExtension.provisionToken(token)
+
             hook(
-                    hook = "test",
-                    body = body,
-                    parameters = parameters,
-                    headers = emptyMap(),
+                hook = "test",
+                body = body,
+                parameters = parameters,
+                headers = emptyMap(),
             )
         } finally {
             testHookEndpointExtension.enabled = oldEnabled
@@ -73,15 +77,15 @@ class HookTestSupport(
     }
 
     fun assertLatestHookRecord(
-            hook: String,
-            code: (HookRecord) -> Unit
+        hook: String,
+        code: (HookRecord) -> Unit
     ) {
         val record = securityService.asAdmin {
             recordingsQueryService.findByFilter(
-                    extension = hookRecordingsExtension,
-                    filter = HookRecordQueryFilter(hook = hook),
-                    offset = 0,
-                    size = 1
+                extension = hookRecordingsExtension,
+                filter = HookRecordQueryFilter(hook = hook),
+                offset = 0,
+                size = 1
             ).pageItems.firstOrNull()
         }
         assertNotNull(record, "Found a hook record with hook = $hook") {

@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import kotlin.test.assertFalse
 
 @TestOnGitHub
 class ConfigLoaderServiceIT : AbstractIngestionTestSupport() {

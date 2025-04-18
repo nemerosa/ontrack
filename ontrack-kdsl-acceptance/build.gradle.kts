@@ -13,6 +13,7 @@ dependencies {
     testImplementation("commons-codec:commons-codec")
 
     testImplementation("org.influxdb:influxdb-java")
+    testImplementation(testFixtures(project(":ontrack-extension-github")))
 }
 
 // Pre-acceptance tests: starting the environment

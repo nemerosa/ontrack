@@ -74,4 +74,11 @@ class HookControllerIT : AbstractDSLTestSupport() {
         }
     }
 
+    @Test
+    fun `Provided token not valid`() {
+        assertFailsWith<AccessDeniedException> {
+            hookTestSupport.testHook(token = "xxxx")
+        }
+    }
+
 }
