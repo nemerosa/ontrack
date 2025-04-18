@@ -24,7 +24,7 @@ services:
 
   # InfluxDB for metrics
   influxdb:
-    image: influxdb:1.8.6
+    image: influxdb:1.11.8
     ports:
       - "8086:8086"
 

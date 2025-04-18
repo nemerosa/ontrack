@@ -28,6 +28,13 @@ services:
         soft: -1
         hard: -1
 
+  influxdb:
+    profiles:
+      - influxdb
+    image: influxdb:1.11.8
+    ports:
+      - "8086:8086"
+
   kibana:
     image: docker.elastic.co/kibana/kibana:7.17.28
     ports:

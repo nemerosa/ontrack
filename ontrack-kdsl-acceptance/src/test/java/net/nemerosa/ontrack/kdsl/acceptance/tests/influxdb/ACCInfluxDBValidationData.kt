@@ -44,7 +44,7 @@ class ACCInfluxDBValidationData : AbstractACCDSLTestSupport() {
             Query(
                 """
                     SELECT * 
-                    FROM ontrack_acceptance_validation_data 
+                    FROM ontrack_validation_data 
                     WHERE project = '${project.name}' 
                     AND branch = 'main' 
                     AND validation = 'VS'
@@ -101,7 +101,7 @@ class ACCInfluxDBValidationData : AbstractACCDSLTestSupport() {
             Query(
                 """
                     SELECT * 
-                    FROM ontrack_acceptance_validation_data 
+                    FROM ontrack_validation_data 
                     WHERE project = '${project.name}' 
                     AND branch = 'main' 
                     AND validation = 'VS'
@@ -129,7 +129,7 @@ class ACCInfluxDBValidationData : AbstractACCDSLTestSupport() {
     }
 }
 
-@Measurement(name = "ontrack_acceptance_validation_data")
+@Measurement(name = "ontrack_validation_data")
 class TestSummaryValidationData {
 
     @field:Column(name = "project")
@@ -160,7 +160,7 @@ class TestSummaryValidationData {
     var total: Int = -1
 }
 
-@Measurement(name = "ontrack_acceptance_validation_data")
+@Measurement(name = "ontrack_validation_data")
 class MetricsValidationData {
 
     @field:Column(name = "project")
