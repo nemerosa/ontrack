@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import net.nemerosa.ontrack.model.security.*
+import net.nemerosa.ontrack.model.structure.TokenAuthenticationToken
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.extension.hook.metrics.*
 import net.nemerosa.ontrack.extension.hook.records.HookRecordService
 import net.nemerosa.ontrack.model.metrics.time
-import net.nemerosa.ontrack.model.security.SecurityService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.*
@@ -18,7 +17,6 @@ class HookController(
     private val extensionManager: ExtensionManager,
     private val meterRegistry: MeterRegistry,
     private val hookRecordService: HookRecordService,
-    private val securityService: SecurityService,
 ) {
 
     private val logger: Logger = LoggerFactory.getLogger(HookController::class.java)
@@ -65,12 +63,10 @@ class HookController(
 
         // Processing
         return try {
-            // TODO #1395 Using reduced rights
-            val result = securityService.asAdmin {
+            val result =
                 meterRegistry.time(HookMetrics.time, "hook" to hook) {
                     endpoint.process(recordId, request)
-                }
-            } ?: error("Processing did not return any result")
+                } ?: error("Processing did not return any result")
             meterRegistry.hookSuccess(hook)
             hookRecordService.onSuccess(recordId, result)
             result

@@ -1,4 +1,4 @@
-package net.nemerosa.ontrack.boot.support
+package net.nemerosa.ontrack.model.structure
 
 import net.nemerosa.ontrack.model.security.Account
 import net.nemerosa.ontrack.model.security.SecurityRole

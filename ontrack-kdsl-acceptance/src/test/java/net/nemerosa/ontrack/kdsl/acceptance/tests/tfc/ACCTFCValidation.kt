@@ -211,7 +211,7 @@ class ACCTFCValidation : AbstractACCDSLTestSupport() {
             validation: String,
             payload: JsonNode,
     ): HookResponse {
-        val response = rawConnector().post(
+        val response = ontrack.connector.post(
                 "/hook/secured/tfc?project=$project&branch=$branch&build=$build&validation=$validation",
                 headers = mapOf(
                         "X-TFE-Notification-Signature" to "signature-is-not-checked",

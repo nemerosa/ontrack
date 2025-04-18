@@ -76,4 +76,12 @@ interface TokensService {
      */
     fun isValid(token: String): Boolean
 
+    /**
+     * Uses a token for the security context
+     *
+     * @param token Token to use
+     * @return True is the token was valid and could be used
+     */
+    fun useTokenForSecurityContext(token: String): Boolean
+
 }

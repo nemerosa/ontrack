@@ -52,7 +52,6 @@ class WebSecurityConfig(
     ): SecurityFilterChain {
         http {
             authorizeHttpRequests {
-                authorize("/hook/secured/**", permitAll)
                 authorize(anyRequest, authenticated)
             }
             csrf { disable() }

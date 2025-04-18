@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.repository.TokensRepository
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -99,6 +100,20 @@ class TokensServiceImpl(
             result.isValid()
         }
         ?: false
+
+    override fun useTokenForSecurityContext(token: String): Boolean {
+        val tokenAccount = findAccountByToken(token)
+        return if (tokenAccount == null || !tokenAccount.token.valid) {
+            false
+        } else {
+            val authentication = TokenAuthenticationToken(
+                token = tokenAccount.token.value,
+                account = tokenAccount.account
+            )
+            SecurityContextHolder.getContext().authentication = authentication
+            true
+        }
+    }
 
     override fun findAccountByToken(token: String, refTime: LocalDateTime): TokenAccount? {
         // Find the account ID
