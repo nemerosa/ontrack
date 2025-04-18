@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.notifications.mail
 
 import com.fasterxml.jackson.databind.JsonNode
 import jakarta.annotation.PostConstruct
+import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.notifications.channels.AbstractNotificationChannel
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationResult
 import net.nemerosa.ontrack.extension.notifications.subscriptions.EventSubscriptionConfigException
@@ -16,6 +17,7 @@ import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.form.textField
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.core.env.Environment
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.stereotype.Component
 
@@ -28,6 +30,7 @@ class MailNotificationChannel(
     private val mailService: MailService,
     private val htmlNotificationEventRenderer: HtmlNotificationEventRenderer,
     private val eventTemplatingService: EventTemplatingService,
+    private val environment: Environment,
 ) : AbstractNotificationChannel<MailNotificationChannelConfig, MailNotificationChannelOutput>(
     MailNotificationChannelConfig::class
 ) {
@@ -36,7 +39,7 @@ class MailNotificationChannel(
 
     override val type: String = "mail"
     override val displayName: String = "Mail"
-    override val enabled: Boolean = javaMailSender != null
+    override val enabled: Boolean = javaMailSender != null || environment.activeProfiles.contains(RunProfile.DEV)
 
     @PostConstruct
     fun log() {
