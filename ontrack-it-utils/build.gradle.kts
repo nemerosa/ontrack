@@ -12,6 +12,7 @@ dependencies {
     api("org.springframework.security:spring-security-oauth2-jose")
     api("org.jetbrains.kotlin:kotlin-test")
 
+    implementation(project(":ontrack-repository"))
     implementation(project(":ontrack-extension-support"))
     implementation(project(":ontrack-ui-support"))
     implementation("org.springframework:spring-context")

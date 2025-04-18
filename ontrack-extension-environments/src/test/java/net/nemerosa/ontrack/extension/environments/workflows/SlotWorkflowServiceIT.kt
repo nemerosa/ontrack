@@ -243,7 +243,7 @@ class SlotWorkflowServiceIT : AbstractDSLTestSupport() {
             assertEquals(WorkflowInstanceStatus.ERROR, overriddenInstance.workflowInstance.status)
             assertNotNull(overriddenInstance.override) {
                 assertEquals("The workflow failed, but we want to carry on", it.message)
-                assertEquals("admin", it.user)
+                assertEquals(securityService.currentUser?.name, it.user)
                 assertNotNull(it.timestamp, "Timestamp has been set")
             }
 

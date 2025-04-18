@@ -37,7 +37,7 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
                 val state =
                     slotService.findPipelineAdmissionRuleStatusByAdmissionRuleConfigId(pipeline, admissionRuleConfig.id)
                 assertNotNull(state, "Manual approval state stored") {
-                    assertEquals("admin", it.data?.user)
+                    assertEquals(securityService.currentUser?.name, it.data?.user)
                     assertEquals(
                         ManualApprovalSlotAdmissionRuleData(
                             approval = true,
@@ -71,7 +71,7 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
                 val state =
                     slotService.findPipelineAdmissionRuleStatusByAdmissionRuleConfigId(pipeline, admissionRuleConfig.id)
                 assertNotNull(state, "Manual approval state stored") {
-                    assertEquals("admin", it.data?.user)
+                    assertEquals(securityService.currentUser?.name, it.data?.user)
                     assertEquals(
                         ManualApprovalSlotAdmissionRuleData(
                             approval = false,
@@ -151,14 +151,14 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
                 assertTrue(check.ok, "Manual approval rejected but overridden")
                 val ruleStatus = slotService.getPipelineAdmissionRuleStatuses(pipeline).first()
                 assertNotNull(ruleStatus.override, "Manual rejection overridden") {
-                    assertEquals("admin", it.user)
+                    assertEquals(securityService.currentUser?.name, it.user)
                     assertEquals("Because I want to", it.message)
                 }
 
                 val state =
                     slotService.findPipelineAdmissionRuleStatusByAdmissionRuleConfigId(pipeline, admissionRuleConfig.id)
                 assertNotNull(state, "Manual approval state stored") {
-                    assertEquals("admin", it.data?.user)
+                    assertEquals(securityService.currentUser?.name, it.data?.user)
                     assertEquals(
                         ManualApprovalSlotAdmissionRuleData(
                             approval = false,

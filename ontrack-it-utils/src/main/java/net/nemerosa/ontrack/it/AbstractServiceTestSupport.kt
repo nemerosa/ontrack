@@ -12,6 +12,9 @@ import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.structure.Project.Companion.of
 import net.nemerosa.ontrack.model.structure.PromotionRun.Companion.of
 import net.nemerosa.ontrack.model.structure.Signature.Companion.of
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties
+import net.nemerosa.ontrack.repository.AccountGroupRepository
+import net.nemerosa.ontrack.repository.AccountRepository
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.TestingAuthenticationToken
@@ -25,7 +28,16 @@ import java.util.concurrent.Callable
 abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
 
     @Autowired
+    protected lateinit var ontrackConfigProperties: OntrackConfigProperties
+
+    @Autowired
     protected lateinit var accountService: AccountService
+
+    @Autowired
+    private lateinit var accountRepository: AccountRepository
+
+    @Autowired
+    private lateinit var accountGroupRepository: AccountGroupRepository
 
     @Autowired
     protected lateinit var structureService: StructureService
@@ -47,6 +59,26 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
 
     @Autowired
     protected lateinit var accountACLService: AccountACLService
+
+    private fun createAdminAccount(): Account {
+        val name = uid("admin-")
+        val groupName = ontrackConfigProperties.security.authorization.admin.groupName
+        val group = accountGroupRepository.findAccountGroupByName(groupName)
+            ?: error("Cannot find group with name $groupName")
+        val account = accountRepository.newAccount(
+            Account(
+                id = ID.NONE,
+                name = name,
+                fullName = name,
+                email = "$name@ontrack.local",
+                role = SecurityRole.USER,
+            )
+        )
+        // Account groups
+        accountGroupRepository.linkAccountToGroups(account.id(), listOf(group.id()))
+        // OK
+        return account
+    }
 
     protected fun doCreateAccountGroup(): AccountGroup {
         return asUser().with(AccountGroupManagement::class.java).call {
@@ -283,7 +315,9 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
 
     protected fun asUser(name: String = uid("U")): UserCall = UserCall(name = name)
 
-    protected fun asAdmin(): AdminCall = AdminCall()
+    protected fun asAdmin() = FixedAccountCall(
+        account = createAdminAccount(),
+    )
 
     protected fun asAnonymous(): AnonymousCall {
         return AnonymousCall()
@@ -553,11 +587,5 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
             accountService.create(accountInput)
         }
     )
-
-    protected inner class AdminCall : AuthenticatedUserCall() {
-        override fun createOntrackAuthenticatedUser(): AuthenticatedUser =
-            RunAsAuthenticatedUser.runAsUser(null)
-
-    }
 }
 

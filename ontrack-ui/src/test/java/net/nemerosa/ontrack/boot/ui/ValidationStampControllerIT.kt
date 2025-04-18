@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
+import kotlin.test.fail
 
 class ValidationStampControllerIT : AbstractWebTestSupport() {
 
@@ -128,7 +129,7 @@ class ValidationStampControllerIT : AbstractWebTestSupport() {
                     )
                 )
             )
-        }
+        }.body ?: fail("Cannot find validation stamp")
         // Gets the edition form
         val form = asUser { validationStampController.updateValidationStampForm(vs.id) }
         // Gets the service configurator field
@@ -161,9 +162,11 @@ class ValidationStampControllerIT : AbstractWebTestSupport() {
                     )
                 )
             )
-        }
+        }.body ?: fail("Cannot find validation stamp")
         // Loads the validation stamp
-        val loadedVs = asUser { validationStampController.getValidationStamp(vs.id) }
+        val loadedVs = asUser {
+            validationStampController.getValidationStamp(vs.id)
+        }.body ?: fail("Cannot find validation stamp")
         // Checks the data type is still there
         val dataType = loadedVs.dataType
         assertNotNull(dataType, "Data type is loaded")

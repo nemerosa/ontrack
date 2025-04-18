@@ -13,7 +13,6 @@ import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.model.support.SettingsRepository
 import net.nemerosa.ontrack.model.tx.DefaultTransactionHelper
 import net.nemerosa.ontrack.model.tx.TransactionHelper
@@ -30,9 +29,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
-
-    @Autowired
-    protected lateinit var ontrackConfigProperties: OntrackConfigProperties
 
     @Autowired
     protected lateinit var labelManagementService: LabelManagementService

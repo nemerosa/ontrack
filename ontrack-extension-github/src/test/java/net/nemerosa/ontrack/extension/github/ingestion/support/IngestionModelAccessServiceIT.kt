@@ -189,13 +189,15 @@ internal class IngestionModelAccessServiceIT : AbstractIngestionTestSupport() {
 
     @Test
     fun `Creating a branch`() {
-        project {
-            val branch = ingestionModelAccessService.getOrCreateBranch(this, "release/1.0", null)
-            assertNotNull(
-                structureService.findBranchByName(project.name, "release-1.0").getOrNull(),
-                "Branch created"
-            ) {
-                assertEquals(branch.id, it.id, "Same branch")
+        asAdmin {
+            project {
+                val branch = ingestionModelAccessService.getOrCreateBranch(this, "release/1.0", null)
+                assertNotNull(
+                    structureService.findBranchByName(project.name, "release-1.0").getOrNull(),
+                    "Branch created"
+                ) {
+                    assertEquals(branch.id, it.id, "Same branch")
+                }
             }
         }
     }
@@ -211,10 +213,12 @@ internal class IngestionModelAccessServiceIT : AbstractIngestionTestSupport() {
 
     @Test
     fun `Keeping a branch`() {
-        project {
-            branch("release-1.0") {
-                val branch = ingestionModelAccessService.getOrCreateBranch(project, "release/1.0", null)
-                assertEquals(this.id, branch.id, "Same branch")
+        asAdmin {
+            project {
+                branch("release-1.0") {
+                    val branch = ingestionModelAccessService.getOrCreateBranch(project, "release/1.0", null)
+                    assertEquals(this.id, branch.id, "Same branch")
+                }
             }
         }
     }

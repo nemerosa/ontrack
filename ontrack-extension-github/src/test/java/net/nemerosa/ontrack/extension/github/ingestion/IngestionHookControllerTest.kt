@@ -16,12 +16,22 @@ import net.nemerosa.ontrack.it.MockSecurityService
 import net.nemerosa.ontrack.json.format
 import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
-import org.junit.Test
+import net.nemerosa.ontrack.model.structure.TokensService
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 
 class IngestionHookControllerTest {
+
+    private lateinit var tokensService: TokensService
+
+    @BeforeEach
+    fun setup() {
+        tokensService = mockk(relaxed = true)
+        every { tokensService.useTokenForSecurityContext(any()) } returns true
+    }
 
     @Test
     fun `Storage and queuing`() {
@@ -32,17 +42,18 @@ class IngestionHookControllerTest {
 
         val ingestionEventProcessor = mockIngestionEventProcessor()
         every { ingestionEventProcessor.preProcessingCheck(any()) } returns IngestionEventPreprocessingCheck.TO_BE_PROCESSED
-        every { ingestionEventProcessor.getPayloadSource(any())} returns "test-source"
+        every { ingestionEventProcessor.getPayloadSource(any()) } returns "test-source"
 
         val controller =
             IngestionHookController(
-                queue,
-                storage,
-                MockIngestionHookSignatureService(),
-                securityService,
-                meterRegistry,
-                mockSettings(),
-                listOf(ingestionEventProcessor),
+                queue = queue,
+                storage = storage,
+                ingestionHookSignatureService = MockIngestionHookSignatureService(),
+                securityService = securityService,
+                meterRegistry = meterRegistry,
+                cachedSettingsService = mockSettings(),
+                tokensService = tokensService,
+                ingestionEventProcessors = listOf(ingestionEventProcessor),
             )
 
         var storedPayload: IngestionHookPayload? = null
@@ -86,13 +97,14 @@ class IngestionHookControllerTest {
 
         val controller =
             IngestionHookController(
-                queue,
-                storage,
-                MockIngestionHookSignatureService(),
-                securityService,
-                meterRegistry,
-                mockSettings(enabled = false),
-                listOf(ingestionEventProcessor),
+                queue = queue,
+                storage = storage,
+                ingestionHookSignatureService = MockIngestionHookSignatureService(),
+                securityService = securityService,
+                meterRegistry = meterRegistry,
+                cachedSettingsService = mockSettings(enabled = false),
+                tokensService = tokensService,
+                ingestionEventProcessors = listOf(ingestionEventProcessor),
             )
 
         val body = IngestionHookFixtures.sampleWorkflowRunJsonPayload().format()
@@ -124,15 +136,16 @@ class IngestionHookControllerTest {
 
         val controller =
             IngestionHookController(
-                queue,
-                storage,
-                MockIngestionHookSignatureService(),
-                securityService,
-                meterRegistry,
-                mockSettings(
+                queue = queue,
+                storage = storage,
+                ingestionHookSignatureService = MockIngestionHookSignatureService(),
+                securityService = securityService,
+                meterRegistry = meterRegistry,
+                cachedSettingsService = mockSettings(
                     repositoryExcludes = IngestionHookFixtures.sampleRepository,
                 ),
-                listOf(ingestionEventProcessor),
+                tokensService = tokensService,
+                ingestionEventProcessors = listOf(ingestionEventProcessor),
             )
 
         var storedPayload: IngestionHookPayload? = null
@@ -173,13 +186,14 @@ class IngestionHookControllerTest {
         val ingestionEventProcessor = mockIngestionEventProcessor()
         val controller =
             IngestionHookController(
-                queue,
-                storage,
-                MockIngestionHookSignatureService(IngestionHookSignatureCheckResult.MISSING_TOKEN),
-                securityService,
-                meterRegistry,
-                mockSettings(),
-                listOf(ingestionEventProcessor),
+                queue = queue,
+                storage = storage,
+                ingestionHookSignatureService = MockIngestionHookSignatureService(IngestionHookSignatureCheckResult.MISSING_TOKEN),
+                securityService = securityService,
+                meterRegistry = meterRegistry,
+                cachedSettingsService = mockSettings(),
+                tokensService = tokensService,
+                ingestionEventProcessors = listOf(ingestionEventProcessor),
             )
 
         val body = IngestionHookFixtures.sampleWorkflowRunJsonPayload().format()
@@ -208,13 +222,14 @@ class IngestionHookControllerTest {
         val ingestionEventProcessor = mockIngestionEventProcessor()
         val controller =
             IngestionHookController(
-                queue,
-                storage,
-                MockIngestionHookSignatureService(IngestionHookSignatureCheckResult.MISMATCH),
-                securityService,
-                meterRegistry,
-                mockSettings(),
-                listOf(ingestionEventProcessor),
+                queue = queue,
+                storage = storage,
+                ingestionHookSignatureService = MockIngestionHookSignatureService(IngestionHookSignatureCheckResult.MISMATCH),
+                securityService = securityService,
+                meterRegistry = meterRegistry,
+                cachedSettingsService = mockSettings(),
+                tokensService = tokensService,
+                ingestionEventProcessors = listOf(ingestionEventProcessor),
             )
 
         val body = IngestionHookFixtures.sampleWorkflowRunJsonPayload().format()
@@ -245,13 +260,14 @@ class IngestionHookControllerTest {
 
         val controller =
             IngestionHookController(
-                queue,
-                storage,
-                MockIngestionHookSignatureService(),
-                securityService,
-                meterRegistry,
-                mockSettings(),
-                listOf(ingestionEventProcessor)
+                queue = queue,
+                storage = storage,
+                ingestionHookSignatureService = MockIngestionHookSignatureService(),
+                securityService = securityService,
+                meterRegistry = meterRegistry,
+                cachedSettingsService = mockSettings(),
+                tokensService = tokensService,
+                ingestionEventProcessors = listOf(ingestionEventProcessor)
             )
 
         var storedPayload: IngestionHookPayload? = null
