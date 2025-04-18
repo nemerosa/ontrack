@@ -114,3 +114,7 @@ jib {
 tasks.named("jibDockerBuild") {
     shouldRunAfter("integrationTest")
 }
+
+val dockerBuild by tasks.registering {
+    dependsOn("jibDockerBuild")
+}
