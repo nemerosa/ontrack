@@ -73,7 +73,7 @@ services:
         condition: service_started
     environment:
       # Development configuration
-      PROFILE: dev
+      SPRING_PROFILES_ACTIVE: dev
 
       ############################################################
       # Configuration of Ontrack
