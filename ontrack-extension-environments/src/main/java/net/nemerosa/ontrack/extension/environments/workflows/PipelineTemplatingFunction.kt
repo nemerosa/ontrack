@@ -7,7 +7,6 @@ import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.docs.DocumentationExampleCode
 import net.nemerosa.ontrack.model.events.EventRenderer
-import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.templating.TemplatingFunction
 import net.nemerosa.ontrack.ui.controller.UILocations
 import org.springframework.stereotype.Component
@@ -27,7 +26,6 @@ import org.springframework.stereotype.Component
 class PipelineTemplatingFunction(
     private val slotService: SlotService,
     private val uiLocations: UILocations,
-    private val securityService: SecurityService,
 ) : TemplatingFunction {
 
     override val id: String = "pipeline"
@@ -40,9 +38,7 @@ class PipelineTemplatingFunction(
     ): String {
         val idExpression = configMap["id"] ?: EnvironmentsEvents.EVENT_PIPELINE_ID
         val id = expressionResolver(idExpression)
-        val pipeline = securityService.asAdmin {
-            slotService.getPipelineById(id)
-        }
+        val pipeline = slotService.getPipelineById(id)
         val link = uiLocations.page("/extension/environments/pipeline/$id")
         return renderer.renderLink(pipeline.fullName(), link)
     }

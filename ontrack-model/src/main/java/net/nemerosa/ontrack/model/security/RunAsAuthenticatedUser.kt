@@ -20,7 +20,7 @@ class RunAsAuthenticatedUser private constructor(
 
     companion object {
 
-        fun runAsUser(authenticatedUser: AuthenticatedUser?) = RunAsAuthenticatedUser(
+        private fun runAsUser(authenticatedUser: AuthenticatedUser?) = RunAsAuthenticatedUser(
             authenticatedUser = authenticatedUser
         )
 

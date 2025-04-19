@@ -24,32 +24,17 @@ abstract class AbstractQLKTITSupport : AbstractBranchLinksTestSupport() {
     @Autowired
     private lateinit var executionGraphQlService: ExecutionGraphQlService
 
-    private fun <T> authenticatedRun(
-            query: String,
-            variables: Map<String, Any?> = emptyMap(),
-            responseProcessing: (response: ExecutionGraphQlResponse) -> T,
-    ): T {
-        // Task to run
-        val code = { internalRun(query, variables, responseProcessing) }
-        // Making sure we're at least authenticated
-        return if (securityService.isLogged) {
-            code()
-        } else {
-            asUser().call(code)
-        }
-    }
-
     fun run(
             query: String,
             variables: Map<String, Any?> = emptyMap()
-    ): JsonNode = authenticatedRun(query, variables, ::assertNoErrors)
+    ): JsonNode = internalRun(query, variables, ::assertNoErrors)
 
     fun run(
             query: String,
             variables: Map<String, Any?> = emptyMap(),
             code: (data: JsonNode) -> Unit = {},
     ) {
-        code(authenticatedRun(query, variables, ::assertNoErrors))
+        code(internalRun(query, variables, ::assertNoErrors))
     }
 
     fun runWithError(
@@ -58,7 +43,7 @@ abstract class AbstractQLKTITSupport : AbstractBranchLinksTestSupport() {
             errorClassification: ErrorClassification? = null,
             errorMessage: String? = null,
     ) {
-        authenticatedRun(query, variables) { response ->
+        internalRun(query, variables) { response ->
             val errors = response.errors
             if (errors.isEmpty()) {
                 fail("Expected some errors")

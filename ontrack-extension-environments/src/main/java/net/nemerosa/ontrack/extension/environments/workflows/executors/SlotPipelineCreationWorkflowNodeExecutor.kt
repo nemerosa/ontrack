@@ -53,7 +53,7 @@ class SlotPipelineCreationWorkflowNodeExecutor(
             // Getting the target environment
             val targetEnvironment = environmentService.findByName(environment)
                 ?: return@asAdmin WorkflowNodeExecutorResult.error(
-                    "Environment name not found: ${environment}",
+                    "Environment name not found: $environment",
                     output = null
                 )
 

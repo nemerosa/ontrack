@@ -318,53 +318,53 @@ class SlotPipelineGraphQLIT : AbstractQLKTITSupport() {
 
     @Test
     fun `Checking if a pipeline can be deployed with one overridden rule`() {
-        slotTestSupport.withSlotPipeline { pipeline ->
-            /* val pl = */ pipeline.build.branch.promotionLevel("GOLD")
-            val admissionRuleConfig = SlotAdmissionRuleTestFixtures.testPromotionAdmissionRuleConfig(pipeline.slot)
-            slotService.addAdmissionRuleConfig(
-                config = admissionRuleConfig,
-            )
-            slotService.overrideAdmissionRule(
-                pipeline = pipeline,
-                admissionRuleConfig = admissionRuleConfig,
-                message = "Because I want to",
-            )
-            asAdmin {
+        asAdmin {
+            slotTestSupport.withSlotPipeline { pipeline ->
+                /* val pl = */ pipeline.build.branch.promotionLevel("GOLD")
+                val admissionRuleConfig = SlotAdmissionRuleTestFixtures.testPromotionAdmissionRuleConfig(pipeline.slot)
+                slotService.addAdmissionRuleConfig(
+                    config = admissionRuleConfig,
+                )
+                slotService.overrideAdmissionRule(
+                    pipeline = pipeline,
+                    admissionRuleConfig = admissionRuleConfig,
+                    message = "Because I want to",
+                )
                 run(
                     """
-                        {
-                            slotPipelineById(id: "${pipeline.id}") {
-                                runAction {
-                                    ok
-                                    overridden
-                                    successCount
-                                    totalCount
-                                    percentage
-                                }
-                                admissionRules {
-                                    check {
+                            {
+                                slotPipelineById(id: "${pipeline.id}") {
+                                    runAction {
                                         ok
-                                        reason
+                                        overridden
+                                        successCount
+                                        totalCount
+                                        percentage
                                     }
-                                    admissionRuleConfig {
-                                        ruleId
-                                        ruleConfig
-                                    }
-                                    data {
-                                        user
-                                        timestamp
-                                        data
-                                    }
-                                    canBeOverridden
-                                    overridden
-                                    override {
-                                        user
-                                        message
+                                    admissionRules {
+                                        check {
+                                            ok
+                                            reason
+                                        }
+                                        admissionRuleConfig {
+                                            ruleId
+                                            ruleConfig
+                                        }
+                                        data {
+                                            user
+                                            timestamp
+                                            data
+                                        }
+                                        canBeOverridden
+                                        overridden
+                                        override {
+                                            user
+                                            message
+                                        }
                                     }
                                 }
                             }
-                        }
-                    """.trimIndent()
+                        """.trimIndent()
                 ) { data ->
                     assertEquals(
                         mapOf(

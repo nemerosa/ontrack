@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.docs.DocumentationExampleCode
 import net.nemerosa.ontrack.model.events.EventRenderer
-import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.templating.TemplatingFunction
 import net.nemerosa.ontrack.ui.controller.UILocations
 import org.springframework.stereotype.Component
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Component
 class SlotTemplatingFunction(
     private val slotService: SlotService,
     private val uiLocations: UILocations,
-    private val securityService: SecurityService,
 ) : TemplatingFunction {
 
     override val id: String = "slot"
@@ -35,9 +33,7 @@ class SlotTemplatingFunction(
     ): String {
         val idExpression = configMap[SlotTemplatingFunctionParameters::id.name]
         val id = expressionResolver(idExpression ?: EnvironmentsEvents.EVENT_SLOT_ID)
-        val slot = securityService.asAdmin {
-            slotService.getSlotById(id)
-        }
+        val slot = slotService.getSlotById(id)
         val link = uiLocations.page("/extension/environments/slot/$id")
         return renderer.renderLink(slot.fullName(), link)
     }

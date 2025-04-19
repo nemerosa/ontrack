@@ -57,12 +57,10 @@ class SlotServiceImpl(
 
     override fun findSlotsByEnvironment(environment: Environment): List<Slot> =
         if (securityService.isGlobalFunctionGranted(EnvironmentList::class.java)) {
-            securityService.asAdmin {
-                slotRepository.findByEnvironment(environment)
-                    .filter {
-                        securityService.isProjectFunctionGranted(it.project, ProjectView::class.java)
-                    }
-            }
+            slotRepository.findByEnvironment(environment)
+                .filter {
+                    securityService.isProjectFunctionGranted(it.project, ProjectView::class.java)
+                }
                 .sortedBy { it.project.name }
         } else {
             emptyList()
@@ -118,7 +116,7 @@ class SlotServiceImpl(
         }
     }
 
-    private fun <C: Any, D> getRequiredInput(
+    private fun <C : Any, D> getRequiredInput(
         pipeline: SlotPipeline,
         config: SlotAdmissionRuleConfig,
         rule: SlotAdmissionRule<C, D>
@@ -228,7 +226,7 @@ class SlotServiceImpl(
         fillEligibilityCriteria(slot, rule, config.ruleConfig, queries, params, deployable)
     }
 
-    private fun <C: Any, D> fillEligibilityCriteria(
+    private fun <C : Any, D> fillEligibilityCriteria(
         slot: Slot,
         rule: SlotAdmissionRule<C, D>,
         jsonRuleConfig: JsonNode,
@@ -251,7 +249,7 @@ class SlotServiceImpl(
         return isBuildEligible(slot, rule, config.ruleConfig, build)
     }
 
-    private fun <C: Any, D> isBuildEligible(
+    private fun <C : Any, D> isBuildEligible(
         slot: Slot,
         rule: SlotAdmissionRule<C, D>,
         jsonRuleConfig: JsonNode,
@@ -585,7 +583,7 @@ class SlotServiceImpl(
         )
     }
 
-    private fun <C: Any, D> getAdmissionRuleCheck(
+    private fun <C : Any, D> getAdmissionRuleCheck(
         pipeline: SlotPipeline,
         rule: SlotAdmissionRule<C, D>,
         admissionRule: SlotAdmissionRuleConfig,

@@ -283,7 +283,7 @@ class SlotWorkflowServiceGraphQLIT : AbstractQLKTITSupport() {
             assertEquals(WorkflowInstanceStatus.ERROR, overriddenInstance.workflowInstance.status)
             assertNotNull(overriddenInstance.override) {
                 assertEquals("Ignoring the result of the workflow", it.message)
-                assertEquals("admin", it.user)
+                assertEquals(securityService.currentUser?.name, it.user)
                 assertNotNull(it.timestamp, "Timestamp has been set")
             }
 
