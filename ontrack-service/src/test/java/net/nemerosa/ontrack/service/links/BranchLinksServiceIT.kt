@@ -1,16 +1,17 @@
 package net.nemerosa.ontrack.service.links
 
 import net.nemerosa.ontrack.extension.api.support.TestMetricsExportExtension
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.it.links.AbstractBranchLinksTestSupport
 import net.nemerosa.ontrack.model.links.BranchLinksDirection
 import net.nemerosa.ontrack.model.structure.Branch
-import net.nemerosa.ontrack.model.structure.BranchLink
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
+@AsAdminTest
 class BranchLinksServiceIT : AbstractBranchLinksTestSupport() {
 
     @Autowired

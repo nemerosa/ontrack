@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.environments.SlotTestSupport
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.extension.environments.service.getPipelineAdmissionRuleChecks
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.test.TestUtils.uid
@@ -22,6 +23,7 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
     private lateinit var slotService: SlotService
 
     @Test
+    @AsAdminTest
     fun `Approval by a super admin`() {
         withManuallyApprovedPipeline { pipeline, admissionRuleConfig ->
             asAdmin {
@@ -51,6 +53,7 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    @AsAdminTest
     fun `Manual approval rejected by a super admin`() {
         withManuallyApprovedPipeline { pipeline, admissionRuleConfig ->
             asAdmin {
@@ -125,6 +128,7 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    @AsAdminTest
     fun `Manual rejected approval overridden by an admin`() {
         withManuallyApprovedPipeline { pipeline, admissionRuleConfig ->
             asAdmin {
@@ -172,6 +176,7 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    @AsAdminTest
     fun `Manual approval by anybody`() {
         withManuallyApprovedPipeline { pipeline, admissionRuleConfig ->
             slotTestSupport.withSlotUser(pipeline.slot) {
@@ -188,6 +193,7 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    @AsAdminTest
     fun `Manual approval by an allowed user`() {
         val name = uid("U")
         withManuallyApprovedPipeline(
@@ -216,6 +222,7 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    @AsAdminTest
     fun `Manual approval not possible if not in the list of users`() {
         val name = uid("U")
         val otherName = uid("U")

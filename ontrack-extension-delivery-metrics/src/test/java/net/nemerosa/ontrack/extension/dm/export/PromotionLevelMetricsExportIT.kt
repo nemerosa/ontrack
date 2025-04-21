@@ -5,6 +5,7 @@ import net.nemerosa.ontrack.common.hours
 import net.nemerosa.ontrack.common.minutes
 import net.nemerosa.ontrack.extension.api.support.TestMetricsExportExtension
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.test.TestUtils.uid
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.Duration
 import java.time.LocalDateTime
 
+@AsAdminTest
 class PromotionLevelMetricsExportIT : AbstractDSLTestSupport() {
 
     @Autowired

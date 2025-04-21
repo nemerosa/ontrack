@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.general
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.test.TestUtils.uid
@@ -12,6 +13,7 @@ import kotlin.test.assertEquals
  * In this test, we assume the source project is part of the main labels (see [MainBuildLinksProjectPropertyType])
  * and that it is always displayed.
  */
+@AsAdminTest
 class BuildLinkDecorationIT : AbstractDSLTestSupport() {
 
     private val targetBuildName = "2"

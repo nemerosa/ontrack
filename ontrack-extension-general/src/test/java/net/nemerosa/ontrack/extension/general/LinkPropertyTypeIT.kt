@@ -1,7 +1,9 @@
 package net.nemerosa.ontrack.extension.general
 
+import net.nemerosa.ontrack.it.AsAdminTest
 import org.junit.jupiter.api.Test
 
+@AsAdminTest
 class LinkPropertyTypeIT : AbstractPropertyTypeTestSupport() {
 
     @Test

@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.api.support.TestMetricsExportExtension
 import net.nemerosa.ontrack.extension.git.branching.BranchingModelProperty
 import net.nemerosa.ontrack.extension.git.branching.BranchingModelPropertyType
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
@@ -16,6 +17,7 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
+@AsAdminTest
 class TimeSinceEventServiceIT : AbstractDSLTestSupport() {
 
     @Autowired

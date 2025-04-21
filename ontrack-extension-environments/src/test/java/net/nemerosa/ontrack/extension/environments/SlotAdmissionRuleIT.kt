@@ -2,10 +2,12 @@ package net.nemerosa.ontrack.extension.environments
 
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
 
+@AsAdminTest
 class SlotAdmissionRuleIT : AbstractDSLTestSupport() {
 
     @Autowired

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.security.BuildCreate
 import net.nemerosa.ontrack.model.security.ProjectEdit
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.security.access.AccessDeniedException
 import kotlin.test.*
 
+@AsAdminTest
 class RunInfoServiceIT : AbstractDSLTestSupport() {
 
     @Test

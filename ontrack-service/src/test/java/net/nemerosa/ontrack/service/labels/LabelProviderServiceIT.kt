@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service.labels
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.labels.*
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.test.TestUtils.uid
@@ -14,6 +15,7 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
+@AsAdminTest
 class LabelProviderServiceIT : AbstractDSLTestSupport() {
 
     @Autowired

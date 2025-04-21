@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.general.validation.FractionValidationData
 import net.nemerosa.ontrack.extension.general.validation.FractionValidationDataType
 import net.nemerosa.ontrack.extension.general.validation.ThresholdConfig
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.test.TestUtils
 import net.nemerosa.ontrack.test.assertIs
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
+@AsAdminTest
 class ValidationRunWithAutoStampIT : AbstractDSLTestSupport() {
 
     @Autowired

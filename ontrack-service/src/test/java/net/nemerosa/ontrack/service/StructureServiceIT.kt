@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.it.NewTxRollbacked
 import net.nemerosa.ontrack.model.security.BuildEdit
 import net.nemerosa.ontrack.model.security.ProjectEdit
@@ -16,6 +17,7 @@ import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.security.access.AccessDeniedException
 import kotlin.test.*
 
+@AsAdminTest
 class StructureServiceIT : AbstractDSLTestSupport() {
 
     @Test

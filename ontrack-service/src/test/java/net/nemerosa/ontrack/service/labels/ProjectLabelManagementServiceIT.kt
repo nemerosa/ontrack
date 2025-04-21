@@ -1,10 +1,12 @@
 package net.nemerosa.ontrack.service.labels
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.labels.ProjectLabelManagement
 import org.junit.jupiter.api.Test
 import kotlin.test.assertTrue
 
+@AsAdminTest
 class ProjectLabelManagementServiceIT : AbstractDSLTestSupport() {
 
     @Test

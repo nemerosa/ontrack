@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.av.dispatcher
 import net.nemerosa.ontrack.extension.general.releaseProperty
 import net.nemerosa.ontrack.extension.general.useLabel
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
+@AsAdminTest
 class LabelOnlyVersionSourceIT : AbstractDSLTestSupport() {
 
     @Autowired

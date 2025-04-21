@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service.security
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.security.*
 import org.apache.commons.lang3.StringUtils
 import org.junit.jupiter.api.Test
@@ -15,6 +16,7 @@ class SecurityServiceIT : AbstractDSLTestSupport() {
     private lateinit var roleService: RolesService
 
     @Test
+    @AsAdminTest
     fun `Running as admin`() {
         project {
             securityService.asAdmin {
@@ -35,12 +37,14 @@ class SecurityServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    @AsAdminTest
     fun currentAccount() {
         val account = asUser().call { securityService.currentUser?.account }
         assertNotNull(account)
     }
 
     @Test
+    @AsAdminTest
     fun currentAccount_none() {
         val account = asAnonymous().call { securityService.currentUser?.account }
         assertNull(account)
@@ -59,6 +63,7 @@ class SecurityServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    @AsAdminTest
     fun read_only_on_one_project() {
         withNoGrantViewToAll {
 
@@ -91,6 +96,7 @@ class SecurityServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    @AsAdminTest
     fun read_only_on_all_projects() {
         withNoGrantViewToAll {
 
@@ -118,6 +124,7 @@ class SecurityServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    @AsAdminTest
     fun `Participant in all projects`() {
         withNoGrantViewToAll {
 

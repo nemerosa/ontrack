@@ -3,11 +3,13 @@ package net.nemerosa.ontrack.service
 import net.nemerosa.ontrack.extension.api.support.TestSimpleProperty
 import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import org.junit.jupiter.api.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
+@AsAdminTest
 class PropertyServiceIT : AbstractDSLTestSupport() {
 
     @Test

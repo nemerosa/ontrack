@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.elastic.metrics
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.structure.RunInfoInput
@@ -17,6 +18,7 @@ import kotlin.test.assertNull
         "management.metrics.export.elastic.enabled=false",
     ]
 )
+@AsAdminTest
 class ElasticMetricsRunInfoListenerIT : AbstractDSLTestSupport() {
 
     @Autowired

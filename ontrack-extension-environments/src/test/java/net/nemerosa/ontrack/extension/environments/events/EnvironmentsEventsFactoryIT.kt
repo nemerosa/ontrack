@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.environments.events
 import net.nemerosa.ontrack.extension.environments.EnvironmentTestSupport
 import net.nemerosa.ontrack.extension.environments.SlotTestSupport
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.HtmlNotificationEventRenderer
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
+@AsAdminTest
 class EnvironmentsEventsFactoryIT : AbstractDSLTestSupport() {
 
     @Autowired

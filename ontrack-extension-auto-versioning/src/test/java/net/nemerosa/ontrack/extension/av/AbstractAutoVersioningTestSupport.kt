@@ -4,10 +4,12 @@ import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfig
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningConfigurationService
 import net.nemerosa.ontrack.extension.scm.mock.MockSCMTester
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.PromotionLevel
 import org.springframework.beans.factory.annotation.Autowired
 
+@AsAdminTest
 abstract class AbstractAutoVersioningTestSupport : AbstractQLKTITSupport() {
 
     @Autowired

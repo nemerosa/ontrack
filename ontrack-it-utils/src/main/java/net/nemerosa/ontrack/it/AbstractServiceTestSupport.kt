@@ -306,16 +306,20 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
     }
 
     private fun <T> withSettings(grantViewToAll: Boolean, grantParticipationToAll: Boolean = true, task: () -> T): T {
-        val old = securitySettings(
-            SecuritySettings(
-                isGrantProjectViewToAll = grantViewToAll,
-                isGrantProjectParticipationToAll = grantParticipationToAll
+        val old = asAdmin().call {
+            securitySettings(
+                SecuritySettings(
+                    isGrantProjectViewToAll = grantViewToAll,
+                    isGrantProjectParticipationToAll = grantParticipationToAll
+                )
             )
-        )
+        }
         return try {
             task()
         } finally {
-            securitySettings(old)
+            asAdmin().call {
+                securitySettings(old)
+            }
         }
     }
 

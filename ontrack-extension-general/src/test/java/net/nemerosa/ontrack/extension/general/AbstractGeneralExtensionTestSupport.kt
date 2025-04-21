@@ -1,9 +1,11 @@
 package net.nemerosa.ontrack.extension.general
 
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.Project
 
+@AsAdminTest
 abstract class AbstractGeneralExtensionTestSupport : AbstractQLKTITSupport() {
 
     /**

@@ -6,6 +6,7 @@ import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.extension.environments.storage.SlotAlreadyDefinedException
 import net.nemerosa.ontrack.extension.environments.storage.SlotIdAlreadyExistsException
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.pagination.PageRequest
 import net.nemerosa.ontrack.model.structure.Build
@@ -17,6 +18,7 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
+@AsAdminTest
 class SlotServiceIT : AbstractDSLTestSupport() {
 
     @Autowired

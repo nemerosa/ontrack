@@ -3,11 +3,13 @@ package net.nemerosa.ontrack.service
 import net.nemerosa.ontrack.extension.api.support.TestProperty
 import net.nemerosa.ontrack.extension.api.support.TestPropertyType
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.repository.PropertyRepository
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertTrue
 
+@AsAdminTest
 class CacheConfigIT : AbstractServiceTestSupport() {
 
     @Autowired

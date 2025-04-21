@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.extension.git.support.TagPatternBuildNameGitCommitLi
 import net.nemerosa.ontrack.extension.scm.support.TagPattern
 import net.nemerosa.ontrack.git.support.GitRepo
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.job.JobRunListener
 import net.nemerosa.ontrack.job.orchestrator.JobOrchestrator
 import net.nemerosa.ontrack.model.security.GlobalSettings
@@ -24,6 +25,7 @@ import kotlin.test.assertTrue
 /**
  * Testing the sync between builds and Git tags.
  */
+@AsAdminTest
 class GitBuildSyncIT : AbstractServiceTestSupport() {
 
     @Autowired

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service.security
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.Project
 import org.junit.jupiter.api.Test
@@ -12,6 +13,7 @@ import kotlin.test.assertTrue
 /**
  * Testing the basic security conditions.
  */
+@AsAdminTest
 class SecuritySetupIT : AbstractDSLTestSupport() {
 
     @Test

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service.security
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.security.*
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -23,6 +24,7 @@ class AccountServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    @AsAdminTest
     fun account_with_no_role() {
         project {
             asUser().call {
@@ -35,6 +37,7 @@ class AccountServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    @AsAdminTest
     fun account_with_global_role_controller() {
         project {
             asGlobalRole(Roles.GLOBAL_CONTROLLER) {
@@ -47,6 +50,7 @@ class AccountServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    @AsAdminTest
     fun account_with_global_role_controller_on_group() {
         // Setup
         val accountGroup = doCreateAccountGroupWithGlobalRole(Roles.GLOBAL_CONTROLLER)
@@ -67,6 +71,7 @@ class AccountServiceIT : AbstractDSLTestSupport() {
      * Regression test for #427
      */
     @Test
+    @AsAdminTest
     fun admin_can_delete_promotion_run() {
         project {
             asAdmin {

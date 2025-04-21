@@ -1,12 +1,14 @@
 package net.nemerosa.ontrack.service.labels
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.labels.MainBuildLinksService
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
+@AsAdminTest
 class MainBuildLinksServiceIT : AbstractDSLTestSupport() {
 
     @Autowired

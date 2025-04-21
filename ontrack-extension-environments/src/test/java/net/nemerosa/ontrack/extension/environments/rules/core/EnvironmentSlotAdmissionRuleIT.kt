@@ -6,12 +6,14 @@ import net.nemerosa.ontrack.extension.environments.SlotDeploymentActionStatus
 import net.nemerosa.ontrack.extension.environments.SlotTestSupport
 import net.nemerosa.ontrack.extension.environments.service.SlotService
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
+@AsAdminTest
 class EnvironmentSlotAdmissionRuleIT : AbstractDSLTestSupport() {
 
     @Autowired

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service.security
 
-import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.security.*
 import org.junit.jupiter.api.Test
 import org.springframework.context.annotation.Bean
@@ -12,7 +13,8 @@ const val extGlobalRole = "EXT_AUTOMATER"
 const val newProjectRole = "NEW_PROJECT"
 const val extProjectRole = "EXT_PARTICIPANT"
 
-class RolesServiceIT : AbstractServiceTestSupport() {
+@AsAdminTest
+class RolesServiceIT : AbstractDSLTestSupport() {
 
     interface TestGlobalFunction : GlobalFunction
     interface TestProject1Function : ProjectFunction

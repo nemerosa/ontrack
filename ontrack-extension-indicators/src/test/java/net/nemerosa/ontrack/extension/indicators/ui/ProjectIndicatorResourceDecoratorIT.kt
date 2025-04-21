@@ -5,12 +5,14 @@ import net.nemerosa.ontrack.extension.indicators.acl.IndicatorRoleContributor
 import net.nemerosa.ontrack.extension.indicators.model.*
 import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueType
 import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueTypeConfig
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.structure.Signature
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecoratorTestSupport
 import net.nemerosa.ontrack.ui.resource.Link
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
+@AsAdminTest
 class ProjectIndicatorResourceDecoratorIT : AbstractResourceDecoratorTestSupport() {
 
     @Autowired

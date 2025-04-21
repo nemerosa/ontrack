@@ -13,6 +13,7 @@ import net.nemerosa.ontrack.extension.artifactory.model.ArtifactoryStatus
 import net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncProperty
 import net.nemerosa.ontrack.extension.artifactory.property.ArtifactoryPromotionSyncPropertyType
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.job.JobRunListener
 import net.nemerosa.ontrack.job.orchestrator.JobOrchestratorSupplier
 import net.nemerosa.ontrack.test.assertIs
@@ -27,6 +28,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
+@AsAdminTest
 class ArtifactoryPromotionSyncServiceIT : AbstractDSLTestSupport() {
 
     @Autowired

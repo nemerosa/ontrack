@@ -141,7 +141,9 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
      * Kotlin friendly account role execution
      */
     fun <T> asAccountWithGlobalRole(role: String, code: () -> T): T {
-        val account = doCreateAccountWithGlobalRole(role)
+        val account = asAdmin {
+            doCreateAccountWithGlobalRole(role)
+        }
         return asFixedAccount(account).call(code)
     }
 
@@ -511,28 +513,26 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
      * Creates a label
      */
     fun label(category: String? = uid("C"), name: String = uid("N"), checkForExisting: Boolean = true): Label {
-        return asUser().with(LabelManagement::class.java).call {
-            if (checkForExisting) {
-                val labels = labelManagementService.findLabels(category, name)
-                val existingLabel = labels.firstOrNull()
-                existingLabel ?: labelManagementService.newLabel(
-                    LabelForm(
-                        category = category,
-                        name = name,
-                        description = null,
-                        color = "#FF0000"
-                    )
+        return if (checkForExisting) {
+            val labels = labelManagementService.findLabels(category, name)
+            val existingLabel = labels.firstOrNull()
+            existingLabel ?: labelManagementService.newLabel(
+                LabelForm(
+                    category = category,
+                    name = name,
+                    description = null,
+                    color = "#FF0000"
                 )
-            } else {
-                labelManagementService.newLabel(
-                    LabelForm(
-                        category = category,
-                        name = name,
-                        description = null,
-                        color = "#FF0000"
-                    )
+            )
+        } else {
+            labelManagementService.newLabel(
+                LabelForm(
+                    category = category,
+                    name = name,
+                    description = null,
+                    color = "#FF0000"
                 )
-            }
+            )
         }
     }
 

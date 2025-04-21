@@ -1,9 +1,11 @@
 package net.nemerosa.ontrack.extension.general
 
+import net.nemerosa.ontrack.it.AsAdminTest
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
+@AsAdminTest
 class ReleasePropertyTypeIT : AbstractPropertyTypeTestSupport() {
 
     @Autowired

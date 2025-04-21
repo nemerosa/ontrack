@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service.dashboards
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.dashboards.*
 import net.nemerosa.ontrack.model.security.Roles
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
+@AsAdminTest
 class DashboardServiceIT : AbstractDSLTestSupport() {
 
     @Autowired

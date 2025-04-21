@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.api.support.TestProperty
 import net.nemerosa.ontrack.extension.api.support.TestProperty.Companion.of
 import net.nemerosa.ontrack.extension.api.support.TestPropertyType
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.security.EncryptionService
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectEdit
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
 
+@AsAdminTest
 class ConfigurationServiceIT : AbstractServiceTestSupport() {
 
     @Autowired

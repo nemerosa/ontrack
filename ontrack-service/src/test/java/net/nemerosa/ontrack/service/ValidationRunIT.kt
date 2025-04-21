@@ -4,6 +4,7 @@ import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
 import net.nemerosa.ontrack.extension.api.support.TestValidationData
 import net.nemerosa.ontrack.extension.api.support.TestValidationDataType
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataInputException
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataStatusRequiredBecauseNoDataException
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataTypeNotFoundException
@@ -17,6 +18,7 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
+@AsAdminTest
 class ValidationRunIT : AbstractDSLTestSupport() {
 
     @Autowired

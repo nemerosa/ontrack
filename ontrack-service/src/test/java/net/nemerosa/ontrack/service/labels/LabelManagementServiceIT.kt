@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service.labels
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.labels.LabelForm
 import net.nemerosa.ontrack.model.labels.LabelManagement
 import net.nemerosa.ontrack.test.TestUtils.uid
@@ -11,6 +12,7 @@ import kotlin.test.*
 class LabelManagementServiceIT : AbstractDSLTestSupport() {
 
     @Test
+    @AsAdminTest
     fun `Creating, updating and deleting a label`() {
         val category = uid("C")
         val name = uid("N")
@@ -53,6 +55,7 @@ class LabelManagementServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    @AsAdminTest
     fun `Null category is allowed`() {
         val label = label(category = null)
         assertNull(label.category)
@@ -76,7 +79,9 @@ class LabelManagementServiceIT : AbstractDSLTestSupport() {
 
     @Test
     fun `Cannot update a label if not authorized`() {
-        val label = label()
+        val label = asAdmin {
+            label()
+        }
         assertFailsWith(AccessDeniedException::class) {
             labelManagementService.updateLabel(
                 label.id,
@@ -92,13 +97,16 @@ class LabelManagementServiceIT : AbstractDSLTestSupport() {
 
     @Test
     fun `Cannot delete a label if not authorized`() {
-        val label = label()
+        val label = asAdmin {
+            label()
+        }
         assertFailsWith(AccessDeniedException::class) {
             labelManagementService.deleteLabel(label.id)
         }
     }
 
     @Test
+    @AsAdminTest
     fun `Associating a list of labels for a project`() {
         val labels = (1..5).map { label() }
         project {
@@ -120,6 +128,7 @@ class LabelManagementServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    @AsAdminTest
     fun `Looking for labels per category`() {
         val category = uid("C")
         (1..5).map { label(category = category, name = "name-$it") }
@@ -135,6 +144,7 @@ class LabelManagementServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    @AsAdminTest
     fun `Looking for labels per name only`() {
         val name = uid("C")
         (1..5).map { label(category = uid("C"), name = name) }
@@ -151,6 +161,7 @@ class LabelManagementServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
+    @AsAdminTest
     fun `Looking for labels per category and name`() {
         val category = uid("C")
         val name = uid("N")

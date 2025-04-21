@@ -2,10 +2,12 @@ package net.nemerosa.ontrack.extension.environments.ui
 
 import net.nemerosa.ontrack.extension.environments.SlotTestSupport
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
+@AsAdminTest
 class GQLBuildSlotsFieldContributorIT : AbstractQLKTITSupport() {
 
     @Autowired

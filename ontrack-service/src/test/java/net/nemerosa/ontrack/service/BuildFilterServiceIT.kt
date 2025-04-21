@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.security.BranchEdit
 import net.nemerosa.ontrack.model.security.BranchFilterMgt
@@ -14,6 +15,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
+@AsAdminTest
 class BuildFilterServiceIT : AbstractDSLTestSupport() {
 
     @Autowired

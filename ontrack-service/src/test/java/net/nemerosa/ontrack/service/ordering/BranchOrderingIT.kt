@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service.ordering
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.ordering.BranchOrderingService
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -10,6 +11,7 @@ import kotlin.test.assertNotNull
 /**
  * Integration tests for the ordering of branches.
  */
+@AsAdminTest
 class BranchOrderingIT : AbstractDSLTestSupport() {
 
     @Autowired
