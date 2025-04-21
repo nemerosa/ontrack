@@ -139,6 +139,7 @@ class DefaultNotificationProcessingService(
             )
             result
         } catch (any: Throwable) {
+            logger.error("Error processing notification", any)
             meterRegistry.incrementForProcessing(NotificationsMetrics.event_processing_channel_error, item)
             recordError(
                 recordId = recordId,
