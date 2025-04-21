@@ -18,7 +18,6 @@ import net.nemerosa.ontrack.repository.AccountRepository
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.TestingAuthenticationToken
-import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.context.SecurityContextImpl
@@ -60,25 +59,8 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
     @Autowired
     protected lateinit var accountACLService: AccountACLService
 
-    private fun createAdminAccount(): Account {
-        val name = uid("admin-")
-        val groupName = ontrackConfigProperties.security.authorization.admin.groupName
-        val group = accountGroupRepository.findAccountGroupByName(groupName)
-            ?: error("Cannot find group with name $groupName")
-        val account = accountRepository.newAccount(
-            Account(
-                id = ID.NONE,
-                name = name,
-                fullName = name,
-                email = "$name@ontrack.local",
-                role = SecurityRole.USER,
-            )
-        )
-        // Account groups
-        accountGroupRepository.linkAccountToGroups(account.id(), listOf(group.id()))
-        // OK
-        return account
-    }
+    @Autowired
+    private lateinit var securityTestSupport: SecurityTestSupport
 
     protected fun doCreateAccountGroup(): AccountGroup {
         val name = uid("G")
@@ -279,7 +261,7 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
     protected fun asUser(name: String = uid("U")): UserCall = UserCall(name = name)
 
     protected fun asAdmin() = FixedAccountCall(
-        account = createAdminAccount(),
+        account = securityTestSupport.createAdminAccount(),
     )
 
     protected fun asAnonymous(): AnonymousCall {
@@ -398,12 +380,7 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
 
         override fun contextSetup() {
             val user = createOntrackAuthenticatedUser()
-            val authentication = AuthenticatedUserAuthentication(
-                authenticatedUser = user,
-                authorities = AuthorityUtils.createAuthorityList(securityRole.name)
-            )
-            val context: SecurityContext = SecurityContextImpl(authentication)
-            SecurityContextHolder.setContext(context)
+            securityTestSupport.setupSecurityContext(user, securityRole)
         }
 
         protected open val securityRole: SecurityRole = SecurityRole.USER
@@ -417,11 +394,7 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
     ) : AuthenticatedUserCall() {
 
         override fun createOntrackAuthenticatedUser(): AuthenticatedUser =
-            AccountAuthenticatedUser(
-                account = account,
-                authorisations = accountACLService.getAuthorizations(account),
-                groups = accountACLService.getGroups(account),
-            )
+            securityTestSupport.createOntrackAuthenticatedUser(account = account)
 
     }
 
