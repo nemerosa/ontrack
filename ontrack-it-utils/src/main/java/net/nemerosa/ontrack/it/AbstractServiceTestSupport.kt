@@ -81,12 +81,10 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
     }
 
     protected fun doCreateAccountGroup(): AccountGroup {
-        return asUser().with(AccountGroupManagement::class.java).call {
-            val name = uid("G")
-            accountService.createGroup(
-                AccountGroupInput(name, "")
-            )
-        }
+        val name = uid("G")
+        return accountService.createGroup(
+            AccountGroupInput(name, "")
+        )
     }
 
     protected fun doCreateAccount(accountGroup: AccountGroup): Account {
@@ -98,93 +96,75 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
         disabled: Boolean = false,
         locked: Boolean = false,
     ): Account {
-        return asUser().with(AccountManagement::class.java).call {
-            val name = uid("A")
-            accountService.create(
-                AccountInput(
-                    name,
-                    "Test $name",
-                    "$name@test.com",
-                    accountGroups.map { it.id() },
-                )
+        val name = uid("A")
+        return accountService.create(
+            AccountInput(
+                name,
+                "Test $name",
+                "$name@test.com",
+                accountGroups.map { it.id() },
             )
-        }
+        )
     }
 
     protected fun doCreateAccountWithGlobalRole(role: String): Account {
         val account = doCreateAccount()
-        return asUser().with(AccountManagement::class.java).call {
-            accountService.saveGlobalPermission(
-                PermissionTargetType.ACCOUNT,
-                account.id(),
-                PermissionInput(role)
-            )
-            account
-        }
+        accountService.saveGlobalPermission(
+            PermissionTargetType.ACCOUNT,
+            account.id(),
+            PermissionInput(role)
+        )
+        return account
     }
 
     protected fun doCreateAccountWithProjectRole(project: Project, role: String): Account {
         val account = doCreateAccount()
-        return asUser().withProjectFunction(project, ProjectAuthorisationMgt::class.java).call {
-            accountService.saveProjectPermission(
-                project.id,
-                PermissionTargetType.ACCOUNT,
-                account.id(),
-                PermissionInput(role)
-            )
-            account
-        }
+        accountService.saveProjectPermission(
+            project.id,
+            PermissionTargetType.ACCOUNT,
+            account.id(),
+            PermissionInput(role)
+        )
+        return account
     }
 
     protected fun doCreateAccountGroupWithGlobalRole(role: String): AccountGroup {
         val group = doCreateAccountGroup()
-        return asUser().with(AccountGroupManagement::class.java).call {
-            accountService.saveGlobalPermission(
-                PermissionTargetType.GROUP,
-                group.id(),
-                PermissionInput(role)
-            )
-            group
-        }
+        accountService.saveGlobalPermission(
+            PermissionTargetType.GROUP,
+            group.id(),
+            PermissionInput(role)
+        )
+        return group
     }
 
     fun <T> setProperty(projectEntity: ProjectEntity, propertyTypeClass: Class<out PropertyType<T>>, data: T) {
-        asUser().withProjectFunction(projectEntity, ProjectEdit::class.java).execute(Runnable {
-            propertyService.editProperty(
-                projectEntity,
-                propertyTypeClass,
-                data
-            )
-        }
+        propertyService.editProperty(
+            projectEntity,
+            propertyTypeClass,
+            data
         )
     }
 
     protected fun <T> deleteProperty(projectEntity: ProjectEntity, propertyTypeClass: Class<out PropertyType<T>>) {
-        asUser().withProjectFunction(projectEntity, ProjectEdit::class.java).execute(Runnable {
-            propertyService.deleteProperty(
-                projectEntity,
-                propertyTypeClass
-            )
-        }
+        propertyService.deleteProperty(
+            projectEntity,
+            propertyTypeClass
         )
     }
 
     protected fun <T> getProperty(projectEntity: ProjectEntity, propertyTypeClass: Class<out PropertyType<T>>): T {
-        return asUser().withProjectFunction(projectEntity, ProjectEdit::class.java).call {
-            propertyService.getProperty(
-                projectEntity,
-                propertyTypeClass
-            ).value
-        }
+        return propertyService.getProperty(
+            projectEntity,
+            propertyTypeClass
+        ).value
     }
 
     @JvmOverloads
     protected fun doCreateProject(nameDescription: NameDescription = nameDescription()): Project {
-        return asUser().with(ProjectCreation::class.java).call {
-            structureService.newProject(
-                of(nameDescription)
-            )
-        }
+        return structureService.newProject(
+            of(nameDescription)
+        )
     }
 
     @JvmOverloads
@@ -192,11 +172,9 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
         project: Project = doCreateProject(),
         nameDescription: NameDescription = nameDescription()
     ): Branch {
-        return asUser().with(project.id(), BranchCreate::class.java).call {
-            structureService.newBranch(
-                of(project, nameDescription)
-            )
-        }
+        return structureService.newBranch(
+            of(project, nameDescription)
+        )
     }
 
     @JvmOverloads
@@ -205,15 +183,13 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
         nameDescription: NameDescription = nameDescription(),
         signature: Signature = of("test")
     ): Build {
-        return asUser().with(branch.projectId(), BuildCreate::class.java).call {
-            structureService.newBuild(
-                of(
-                    branch,
-                    nameDescription,
-                    signature
-                )
+        return structureService.newBuild(
+            of(
+                branch,
+                nameDescription,
+                signature
             )
-        }
+        )
     }
 
     @JvmOverloads
@@ -223,18 +199,16 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
         statusId: ValidationRunStatusID?,
         runData: ValidationRunData<*>? = null
     ): ValidationRun {
-        return asUser().withView(build).withProjectFunction(build, ValidationRunCreate::class.java).call {
-            structureService.newValidationRun(
-                build,
-                ValidationRunRequest(
-                    vs.name,
-                    statusId,
-                    runData?.descriptor?.id,
-                    runData?.data,
-                    null
-                )
+        return structureService.newValidationRun(
+            build,
+            ValidationRunRequest(
+                vs.name,
+                statusId,
+                runData?.descriptor?.id,
+                runData?.data,
+                null
             )
-        }
+        )
     }
 
     fun doValidateBuild(build: Build, vsName: String, statusId: ValidationRunStatusID): ValidationRun {
@@ -247,14 +221,12 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
         branch: Branch = doCreateBranch(),
         nameDescription: NameDescription = nameDescription()
     ): PromotionLevel {
-        return asUser().with(branch.projectId(), PromotionLevelCreate::class.java).call {
-            structureService.newPromotionLevel(
-                PromotionLevel.of(
-                    branch,
-                    nameDescription,
-                )
+        return structureService.newPromotionLevel(
+            PromotionLevel.of(
+                branch,
+                nameDescription,
             )
-        }
+        )
     }
 
     protected fun doCreateValidationStamp(): ValidationStamp {
@@ -271,14 +243,12 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
         nameDescription: NameDescription,
         config: ValidationDataTypeConfig<*>? = null
     ): ValidationStamp {
-        return asUser().with(branch.project.id(), ValidationStampCreate::class.java).call {
-            structureService.newValidationStamp(
-                ValidationStamp.of(
-                    branch,
-                    nameDescription
-                ).withDataType(config)
-            )
-        }
+        return structureService.newValidationStamp(
+            ValidationStamp.of(
+                branch,
+                nameDescription
+            ).withDataType(config)
+        )
     }
 
     @JvmOverloads
@@ -288,29 +258,22 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
         description: String?,
         signature: Signature = of("test")
     ): PromotionRun {
-        return asUser()
-            .with(build.projectId(), PromotionRunCreate::class.java)
-            .with(build.projectId(), ProjectView::class.java)
-            .call {
-                structureService.newPromotionRun(
-                    of(
-                        build,
-                        promotionLevel,
-                        signature,
-                        description
-                    )
-                )
-            }
+        return structureService.newPromotionRun(
+            of(
+                build,
+                promotionLevel,
+                signature,
+                description
+            )
+        )
     }
 
     protected fun <T> doSetProperty(entity: ProjectEntity, propertyType: Class<out PropertyType<T>>, data: T) {
-        asUser().withProjectFunction(entity, ProjectEdit::class.java).call {
-            propertyService.editProperty(
-                entity,
-                propertyType,
-                data
-            )
-        }
+        propertyService.editProperty(
+            entity,
+            propertyType,
+            data
+        )
     }
 
     protected fun asUser(name: String = uid("U")): UserCall = UserCall(name = name)
@@ -354,12 +317,11 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
     /**
      * This must always be called from [withGrantViewToAll] or [withNoGrantViewToAll].
      */
-    private fun securitySettings(settings: SecuritySettings): SecuritySettings =
-        asUser().with(GlobalSettings::class.java).call {
-            val old = cachedSettingsService.getCachedSettings(SecuritySettings::class.java)
-            settingsManagerService.saveSettings(settings)
-            old
-        }
+    private fun securitySettings(settings: SecuritySettings): SecuritySettings {
+        val old = cachedSettingsService.getCachedSettings(SecuritySettings::class.java)
+        settingsManagerService.saveSettings(settings)
+        return old
+    }
 
     private fun <T> withSettings(grantViewToAll: Boolean, grantParticipationToAll: Boolean = true, task: () -> T): T {
         val old = securitySettings(
