@@ -9,7 +9,7 @@ import org.springframework.web.client.RestTemplate
 import java.util.concurrent.atomic.AtomicInteger
 
 class MockJIRAClient(
-    private val instance: MockJIRAInstance,
+    private val instance: MockJIRAInstance
 ) : JIRAClient {
 
     private val counter = AtomicInteger(0)
@@ -114,5 +114,5 @@ class MockJIRAClient(
         get() = instance.projectNames
 
     override val restTemplate: RestTemplate
-        get() = TODO("Not supported for the Mock Client")
+        get() = error("Not supported for MockJIRAClient")
 }

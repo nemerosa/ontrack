@@ -19,16 +19,10 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.test.context.TestPropertySource
 import kotlin.random.Random
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-@TestPropertySource(
-    properties = [
-        "ontrack.config.extension.support.client.resttemplate=mock",
-    ]
-)
 @QueueNoAsync
 class JiraServiceDeskNotificationChannelIT : AbstractNotificationTestSupport() {
 

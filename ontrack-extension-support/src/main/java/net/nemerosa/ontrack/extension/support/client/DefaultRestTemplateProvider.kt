@@ -1,17 +1,12 @@
 package net.nemerosa.ontrack.extension.support.client
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
 
 @Component
-@ConditionalOnProperty(
-    prefix = "ontrack.config.extension.support.client",
-    name = ["resttemplate"],
-    havingValue = "default",
-    matchIfMissing = true,
-)
+@ConditionalOnWebApplication
 open class DefaultRestTemplateProvider : RestTemplateProvider {
 
     override fun createRestTemplate(

@@ -1,14 +1,19 @@
 package net.nemerosa.ontrack.extension.jira.mock
 
-import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.jira.JIRAConfiguration
+import net.nemerosa.ontrack.extension.jira.client.JIRAClient.Companion.PROPERTY_JIRA_CLIENT_TYPE
+import net.nemerosa.ontrack.extension.jira.client.JIRAClient.Companion.PROPERTY_JIRA_CLIENT_TYPE_MOCK
 import net.nemerosa.ontrack.extension.jira.tx.JIRASession
 import net.nemerosa.ontrack.extension.jira.tx.JIRASessionFactory
-import org.springframework.context.annotation.Profile
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 
 @Component
-@Profile(RunProfile.DEV)
+@ConditionalOnProperty(
+    name = [PROPERTY_JIRA_CLIENT_TYPE],
+    havingValue = PROPERTY_JIRA_CLIENT_TYPE_MOCK,
+    matchIfMissing = false,
+)
 class MockJIRASessionFactory(
     private val instance: MockJIRAInstance,
 ) : JIRASessionFactory {

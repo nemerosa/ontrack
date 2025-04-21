@@ -1,16 +1,21 @@
 package net.nemerosa.ontrack.extension.jira.tx
 
-import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.jira.JIRAConfiguration
 import net.nemerosa.ontrack.extension.jira.client.JIRAClient
+import net.nemerosa.ontrack.extension.jira.client.JIRAClient.Companion.PROPERTY_JIRA_CLIENT_TYPE
+import net.nemerosa.ontrack.extension.jira.client.JIRAClient.Companion.PROPERTY_JIRA_CLIENT_TYPE_DEFAULT
 import net.nemerosa.ontrack.extension.jira.client.JIRAClientImpl
 import net.nemerosa.ontrack.extension.support.client.RestTemplateBasicAuthentication
 import net.nemerosa.ontrack.extension.support.client.RestTemplateProvider
-import org.springframework.context.annotation.Profile
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 
 @Component
-@Profile("!${RunProfile.DEV}")
+@ConditionalOnProperty(
+    name = [PROPERTY_JIRA_CLIENT_TYPE],
+    havingValue = PROPERTY_JIRA_CLIENT_TYPE_DEFAULT,
+    matchIfMissing = true,
+)
 class JIRASessionFactoryImpl(
     private val restTemplateProvider: RestTemplateProvider,
 ) : JIRASessionFactory {

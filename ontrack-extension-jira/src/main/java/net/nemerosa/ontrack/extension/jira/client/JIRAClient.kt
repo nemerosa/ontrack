@@ -49,4 +49,10 @@ interface JIRAClient : AutoCloseable {
      */
     val restTemplate: RestTemplate
 
+    companion object {
+        const val PROPERTY_JIRA_CLIENT_TYPE = "ontrack.extension.jira.client.type"
+        const val PROPERTY_JIRA_CLIENT_TYPE_DEFAULT = "default"
+        const val PROPERTY_JIRA_CLIENT_TYPE_MOCK = "mock"
+    }
+
 }

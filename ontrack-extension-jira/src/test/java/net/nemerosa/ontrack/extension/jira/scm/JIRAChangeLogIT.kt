@@ -1,18 +1,17 @@
 package net.nemerosa.ontrack.extension.jira.scm
 
-import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.jira.JIRAConfiguration
 import net.nemerosa.ontrack.extension.jira.JIRAConfigurationService
+import net.nemerosa.ontrack.extension.jira.UseJiraClientMock
 import net.nemerosa.ontrack.extension.jira.mock.MockJIRAInstance
 import net.nemerosa.ontrack.extension.scm.mock.MockSCMTester
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import net.nemerosa.ontrack.test.TestUtils
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.annotation.Profile
 import kotlin.test.assertEquals
 
-@Profile(RunProfile.DEV)
+@UseJiraClientMock
 class JIRAChangeLogIT : AbstractQLKTITSupport() {
 
     @Autowired

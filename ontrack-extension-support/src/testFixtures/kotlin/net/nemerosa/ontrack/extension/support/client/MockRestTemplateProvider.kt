@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.extension.support.client
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.boot.autoconfigure.condition.ConditionalOnNotWebApplication
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Component
 import org.springframework.test.web.client.ExpectedCount
@@ -11,12 +11,7 @@ import org.springframework.web.util.UriComponentsBuilder
 import java.net.URLEncoder
 
 @Component
-@ConditionalOnProperty(
-    prefix = "ontrack.config.extension.support.client",
-    name = ["resttemplate"],
-    havingValue = "mock",
-    matchIfMissing = false,
-)
+@ConditionalOnNotWebApplication
 class MockRestTemplateProvider : DefaultRestTemplateProvider() {
 
     private var context: MockRestTemplateProviderContext? = null
