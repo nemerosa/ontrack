@@ -2,12 +2,14 @@ package net.nemerosa.ontrack.extension.license.message
 
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.license.AbstractLicenseTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.message.Message
 import net.nemerosa.ontrack.model.message.MessageType
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
+@AsAdminTest
 internal class LicenseMessageIT : AbstractLicenseTestSupport() {
 
     @Autowired

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.notifications
 
 import net.nemerosa.ontrack.extension.notifications.mock.MockNotificationChannelConfig
 import net.nemerosa.ontrack.extension.notifications.subscriptions.subscribe
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
@@ -11,6 +12,7 @@ import kotlin.test.assertNotNull
 /**
  * Notification integration test using a mock channel.
  */
+@AsAdminTest
 class MockNotificationIT : AbstractNotificationTestSupport() {
 
     @Test

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.scm.catalog
 
 import net.nemerosa.ontrack.extension.scm.catalog.mock.MockSCMCatalogProvider
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.structure.Project
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
+@AsAdminTest
 class SCMCatalogProjectFilterServiceIT : AbstractDSLTestSupport() {
 
     @Autowired

@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.notifications.subscriptions
 
 import net.nemerosa.ontrack.extension.notifications.AbstractNotificationTestSupport
 import net.nemerosa.ontrack.extension.notifications.mock.MockNotificationChannelConfig
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getRequiredBooleanField
 import net.nemerosa.ontrack.json.getRequiredJsonField
@@ -14,6 +15,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
+@AsAdminTest
 internal class GQLRootQueryEventSubscriptionsIT : AbstractNotificationTestSupport() {
 
     @Test

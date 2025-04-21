@@ -5,12 +5,14 @@ import net.nemerosa.ontrack.extension.scm.catalog.CatalogLinkService
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalog
 import net.nemerosa.ontrack.extension.scm.catalog.mock.MockSCMCatalogProvider
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.test.TestUtils
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
+@AsAdminTest
 class SCMCatalogEntryOrphanProjectDecorationIT : AbstractDSLTestSupport() {
 
     @Autowired

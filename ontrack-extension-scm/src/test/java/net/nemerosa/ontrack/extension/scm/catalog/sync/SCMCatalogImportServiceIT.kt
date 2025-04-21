@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.scm.catalog.sync
 
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.test.assertNotPresent
 import net.nemerosa.ontrack.test.assertPresent
 import org.junit.jupiter.api.Test
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
+@AsAdminTest
 class SCMCatalogImportServiceIT : AbstractSCMCatalogSyncTestSupport() {
 
     @Autowired

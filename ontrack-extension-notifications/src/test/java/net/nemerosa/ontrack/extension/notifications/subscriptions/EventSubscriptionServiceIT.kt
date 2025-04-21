@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.notifications.subscriptions
 
 import net.nemerosa.ontrack.extension.notifications.AbstractNotificationTestSupport
 import net.nemerosa.ontrack.extension.notifications.mock.MockNotificationChannelConfig
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.json.getTextField
@@ -14,6 +15,7 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
+@AsAdminTest
 internal class EventSubscriptionServiceIT : AbstractNotificationTestSupport() {
 
     @Test

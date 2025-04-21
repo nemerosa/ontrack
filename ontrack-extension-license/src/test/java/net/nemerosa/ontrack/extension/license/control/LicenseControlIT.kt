@@ -2,9 +2,11 @@ package net.nemerosa.ontrack.extension.license.control
 
 import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.license.AbstractLicenseTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import org.junit.jupiter.api.Test
 import kotlin.test.assertFailsWith
 
+@AsAdminTest
 class LicenseControlIT : AbstractLicenseTestSupport() {
 
     @Test

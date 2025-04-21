@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.notifications.subscriptions
 import net.nemerosa.ontrack.extension.notifications.AbstractNotificationTestSupport
 import net.nemerosa.ontrack.extension.notifications.webhooks.WebhookAdminService
 import net.nemerosa.ontrack.extension.notifications.webhooks.WebhookFixtures
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.form.IdName
 import net.nemerosa.ontrack.model.form.Selection
 import net.nemerosa.ontrack.model.form.ServiceConfigurator
@@ -14,6 +15,7 @@ import java.time.Duration
 import kotlin.test.assertContains
 import kotlin.test.assertNotNull
 
+@AsAdminTest
 internal class EventSubscriptionControllerIT : AbstractNotificationTestSupport() {
 
     @Autowired
