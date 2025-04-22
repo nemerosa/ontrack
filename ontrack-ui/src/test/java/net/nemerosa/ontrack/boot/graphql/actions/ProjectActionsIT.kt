@@ -1,12 +1,16 @@
 package net.nemerosa.ontrack.boot.graphql.actions
 
+import net.nemerosa.ontrack.boot.support.UITest
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.asJson
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
+@UITest
+@AsAdminTest
 class ProjectActionsIT : AbstractQLKTITSupport() {
 
     @Test

@@ -1,11 +1,15 @@
 package net.nemerosa.ontrack.boot.ui
 
+import net.nemerosa.ontrack.boot.support.UITest
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.labels.LabelManagement
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
+@UITest
+@AsAdminTest
 class LabelLinksGraphQLIT : AbstractQLKTITSupport() {
 
     @Test

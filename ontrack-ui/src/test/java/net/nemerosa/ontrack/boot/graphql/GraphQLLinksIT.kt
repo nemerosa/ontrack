@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.boot.graphql
 
+import net.nemerosa.ontrack.boot.support.UITest
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getRequiredJsonField
 import net.nemerosa.ontrack.json.getRequiredTextField
@@ -12,6 +14,8 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
+@UITest
+@AsAdminTest
 class GraphQLLinksIT : AbstractQLKTITSupport() {
 
     @Test

@@ -1,11 +1,15 @@
 package net.nemerosa.ontrack.boot.resources
 
+import net.nemerosa.ontrack.boot.support.UITest
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.security.Roles
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecoratorTestSupport
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
+@UITest
+@AsAdminTest
 class ValidationRunStatusResourceDecoratorIT : AbstractResourceDecoratorTestSupport() {
 
     @Autowired

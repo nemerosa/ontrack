@@ -28,8 +28,10 @@ import javax.sql.DataSource
 @Transactional
 @ActiveProfiles(profiles = [RunProfile.DEV])
 @SpringBootTest(
-    classes = [AbstractIntegrationTestConfiguration::class
-    ], webEnvironment = SpringBootTest.WebEnvironment.NONE
+    classes = [
+        AbstractIntegrationTestConfiguration::class
+    ],
+    webEnvironment = SpringBootTest.WebEnvironment.NONE
 )
 @TestPropertySource(
     properties = [

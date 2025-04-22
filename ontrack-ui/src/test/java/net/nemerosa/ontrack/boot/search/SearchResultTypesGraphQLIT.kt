@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.search
 
+import net.nemerosa.ontrack.boot.support.UITest
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
 import org.junit.jupiter.api.Test
 import org.springframework.test.context.TestPropertySource
@@ -10,6 +11,7 @@ import kotlin.test.assertTrue
             "ontrack.config.search.index.immediate=true"
         ]
 )
+@UITest
 class SearchResultTypesGraphQLIT : AbstractQLKTITSupport() {
 
     @Test

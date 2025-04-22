@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.boot.resources
 
+import net.nemerosa.ontrack.boot.support.UITest
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.security.Roles
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Project
@@ -18,6 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired
  * * scope: branch, project, global
  * * role: view only, participant, validation stamp manager, project manager, project owner, global config
  */
+@UITest
+@AsAdminTest
 class ValidationStampFilterResourceDecoratorIT : AbstractResourceDecoratorTestSupport() {
 
     @Autowired
