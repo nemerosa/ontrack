@@ -2,6 +2,8 @@ package net.nemerosa.ontrack.it
 
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.ID
+import net.nemerosa.ontrack.model.structure.TokenOptions
+import net.nemerosa.ontrack.model.structure.TokensService
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
 import net.nemerosa.ontrack.repository.AccountGroupRepository
 import net.nemerosa.ontrack.repository.AccountRepository
@@ -11,9 +13,13 @@ import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.context.SecurityContextImpl
 import org.springframework.stereotype.Component
+import java.util.*
 
 @Component
 class SecurityTestSupport(
+    private val securityService: SecurityService,
+    private val accountService: AccountService,
+    private val tokensService: TokensService,
     private val ontrackConfigProperties: OntrackConfigProperties,
     private val accountACLService: AccountACLService,
     private val accountGroupRepository: AccountGroupRepository,
@@ -60,5 +66,21 @@ class SecurityTestSupport(
             authorisations = accountACLService.getAuthorizations(account),
             groups = accountACLService.getGroups(account),
         )
+
+    fun provisionToken(): String {
+        val accountName = securityService.currentUser?.name
+            ?: error("No account found in the context")
+        return securityService.asAdmin {
+            val account = accountService.findAccountByName(accountName)
+                ?: error("Account not found: $accountName")
+            val result = tokensService.generateToken(
+                accountId = account.id(),
+                options = TokenOptions(
+                    name = UUID.randomUUID().toString(),
+                )
+            )
+            result.value
+        }
+    }
 
 }

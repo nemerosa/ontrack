@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.hook
 
 import net.nemerosa.ontrack.extension.hook.records.HookRecordState
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -11,6 +12,7 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 
+@AsAdminTest
 class HookControllerIT : AbstractDSLTestSupport() {
 
     @Autowired

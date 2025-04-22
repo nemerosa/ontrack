@@ -1,10 +1,12 @@
 package net.nemerosa.ontrack.extension.stale
 
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
+@AsAdminTest
 class StalePropertyMutationProviderIT : AbstractQLKTITSupport() {
 
     @Test

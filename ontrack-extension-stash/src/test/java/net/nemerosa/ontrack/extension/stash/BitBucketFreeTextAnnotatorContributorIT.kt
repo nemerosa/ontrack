@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.stash.property.StashProjectConfigurationPr
 import net.nemerosa.ontrack.extension.stash.property.StashProjectConfigurationPropertyType
 import net.nemerosa.ontrack.extension.stash.service.StashConfigurationService
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.support.MessageAnnotationUtils
@@ -15,6 +16,7 @@ import net.nemerosa.ontrack.test.TestUtils
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
+@AsAdminTest
 class BitBucketFreeTextAnnotatorContributorIT : AbstractDSLTestSupport() {
 
     @Autowired

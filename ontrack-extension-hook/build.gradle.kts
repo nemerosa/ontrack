@@ -25,6 +25,7 @@ dependencies {
     testImplementation(testFixtures(project(":ontrack-extension-casc")))
 
     testFixturesImplementation("org.jetbrains.kotlin:kotlin-test")
+    testFixturesImplementation(project(":ontrack-it-utils"))
     testFixturesImplementation(project(":ontrack-extension-recordings"))
     testFixturesImplementation(testFixtures(project(":ontrack-extension-api")))
 

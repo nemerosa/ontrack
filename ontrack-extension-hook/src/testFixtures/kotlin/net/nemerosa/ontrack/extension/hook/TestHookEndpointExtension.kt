@@ -2,23 +2,15 @@ package net.nemerosa.ontrack.extension.hook
 
 import net.nemerosa.ontrack.extension.api.support.TestExtensionFeature
 import net.nemerosa.ontrack.extension.support.AbstractExtension
-import net.nemerosa.ontrack.model.security.AccountService
-import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.model.structure.TokenOptions
-import net.nemerosa.ontrack.model.structure.TokensService
-import net.nemerosa.ontrack.model.support.OntrackConfigProperties
+import net.nemerosa.ontrack.it.SecurityTestSupport
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Component
-import java.util.*
 
 @Component
 class TestHookEndpointExtension(
     extension: TestExtensionFeature,
     private val testHookInfoLinkExtension: TestHookInfoLinkExtension,
-    private val ontrackConfigProperties: OntrackConfigProperties,
-    private val accountService: AccountService,
-    private val securityService: SecurityService,
-    private val tokensService: TokensService,
+    private val securityTestSupport: SecurityTestSupport,
 ) : AbstractExtension(extension), HookEndpointExtension {
 
     override var enabled: Boolean = true
@@ -31,18 +23,7 @@ class TestHookEndpointExtension(
 
     fun provisionToken(token: String?) {
         if (token.isNullOrBlank()) {
-            securityService.asAdmin {
-                val account = accountService.findAccountByName(
-                    ontrackConfigProperties.security.authorization.admin.email,
-                ) ?: error("Account not found: ${ontrackConfigProperties.security.authorization.admin.email}")
-                val result = tokensService.generateToken(
-                    accountId = account.id(),
-                    options = TokenOptions(
-                        name = UUID.randomUUID().toString(),
-                    )
-                )
-                this.token = result.value
-            }
+            this.token = securityTestSupport.provisionToken()
         } else {
             this.token = token
         }
