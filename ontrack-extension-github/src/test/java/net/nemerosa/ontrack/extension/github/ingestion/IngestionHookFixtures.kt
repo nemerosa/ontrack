@@ -130,6 +130,7 @@ object IngestionHookFixtures {
             repository = sampleRepository(repoName = repoName, owner = owner),
             message = message,
             status = status,
+            accountName = "admin",
         )
     }
 
