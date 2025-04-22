@@ -108,3 +108,5 @@ services:
       # ... InfluxDB specifics
       ONTRACK_INFLUXDB_ENABLED: true
       ONTRACK_INFLUXDB_URI: http://influxdb:8086
+      # ... Jira in mock mode
+      ONTRACK_EXTENSION_JIRA_CLIENT_TYPE: mock
