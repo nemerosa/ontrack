@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.graphql
 
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.getRequiredIntField
 import net.nemerosa.ontrack.json.getRequiredTextField
 import org.junit.jupiter.api.Test
@@ -10,6 +11,7 @@ import kotlin.test.assertTrue
 /**
  * Management of build links using GraphQL.
  */
+@AsAdminTest
 class BuildLinksGraphQLIT : AbstractQLKTITSupport() {
 
     @Test

@@ -1,11 +1,13 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.*
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
+@AsAdminTest
 class GQLBranchBuildFilterFieldsContributorIT : AbstractQLKTITSupport() {
 
     @Test

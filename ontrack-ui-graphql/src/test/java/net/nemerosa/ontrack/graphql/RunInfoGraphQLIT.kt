@@ -1,11 +1,13 @@
 package net.nemerosa.ontrack.graphql
 
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.structure.RunInfoInput
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
+@AsAdminTest
 class RunInfoGraphQLIT : AbstractQLKTITSupport() {
 
     @Test

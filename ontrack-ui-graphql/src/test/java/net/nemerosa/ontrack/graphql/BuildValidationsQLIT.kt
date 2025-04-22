@@ -1,10 +1,12 @@
 package net.nemerosa.ontrack.graphql
 
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
+@AsAdminTest
 class BuildValidationsQLIT : AbstractQLKTITSupport() {
 
     private fun withTestBuild(code: (Build) -> Unit) {

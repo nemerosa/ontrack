@@ -1,9 +1,11 @@
 package net.nemerosa.ontrack.graphql
 
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.model.structure.Branch
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
+@AsAdminTest
 class ValidationRunsPaginationQLIT : AbstractQLKTITSupport() {
 
     private fun withTestBranch(code: (branch: Branch) -> Unit) {

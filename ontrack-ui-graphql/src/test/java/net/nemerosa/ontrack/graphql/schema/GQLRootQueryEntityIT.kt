@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.getJsonField
 import net.nemerosa.ontrack.json.getRequiredIntField
 import net.nemerosa.ontrack.json.getRequiredTextField
@@ -9,6 +10,7 @@ import net.nemerosa.ontrack.test.assertJsonNull
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
+@AsAdminTest
 internal class GQLRootQueryEntityIT : AbstractQLKTITSupport() {
 
     @Test

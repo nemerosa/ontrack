@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.graphql
 
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.api.support.*
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.isNullOrNullNode
 import net.nemerosa.ontrack.model.security.Roles
 import net.nemerosa.ontrack.model.structure.Branch
@@ -17,6 +18,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
+@AsAdminTest
 class BranchGraphQLIT : AbstractQLKTITSupport() {
 
     @Autowired

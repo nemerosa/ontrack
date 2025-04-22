@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.graphql
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.api.support.TestSimpleProperty
 import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.*
 import net.nemerosa.ontrack.model.security.BuildCreate
 import net.nemerosa.ontrack.model.structure.Branch
@@ -24,6 +25,7 @@ import kotlin.test.fail
 /**
  * Integration tests around the `builds` root query.
  */
+@AsAdminTest
 class BuildGraphQLIT : AbstractQLKTITSupport() {
 
     @Test
@@ -99,7 +101,7 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             assertEquals("Simple value", p.path("type").path("name").asText())
             assertEquals("Value.", p.path("type").path("description").asText())
             assertEquals("value 2", p.path("value").path("value").asText())
-            assertEquals(false, p.path("editable").asBoolean())
+            assertEquals(true, p.path("editable").asBoolean())
 
             p = data.path("builds").first().path("properties").find {
                 it.path("type").path("name").asText() == "Configuration value"
@@ -108,7 +110,7 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             assertEquals("Configuration value", p.path("type").path("name").asText())
             assertEquals("Value.", p.path("type").path("description").asText())
             assertJsonNull(p.path("type").path("value"))
-            assertEquals(false, p.path("editable").asBoolean())
+            assertEquals(true, p.path("editable").asBoolean())
         }
     }
 
@@ -136,7 +138,7 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             assertEquals("Simple value", p.path("type").path("name").asText())
             assertEquals("Value.", p.path("type").path("description").asText())
             assertEquals("value 2", p.path("value").path("value").asText())
-            assertEquals(false, p.path("editable").asBoolean())
+            assertEquals(true, p.path("editable").asBoolean())
         }
     }
 
@@ -164,7 +166,7 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             assertEquals("Simple value", p.path("type").path("name").asText())
             assertEquals("Value.", p.path("type").path("description").asText())
             assertEquals("value 2", p.path("value").path("value").asText())
-            assertEquals(false, p.path("editable").asBoolean())
+            assertEquals(true, p.path("editable").asBoolean())
         }
     }
 

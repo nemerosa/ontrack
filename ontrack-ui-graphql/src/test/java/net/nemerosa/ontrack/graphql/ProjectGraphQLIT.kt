@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.graphql
 import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.api.support.TestSimpleProperty
 import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.isNullOrNullNode
 import net.nemerosa.ontrack.model.security.ProjectCreation
 import net.nemerosa.ontrack.model.security.Roles
@@ -20,6 +21,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
+@AsAdminTest
 class ProjectGraphQLIT : AbstractQLKTITSupport() {
 
     @Autowired

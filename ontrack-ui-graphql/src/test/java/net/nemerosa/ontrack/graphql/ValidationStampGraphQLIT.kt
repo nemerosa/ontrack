@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.graphql
 
 //import net.nemerosa.ontrack.extension.general.validation.*
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.test.TestUtils.uid
 import net.nemerosa.ontrack.test.assertNotPresent
 import net.nemerosa.ontrack.test.assertPresent
@@ -13,6 +14,7 @@ import kotlin.test.assertTrue
 /**
  * Integration tests around the `validationStamp` root query.
  */
+@AsAdminTest
 class ValidationStampGraphQLIT : AbstractQLKTITSupport() {
 
 //    @Autowired

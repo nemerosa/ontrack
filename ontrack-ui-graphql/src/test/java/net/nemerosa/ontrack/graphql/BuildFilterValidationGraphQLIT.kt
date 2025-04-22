@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.graphql
 
+import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.StandardBuildFilterData
@@ -7,6 +8,7 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
+@AsAdminTest
 class BuildFilterValidationGraphQLIT : AbstractQLKTITSupport() {
 
     @Test

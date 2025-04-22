@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.graphql
 
 import net.nemerosa.ontrack.common.Time
+import net.nemerosa.ontrack.it.AsAdminTest
 //import net.nemerosa.ontrack.extension.general.BuildLinkDisplayProperty
 //import net.nemerosa.ontrack.extension.general.BuildLinkDisplayPropertyType
 //import net.nemerosa.ontrack.extension.general.ReleaseProperty
@@ -18,6 +19,7 @@ import kotlin.test.assertTrue
 /**
  * Integration tests around the `promotionLevel` root query.
  */
+@AsAdminTest
 class PromotionLevelGraphQLIT : AbstractQLKTITSupport() {
 
     @Test

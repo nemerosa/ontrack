@@ -1,6 +1,8 @@
 package net.nemerosa.ontrack.graphql
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.it.AsAdminTest
+import net.nemerosa.ontrack.it.NoAuthTest
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Disabled
@@ -8,12 +10,14 @@ import org.junit.jupiter.api.Test
 import org.springframework.graphql.execution.ErrorType
 import kotlin.test.*
 
+@AsAdminTest
 class AdminQLIT : AbstractQLKTITSupport() {
 
     private val JsonNode.name: String? get() = get("name").asText()
     private val JsonNode.id: Int get() = get("id").asInt()
 
     @Test
+    @NoAuthTest
     fun `List of groups needs authorisation`() {
         runWithError(
             """{ accountGroups { id } }""",
@@ -23,6 +27,7 @@ class AdminQLIT : AbstractQLKTITSupport() {
     }
 
     @Test
+    @NoAuthTest
     fun `List of accounts needs authorisation`() {
         runWithError(
             """{ accounts { id } }""",
