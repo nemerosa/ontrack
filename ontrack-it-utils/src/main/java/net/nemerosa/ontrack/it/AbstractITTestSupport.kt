@@ -38,7 +38,8 @@ import javax.sql.DataSource
         "spring.rabbitmq.host=localhost",
         "spring.rabbitmq.username=ontrack",
         "spring.rabbitmq.password=ontrack",
-        "spring.graphql.schema.locations=classpath:graphql/"
+        "spring.graphql.schema.locations=classpath:graphql/",
+        "ontrack.config.search.index.ignoreExisting=true",
     ]
 )
 abstract class AbstractITTestSupport {
