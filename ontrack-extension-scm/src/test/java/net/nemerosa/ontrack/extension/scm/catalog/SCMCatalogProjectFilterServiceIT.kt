@@ -31,9 +31,12 @@ class SCMCatalogProjectFilterServiceIT : AbstractDSLTestSupport() {
 
     @BeforeEach
     fun projects() {
-        projectLinked = project {}
-        projectLinkedOther = project {}
-        projectOrphan = project {}
+        asAdmin {
+            deleteAllProjects()
+            projectLinked = project {}
+            projectLinkedOther = project {}
+            projectOrphan = project {}
+        }
     }
 
     @Test
@@ -143,21 +146,21 @@ class SCMCatalogProjectFilterServiceIT : AbstractDSLTestSupport() {
     }
 
     private fun doTest(
-            authorizedProjects: List<Project>? = null,
-            offset: Int = 0,
-            size: Int = 20,
-            scm: String? = null,
-            config: String? = null,
-            repository: String? = null,
-            project: String? = null,
-            link: SCMCatalogProjectFilterLink = SCMCatalogProjectFilterLink.ALL,
-            expectations: Expectations.() -> Unit
+        offset: Int = 0,
+        size: Int = 20,
+        scm: String? = null,
+        config: String? = null,
+        repository: String? = null,
+        project: String? = null,
+        link: SCMCatalogProjectFilterLink = SCMCatalogProjectFilterLink.ALL,
+        expectations: Expectations.() -> Unit
     ) {
         scmCatalogProvider.clear()
 
         // All entries
         val entryLinked = CatalogFixtures.entry(scm = "mocking", repository = REPO_LINKED, config = "config-1")
-        val entryLinkedOther = CatalogFixtures.entry(scm = "mocking", repository = REPO_LINKED_OTHER, config = "config-2")
+        val entryLinkedOther =
+            CatalogFixtures.entry(scm = "mocking", repository = REPO_LINKED_OTHER, config = "config-2")
         val entryUnlinked = CatalogFixtures.entry(scm = "mocking", repository = REPO_UNLINKED, config = "config-3")
 
         // Mock data
@@ -168,67 +171,52 @@ class SCMCatalogProjectFilterServiceIT : AbstractDSLTestSupport() {
         scmCatalogProvider.linkEntry(entryLinked, projectLinked)
         scmCatalogProvider.linkEntry(entryLinkedOther, projectLinkedOther)
 
-        asAdmin {
-            // Collection of entries
-            scmCatalog.collectSCMCatalog { println(it) }
-            // Collection of catalog links
-            catalogLinkService.computeCatalogLinks()
-        }
+        // Collection of entries
+        scmCatalog.collectSCMCatalog { println(it) }
+        // Collection of catalog links
+        catalogLinkService.computeCatalogLinks()
 
         // Testing context
         val expectationsContext = Expectations()
         expectationsContext.expectations()
 
-        // Security context
-        val securityContext: (() -> Unit) -> Unit = if (authorizedProjects != null) {
-            {
-                asUserWithView(*authorizedProjects.toTypedArray())
-            }
-        } else {
-            {
-                asAdmin(it)
-            }
-        }
-
-        securityContext {
-            val items = scmCatalogFilterService.findCatalogProjectEntries(
-                    SCMCatalogProjectFilter(
-                            offset = offset,
-                            size = size,
-                            scm = scm,
-                            config = config,
-                            repository = repository,
-                            project = project,
-                            link = link
-                    )
+        val items = scmCatalogFilterService.findCatalogProjectEntries(
+            SCMCatalogProjectFilter(
+                offset = offset,
+                size = size,
+                scm = scm,
+                config = config,
+                repository = repository,
+                project = project,
+                link = link
             )
-            // Repositories
-            assertEquals(
-                    expectationsContext.repos,
-                    items.mapNotNull { it.entry?.repository }
-            )
-            // Orphan projects
-            val actualOrphanProjectNames = items.filter { it.entry == null }.mapNotNull { it.project?.name }
-            assertTrue(
-                    // Actual list of orphan projects contains the expected one
-                    // Note that the list of orphan projects will grow
-                    // much larger than the expected ones
-                    actual = actualOrphanProjectNames.containsAll(
-                            expectationsContext.orphans.mapNotNull { it.project.name }
-                    ),
-                    message = "Orphan projects"
-            )
-            // Not orphan projects
-            assertTrue(
-                    // Actual list of orphan projects DOES NOT contains any of the expected one
-                    // Note that the list of orphan projects will grow
-                    // much larger than the expected ones
-                    actual = actualOrphanProjectNames.intersect(
-                            expectationsContext.notOrphans.mapNotNull { it.project.name }
-                    ).isEmpty(),
-                    message = "Not in orphan projects"
-            )
-        }
+        )
+        // Repositories
+        assertEquals(
+            expectationsContext.repos,
+            items.mapNotNull { it.entry?.repository }
+        )
+        // Orphan projects
+        val actualOrphanProjectNames = items.filter { it.entry == null }.mapNotNull { it.project?.name }
+        assertTrue(
+            // Actual list of orphan projects contains the expected one
+            // Note that the list of orphan projects will grow
+            // much larger than the expected ones
+            actual = actualOrphanProjectNames.containsAll(
+                expectationsContext.orphans.map { it.project.name }
+            ),
+            message = "Orphan projects"
+        )
+        // Not orphan projects
+        assertTrue(
+            // Actual list of orphan projects DOES NOT contains any of the expected one
+            // Note that the list of orphan projects will grow
+            // much larger than the expected ones
+            actual = actualOrphanProjectNames.intersect(
+                expectationsContext.notOrphans.map { it.project.name }.toSet()
+            ).isEmpty(),
+            message = "Not in orphan projects"
+        )
     }
 
     @DslMarker
