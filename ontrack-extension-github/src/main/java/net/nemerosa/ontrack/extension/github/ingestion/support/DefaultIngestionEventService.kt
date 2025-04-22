@@ -36,7 +36,7 @@ class DefaultIngestionEventService(
             securityService.checkGlobalFunction(ProjectCreation::class.java)
         }
         // Creates the payload
-        val payload = IngestionHookPayload(
+        val ingestionHookPayload = IngestionHookPayload(
             gitHubDelivery = "",
             gitHubEvent = event,
             gitHubHookID = 0,
@@ -44,14 +44,16 @@ class DefaultIngestionEventService(
             gitHubHookInstallationTargetType = "",
             payload = payload,
             repository = repository,
+            accountName = securityService.currentUser?.name
+                ?: error("Missing account name to process the payload")
         )
         securityService.asAdmin {
             // Stores it
-            storage.store(payload, payloadSource)
+            storage.store(ingestionHookPayload, payloadSource)
             // Pushes it on the queue
-            queue.queue(payload)
+            queue.queue(ingestionHookPayload)
         }
         // OK
-        return payload.uuid
+        return ingestionHookPayload.uuid
     }
 }

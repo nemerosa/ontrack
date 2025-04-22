@@ -1,18 +1,33 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Application (kdsl)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-    <option name="ACTIVE_PROFILES" value="dev" />
-    <envs>
-      <env name="MANAGEMENT_ENDPOINT_ACCOUNT_ACCESS" value="unrestricted" />
-      <env name="ONTRACK_CONFIG_CONFIGURATION_TEST" value="false" />
-      <env name="ONTRACK_EXTENSION_GITHUB_INGESTION_HOOK_SIGNATURE_DISABLED" value="true" />
-      <env name="ONTRACK_EXTENSION_GITHUB_INGESTION_PROCESSING_REPOSITORIES_TEST_REPOSITORY" value="test-routing-repository" />
-      <env name="ONTRACK_EXTENSION_JIRA_CLIENT_TYPE" value="mock" />
-      <env name="ONTRACK_INFLUXDB_ENABLED" value="true" />
-    </envs>
-    <module name="ontrack.ontrack-ui.main" />
-    <option name="SPRING_BOOT_MAIN_CLASS" value="net.nemerosa.ontrack.boot.Application" />
-    <method v="2">
-      <option name="Make" enabled="true" />
-    </method>
-  </configuration>
+    <configuration default="false" name="Application (kdsl)" type="SpringBootApplicationConfigurationType"
+                   factoryName="Spring Boot">
+        <option name="ACTIVE_PROFILES" value="dev"/>
+        <envs>
+            <env name="MANAGEMENT_ENDPOINT_ACCOUNT_ACCESS" value="unrestricted"/>
+            <env name="ONTRACK_CONFIG_CONFIGURATION_TEST" value="false"/>
+            <env name="ONTRACK_EXTENSION_GITHUB_INGESTION_HOOK_SIGNATURE_DISABLED" value="true"/>
+            <env name="ONTRACK_EXTENSION_GITHUB_INGESTION_PROCESSING_REPOSITORIES_TEST_REPOSITORY"
+                 value="test-routing-repository"/>
+            <env name="ONTRACK_EXTENSION_JIRA_CLIENT_TYPE" value="mock"/>
+            <env name="ONTRACK_INFLUXDB_ENABLED" value="true"/>
+            <env name="ONTRACK_ACCEPTANCE_GITHUB_ORGANIZATION" value="${ONTRACK_ACCEPTANCE_GITHUB_ORGANIZATION}"/>
+            <env name="ONTRACK_ACCEPTANCE_GITHUB_TOKEN" value="${ONTRACK_ACCEPTANCE_GITHUB_TOKEN}"/>
+        </envs>
+        <module name="ontrack.ontrack-ui.main"/>
+        <option name="SPRING_BOOT_MAIN_CLASS" value="net.nemerosa.ontrack.boot.Application"/>
+        <extension name="net.ashald.envfile">
+            <option name="IS_ENABLED" value="true"/>
+            <option name="IS_SUBST" value="true"/>
+            <option name="IS_PATH_MACRO_SUPPORTED" value="false"/>
+            <option name="IS_IGNORE_MISSING_FILES" value="false"/>
+            <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false"/>
+            <ENTRIES>
+                <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false"/>
+                <ENTRY IS_ENABLED="true" PARSER="env" IS_EXECUTABLE="false" PATH=".run/.env"/>
+            </ENTRIES>
+        </extension>
+        <method v="2">
+            <option name="Make" enabled="true"/>
+        </method>
+    </configuration>
 </component>

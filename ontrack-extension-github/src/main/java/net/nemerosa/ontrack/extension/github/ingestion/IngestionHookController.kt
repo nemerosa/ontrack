@@ -118,10 +118,12 @@ class IngestionHookController(
             payload = json,
             repository = repository,
             configuration = configuration,
+            accountName = securityService.currentUser?.name
+                ?: error("Missing account name to process the payload")
         )
         // Pre-sorting
         return when (eventProcessor.preProcessingCheck(payload)) {
-            IngestionEventPreprocessingCheck.TO_BE_PROCESSED -> securityService.asAdmin {
+            IngestionEventPreprocessingCheck.TO_BE_PROCESSED -> {
                 meterRegistry.increment(
                     IngestionMetrics.Hook.acceptedCount,
                     INGESTION_METRIC_EVENT_TAG to gitHubEvent,

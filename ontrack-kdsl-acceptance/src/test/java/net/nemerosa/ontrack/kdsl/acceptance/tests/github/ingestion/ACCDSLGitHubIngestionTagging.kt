@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests.github.ingestion
 
-import net.nemerosa.ontrack.extension.github.TestOnGitHub
 import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.kdsl.acceptance.tests.github.TestOnGitHub
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.resourceAsText
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.spec.extension.general.label

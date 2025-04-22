@@ -10,6 +10,8 @@ import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayl
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionHookProcessingService
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.parseAsJson
+import net.nemerosa.ontrack.model.security.AccountSecurityContextService
+import net.nemerosa.ontrack.model.security.AccountService
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.support.ApplicationLogEntry
@@ -30,6 +32,8 @@ class AsyncIngestionHookQueueListener(
     private val securityService: SecurityService,
     private val applicationLogService: ApplicationLogService,
     private val meterRegistry: MeterRegistry,
+    private val accountSecurityContextService: AccountSecurityContextService,
+    private val accountService: AccountService,
 ) : RabbitListenerConfigurer {
 
     private val listener = MessageListener(::onMessage)
@@ -93,7 +97,14 @@ class AsyncIngestionHookQueueListener(
                 IngestionMetrics.Queue.consumedCount,
                 INGESTION_METRIC_QUEUE_TAG to queue
             )
-            securityService.asAdmin {
+
+            // Gets the account to use from the queue payload
+            val account = securityService.asAdmin {
+                accountService.findAccountByName(payload.accountName)
+                    ?: error("Account not found: ${payload.accountName}")
+            }
+
+            accountSecurityContextService.withAccount(account) {
                 ingestionHookPayloadStorage.queue(payload, queue)
                 ingestionHookProcessingService.process(payload)
             }

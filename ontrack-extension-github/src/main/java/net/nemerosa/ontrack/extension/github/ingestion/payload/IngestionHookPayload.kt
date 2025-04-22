@@ -69,4 +69,6 @@ data class IngestionHookPayload(
     val routing: String? = null,
     @APIDescription("Queue information")
     val queue: String? = null,
+    @APIDescription("Identity of the user")
+    val accountName: String,
 )

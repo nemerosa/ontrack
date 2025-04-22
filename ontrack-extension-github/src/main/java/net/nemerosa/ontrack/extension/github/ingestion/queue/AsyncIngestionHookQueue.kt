@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayl
 import net.nemerosa.ontrack.extension.github.ingestion.payload.IngestionHookPayloadStorage
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.format
+import net.nemerosa.ontrack.model.security.SecurityService
 import org.springframework.amqp.core.AmqpTemplate
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
@@ -28,6 +29,7 @@ class AsyncIngestionHookQueue(
     private val amqpTemplate: AmqpTemplate,
     private val ingestionHookPayloadStorage: IngestionHookPayloadStorage,
     private val ingestionConfigProperties: IngestionConfigProperties,
+    private val securityService: SecurityService,
 ) : IngestionHookQueue {
     override fun queue(payload: IngestionHookPayload) {
         val routingKey = AsyncIngestionHookQueueConfig.getRoutingKey(ingestionConfigProperties, payload.repository)
