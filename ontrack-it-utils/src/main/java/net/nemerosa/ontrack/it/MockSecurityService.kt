@@ -18,8 +18,7 @@ class MockSecurityService : SecurityService {
 
     override fun isProjectFunctionGranted(projectId: Int, fn: Class<out ProjectFunction>): Boolean = true
 
-    override val currentUser: AuthenticatedUser
-        get() = error("Not available in mock")
+    override val currentUser: AuthenticatedUser = MockAuthenticatedUser()
 
     override val currentSignature: Signature = Signature.Companion.of("test")
 
