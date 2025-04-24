@@ -22,7 +22,7 @@ include(":ontrack-ui-graphql")
 include(":ontrack-ui-support")
 // TODO include(":ontrack-web")
 include(":ontrack-web-core")
-// TODO include(":ontrack-web-tests")
+include(":ontrack-web-tests")
 // TODO include(":ontrack-docs")
 
 // KDSL

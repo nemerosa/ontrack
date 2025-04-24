@@ -9,6 +9,7 @@ plugins {
     id("com.avast.gradle.docker-compose") version "0.17.12"
     id("com.google.cloud.tools.jib") version "3.4.4" apply false
     id("com.bmuschko.docker-remote-api") version "9.4.0" apply false
+    id("com.github.node-gradle.node") version "7.1.0" apply false
 }
 
 /**
