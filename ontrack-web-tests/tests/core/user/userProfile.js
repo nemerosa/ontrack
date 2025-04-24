@@ -8,19 +8,9 @@ export class UserProfilePage {
     }
 
 
-    async goTo(expectChangePassword) {
+    async goTo() {
         await this.page.goto(`${ui()}/core/admin/userProfile`)
         await expect(this.page.getByText("API tokens")).toBeVisible()
-        if (expectChangePassword) {
-            await expect(this.page.getByText("Change password")).toBeVisible()
-        }
-    }
-
-    async changePassword(oldPassword, newPassword) {
-        await this.page.getByLabel("Old password").fill(oldPassword)
-        await this.page.getByLabel("New password").fill(newPassword)
-        await this.page.getByLabel("Confirm password").fill(newPassword)
-        await this.page.getByText("Submit", {exact: true}).click()
     }
 
     async generateToken(tokenName) {
