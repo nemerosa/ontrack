@@ -38,6 +38,7 @@ class GQLRootQueryGitHubIngestionHookPayloadsIT : AbstractIngestionTestSupport()
                             message
                             completion
                             source
+                            accountName
                         }
                      }
                     }
@@ -47,6 +48,7 @@ class GQLRootQueryGitHubIngestionHookPayloadsIT : AbstractIngestionTestSupport()
                         data.path("gitHubIngestionHookPayloads").path("pageItems").first().parse<IngestionHookPayload>()
                 assertEquals(payload.uuid, item.uuid)
                 assertEquals("sample source", item.source)
+                assertEquals("admin", item.accountName)
             }
         }
     }
