@@ -1,9 +1,9 @@
-import {credentials, ui} from "@ontrack/connection";
 import {expect} from "@playwright/test";
 import {selectUserMenu} from "./userMenu";
 
 export const login = async (
     page,
+    ontrack,
     customerUsername = undefined,
     customPassword = undefined,
     options = {}
@@ -14,11 +14,11 @@ export const login = async (
         username = customerUsername
         password = customPassword
     } else {
-        const creds = credentials()
+        const creds = ontrack.connection.credentials
         username = creds.username
         password = creds.password
     }
-    await page.goto(ui())
+    await page.goto(ontrack.connection.ui)
     // We expect to land on the sign-in page
     const signIn = await signInButton(page)
     await signIn.click()

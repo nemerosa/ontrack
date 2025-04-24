@@ -1,15 +1,15 @@
-import {ui} from "@ontrack/connection";
 import {expect} from "@playwright/test";
 
 export class ProjectPage {
 
-    constructor(page, project) {
+    constructor(page, ontrack, project) {
         this.page = page
         this.project = project
+        this.ontrack = ontrack
     }
 
     async goTo() {
-        await this.page.goto(`${ui()}/project/${this.project.id}`)
+        await this.page.goto(`${this.ontrack.connection.ui}/project/${this.project.id}`)
         await expect(this.page.getByText(this.project.name)).toBeVisible()
     }
 

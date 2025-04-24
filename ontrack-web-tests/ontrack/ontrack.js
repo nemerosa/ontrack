@@ -7,7 +7,21 @@ import {getBranchById} from "@ontrack/branch";
 import {EnvironmentsExtension} from "@ontrack/extensions/environments/environments";
 
 /**
+ * Ontrack service
+ */
+export class Ontrack {
+    constructor(connection) {
+        this.connection = connection
+    }
+
+    createProject = async (name) => createProject(this, name)
+    getProjectById = async (id) => getProjectById(this, id)
+}
+
+/**
  * Ontrack root
+ *
+ * @deprecated Use the `ontrack` fixture
  */
 export const ontrack = (customCredentials) => {
     const connection = {
@@ -20,10 +34,8 @@ export const ontrack = (customCredentials) => {
         connection,
     }
 
-    self.createProject = async (name) => createProject(self, name)
     self.projectList = async () => projectList(self)
 
-    self.getProjectById = async (id) => getProjectById(self, id)
     self.getBranchById = async (id) => getBranchById(self, id)
 
     self.getValidationRunById = async (runId) => getValidationRunById(self, runId)

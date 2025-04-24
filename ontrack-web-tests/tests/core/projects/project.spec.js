@@ -1,12 +1,12 @@
-const {test, expect} = require("@playwright/test");
+const {expect} = require("@playwright/test");
 const {login} = require("../login");
 const {HomePage} = require("../home/home");
 const {generate} = require("@ontrack/utils");
-const {ontrack} = require("@ontrack/ontrack");
 const {ProjectPage} = require("./project");
+const {test} = require("../../fixtures/connection");
 
-test('project creation', async ({page}) => {
-    await login(page)
+test('project creation', async ({page, ontrack}) => {
+    await login(page, ontrack)
 
     const homePage = new HomePage(page)
     const projectName = generate("p-")
@@ -15,15 +15,15 @@ test('project creation', async ({page}) => {
     await expect(page.getByText(projectName)).toBeVisible()
 })
 
-test('project disabling and enabling', async ({page}) => {
-    let project = await ontrack().createProject()
+test('project disabling and enabling', async ({page, ontrack}) => {
+    let project = await ontrack.createProject()
 
-    await login(page)
-    const projectPage = new ProjectPage(page, project)
+    await login(page, ontrack)
+    const projectPage = new ProjectPage(page, ontrack, project)
     await projectPage.goTo()
 
     // Checking that the project is correctly enabled (using the API)
-    project = await ontrack().getProjectById(project.id);
+    project = await ontrack.getProjectById(project.id);
     expect(project.disabled).toBeFalsy()
 
     // Checking that there is NO banner showing that the project is disabled
@@ -33,7 +33,7 @@ test('project disabling and enabling', async ({page}) => {
     await projectPage.disableProject()
 
     // Checking that the project is correctly disabled (using the API)
-    project = await ontrack().getProjectById(project.id);
+    project = await ontrack.getProjectById(project.id);
     expect(project.disabled).toBeTruthy()
 
     // Checking that there IS a banner showing that the project is disabled
@@ -42,8 +42,8 @@ test('project disabling and enabling', async ({page}) => {
     // Enabling the project again
     await projectPage.enableProject()
 
-    // Checking that the project is correctly eabled (using the API)
-    project = await ontrack().getProjectById(project.id);
+    // Checking that the project is correctly enabled (using the API)
+    project = await ontrack.getProjectById(project.id);
     expect(project.disabled).toBeFalsy()
 
     // Checking that there is NO banner showing that the project is disabled
