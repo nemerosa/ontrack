@@ -6,7 +6,7 @@ test('login', async ({page}) => {
     await login(page)
 })
 
-// TODO test('login and logout', async ({page}) => {
-//     await login(page)
-//     await logout(page)
-// })
+test('login and logout', async ({page}) => {
+    await login(page)
+    await logout(page)
+})

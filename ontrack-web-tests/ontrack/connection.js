@@ -1,5 +1,5 @@
 export const ui = () => {
-    return process.env.ONTRACK_UI_URL ?? "http://localhost:3000/ui"
+    return process.env.ONTRACK_UI_URL ?? "http://localhost:3000"
 }
 
 export const backend = () => {

@@ -1,7 +1,6 @@
 import {credentials, ui} from "@ontrack/connection";
 import {expect} from "@playwright/test";
 import {selectUserMenu} from "./userMenu";
-import exp from "constants";
 
 export const login = async (
     page,
@@ -20,13 +19,14 @@ export const login = async (
         password = creds.password
     }
     await page.goto(ui())
-    // We expect to land on the Legacy UI login page
-    await expect(page).toHaveTitle(/Ontrack - Sign in/)
-    // Filling the username & password
-    await page.getByPlaceholder("User name").fill(username)
-    await page.getByPlaceholder("Password").fill(password)
+    // We expect to land on the sign-in page
+    const signIn = await signInButton(page)
+    await signIn.click()
+    // Filling the username and password
+    await page.getByRole("textbox", {exact: false, name: "Username"}).fill(username)
+    await page.getByRole("textbox", {exact: false, name: "Password"}).fill(password)
     // Launching the login
-    await page.getByText("Sign in", {exact: true}).click()
+    await page.getByRole("button", {name: "Sign In", exact: true}).click()
 
     // If we expect a message
     if (options.message) {
@@ -42,6 +42,11 @@ export const logout = async (page) => {
     // Selecting the logout menu
     await selectUserMenu(page, "Sign out")
     // We expect to be on the login page again
-    await expect(page).toHaveTitle(/Ontrack - Sign in/)
+    await signInButton(page)
+}
 
+const signInButton = async (page) => {
+    let button = page.getByRole("button", {name: "Sign in", exact: false});
+    await expect(button).toBeVisible()
+    return button
 }
