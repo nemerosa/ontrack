@@ -1,13 +1,12 @@
-import {test} from "@playwright/test";
-import {ontrack} from "@ontrack/ontrack";
 import {BranchPage} from "../branches/branch";
 import {login} from "../login";
+import {test} from "../../fixtures/connection";
 
-test('promotion level description is not required', async ({page}) => {
-    const project = await ontrack().createProject()
+test('promotion level description is not required', async ({page, ontrack}) => {
+    const project = await ontrack.createProject()
     const branch = await project.createBranch()
 
-    await login(page)
+    await login(page, ontrack)
 
     const branchPage = new BranchPage(page, branch)
     await branchPage.goTo()

@@ -67,7 +67,7 @@ export default function BranchPromotionLevelsView({id}) {
 
                     ${gqlDecorationFragment}
                 `,
-                {id}
+                {id: Number(id)}
             ).then(data => {
                 setBranch(data.branch)
 
