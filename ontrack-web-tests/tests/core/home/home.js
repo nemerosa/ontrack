@@ -1,4 +1,3 @@
-import {LegacyHomePage} from "../legacy/legacyHome";
 import {expect} from "@playwright/test";
 import {EnvironmentsPage} from "../../extensions/environments/Environments";
 
@@ -6,11 +5,6 @@ export class HomePage {
 
     constructor(page) {
         this.page = page
-    }
-
-    async legacyHome() {
-        await this.page.getByRole('link', {name: 'Legacy home'}).click()
-        return new LegacyHomePage(this.page)
     }
 
     async newProject({name, description, disabled}) {
