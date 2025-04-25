@@ -24,7 +24,7 @@ export default function DisableProjectCommand({project}) {
                         }
                     }
                 `,
-                {id: project.id}
+                {id: Number(project.id)}
             )
             eventsContext.fireEvent("project.updated", {id: project.id})
         } finally {
@@ -45,7 +45,7 @@ export default function DisableProjectCommand({project}) {
                         }
                     }
                 `,
-                {id: project.id}
+                {id: Number(project.id)}
             )
             eventsContext.fireEvent("project.updated", {id: project.id})
         } finally {

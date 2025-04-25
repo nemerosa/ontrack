@@ -4,6 +4,7 @@ const {HomePage} = require("../home/home");
 const {generate} = require("@ontrack/utils");
 const {ProjectPage} = require("./project");
 const {test} = require("../../fixtures/connection");
+const {waitUntilCondition} = require("../../support/timing");
 
 test('project creation', async ({page, ontrack}) => {
     await login(page, ontrack)
@@ -33,8 +34,14 @@ test('project disabling and enabling', async ({page, ontrack}) => {
     await projectPage.disableProject()
 
     // Checking that the project is correctly disabled (using the API)
-    project = await ontrack.getProjectById(project.id);
-    expect(project.disabled).toBeTruthy()
+    await waitUntilCondition({
+        page,
+        condition: async () => {
+            const p = await ontrack.getProjectById(project.id)
+            return p.disabled
+        },
+        message: `Project ${project.name} is disabled`
+    })
 
     // Checking that there IS a banner showing that the project is disabled
     await projectPage.checkDisabledBanner()
@@ -43,8 +50,14 @@ test('project disabling and enabling', async ({page, ontrack}) => {
     await projectPage.enableProject()
 
     // Checking that the project is correctly enabled (using the API)
-    project = await ontrack.getProjectById(project.id);
-    expect(project.disabled).toBeFalsy()
+    await waitUntilCondition({
+        page,
+        condition: async () => {
+            const p = await ontrack.getProjectById(project.id)
+            return !p.disabled
+        },
+        message: `Project ${project.name} is enabled`
+    })
 
     // Checking that there is NO banner showing that the project is disabled
     await projectPage.checkNoDisabledBanner()
