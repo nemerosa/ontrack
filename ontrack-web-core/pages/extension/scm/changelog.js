@@ -9,7 +9,7 @@ export default function GitChangeLogPage() {
         <>
             <main>
                 <MainLayout>
-                    <ScmChangeLogView from={from} to={to}/>
+                    <ScmChangeLogView from={Number(from)} to={Number(to)}/>
                 </MainLayout>
             </main>
         </>

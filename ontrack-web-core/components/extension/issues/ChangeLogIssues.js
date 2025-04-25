@@ -4,16 +4,14 @@ import {useEffect, useState} from "react";
 import {useTemplateRenderers} from "@components/extension/issues/SelectTemplateRenderer";
 import {Button, Dropdown, Input, Modal, Space, Spin} from "antd";
 import {FaCheck, FaCopy, FaDownload, FaTools} from "react-icons/fa";
-import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import copy from "copy-to-clipboard";
 import {gql} from "graphql-request";
 import IssueChangeLogExportRequestDialog, {
     useIssueChangeLogExportRequestDialog
 } from "@components/extension/issues/IssueChangeLogExportRequestDialog";
+import {useMutation} from "@components/services/GraphQL";
 
 export default function ChangeLogIssues({id, from, to, issues}) {
-
-    const client = useGraphQLClient()
 
     const [issueServiceId, setIssueServiceId] = useState('')
     useEffect(() => {
@@ -81,15 +79,46 @@ export default function ChangeLogIssues({id, from, to, issues}) {
 
         setItems(items)
 
-    }, [templateRenderers, preferences]);
+    }, [templateRenderers, preferences])
 
-    const [exporting, setExporting] = useState(false)
     const [exportedContent, setExportedContent] = useState('')
-    const [exportedContentShowing, setExportedContentShowing] = useState(false)
     const [exportCopied, setExportCopied] = useState(false)
 
-    const onExport = () => {
-        setExporting(true)
+    const {mutate: scmChangeLog, loading: exporting} = useMutation(
+        gql`
+            query ChangeLogExport(
+                $from: Int!,
+                $to: Int!,
+                $format: String!,
+                $grouping: String,
+                $exclude: String,
+                $altGroup: String,
+            ) {
+                scmChangeLog(from: $from, to: $to) {
+                    export(
+                        request: {
+                            format: $format,
+                            grouping: $grouping,
+                            exclude: $exclude,
+                            altGroup: $altGroup,
+                        }
+                    )
+                }
+            }
+        `,
+        {
+            userNodeName: 'scmChangeLog',
+            onSuccess: (userNode) => {
+                const content = userNode.export
+                setExportedContent(content)
+                showExportedContent()
+            }
+        }
+    )
+
+    const [exportedContentShowing, setExportedContentShowing] = useState(false)
+
+    const onExport = async () => {
         setExportedContent('')
         setExportCopied(false)
 
@@ -101,42 +130,13 @@ export default function ChangeLogIssues({id, from, to, issues}) {
             ))
             .join('|')
 
-        client.request(
-            gql`
-                query ChangeLogExport(
-                    $from: Int!,
-                    $to: Int!,
-                    $format: String!,
-                    $grouping: String,
-                    $exclude: String,
-                    $altGroup: String,
-                ) {
-                    scmChangeLog(from: $from, to: $to) {
-                        export(
-                            request: {
-                                format: $format,
-                                grouping: $grouping,
-                                exclude: $exclude,
-                                altGroup: $altGroup,
-                            }
-                        )
-                    }
-                }
-            `,
-            {
-                from,
-                to,
-                format: preferences.format,
-                grouping,
-                exclude: null, // TODO
-                altGroup: null, // TODO
-            }
-        ).then(data => {
-            const content = data.scmChangeLog.export
-            setExportedContent(content)
-            showExportedContent()
-        }).finally(() => {
-            setExporting(false)
+        await scmChangeLog({
+            from,
+            to,
+            format: preferences.format,
+            grouping,
+            exclude: null, // TODO
+            altGroup: null, // TODO
         })
     }
 

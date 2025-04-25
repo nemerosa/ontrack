@@ -83,11 +83,11 @@ test("SCM change log", async ({page, ontrack}) => {
     await doTestSCMChangeLog(page, ontrack)
 })
 
-test('JIRA SCM change log', async ({page, context}) => {
+test('JIRA SCM change log', async ({page, ontrack, context}) => {
     await context.grantPermissions(['clipboard-read'])
     // Creates the JIRA mock configuration
     const configName = generate("mock-")
-    await ontrack().configurations.jira.createConfig({
+    await ontrack.configurations.jira.createConfig({
         name: configName,
         url: "mock://jira",
         user: "",
@@ -97,6 +97,7 @@ test('JIRA SCM change log', async ({page, context}) => {
     // Running the test
     const changeLogPage = await doTestSCMChangeLog(
         page,
+        ontrack,
         'jira',
         `jira//${configName}`
     )

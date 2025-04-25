@@ -36,7 +36,7 @@ export const graphQL = async (request, {query, variables = {}}) => {
                 response: NextResponse.json({error: "Unauthorized"}, {status: 401})
             }
         } else {
-            console.error("GraphQL", {error})
+            console.error("GraphQL", {error, query})
             return {
                 data: null,
                 response: NextResponse.json({error}, {status: 500}),
