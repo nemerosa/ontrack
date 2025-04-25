@@ -89,7 +89,7 @@ export default function PromotionRunView({id}) {
 
                     ${gqlAutoVersioningTrailContent}
                 `,
-                {id}
+                {id: Number(id)}
             ).then(data => {
                 const promotionRun = data.promotionRuns[0];
                 setRun(promotionRun)

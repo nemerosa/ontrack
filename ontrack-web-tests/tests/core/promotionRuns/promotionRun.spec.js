@@ -1,17 +1,16 @@
-import {test} from "@playwright/test";
-import {ontrack} from "@ontrack/ontrack";
 import {login} from "../login";
 import {BuildPage} from "../builds/build";
+import {test} from "../../fixtures/connection";
 
-test('repromoting a promotion run', async ({page}) => {
-    const project = await ontrack().createProject()
+test('repromoting a promotion run', async ({page, ontrack}) => {
+    const project = await ontrack.createProject()
     const branch = await project.createBranch()
     const pl = await branch.createPromotionLevel()
     const build = await branch.createBuild()
     const run = await build.promote(pl)
 
     // Going to the build page
-    await login(page)
+    await login(page, ontrack)
     const buildPage = new BuildPage(page, build)
     await buildPage.goTo()
 

@@ -30,7 +30,7 @@ export const createPromotionLevel = async (branch, name) => {
             }
         `,
         {
-            branchId: branch.id,
+            branchId: Number(branch.id),
             name: actualName,
         }
     )

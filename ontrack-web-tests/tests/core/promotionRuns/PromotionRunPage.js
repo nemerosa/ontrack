@@ -1,4 +1,3 @@
-import {ui} from "@ontrack/connection";
 import {expect} from "@playwright/test";
 
 export class PromotionRunPage {
@@ -9,7 +8,7 @@ export class PromotionRunPage {
     }
 
     async goTo() {
-        await this.page.goto(`${ui()}/promotionRun/${this.promotionRun.id}`)
+        await this.page.goto(`${this.promotionRun.ontrack.connection.ui}/promotionRun/${this.promotionRun.id}`)
         await expect(this.page.getByText("has been promoted")).toBeVisible()
     }
 
