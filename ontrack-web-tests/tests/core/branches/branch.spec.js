@@ -1,19 +1,25 @@
-const {test, expect} = require("@playwright/test");
-const {ontrack} = require("@ontrack/ontrack");
 const {login} = require("../login");
 const {BranchPage} = require("./branch");
+const {test} = require("../../fixtures/connection");
+const {waitUntilCondition} = require("../../support/timing");
 
-test('branch disabling and enabling', async ({page}) => {
-    const project = await ontrack().createProject()
+test('branch disabling and enabling', async ({page, ontrack}) => {
+    const project = await ontrack.createProject()
     let branch = await project.createBranch()
 
-    await login(page)
+    await login(page, ontrack)
     const branchPage = new BranchPage(page, branch)
     await branchPage.goTo()
 
     // Checking that the branch is correctly enabled (using the API)
-    branch = await ontrack().getBranchById(branch.id)
-    expect(branch.disabled).toBeFalsy()
+    await waitUntilCondition({
+        page,
+        condition: async () => {
+            const b = await ontrack.getBranchById(branch.id)
+            return !b.disabled
+        },
+        message: `Branch ${branch.name} is enabled`
+    })
 
     // Checking that there is NO banner showing that the branch is disabled
     await branchPage.checkNoDisabledBanner()
@@ -22,8 +28,14 @@ test('branch disabling and enabling', async ({page}) => {
     await branchPage.disableBranch()
 
     // Checking that the branch is correctly disabled (using the API)
-    branch = await ontrack().getBranchById(branch.id)
-    expect(branch.disabled).toBeTruthy()
+    await waitUntilCondition({
+        page,
+        condition: async () => {
+            const b = await ontrack.getBranchById(branch.id)
+            return b.disabled
+        },
+        message: `Branch ${branch.name} is disabled`
+    })
 
     // Checking that there IS a banner showing that the branch is disabled
     await branchPage.checkDisabledBanner()
@@ -32,8 +44,14 @@ test('branch disabling and enabling', async ({page}) => {
     await branchPage.enableBranch()
 
     // Checking that the branch is correctly enabled (using the API)
-    branch = await ontrack().getBranchById(branch.id)
-    expect(branch.disabled).toBeFalsy()
+    await waitUntilCondition({
+        page,
+        condition: async () => {
+            const b = await ontrack.getBranchById(branch.id)
+            return !b.disabled
+        },
+        message: `Branch ${branch.name} is enabled`
+    })
 
     // Checking that there is NO banner showing that the branch is disabled
     await branchPage.checkNoDisabledBanner()

@@ -63,7 +63,7 @@ export const getBranchById = async (ontrack, id) => {
             }
             ${gqlBranchData}
         `,
-        {id}
+        {id: Number(id)}
     )
     const project = projectInstance(ontrack, data.branch.project)
     return branchInstance(ontrack, data.branch, project)

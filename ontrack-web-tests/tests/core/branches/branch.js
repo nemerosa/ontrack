@@ -12,7 +12,7 @@ class BranchPage {
     }
 
     async goTo() {
-        await this.page.goto(`${ui()}/branch/${this.branch.id}`)
+        await this.page.goto(`${this.branch.ontrack.connection.ui}/branch/${this.branch.id}`)
         await expect(this.page.getByText(this.branch.name)).toBeVisible()
         // Loading finished
         await expect(this.page.getByTestId('loading-builds')).toBeHidden()

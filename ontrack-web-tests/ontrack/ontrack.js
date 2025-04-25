@@ -16,6 +16,8 @@ export class Ontrack {
 
     createProject = async (name) => createProject(this, name)
     getProjectById = async (id) => getProjectById(this, id)
+
+    getBranchById = async (id) => getBranchById(this, id)
 }
 
 /**
@@ -35,8 +37,6 @@ export const ontrack = (customCredentials) => {
     }
 
     self.projectList = async () => projectList(self)
-
-    self.getBranchById = async (id) => getBranchById(self, id)
 
     self.getValidationRunById = async (runId) => getValidationRunById(self, runId)
 
