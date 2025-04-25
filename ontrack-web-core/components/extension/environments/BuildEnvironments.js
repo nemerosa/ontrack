@@ -42,7 +42,7 @@ export default function BuildEnvironments({build}) {
             ${gqlSlotData}
             ${gqlSlotPipelineData}
         `,
-        {variables: {buildId: build.id}}
+        {variables: {buildId: Number(build.id)}}
     )
 
     const [items, setItems] = useState([])

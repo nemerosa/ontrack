@@ -172,7 +172,7 @@ function BuildLinksFlow({build}) {
             setLoading(true)
             client.request(
                 buildQuery,
-                {buildId: build.id}
+                {buildId: Number(build.id)}
             ).then(data => {
                 // Nodes & edges to build
                 const nodes = []

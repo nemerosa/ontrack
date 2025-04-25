@@ -72,7 +72,7 @@ export default function BuildContentPromotions({build}) {
                             }
                         }
                     }
-                `, {buildId: build.id}
+                `, {buildId: Number(build.id)}
             ).then(data => {
                 // Authorizations
                 build.authorizations = data.build.authorizations

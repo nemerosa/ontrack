@@ -73,7 +73,7 @@ export default function NotificationRecordingsTable({entity, sourceId}) {
                 }
                 variables={{
                     eventEntityType: entity?.type,
-                    eventEntityId: entity?.id,
+                    eventEntityId: entity ? Number(entity.id) : null,
                     sourceId: sourceId,
                 }}
                 queryNode="notificationRecords"

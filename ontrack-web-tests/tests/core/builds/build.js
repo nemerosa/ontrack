@@ -12,7 +12,7 @@ export class BuildPage {
     }
 
     async goTo() {
-        await this.page.goto(`${ui()}/build/${this.build.id}`)
+        await this.page.goto(`${this.build.ontrack.connection.ui}/build/${this.build.id}`)
         await expect(this.page.getByText(this.build.name)).toBeVisible()
         // Widgets must be visible
         await expect(this.page.getByText("Promotions")).toBeVisible()

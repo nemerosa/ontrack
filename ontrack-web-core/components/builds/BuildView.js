@@ -87,7 +87,7 @@ export default function BuildView({id}) {
                     ${gqlInformationFragment}
                     ${gqlUserMenuActionFragment}
                 `,
-                {id}
+                {id: Number(id)}
             ).then(data => {
                 setBuild(data.build)
                 setLoadingBuild(false)
