@@ -55,7 +55,7 @@ export default function UserProfileTokens() {
                         data?.token?.value &&
                         <Form.Item>
                             <Space>
-                                <Typography.Text code={true} copyable={true}>
+                                <Typography.Text data-testid="generatedToken" code={true} copyable={true}>
                                     {data.token.value}
                                 </Typography.Text>
                             </Space>

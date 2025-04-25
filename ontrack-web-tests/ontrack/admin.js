@@ -1,4 +1,3 @@
-import {generate} from "@ontrack/utils";
 import {graphQLCallMutation} from "@ontrack/graphql";
 import {gql} from "graphql-request";
 
@@ -8,7 +7,6 @@ export const admin = (ontrack) => {
     }
 
     admin.revokeToken = async (tokenName) => revokeToken(admin, tokenName)
-    admin.createAccount = async () => createAccount(admin)
 
     return admin
 }
@@ -28,44 +26,4 @@ const revokeToken = async (admin, tokenName) => {
         `,
         {name: tokenName}
     )
-}
-
-const createAccount = async (admin) => {
-    const username = generate('usr_')
-    const password = generate('psw_')
-
-    await graphQLCallMutation(
-        admin.ontrack.connection,
-        'createBuiltInAccount',
-        gql`
-            mutation CreateAccount(
-                $username: String!,
-                $email: String!,
-                $fullName: String!,
-                $password: String!,
-            ) {
-                createBuiltInAccount(input: {
-                    name: $username,
-                    email: $email,
-                    fullName: $fullName,
-                    password: $password,
-                }) {
-                    errors {
-                        message
-                    }
-                }
-            }
-        `,
-        {
-            username: username,
-            email: `${username}@ontrack.run`,
-            fullName: `${username} Ontrack`,
-            password: password,
-        }
-    )
-
-    return {
-        username,
-        password,
-    }
 }

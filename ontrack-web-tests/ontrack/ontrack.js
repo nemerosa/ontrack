@@ -14,10 +14,18 @@ export class Ontrack {
         this.connection = connection
     }
 
+    admin = () => admin(this)
+
     createProject = async (name) => createProject(this, name)
     getProjectById = async (id) => getProjectById(this, id)
+    projectList = async () => projectList(this)
 
     getBranchById = async (id) => getBranchById(this, id)
+
+    // Cloning with a specific token
+    withToken = (token) => new Ontrack(
+        this.connection.withToken(token)
+    )
 }
 
 /**
@@ -36,11 +44,8 @@ export const ontrack = (customCredentials) => {
         connection,
     }
 
-    self.projectList = async () => projectList(self)
-
     self.getValidationRunById = async (runId) => getValidationRunById(self, runId)
 
-    self.admin = () => admin(self)
     self.configurations = new OntrackConfigurations(self)
 
     // Extensions

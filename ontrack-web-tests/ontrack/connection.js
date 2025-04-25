@@ -17,6 +17,13 @@ export class Connection {
         this.token = token
     }
 
+    withToken(token) {
+        return new Connection({
+            ...this,
+            token
+        })
+    }
+
 }
 
 export const createConnection = async () => {

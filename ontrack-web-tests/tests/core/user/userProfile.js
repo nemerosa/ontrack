@@ -3,13 +3,14 @@ const {expect} = require("@playwright/test");
 
 export class UserProfilePage {
 
-    constructor(page) {
+    constructor(page, ontrack) {
         this.page = page
+        this.ontrack = ontrack
     }
 
 
     async goTo() {
-        await this.page.goto(`${ui()}/core/admin/userProfile`)
+        await this.page.goto(`${this.ontrack.connection.ui}/core/admin/userProfile`)
         await expect(this.page.getByText("API tokens")).toBeVisible()
     }
 
@@ -21,7 +22,7 @@ export class UserProfilePage {
         // await this.page.getByTitle("Copies the generated token into the clipboard.").click()
         // const text = await this.page.evaluate(() => navigator.clipboard.readText())
 
-        return this.page.getByTestId("generatedToken").inputValue()
+        return this.page.getByTestId("generatedToken").textContent()
     }
 
 }
