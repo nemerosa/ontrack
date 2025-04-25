@@ -1,4 +1,3 @@
-import {backend, credentials, ui} from "@ontrack/connection";
 import {createProject, getProjectById, projectList} from "@ontrack/project";
 import {getValidationRunById} from "@ontrack/validationRun";
 import {admin} from "@ontrack/admin";
@@ -15,6 +14,7 @@ export class Ontrack {
     }
 
     admin = () => admin(this)
+    configurations = new OntrackConfigurations(this)
 
     createProject = async (name) => createProject(this, name)
     getProjectById = async (id) => getProjectById(this, id)
@@ -32,25 +32,4 @@ export class Ontrack {
     withToken = (token) => new Ontrack(
         this.connection.withToken(token)
     )
-}
-
-/**
- * Ontrack root
- *
- * @deprecated Use the `ontrack` fixture
- */
-export const ontrack = (customCredentials) => {
-    const connection = {
-        ui: ui(),
-        backend: backend(),
-        credentials: customCredentials ?? credentials(),
-    }
-
-    const self = {
-        connection,
-    }
-
-    self.configurations = new OntrackConfigurations(self)
-
-    return self
 }

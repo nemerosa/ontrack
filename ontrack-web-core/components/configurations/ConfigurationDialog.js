@@ -19,7 +19,7 @@ export const useConfigurationDialog = ({onSuccess, dialogItems, configurationTyp
         prepareValues: (values) => {
             return prepareConfigValues(values, configurationType)
         },
-        query: ({creation}) => creation ?
+        query: (context) => context?.creation ?
             gql`
                 mutation CreateConfiguration(
                     $type: String!,
@@ -54,7 +54,7 @@ export const useConfigurationDialog = ({onSuccess, dialogItems, configurationTyp
                     }
                 }
             `,
-        userNode: ({creation}) => creation ? 'createConfiguration' : 'updateConfiguration',
+        userNode: (context) => context?.creation ? 'createConfiguration' : 'updateConfiguration',
     })
 }
 
