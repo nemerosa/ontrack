@@ -97,7 +97,7 @@ export const gqlValidationStampFragment = gql`
 export const getValidationStampById = (client, id) => {
     return client.request(
         gqlValidationStampByIdQuery,
-        {id}
+        {id: Number(id)}
     ).then(data => data.validationStamp)
 }
 

@@ -22,6 +22,8 @@ export class Ontrack {
 
     getBranchById = async (id) => getBranchById(this, id)
 
+    getValidationRunById = async (runId) => getValidationRunById(this, runId)
+
     // Cloning with a specific token
     withToken = (token) => new Ontrack(
         this.connection.withToken(token)
@@ -43,8 +45,6 @@ export const ontrack = (customCredentials) => {
     const self = {
         connection,
     }
-
-    self.getValidationRunById = async (runId) => getValidationRunById(self, runId)
 
     self.configurations = new OntrackConfigurations(self)
 

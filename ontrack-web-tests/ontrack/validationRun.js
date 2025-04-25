@@ -80,7 +80,7 @@ export const getValidationRunById = async (ontrack, runId) => {
             ${validationRunFragment}
         `,
         {
-            runId,
+            runId: Number(runId),
         }
     )
 

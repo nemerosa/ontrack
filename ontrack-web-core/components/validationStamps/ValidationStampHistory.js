@@ -119,7 +119,7 @@ export default function ValidationStampHistory({validationStamp}) {
                     }
                 `,
                 {
-                    id: validationStamp.id,
+                    id: Number(validationStamp.id),
                     offset: pagination.offset,
                     size: pagination.size,
                     passed: filter.passed,

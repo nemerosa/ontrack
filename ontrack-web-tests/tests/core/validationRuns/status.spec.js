@@ -1,19 +1,19 @@
 // @ts-check
-const {test, expect} = require('@playwright/test');
-const {ontrack} = require("@ontrack/ontrack");
+const {expect} = require('@playwright/test');
 const {login} = require("../login");
 const {BranchPage} = require("../branches/branch");
 const {generate} = require("@ontrack/utils");
+const {test} = require("../../fixtures/connection");
 
-test('changing status', async ({page}) => {
+test('changing status', async ({page, ontrack}) => {
     // Provisioning
-    const project = await ontrack().createProject()
+    const project = await ontrack.createProject()
     const branch = await project.createBranch()
     const validationStamp = await branch.createValidationStamp()
     const build = await branch.createBuild()
     let run = await build.validate(validationStamp, {status: "FAILED"})
     // Login
-    await login(page)
+    await login(page, ontrack)
     // Navigating to the branch
     const branchPage = new BranchPage(page, branch)
     await branchPage.goTo()
@@ -28,6 +28,6 @@ test('changing status', async ({page}) => {
     // Checking the validation status has changed in the UI
     await runHistoryDialog.checkStatus('Investigating', message)
     // Checking through the API
-    run = await ontrack().getValidationRunById(run.id)
+    run = await ontrack.getValidationRunById(run.id)
     expect(run.lastStatus.statusID.id).toBe('INVESTIGATING')
 })
