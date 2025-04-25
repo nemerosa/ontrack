@@ -1,13 +1,13 @@
 const {login} = require("../../core/login");
 const {HomePage} = require("../../core/home/home");
 const {generate} = require("@ontrack/utils");
-const {test} = require("@playwright/test");
+const {test} = require("../../fixtures/connection");
 
-test('creating an environment', async ({page}) => {
+test('creating an environment', async ({page, ontrack}) => {
     // Login
-    await login(page)
+    await login(page, ontrack)
     // Going to the environment page, using the button in the home page
-    const homePage = new HomePage(page)
+    const homePage = new HomePage(page, ontrack)
     const environmentsPage = await homePage.selectEnvironments()
     // Creating a new environment
     const name = generate("env-")

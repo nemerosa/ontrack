@@ -1,8 +1,8 @@
-import {test} from "@playwright/test";
 import {prepareManualApprovalInPipelinePage} from "./manualApprovalFixtures";
+import {test} from "../../fixtures/connection";
 
-test('manual approval on the pipeline page', async ({page}) => {
-    const {pipelinePage, ruleConfigId} = await prepareManualApprovalInPipelinePage(page)
+test('manual approval on the pipeline page', async ({page, ontrack}) => {
+    const {pipelinePage, ruleConfigId} = await prepareManualApprovalInPipelinePage(page, ontrack)
 
     const admissionRule = await pipelinePage.getAdmissionRule(ruleConfigId)
     await admissionRule.expectManualInputButton()

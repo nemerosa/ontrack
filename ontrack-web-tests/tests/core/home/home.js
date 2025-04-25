@@ -3,8 +3,9 @@ import {EnvironmentsPage} from "../../extensions/environments/Environments";
 
 export class HomePage {
 
-    constructor(page) {
+    constructor(page, ontrack) {
         this.page = page
+        this.ontrack = ontrack
     }
 
     async newProject({name, description, disabled}) {
@@ -18,7 +19,7 @@ export class HomePage {
 
     async selectEnvironments() {
         await this.page.getByRole('button', {name: 'Environments'}).click()
-        return new EnvironmentsPage(this.page)
+        return new EnvironmentsPage(this.page, this.ontrack)
     }
 
 }

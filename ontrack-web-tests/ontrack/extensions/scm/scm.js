@@ -39,7 +39,7 @@ class MockSCMContext {
                 }
             `,
             {
-                projectId: project.id,
+                projectId: Number(project.id),
                 value: {
                     name: this.repositoryName,
                     issueServiceIdentifier: issueServiceIdentifier,
@@ -69,7 +69,7 @@ class MockSCMContext {
                 }
             `,
             {
-                branchId: branch.id,
+                branchId: Number(branch.id),
                 value: {
                     name: scmBranch
                 }
@@ -98,7 +98,7 @@ class MockSCMContext {
                 }
             `,
             {
-                buildId: build.id,
+                buildId: Number(build.id),
                 value: {
                     id: commitId
                 }

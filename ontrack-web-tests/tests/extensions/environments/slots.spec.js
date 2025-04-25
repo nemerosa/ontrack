@@ -1,24 +1,23 @@
-import {test} from "@playwright/test";
 import {login} from "../../core/login";
 import {HomePage} from "../../core/home/home";
-import {ontrack} from "@ontrack/ontrack";
 import {createSlot} from "./slotFixtures";
 import {SlotPage} from "./SlotPage";
 import {EnvironmentsPage} from "./Environments";
+import {test} from "../../fixtures/connection";
 
-test('creating a slot for several environments', async ({page}) => {
+test('creating a slot for several environments', async ({page, ontrack}) => {
 
     // Provisioning
     // Creating two environments
-    const env1 = await ontrack().environments.createEnvironment({})
-    const env2 = await ontrack().environments.createEnvironment({})
+    const env1 = await ontrack.environments.createEnvironment({})
+    const env2 = await ontrack.environments.createEnvironment({})
     // Creating a project
-    const project = await ontrack().createProject()
+    const project = await ontrack.createProject()
 
     // Login
-    await login(page)
+    await login(page, ontrack)
     // Going to the environment page, using the button in the home page
-    const homePage = new HomePage(page)
+    const homePage = new HomePage(page, ontrack)
     const environmentsPage = await homePage.selectEnvironments()
 
     // Creating a new slot for the 2 environments
@@ -33,11 +32,11 @@ test('creating a slot for several environments', async ({page}) => {
     await environmentsPage.checkSlotIsVisible(env2, project.name)
 })
 
-test('deleting a slot', async ({page}) => {
-    const {slot} = await createSlot(ontrack())
+test('deleting a slot', async ({page, ontrack}) => {
+    const {slot} = await createSlot(ontrack)
 
     // Login
-    await login(page)
+    await login(page, ontrack)
     // Going to the slot page
     const slotPage = new SlotPage(page, slot)
     await slotPage.goTo()
@@ -46,14 +45,14 @@ test('deleting a slot', async ({page}) => {
     await slotPage.delete()
 
     // We're back in the environment page
-    const environmentsPage = new EnvironmentsPage(page)
+    const environmentsPage = new EnvironmentsPage(page, ontrack)
     await environmentsPage.checkEnvironmentIsVisible(slot.environment.name)
 })
 
-test('eligible and deployable builds for a slot', async ({page}) => {
-    const {project, slot} = await createSlot(ontrack())
+test('eligible and deployable builds for a slot', async ({page, ontrack}) => {
+    const {project, slot} = await createSlot(ontrack)
     // Promotion admission rule
-    await ontrack().environments.addPromotionRule({slot, promotion: "BRONZE"})
+    await ontrack.environments.addPromotionRule({slot, promotion: "BRONZE"})
     // Branch for the project
     const branch = await project.createBranch()
     const bronze = await branch.createPromotionLevel("BRONZE")
@@ -64,7 +63,7 @@ test('eligible and deployable builds for a slot', async ({page}) => {
     await build2.promote(bronze)
 
     // Login & going to the slot page
-    await login(page)
+    await login(page, ontrack)
     const slotPage = new SlotPage(page, slot)
     await slotPage.goTo()
 

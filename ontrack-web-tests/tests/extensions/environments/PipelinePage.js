@@ -1,4 +1,3 @@
-import {ui} from "@ontrack/connection";
 import {expect} from "@playwright/test";
 import {PipelineRule} from "./PipelineRule";
 import {confirmBox} from "../../support/confirm";
@@ -6,13 +5,14 @@ import {PipelineWorkflow} from "./PipelineWorkflow";
 import {PipelineStatus} from "./PipelineStatus";
 
 export class PipelinePage {
-    constructor(page, pipeline) {
+    constructor(page, pipeline, ontrack) {
         this.page = page
         this.pipeline = pipeline
+        this.ontrack = ontrack
     }
 
     async goTo() {
-        await this.page.goto(`${ui()}/extension/environments/pipeline/${this.pipeline.id}`)
+        await this.page.goto(`${this.ontrack.connection.ui}/extension/environments/pipeline/${this.pipeline.id}`)
         await expect(this.page.getByText(`Slot ${this.pipeline.slot.environment.name} - ${this.pipeline.slot.project.name}`)).toBeVisible()
         await expect(this.page.getByText(`Deployment #${this.pipeline.number}`)).toBeVisible()
     }

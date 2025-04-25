@@ -24,6 +24,10 @@ export class Ontrack {
 
     getValidationRunById = async (runId) => getValidationRunById(this, runId)
 
+    // Extensions
+
+    environments = new EnvironmentsExtension(this)
+
     // Cloning with a specific token
     withToken = (token) => new Ontrack(
         this.connection.withToken(token)
@@ -47,9 +51,6 @@ export const ontrack = (customCredentials) => {
     }
 
     self.configurations = new OntrackConfigurations(self)
-
-    // Extensions
-    self.environments = new EnvironmentsExtension(self)
 
     return self
 }

@@ -1,5 +1,4 @@
 import {createSlot} from "../slotFixtures";
-import {ontrack} from "@ontrack/ontrack";
 import {addSlotWorkflow} from "@ontrack/extensions/environments/workflows";
 import {graphQLCall} from "@ontrack/graphql";
 import {gql} from "graphql-request";
@@ -11,8 +10,8 @@ export const triggerMapping = {
     DONE: "On deployment done",
 }
 
-export const withSlotWorkflow = async ({trigger}) => {
-    const {slot, project} = await createSlot(ontrack())
+export const withSlotWorkflow = async (ontrack, {trigger}) => {
+    const {slot, project} = await createSlot(ontrack)
     const slotWorkflow = await addSlotWorkflow({
         slot,
         trigger,
@@ -35,12 +34,12 @@ export const withSlotWorkflow = async ({trigger}) => {
     return {slot, project, slotWorkflow}
 }
 
-export const waitForPipelineWorkflowToBeFinished = async (page, pipelineId, slotWorkflow) => {
+export const waitForPipelineWorkflowToBeFinished = async (page, ontrack, pipelineId, slotWorkflow) => {
     await waitUntilCondition({
         page,
         condition: async () => {
             const data = await graphQLCall(
-                ontrack().connection,
+                ontrack.connection,
                 gql`
                     query PipelineDeploymentStatus($pipelineId: String!) {
                         slotPipelineById(id: $pipelineId) {
@@ -70,12 +69,12 @@ export const waitForPipelineWorkflowToBeFinished = async (page, pipelineId, slot
     })
 }
 
-export const waitForPipelineToBeRunnable = async (page, pipelineId) => {
+export const waitForPipelineToBeRunnable = async (page, ontrack, pipelineId) => {
     await waitUntilCondition({
         page,
         condition: async () => {
             const data = await graphQLCall(
-                ontrack().connection,
+                ontrack.connection,
                 gql`
                     query PipelineDeploymentStatus($pipelineId: String!) {
                         slotPipelineById(id: $pipelineId) {

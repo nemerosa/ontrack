@@ -1,10 +1,9 @@
 import {graphQLCallMutation} from "@ontrack/graphql";
 import {gql} from "graphql-request";
-import {ontrack} from "@ontrack/ontrack";
 
 export const addSlotWorkflow = async ({slot, trigger, workflowYaml}) => {
     const data = await graphQLCallMutation(
-        ontrack().connection,
+        slot.ontrack.connection,
         'addSlotWorkflow',
         gql`
             mutation AddSlotWorkflow(

@@ -1,4 +1,4 @@
-import {expect, test} from "@playwright/test";
+import {expect} from "@playwright/test";
 import {
     waitForPipelineToBeRunnable,
     waitForPipelineWorkflowToBeFinished,
@@ -6,7 +6,6 @@ import {
 } from "./slotWorkflowsFixtures";
 import {createPipeline} from "../pipelineFixtures";
 import {graphQLCall} from "@ontrack/graphql";
-import {ontrack} from "@ontrack/ontrack";
 import {gql} from "graphql-request";
 import {login} from "../../../core/login";
 import {PipelinePage} from "../PipelinePage";
@@ -14,15 +13,16 @@ import {createSlot} from "../slotFixtures";
 import {addSlotWorkflow} from "@ontrack/extensions/environments/workflows";
 import {gqlPipelineData} from "@ontrack/extensions/environments/environments";
 import {waitUntilCondition} from "../../../support/timing";
+import {test} from "../../../fixtures/connection";
 
-test('API - workflows on creation participate into the pipeline check list', async ({page}) => {
-    const {slot, project} = await withSlotWorkflow({trigger: 'CANDIDATE'})
+test('API - workflows on creation participate into the pipeline check list', async ({page, ontrack}) => {
+    const {slot, project} = await withSlotWorkflow(ontrack, {trigger: 'CANDIDATE'})
     const {pipeline} = await createPipeline({project, slot})
 
     // Pipeline was just created, workflow is running into the background
     // The pipeline must be marked as non-deployable
     let data = await graphQLCall(
-        ontrack().connection,
+        ontrack.connection,
         gql`
             query PipelineDeploymentStatus($pipelineId: String!) {
                 slotPipelineById(id: $pipelineId) {
@@ -52,11 +52,11 @@ test('API - workflows on creation participate into the pipeline check list', asy
     await expect(slotWorkflowInstance.workflowInstance.status).toBe('RUNNING')
 
     // Waiting for the deployment to be runnable
-    await waitForPipelineToBeRunnable(page, pipeline.id)
+    await waitForPipelineToBeRunnable(page, ontrack, pipeline.id)
 
     // Checking that the pipeline is now deployable
     data = await graphQLCall(
-        ontrack().connection,
+        ontrack.connection,
         gql`
             query PipelineDeploymentStatus($pipelineId: String!) {
                 slotPipelineById(id: $pipelineId) {
@@ -86,15 +86,15 @@ test('API - workflows on creation participate into the pipeline check list', asy
     await expect(slotWorkflowInstance.workflowInstance.status).toBe('SUCCESS')
 })
 
-test('workflows on creation participate into the pipeline check list', async ({page}) => {
-    const {slot, project, slotWorkflow} = await withSlotWorkflow({trigger: 'CANDIDATE'})
+test('workflows on creation participate into the pipeline check list', async ({page, ontrack}) => {
+    const {slot, project, slotWorkflow} = await withSlotWorkflow(ontrack, {trigger: 'CANDIDATE'})
     const {pipeline} = await createPipeline({project, slot})
 
-    await waitForPipelineToBeRunnable(page, pipeline.id)
+    await waitForPipelineToBeRunnable(page, ontrack, pipeline.id)
 
-    await login(page)
+    await login(page, ontrack)
 
-    const pipelinePage = new PipelinePage(page, pipeline)
+    const pipelinePage = new PipelinePage(page, pipeline, ontrack)
     await pipelinePage.goTo()
 
     await pipelinePage.expectRuleStatusProgress({value: 100})
@@ -108,8 +108,8 @@ test('workflows on creation participate into the pipeline check list', async ({p
     })
 })
 
-test('workflows on creation participate into the pipeline progress', async ({page}) => {
-    const {slot, project} = await createSlot(ontrack())
+test('workflows on creation participate into the pipeline progress', async ({page, ontrack}) => {
+    const {slot, project} = await createSlot(ontrack)
     // Adding two workflows, one successful, one with error
     const slotWorkflowSuccess = await addSlotWorkflow({
         slot,
@@ -139,20 +139,20 @@ test('workflows on creation participate into the pipeline progress', async ({pag
     })
     const {pipeline} = await createPipeline({project, slot})
 
-    await waitForPipelineWorkflowToBeFinished(page, pipeline.id, slotWorkflowSuccess)
-    await waitForPipelineWorkflowToBeFinished(page, pipeline.id, slotWorkflowError)
+    await waitForPipelineWorkflowToBeFinished(page, ontrack, pipeline.id, slotWorkflowSuccess)
+    await waitForPipelineWorkflowToBeFinished(page, ontrack, pipeline.id, slotWorkflowError)
 
-    await login(page)
+    await login(page, ontrack)
 
-    const pipelinePage = new PipelinePage(page, pipeline)
+    const pipelinePage = new PipelinePage(page, pipeline, ontrack)
     await pipelinePage.goTo()
 
     await pipelinePage.expectRuleStatusProgress({value: 50})
 })
 
-test('API - workflow on promotion leading to the deployment of a build', async ({page}) => {
+test('API - workflow on promotion leading to the deployment of a build', async ({page, ontrack}) => {
     // Creating a slot
-    const {slot, project} = await createSlot(ontrack())
+    const {slot, project} = await createSlot(ontrack)
 
     // Creating a promotion
     const branch = await project.createBranch()
@@ -205,7 +205,7 @@ test('API - workflow on promotion leading to the deployment of a build', async (
         condition: async () => {
             // Getting the current pipeline of the slot and checking its status
             const data = await graphQLCall(
-                ontrack().connection,
+                ontrack.connection,
                 gql`
                     query SlotPipeline($slotId: String!) {
                         slotById(id: $slotId) {
@@ -228,8 +228,8 @@ test('API - workflow on promotion leading to the deployment of a build', async (
 
 })
 
-test('failing workflows on deploying block the deployment completion', async ({page}) => {
-    const {slot, project} = await createSlot(ontrack())
+test('failing workflows on deploying block the deployment completion', async ({page, ontrack}) => {
+    const {slot, project} = await createSlot(ontrack)
     // Adding two workflows, one successful, one with error
     const slotWorkflowSuccess = await addSlotWorkflow({
         slot,
@@ -260,28 +260,28 @@ test('failing workflows on deploying block the deployment completion', async ({p
 
     // Creating a pipeline and starting its deployment
     const {pipeline} = await createPipeline({project, slot})
-    await ontrack().environments.startPipeline({pipeline})
+    await ontrack.environments.startPipeline({pipeline})
 
-    await waitForPipelineWorkflowToBeFinished(page, pipeline.id, slotWorkflowSuccess)
-    await waitForPipelineWorkflowToBeFinished(page, pipeline.id, slotWorkflowError)
+    await waitForPipelineWorkflowToBeFinished(page, ontrack, pipeline.id, slotWorkflowSuccess)
+    await waitForPipelineWorkflowToBeFinished(page, ontrack, pipeline.id, slotWorkflowError)
 
-    await login(page)
+    await login(page, ontrack)
 
-    const pipelinePage = new PipelinePage(page, pipeline)
+    const pipelinePage = new PipelinePage(page, pipeline, ontrack)
     await pipelinePage.goTo()
 
     await pipelinePage.checkFinishAction({disabled: true})
 })
 
-test('going to the workflow instance from a pipeline workflow', async ({page}) => {
-    const {slot, project, slotWorkflow} = await withSlotWorkflow({trigger: 'CANDIDATE'})
+test('going to the workflow instance from a pipeline workflow', async ({page, ontrack}) => {
+    const {slot, project, slotWorkflow} = await withSlotWorkflow(ontrack, {trigger: 'CANDIDATE'})
     const {pipeline} = await createPipeline({project, slot})
 
-    await waitForPipelineToBeRunnable(page, pipeline.id)
+    await waitForPipelineToBeRunnable(page, ontrack, pipeline.id)
 
-    await login(page)
+    await login(page, ontrack)
 
-    const pipelinePage = new PipelinePage(page, pipeline)
+    const pipelinePage = new PipelinePage(page, pipeline, ontrack)
     await pipelinePage.goTo()
 
     const pipelineWorkflow = await pipelinePage.getWorkflow(slotWorkflow.id)
@@ -290,8 +290,8 @@ test('going to the workflow instance from a pipeline workflow', async ({page}) =
     await workflowInstancePage.checkStatus('Success')
 })
 
-test('a workflow status can be overridden for a pipeline', async ({page}) => {
-    const {slot, project} = await createSlot(ontrack())
+test('a workflow status can be overridden for a pipeline', async ({page, ontrack}) => {
+    const {slot, project} = await createSlot(ontrack)
     const slotWorkflowError = await addSlotWorkflow({
         slot,
         trigger: 'CANDIDATE',
@@ -306,10 +306,10 @@ test('a workflow status can be overridden for a pipeline', async ({page}) => {
         `
     })
     const {pipeline} = await createPipeline({project, slot})
-    await waitForPipelineWorkflowToBeFinished(page, pipeline.id, slotWorkflowError)
+    await waitForPipelineWorkflowToBeFinished(page, ontrack, pipeline.id, slotWorkflowError)
 
-    await login(page)
-    const pipelinePage = new PipelinePage(page, pipeline)
+    await login(page, ontrack)
+    const pipelinePage = new PipelinePage(page, pipeline, ontrack)
     await pipelinePage.goTo()
 
     await pipelinePage.expectRuleStatusProgress({value: 0, overridden: false})

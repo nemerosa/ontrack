@@ -1,16 +1,15 @@
-import {test} from "@playwright/test";
-import {ontrack} from "@ontrack/ontrack";
 import {login} from "../../core/login";
 import {generate} from "@ontrack/utils";
 import {createSlot} from "./slotFixtures";
 import {SlotPage} from "./SlotPage";
+import {test} from "../../fixtures/connection";
 
-test('adding a branch pattern admission rule with default name', async ({page}) => {
+test('adding a branch pattern admission rule with default name', async ({page, ontrack}) => {
     // Provisioning
-    const {slot} = await createSlot(ontrack())
+    const {slot} = await createSlot(ontrack)
 
     // Login
-    await login(page)
+    await login(page, ontrack)
     // Going to the slot page
     const slotPage = new SlotPage(page, slot)
     await slotPage.goTo()
@@ -30,12 +29,12 @@ test('adding a branch pattern admission rule with default name', async ({page}) 
     })
 })
 
-test('adding a manual approval admission rule with default name', async ({page}) => {
+test('adding a manual approval admission rule with default name', async ({page, ontrack}) => {
     // Provisioning
-    const {slot} = await createSlot(ontrack())
+    const {slot} = await createSlot(ontrack)
 
     // Login
-    await login(page)
+    await login(page, ontrack)
     // Going to the slot page
     const slotPage = new SlotPage(page, slot)
     await slotPage.goTo()

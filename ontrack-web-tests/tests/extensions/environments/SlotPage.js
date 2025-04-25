@@ -1,4 +1,3 @@
-import {ui} from "@ontrack/connection";
 import {expect} from "@playwright/test";
 import {confirmBox} from "../../support/confirm";
 import {SlotBuilds} from "./SlotBuilds";
@@ -11,7 +10,7 @@ export class SlotPage {
     }
 
     async goTo() {
-        await this.page.goto(`${ui()}/extension/environments/slot/${this.slot.id}`)
+        await this.page.goto(`${this.slot.ontrack.connection.ui}/extension/environments/slot/${this.slot.id}`)
         await expect(this.page.getByText('Slot details', {exact: true})).toBeVisible()
         await expect(this.page.getByText(`Slot ${this.slot.environment.name} - ${this.slot.project.name}`, {exact: true})).toBeVisible()
     }

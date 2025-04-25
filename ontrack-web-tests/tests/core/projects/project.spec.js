@@ -9,7 +9,7 @@ const {waitUntilCondition} = require("../../support/timing");
 test('project creation', async ({page, ontrack}) => {
     await login(page, ontrack)
 
-    const homePage = new HomePage(page)
+    const homePage = new HomePage(page, ontrack)
     const projectName = generate("p-")
     await homePage.newProject({name: projectName})
 

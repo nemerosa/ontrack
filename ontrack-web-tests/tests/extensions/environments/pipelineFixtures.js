@@ -1,6 +1,5 @@
 import {graphQLCallMutation} from "@ontrack/graphql";
 import {gql} from "graphql-request";
-import {ontrack} from "@ontrack/ontrack";
 
 export const createPipeline = async ({
                                          project,
@@ -18,7 +17,7 @@ export const createPipeline = async ({
     const build = await branch.createBuild()
 
     const data = await graphQLCallMutation(
-        ontrack().connection,
+        slot.ontrack.connection,
         '',
         gql`
             mutation CreatePipeline(
@@ -57,7 +56,7 @@ export const createPipeline = async ({
         `,
         {
             slotId: slot.id,
-            buildId: build.id,
+            buildId: Number(build.id),
             forceDone,
             forceDoneMessage,
         }
