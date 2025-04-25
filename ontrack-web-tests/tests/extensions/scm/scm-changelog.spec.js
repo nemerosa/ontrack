@@ -1,25 +1,27 @@
 // @ts-check
-const {test, expect} = require('@playwright/test')
 const {login} = require("../../core/login");
 const {BranchPage} = require("../../core/branches/branch");
 const {provisionChangeLog, commits, issues} = require("./scm");
 const {generate, trimIndent} = require("@ontrack/utils");
 const {ontrack} = require("@ontrack/ontrack");
+const {test} = require("../../fixtures/connection");
 
 
 const doTestSCMChangeLog = async (
     page,
+    ontrack,
     issueServiceId = undefined,
     issueServiceIdentifier = undefined
 ) => {
     // Provisioning
     const {from, to, mockSCMContext, builds} = await provisionChangeLog(
+        ontrack,
         issueServiceId,
         issueServiceIdentifier,
     )
 
     // Login & going to the branch page
-    await login(page)
+    await login(page, ontrack)
     const branchPage = new BranchPage(page, from.branch)
     await branchPage.goTo()
 
@@ -77,8 +79,8 @@ const doTestSCMChangeLog = async (
 }
 
 
-test("SCM change log", async ({page}) => {
-    await doTestSCMChangeLog(page)
+test("SCM change log", async ({page, ontrack}) => {
+    await doTestSCMChangeLog(page, ontrack)
 })
 
 test('JIRA SCM change log', async ({page, context}) => {

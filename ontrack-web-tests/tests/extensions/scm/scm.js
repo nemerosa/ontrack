@@ -31,11 +31,12 @@ export const issues = {
 }
 
 export async function provisionChangeLog(
+    ontrack,
     issueServiceId = undefined,
     issueServiceIdentifier = undefined,
 ) {
-    const mockSCMContext = createMockSCMContext()
-    const project = await ontrack().createProject()
+    const mockSCMContext = createMockSCMContext(ontrack)
+    const project = await ontrack.createProject()
     await mockSCMContext.configureProjectForMockSCM(project, issueServiceIdentifier)
 
     const branch = await project.createBranch()
@@ -50,7 +51,7 @@ export async function provisionChangeLog(
         }
     }
 
-    const dependency = await ontrack().createProject()
+    const dependency = await ontrack.createProject()
     const depBranch = await dependency.createBranch()
     const depFrom = await depBranch.createBuild("3.0.1")
     const depTo = await depBranch.createBuild("3.0.4")
