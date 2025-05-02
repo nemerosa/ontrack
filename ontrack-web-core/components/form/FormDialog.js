@@ -76,17 +76,21 @@ export default function FormDialog({
         }
     }
 
+    const actualQuery = getActualQuery()
+
+    const formOnSuccess = (result) => {
+        dialog.setOpen(false)
+        form.resetFields()
+        if (dialog.onSuccess) {
+            dialog.onSuccess(result, dialog.context)
+        }
+    }
+
     const {mutate, loading, error} = useMutation(
-        getActualQuery(),
+        actualQuery,
         {
             userNodeName: getActualUserNode(),
-            onSuccess: (result) => {
-                dialog.setOpen(false)
-                form.resetFields()
-                if (dialog.onSuccess) {
-                    dialog.onSuccess(result, dialog.context)
-                }
-            }
+            onSuccess: formOnSuccess,
         }
     )
 
@@ -100,7 +104,11 @@ export default function FormDialog({
         if (dialog.prepareValues) {
             values = await dialog.prepareValues(values, dialog.context)
         }
-        await mutate(values)
+        if (actualQuery) {
+            await mutate(values)
+        } else {
+            formOnSuccess(values)
+        }
     }
 
     return (
