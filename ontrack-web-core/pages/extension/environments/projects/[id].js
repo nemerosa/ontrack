@@ -10,7 +10,7 @@ export default function ProjectEnvironmentsPage() {
         <>
             <main>
                 <MainLayout>
-                    <ProjectEnvironmentsView id={id}/>
+                    <ProjectEnvironmentsView id={Number(id)}/>
                 </MainLayout>
             </main>
         </>

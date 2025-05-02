@@ -10,7 +10,7 @@ export default function ProjectPage() {
         <>
             <main>
                 <MainLayout>
-                    <ProjectView id={id}/>
+                    <ProjectView id={Number(id)}/>
                 </MainLayout>
             </main>
         </>

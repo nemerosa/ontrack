@@ -16,7 +16,7 @@ export default function ProjectBuildSearchPage() {
     const router = useRouter()
     const {id} = router.query
 
-    const {project, loading: loadingProject} = useProject({id})
+    const {project, loading: loadingProject} = useProject({id: Number(id)})
 
     const {builds, setBuilds, search, loading: loadingBuilds} = useProjectBuildSearch({project})
 
@@ -58,7 +58,7 @@ export default function ProjectBuildSearchPage() {
                 pageTitle="Build search"
                 loading={loadingProject}
                 commands={[
-                    <CloseCommand key="close" href={projectUri({id})}/>,
+                    <CloseCommand key="close" href={projectUri({id: Number(id)})}/>,
                 ]}
                 breadcrumbs={[
                     ...downToProjectBreadcrumbs({project})

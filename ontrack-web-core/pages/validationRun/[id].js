@@ -10,7 +10,7 @@ export default function ValidationRunPage() {
         <>
             <main>
                 <MainLayout>
-                    <ValidationRunView id={id}/>
+                    <ValidationRunView id={Number(id)}/>
                 </MainLayout>
             </main>
         </>

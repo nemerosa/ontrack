@@ -10,7 +10,7 @@ export default function BranchPage() {
         <>
             <main>
                 <MainLayout>
-                    <BranchPageView id={id} key={router.asPath}/>
+                    <BranchPageView id={Number(id)} key={router.asPath}/>
                 </MainLayout>
             </main>
         </>

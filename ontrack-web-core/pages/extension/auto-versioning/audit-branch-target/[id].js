@@ -34,7 +34,7 @@ export default function AutoVersioningAuditBranchTargetPage() {
 
                     ${gqlBranchCommonFragment}
                 `,
-                {id}
+                {id: Number(id)}
             ).then(data => {
                 const branch = data.branch;
                 setBranch(branch)

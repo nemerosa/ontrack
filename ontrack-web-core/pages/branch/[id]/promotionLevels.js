@@ -10,7 +10,7 @@ export default function BranchPromotionLevelsPage() {
         <>
             <main>
                 <MainLayout>
-                    <BranchPromotionLevelsView id={id}/>
+                    <BranchPromotionLevelsView id={Number(id)}/>
                 </MainLayout>
             </main>
         </>

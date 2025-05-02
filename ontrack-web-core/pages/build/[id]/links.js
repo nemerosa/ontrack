@@ -10,7 +10,7 @@ export default function BuildLinksPage() {
         <>
             <main>
                 <MainLayout>
-                    <BuildLinksView id={id}/>
+                    <BuildLinksView id={Number(id)}/>
                 </MainLayout>
             </main>
         </>

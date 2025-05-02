@@ -12,7 +12,7 @@ export default function PromotionLevelPage() {
             <main>
                 <MainLayout>
                     <StoredChartOptionsCommandContextProvider id="promotion-charts">
-                        <PromotionLevelView id={id}/>
+                        <PromotionLevelView id={Number(id)}/>
                     </StoredChartOptionsCommandContextProvider>
                 </MainLayout>
             </main>
