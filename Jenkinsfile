@@ -309,10 +309,6 @@ pipeline {
 
         stage('Local Next UI tests') {
             when {
-                // TODO
-                expression {
-                    false
-                }
                 not {
                     branch 'master'
                 }
