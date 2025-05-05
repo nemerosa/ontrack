@@ -1,0 +1,48 @@
+{
+  "id": "ontrack",
+  "realm": "ontrack",
+  "enabled": true,
+  "registrationAllowed": true,
+  "resetPasswordAllowed": true,
+  "users": [
+    {
+      "username": "admin",
+      "enabled": true,
+      "email": "admin@ontrack.local",
+      "firstName": "Admin",
+      "lastName": "User",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin"
+        }
+      ],
+      "realmRoles": [
+        "default-roles-ontrack"
+      ]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "ontrack-client",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "baseUrl": "http://localhost:3000",
+      "redirectUris": [
+        "http://localhost:3000/api/auth/callback/oidc"
+      ],
+      "webOrigins": [
+        "http://localhost:3000"
+      ],
+      "directAccessGrantsEnabled": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "authorizationServicesEnabled": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "ontrack-client-secret"
+    }
+  ]
+}

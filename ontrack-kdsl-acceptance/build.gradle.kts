@@ -40,6 +40,15 @@ configure<ComposeExtension> {
         composeLogToFile.set(file("build/logs/kdsl-ldap/compose"))
         retainContainersOnStartupFailure.set(true)
     }
+    createNested("kdslOidc").apply {
+        useComposeFiles.addAll(listOf("${rootDir}/compose/docker-compose-kdsl-oidc.yml"))
+        setProjectName("kdsl-oidc")
+        // environment.put("ONTRACK_VERSION", project.version.toString())
+        captureContainersOutput.set(true)
+        captureContainersOutputToFiles.set(file("build/logs/kdsl-oidc/containers"))
+        composeLogToFile.set(file("build/logs/kdsl-oidc/compose"))
+        retainContainersOnStartupFailure.set(true)
+    }
 }
 
 val isCI = System.getenv("CI") == "true"
@@ -57,6 +66,10 @@ val kdslAcceptanceTestComposeDown by tasks.named("kdslAcceptanceTestComposeDown"
 
 tasks.named("kdslLdapComposeUp") {
     dependsOn(kdslAcceptanceTestComposeDown)
+}
+
+tasks.named("kdslOidcComposeUp") {
+    dependsOn("kdslLdapComposeDown")
 }
 
 // Restricting unit tests
