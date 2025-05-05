@@ -27,8 +27,17 @@ configure<ComposeExtension> {
         setProjectName("kdsl")
         // environment.put("ONTRACK_VERSION", project.version.toString())
         captureContainersOutput.set(true)
-        captureContainersOutputToFiles.set(file("build/logs/containers"))
-        composeLogToFile.set(file("build/logs/compose"))
+        captureContainersOutputToFiles.set(file("build/logs/kdsl/containers"))
+        composeLogToFile.set(file("build/logs/kdsl/compose"))
+        retainContainersOnStartupFailure.set(true)
+    }
+    createNested("kdslLdap").apply {
+        useComposeFiles.addAll(listOf("${rootDir}/compose/docker-compose-kdsl-ldap.yml"))
+        setProjectName("kdsl-ldap")
+        // environment.put("ONTRACK_VERSION", project.version.toString())
+        captureContainersOutput.set(true)
+        captureContainersOutputToFiles.set(file("build/logs/kdsl-ldap/containers"))
+        composeLogToFile.set(file("build/logs/kdsl-ldap/compose"))
         retainContainersOnStartupFailure.set(true)
     }
 }
@@ -45,6 +54,10 @@ val kdslAcceptanceTestComposeUp by tasks.named("kdslAcceptanceTestComposeUp") {
 // Post-acceptance tests: stopping the environment
 
 val kdslAcceptanceTestComposeDown by tasks.named("kdslAcceptanceTestComposeDown")
+
+tasks.named("kdslLdapComposeUp") {
+    dependsOn(kdslAcceptanceTestComposeDown)
+}
 
 // Restricting unit tests
 

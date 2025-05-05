@@ -6,7 +6,8 @@
   "scripts": {
     "playwright-install": "npx playwright install",
     "playwright-setup": "npx playwright install-deps",
-    "test": "npx playwright test --retries 3"
+    "test": "npx playwright test --retries 3",
+    "test-ldap": "npx playwright test --retries 3 tests/core/login.spec.js"
   },
   "keywords": [],
   "author": "",

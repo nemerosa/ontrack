@@ -10,6 +10,10 @@ const {defineConfig, devices} = require('@playwright/test');
 /**
  * @see https://playwright.dev/docs/test-configuration
  */
+
+const junitOutput = process.env.JUNIT_REPORT_PATH || 'reports/junit/report.xml';
+const htmlOutput = process.env.HTML_REPORT_PATH || 'reports/html';
+
 module.exports = defineConfig({
     testDir: './tests',
     /* Run tests in files in parallel */
@@ -23,8 +27,8 @@ module.exports = defineConfig({
     // workers: process.env.CI ? 1 : undefined,
     /* Reporter to use. See https://playwright.dev/docs/test-reporters */
     reporter: [
-        ['junit', {outputFile: 'reports/junit/report.xml'}],
-        ['html', {outputFolder: 'reports/html'}],
+        ['junit', {outputFile: junitOutput}],
+        ['html', {outputFolder: htmlOutput}],
     ],
     /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
     use: {

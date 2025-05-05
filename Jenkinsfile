@@ -325,7 +325,7 @@ pipeline {
                             --stacktrace \\
                             --console plain \\
                             --parallel \\
-                            :ontrack-web-tests:uiTest
+                            :ontrack-web-tests:uiTests
                         '''
                 }
             }
@@ -333,15 +333,12 @@ pipeline {
                 always {
                     ontrackCliValidateTests(
                             stamp: 'PLAYWRIGHT',
-                            pattern: 'ontrack-web-tests/reports/junit/*.xml',
+                            pattern: 'ontrack-web-tests/reports/*/junit/*.xml',
                     )
                 }
                 failure {
-                    script {
-                        sh 'mv ontrack-kdsl-acceptance/build/logs ontrack-kdsl-acceptance/build/logs-ui'
-                    }
-                    archiveArtifacts(artifacts: "ontrack-kdsl-acceptance/build/logs-ui/**", allowEmptyArchive: true)
-                    archiveArtifacts(artifacts: "ontrack-web-tests/reports/html/**", allowEmptyArchive: true)
+                    archiveArtifacts(artifacts: "ontrack-kdsl-acceptance/build/logs/**", allowEmptyArchive: true)
+                    archiveArtifacts(artifacts: "ontrack-web-tests/reports/*/html/**", allowEmptyArchive: true)
                 }
             }
         }
