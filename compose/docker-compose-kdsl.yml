@@ -96,7 +96,10 @@ services:
       SPRING_RABBITMQ_PASSWORD: ontrack
 
       # Authentication
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/ontrack
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://localhost:8008/realms/ontrack
+      # We need to skip the host verification (keycloak vs. localhost)
+      # DO NOT USE IN PRODUCTION
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/realms/ontrack/protocol/openid-connect/certs
 
       ############################################################
       # Configuration for the tests
