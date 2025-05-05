@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.service.elasticsearch
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient
+import co.elastic.clients.elasticsearch._types.ElasticsearchException
 import co.elastic.clients.elasticsearch._types.mapping.Property
 import co.elastic.clients.elasticsearch._types.mapping.PropertyBase
 import co.elastic.clients.elasticsearch.core.BulkRequest
@@ -74,7 +75,7 @@ class ElasticSearchIndexService(
 
             try {
                 client.indices().create(request)
-            } catch (ex: ElasticSearchException) {
+            } catch (ex: ElasticsearchException) {
                 if (ontrackConfigProperties.search.index.ignoreExisting) {
                     logger.info("[elasticsearch][index][${indexer.indexName}] Cannot create index because already existing. Ignoring issue (likely happens during test).")
                 } else {
