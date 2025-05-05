@@ -36,6 +36,8 @@ services:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
       KC_HOSTNAME: http://localhost:8008
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: true
+      KC_HOSTNAME_STRICT: false
     ports:
       - "8008:8080"
     command:
@@ -119,7 +121,7 @@ services:
       - "3000:3000"
     environment:
       ONTRACK_URL: http://ontrack:8080
-      NEXTAUTH_SECRET: d18828b20e2a036cc3091959f13bdc080314ff5c3bae410a
+      NEXTAUTH_SECRET: d18828b20e2a036cc3091959f13bdc080314ff5c3bae41
       NEXTAUTH_URL: http://localhost:3000
       NEXTAUTH_ISSUER: http://keycloak:8080/realms/ontrack
       NEXTAUTH_CLIENT_ID: ontrack-client
