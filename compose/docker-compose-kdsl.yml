@@ -1,5 +1,3 @@
-version: "2.1"
-
 services:
 
   # Database
@@ -37,6 +35,7 @@ services:
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HOSTNAME: http://localhost:8008
     ports:
       - "8008:8080"
     command:
@@ -94,6 +93,9 @@ services:
       SPRING_RABBITMQ_USERNAME: ontrack
       SPRING_RABBITMQ_PASSWORD: ontrack
 
+      # Authentication
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/ontrack
+
       ############################################################
       # Configuration for the tests
       ############################################################
@@ -110,3 +112,21 @@ services:
       ONTRACK_INFLUXDB_URI: http://influxdb:8086
       # ... Jira in mock mode
       ONTRACK_EXTENSION_JIRA_CLIENT_TYPE: mock
+
+  ui:
+    image: "nemerosa/ontrack-ui:${ONTRACK_VERSION:-latest}"
+    ports:
+      - "3000:3000"
+    environment:
+      ONTRACK_URL: http://ontrack:8080
+      NEXTAUTH_SECRET: d18828b20e2a036cc3091959f13bdc080314ff5c3bae410a
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_ISSUER: http://keycloak:8080/realms/ontrack
+      NEXTAUTH_CLIENT_ID: ontrack-client
+      NEXTAUTH_CLIENT_SECRET: ontrack-client-secret
+      NEXTAUTH_ACCOUNT_URL: http://localhost:8008/realms/ontrack/account
+    depends_on:
+      ontrack:
+        condition: service_started
+      keycloak:
+        condition: service_started
