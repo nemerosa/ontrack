@@ -1,3 +1,6 @@
+import net.nemerosa.versioning.VersioningExtension
+import org.springframework.boot.gradle.dsl.SpringBootExtension
+
 plugins {
     `java-library`
     id("com.google.cloud.tools.jib")
@@ -82,6 +85,22 @@ dependencies {
     runtimeOnly(project(":ontrack-extension-queue"))
     runtimeOnly(project(":ontrack-extension-workflows"))
     runtimeOnly(project(":ontrack-extension-environments"))
+}
+
+configure<SpringBootExtension> {
+    val info = rootProject.extensions.getByName<VersioningExtension>("versioning").info
+    buildInfo {
+        properties {
+            time = null
+            additional = mapOf(
+                "full" to info.full,
+                "branch" to info.branch,
+                "build" to info.build,
+                "commit" to info.commit,
+                "dirty" to info.dirty,
+            )
+        }
+    }
 }
 
 val isMacOS = System.getProperty("os.name").lowercase().contains("mac")
