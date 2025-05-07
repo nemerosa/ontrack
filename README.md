@@ -74,7 +74,7 @@ helm delete ontrack
 This installs 4 services:
 
 * Ontrack itself
-* a Postgres 15 database
+* a Postgres 17 database
 * an Elasticsearch 7 single node
 * a RabbitMQ message broker
 
@@ -88,6 +88,7 @@ On a local machine, you can start Ontrack using Docker Compose:
 
 ```bash
 curl -fsSLO https://raw.githubusercontent.com/nemerosa/ontrack/master/compose/docker-compose.yml
+curl -fsSL https://raw.githubusercontent.com/nemerosa/ontrack/master/compose/keycloak/import/dev/ontrack.json --output keycloak/import/dev/ontrack.json
 docker compose up -d
 ```
 
