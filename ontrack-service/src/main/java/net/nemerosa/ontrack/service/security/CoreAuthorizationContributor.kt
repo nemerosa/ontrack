@@ -8,6 +8,8 @@ class CoreAuthorizationContributor : AuthorizationContributor {
 
     companion object {
         const val GLOBAL = "global"
+        const val ACCOUNTS = "accounts"
+        const val ACCOUNT_GROUPS = "account_groups"
         const val PROJECT = "project"
         const val BRANCH = "branch"
         const val PROMOTION_LEVEL = "promotion_level"
@@ -24,6 +26,17 @@ class CoreAuthorizationContributor : AuthorizationContributor {
                 GLOBAL,
                 Authorization.SETTINGS,
                 user.isGranted(GlobalSettings::class.java)
+            ),
+            // Account management
+            Authorization(
+                name = ACCOUNTS,
+                action = Authorization.CONFIG,
+                authorized = user.isGranted(AccountManagement::class.java)
+            ),
+            Authorization(
+                name = ACCOUNT_GROUPS,
+                action = Authorization.CONFIG,
+                authorized = user.isGranted(AccountGroupManagement::class.java)
             ),
             // Project
             Authorization(

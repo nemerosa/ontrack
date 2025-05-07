@@ -25,6 +25,7 @@ import {
     FaStamp,
     FaTag,
     FaUser,
+    FaUsers,
     FaWrench
 } from "react-icons/fa";
 import {MainLayoutContext} from "@components/layouts/MainLayout";
@@ -67,6 +68,7 @@ export default function UserMenu({userMenu}) {
     const itemIcons = {
         'core/config/predefined-promotion-levels': <FaMedal/>,
         'core/config/predefined-validation-stamps': <FaStamp/>,
+        'core/admin/account-management': <FaUsers/>,
         'core/admin/jobs': <FaCogs/>,
         'core/admin/settings': <FaWrench/>,
         'extension/jenkins/configurations': <FaJenkins/>,

@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.boot.ui
 import net.nemerosa.ontrack.extension.api.UserMenuItemExtension
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.extension.support.CoreExtensionFeature
+import net.nemerosa.ontrack.model.security.AccountManagement
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.security.isGlobalFunctionGranted
@@ -18,6 +19,7 @@ class CoreUserMenuItemExtension(
     override val items: List<UserMenuItem>
         get() {
             val globalSettings = securityService.isGlobalFunctionGranted<GlobalSettings>()
+            val accountManagement = securityService.isGlobalFunctionGranted<AccountManagement>()
 
             val items = mutableListOf<UserMenuItem>()
 
@@ -52,6 +54,15 @@ class CoreUserMenuItemExtension(
                     extension = "core/admin",
                     id = "jobs",
                     name = "Background jobs",
+                )
+            }
+
+            if (accountManagement) {
+                items += UserMenuItem(
+                    groupId = CoreUserMenuGroups.SYSTEM,
+                    extension = "core/admin",
+                    id = "account-management",
+                    name = "Account management",
                 )
             }
 
