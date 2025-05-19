@@ -62,8 +62,9 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
     @Autowired
     private lateinit var securityTestSupport: SecurityTestSupport
 
-    protected fun doCreateAccountGroup(): AccountGroup {
-        val name = uid("G")
+    protected fun doCreateAccountGroup(
+        name: String = uid("G"),
+    ): AccountGroup {
         return accountService.createGroup(
             AccountGroupInput(name, "")
         )
@@ -75,10 +76,10 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
 
     protected fun doCreateAccount(
         accountGroups: List<AccountGroup> = emptyList(),
+        name: String = uid("A"),
         disabled: Boolean = false,
         locked: Boolean = false,
     ): Account {
-        val name = uid("A")
         return accountService.create(
             AccountInput(
                 name,

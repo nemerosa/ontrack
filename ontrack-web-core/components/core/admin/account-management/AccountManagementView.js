@@ -14,6 +14,7 @@ import AccountTokens from "@components/core/admin/account-management/AccountToke
 import EditAccountCommand from "@components/core/admin/account-management/EditAccountCommand";
 import DeleteAccountCommand from "@components/core/admin/account-management/DeleteAccountCommand";
 import RevokeAllTokensCommand from "@components/core/admin/account-management/RevokeAllTokensCommand";
+import GlobalPermissionsCommand from "@components/core/admin/account-management/GlobalPermissionsCommand";
 
 export default function AccountManagementView() {
 
@@ -35,6 +36,7 @@ export default function AccountManagementView() {
                 title="Account management"
                 breadcrumbs={homeBreadcrumbs()}
                 commands={[
+                    <GlobalPermissionsCommand key="permissions"/>,
                     <AccountGroupsCommand key="groups"/>,
                     <RevokeAllTokensCommand key="revoke" refresh={refresh}/>,
                     <CloseCommand key="close" href={homeUri()}/>,
