@@ -5,6 +5,7 @@ import {UserContext} from "@components/providers/UserProvider";
 import {FaRegUser} from "react-icons/fa";
 import HomeLink from "@components/common/HomeLink";
 import NavBarSearch from "@components/search/NavBarSearch";
+import Image from "next/image";
 
 const {Text} = Typography;
 
@@ -28,27 +29,24 @@ export default function NavBar() {
             <div style={{
                 display: 'flex',
                 justifyContent: 'space-between',
-                alignItems: 'center'
+                alignItems: 'center',
             }}>
                 <Space direction="horizontal" size={16}>
                     <HomeLink
                         text={
-                            <img
-                                src={`/ui/ontrack-128.png`}
-                                alt="Ontrack Logo"
+                            <Image
+                                src={`/yontrack-logo.svg`}
+                                alt="Yontrack Logo"
                                 width={24}
                                 height={24}
                             />
                         }
                     />
-                    <HomeLink
-                        text={
-                            <Text
-                                style={{color: "white", fontSize: '175%', verticalAlign: 'middle'}}
-                            >
-                                Ontrack
-                            </Text>
-                        }
+                    <Image
+                        src={`/yontrack-text.svg`}
+                        alt="Yontrack test"
+                        width={120}
+                        height={24}
                     />
                 </Space>
                 <Space direction="horizontal" size={8}>
