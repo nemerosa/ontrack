@@ -44,7 +44,7 @@ export default function NavBar() {
                     />
                     <Image
                         src={`/yontrack-text.svg`}
-                        alt="Yontrack test"
+                        alt="Yontrack"
                         width={120}
                         height={24}
                     />
