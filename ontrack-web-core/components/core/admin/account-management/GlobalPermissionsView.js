@@ -8,18 +8,46 @@ import AccountManagementLink, {
 import {CloseCommand} from "@components/common/Commands";
 import {Button, Form, Space, Table} from "antd";
 import {useRefresh} from "@components/common/RefreshUtils";
-import {useGlobalPermissions} from "@components/core/admin/account-management/GlobalPermissionsService";
+import {
+    useGlobalPermissions,
+    useMutationAddGlobalPermissionToAccount,
+    useMutationAddGlobalPermissionToAccountGroup
+} from "@components/core/admin/account-management/GlobalPermissionsService";
 import GlobalRole from "@components/core/admin/account-management/GlobalRole";
 import PermissionTarget from "@components/core/admin/account-management/PermissionTarget";
 import TableFormSection from "@components/common/table/TableFormSection";
 import {FaPlus} from "react-icons/fa";
 import SelectGlobalRole from "@components/core/admin/account-management/SelectGlobalRole";
 import SelectPermissionTarget from "@components/core/admin/account-management/SelectPermissionTarget";
+import DeleteGlobalPermissionCommand from "@components/core/admin/account-management/DeleteGlobalPermissionCommand";
 
 export default function GlobalPermissionsView() {
 
     const [refreshState, refresh] = useRefresh()
     const {globalPermissions, loading} = useGlobalPermissions({refreshState})
+
+    const [form] = Form.useForm()
+
+    const {
+        addGlobalPermissionToAccount,
+        loading: loadingAccount
+    } = useMutationAddGlobalPermissionToAccount({onSuccess: refresh})
+    const {
+        addGlobalPermissionToAccountGroup,
+        loading: loadingAccountGroup
+    } = useMutationAddGlobalPermissionToAccountGroup({onSuccess: refresh})
+
+    const onCreate = async (values) => {
+        const [type, id] = values.target.split("-")
+        const role = values.role
+        if (type === 'ACCOUNT') {
+            await addGlobalPermissionToAccount({accountId: id, role})
+            form.resetFields()
+        } else if (type === 'GROUP') {
+            await addGlobalPermissionToAccountGroup({accountGroupId: id, role})
+            form.resetFields()
+        }
+    }
 
     return (
         <>
@@ -39,7 +67,9 @@ export default function GlobalPermissionsView() {
                 <Space direction="vertical" className="ot-line">
                     <TableFormSection>
                         <Form
+                            form={form}
                             layout="inline"
+                            onFinish={onCreate}
                         >
                             <Form.Item
                                 name="target"
@@ -56,6 +86,7 @@ export default function GlobalPermissionsView() {
                             <Button
                                 type="primary"
                                 htmlType="submit"
+                                loading={loadingAccount || loadingAccountGroup}
                             >
                                 <Space>
                                     <FaPlus/>
@@ -82,6 +113,9 @@ export default function GlobalPermissionsView() {
                         <Table.Column
                             key="actions"
                             title="Actions"
+                            render={(_, globalPermission) =>
+                                    <DeleteGlobalPermissionCommand globalPermission={globalPermission} refresh={refresh}/>
+                            }
                         />
                     </Table>
                 </Space>
