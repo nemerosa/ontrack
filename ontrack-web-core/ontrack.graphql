@@ -2462,6 +2462,14 @@ type GitUICommit {
   timestamp: LocalDateTime!
 }
 
+"Granted global permission"
+type GlobalPermission {
+  "Granted global role"
+  role: GlobalRole!
+  "Target the permission is assigned to"
+  target: PermissionTarget!
+}
+
 type GlobalRole {
   "List of accounts having this role"
   accounts: [Account!]!
@@ -4879,6 +4887,18 @@ type PayloadUserError {
   message: String!
 }
 
+"PermissionTarget"
+type PermissionTarget {
+  "description field"
+  description: String
+  "id field"
+  id: Int
+  "name field"
+  name: String!
+  "type field"
+  type: PermissionTargetType!
+}
+
 "Output type for the postQueue mutation."
 type PostQueuePayload implements Payload {
   "List of errors"
@@ -5757,6 +5777,8 @@ type Query {
   ): OntrackGitIssueInfo
   "List of global messages"
   globalMessages: [Message!]!
+  "List of global permissions"
+  globalPermissions: [GlobalPermission!]!
   "List of global security roles"
   globalRoles(
     "Filter by role name"
@@ -5869,6 +5891,11 @@ type Query {
   ): NotificationRecordPaginated
   "Notification settings"
   notificationSettings: NotificationSettings
+  "List of permission targets"
+  permissionTargets(
+    "Part of the name of the permission target to look for"
+    token: String
+  ): [PermissionTarget!]!
   "Basic test service"
   ping: String
   "Predefined promotion level by ID"
@@ -8554,6 +8581,12 @@ enum NotificationResultType {
   OK
   ONGOING
   TIMEOUT
+}
+
+"Target for a permission assignment"
+enum PermissionTargetType {
+  ACCOUNT
+  GROUP
 }
 
 "Project entity type"

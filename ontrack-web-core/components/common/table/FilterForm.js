@@ -1,5 +1,6 @@
-import {Button, Card, Form, Space} from "antd";
+import {Button, Form, Space} from "antd";
 import {FaBan, FaFilter} from "react-icons/fa";
+import TableFormSection from "@components/common/table/TableFormSection";
 
 export default function FilterForm({setFilterFormData, onFilterFormValuesChanged, filterForm, filterExtraButtons}) {
 
@@ -16,10 +17,7 @@ export default function FilterForm({setFilterFormData, onFilterFormValuesChanged
 
     return (
         <>
-            <Card
-                size="small"
-                className="ot-well"
-            >
+            <TableFormSection>
                 <Form
                     layout="inline"
                     onFinish={onFilterFormFinish}
@@ -54,7 +52,7 @@ export default function FilterForm({setFilterFormData, onFilterFormValuesChanged
                     {/* Extra buttons */}
                     {filterExtraButtons}
                 </Form>
-            </Card>
+            </TableFormSection>
         </>
     )
 }

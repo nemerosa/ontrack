@@ -6,9 +6,21 @@ import AccountManagementLink, {
     accountManagementUri
 } from "@components/core/admin/account-management/AccountManagementLink";
 import {CloseCommand} from "@components/common/Commands";
-import {Space} from "antd";
+import {Button, Form, Space, Table} from "antd";
+import {useRefresh} from "@components/common/RefreshUtils";
+import {useGlobalPermissions} from "@components/core/admin/account-management/GlobalPermissionsService";
+import GlobalRole from "@components/core/admin/account-management/GlobalRole";
+import PermissionTarget from "@components/core/admin/account-management/PermissionTarget";
+import TableFormSection from "@components/common/table/TableFormSection";
+import {FaPlus} from "react-icons/fa";
+import SelectGlobalRole from "@components/core/admin/account-management/SelectGlobalRole";
+import SelectPermissionTarget from "@components/core/admin/account-management/SelectPermissionTarget";
 
 export default function GlobalPermissionsView() {
+
+    const [refreshState, refresh] = useRefresh()
+    const {globalPermissions, loading} = useGlobalPermissions({refreshState})
+
     return (
         <>
             <Head>
@@ -25,6 +37,53 @@ export default function GlobalPermissionsView() {
                 ]}
             >
                 <Space direction="vertical" className="ot-line">
+                    <TableFormSection>
+                        <Form
+                            layout="inline"
+                        >
+                            <Form.Item
+                                name="target"
+                                rules={[{required: true, message: 'Target is required'}]}
+                            >
+                                <SelectPermissionTarget/>
+                            </Form.Item>
+                            <Form.Item
+                                name="role"
+                                rules={[{required: true, message: 'Role is required'}]}
+                            >
+                                <SelectGlobalRole/>
+                            </Form.Item>
+                            <Button
+                                type="primary"
+                                htmlType="submit"
+                            >
+                                <Space>
+                                    <FaPlus/>
+                                    Add permission
+                                </Space>
+                            </Button>
+                        </Form>
+                    </TableFormSection>
+                    <Table
+                        dataSource={globalPermissions}
+                        loading={loading}
+                        pagination={false}
+                    >
+                        <Table.Column
+                            key="name"
+                            title="Name"
+                            render={(_, globalPermission) => <PermissionTarget target={globalPermission.target}/>}
+                        />
+                        <Table.Column
+                            key="role"
+                            title="Role"
+                            render={(_, globalPermission) => <GlobalRole role={globalPermission.role}/>}
+                        />
+                        <Table.Column
+                            key="actions"
+                            title="Actions"
+                        />
+                    </Table>
                 </Space>
             </MainPage>
         </>
