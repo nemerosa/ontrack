@@ -21,9 +21,9 @@ class SecurityTestSupport(
     private val accountService: AccountService,
     private val tokensService: TokensService,
     private val ontrackConfigProperties: OntrackConfigProperties,
-    private val accountACLService: AccountACLService,
     private val accountGroupRepository: AccountGroupRepository,
     private val accountRepository: AccountRepository,
+    private val authenticationUserService: AuthenticationUserService,
 ) {
 
     fun setupSecurityContext(
@@ -61,11 +61,7 @@ class SecurityTestSupport(
     }
 
     fun createOntrackAuthenticatedUser(account: Account): AuthenticatedUser =
-        AccountAuthenticatedUser(
-            account = account,
-            authorisations = accountACLService.getAuthorizations(account),
-            groups = accountACLService.getGroups(account),
-        )
+        authenticationUserService.createAuthenticatedUser(account)
 
     fun provisionToken(): String {
         val accountName = securityService.currentUser?.name

@@ -4,6 +4,9 @@ class AccountAuthenticatedUser(
     override val account: Account,
     val authorisations: Authorisations,
     override val groups: List<AuthorizedGroup>,
+    override val assignedGroups: List<AccountGroup>,
+    override val mappedGroups: List<AccountGroup>,
+    override val idpGroups: List<String>,
 ) : AuthenticatedUser {
 
     override fun isGranted(fn: Class<out GlobalFunction>): Boolean =

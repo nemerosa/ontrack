@@ -76,15 +76,14 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
 
     protected fun doCreateAccount(
         accountGroups: List<AccountGroup> = emptyList(),
-        name: String = uid("A"),
-        disabled: Boolean = false,
-        locked: Boolean = false,
+        email: String = "${uid("A")}@test.com",
+        name: String = email,
     ): Account {
         return accountService.create(
             AccountInput(
                 name,
                 "Test $name",
-                "$name@test.com",
+                email,
                 accountGroups.map { it.id() },
             )
         )

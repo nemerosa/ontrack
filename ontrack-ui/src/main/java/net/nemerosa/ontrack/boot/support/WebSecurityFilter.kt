@@ -79,7 +79,11 @@ class WebSecurityFilter(
                 fullName = email
             }
             if (debug) log.debug("JWT full name {}", fullName)
-            return accountLoginService.login(email, fullName)
+
+            val groups = jwtAuthenticationToken.token.getClaim<List<String>>("groups")
+                ?: emptyList()
+
+            return accountLoginService.login(email, fullName, groups)
         }
     }
 

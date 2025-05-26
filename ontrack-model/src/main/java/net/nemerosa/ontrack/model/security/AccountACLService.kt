@@ -6,7 +6,10 @@ interface AccountACLService {
 
     fun getAuthorizations(account: Account): Authorisations
 
-    fun getGroups(account: Account): List<AuthorizedGroup>
+    /**
+     * Getting the authorized groups for a list of groups
+     */
+    fun getAuthorizedGroups(groups: List<AccountGroup>): List<AuthorizedGroup>
 
     /**
      * List of [project functions][ProjectFunction] which are automatically assigned to authenticated users.

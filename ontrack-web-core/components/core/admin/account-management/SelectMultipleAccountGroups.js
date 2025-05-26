@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import {useAccountGroups} from "@components/core/admin/account-management/AccountManagementService";
 import {Select} from "antd";
 
-export default function SelectMultipleAccountGroups({id, value, onChange}) {
+export default function SelectMultipleAccountGroups({id, value, onChange, mode = "multiple"}) {
 
     const [name, setName] = useState('')
     const {groups, loading} = useAccountGroups({name})
@@ -49,7 +49,10 @@ export default function SelectMultipleAccountGroups({id, value, onChange}) {
                 onClear={handleClear}
                 notFoundContent={null}
                 options={options}
-                mode="multiple"
+                mode={mode}
+                style={{
+                    width: '16em',
+                }}
             />
         </>
     )

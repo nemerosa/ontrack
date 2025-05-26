@@ -2507,6 +2507,14 @@ type GrantGlobalRoleToAccountPayload implements Payload {
   errors: [UserError]
 }
 
+"Mapping between an IdP group and a Yontrack group"
+type GroupMapping {
+  "Yontrack group"
+  group: AccountGroup!
+  "IdP group name"
+  idpGroup: String!
+}
+
 "Home page settings"
 type HomePageSettingsType {
   "Maximum of branches to display per favorite project"
@@ -3369,6 +3377,12 @@ type LockAccountPayload implements Payload {
   errors: [UserError]
 }
 
+"Output type for the mapGroup mutation."
+type MapGroupPayload implements Payload {
+  "List of errors"
+  errors: [UserError]
+}
+
 "Message"
 type Message {
   "content field"
@@ -4091,6 +4105,11 @@ type Mutation {
     "Input for the mutation"
     input: LockAccountInput
   ): LockAccountPayload
+  "Maps an identity provider group to a Yontrack group"
+  mapGroup(
+    "Input for the mutation"
+    input: MapGroupInput
+  ): MapGroupPayload
   "Overriding a rule into a pipeline"
   overridePipelineRule(
     "Input for the mutation"
@@ -5817,6 +5836,8 @@ type Query {
     "Filter by role name"
     role: String
   ): [GlobalRole!]!
+  "List of mappings between IdP groups and Yontrack groups"
+  groupMappings: [GroupMapping!]!
   "Information for the hook record query filter"
   hookRecordFilterInfo: HookRecordFilterInfo!
   "List of recordings for hook messages"
@@ -10246,6 +10267,14 @@ input LinksBuildInputItem {
 input LockAccountInput {
   "ID of the account"
   id: Int!
+}
+
+"Input type for the mapGroup mutation."
+input MapGroupInput {
+  "groupId field"
+  groupId: Int
+  "idpGroup field"
+  idpGroup: String!
 }
 
 "Meta information property"

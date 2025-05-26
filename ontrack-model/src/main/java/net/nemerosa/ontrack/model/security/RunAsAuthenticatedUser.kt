@@ -18,6 +18,10 @@ class RunAsAuthenticatedUser private constructor(
     override val groups: List<AuthorizedGroup> =
         authenticatedUser?.groups ?: emptyList()
 
+    override val assignedGroups: List<AccountGroup> = authenticatedUser?.assignedGroups ?: emptyList()
+    override val mappedGroups: List<AccountGroup> = authenticatedUser?.mappedGroups ?: emptyList()
+    override val idpGroups: List<String> = authenticatedUser?.idpGroups ?: emptyList()
+
     companion object {
 
         private fun runAsUser(authenticatedUser: AuthenticatedUser?) = RunAsAuthenticatedUser(

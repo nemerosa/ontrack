@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class AuthenticationUserServiceImpl(
     private val accountACLService: AccountACLService,
+    private val accountGroupService: AccountGroupService,
 ) : AuthenticationUserService {
 
     override fun asUser(account: Account) {
@@ -21,11 +22,16 @@ class AuthenticationUserServiceImpl(
     }
 
 
-    private fun createAuthenticatedUser(account: Account): AccountAuthenticatedUser {
+    override fun createAuthenticatedUser(account: Account): AccountAuthenticatedUser {
+        val (assignedGroups, mappedGroups, idpGroups) = accountGroupService.getAccountGroups(account)
+        val groups = (assignedGroups + mappedGroups).distinctBy { it.id() }
         return AccountAuthenticatedUser(
             account = account,
             authorisations = accountACLService.getAuthorizations(account),
-            groups = accountACLService.getGroups(account),
+            groups = accountACLService.getAuthorizedGroups(groups),
+            assignedGroups = assignedGroups,
+            mappedGroups = mappedGroups,
+            idpGroups = idpGroups,
         )
     }
 }

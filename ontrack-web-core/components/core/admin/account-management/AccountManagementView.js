@@ -15,6 +15,7 @@ import EditAccountCommand from "@components/core/admin/account-management/EditAc
 import DeleteAccountCommand from "@components/core/admin/account-management/DeleteAccountCommand";
 import RevokeAllTokensCommand from "@components/core/admin/account-management/RevokeAllTokensCommand";
 import GlobalPermissionsCommand from "@components/core/admin/account-management/GlobalPermissionsCommand";
+import GroupMappingsCommand from "@components/core/admin/account-management/GroupMappingsCommand";
 
 export default function AccountManagementView() {
 
@@ -38,6 +39,7 @@ export default function AccountManagementView() {
                 commands={[
                     <GlobalPermissionsCommand key="permissions"/>,
                     <AccountGroupsCommand key="groups"/>,
+                    <GroupMappingsCommand key="mappings"/>,
                     <RevokeAllTokensCommand key="revoke" refresh={refresh}/>,
                     <CloseCommand key="close" href={homeUri()}/>,
                 ]}

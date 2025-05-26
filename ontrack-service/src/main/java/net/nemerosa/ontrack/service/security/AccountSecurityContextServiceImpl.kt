@@ -8,14 +8,10 @@ import org.springframework.stereotype.Service
 
 @Service
 class AccountSecurityContextServiceImpl(
-    private val accountACLService: AccountACLService,
+    private val authenticationUserService: AuthenticationUserService,
 ) : AccountSecurityContextService {
     override fun withAccount(account: Account, code: () -> Unit) {
-        val user = AccountAuthenticatedUser(
-            account = account,
-            authorisations = accountACLService.getAuthorizations(account),
-            groups = accountACLService.getGroups(account),
-        )
+        val user = authenticationUserService.createAuthenticatedUser(account)
         val authentication = AuthenticatedUserAuthentication(
             authenticatedUser = user,
             authorities = AuthorityUtils.createAuthorityList(SecurityRole.USER.name),

@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.model.dashboards.DashboardSharing
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.settings.SecuritySettings
-import net.nemerosa.ontrack.repository.AccountGroupRepository
 import net.nemerosa.ontrack.repository.RoleRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -18,8 +17,6 @@ class AccountACLServiceImpl(
     private val cachedSettingsService: CachedSettingsService,
     private val roleRepository: RoleRepository,
     private val rolesService: RolesService,
-    private val accountGroupRepository: AccountGroupRepository,
-    private val accountGroupContributors: List<AccountGroupContributor>,
 ) : AccountACLService {
 
     override fun getAuthorizations(account: Account): Authorisations {
@@ -68,32 +65,13 @@ class AccountACLServiceImpl(
             return functions.toSet()
         }
 
-    override fun getGroups(account: Account): List<AuthorizedGroup> {
-        // List of authenticated groups
-        val groups = mutableListOf<AuthorizedGroup>()
-        // Authorisations from groups
-        groups.addAll(
-            accountGroupRepository.findByAccount(account.id()).map {
-                AuthorizedGroup(
-                    group = it,
-                    authorisations = getGroupACL(it)
-                )
-            }
-        )
-        // Authorisations from groups contributors
-        groups.addAll(
-            accountGroupContributors.flatMap { contributor ->
-                contributor.collectGroups(account)
-            }.map { group ->
-                AuthorizedGroup(
-                    group = group,
-                    authorisations = getGroupACL(group)
-                )
-            }
-        )
-        // OK
-        return groups
-    }
+    override fun getAuthorizedGroups(groups: List<AccountGroup>): List<AuthorizedGroup> =
+        groups.map {
+            AuthorizedGroup(
+                group = it,
+                authorisations = getGroupACL(it)
+            )
+        }
 
     private fun getGroupACL(group: AccountGroup): Authorisations =
         Authorisations()
