@@ -3,6 +3,11 @@ objectClass: top
 objectClass: organizationalUnit
 ou: users
 
+dn: ou=groups,dc=nemerosa,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: groups
+
 dn: uid=admin,ou=users,dc=nemerosa,dc=com
 objectClass: inetOrgPerson
 objectClass: organizationalPerson
@@ -13,3 +18,19 @@ cn: Administrator
 sn: Administrator
 mail: admin@ontrack.local
 userPassword: {SSHA}cqhYu0IJNPgwklQuoENm6PtzGJLpPkgt
+
+dn: uid=demo,ou=users,dc=nemerosa,dc=com
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+uid: demo
+cn: Demo User
+sn: User
+mail: demo@ontrack.local
+userPassword: {SSHA}PlR40MKxhPR2dc2j0Iv/bN9Rd20/9k5u
+
+dn: cn=ReadOnly,ou=groups,dc=nemerosa,dc=com
+objectClass: groupOfNames
+cn: ReadOnly
+member: uid=demo,ou=users,dc=nemerosa,dc=com
