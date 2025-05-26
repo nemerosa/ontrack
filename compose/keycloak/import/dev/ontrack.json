@@ -4,6 +4,8 @@
   "enabled": true,
   "registrationAllowed": true,
   "resetPasswordAllowed": true,
+  "ssoSessionIdleTimeout": 3600,
+  "accessTokenLifespan": 3600,
   "users": [
     {
       "username": "admin",
