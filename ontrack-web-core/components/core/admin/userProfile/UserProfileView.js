@@ -7,6 +7,7 @@ import {homeUri} from "@components/common/Links";
 import {CloseCommand} from "@components/common/Commands";
 import PageSection from "@components/common/PageSection";
 import UserAccountCommand from "@components/core/admin/userProfile/UserAccountCommand";
+import UserProfileGroups from "@components/core/admin/userProfile/UserProfileGroups";
 
 export default function UserProfileView() {
     return (
@@ -24,6 +25,9 @@ export default function UserProfileView() {
             >
                 <PageSection title="API tokens" padding={true}>
                     <UserProfileTokens/>
+                </PageSection>
+                <PageSection title="Groups" padding={true}>
+                    <UserProfileGroups/>
                 </PageSection>
             </MainPage>
         </>

@@ -7910,6 +7910,12 @@ type User {
   account: Account
   "Actions for a RootUser"
   actions: RootUserActions @deprecated(reason : "Will be removed in V5. User `userMenuActions` instead.")
+  "List of groups the user is assigned to"
+  assignedGroups: [AccountGroup!]!
+  "idpGroups field"
+  idpGroups: [String!]!
+  "List of groups that have been mapped to the user from their IdP groups"
+  mappedGroups: [AccountGroup!]!
 }
 
 "Representation of an error."
