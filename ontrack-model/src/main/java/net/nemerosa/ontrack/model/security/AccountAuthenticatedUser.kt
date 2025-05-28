@@ -15,6 +15,6 @@ class AccountAuthenticatedUser(
     override fun isGranted(projectId: Int, fn: Class<out ProjectFunction>): Boolean =
         authorisations.isGranted(projectId, fn) || groups.any { it.isGranted(projectId, fn) }
 
-    override fun getName(): String = account.name
+    override fun getName(): String = account.email
 
 }

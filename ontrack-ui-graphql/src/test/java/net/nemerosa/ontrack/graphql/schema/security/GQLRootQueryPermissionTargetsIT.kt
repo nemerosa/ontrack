@@ -13,7 +13,7 @@ class GQLRootQueryPermissionTargetsIT : AbstractQLKTITSupport() {
     @AsAdminTest
     fun `Searching permission targets`() {
         val prefix = uid("p-")
-        val account = doCreateAccount(name = uid("$prefix-"))
+        val account = doCreateAccount(email = uid("$prefix-"))
         val group = doCreateAccountGroup(name = uid("$prefix-"))
 
         val query = """
@@ -40,7 +40,7 @@ class GQLRootQueryPermissionTargetsIT : AbstractQLKTITSupport() {
         }
 
         // Account only
-        run(query, mapOf("token" to account.name)) { data ->
+        run(query, mapOf("token" to account.email)) { data ->
             val targets = data.path("permissionTargets")
             assertNotNull(
                 targets.find { it.path("type").asText() == "ACCOUNT" && it.path("id").asInt() == account.id() },

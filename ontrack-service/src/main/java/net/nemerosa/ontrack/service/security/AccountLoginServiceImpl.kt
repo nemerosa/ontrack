@@ -20,7 +20,6 @@ class AccountLoginServiceImpl(
         val account = accountRepository.findOrCreateAccount(
             Account(
                 id = ID.NONE,
-                name = email,
                 fullName = fullName,
                 email = email,
                 role = SecurityRole.USER,

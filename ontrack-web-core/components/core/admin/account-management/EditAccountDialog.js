@@ -45,13 +45,6 @@ export default function EditAccountDialog({dialog}) {
         <>
             <FormDialog dialog={dialog}>
                 <Form.Item
-                    key="name"
-                    name="name"
-                    label="Name"
-                >
-                    <Input disabled={true}/>
-                </Form.Item>
-                <Form.Item
                     key="email"
                     name="email"
                     label="Email"

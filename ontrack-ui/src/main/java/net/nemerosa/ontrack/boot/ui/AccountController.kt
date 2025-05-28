@@ -78,7 +78,6 @@ class AccountController(
         )
         // OK
         return form
-                .fill("name", account.name)
                 .fill("fullName", account.fullName)
                 .fill("email", account.email)
     }

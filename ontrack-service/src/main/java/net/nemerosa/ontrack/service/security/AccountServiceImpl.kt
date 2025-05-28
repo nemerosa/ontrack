@@ -32,7 +32,6 @@ class AccountServiceImpl(
         securityService.checkGlobalFunction(AccountManagement::class.java)
         // Creates the account
         var account = Account.user(
-            name = input.name,
             fullName = input.fullName,
             email = input.email,
         )

@@ -48,7 +48,6 @@ class SecurityTestSupport(
         val account = accountRepository.newAccount(
             Account(
                 id = ID.NONE,
-                name = name,
                 fullName = name,
                 email = "$name@ontrack.local",
                 role = SecurityRole.USER,

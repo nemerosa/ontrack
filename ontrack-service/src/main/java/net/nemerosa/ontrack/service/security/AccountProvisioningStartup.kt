@@ -37,7 +37,6 @@ class AccountProvisioningStartup(
             } else {
                 val accountDef = Account(
                     id = ID.NONE,
-                    name = admin.email,
                     fullName = admin.fullName,
                     email = admin.email,
                     role = SecurityRole.ADMINISTRATOR,

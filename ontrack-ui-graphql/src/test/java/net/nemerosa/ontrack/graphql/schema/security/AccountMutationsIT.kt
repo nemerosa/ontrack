@@ -67,7 +67,7 @@ class AccountMutationsIT : AbstractQLKTITSupport() {
         }
 
         assertNull(
-            accountService.findAccountByName(account.name),
+            accountService.findAccountByName(account.email),
             "Account has been deleted"
         )
     }

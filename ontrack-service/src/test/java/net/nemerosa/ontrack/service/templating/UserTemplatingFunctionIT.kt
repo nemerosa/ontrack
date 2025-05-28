@@ -13,9 +13,9 @@ class UserTemplatingFunctionIT : AbstractDSLTestSupport() {
     private lateinit var templatingService: TemplatingService
 
     @Test
-    fun `Current user name by default`() {
+    fun `Current user email by default`() {
         asUser {
-            val name = securityService.currentUser?.account?.name
+            val name = securityService.currentUser?.account?.email
             assertEquals(
                 "Current user is $name",
                 templatingService.render(
@@ -28,9 +28,10 @@ class UserTemplatingFunctionIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    fun `Current user name`() {
+    @Deprecated("Will be removed in V6.")
+    fun `Current user name (deprecated)`() {
         asUser {
-            val name = securityService.currentUser?.account?.name
+            val name = securityService.currentUser?.account?.email
             assertEquals(
                 "Current user is $name",
                 templatingService.render(

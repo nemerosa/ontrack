@@ -24,7 +24,6 @@ public class ResourceAccountTest {
                         .with("_self", "urn:user")
                         .with("account", object()
                                 .with("id", 1)
-                                .with("name", "admin")
                                 .with("fullName", "Administrator")
                                 .with("email", "")
                                 .with("role", "ADMINISTRATOR")
@@ -40,7 +39,7 @@ public class ResourceAccountTest {
                         .end(),
                 Resource.of(
                         ConnectedAccount.of(
-                                Account.of("admin", "Administrator", "", SecurityRole.ADMINISTRATOR)
+                                Account.of("Administrator", "", SecurityRole.ADMINISTRATOR)
                                         .withId(ID.of(1)),
                                 new Preferences()
                         ),

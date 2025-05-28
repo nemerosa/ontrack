@@ -68,10 +68,8 @@ class GQLRootQueryAdminAccounts(
             // Filter by name
             if (!name.isNullOrBlank()) {
                 filter = filter and { account ->
-                    account.name.contains(name, ignoreCase = true) ||
-                            account.email.contains(name, ignoreCase = true)
-                    account.fullName.contains(name, ignoreCase = true)
-
+                    account.email.contains(name, ignoreCase = true) ||
+                            account.fullName.contains(name, ignoreCase = true)
                 }
             }
             // Filter by group
@@ -85,8 +83,7 @@ class GQLRootQueryAdminAccounts(
             // Filter by token
             if (!token.isNullOrBlank()) {
                 filter = filter and { account ->
-                    account.name.contains(token, ignoreCase = true) ||
-                            account.fullName.contains(token, ignoreCase = true) ||
+                    account.fullName.contains(token, ignoreCase = true) ||
                             account.email.contains(token, ignoreCase = true) ||
                             accountService.getGroupsForAccount(account.id).any { accountGroup ->
                                 accountGroup.name.contains(token, ignoreCase = true)

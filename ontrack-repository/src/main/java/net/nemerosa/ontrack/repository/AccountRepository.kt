@@ -54,7 +54,7 @@ interface AccountRepository {
     /**
      * Finds an account using its name only.
      */
-    fun findAccountByName(username: String): Account?
+    fun findAccountByName(email: String): Account?
 
     /**
      * Checks if an account ID exists

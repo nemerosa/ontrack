@@ -45,7 +45,7 @@ class QueueDispatcherImpl(
             queueProcessor.process(payload, queueMetadata = null)
             QueueDispatchResult(type = QueueDispatchResultType.PROCESSED, id = null)
         } else {
-            val accountName = securityService.currentUser?.account?.name
+            val accountName = securityService.currentUser?.account?.email
                 ?: throw QueueAccountMissingException(queueProcessor.id)
             val queuePayload = QueuePayload.create(
                 processor = queueProcessor,

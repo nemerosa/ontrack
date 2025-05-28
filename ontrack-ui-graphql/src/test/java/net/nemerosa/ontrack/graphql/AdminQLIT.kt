@@ -13,7 +13,6 @@ import kotlin.test.*
 @AsAdminTest
 class AdminQLIT : AbstractQLKTITSupport() {
 
-    private val JsonNode.name: String? get() = get("name").asText()
     private val JsonNode.id: Int get() = get("id").asInt()
 
     @Test
@@ -115,8 +114,8 @@ class AdminQLIT : AbstractQLKTITSupport() {
     fun `Account by ID`() {
         val a = doCreateAccount()
         asUser().with(AccountManagement::class.java).call {
-            val data = run("""{ accounts(id: ${a.id}) { name } }""")
-            assertEquals(a.name, data["accounts"].first().name)
+            val data = run("""{ accounts(id: ${a.id}) { email } }""")
+            assertEquals(a.email, data["accounts"].first().path("email").asText())
         }
     }
 
@@ -124,7 +123,7 @@ class AdminQLIT : AbstractQLKTITSupport() {
     fun `Account by name`() {
         val a = doCreateAccount()
         asUser().with(AccountManagement::class.java).call {
-            val data = run("""{ accounts(name: "${a.name.substring(1)}") { id } }""")
+            val data = run("""{ accounts(name: "${a.email.substring(1)}") { id } }""")
             assertEquals(a.id(), data["accounts"].first()["id"].asInt())
         }
     }
@@ -136,7 +135,6 @@ class AdminQLIT : AbstractQLKTITSupport() {
         asUser().with(AccountManagement::class.java).call {
             a = accountService.updateAccount(
                 a.id, AccountInput(
-                    a.name,
                     a.fullName,
                     a.email,
                     listOf(g.id()),
@@ -155,14 +153,13 @@ class AdminQLIT : AbstractQLKTITSupport() {
         asUser().with(AccountManagement::class.java).call {
             a = accountService.updateAccount(
                 a.id, AccountInput(
-                    a.name,
                     a.fullName,
                     a.email,
                     listOf(g1.id(), g2.id()),
                 )
             )
             val data = run("""{ accounts(id: ${a.id}) { groups { name } } }""")
-            assertEquals(listOf(g1.name, g2.name), data["accounts"].first()["groups"].map { it.name })
+            assertEquals(listOf(g1.name, g2.name), data["accounts"].first()["groups"].map { it.path("name").asText() })
         }
     }
 
@@ -198,7 +195,7 @@ class AdminQLIT : AbstractQLKTITSupport() {
             )
         }
         assertEquals("CONTROLLER", data["accounts"].first()["globalRole"]["id"].asText())
-        assertEquals("Controller", data["accounts"].first()["globalRole"].name)
+        assertEquals("Controller", data["accounts"].first()["globalRole"].path("name").asText())
     }
 
     @Test
@@ -264,7 +261,7 @@ class AdminQLIT : AbstractQLKTITSupport() {
                 )
             }
         assertEquals("CONTROLLER", data["accountGroups"].first()["globalRole"]["id"].asText())
-        assertEquals("Controller", data["accountGroups"].first()["globalRole"].name)
+        assertEquals("Controller", data["accountGroups"].first()["globalRole"].path("name").asText())
     }
 
     @Test
@@ -304,10 +301,10 @@ class AdminQLIT : AbstractQLKTITSupport() {
         assertEquals(2, projects.size())
 
         assertEquals("PARTICIPANT", projects.get(0)["role"]["id"].asText())
-        assertEquals(p1.name, projects.get(0)["project"].name)
+        assertEquals(p1.name, projects.get(0)["project"].path("name").asText())
 
         assertEquals("OWNER", projects.get(1)["role"]["id"].asText())
-        assertEquals(p2.name, projects.get(1)["project"].name)
+        assertEquals(p2.name, projects.get(1)["project"].path("name").asText())
     }
 
     @Test
@@ -601,7 +598,7 @@ class AdminQLIT : AbstractQLKTITSupport() {
             )
             // Checks
             val p = data["projects"].first()
-            assertEquals(project.name, p.name)
+            assertEquals(project.name, p.path("name").asText())
             // Owner
             val owner = p["projectRoles"].find { it["id"].asText() == "OWNER" }
             assertNotNull(owner) {
@@ -662,7 +659,7 @@ class AdminQLIT : AbstractQLKTITSupport() {
             )
             // Checks
             val p = data["projects"].first()
-            assertEquals(project.name, p.name)
+            assertEquals(project.name, p.path("name").asText())
             // Owner
             val owner = p["projectRoles"].find { it["id"].asText() == "OWNER" }
             assertNotNull(owner) {

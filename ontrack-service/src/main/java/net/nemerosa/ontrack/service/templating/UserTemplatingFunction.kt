@@ -35,7 +35,7 @@ class UserTemplatingFunction(
         return if (account == null) {
             ""
         } else when (field) {
-            UserTemplatingFunctionField.NAME -> account.name
+            UserTemplatingFunctionField.NAME -> account.email
             UserTemplatingFunctionField.DISPLAY -> account.fullName
             UserTemplatingFunctionField.EMAIL -> account.email
         }

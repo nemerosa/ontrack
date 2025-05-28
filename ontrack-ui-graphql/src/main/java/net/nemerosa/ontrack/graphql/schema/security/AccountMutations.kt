@@ -26,7 +26,6 @@ class AccountMutations(
         ) { input ->
             accountService.create(
                 AccountInput(
-                    name = input.name,
                     fullName = input.fullName,
                     email = input.email,
                     groups = emptyList(),
@@ -94,7 +93,6 @@ class AccountMutations(
             accountService.updateAccount(
                 id,
                 AccountInput(
-                    name = existing.name,
                     email = existing.email,
                     fullName = input.fullName?.takeIf { it.isNotBlank() } ?: existing.fullName,
                     groups = input.groups,

@@ -19,6 +19,6 @@ class AccountTest {
     }
 
     private fun baseAccount(): Account {
-        return of("test", "Test", "test@test.com", SecurityRole.USER)
+        return of("Test", "test@test.com", SecurityRole.USER)
     }
 }

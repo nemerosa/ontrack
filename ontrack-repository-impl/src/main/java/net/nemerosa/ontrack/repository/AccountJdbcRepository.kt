@@ -22,7 +22,6 @@ class AccountJdbcRepository(
 
     private fun toAccount(rs: ResultSet): Account {
         return Account.of(
-            name = rs.getString("name"),
             fullName = rs.getString("fullName"),
             email = rs.getString("email"),
             // Only USER roles can be loaded from the database
@@ -32,7 +31,7 @@ class AccountJdbcRepository(
 
     override fun findAll(): Collection<Account> {
         return jdbcTemplate!!.query(
-            "SELECT * FROM ACCOUNTS ORDER BY NAME"
+            "SELECT * FROM ACCOUNTS ORDER BY EMAIL"
         ) { rs: ResultSet, _ ->
             toAccount(rs)
         }.filterNotNull()
@@ -41,15 +40,14 @@ class AccountJdbcRepository(
     override fun newAccount(account: Account): Account {
         return try {
             val id = dbCreate(
-                "INSERT INTO ACCOUNTS (NAME, FULLNAME, EMAIL) " +
-                        "VALUES (:name, :fullName, :email)",
-                params("name", account.name)
-                    .addValue("fullName", account.fullName)
+                "INSERT INTO ACCOUNTS (FULLNAME, EMAIL) " +
+                        "VALUES (:fullName, :email)",
+                params("fullName", account.fullName)
                     .addValue("email", account.email)
             )
             account.withId(of(id))
         } catch (ex: DuplicateKeyException) {
-            throw AccountNameAlreadyDefinedException(account.name)
+            throw AccountNameAlreadyDefinedException(account.email)
         }
     }
 
@@ -57,16 +55,15 @@ class AccountJdbcRepository(
         try {
             namedParameterJdbcTemplate!!.update(
                 """
-                    UPDATE ACCOUNTS SET NAME = :name, FULLNAME = :fullName, EMAIL = :email
+                    UPDATE ACCOUNTS SET FULLNAME = :fullName, EMAIL = :email
                     WHERE ID = :id
                 """,
                 params("id", account.id())
-                    .addValue("name", account.name)
                     .addValue("fullName", account.fullName)
                     .addValue("email", account.email)
             )
         } catch (ex: DuplicateKeyException) {
-            throw AccountNameAlreadyDefinedException(account.name)
+            throw AccountNameAlreadyDefinedException(account.email)
         }
     }
 
@@ -103,7 +100,7 @@ class AccountJdbcRepository(
 
     override fun findByNameToken(token: String): List<Account> {
         return namedParameterJdbcTemplate!!.query(
-            "SELECT * FROM ACCOUNTS WHERE LOWER(NAME) LIKE :filter ORDER BY NAME",
+            "SELECT * FROM ACCOUNTS WHERE LOWER(EMAIL) LIKE :filter ORDER BY EMAIL",
             params("filter", String.format("%%%s%%", StringUtils.lowerCase(token)))
         ) { rs: ResultSet, _ ->
             toAccount(rs)
@@ -112,21 +109,23 @@ class AccountJdbcRepository(
 
     override fun getAccountsForGroup(accountGroup: AccountGroup): List<Account> {
         return namedParameterJdbcTemplate!!.query(
-            "SELECT A.* FROM ACCOUNTS A " +
-                    "INNER JOIN ACCOUNT_GROUP_LINK L ON L.ACCOUNT = A.ID " +
-                    "WHERE L.ACCOUNTGROUP = :accountGroupId " +
-                    "ORDER BY A.NAME ASC",
+            """
+                SELECT A.* FROM ACCOUNTS A 
+                INNER JOIN ACCOUNT_GROUP_LINK L ON L.ACCOUNT = A.ID 
+                WHERE L.ACCOUNTGROUP = :accountGroupId 
+                ORDER BY A.EMAIL
+            """,
             params("accountGroupId", accountGroup.id())
         ) { rs: ResultSet, _ ->
             toAccount(rs)
         }
     }
 
-    override fun findAccountByName(username: String): Account? {
+    override fun findAccountByName(email: String): Account? {
         return getFirstItem(
-            "SELECT * FROM ACCOUNTS WHERE NAME = :name",
-            params("name", username)
-        ) { rs: ResultSet, _ ->
+            "SELECT * FROM ACCOUNTS WHERE EMAIL = :email",
+            params("email", email)
+        ) { rs, _ ->
             toAccount(rs)
         }
     }
@@ -144,14 +143,13 @@ class AccountJdbcRepository(
     override fun findOrCreateAccount(account: Account): Account {
         return namedParameterJdbcTemplate!!.query(
             """
-                INSERT INTO ACCOUNTS (NAME, FULLNAME, EMAIL)
-                VALUES (:name, :fullName, :email)
-                ON CONFLICT (NAME)
-                DO UPDATE SET NAME = EXCLUDED.NAME
+                INSERT INTO ACCOUNTS (FULLNAME, EMAIL)
+                VALUES (:fullName, :email)
+                ON CONFLICT (EMAIL)
+                DO UPDATE SET EMAIL = EXCLUDED.EMAIL
                 RETURNING *
             """.trimIndent(),
-            params("name", account.name)
-                .addValue("fullName", account.fullName)
+            params("fullName", account.fullName)
                 .addValue("email", account.email)
         ) { rs, _ -> toAccount(rs) }
             .firstOrNull()

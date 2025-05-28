@@ -43,11 +43,11 @@ class UserTemplatingFunctionTest {
     }
 
     @Test
-    fun `Account username field by default`() {
-        every { account.name } returns "test"
+    fun `Account email field by default`() {
+        every { account.email } returns "test@yontrack.local"
         every { securityService.currentUser } returns user
         assertEquals(
-            "test",
+            "test@yontrack.local",
             userTemplatingFunction.render(
                 configMap = emptyMap(),
                 context = emptyMap(),
@@ -58,11 +58,12 @@ class UserTemplatingFunctionTest {
     }
 
     @Test
+    @Deprecated("Will be removed in V6.")
     fun `Account username field`() {
-        every { account.name } returns "test"
+        every { account.email } returns "test@yontrack.local"
         every { securityService.currentUser } returns user
         assertEquals(
-            "test",
+            "test@yontrack.local",
             userTemplatingFunction.render(
                 configMap = mapOf(
                     "field" to "name"

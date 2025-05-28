@@ -9,7 +9,6 @@ export const useAccounts = ({refreshState, token}) => {
             ) {
                 accounts(token: $token) {
                     id
-                    name
                     fullName
                     email
                     groups {

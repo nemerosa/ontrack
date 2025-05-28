@@ -19,7 +19,6 @@ class AccountJdbcRepositoryIT : AbstractRepositoryTestSupport() {
         val name = uid("user-")
         val account = Account(
             id = ID.NONE,
-            name = name,
             fullName = name,
             email = "$name@test.com",
             role = SecurityRole.USER,
@@ -37,7 +36,6 @@ class AccountJdbcRepositoryIT : AbstractRepositoryTestSupport() {
         val email = "$name@test.com"
         val account = Account(
             id = ID.NONE,
-            name = name,
             fullName = name,
             email = email,
             role = SecurityRole.USER,
@@ -46,7 +44,6 @@ class AccountJdbcRepositoryIT : AbstractRepositoryTestSupport() {
         // Tries to find it or create it
         val savedAccount = accountRepository.findOrCreateAccount(account)
         assertTrue(savedAccount.id.isSet, "Account created")
-        assertEquals(name, savedAccount.name)
         assertEquals(name, savedAccount.fullName)
         assertEquals(email, savedAccount.email)
     }

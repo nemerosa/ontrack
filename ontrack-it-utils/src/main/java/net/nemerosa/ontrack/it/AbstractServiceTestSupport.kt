@@ -77,12 +77,10 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
     protected fun doCreateAccount(
         accountGroups: List<AccountGroup> = emptyList(),
         email: String = "${uid("A")}@test.com",
-        name: String = email,
     ): Account {
         return accountService.create(
             AccountInput(
-                name,
-                "Test $name",
+                "Test $email",
                 email,
                 accountGroups.map { it.id() },
             )
@@ -518,7 +516,6 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
     ) : ConfigurableAccountCall(
         securityService.asAdmin {
             val accountInput = AccountInput(
-                name,
                 "$name von Test",
                 "$name@test.com",
                 emptyList(),

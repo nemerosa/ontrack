@@ -17,7 +17,7 @@ class AccountProvisioningEndpointIT(
     @Test
     fun `Provisioning a token for an existing user`() {
         val account = doCreateAccount()
-        val token = accountProvisioningEndpoint.provisionAccount(username = account.name)
+        val token = accountProvisioningEndpoint.provisionAccount(username = account.email)
         assertTrue(
             token.isNotBlank(),
             "Token has been generated"

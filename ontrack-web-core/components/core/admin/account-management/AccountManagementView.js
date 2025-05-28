@@ -67,19 +67,14 @@ export default function AccountManagementView() {
                         loading={loading}
                     >
                         <Table.Column
-                            key="name"
-                            title="Name"
-                            dataIndex="name"
+                            key="email"
+                            title="Email"
+                            dataIndex="email"
                         />
                         <Table.Column
                             key="fullName"
                             title="Full name"
                             dataIndex="fullName"
-                        />
-                        <Table.Column
-                            key="email"
-                            title="Email"
-                            dataIndex="email"
                         />
                         <Table.Column
                             key="groups"

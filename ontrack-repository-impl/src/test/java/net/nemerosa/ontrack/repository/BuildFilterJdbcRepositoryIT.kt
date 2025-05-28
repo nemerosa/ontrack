@@ -32,9 +32,8 @@ class BuildFilterJdbcRepositoryIT : AbstractRepositoryTestSupport() {
         accountName = TestUtils.uid("A")
         account = accountRepository.newAccount(
             of(
-                accountName,
-                "Test user",
-                "test@test.com",
+                "${accountName} user",
+                "${accountName}@test.com",
                 SecurityRole.USER,
             )
         )

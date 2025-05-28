@@ -64,7 +64,7 @@ class GQLRootQueryGlobalPermissionsIT : AbstractQLKTITSupport() {
                 }
             assertNotNull(accountPermission) {
                 assertEquals(
-                    account.name,
+                    account.email,
                     it.path("target").path("name").asText()
                 )
                 val role = it.path("role")
