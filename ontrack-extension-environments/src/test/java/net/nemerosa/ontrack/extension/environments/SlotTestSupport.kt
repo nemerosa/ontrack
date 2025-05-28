@@ -113,10 +113,10 @@ class SlotTestSupport : AbstractDSLTestSupport() {
 
     fun withSlotUser(
         slot: Slot,
-        name: String = uid("U"),
+        email: String = uid("u-") + "@ontrack.local",
         code: (user: ConfigurableAccountCall) -> Unit,
     ) {
-        val user = asUser(name = name)
+        val user = asUser(email = email)
             .with(EnvironmentList::class.java)
             .withProjectFunction(slot.project, SlotView::class.java)
             .withProjectFunction(slot.project, ProjectView::class.java)

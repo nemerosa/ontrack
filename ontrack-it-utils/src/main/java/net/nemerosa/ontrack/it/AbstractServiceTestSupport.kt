@@ -256,7 +256,7 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
         )
     }
 
-    protected fun asUser(name: String = uid("U")): UserCall = UserCall(name = name)
+    protected fun asUser(email: String = uid("u-") + "@ontrack.local"): UserCall = UserCall(email = email)
 
     protected fun asAdmin() = FixedAccountCall(
         account = securityTestSupport.createAdminAccount(),
@@ -512,12 +512,12 @@ abstract class AbstractServiceTestSupport : AbstractITTestSupport() {
     }
 
     protected inner class UserCall(
-        name: String = uid("U"),
+        email: String = uid("u-") + "@ontrack.local",
     ) : ConfigurableAccountCall(
         securityService.asAdmin {
             val accountInput = AccountInput(
-                "$name von Test",
-                "$name@test.com",
+                "$email von Test",
+                email,
                 emptyList(),
             )
             accountService.create(accountInput)

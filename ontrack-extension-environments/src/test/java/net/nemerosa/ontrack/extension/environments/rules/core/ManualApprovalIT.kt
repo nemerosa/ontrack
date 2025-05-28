@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.it.AsAdminTest
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.test.TestUtils.uid
+import net.nemerosa.ontrack.test.email
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.*
@@ -195,12 +196,12 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
     @Test
     @AsAdminTest
     fun `Manual approval by an allowed user`() {
-        val name = uid("U")
+        val email = uid("u-") + "@ontrack.local"
         withManuallyApprovedPipeline(
-            users = listOf(name),
+            users = listOf(email),
         ) { pipeline, admissionRuleConfig ->
             slotTestSupport.withSlotUser(
-                name = name,
+                email = email,
                 slot = pipeline.slot,
             ) {
                 slotService.approve(pipeline, admissionRuleConfig)
@@ -216,7 +217,7 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
                     admissionRuleConfig.id
                 )
             assertNotNull(state, "Manual approval state stored") {
-                assertEquals(name, it.data?.user)
+                assertEquals(email, it.data?.user)
             }
         }
     }
@@ -224,12 +225,12 @@ class ManualApprovalIT : AbstractDSLTestSupport() {
     @Test
     @AsAdminTest
     fun `Manual approval not possible if not in the list of users`() {
-        val name = uid("U")
-        val otherName = uid("U")
+        val name = email()
+        val otherName = email()
         withManuallyApprovedPipeline(
             users = listOf(name),
         ) { pipeline, admissionRuleConfig ->
-            slotTestSupport.withSlotUser(name = otherName, slot = pipeline.slot) {
+            slotTestSupport.withSlotUser(email = otherName, slot = pipeline.slot) {
                 assertFailsWith<ManualApprovalSlotAdmissionRuleException> {
                     slotService.approve(pipeline, admissionRuleConfig)
                 }
