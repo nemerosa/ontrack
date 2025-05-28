@@ -18,6 +18,7 @@ import net.nemerosa.ontrack.model.tx.DefaultTransactionHelper
 import net.nemerosa.ontrack.model.tx.TransactionHelper
 import net.nemerosa.ontrack.test.TestUtils
 import net.nemerosa.ontrack.test.TestUtils.uid
+import net.nemerosa.ontrack.test.email
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.PlatformTransactionManager
@@ -127,7 +128,7 @@ abstract class AbstractDSLTestSupport : AbstractServiceTestSupport() {
     /**
      * Kotlin friendly user execution
      */
-    fun <T> asUser(name: String = uid("U"), code: () -> T): T = asUser(name = name).call(code)
+    fun <T> asUser(email: String = email(), code: () -> T): T = asUser(email = email).call(code)
 
     /**
      * Kotlin friendly account role execution
