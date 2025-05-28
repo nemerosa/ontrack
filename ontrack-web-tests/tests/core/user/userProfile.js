@@ -1,4 +1,5 @@
-const {ui} = require("@ontrack/connection");
+import {checkListContainsItemText} from "../../support/antd-list-support";
+
 const {expect} = require("@playwright/test");
 
 export class UserProfilePage {
@@ -25,4 +26,24 @@ export class UserProfilePage {
         return this.page.getByTestId("generatedToken").textContent()
     }
 
+    async checkGroups({assignedGroups, mappedGroups, idpGroups}) {
+        if (assignedGroups) {
+            const list = this.page.getByTestId("assigned-groups")
+            for (const group of assignedGroups) {
+                await checkListContainsItemText(list, group);
+            }
+        }
+        if (mappedGroups) {
+            const list = this.page.getByTestId("mapped-groups")
+            for (const group of mappedGroups) {
+                await checkListContainsItemText(list, group)
+            }
+        }
+        if (idpGroups) {
+            const list = this.page.getByTestId("idp-groups")
+            for (const group of idpGroups) {
+                await checkListContainsItemText(list, group)
+            }
+        }
+    }
 }

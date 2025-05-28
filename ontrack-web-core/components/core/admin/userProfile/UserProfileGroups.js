@@ -35,6 +35,7 @@ export default function UserProfileGroups() {
                     <Col span={8}>
                         <Card size="small" title="Assigned groups" variant="borderless">
                             <List
+                                data-testid="assigned-groups"
                                 itemLayout="horizontal"
                                 dataSource={data.assignedGroups}
                                 renderItem={(item) => item.name}
@@ -44,6 +45,7 @@ export default function UserProfileGroups() {
                     <Col span={8}>
                         <Card size="small" title="Mapped groups" variant="borderless">
                             <List
+                                data-testid="mapped-groups"
                                 itemLayout="horizontal"
                                 dataSource={data.mappedGroups}
                                 renderItem={(item) => item.name}
@@ -53,6 +55,7 @@ export default function UserProfileGroups() {
                     <Col span={8}>
                         <Card size="small" title="IdP groups" variant="borderless">
                             <List
+                                data-testid="idp-groups"
                                 itemLayout="horizontal"
                                 dataSource={data.idpGroups}
                                 renderItem={item => item}

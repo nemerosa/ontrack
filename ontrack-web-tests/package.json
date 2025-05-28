@@ -7,8 +7,8 @@
     "playwright-install": "npx playwright install",
     "playwright-setup": "npx playwright install-deps",
     "test": "npx playwright test --retries 3",
-    "test-ldap": "npx playwright test --retries 3 tests/core/login.spec.js",
-    "test-oidc": "npx playwright test --retries 3 tests/core/login.spec.js"
+    "test-ldap": "npx playwright test --retries 3 --grep '@auth'",
+    "test-oidc": "npx playwright test --retries 3 --grep '@auth'"
   },
   "keywords": [],
   "author": "",
