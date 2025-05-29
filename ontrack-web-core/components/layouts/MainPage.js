@@ -19,11 +19,7 @@ export default function MainPage({title, breadcrumbs, commands, description, war
             <Layout>
                 <Content
                     style={{
-                        marginLeft: 8,
-                        marginTop: 8,
-                        marginRight: 8,
-                        marginBottom: 0,
-                        padding: 24,
+                        padding: 12,
                         paddingTop: 8,
                         minHeight: 280,
                         background: colorBgContainer,
