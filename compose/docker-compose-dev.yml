@@ -70,6 +70,7 @@ services:
       - --import-realm
     volumes:
       - ./keycloak/import/dev:/opt/keycloak/data/import
+      - ./keycloak/themes/yontrack:/opt/keycloak/themes/yontrack
     depends_on:
       - postgresql-keycloak
 
