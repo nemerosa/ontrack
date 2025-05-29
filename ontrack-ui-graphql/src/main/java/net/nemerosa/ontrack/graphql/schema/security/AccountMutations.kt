@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.graphql.schema.security
 
 import jakarta.validation.constraints.NotNull
-import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
 import net.nemerosa.ontrack.graphql.schema.Mutation
 import net.nemerosa.ontrack.graphql.support.ListRef
@@ -188,12 +187,6 @@ data class DeleteAccountInput(
 )
 
 data class CreateBuiltInAccountInput(
-    @get:NotNull(message = "The account name is required.")
-    @get:Pattern(
-        regexp = "[a-zA-Z0-9@_.-]+",
-        message = "The account name must contain only letters, digits, underscores, @, dashes and dots."
-    )
-    val name: String,
     @get:NotNull(message = "The account full name is required.")
     @get:Size(min = 1, max = 100, message = "The account full name must be between 1 and 100 long.")
     val fullName: String,

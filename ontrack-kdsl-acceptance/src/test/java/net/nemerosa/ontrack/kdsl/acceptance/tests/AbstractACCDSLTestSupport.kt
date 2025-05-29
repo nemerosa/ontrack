@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.kdsl.acceptance.tests
 
+import net.nemerosa.ontrack.kdsl.acceptance.tests.support.email
 import net.nemerosa.ontrack.kdsl.acceptance.tests.support.uid
 import net.nemerosa.ontrack.kdsl.connector.support.DefaultConnector
 import net.nemerosa.ontrack.kdsl.spec.Branch
@@ -103,7 +104,7 @@ abstract class AbstractACCDSLTestSupport : AbstractACCTestSupport() {
     ) {
         // Creating a new user
         val user = ontrack.admin.createUser(
-            uid("user-")
+            email = email(),
         )
         // If a global role is given, grants it to the user
         if (!globalRole.isNullOrBlank()) {
@@ -122,7 +123,7 @@ abstract class AbstractACCDSLTestSupport : AbstractACCTestSupport() {
     private fun <T> runWithUser(user: Account, code: (account: Account) -> T): T {
         // Getting a token for this user
         val token = ACCProperties.getOrCreateToken(
-            username = user.name,
+            username = user.email,
         )
         // Creating a connector for this user
         val connector = DefaultConnector(

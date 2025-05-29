@@ -38,13 +38,11 @@ class AdminMgt(connector: Connector) : Connected(connector) {
      * Creating a user
      */
     fun createUser(
-        name: String,
-        fullName: String = name,
-        email: String = "$name@test.com",
+        email: String,
+        fullName: String = "Test $email",
     ): Account =
         graphqlConnector.mutate(
             CreateUserMutation(
-                name,
                 fullName,
                 email,
             )
@@ -53,7 +51,7 @@ class AdminMgt(connector: Connector) : Connected(connector) {
             ?.run {
                 Account(
                     id = id.toInt(),
-                    name = name,
+                    email = email,
                 )
             }
             ?: error("could not create user")

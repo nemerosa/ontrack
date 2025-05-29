@@ -73,7 +73,7 @@ type Account {
   "Links"
   links: AccountLinks @deprecated(reason : "Use the `actions` field instead.")
   "Unique name for the account"
-  name: String
+  name: String! @deprecated(reason : "Will be removed in V6. Use email instead. Replaced by email.")
   "Security role (admin or none)"
   role: String
   "List of authentication tokens linked to this account."
@@ -1066,6 +1066,14 @@ type ConnectionResult {
   type: ConnectionResultType!
 }
 
+"Output type for the createAccountGroup mutation."
+type CreateAccountGroupPayload implements Payload {
+  "Created account group"
+  accountGroup: AccountGroup
+  "List of errors"
+  errors: [UserError]
+}
+
 "Output type for the createBranchOrGet mutation."
 type CreateBranchOrGetPayload implements Payload {
   "Created or existing branch"
@@ -1263,6 +1271,18 @@ type Decoration {
   feature: ExtensionFeatureDescription
 }
 
+"Output type for the deleteAccountGroup mutation."
+type DeleteAccountGroupPayload implements Payload {
+  "List of errors"
+  errors: [UserError]
+}
+
+"Output type for the deleteAccount mutation."
+type DeleteAccountPayload implements Payload {
+  "List of errors"
+  errors: [UserError]
+}
+
 "Output type for the deleteAutoVersioningConfig mutation."
 type DeleteAutoVersioningConfigPayload implements Payload {
   "List of errors"
@@ -1423,6 +1443,18 @@ type DeleteEnvironmentPayload implements Payload {
 
 "Output type for the deleteGenericProperty mutation."
 type DeleteGenericPropertyPayload implements Payload {
+  "List of errors"
+  errors: [UserError]
+}
+
+"Output type for the deleteGlobalRoleFromAccountGroup mutation."
+type DeleteGlobalRoleFromAccountGroupPayload implements Payload {
+  "List of errors"
+  errors: [UserError]
+}
+
+"Output type for the deleteGlobalRoleFromAccount mutation."
+type DeleteGlobalRoleFromAccountPayload implements Payload {
   "List of errors"
   errors: [UserError]
 }
@@ -1878,6 +1910,18 @@ type DisableSubscriptionPayload implements Payload {
   subscription: EventSubscriptionPayload
 }
 
+"Output type for the editAccountGroup mutation."
+type EditAccountGroupPayload implements Payload {
+  "List of errors"
+  errors: [UserError]
+}
+
+"Output type for the editAccount mutation."
+type EditAccountPayload implements Payload {
+  "List of errors"
+  errors: [UserError]
+}
+
 "Association of a slot with its eligibility"
 type EligibleSlot {
   "eligible field"
@@ -2275,6 +2319,8 @@ type GitHubIngestionFilterConfig {
 
 "Payload received by the GitHub Ingestion Hook"
 type GitHubIngestionHookPayload {
+  "Identity of the user"
+  accountName: String!
   "Timestamp for the end of the processing"
   completion: LocalDateTime
   "Mapped to the `X-GitHub-Delivery` header"
@@ -2432,6 +2478,14 @@ type GitUICommit {
   timestamp: LocalDateTime!
 }
 
+"Granted global permission"
+type GlobalPermission {
+  "Granted global role"
+  role: GlobalRole!
+  "Target the permission is assigned to"
+  target: PermissionTarget!
+}
+
 type GlobalRole {
   "List of accounts having this role"
   accounts: [Account!]!
@@ -2445,10 +2499,24 @@ type GlobalRole {
   name: String!
 }
 
+"Output type for the grantGlobalRoleToAccountGroup mutation."
+type GrantGlobalRoleToAccountGroupPayload implements Payload {
+  "List of errors"
+  errors: [UserError]
+}
+
 "Output type for the grantGlobalRoleToAccount mutation."
 type GrantGlobalRoleToAccountPayload implements Payload {
   "List of errors"
   errors: [UserError]
+}
+
+"Mapping between an IdP group and a Yontrack group"
+type GroupMapping {
+  "Yontrack group"
+  group: AccountGroup!
+  "IdP group name"
+  idpGroup: String!
 }
 
 "Home page settings"
@@ -3313,6 +3381,12 @@ type LockAccountPayload implements Payload {
   errors: [UserError]
 }
 
+"Output type for the mapGroup mutation."
+type MapGroupPayload implements Payload {
+  "List of errors"
+  errors: [UserError]
+}
+
 "Message"
 type Message {
   "content field"
@@ -3359,6 +3433,11 @@ type Mutation {
     "Input for the mutation"
     input: CheckAutoVersioningInput
   ): CheckAutoVersioningPayload
+  "Creates an account group"
+  createAccountGroup(
+    "Input for the mutation"
+    input: CreateAccountGroupInput
+  ): CreateAccountGroupPayload
   "Creates a new branch"
   createBranch(
     "Input for the mutation"
@@ -3469,6 +3548,16 @@ type Mutation {
     "Input for the mutation"
     input: CreateWebhookInput
   ): CreateWebhookPayload
+  "Deletes an account"
+  deleteAccount(
+    "Input for the mutation"
+    input: DeleteAccountInput
+  ): DeleteAccountPayload
+  "Deletes an account group"
+  deleteAccountGroup(
+    "Input for the mutation"
+    input: DeleteAccountGroupInput
+  ): DeleteAccountGroupPayload
   "Deletes the auto-versioning configuration from a branch"
   deleteAutoVersioningConfig(
     "Input for the mutation"
@@ -3581,6 +3670,16 @@ type Mutation {
     "Input for the mutation"
     input: DeleteGenericPropertyInput
   ): DeleteGenericPropertyPayload
+  "Removes any global role from an account"
+  deleteGlobalRoleFromAccount(
+    "Input for the mutation"
+    input: DeleteGlobalRoleFromAccountInput
+  ): DeleteGlobalRoleFromAccountPayload
+  "Removes any global role from an account group"
+  deleteGlobalRoleFromAccountGroup(
+    "Input for the mutation"
+    input: DeleteGlobalRoleFromAccountGroupInput
+  ): DeleteGlobalRoleFromAccountGroupPayload
   "Deletes a Jenkins configuration"
   deleteJenkinsConfiguration(
     "Input for the mutation"
@@ -3878,6 +3977,16 @@ type Mutation {
     "Input for the mutation"
     input: DisableSubscriptionInput
   ): DisableSubscriptionPayload
+  "Edits an account"
+  editAccount(
+    "Input for the mutation"
+    input: EditAccountInput
+  ): EditAccountPayload
+  "Edits an account group"
+  editAccountGroup(
+    "Input for the mutation"
+    input: EditAccountGroupInput
+  ): EditAccountGroupPayload
   "Enables an account"
   enableAccount(
     "Input for the mutation"
@@ -3968,6 +4077,11 @@ type Mutation {
     "Input for the mutation"
     input: GrantGlobalRoleToAccountInput
   ): GrantGlobalRoleToAccountPayload
+  "Grants a global role to an account group"
+  grantGlobalRoleToAccountGroup(
+    "Input for the mutation"
+    input: GrantGlobalRoleToAccountGroupInput
+  ): GrantGlobalRoleToAccountGroupPayload
   "Launches a job"
   launchJob(id: Int!): JobActionResult!
   "Launches an existing workflow"
@@ -3995,6 +4109,11 @@ type Mutation {
     "Input for the mutation"
     input: LockAccountInput
   ): LockAccountPayload
+  "Maps an identity provider group to a Yontrack group"
+  mapGroup(
+    "Input for the mutation"
+    input: MapGroupInput
+  ): MapGroupPayload
   "Overriding a rule into a pipeline"
   overridePipelineRule(
     "Input for the mutation"
@@ -4824,6 +4943,18 @@ type PayloadUserError {
   message: String!
 }
 
+"PermissionTarget"
+type PermissionTarget {
+  "description field"
+  description: String
+  "id field"
+  id: Int
+  "name field"
+  name: String!
+  "type field"
+  type: PermissionTargetType!
+}
+
 "Output type for the postQueue mutation."
 type PostQueuePayload implements Payload {
   "List of errors"
@@ -5497,6 +5628,10 @@ type PurgeQueueRecordingsPayload implements Payload {
 }
 
 type Query {
+  accountGroupByName(
+    "Name of the group"
+    name: String!
+  ): AccountGroup
   accountGroups(
     "Searching by ID"
     id: Int,
@@ -5509,7 +5644,9 @@ type Query {
     "Searching by ID"
     id: Int,
     "Searching by looking for a string in the name or the full name"
-    name: String
+    name: String,
+    "Filtering accounts having this token in the name, email or groups"
+    token: String
   ): [Account!]
   "Getting a list of authorizations for the authenticated user"
   authorizations: [Authorization!]!
@@ -5702,11 +5839,15 @@ type Query {
   ): OntrackGitIssueInfo
   "List of global messages"
   globalMessages: [Message!]!
+  "List of global permissions"
+  globalPermissions: [GlobalPermission!]!
   "List of global security roles"
   globalRoles(
     "Filter by role name"
     role: String
   ): [GlobalRole!]!
+  "List of mappings between IdP groups and Yontrack groups"
+  groupMappings: [GroupMapping!]!
   "Information for the hook record query filter"
   hookRecordFilterInfo: HookRecordFilterInfo!
   "List of recordings for hook messages"
@@ -5819,6 +5960,11 @@ type Query {
   ): NotificationRecordPaginated
   "Notification settings"
   notificationSettings: NotificationSettings
+  "List of permission targets"
+  permissionTargets(
+    "Part of the name of the permission target to look for"
+    token: String
+  ): [PermissionTarget!]!
   "Basic test service"
   ping: String
   "Predefined promotion level by ID"
@@ -7779,6 +7925,12 @@ type User {
   account: Account
   "Actions for a RootUser"
   actions: RootUserActions @deprecated(reason : "Will be removed in V5. User `userMenuActions` instead.")
+  "List of groups the user is assigned to"
+  assignedGroups: [AccountGroup!]!
+  "idpGroups field"
+  idpGroups: [String!]!
+  "List of groups that have been mapped to the user from their IdP groups"
+  mappedGroups: [AccountGroup!]!
 }
 
 "Representation of an error."
@@ -8506,6 +8658,12 @@ enum NotificationResultType {
   TIMEOUT
 }
 
+"Target for a permission assignment"
+enum PermissionTargetType {
+  ACCOUNT
+  GROUP
+}
+
 "Project entity type"
 enum ProjectEntityType {
   BRANCH
@@ -8818,6 +8976,14 @@ input CheckAutoVersioningInput {
   project: String!
 }
 
+"Input type for the createAccountGroup mutation."
+input CreateAccountGroupInput {
+  "Description of the group"
+  description: String
+  "Name of the group"
+  name: String!
+}
+
 "Input type for the createBranch mutation."
 input CreateBranchInput {
   "Branch description"
@@ -8888,8 +9054,6 @@ input CreateBuiltInAccountInput {
   email: String!
   "fullName field"
   fullName: String!
-  "name field"
-  name: String!
 }
 
 "Input type for the createConfiguration mutation."
@@ -9114,6 +9278,18 @@ input CreateWebhookInput {
   url: String!
 }
 
+"Input type for the deleteAccountGroup mutation."
+input DeleteAccountGroupInput {
+  "ID of the account group"
+  id: Int!
+}
+
+"Input type for the deleteAccount mutation."
+input DeleteAccountInput {
+  "ID of the account"
+  accountId: Int!
+}
+
 "Input type for the deleteAutoVersioningConfig mutation."
 input DeleteAutoVersioningConfigInput {
   "ID of the branch to clean"
@@ -9281,6 +9457,18 @@ input DeleteGenericPropertyInput {
   entityType: ProjectEntityType!
   "type field"
   type: String!
+}
+
+"Input type for the deleteGlobalRoleFromAccountGroup mutation."
+input DeleteGlobalRoleFromAccountGroupInput {
+  "accountGroupId field"
+  accountGroupId: Int!
+}
+
+"Input type for the deleteGlobalRoleFromAccount mutation."
+input DeleteGlobalRoleFromAccountInput {
+  "accountId field"
+  accountId: Int!
 }
 
 "Input type for the deleteJenkinsConfiguration mutation."
@@ -9691,6 +9879,26 @@ input DisableSubscriptionInput {
   projectEntity: ProjectEntityIDInput
 }
 
+"Input type for the editAccountGroup mutation."
+input EditAccountGroupInput {
+  "Description of the group"
+  description: String
+  "ID of the account group"
+  id: Int!
+  "Name of the group"
+  name: String!
+}
+
+"Input type for the editAccount mutation."
+input EditAccountInput {
+  "New full name for the account. If null, the full name is not changed."
+  fullName: String
+  "List of groups the account is a member of. If null, the groups are not changed."
+  groups: [Int!]
+  "ID of the account"
+  id: Int!
+}
+
 "Input type for the enableAccount mutation."
 input EnableAccountInput {
   "ID of the account"
@@ -9936,6 +10144,14 @@ input GitHubIngestionValidationDataInput {
   type: String!
 }
 
+"Input type for the grantGlobalRoleToAccountGroup mutation."
+input GrantGlobalRoleToAccountGroupInput {
+  "accountGroupId field"
+  accountGroupId: Int!
+  "globalRole field"
+  globalRole: String!
+}
+
 "Input type for the grantGlobalRoleToAccount mutation."
 input GrantGlobalRoleToAccountInput {
   "accountId field"
@@ -10070,6 +10286,14 @@ input LinksBuildInputItem {
 input LockAccountInput {
   "ID of the account"
   id: Int!
+}
+
+"Input type for the mapGroup mutation."
+input MapGroupInput {
+  "groupId field"
+  groupId: Int
+  "idpGroup field"
+  idpGroup: String!
 }
 
 "Meta information property"

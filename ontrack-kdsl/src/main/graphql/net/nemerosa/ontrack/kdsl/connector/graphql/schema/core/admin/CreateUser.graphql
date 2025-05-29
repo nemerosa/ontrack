@@ -1,10 +1,8 @@
 mutation CreateUser(
-    $name: String!,
     $fullName: String!,
     $email: String!,
 ) {
     createBuiltInAccount(input: {
-        name: $name,
         fullName: $fullName,
         email: $email,
     }) {

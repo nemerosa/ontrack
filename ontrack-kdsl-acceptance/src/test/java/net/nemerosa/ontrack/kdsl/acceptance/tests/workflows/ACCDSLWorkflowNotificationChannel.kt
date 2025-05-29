@@ -518,7 +518,7 @@ class ACCDSLWorkflowNotificationChannel : AbstractACCDSLWorkflowsTestSupport() {
                                 val message = ontrack.notifications.inMemory.group(group)
                                     .firstOrNull()?.trim()
                                 println("In-memory message: $message")
-                                message == "User ${user.name} - build linked to ${dep.name}"
+                                message == "User ${user.email} - build linked to ${dep.name}"
                             }
                         }
                     }
