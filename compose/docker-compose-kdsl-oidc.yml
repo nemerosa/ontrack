@@ -40,6 +40,7 @@ services:
       - --import-realm
     volumes:
       - ./keycloak/import/oidc:/opt/keycloak/data/import
+      - ./keycloak/themes/yontrack:/opt/keycloak/themes/yontrack
 
   rabbitmq:
     image: rabbitmq:3.13.7-management

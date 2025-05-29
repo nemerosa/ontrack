@@ -57,6 +57,7 @@ services:
       - --import-realm
     volumes:
       - ./keycloak/import/ldap:/opt/keycloak/data/import
+      - ./keycloak/themes/yontrack:/opt/keycloak/themes/yontrack
     depends_on:
       ldap:
         condition: service_started

@@ -2,6 +2,8 @@
   "id": "ontrack",
   "realm": "ontrack",
   "enabled": true,
+  "loginTheme": "yontrack",
+  "internationalizationEnabled": false,
   "registrationAllowed": true,
   "resetPasswordAllowed": true,
   "ssoSessionIdleTimeout": 3600,
