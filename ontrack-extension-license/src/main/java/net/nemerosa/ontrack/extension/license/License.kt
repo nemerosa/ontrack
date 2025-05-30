@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.license
 
-import net.nemerosa.ontrack.common.Time
 import java.time.LocalDateTime
 
 /**
@@ -25,8 +24,6 @@ data class License(
 ) {
 
     private val featureIndex = features.associateBy { it.id }
-
-    fun isValid() = active && (validUntil == null || validUntil > Time.now)
 
     fun findFeatureData(id: String) = featureIndex[id]
 

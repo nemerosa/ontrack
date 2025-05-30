@@ -6,7 +6,19 @@ import org.springframework.stereotype.Component
 
 @Component
 @Profile(RunProfile.DEV)
-class DevLicenseService : LicenseService {
+class DevLicenseService(
+    licensedFeatureProviders: List<LicensedFeatureProvider>,
+) : LicenseService {
+
+    private val features = licensedFeatureProviders
+        .flatMap { it.providedFeatures }
+        .map {
+            LicenseFeatureData(
+                id = it.id,
+                enabled = true,
+                data = emptyList(),
+            )
+        }
 
     override val license: License = License(
         type = "dev",
@@ -15,6 +27,6 @@ class DevLicenseService : LicenseService {
         maxProjects = 10,
         active = true,
         validUntil = null,
-        features = emptyList(),
+        features = features,
     )
 }
