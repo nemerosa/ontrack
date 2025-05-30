@@ -19,20 +19,16 @@ class LicenseLoggingService(
 
     override fun start() {
         val license = licenseService.license
-        if (license != null) {
-            license.apply {
-                logger.info("[license] Type = $type")
-                logger.info("[license] Name = $name")
-                logger.info("[license] Assignee = $assignee")
-                logger.info("[license] Active = $active")
-                logger.info("[license] Valid until = $validUntil")
-                logger.info("[license] Max. projects = $maxProjects")
-                license.features.forEach { feature ->
-                    logger.info("[license] Feature = $feature")
-                }
+        license.apply {
+            logger.info("[license] Type = $type")
+            logger.info("[license] Name = $name")
+            logger.info("[license] Assignee = $assignee")
+            logger.info("[license] Active = $active")
+            logger.info("[license] Valid until = $validUntil")
+            logger.info("[license] Max. projects = $maxProjects")
+            license.features.forEach { feature ->
+                logger.info("[license] Feature = $feature")
             }
-        } else {
-            logger.info("[license] No license")
         }
     }
 }

@@ -16,7 +16,7 @@ class LicenseControlListener(
         if (event.eventType == EventFactory.NEW_PROJECT) {
             val license = licenseService.license
             val control = licenseControlService.control(license)
-            if (license != null && !control.valid) {
+            if (!control.valid) {
                 if (!control.active) {
                     throw LicenseInactiveException(license)
                 }

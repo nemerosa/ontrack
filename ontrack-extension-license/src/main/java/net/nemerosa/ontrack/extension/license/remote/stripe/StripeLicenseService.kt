@@ -47,8 +47,8 @@ class StripeLicenseService(
         stripeLicense = license
     }
 
-    override val license: License?
-        get() = stripeLicense
+    override val license: License
+        get() = stripeLicense!!
 
     override fun getStartingJobs(): Collection<JobRegistration> =
         listOf(

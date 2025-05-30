@@ -6,8 +6,6 @@ import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseInto
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.StructureService
-import net.nemerosa.ontrack.model.support.EnvService
-import net.nemerosa.ontrack.model.support.isProdProfile
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import kotlin.reflect.KClass
@@ -19,19 +17,15 @@ class LicenseControlServiceImpl(
     private val structureService: StructureService,
     private val securityService: SecurityService,
     private val licenseService: LicenseService,
-    private val envService: EnvService,
     private val licensedFeatureProviders: List<LicensedFeatureProvider>,
 ) : LicenseControlService {
 
-    override fun control(license: License?): LicenseControl =
-        if (license != null) {
-            val count = securityService.asAdmin {
-                structureService.projectList.size
-            }
-            control(license, count)
-        } else {
-            LicenseControl.OK
+    override fun control(license: License): LicenseControl {
+        val count = securityService.asAdmin {
+            structureService.projectList.size
         }
+        return control(license, count)
+    }
 
     override fun getLicensedFeatures(license: License): List<LicensedFeature> =
         licensedFeatureProviders.flatMap {
@@ -47,24 +41,14 @@ class LicenseControlServiceImpl(
 
     override fun isFeatureEnabled(featureID: String): Boolean {
         val license = licenseService.license
-        return if (license != null) {
-            license.active && license.isFeatureEnabled(featureID)
-        } else {
-            isFeatureEnabledByDefault()
-        }
+        return license.active && license.isFeatureEnabled(featureID)
     }
 
     override fun <T : Any> parseLicenseDataInto(featureID: String, type: KClass<T>): T? {
         val license = licenseService.license
-        val feature = license?.findFeatureData(featureID)
+        val feature = license.findFeatureData(featureID)
         return feature?.data?.associate { it.name to it.value }?.asJson()?.parseInto(type)
     }
-
-    /**
-     * Enabling all features by default if not running in PROD.
-     */
-    private fun isFeatureEnabledByDefault(): Boolean =
-        !envService.isProdProfile()
 
     fun control(license: License, count: Int) = LicenseControl(
         active = license.active,

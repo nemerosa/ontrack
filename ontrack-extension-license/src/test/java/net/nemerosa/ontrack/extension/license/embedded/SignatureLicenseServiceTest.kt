@@ -37,7 +37,7 @@ class SignatureLicenseServiceTest {
             license().toLicense("Embedded"),
             license
         )
-        assertEquals(true, license?.isFeatureEnabled("extension.environments"))
+        assertEquals(true, license.isFeatureEnabled("extension.environments"))
     }
 
     private fun license() = SignatureLicense(

@@ -16,7 +16,7 @@ class FixedLicenseService(
     fixedLicenseConfigurationProperties: FixedLicenseConfigurationProperties,
 ) : LicenseService {
 
-    override var license: License? = License(
+    override var license: License = License(
         type = "Fixed",
         name = fixedLicenseConfigurationProperties.name,
         assignee = fixedLicenseConfigurationProperties.assignee,
