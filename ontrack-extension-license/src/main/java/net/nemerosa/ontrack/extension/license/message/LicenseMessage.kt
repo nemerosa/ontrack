@@ -23,6 +23,14 @@ class LicenseMessage(
 
     internal fun checkLicense(license: License): List<Message> {
         val messages = mutableListOf<Message>()
+
+        if (!license.message.isNullOrBlank()) {
+            messages += Message(
+                type = MessageType.WARNING,
+                content = license.message
+            )
+        }
+
         val control = licenseControlService.control(license)
         if (!control.active) {
             messages += Message(

@@ -28,5 +28,6 @@ class DevLicenseService(
         active = true,
         validUntil = null,
         features = features,
+        message = "You're currently using a development license."
     )
 }

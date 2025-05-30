@@ -12,6 +12,7 @@ import java.time.LocalDateTime
  * @property validUntil End of validity for this license (null for unlimited)
  * @property maxProjects Maximum number of projects which can be created (0 for unlimited)
  * @property features List of features being allowed
+ * @property message Message to display to the end user
  */
 data class License(
     val type: String,
@@ -21,6 +22,7 @@ data class License(
     val validUntil: LocalDateTime?,
     val maxProjects: Int,
     val features: List<LicenseFeatureData>,
+    val message: String? = null,
 ) {
 
     private val featureIndex = features.associateBy { it.id }
