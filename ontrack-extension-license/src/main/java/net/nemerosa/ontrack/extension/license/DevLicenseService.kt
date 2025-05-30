@@ -24,7 +24,7 @@ class DevLicenseService(
         type = "dev",
         name = "Development license",
         assignee = "Development",
-        maxProjects = 10,
+        maxProjects = 0,
         active = true,
         validUntil = null,
         features = features,

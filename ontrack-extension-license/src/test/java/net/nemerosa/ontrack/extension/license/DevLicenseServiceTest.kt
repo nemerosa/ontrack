@@ -17,9 +17,9 @@ class DevLicenseServiceTest {
     )
 
     @Test
-    fun `Development license is limited to 10 projects`() {
+    fun `Development license is not limited`() {
         val license = devLicenseService.license
-        assertEquals(10, license.maxProjects, "Development license has a maximum of 10 projects")
+        assertEquals(0, license.maxProjects, "Development license is not limited")
     }
 
     @Test
