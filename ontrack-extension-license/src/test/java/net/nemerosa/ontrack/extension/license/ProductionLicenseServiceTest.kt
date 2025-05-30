@@ -1,6 +1,5 @@
-package net.nemerosa.ontrack.extension.license.embedded
+package net.nemerosa.ontrack.extension.license
 
-import net.nemerosa.ontrack.extension.license.LicenseFeatureData
 import net.nemerosa.ontrack.extension.license.signature.SignatureLicense
 import net.nemerosa.ontrack.extension.license.signature.SignatureLicenseException
 import net.nemerosa.ontrack.model.support.NameValue
@@ -8,13 +7,13 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
-class SignatureLicenseServiceTest {
+class ProductionLicenseServiceTest {
 
     @Test
     fun `No license content provided`() {
-        val service = EmbeddedLicenseService(
-            embeddedLicenseConfigurationProperties = EmbeddedLicenseConfigurationProperties().apply {
-                key = null
+        val service = ProductionLicenseService(
+            licenseConfigurationProperties = LicenseConfigurationProperties().apply {
+                key = ""
             },
             licenseKeyPath = "/testing/keys/embedded.key"
         )
@@ -25,8 +24,8 @@ class SignatureLicenseServiceTest {
 
     @Test
     fun `License OK`() {
-        val service = EmbeddedLicenseService(
-            embeddedLicenseConfigurationProperties = EmbeddedLicenseConfigurationProperties().apply {
+        val service = ProductionLicenseService(
+            licenseConfigurationProperties = LicenseConfigurationProperties().apply {
                 key =
                     "eyJkYXRhIjoiZXlKdVlXMWxJam9pV0V3aUxDSmhjM05wWjI1bFpTSTZJazVsYldWeWIzTmhJRXh2WTJGc0lpd2lkbUZzYVdSVmJuUnBiQ0k2Ym5Wc2JDd2liV0Y0VUhKdmFtVmpkSE1pT2pBc0ltWmxZWFIxY21WeklqcGJleUpwWkNJNkltVjRkR1Z1YzJsdmJpNWxiblpwY205dWJXVnVkSE1pTENKbGJtRmliR1ZrSWpwMGNuVmxMQ0prWVhSaElqcGJleUp1WVcxbElqb2liV0Y0Ulc1MmFYSnZibTFsYm5Seklpd2lkbUZzZFdVaU9pSXdJbjFkZlYxOSIsInNpZ25hdHVyZSI6Ik1FVUNJUURiNmd5WkZNbktINUxXdFhTODFtdFlwMzN2STFRSFNmNldTREdGd2UxUnBRSWdOekMwditTd29ad1pVZ01CcFlDeCtmb2g0L0EwSnVhd0hYU2V5UW1sQ3dvPSJ9"
             },
