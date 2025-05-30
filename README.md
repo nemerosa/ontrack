@@ -1,7 +1,6 @@
-ontrack
-=======
+Yontrack
+========
 
-[![codecov](https://codecov.io/gh/nemerosa/ontrack/branch/develop/graph/badge.svg)](https://codecov.io/gh/nemerosa/ontrack)
 [![Slack chat](https://img.shields.io/badge/slack-ontrack-brightgreen.svg?logo=slack)](https://ontrack-run.slack.com/)
 [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/nemerosa/ontrack.svg)](http://isitmaintained.com/project/nemerosa/ontrack "Average time to resolve an issue")
 
@@ -71,9 +70,10 @@ To uninstall the chart:
 helm delete ontrack
 ```
 
-This installs 4 services:
+This installs the following services:
 
-* Ontrack itself
+* Ontrack itself (frontend & backend)
+* Keycloak for the authentication
 * a Postgres 17 database
 * an Elasticsearch 7 single node
 * a RabbitMQ message broker
@@ -82,9 +82,12 @@ This installs 4 services:
 
 See https://github.com/nemerosa/ontrack-chart for more options.
 
+> Note that the provided evaluation key is only for 10 projects at a maximum and not all features are enabled.
+> Go to https://yontrack.com for conditions.
+
 ### With Docker Compose
 
-On a local machine, you can start Ontrack using Docker Compose:
+On a local machine, you can start Yontrack using Docker Compose:
 
 ```bash
 curl -fsSLO https://raw.githubusercontent.com/nemerosa/ontrack/master/compose/docker-compose.yml
@@ -97,11 +100,15 @@ This sets up:
 * a Postgres database
 * an ElasticSearch (single node)
 * a RabbitMQ message broker
-* Ontrack running on port 8080
+* a Keycloak instance for the authentication
+* Ontrack (frontend & api)
 
-Go to http://localhost:8080 and start using Ontrack.
+Go to http://localhost:3000 and start using Ontrack.
 
 The initial administrator credentials are `admin` / `admin`.
+
+> Note that the provided evaluation key is only for 10 projects at a maximum and not all features are enabled.
+> Go to https://yontrack.com for conditions.
 
 ## Documentation
 
