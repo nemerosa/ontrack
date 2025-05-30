@@ -33,7 +33,7 @@ class ProductionLicenseServiceTest {
         )
         val license = service.license
         assertEquals(
-            license().toLicense("Embedded"),
+            license().toLicense("Production"),
             license
         )
         assertEquals(true, license.isFeatureEnabled("extension.environments"))

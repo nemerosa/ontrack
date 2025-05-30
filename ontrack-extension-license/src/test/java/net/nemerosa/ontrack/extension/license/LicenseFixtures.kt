@@ -12,10 +12,18 @@ object LicenseFixtures {
         alwaysEnabled = false,
     )
 
-    fun sampleFeatureData() = LicenseFeatureData(
-        id = sampleFeatureId,
-        enabled = true,
-        data = emptyList(),
+    fun testLicense(
+        active: Boolean = true,
+        message: String? = null,
+    ) = License(
+        type = "test",
+        name = "Test",
+        assignee = "test",
+        active = active,
+        validUntil = null,
+        maxProjects = 10,
+        features = emptyList(),
+        message = message,
     )
 
 }

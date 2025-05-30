@@ -26,8 +26,8 @@ dependencies {
     testImplementation(testFixtures(project(":ontrack-extension-queue")))
     testImplementation(testFixtures(project(":ontrack-extension-scm")))
     testImplementation(testFixtures(project(":ontrack-extension-workflows")))
+    testImplementation(testFixtures(project(":ontrack-extension-license")))
 
     testRuntimeOnly(project(":ontrack-service"))
     testRuntimeOnly(project(":ontrack-repository-impl"))
-    testRuntimeOnly(testFixtures(project(":ontrack-extension-license"))) // Test license key
 }
