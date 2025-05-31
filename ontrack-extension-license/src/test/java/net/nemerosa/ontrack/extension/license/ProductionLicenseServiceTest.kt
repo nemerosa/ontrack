@@ -39,7 +39,25 @@ class ProductionLicenseServiceTest {
         assertEquals(true, license.isFeatureEnabled("extension.environments"))
     }
 
-    private fun license() = SignatureLicense(
+    @Test
+    fun `License with message OK`() {
+        val service = ProductionLicenseService(
+            licenseConfigurationProperties = LicenseConfigurationProperties().apply {
+                key = "eyJkYXRhIjoiZXlKdVlXMWxJam9pV0V3aUxDSmhjM05wWjI1bFpTSTZJazVsYldWeWIzTmhJRXh2WTJGc0lpd2lkbUZzYVdSVmJuUnBiQ0k2Ym5Wc2JDd2liV0Y0VUhKdmFtVmpkSE1pT2pBc0ltWmxZWFIxY21WeklqcGJleUpwWkNJNkltVjRkR1Z1YzJsdmJpNWxiblpwY205dWJXVnVkSE1pTENKbGJtRmliR1ZrSWpwMGNuVmxMQ0prWVhSaElqcGJleUp1WVcxbElqb2liV0Y0Ulc1MmFYSnZibTFsYm5Seklpd2lkbUZzZFdVaU9pSXdJbjFkZlYwc0ltMWxjM05oWjJVaU9pSlVhR2x6SUdseklHRWdkR1Z6ZENCc2FXTmxibk5sSW4wPSIsInNpZ25hdHVyZSI6Ik1FVUNJUURXM0pFTGJiK1paQnh1ZFRiQW5JZy9pbVFJR0lpUk5tMklOTCs5UktIMG1RSWdOOGg1STJrZ1cxR2tCZS92dnR5WUcxbnR1cDZ1bGJ5OTNtRnVYeTN5dHNRPSJ9"
+            },
+            licenseKeyPath = "/testing/keys/embedded.key"
+        )
+        val license = service.license
+        assertEquals(
+            license(message = "This is a test license").toLicense("Production"),
+            license
+        )
+        assertEquals(true, license.isFeatureEnabled("extension.environments"))
+    }
+
+    private fun license(
+        message: String? = null,
+    ) = SignatureLicense(
         name = "XL",
         assignee = "Nemerosa Local",
         validUntil = null,
@@ -52,7 +70,8 @@ class ProductionLicenseServiceTest {
                     NameValue("maxEnvironments", "0")
                 ),
             )
-        )
+        ),
+        message = message,
     )
 
 }
