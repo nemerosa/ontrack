@@ -1,10 +1,13 @@
 import {createContext, useContext, useEffect, useState} from "react";
-import LoadingContainer from "@components/common/LoadingContainer";
 import {useQuery} from "@components/services/GraphQL";
 import {gql} from "graphql-request";
 import {useJobStates} from "@components/core/admin/jobs/JobState";
 
 const refDataSignature = {
+    /**
+     * Ref data loaded?
+     */
+    loaded: false,
     /**
      * Management of validation run statuses
      */
@@ -116,6 +119,7 @@ export default function RefDataContextProvider({children}) {
     useEffect(() => {
         if (data && finished) {
             setRefData({
+                loaded: true,
                 validationRunStatuses: validationRunStatuses(data.validationRunStatusIDList),
                 eventTypes: data.eventTypes,
                 jobStates: jobStates,
@@ -125,8 +129,11 @@ export default function RefDataContextProvider({children}) {
         }
     }, [data, finished, jobStates])
 
-    return <LoadingContainer loading={loading} error={error}>
-        <RefDataContext.Provider value={refData}>{children}</RefDataContext.Provider>
-    </LoadingContainer>
+    return <>
+        {
+            !loading &&
+            <RefDataContext.Provider value={refData}>{children}</RefDataContext.Provider>
+        }
+    </>
 
 }

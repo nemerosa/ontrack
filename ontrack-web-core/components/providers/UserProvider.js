@@ -1,7 +1,6 @@
 import {createContext, useEffect, useState} from "react";
 import {gql} from "graphql-request";
 import {useQuery} from "@components/services/GraphQL";
-import LoadingContainer from "@components/common/LoadingContainer";
 
 export const UserContext = createContext({
     name: '',
@@ -101,9 +100,10 @@ export default function UserContextProvider({children}) {
 
     return (
         <>
-            <LoadingContainer loading={loading} error={error}>
+            {
+                !loading && user?.name &&
                 <UserContext.Provider value={user}>{children}</UserContext.Provider>
-            </LoadingContainer>
+            }
         </>
     )
 

@@ -1,5 +1,6 @@
 import {createContext} from "react";
 import {signIn, useSession} from "next-auth/react";
+import LoadingLogo from "@components/providers/LoadingLogo";
 
 export const AuthContext = createContext({session: null})
 
@@ -20,11 +21,8 @@ export default function AuthProvider({children}) {
         <>
             <AuthContext.Provider value={context}>
                 {
-                    status === "loading" &&
-                    <div>Loading...</div>
-                }
-                {
-                    status === "authenticated" && children
+                    status !== "authenticated" ?
+                        <LoadingLogo/> : children
                 }
             </AuthContext.Provider>
         </>

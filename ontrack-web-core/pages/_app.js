@@ -18,6 +18,7 @@ import 'ace-builds/src-noconflict/mode-json';
 import 'ace-builds/src-noconflict/theme-github';
 import MessageContextProvider from "@components/providers/MessageProvider";
 import AuthProvider from "@components/providers/AuthProvider";
+import LoadingAggregator from "@components/providers/LoadingAggregator";
 
 export default function App({Component, pageProps}) {
 
@@ -36,7 +37,9 @@ export default function App({Component, pageProps}) {
                                 <RefDataContextProvider>
                                     <SearchContextProvider>
                                         <EventsContextProvider>
-                                            <Component {...pageProps} />
+                                            <LoadingAggregator>
+                                                <Component {...pageProps} />
+                                            </LoadingAggregator>
                                         </EventsContextProvider>
                                     </SearchContextProvider>
                                 </RefDataContextProvider>

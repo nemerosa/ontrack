@@ -9,6 +9,23 @@
 }
 
 /**
+ * Spinning Yontrack logo
+ */
+.logo-spin {
+    animation: spin 2s linear infinite;
+}
+
+/* Define the keyframes for the rotation */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/**
  * For any component which must span 100% of the horizontal space
  */
 .ot-line {
