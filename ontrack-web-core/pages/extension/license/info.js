@@ -31,6 +31,7 @@ export default function LicenseInfoPage() {
                                 active
                                 validUntil
                                 maxProjects
+                                message
                                 licensedFeatures {
                                     id
                                     name
@@ -82,6 +83,13 @@ export default function LicenseInfoPage() {
                             label: "Max. projects",
                             children: <LicenseMaxProjects maxProjects={info.license.maxProjects}/>,
                         },
+                        {
+                            key: 'message',
+                            label: "Message",
+                            children: info.license.message ?
+                                <Typography.Text>{info.license.message}</Typography.Text> :
+                                <Typography.Text type="secondary">No message</Typography.Text>,
+                        },
                     ])
                 } else {
                     setLicenseItems([
@@ -101,7 +109,7 @@ export default function LicenseInfoPage() {
         <StandardPage
             pageTitle="License info">
             <LoadingContainer loading={loading}>
-                <Space direction="vertical">
+                <Space direction="vertical" className="ot-line">
                     {
                         licenseInfo?.licenseControl && (
                             licenseInfo.licenseControl.active ?
@@ -121,9 +129,10 @@ export default function LicenseInfoPage() {
                         title=""
                         padding={true}
                     >
-                        <Space direction="vertical">
+                        <Space direction="vertical" className="ot-line">
                             <Descriptions
                                 items={licenseItems}
+                                bordered={true}
                                 layout="vertical"
                             />
                             <Row gutter={[8, 8]}>

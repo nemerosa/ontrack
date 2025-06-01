@@ -73,7 +73,7 @@ type Account {
   "Links"
   links: AccountLinks @deprecated(reason : "Use the `actions` field instead.")
   "Unique name for the account"
-  name: String
+  name: String! @deprecated(reason : "Will be removed in V6. Use email instead. Replaced by email.")
   "Security role (admin or none)"
   role: String
   "List of authentication tokens linked to this account."
@@ -616,19 +616,12 @@ type Build implements Authorizable & ProjectEntity {
   "Link to the GitHub Workflow Run which created this build."
   buildGitHubWorkflowRunProperty: Property
   creation: Signature
-  "Gets the list of slots where this build is actually deployed"
-  currentDeployments(
-    "Qualifier to use"
-    qualifier: String = ""
-  ): [SlotPipeline!]!
   "List of decorations"
   decorations(
     "Fully qualified name of the decoration type"
     type: String
   ): [Decoration!]!
   description: String
-  "List of slots this eligible to"
-  eligibleSlots: [Slot!]!
   gitChangeLog(
     "Name of the build to end the change log with. If not set, compares with the previous build."
     to: String
@@ -685,20 +678,6 @@ type Build implements Authorizable & ProjectEntity {
   ): String!
   "Run info associated with this build"
   runInfo: RunInfo
-  "List of pipelines this build is associated with"
-  slotPipelines(
-    "Sorting by decreasing environment order"
-    sortedByEnvironment: Boolean,
-    "Filtering on the pipeline status"
-    status: SlotPipelineStatus
-  ): [SlotPipeline!]!
-  "List of deployment slots this build is associated with"
-  slots(
-    "Name of the environment"
-    environment: String,
-    "Qualifier for the project"
-    qualifier: String
-  ): [Slot!]!
   "List of builds using this one."
   usedBy(
     "Keeps only links targeted from this branch. `project` argument is also required."
@@ -3302,6 +3281,8 @@ type License {
   licensedFeatures: [LicensedFeature!]!
   "Maximum number of projects which can be created (0 for unlimited)"
   maxProjects: Int!
+  "Message associated with the license"
+  message: String
   "Display name for the license"
   name: String!
   "Type of license"
@@ -5119,11 +5100,6 @@ type Project implements Authorizable & ProjectEntity {
   scmCatalogEntry: SCMCatalogEntry
   "List of saved SCM file filters for the project"
   scmFileChangeFilters: SCMFileChangeFilters!
-  "Graph of environment slots for a project"
-  slotGraph(
-    "Qualifier for the slots"
-    qualifier: String = ""
-  ): SlotGraph!
   "Association with a SonarQube project."
   sonarQubeProperty: Property
   "Allows to disable or delete stale branches"
@@ -5622,6 +5598,10 @@ type PurgeQueueRecordingsPayload implements Payload {
 }
 
 type Query {
+  accountGroupByName(
+    "Name of the group"
+    name: String!
+  ): AccountGroup
   accountGroups(
     "Searching by ID"
     id: Int,
@@ -9039,8 +9019,6 @@ input CreateBuiltInAccountInput {
   email: String!
   "fullName field"
   fullName: String!
-  "name field"
-  name: String!
 }
 
 "Input type for the createConfiguration mutation."
