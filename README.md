@@ -52,22 +52,16 @@ You can feed information into Ontrack using:
 
 ### On Kubernetes
 
-You can install Ontrack using its [Helm chart](https://github.com/nemerosa/ontrack-chart):
+You can install Yontrack using its [Helm chart](https://github.com/nemerosa/ontrack-chart):
 
 ```
-helm repo add ontrack https://nemerosa.github.io/ontrack-chart
-```
-
-To install the `ontrack` chart:
-
-```
-helm install ontrack ontrack/ontrack
+helm install yontrack oci://registry-1.docker.io/nemerosa/yontrack-chart
 ```
 
 To uninstall the chart:
 
 ```
-helm delete ontrack
+helm delete yontrack
 ```
 
 This installs the following services:
