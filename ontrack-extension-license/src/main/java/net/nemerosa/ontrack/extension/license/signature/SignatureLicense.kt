@@ -21,5 +21,6 @@ data class SignatureLicense(
             active = true,
             maxProjects = maxProjects,
             features = features,
+            message = message,
         )
 }
