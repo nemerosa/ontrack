@@ -24,6 +24,7 @@ class LicenseLoggingService(
             logger.info("[license] Name = $name")
             logger.info("[license] Assignee = $assignee")
             logger.info("[license] Active = $active")
+            logger.info("[license] Message = $message")
             logger.info("[license] Valid until = $validUntil")
             logger.info("[license] Max. projects = $maxProjects")
             license.features.forEach { feature ->
