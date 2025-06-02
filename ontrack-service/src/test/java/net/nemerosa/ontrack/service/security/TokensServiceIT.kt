@@ -153,35 +153,6 @@ class TokensServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    fun `Checking the validity of a token with cache not enabled`() {
-        withCustomTokenCache(false) {
-            asUser {
-                val id = securityService.currentUser?.account?.id()
-                    ?: fail("No current account")
-                val token = tokensService.generateNewToken(TokenOptions("test"))
-                assertTrue(tokensService.isValid(token.value), "Token is valid")
-                asAdmin { tokensService.revokeToken(id, "test") }
-                assertFalse(tokensService.isValid(token.value), "Token has been revoked")
-                assertFalse(tokensService.isValid(token.value), "Token has been revoked")
-            }
-        }
-    }
-
-    @Test
-    fun `Checking the validity of a token with cache enabled`() {
-        withCustomTokenCache(true) {
-            asUser {
-                val id = securityService.currentUser?.account?.id()
-                    ?: fail("No current account")
-                val token = tokensService.generateNewToken(TokenOptions("test"))
-                assertTrue(tokensService.isValid(token.value), "Token is valid")
-                asAdmin { tokensService.revokeToken(id, "test") }
-                assertFalse(tokensService.isValid(token.value), "Token has been revoked")
-            }
-        }
-    }
-
-    @Test
     fun `Changing the validity of a token to a shorter one with unlimited defaults`() {
         asUser {
             val id = securityService.currentUser?.account?.id()
@@ -280,16 +251,6 @@ class TokensServiceIT : AbstractDSLTestSupport() {
             code()
         } finally {
             ontrackConfigProperties.security.tokens.validity = old
-        }
-    }
-
-    private fun <T> withCustomTokenCache(enabled: Boolean, code: () -> T): T {
-        val old = ontrackConfigProperties.security.tokens.cache.enabled
-        return try {
-            ontrackConfigProperties.security.tokens.cache.enabled = enabled
-            code()
-        } finally {
-            ontrackConfigProperties.security.tokens.cache.enabled = old
         }
     }
 

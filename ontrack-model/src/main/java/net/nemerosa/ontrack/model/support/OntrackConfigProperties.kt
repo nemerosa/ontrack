@@ -285,34 +285,6 @@ class OntrackConfigProperties {
         @Deprecated("Will be removed in V5")
         var password: Boolean = true
 
-        /**
-         * Cache properties
-         */
-        var cache = TokensCacheProperties()
-
-    }
-
-    /**
-     * Token cache properties
-     */
-    @Deprecated("Will be removed in V5")
-    class TokensCacheProperties {
-        /**
-         * Is caching of the tokens enabled?
-         */
-        var enabled = true
-
-        /**
-         * Cache validity period
-         */
-        @DurationUnit(ChronoUnit.MINUTES)
-        var validity: Duration = Duration.ofDays(30)
-
-        /**
-         * Maximum number of items in the cache. Should be aligned with the
-         * number of sessions. Note that the objects stored in the cache are tiny.
-         */
-        var maxCount: Long = 1_000
     }
 
     companion object {
