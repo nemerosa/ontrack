@@ -279,12 +279,6 @@ class OntrackConfigProperties {
         @DurationUnit(ChronoUnit.DAYS)
         var validity: Duration = Duration.ofDays(0)
 
-        /**
-         * Allows the token to be used as passwords.
-         */
-        @Deprecated("Will be removed in V5")
-        var password: Boolean = true
-
     }
 
     companion object {
