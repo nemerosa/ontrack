@@ -25,6 +25,7 @@ class GQLTypeToken : GQLType {
             .field {
                 it.name("transient")
                     .description("Is this token managed?")
+                    .deprecate("Transient tokens will be removed in V5.")
                     .type(GraphQLBoolean.toNotNull())
                     .dataFetcher { env ->
                         val token: Token = env.getSource()

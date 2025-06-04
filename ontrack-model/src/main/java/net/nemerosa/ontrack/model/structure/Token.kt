@@ -18,6 +18,7 @@ data class Token(
     val name: String,
     val value: String,
     val creation: LocalDateTime,
+    @Deprecated("Token scopes will be removed in V5")
     val scope: TokenScope,
     val validUntil: LocalDateTime?,
     val lastUsed: LocalDateTime?,

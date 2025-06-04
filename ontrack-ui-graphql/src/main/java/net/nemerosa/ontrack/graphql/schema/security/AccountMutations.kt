@@ -21,9 +21,13 @@ class AccountMutations(
          * Creating a built-in account
          */
         simpleMutation(
-            "createBuiltInAccount", "Creates a built-in account",
-            CreateBuiltInAccountInput::class,
-            "account", "Created account", Account::class
+            name = "createBuiltInAccount",
+            description = "Creates a built-in account",
+            deprecation = "Creation of accounts is deprecated and will be removed in V5",
+            input = CreateBuiltInAccountInput::class,
+            outputName = "account",
+            outputDescription = "Created account",
+            outputType = Account::class
         ) { input ->
             accountService.create(
                 AccountInput(
@@ -41,9 +45,13 @@ class AccountMutations(
          * Disabling an account
          */
         simpleMutation(
-            "disableAccount", "Disables an account",
-            DisableAccountInput::class,
-            "account", "Updated account", Account::class
+            name = "disableAccount",
+            description = "Disables an account",
+            deprecation = "Disabling of accounts is deprecated and will be removed in V5",
+            input = DisableAccountInput::class,
+            outputName = "account",
+            outputDescription = "Updated account",
+            outputType = Account::class
         ) { input ->
             val id = ID.of(input.id)
             accountService.setAccountDisabled(id, true)
@@ -53,9 +61,13 @@ class AccountMutations(
          * Enabling an account
          */
         simpleMutation(
-            "enableAccount", "Enables an account",
-            EnableAccountInput::class,
-            "account", "Updated account", Account::class
+            name = "enableAccount",
+            description = "Enables an account",
+            deprecation = "Enabling of accounts is deprecated and will be removed in V5",
+            input = EnableAccountInput::class,
+            outputName = "account",
+            outputDescription = "Updated account",
+            outputType = Account::class
         ) { input ->
             val id = ID.of(input.id)
             accountService.setAccountDisabled(id, false)
@@ -65,9 +77,13 @@ class AccountMutations(
          * Locking an account
          */
         simpleMutation(
-            "lockAccount", "Locks an account",
-            LockAccountInput::class,
-            "account", "Updated account", Account::class
+            name = "lockAccount",
+            description = "Locks an account",
+            deprecation = "Locking of accounts is deprecated and will be removed in V5",
+            input = LockAccountInput::class,
+            outputName = "account",
+            outputDescription = "Updated account",
+            outputType = Account::class
         ) { input ->
             val id = ID.of(input.id)
             accountService.setAccountLocked(id, true)
@@ -77,9 +93,13 @@ class AccountMutations(
          * Unlocking an account
          */
         simpleMutation(
-            "unlockAccount", "Unlocks an account",
-            UnlockAccountInput::class,
-            "account", "Updated account", Account::class
+            name = "unlockAccount",
+            description = "Unlocks an account",
+            deprecation = "Unlocking of accounts is deprecated and will be removed in V5",
+            input = UnlockAccountInput::class,
+            outputName = "account",
+            outputDescription = "Updated account",
+            outputType = Account::class
         ) { input ->
             val id = ID.of(input.id)
             accountService.setAccountLocked(id, false)
