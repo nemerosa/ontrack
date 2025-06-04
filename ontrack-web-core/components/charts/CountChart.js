@@ -2,6 +2,7 @@ import {useGraphQLClient} from "@components/providers/ConnectionContextProvider"
 import {useEffect, useState} from "react";
 import {Bar, CartesianGrid, ComposedChart, Legend, Tooltip, XAxis, YAxis} from "recharts";
 import ChartContainer from "@components/charts/ChartContainer";
+import {brand} from "@components/common/brand/Colors";
 
 export default function CountChart({
                                        query,
@@ -67,7 +68,7 @@ export default function CountChart({
                     <YAxis tickFormatter={yTickFormatter} domain={domain}/>
                     <Tooltip/>
                     <Legend formatter={legendFormatter} onClick={legendClick} style={{cursor: 'pointer'}}/>
-                    <Bar dataKey="value" fill="#6666aa" hide={inactiveSeries.includes('value')}/>
+                    <Bar dataKey="value" fill={brand.colors.lilac} hide={inactiveSeries.includes('value')}/>
                 </ComposedChart>
             </ChartContainer>
         </>

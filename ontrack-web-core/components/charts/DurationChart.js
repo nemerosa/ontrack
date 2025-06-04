@@ -3,6 +3,7 @@ import {useEffect, useState} from "react";
 import {formatSeconds} from "@components/common/Duration";
 import {Bar, CartesianGrid, ComposedChart, Legend, Line, Tooltip, XAxis, YAxis} from "recharts";
 import ChartContainer from "@components/charts/ChartContainer";
+import {brand} from "@components/common/brand/Colors";
 
 export default function DurationChart({query, variables}) {
 
@@ -74,9 +75,9 @@ export default function DurationChart({query, variables}) {
                     <YAxis tickFormatter={durationFormatter}/>
                     <Tooltip formatter={durationFormatter}/>
                     <Legend formatter={legendFormatter} onClick={legendClick} style={{cursor: 'pointer'}}/>
-                    <Bar dataKey="mean" fill="#6666aa" hide={inactiveSeries.includes('mean')}/>
-                    <Line type="monotone" connectNulls={true} dataKey="percentile90" stroke="#66aa66" hide={inactiveSeries.includes('percentile90')}/>
-                    <Line type="monotone" connectNulls={true} dataKey="maximum" stroke="#aa6666" hide={inactiveSeries.includes('maximum')}/>
+                    <Bar dataKey="mean" fill={brand.colors.lilac} hide={inactiveSeries.includes('mean')}/>
+                    <Line type="monotone" connectNulls={true} dataKey="percentile90" stroke={brand.colors.purple} hide={inactiveSeries.includes('percentile90')}/>
+                    <Line type="monotone" connectNulls={true} dataKey="maximum" stroke={brand.colors.green} hide={inactiveSeries.includes('maximum')}/>
                 </ComposedChart>
             </ChartContainer>
         </>
