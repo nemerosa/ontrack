@@ -27,6 +27,11 @@ interface Mutation {
     val description: String
 
     /**
+     * Deprecation reason (if any)
+     */
+    val deprecation: String?
+
+    /**
      * Fields attached to the input of the mutation
      */
     fun inputFields(dictionary: MutableSet<GraphQLType>): List<GraphQLInputObjectField>

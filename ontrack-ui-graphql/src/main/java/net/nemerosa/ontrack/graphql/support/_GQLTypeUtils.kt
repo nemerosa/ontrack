@@ -11,6 +11,7 @@ import net.nemerosa.ontrack.model.support.toNameValues
 import java.time.LocalDateTime
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
+import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.jvm.javaType
 
 typealias TypeBuilder = GraphQLObjectType.Builder
@@ -257,6 +258,12 @@ inline fun <reified E : Enum<E>> TypeBuilder.enumField(
     field {
         it.name(property.name)
             .description(getPropertyDescription(property, description))
+            .apply {
+                val deprecated = property.findAnnotation<Deprecated>()
+                if (deprecated != null) {
+                    deprecate(deprecated.message)
+                }
+            }
             .type(
                 nullableOutputType(
                     GraphQLTypeReference(E::class.java.simpleName),
