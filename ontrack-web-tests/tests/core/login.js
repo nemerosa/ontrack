@@ -23,7 +23,9 @@ export const login = async (
     const signIn = await signInButton(page)
     await signIn.click()
     // Filling the username and password
-    await page.getByRole("textbox", {exact: false, name: "Username"}).fill(username)
+    const usernameField = page.getByRole("textbox", {exact: false, name: "Username"});
+    await expect(usernameField).toBeVisible()
+    await usernameField.fill(username)
     await page.getByRole("textbox", {exact: false, name: "Password"}).fill(password)
     // Launching the login
     await page.getByRole("button", {name: "Sign In", exact: true}).click()
@@ -48,5 +50,6 @@ export const logout = async (page) => {
 const signInButton = async (page) => {
     let button = page.getByRole("button", {name: "Sign in", exact: false});
     await expect(button).toBeVisible()
+    await page.waitForTimeout(500)
     return button
 }
