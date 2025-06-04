@@ -34,12 +34,12 @@ class PromotionLevelMutations(
              * Creating a promotion level from a branch ID
              */
             simpleMutation(
-                "createPromotionLevelById",
-                "Creates a new promotion level from a branch ID",
-                CreatePromotionLevelByIdInput::class,
-                "promotionLevel",
-                "Created promotion level",
-                PromotionLevel::class
+                name = "createPromotionLevelById",
+                description = "Creates a new promotion level from a branch ID",
+                input = CreatePromotionLevelByIdInput::class,
+                outputName = "promotionLevel",
+                outputDescription = "Created promotion level",
+                outputType = PromotionLevel::class
             ) { input ->
                 val branch = structureService.getBranch(ID.of(input.branchId))
                 structureService.newPromotionLevel(
@@ -53,12 +53,12 @@ class PromotionLevelMutations(
              * Updating an existing promotion level
              */
             simpleMutation(
-                "updatePromotionLevelById",
-                "Updates an existing promotion level",
-                UpdatePromotionLevelByIdInput::class,
-                "promotionLevel",
-                "Updated promotion level",
-                PromotionLevel::class
+                name = "updatePromotionLevelById",
+                description = "Updates an existing promotion level",
+                input = UpdatePromotionLevelByIdInput::class,
+                outputName = "promotionLevel",
+                outputDescription = "Updated promotion level",
+                outputType = PromotionLevel::class
             ) { input ->
                 val pl = structureService.getPromotionLevel(ID.of(input.id))
                 structureService.savePromotionLevel(

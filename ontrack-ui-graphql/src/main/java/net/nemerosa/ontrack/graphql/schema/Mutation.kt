@@ -29,7 +29,7 @@ interface Mutation {
     /**
      * Deprecation reason (if any)
      */
-    val deprecation: String?
+    val deprecation: String? get() = null
 
     /**
      * Fields attached to the input of the mutation
