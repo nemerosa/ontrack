@@ -2,7 +2,7 @@ mutation CreateUser(
     $fullName: String!,
     $email: String!,
 ) {
-    createBuiltInAccount(input: {
+    createTestAccount(input: {
         fullName: $fullName,
         email: $email,
     }) {

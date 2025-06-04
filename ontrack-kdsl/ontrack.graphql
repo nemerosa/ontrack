@@ -1106,14 +1106,6 @@ type CreateBuildPayload implements Payload {
   errors: [UserError]
 }
 
-"Output type for the createBuiltInAccount mutation."
-type CreateBuiltInAccountPayload implements Payload {
-  "Created account"
-  account: Account
-  "List of errors"
-  errors: [UserError]
-}
-
 "Output type for the createConfiguration mutation."
 type CreateConfigurationPayload implements Payload {
   "List of errors"
@@ -1204,6 +1196,14 @@ type CreateSlotsPayload implements Payload {
   errors: [UserError]
   "List of the created slots"
   slots: SlotList
+}
+
+"Output type for the createTestAccount mutation."
+type CreateTestAccountPayload implements Payload {
+  "Creates account"
+  account: Account
+  "List of errors"
+  errors: [UserError]
 }
 
 "Output type for the createValidationRunById mutation."
@@ -1878,14 +1878,6 @@ type DeletionPayload implements PayloadInterface {
   errors: [PayloadUserError]
 }
 
-"Output type for the disableAccount mutation."
-type DisableAccountPayload implements Payload {
-  "Updated account"
-  account: Account
-  "List of errors"
-  errors: [UserError]
-}
-
 "Output type for the disableBranch mutation."
 type DisableBranchPayload implements Payload {
   "Updated branch"
@@ -1928,14 +1920,6 @@ type EligibleSlot {
   eligible: Boolean
   "slot field"
   slot: Slot!
-}
-
-"Output type for the enableAccount mutation."
-type EnableAccountPayload implements Payload {
-  "Updated account"
-  account: Account
-  "List of errors"
-  errors: [UserError]
 }
 
 "Output type for the enableBranch mutation."
@@ -3306,6 +3290,8 @@ type License {
   licensedFeatures: [LicensedFeature!]!
   "Maximum number of projects which can be created (0 for unlimited)"
   maxProjects: Int!
+  "Message associated with the license"
+  message: String
   "Display name for the license"
   name: String!
   "Type of license"
@@ -3369,14 +3355,6 @@ type LinkChange {
 type LinksBuildPayload implements Payload {
   "Build linked from"
   build: Build
-  "List of errors"
-  errors: [UserError]
-}
-
-"Output type for the lockAccount mutation."
-type LockAccountPayload implements Payload {
-  "Updated account"
-  account: Account
   "List of errors"
   errors: [UserError]
 }
@@ -3458,11 +3436,6 @@ type Mutation {
     "Input for the mutation"
     input: CreateBuildOrGetInput
   ): CreateBuildOrGetPayload
-  "Creates a built-in account"
-  createBuiltInAccount(
-    "Input for the mutation"
-    input: CreateBuiltInAccountInput
-  ): CreateBuiltInAccountPayload
   "Creates a configuration"
   createConfiguration(
     "Input for the mutation"
@@ -3523,6 +3496,11 @@ type Mutation {
     "Input for the mutation"
     input: CreateSlotsInput
   ): CreateSlotsPayload
+  "Creates a test account (not available in production mode)"
+  createTestAccount(
+    "Input for the mutation"
+    input: CreateTestAccountInput
+  ): CreateTestAccountPayload
   "Creating a validation run for a build identified by its name"
   createValidationRun(
     "Input for the mutation"
@@ -3957,11 +3935,6 @@ type Mutation {
     "Input for the mutation"
     input: DeleteWebhookInput
   ): DeleteWebhookPayload
-  "Disables an account"
-  disableAccount(
-    "Input for the mutation"
-    input: DisableAccountInput
-  ): DisableAccountPayload
   "Disables an existing branch"
   disableBranch(
     "Input for the mutation"
@@ -3987,11 +3960,6 @@ type Mutation {
     "Input for the mutation"
     input: EditAccountGroupInput
   ): EditAccountGroupPayload
-  "Enables an account"
-  enableAccount(
-    "Input for the mutation"
-    input: EnableAccountInput
-  ): EnableAccountPayload
   "Enables an existing branch"
   enableBranch(
     "Input for the mutation"
@@ -4104,11 +4072,6 @@ type Mutation {
     "Input for the mutation"
     input: LinksBuildInput
   ): LinksBuildPayload
-  "Locks an account"
-  lockAccount(
-    "Input for the mutation"
-    input: LockAccountInput
-  ): LockAccountPayload
   "Maps an identity provider group to a Yontrack group"
   mapGroup(
     "Input for the mutation"
@@ -4707,11 +4670,6 @@ type Mutation {
     "Input for the mutation"
     input: UnfavouriteProjectInput
   ): UnfavouriteProjectPayload
-  "Unlocks an account"
-  unlockAccount(
-    "Input for the mutation"
-    input: UnlockAccountInput
-  ): UnlockAccountPayload
   "Unshares a filter at project level"
   unshareSCMFileChangeFilter(
     "Input for the mutation"
@@ -7831,14 +7789,6 @@ type UnfavouriteProjectPayload implements Payload {
   project: Project
 }
 
-"Output type for the unlockAccount mutation."
-type UnlockAccountPayload implements Payload {
-  "Updated account"
-  account: Account
-  "List of errors"
-  errors: [UserError]
-}
-
 "Output type for the unshareSCMFileChangeFilter mutation."
 type UnshareSCMFileChangeFilterPayload implements Payload {
   "List of errors"
@@ -9048,14 +8998,6 @@ input CreateBuildOrGetInput {
   runInfo: RunInfoInput
 }
 
-"Input type for the createBuiltInAccount mutation."
-input CreateBuiltInAccountInput {
-  "email field"
-  email: String!
-  "fullName field"
-  fullName: String!
-}
-
 "Input type for the createConfiguration mutation."
 input CreateConfigurationInput {
   "data field"
@@ -9200,6 +9142,16 @@ input CreateSlotsInput {
   projectId: Int!
   "qualifier field"
   qualifier: String
+}
+
+"Input type for the createTestAccount mutation."
+input CreateTestAccountInput {
+  "Email of the account"
+  email: String!
+  "Full name for the account. If null, the full name is not changed."
+  fullName: String!
+  "List of groups the account is a member of. If null, no group is assigned."
+  groups: [Int!]
 }
 
 "Input type for the createValidationRunById mutation."
@@ -9851,12 +9803,6 @@ input DeleteWebhookInput {
   name: String!
 }
 
-"Input type for the disableAccount mutation."
-input DisableAccountInput {
-  "ID of the account"
-  id: Int!
-}
-
 "Input type for the disableBranch mutation."
 input DisableBranchInput {
   "Branch ID"
@@ -9895,12 +9841,6 @@ input EditAccountInput {
   fullName: String
   "List of groups the account is a member of. If null, the groups are not changed."
   groups: [Int!]
-  "ID of the account"
-  id: Int!
-}
-
-"Input type for the enableAccount mutation."
-input EnableAccountInput {
   "ID of the account"
   id: Int!
 }
@@ -10280,12 +10220,6 @@ input LinksBuildInputItem {
   project: String!
   "Qualifier for the link"
   qualifier: String
-}
-
-"Input type for the lockAccount mutation."
-input LockAccountInput {
-  "ID of the account"
-  id: Int!
 }
 
 "Input type for the mapGroup mutation."
@@ -11876,12 +11810,6 @@ input UnfavouriteBranchInput {
 "Input type for the unfavouriteProject mutation."
 input UnfavouriteProjectInput {
   "Project ID"
-  id: Int!
-}
-
-"Input type for the unlockAccount mutation."
-input UnlockAccountInput {
-  "ID of the account"
   id: Int!
 }
 

@@ -46,8 +46,8 @@ class AdminMgt(connector: Connector) : Connected(connector) {
                 fullName,
                 email,
             )
-        ) { it?.createBuiltInAccount?.payloadUserErrors?.convert() }
-            ?.checkData { it.createBuiltInAccount?.account }
+        ) { it?.createTestAccount?.payloadUserErrors?.convert() }
+            ?.checkData { it.createTestAccount?.account }
             ?.run {
                 Account(
                     id = id.toInt(),
