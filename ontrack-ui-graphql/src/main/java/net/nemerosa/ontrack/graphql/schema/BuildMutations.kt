@@ -1,5 +1,7 @@
 package net.nemerosa.ontrack.graphql.schema
 
+import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Pattern
 import net.nemerosa.ontrack.graphql.support.ListRef
 import net.nemerosa.ontrack.graphql.support.TypeRef
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
@@ -11,8 +13,6 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
-import jakarta.validation.constraints.NotNull
-import jakarta.validation.constraints.Pattern
 import kotlin.jvm.optionals.getOrNull
 
 @Component
@@ -27,8 +27,12 @@ class BuildMutations(
          * Creating a build
          */
         simpleMutation(
-            CREATE_BUILD, "Creates a new build", CreateBuildInput::class,
-            "build", "Created build", Build::class
+            name = CREATE_BUILD,
+            description = "Creates a new build",
+            input = CreateBuildInput::class,
+            outputName = "build",
+            outputDescription = "Created build",
+            outputType = Build::class
         ) { input ->
             val branch = getBranch(input)
             val build = structureService.newBuild(
@@ -86,8 +90,12 @@ class BuildMutations(
          * Creating a build or getting it if it already exists
          */
         simpleMutation(
-            CREATE_BUILD_OR_GET, "Creates a new build or gets it if it already exists", CreateBuildOrGetInput::class,
-            "build", "Created or existing build", Build::class
+            name = CREATE_BUILD_OR_GET,
+            description = "Creates a new build or gets it if it already exists",
+            input = CreateBuildOrGetInput::class,
+            outputName = "build",
+            outputDescription = "Created or existing build",
+            outputType = Build::class
         ) { input ->
             createBuildOrGet(input)
         },
@@ -95,8 +103,12 @@ class BuildMutations(
          * Creating a link between two builds using their names
          */
         simpleMutation(
-            "linkBuild", "Link two builds using their names", LinkBuildInput::class,
-            "build", "Build linked from", Build::class
+            name = "linkBuild",
+            description = "Link two builds using their names",
+            input = LinkBuildInput::class,
+            outputName = "build",
+            outputDescription = "Build linked from",
+            outputType = Build::class
         ) { input ->
             val from = findBuildByProjectAndName(input.fromProject, input.fromBuild)
             val to = findBuildByProjectAndName(input.toProject, input.toBuild)
@@ -110,8 +122,12 @@ class BuildMutations(
          * Creating a link between one build and several other ones using their names
          */
         simpleMutation(
-            "linksBuild", "Link build to other ones using their names", LinksBuildInput::class,
-            "build", "Build linked from", Build::class
+            name = "linksBuild",
+            description = "Link build to other ones using their names",
+            input = LinksBuildInput::class,
+            outputName = "build",
+            outputDescription = "Build linked from",
+            outputType = Build::class
         ) { input ->
             val from = findBuildByProjectAndName(input.fromProject, input.fromBuild)
             if (from != null) {
@@ -129,8 +145,12 @@ class BuildMutations(
          * Creating a link between two builds using their IDs
          */
         simpleMutation(
-            "linkBuildById", "Link two builds using their IDs", LinkBuildByIdInput::class,
-            "build", "Build linked from", Build::class
+            name = "linkBuildById",
+            description = "Link two builds using their IDs",
+            input = LinkBuildByIdInput::class,
+            outputName = "build",
+            outputDescription = "Build linked from",
+            outputType = Build::class
         ) { input ->
             val from = structureService.getBuild(ID.of(input.fromBuild))
             val to = structureService.getBuild(ID.of(input.toBuild))

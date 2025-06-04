@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.graphql.schema
 
-import net.nemerosa.ontrack.common.getOrNull
+import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Pattern
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.exceptions.ProjectNameAlreadyDefinedException
@@ -8,8 +9,7 @@ import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
-import jakarta.validation.constraints.NotNull
-import jakarta.validation.constraints.Pattern
+import kotlin.jvm.optionals.getOrNull
 
 @Component
 class ProjectMutations(
@@ -23,8 +23,12 @@ class ProjectMutations(
              * Creating a project
              */
             simpleMutation(
-                    CREATE_PROJECT, "Creates a new project", CreateProjectInput::class,
-                    "project", "Created project", Project::class
+                name = CREATE_PROJECT,
+                description = "Creates a new project",
+                input = CreateProjectInput::class,
+                outputName = "project",
+                outputDescription = "Created project",
+                outputType = Project::class
             ) { input ->
                 structureService.newProject(Project.of(input.toNameDescriptionState()))
             },
@@ -32,8 +36,12 @@ class ProjectMutations(
              * Creating a project or getting it if it already exists
              */
             simpleMutation(
-                    CREATE_PROJECT_OR_GET, "Creates a new project or gets it if it already exists", CreateProjectOrGetInput::class,
-                    "project", "Created or existing project", Project::class
+                name = CREATE_PROJECT_OR_GET,
+                description = "Creates a new project or gets it if it already exists",
+                input = CreateProjectOrGetInput::class,
+                outputName = "project",
+                outputDescription = "Created or existing project",
+                outputType = Project::class
             ) { input ->
                 createProjectOrGet(input)
             },
@@ -41,8 +49,12 @@ class ProjectMutations(
              * Updating a project
              */
             simpleMutation(
-                    UPDATE_PROJECT, "Updates an existing project", UpdateProjectInput::class,
-                    "project", "Updated project", Project::class
+                name = UPDATE_PROJECT,
+                description = "Updates an existing project",
+                input = UpdateProjectInput::class,
+                outputName = "project",
+                outputDescription = "Updated project",
+                outputType = Project::class
             ) { input ->
                 val project = structureService.getProject(ID(input.id))
                 val state = NameDescriptionState(
@@ -65,8 +77,12 @@ class ProjectMutations(
              * Disables a project
              */
             simpleMutation(
-                    DISABLE_PROJECT, "Disables an existing project", DisableProjectInput::class,
-                    "project", "Updated project", Project::class
+                name = DISABLE_PROJECT,
+                description = "Disables an existing project",
+                input = DisableProjectInput::class,
+                outputName = "project",
+                outputDescription = "Updated project",
+                outputType = Project::class
             ) { input ->
                 val project = structureService.getProject(ID(input.id))
                 structureService.disableProject(project)
@@ -75,8 +91,12 @@ class ProjectMutations(
              * Enables a project
              */
             simpleMutation(
-                    ENABLE_PROJECT, "Enables an existing project", EnableProjectInput::class,
-                    "project", "Updated project", Project::class
+                name = ENABLE_PROJECT,
+                description = "Enables an existing project",
+                input = EnableProjectInput::class,
+                outputName = "project",
+                outputDescription = "Updated project",
+                outputType = Project::class
             ) { input ->
                 val project = structureService.getProject(ID(input.id))
                 structureService.enableProject(project)
@@ -85,8 +105,12 @@ class ProjectMutations(
              * Mark a project as favourite
              */
             simpleMutation(
-                    FAVOURITE_PROJECT, "Marks a project as favourite", FavouriteProjectInput::class,
-                    "project", "Updated project", Project::class
+                name = FAVOURITE_PROJECT,
+                description = "Marks a project as favourite",
+                input = FavouriteProjectInput::class,
+                outputName = "project",
+                outputDescription = "Updated project",
+                outputType = Project::class
             ) { input ->
                 val project = structureService.getProject(ID(input.id))
                 projectFavouriteService.setProjectFavourite(project, true)
@@ -96,8 +120,12 @@ class ProjectMutations(
              * Unmark a project as favourite
              */
             simpleMutation(
-                    UNFAVOURITE_PROJECT, "Unmarks a project as favourite", UnfavouriteProjectInput::class,
-                    "project", "Updated project", Project::class
+                name = UNFAVOURITE_PROJECT,
+                description = "Unmarks a project as favourite",
+                input = UnfavouriteProjectInput::class,
+                outputName = "project",
+                outputDescription = "Updated project",
+                outputType = Project::class
             ) { input ->
                 val project = structureService.getProject(ID(input.id))
                 projectFavouriteService.setProjectFavourite(project, false)
