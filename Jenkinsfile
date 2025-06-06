@@ -76,7 +76,9 @@ pipeline {
                         BRONZE: [
                             validations: [
                                 'BUILD',
+                                'UI_UNIT',
                                 'KDSL.ACCEPTANCE',
+                                'PLAYWRIGHT',
                             ],
                         ],
                         RELEASE: [
@@ -307,7 +309,7 @@ pipeline {
             }
         }
 
-        stage('Local Next UI tests') {
+        stage('Local UI tests') {
             when {
                 not {
                     branch 'master'
