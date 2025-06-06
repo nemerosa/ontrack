@@ -77,7 +77,6 @@ export default function UserContextProvider({children}) {
                 fullName: data?.user?.account?.fullName,
                 email: data?.user?.account?.email,
             }
-            console.log({data, tmpUser})
             // Groups
             tmpUser.userMenuGroups = data.userMenuItems
             // Indexing of authorizations

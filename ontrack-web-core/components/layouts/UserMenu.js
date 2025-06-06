@@ -1,7 +1,6 @@
 import {Drawer, Menu, Typography} from "antd";
 import {useContext, useEffect, useState} from "react";
 import {UserContext} from "@components/providers/UserProvider";
-import {legacyGraphiQLUri} from "@components/common/Links";
 import {
     FaBars,
     FaCertificate,
@@ -33,6 +32,7 @@ import LegacyLink from "@components/common/LegacyLink";
 import UserMenuItemLink from "@components/layouts/UserMenuItemLink";
 import {useRefData} from "@components/providers/RefDataProvider";
 import {signOut} from "next-auth/react";
+import Link from "next/link";
 
 export function useUserMenu() {
     const [open, setOpen] = useState(false);
@@ -105,7 +105,7 @@ export default function UserMenu({userMenu}) {
         // GraphiQL
         menu.push({
             key: 'graphiql',
-            label: <LegacyLink href={legacyGraphiQLUri()}>GraphiQL</LegacyLink>,
+            label: <Link href="/graphiql">GraphiQL</Link>,
             title: "GraphQL IDE",
             icon: <FaCode/>,
         })

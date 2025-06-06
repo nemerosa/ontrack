@@ -1,9 +1,5 @@
 import Link from "next/link";
 
-export function legacyGraphiQLUri() {
-    return `/graphiql.html`
-}
-
 export function homeUri() {
     return `/`
 }
