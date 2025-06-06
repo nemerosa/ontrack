@@ -32,7 +32,7 @@ tasks.named("build") {
 // Docker image
 
 val dockerBuild by tasks.registering(DockerBuildImage::class) {
-    dependsOn("build")
+    dependsOn(test)
     inputDir.set(project.projectDir)
     images.add("nemerosa/ontrack-ui:${version}")
     images.add("nemerosa/ontrack-ui:latest")
