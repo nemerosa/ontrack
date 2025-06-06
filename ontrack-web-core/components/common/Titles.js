@@ -63,7 +63,7 @@ export function validationStampTitle(validationStamp) {
 }
 
 export function title(text) {
-    return <title>{`Yontrack | ${text ? text : "loading..."}`}</title>
+    return <title>{`Yontrack - ${text ? text : "loading..."}`}</title>
 }
 
 export const pageTitle = title
