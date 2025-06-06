@@ -1,5 +1,8 @@
-import 'antd/dist/reset.css';
-import './globals.css';
+/**
+ * Root layout for the auth page
+ */
+
+import "./auth.css"
 
 export default function RootLayout({children}) {
     return (

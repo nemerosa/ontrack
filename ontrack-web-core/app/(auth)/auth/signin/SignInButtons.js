@@ -1,7 +1,6 @@
 "use client";
 
 import {signIn} from "next-auth/react";
-import {Button, Space} from "antd";
 
 export default function SignInButtons({providers}) {
     if (!providers) return null;
@@ -13,17 +12,16 @@ export default function SignInButtons({providers}) {
     }
 
     return (
-        <Space direction="vertical" size="middle">
+        <div className="button-container">
             {Object.values(providers).map((provider) => (
-                <Button
+                <button
                     key={provider.name}
-                    type="primary"
-                    size="large"
                     onClick={providerSignIn(provider)}
+                    className="signin-button"
                 >
                     Sign in with {provider.name}
-                </Button>
+                </button>
             ))}
-        </Space>
+        </div>
     );
 }
