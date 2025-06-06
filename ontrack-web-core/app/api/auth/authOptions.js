@@ -44,9 +44,9 @@ if (providerId === "oidc") {
 
 export const authOptions = {
     providers: providers,
-    // pages: {
-    //     signIn: '/auth/signin'
-    // },
+    pages: {
+        signIn: '/auth/signin'
+    },
     callbacks: {
         async jwt({token, account}) {
             if (account) {
