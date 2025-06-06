@@ -1,7 +1,7 @@
 <#import "template.ftl" as layout>
 <div class="${properties.kcLoginClass!}">
     <div id="yontrack-header" class="${properties.kcHeaderClass!} yontrack-header">
-        <img src="${url.resourcesPath}/img/logo.svg" alt="Yontrack" class="yontrack-logo"/>
+        <img src="${url.resourcesPath}/img/logo.svg" alt="Yontrack" style="width: 240px"/>
     </div>
 </div>
 <@layout.registrationLayout displayMessage=!messagesPerField.existsError('username','password') displayInfo=realm.password && realm.registrationAllowed && !registrationDisabled??; section>
