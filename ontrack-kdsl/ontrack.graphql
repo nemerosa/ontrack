@@ -435,6 +435,8 @@ type Branch implements Authorizable & ProjectEntity {
   messageProperty: Property
   "List of meta information properties"
   metaInfoProperty: Property
+  "Mock SCM used for testing only"
+  mockSCMBranchProperty: Property
   name: String
   "List of other branches in the same project"
   otherBranches: [Branch!]!
@@ -614,12 +616,19 @@ type Build implements Authorizable & ProjectEntity {
   "Link to the GitHub Workflow Run which created this build."
   buildGitHubWorkflowRunProperty: Property
   creation: Signature
+  "Gets the list of slots where this build is actually deployed"
+  currentDeployments(
+    "Qualifier to use"
+    qualifier: String = ""
+  ): [SlotPipeline!]!
   "List of decorations"
   decorations(
     "Fully qualified name of the decoration type"
     type: String
   ): [Decoration!]!
   description: String
+  "List of slots this eligible to"
+  eligibleSlots: [Slot!]!
   gitChangeLog(
     "Name of the build to end the change log with. If not set, compares with the previous build."
     to: String
@@ -644,6 +653,8 @@ type Build implements Authorizable & ProjectEntity {
   messageProperty: Property
   "List of meta information properties"
   metaInfoProperty: Property
+  "Mock SCM used for testing only"
+  mockSCMBuildCommitProperty: Property
   name: String
   "Next build"
   nextBuild: Build
@@ -676,6 +687,20 @@ type Build implements Authorizable & ProjectEntity {
   ): String!
   "Run info associated with this build"
   runInfo: RunInfo
+  "List of pipelines this build is associated with"
+  slotPipelines(
+    "Sorting by decreasing environment order"
+    sortedByEnvironment: Boolean,
+    "Filtering on the pipeline status"
+    status: SlotPipelineStatus
+  ): [SlotPipeline!]!
+  "List of deployment slots this build is associated with"
+  slots(
+    "Name of the environment"
+    environment: String,
+    "Qualifier for the project"
+    qualifier: String
+  ): [Slot!]!
   "List of builds using this one."
   usedBy(
     "Keeps only links targeted from this branch. `project` argument is also required."
@@ -1147,6 +1172,14 @@ type CreateSlotsPayload implements Payload {
   errors: [UserError]
   "List of the created slots"
   slots: SlotList
+}
+
+"Output type for the createTestAccount mutation."
+type CreateTestAccountPayload implements Payload {
+  "Creates account"
+  account: Account
+  "List of errors"
+  errors: [UserError]
 }
 
 "Output type for the createValidationRunById mutation."
@@ -3439,6 +3472,11 @@ type Mutation {
     "Input for the mutation"
     input: CreateSlotsInput
   ): CreateSlotsPayload
+  "Creates a test account (not available in production mode)"
+  createTestAccount(
+    "Input for the mutation"
+    input: CreateTestAccountInput
+  ): CreateTestAccountPayload
   "Creating a validation run for a build identified by its name"
   createValidationRun(
     "Input for the mutation"
@@ -4991,6 +5029,8 @@ type Project implements Authorizable & ProjectEntity {
   messageProperty: Property
   "List of meta information properties"
   metaInfoProperty: Property
+  "Mock SCM used for testing only"
+  mockSCMProjectProperty: Property
   name: String
   "Makes a promotion conditional based on the fact that a previous promotion has been granted."
   previousPromotionConditionProperty: Property
@@ -5017,6 +5057,11 @@ type Project implements Authorizable & ProjectEntity {
   scmCatalogEntry: SCMCatalogEntry
   "List of saved SCM file filters for the project"
   scmFileChangeFilters: SCMFileChangeFilters!
+  "Graph of environment slots for a project"
+  slotGraph(
+    "Qualifier for the slots"
+    qualifier: String = ""
+  ): SlotGraph!
   "Association with a SonarQube project."
   sonarQubeProperty: Property
   "Allows to disable or delete stale branches"
@@ -5742,6 +5787,11 @@ type Query {
   ): [Project!]!
   "License"
   licenseInfo: LicenseResponse!
+  "Getting a list of texts generated for a mock workflow"
+  mockWorkflowTexts(
+    "ID of the workflow instance"
+    instanceId: String!
+  ): [String!]!
   "List of all notification channels"
   notificationChannels: [NotificationChannel!]!
   "Getting a notification record using its ID"
@@ -8952,6 +9002,16 @@ input CreateSlotsInput {
   projectId: Int!
   "qualifier field"
   qualifier: String
+}
+
+"Input type for the createTestAccount mutation."
+input CreateTestAccountInput {
+  "Email of the account"
+  email: String!
+  "Full name for the account. If null, the full name is not changed."
+  fullName: String!
+  "List of groups the account is a member of. If null, no group is assigned."
+  groups: [Int!]
 }
 
 "Input type for the createValidationRunById mutation."

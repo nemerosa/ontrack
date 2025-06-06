@@ -2,10 +2,7 @@ package net.nemerosa.ontrack.ui.resource;
 
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
-import net.nemerosa.ontrack.model.support.ApplicationLogEntry;
-import net.nemerosa.ontrack.model.support.ApplicationLogService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,13 +15,6 @@ import static org.mockito.Mockito.*;
 
 public class ResourceDecorationContributorServiceTest {
 
-    private ApplicationLogService logService;
-
-    @Before
-    public void before() {
-        logService = mock(ApplicationLogService.class);
-    }
-
     @Test
     public void no_contribution() {
         ResourceDecorationContributor contributor =
@@ -32,9 +22,9 @@ public class ResourceDecorationContributorServiceTest {
         when(contributor.applyTo(any(ProjectEntityType.class))).thenReturn(false);
         ResourceDecorationContributorService service =
                 new ResourceDecorationContributorServiceImpl(
-                        logService, Collections.singletonList(
-                        contributor
-                )
+                        Collections.singletonList(
+                                contributor
+                        )
                 );
         Stream.of(ProjectEntityType.values()).forEach(type -> {
             List<LinkDefinition<ProjectEntity>> linkDefinitions = service.getLinkDefinitions(type);
@@ -60,9 +50,9 @@ public class ResourceDecorationContributorServiceTest {
 
         ResourceDecorationContributorService service =
                 new ResourceDecorationContributorServiceImpl(
-                        logService, Collections.singletonList(
-                        contributor
-                )
+                        Collections.singletonList(
+                                contributor
+                        )
                 );
 
         Stream.of(ProjectEntityType.values()).forEach(type -> {
@@ -108,10 +98,10 @@ public class ResourceDecorationContributorServiceTest {
 
         ResourceDecorationContributorService service =
                 new ResourceDecorationContributorServiceImpl(
-                        logService, Arrays.asList(
-                        contributor1,
-                        contributor2
-                )
+                        Arrays.asList(
+                                contributor1,
+                                contributor2
+                        )
                 );
 
         // Branch
@@ -150,7 +140,6 @@ public class ResourceDecorationContributorServiceTest {
 
         ResourceDecorationContributorService service =
                 new ResourceDecorationContributorServiceImpl(
-                        logService,
                         Arrays.asList(
                                 contributor1,
                                 contributor2
@@ -161,8 +150,6 @@ public class ResourceDecorationContributorServiceTest {
         List<LinkDefinition<ProjectEntity>> linkDefinitions = service.getLinkDefinitions(ProjectEntityType.BRANCH);
         assertEquals(1, linkDefinitions.size());
         assertEquals("_page1", linkDefinitions.get(0).getName());
-        // Checks error log
-        verify(logService, times(1)).log(any(ApplicationLogEntry.class));
     }
 
 }

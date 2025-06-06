@@ -37,7 +37,6 @@ class IndicatorComputingJobsTest {
             computers = listOf(indicatorComputer),
             indicatorComputingService = indicatorComputingService,
             meterRegistry = meterRegistry,
-            applicationLogService = mockk(relaxed = true)
         )
     }
 

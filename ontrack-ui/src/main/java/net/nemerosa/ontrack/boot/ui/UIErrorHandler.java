@@ -3,10 +3,9 @@ package net.nemerosa.ontrack.boot.ui;
 import jakarta.servlet.http.HttpServletRequest;
 import net.nemerosa.ontrack.model.exceptions.InputException;
 import net.nemerosa.ontrack.model.exceptions.NotFoundException;
-import net.nemerosa.ontrack.model.structure.NameDescription;
-import net.nemerosa.ontrack.model.support.ApplicationLogEntry;
-import net.nemerosa.ontrack.model.support.ApplicationLogService;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
@@ -25,13 +24,13 @@ import java.util.stream.Collectors;
 @ControllerAdvice(annotations = RestController.class)
 public class UIErrorHandler {
 
+    private final Logger logger;
     private final MessageSource messageSource;
-    private final ApplicationLogService applicationLogService;
 
     @Autowired
-    public UIErrorHandler(MessageSource messageSource, ApplicationLogService applicationLogService) {
+    public UIErrorHandler(MessageSource messageSource) {
+        this.logger = LoggerFactory.getLogger(getClass());
         this.messageSource = messageSource;
-        this.applicationLogService = applicationLogService;
     }
 
     @ExceptionHandler(NotFoundException.class)
@@ -65,7 +64,7 @@ public class UIErrorHandler {
                         return messageSource.getMessage(fieldError, Locale.ENGLISH);
                     }
                 })
-                .collect(Collectors.toList());
+                .toList();
         // Returned message
         String message;
         if (messages.size() > 1) {
@@ -98,15 +97,12 @@ public class UIErrorHandler {
         // Returns a message to display to the user
         String message = "An error has occurred.";
         // Logs the error in the application
-        applicationLogService.log(
-                ApplicationLogEntry.error(
-                        ex,
-                        NameDescription.nd(
-                                "ui-error",
-                                "Error display to the user"
-                        ),
+        logger.error(
+                String.format(
+                        "Error when calling the API: %s",
                         request.getServletPath()
-                )
+                ),
+                ex
         );
         // OK
         return getMessageResponse(HttpStatus.INTERNAL_SERVER_ERROR, message);

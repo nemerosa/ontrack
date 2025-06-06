@@ -33,21 +33,6 @@ class OntrackConfigProperties {
     @APIDescription("Root URL for this Ontrack installation, used for notifications")
     var url: String = "http://localhost:3000"
 
-    @APIDescription("Maximum number of days to keep the log entries")
-    var applicationLogRetentionDays = 7
-
-    @APIDescription("Disabling the collection of log entries in the application")
-    var applicationLogEnabled = true
-
-    /**
-     * Number of fatal errors to notify into the GUI.
-     *
-     * @see ApplicationLogEntryLevel.FATAL
-     */
-    @Min(1)
-    @APIDescription("Maximum number of errors to display as notifications in the GUI")
-    var applicationLogInfoMax = 10
-
     @Min(1)
     @APIDescription("# Maximum number of builds which can be returned by a build filter. Any number above is truncated down to this value")
     var buildFilterCountMax = 200

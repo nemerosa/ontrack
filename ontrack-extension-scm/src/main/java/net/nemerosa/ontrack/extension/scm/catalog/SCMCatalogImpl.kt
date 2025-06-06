@@ -1,10 +1,9 @@
 package net.nemerosa.ontrack.extension.scm.catalog
 
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.model.structure.NameDescription
-import net.nemerosa.ontrack.model.support.ApplicationLogEntry
-import net.nemerosa.ontrack.model.support.ApplicationLogService
 import net.nemerosa.ontrack.model.support.StorageService
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -13,8 +12,10 @@ import org.springframework.transaction.annotation.Transactional
 class SCMCatalogImpl(
     private val storageService: StorageService,
     private val scmCatalogProviders: List<SCMCatalogProvider>,
-    private val applicationLogService: ApplicationLogService
 ) : SCMCatalog {
+
+    private val logger: Logger = LoggerFactory.getLogger(javaClass)
+
     override fun collectSCMCatalog(logger: (String) -> Unit) {
 
         // Gets existing keys
@@ -26,14 +27,11 @@ class SCMCatalogImpl(
             val entries = try {
                 provider.entries
             } catch (ex: Exception) {
-                applicationLogService.log(
-                    ApplicationLogEntry.error(
-                        ex,
-                        NameDescription.nd("scm-provider-access", "Cannot access SCM provider"),
-                        "Cannot get SCM entries from ${provider.id}"
-                    ).withDetail("provider", provider.id)
+                this.logger.error(
+                    "Cannot get SCM entries from ${provider.id}",
+                    ex
                 )
-                emptyList<SCMCatalogSource>()
+                emptyList()
             }
             entries.forEach { source ->
                 logger("SCM Catalog entry: $source")

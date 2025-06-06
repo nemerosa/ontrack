@@ -13,9 +13,7 @@ import net.nemerosa.ontrack.json.parseAsJson
 import net.nemerosa.ontrack.model.security.AccountSecurityContextService
 import net.nemerosa.ontrack.model.security.AccountService
 import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.model.structure.NameDescription
-import net.nemerosa.ontrack.model.support.ApplicationLogEntry
-import net.nemerosa.ontrack.model.support.ApplicationLogService
+import org.slf4j.LoggerFactory
 import org.springframework.amqp.core.Message
 import org.springframework.amqp.core.MessageListener
 import org.springframework.amqp.rabbit.annotation.RabbitListenerConfigurer
@@ -30,12 +28,12 @@ class AsyncIngestionHookQueueListener(
     private val ingestionHookProcessingService: IngestionHookProcessingService,
     private val ingestionHookPayloadStorage: IngestionHookPayloadStorage,
     private val securityService: SecurityService,
-    private val applicationLogService: ApplicationLogService,
     private val meterRegistry: MeterRegistry,
     private val accountSecurityContextService: AccountSecurityContextService,
     private val accountService: AccountService,
 ) : RabbitListenerConfigurer {
 
+    private val logger = LoggerFactory.getLogger(AsyncIngestionHookQueueListener::class.java)
     private val listener = MessageListener(::onMessage)
 
     override fun configureRabbitListeners(registrar: RabbitListenerEndpointRegistrar) {
@@ -109,12 +107,9 @@ class AsyncIngestionHookQueueListener(
                 ingestionHookProcessingService.process(payload)
             }
         } catch (any: Throwable) {
-            applicationLogService.log(
-                ApplicationLogEntry.error(
-                    any,
-                    NameDescription.nd("github-ingestion-error", "Catch-all error in GitHub ingestion processing"),
-                    "Uncaught error during the GitHub ingestion processing"
-                )
+            logger.error(
+                "Uncaught error during the GitHub ingestion processing",
+                any
             )
         }
     }

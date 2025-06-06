@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.boot.ui
 
+import jakarta.validation.Valid
 import net.nemerosa.ontrack.job.JobScheduler
 import net.nemerosa.ontrack.job.JobStatus
 import net.nemerosa.ontrack.model.Ack
@@ -7,7 +8,8 @@ import net.nemerosa.ontrack.model.security.ApplicationManagement
 import net.nemerosa.ontrack.model.security.EncryptionService
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.NameDescription
-import net.nemerosa.ontrack.model.support.*
+import net.nemerosa.ontrack.model.support.ConnectorGlobalStatusService
+import net.nemerosa.ontrack.model.support.Page
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import net.nemerosa.ontrack.ui.resource.Pagination
 import net.nemerosa.ontrack.ui.resource.Resource
@@ -18,19 +20,17 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
-import jakarta.validation.Valid
 
 @RestController
 @RequestMapping("/rest/admin")
 class AdminController
 @Autowired
 constructor(
-        private val jobScheduler: JobScheduler,
-        private val applicationLogService: ApplicationLogService,
-        private val healthEndpoint: HealthEndpoint,
-        private val connectorGlobalStatusService: ConnectorGlobalStatusService,
-        private val securityService: SecurityService,
-        private val encryptionService: EncryptionService
+    private val jobScheduler: JobScheduler,
+    private val healthEndpoint: HealthEndpoint,
+    private val connectorGlobalStatusService: ConnectorGlobalStatusService,
+    private val securityService: SecurityService,
+    private val encryptionService: EncryptionService
 ) : AbstractResourceController() {
 
     /**
@@ -40,72 +40,12 @@ constructor(
     fun getStatus(): Resource<AdminStatus> {
         securityService.checkGlobalFunction(ApplicationManagement::class.java)
         return Resource.of(
-                AdminStatus(
-                        health = healthEndpoint.health(),
-                        connectors = connectorGlobalStatusService.globalStatus
-                ),
-                uri(on(javaClass).getStatus())
+            AdminStatus(
+                health = healthEndpoint.health(),
+                connectors = connectorGlobalStatusService.globalStatus
+            ),
+            uri(on(javaClass).getStatus())
         )
-    }
-
-    /**
-     * Gets the list of application log entries
-     */
-    @GetMapping("logs")
-    @Deprecated("Will be removed in V5. Logs are no longer managed by Ontrack.")
-    fun getLogEntries(filter: ApplicationLogEntryFilter, page: Page): Resources<ApplicationLogEntry> {
-        // Gets the entries
-        val entries = applicationLogService.getLogEntries(
-                filter,
-                page
-        )
-        // Builds the resources
-        val resources = Resources.of(
-                entries,
-                uri(on(javaClass).getLogEntries(filter, page))
-        )
-        // Pagination information
-        val offset = page.offset
-        val count = page.count
-        val actualCount = entries.size
-        val total = applicationLogService.logEntriesTotal
-        var pagination = Pagination.of(offset, actualCount, total)
-        // Previous page
-        if (offset > 0) {
-            pagination = pagination.withPrev(
-                    uri(on(AdminController::class.java).getLogEntries(
-                            filter,
-                            Page(
-                                    Math.max(0, offset - count),
-                                    count
-                            )
-                    ))
-            )
-        }
-        // Next page
-        if (offset + count < total) {
-            pagination = pagination.withNext(
-                    uri(on(AdminController::class.java).getLogEntries(
-                            filter,
-                            Page(
-                                    offset + count,
-                                    count
-                            )
-                    ))
-            )
-        }
-        // OK
-        return resources.withPagination(pagination)
-    }
-
-    /**
-     * Deletes all application log entries
-     */
-    @DeleteMapping("logs")
-    @Deprecated("Will be removed in V5. Logs are no longer managed by Ontrack.")
-    fun deleteLogEntries(): Ack {
-        applicationLogService.deleteLogEntries()
-        return Ack.OK
     }
 
     /**
@@ -115,26 +55,26 @@ constructor(
     fun getJobFilter(): JobFilterResources {
         // All job types
         val types = jobScheduler.allJobKeys
-                .map { it.type }
-                .distinctBy { it.key }
+            .map { it.type }
+            .distinctBy { it.key }
         // All categories
         val categories = types
-                .map { it.category }
-                .distinctBy { it.key }
-                .map {
-                    NameDescription(
-                            it.key,
-                            it.name
-                    )
-                }
+            .map { it.category }
+            .distinctBy { it.key }
+            .map {
+                NameDescription(
+                    it.key,
+                    it.name
+                )
+            }
         // Indexation of types per category
         val indexedTypes = types.groupBy { it.category.key }
         // OK
         return JobFilterResources(
-                categories,
-                indexedTypes.mapValues { (_, typeList) ->
-                    typeList.map { NameDescription(it.key, it.name) }
-                }
+            categories,
+            indexedTypes.mapValues { (_, typeList) ->
+                typeList.map { NameDescription(it.key, it.name) }
+            }
         )
     }
 
@@ -143,33 +83,33 @@ constructor(
      */
     @GetMapping("jobs")
     fun getJobs(
-            @Valid jobFilter: JobFilter?,
-            page: Page?
+        @Valid jobFilter: JobFilter?,
+        page: Page?
     ): Resources<JobStatus> {
         securityService.checkGlobalFunction(ApplicationManagement::class.java)
         val jobs = (jobFilter ?: JobFilter()).filter(jobScheduler.jobStatuses)
         val pagination = Pagination.paginate(
-                jobs,
-                page ?: Page(),
-                { offset, limit ->
-                    uri(on(javaClass).getJobs(null, null)).map(jobFilter, Page(offset, limit))
-                }
+            jobs,
+            page ?: Page(),
+            { offset, limit ->
+                uri(on(javaClass).getJobs(null, null)).map(jobFilter, Page(offset, limit))
+            }
         )
         return Resources.of(
-                pagination.items,
-                uri(on(javaClass).getJobs(jobFilter, page))
+            pagination.items,
+            uri(on(javaClass).getJobs(jobFilter, page))
         )
-                .withPagination(pagination.pagination)
-                .with(
-                        "_pause",
-                        uri(on(javaClass).pauseAllJobs()),
-                        !jobScheduler.isPaused
-                )
-                .with(
-                        "_resume",
-                        uri(on(javaClass).resumeAllJobs()),
-                        jobScheduler.isPaused
-                )
+            .withPagination(pagination.pagination)
+            .with(
+                "_pause",
+                uri(on(javaClass).pauseAllJobs()),
+                !jobScheduler.isPaused
+            )
+            .with(
+                "_resume",
+                uri(on(javaClass).resumeAllJobs()),
+                jobScheduler.isPaused
+            )
     }
 
     /**
@@ -179,8 +119,8 @@ constructor(
     fun launchJob(@PathVariable id: Long): Ack {
         securityService.checkGlobalFunction(ApplicationManagement::class.java)
         return jobScheduler.getJobKey(id)
-                .map { key -> Ack.validate(jobScheduler.fireImmediately(key) != null) }
-                .orElse(Ack.NOK)
+            .map { key -> Ack.validate(jobScheduler.fireImmediately(key) != null) }
+            .orElse(Ack.NOK)
     }
 
     /**
@@ -210,8 +150,8 @@ constructor(
     fun pauseJob(@PathVariable id: Long): Ack {
         securityService.checkGlobalFunction(ApplicationManagement::class.java)
         return jobScheduler.getJobKey(id)
-                .map { key -> Ack.validate(jobScheduler.pause(key)) }
-                .orElse(Ack.NOK)
+            .map { key -> Ack.validate(jobScheduler.pause(key)) }
+            .orElse(Ack.NOK)
     }
 
     /**
@@ -221,8 +161,8 @@ constructor(
     fun resumeJob(@PathVariable id: Long): Ack {
         securityService.checkGlobalFunction(ApplicationManagement::class.java)
         return jobScheduler.getJobKey(id)
-                .map { key -> Ack.validate(jobScheduler.resume(key)) }
-                .orElse(Ack.NOK)
+            .map { key -> Ack.validate(jobScheduler.resume(key)) }
+            .orElse(Ack.NOK)
     }
 
     /**
@@ -232,9 +172,9 @@ constructor(
     fun deleteJob(@PathVariable id: Long): Ack {
         securityService.checkGlobalFunction(ApplicationManagement::class.java)
         return jobScheduler.getJobKey(id)
-                .filter { key -> !jobScheduler.getJobStatus(key).get().isValid }
-                .map { key -> Ack.validate(jobScheduler.unschedule(key)) }
-                .orElse(Ack.NOK)
+            .filter { key -> !jobScheduler.getJobStatus(key).get().isValid }
+            .map { key -> Ack.validate(jobScheduler.unschedule(key)) }
+            .orElse(Ack.NOK)
     }
 
     /**
@@ -244,8 +184,8 @@ constructor(
     fun stopJob(@PathVariable id: Long): Ack {
         securityService.checkGlobalFunction(ApplicationManagement::class.java)
         return jobScheduler.getJobKey(id)
-                .map { key -> Ack.validate(jobScheduler.stop(key)) }
-                .orElse(Ack.NOK)
+            .map { key -> Ack.validate(jobScheduler.stop(key)) }
+            .orElse(Ack.NOK)
     }
 
     /**
@@ -253,9 +193,9 @@ constructor(
      */
     @GetMapping("/encryption")
     fun exportEncryptionKey(): ResponseEntity<String> =
-            encryptionService.exportKey()
-                    ?.let { ResponseEntity.ok(it) }
-                    ?: ResponseEntity.notFound().build()
+        encryptionService.exportKey()
+            ?.let { ResponseEntity.ok(it) }
+            ?: ResponseEntity.notFound().build()
 
     /**
      * Importing the encryption key

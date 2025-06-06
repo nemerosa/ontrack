@@ -4,9 +4,6 @@ import jakarta.mail.Message
 import jakarta.mail.internet.InternetAddress
 import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.notifications.NotificationsConfigProperties
-import net.nemerosa.ontrack.model.structure.NameDescription
-import net.nemerosa.ontrack.model.support.ApplicationLogEntry
-import net.nemerosa.ontrack.model.support.ApplicationLogService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
@@ -19,7 +16,6 @@ import org.springframework.stereotype.Component
 @Profile(RunProfile.PROD)
 class DefaultMailService(
     private val javaMailSender: JavaMailSender?,
-    private val applicationLogService: ApplicationLogService,
     private val notificationsConfigProperties: NotificationsConfigProperties,
 ) : MailService {
 
@@ -45,12 +41,9 @@ class DefaultMailService(
         }
     } catch (ex: Exception) {
         // Logs the error
-        applicationLogService.log(
-            ApplicationLogEntry.error(
-                ex,
-                NameDescription.nd("mail-error", "Mail notification error"),
-                "Cannot send mail: ${ex.message}"
-            )
+        logger.error(
+            "Cannot send mail: ${ex.message}",
+            ex
         )
         // Not sent
         false

@@ -1,10 +1,9 @@
 package net.nemerosa.ontrack.ui.resource;
 
-import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
-import net.nemerosa.ontrack.model.support.ApplicationLogEntry;
-import net.nemerosa.ontrack.model.support.ApplicationLogService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,12 +14,11 @@ import java.util.List;
 @Service
 public class ResourceDecorationContributorServiceImpl implements ResourceDecorationContributorService {
 
-    private final ApplicationLogService logService;
+    private final Logger logger = LoggerFactory.getLogger(ResourceDecorationContributorServiceImpl.class);
     private final Collection<ResourceDecorationContributor> contributors;
 
     @Autowired
-    public ResourceDecorationContributorServiceImpl(ApplicationLogService logService, Collection<ResourceDecorationContributor> contributors) {
-        this.logService = logService;
+    public ResourceDecorationContributorServiceImpl(Collection<ResourceDecorationContributor> contributors) {
         this.contributors = contributors;
     }
 
@@ -35,18 +33,13 @@ public class ResourceDecorationContributorServiceImpl implements ResourceDecorat
                     definitions.addAll(tResourceDecorationContributor.getLinkDefinitions());
                 } catch (Exception ex) {
                     // Logging
-                    logService.log(
-                            ApplicationLogEntry.fatal(
-                                    ex,
-                                    NameDescription.nd(
-                                            "ui-resource-decoration",
-                                            "Issue when collecting UI resource decoration"
-                                    ),
+                    logger.error(
+                            String.format(
+                                    "Issue when collecting UI resource decoration: type: %s, decorator: %s",
+                                    projectEntityType.name(),
                                     contributor.getClass().getName()
-                            )
-                                    .withDetail("ui-resource-type", projectEntityType.name())
-                                    .withDetail("ui-resource-decorator", contributor.getClass().getName())
-                    );
+                            ),
+                            ex);
                 }
             }
         });

@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
 import net.nemerosa.ontrack.extension.api.model.BuildDiffRequestDifferenceProjectException
 import net.nemerosa.ontrack.extension.git.GitConfigProperties
-import net.nemerosa.ontrack.extension.git.GitController
 import net.nemerosa.ontrack.extension.git.branching.BranchingModelService
 import net.nemerosa.ontrack.extension.git.model.*
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
@@ -36,21 +35,20 @@ import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.model.support.*
+import net.nemerosa.ontrack.model.support.AbstractBranchJob
+import net.nemerosa.ontrack.model.support.MessageAnnotationUtils
+import net.nemerosa.ontrack.model.support.MessageAnnotator
 import net.nemerosa.ontrack.tx.TransactionService
-import net.nemerosa.ontrack.ui.resource.Resources
 import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.support.TransactionTemplate
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
 import java.lang.String.format
 import java.util.*
 import java.util.concurrent.Future
 import java.util.function.BiConsumer
-import java.util.stream.Stream
 
 @Service
 @Transactional
@@ -60,7 +58,6 @@ class GitServiceImpl(
     private val jobScheduler: JobScheduler,
     private val securityService: SecurityService,
     private val transactionService: TransactionService,
-    private val applicationLogService: ApplicationLogService,
     private val gitRepositoryClientFactory: GitRepositoryClientFactory,
     private val buildGitCommitLinkService: BuildGitCommitLinkService,
     private val gitConfigurators: Collection<GitConfigurator>,
@@ -184,17 +181,9 @@ class GitServiceImpl(
                     syncAndWait(oProjectConfiguration)
                     syncError = false
                 } catch (ex: GitRepositorySyncException) {
-                    applicationLogService.log(
-                        ApplicationLogEntry.error(
-                            ex,
-                            NameDescription.nd(
-                                "git-sync",
-                                "Git synchronisation issue"
-                            ),
-                            oProjectConfiguration.remote
-                        ).withDetail("project", project.name)
-                            .withDetail("git-name", oProjectConfiguration.name)
-                            .withDetail("git-remote", oProjectConfiguration.remote)
+                    logger.error(
+                        "Sync error: remote: ${oProjectConfiguration.remote}, project: ${project.name}, config=${oProjectConfiguration.name}",
+                        ex
                     )
                     syncError = true
                 }
@@ -773,12 +762,10 @@ class GitServiceImpl(
                                 configurator.getPullRequest(configuration, prId)
                                     ?: GitPullRequest.invalidPR(prId, configurator.toPullRequestKey(prId))
                             } catch (any: Exception) {
-                                ApplicationLogEntry.error(
-                                    any,
-                                    NameDescription.nd("git-pr-error", "Git PR error"),
-                                    "Error while getting PR info for ${branch.entityDisplayName}"
+                                logger.error(
+                                    "Error while getting PR info for ${branch.entityDisplayName}",
+                                    any
                                 )
-                                    .withDetail("branch", branch.entityDisplayName)
                                 // Not returning a PR
                                 null
                             }

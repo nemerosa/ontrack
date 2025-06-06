@@ -10,8 +10,10 @@ import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventPostService
 import net.nemerosa.ontrack.model.security.EncryptionService
 import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
-import net.nemerosa.ontrack.model.support.*
+import net.nemerosa.ontrack.model.support.ConfigurationRepository
+import net.nemerosa.ontrack.model.support.ConnectionResult
+import net.nemerosa.ontrack.model.support.OntrackConfigProperties
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -25,7 +27,6 @@ class GitHubConfigurationServiceImpl(
     eventFactory: EventFactory,
     private val gitHubClientFactory: OntrackGitHubClientFactory,
     ontrackConfigProperties: OntrackConfigProperties,
-    private val applicationLogService: ApplicationLogService,
     private val gitHubAppTokenService: GitHubAppTokenService,
 ) : AbstractConfigurationService<GitHubEngineConfiguration>(
     GitHubEngineConfiguration::class.java,
@@ -36,6 +37,8 @@ class GitHubConfigurationServiceImpl(
     eventFactory,
     ontrackConfigProperties
 ), GitHubConfigurationService {
+
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     override val type: String = "github"
 
@@ -67,14 +70,9 @@ class GitHubConfigurationServiceImpl(
             // OK
             ConnectionResult.ok()
         } catch (ex: Exception) {
-            applicationLogService.log(
-                ApplicationLogEntry.error(
-                    ex,
-                    nd("github", "GitHub connection issue"),
-                    configuration.url
-                )
-                    .withDetail("github-config-name", configuration.name)
-                    .withDetail("github-config-url", configuration.url)
+            logger.error(
+                "Cannot connect to GitHub: config=${configuration.name}, remote=${configuration.url}",
+                ex
             )
             ConnectionResult.error(ex)
         }

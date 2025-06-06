@@ -12,9 +12,6 @@ import net.nemerosa.ontrack.extension.github.model.*
 import net.nemerosa.ontrack.extension.github.support.parseLocalDateTime
 import net.nemerosa.ontrack.git.support.GitConnectionRetry
 import net.nemerosa.ontrack.json.*
-import net.nemerosa.ontrack.model.structure.NameDescription
-import net.nemerosa.ontrack.model.support.ApplicationLogEntry
-import net.nemerosa.ontrack.model.support.ApplicationLogService
 import org.apache.commons.codec.binary.Base64
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -34,7 +31,6 @@ import java.time.LocalDateTime
 class DefaultOntrackGitHubClient(
     private val configuration: GitHubEngineConfiguration,
     private val gitHubAppTokenService: GitHubAppTokenService,
-    private val applicationLogService: ApplicationLogService,
     private val timeout: Duration = Duration.ofSeconds(60),
     private val retries: UInt = 3u,
     private val interval: Duration = Duration.ofSeconds(30),
@@ -55,12 +51,9 @@ class DefaultOntrackGitHubClient(
             // Rate limit not supported
             null
         } catch (any: Exception) {
-            applicationLogService.log(
-                ApplicationLogEntry.error(
-                    any,
-                    NameDescription.nd("github-ratelimit", "Cannot get the GitHub rate limit"),
-                    "Cannot get the rate limit for GitHub at ${configuration.url}"
-                ).withDetail("configuration", configuration.name)
+            logger.error(
+                "Cannot get the rate limit for GitHub at ${configuration.url} (config = ${configuration.name})",
+                any
             )
             // No rate limit
             null

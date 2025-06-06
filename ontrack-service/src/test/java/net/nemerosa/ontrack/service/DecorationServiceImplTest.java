@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.Decoration;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
-import net.nemerosa.ontrack.model.support.ApplicationLogService;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -33,7 +32,7 @@ public class DecorationServiceImplTest {
 
         SecurityService securityService = mock(SecurityService.class);
 
-        DecorationServiceImpl service = new DecorationServiceImpl(extensionManager, securityService, mock(ApplicationLogService.class));
+        DecorationServiceImpl service = new DecorationServiceImpl(extensionManager, securityService);
 
         @SuppressWarnings("unchecked")
         List<? extends Decoration> decorations = service.getDecorations(projectEntity, decorator);
@@ -59,7 +58,7 @@ public class DecorationServiceImplTest {
 
         SecurityService securityService = mock(SecurityService.class);
 
-        DecorationServiceImpl service = new DecorationServiceImpl(extensionManager, securityService, mock(ApplicationLogService.class));
+        DecorationServiceImpl service = new DecorationServiceImpl(extensionManager, securityService);
 
         @SuppressWarnings("unchecked")
         List<? extends Decoration> decorations = service.getDecorations(projectEntity, decorator);
