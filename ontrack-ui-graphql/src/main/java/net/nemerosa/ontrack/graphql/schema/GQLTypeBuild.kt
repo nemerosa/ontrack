@@ -7,8 +7,6 @@ import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
 import graphql.schema.GraphQLObjectType.newObject
 import net.nemerosa.ontrack.common.and
 import net.nemerosa.ontrack.extension.api.ExtensionManager
-import net.nemerosa.ontrack.graphql.schema.actions.UIActionsGraphQLService
-import net.nemerosa.ontrack.graphql.schema.actions.actions
 import net.nemerosa.ontrack.graphql.schema.authorizations.GQLInterfaceAuthorizableService
 import net.nemerosa.ontrack.graphql.support.intArgument
 import net.nemerosa.ontrack.graphql.support.listType
@@ -28,7 +26,6 @@ import kotlin.jvm.optionals.getOrNull
 @Component
 class GQLTypeBuild(
     private val gqlInterfaceAuthorizableService: GQLInterfaceAuthorizableService,
-    private val uiActionsGraphQLService: UIActionsGraphQLService,
     private val structureService: StructureService,
     private val projectEntityInterface: GQLProjectEntityInterface,
     private val validation: GQLTypeValidation,
@@ -60,8 +57,6 @@ class GQLTypeBuild(
             .name(BUILD)
             .withInterface(projectEntityInterface.typeRef)
             .fields(projectEntityInterfaceFields())
-            // Actions
-            .actions(uiActionsGraphQLService, Build::class)
             // Authorizations
             .apply {
                 gqlInterfaceAuthorizableService.apply(this, Build::class)

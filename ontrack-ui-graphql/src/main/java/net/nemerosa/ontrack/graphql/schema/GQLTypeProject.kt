@@ -8,8 +8,6 @@ import graphql.schema.GraphQLFieldDefinition.newFieldDefinition
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLObjectType.newObject
 import net.nemerosa.ontrack.extension.api.ExtensionManager
-import net.nemerosa.ontrack.graphql.schema.actions.UIActionsGraphQLService
-import net.nemerosa.ontrack.graphql.schema.actions.actions
 import net.nemerosa.ontrack.graphql.schema.authorizations.GQLInterfaceAuthorizableService
 import net.nemerosa.ontrack.graphql.support.disabledField
 import net.nemerosa.ontrack.graphql.support.listType
@@ -22,7 +20,6 @@ import org.springframework.stereotype.Component
 
 @Component
 class GQLTypeProject(
-    private val uiActionsGraphQLService: UIActionsGraphQLService,
     private val structureService: StructureService,
     private val projectLabelManagementService: ProjectLabelManagementService,
     creation: GQLTypeCreation,
@@ -57,8 +54,6 @@ class GQLTypeProject(
                 .withInterface(projectEntityInterface.typeRef)
                 .fields(projectEntityInterfaceFields())
                 .field(disabledField())
-                // Actions
-                .actions(uiActionsGraphQLService, Project::class)
                 // Authorizations
                 .apply {
                     gqlInterfaceAuthorizableService.apply(this, Project::class)

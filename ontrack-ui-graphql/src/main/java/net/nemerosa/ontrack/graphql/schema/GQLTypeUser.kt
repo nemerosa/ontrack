@@ -2,8 +2,6 @@ package net.nemerosa.ontrack.graphql.schema
 
 import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLObjectType
-import net.nemerosa.ontrack.graphql.schema.actions.UIActionsGraphQLService
-import net.nemerosa.ontrack.graphql.schema.actions.actions
 import net.nemerosa.ontrack.graphql.support.listFieldGetter
 import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.graphql.support.objectField
@@ -16,7 +14,6 @@ import org.springframework.stereotype.Component
 @Component
 class GQLTypeUser(
     private val securityService: SecurityService,
-    private val uiActionsGraphQLService: UIActionsGraphQLService
 ) : GQLType {
 
     companion object {
@@ -58,8 +55,6 @@ class GQLTypeUser(
                         securityService.currentUser?.idpGroups ?: emptyList<String>()
                     }
             }
-            // Actions
-            .actions(uiActionsGraphQLService, RootUser::class)
             // OK
             .build()
 
