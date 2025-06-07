@@ -8,7 +8,7 @@ export const useNewBranchDialog = ({onSuccess}) => {
         prepareValues: (values, {project}) => {
             return {
                 ...values,
-                projectId: project.id,
+                projectId: Number(project.id),
             }
         },
         query: gql`
@@ -39,7 +39,7 @@ export default function NewBranchDialog({dialog}) {
         <>
             <FormDialog dialog={dialog}>
                 <Form.Item name="name"
-                           label="Name"
+                           label="Branch name"
                            rules={[
                                {
                                    required: true,
@@ -59,7 +59,7 @@ export default function NewBranchDialog({dialog}) {
                     <Input placeholder="Branch name" allowClear/>
                 </Form.Item>
                 <Form.Item name="description"
-                           label="Description"
+                           label="Branch description"
                            rules={[
                                {
                                    max: 500,

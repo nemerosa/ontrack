@@ -2,6 +2,24 @@ const {login} = require("../login");
 const {BranchPage} = require("./branch");
 const {test} = require("../../fixtures/connection");
 const {waitUntilCondition} = require("../../support/timing");
+const {HomePage} = require("../home/home");
+const {generate} = require("@ontrack/utils");
+const {expect} = require("@playwright/test");
+const {ProjectPage} = require("../projects/project");
+
+test('branch creation', async ({page, ontrack}) => {
+    const project = await ontrack.createProject()
+
+    await login(page, ontrack)
+
+    const projectPage = new ProjectPage(page, ontrack, project)
+    await projectPage.goTo()
+
+    const branchName = generate("b-")
+    await projectPage.newBranch({name: branchName})
+
+    await projectPage.expectBranchToBePresent(branchName)
+})
 
 test('branch disabling and enabling', async ({page, ontrack}) => {
     const project = await ontrack.createProject()

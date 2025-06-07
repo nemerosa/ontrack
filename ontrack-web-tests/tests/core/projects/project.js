@@ -33,4 +33,17 @@ export class ProjectPage {
         return this.page.getByTestId("banner-disabled")
     }
 
+    async newBranch({name, description, disabled}) {
+        await this.page.getByRole('button', {name: 'New branch'}).click()
+        await expect(this.page.getByPlaceholder('Branch name')).toBeVisible()
+        await this.page.getByPlaceholder('Branch name').fill(name)
+        if (description) await this.page.getByPlaceholder('Branch description').fill(name)
+        if (disabled === true) await this.page.getByLabel('Disabled').click()
+        await this.page.getByRole('button', {name: 'OK'}).click()
+    }
+
+    async expectBranchToBePresent(branchName) {
+        await expect(this.page.getByRole('link', {name: branchName, exact: true})).toBeVisible()
+    }
+
 }
