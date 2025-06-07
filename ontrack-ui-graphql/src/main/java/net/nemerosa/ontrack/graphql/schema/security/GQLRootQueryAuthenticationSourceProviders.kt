@@ -27,6 +27,7 @@ class GQLRootQueryAuthenticationSourceProviders(
             GraphQLFieldDefinition.newFieldDefinition()
                     .name("authenticationSources")
                     .description("List of all authentication sources.")
+                    .deprecate("Will be removed in V5. No replacement.")
                     .argument {
                         it.name(ARG_ENABLED)
                                 .description("Filters on authentication source which are enabled")

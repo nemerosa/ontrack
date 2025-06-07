@@ -21,6 +21,7 @@ class GQLRootQueryAdminAccountGroupMappings(
     override fun getFieldDefinition(): GraphQLFieldDefinition {
         return GraphQLFieldDefinition.newFieldDefinition()
                 .name("accountGroupMappings")
+                .deprecate("Will be removed in V5. Replaced in V5 by the `groupMappings` root query.")
                 .type(listType(accountGroupMapping.typeRef))
                 .argument { a ->
                     a.name(ARG_PROVIDER)
