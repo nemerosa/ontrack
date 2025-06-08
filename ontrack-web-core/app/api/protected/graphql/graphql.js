@@ -1,7 +1,5 @@
 import {GraphQLClient} from "graphql-request";
-import {backend} from "@/app/api/protected/backend";
-import {getServerSession} from "next-auth";
-import {authOptions} from "@/app/api/auth/authOptions";
+import {backend, getAccessToken} from "@/app/api/protected/backend";
 import {NextResponse} from "next/server";
 
 const graphQLClient = (accessToken) => new GraphQLClient(
@@ -12,16 +10,13 @@ const graphQLClient = (accessToken) => new GraphQLClient(
     });
 
 export const graphQL = async (request, {query, variables = {}}) => {
-    const session = await getServerSession(authOptions)
-
-    if (!session || !session.accessToken) {
+    const accessToken = await getAccessToken()
+    if (!accessToken) {
         return {
             data: null,
             response: NextResponse.json({error: "Unauthorized"}, {status: 401})
         }
     }
-
-    const accessToken = session.accessToken
 
     try {
         const data = await graphQLClient(accessToken).request(query, variables)

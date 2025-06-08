@@ -27,7 +27,7 @@ export default function PromotionLevelAutoVersioningTargets({promotionLevel}) {
                     ${gqlAutoVersioningTrailContent}
                 `,
                 {
-                    id: promotionLevel.id,
+                    id: Number(promotionLevel.id),
                 }
             ).then(data => {
                 setTrail(data.promotionLevel.autoVersioningTrail)

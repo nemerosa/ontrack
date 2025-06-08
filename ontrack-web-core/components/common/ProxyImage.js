@@ -5,7 +5,7 @@ import {actionClassName} from "@components/common/ClassUtils";
 /**
  * This renders an image using a call to the REST API.
  */
-export default function ProxyImage({restUri, alt, width, height, onClick, tooltipText, disabled = false}) {
+export default function ProxyImage({id, restUri, alt, width, height, onClick, tooltipText, disabled = false}) {
 
     const [dataUrl, setDataUrl] = useState('')
 
@@ -35,6 +35,7 @@ export default function ProxyImage({restUri, alt, width, height, onClick, toolti
                 dataUrl &&
                 <Tooltip title={tooltipText}>
                     <img
+                        data-testid={id}
                         src={dataUrl}
                         alt={alt}
                         width={width}

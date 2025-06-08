@@ -111,7 +111,7 @@ export default function PromotionLevelHistory({promotionLevel}) {
                     }
                 `,
                 {
-                    id: promotionLevel.id,
+                    id: Number(promotionLevel.id),
                     offset: pagination.offset,
                     size: pagination.size,
                     name: filter.name,

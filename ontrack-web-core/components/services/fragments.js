@@ -2,6 +2,7 @@ import {gql} from "graphql-request";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {useEffect, useState} from "react";
 import {gqlBranchContentFragment} from "@components/branches/BranchGraphQLFragments";
+import {useQuery} from "@components/services/GraphQL";
 
 export const gqlUserMenuActionFragment = gql`
     fragment userMenuActionFragment on UserMenuAction {
@@ -40,6 +41,9 @@ export const gqlPromotionLevelFragment = gql`
     ${gqlUserMenuActionFragment}
 `
 
+/**
+ * @deprecated Use `usePromotionLevelById` instead
+ */
 export const getPromotionLevelById = (client, id) => {
     return client.request(
         gqlPromotionLevelByIdQuery,
@@ -47,6 +51,9 @@ export const getPromotionLevelById = (client, id) => {
     ).then(data => data.promotionLevel)
 }
 
+/**
+ * @deprecated Use `usePromotionLevelById` instead
+ */
 export const usePromotionLevel = (id) => {
     const client = useGraphQLClient()
     const [promotionLevel, setPromotionLevel] = useState()
@@ -56,6 +63,20 @@ export const usePromotionLevel = (id) => {
         }
     }, [client, id]);
     return promotionLevel
+}
+
+export const usePromotionLevelById = ({id, refreshCount = 0}) => {
+    const {data: promotionLevel, loading} = useQuery(
+        gqlPromotionLevelByIdQuery,
+        {
+            variables: {
+                id: Number(id)
+            },
+            deps: [refreshCount],
+            dataFn: data => data.promotionLevel,
+        }
+    )
+    return {promotionLevel, loading}
 }
 
 export const gqlValidationStampFragment = gql`

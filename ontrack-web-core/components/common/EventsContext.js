@@ -14,12 +14,27 @@ export const useEventForRefresh = (name) => {
     return refreshCount
 }
 
+export const useEventsForRefresh = (names) => {
+    const dashboardEventsContext = useContext(EventsContext)
+
+    const [refreshCount, setRefreshCount] = useState(0)
+
+    for (const name of names) {
+        dashboardEventsContext.subscribeToEvent(name, (_) => {
+            setRefreshCount(refreshCount + 1)
+        })
+    }
+
+    return refreshCount
+}
+
 
 export default function EventsContextProvider({children}) {
 
     const subscriptions = {}
 
     const fireEvent = (name, values) => {
+        console.debug("Event fired: ", {name, values})
         const callbacks = subscriptions[name]
         if (callbacks) {
             callbacks.forEach(callback => {

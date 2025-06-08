@@ -1,4 +1,3 @@
-import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {useContext, useEffect, useState} from "react";
 import Head from "next/head";
 import {promotionLevelTitle} from "@components/common/Titles";
@@ -14,9 +13,9 @@ import {useChartOptionsCommand} from "@components/charts/ChartOptionsDialog";
 import StoredGridLayoutResetCommand from "@components/grid/StoredGridLayoutResetCommand";
 import PromotionLevelChangeImageCommand from "@components/promotionLevels/PromotionLevelChangeImageCommand";
 import PromotionLevelUpdateCommand from "@components/promotionLevels/PromotionLevelUpdateCommand";
-import {useEventForRefresh} from "@components/common/EventsContext";
+import {useEventsForRefresh} from "@components/common/EventsContext";
 import PromotionLevelDeleteCommand from "@components/promotionLevels/PromotionLevelDeleteCommand";
-import {getPromotionLevelById} from "@components/services/fragments";
+import {usePromotionLevelById} from "@components/services/fragments";
 import {isAuthorized} from "@components/common/authorizations";
 import {UserContext} from "@components/providers/UserProvider";
 import PromotionLevelBulkUpdateCommand from "@components/promotionLevels/PromotionLevelBulkUpdateCommand";
@@ -39,42 +38,34 @@ export default function PromotionLevelView({id}) {
     const sectionHistory = "section-history"
     const sectionAutoVersioning = "section-auto-versioning"
 
-    const client = useGraphQLClient()
-
-    const [loadingPromotionLevel, setLoadingPromotionLevel] = useState(true)
-    const [promotionLevel, setPromotionLevel] = useState({branch: {project: {}}})
     const [commands, setCommands] = useState([])
 
-    const refreshCount = useEventForRefresh("promotionLevel.updated")
+    const refreshCount = useEventsForRefresh(["promotionLevel.updated", "promotionLevel.image"])
 
     const user = useContext(UserContext)
 
+    const {promotionLevel, loading: loadingPromotionLevel} = usePromotionLevelById({id, refreshCount})
+
     useEffect(() => {
-        if (client && id) {
-            setLoadingPromotionLevel(true)
-            getPromotionLevelById(client, id).then(pl => {
-                setPromotionLevel(pl)
-                const commands = [
-                    <UserMenuActions key="userMenuActions" actions={pl.userMenuActions}/>
-                ]
-                if (isAuthorized(pl, 'promotion_level', 'edit')) {
-                    commands.push(<PromotionLevelChangeImageCommand key="change-image" id={id}/>)
-                    commands.push(<PromotionLevelUpdateCommand key="update" id={id}/>)
-                }
-                if (isAuthorized(pl, 'promotion_level', 'delete')) {
-                    commands.push(<PromotionLevelDeleteCommand key="delete" id={id}/>)
-                }
-                if (user.authorizations?.promotion_level?.bulkUpdate) {
-                    commands.push(<PromotionLevelBulkUpdateCommand key="bulk-update" id={id}/>)
-                }
-                commands.push(<StoredGridLayoutResetCommand key="reset"/>)
-                commands.push(<CloseCommand href={branchPromotionLevelsUri(pl.branch)}/>)
-                setCommands(commands)
-            }).finally(() => {
-                setLoadingPromotionLevel(false)
-            })
+        if (promotionLevel) {
+            const commands = [
+                <UserMenuActions key="userMenuActions" actions={promotionLevel.userMenuActions}/>
+            ]
+            if (isAuthorized(promotionLevel, 'promotion_level', 'edit')) {
+                commands.push(<PromotionLevelChangeImageCommand key="change-image" id={id}/>)
+                commands.push(<PromotionLevelUpdateCommand key="update" id={id}/>)
+            }
+            if (isAuthorized(promotionLevel, 'promotion_level', 'delete')) {
+                commands.push(<PromotionLevelDeleteCommand key="delete" id={id}/>)
+            }
+            if (user.authorizations?.promotion_level?.bulkUpdate) {
+                commands.push(<PromotionLevelBulkUpdateCommand key="bulk-update" id={id}/>)
+            }
+            commands.push(<StoredGridLayoutResetCommand key="reset"/>)
+            commands.push(<CloseCommand href={branchPromotionLevelsUri(promotionLevel.branch)}/>)
+            setCommands(commands)
         }
-    }, [client, id, refreshCount, user]);
+    }, [promotionLevel])
 
     const defaultLayout = [
         // Charts - 2 x 2
@@ -180,16 +171,16 @@ export default function PromotionLevelView({id}) {
     return (
         <>
             <Head>
-                {promotionLevelTitle(promotionLevel)}
+                {promotionLevel ? promotionLevelTitle(promotionLevel) : ""}
             </Head>
             <StoredGridLayoutContextProvider>
                 <MainPage
                     title={
-                        <PromotionLevelViewTitle promotionLevel={promotionLevel}/>
+                        promotionLevel ? <PromotionLevelViewTitle promotionLevel={promotionLevel}/> : ""
                     }
-                    breadcrumbs={promotionLevelBreadcrumbs(promotionLevel)}
+                    breadcrumbs={promotionLevel ? promotionLevelBreadcrumbs(promotionLevel) : []}
                     commands={commands}
-                    description={promotionLevel.description}
+                    description={promotionLevel?.description}
                 >
                     <Skeleton loading={loadingPromotionLevel} active>
                         <StoredGridLayout
@@ -198,7 +189,10 @@ export default function PromotionLevelView({id}) {
                             items={items}
                             rowHeight={30}
                         />
-                        <PromotionLevelViewDrawer promotionLevel={promotionLevel} loading={loadingPromotionLevel}/>
+                        {
+                            promotionLevel &&
+                            <PromotionLevelViewDrawer promotionLevel={promotionLevel} loading={loadingPromotionLevel}/>
+                        }
                     </Skeleton>
                 </MainPage>
             </StoredGridLayoutContextProvider>
