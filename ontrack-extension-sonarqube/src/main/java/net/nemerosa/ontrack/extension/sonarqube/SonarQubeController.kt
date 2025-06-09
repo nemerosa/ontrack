@@ -9,7 +9,6 @@ import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubePropertyType
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription
-import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ID
@@ -17,31 +16,24 @@ import net.nemerosa.ontrack.model.structure.PropertyService
 import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.ConnectionResult
-import net.nemerosa.ontrack.ui.resource.Resource
-import net.nemerosa.ontrack.ui.resource.Resources
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 
 @RestController
 @RequestMapping("extension/sonarqube")
 class SonarQubeController(
-        feature: SonarQubeExtensionFeature,
-        private val securityService: SecurityService,
-        private val configurationService: SonarQubeConfigurationService,
-        private val structureService: StructureService,
-        private val propertyService: PropertyService,
-        private val sonarQubeMeasuresCollectionService: SonarQubeMeasuresCollectionService
+    feature: SonarQubeExtensionFeature,
+    private val securityService: SecurityService,
+    private val configurationService: SonarQubeConfigurationService,
+    private val structureService: StructureService,
+    private val propertyService: PropertyService,
+    private val sonarQubeMeasuresCollectionService: SonarQubeMeasuresCollectionService
 ) : AbstractExtensionController<SonarQubeExtensionFeature>(feature) {
 
     @GetMapping("")
-    override fun getDescription(): Resource<ExtensionFeatureDescription> {
-        @Suppress("RecursivePropertyAccessor")
-        return Resource.of(
-                feature.featureDescription,
-                uri(on(javaClass).description)
-        )
-                .with("configurations", uri(on(javaClass).getConfigurations()), securityService.isGlobalFunctionGranted(GlobalSettings::class.java))
+    override fun getDescription(): ExtensionFeatureDescription {
+        return feature.featureDescription
     }
 
     /**
@@ -50,7 +42,8 @@ class SonarQubeController(
     @PutMapping("/build/{buildId}/measures")
     fun collectBuildMeasures(@PathVariable buildId: ID): SonarQubeMeasuresCollectionResult {
         val build = structureService.getBuild(buildId)
-        val property: SonarQubeProperty? = propertyService.getProperty(build.project, SonarQubePropertyType::class.java).value
+        val property: SonarQubeProperty? =
+            propertyService.getProperty(build.project, SonarQubePropertyType::class.java).value
         return if (property != null && securityService.isProjectFunctionGranted(build, ProjectEdit::class.java)) {
             return if (sonarQubeMeasuresCollectionService.matches(build, property)) {
                 sonarQubeMeasuresCollectionService.collect(build, property)
@@ -66,12 +59,10 @@ class SonarQubeController(
      * Gets the configurations
      */
     @GetMapping("configurations")
-    fun getConfigurations(): Resources<SonarQubeConfiguration> {
-        return Resources.of(
-                configurationService.configurations,
-                uri(on(javaClass).getConfigurations())
+    fun getConfigurations(): ResponseEntity<List<SonarQubeConfiguration>> {
+        return ResponseEntity.ok(
+            configurationService.configurations,
         )
-                .with("_test", uri(on(javaClass).testConfiguration(null)), securityService.isGlobalFunctionGranted(GlobalSettings::class.java))
     }
 
     /**
@@ -86,10 +77,9 @@ class SonarQubeController(
      * Gets the configuration descriptors
      */
     @GetMapping("configurations/descriptors")
-    fun getConfigurationsDescriptors(): Resources<ConfigurationDescriptor> {
-        return Resources.of(
-                configurationService.configurationDescriptors,
-                uri(on(javaClass).getConfigurationsDescriptors())
+    fun getConfigurationsDescriptors(): ResponseEntity<List<ConfigurationDescriptor>> {
+        return ResponseEntity.ok(
+            configurationService.configurationDescriptors,
         )
     }
 
@@ -98,14 +88,14 @@ class SonarQubeController(
      */
     @PostMapping("configurations/create")
     fun newConfiguration(@RequestBody configuration: SonarQubeConfiguration): SonarQubeConfiguration =
-            configurationService.newConfiguration(configuration)
+        configurationService.newConfiguration(configuration)
 
     /**
      * Gets one configuration
      */
     @GetMapping("configurations/{name:.*}")
     fun getConfiguration(@PathVariable name: String): SonarQubeConfiguration =
-            configurationService.getConfiguration(name)
+        configurationService.getConfiguration(name)
 
     /**
      * Deleting one configuration
@@ -121,7 +111,10 @@ class SonarQubeController(
      * Updating one configuration
      */
     @PutMapping("configurations/{name:.*}/update")
-    fun updateConfiguration(@PathVariable name: String, @RequestBody configuration: SonarQubeConfiguration): SonarQubeConfiguration {
+    fun updateConfiguration(
+        @PathVariable name: String,
+        @RequestBody configuration: SonarQubeConfiguration
+    ): SonarQubeConfiguration {
         configurationService.updateConfiguration(name, configuration)
         return getConfiguration(name)
     }

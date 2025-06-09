@@ -4,19 +4,15 @@ import jakarta.validation.Valid;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.annotations.API;
 import net.nemerosa.ontrack.model.annotations.APIMethod;
-import net.nemerosa.ontrack.model.security.BranchCreate;
-import net.nemerosa.ontrack.model.security.ProjectCreation;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
-import net.nemerosa.ontrack.ui.resource.Link;
-import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+import java.util.List;
 
 @RestController
 @RequestMapping("/rest/structure/projects")
@@ -37,22 +33,13 @@ public class ProjectController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public Resources<Project> getProjectList() {
-        return Resources.of(
-                        structureService.getProjectList(),
-                        uri(on(ProjectController.class).getProjectList())
-                )
-                .with(Link.CREATE, uri(on(ProjectController.class).newProject(null)), securityService.isGlobalFunctionGranted(ProjectCreation.class));
+    public List<Project> getProjectList() {
+        return structureService.getProjectList();
     }
 
     @RequestMapping(value = "view", method = RequestMethod.GET)
-    public Resources<ProjectStatusView> getProjectStatusViews() {
-        return Resources.of(
-                        structureService.getProjectStatusViews(),
-                        uri(on(ProjectController.class).getProjectStatusViews())
-                )
-                .forView(ProjectStatusView.class)
-                .with(Link.CREATE, uri(on(ProjectController.class).newProject(null)), securityService.isGlobalFunctionGranted(ProjectCreation.class));
+    public List<ProjectStatusView> getProjectStatusViews() {
+        return structureService.getProjectStatusViews();
     }
 
     @RequestMapping(value = "create", method = RequestMethod.POST)
@@ -67,17 +54,8 @@ public class ProjectController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "{projectId}/view", method = RequestMethod.GET)
-    public Resources<BranchStatusView> getBranchStatusViews(@PathVariable ID projectId) {
-        return Resources.of(
-                        structureService.getBranchStatusViews(projectId),
-                        uri(on(ProjectController.class).getBranchStatusViews(projectId))
-                )
-                .forView(BranchStatusView.class)
-                .with(
-                        Link.CREATE,
-                        uri(on(BranchController.class).newBranch(projectId, null)),
-                        securityService.isProjectFunctionGranted(projectId.get(), BranchCreate.class)
-                );
+    public List<BranchStatusView> getBranchStatusViews(@PathVariable ID projectId) {
+        return structureService.getBranchStatusViews(projectId);
     }
 
     @RequestMapping(value = "{projectId}", method = RequestMethod.GET)

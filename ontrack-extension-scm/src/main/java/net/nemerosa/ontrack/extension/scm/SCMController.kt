@@ -9,12 +9,9 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
-import net.nemerosa.ontrack.ui.resource.Link
-import net.nemerosa.ontrack.ui.resource.Resource
-import net.nemerosa.ontrack.ui.resource.Resources
 import org.apache.commons.lang3.StringUtils
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
 
 @RestController
 @RequestMapping("extension/scm")
@@ -28,13 +25,12 @@ class SCMController(
      * Gets the list of change log file filters
      */
     @GetMapping("changeLog/fileFilter/{projectId}")
-    fun getChangeLogFileFilters(@PathVariable projectId: ID): Resources<Resource<SCMFileChangeFilter>> {
+    fun getChangeLogFileFilters(@PathVariable projectId: ID): ResponseEntity<List<SCMFileChangeFilter>> {
         // Gets the store
         val config = loadStore(projectId)
         // Resources
-        return Resources.of(
-            config.filters.stream().map { f: SCMFileChangeFilter -> toResource(projectId, f) },
-            uri(MvcUriComponentsBuilder.on(javaClass).getChangeLogFileFilters(projectId))
+        return ResponseEntity.ok(
+            config.filters.map { f: SCMFileChangeFilter -> f },
         )
     }
 
@@ -45,7 +41,7 @@ class SCMController(
     fun createChangeLogFileFilter(
         @PathVariable projectId: ID,
         @RequestBody filter: SCMFileChangeFilter
-    ): Resource<SCMFileChangeFilter> {
+    ): ResponseEntity<SCMFileChangeFilter> {
         securityService.checkProjectFunction(projectId.get(), ProjectConfig::class.java)
         return securityService.asAdmin {
             // Loads the project
@@ -64,7 +60,7 @@ class SCMController(
         @PathVariable projectId: ID,
         @PathVariable name: String?,
         @RequestBody filter: SCMFileChangeFilter
-    ): Resource<SCMFileChangeFilter> {
+    ): ResponseEntity<SCMFileChangeFilter> {
         check(
             StringUtils.equals(
                 name,
@@ -81,32 +77,15 @@ class SCMController(
     fun getChangeLogFileFilter(
         @PathVariable projectId: ID,
         @PathVariable name: String?
-    ): Resource<SCMFileChangeFilter> {
+    ): ResponseEntity<SCMFileChangeFilter> {
         val config = loadStore(projectId)
         // Resource
-        return config.filters.stream()
-            .filter { filter: SCMFileChangeFilter -> StringUtils.equals(name, filter.name) }
-            .findFirst()
-            .map { filter: SCMFileChangeFilter ->
-                toResource(
-                    projectId,
-                    filter
-                )
+        return config.filters
+            .firstOrNull { filter: SCMFileChangeFilter -> name == filter.name }
+            ?.let {
+                ResponseEntity.ok(it)
             }
-            .orElseThrow { SCMFileChangeFilterNotFound(name) }
-    }
-
-    private fun toResource(projectId: ID, filter: SCMFileChangeFilter): Resource<SCMFileChangeFilter> {
-        val granted = securityService.isProjectFunctionGranted(projectId.get(), ProjectConfig::class.java)
-        return Resource.of(
-            filter,
-            uri(MvcUriComponentsBuilder.on(javaClass).getChangeLogFileFilter(projectId, filter.name))
-        )
-            .with(
-                Link.DELETE,
-                uri(MvcUriComponentsBuilder.on(javaClass).deleteChangeLogFileFilter(projectId, filter.name)),
-                granted
-            )
+            ?: throw SCMFileChangeFilterNotFound(name)
     }
 
     private fun loadStore(projectId: ID): SCMFileChangeFilters {

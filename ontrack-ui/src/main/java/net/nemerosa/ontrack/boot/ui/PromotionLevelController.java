@@ -6,8 +6,6 @@ import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
-import net.nemerosa.ontrack.ui.resource.Resource;
-import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +14,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Base64;
+import java.util.List;
 
 import static net.nemerosa.ontrack.ui.support.UIUtils.setupDefaultImageCache;
-import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
 @RequestMapping("/rest/structure")
@@ -34,16 +32,12 @@ public class PromotionLevelController extends AbstractResourceController {
     // Promotion levels
 
     @RequestMapping(value = "branches/{branchId}/promotionLevels", method = RequestMethod.GET)
-    public Resources<PromotionLevel> getPromotionLevelListForBranch(@PathVariable ID branchId) {
-        Branch branch = structureService.getBranch(branchId);
-        return Resources.of(
-                        structureService.getPromotionLevelListForBranch(branchId),
-                        uri(on(PromotionLevelController.class).getPromotionLevelListForBranch(branchId))
-                );
+    public List<PromotionLevel> getPromotionLevelListForBranch(@PathVariable ID branchId) {
+        return structureService.getPromotionLevelListForBranch(branchId);
     }
 
     @RequestMapping(value = "branches/{branchId}/promotionLevels/reorder", method = RequestMethod.PUT)
-    public Resources<PromotionLevel> reorderPromotionLevelListForBranch(@PathVariable ID branchId, @RequestBody Reordering reordering) {
+    public List<PromotionLevel> reorderPromotionLevelListForBranch(@PathVariable ID branchId, @RequestBody Reordering reordering) {
         // Reordering
         structureService.reorderPromotionLevels(branchId, reordering);
         // OK
@@ -117,11 +111,8 @@ public class PromotionLevelController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "promotionLevels/{promotionLevelId}/runs", method = RequestMethod.GET)
-    public Resource<PromotionRunView> getPromotionRunView(@PathVariable ID promotionLevelId) {
-        return Resource.of(
-                structureService.getPromotionRunView(structureService.getPromotionLevel(promotionLevelId)),
-                uri(on(PromotionLevelController.class).getPromotionRunView(promotionLevelId))
-        );
+    public PromotionRunView getPromotionRunView(@PathVariable ID promotionLevelId) {
+        return structureService.getPromotionRunView(structureService.getPromotionLevel(promotionLevelId));
     }
 
     /**

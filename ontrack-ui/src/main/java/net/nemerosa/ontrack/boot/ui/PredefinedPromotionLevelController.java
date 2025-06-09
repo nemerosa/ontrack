@@ -9,7 +9,6 @@ import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.model.structure.PredefinedPromotionLevel;
 import net.nemerosa.ontrack.model.structure.Reordering;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
-import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -17,8 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Base64;
-
-import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+import java.util.List;
 
 /**
  * Access to the list of predefined promotion levels.
@@ -40,18 +38,12 @@ public class PredefinedPromotionLevelController extends AbstractResourceControll
      * Gets the list of predefined promotion levels.
      */
     @RequestMapping(value = "predefinedPromotionLevels", method = RequestMethod.GET)
-    public Resources<PredefinedPromotionLevel> getPredefinedPromotionLevelList() {
-        return Resources.of(
-                predefinedPromotionLevelService.getPredefinedPromotionLevels(),
-                uri(on(getClass()).getPredefinedPromotionLevelList())
-        ).with(
-                "_reorderPromotionLevels",
-                uri(on(getClass()).reorderPromotionLevelListForBranch(null))
-        );
+    public List<PredefinedPromotionLevel> getPredefinedPromotionLevelList() {
+        return predefinedPromotionLevelService.getPredefinedPromotionLevels();
     }
 
     @RequestMapping(value = "predefinedPromotionLevels/reorder", method = RequestMethod.PUT)
-    public Resources<PredefinedPromotionLevel> reorderPromotionLevelListForBranch(@RequestBody Reordering reordering) {
+    public List<PredefinedPromotionLevel> reorderPromotionLevelListForBranch(@RequestBody Reordering reordering) {
         // Reordering
         predefinedPromotionLevelService.reorderPromotionLevels(reordering);
         // OK

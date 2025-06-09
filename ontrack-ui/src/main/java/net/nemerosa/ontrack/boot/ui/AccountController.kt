@@ -5,10 +5,8 @@ import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
-import net.nemerosa.ontrack.ui.resource.Resources
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
 
 /**
  * Management of accounts
@@ -22,9 +20,8 @@ class AccountController(
      * List of accounts
      */
     @GetMapping("")
-    fun getAccounts(): Resources<Account> = Resources.of(
+    fun getAccounts(): ResponseEntity<List<Account>> = ResponseEntity.ok(
         accountService.accounts,
-        uri(MvcUriComponentsBuilder.on(javaClass).getAccounts())
     )
 
     /**
@@ -55,9 +52,8 @@ class AccountController(
      * List of groups
      */
     @GetMapping("groups")
-    fun getAccountGroups(): Resources<AccountGroup> = Resources.of(
+    fun getAccountGroups(): ResponseEntity<List<AccountGroup>> = ResponseEntity.ok(
         accountService.accountGroups,
-        uri(MvcUriComponentsBuilder.on(javaClass).getAccountGroups())
     )
 
     /**

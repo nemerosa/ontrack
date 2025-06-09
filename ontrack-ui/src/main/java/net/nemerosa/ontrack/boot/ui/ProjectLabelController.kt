@@ -8,33 +8,28 @@ import net.nemerosa.ontrack.model.labels.ProjectLabelManagementService
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
-import net.nemerosa.ontrack.ui.resource.Resources
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 
 @RestController
 @RequestMapping("/rest/labels/projects")
 class ProjectLabelController(
-        private val structureService: StructureService,
-        private val labelManagementService: LabelManagementService,
-        private val projectLabelManagementService: ProjectLabelManagementService
+    private val structureService: StructureService,
+    private val labelManagementService: LabelManagementService,
+    private val projectLabelManagementService: ProjectLabelManagementService
 ) : AbstractResourceController() {
 
     @GetMapping("{projectId}")
-    fun getLabelsForProject(@PathVariable projectId: Int): Resources<Label> {
-        return Resources.of(
-                projectLabelManagementService.getLabelsForProject(
-                        structureService.getProject(ID.of(projectId))
-                ),
-                uri(on(this::class.java).getLabelsForProject(projectId))
+    fun getLabelsForProject(@PathVariable projectId: Int): List<Label> {
+        return projectLabelManagementService.getLabelsForProject(
+            structureService.getProject(ID.of(projectId))
         )
     }
 
     @PutMapping("{projectId}")
-    fun setLabelsForProject(@PathVariable projectId: Int, @RequestBody form: ProjectLabelForm): Resources<Label> {
+    fun setLabelsForProject(@PathVariable projectId: Int, @RequestBody form: ProjectLabelForm): List<Label> {
         projectLabelManagementService.associateProjectToLabels(
-                structureService.getProject(ID.of(projectId)),
-                form
+            structureService.getProject(ID.of(projectId)),
+            form
         )
         return getLabelsForProject(projectId)
     }

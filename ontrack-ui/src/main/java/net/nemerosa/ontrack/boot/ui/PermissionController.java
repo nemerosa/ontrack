@@ -4,11 +4,10 @@ import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.security.*;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
-import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+import java.util.List;
 
 @RestController
 @RequestMapping("/rest/accounts/permissions")
@@ -27,33 +26,24 @@ public class PermissionController extends AbstractResourceController {
      * Looking for a permission target
      */
     @RequestMapping(value = "search/{token:.*}", method = RequestMethod.GET)
-    public Resources<PermissionTarget> searchPermissionTargets(@PathVariable String token) {
-        return Resources.of(
-                accountService.searchPermissionTargets(token),
-                uri(on(PermissionController.class).searchPermissionTargets(token))
-        );
+    public List<PermissionTarget> searchPermissionTargets(@PathVariable String token) {
+        return accountService.searchPermissionTargets(token).stream().toList();
     }
 
     /**
      * List of global permissions
      */
     @RequestMapping(value = "globals", method = RequestMethod.GET)
-    public Resources<GlobalPermission> getGlobalPermissions() {
-        return Resources.of(
-                accountService.getGlobalPermissions(),
-                uri(on(PermissionController.class).getGlobalPermissions())
-        ).with("_globalRoles", uri(on(PermissionController.class).getGlobalRoles()));
+    public List<GlobalPermission> getGlobalPermissions() {
+        return accountService.getGlobalPermissions().stream().toList();
     }
 
     /**
      * List of global roles
      */
     @RequestMapping(value = "globals/roles", method = RequestMethod.GET)
-    public Resources<GlobalRole> getGlobalRoles() {
-        return Resources.of(
-                rolesService.getGlobalRoles(),
-                uri(on(PermissionController.class).getGlobalRoles())
-        );
+    public List<GlobalRole> getGlobalRoles() {
+        return rolesService.getGlobalRoles();
     }
 
     /**
@@ -76,22 +66,16 @@ public class PermissionController extends AbstractResourceController {
      * List of project roles
      */
     @RequestMapping(value = "projects/roles", method = RequestMethod.GET)
-    public Resources<ProjectRole> getProjectRoles() {
-        return Resources.of(
-                rolesService.getProjectRoles(),
-                uri(on(PermissionController.class).getProjectRoles())
-        );
+    public List<ProjectRole> getProjectRoles() {
+        return rolesService.getProjectRoles();
     }
 
     /**
      * List of permissions for a project.
      */
     @RequestMapping(value = "projects/{projectId}", method = RequestMethod.GET)
-    public Resources<ProjectPermission> getProjectPermissions(@PathVariable ID projectId) {
-        return Resources.of(
-                accountService.getProjectPermissions(projectId),
-                uri(on(PermissionController.class).getProjectPermissions(projectId))
-        ).with("_projectRoles", uri(on(PermissionController.class).getProjectRoles()));
+    public List<ProjectPermission> getProjectPermissions(@PathVariable ID projectId) {
+        return accountService.getProjectPermissions(projectId).stream().toList();
     }
 
     /**

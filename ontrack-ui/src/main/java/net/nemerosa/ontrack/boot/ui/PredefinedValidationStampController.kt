@@ -8,11 +8,9 @@ import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.structure.PredefinedValidationStamp.Companion.of
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
-import net.nemerosa.ontrack.ui.resource.Resources
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
 import java.util.*
 
 /**
@@ -30,10 +28,8 @@ class PredefinedValidationStampController(
      * Gets the list of predefined validation stamps.
      */
     @GetMapping("predefinedValidationStamps")
-    fun predefinedValidationStampList(): Resources<PredefinedValidationStamp> = Resources.of(
-        predefinedValidationStampService.predefinedValidationStamps,
-        uri(MvcUriComponentsBuilder.on(javaClass).predefinedValidationStampList())
-    )
+    fun predefinedValidationStampList(): List<PredefinedValidationStamp> =
+        predefinedValidationStampService.predefinedValidationStamps
 
     @PostMapping("predefinedValidationStamps/create")
     fun newPredefinedValidationStamp(@RequestBody input: @Valid ValidationStampInput): PredefinedValidationStamp {
@@ -99,9 +95,11 @@ class PredefinedValidationStampController(
     @ResponseStatus(HttpStatus.ACCEPTED)
     @Deprecated("Will be removed in V5")
     fun setValidationStampImage(@PathVariable predefinedValidationStampId: ID, @RequestParam file: MultipartFile) {
-        predefinedValidationStampService.setPredefinedValidationStampImage(predefinedValidationStampId, Document(
-            file.contentType!!,
-            file.bytes
-        ))
+        predefinedValidationStampService.setPredefinedValidationStampImage(
+            predefinedValidationStampId, Document(
+                file.contentType!!,
+                file.bytes
+            )
+        )
     }
 }

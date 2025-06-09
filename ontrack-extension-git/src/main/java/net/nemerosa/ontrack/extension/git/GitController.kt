@@ -12,62 +12,45 @@ import net.nemerosa.ontrack.extension.support.AbstractExtensionController
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.buildfilter.BuildDiff
 import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription
-import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.ConnectionResult
-import net.nemerosa.ontrack.ui.resource.Resource
-import net.nemerosa.ontrack.ui.resource.Resources
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 
 @RestController
 @RequestMapping("extension/git")
 class GitController(
-        feature: GitExtensionFeature,
-        private val structureService: StructureService,
-        private val gitService: GitService,
-        private val configurationService: GitConfigurationService,
-        private val securityService: SecurityService,
-        private val gitChangeLogCache: GitChangeLogCache,
+    feature: GitExtensionFeature,
+    private val structureService: StructureService,
+    private val gitService: GitService,
+    private val configurationService: GitConfigurationService,
+    private val securityService: SecurityService,
+    private val gitChangeLogCache: GitChangeLogCache,
 ) : AbstractExtensionController<GitExtensionFeature>(feature) {
 
     /**
      * Gets the configurations
      */
-    val configurations: Resources<BasicGitConfiguration>
+    val configurations: List<BasicGitConfiguration>
         @GetMapping("configurations")
-        get() = Resources.of(
-                configurationService.configurations,
-                uri(on(javaClass).configurations)
-        )
-                .with("_test", uri(on(javaClass).testConfiguration(null)), securityService.isGlobalFunctionGranted(GlobalSettings::class.java))
+        get() = configurationService.configurations
 
     /**
      * Gets the configuration descriptors
      */
     @Suppress("unused")
-    val configurationsDescriptors: Resources<ConfigurationDescriptor>
+    val configurationsDescriptors: List<ConfigurationDescriptor>
         @GetMapping("configurations/descriptors")
-        get() = Resources.of(
-                configurationService.configurationDescriptors,
-                uri(on(javaClass).configurationsDescriptors)
-        )
+        get() = configurationService.configurationDescriptors
 
     @GetMapping("")
-    override fun getDescription(): Resource<ExtensionFeatureDescription> {
-        @Suppress("RecursivePropertyAccessor")
-        return Resource.of(
-                feature.featureDescription,
-                uri(on(javaClass).description)
-        )
-                .with("configurations", uri(on(javaClass).configurations), securityService.isGlobalFunctionGranted(GlobalSettings::class.java))
+    override fun getDescription(): ExtensionFeatureDescription {
+        return feature.featureDescription
     }
 
     /**
@@ -108,7 +91,10 @@ class GitController(
      * Updating one configuration
      */
     @PutMapping("configurations/{name:.*}/update")
-    fun updateConfiguration(@PathVariable name: String, @RequestBody configuration: BasicGitConfiguration): BasicGitConfiguration {
+    fun updateConfiguration(
+        @PathVariable name: String,
+        @RequestBody configuration: BasicGitConfiguration
+    ): BasicGitConfiguration {
         configurationService.updateConfiguration(name, configuration)
         return getConfiguration(name)
     }
@@ -139,13 +125,9 @@ class GitController(
      */
     @GetMapping("changelog/export/{projectId}/formats")
     @Deprecated("Will be removed in V5. Use the templating service instead.")
-    fun changeLogExportFormats(@PathVariable projectId: ID): Resources<ExportFormat> {
+    fun changeLogExportFormats(@PathVariable projectId: ID): List<ExportFormat> {
         val project = structureService.getProject(projectId)
-        val formats = gitService.getIssueExportFormats(project)
-        return Resources.of(
-            formats,
-            uri(on(GitController::class.java).changeLogExportFormats(projectId))
-        )
+        return gitService.getIssueExportFormats(project)
     }
 
     /**
@@ -160,12 +142,12 @@ class GitController(
         val project = changeLog.project
         // Gets the configuration for the project
         val gitConfiguration = gitService.getProjectConfiguration(project)
-                ?: throw GitProjectNotConfiguredException(project.id)
+            ?: throw GitProjectNotConfiguredException(project.id)
         // Gets the issue service
         val configuredIssueService = gitConfiguration.configuredIssueService
             ?: return ResponseEntity(
-                    "The branch is not configured for issues",
-                    HttpStatus.NO_CONTENT
+                "The branch is not configured for issues",
+                HttpStatus.NO_CONTENT
             )
         // Gets the issue change log
         val changeLogIssues = gitService.getChangeLogIssues(changeLog)
@@ -173,11 +155,11 @@ class GitController(
         val issues = changeLogIssues.list.map { it.issue }
         // Exports the change log using the given format
         val exportedChangeLogIssues = configuredIssueService.issueServiceExtension
-                .exportIssues(
-                        configuredIssueService.issueServiceConfiguration,
-                        issues,
-                        request
-                )
+            .exportIssues(
+                configuredIssueService.issueServiceConfiguration,
+                issues,
+                request
+            )
         // Content type
         val responseHeaders = HttpHeaders()
         responseHeaders.set("Content-Type", exportedChangeLogIssues.format + "; charset=utf-8")
@@ -198,8 +180,8 @@ class GitController(
         val changeLog = gitService.changeLog(nonNullRequest)
         // Diff export
         val diff = gitService.diff(
-                changeLog,
-                nonNullRequest.patterns
+            changeLog,
+            nonNullRequest.patterns
         )
         // Content type
         val responseHeaders = HttpHeaders()
@@ -290,22 +272,16 @@ class GitController(
      * Commit information in a project
      */
     @GetMapping("{projectId}/commit-info/{commit}")
-    fun commitProjectInfo(@PathVariable projectId: ID, @PathVariable commit: String): Resource<OntrackGitCommitInfo> {
-        return Resource.of(
-                gitService.getCommitProjectInfo(projectId, commit),
-                uri(on(javaClass).commitProjectInfo(projectId, commit))
-        ).withView(Build::class.java)
+    fun commitProjectInfo(@PathVariable projectId: ID, @PathVariable commit: String): OntrackGitCommitInfo {
+        return gitService.getCommitProjectInfo(projectId, commit)
     }
 
     /**
      * Issue information in a project
      */
     @GetMapping("{projectId}/issue-info/{issue}")
-    fun issueProjectInfo(@PathVariable projectId: ID, @PathVariable issue: String): Resource<OntrackGitIssueInfo> {
-        return Resource.of<OntrackGitIssueInfo>(
-                gitService.getIssueProjectInfo(projectId, issue),
-                uri(on(javaClass).issueProjectInfo(projectId, issue))
-        ).withView(Build::class.java)
+    fun issueProjectInfo(@PathVariable projectId: ID, @PathVariable issue: String): OntrackGitIssueInfo? {
+        return gitService.getIssueProjectInfo(projectId, issue)
     }
 
     /**
@@ -318,8 +294,8 @@ class GitController(
         val branch = structureService.getBranch(branchId)
         val config = gitService.getBranchConfiguration(branch) ?: throw GitBranchNotConfiguredException(branchId)
         return gitService.download(branch.project, config.branch, path)
-                ?.let { ResponseEntity.ok(it) }
-                ?: throw SCMDocumentNotFoundException(path)
+            ?.let { ResponseEntity.ok(it) }
+            ?: throw SCMDocumentNotFoundException(path)
     }
 
     /**

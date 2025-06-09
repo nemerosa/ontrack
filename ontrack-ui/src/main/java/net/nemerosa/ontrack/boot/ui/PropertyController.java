@@ -3,16 +3,11 @@ package net.nemerosa.ontrack.boot.ui;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.ui.resource.Resource;
-import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 /**
  * UI end point for the management of properties.
@@ -36,23 +31,10 @@ public class PropertyController extends AbstractProjectEntityController {
      * @param id         Entity ID
      * @return List of properties
      */
-    @RequestMapping(value = "{entityType}/{id}", method = RequestMethod.GET)
-    public Resources<Resource<Property<?>>> getProperties(@PathVariable ProjectEntityType entityType, @PathVariable ID id) {
+    @GetMapping("{entityType}/{id}")
+    public List<Property<?>> getProperties(@PathVariable ProjectEntityType entityType, @PathVariable ID id) {
         ProjectEntity entity = getEntity(entityType, id);
-        List<Property<?>> properties = propertyService.getProperties(entity);
-        List<Resource<Property<?>>> resources = new ArrayList<>();
-        for (Property<?> property : properties) {
-            resources.add(
-                    Resource.of(
-                            property,
-                            uri(on(getClass()).getPropertyValue(entity.getProjectEntityType(), entity.getId(), property.getType().getClass().getName()))
-                    )
-            );
-        }
-        return Resources.of(
-                resources,
-                uri(on(getClass()).getProperties(entityType, id))
-        );
+        return propertyService.getProperties(entity);
     }
 
     /**
@@ -68,11 +50,8 @@ public class PropertyController extends AbstractProjectEntityController {
      * @return A response that defines the property
      */
     @RequestMapping(value = "{entityType}/{id}/{propertyTypeName}/view", method = RequestMethod.GET)
-    public Resource<Property<?>> getPropertyValue(@PathVariable ProjectEntityType entityType, @PathVariable ID id, @PathVariable String propertyTypeName) {
-        return Resource.of(
-                propertyService.getProperty(getEntity(entityType, id), propertyTypeName),
-                uri(on(getClass()).getPropertyValue(entityType, id, propertyTypeName))
-        );
+    public Property<?> getPropertyValue(@PathVariable ProjectEntityType entityType, @PathVariable ID id, @PathVariable String propertyTypeName) {
+        return propertyService.getProperty(getEntity(entityType, id), propertyTypeName);
     }
 
     /**

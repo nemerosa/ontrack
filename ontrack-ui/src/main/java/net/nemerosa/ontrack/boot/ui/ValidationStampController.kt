@@ -7,14 +7,12 @@ import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.ValidationStamp.Companion.of
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
-import net.nemerosa.ontrack.ui.resource.Resources
 import net.nemerosa.ontrack.ui.support.UIUtils.setupDefaultImageCache
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
 import java.util.*
 
 @RestController
@@ -27,22 +25,16 @@ class ValidationStampController(
 
     // Validation stamps
     @GetMapping("branches/{branchId}/validationStamps")
-    fun getValidationStampListForBranch(@PathVariable branchId: ID): Resources<ValidationStamp> {
+    fun getValidationStampListForBranch(@PathVariable branchId: ID): List<ValidationStamp> {
         val (_, _, _, _, project) = structureService.getBranch(branchId)
-        return Resources.of(
-            structureService.getValidationStampListForBranch(branchId),
-            uri(
-                MvcUriComponentsBuilder.on(ValidationStampController::class.java)
-                    .getValidationStampListForBranch(branchId)
-            )
-        )
+        return structureService.getValidationStampListForBranch(branchId)
     }
 
     @GetMapping("branches/{branchId}/validationStamps/view")
     @Transactional
-    fun getValidationStampViewListForBranch(@PathVariable branchId: ID): Resources<ValidationStampView> {
+    fun getValidationStampViewListForBranch(@PathVariable branchId: ID): List<ValidationStampView> {
         return getValidationStampListForBranch(branchId)
-            .transform { validationStamp: ValidationStamp? ->
+            .map { validationStamp: ValidationStamp? ->
                 ValidationStampView.of(
                     validationStamp,
                     decorationService.getDecorations(validationStamp)
@@ -54,7 +46,7 @@ class ValidationStampController(
     fun reorderValidationStampListForBranch(
         @PathVariable branchId: ID,
         @RequestBody reordering: Reordering?
-    ): Resources<ValidationStamp> {
+    ): List<ValidationStamp> {
         // Reordering
         reordering?.let {
             structureService.reorderValidationStamps(branchId, reordering)

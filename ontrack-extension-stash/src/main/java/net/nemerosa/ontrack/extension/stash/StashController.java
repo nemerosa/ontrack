@@ -5,56 +5,39 @@ import net.nemerosa.ontrack.extension.stash.service.StashConfigurationService;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
-import net.nemerosa.ontrack.model.security.GlobalSettings;
-import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import net.nemerosa.ontrack.model.support.ConnectionResult;
-import net.nemerosa.ontrack.ui.resource.Resource;
-import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+import java.util.List;
 
 @RestController
 @RequestMapping("extension/stash")
 public class StashController extends AbstractExtensionController<StashExtensionFeature> {
 
     private final StashConfigurationService configurationService;
-    private final SecurityService securityService;
 
     @Autowired
     public StashController(StashExtensionFeature feature,
-                           StashConfigurationService configurationService,
-                           SecurityService securityService) {
+                           StashConfigurationService configurationService) {
         super(feature);
         this.configurationService = configurationService;
-        this.securityService = securityService;
     }
 
     @Override
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public Resource<ExtensionFeatureDescription> getDescription() {
-        return Resource.of(
-                feature.getFeatureDescription(),
-                uri(on(getClass()).getDescription())
-        )
-                .with("configurations", uri(on(getClass()).getConfigurations()), securityService.isGlobalFunctionGranted(GlobalSettings.class))
-                ;
+    public ExtensionFeatureDescription getDescription() {
+        return feature.getFeatureDescription();
     }
 
     /**
      * Gets the configurations
      */
     @RequestMapping(value = "configurations", method = RequestMethod.GET)
-    public Resources<StashConfiguration> getConfigurations() {
-        return Resources.of(
-                configurationService.getConfigurations(),
-                uri(on(getClass()).getConfigurations())
-        )
-                .with("_test", uri(on(getClass()).testConfiguration(null)), securityService.isGlobalFunctionGranted(GlobalSettings.class))
-                ;
+    public List<StashConfiguration> getConfigurations() {
+        return configurationService.getConfigurations();
     }
 
     /**
@@ -69,11 +52,8 @@ public class StashController extends AbstractExtensionController<StashExtensionF
      * Gets the configuration descriptors
      */
     @RequestMapping(value = "configurations/descriptors", method = RequestMethod.GET)
-    public Resources<ConfigurationDescriptor> getConfigurationsDescriptors() {
-        return Resources.of(
-                configurationService.getConfigurationDescriptors(),
-                uri(on(getClass()).getConfigurationsDescriptors())
-        );
+    public List<ConfigurationDescriptor> getConfigurationsDescriptors() {
+        return configurationService.getConfigurationDescriptors();
     }
 
     /**

@@ -10,12 +10,9 @@ import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.Build.Companion.of
 import net.nemerosa.ontrack.model.support.Action
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
-import net.nemerosa.ontrack.ui.resource.Resources
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
-import java.util.stream.Collectors
 
 @RestController
 @RequestMapping("/rest/structure")
@@ -30,35 +27,30 @@ class BuildController(
      * Build search
      */
     @GetMapping("project/{projectId}/builds/search")
-    fun buildSearch(@PathVariable projectId: ID, form: @Valid BuildSearchForm?): Resources<BuildView> {
-        return Resources.of(
+    fun buildSearch(@PathVariable projectId: ID, form: @Valid BuildSearchForm?): ResponseEntity<List<BuildView>> {
+        return ResponseEntity.ok(
             structureService.buildSearch(projectId, form ?: BuildSearchForm())
                 .map { build: Build? ->
                     structureService.getBuildView(
                         build!!, true
                     )
                 },
-            uri(MvcUriComponentsBuilder.on(javaClass).buildSearch(projectId, form))
         )
-            .forView(BuildView::class.java)
     }
 
     /**
      * List of diff actions
      */
     @GetMapping("project/{projectId}/builds/diff")
-    fun buildDiffActions(@PathVariable projectId: ID): Resources<Action> {
-        return Resources.of(
+    fun buildDiffActions(@PathVariable projectId: ID): ResponseEntity<List<Action>> {
+        return ResponseEntity.ok(
             extensionManager.getExtensions(BuildDiffExtension::class.java)
-                .stream()
                 .filter { extension: BuildDiffExtension ->
                     extension.apply(
                         structureService.getProject(projectId)
                     )
                 }
                 .map { actionExtension: BuildDiffExtension? -> this.resolveExtensionAction(actionExtension) }
-                .collect(Collectors.toList()),
-            uri(MvcUriComponentsBuilder.on(javaClass).buildDiffActions(projectId))
         )
     }
 
@@ -179,15 +171,14 @@ class BuildController(
         @PathVariable buildId: ID,
         @RequestParam(defaultValue = "0") offset: Int,
         @RequestParam(defaultValue = "10") size: Int
-    ): Resources<Build> {
-        return Resources.of(
+    ): ResponseEntity<List<Build>> {
+        return ResponseEntity.ok(
             structureService.getQualifiedBuildsUsedBy(
                 structureService.getBuild(buildId),
                 offset,
                 size
             ).pageItems.map { it.build },
-            uri(MvcUriComponentsBuilder.on(javaClass).getBuildLinksFrom(buildId, offset, size))
-        ).forView(Build::class.java)
+        )
     }
 
     /**
@@ -201,15 +192,14 @@ class BuildController(
         @PathVariable buildId: ID,
         @RequestParam(defaultValue = "0") offset: Int,
         @RequestParam(defaultValue = "10") size: Int
-    ): Resources<Build> {
-        return Resources.of(
+    ): ResponseEntity<List<Build>> {
+        return ResponseEntity.ok(
             structureService.getBuildsUsing(
                 structureService.getBuild(buildId),
                 offset,
                 size
             ).pageItems,
-            uri(MvcUriComponentsBuilder.on(javaClass).getBuildLinksTo(buildId, offset, size))
-        ).forView(Build::class.java)
+        )
     }
 
     /**

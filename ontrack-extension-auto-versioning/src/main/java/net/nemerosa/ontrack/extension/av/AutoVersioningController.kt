@@ -8,9 +8,8 @@ import net.nemerosa.ontrack.extension.av.validation.AutoVersioningValidationServ
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
-import net.nemerosa.ontrack.ui.resource.Resource
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
 
 @RestController
 @RequestMapping("/extension/auto-versioning")
@@ -23,8 +22,8 @@ class AutoVersioningController(
      * Gets some statistics about the processing of PR creation orders.
      */
     @GetMapping("stats")
-    fun getStats(): Resource<AutoVersioningStats> =
-        Resource.of(
+    fun getStats(): ResponseEntity<AutoVersioningStats> =
+        ResponseEntity.ok(
             AutoVersioningStats(
                 pendingOrders = autoVersioningAuditQueryService.countByFilter(
                     filter = AutoVersioningAuditQueryFilter(
@@ -32,7 +31,6 @@ class AutoVersioningController(
                     )
                 )
             ),
-            uri(MvcUriComponentsBuilder.on(AutoVersioningController::class.java).getStats())
         )
 
     /**

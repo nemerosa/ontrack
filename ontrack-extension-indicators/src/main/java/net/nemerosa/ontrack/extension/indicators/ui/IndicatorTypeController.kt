@@ -9,11 +9,8 @@ import net.nemerosa.ontrack.extension.indicators.model.IndicatorTypeIdMismatchEx
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorTypeService
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
-import net.nemerosa.ontrack.ui.resource.Resource
-import net.nemerosa.ontrack.ui.resource.Resources
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 
 /**
  * Controller for the management of types.
@@ -29,23 +26,22 @@ class IndicatorTypeController(
      * Gets the list of types
      */
     @GetMapping("")
-    fun findAll(): Resources<ProjectIndicatorType> =
-        Resources.of(
+    fun findAll(): ResponseEntity<List<ProjectIndicatorType>> =
+        ResponseEntity.ok(
             indicatorTypeService.findAll().map {
                 ProjectIndicatorType(it)
             },
-            uri(on(this::class.java).findAll())
         )
 
     @PostMapping("create")
-    fun createType(@RequestBody @Valid input: CreateTypeForm): Resource<ProjectIndicatorType> =
+    fun createType(@RequestBody @Valid input: CreateTypeForm): ResponseEntity<ProjectIndicatorType> =
         getTypeById(indicatorTypeService.createType(input).id)
 
     @PutMapping("{id}/update")
     fun updateType(
         @PathVariable id: String,
         @RequestBody @Valid input: CreateTypeForm
-    ): Resource<ProjectIndicatorType> {
+    ): ResponseEntity<ProjectIndicatorType> {
         if (id != input.id) {
             throw IndicatorTypeIdMismatchException(id, input.id)
         }
@@ -78,10 +74,9 @@ class IndicatorTypeController(
     }
 
     @GetMapping("{id}")
-    fun getTypeById(@PathVariable id: String): Resource<ProjectIndicatorType> =
-        Resource.of(
+    fun getTypeById(@PathVariable id: String): ResponseEntity<ProjectIndicatorType> =
+        ResponseEntity.ok(
             ProjectIndicatorType(indicatorTypeService.getTypeById(id)),
-            uri(on(this::class.java).getTypeById(id))
         )
 
 }

@@ -10,13 +10,9 @@ import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorView
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorViewIDNotFoundException
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorViewService
 import net.nemerosa.ontrack.model.Ack
-import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
-import net.nemerosa.ontrack.ui.resource.Resource
-import net.nemerosa.ontrack.ui.resource.Resources
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 
 /**
  * Controller for the management of indicator views.
@@ -27,22 +23,20 @@ class IndicatorViewController(
     private val indicatorViewService: IndicatorViewService,
     private val indicatorCategoryService: IndicatorCategoryService,
     private val indicatorTypeService: IndicatorTypeService,
-    private val indicatorExportService: IndicatorExportService,
-    private val securityService: SecurityService
+    private val indicatorExportService: IndicatorExportService
 ) : AbstractResourceController() {
 
     /**
      * Gets the list of views
      */
     @GetMapping("")
-    fun findAll(): Resources<IndicatorView> =
-        Resources.of(
+    fun findAll(): ResponseEntity<List<IndicatorView>> =
+        ResponseEntity.ok(
             indicatorViewService.getIndicatorViews(),
-            uri(on(this::class.java).findAll())
         )
 
     @PostMapping("create")
-    fun create(@RequestBody @Valid input: IndicatorViewForm): Resource<IndicatorView> =
+    fun create(@RequestBody @Valid input: IndicatorViewForm): ResponseEntity<IndicatorView> =
         getViewById(
             indicatorViewService.saveIndicatorView(
                 IndicatorView(
@@ -54,17 +48,16 @@ class IndicatorViewController(
         )
 
     @GetMapping("{id}")
-    fun getViewById(@PathVariable id: String): Resource<IndicatorView> =
-        Resource.of(
+    fun getViewById(@PathVariable id: String): ResponseEntity<IndicatorView> =
+        ResponseEntity.ok(
             indicatorViewService.findIndicatorViewById(id) ?: throw IndicatorViewIDNotFoundException(id),
-            uri(on(this::class.java).getViewById(id))
         )
 
     @PutMapping("{id}/update")
     fun update(
         @PathVariable id: String,
         @RequestBody @Valid input: IndicatorViewForm
-    ): Resource<IndicatorView> {
+    ): ResponseEntity<IndicatorView> {
         return getViewById(
             indicatorViewService.saveIndicatorView(
                 IndicatorView(

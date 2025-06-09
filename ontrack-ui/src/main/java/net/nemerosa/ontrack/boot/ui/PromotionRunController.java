@@ -5,15 +5,13 @@ import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
-import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Objects;
-
-import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
 @RequestMapping("/rest/structure")
@@ -31,30 +29,21 @@ public class PromotionRunController extends AbstractResourceController {
     }
 
     @RequestMapping(value = "builds/{buildId}/promotionRun", method = RequestMethod.GET)
-    public Resources<PromotionRun> getPromotionRuns(@PathVariable ID buildId) {
-        return Resources.of(
-                structureService.getPromotionRunsForBuild(buildId),
-                uri(on(getClass()).getPromotionRuns(buildId))
-        ).forView(Build.class);
+    public List<PromotionRun> getPromotionRuns(@PathVariable ID buildId) {
+        return structureService.getPromotionRunsForBuild(buildId);
     }
 
     @RequestMapping(value = "builds/{buildId}/promotionRun/last", method = RequestMethod.GET)
-    public Resources<PromotionRun> getLastPromotionRuns(@PathVariable ID buildId) {
-        return Resources.of(
-                structureService.getLastPromotionRunsForBuild(buildId),
-                uri(on(getClass()).getLastPromotionRuns(buildId))
-        ).forView(Build.class);
+    public List<PromotionRun> getLastPromotionRuns(@PathVariable ID buildId) {
+        return structureService.getLastPromotionRunsForBuild(buildId);
     }
 
     @RequestMapping(value = "builds/{buildId}/promotionRun/{promotionLevelId}", method = RequestMethod.GET)
-    public Resources<PromotionRun> getPromotionRunsForBuildAndPromotionLevel(@PathVariable ID buildId, @PathVariable ID promotionLevelId) {
-        return Resources.of(
-                structureService.getPromotionRunsForBuildAndPromotionLevel(
-                        structureService.getBuild(buildId),
-                        structureService.getPromotionLevel(promotionLevelId)
-                ),
-                uri(on(getClass()).getPromotionRunsForBuildAndPromotionLevel(buildId, promotionLevelId))
-        ).forView(Build.class);
+    public List<PromotionRun> getPromotionRunsForBuildAndPromotionLevel(@PathVariable ID buildId, @PathVariable ID promotionLevelId) {
+        return structureService.getPromotionRunsForBuildAndPromotionLevel(
+                structureService.getBuild(buildId),
+                structureService.getPromotionLevel(promotionLevelId)
+        );
     }
 
     @RequestMapping(value = "builds/{buildId}/promotionRun/create", method = RequestMethod.POST)

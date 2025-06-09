@@ -41,7 +41,6 @@ dependencies {
     // TODO Logging extensions
     runtimeOnly("net.logstash.logback:logstash-logback-encoder")
 
-    testImplementation(testFixtures(project(":ontrack-ui-support")))
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(testFixtures(project(":ontrack-model")))
     testImplementation(testFixtures(project(":ontrack-ui-graphql")))

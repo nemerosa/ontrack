@@ -4,13 +4,13 @@ import jakarta.annotation.PostConstruct
 import jakarta.servlet.DispatcherType
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
-import net.nemerosa.ontrack.ui.resource.ResourceModule
 import org.slf4j.LoggerFactory
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.converter.HttpMessageConverter
 import org.springframework.http.converter.StringHttpMessageConverter
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.web.filter.ShallowEtagHeaderFilter
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer
 import org.springframework.web.servlet.config.annotation.CorsRegistry
@@ -21,7 +21,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 class WebConfig(
     private val uriBuilder: EntityURIBuilder,
     private val securityService: SecurityService,
-    private val resourceModules: List<ResourceModule>,
 ) : WebMvcConfigurer {
 
     private val logger = LoggerFactory.getLogger(WebConfig::class.java)
@@ -60,7 +59,7 @@ class WebConfig(
         // Documents
         converters.add(DocumentHttpMessageConverter())
         // JSON
-        converters.add(ResourceHttpMessageConverter(uriBuilder, securityService, resourceModules))
+        converters.add(MappingJackson2HttpMessageConverter())
     }
 
     override fun addCorsMappings(registry: CorsRegistry) {

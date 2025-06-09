@@ -1,15 +1,12 @@
 package net.nemerosa.ontrack.extension.bitbucket.cloud.configuration
 
 import net.nemerosa.ontrack.model.Ack
-import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.ConnectionResult
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
-import net.nemerosa.ontrack.ui.resource.Resources
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 
 @RestController
 @RequestMapping("extension/bitbucket-cloud/configurations")
@@ -22,17 +19,7 @@ class BitbucketCloudConfigurationController(
      * Gets the configurations
      */
     @GetMapping("")
-    fun getConfigurations(): Resources<BitbucketCloudConfiguration> = Resources.of(
-        configurationService.configurations,
-        uri(on(javaClass).getConfigurations())
-    )
-        .with(
-            "_test",
-            uri(on(javaClass).testConfiguration(null)),
-            securityService.isGlobalFunctionGranted(
-                GlobalSettings::class.java
-            )
-        )
+    fun getConfigurations(): List<BitbucketCloudConfiguration> = configurationService.configurations
 
     /**
      * Test for a configuration
@@ -46,10 +33,7 @@ class BitbucketCloudConfigurationController(
      * Gets the configuration descriptors
      */
     @GetMapping("descriptors")
-    fun getConfigurationsDescriptors(): Resources<ConfigurationDescriptor> = Resources.of(
-        configurationService.configurationDescriptors,
-        uri(on(javaClass).getConfigurationsDescriptors())
-    )
+    fun getConfigurationsDescriptors(): List<ConfigurationDescriptor> = configurationService.configurationDescriptors
 
     /**
      * Creating a configuration

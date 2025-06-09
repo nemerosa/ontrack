@@ -2,21 +2,14 @@ package net.nemerosa.ontrack.extension.indicators.ui.graphql
 
 import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLObjectType
-import net.nemerosa.ontrack.extension.indicators.acl.IndicatorViewManagement
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorView
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorViewService
-import net.nemerosa.ontrack.extension.indicators.ui.IndicatorViewController
 import net.nemerosa.ontrack.graphql.schema.GQLFieldContributor
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.graphQLFieldContributions
 import net.nemerosa.ontrack.graphql.support.listType
-import net.nemerosa.ontrack.ui.resource.AbstractLinkResourceDecorator
-import net.nemerosa.ontrack.ui.resource.Link
-import net.nemerosa.ontrack.ui.resource.linkIfGlobal
-import net.nemerosa.ontrack.ui.resource.linkTo
 import org.springframework.stereotype.Component
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 
 /**
  * Management of [IndicatorView] list.
@@ -79,15 +72,4 @@ class IndicatorViewList private constructor() {
     companion object {
         val INSTANCE = IndicatorViewList()
     }
-}
-
-@Component
-class IndicatorViewListResourceDecorator :
-    AbstractLinkResourceDecorator<IndicatorViewList>(IndicatorViewList::class.java) {
-    override fun getLinkDefinitions() = listOf(
-        Link.CREATE linkTo { _: IndicatorViewList ->
-            on(IndicatorViewController::class.java).create(IndicatorViewController.IndicatorViewForm("", emptyList()))
-        } linkIfGlobal IndicatorViewManagement::class
-    )
-
 }

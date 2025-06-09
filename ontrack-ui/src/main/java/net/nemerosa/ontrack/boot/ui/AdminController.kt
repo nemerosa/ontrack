@@ -9,17 +9,12 @@ import net.nemerosa.ontrack.model.security.EncryptionService
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.support.ConnectorGlobalStatusService
-import net.nemerosa.ontrack.model.support.Page
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
-import net.nemerosa.ontrack.ui.resource.Pagination
-import net.nemerosa.ontrack.ui.resource.Resource
-import net.nemerosa.ontrack.ui.resource.Resources
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.actuate.health.HealthEndpoint
 import org.springframework.http.HttpEntity
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 
 @RestController
 @RequestMapping("/rest/admin")
@@ -37,14 +32,13 @@ constructor(
      * Gets the health status
      */
     @GetMapping("status")
-    fun getStatus(): Resource<AdminStatus> {
+    fun getStatus(): ResponseEntity<AdminStatus> {
         securityService.checkGlobalFunction(ApplicationManagement::class.java)
-        return Resource.of(
+        return ResponseEntity.ok(
             AdminStatus(
                 health = healthEndpoint.health(),
                 connectors = connectorGlobalStatusService.globalStatus
             ),
-            uri(on(javaClass).getStatus())
         )
     }
 
@@ -84,32 +78,9 @@ constructor(
     @GetMapping("jobs")
     fun getJobs(
         @Valid jobFilter: JobFilter?,
-        page: Page?
-    ): Resources<JobStatus> {
+    ): List<JobStatus> {
         securityService.checkGlobalFunction(ApplicationManagement::class.java)
-        val jobs = (jobFilter ?: JobFilter()).filter(jobScheduler.jobStatuses)
-        val pagination = Pagination.paginate(
-            jobs,
-            page ?: Page(),
-            { offset, limit ->
-                uri(on(javaClass).getJobs(null, null)).map(jobFilter, Page(offset, limit))
-            }
-        )
-        return Resources.of(
-            pagination.items,
-            uri(on(javaClass).getJobs(jobFilter, page))
-        )
-            .withPagination(pagination.pagination)
-            .with(
-                "_pause",
-                uri(on(javaClass).pauseAllJobs()),
-                !jobScheduler.isPaused
-            )
-            .with(
-                "_resume",
-                uri(on(javaClass).resumeAllJobs()),
-                jobScheduler.isPaused
-            )
+        return (jobFilter ?: JobFilter()).filter(jobScheduler.jobStatuses)
     }
 
     /**

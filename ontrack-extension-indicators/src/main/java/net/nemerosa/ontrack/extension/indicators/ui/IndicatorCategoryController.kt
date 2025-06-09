@@ -6,11 +6,8 @@ import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.extension.indicators.model.*
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
-import net.nemerosa.ontrack.ui.resource.Resource
-import net.nemerosa.ontrack.ui.resource.Resources
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 
 /**
  * Controller for the management of categories.
@@ -27,28 +24,26 @@ class IndicatorCategoryController(
      * Gets the list of categories
      */
     @GetMapping("")
-    fun findAll(): Resources<IndicatorCategory> =
-        Resources.of(
-            indicatorCategoryService.findAll(),
-            uri(on(this::class.java).findAll())
+    fun findAll(): ResponseEntity<List<IndicatorCategory>> =
+        ResponseEntity.ok(
+            indicatorCategoryService.findAll()
         )
 
     @PostMapping("create")
-    fun createType(@RequestBody @Valid input: IndicatorForm): Resource<IndicatorCategory> =
+    fun createType(@RequestBody @Valid input: IndicatorForm): ResponseEntity<IndicatorCategory> =
         getCategoryById(indicatorCategoryService.createCategory(input).id)
 
     @GetMapping("{id}")
-    fun getCategoryById(@PathVariable id: String): Resource<IndicatorCategory> =
-        Resource.of(
-            indicatorCategoryService.getCategory(id),
-            uri(on(this::class.java).getCategoryById(id))
+    fun getCategoryById(@PathVariable id: String): ResponseEntity<IndicatorCategory> =
+        ResponseEntity.ok(
+            indicatorCategoryService.getCategory(id)
         )
 
     @PutMapping("{id}/update")
     fun updateCategory(
         @PathVariable id: String,
         @RequestBody @Valid input: IndicatorForm
-    ): Resource<IndicatorCategory> {
+    ): ResponseEntity<IndicatorCategory> {
         if (id != input.id) {
             throw IndicatorCategoryIdMismatchException(id, input.id)
         }

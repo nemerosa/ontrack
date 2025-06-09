@@ -4,15 +4,12 @@ import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.exceptions.ValidationStampFilterNotShareableException;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
-import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
 @RequestMapping("/rest/validation-stamp-filters")
@@ -28,13 +25,10 @@ public class ValidationStampFilterController extends AbstractResourceController 
     }
 
     @GetMapping("/branch/{branchId}/all")
-    public Resources<ValidationStampFilter> getAllBranchValidationStampFilters(@PathVariable ID branchId) {
-        return Resources.of(
-                filterService.getBranchValidationStampFilters(
-                        structureService.getBranch(branchId),
-                        true
-                ),
-                uri(on(getClass()).getAllBranchValidationStampFilters(branchId))
+    public List<ValidationStampFilter> getAllBranchValidationStampFilters(@PathVariable ID branchId) {
+        return filterService.getBranchValidationStampFilters(
+                structureService.getBranch(branchId),
+                true
         );
     }
 

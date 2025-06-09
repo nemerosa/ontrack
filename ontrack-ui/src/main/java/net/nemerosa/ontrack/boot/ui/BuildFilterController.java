@@ -7,13 +7,12 @@ import net.nemerosa.ontrack.model.buildfilter.BuildFilterResource;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
-import net.nemerosa.ontrack.ui.resource.Resources;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
+import java.util.List;
 
 /**
  * Management of build filters for the branches.
@@ -35,11 +34,8 @@ public class BuildFilterController extends AbstractResourceController {
      * @param branchId ID of the branch to get the filter for.
      */
     @RequestMapping(value = "branches/{branchId}/filters", method = RequestMethod.GET)
-    public Resources<BuildFilterResource<?>> buildFilters(@PathVariable ID branchId) {
-        return Resources.of(
-                buildFilterService.getBuildFilters(branchId),
-                uri(on(getClass()).buildFilters(branchId))
-        );
+    public List<BuildFilterResource<?>> buildFilters(@PathVariable ID branchId) {
+        return buildFilterService.getBuildFilters(branchId).stream().toList();
     }
 
     /**

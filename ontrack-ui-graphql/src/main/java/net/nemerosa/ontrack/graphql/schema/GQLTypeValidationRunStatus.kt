@@ -13,7 +13,6 @@ import net.nemerosa.ontrack.model.structure.ValidationRunStatus
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import net.nemerosa.ontrack.model.support.FreeTextAnnotatorContributor
 import net.nemerosa.ontrack.model.support.MessageAnnotationUtils
-import net.nemerosa.ontrack.ui.resource.ResourceDecoratorDelegate
 import org.springframework.stereotype.Component
 
 @Component
@@ -100,11 +99,9 @@ class GQLTypeValidationRunStatus(
     class Data(
         val validationRun: ValidationRun,
         val delegate: ValidationRunStatus
-    ) : ResourceDecoratorDelegate {
+    ) {
         val statusID: ValidationRunStatusID get() = delegate.statusID
         val description: String? get() = delegate.description
-
-        override fun getLinkDelegate(): Any = delegate
     }
 
 }

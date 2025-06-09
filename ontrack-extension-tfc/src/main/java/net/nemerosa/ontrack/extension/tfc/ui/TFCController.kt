@@ -6,56 +6,33 @@ import net.nemerosa.ontrack.extension.tfc.config.TFCConfiguration
 import net.nemerosa.ontrack.extension.tfc.config.TFCConfigurationService
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription
-import net.nemerosa.ontrack.model.security.GlobalSettings
-import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.model.structure.PropertyService
-import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.ConnectionResult
-import net.nemerosa.ontrack.ui.resource.Resource
-import net.nemerosa.ontrack.ui.resource.Resources
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 
 @RestController
 @RequestMapping("extension/tfc")
 class TFCController(
     feature: TFCExtensionFeature,
-    private val securityService: SecurityService,
     private val configurationService: TFCConfigurationService,
-    private val structureService: StructureService,
-    private val propertyService: PropertyService,
 ) : AbstractExtensionController<TFCExtensionFeature>(feature) {
 
     @GetMapping("")
-    override fun getDescription(): Resource<ExtensionFeatureDescription> {
+    override fun getDescription(): ExtensionFeatureDescription {
         @Suppress("RecursivePropertyAccessor")
-        return Resource.of(
-            feature.featureDescription,
-            uri(on(javaClass).description)
-        )
-            .with(
-                "configurations",
-                uri(on(javaClass).getConfigurations()),
-                securityService.isGlobalFunctionGranted(GlobalSettings::class.java)
-            )
+        return feature.featureDescription
     }
 
     /**
      * Gets the configurations
      */
     @GetMapping("configurations")
-    fun getConfigurations(): Resources<TFCConfiguration> {
-        return Resources.of(
+    fun getConfigurations(): ResponseEntity<List<TFCConfiguration>> {
+        return ResponseEntity.ok(
             configurationService.configurations,
-            uri(on(javaClass).getConfigurations())
         )
-            .with(
-                "_test",
-                uri(on(javaClass).testConfiguration(null)),
-                securityService.isGlobalFunctionGranted(GlobalSettings::class.java)
-            )
     }
 
     /**
@@ -70,10 +47,9 @@ class TFCController(
      * Gets the configuration descriptors
      */
     @GetMapping("configurations/descriptors")
-    fun getConfigurationsDescriptors(): Resources<ConfigurationDescriptor> {
-        return Resources.of(
+    fun getConfigurationsDescriptors(): ResponseEntity<List<ConfigurationDescriptor>> {
+        return ResponseEntity.ok(
             configurationService.configurationDescriptors,
-            uri(on(javaClass).getConfigurationsDescriptors())
         )
     }
 

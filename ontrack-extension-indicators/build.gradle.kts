@@ -13,7 +13,6 @@ dependencies {
 
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(testFixtures(project(":ontrack-ui-graphql")))
-    testImplementation(testFixtures(project(":ontrack-ui-support")))
     testImplementation(testFixtures(project(":ontrack-extension-api")))
 
     testRuntimeOnly(project(":ontrack-service"))

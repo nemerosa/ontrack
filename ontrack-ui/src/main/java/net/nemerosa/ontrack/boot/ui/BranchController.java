@@ -7,13 +7,9 @@ import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
-import net.nemerosa.ontrack.model.security.BranchCreate;
-import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.Action;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
-import net.nemerosa.ontrack.ui.resource.Link;
-import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +19,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static net.nemerosa.ontrack.ui.support.UIUtils.requestParametersToJson;
-import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RestController
 @RequestMapping("/rest/structure")
@@ -33,7 +28,6 @@ public class BranchController extends AbstractResourceController {
     private final CopyService copyService;
     private final BuildFilterService buildFilterService;
     private final ExtensionManager extensionManager;
-    private final SecurityService securityService;
     private final BranchFavouriteService branchFavouriteService;
 
     @Autowired
@@ -42,29 +36,17 @@ public class BranchController extends AbstractResourceController {
             CopyService copyService,
             BuildFilterService buildFilterService,
             ExtensionManager extensionManager,
-            SecurityService securityService,
             BranchFavouriteService branchFavouriteService) {
         this.structureService = structureService;
         this.copyService = copyService;
         this.buildFilterService = buildFilterService;
         this.extensionManager = extensionManager;
-        this.securityService = securityService;
         this.branchFavouriteService = branchFavouriteService;
     }
 
     @RequestMapping(value = "projects/{projectId}/branches", method = RequestMethod.GET)
-    public Resources<Branch> getBranchListForProject(@PathVariable ID projectId) {
-        return Resources.of(
-                        structureService.getBranchesForProject(projectId),
-                        uri(on(BranchController.class).getBranchListForProject(projectId))
-                )
-                // Create
-                .with(
-                        Link.CREATE,
-                        uri(on(BranchController.class).newBranch(projectId, null)),
-                        securityService.isProjectFunctionGranted(projectId.getValue(), BranchCreate.class)
-                )
-                ;
+    public List<Branch> getBranchListForProject(@PathVariable ID projectId) {
+        return structureService.getBranchesForProject(projectId);
     }
 
     @RequestMapping(value = "projects/{projectId}/branches/create", method = RequestMethod.POST)
