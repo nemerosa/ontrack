@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.model.buildfilter.BuildFilterInput;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterResource;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.structure.ID;
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +18,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/rest")
-public class BuildFilterController extends AbstractResourceController {
+public class BuildFilterController {
 
     private final BuildFilterService buildFilterService;
 

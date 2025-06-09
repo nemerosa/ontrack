@@ -5,7 +5,6 @@ import jakarta.validation.Valid;
 import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +19,7 @@ import static net.nemerosa.ontrack.ui.support.UIUtils.setupDefaultImageCache;
 
 @RestController
 @RequestMapping("/rest/structure")
-public class PromotionLevelController extends AbstractResourceController {
+public class PromotionLevelController {
 
     private final StructureService structureService;
 

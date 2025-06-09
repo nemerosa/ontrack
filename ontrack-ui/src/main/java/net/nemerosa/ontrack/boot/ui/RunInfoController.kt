@@ -5,14 +5,13 @@ import net.nemerosa.ontrack.model.structure.RunInfo
 import net.nemerosa.ontrack.model.structure.RunInfoInput
 import net.nemerosa.ontrack.model.structure.RunInfoService
 import net.nemerosa.ontrack.model.structure.RunnableEntityType
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/rest/structure/run-info")
 class RunInfoController(
         private val runInfoService: RunInfoService
-) : AbstractResourceController() {
+) {
 
     @PutMapping("{runnableEntityType}/{id}")
     fun setRunInfo(

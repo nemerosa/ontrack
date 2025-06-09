@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.general
 
 import net.nemerosa.ontrack.model.structure.BuildLink
 import net.nemerosa.ontrack.model.structure.PromotionRun
-import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import java.net.URI
 
 /**
@@ -29,24 +28,22 @@ class BuildLinkDecoration(
         val build: String,
         val label: String,
         val qualifier: String,
-        val uri: URI,
+        val uri: URI?,
         val promotions: List<BuildLinkDecorationPromotion>
 )
 
-fun BuildLink.asBuildLinkDecoration(uriBuilder: EntityURIBuilder, promotionRuns: List<PromotionRun>, label: String) =
+fun BuildLink.asBuildLinkDecoration(promotionRuns: List<PromotionRun>, label: String) =
         BuildLinkDecoration(
                 project = this.build.project.name,
                 build = this.build.name,
                 label = label,
                 qualifier = this.qualifier,
-                uri = uriBuilder.getEntityPage(this.build),
+                uri = null,
                 promotions = promotionRuns.map {
                     BuildLinkDecorationPromotion(
                             it.promotionLevel.name,
                             // See PromotionLevelController
-                            uriBuilder.url(
-                                    "/rest/structure/promotionLevels/${it.promotionLevel.id}/image"
-                            ).toString()
+                            null
                     )
                 }
         )

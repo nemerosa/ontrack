@@ -5,14 +5,13 @@ import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.labels.Label
 import net.nemerosa.ontrack.model.labels.LabelForm
 import net.nemerosa.ontrack.model.labels.LabelManagementService
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/rest/labels")
 class LabelController(
     private val labelManagementService: LabelManagementService
-) : AbstractResourceController() {
+) {
 
     /**
      * Creation of a label

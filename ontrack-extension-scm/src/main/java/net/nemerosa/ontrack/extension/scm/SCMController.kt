@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.StructureService
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import org.apache.commons.lang3.StringUtils
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -19,8 +18,7 @@ class SCMController(
     private val structureService: StructureService,
     private val securityService: SecurityService,
     private val scmFileChangeFilterService: SCMFileChangeFilterService
-) :
-    AbstractResourceController() {
+) {
     /**
      * Gets the list of change log file filters
      */

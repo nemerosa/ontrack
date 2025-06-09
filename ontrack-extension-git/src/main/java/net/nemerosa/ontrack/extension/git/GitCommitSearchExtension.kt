@@ -13,19 +13,14 @@ import net.nemerosa.ontrack.model.security.ProjectView
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.OntrackConfigProperties
-import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
-import java.util.function.BiConsumer
-import java.util.regex.Pattern
 
 @Component
 class GitCommitSearchExtension(
     extensionFeature: GitExtensionFeature,
     private val gitService: GitService,
-    private val uriBuilder: EntityURIBuilder,
     private val securityService: SecurityService,
     private val structureService: StructureService,
     gitSearchConfigProperties: GitSearchConfigProperties,
@@ -115,13 +110,6 @@ class GitCommitSearchExtension(
             SearchResult(
                     title = "${project.name} ${item.commit}",
                     description = "${item.commitAuthor}: ${item.commitMessage}",
-                    uri = uriBuilder.build(
-                            MvcUriComponentsBuilder.on(GitController::class.java).commitProjectInfo(
-                                    project.id,
-                                    item.commit
-                            )
-                    ),
-                    page = uriBuilder.page("extension/git/${project.id}/commit/${item.commit}"),
                     accuracy = score,
                     type = searchResultType,
                     data = mapOf(

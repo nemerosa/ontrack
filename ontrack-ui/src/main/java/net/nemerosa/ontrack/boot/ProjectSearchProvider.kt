@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventListener
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import org.springframework.stereotype.Component
 
 /**
@@ -30,7 +29,6 @@ const val PROJECT_SEARCH_RESULT_TYPE = "project"
  */
 @Component
 class ProjectSearchProvider(
-    private val uriBuilder: EntityURIBuilder,
     private val structureService: StructureService,
     private val searchIndexService: SearchIndexService
 ) : SearchIndexer<ProjectSearchItem>, EventListener {
@@ -63,8 +61,6 @@ class ProjectSearchProvider(
             SearchResult(
                 title = entityDisplayName,
                 description = description ?: "",
-                uri = uriBuilder.getEntityURI(this),
-                page = uriBuilder.getEntityPage(this),
                 accuracy = score,
                 type = searchResultType,
                 data = mapOf(

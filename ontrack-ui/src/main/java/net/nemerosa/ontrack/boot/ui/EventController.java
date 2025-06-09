@@ -7,7 +7,6 @@ import net.nemerosa.ontrack.model.events.HtmlNotificationEventRenderer;
 import net.nemerosa.ontrack.model.exceptions.PropertyTypeNotFoundException;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.model.support.NameValue;
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/rest/events")
-public class EventController extends AbstractResourceController {
+public class EventController {
 
     private final Logger logger = LoggerFactory.getLogger(EventController.class);
 

@@ -5,13 +5,11 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import org.springframework.stereotype.Component
 
 @Component
 class MetaInfoSearchExtension(
     extensionFeature: GeneralExtensionFeature,
-    private val uriBuilder: EntityURIBuilder,
     private val propertyService: PropertyService,
     private val structureService: StructureService
 ) : AbstractExtension(extensionFeature), SearchIndexer<MetaInfoSearchItem> {
@@ -61,8 +59,6 @@ class MetaInfoSearchExtension(
             SearchResult(
                 title = entity.entityDisplayName,
                 description = item.items.map { (name, value) -> "$name -> $value" }.sorted().joinToString(", "),
-                uri = uriBuilder.getEntityURI(entity),
-                page = uriBuilder.getEntityPage(entity),
                 accuracy = score,
                 type = searchResultType,
                 data = mapOf(

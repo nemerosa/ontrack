@@ -12,7 +12,6 @@ import net.nemerosa.ontrack.model.links.BranchLinksDecoration
 import net.nemerosa.ontrack.model.links.BranchLinksDirection
 import net.nemerosa.ontrack.model.links.BranchLinksNode
 import net.nemerosa.ontrack.model.structure.Branch
-import net.nemerosa.ontrack.ui.controller.URIBuilder
 import org.springframework.stereotype.Component
 
 /**
@@ -24,7 +23,6 @@ class AutoVersioningBranchLinksDecorationExtension(
     extensionFeature: AutoVersioningExtensionFeature,
     private val autoVersioningConfigurationService: AutoVersioningConfigurationService,
     private val autoVersioningAuditQueryService: AutoVersioningAuditQueryService,
-    private val uriBuilder: URIBuilder,
 ) : AbstractExtension(extensionFeature), BranchLinksDecorationExtension {
 
     override val id: String = "auto_versioning"
@@ -74,22 +72,11 @@ class AutoVersioningBranchLinksDecorationExtension(
         text = mostRecentState.state.name,
         description = decorationDescription(this),
         icon = decorationIcon(mostRecentState.state),
-        url = decorationUrl(this, direction)
+        url = null,
     )
 
     private fun decorationDescription(autoVersioningAuditEntry: AutoVersioningAuditEntry): String =
         "Auto version of <b>${autoVersioningAuditEntry.order.branch.project.name}/${autoVersioningAuditEntry.order.branch.name}</b> to <b>${autoVersioningAuditEntry.order.sourceProject}</b> version <b>${autoVersioningAuditEntry.order.targetVersion}</b>"
-
-    private fun decorationUrl(
-        autoVersioningAuditEntry: AutoVersioningAuditEntry,
-        direction: BranchLinksDirection,
-    ): String =
-        when (direction) {
-            BranchLinksDirection.USING -> uriBuilder.page("extension/collibra/auto-versioning-audit/branch/${autoVersioningAuditEntry.order.branch.project.name}/${autoVersioningAuditEntry.order.branch.name}")
-                .toString()
-            BranchLinksDirection.USED_BY -> uriBuilder.page("extension/collibra/auto-versioning-audit/source/${autoVersioningAuditEntry.order.sourceProject}")
-                .toString()
-        }
 
     private fun decorationIcon(state: AutoVersioningAuditState): String =
         when (state) {

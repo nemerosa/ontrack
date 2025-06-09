@@ -1,19 +1,16 @@
 package net.nemerosa.ontrack.extension.bitbucket.cloud.configuration
 
 import net.nemerosa.ontrack.model.Ack
-import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.ConnectionResult
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("extension/bitbucket-cloud/configurations")
 class BitbucketCloudConfigurationController(
-    private val configurationService: BitbucketCloudConfigurationService,
-    private val securityService: SecurityService
-) : AbstractResourceController() {
+    private val configurationService: BitbucketCloudConfigurationService
+) {
 
     /**
      * Gets the configurations

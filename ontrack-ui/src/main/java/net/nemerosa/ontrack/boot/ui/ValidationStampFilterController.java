@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.boot.ui;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.exceptions.ValidationStampFilterNotShareableException;
 import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +12,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/rest/validation-stamp-filters")
-public class ValidationStampFilterController extends AbstractResourceController {
+public class ValidationStampFilterController {
 
     private final StructureService structureService;
     private final ValidationStampFilterService filterService;

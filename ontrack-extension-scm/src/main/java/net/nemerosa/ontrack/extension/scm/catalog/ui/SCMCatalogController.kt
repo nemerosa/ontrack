@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalog
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogEntry
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogExportService
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -16,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 class SCMCatalogController(
     private val scmCatalog: SCMCatalog,
     private val scmCatalogExportService: SCMCatalogExportService
-) : AbstractResourceController() {
+) {
 
     /**
      * Gets the entries of the catalog

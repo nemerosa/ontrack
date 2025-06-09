@@ -1,10 +1,6 @@
 package net.nemerosa.ontrack.boot.support
 
-import jakarta.annotation.PostConstruct
 import jakarta.servlet.DispatcherType
-import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
-import org.slf4j.LoggerFactory
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -18,20 +14,7 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 @Configuration
-class WebConfig(
-    private val uriBuilder: EntityURIBuilder,
-    private val securityService: SecurityService,
-) : WebMvcConfigurer {
-
-    private val logger = LoggerFactory.getLogger(WebConfig::class.java)
-
-    /**
-     * Logging
-     */
-    @PostConstruct
-    fun log() {
-        logger.info("[web] URI builder = " + uriBuilder.javaClass.name)
-    }
+class WebConfig : WebMvcConfigurer {
 
     /**
      * Uses the HTTP header for content negociation.

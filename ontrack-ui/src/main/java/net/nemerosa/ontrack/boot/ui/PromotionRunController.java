@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +14,7 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("/rest/structure")
-public class PromotionRunController extends AbstractResourceController {
+public class PromotionRunController {
 
     private final StructureService structureService;
     private final PropertyService propertyService;

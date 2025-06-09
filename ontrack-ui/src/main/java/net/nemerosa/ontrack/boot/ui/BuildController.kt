@@ -1,15 +1,11 @@
 package net.nemerosa.ontrack.boot.ui
 
 import jakarta.validation.Valid
-import net.nemerosa.ontrack.extension.api.BuildDiffExtension
-import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.Build.Companion.of
-import net.nemerosa.ontrack.model.support.Action
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -20,8 +16,7 @@ class BuildController(
     private val structureService: StructureService,
     private val propertyService: PropertyService,
     private val securityService: SecurityService,
-    private val extensionManager: ExtensionManager,
-) : AbstractResourceController() {
+) {
 
     /**
      * Build search
@@ -35,22 +30,6 @@ class BuildController(
                         build!!, true
                     )
                 },
-        )
-    }
-
-    /**
-     * List of diff actions
-     */
-    @GetMapping("project/{projectId}/builds/diff")
-    fun buildDiffActions(@PathVariable projectId: ID): ResponseEntity<List<Action>> {
-        return ResponseEntity.ok(
-            extensionManager.getExtensions(BuildDiffExtension::class.java)
-                .filter { extension: BuildDiffExtension ->
-                    extension.apply(
-                        structureService.getProject(projectId)
-                    )
-                }
-                .map { actionExtension: BuildDiffExtension? -> this.resolveExtensionAction(actionExtension) }
         )
     }
 

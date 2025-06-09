@@ -4,14 +4,13 @@ import net.nemerosa.ontrack.model.exceptions.ValidationRunStatusIDNotAvailableEx
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.structure.ValidationRun
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/rest/validationRunStatuses")
 class ValidationRunStatusController(
         private val structureService: StructureService
-) : AbstractResourceController() {
+) {
 
     /**
      * Edition of a validation run status comment

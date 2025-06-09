@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.model.structure
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import net.nemerosa.ontrack.model.annotations.APIDescription
-import java.net.URI
 
 /**
  * Result for a research
@@ -18,14 +17,6 @@ constructor(
          * Description linked to the item being found
          */
         val description: String,
-        /**
-         * API access point
-         */
-        val uri: URI,
-        /**
-         * Web access point
-         */
-        val page: URI,
         /**
          * Score for the search
          */

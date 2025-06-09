@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.extension.indicators.model.IndicatorReportingFilter
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorTypeIdMismatchException
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorTypeService
 import net.nemerosa.ontrack.model.Ack
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -20,7 +19,7 @@ import org.springframework.web.bind.annotation.*
 class IndicatorTypeController(
     private val indicatorTypeService: IndicatorTypeService,
     private val indicatorExportService: IndicatorExportService
-) : AbstractResourceController() {
+) {
 
     /**
      * Gets the list of types

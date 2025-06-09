@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.indicators.computing.ConfigurableIndicatorService
 import net.nemerosa.ontrack.extension.indicators.computing.ConfigurableIndicatorState
 import net.nemerosa.ontrack.json.getTextField
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
@@ -15,7 +14,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/extension/indicators/configurables")
 class ConfigurableIndicatorController(
     private val configurableIndicatorService: ConfigurableIndicatorService,
-) : AbstractResourceController() {
+) {
 
     /**
      * Edits a configurable indicator

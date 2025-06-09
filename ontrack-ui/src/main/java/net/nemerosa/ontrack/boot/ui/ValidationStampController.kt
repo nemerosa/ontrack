@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.ValidationStamp.Companion.of
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import net.nemerosa.ontrack.ui.support.UIUtils.setupDefaultImageCache
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -21,7 +20,7 @@ class ValidationStampController(
     private val structureService: StructureService,
     private val decorationService: DecorationService,
     private val validationDataTypeService: ValidationDataTypeService
-) : AbstractResourceController() {
+) {
 
     // Validation stamps
     @GetMapping("branches/{branchId}/validationStamps")

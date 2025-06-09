@@ -4,7 +4,6 @@ import net.nemerosa.ontrack.json.JsonParseException
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataJSONInputException
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -19,7 +18,7 @@ constructor(
     private val validationRunStatusService: ValidationRunStatusService,
     private val validationDataTypeService: ValidationDataTypeService,
     private val securityService: SecurityService
-) : AbstractResourceController() {
+) {
 
     @GetMapping("builds/{buildId}/validationRuns/view")
     fun getValidationStampRunViews(@PathVariable buildId: ID): List<ValidationStampRunView> {

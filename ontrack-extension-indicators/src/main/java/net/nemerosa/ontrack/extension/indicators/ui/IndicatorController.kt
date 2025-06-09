@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.indicators.ui
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.model.structure.ID
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -10,7 +9,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/extension/indicators")
 class IndicatorController(
     private val projectIndicatorService: ProjectIndicatorService
-) : AbstractResourceController() {
+) {
 
     /**
      * Gets the list of ALL indicators for a project

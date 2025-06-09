@@ -7,7 +7,6 @@ import net.nemerosa.ontrack.extension.av.validation.AutoVersioningValidationData
 import net.nemerosa.ontrack.extension.av.validation.AutoVersioningValidationService
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.StructureService
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -17,7 +16,7 @@ class AutoVersioningController(
     private val structureService: StructureService,
     private val autoVersioningAuditQueryService: AutoVersioningAuditQueryService,
     private val autoVersioningValidationService: AutoVersioningValidationService,
-) : AbstractResourceController() {
+) {
     /**
      * Gets some statistics about the processing of PR creation orders.
      */

@@ -2,19 +2,17 @@ package net.nemerosa.ontrack.boot.ui;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.validation.Valid;
-import net.nemerosa.ontrack.extension.api.BuildDiffExtension;
 import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.model.support.Action;
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +20,7 @@ import static net.nemerosa.ontrack.ui.support.UIUtils.requestParametersToJson;
 
 @RestController
 @RequestMapping("/rest/structure")
-public class BranchController extends AbstractResourceController {
+public class BranchController {
 
     private final StructureService structureService;
     private final CopyService copyService;
@@ -162,19 +160,13 @@ public class BranchController extends AbstractResourceController {
         Branch branch = structureService.getBranch(branchId);
         // Gets the list of builds
         List<Build> builds = buildFilterProviderData.filterBranchBuilds(branch);
-        // Gets the list of build diff actions
-        List<Action> buildDiffActions = extensionManager.getExtensions(BuildDiffExtension.class)
-                .stream()
-                .filter(extension -> extension.apply(branch.getProject()))
-                .map(this::resolveExtensionAction)
-                .collect(Collectors.toList());
         // Gets the views for each build
         return ResponseEntity.ok(
                 new BranchBuildView(
                         builds.stream()
                                 .map(build -> structureService.getBuildView(build, true))
                                 .collect(Collectors.toList()),
-                        buildDiffActions
+                        Collections.emptyList()
                 )
         );
     }

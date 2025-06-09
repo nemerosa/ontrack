@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.model.structure.PredefinedPromotionLevel;
 import net.nemerosa.ontrack.model.structure.Reordering;
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +24,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/rest/admin")
-public class PredefinedPromotionLevelController extends AbstractResourceController {
+public class PredefinedPromotionLevelController {
 
     private final PredefinedPromotionLevelService predefinedPromotionLevelService;
 

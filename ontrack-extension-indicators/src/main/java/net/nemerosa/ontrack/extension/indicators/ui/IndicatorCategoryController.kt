@@ -5,7 +5,6 @@ import jakarta.validation.Valid
 import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.extension.indicators.model.*
 import net.nemerosa.ontrack.model.Ack
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -18,7 +17,7 @@ class IndicatorCategoryController(
     private val indicatorCategoryService: IndicatorCategoryService,
     private val indicatorTypeService: IndicatorTypeService,
     private val indicatorExportService: IndicatorExportService
-) : AbstractResourceController() {
+) {
 
     /**
      * Gets the list of categories

@@ -4,7 +4,6 @@ import jakarta.validation.Valid
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.structure.ID
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -15,7 +14,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/rest/accounts")
 class AccountController(
     private val accountService: AccountService
-) : AbstractResourceController() {
+) {
     /**
      * List of accounts
      */

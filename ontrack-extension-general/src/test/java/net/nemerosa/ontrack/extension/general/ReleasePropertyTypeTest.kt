@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.general
 
 import io.mockk.mockk
-import net.nemerosa.ontrack.ui.controller.MockURIBuilder
 import org.junit.jupiter.api.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -13,7 +12,6 @@ class ReleasePropertyTypeTest {
             searchIndexService = mockk(),
             releaseSearchExtension = ReleaseSearchExtension(
                     extensionFeature = GeneralExtensionFeature(),
-                    uriBuilder = MockURIBuilder(),
                     propertyService = mockk(),
                     structureService = mockk()
             )

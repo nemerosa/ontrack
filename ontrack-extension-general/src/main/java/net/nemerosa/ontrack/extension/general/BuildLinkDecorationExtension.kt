@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.labels.MainBuildLinksFilterService
 import net.nemerosa.ontrack.model.labels.MainBuildLinksService
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import org.springframework.stereotype.Component
 import java.util.*
 
@@ -13,7 +12,6 @@ import java.util.*
 class BuildLinkDecorationExtension(
     extensionFeature: GeneralExtensionFeature,
     private val structureService: StructureService,
-    private val uriBuilder: EntityURIBuilder,
     private val mainBuildLinksService: MainBuildLinksService,
     private val mainBuildLinksFilterService: MainBuildLinksFilterService,
     private val buildDisplayNameService: BuildDisplayNameService
@@ -38,14 +36,8 @@ class BuildLinkDecorationExtension(
             mainLink
         }.pageItems
 
-        // Checks if there are extra links (besides the main ones)
-        val extraLink = if (extraLinks) {
-            uriBuilder.getEntityPage(entity)
-        } else {
-            null
-        }
-        // No main links, no extra link ==> no decoration at all
-        if (mainLinks.isEmpty() && extraLink == null) {
+        // No main links ==> no decoration at all
+        if (mainLinks.isEmpty()) {
             return emptyList()
         } else {
             // Decoration items for the main links
@@ -58,7 +50,7 @@ class BuildLinkDecorationExtension(
                         buildId = entity.id(),
                         linksCount = linksCount,
                         decorations = decorations,
-                        extraLink = extraLink,
+                        extraLink = null,
                     )
                 )
             )
@@ -71,7 +63,7 @@ class BuildLinkDecorationExtension(
         // Gets the label to use for the decoration
         val label = buildDisplayNameService.getBuildDisplayName(buildLink.build)
         // Decoration
-        return buildLink.asBuildLinkDecoration(uriBuilder, promotionRuns, label)
+        return buildLink.asBuildLinkDecoration(promotionRuns, label)
     }
 
 }

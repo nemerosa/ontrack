@@ -6,20 +6,15 @@ import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
 import net.nemerosa.ontrack.extension.scm.catalog.CatalogLinkService
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalog
 import net.nemerosa.ontrack.extension.scm.catalog.SCMCatalogEntry
-import net.nemerosa.ontrack.extension.scm.catalog.ui.SCMCatalogController
 import net.nemerosa.ontrack.job.Schedule
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import org.springframework.stereotype.Component
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
-import java.net.URI
 
 @Component
 class SCMCatalogSearchIndexer(
     extensionFeature: SCMExtensionFeature,
     private val scmCatalog: SCMCatalog,
     private val catalogLinkService: CatalogLinkService,
-    private val uriBuilder: EntityURIBuilder
 ) : SearchIndexer<SCMCatalogSearchItem> {
 
     override val indexerName: String = "SCM Catalog"
@@ -51,26 +46,18 @@ class SCMCatalogSearchIndexer(
             // Title and description
             val title: String
             val description: String
-            val uri: URI
-            val page: URI
             if (project != null) {
                 title = "${project.name} (${entry.repository})"
                 description =
                     "Project ${project.name} associated with SCM ${entry.repository} (${entry.scm} @ ${entry.config})"
-                uri = uriBuilder.getEntityURI(project)
-                page = uriBuilder.getEntityPage(project)
             } else {
                 title = entry.repository
                 description = "SCM ${entry.repository} (${entry.scm} @ ${entry.config}) not associated with any project"
-                uri = uriBuilder.build(MvcUriComponentsBuilder.on(SCMCatalogController::class.java).entries())
-                page = uriBuilder.page("extension/scm/scm-catalog")
             }
             // Result
             SearchResult(
                 title = title,
                 description = description,
-                uri = uri,
-                page = page,
                 accuracy = score,
                 type = searchResultType,
                 data = mapOf(

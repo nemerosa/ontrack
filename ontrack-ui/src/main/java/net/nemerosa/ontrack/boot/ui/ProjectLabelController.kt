@@ -7,7 +7,6 @@ import net.nemerosa.ontrack.model.labels.ProjectLabelForm
 import net.nemerosa.ontrack.model.labels.ProjectLabelManagementService
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.StructureService
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -16,7 +15,7 @@ class ProjectLabelController(
     private val structureService: StructureService,
     private val labelManagementService: LabelManagementService,
     private val projectLabelManagementService: ProjectLabelManagementService
-) : AbstractResourceController() {
+) {
 
     @GetMapping("{projectId}")
     fun getLabelsForProject(@PathVariable projectId: Int): List<Label> {

@@ -4,9 +4,7 @@ import jakarta.validation.Valid;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.annotations.API;
 import net.nemerosa.ontrack.model.annotations.APIMethod;
-import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,18 +15,16 @@ import java.util.List;
 @RestController
 @RequestMapping("/rest/structure/projects")
 @API("Management of projects")
-public class ProjectController extends AbstractResourceController {
+public class ProjectController {
 
     private final StructureService structureService;
     private final CopyService copyService;
-    private final SecurityService securityService;
     private final ProjectFavouriteService projectFavouriteService;
 
     @Autowired
-    public ProjectController(StructureService structureService, CopyService copyService, SecurityService securityService, ProjectFavouriteService projectFavouriteService) {
+    public ProjectController(StructureService structureService, CopyService copyService, ProjectFavouriteService projectFavouriteService) {
         this.structureService = structureService;
         this.copyService = copyService;
-        this.securityService = securityService;
         this.projectFavouriteService = projectFavouriteService;
     }
 

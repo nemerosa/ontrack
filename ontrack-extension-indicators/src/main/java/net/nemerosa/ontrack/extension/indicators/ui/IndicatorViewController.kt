@@ -10,7 +10,6 @@ import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorView
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorViewIDNotFoundException
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorViewService
 import net.nemerosa.ontrack.model.Ack
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -24,7 +23,7 @@ class IndicatorViewController(
     private val indicatorCategoryService: IndicatorCategoryService,
     private val indicatorTypeService: IndicatorTypeService,
     private val indicatorExportService: IndicatorExportService
-) : AbstractResourceController() {
+) {
 
     /**
      * Gets the list of views

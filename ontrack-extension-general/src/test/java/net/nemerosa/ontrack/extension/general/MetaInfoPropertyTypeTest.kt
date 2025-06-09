@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.general
 
 import io.mockk.mockk
 import net.nemerosa.ontrack.extension.general.MetaInfoPropertyItem.Companion.of
-import net.nemerosa.ontrack.ui.controller.MockURIBuilder
 import org.junit.jupiter.api.Test
 import java.util.*
 import kotlin.test.*
@@ -14,7 +13,6 @@ class MetaInfoPropertyTypeTest {
         searchIndexService = mockk(),
         metaInfoSearchExtension = MetaInfoSearchExtension(
             extensionFeature = GeneralExtensionFeature(),
-            uriBuilder = MockURIBuilder(),
             propertyService = mockk(),
             structureService = mockk()
         )

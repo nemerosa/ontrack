@@ -7,7 +7,6 @@ import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.structure.PredefinedValidationStamp.Companion.of
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -23,7 +22,7 @@ import java.util.*
 class PredefinedValidationStampController(
     private val predefinedValidationStampService: PredefinedValidationStampService,
     private val validationDataTypeService: ValidationDataTypeService
-) : AbstractResourceController() {
+) {
     /**
      * Gets the list of predefined validation stamps.
      */

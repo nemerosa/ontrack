@@ -7,7 +7,6 @@ import net.nemerosa.ontrack.job.Schedule
 import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.events.BuildLinkListener
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import org.springframework.stereotype.Component
 
 /**
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Component
 @Component
 class BuildLinkSearchExtension(
     extensionFeature: GeneralExtensionFeature,
-    private val uriBuilder: EntityURIBuilder,
     private val structureService: StructureService,
     private val buildDisplayNameService: BuildDisplayNameService,
     private val searchIndexService: SearchIndexService
@@ -61,8 +59,6 @@ class BuildLinkSearchExtension(
         return SearchResult(
             title = sourceBuild.entityDisplayName,
             description = "Linked to ${item.targetProject}:${item.targetBuild}",
-            uri = uriBuilder.getEntityURI(sourceBuild),
-            page = uriBuilder.getEntityPage(sourceBuild),
             accuracy = score,
             type = searchResultType,
             // Puts source & linked build, and qualifier

@@ -14,6 +14,7 @@ import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription
  * @property url Optional link from the decoration to another page
  */
 @APIDescription("Decoration for the edge between two nodes on a branch links graph.")
+@Deprecated("Will be removed in V5.")
 class BranchLinksDecoration(
     @APIDescription("Feature contributing to this decoration")
     val feature: ExtensionFeatureDescription,

@@ -9,7 +9,6 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.SettingsManager
 import net.nemerosa.ontrack.model.settings.SettingsManagerNotFoundException
 import net.nemerosa.ontrack.model.settings.SettingsValidationException
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import org.apache.commons.lang3.StringUtils
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -22,7 +21,7 @@ import org.springframework.web.bind.annotation.*
 class SettingsController(
         private val securityService: SecurityService,
         private val settingsManagers: Collection<SettingsManager<*>>
-) : AbstractResourceController() {
+) {
 
     private val objectMapper = ObjectMapperFactory.create()
 

@@ -9,7 +9,6 @@ import net.nemerosa.ontrack.model.security.EncryptionService
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.support.ConnectorGlobalStatusService
-import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.actuate.health.HealthEndpoint
 import org.springframework.http.HttpEntity
@@ -26,7 +25,7 @@ constructor(
     private val connectorGlobalStatusService: ConnectorGlobalStatusService,
     private val securityService: SecurityService,
     private val encryptionService: EncryptionService
-) : AbstractResourceController() {
+) {
 
     /**
      * Gets the health status
