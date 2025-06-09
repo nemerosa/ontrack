@@ -1,10 +1,16 @@
 import {expect} from "@playwright/test";
+import {AbstractImagePage} from "../common/AbstractImagePage";
 
-export class ValidationStampPage {
+export class ValidationStampPage extends AbstractImagePage {
 
     constructor(page, validationStamp) {
-        this.page = page
+        super(page)
         this.validationStamp = validationStamp
+    }
+
+
+    id() {
+        return `validation-stamp-image-${this.validationStamp.id}`
     }
 
     async goTo() {

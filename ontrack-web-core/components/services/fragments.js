@@ -115,6 +115,9 @@ export const gqlValidationStampFragment = gql`
     }
 `
 
+/**
+ * @deprecated Use `useValidationStampById` instead
+ */
 export const getValidationStampById = (client, id) => {
     return client.request(
         gqlValidationStampByIdQuery,
@@ -122,6 +125,9 @@ export const getValidationStampById = (client, id) => {
     ).then(data => data.validationStamp)
 }
 
+/**
+ * @deprecated Use `useValidationStampById` instead
+ */
 export const useValidationStamp = (id) => {
     const client = useGraphQLClient()
     const [validationStamp, setValidationStamp] = useState()
@@ -131,6 +137,20 @@ export const useValidationStamp = (id) => {
         }
     }, [client, id]);
     return validationStamp
+}
+
+export const useValidationStampById = ({id, refreshCount = 0}) => {
+    const {data: validationStamp, loading} = useQuery(
+        gqlValidationStampByIdQuery,
+        {
+            variables: {
+                id: Number(id)
+            },
+            deps: [refreshCount],
+            dataFn: data => data.validationStamp,
+        }
+    )
+    return {validationStamp, loading}
 }
 
 export const gqlDecorationFragment = gql`
