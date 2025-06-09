@@ -12,15 +12,15 @@ export default function StoredGridLayout({id, defaultLayout, items, rowHeight = 
         const value = localStorage.getItem(id)
         if (value) {
             setLayout(JSON.parse(value))
+        } else {
+            setLayout(defaultLayout)
         }
         setLoaded(true)
     }, []);
 
     const {resetLayoutCount} = useContext(StoredGridLayoutContext)
     useEffect(() => {
-        if (resetLayoutCount > 0) {
-            setLayout(defaultLayout)
-        }
+        setLayout(defaultLayout)
     }, [defaultLayout, resetLayoutCount]);
 
     const onLayoutChange = (newLayout) => {
