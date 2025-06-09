@@ -2,9 +2,6 @@ package net.nemerosa.ontrack.extension.general
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.MultiStrings
-import net.nemerosa.ontrack.model.form.YesNo
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
@@ -31,22 +28,6 @@ class MainBuildLinksProjectPropertyType(
             securityService.isProjectFunctionGranted(entity, ProjectEdit::class.java)
 
     override fun canView(entity: ProjectEntity, securityService: SecurityService): Boolean = true
-
-    override fun getEditionForm(entity: ProjectEntity, value: MainBuildLinksProjectProperty?): Form {
-        return Form.create()
-                .with(
-                        MultiStrings.of("labels")
-                                .help("List of project labels identifying the build links to keep in decorations.")
-                                .label("Project labels")
-                                .value(value?.labels ?: emptyList<String>())
-                )
-                .with(
-                        YesNo.of("overrideGlobal")
-                                .label("Override global settings")
-                                .help("Checked if the project settings override the global settings, without being merged.")
-                                .value(value?.overrideGlobal ?: false)
-                )
-    }
 
     override fun fromClient(node: JsonNode): MainBuildLinksProjectProperty {
         return fromStorage(node)

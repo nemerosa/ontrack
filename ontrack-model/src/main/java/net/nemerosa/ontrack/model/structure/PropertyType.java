@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.model.structure;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.model.extension.Extension;
-import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -57,14 +56,6 @@ public interface PropertyType<T> extends Extension {
     boolean canView(ProjectEntity entity, SecurityService securityService);
 
     /**
-     * Form to create/update this property.
-     *
-     * @param entity Entity to edit the property for
-     * @param value  Value to update if set. If not set, this means the creation of a new property.
-     */
-    Form getEditionForm(ProjectEntity entity, T value);
-
-    /**
      * Creation of a property value from a value. Should perform validation.
      */
     Property<T> of(T value);
@@ -77,8 +68,6 @@ public interface PropertyType<T> extends Extension {
     /**
      * Parses the client JSON representation for a property value. This method
      * <i>MUST</i> perform validation before accepting the value.
-     *
-     * @see #getEditionForm(ProjectEntity, Object)
      */
     T fromClient(JsonNode node);
 

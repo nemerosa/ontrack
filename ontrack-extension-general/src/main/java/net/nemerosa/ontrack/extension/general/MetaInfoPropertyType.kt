@@ -2,9 +2,6 @@ package net.nemerosa.ontrack.extension.general
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.MultiForm
-import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
@@ -42,26 +39,6 @@ class MetaInfoPropertyType(
     override fun onPropertyDeleted(entity: ProjectEntity, oldValue: MetaInfoProperty) {
         searchIndexService.deleteSearchIndex(metaInfoSearchExtension, MetaInfoSearchItem(entity, oldValue).id)
     }
-
-    override fun getEditionForm(entity: ProjectEntity, value: MetaInfoProperty?): Form = Form.create()
-        .with(
-            MultiForm.of(
-                "items",
-                Form.create()
-                    .name()
-                    .with(
-                        Text.of("value").label("Value")
-                    )
-                    .with(
-                        Text.of("link").label("Link").optional()
-                    )
-                    .with(
-                        Text.of("category").label("Category").optional()
-                    )
-            )
-                .label("Items")
-                .value(value?.items ?: emptyList<Any>())
-        )
 
     override fun fromClient(node: JsonNode): MetaInfoProperty {
         return fromStorage(node)

@@ -3,8 +3,6 @@ package net.nemerosa.ontrack.extension.general
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.parse
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.YesNo
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
@@ -37,16 +35,6 @@ class PreviousPromotionConditionPropertyType(
 
     override fun canView(entity: ProjectEntity, securityService: SecurityService): Boolean =
             true
-
-    override fun getEditionForm(entity: ProjectEntity, value: PreviousPromotionConditionProperty?): Form {
-        return Form.create()
-                .with(
-                        YesNo.of("previousPromotionRequired")
-                                .label("Previous promotion required")
-                                .help("Makes a promotion conditional based on the fact that a previous promotion has been granted.")
-                                .value(value?.previousPromotionRequired ?: false)
-                )
-    }
 
     override fun fromClient(node: JsonNode): PreviousPromotionConditionProperty = fromStorage(node)
 

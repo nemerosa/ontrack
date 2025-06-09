@@ -4,15 +4,9 @@ import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
 import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.model.Ack
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.ServiceConfigurator
-import net.nemerosa.ontrack.model.form.textField
-import net.nemerosa.ontrack.model.security.SecurityService
-import net.nemerosa.ontrack.model.security.ValidationStampCreate
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.ValidationStamp.Companion.of
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
-import net.nemerosa.ontrack.ui.resource.Link
 import net.nemerosa.ontrack.ui.resource.Resources
 import net.nemerosa.ontrack.ui.support.UIUtils.setupDefaultImageCache
 import org.springframework.http.HttpStatus
@@ -22,13 +16,11 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
 import java.util.*
-import java.util.stream.Collectors
 
 @RestController
 @RequestMapping("/rest/structure")
 class ValidationStampController(
     private val structureService: StructureService,
-    private val securityService: SecurityService,
     private val decorationService: DecorationService,
     private val validationDataTypeService: ValidationDataTypeService
 ) : AbstractResourceController() {
@@ -43,12 +35,7 @@ class ValidationStampController(
                 MvcUriComponentsBuilder.on(ValidationStampController::class.java)
                     .getValidationStampListForBranch(branchId)
             )
-        ) // Create
-            .with(
-                Link.CREATE,
-                uri(MvcUriComponentsBuilder.on(ValidationStampController::class.java).newValidationStampForm(branchId)),
-                securityService.isProjectFunctionGranted(project.id(), ValidationStampCreate::class.java)
-            )
+        )
     }
 
     @GetMapping("branches/{branchId}/validationStamps/view")
@@ -76,31 +63,6 @@ class ValidationStampController(
         return getValidationStampListForBranch(branchId)
     }
 
-    @GetMapping("branches/{branchId}/validationStamps/create")
-    fun newValidationStampForm(@PathVariable branchId: ID): Form {
-        structureService.getBranch(branchId)
-        return Form.create()
-            .textField(ValidationStamp::name, null)
-            .textField(ValidationStamp::description, null)
-            .with(
-                ServiceConfigurator.of("dataType")
-                    .label("Data type")
-                    .help("Type of the data to associate with a validation run.")
-                    .optional()
-                    .sources(
-                        validationDataTypeService.getAllTypes().stream()
-                            .map { dataType: ValidationDataType<*, *> ->
-                                ServiceConfigurationSource(
-                                    dataType.javaClass.name,
-                                    dataType.displayName,
-                                    dataType.getConfigForm(null), emptyMap<String, Any>()
-                                )
-                            }
-                            .collect(Collectors.toList())
-                    )
-            )
-    }
-
     @PostMapping("branches/{branchId}/validationStamps/create")
     fun newValidationStamp(
         @PathVariable branchId: ID,
@@ -123,17 +85,6 @@ class ValidationStampController(
     @GetMapping("validationStamps/{validationStampId}")
     fun getValidationStamp(@PathVariable validationStampId: ID): ResponseEntity<ValidationStamp> {
         return ResponseEntity.ok(structureService.getValidationStamp(validationStampId))
-    }
-
-    @GetMapping("validationStamps/{validationStampId}/update")
-    fun updateValidationStampForm(@PathVariable validationStampId: ID): Form {
-        val (_, name, description, branch, _, _, _, dataType) = structureService.getValidationStamp(
-            validationStampId
-        )
-        return newValidationStampForm(branch.id)
-            .fill("name", name)
-            .fill("description", description)
-            .fill("dataType", validationDataTypeService.getServiceConfigurationForConfig(dataType))
     }
 
     @PutMapping("validationStamps/{validationStampId}/update")

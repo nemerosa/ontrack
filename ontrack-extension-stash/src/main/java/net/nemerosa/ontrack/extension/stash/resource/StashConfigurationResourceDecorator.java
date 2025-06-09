@@ -38,7 +38,6 @@ public class StashConfigurationResourceDecorator extends AbstractResourceDecorat
         boolean globalSettingsGranted = securityService.isGlobalFunctionGranted(GlobalSettings.class);
         return resourceContext.links()
                 .self(on(StashController.class).getConfiguration(configuration.getName()))
-                .link(Link.UPDATE, on(StashController.class).updateConfigurationForm(configuration.getName()), globalSettingsGranted)
                 .link(Link.DELETE, on(StashController.class).deleteConfiguration(configuration.getName()), globalSettingsGranted)
                         // OK
                 .build();

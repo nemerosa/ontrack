@@ -1,24 +1,19 @@
 package net.nemerosa.ontrack.boot.ui
 
+import jakarta.validation.Valid
 import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.model.Ack
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.ServiceConfigurator
-import net.nemerosa.ontrack.model.form.textField
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.structure.PredefinedValidationStamp.Companion.of
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
-import net.nemerosa.ontrack.ui.resource.Link
 import net.nemerosa.ontrack.ui.resource.Resources
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
 import java.util.*
-import java.util.stream.Collectors
-import jakarta.validation.Valid
 
 /**
  * Access to the list of predefined validation stamps.
@@ -38,32 +33,7 @@ class PredefinedValidationStampController(
     fun predefinedValidationStampList(): Resources<PredefinedValidationStamp> = Resources.of(
         predefinedValidationStampService.predefinedValidationStamps,
         uri(MvcUriComponentsBuilder.on(javaClass).predefinedValidationStampList())
-    ).with(
-        Link.CREATE, uri(MvcUriComponentsBuilder.on(javaClass).predefinedValidationStampCreationForm())
     )
-
-    @Suppress("DuplicatedCode")
-    @GetMapping("predefinedValidationStamps/create")
-    fun predefinedValidationStampCreationForm(): Form =
-        Form.create()
-            .textField(ValidationStamp::name, null)
-            .textField(ValidationStamp::description, null)
-            .with(
-                ServiceConfigurator.of("dataType")
-                    .label("Data type")
-                    .help("Type of the data to associate with a validation run.")
-                    .optional()
-                    .sources(
-                        validationDataTypeService.getAllTypes().stream()
-                            .map { dataType: ValidationDataType<*, *> ->
-                                ServiceConfigurationSource(
-                                    dataType.javaClass.name,
-                                    dataType.displayName,
-                                    dataType.getConfigForm(null), emptyMap<String, Any>())
-                            }
-                            .collect(Collectors.toList())
-                    )
-            )
 
     @PostMapping("predefinedValidationStamps/create")
     fun newPredefinedValidationStamp(@RequestBody input: @Valid ValidationStampInput): PredefinedValidationStamp {
@@ -79,15 +49,6 @@ class PredefinedValidationStampController(
     @GetMapping("predefinedValidationStamps/{predefinedValidationStampId}")
     fun getValidationStamp(@PathVariable predefinedValidationStampId: ID): PredefinedValidationStamp {
         return predefinedValidationStampService.getPredefinedValidationStamp(predefinedValidationStampId)
-    }
-
-    @GetMapping("predefinedValidationStamps/{predefinedValidationStampId}/update")
-    fun updateValidationStampForm(@PathVariable predefinedValidationStampId: ID): Form {
-        val validationStamp = predefinedValidationStampService.getPredefinedValidationStamp(predefinedValidationStampId)
-        return predefinedValidationStampCreationForm()
-            .fill("name", validationStamp.name)
-            .fill("description", validationStamp.description)
-            .fill("dataType", validationDataTypeService.getServiceConfigurationForConfig(validationStamp.dataType))
     }
 
     @PutMapping("predefinedValidationStamps/{predefinedValidationStampId}/update")

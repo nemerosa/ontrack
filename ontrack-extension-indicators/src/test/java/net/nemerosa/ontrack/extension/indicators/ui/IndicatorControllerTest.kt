@@ -6,7 +6,6 @@ import io.mockk.verify
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCategory
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCompliance
 import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.structure.Project
@@ -25,14 +24,6 @@ class IndicatorControllerTest {
     fun before() {
         projectIndicatorService = mockk(relaxed = true)
         controller = IndicatorController(projectIndicatorService)
-    }
-
-    @Test
-    fun getUpdateFormForIndicator() {
-        val form = Form.create()
-        every { projectIndicatorService.getUpdateFormForIndicator(ID.of(1), "type") } returns form
-        val returnedForm = controller.getUpdateFormForIndicator(ID.of(1), "type")
-        assertSame(form, returnedForm)
     }
 
     @Test

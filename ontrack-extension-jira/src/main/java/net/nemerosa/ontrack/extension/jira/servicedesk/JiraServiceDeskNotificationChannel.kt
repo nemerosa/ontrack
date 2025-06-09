@@ -17,10 +17,6 @@ import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.intField
-import net.nemerosa.ontrack.model.form.textField
-import net.nemerosa.ontrack.model.form.yesNoField
 import org.springframework.stereotype.Component
 
 @Component
@@ -138,13 +134,6 @@ class JiraServiceDeskNotificationChannel(
     }
 
     override fun toSearchCriteria(text: String): JsonNode = NullNode.instance
-
-    @Deprecated("Will be removed in V5. Only Next UI is used.")
-    override fun getForm(c: JiraServiceDeskNotificationChannelConfig?): Form = Form.create()
-        .textField(JiraServiceDeskNotificationChannelConfig::configName, c?.configName)
-        .yesNoField(JiraServiceDeskNotificationChannelConfig::useExisting, c?.useExisting)
-        .intField(JiraServiceDeskNotificationChannelConfig::serviceDeskId, c?.serviceDeskId)
-        .intField(JiraServiceDeskNotificationChannelConfig::requestTypeId, c?.requestTypeId)
 
     @Deprecated("Will be removed in V5. Only Next UI is used.")
     override fun toText(config: JiraServiceDeskNotificationChannelConfig): String = ""

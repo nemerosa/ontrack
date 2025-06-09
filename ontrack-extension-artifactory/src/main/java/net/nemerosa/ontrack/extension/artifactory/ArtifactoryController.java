@@ -5,12 +5,10 @@ import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfi
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
-import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import net.nemerosa.ontrack.model.support.ConnectionResult;
-import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +52,6 @@ public class ArtifactoryController extends AbstractExtensionController<Artifacto
                 configurationService.getConfigurations(),
                 uri(on(getClass()).getConfigurations())
         )
-                .with(Link.CREATE, uri(on(getClass()).getConfigurationForm()))
                 .with("_test", uri(on(getClass()).testConfiguration(null)), securityService.isGlobalFunctionGranted(GlobalSettings.class))
                 ;
     }
@@ -76,14 +73,6 @@ public class ArtifactoryController extends AbstractExtensionController<Artifacto
     @RequestMapping(value = "configurations/test", method = RequestMethod.POST)
     public ConnectionResult testConfiguration(@RequestBody ArtifactoryConfiguration configuration) {
         return configurationService.test(configuration);
-    }
-
-    /**
-     * Form for a configuration
-     */
-    @RequestMapping(value = "configurations/create", method = RequestMethod.GET)
-    public Form getConfigurationForm() {
-        return ArtifactoryConfiguration.form();
     }
 
     /**
@@ -110,14 +99,6 @@ public class ArtifactoryController extends AbstractExtensionController<Artifacto
     public Ack deleteConfiguration(@PathVariable String name) {
         configurationService.deleteConfiguration(name);
         return Ack.OK;
-    }
-
-    /**
-     * Update form
-     */
-    @RequestMapping(value = "configurations/{name}/update", method = RequestMethod.GET)
-    public Form updateConfigurationForm(@PathVariable String name) {
-        return configurationService.getConfiguration(name).asForm();
     }
 
     /**

@@ -28,7 +28,6 @@ public class JIRAConfigurationResourceDecorator extends AbstractResourceDecorato
     public List<Link> links(JIRAConfiguration configuration, ResourceContext resourceContext) {
         return resourceContext.links()
                 .self(on(JIRAController.class).getConfiguration(configuration.getName()))
-                .link(Link.UPDATE, on(JIRAController.class).updateConfigurationForm(configuration.getName()))
                 .link(Link.DELETE, on(JIRAController.class).deleteConfiguration(configuration.getName()))
                 .build();
     }

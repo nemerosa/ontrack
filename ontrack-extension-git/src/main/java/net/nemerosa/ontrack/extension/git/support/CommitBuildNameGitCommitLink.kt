@@ -5,8 +5,6 @@ import net.nemerosa.ontrack.extension.git.model.BuildGitCommitLink
 import net.nemerosa.ontrack.extension.git.model.GitBranchConfiguration
 import net.nemerosa.ontrack.git.GitRepositoryClient
 import net.nemerosa.ontrack.json.JsonUtils
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.YesNo
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.StructureService
@@ -46,15 +44,6 @@ class CommitBuildNameGitCommitLink(
             JsonUtils.`object`()
                     .with("abbreviated", data.isAbbreviated)
                     .end()
-
-    override val form: Form
-        get() = Form.create()
-                .with(
-                        YesNo.of("abbreviated")
-                                .label("Abbreviated")
-                                .help("Using abbreviated commit hashes or not.")
-                                .value(true)
-                )
 
     override fun getEarliestBuildAfterCommit(branch: Branch, gitClient: GitRepositoryClient, branchConfiguration: GitBranchConfiguration, data: CommitLinkConfig, commit: String): Int? {
         return if (gitClient.isCommit(commit)) {

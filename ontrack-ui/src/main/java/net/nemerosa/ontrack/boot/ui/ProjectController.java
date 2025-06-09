@@ -4,9 +4,6 @@ import jakarta.validation.Valid;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.annotations.API;
 import net.nemerosa.ontrack.model.annotations.APIMethod;
-import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.form.Replacements;
-import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.security.BranchCreate;
 import net.nemerosa.ontrack.model.security.ProjectCreation;
 import net.nemerosa.ontrack.model.security.SecurityService;
@@ -58,11 +55,6 @@ public class ProjectController extends AbstractResourceController {
                 .with(Link.CREATE, uri(on(ProjectController.class).newProject(null)), securityService.isGlobalFunctionGranted(ProjectCreation.class));
     }
 
-    @RequestMapping(value = "create", method = RequestMethod.GET)
-    public Form newProjectForm() {
-        return Project.form();
-    }
-
     @RequestMapping(value = "create", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Project> newProject(@RequestBody @Valid NameDescriptionState nameDescription) {
@@ -98,12 +90,6 @@ public class ProjectController extends AbstractResourceController {
         return ResponseEntity.ok(structureService.deleteProject(projectId));
     }
 
-    @RequestMapping(value = "{projectId}/update", method = RequestMethod.GET)
-    @APIMethod(value = "Project update form", description = "Get the form for the project update")
-    public Form saveProjectForm(@PathVariable ID projectId) {
-        return structureService.getProject(projectId).asForm();
-    }
-
     @RequestMapping(value = "{projectId}/update", method = RequestMethod.PUT)
     @APIMethod(value = "Updates project")
     public ResponseEntity<Project> saveProject(@PathVariable ID projectId, @RequestBody @Valid NameDescriptionState nameDescription) {
@@ -131,24 +117,6 @@ public class ProjectController extends AbstractResourceController {
         Project project = structureService.getProject(projectId);
         // Saves in repository
         return ResponseEntity.ok(structureService.disableProject(project));
-    }
-
-    /**
-     * Gets the form to clone this project into another projevt
-     */
-    @RequestMapping(value = "{projectId}/clone", method = RequestMethod.GET)
-    public Form clone(@SuppressWarnings("UnusedParameters") @PathVariable ID projectId) {
-        return Form.create()
-                .with(
-                        Text.of("name")
-                                .label("Target project")
-                                .help("Name of the project to create")
-                )
-                .with(
-                        Replacements.of("replacements")
-                                .label("Replacements")
-                )
-                ;
     }
 
     /**

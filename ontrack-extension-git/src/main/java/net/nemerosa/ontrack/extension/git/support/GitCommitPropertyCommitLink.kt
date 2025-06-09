@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.extension.git.model.GitBranchConfiguration
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.git.GitRepositoryClient
 import net.nemerosa.ontrack.json.JsonUtils
-import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.ID
@@ -44,8 +43,6 @@ class GitCommitPropertyCommitLink(
     override fun toJson(data: NoConfig): JsonNode {
         return JsonUtils.`object`().end()
     }
-
-    override val form: Form = Form.create()
 
     override fun getEarliestBuildAfterCommit(branch: Branch, gitClient: GitRepositoryClient, branchConfiguration: GitBranchConfiguration, data: NoConfig, commit: String): Int? {
         // Loops over the commits on this branch, starting from this commit

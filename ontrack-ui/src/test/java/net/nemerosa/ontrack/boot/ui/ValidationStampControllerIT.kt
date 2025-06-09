@@ -1,15 +1,14 @@
 package net.nemerosa.ontrack.boot.ui
 
-import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
 //import net.nemerosa.ontrack.extension.general.AutoPromotionProperty
 //import net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType
+import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException
 import net.nemerosa.ontrack.model.security.Roles
 import net.nemerosa.ontrack.model.security.ValidationStampCreate
 import net.nemerosa.ontrack.model.structure.ServiceConfiguration
 import net.nemerosa.ontrack.model.structure.ValidationStampInput
-import net.nemerosa.ontrack.test.assertIs
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -110,39 +109,6 @@ class ValidationStampControllerIT : AbstractWebTestSupport() {
 //                }
 //            }
 //        }
-    }
-
-    @Test
-    fun `Edition form for a validation stamp with type`() {
-        // Branch
-        val branch = doCreateBranch()
-        // Creates a validation stamp with an associated percentage data type
-        val vs = asUser().with(branch, ValidationStampCreate::class.java).call {
-            validationStampController.newValidationStamp(
-                branch.id,
-                ValidationStampInput(
-                    "VSPercent",
-                    "",
-                    ServiceConfiguration(
-                        TestNumberValidationDataType::class.java.name,
-                        JsonUtils.format(mapOf("threshold" to 60))
-                    )
-                )
-            )
-        }.body ?: fail("Cannot find validation stamp")
-        // Gets the edition form
-        val form = asUser { validationStampController.updateValidationStampForm(vs.id) }
-        // Gets the service configurator field
-        val field = form.fields.find { it.type == "service-configurator" }
-        assertNotNull(field) {
-            // Checks that the field value is a service configuration
-            assertIs<ServiceConfiguration>(it.value) {
-                assertEquals("net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType", it.id)
-                assertNotNull(it.data) {
-                    assertEquals(60, it["threshold"].asInt())
-                }
-            }
-        }
     }
 
     @Test

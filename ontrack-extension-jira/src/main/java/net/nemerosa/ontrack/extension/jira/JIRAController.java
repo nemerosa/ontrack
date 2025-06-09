@@ -4,12 +4,10 @@ import net.nemerosa.ontrack.extension.jira.tx.JIRASessionFactory;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
-import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import net.nemerosa.ontrack.model.support.ConnectionResult;
-import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,9 +37,9 @@ public class JIRAController extends AbstractExtensionController<JIRAExtensionFea
     @RequestMapping(value = "", method = RequestMethod.GET)
     public Resource<ExtensionFeatureDescription> getDescription() {
         return Resource.of(
-                feature.getFeatureDescription(),
-                uri(MvcUriComponentsBuilder.on(getClass()).getDescription())
-        )
+                        feature.getFeatureDescription(),
+                        uri(MvcUriComponentsBuilder.on(getClass()).getDescription())
+                )
                 .with("configurations", uri(on(getClass()).getConfigurations()), securityService.isGlobalFunctionGranted(GlobalSettings.class))
                 ;
     }
@@ -52,10 +50,9 @@ public class JIRAController extends AbstractExtensionController<JIRAExtensionFea
     @RequestMapping(value = "configurations", method = RequestMethod.GET)
     public Resources<JIRAConfiguration> getConfigurations() {
         return Resources.of(
-                jiraConfigurationService.getConfigurations(),
-                uri(on(getClass()).getConfigurations())
-        )
-                .with(Link.CREATE, uri(on(getClass()).getConfigurationForm()))
+                        jiraConfigurationService.getConfigurations(),
+                        uri(on(getClass()).getConfigurations())
+                )
                 .with("_test", uri(on(getClass()).testConfiguration(null)), securityService.isGlobalFunctionGranted(GlobalSettings.class))
                 ;
     }
@@ -77,14 +74,6 @@ public class JIRAController extends AbstractExtensionController<JIRAExtensionFea
     @RequestMapping(value = "configurations/test", method = RequestMethod.POST)
     public ConnectionResult testConfiguration(@RequestBody JIRAConfiguration configuration) {
         return jiraConfigurationService.test(configuration);
-    }
-
-    /**
-     * Form for a configuration
-     */
-    @RequestMapping(value = "configurations/create", method = RequestMethod.GET)
-    public Form getConfigurationForm() {
-        return JIRAConfiguration.form();
     }
 
     /**
@@ -111,14 +100,6 @@ public class JIRAController extends AbstractExtensionController<JIRAExtensionFea
     public Ack deleteConfiguration(@PathVariable String name) {
         jiraConfigurationService.deleteConfiguration(name);
         return Ack.OK;
-    }
-
-    /**
-     * Update form
-     */
-    @RequestMapping(value = "configurations/{name}/update", method = RequestMethod.GET)
-    public Form updateConfigurationForm(@PathVariable String name) {
-        return jiraConfigurationService.getConfiguration(name).asForm();
     }
 
     /**

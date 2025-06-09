@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getBooleanField
-import net.nemerosa.ontrack.model.form.*
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
@@ -36,58 +35,6 @@ class SonarQubePropertyType(
 
     override fun canView(entity: ProjectEntity, securityService: SecurityService): Boolean = true
 
-    override fun getEditionForm(entity: ProjectEntity?, value: SonarQubeProperty?): Form {
-        return Form.create()
-            .with(
-                Selection.of("configuration")
-                    .label("Configuration")
-                    .help("SonarQube configuration to use")
-                    .items(configurationService.configurationDescriptors)
-                    .value(value?.configuration?.name)
-            )
-            .with(
-                Text.of("key")
-                    .label("Project key")
-                    .help("Key of the project in SonarQube")
-                    .value(value?.key)
-            )
-            .with(
-                Text.of("validationStamp")
-                    .label("Validation stamp")
-                    .help("Validation stamp to listen to for collecting SionarQube metrics on validation run")
-                    .value(value?.validationStamp ?: SonarQubeProperty.DEFAULT_VALIDATION_STAMP)
-            )
-            .with(
-                MultiStrings.of("measures")
-                    .help("List of SonarQube measures to export.")
-                    .label("Measures")
-                    .value(value?.measures ?: emptyList<String>())
-            )
-            .with(
-                YesNo.of("override")
-                    .help("Overriding the global settings for the list of SonarQube measures to export.")
-                    .label("Override")
-                    .value(value?.override ?: false)
-            )
-            .with(
-                YesNo.of("branchModel")
-                    .help("Use the project branch model to filter the branches where to collect the SonarQube measures.")
-                    .label("Use branch model")
-                    .value(value?.branchModel ?: false)
-            )
-            .with(
-                Text.of("branchPattern")
-                    .optional()
-                    .help("Regular expression to filter the branch where to collect the SonarQube measures.")
-                    .label("Branch pattern")
-                    .value(value?.branchPattern ?: "")
-            )
-            .yesNoField(
-                SonarQubeProperty::validationMetrics,
-                value?.validationMetrics ?: true
-            )
-    }
-
     override fun fromClient(node: JsonNode): SonarQubeProperty = fromStorage(node)
 
     override fun fromStorage(node: JsonNode): SonarQubeProperty {
@@ -96,14 +43,14 @@ class SonarQubePropertyType(
         val configuration = configurationService.getConfiguration(configurationName)
         // OK
         return SonarQubeProperty(
-            configuration,
-            node.path("key").asText(),
-            node.path("validationStamp").asText().ifBlank { SonarQubeProperty.DEFAULT_VALIDATION_STAMP },
-            node.path("measures").map { it.asText() },
-            node.path("override").asBoolean(),
-            node.path("branchModel").asBoolean(),
-            JsonUtils.get(node, "branchPattern", null),
-            node.getBooleanField(SonarQubeProperty::validationMetrics.name) ?: true,
+            configuration = configuration,
+            key = node.path("key").asText(),
+            validationStamp = node.path("validationStamp").asText().ifBlank { SonarQubeProperty.DEFAULT_VALIDATION_STAMP },
+            measures = node.path("measures").map { it.asText() },
+            override = node.path("override").asBoolean(),
+            branchModel = node.path("branchModel").asBoolean(),
+            branchPattern = JsonUtils.get(node, "branchPattern", null),
+            validationMetrics = node.getBooleanField(SonarQubeProperty::validationMetrics.name) ?: true,
         )
     }
 

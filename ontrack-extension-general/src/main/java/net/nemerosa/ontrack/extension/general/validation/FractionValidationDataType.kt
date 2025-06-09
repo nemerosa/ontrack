@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.general.GeneralExtensionFeature
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.toJson
-import net.nemerosa.ontrack.model.form.Form
 import org.springframework.stereotype.Component
 
 data class FractionValidationData(val numerator: Int, val denominator: Int)
@@ -21,20 +20,6 @@ class FractionValidationDataType(
 
     override fun fromJson(node: JsonNode): FractionValidationData? =
             node.parse()
-
-    override fun getForm(data: FractionValidationData?): Form = Form.create()
-            .with(net.nemerosa.ontrack.model.form.Int
-                    .of("numerator")
-                    .label("Numerator")
-                    .value(data?.numerator)
-                    .min(0)
-            )
-            .with(net.nemerosa.ontrack.model.form.Int
-                    .of("denominator")
-                    .label("Denominator")
-                    .value(data?.denominator)
-                    .min(1)
-            )
 
     override fun fromForm(node: JsonNode?): FractionValidationData? =
             node?.parse()

@@ -1,7 +1,8 @@
 package net.nemerosa.ontrack.boot.resources
 
 import net.nemerosa.ontrack.boot.ui.*
-import net.nemerosa.ontrack.model.security.*
+import net.nemerosa.ontrack.model.security.BuildDelete
+import net.nemerosa.ontrack.model.security.BuildEdit
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
@@ -34,14 +35,6 @@ class BuildResourceDecorator(
                 link(
                         "_validationStampRunViews"
                 ) { build -> on(ValidationRunController::class.java).getValidationStampRunViews(build.id) },
-                // Creation of a promoted run
-                "_promote" linkTo { build: Build ->
-                    on(PromotionRunController::class.java).newPromotionRunForm(build.id)
-                } linkIf PromotionRunCreate::class,
-                // Creation of a validation run
-                "_validate" linkTo { build: Build ->
-                    on(ValidationRunController::class.java).newValidationRunForm(build.id)
-                } linkIf ValidationRunCreate::class,
                 // Actual properties for this build
                 link(
                         "_properties"
@@ -70,10 +63,6 @@ class BuildResourceDecorator(
                 link(
                         "_events"
                 ) { build -> on(EventController::class.java).getEvents(build.projectEntityType, build.id, 0, 10) },
-                // Signature change
-                "_signature" linkTo { build: Build ->
-                    on(BuildController::class.java).updateBuildSignatureForm(build.id)
-                } linkIf ProjectEdit::class,
                 // Previous & next build
                 link(
                         "_previous"

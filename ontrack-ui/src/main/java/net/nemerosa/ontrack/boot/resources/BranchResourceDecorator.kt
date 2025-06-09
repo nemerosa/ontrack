@@ -2,7 +2,9 @@ package net.nemerosa.ontrack.boot.resources
 
 import net.nemerosa.ontrack.boot.ui.*
 import net.nemerosa.ontrack.model.security.*
-import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.BranchFavouriteService
+import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.ui.resource.*
 import net.nemerosa.ontrack.ui.resource.LinkDefinitions.page
 import org.springframework.stereotype.Component
@@ -23,26 +25,14 @@ class BranchResourceDecorator(
                         linkTo { branch: Branch -> on(BuildController::class.java).newBuild(branch.id, null) }
                         linkIf { branch, resourceContext -> resourceContext.isProjectFunctionGranted(branch, BuildCreate::class.java) }
                 ,
-                // Promotion level creation
-                "_createPromotionLevel" linkTo { branch: Branch ->
-                    on(PromotionLevelController::class.java).newPromotionLevelForm(branch.id)
-                } linkIf PromotionLevelCreate::class,
                 // Promotion level list
                 "_promotionLevels" linkTo { branch -> on(PromotionLevelController::class.java).getPromotionLevelListForBranch(branch.id) },
-                // Validation stamp creation
-                "_createValidationStamp" linkTo { branch: Branch ->
-                    on(ValidationStampController::class.java).newValidationStampForm(branch.id)
-                } linkIf ValidationStampCreate::class,
                 // Validation stamp list
                 "_validationStamps" linkTo { branch -> on(ValidationStampController::class.java).getValidationStampListForBranch(branch.id) },
                 // Validation stamp list with view
                 "_validationStampViews" linkTo { branch -> on(ValidationStampController::class.java).getValidationStampViewListForBranch(branch.id) },
                 // List of validation stamp filters for this branch, all of them
                 "_allValidationStampFilters" linkTo { branch -> on(ValidationStampFilterController::class.java).getAllBranchValidationStampFilters(branch.id) },
-                // Creation of a validation stamp filter for the branch
-                "_validationStampFilterCreate" linkTo { branch: Branch ->
-                    on(ValidationStampFilterController::class.java).getBranchValidationStampFilterForm(branch.id)
-                } linkIf ValidationStampFilterCreate::class,
                 // All branches for the same project
                 "_branches" linkTo { branch -> on(BranchController::class.java).getBranchListForProject(branch.projectId) },
                 // Actual properties for this build
@@ -53,14 +43,6 @@ class BranchResourceDecorator(
                 },
                 // Actions
                 "_actions" linkTo { branch -> on(ProjectEntityExtensionController::class.java).getActions(ProjectEntityType.BRANCH, branch.id) },
-                // Update link (with authorisation)
-                Link.UPDATE linkTo { branch: Branch ->
-                    on(BranchController::class.java).getUpdateForm(branch.id)
-                } linkIf BranchEdit::class,
-                // Bulk update
-                "_bulkUpdate" linkTo { branch: Branch ->
-                    on(BranchController::class.java).bulkUpdate(branch.id)
-                } linkIf BranchEdit::class,
                 // Delete link
                 Link.DELETE linkTo { branch: Branch ->
                     on(BranchController::class.java).deleteBranch(branch.id)
@@ -73,8 +55,6 @@ class BranchResourceDecorator(
                 "_decorations" linkTo { branch -> on(DecorationsController::class.java).getDecorations(branch.projectEntityType, branch.id) },
                 // Build filters
                 "_buildFilterResources" linkTo { branch -> on(BuildFilterController::class.java).buildFilters(branch.id) },
-                // Build filter forms
-                "_buildFilterForms" linkTo { branch -> on(BuildFilterController::class.java).buildFilterForms(branch.id) },
                 // Saving a filter
                 "_buildFilterSave" linkTo { branch -> on(BuildFilterController::class.java).createFilter(branch.id, null) },
                 // Sharing a filter
@@ -89,14 +69,6 @@ class BranchResourceDecorator(
                 "_reorderValidationStamps" linkTo { branch: Branch ->
                     on(ValidationStampController::class.java).reorderValidationStampListForBranch(branch.id, null)
                 } linkIf ValidationStampEdit::class,
-                // Copy of a configuration from another branch
-                "_copy" linkTo { branch: Branch ->
-                    on(BranchController::class.java).copy(branch.id)
-                } linkIf (BranchEdit::class),
-                // Clone to another branch
-                "_clone" linkTo { branch: Branch ->
-                    on(BranchController::class.java).clone(branch.id)
-                } linkIf (BranchCreate::class),
                 // Events
                 "_events" linkTo { branch -> on(EventController::class.java).getEvents(branch.projectEntityType, branch.id, 0, 10) },
                 // Enable

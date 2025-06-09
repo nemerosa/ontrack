@@ -6,15 +6,11 @@ import net.nemerosa.ontrack.json.getIntField
 import net.nemerosa.ontrack.json.getRequiredEnum
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.toJson
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.selection
 import net.nemerosa.ontrack.model.structure.AbstractValidationDataType
 import net.nemerosa.ontrack.model.structure.MetricsColors
 import net.nemerosa.ontrack.model.structure.NumericValidationDataType
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.springframework.stereotype.Component
-import kotlin.Int
-import net.nemerosa.ontrack.model.form.Int as IntField
 
 /**
  * Validation data based on the critical / high / medium / low numbers.
@@ -30,31 +26,6 @@ class CHMLValidationDataType(
     override fun configToJson(config: CHMLValidationDataTypeConfig) = config.toJson()!!
 
     override fun configFromJson(node: JsonNode?): CHMLValidationDataTypeConfig? = node?.parse()
-
-    override fun getConfigForm(config: CHMLValidationDataTypeConfig?): Form =
-        Form.create()
-            .with(
-                selection<CHML>("failedLevel", CHML::displayName)
-                    .label("Failed if")
-                    .value(config?.failedLevel?.level)
-            )
-            .with(
-                IntField.of("failedValue")
-                    .label("greater or equal than")
-                    .min(0)
-                    .value(config?.failedLevel?.value ?: 0)
-            )
-            .with(
-                selection<CHML>("warningLevel", CHML::displayName)
-                    .label("Warning if")
-                    .value(config?.warningLevel?.level)
-            )
-            .with(
-                IntField.of("warningValue")
-                    .label("greater or equal than")
-                    .min(0)
-                    .value(config?.warningLevel?.value ?: 0)
-            )
 
     override fun configToFormJson(config: CHMLValidationDataTypeConfig?) =
         config?.let {
@@ -83,18 +54,6 @@ class CHMLValidationDataType(
     override fun toJson(data: CHMLValidationDataTypeData) = data.toJson()!!
 
     override fun fromJson(node: JsonNode): CHMLValidationDataTypeData = node.parse()
-
-    override fun getForm(data: CHMLValidationDataTypeData?): Form =
-        Form.create()
-            .with(
-                CHML.values().map {
-                    IntField.of(it.name)
-                        .label(it.displayName)
-                        .optional()
-                        .min(0)
-                        .value(data?.levels?.get(it) ?: 0)
-                }
-            )
 
     override fun fromForm(node: JsonNode?): CHMLValidationDataTypeData? =
         node?.let {

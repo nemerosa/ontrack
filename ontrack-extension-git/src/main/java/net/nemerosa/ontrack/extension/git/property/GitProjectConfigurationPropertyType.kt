@@ -5,9 +5,6 @@ import net.nemerosa.ontrack.common.MapBuilder
 import net.nemerosa.ontrack.extension.git.GitExtensionFeature
 import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
 import net.nemerosa.ontrack.extension.git.service.GitConfigurationService
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Form.Companion.create
-import net.nemerosa.ontrack.model.form.Selection
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
@@ -38,17 +35,6 @@ class GitProjectConfigurationPropertyType(
 
     override fun canView(entity: ProjectEntity, securityService: SecurityService): Boolean {
         return true
-    }
-
-    override fun getEditionForm(entity: ProjectEntity, value: GitProjectConfigurationProperty): Form {
-        return create()
-            .with(
-                Selection.of("configuration")
-                    .label("Configuration")
-                    .help("Git configuration to use to access the repository")
-                    .items(configurationService.configurationDescriptors)
-                    .value(value.configuration.name)
-            )
     }
 
     override fun fromClient(node: JsonNode): GitProjectConfigurationProperty {

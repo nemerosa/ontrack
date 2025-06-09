@@ -22,9 +22,6 @@ class GitHubEngineConfigurationResourceDecorator :
             Link.SELF linkTo { configuration: GitHubEngineConfiguration ->
                 MvcUriComponentsBuilder.on(GitHubController::class.java).getConfiguration(configuration.name)
             },
-            Link.UPDATE linkTo { configuration: GitHubEngineConfiguration ->
-                MvcUriComponentsBuilder.on(GitHubController::class.java).updateConfigurationForm(configuration.name)
-            } linkIfGlobal GlobalSettings::class,
             Link.DELETE linkTo { configuration: GitHubEngineConfiguration ->
                 MvcUriComponentsBuilder.on(GitHubController::class.java).deleteConfiguration(configuration.name)
             } linkIfGlobal GlobalSettings::class,

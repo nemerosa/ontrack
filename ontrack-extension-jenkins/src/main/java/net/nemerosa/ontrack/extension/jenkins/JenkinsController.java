@@ -3,12 +3,10 @@ package net.nemerosa.ontrack.extension.jenkins;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
-import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import net.nemerosa.ontrack.model.support.ConnectionResult;
-import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +50,6 @@ public class JenkinsController extends AbstractExtensionController<JenkinsExtens
                 jenkinsService.getConfigurations(),
                 uri(on(getClass()).getConfigurations())
         )
-                .with(Link.CREATE, uri(on(getClass()).getConfigurationForm()))
                 .with("_test", uri(on(getClass()).testConfiguration(null)), securityService.isGlobalFunctionGranted(GlobalSettings.class))
                 ;
     }
@@ -74,14 +71,6 @@ public class JenkinsController extends AbstractExtensionController<JenkinsExtens
     @RequestMapping(value = "configurations/test", method = RequestMethod.POST)
     public ConnectionResult testConfiguration(@RequestBody JenkinsConfiguration configuration) {
         return jenkinsService.test(configuration);
-    }
-
-    /**
-     * Form for a configuration
-     */
-    @RequestMapping(value = "configurations/create", method = RequestMethod.GET)
-    public Form getConfigurationForm() {
-        return JenkinsConfiguration.Companion.form();
     }
 
     /**
@@ -108,14 +97,6 @@ public class JenkinsController extends AbstractExtensionController<JenkinsExtens
     public Ack deleteConfiguration(@PathVariable String name) {
         jenkinsService.deleteConfiguration(name);
         return Ack.OK;
-    }
-
-    /**
-     * Update form
-     */
-    @RequestMapping(value = "configurations/{name}/update", method = RequestMethod.GET)
-    public Form updateConfigurationForm(@PathVariable String name) {
-        return jenkinsService.getConfiguration(name).asForm();
     }
 
     /**

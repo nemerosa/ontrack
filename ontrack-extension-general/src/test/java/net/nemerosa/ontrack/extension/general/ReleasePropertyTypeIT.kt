@@ -2,14 +2,10 @@ package net.nemerosa.ontrack.extension.general
 
 import net.nemerosa.ontrack.it.AsAdminTest
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
 @AsAdminTest
 class ReleasePropertyTypeIT : AbstractPropertyTypeTestSupport() {
-
-    @Autowired
-    private lateinit var releasePropertyType: ReleasePropertyType
 
     @Test
     fun `Case insensitive search on release property`() {
@@ -84,30 +80,6 @@ class ReleasePropertyTypeIT : AbstractPropertyTypeTestSupport() {
                     it.withSinceProperty(ReleasePropertyType::class.java.name)
                             .withSincePropertyValue("1.1.0")
                 } returns listOf(build3, build2, build1)
-            }
-        }
-    }
-
-    @Test
-    fun getEditionForm_empty() {
-        project {
-            branch {
-                build {
-                    val form = releasePropertyType.getEditionForm(this, null)
-                    assertEquals(null, form.getField("name")?.value)
-                }
-            }
-        }
-    }
-
-    @Test
-    fun getEditionForm_not_empty() {
-        project {
-            branch {
-                build {
-                    val form = releasePropertyType.getEditionForm(this, ReleaseProperty("test"))
-                    assertEquals("test", form.getField("name")?.value)
-                }
             }
         }
     }

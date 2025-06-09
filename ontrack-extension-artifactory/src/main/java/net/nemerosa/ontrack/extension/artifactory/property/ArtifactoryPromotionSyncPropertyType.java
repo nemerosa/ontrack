@@ -6,15 +6,12 @@ import net.nemerosa.ontrack.extension.artifactory.ArtifactoryExtensionFeature;
 import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfiguration;
 import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfigurationService;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
-import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.form.Int;
-import net.nemerosa.ontrack.model.form.Selection;
-import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.model.support.ConfigurationPropertyType;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -60,35 +57,6 @@ public class ArtifactoryPromotionSyncPropertyType extends AbstractPropertyType<A
     }
 
     @Override
-    public Form getEditionForm(ProjectEntity entity, ArtifactoryPromotionSyncProperty value) {
-        return Form.create()
-                .with(
-                        Selection.of("configuration")
-                                .label("Configuration")
-                                .help("Configuration to use to access Artifactory")
-                                .items(configurationService.getConfigurationDescriptors())
-                                .value(value != null ? value.getConfiguration().getName() : null)
-                ).with(
-                        Text.of("buildName")
-                                .label("Build name")
-                                .help("Name of the Artifactory build")
-                                .value(value != null ? value.getBuildName() : ""))
-                .with(
-                        Text.of("buildNameFilter")
-                                .label("Build name filter")
-                                .help("Filter on the build name in Artifactory (* can be used as a wildcard)")
-                                .value(value != null ? value.getBuildNameFilter() : "")
-                ).with(
-                        Int.of("interval")
-                                .label("Sync. interval (min)")
-                                .min(0)
-                                .max(60 * 24 * 7) // 1 week
-                                .help("Interval in minutes for the synchronisation. If 0, no synchronisation is done.")
-                                .value(value != null ? value.getInterval() : 0)
-                );
-    }
-
-    @Override
     public JsonNode forStorage(ArtifactoryPromotionSyncProperty value) {
         return format(
                 MapBuilder.params()
@@ -127,7 +95,7 @@ public class ArtifactoryPromotionSyncPropertyType extends AbstractPropertyType<A
     }
 
     @Override
-    public ArtifactoryPromotionSyncProperty replaceValue(ArtifactoryPromotionSyncProperty value, Function<String, String> replacementFunction) {
+    public ArtifactoryPromotionSyncProperty replaceValue(@NotNull ArtifactoryPromotionSyncProperty value, Function<String, String> replacementFunction) {
         return new ArtifactoryPromotionSyncProperty(
                 configurationService.replaceConfiguration(value.getConfiguration(), replacementFunction),
                 replacementFunction.apply(value.getBuildName()),

@@ -6,14 +6,12 @@ import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest
 import net.nemerosa.ontrack.extension.git.model.*
 import net.nemerosa.ontrack.extension.git.service.GitConfigurationService
 import net.nemerosa.ontrack.extension.git.service.GitService
-import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
 import net.nemerosa.ontrack.extension.issues.export.ExportFormat
 import net.nemerosa.ontrack.extension.scm.model.SCMDocumentNotFoundException
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.buildfilter.BuildDiff
 import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription
-import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Build
@@ -21,7 +19,6 @@ import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.ConnectionResult
-import net.nemerosa.ontrack.ui.resource.Link
 import net.nemerosa.ontrack.ui.resource.Resource
 import net.nemerosa.ontrack.ui.resource.Resources
 import org.springframework.http.HttpHeaders
@@ -37,7 +34,6 @@ class GitController(
         private val structureService: StructureService,
         private val gitService: GitService,
         private val configurationService: GitConfigurationService,
-        private val issueServiceRegistry: IssueServiceRegistry,
         private val securityService: SecurityService,
         private val gitChangeLogCache: GitChangeLogCache,
 ) : AbstractExtensionController<GitExtensionFeature>(feature) {
@@ -51,7 +47,6 @@ class GitController(
                 configurationService.configurations,
                 uri(on(javaClass).configurations)
         )
-                .with(Link.CREATE, uri(on(javaClass).configurationForm))
                 .with("_test", uri(on(javaClass).testConfiguration(null)), securityService.isGlobalFunctionGranted(GlobalSettings::class.java))
 
     /**
@@ -64,13 +59,6 @@ class GitController(
                 configurationService.configurationDescriptors,
                 uri(on(javaClass).configurationsDescriptors)
         )
-
-    /**
-     * Form for a configuration
-     */
-    val configurationForm: Form
-        @GetMapping("configurations/create")
-        get() = BasicGitConfiguration.form(issueServiceRegistry.availableIssueServiceConfigurations)
 
     @GetMapping("")
     override fun getDescription(): Resource<ExtensionFeatureDescription> {
@@ -114,14 +102,6 @@ class GitController(
     fun deleteConfiguration(@PathVariable name: String): Ack {
         configurationService.deleteConfiguration(name)
         return Ack.OK
-    }
-
-    /**
-     * Update form
-     */
-    @GetMapping("configurations/{name:.*}/update")
-    fun updateConfigurationForm(@PathVariable name: String): Form {
-        return configurationService.getConfiguration(name).asForm(issueServiceRegistry.availableIssueServiceConfigurations)
     }
 
     /**

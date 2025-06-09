@@ -24,15 +24,6 @@ class IndicatorController(
     )
 
     /**
-     * Gets the update form for a project indicator
-     */
-    @GetMapping("project/{projectId}/indicator/{typeId}/update")
-    fun getUpdateFormForIndicator(
-            @PathVariable projectId: ID,
-            @PathVariable typeId: String
-    ) = projectIndicatorService.getUpdateFormForIndicator(projectId, typeId)
-
-    /**
      * Updates a project indicator
      */
     @PutMapping("project/{projectId}/indicator/{typeId}/update")

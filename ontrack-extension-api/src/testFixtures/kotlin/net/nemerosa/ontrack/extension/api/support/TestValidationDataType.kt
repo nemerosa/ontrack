@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.api.support
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.NullNode
 import net.nemerosa.ontrack.json.JsonUtils
-import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.structure.AbstractValidationDataType
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.springframework.stereotype.Component
@@ -43,8 +42,6 @@ class TestValidationDataType(
 
     override fun configFromJson(node: JsonNode?): Any? = null
 
-    override fun getConfigForm(config: Any?): Form = Form.create()
-
     override fun configToFormJson(config: Any?) = null
 
     override fun fromConfigForm(node: JsonNode?) {}
@@ -52,30 +49,6 @@ class TestValidationDataType(
     override fun toJson(data: TestValidationData): JsonNode = JsonUtils.format(data)
 
     override fun fromJson(node: JsonNode): TestValidationData? = JsonUtils.parse(node, TestValidationData::class.java)
-
-    override fun getForm(data: TestValidationData?): Form =
-            Form.create()
-                    .with(
-                            net.nemerosa.ontrack.model.form.Int
-                                    .of("critical")
-                                    .label("Critical issues")
-                                    .min(0)
-                                    .value(data?.critical)
-                    )
-                    .with(
-                            net.nemerosa.ontrack.model.form.Int
-                                    .of("high")
-                                    .label("High issues")
-                                    .min(0)
-                                    .value(data?.high)
-                    )
-                    .with(
-                            net.nemerosa.ontrack.model.form.Int
-                                    .of("medium")
-                                    .label("Medium issues")
-                                    .min(0)
-                                    .value(data?.medium)
-                    )
 
     override fun fromForm(node: JsonNode?): TestValidationData? =
             node?.run {

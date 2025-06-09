@@ -4,10 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getTextField
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Form.Companion.create
-import net.nemerosa.ontrack.model.form.MultiSelection
-import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
@@ -33,54 +29,6 @@ class AutoPromotionPropertyType(
         securityService.isProjectFunctionGranted(entity, ProjectConfig::class.java)
 
     override fun canView(entity: ProjectEntity, securityService: SecurityService): Boolean = true
-
-    override fun getEditionForm(entity: ProjectEntity, value: AutoPromotionProperty?): Form {
-        val promotionLevel = entity as PromotionLevel
-        return create()
-            .with(
-                MultiSelection.of("validationStamps")
-                    .label("Validation stamps")
-                    .items(
-                        structureService.getValidationStampListForBranch(promotionLevel.branch.id)
-                            .map { vs ->
-                                ValidationStampSelection(
-                                    vs,
-                                    value?.containsDirectValidationStamp(vs) ?: false
-                                )
-                            }
-                    )
-                    .help("When all the selected validation stamps have passed for a build, the promotion will automatically be granted.")
-            )
-            .with(
-                Text.of("include")
-                    .label("Include")
-                    .optional()
-                    .value(value?.include ?: "")
-                    .help("Regular expression to select validation stamps by name")
-            )
-            .with(
-                Text.of("exclude")
-                    .label("Exclude")
-                    .optional()
-                    .value(value?.exclude ?: "")
-                    .help("Regular expression to exclude validation stamps by name")
-            )
-            .with(
-                MultiSelection.of("promotionLevels")
-                    .label("Promotion levels")
-                    .items(
-                        structureService.getPromotionLevelListForBranch(promotionLevel.branch.id)
-                            .filter { pl -> pl.id() != promotionLevel.id() }
-                            .map { pl: PromotionLevel ->
-                                PromotionLevelSelection(
-                                    pl,
-                                    value?.contains(pl) ?: false
-                                )
-                            }
-                    )
-                    .help("When all the selected promotion levels have been granted to a build, the promotion will automatically be granted.")
-            )
-    }
 
     override fun fromClient(node: JsonNode): AutoPromotionProperty {
         return loadAutoPromotionProperty(node)

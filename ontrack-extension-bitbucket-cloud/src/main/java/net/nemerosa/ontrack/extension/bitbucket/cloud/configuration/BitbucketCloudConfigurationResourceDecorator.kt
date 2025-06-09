@@ -26,11 +26,6 @@ class BitbucketCloudConfigurationResourceDecorator(
         return resourceContext.links()
             .self(on(BitbucketCloudConfigurationController::class.java).getConfiguration(configuration.name))
             .link(
-                Link.UPDATE,
-                on(BitbucketCloudConfigurationController::class.java).updateConfigurationForm(configuration.name),
-                globalSettingsGranted
-            )
-            .link(
                 Link.DELETE,
                 on(BitbucketCloudConfigurationController::class.java).deleteConfiguration(configuration.name),
                 globalSettingsGranted

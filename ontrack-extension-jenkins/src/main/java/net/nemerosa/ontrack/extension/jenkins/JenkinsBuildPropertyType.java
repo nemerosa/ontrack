@@ -3,15 +3,13 @@ package net.nemerosa.ontrack.extension.jenkins;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.common.MapBuilder;
 import net.nemerosa.ontrack.model.exceptions.PropertyUnsupportedEntityTypeException;
-import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.form.Int;
-import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.security.BuildCreate;
 import net.nemerosa.ontrack.model.security.PromotionRunCreate;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.security.ValidationRunCreate;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -72,25 +70,6 @@ public class JenkinsBuildPropertyType extends AbstractJenkinsPropertyType<Jenkin
     }
 
     @Override
-    public Form getEditionForm(ProjectEntity entity, JenkinsBuildProperty value) {
-        return super.getEditionForm(entity, value)
-                .with(
-                        Text.of("job")
-                                .label("Job name")
-                                .length(120)
-                                .help("Name of Jenkins Job")
-                                .value(value != null ? value.getJob() : null)
-                )
-                .with(
-                        Int.of("build")
-                                .label("Build number")
-                                .min(1)
-                                .help("Jenkins Build number")
-                                .value(value != null ? value.getBuild() : null)
-                );
-    }
-
-    @Override
     public JsonNode forStorage(JenkinsBuildProperty value) {
         return format(
                 MapBuilder.params()
@@ -124,7 +103,7 @@ public class JenkinsBuildPropertyType extends AbstractJenkinsPropertyType<Jenkin
     }
 
     @Override
-    public JenkinsBuildProperty replaceValue(JenkinsBuildProperty value, Function<String, String> replacementFunction) {
+    public JenkinsBuildProperty replaceValue(@NotNull JenkinsBuildProperty value, Function<String, String> replacementFunction) {
         return new JenkinsBuildProperty(
                 replaceConfiguration(value.getConfiguration(), replacementFunction),
                 replacementFunction.apply(value.getJob()),

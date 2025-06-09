@@ -2,8 +2,6 @@ package net.nemerosa.ontrack.extension.general
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.NamedEntries
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
@@ -31,18 +29,6 @@ class LinkPropertyType(
             securityService.isProjectFunctionGranted(entity, ProjectConfig::class.java)
 
     override fun canView(entity: ProjectEntity, securityService: SecurityService): Boolean = true
-
-    override fun getEditionForm(entity: ProjectEntity, value: LinkProperty?): Form = Form.create()
-            .with(
-                    NamedEntries.of("links")
-                            .label("List of links")
-                            .nameLabel("Name")
-                            .valueLabel("Link")
-                            .nameOptional()
-                            .addText("Add a link")
-                            .help("List of links associated with a name.")
-                            .value(value?.links ?: emptyList<Any>())
-            )
 
     override fun fromClient(node: JsonNode): LinkProperty {
         return fromStorage(node)

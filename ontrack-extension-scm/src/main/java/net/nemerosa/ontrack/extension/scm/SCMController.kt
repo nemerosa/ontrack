@@ -4,10 +4,6 @@ import net.nemerosa.ontrack.extension.scm.model.SCMFileChangeFilter
 import net.nemerosa.ontrack.extension.scm.model.SCMFileChangeFilters
 import net.nemerosa.ontrack.extension.scm.service.SCMFileChangeFilterService
 import net.nemerosa.ontrack.model.Ack
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Form.Companion.create
-import net.nemerosa.ontrack.model.form.Memo
-import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ID
@@ -40,29 +36,6 @@ class SCMController(
             config.filters.stream().map { f: SCMFileChangeFilter -> toResource(projectId, f) },
             uri(MvcUriComponentsBuilder.on(javaClass).getChangeLogFileFilters(projectId))
         )
-            .with(
-                Link.CREATE,
-                uri(MvcUriComponentsBuilder.on(javaClass).createChangeLogFileFilterForm(projectId)),
-                securityService.isProjectFunctionGranted(projectId.get(), ProjectConfig::class.java)
-            )
-    }
-
-    /**
-     * Form to create a change log filter
-     */
-    @GetMapping("changeLog/fileFilter/{projectId}/create")
-    fun createChangeLogFileFilterForm(@PathVariable projectId: ID?): Form {
-        return create()
-            .with(
-                Text.of("name")
-                    .label("Name")
-                    .help("Name to use to save the filter.")
-            )
-            .with(
-                Memo.of("patterns")
-                    .label("Filter(s)")
-                    .help("List of ANT-like patterns (one per line).")
-            )
     }
 
     /**
@@ -81,28 +54,6 @@ class SCMController(
             scmFileChangeFilterService.save(project, filter)
             getChangeLogFileFilter(projectId, filter.name)
         }
-    }
-
-    /**
-     * Updating form for a change log file filter
-     */
-    @GetMapping("changeLog/fileFilter/{projectId}/{name}/update")
-    fun saveChangeLogFileFilterForm(@PathVariable projectId: ID, @PathVariable name: String?): Form {
-        val filter = getChangeLogFileFilter(projectId, name)
-        return create()
-            .with(
-                Text.of("name")
-                    .label("Name")
-                    .help("Name to use to save the filter.")
-                    .readOnly()
-                    .value(filter.data.name)
-            )
-            .with(
-                Memo.of("patterns")
-                    .label("Filter(s)")
-                    .help("List of ANT-like patterns (one per line).")
-                    .value(java.lang.String.join("\n", filter.data.patterns))
-            )
     }
 
     /**
@@ -154,11 +105,6 @@ class SCMController(
             .with(
                 Link.DELETE,
                 uri(MvcUriComponentsBuilder.on(javaClass).deleteChangeLogFileFilter(projectId, filter.name)),
-                granted
-            )
-            .with(
-                Link.UPDATE,
-                uri(MvcUriComponentsBuilder.on(javaClass).saveChangeLogFileFilterForm(projectId, filter.name)),
                 granted
             )
     }

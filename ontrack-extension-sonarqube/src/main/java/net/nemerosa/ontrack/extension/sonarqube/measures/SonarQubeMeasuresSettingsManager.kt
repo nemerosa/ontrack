@@ -1,18 +1,10 @@
 package net.nemerosa.ontrack.extension.sonarqube.measures
 
-import net.nemerosa.ontrack.extension.sonarqube.measures.SonarQubeMeasuresSettings.Companion.DEFAULT_BLOCKER_THRESHOLD
-import net.nemerosa.ontrack.extension.sonarqube.measures.SonarQubeMeasuresSettings.Companion.DEFAULT_COVERAGE_THRESHOLD
-import net.nemerosa.ontrack.extension.sonarqube.measures.SonarQubeMeasuresSettings.Companion.DEFAULT_DISABLED
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.MultiStrings
-import net.nemerosa.ontrack.model.form.YesNo
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.AbstractSettingsManager
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.support.SettingsRepository
 import org.springframework.stereotype.Component
-
-typealias IntField = net.nemerosa.ontrack.model.form.Int
 
 @Component
 class SonarQubeMeasuresSettingsManager(
@@ -54,34 +46,4 @@ class SonarQubeMeasuresSettingsManager(
         }
     }
 
-    override fun getSettingsForm(settings: SonarQubeMeasuresSettings?): Form {
-        return Form.create()
-                .with(
-                        MultiStrings.of("measures")
-                                .help("List of SonarQube measures to export by default.")
-                                .label("Measures")
-                                .value(settings?.measures ?: SonarQubeMeasuresSettings.DEFAULT_MEASURES)
-                )
-                .with(
-                        YesNo.of("disabled")
-                                .help("Check to disable the collection of SonarQube measures")
-                                .label("Disable collection")
-                                .value(settings?.disabled ?: DEFAULT_DISABLED)
-                )
-                .with(
-                        IntField.of(SonarQubeMeasuresSettings::coverageThreshold.name)
-                                .help("Coverage to reach to get A rating indicator")
-                                .label("Coverage threshold")
-                                .min(0)
-                                .max(100)
-                                .value(settings?.coverageThreshold ?: DEFAULT_COVERAGE_THRESHOLD)
-                )
-                .with(
-                        IntField.of(SonarQubeMeasuresSettings::blockerThreshold.name)
-                                .help("Maximum number of blocker issues")
-                                .label("Blocker issues")
-                                .min(1)
-                                .value(settings?.blockerThreshold ?: DEFAULT_BLOCKER_THRESHOLD)
-                )
-    }
 }

@@ -11,16 +11,12 @@ import net.nemerosa.ontrack.extension.git.service.BuildGitCommitLinkService
 import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.JsonUtils
-import net.nemerosa.ontrack.model.form.*
-import net.nemerosa.ontrack.model.form.Form.Companion.create
-import net.nemerosa.ontrack.model.form.Int
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 import java.util.*
 import java.util.function.Function
-import java.util.stream.Collectors
 
 @Component
 class GitBranchConfigurationPropertyType(
@@ -42,56 +38,6 @@ class GitBranchConfigurationPropertyType(
     }
 
     override fun canView(entity: ProjectEntity, securityService: SecurityService): Boolean = true
-
-    override fun getEditionForm(entity: ProjectEntity, value: GitBranchConfigurationProperty?): Form {
-        return create()
-                .with(
-                        Text.of("branch")
-                                .label("Git branch")
-                                .value(value?.branch ?: "main")
-                )
-                .with(
-                        ServiceConfigurator.of("buildCommitLink")
-                                .label("Build commit link")
-                                .help("Link between the builds and the Git commits.")
-                                .sources(
-                                        buildGitCommitLinkService.links.stream()
-                                                .map { link: BuildGitCommitLink<*> ->
-                                                    ServiceConfigurationSource(
-                                                            link.id,
-                                                            link.name,
-                                                            link.form,
-                                                            Collections.singletonMap(
-                                                                    "indexationAvailable",
-                                                                    link is IndexableBuildGitCommitLink<*>
-                                                            )
-                                                    )
-                                                }
-                                                .collect(Collectors.toList())
-                                )
-                                .value(
-                                        value?.buildCommitLink
-                                )
-                )
-                .with(
-                        YesNo.of("override")
-                                .label("Override builds")
-                                .help("Can the existing builds be overridden by a synchronisation? If yes, " +
-                                        "the existing validation and promotion runs would be lost as well.")
-                                .value(value != null && value.isOverride)
-                                .visibleIf("buildCommitLink.extra.indexationAvailable")
-                )
-                .with(
-                        Int.of("buildTagInterval")
-                                .label("Build/tag sync. interval (min)")
-                                .min(0)
-                                .max(60 * 24 * 7) // 1 week
-                                .help("Interval in minutes for the synchronisation between builds and tags. " +
-                                        "If 0, the synchronisation must be done manually")
-                                .value(value?.buildTagInterval ?: 0)
-                                .visibleIf("buildCommitLink.extra.indexationAvailable")
-                )
-    }
 
     override fun fromClient(node: JsonNode): GitBranchConfigurationProperty {
         return fromStorage(node)

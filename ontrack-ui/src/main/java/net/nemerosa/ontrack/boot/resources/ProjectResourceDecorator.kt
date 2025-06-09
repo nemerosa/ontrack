@@ -1,10 +1,10 @@
 package net.nemerosa.ontrack.boot.resources
 
 import net.nemerosa.ontrack.boot.ui.*
-import net.nemerosa.ontrack.model.labels.LabelManagement
-import net.nemerosa.ontrack.model.labels.LabelTokenForm
 import net.nemerosa.ontrack.model.labels.ProjectLabelManagement
-import net.nemerosa.ontrack.model.security.*
+import net.nemerosa.ontrack.model.security.ProjectAuthorisationMgt
+import net.nemerosa.ontrack.model.security.ProjectDelete
+import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.structure.ProjectFavouriteService
@@ -25,14 +25,8 @@ class ProjectResourceDecorator(
                 link(Link.SELF) { project -> on(ProjectController::class.java).getProject(project.id) },
                 // List of branches for this project
                 link("_branches") { project -> on(BranchController::class.java).getBranchListForProject(project.id) },
-                // Creates a branch for this project
-                "_createBranch" linkTo { project: Project ->
-                    on(BranchController::class.java).newBranchForm(project.id)
-                } linkIf (BranchCreate::class),
                 // List of branches and their views
                 link("_branchStatusViews") { project -> on(ProjectController::class.java).getBranchStatusViews(project.id) },
-                // Build search
-                link("_buildSearch") { project -> on(BuildController::class.java).buildSearchForm(project.id) },
                 // Build diff actions
                 link("_buildDiffActions") { project -> on(BuildController::class.java).buildDiffActions(project.id) },
                 // Actual properties for this project
@@ -59,10 +53,6 @@ class ProjectResourceDecorator(
                 } linkIf (ProjectAuthorisationMgt::class),
                 // Events
                 link("_events") { project -> on(EventController::class.java).getEvents(project.projectEntityType, project.id, 0, 10) },
-                // Clone to another project
-                "_clone" linkTo { project: Project ->
-                    on(ProjectController::class.java).clone(project.id)
-                } linkIfGlobal (ProjectCreation::class),
                 // Enable
                 link(
                         "_enable",
@@ -92,18 +82,6 @@ class ProjectResourceDecorator(
                         "_labels",
                         { project -> on(ProjectLabelController::class.java).getLabelsForProject(project.id()) },
                         { project, resourceContext -> resourceContext.isProjectFunctionGranted(project, ProjectLabelManagement::class.java) }
-                ),
-                // Creating a label from a project and a token
-                link(
-                        "_labelFromToken",
-                        { _ -> on(LabelController::class.java).getFormForToken(LabelTokenForm("")) },
-                        { project, resourceContext -> resourceContext.isProjectFunctionGranted(project, ProjectLabelManagement::class.java) && resourceContext.isGlobalFunctionGranted(LabelManagement::class.java) }
-                ),
-                // Creation of a label for the project
-                link(
-                        "_labelsCreate",
-                        { _ -> on(LabelController::class.java).getCreationForm() },
-                        { _, resourceContext -> resourceContext.isGlobalFunctionGranted(LabelManagement::class.java) }
                 ),
                 // Page
                 page()

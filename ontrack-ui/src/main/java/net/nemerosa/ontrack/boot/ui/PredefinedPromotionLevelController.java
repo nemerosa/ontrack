@@ -1,22 +1,20 @@
 package net.nemerosa.ontrack.boot.ui;
 
+import jakarta.validation.Valid;
 import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.model.Ack;
-import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.model.structure.PredefinedPromotionLevel;
 import net.nemerosa.ontrack.model.structure.Reordering;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
-import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.Base64;
 
@@ -47,9 +45,6 @@ public class PredefinedPromotionLevelController extends AbstractResourceControll
                 predefinedPromotionLevelService.getPredefinedPromotionLevels(),
                 uri(on(getClass()).getPredefinedPromotionLevelList())
         ).with(
-                Link.CREATE,
-                uri(on(getClass()).getPredefinedPromotionLevelCreationForm())
-        ).with(
                 "_reorderPromotionLevels",
                 uri(on(getClass()).reorderPromotionLevelListForBranch(null))
         );
@@ -61,11 +56,6 @@ public class PredefinedPromotionLevelController extends AbstractResourceControll
         predefinedPromotionLevelService.reorderPromotionLevels(reordering);
         // OK
         return getPredefinedPromotionLevelList();
-    }
-
-    @RequestMapping(value = "predefinedPromotionLevels/create", method = RequestMethod.GET)
-    public Form getPredefinedPromotionLevelCreationForm() {
-        return PredefinedPromotionLevel.form();
     }
 
     @RequestMapping(value = "predefinedPromotionLevels/create", method = RequestMethod.POST)
@@ -80,11 +70,6 @@ public class PredefinedPromotionLevelController extends AbstractResourceControll
     @RequestMapping(value = "predefinedPromotionLevels/{predefinedPromotionLevelId}", method = RequestMethod.GET)
     public PredefinedPromotionLevel getPromotionLevel(@PathVariable ID predefinedPromotionLevelId) {
         return predefinedPromotionLevelService.getPredefinedPromotionLevel(predefinedPromotionLevelId);
-    }
-
-    @RequestMapping(value = "predefinedPromotionLevels/{predefinedPromotionLevelId}/update", method = RequestMethod.GET)
-    public Form updatePromotionLevelForm(@PathVariable ID predefinedPromotionLevelId) {
-        return predefinedPromotionLevelService.getPredefinedPromotionLevel(predefinedPromotionLevelId).asForm();
     }
 
     @RequestMapping(value = "predefinedPromotionLevels/{predefinedPromotionLevelId}/update", method = RequestMethod.PUT)

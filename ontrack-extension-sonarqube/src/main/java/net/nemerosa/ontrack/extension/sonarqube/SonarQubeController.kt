@@ -9,9 +9,6 @@ import net.nemerosa.ontrack.extension.sonarqube.property.SonarQubePropertyType
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Password
-import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.security.SecurityService
@@ -20,7 +17,6 @@ import net.nemerosa.ontrack.model.structure.PropertyService
 import net.nemerosa.ontrack.model.structure.StructureService
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.ConnectionResult
-import net.nemerosa.ontrack.ui.resource.Link
 import net.nemerosa.ontrack.ui.resource.Resource
 import net.nemerosa.ontrack.ui.resource.Resources
 import org.springframework.http.HttpStatus
@@ -75,7 +71,6 @@ class SonarQubeController(
                 configurationService.configurations,
                 uri(on(javaClass).getConfigurations())
         )
-                .with(Link.CREATE, uri(on(javaClass).getConfigurationForm()))
                 .with("_test", uri(on(javaClass).testConfiguration(null)), securityService.isGlobalFunctionGranted(GlobalSettings::class.java))
     }
 
@@ -96,24 +91,6 @@ class SonarQubeController(
                 configurationService.configurationDescriptors,
                 uri(on(javaClass).getConfigurationsDescriptors())
         )
-    }
-
-    /**
-     * Form for a configuration
-     */
-    @GetMapping("configurations/create")
-    fun getConfigurationForm(): Form {
-        return Form.create()
-                .with(Form.defaultNameField())
-                .with(
-                        Text.of("url")
-                                .label("URL")
-                                .help("URL to the SonarQube instance."))
-                .with(
-                        Password.of("password")
-                                .label("Token")
-                                .length(80)
-                )
     }
 
     /**
@@ -138,19 +115,6 @@ class SonarQubeController(
     fun deleteConfiguration(@PathVariable name: String): Ack {
         configurationService.deleteConfiguration(name)
         return Ack.OK
-    }
-
-    /**
-     * Update form
-     */
-    @GetMapping("configurations/{name:.*}/update")
-    fun updateConfigurationForm(@PathVariable name: String): Form {
-        return configurationService.getConfiguration(name).run {
-            getConfigurationForm()
-                    .with(Form.defaultNameField().readOnly().value(name))
-                    .fill("url", url)
-                    .fill("password", "")
-        }
     }
 
     /**

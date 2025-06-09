@@ -24,11 +24,6 @@ class TFCConfigurationResourceDecorator(
         return resourceContext.links()
             .self(on(TFCController::class.java).getConfiguration(configuration.name))
             .link(
-                Link.UPDATE,
-                on(TFCController::class.java).updateConfigurationForm(configuration.name),
-                globalSettingsGranted
-            )
-            .link(
                 Link.DELETE,
                 on(TFCController::class.java).deleteConfiguration(configuration.name),
                 globalSettingsGranted

@@ -1,8 +1,5 @@
 package net.nemerosa.ontrack.extension.github.catalog
 
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.MultiStrings
-import net.nemerosa.ontrack.model.form.longField
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.AbstractSettingsManager
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
@@ -41,20 +38,4 @@ class GitHubSCMCatalogSettingsManager(
 
     override fun getTitle(): String = "GitHub"
 
-    override fun getSettingsForm(settings: GitHubSCMCatalogSettings): Form =
-        Form.create()
-            .with(
-                MultiStrings.of(GitHubSCMCatalogSettings::orgs.name)
-                    .label("Organizations")
-                    .help("List of organizations to collect information about.")
-                    .value(settings.orgs)
-            )
-            .longField(
-                GitHubSCMCatalogSettings::autoMergeTimeout,
-                settings.autoMergeTimeout
-            )
-            .longField(
-                GitHubSCMCatalogSettings::autoMergeInterval,
-                settings.autoMergeInterval
-            )
 }

@@ -1,11 +1,7 @@
 package net.nemerosa.ontrack.boot.ui;
 
 import jakarta.validation.Valid;
-import net.nemerosa.ontrack.common.Time;
 import net.nemerosa.ontrack.model.Ack;
-import net.nemerosa.ontrack.model.form.DateTime;
-import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.form.Selection;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
@@ -59,24 +55,6 @@ public class PromotionRunController extends AbstractResourceController {
                 ),
                 uri(on(getClass()).getPromotionRunsForBuildAndPromotionLevel(buildId, promotionLevelId))
         ).forView(Build.class);
-    }
-
-    @RequestMapping(value = "builds/{buildId}/promotionRun/create", method = RequestMethod.GET)
-    public Form newPromotionRunForm(@PathVariable ID buildId) {
-        Build build = structureService.getBuild(buildId);
-        return Form.create()
-                .with(
-                        Selection.of("promotionLevelId")
-                                .label("Promotion level")
-                                .items(structureService.getPromotionLevelListForBranch(build.getBranch().getId()))
-                )
-                .with(
-                        DateTime.of("dateTime")
-                                .label("Date/time")
-                                .value(Time.now())
-                                .minuteStep(15)
-                )
-                .description();
     }
 
     @RequestMapping(value = "builds/{buildId}/promotionRun/create", method = RequestMethod.POST)

@@ -4,9 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getRequiredTextField
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Form.Companion.create
-import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
@@ -40,15 +37,6 @@ class TestPropertyType(
 
     override fun canView(entity: ProjectEntity, securityService: SecurityService): Boolean {
         return true
-    }
-
-    override fun getEditionForm(entity: ProjectEntity, value: TestProperty): Form {
-        return create()
-            .with(
-                Text.of("value")
-                    .label("Value")
-                    .value(value.value)
-            )
     }
 
     override fun forStorage(value: TestProperty): JsonNode =

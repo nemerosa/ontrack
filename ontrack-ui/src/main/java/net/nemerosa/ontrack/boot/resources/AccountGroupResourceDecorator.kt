@@ -15,10 +15,6 @@ class AccountGroupResourceDecorator : AbstractLinkResourceDecorator<AccountGroup
                 on(AccountController::class.java).getGroup(group.id)
             },
 
-            Link.UPDATE linkTo { group: AccountGroup ->
-                on(AccountController::class.java).getGroupUpdateForm(group.id)
-            } linkIfGlobal AccountManagement::class,
-
             Link.DELETE linkTo { group: AccountGroup ->
                 on(AccountController::class.java).deleteGroup(group.id)
             } linkIfGlobal AccountManagement::class

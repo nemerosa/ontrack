@@ -7,7 +7,6 @@ import net.nemerosa.ontrack.model.events.EventFactory
 import net.nemerosa.ontrack.model.events.EventPostService
 import net.nemerosa.ontrack.model.exceptions.PropertyTypeNotFoundException
 import net.nemerosa.ontrack.model.exceptions.PropertyUnsupportedEntityTypeException
-import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.repository.PropertyRepository
@@ -180,13 +179,6 @@ class PropertyServiceImpl(
         return type.fromStorage(t.json)
     }
 
-    override fun getPropertyEditionForm(entity: ProjectEntity, propertyTypeName: String): Form {
-        // Gets the property using its fully qualified type name
-        val propertyType: PropertyType<*> = getPropertyTypeByName<Any>(propertyTypeName)
-        // Gets the edition form for this type
-        return getPropertyEditionForm(entity, propertyType)
-    }
-
     override fun <T> searchWithPropertyValue(
             propertyTypeClass: Class<out PropertyType<T>>,
             entityLoader: BiFunction<ProjectEntityType, ID, ProjectEntity>,
@@ -271,17 +263,6 @@ class PropertyServiceImpl(
         val data = property.type.copy(sourceEntity, property.value, targetEntity, replacementFn)
         // Direct edition
         editProperty(targetEntity, property.type, data)
-    }
-
-    protected fun <T> getPropertyEditionForm(entity: ProjectEntity, propertyType: PropertyType<T>): Form {
-        // Checks for edition
-        if (!propertyType.canEdit(entity, securityService)) {
-            throw AccessDeniedException("Property is not opened for edition.")
-        }
-        // Gets the value for this property
-        val value: T? = getPropertyValue(propertyType, entity)
-        // Gets the form
-        return propertyType.getEditionForm(entity, value)
     }
 
 }

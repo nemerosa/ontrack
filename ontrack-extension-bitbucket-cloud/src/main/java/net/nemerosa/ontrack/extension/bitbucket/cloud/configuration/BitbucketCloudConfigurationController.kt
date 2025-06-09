@@ -1,15 +1,11 @@
 package net.nemerosa.ontrack.extension.bitbucket.cloud.configuration
 
 import net.nemerosa.ontrack.model.Ack
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Password
-import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.ConnectionResult
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
-import net.nemerosa.ontrack.ui.resource.Link
 import net.nemerosa.ontrack.ui.resource.Resources
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -30,7 +26,6 @@ class BitbucketCloudConfigurationController(
         configurationService.configurations,
         uri(on(javaClass).getConfigurations())
     )
-        .with(Link.CREATE, uri(on(javaClass).getConfigurationForm()))
         .with(
             "_test",
             uri(on(javaClass).testConfiguration(null)),
@@ -57,12 +52,6 @@ class BitbucketCloudConfigurationController(
     )
 
     /**
-     * Form for a configuration
-     */
-    @GetMapping("create")
-    fun getConfigurationForm(): Form = getConfigurationForm(null)
-
-    /**
      * Creating a configuration
      */
     @PostMapping("create")
@@ -87,13 +76,6 @@ class BitbucketCloudConfigurationController(
     }
 
     /**
-     * Update form
-     */
-    @GetMapping("{name:.*}/update")
-    fun updateConfigurationForm(@PathVariable name: String): Form =
-        getConfigurationForm(configurationService.getConfiguration(name))
-
-    /**
      * Updating one configuration
      */
     @PutMapping("{name:.*}/update")
@@ -104,36 +86,5 @@ class BitbucketCloudConfigurationController(
         configurationService.updateConfiguration(name, configuration)
         return getConfiguration(name)
     }
-
-    /**
-     * Gets the form for a configuration.
-     */
-    private fun getConfigurationForm(config: BitbucketCloudConfiguration?): Form =
-        Form.create()
-            .with(
-                Text.of("name")
-                    .label("Name")
-                    .help("Name of the configuration")
-                    .value(config?.name)
-                    .readOnly(config != null)
-            )
-            .with(
-                Text.of(BitbucketCloudConfiguration::workspace.name)
-                    .label("Workspace")
-                    .help("Name of the Bitbucket Cloud workspace to connect to")
-                    .value(config?.workspace)
-            )
-            .with(
-                Text.of("user")
-                    .label("User")
-                    .help("Name of the Bitbucket Cloud user name")
-                    .value(config?.user)
-            )
-            .with(
-                Password.of("password")
-                    .label("App password")
-                    .help("App password to use to connect to Bitbucket Cloud")
-                    .optional()
-            )
 
 }

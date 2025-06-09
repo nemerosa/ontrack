@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.model.pagination.PaginatedList
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
-import net.nemerosa.ontrack.model.structure.ID
 
 interface BuildFilterProvider<T> {
 
@@ -22,20 +21,6 @@ interface BuildFilterProvider<T> {
      * If this method returns `true`, there is no need to configure the filter.
      */
     val isPredefined: Boolean
-
-    /**
-     * Gets the form for a new filter on the given branch
-     */
-    fun newFilterForm(branchId: ID): BuildFilterForm
-
-    /**
-     * Gets the form for a pre-filled filter
-     *
-     * @param branchId Branch to filter
-     * @param data     Filter data
-     * @return Form
-     */
-    fun getFilterForm(branchId: ID, data: T): BuildFilterForm
 
     /**
      * Performs the filtering

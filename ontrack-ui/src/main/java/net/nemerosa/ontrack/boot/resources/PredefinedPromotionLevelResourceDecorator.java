@@ -25,8 +25,6 @@ public class PredefinedPromotionLevelResourceDecorator extends AbstractResourceD
                 .self(on(PredefinedPromotionLevelController.class).getPromotionLevel(promotionLevel.getId()))
                         // Image link
                 .link(Link.IMAGE_LINK, on(PredefinedPromotionLevelController.class).getPromotionLevelImage(promotionLevel.getId()))
-                        // Update link
-                .link(Link.UPDATE, on(PredefinedPromotionLevelController.class).updatePromotionLevelForm(promotionLevel.getId()), GlobalSettings.class)
                         // Delete link
                 .link(Link.DELETE, on(PredefinedPromotionLevelController.class).deletePromotionLevel(promotionLevel.getId()), GlobalSettings.class)
                         // OK

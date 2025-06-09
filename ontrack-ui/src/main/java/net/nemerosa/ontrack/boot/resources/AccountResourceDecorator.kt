@@ -15,8 +15,6 @@ class AccountResourceDecorator : AbstractLinkResourceDecorator<Account>(Account:
     override fun getLinkDefinitions(): Iterable<LinkDefinition<Account>> = listOf(
         // Self
         Link.SELF linkTo { account, _ -> on(AccountController::class.java).getAccount(account.id) },
-        // Update
-        Link.UPDATE linkTo { account, _ -> on(AccountController::class.java).getUpdateForm(account.id) },
         // Delete
         Link.DELETE linkTo { account: Account, _ ->
             on(AccountController::class.java).deleteAccount(account.id)

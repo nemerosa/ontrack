@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.boot.resources;
 import net.nemerosa.ontrack.boot.ui.*;
 import net.nemerosa.ontrack.model.security.ValidationStampBulkUpdate;
 import net.nemerosa.ontrack.model.security.ValidationStampDelete;
-import net.nemerosa.ontrack.model.security.ValidationStampEdit;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
 import net.nemerosa.ontrack.model.structure.ValidationStamp;
 import net.nemerosa.ontrack.ui.resource.AbstractLinkResourceDecorator;
@@ -44,12 +43,6 @@ public class ValidationStampResourceDecorator extends AbstractLinkResourceDecora
                 link(
                         Link.IMAGE_LINK,
                         validationStamp -> on(ValidationStampController.class).getValidationStampImage_(null, validationStamp.getId())
-                ),
-                // Update link
-                link(
-                        Link.UPDATE,
-                        validationStamp -> on(ValidationStampController.class).updateValidationStampForm(validationStamp.getId()),
-                        withProjectFn(ValidationStampEdit.class)
                 ),
                 // Delete link
                 link(

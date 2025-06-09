@@ -2,8 +2,6 @@ package net.nemerosa.ontrack.extension.general
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.YesNo
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
@@ -35,19 +33,6 @@ class BuildLinkDisplayPropertyType(
 
     override fun canView(entity: ProjectEntity, securityService: SecurityService): Boolean {
         return true
-    }
-
-    override fun getEditionForm(entity: ProjectEntity, value: BuildLinkDisplayProperty?): Form {
-        return Form.create()
-                .with(
-                        YesNo.of("useLabel")
-                                .label("Use label")
-                                .help("""Configuration at project label to specify that a
-                                    build link decoration should use the release/label
-                                    of a build when available. By default, it displays
-                                    the build name.""")
-                                .value(value?.useLabel)
-                )
     }
 
     override fun fromClient(node: JsonNode): BuildLinkDisplayProperty {

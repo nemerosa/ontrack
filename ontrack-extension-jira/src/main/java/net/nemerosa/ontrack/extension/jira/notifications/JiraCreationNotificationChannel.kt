@@ -14,10 +14,6 @@ import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.multiStrings
-import net.nemerosa.ontrack.model.form.textField
-import net.nemerosa.ontrack.model.form.yesNoField
 import org.springframework.stereotype.Component
 
 @Component
@@ -157,18 +153,6 @@ class JiraCreationNotificationChannel(
     override val displayName: String = "Jira ticket creation"
 
     override val enabled: Boolean = true
-
-    @Deprecated("Will be removed in V5. Only Next UI is used.")
-    override fun getForm(c: JiraCreationNotificationChannelConfig?): Form =
-        Form.create()
-            .textField(JiraCreationNotificationChannelConfig::configName, c?.configName)
-            .yesNoField(JiraCreationNotificationChannelConfig::useExisting, c?.useExisting)
-            .textField(JiraCreationNotificationChannelConfig::projectName, c?.projectName)
-            .textField(JiraCreationNotificationChannelConfig::issueType, c?.issueType)
-            .multiStrings(JiraCreationNotificationChannelConfig::labels, c?.labels)
-            .textField(JiraCreationNotificationChannelConfig::fixVersion, c?.fixVersion)
-            .textField(JiraCreationNotificationChannelConfig::assignee, c?.assignee)
-            .textField(JiraCreationNotificationChannelConfig::titleTemplate, c?.titleTemplate)
 
     @Deprecated("Will be removed in V5. Only Next UI is used.")
     override fun toText(config: JiraCreationNotificationChannelConfig): String =

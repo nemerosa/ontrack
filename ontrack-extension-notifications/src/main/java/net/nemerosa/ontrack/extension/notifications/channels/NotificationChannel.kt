@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.notifications.channels
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.notifications.recording.NotificationRecord
 import net.nemerosa.ontrack.model.events.Event
-import net.nemerosa.ontrack.model.form.Form
 
 /**
  * Makes the link between an event to be sent and an actual notification backend.
@@ -58,12 +57,6 @@ interface NotificationChannel<C, R> {
      */
     @Deprecated("Will be removed in V5. Only Next UI is used.")
     fun toText(config: C): String
-
-    /**
-     * Gets the form for the channel's configuration
-     */
-    @Deprecated("Will be removed in V5. Only Next UI is used.")
-    fun getForm(c: C?): Form
 
     /**
      * Type of the channel, used as an identifier for the serialization of the subscriptions.

@@ -2,17 +2,13 @@ package net.nemerosa.ontrack.extension.indicators.ui.graphql
 
 import graphql.Scalars
 import graphql.schema.GraphQLObjectType
-import net.nemerosa.ontrack.extension.indicators.acl.IndicatorTypeManagement
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCategoryService
-import net.nemerosa.ontrack.extension.indicators.ui.IndicatorCategoryController
 import net.nemerosa.ontrack.graphql.schema.GQLFieldContributor
 import net.nemerosa.ontrack.graphql.schema.GQLType
 import net.nemerosa.ontrack.graphql.schema.GQLTypeCache
 import net.nemerosa.ontrack.graphql.schema.graphQLFieldContributions
 import net.nemerosa.ontrack.graphql.support.listType
-import net.nemerosa.ontrack.ui.resource.*
 import org.springframework.stereotype.Component
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 
 /**
  * List of indicator categories
@@ -61,15 +57,3 @@ class GQLTypeIndicatorCategories(
 }
 
 class IndicatorCategories
-
-@Component
-class IndicatorCategoriesResourceDecorator : AbstractLinkResourceDecorator<IndicatorCategories>(IndicatorCategories::class.java) {
-    override fun getLinkDefinitions(): Iterable<LinkDefinition<IndicatorCategories>> = listOf(
-
-            Link.CREATE linkTo { _: IndicatorCategories ->
-                on(IndicatorCategoryController::class.java).getCreationForm()
-            } linkIfGlobal IndicatorTypeManagement::class
-
-    )
-
-}

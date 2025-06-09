@@ -1,9 +1,6 @@
 package net.nemerosa.ontrack.extension.general.validation
 
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.YesNo
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
-import net.nemerosa.ontrack.model.form.Int as IntField
 
 data class ThresholdConfig(
         val warningThreshold: Int?,
@@ -27,25 +24,3 @@ data class ThresholdConfig(
             }
 
 }
-
-fun ThresholdConfig?.toForm(): Form =
-        Form.create()
-                .with(
-                        IntField.of("warningThreshold")
-                                .label("Warning threshold")
-                                .help("Percentage to reach before having a warning. Optional.")
-                                .optional()
-                                .value(this?.warningThreshold)
-                )
-                .with(
-                        IntField.of("failureThreshold")
-                                .label("Failure threshold")
-                                .help("Percentage to reach before having a failure. Optional.")
-                                .optional()
-                                .value(this?.failureThreshold)
-                )
-                .with(
-                        YesNo.of("okIfGreater")
-                                .label("OK if greater")
-                                .value(this?.okIfGreater ?: true)
-                )

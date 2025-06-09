@@ -4,12 +4,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import net.nemerosa.ontrack.common.Document;
 import net.nemerosa.ontrack.model.Ack;
-import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.security.PromotionLevelCreate;
-import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController;
-import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,12 +25,10 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 public class PromotionLevelController extends AbstractResourceController {
 
     private final StructureService structureService;
-    private final SecurityService securityService;
 
     @Autowired
-    public PromotionLevelController(StructureService structureService, SecurityService securityService) {
+    public PromotionLevelController(StructureService structureService) {
         this.structureService = structureService;
-        this.securityService = securityService;
     }
 
     // Promotion levels
@@ -45,14 +39,7 @@ public class PromotionLevelController extends AbstractResourceController {
         return Resources.of(
                         structureService.getPromotionLevelListForBranch(branchId),
                         uri(on(PromotionLevelController.class).getPromotionLevelListForBranch(branchId))
-                )
-                // Create
-                .with(
-                        Link.CREATE,
-                        uri(on(PromotionLevelController.class).newPromotionLevelForm(branchId)),
-                        securityService.isProjectFunctionGranted(branch.getProject().id(), PromotionLevelCreate.class)
-                )
-                ;
+                );
     }
 
     @RequestMapping(value = "branches/{branchId}/promotionLevels/reorder", method = RequestMethod.PUT)
@@ -61,12 +48,6 @@ public class PromotionLevelController extends AbstractResourceController {
         structureService.reorderPromotionLevels(branchId, reordering);
         // OK
         return getPromotionLevelListForBranch(branchId);
-    }
-
-    @RequestMapping(value = "branches/{branchId}/promotionLevels/create", method = RequestMethod.GET)
-    public Form newPromotionLevelForm(@PathVariable ID branchId) {
-        structureService.getBranch(branchId);
-        return PromotionLevel.form();
     }
 
     @RequestMapping(value = "branches/{branchId}/promotionLevels/create", method = RequestMethod.POST)
@@ -84,11 +65,6 @@ public class PromotionLevelController extends AbstractResourceController {
     @RequestMapping(value = "promotionLevels/{promotionLevelId}", method = RequestMethod.GET)
     public ResponseEntity<PromotionLevel> getPromotionLevel(@PathVariable ID promotionLevelId) {
         return ResponseEntity.ok(structureService.getPromotionLevel(promotionLevelId));
-    }
-
-    @RequestMapping(value = "promotionLevels/{promotionLevelId}/update", method = RequestMethod.GET)
-    public Form updatePromotionLevelForm(@PathVariable ID promotionLevelId) {
-        return structureService.getPromotionLevel(promotionLevelId).asForm();
     }
 
     @RequestMapping(value = "promotionLevels/{promotionLevelId}/update", method = RequestMethod.PUT)

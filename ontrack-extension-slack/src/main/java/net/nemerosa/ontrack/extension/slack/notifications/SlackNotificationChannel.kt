@@ -12,9 +12,6 @@ import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.docs.DocumentationLink
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.enumField
-import net.nemerosa.ontrack.model.form.textField
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import org.springframework.stereotype.Component
 
@@ -76,11 +73,6 @@ class SlackNotificationChannel(
 
     @Deprecated("Will be removed in V5. Only Next UI is used.")
     override fun toText(config: SlackNotificationChannelConfig): String = config.channel
-
-    @Deprecated("Will be removed in V5. Only Next UI is used.")
-    override fun getForm(c: SlackNotificationChannelConfig?): Form = Form.create()
-        .textField(SlackNotificationChannelConfig::channel, c?.channel)
-        .enumField(SlackNotificationChannelConfig::type, c?.type)
 
     override val type: String = "slack"
 

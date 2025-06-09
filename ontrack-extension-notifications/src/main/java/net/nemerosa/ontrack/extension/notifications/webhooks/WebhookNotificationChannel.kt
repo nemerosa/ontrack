@@ -9,8 +9,6 @@ import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.selectionOfString
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import org.springframework.stereotype.Component
@@ -70,15 +68,6 @@ class WebhookNotificationChannel(
         mapOf(WebhookNotificationChannelConfig::name.name to text).asJson()
 
     override fun toText(config: WebhookNotificationChannelConfig): String = config.name
-
-    override fun getForm(c: WebhookNotificationChannelConfig?): Form = Form.create()
-        .selectionOfString(
-            WebhookNotificationChannelConfig::name,
-            securityService.asAdmin {
-                webhookAdminService.webhooks.map { it.name }.sorted()
-            },
-            c?.name
-        )
 
     override val type: String = "webhook"
 

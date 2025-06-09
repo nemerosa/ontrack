@@ -7,7 +7,6 @@ import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 class FractionValidationDataTypeTest {
@@ -33,13 +32,6 @@ class FractionValidationDataTypeTest {
         )
         assertEquals(12, data?.numerator)
         assertEquals(50, data?.denominator)
-    }
-
-    @Test
-    fun getForm() {
-        val form = dataType.getForm(null)
-        assertNotNull(form.getField("numerator"))
-        assertNotNull(form.getField("denominator"))
     }
 
     @Test

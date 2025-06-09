@@ -21,9 +21,6 @@ class ValidationStampFilterResourceDecorator : AbstractLinkResourceDecorator<Val
     }
 
     override fun getLinkDefinitions(): Iterable<LinkDefinition<ValidationStampFilter>> = listOf(
-            Link.UPDATE linkTo { resource: ValidationStampFilter ->
-                on(ValidationStampFilterController::class.java).getValidationStampFilterUpdateForm(resource.id)
-            } linkIf ::canUpdate,
             Link.DELETE linkTo { resource: ValidationStampFilter ->
                 on(ValidationStampFilterController::class.java).deleteValidationStampFilter(resource.id)
             } linkIf ::canUpdate,

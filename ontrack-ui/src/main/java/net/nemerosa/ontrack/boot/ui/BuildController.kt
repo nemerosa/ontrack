@@ -5,18 +5,11 @@ import net.nemerosa.ontrack.extension.api.BuildDiffExtension
 import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Form.Companion.create
-import net.nemerosa.ontrack.model.form.intField
-import net.nemerosa.ontrack.model.form.selectionOfString
-import net.nemerosa.ontrack.model.form.textField
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.model.structure.Build.Companion.form
 import net.nemerosa.ontrack.model.structure.Build.Companion.of
 import net.nemerosa.ontrack.model.support.Action
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
-import net.nemerosa.ontrack.ui.resource.Resource
 import net.nemerosa.ontrack.ui.resource.Resources
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -32,35 +25,6 @@ class BuildController(
     private val securityService: SecurityService,
     private val extensionManager: ExtensionManager,
 ) : AbstractResourceController() {
-
-    @GetMapping("project/{projectId}/builds")
-    fun buildSearchForm(@PathVariable projectId: ID): Resource<Form> {
-        return Resource.of(
-            createBuildSearchForm(),
-            uri(MvcUriComponentsBuilder.on(javaClass).buildSearchForm(projectId))
-        ).with("_search", uri(MvcUriComponentsBuilder.on(javaClass).buildSearch(projectId, null)))
-    }
-
-    private fun createBuildSearchForm(): Form {
-        // List of properties for a build
-        val properties = propertyService.propertyTypes.stream()
-            .filter { type: PropertyType<*> -> type.supportedEntityTypes.contains(ProjectEntityType.BUILD) }
-            .map { type: PropertyType<*>? -> PropertyTypeDescriptor.of(type) }
-            .collect(Collectors.toList())
-        // Form
-        return create()
-            .intField(BuildSearchForm::maximumCount, null)
-            .textField(BuildSearchForm::branchName, null)
-            .textField(BuildSearchForm::buildName, null)
-            .textField(BuildSearchForm::promotionName, null)
-            .textField(BuildSearchForm::validationStampName, null)
-            .selectionOfString(
-                BuildSearchForm::property,
-                properties.map { it.typeName },
-                null,
-            )
-            .textField(BuildSearchForm::propertyValue, null)
-    }
 
     /**
      * Build search
@@ -96,14 +60,6 @@ class BuildController(
                 .collect(Collectors.toList()),
             uri(MvcUriComponentsBuilder.on(javaClass).buildDiffActions(projectId))
         )
-    }
-
-    @GetMapping("branches/{branchId}/builds/create")
-    fun newBuildForm(@PathVariable branchId: ID): Form {
-        // Checks the branch does exist
-        structureService.getBranch(branchId)
-        // Returns the form
-        return form()
     }
 
     @PostMapping("branches/{branchId}/builds/create")
@@ -142,11 +98,6 @@ class BuildController(
         )
     }
 
-    @GetMapping("builds/{buildId}/update")
-    fun updateBuildForm(@PathVariable buildId: ID): Form {
-        return structureService.getBuild(buildId).asForm()
-    }
-
     @PutMapping("builds/{buildId}/update")
     fun updateBuild(
         @PathVariable buildId: ID,
@@ -160,16 +111,6 @@ class BuildController(
         structureService.saveBuild(build)
         // As resource
         return ResponseEntity.ok(build)
-    }
-
-    /**
-     * Update form for the build signature.
-     */
-    @GetMapping("builds/{buildId}/signature")
-    fun updateBuildSignatureForm(@PathVariable buildId: ID): Form {
-        return SignatureRequest.of(
-            structureService.getBuild(buildId).signature
-        ).asForm()
     }
 
     /**

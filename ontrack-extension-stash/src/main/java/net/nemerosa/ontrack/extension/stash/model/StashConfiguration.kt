@@ -3,8 +3,6 @@ package net.nemerosa.ontrack.extension.stash.model
 import com.fasterxml.jackson.annotation.JsonIgnore
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APILabel
-import net.nemerosa.ontrack.model.form.*
-import net.nemerosa.ontrack.model.form.Form.Companion.defaultNameField
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
 import org.apache.commons.lang3.StringUtils
@@ -65,40 +63,4 @@ open class StashConfiguration(
         )
     }
 
-    fun asForm(): Form {
-        return form()
-            .with(defaultNameField().readOnly().value(name))
-            .fill("url", url)
-            .fill("user", user)
-            .fill("password", "")
-            .fill("autoMergeUser", autoMergeUser)
-            .fill("autoMergeToken", "")
-    }
-
-    companion object {
-
-        fun form(): Form {
-            return Form.create()
-                .with(defaultNameField())
-                .with(
-                    Text.of("url")
-                        .label("URL")
-                        .help("URL to the Bitbucket instance (https://bitbucket.org for example)")
-                )
-                .with(
-                    Text.of("user")
-                        .label("User")
-                        .length(16)
-                        .optional()
-                )
-                .with(
-                    Password.of("password")
-                        .label("Password")
-                        .length(40)
-                        .optional()
-                )
-                .textField(StashConfiguration::autoMergeUser, null)
-                .passwordField(StashConfiguration::autoMergeToken)
-        }
-    }
 }

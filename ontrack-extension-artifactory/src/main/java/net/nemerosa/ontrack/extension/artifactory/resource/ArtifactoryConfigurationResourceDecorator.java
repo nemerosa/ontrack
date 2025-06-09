@@ -30,7 +30,6 @@ public class ArtifactoryConfigurationResourceDecorator extends AbstractResourceD
     public List<Link> links(ArtifactoryConfiguration configuration, ResourceContext resourceContext) {
         return resourceContext.links()
                 .self(on(ArtifactoryController.class).getConfiguration(configuration.getName()))
-                .link(Link.UPDATE, on(ArtifactoryController.class).updateConfigurationForm(configuration.getName()))
                 .link(Link.DELETE, on(ArtifactoryController.class).deleteConfiguration(configuration.getName()))
                 .build();
     }

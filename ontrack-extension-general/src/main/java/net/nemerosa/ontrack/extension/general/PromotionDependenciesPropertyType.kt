@@ -3,15 +3,11 @@ package net.nemerosa.ontrack.extension.general
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.parse
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.MultiSelection
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
-import net.nemerosa.ontrack.model.structure.PromotionLevel
 import net.nemerosa.ontrack.model.structure.StructureService
-import net.nemerosa.ontrack.model.support.SelectableItem
 import org.springframework.stereotype.Component
 import java.util.function.Function
 
@@ -40,30 +36,6 @@ class PromotionDependenciesPropertyType(
 
     override fun canView(entity: ProjectEntity, securityService: SecurityService): Boolean =
             true
-
-    override fun getEditionForm(entity: ProjectEntity, value: PromotionDependenciesProperty?): Form {
-        val promotion = entity as PromotionLevel
-        val promotions = structureService.getPromotionLevelListForBranch(
-                promotion.branch.id
-        )
-        return Form.create()
-                .with(
-                        MultiSelection.of("dependencies")
-                                .label("Dependencies")
-                                .help("List of promotions this promotion depends on.")
-                                .items(
-                                        promotions.filter {
-                                            it.id != promotion.id
-                                        }.map {
-                                            SelectableItem(
-                                                    it.name in (value?.dependencies ?: emptyList()),
-                                                    it.name,
-                                                    it.name
-                                            )
-                                        }
-                                )
-                )
-    }
 
     override fun fromClient(node: JsonNode): PromotionDependenciesProperty = fromStorage(node)
 

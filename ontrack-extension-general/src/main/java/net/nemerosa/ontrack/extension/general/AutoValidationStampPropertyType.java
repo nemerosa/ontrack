@@ -3,12 +3,11 @@ package net.nemerosa.ontrack.extension.general;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
 import net.nemerosa.ontrack.model.extension.ValidationStampPropertyType;
-import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.form.YesNo;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService;
 import net.nemerosa.ontrack.model.structure.*;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -90,24 +89,6 @@ public class AutoValidationStampPropertyType extends AbstractPropertyType<AutoVa
     }
 
     @Override
-    public Form getEditionForm(ProjectEntity entity, AutoValidationStampProperty value) {
-        return Form.create()
-                .with(
-                        YesNo.of("autoCreate")
-                                .label("Auto creation")
-                                .help("If set, allows validation stamps to be created automatically")
-                                .value(value != null && value.isAutoCreate())
-                )
-                .with(
-                        YesNo.of("autoCreateIfNotPredefined")
-                                .label("Auto creation if not predefined")
-                                .help("If set, allows validation stamps to be created automatically, even if not predefined version is present.")
-                                .value(value != null && value.isAutoCreateIfNotPredefined())
-                )
-                ;
-    }
-
-    @Override
     public AutoValidationStampProperty fromClient(JsonNode node) {
         return fromStorage(node);
     }
@@ -118,7 +99,7 @@ public class AutoValidationStampPropertyType extends AbstractPropertyType<AutoVa
     }
 
     @Override
-    public AutoValidationStampProperty replaceValue(AutoValidationStampProperty value, Function<String, String> replacementFunction) {
+    public AutoValidationStampProperty replaceValue(@NotNull AutoValidationStampProperty value, Function<String, String> replacementFunction) {
         return value;
     }
 }

@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.general.GeneralExtensionFeature
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.toJson
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.YesNo
 import net.nemerosa.ontrack.model.structure.AbstractValidationDataType
 import net.nemerosa.ontrack.model.structure.MetricsColors
 import net.nemerosa.ontrack.model.structure.NumericValidationDataType
@@ -28,29 +26,6 @@ class TestSummaryValidationDataType(
 
     override fun fromJson(node: JsonNode): TestSummaryValidationData? = node.parse()
 
-    override fun getForm(data: TestSummaryValidationData?): Form = Form.create()
-            .with(net.nemerosa.ontrack.model.form.Int
-                    .of("passed")
-                    .label("Passed")
-                    .help("Count of passed tests")
-                    .value(data?.passed)
-                    .min(0)
-            )
-            .with(net.nemerosa.ontrack.model.form.Int
-                    .of("skipped")
-                    .label("Skipped")
-                    .help("Count of skipped tests")
-                    .value(data?.skipped)
-                    .min(0)
-            )
-            .with(net.nemerosa.ontrack.model.form.Int
-                    .of("failed")
-                    .label("Failed")
-                    .help("Count of failed tests")
-                    .value(data?.failed)
-                    .min(0)
-            )
-
     override fun fromForm(node: JsonNode?): TestSummaryValidationData? =
             node?.parse()
 
@@ -68,13 +43,6 @@ class TestSummaryValidationDataType(
 
     override fun configFromJson(node: JsonNode?): TestSummaryValidationConfig? =
             node?.parse()
-
-    override fun getConfigForm(config: TestSummaryValidationConfig?): Form = Form.create()
-            .with(
-                    YesNo.of("warningIfSkipped")
-                            .label("Warning if skipped")
-                            .help("If set to Yes, the status is set to warning if there is at least one skipped test.")
-            )
 
     override fun configToFormJson(config: TestSummaryValidationConfig?): JsonNode? =
             config?.toJson()

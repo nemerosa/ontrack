@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.IntNode
 import com.fasterxml.jackson.databind.node.NullNode
 import net.nemerosa.ontrack.json.toJson
-import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.structure.AbstractValidationDataType
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.springframework.stereotype.Component
@@ -26,14 +25,6 @@ class NOPValidationDataType(
     override fun configToJson(config: Int?): JsonNode =
             config?.let { IntNode(it) } ?: NullNode.instance
 
-    override fun getConfigForm(config: Int?): Form = Form.create()
-            .with(net.nemerosa.ontrack.model.form.Int
-                    .of("threshold")
-                    .label("Threshold")
-                    .value(config)
-                    .optional()
-            )
-
     override fun configToFormJson(config: Int?): JsonNode? {
         return config?.let { mapOf("threshold" to it).toJson() }
     }
@@ -53,14 +44,6 @@ class NOPValidationDataType(
                 is IntNode -> node.asInt()
                 else -> null
             }
-
-    override fun getForm(data: Int?): Form = Form.create()
-            .with(net.nemerosa.ontrack.model.form.Int
-                    .of("value")
-                    .label("Value")
-                    .value(data)
-                    .optional()
-            )
 
     override fun fromForm(node: JsonNode?): Int? {
         return if (node?.has("value") == true) {

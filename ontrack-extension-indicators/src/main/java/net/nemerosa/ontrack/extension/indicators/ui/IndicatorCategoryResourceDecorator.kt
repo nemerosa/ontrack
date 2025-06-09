@@ -9,13 +9,6 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 @Component
 class IndicatorCategoryResourceDecorator : AbstractLinkResourceDecorator<IndicatorCategory>(IndicatorCategory::class.java) {
     override fun getLinkDefinitions(): Iterable<LinkDefinition<IndicatorCategory>> = listOf(
-
-            Link.UPDATE linkTo { t: IndicatorCategory ->
-                on(IndicatorCategoryController::class.java).getUpdateForm(t.id)
-            } linkIf { t: IndicatorCategory, rc: ResourceContext ->
-                t.source == null && rc.isGlobalFunctionGranted(IndicatorTypeManagement::class.java)
-            },
-
             Link.DELETE linkTo { t: IndicatorCategory ->
                 on(IndicatorCategoryController::class.java).deleteCategory(t.id)
             } linkIf { t: IndicatorCategory, rc: ResourceContext ->

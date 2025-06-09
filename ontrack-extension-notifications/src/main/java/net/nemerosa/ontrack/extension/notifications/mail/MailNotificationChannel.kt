@@ -13,8 +13,6 @@ import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.HtmlNotificationEventRenderer
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.textField
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.core.env.Environment
@@ -59,11 +57,6 @@ class MailNotificationChannel(
         mapOf(
             MailNotificationChannelConfig::subject.name to text
         ).asJson()
-
-    override fun getForm(c: MailNotificationChannelConfig?): Form = Form.create()
-        .textField(MailNotificationChannelConfig::to, c?.to)
-        .textField(MailNotificationChannelConfig::cc, c?.cc)
-        .textField(MailNotificationChannelConfig::subject, c?.subject)
 
     override fun toText(config: MailNotificationChannelConfig): String = config.subject
 

@@ -12,8 +12,6 @@ import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.exceptions.BranchNotFoundException
 import net.nemerosa.ontrack.model.exceptions.BuildNotFoundException
 import net.nemerosa.ontrack.model.exceptions.ProjectNotFoundException
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.textField
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
@@ -147,14 +145,6 @@ class OntrackValidationNotificationChannel(
 
     @Deprecated("Will be removed in V5. Only Next UI is used.")
     override fun toText(config: OntrackValidationNotificationChannelConfig): String = config.validation
-
-    @Deprecated("Will be removed in V5. Only Next UI is used.")
-    override fun getForm(c: OntrackValidationNotificationChannelConfig?): Form =
-        Form.create()
-            .textField(OntrackValidationNotificationChannelConfig::project, c?.project)
-            .textField(OntrackValidationNotificationChannelConfig::branch, c?.branch)
-            .textField(OntrackValidationNotificationChannelConfig::build, c?.build)
-            .textField(OntrackValidationNotificationChannelConfig::validation, c?.validation)
 
     override val type: String = "ontrack-validation"
     override val displayName: String = "Ontrack validation"

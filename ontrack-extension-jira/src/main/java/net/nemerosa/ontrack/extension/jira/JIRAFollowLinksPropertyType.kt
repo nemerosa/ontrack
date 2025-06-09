@@ -2,15 +2,10 @@ package net.nemerosa.ontrack.extension.jira
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Form.Companion.create
-import net.nemerosa.ontrack.model.form.MultiStrings
-import net.nemerosa.ontrack.model.form.multiStrings
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import java.util.*
 import java.util.function.Function
@@ -35,11 +30,6 @@ class JIRAFollowLinksPropertyType(
     }
 
     override fun canView(entity: ProjectEntity, securityService: SecurityService): Boolean = true
-
-    override fun getEditionForm(entity: ProjectEntity, value: JIRAFollowLinksProperty?): Form {
-        return create()
-            .multiStrings(JIRAFollowLinksProperty::linkNames, value?.linkNames)
-    }
 
     override fun forStorage(value: JIRAFollowLinksProperty): JsonNode {
         return format(value)

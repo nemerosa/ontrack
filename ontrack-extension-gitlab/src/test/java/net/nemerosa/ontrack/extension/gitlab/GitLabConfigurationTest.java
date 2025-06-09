@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.gitlab;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import net.nemerosa.ontrack.extension.gitlab.model.GitLabConfiguration;
-import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import org.junit.jupiter.api.Test;
 
@@ -10,7 +9,6 @@ import static net.nemerosa.ontrack.json.JsonUtils.object;
 import static net.nemerosa.ontrack.test.TestUtils.assertJsonRead;
 import static net.nemerosa.ontrack.test.TestUtils.assertJsonWrite;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 public class GitLabConfigurationTest {
 
@@ -54,18 +52,6 @@ public class GitLabConfigurationTest {
     public void obfuscate() {
         GitLabConfiguration obfuscate = configurationFixture().obfuscate();
         assertEquals("", obfuscate.getPassword());
-    }
-
-    @Test
-    public void form() {
-        Form form = configurationFixture().asForm();
-        assertEquals(5, form.getFields().size());
-        assertEquals("ontrack", form.getField("name").getValue());
-        assertEquals("https://gitlab.nemerosa.net", form.getField("url").getValue());
-        assertEquals("test", form.getField("user").getValue());
-        assertEquals(Boolean.FALSE, form.getField("ignoreSslCertificate").getValue());
-        // Obfuscated token
-        assertNull(form.getField("password").getValue());
     }
 
     @Test

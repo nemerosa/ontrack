@@ -5,12 +5,10 @@ import net.nemerosa.ontrack.extension.stash.service.StashConfigurationService;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
-import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.GlobalSettings;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import net.nemerosa.ontrack.model.support.ConnectionResult;
-import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +53,6 @@ public class StashController extends AbstractExtensionController<StashExtensionF
                 configurationService.getConfigurations(),
                 uri(on(getClass()).getConfigurations())
         )
-                .with(Link.CREATE, uri(on(getClass()).getConfigurationForm()))
                 .with("_test", uri(on(getClass()).testConfiguration(null)), securityService.isGlobalFunctionGranted(GlobalSettings.class))
                 ;
     }
@@ -77,14 +74,6 @@ public class StashController extends AbstractExtensionController<StashExtensionF
                 configurationService.getConfigurationDescriptors(),
                 uri(on(getClass()).getConfigurationsDescriptors())
         );
-    }
-
-    /**
-     * Form for a configuration
-     */
-    @RequestMapping(value = "configurations/create", method = RequestMethod.GET)
-    public Form getConfigurationForm() {
-        return StashConfiguration.Companion.form();
     }
 
     /**
@@ -111,14 +100,6 @@ public class StashController extends AbstractExtensionController<StashExtensionF
     public Ack deleteConfiguration(@PathVariable String name) {
         configurationService.deleteConfiguration(name);
         return Ack.OK;
-    }
-
-    /**
-     * Update form
-     */
-    @RequestMapping(value = "configurations/{name:.*}/update", method = RequestMethod.GET)
-    public Form updateConfigurationForm(@PathVariable String name) {
-        return configurationService.getConfiguration(name).asForm();
     }
 
     /**

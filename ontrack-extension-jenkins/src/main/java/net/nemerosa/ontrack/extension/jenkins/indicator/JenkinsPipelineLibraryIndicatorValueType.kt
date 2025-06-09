@@ -12,8 +12,6 @@ import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getBooleanField
 import net.nemerosa.ontrack.json.getTextField
 import net.nemerosa.ontrack.json.parse
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Text
 import org.springframework.stereotype.Component
 
 /**
@@ -43,17 +41,6 @@ class JenkinsPipelineLibraryIndicatorValueType(
     IndicatorValueType<JenkinsPipelineLibraryVersion?, JenkinsPipelineLibraryIndicatorValueTypeConfig> {
 
     override val name: String = "Jenkins pipeline library"
-
-    override fun form(
-        config: JenkinsPipelineLibraryIndicatorValueTypeConfig,
-        value: JenkinsPipelineLibraryVersion?,
-    ): Form = Form.create()
-        .with(
-            Text.of("version")
-                .optional()
-                .label("Version")
-                .value(value?.value)
-        )
 
     override fun status(
         config: JenkinsPipelineLibraryIndicatorValueTypeConfig,
@@ -93,9 +80,6 @@ class JenkinsPipelineLibraryIndicatorValueType(
         config: JenkinsPipelineLibraryIndicatorValueTypeConfig,
         value: JenkinsPipelineLibraryVersion?,
     ): JsonNode = value?.let { TextNode.valueOf(it.value) } ?: NullNode.instance
-
-    override fun configForm(config: JenkinsPipelineLibraryIndicatorValueTypeConfig?): Form =
-        JenkinsPipelineLibraryIndicatorLibrarySettings.getForm(config?.settings)
 
     override fun toConfigForm(config: JenkinsPipelineLibraryIndicatorValueTypeConfig): JsonNode =
         config.settings.asJson()

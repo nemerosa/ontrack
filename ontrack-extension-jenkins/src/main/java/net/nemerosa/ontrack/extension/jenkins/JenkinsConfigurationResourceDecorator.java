@@ -28,7 +28,6 @@ public class JenkinsConfigurationResourceDecorator extends AbstractResourceDecor
     public List<Link> links(JenkinsConfiguration configuration, ResourceContext resourceContext) {
         return resourceContext.links()
                 .self(on(JenkinsController.class).getConfiguration(configuration.getName()))
-                .link(Link.UPDATE, on(JenkinsController.class).updateConfigurationForm(configuration.getName()))
                 .link(Link.DELETE, on(JenkinsController.class).deleteConfiguration(configuration.getName()))
                 .build();
     }

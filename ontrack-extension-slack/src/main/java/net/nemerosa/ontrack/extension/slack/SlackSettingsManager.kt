@@ -1,9 +1,5 @@
 package net.nemerosa.ontrack.extension.slack
 
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.passwordField
-import net.nemerosa.ontrack.model.form.textField
-import net.nemerosa.ontrack.model.form.yesNoField
 import net.nemerosa.ontrack.model.security.EncryptionService
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.AbstractSettingsManager
@@ -35,12 +31,6 @@ class SlackSettingsManager(
         settingsRepository.setString<SlackSettings>(settings::emoji)
         settingsRepository.setString<SlackSettings>(settings::endpoint)
     }
-
-    override fun getSettingsForm(settings: SlackSettings): Form = Form.create()
-        .yesNoField(SlackSettings::enabled, settings.enabled)
-        .passwordField(SlackSettings::token)
-        .textField(SlackSettings::emoji, settings.emoji)
-        .textField(SlackSettings::endpoint, settings.endpoint)
 
     override fun getId(): String = "slack"
 

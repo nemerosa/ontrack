@@ -2,12 +2,11 @@ package net.nemerosa.ontrack.extension.jenkins;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.common.MapBuilder;
-import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.structure.ProjectEntityType;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -60,18 +59,6 @@ public class JenkinsJobPropertyType extends AbstractJenkinsPropertyType<JenkinsJ
     }
 
     @Override
-    public Form getEditionForm(ProjectEntity entity, JenkinsJobProperty value) {
-        return super.getEditionForm(entity, value)
-                .with(
-                        Text.of("job")
-                                .label("Job name")
-                                .length(120)
-                                .help("Name of Jenkins Job")
-                                .value(value != null ? value.getJob() : null)
-                );
-    }
-
-    @Override
     public JsonNode forStorage(JenkinsJobProperty value) {
         return format(
                 MapBuilder.params()
@@ -102,7 +89,7 @@ public class JenkinsJobPropertyType extends AbstractJenkinsPropertyType<JenkinsJ
     }
 
     @Override
-    public JenkinsJobProperty replaceValue(JenkinsJobProperty value, Function<String, String> replacementFunction) {
+    public JenkinsJobProperty replaceValue(@NotNull JenkinsJobProperty value, Function<String, String> replacementFunction) {
         return new JenkinsJobProperty(
                 replaceConfiguration(value.getConfiguration(), replacementFunction),
                 replacementFunction.apply(value.getJob())

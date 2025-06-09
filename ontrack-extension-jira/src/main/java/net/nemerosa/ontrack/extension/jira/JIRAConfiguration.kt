@@ -3,11 +3,6 @@ package net.nemerosa.ontrack.extension.jira
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
 import net.nemerosa.ontrack.model.annotations.APIIgnore
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Form.Companion.defaultNameField
-import net.nemerosa.ontrack.model.form.Password
-import net.nemerosa.ontrack.model.form.Text
-import net.nemerosa.ontrack.model.form.multiStrings
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
 import org.apache.commons.lang3.StringUtils
@@ -64,16 +59,6 @@ open class JIRAConfiguration(
         )
     }
 
-    fun asForm(): Form {
-        return form()
-            .with(defaultNameField().readOnly().value(name))
-            .fill("url", url)
-            .fill("user", user)
-            .fill("password", "")
-            .fill("include", include)
-            .fill("exclude", exclude)
-    }
-
     override fun withPassword(password: String?): JIRAConfiguration {
         return JIRAConfiguration(
             name = name,
@@ -123,15 +108,5 @@ open class JIRAConfiguration(
 
         val ISSUE_PATTERN_REGEX = "(?:[^A-Z0-9]|^)([A-Z][A-Z0-9]+-\\d+)(?:[^0-9]|\$)".toRegex()
 
-        @JvmStatic
-        fun form(): Form {
-            return Form.create()
-                .with(defaultNameField())
-                .url()
-                .with(Text.of("user").label("User").length(16).optional())
-                .with(Password.of("password").label("Password").length(40).optional())
-                .multiStrings(JIRAConfiguration::include, null)
-                .multiStrings(JIRAConfiguration::exclude, null)
-        }
     }
 }

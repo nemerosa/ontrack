@@ -4,9 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APILabel
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.passwordField
-import net.nemerosa.ontrack.model.form.textField
 import org.springframework.stereotype.Component
 import java.net.http.HttpRequest
 
@@ -16,10 +13,6 @@ class HeaderWebhookAuthenticator : AbstractWebhookAuthenticator<HeaderWebhookAut
     override val type: String = "header"
 
     override val displayName: String = "HTTP Header authentication"
-
-    override fun getForm(config: HeaderWebhookAuthenticatorConfig?): Form = Form.create()
-        .textField(HeaderWebhookAuthenticatorConfig::name, config?.name)
-        .passwordField(HeaderWebhookAuthenticatorConfig::value)
 
     override fun validateConfig(node: JsonNode): HeaderWebhookAuthenticatorConfig = node.parse()
 

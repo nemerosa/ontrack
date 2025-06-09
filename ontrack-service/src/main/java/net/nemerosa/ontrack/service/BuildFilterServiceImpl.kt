@@ -3,8 +3,6 @@ package net.nemerosa.ontrack.service
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.buildfilter.*
-import net.nemerosa.ontrack.model.exceptions.BuildFilterNotFoundException
-import net.nemerosa.ontrack.model.exceptions.BuildFilterNotLoggedException
 import net.nemerosa.ontrack.model.security.BranchFilterMgt
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Branch
@@ -16,7 +14,6 @@ import net.nemerosa.ontrack.repository.TBuildFilter
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
-import java.util.*
 
 @Service
 @Transactional
@@ -160,11 +157,6 @@ class BuildFilterServiceImpl(
         }
     }
 
-    override fun getBuildFilterForms(branchId: ID): Collection<BuildFilterForm> {
-        return buildFilterProviders.values
-            .map { provider -> provider.newFilterForm(branchId) }
-    }
-
     override fun <T> getBuildFilterProviderData(filterType: String, parameters: JsonNode): BuildFilterProviderData<T> {
         val buildFilterProvider = getBuildFilterProviderByType<T>(filterType)
         return buildFilterProvider
@@ -212,29 +204,6 @@ class BuildFilterServiceImpl(
         } else {
             throw BuildFilterProviderDataParsingException(provider.javaClass.name)
         }
-    }
-
-    @Throws(BuildFilterNotFoundException::class)
-    override fun getEditionForm(branchId: ID, name: String): BuildFilterForm {
-        return securityService.currentUser
-            ?.account
-            ?.let { account ->
-                buildFilterRepository.findByBranchAndName(account.id(), branchId.value, name)
-            }
-            ?.let { this.getBuildFilterForm<Any>(it) }
-            ?: throw BuildFilterNotLoggedException()
-    }
-
-    private fun <T> getBuildFilterForm(t: TBuildFilter): BuildFilterForm? {
-        val provider = getBuildFilterProviderByType<T>(t.type)
-        return provider
-            ?.parse(t.data)
-            ?.let { data ->
-                provider.getFilterForm(
-                    ID.of(t.branchId),
-                    data
-                )
-            }
     }
 
     override fun saveFilter(branchId: ID, shared: Boolean, name: String, type: String, parameters: JsonNode): Ack {

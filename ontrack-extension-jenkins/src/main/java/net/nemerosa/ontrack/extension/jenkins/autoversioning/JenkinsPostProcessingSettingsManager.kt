@@ -1,8 +1,5 @@
 package net.nemerosa.ontrack.extension.jenkins.autoversioning
 
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.intField
-import net.nemerosa.ontrack.model.form.textField
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.AbstractSettingsManager
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
@@ -32,22 +29,4 @@ class JenkinsPostProcessingSettingsManager(
 
     override fun getTitle(): String = "Jenkins Auto Versioning Processing"
 
-    override fun getSettingsForm(settings: JenkinsPostProcessingSettings): Form =
-        Form.create()
-            .textField(
-                JenkinsPostProcessingSettings::config,
-                settings.config
-            )
-            .textField(
-                JenkinsPostProcessingSettings::job,
-                settings.job
-            )
-            .intField(
-                JenkinsPostProcessingSettings::retries,
-                settings.retries
-            )
-            .intField(
-                JenkinsPostProcessingSettings::retriesDelaySeconds,
-                settings.retriesDelaySeconds
-            )
 }

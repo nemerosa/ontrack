@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.model.structure
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.exceptions.PropertyTypeNotFoundException
-import net.nemerosa.ontrack.model.form.Form
 import java.util.function.BiFunction
 import java.util.function.Function
 import java.util.function.Predicate
@@ -37,17 +36,6 @@ interface PropertyService {
      * @return List of properties for this entity
      */
     fun getProperties(entity: ProjectEntity): List<Property<*>>
-
-    /**
-     * Gets the edition form for a given property for an entity. The content of the form may be filled or not,
-     * according to the fact if the property is actually set for this entity or not. If the property is not
-     * opened for edition, the call could be rejected with an authorization exception.
-     *
-     * @param entity           Entity to get the edition form for
-     * @param propertyTypeName Fully qualified name of the property to get the form for
-     * @return An edition form to be used by the client
-     */
-    fun getPropertyEditionForm(entity: ProjectEntity, propertyTypeName: String): Form
 
     /**
      * Gets the value for a given property for an entity. If the property is not set, a non-null

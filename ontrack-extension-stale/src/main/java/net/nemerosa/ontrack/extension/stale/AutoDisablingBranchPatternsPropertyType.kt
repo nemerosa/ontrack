@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.stale
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.parse
-import net.nemerosa.ontrack.model.form.*
 import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
@@ -40,17 +39,4 @@ class AutoDisablingBranchPatternsPropertyType(
         value: AutoDisablingBranchPatternsProperty,
         replacementFunction: Function<String, String?>,
     ): AutoDisablingBranchPatternsProperty = value
-
-    override fun getEditionForm(entity: ProjectEntity, value: AutoDisablingBranchPatternsProperty?): Form =
-        Form.create()
-            .multiform(
-                property = AutoDisablingBranchPatternsProperty::items,
-                items = value?.items
-            ) {
-                Form.create()
-                    .multiStrings(AutoDisablingBranchPatternsPropertyItem::includes, null)
-                    .multiStrings(AutoDisablingBranchPatternsPropertyItem::excludes, null)
-                    .enumField(AutoDisablingBranchPatternsPropertyItem::mode, null)
-                    .intField(AutoDisablingBranchPatternsPropertyItem::keepLast, null, min = 1)
-            }
 }

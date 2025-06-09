@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.indicators.model
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.model.form.Form
 
 /**
  * Definition of the type of a project indicator.
@@ -39,11 +38,6 @@ data class IndicatorType<T, C>(
     fun toStoredJson(value: T) = valueType.toStoredJson(valueConfig, value)
 
     fun toConfigClientJson(): JsonNode = valueType.toConfigClientJson(valueConfig)
-
-    fun getUpdateForm(value: T?): Form = valueType.form(
-            config = valueConfig,
-            value = value
-    )
 
     fun getStatus(value: T) = valueType.status(valueConfig, value)
 

@@ -7,10 +7,6 @@ import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData;
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
-import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.form.Replacements;
-import net.nemerosa.ontrack.model.form.Selection;
-import net.nemerosa.ontrack.model.form.Text;
 import net.nemerosa.ontrack.model.security.BranchCreate;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
@@ -71,14 +67,6 @@ public class BranchController extends AbstractResourceController {
                 ;
     }
 
-    @RequestMapping(value = "projects/{projectId}/branches/create", method = RequestMethod.GET)
-    public Form newBranchForm(@PathVariable ID projectId) {
-        // Checks the project exists
-        structureService.getProject(projectId);
-        // Returns the form
-        return Branch.form();
-    }
-
     @RequestMapping(value = "projects/{projectId}/branches/create", method = RequestMethod.POST)
     public ResponseEntity<Branch> newBranch(@PathVariable ID projectId, @RequestBody @Valid NameDescriptionState nameDescription) {
         // Gets the project
@@ -99,12 +87,6 @@ public class BranchController extends AbstractResourceController {
     @RequestMapping(value = "branches/{branchId}", method = RequestMethod.DELETE)
     public ResponseEntity<Ack> deleteBranch(@PathVariable ID branchId) {
         return ResponseEntity.ok(structureService.deleteBranch(branchId));
-    }
-
-    @RequestMapping(value = "branches/{branchId}/update", method = RequestMethod.GET)
-    public Form getUpdateForm(@PathVariable ID branchId) {
-        // Loads the branch and gets a form
-        return structureService.getBranch(branchId).toForm();
     }
 
     @RequestMapping(value = "branches/{branchId}/update", method = RequestMethod.PUT)
@@ -160,30 +142,6 @@ public class BranchController extends AbstractResourceController {
     }
 
     /**
-     * Gets the form to copy a source branch into this branch
-     */
-    @RequestMapping(value = "branches/{branchId}/copy", method = RequestMethod.GET)
-    public Form copy(@PathVariable ID branchId) {
-        return Form.create()
-                .with(
-                        Selection.of("sourceBranch")
-                                .label("Source branch")
-                                .help("Branch to copy configuration from")
-                                // All branches for all projects
-                                .items(structureService.getProjectList().stream()
-                                        .flatMap(project -> structureService.getBranchesForProject(project.getId()).stream())
-                                        // Keeps only the different branches
-                                        .filter(branch -> !branchId.equals(branch.getId()))
-                                        .collect(Collectors.toList()))
-                )
-                .with(
-                        Replacements.of("replacements")
-                                .label("Replacements")
-                )
-                ;
-    }
-
-    /**
      * Copies the configuration from a branch into this one.
      */
     @RequestMapping(value = "branches/{branchId}/copy", method = RequestMethod.PUT)
@@ -195,19 +153,6 @@ public class BranchController extends AbstractResourceController {
     }
 
     /**
-     * Gets the form for a bulk update of the branch
-     */
-    @RequestMapping(value = "branches/{branchId}/update/bulk", method = RequestMethod.GET)
-    public Form bulkUpdate(@SuppressWarnings("UnusedParameters") @PathVariable ID branchId) {
-        return Form.create()
-                .with(
-                        Replacements.of("replacements")
-                                .label("Replacements")
-                )
-                ;
-    }
-
-    /**
      * Bulk update for a branch.
      */
     @RequestMapping(value = "branches/{branchId}/update/bulk", method = RequestMethod.PUT)
@@ -216,24 +161,6 @@ public class BranchController extends AbstractResourceController {
         Branch branch = structureService.getBranch(branchId);
         // Performs the update
         return ResponseEntity.ok(copyService.update(branch, request));
-    }
-
-    /**
-     * Gets the form to clone this branch into another branch
-     */
-    @RequestMapping(value = "branches/{branchId}/clone", method = RequestMethod.GET)
-    public Form clone(@SuppressWarnings("UnusedParameters") @PathVariable ID branchId) {
-        return Form.create()
-                .with(
-                        Text.of("name")
-                                .label("Target branch")
-                                .help("Name of the branch to create")
-                )
-                .with(
-                        Replacements.of("replacements")
-                                .label("Replacements")
-                )
-                ;
     }
 
     /**

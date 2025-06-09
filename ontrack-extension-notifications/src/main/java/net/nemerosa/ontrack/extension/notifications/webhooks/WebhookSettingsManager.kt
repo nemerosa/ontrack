@@ -1,8 +1,5 @@
 package net.nemerosa.ontrack.extension.notifications.webhooks
 
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.intField
-import net.nemerosa.ontrack.model.form.yesNoField
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.AbstractSettingsManager
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
@@ -26,11 +23,6 @@ class WebhookSettingsManager(
         settingsRepository.setInt<WebhookSettings>(settings::timeoutMinutes)
         settingsRepository.setInt<WebhookSettings>(settings::deliveriesRetentionDays)
     }
-
-    override fun getSettingsForm(settings: WebhookSettings): Form = Form.create()
-        .yesNoField(WebhookSettings::enabled, settings.enabled)
-        .intField(WebhookSettings::timeoutMinutes, settings.timeoutMinutes)
-        .intField(WebhookSettings::deliveriesRetentionDays, settings.deliveriesRetentionDays)
 
     override fun getId(): String = "webhooks"
 

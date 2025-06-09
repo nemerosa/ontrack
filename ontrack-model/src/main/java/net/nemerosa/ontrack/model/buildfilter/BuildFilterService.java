@@ -2,8 +2,6 @@ package net.nemerosa.ontrack.model.buildfilter;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.model.Ack;
-import net.nemerosa.ontrack.model.exceptions.BuildFilterNotFoundException;
-import net.nemerosa.ontrack.model.exceptions.BuildFilterNotLoggedException;
 import net.nemerosa.ontrack.model.structure.Branch;
 import net.nemerosa.ontrack.model.structure.ID;
 import org.jetbrains.annotations.Nullable;
@@ -44,14 +42,6 @@ public interface BuildFilterService {
     Collection<BuildFilterResource<?>> getBuildFilters(ID branchId);
 
     /**
-     * Gets the list of forms to create new filters
-     *
-     * @param branchId Branch to get the forms for
-     * @return List of forms
-     */
-    Collection<BuildFilterForm> getBuildFilterForms(ID branchId);
-
-    /**
      * Gets a build filter provider for the given type.
      *
      * @param filterType Qualified type for the filter
@@ -83,17 +73,6 @@ public interface BuildFilterService {
      */
     @Nullable
     String validateBuildFilterProviderData(Branch branch, String filterType, JsonNode parameters);
-
-    /**
-     * Gets the form to edit an existing filter.
-     *
-     * @param branchId Branch to get the form on
-     * @param name     name of the filter on the branch
-     * @return An edition form
-     * @throws BuildFilterNotFoundException  If the filter is not defined
-     * @throws BuildFilterNotLoggedException If the user is not logged
-     */
-    BuildFilterForm getEditionForm(ID branchId, String name) throws BuildFilterNotFoundException, BuildFilterNotLoggedException;
 
     /**
      * Saves a filter for a branch. This method does nothing if the user is not logged,

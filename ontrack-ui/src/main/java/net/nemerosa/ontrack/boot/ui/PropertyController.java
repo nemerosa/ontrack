@@ -2,9 +2,7 @@ package net.nemerosa.ontrack.boot.ui;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.model.Ack;
-import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.structure.*;
-import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.Resource;
 import net.nemerosa.ontrack.ui.resource.Resources;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,16 +42,12 @@ public class PropertyController extends AbstractProjectEntityController {
         List<Property<?>> properties = propertyService.getProperties(entity);
         List<Resource<Property<?>>> resources = new ArrayList<>();
         for (Property<?> property : properties) {
-            Resource<Property<?>> resource = Resource.of(
-                    property,
-                    uri(on(getClass()).getPropertyValue(entity.getProjectEntityType(), entity.getId(), property.getType().getClass().getName()))
+            resources.add(
+                    Resource.of(
+                            property,
+                            uri(on(getClass()).getPropertyValue(entity.getProjectEntityType(), entity.getId(), property.getType().getClass().getName()))
+                    )
             );
-            // Update
-            resource = resource.with(
-                    Link.UPDATE,
-                    uri(on(getClass()).getPropertyEditionForm(entity.getProjectEntityType(), entity.getId(), property.getType().getClass().getName())));
-            // OK
-            resources.add(resource);
         }
         return Resources.of(
                 resources,
@@ -78,24 +72,6 @@ public class PropertyController extends AbstractProjectEntityController {
         return Resource.of(
                 propertyService.getProperty(getEntity(entityType, id), propertyTypeName),
                 uri(on(getClass()).getPropertyValue(entityType, id, propertyTypeName))
-        );
-    }
-
-    /**
-     * Gets the edition form for a given property for an entity. The content of the form may be filled or not,
-     * according to the fact if the property is actually set for this entity or not. If the property is not
-     * opened for edition, the call could be rejected with an authorization exception.
-     *
-     * @param entityType       Type of the entity to get the edition form for
-     * @param id               ID of the entity to get the edition form for
-     * @param propertyTypeName Fully qualified name of the property to get the form for
-     * @return An edition form to be used by the client
-     */
-    @RequestMapping(value = "{entityType}/{id}/{propertyTypeName}/edit", method = RequestMethod.GET)
-    public Form getPropertyEditionForm(@PathVariable ProjectEntityType entityType, @PathVariable ID id, @PathVariable String propertyTypeName) {
-        return propertyService.getPropertyEditionForm(
-                getEntity(entityType, id),
-                propertyTypeName
         );
     }
 

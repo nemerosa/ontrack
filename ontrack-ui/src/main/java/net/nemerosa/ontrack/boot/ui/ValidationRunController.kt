@@ -2,9 +2,6 @@ package net.nemerosa.ontrack.boot.ui
 
 import net.nemerosa.ontrack.json.JsonParseException
 import net.nemerosa.ontrack.model.exceptions.ValidationRunDataJSONInputException
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Selection
-import net.nemerosa.ontrack.model.form.ServiceConfigurator
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
@@ -50,40 +47,7 @@ constructor(
         ).forView(Build::class.java)
     }
 
-    @GetMapping("builds/{buildId}/validationRuns/create")
-    fun newValidationRunForm(@PathVariable buildId: ID): Form {
-        val build = structureService.getBuild(buildId)
-        return Form.create()
-                .with(
-                        ServiceConfigurator.of("validationStampData")
-                                .label("Validation stamp")
-                                .sources(
-                                        structureService.getValidationStampListForBranch(build.branch.id)
-                                                .map {
-                                                    ServiceConfigurationSource(
-                                                            it.name,
-                                                            it.name,
-                                                            it.dataType?.let { dataType ->
-                                                                validationDataTypeService
-                                                                        .getValidationDataType<Any, Any>(dataType.descriptor.id)
-                                                                        ?.getForm(null)
-                                                            } ?: Form.create()
-                                                    )
-                                                }
-                                )
-                )
-                .with(
-                        Selection.of("validationRunStatusId")
-                                .label("Status")
-                                .optional()
-                                .items(validationRunStatusService.validationRunStatusRoots)
-                )
-                .description()
-    }
-
     /**
-     * See [newValidationRunForm] to get the mapping from the form.
-     *
      * Note that some properties, like the `type` of data are provided only when using the DSL
      * or the raw REST API, never through the GUI.
      */
@@ -138,20 +102,6 @@ constructor(
             structureService.getValidationRun(validationRunId)
 
     // Validation run status
-
-    @GetMapping("validationRuns/{validationRunId}/status/change")
-    fun getValidationRunStatusChangeForm(@PathVariable validationRunId: ID): Form {
-        val validationRun = structureService.getValidationRun(validationRunId)
-        return Form.create()
-                .with(
-                        Selection.of("validationRunStatusId")
-                                .label("Status")
-                                .items(
-                                        validationRunStatusService.getNextValidationRunStatusList(validationRun.lastStatus.statusID.id)
-                                )
-                )
-                .description()
-    }
 
     @PostMapping("validationRuns/{validationRunId}/status/change")
     @ResponseStatus(HttpStatus.CREATED)

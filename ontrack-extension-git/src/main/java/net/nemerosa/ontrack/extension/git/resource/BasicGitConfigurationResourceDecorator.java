@@ -2,12 +2,9 @@ package net.nemerosa.ontrack.extension.git.resource;
 
 import net.nemerosa.ontrack.extension.git.GitController;
 import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration;
-import net.nemerosa.ontrack.model.security.GlobalSettings;
-import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.ui.resource.AbstractResourceDecorator;
 import net.nemerosa.ontrack.ui.resource.Link;
 import net.nemerosa.ontrack.ui.resource.ResourceContext;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -17,12 +14,8 @@ import static org.springframework.web.servlet.mvc.method.annotation.MvcUriCompon
 @Component
 public class BasicGitConfigurationResourceDecorator extends AbstractResourceDecorator<BasicGitConfiguration> {
 
-    private final SecurityService securityService;
-
-    @Autowired
-    public BasicGitConfigurationResourceDecorator(SecurityService securityService) {
+    public BasicGitConfigurationResourceDecorator() {
         super(BasicGitConfiguration.class);
-        this.securityService = securityService;
     }
 
     /**
@@ -35,10 +28,8 @@ public class BasicGitConfigurationResourceDecorator extends AbstractResourceDeco
 
     @Override
     public List<Link> links(BasicGitConfiguration configuration, ResourceContext resourceContext) {
-        boolean globalSettingsGranted = securityService.isGlobalFunctionGranted(GlobalSettings.class);
         return resourceContext.links()
                 .self(on(GitController.class).getConfiguration(configuration.getName()))
-                .link(Link.UPDATE, on(GitController.class).updateConfigurationForm(configuration.getName()))
                 .link(Link.DELETE, on(GitController.class).deleteConfiguration(configuration.getName()))
                         // OK
                 .build();

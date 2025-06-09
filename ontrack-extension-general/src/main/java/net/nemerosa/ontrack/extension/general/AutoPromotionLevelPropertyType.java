@@ -3,12 +3,11 @@ package net.nemerosa.ontrack.extension.general;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
 import net.nemerosa.ontrack.model.extension.PromotionLevelPropertyType;
-import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.form.YesNo;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService;
 import net.nemerosa.ontrack.model.structure.*;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -83,18 +82,6 @@ public class AutoPromotionLevelPropertyType extends AbstractPropertyType<AutoPro
     }
 
     @Override
-    public Form getEditionForm(ProjectEntity entity, AutoPromotionLevelProperty value) {
-        return Form.create()
-                .with(
-                        YesNo.of("autoCreate")
-                                .label("Auto creation")
-                                .help("If set, allows promotion levels to be created automatically")
-                                .value(value != null && value.isAutoCreate())
-                )
-                ;
-    }
-
-    @Override
     public AutoPromotionLevelProperty fromClient(JsonNode node) {
         return fromStorage(node);
     }
@@ -105,7 +92,7 @@ public class AutoPromotionLevelPropertyType extends AbstractPropertyType<AutoPro
     }
 
     @Override
-    public AutoPromotionLevelProperty replaceValue(AutoPromotionLevelProperty value, Function<String, String> replacementFunction) {
+    public AutoPromotionLevelProperty replaceValue(@NotNull AutoPromotionLevelProperty value, Function<String, String> replacementFunction) {
         return value;
     }
 }

@@ -4,9 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.av.AutoVersioningExtensionFeature
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.parse
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.dateTime
-import net.nemerosa.ontrack.model.form.multiStrings
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
@@ -40,9 +37,4 @@ class AutoVersioningProjectPropertyType(
         replacementFunction: Function<String, String>
     ): AutoVersioningProjectProperty = value
 
-    override fun getEditionForm(entity: ProjectEntity, value: AutoVersioningProjectProperty?): Form =
-        Form.create()
-            .multiStrings(AutoVersioningProjectProperty::branchIncludes, value?.branchIncludes)
-            .multiStrings(AutoVersioningProjectProperty::branchExcludes, value?.branchExcludes)
-            .dateTime(AutoVersioningProjectProperty::lastActivityDate, value?.lastActivityDate)
 }

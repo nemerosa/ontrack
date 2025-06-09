@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.extension.indicators.model.Indicator
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorService
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorTypeService
 import net.nemerosa.ontrack.model.Ack
-import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.StructureService
@@ -71,12 +70,6 @@ class ProjectIndicatorServiceImpl(
                 offset = history.offset,
                 total = history.total
         )
-    }
-
-    override fun getUpdateFormForIndicator(projectId: ID, typeId: String): Form {
-        val project = structureService.getProject(projectId)
-        val indicator = indicatorService.getProjectIndicator(project, typeId)
-        return indicator.getUpdateForm()
     }
 
     override fun updateIndicator(projectId: ID, typeId: String, input: JsonNode): ProjectIndicator {

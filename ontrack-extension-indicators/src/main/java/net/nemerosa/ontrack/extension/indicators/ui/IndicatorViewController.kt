@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.indicators.ui
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
 import net.nemerosa.ontrack.common.Document
-import net.nemerosa.ontrack.extension.indicators.acl.IndicatorViewManagement
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorCategoryService
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorReportingFilter
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorTypeService
@@ -11,11 +10,8 @@ import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorView
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorViewIDNotFoundException
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorViewService
 import net.nemerosa.ontrack.model.Ack
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
-import net.nemerosa.ontrack.ui.resource.Link
 import net.nemerosa.ontrack.ui.resource.Resource
 import net.nemerosa.ontrack.ui.resource.Resources
 import org.springframework.http.ResponseEntity
@@ -43,17 +39,7 @@ class IndicatorViewController(
         Resources.of(
             indicatorViewService.getIndicatorViews(),
             uri(on(this::class.java).findAll())
-        ).with(
-            Link.CREATE,
-            uri(on(this::class.java).getCreationForm()),
-            securityService.isGlobalFunctionGranted(IndicatorViewManagement::class.java)
         )
-
-    /**
-     * Gets the creation form for a view
-     */
-    @GetMapping("create")
-    fun getCreationForm(): Form = getViewForm()
 
     @PostMapping("create")
     fun create(@RequestBody @Valid input: IndicatorViewForm): Resource<IndicatorView> =
@@ -73,12 +59,6 @@ class IndicatorViewController(
             indicatorViewService.findIndicatorViewById(id) ?: throw IndicatorViewIDNotFoundException(id),
             uri(on(this::class.java).getViewById(id))
         )
-
-    @GetMapping("{id}/update")
-    fun getUpdateForm(@PathVariable id: String): Form {
-        val view = indicatorViewService.findIndicatorViewById(id) ?: throw IndicatorViewIDNotFoundException(id)
-        return getViewForm(view)
-    }
 
     @PutMapping("{id}/update")
     fun update(
@@ -123,16 +103,6 @@ class IndicatorViewController(
         response.addHeader("Content-Disposition", "attachment; filename=ontrack-indicator-view-$id.csv")
         // Export as CSV
         return csv
-    }
-
-    private fun getViewForm(view: IndicatorView? = null): Form {
-        return Form.create()
-            .with(
-                Text.of(IndicatorView::name.name)
-                    .label("Name")
-                    .help("Unique name of the view")
-                    .value(view?.name)
-            )
     }
 
     class IndicatorViewForm(

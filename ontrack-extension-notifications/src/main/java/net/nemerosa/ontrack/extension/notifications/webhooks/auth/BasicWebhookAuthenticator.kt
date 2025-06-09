@@ -4,9 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APILabel
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.passwordField
-import net.nemerosa.ontrack.model.form.textField
 import org.springframework.stereotype.Component
 import java.net.http.HttpRequest
 import java.util.*
@@ -19,10 +16,6 @@ class BasicWebhookAuthenticator : AbstractWebhookAuthenticator<BasicWebhookAuthe
     override val displayName: String = "Basic authentication"
 
     override fun validateConfig(node: JsonNode): BasicWebhookAuthenticatorConfig = node.parse()
-
-    override fun getForm(config: BasicWebhookAuthenticatorConfig?): Form = Form.create()
-        .textField(BasicWebhookAuthenticatorConfig::username, config?.username)
-        .passwordField(BasicWebhookAuthenticatorConfig::password)
 
     override fun authenticate(config: BasicWebhookAuthenticatorConfig, builder: HttpRequest.Builder) {
         val encoded = Base64.getEncoder().encodeToString(

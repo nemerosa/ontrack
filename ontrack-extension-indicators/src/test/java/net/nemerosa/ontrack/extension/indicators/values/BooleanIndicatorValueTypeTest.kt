@@ -9,7 +9,6 @@ import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 
 class BooleanIndicatorValueTypeTest {
 
@@ -21,29 +20,6 @@ class BooleanIndicatorValueTypeTest {
         assertEquals(IndicatorCompliance.HIGHEST, type.status(BooleanIndicatorValueTypeConfig(false), true))
         assertEquals(IndicatorCompliance.LOWEST, type.status(BooleanIndicatorValueTypeConfig(true), false))
         assertEquals(IndicatorCompliance.HIGHEST, type.status(BooleanIndicatorValueTypeConfig(true), true))
-    }
-
-    @Test
-    fun form() {
-
-        fun assertForm(required: Boolean, value: Boolean?, expectedValue: String?) {
-            val form = type.form(
-                    BooleanIndicatorValueTypeConfig(required),
-                    value
-            )
-            assertNotNull(form.getField("value")) {
-                assertEquals("Value", it.label)
-                assertEquals(expectedValue, it.value)
-            }
-        }
-
-        assertForm(required = false, value = null, expectedValue = "")
-        assertForm(required = false, value = false, expectedValue = "false")
-        assertForm(required = false, value = true, expectedValue = "true")
-        assertForm(required = true, value = null, expectedValue = "")
-        assertForm(required = true, value = false, expectedValue = "false")
-        assertForm(required = true, value = true, expectedValue = "true")
-
     }
 
     @Test
@@ -115,23 +91,6 @@ class BooleanIndicatorValueTypeTest {
 
         assertStoredJson(false, BooleanNode.FALSE)
         assertStoredJson(true, BooleanNode.TRUE)
-
-    }
-
-    @Test
-    fun configForm() {
-
-        fun assertForm(config: BooleanIndicatorValueTypeConfig?, expectedValue: Boolean) {
-            val form = type.configForm(config)
-            assertNotNull(form.getField("required")) {
-                assertEquals("Required", it.label)
-                assertEquals(expectedValue, it.value)
-            }
-        }
-
-        assertForm(null, expectedValue = true)
-        assertForm(BooleanIndicatorValueTypeConfig(true), expectedValue = true)
-        assertForm(BooleanIndicatorValueTypeConfig(false), expectedValue = false)
 
     }
 

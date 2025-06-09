@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.json.ObjectMapperFactory
 import net.nemerosa.ontrack.model.Ack
-import net.nemerosa.ontrack.model.form.DescribedForm
 import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.SettingsManager
@@ -12,7 +11,6 @@ import net.nemerosa.ontrack.model.settings.SettingsManagerNotFoundException
 import net.nemerosa.ontrack.model.settings.SettingsValidationException
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import net.nemerosa.ontrack.ui.resource.Resource
-import net.nemerosa.ontrack.ui.resource.Resources
 import org.apache.commons.lang3.StringUtils
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -29,22 +27,6 @@ class SettingsController(
 ) : AbstractResourceController() {
 
     private val objectMapper = ObjectMapperFactory.create()
-
-    /**
-     * List of forms to configure.
-     */
-    @GetMapping("")
-    fun configuration(): Resources<DescribedForm> {
-        securityService.checkGlobalFunction(GlobalSettings::class.java)
-        val forms = settingsManagers
-                .sortedBy { it.title }
-                .map { this.getSettingsForm(it) }
-        // OK
-        return Resources.of(
-                forms,
-                uri(on(javaClass).configuration())
-        )
-    }
 
     /**
      * Gets settings
@@ -106,15 +88,6 @@ class SettingsController(
 
     private fun getSettingsManagerName(settingsManager: SettingsManager<*>): String {
         return settingsManager.id
-    }
-
-    private fun <T> getSettingsForm(settingsManager: SettingsManager<T>): DescribedForm {
-        return DescribedForm.create(
-                getSettingsManagerName(settingsManager),
-                settingsManager.settingsForm
-        )
-                .title(settingsManager.title)
-                .uri(uri(on(javaClass).updateSettings<Any>(getSettingsManagerName(settingsManager), null)))
     }
 
 }

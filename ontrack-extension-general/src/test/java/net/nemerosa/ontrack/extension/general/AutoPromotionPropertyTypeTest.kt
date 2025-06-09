@@ -4,7 +4,6 @@ import io.mockk.every
 import io.mockk.mockk
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.model.form.MultiSelection
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import org.junit.jupiter.api.BeforeEach
@@ -44,26 +43,6 @@ class AutoPromotionPropertyTypeTest {
             GeneralExtensionFeature(),
             structureService
         )
-    }
-
-    @Test
-    fun `Edition form`() {
-
-        every {
-            structureService.getValidationStampListForBranch(branch.id)
-        } returns listOf(validationStamp1, validationStamp2)
-
-        every {
-            structureService.getPromotionLevelListForBranch(branch.id)
-        } returns emptyList()
-
-        val form = type.getEditionForm(
-            promotionLevel,
-            AutoPromotionProperty(listOf(validationStamp1), "", "", emptyList())
-        )
-        val field = form.getField("validationStamps") as MultiSelection
-        assertEquals(listOf("VS1", "VS2"), field.items.map { it.name })
-        assertEquals(listOf(true, false), field.items.map { it.isSelected })
     }
 
     @Test

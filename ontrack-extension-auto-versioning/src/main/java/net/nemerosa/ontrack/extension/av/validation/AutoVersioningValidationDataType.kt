@@ -5,9 +5,6 @@ import com.fasterxml.jackson.databind.node.NullNode
 import net.nemerosa.ontrack.extension.av.AutoVersioningExtensionFeature
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parse
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Int
-import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.structure.AbstractValidationDataType
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.springframework.stereotype.Component
@@ -44,25 +41,6 @@ class AutoVersioningValidationDataType(
         path = node["path"].textValue(),
         time = node["time"].longValue()
     )
-
-    override fun getConfigForm(config: Any?): Form = Form.create()
-
-    override fun getForm(data: AutoVersioningValidationData?): Form = Form.create()
-        .with(
-            Text.of(AutoVersioningValidationData::project.name).label("Project").value(data?.project)
-        )
-        .with(
-            Text.of(AutoVersioningValidationData::version.name).label("Version").value(data?.version)
-        )
-        .with(
-            Text.of(AutoVersioningValidationData::latestVersion.name).label("Latest version").value(data?.latestVersion)
-        )
-        .with(
-            Text.of(AutoVersioningValidationData::path.name).label("Path").value(data?.path)
-        )
-        .with(
-            Int.of(AutoVersioningValidationData::time.name).label("Time (ms)").value(data?.time)
-        )
 
     override fun getMetrics(data: AutoVersioningValidationData): Map<String, *>? = mapOf(
         "executionTime" to data.time

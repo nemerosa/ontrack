@@ -23,7 +23,6 @@ import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.events.SerializableEventService
-import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.trigger.createTriggerData
 import org.springframework.stereotype.Component
 
@@ -148,9 +147,6 @@ class WorkflowNotificationChannel(
     override val type: String = "workflow"
     override val displayName: String = "Workflow"
     override val enabled: Boolean = true
-
-    @Deprecated("Will be removed in V5. Only Next UI is used.")
-    override fun getForm(c: WorkflowNotificationChannelConfig?): Form = Form.create()
 
     @Deprecated("Will be removed in V5. Only Next UI is used.")
     override fun toText(config: WorkflowNotificationChannelConfig): String = config.workflow.name

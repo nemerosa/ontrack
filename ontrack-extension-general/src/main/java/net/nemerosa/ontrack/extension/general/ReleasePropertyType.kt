@@ -2,8 +2,6 @@ package net.nemerosa.ontrack.extension.general
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.security.PromotionRunCreate
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
@@ -43,16 +41,6 @@ class ReleasePropertyType(
 
     override fun onPropertyDeleted(entity: ProjectEntity, oldValue: ReleaseProperty) {
         searchIndexService.deleteSearchIndex(releaseSearchExtension, ReleaseSearchItem(entity, oldValue).id)
-    }
-
-    override fun getEditionForm(entity: ProjectEntity, value: ReleaseProperty?): Form {
-        return Form.create()
-                .with(
-                        Text.of("name")
-                                .label("Release name")
-                                .length(20)
-                                .value(value?.name)
-                )
     }
 
     override fun fromClient(node: JsonNode): ReleaseProperty {

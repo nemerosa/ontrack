@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.github.GitHubExtensionFeature
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.parse
-import net.nemerosa.ontrack.model.form.*
 import net.nemerosa.ontrack.model.security.BuildConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
@@ -30,21 +29,6 @@ class BuildGitHubWorkflowRunPropertyType(
         securityService.isProjectFunctionGranted(entity, BuildConfig::class.java)
 
     override fun canView(entity: ProjectEntity, securityService: SecurityService): Boolean = true
-
-    override fun getEditionForm(entity: ProjectEntity, value: BuildGitHubWorkflowRunProperty?): Form =
-        Form.create()
-            .multiform(
-                BuildGitHubWorkflowRunProperty::workflows,
-                value?.workflows
-            ) {
-                Form.create()
-                    .longField(BuildGitHubWorkflowRun::runId, null)
-                    .urlField(BuildGitHubWorkflowRun::url, null)
-                    .textField(BuildGitHubWorkflowRun::name, null)
-                    .intField(BuildGitHubWorkflowRun::runNumber, null)
-                    .yesNoField(BuildGitHubWorkflowRun::running, null)
-                    .textField(BuildGitHubWorkflowRun::event, null)
-            }
 
     override fun fromClient(node: JsonNode): BuildGitHubWorkflowRunProperty = node.parse()
 

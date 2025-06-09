@@ -1,22 +1,19 @@
 package net.nemerosa.ontrack.boot.ui
 
-import jakarta.validation.Valid
 import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.extension.api.UserMenuExtension
 import net.nemerosa.ontrack.extension.api.UserMenuExtensionGroups
-import net.nemerosa.ontrack.model.Ack
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Form.Companion.create
-import net.nemerosa.ontrack.model.form.Password
 import net.nemerosa.ontrack.model.labels.LabelManagement
 import net.nemerosa.ontrack.model.preferences.PreferencesService
 import net.nemerosa.ontrack.model.security.*
 import net.nemerosa.ontrack.model.security.ConnectedAccount.Companion.none
 import net.nemerosa.ontrack.model.support.Action.Companion.of
-import net.nemerosa.ontrack.model.support.PasswordChange
 import net.nemerosa.ontrack.ui.controller.AbstractResourceController
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.ResponseStatus
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/rest/user")
@@ -48,27 +45,6 @@ class UserController(
     @GetMapping("logged-out")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun loggedOut() {
-    }
-
-    @GetMapping("password")
-    fun getChangePasswordForm(): Form = create()
-        .with(
-            Password.of("oldPassword")
-                .label("Old password")
-                .help(
-                    "You need your old password in order to change it. If you do not remember it, " +
-                            "you'll have to contact an administrator who can change it for you."
-                )
-        )
-        .with(
-            Password.of("newPassword")
-                .label("New password")
-                .withConfirmation()
-        )
-
-    @PostMapping("password")
-    fun changePassword(@RequestBody input: @Valid PasswordChange?): Ack {
-        return userService.changePassword(input!!)
     }
 
     // Resource assemblers

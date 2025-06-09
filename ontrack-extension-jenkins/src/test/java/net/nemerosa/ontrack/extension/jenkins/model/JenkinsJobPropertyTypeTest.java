@@ -1,12 +1,9 @@
 package net.nemerosa.ontrack.extension.jenkins.model;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.nemerosa.ontrack.extension.indicators.IndicatorsExtensionFeature;
 import net.nemerosa.ontrack.extension.jenkins.*;
 import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature;
-import net.nemerosa.ontrack.model.form.Field;
-import net.nemerosa.ontrack.model.form.Form;
 import net.nemerosa.ontrack.model.security.ProjectConfig;
 import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.*;
@@ -114,48 +111,6 @@ public class JenkinsJobPropertyTypeTest {
         JenkinsJobProperty retrieved = type.fromStorage(node);
         assertEquals(configuration.getUrl(), retrieved.getConfiguration().getUrl());
         assertEquals("MyJob", retrieved.getJob());
-    }
-
-    @Test
-    public void editionForm_for_new() {
-        Form form = type.getEditionForm(null, null);
-        assertEquals(2, form.getFields().size());
-        {
-            Field f = form.getField("configuration");
-            assertNotNull(f);
-            assertNull(f.getValue());
-        }
-        {
-            Field f = form.getField("job");
-            assertNotNull(f);
-            assertNull(f.getValue());
-        }
-    }
-
-    @Test
-    public void editionForm_for_update() {
-        JenkinsConfiguration configuration = new JenkinsConfiguration(
-                "MyConfig",
-                "http://jenkins",
-                "user",
-                "secret"
-        );
-        JenkinsJobProperty property = new JenkinsJobProperty(
-                configuration,
-                "MyJob"
-        );
-        Form form = type.getEditionForm(null, property);
-        assertEquals(2, form.getFields().size());
-        {
-            Field f = form.getField("configuration");
-            assertNotNull(f);
-            assertEquals("MyConfig", f.getValue());
-        }
-        {
-            Field f = form.getField("job");
-            assertNotNull(f);
-            assertEquals("MyJob", f.getValue());
-        }
     }
 
 }

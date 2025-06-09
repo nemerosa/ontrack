@@ -1,7 +1,5 @@
 package net.nemerosa.ontrack.extension.workflows.mgt
 
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.longField
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.settings.AbstractSettingsManager
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
@@ -27,11 +25,4 @@ class WorkflowSettingsManager(
 
     override fun getTitle(): String = "Workflows"
 
-    @Deprecated("Deprecated in Java")
-    override fun getSettingsForm(settings: WorkflowSettings?): Form =
-        Form.create()
-            .longField(
-                WorkflowSettings::retentionDuration,
-                settings?.retentionDuration
-            )
 }

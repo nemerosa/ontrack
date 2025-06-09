@@ -9,11 +9,6 @@ import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseOrNull
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Selection
-import net.nemerosa.ontrack.model.form.YesNo
-import net.nemerosa.ontrack.model.structure.Description
-import net.nemerosa.ontrack.model.structure.NameDescription
 import org.springframework.stereotype.Component
 
 @Component
@@ -29,24 +24,6 @@ class BooleanIndicatorValueType(
                 config.required -> IndicatorCompliance.LOWEST
                 else -> IndicatorCompliance.MEDIUM
             }
-
-    override fun form(
-            config: BooleanIndicatorValueTypeConfig,
-            value: Boolean?
-    ): Form = Form.create()
-            .with(
-                    Selection.of("value")
-                            .label("Value")
-                            .optional()
-                            .items(
-                                    listOf(
-                                            Description("", "n/a", "Not applicable"),
-                                            Description("true", "Yes", "Yes"),
-                                            Description("false", "No", "No")
-                                    )
-                            )
-                            .value(toClientValue(value))
-            )
 
     override fun toClientJson(config: BooleanIndicatorValueTypeConfig, value: Boolean): JsonNode =
             mapOf(
@@ -87,14 +64,6 @@ class BooleanIndicatorValueType(
                     else -> null
                 }
     }
-
-    override fun configForm(config: BooleanIndicatorValueTypeConfig?): Form =
-            Form.create()
-                    .with(
-                            YesNo.of(BooleanIndicatorValueTypeConfig::required.name)
-                                    .label("Required")
-                                    .value(config?.required ?: true)
-                    )
 
     override fun toConfigForm(config: BooleanIndicatorValueTypeConfig): JsonNode = config.asJson()
 

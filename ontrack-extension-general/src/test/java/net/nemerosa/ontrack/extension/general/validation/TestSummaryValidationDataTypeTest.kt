@@ -7,7 +7,6 @@ import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 class TestSummaryValidationDataTypeTest {
@@ -54,14 +53,6 @@ class TestSummaryValidationDataTypeTest {
         assertEquals(50, data?.skipped)
         assertEquals(24, data?.failed)
         assertEquals(86, data?.total)
-    }
-
-    @Test
-    fun getForm() {
-        val form = dataType.getForm(null)
-        assertNotNull(form.getField("passed"))
-        assertNotNull(form.getField("skipped"))
-        assertNotNull(form.getField("failed"))
     }
 
     @Test

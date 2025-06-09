@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
 import net.nemerosa.ontrack.json.parse
-import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
@@ -38,5 +37,4 @@ class MockSCMProjectPropertyType(
         replacementFunction: Function<String, String>,
     ): MockSCMProjectProperty = value
 
-    override fun getEditionForm(entity: ProjectEntity, value: MockSCMProjectProperty?): Form = Form.create()
 }

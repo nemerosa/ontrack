@@ -23,7 +23,6 @@ class SonarQubeConfigurationResourceDecorator(
         val globalSettingsGranted = securityService.isGlobalFunctionGranted(GlobalSettings::class.java)
         return resourceContext.links()
                 .self(on(SonarQubeController::class.java).getConfiguration(configuration.name))
-                .link(Link.UPDATE, on(SonarQubeController::class.java).updateConfigurationForm(configuration.name), globalSettingsGranted)
                 .link(Link.DELETE, on(SonarQubeController::class.java).deleteConfiguration(configuration.name), globalSettingsGranted)
                 // OK
                 .build()

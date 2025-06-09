@@ -6,10 +6,6 @@ import net.nemerosa.ontrack.extension.github.app.GitHubApp
 import net.nemerosa.ontrack.model.annotations.APIIgnore
 import net.nemerosa.ontrack.model.docs.DocumentationIgnore
 import net.nemerosa.ontrack.model.docs.SelfDocumented
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Memo
-import net.nemerosa.ontrack.model.form.Password
-import net.nemerosa.ontrack.model.form.Text
 import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.CredentialsConfiguration
 
@@ -151,8 +147,6 @@ open class GitHubEngineConfiguration(
         autoMergeToken = decrypting(autoMergeToken?.takeIf { it.isNotBlank() }),
     )
 
-    fun asForm(): Form = form(this)
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -227,74 +221,6 @@ open class GitHubEngineConfiguration(
          */
         const val GITHUB_COM = "https://github.com"
 
-        @JvmStatic
-        fun form(configuration: GitHubEngineConfiguration?): Form {
-            return Form.create()
-                .with(
-                    Text.of(GitHubEngineConfiguration::name.name)
-                        .label("Name")
-                        .length(40)
-                        .readOnly(configuration != null)
-                        .regex("[A-Za-z0-9_\\.\\-]+")
-                        .validation("Name is required and must contain only alpha-numeric characters, underscores, points or dashes.")
-                        .value(configuration?.name)
-                )
-                .with(
-                    Text.of(GitHubEngineConfiguration::url.name)
-                        .label("URL")
-                        .length(250)
-                        .optional()
-                        .help("URL of the GitHub engine. Defaults to $GITHUB_COM if not defined.")
-                        .value(configuration?.url)
-                )
-                .with(
-                    Text.of(GitHubEngineConfiguration::user.name)
-                        .label("User")
-                        .length(16)
-                        .optional()
-                        .value(configuration?.user)
-                )
-                .with(
-                    Password.of(GitHubEngineConfiguration::password.name)
-                        .label("Password")
-                        .help("Deprecated. Prefer using tokens or GitHub Apps")
-                        .length(40)
-                        .optional()
-                )
-                .with(
-                    Password.of(GitHubEngineConfiguration::oauth2Token.name)
-                        .label("OAuth2 token")
-                        .length(50)
-                        .optional()
-                )
-                .with(
-                    Text.of(GitHubEngineConfiguration::appId.name)
-                        .label("GitHub App ID")
-                        .help("ID of the GitHub App to use")
-                        .optional()
-                        .value(configuration?.appId)
-                )
-                .with(
-                    Memo.of(GitHubEngineConfiguration::appPrivateKey.name)
-                        .label("GitHub App PKey")
-                        .help("Private key for the GitHub App")
-                        .optional()
-                )
-                .with(
-                    Text.of(GitHubEngineConfiguration::appInstallationAccountName.name)
-                        .label("GitHub App Installation Account")
-                        .help("Optional. In case of several installations for this app, select the account where this app has been installed.")
-                        .optional()
-                        .value(configuration?.appInstallationAccountName)
-                )
-                .with(
-                    Password.of(GitHubEngineConfiguration::autoMergeToken.name)
-                        .label("Auto merge token")
-                        .help("Token for an account used to approve pull requests for auto approval processes")
-                        .length(50)
-                        .optional()
-                )
-        }
     }
 
 }

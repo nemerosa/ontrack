@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.indicators.model
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.model.extension.Extension
-import net.nemerosa.ontrack.model.form.Form
 
 interface IndicatorValueType<T, C> : Extension {
 
@@ -10,8 +9,6 @@ interface IndicatorValueType<T, C> : Extension {
      * Display name
      */
     val name: String
-
-    fun form(config: C, value: T?): Form
 
     fun status(config: C, value: T): IndicatorCompliance
 
@@ -26,7 +23,6 @@ interface IndicatorValueType<T, C> : Extension {
     fun fromStoredJson(valueConfig: C, value: JsonNode): T?
     fun toStoredJson(config: C, value: T): JsonNode
 
-    fun configForm(config: C?): Form
     fun toConfigForm(config: C): JsonNode
     fun fromConfigForm(config: JsonNode): C
 

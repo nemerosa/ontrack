@@ -10,7 +10,6 @@ import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseAsJson
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 
 class PercentageIndicatorValueTypeTest {
 
@@ -29,30 +28,6 @@ class PercentageIndicatorValueTypeTest {
         assertEquals(100, type.status(threshold(50, false), 50.percent()).value)
         assertEquals(50, type.status(threshold(50, false), 75.percent()).value)
         assertEquals(0, type.status(threshold(50, false), 100.percent()).value)
-    }
-
-    @Test
-    fun form() {
-
-        fun assertForm(threshold: PercentageThreshold, value: Int?, expectedValue: Int?) {
-            val form = type.form(
-                    threshold,
-                    value?.percent()
-            )
-            assertNotNull(form.getField("value")) {
-                assertEquals("Value (%)", it.label)
-                assertEquals(expectedValue, it.value)
-            }
-        }
-
-        assertForm(threshold = threshold(50, true), value = null, expectedValue = null)
-        assertForm(threshold = threshold(50, true), value = 25, expectedValue = 25)
-        assertForm(threshold = threshold(50, true), value = 75, expectedValue = 75)
-
-        assertForm(threshold = threshold(50, false), value = null, expectedValue = null)
-        assertForm(threshold = threshold(50, false), value = 25, expectedValue = 25)
-        assertForm(threshold = threshold(50, false), value = 75, expectedValue = 75)
-
     }
 
     @Test
@@ -126,29 +101,6 @@ class PercentageIndicatorValueTypeTest {
 
         assertStoredJson(25)
         assertStoredJson(75)
-
-    }
-
-    @Test
-    fun configForm() {
-
-        fun assertForm(config: PercentageThreshold?, expected: PercentageThreshold? = config) {
-            val form = type.configForm(config)
-            assertNotNull(form.getField("threshold")) {
-                assertEquals("Threshold", it.label)
-                assertEquals(expected?.threshold?.value, it.value)
-            }
-            assertNotNull(form.getField("higherIsBetter")) {
-                assertEquals("Higher is better", it.label)
-                assertEquals(expected?.higherIsBetter, it.value)
-            }
-        }
-
-        assertForm(null, expected = threshold(50, true))
-        assertForm(threshold(25, true))
-        assertForm(threshold(75, true))
-        assertForm(threshold(25, false))
-        assertForm(threshold(75, false))
 
     }
 

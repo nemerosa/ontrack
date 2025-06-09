@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.general.GeneralExtensionFeature
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.toJson
-import net.nemerosa.ontrack.model.form.Form
 import net.nemerosa.ontrack.model.structure.AbstractValidationDataType
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 
@@ -17,8 +16,6 @@ abstract class AbstractThresholdConfigValidationDataType<T>(
             node?.parse()
 
     override fun configToJson(config: ThresholdConfig) = config.toJson()!!
-
-    override fun getConfigForm(config: ThresholdConfig?): Form = config.toForm()
 
     override fun configToFormJson(config: ThresholdConfig?): JsonNode? = config?.toJson()
 

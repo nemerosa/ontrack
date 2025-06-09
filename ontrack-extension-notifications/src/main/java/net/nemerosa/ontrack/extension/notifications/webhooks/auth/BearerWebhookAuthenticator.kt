@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APILabel
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.passwordField
 import org.springframework.stereotype.Component
 import java.net.http.HttpRequest
 
@@ -15,9 +13,6 @@ class BearerWebhookAuthenticator : AbstractWebhookAuthenticator<BearerWebhookAut
     override val type: String = "bearer"
 
     override val displayName: String = "Bearer token authentication"
-
-    override fun getForm(config: BearerWebhookAuthenticatorConfig?): Form = Form.create()
-        .passwordField(BearerWebhookAuthenticatorConfig::token)
 
     override fun validateConfig(node: JsonNode): BearerWebhookAuthenticatorConfig = node.parse()
 

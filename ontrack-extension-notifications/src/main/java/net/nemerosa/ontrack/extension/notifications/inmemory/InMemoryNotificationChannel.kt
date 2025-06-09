@@ -11,8 +11,6 @@ import net.nemerosa.ontrack.model.docs.Documentation
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.textField
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
@@ -62,9 +60,6 @@ class InMemoryNotificationChannel(
     override fun toSearchCriteria(text: String): JsonNode = InMemoryNotificationChannelConfig(text).asJson()
 
     override fun toText(config: InMemoryNotificationChannelConfig): String = config.group
-
-    override fun getForm(c: InMemoryNotificationChannelConfig?): Form = Form.create()
-        .textField(InMemoryNotificationChannelConfig::group, c?.group)
 
     fun clear(): Ack {
         messages.clear()

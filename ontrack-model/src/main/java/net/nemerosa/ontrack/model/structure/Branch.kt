@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonView
 import jakarta.validation.constraints.Size
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.YesNo
 
 /**
  * Representation of a branch inside a [Project]. They are usually associated
@@ -58,15 +56,6 @@ data class Branch(
                         Signature.anonymous()
                 )
 
-        @JvmStatic
-        fun form(): Form = Form.create()
-                .with(
-                        Form.defaultNameField().length(120)
-                )
-                .description()
-                .with(
-                        YesNo.of("disabled").label("Disabled").help("Check if the branch must be disabled.")
-                )
     }
 
     override val parent: ProjectEntity? get() = project
@@ -76,11 +65,6 @@ data class Branch(
     override val entityDisplayName: String
         get() = "Branch ${project.name}/$name"
 
-
-    fun toForm(): Form = form()
-            .fill("name", name)
-            .fill("description", description)
-            .fill("disabled", isDisabled)
 
     fun update(form: NameDescriptionState): Branch =
             of(project, form)

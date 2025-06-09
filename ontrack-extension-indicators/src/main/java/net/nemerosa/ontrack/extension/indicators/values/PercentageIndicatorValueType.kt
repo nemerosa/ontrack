@@ -10,11 +10,7 @@ import net.nemerosa.ontrack.extension.indicators.support.percent
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.json.parseOrNull
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Int
-import net.nemerosa.ontrack.model.form.YesNo
 import org.springframework.stereotype.Component
 
 @Component
@@ -26,17 +22,6 @@ class PercentageIndicatorValueType(
 
     override fun status(config: PercentageThreshold, value: Percentage): IndicatorCompliance =
             IndicatorCompliance(config.getCompliance(value).value)
-
-    override fun form(config: PercentageThreshold, value: Percentage?): Form =
-            Form.create()
-                    .with(
-                            Int.of("value")
-                                    .optional()
-                                    .label("Value (%)")
-                                    .min(0)
-                                    .max(100)
-                                    .value(value?.value)
-                    )
 
     override fun toClientJson(config: PercentageThreshold, value: Percentage): JsonNode =
             mapOf("value" to value.value).asJson()
@@ -59,21 +44,6 @@ class PercentageIndicatorValueType(
 
     override fun toStoredJson(config: PercentageThreshold, value: Percentage): JsonNode =
             value.value.asJson()
-
-    override fun configForm(config: PercentageThreshold?): Form =
-            Form.create()
-                    .with(
-                            Int.of(PercentageThreshold::threshold.name)
-                                    .label("Threshold")
-                                    .min(0)
-                                    .max(100)
-                                    .value(config?.threshold?.value ?: DEFAULT.threshold.value)
-                    )
-                    .with(
-                            YesNo.of(PercentageThreshold::higherIsBetter.name)
-                                    .label("Higher is better")
-                                    .value(config?.higherIsBetter ?: DEFAULT.higherIsBetter)
-                    )
 
     override fun toConfigForm(config: PercentageThreshold): JsonNode =
             config.asJson()

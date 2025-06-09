@@ -1,35 +1,21 @@
 package net.nemerosa.ontrack.extension.indicators.ui
 
-import net.nemerosa.ontrack.extension.indicators.model.IndicatorConstants
-import net.nemerosa.ontrack.extension.indicators.portfolio.*
-import net.nemerosa.ontrack.model.Ack
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Text
-import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Pattern
+import net.nemerosa.ontrack.extension.indicators.model.IndicatorConstants
+import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolioOfPortfolios
+import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolioService
+import net.nemerosa.ontrack.extension.indicators.portfolio.PortfolioGlobalIndicators
+import net.nemerosa.ontrack.extension.indicators.portfolio.PortfolioUpdateForm
+import net.nemerosa.ontrack.model.Ack
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/extension/indicators/portfolios")
 class IndicatorPortfolioController(
         private val indicatorPortfolioService: IndicatorPortfolioService
 ) {
-
-    /**
-     * Form to create a portfolio
-     */
-    @GetMapping("create")
-    fun getPortfolioCreationForm(): Form = Form.create()
-            .with(
-                    Text.of(IndicatorPortfolio::id.name)
-                            .label("ID")
-                            .regex(IndicatorConstants.INDICATOR_ID_PATTERN)
-            )
-            .with(
-                    Text.of(IndicatorPortfolio::name.name)
-                            .label("Name")
-            )
 
     /**
      * Creating a portfolio

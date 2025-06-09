@@ -38,7 +38,6 @@ public class GitLabConfigurationResourceDecorator extends AbstractResourceDecora
         boolean globalSettingsGranted = securityService.isGlobalFunctionGranted(GlobalSettings.class);
         return resourceContext.links()
                 .self(on(GitLabController.class).getConfiguration(configuration.getName()))
-                .link(Link.UPDATE, on(GitLabController.class).updateConfigurationForm(configuration.getName()), globalSettingsGranted)
                 .link(Link.DELETE, on(GitLabController.class).deleteConfiguration(configuration.getName()), globalSettingsGranted)
                 // OK
                 .build();

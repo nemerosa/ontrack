@@ -11,8 +11,6 @@ import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventRendererRegistry
 import net.nemerosa.ontrack.model.events.EventTemplatingService
 import net.nemerosa.ontrack.model.events.PlainEventRenderer
-import net.nemerosa.ontrack.model.form.Form
-import net.nemerosa.ontrack.model.form.Text
 import org.springframework.stereotype.Component
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -121,15 +119,6 @@ class MockNotificationChannel(
 
     @Deprecated("Will be removed in V5. Only Next UI is used.")
     override fun toText(config: MockNotificationChannelConfig): String = config.target
-
-    @Deprecated("Will be removed in V5. Only Next UI is used.")
-    override fun getForm(c: MockNotificationChannelConfig?): Form = Form.create()
-        .with(
-            Text.of(MockNotificationChannelConfig::target.name)
-                .label("Target")
-                .help("Test target")
-                .value(c?.target)
-        )
 
     override val type: String = "mock"
 

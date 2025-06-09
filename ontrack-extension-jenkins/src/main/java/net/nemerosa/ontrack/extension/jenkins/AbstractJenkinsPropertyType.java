@@ -1,9 +1,6 @@
 package net.nemerosa.ontrack.extension.jenkins;
 
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType;
-import net.nemerosa.ontrack.model.form.Form;
-import net.nemerosa.ontrack.model.form.Selection;
-import net.nemerosa.ontrack.model.structure.ProjectEntity;
 import net.nemerosa.ontrack.model.support.ConfigurationPropertyType;
 
 import java.util.function.Function;
@@ -17,19 +14,6 @@ public abstract class AbstractJenkinsPropertyType<T extends AbstractJenkinsPrope
         super(extensionFeature);
         this.configurationService = configurationService;
     }
-
-    @Override
-    public Form getEditionForm(ProjectEntity entity, T value) {
-        return Form.create()
-                .with(
-                        Selection.of("configuration")
-                                .label("Configuration")
-                                .help("Jenkins configuration to use when connecting")
-                                .items(configurationService.getConfigurationDescriptors())
-                                .value(value != null ? value.getConfiguration().getName() : null)
-                );
-    }
-
 
     protected JenkinsConfiguration loadConfiguration(String configurationName) {
         return configurationService.getConfiguration(configurationName);
