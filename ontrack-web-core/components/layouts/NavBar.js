@@ -42,12 +42,16 @@ export default function NavBar() {
                             />
                         }
                     />
-                    <Image
-                        src={`/yontrack-text.svg`}
-                        alt="Yontrack"
-                        width={120}
-                        height={24}
-                    />
+                    <HomeLink
+                        text={
+                            <Image
+                                src={`/yontrack-text.svg`}
+                                alt="Yontrack"
+                                width={120}
+                                height={24}
+                            />
+                        }
+                        />
                 </Space>
                 <Space direction="horizontal" size={8}>
                     <NavBarSearch
