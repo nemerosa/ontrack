@@ -70,8 +70,6 @@ type Account {
   "List of groups the account belongs to"
   groups: [AccountGroup!]!
   id: ID!
-  "Links"
-  links: AccountLinks @deprecated(reason : "Use the `actions` field instead.")
   "Unique name for the account"
   name: String! @deprecated(reason : "Will be removed in V6. Use email instead. Replaced by email.")
   "Security role (admin or none)"
@@ -89,23 +87,7 @@ type AccountGroup {
   "Global role for the account group"
   globalRole: GlobalRole
   id: ID!
-  "Links"
-  links: AccountGroupLinks @deprecated(reason : "Use the `actions` field instead.")
   name: String
-}
-
-"AccountGroup links"
-type AccountGroupLinks {
-  _delete: String
-  _self: String
-  _update: String
-}
-
-"Account links"
-type AccountLinks {
-  _delete: String
-  _self: String
-  _update: String
 }
 
 type Action {
@@ -362,10 +344,6 @@ type Branch implements Authorizable & ProjectEntity {
   ): BuildAutoVersioning
   "Auto versioning configuration"
   autoVersioningConfig: AutoVersioningConfig
-  "Actions to get a diff on builds of the branch"
-  buildDiffActions: [Action!]!
-  "List of forms for the build filters (for the creation of new filters)"
-  buildFilterForms: [BuildFilterForm!]!
   "List of shared build filters for this branch"
   buildFilterResources: [BuildFilterResource!]!
   "Gets a list of builds for this branch. Use `buildsPaginated` to get a list of paginated builds."
@@ -429,12 +407,12 @@ type Branch implements Authorizable & ProjectEntity {
   jenkinsJobProperty: Property
   "List of links."
   linkProperty: Property
-  "Links"
-  links: BranchLinks @deprecated(reason : "Use the `actions` field instead.")
   "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI."
   messageProperty: Property
   "List of meta information properties"
   metaInfoProperty: Property
+  "Mock SCM used for testing only"
+  mockSCMBranchProperty: Property
   name: String
   "List of other branches in the same project"
   otherBranches: [Branch!]!
@@ -521,45 +499,6 @@ type BranchLink {
   targetBuild: Build!
 }
 
-"Branch links"
-type BranchLinks {
-  _actions: String
-  _allValidationStampFilters: String
-  _branches: String
-  _buildFilterForms: String
-  _buildFilterResources: String
-  _buildFilterSave: String
-  _buildFilterShare: String
-  _bulkUpdate: String
-  _clone: String
-  _copy: String
-  _createBuild: String
-  _createPromotionLevel: String
-  _createValidationStamp: String
-  _decorations: String
-  _delete: String
-  _disable: String
-  _download: String
-  _enable: String
-  _events: String
-  _extra: String
-  _favourite: String
-  _page: String
-  _project: String
-  _promotionLevels: String
-  _properties: String
-  _reorderPromotionLevels: String
-  _reorderValidationStamps: String
-  _self: String
-  _status: String
-  _unfavourite: String
-  _update: String
-  _validationStampFilterCreate: String
-  _validationStampViews: String
-  _validationStamps: String
-  _view: String
-}
-
 type BranchLinksDecoration {
   "Optional longer text, typically used as a tooltip"
   description: String
@@ -596,8 +535,6 @@ type BranchLinksNode {
 }
 
 type Build implements Authorizable & ProjectEntity {
-  "Actions for a Build"
-  actions: BuildActions @deprecated(reason : "Will be removed in V5. User `userMenuActions` instead.")
   "Description with links."
   annotatedDescription: String
   "Authorizations for this context"
@@ -616,12 +553,19 @@ type Build implements Authorizable & ProjectEntity {
   "Link to the GitHub Workflow Run which created this build."
   buildGitHubWorkflowRunProperty: Property
   creation: Signature
+  "Gets the list of slots where this build is actually deployed"
+  currentDeployments(
+    "Qualifier to use"
+    qualifier: String = ""
+  ): [SlotPipeline!]!
   "List of decorations"
   decorations(
     "Fully qualified name of the decoration type"
     type: String
   ): [Decoration!]!
   description: String
+  "List of slots this eligible to"
+  eligibleSlots: [Slot!]!
   gitChangeLog(
     "Name of the build to end the change log with. If not set, compares with the previous build."
     to: String
@@ -640,12 +584,12 @@ type Build implements Authorizable & ProjectEntity {
   jenkinsBuildProperty: Property
   "List of links."
   linkProperty: Property
-  "Links"
-  links: BuildLinks @deprecated(reason : "Use the `actions` field instead.")
   "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI."
   messageProperty: Property
   "List of meta information properties"
   metaInfoProperty: Property
+  "Mock SCM used for testing only"
+  mockSCMBuildCommitProperty: Property
   name: String
   "Next build"
   nextBuild: Build
@@ -678,6 +622,20 @@ type Build implements Authorizable & ProjectEntity {
   ): String!
   "Run info associated with this build"
   runInfo: RunInfo
+  "List of pipelines this build is associated with"
+  slotPipelines(
+    "Sorting by decreasing environment order"
+    sortedByEnvironment: Boolean,
+    "Filtering on the pipeline status"
+    status: SlotPipelineStatus
+  ): [SlotPipeline!]!
+  "List of deployment slots this build is associated with"
+  slots(
+    "Name of the environment"
+    environment: String,
+    "Qualifier for the project"
+    qualifier: String
+  ): [Slot!]!
   "List of builds using this one."
   usedBy(
     "Keeps only links targeted from this branch. `project` argument is also required."
@@ -763,28 +721,6 @@ type Build implements Authorizable & ProjectEntity {
   ): [Validation!]!
 }
 
-"Creating a validation run for this build"
-type BuildActionCreateValidationRunById {
-  "Description of the action"
-  description: String!
-  "Links attached to this action"
-  links: BuildActionCreateValidationRunByIdLinks
-  "Mutation associated with this action"
-  mutation: String
-}
-
-"Links attached to the createValidationRunById action on the Build type."
-type BuildActionCreateValidationRunByIdLinks {
-  "Creating a validation run for this build"
-  form: UIActionLink
-}
-
-"Actions for a Build"
-type BuildActions {
-  "Creating a validation run for this build"
-  createValidationRunById: BuildActionCreateValidationRunById
-}
-
 "Gathering information about the auto versioning around this build"
 type BuildAutoVersioning {
   "AV source config"
@@ -795,18 +731,6 @@ type BuildAutoVersioning {
   status: AutoVersioningAuditEntry
 }
 
-"Form to create a new build filter."
-type BuildFilterForm {
-  "Form for the filter."
-  form: JSON @deprecated(reason : "Form is only used for the Ontrack legacy UI")
-  "If the filter is predefined and cannot be configured."
-  isPredefined: Boolean
-  "FQCN for the build filter provider"
-  type: String!
-  "Display name for the filter"
-  typeName: String!
-}
-
 "Shared build filter for a branch."
 type BuildFilterResource {
   "Data for this filter"
@@ -815,19 +739,10 @@ type BuildFilterResource {
   error: String
   "Is this filter shared?"
   isShared: Boolean
-  "Links"
-  links: BuildFilterResourceLinks @deprecated(reason : "Use the `actions` field instead.")
   "Name for this filter"
   name: String!
   "FQCN of the build filter provider"
   type: String!
-}
-
-"BuildFilterResource links"
-type BuildFilterResourceLinks {
-  _delete: String
-  _share: String
-  _update: String
 }
 
 "Build filter validation result."
@@ -849,33 +764,6 @@ type BuildLinkPaginated {
   pageInfo: PageInfo
   "Items in the current page"
   pageItems: [BuildLink!]!
-}
-
-"Build links"
-type BuildLinks {
-  _actions: String
-  _buildLinksFrom: String
-  _changeLog: String
-  _changeLogPage: String
-  _collectSonarQube: String
-  _decorations: String
-  _delete: String
-  _events: String
-  _extra: String
-  _lastPromotionRuns: String
-  _next: String
-  _page: String
-  _previous: String
-  _promote: String
-  _promotionRuns: String
-  _properties: String
-  _runInfo: String
-  _self: String
-  _signature: String
-  _update: String
-  _validate: String
-  _validationRuns: String
-  _validationStampRunViews: String
 }
 
 type BuildPaginated {
@@ -1010,17 +898,10 @@ type ConfigurableIndicatorTypeState {
   category: IndicatorComputedCategory!
   "Indicator type ID"
   id: String
-  "Links"
-  links: ConfigurableIndicatorTypeStateLinks @deprecated(reason : "Use the `actions` field instead.")
   "Indicator type name"
   name: String
   "Saved stated for this configurable indicator"
   state: ConfigurableIndicatorState
-}
-
-"ConfigurableIndicatorTypeState links"
-type ConfigurableIndicatorTypeStateLinks {
-  _update: String
 }
 
 "Generic configuration"
@@ -1077,14 +958,6 @@ type CreateBuildOrGetPayload implements Payload {
 type CreateBuildPayload implements Payload {
   "Created build"
   build: Build
-  "List of errors"
-  errors: [UserError]
-}
-
-"Output type for the createBuiltInAccount mutation."
-type CreateBuiltInAccountPayload implements Payload {
-  "Created account"
-  account: Account
   "List of errors"
   errors: [UserError]
 }
@@ -1179,6 +1052,14 @@ type CreateSlotsPayload implements Payload {
   errors: [UserError]
   "List of the created slots"
   slots: SlotList
+}
+
+"Output type for the createTestAccount mutation."
+type CreateTestAccountPayload implements Payload {
+  "Creates account"
+  account: Account
+  "List of errors"
+  errors: [UserError]
 }
 
 "Output type for the createValidationRunById mutation."
@@ -1853,14 +1734,6 @@ type DeletionPayload implements PayloadInterface {
   errors: [PayloadUserError]
 }
 
-"Output type for the disableAccount mutation."
-type DisableAccountPayload implements Payload {
-  "Updated account"
-  account: Account
-  "List of errors"
-  errors: [UserError]
-}
-
 "Output type for the disableBranch mutation."
 type DisableBranchPayload implements Payload {
   "Updated branch"
@@ -1903,14 +1776,6 @@ type EligibleSlot {
   eligible: Boolean
   "slot field"
   slot: Slot!
-}
-
-"Output type for the enableAccount mutation."
-type EnableAccountPayload implements Payload {
-  "Updated account"
-  account: Account
-  "List of errors"
-  errors: [UserError]
 }
 
 "Output type for the enableBranch mutation."
@@ -2217,8 +2082,6 @@ type GitHubEngineConfiguration {
   appToken: GitHubAppToken
   "Authentication type"
   authenticationType: String
-  "Links"
-  links: GitHubEngineConfigurationLinks @deprecated(reason : "Use the `actions` field instead.")
   "Name of the configuration"
   name: String
   "Rate limits for this configuration"
@@ -2227,13 +2090,6 @@ type GitHubEngineConfiguration {
   url: String!
   "User used to connect to GitHub. Can be used with a password or an OAuth2 token. Not needed if using only the OAUth2 token or a GitHub App."
   user: String
-}
-
-"GitHubEngineConfiguration links"
-type GitHubEngineConfigurationLinks {
-  _delete: String
-  _self: String
-  _update: String
 }
 
 "Output type for the gitHubIngestionBuildLinksByBuildLabel mutation."
@@ -2574,13 +2430,6 @@ type IndicatorCategories {
     "ID of the indicator category"
     id: String
   ): [IndicatorCategory!]!
-  "Links"
-  links: IndicatorCategoriesLinks @deprecated(reason : "Use the `actions` field instead.")
-}
-
-"IndicatorCategories links"
-type IndicatorCategoriesLinks {
-  _create: String
 }
 
 "Indicator category"
@@ -2589,8 +2438,6 @@ type IndicatorCategory {
   deprecated: String
   "Indicator category ID"
   id: String
-  "Links"
-  links: IndicatorCategoryLinks @deprecated(reason : "Use the `actions` field instead.")
   "Indicator category name"
   name: String
   "Reporting the indicators for the types in this category"
@@ -2610,12 +2457,6 @@ type IndicatorCategory {
   source: IndicatorSource
   "List of indicator types belonging to this category."
   types: [ProjectIndicatorType!]!
-}
-
-"IndicatorCategory links"
-type IndicatorCategoryLinks {
-  _delete: String
-  _update: String
 }
 
 "Report of indicators for a category"
@@ -2689,8 +2530,6 @@ type IndicatorPortfolio {
   id: String
   "Label for this portfolio"
   label: Label
-  "Links"
-  links: IndicatorPortfolioLinks @deprecated(reason : "Use the `actions` field instead.")
   "Name of the portfolio"
   name: String
   "List of projects associated with this portfolio"
@@ -2704,26 +2543,12 @@ type IndicatorPortfolio {
   ): [IndicatorCategoryStats!]
 }
 
-"IndicatorPortfolio links"
-type IndicatorPortfolioLinks {
-  _delete: String
-  _update: String
-}
-
 "List of portfolios"
 type IndicatorPortfolioOfPortfolios {
   "Global indicator categories"
   categories: [IndicatorCategory!]! @deprecated(reason : "Use indicator views")
-  "Links"
-  links: IndicatorPortfolioOfPortfoliosLinks @deprecated(reason : "Use the `actions` field instead.")
   "List of portfolios"
   portfolios: [IndicatorPortfolio!]!
-}
-
-"IndicatorPortfolioOfPortfolios links"
-type IndicatorPortfolioOfPortfoliosLinks {
-  _create: String
-  _globalIndicators: String
 }
 
 "Indicator stats from the past"
@@ -2790,8 +2615,6 @@ type IndicatorTypeStats {
 
 "Aggregator of indicator types"
 type IndicatorTypes {
-  "Links"
-  links: IndicatorTypesLinks @deprecated(reason : "Use the `actions` field instead.")
   "List of indicator types"
   types(
     "ID of the indicator category"
@@ -2799,11 +2622,6 @@ type IndicatorTypes {
     "ID of the indicator type"
     id: String
   ): [ProjectIndicatorType!]!
-}
-
-"IndicatorTypes links"
-type IndicatorTypesLinks {
-  _create: String
 }
 
 "Indicator value type"
@@ -2822,8 +2640,6 @@ type IndicatorView {
   categories: [IndicatorCategory!]!
   "Unique ID for this view"
   id: String!
-  "Links"
-  links: IndicatorViewLinks @deprecated(reason : "Use the `actions` field instead.")
   "Name of the view"
   name: String!
   "List of indicator stats per project for all categories in this view"
@@ -2845,16 +2661,8 @@ type IndicatorView {
   ): [IndicatorViewProjectReport!]!
 }
 
-"IndicatorView links"
-type IndicatorViewLinks {
-  _delete: String
-  _update: String
-}
-
 "List of indicator views and management links."
 type IndicatorViewList {
-  "Links"
-  links: IndicatorViewListLinks @deprecated(reason : "Use the `actions` field instead.")
   "List of indicator views"
   views(
     "ID of the view to put in the list"
@@ -2862,11 +2670,6 @@ type IndicatorViewList {
     "Name of the view to put in the list"
     name: String
   ): [IndicatorView!]!
-}
-
-"IndicatorViewList links"
-type IndicatorViewListLinks {
-  _create: String
 }
 
 "View report line for a project"
@@ -3240,18 +3043,10 @@ type Label {
   foregroundColor: String!
   "id field"
   id: Int!
-  "Links"
-  links: LabelLinks @deprecated(reason : "Use the `actions` field instead.")
   "name field"
   name: String!
   "List of associated projects"
   projects: [Project!]!
-}
-
-"Label links"
-type LabelLinks {
-  _delete: String
-  _update: String
 }
 
 "LabelProviderDescription"
@@ -3350,14 +3145,6 @@ type LinksBuildPayload implements Payload {
   errors: [UserError]
 }
 
-"Output type for the lockAccount mutation."
-type LockAccountPayload implements Payload {
-  "Updated account"
-  account: Account
-  "List of errors"
-  errors: [UserError]
-}
-
 "Output type for the mapGroup mutation."
 type MapGroupPayload implements Payload {
   "List of errors"
@@ -3435,11 +3222,6 @@ type Mutation {
     "Input for the mutation"
     input: CreateBuildOrGetInput
   ): CreateBuildOrGetPayload
-  "Creates a built-in account"
-  createBuiltInAccount(
-    "Input for the mutation"
-    input: CreateBuiltInAccountInput
-  ): CreateBuiltInAccountPayload
   "Creates a configuration"
   createConfiguration(
     "Input for the mutation"
@@ -3500,6 +3282,11 @@ type Mutation {
     "Input for the mutation"
     input: CreateSlotsInput
   ): CreateSlotsPayload
+  "Creates a test account (not available in production mode)"
+  createTestAccount(
+    "Input for the mutation"
+    input: CreateTestAccountInput
+  ): CreateTestAccountPayload
   "Creating a validation run for a build identified by its name"
   createValidationRun(
     "Input for the mutation"
@@ -3934,11 +3721,6 @@ type Mutation {
     "Input for the mutation"
     input: DeleteWebhookInput
   ): DeleteWebhookPayload
-  "Disables an account"
-  disableAccount(
-    "Input for the mutation"
-    input: DisableAccountInput
-  ): DisableAccountPayload
   "Disables an existing branch"
   disableBranch(
     "Input for the mutation"
@@ -3964,11 +3746,6 @@ type Mutation {
     "Input for the mutation"
     input: EditAccountGroupInput
   ): EditAccountGroupPayload
-  "Enables an account"
-  enableAccount(
-    "Input for the mutation"
-    input: EnableAccountInput
-  ): EnableAccountPayload
   "Enables an existing branch"
   enableBranch(
     "Input for the mutation"
@@ -4081,11 +3858,6 @@ type Mutation {
     "Input for the mutation"
     input: LinksBuildInput
   ): LinksBuildPayload
-  "Locks an account"
-  lockAccount(
-    "Input for the mutation"
-    input: LockAccountInput
-  ): LockAccountPayload
   "Maps an identity provider group to a Yontrack group"
   mapGroup(
     "Input for the mutation"
@@ -4684,11 +4456,6 @@ type Mutation {
     "Input for the mutation"
     input: UnfavouriteProjectInput
   ): UnfavouriteProjectPayload
-  "Unlocks an account"
-  unlockAccount(
-    "Input for the mutation"
-    input: UnlockAccountInput
-  ): UnlockAccountPayload
   "Unshares a filter at project level"
   unshareSCMFileChangeFilter(
     "Input for the mutation"
@@ -4979,8 +4746,6 @@ type Preferences {
 }
 
 type Project implements Authorizable & ProjectEntity {
-  "Actions for a Project"
-  actions: ProjectActions @deprecated(reason : "Will be removed in V5. User `userMenuActions` instead.")
   "Description with links."
   annotatedDescription: String
   "Authorizations for this context"
@@ -5063,8 +4828,6 @@ type Project implements Authorizable & ProjectEntity {
   ): [PromotionRun!]!
   "List of links."
   linkProperty: Property
-  "Links"
-  links: ProjectLinks @deprecated(reason : "Use the `actions` field instead.")
   """
   List of project labels which describes the list of build links
   to display in a build links decoration.
@@ -5074,6 +4837,8 @@ type Project implements Authorizable & ProjectEntity {
   messageProperty: Property
   "List of meta information properties"
   metaInfoProperty: Property
+  "Mock SCM used for testing only"
+  mockSCMProjectProperty: Property
   name: String
   "Makes a promotion conditional based on the fact that a previous promotion has been granted."
   previousPromotionConditionProperty: Property
@@ -5100,6 +4865,11 @@ type Project implements Authorizable & ProjectEntity {
   scmCatalogEntry: SCMCatalogEntry
   "List of saved SCM file filters for the project"
   scmFileChangeFilters: SCMFileChangeFilters!
+  "Graph of environment slots for a project"
+  slotGraph(
+    "Qualifier for the slots"
+    qualifier: String = ""
+  ): SlotGraph!
   "Association with a SonarQube project."
   sonarQubeProperty: Property
   "Allows to disable or delete stale branches"
@@ -5121,78 +4891,6 @@ type Project implements Authorizable & ProjectEntity {
     "Validation stamp where to look for validation runs (regular expression, defaults to all)"
     validationStamp: String
   ): ValidationRunPaginated
-}
-
-"Deleting the project"
-type ProjectActionDeleteProject {
-  "Description of the action"
-  description: String!
-  "Mutation associated with this action"
-  mutation: String
-}
-
-"Disabling the project"
-type ProjectActionDisableProject {
-  "Description of the action"
-  description: String!
-  "Mutation associated with this action"
-  mutation: String
-}
-
-"Enabling the project"
-type ProjectActionEnableProject {
-  "Description of the action"
-  description: String!
-  "Mutation associated with this action"
-  mutation: String
-}
-
-"Marks the project as a favourite"
-type ProjectActionFavouriteProject {
-  "Description of the action"
-  description: String!
-  "Mutation associated with this action"
-  mutation: String
-}
-
-"Unmarks the project as a favourite"
-type ProjectActionUnfavouriteProject {
-  "Description of the action"
-  description: String!
-  "Mutation associated with this action"
-  mutation: String
-}
-
-"Updating the project"
-type ProjectActionUpdateProject {
-  "Description of the action"
-  description: String!
-  "Links attached to this action"
-  links: ProjectActionUpdateProjectLinks
-  "Mutation associated with this action"
-  mutation: String
-}
-
-"Links attached to the updateProject action on the Project type."
-type ProjectActionUpdateProjectLinks {
-  "Updating the project"
-  form: UIActionLink
-}
-
-"Actions for a Project"
-type ProjectActions {
-  "Deleting the project"
-  deleteProject: ProjectActionDeleteProject
-  "Disabling the project"
-  disableProject: ProjectActionDisableProject
-  "Enabling the project"
-  enableProject: ProjectActionEnableProject
-  "Marks the project as a favourite"
-  favouriteProject: ProjectActionFavouriteProject
-  "Unmarks the project as a favourite"
-  unfavouriteProject: ProjectActionUnfavouriteProject
-  "Updating the project"
-  updateProject: ProjectActionUpdateProject
 }
 
 type ProjectAuthorization {
@@ -5264,8 +4962,6 @@ type ProjectIndicator {
     "Size of the page"
     size: Int = 20
   ): ProjectIndicatorHistoryItemPaginated
-  "Links"
-  links: ProjectIndicatorLinks @deprecated(reason : "Use the `actions` field instead.")
   "Previous value for this indicator"
   previousValue: ProjectIndicator
   "Associated project"
@@ -5309,12 +5005,6 @@ type ProjectIndicatorHistoryItemPaginated {
   pageItems: [ProjectIndicatorHistoryItem!]!
 }
 
-"ProjectIndicator links"
-type ProjectIndicatorLinks {
-  _delete: String
-  _update: String
-}
-
 "Type of indicator"
 type ProjectIndicatorType {
   "Associated category"
@@ -5342,8 +5032,6 @@ type ProjectIndicatorType {
   ): [ProjectIndicator!]!
   "Link to the definition of the indicator"
   link: String
-  "Links"
-  links: ProjectIndicatorTypeLinks @deprecated(reason : "Use the `actions` field instead.")
   "Name for the indicator type"
   name: String
   "Source for this type"
@@ -5352,12 +5040,6 @@ type ProjectIndicatorType {
   valueConfig: JSON
   "Value type"
   valueType: IndicatorValueType
-}
-
-"ProjectIndicatorType links"
-type ProjectIndicatorTypeLinks {
-  _delete: String
-  _update: String
 }
 
 "List of indicators for a project"
@@ -5375,34 +5057,6 @@ type ProjectIndicators {
   project: Project
 }
 
-"Project links"
-type ProjectLinks {
-  _actions: String
-  _branchStatusViews: String
-  _branches: String
-  _buildDiffActions: String
-  _buildSearch: String
-  _clone: String
-  _createBranch: String
-  _decorations: String
-  _delete: String
-  _disable: String
-  _enable: String
-  _events: String
-  _extra: String
-  _favourite: String
-  _gitSync: String
-  _labelFromToken: String
-  _labels: String
-  _labelsCreate: String
-  _page: String
-  _permissions: String
-  _properties: String
-  _self: String
-  _unfavourite: String
-  _update: String
-}
-
 type ProjectRole {
   "description field"
   description: String!
@@ -5413,8 +5067,6 @@ type ProjectRole {
 }
 
 type PromotionLevel implements Authorizable & ProjectEntity {
-  "Link to the image"
-  _image: String
   "Description with links."
   annotatedDescription: String
   "Authorizations for this context"
@@ -5443,8 +5095,6 @@ type PromotionLevel implements Authorizable & ProjectEntity {
   jenkinsJobProperty: Property
   "List of links."
   linkProperty: Property
-  "Links"
-  links: PromotionLevelLinks @deprecated(reason : "Use the `actions` field instead.")
   "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI."
   messageProperty: Property
   "List of meta information properties"
@@ -5487,23 +5137,6 @@ type PromotionLevel implements Authorizable & ProjectEntity {
   userMenuActions: [UserMenuAction!]!
 }
 
-"PromotionLevel links"
-type PromotionLevelLinks {
-  _actions: String
-  _branch: String
-  _bulkUpdate: String
-  _decorations: String
-  _delete: String
-  _events: String
-  _image: String
-  _page: String
-  _project: String
-  _properties: String
-  _runs: String
-  _self: String
-  _update: String
-}
-
 type PromotionRun implements Authorizable & ProjectEntity {
   "Description with links."
   annotatedDescription: String
@@ -5527,8 +5160,6 @@ type PromotionRun implements Authorizable & ProjectEntity {
   jenkinsBuildProperty: Property
   "List of links."
   linkProperty: Property
-  "Links"
-  links: PromotionRunLinks @deprecated(reason : "Use the `actions` field instead.")
   "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI."
   messageProperty: Property
   "List of meta information properties"
@@ -5545,16 +5176,6 @@ type PromotionRun implements Authorizable & ProjectEntity {
   ): [Property!]!
   "List of actions available for this entity"
   userMenuActions: [UserMenuAction!]!
-}
-
-"PromotionRun links"
-type PromotionRunLinks {
-  _all: String
-  _delete: String
-  _image: String
-  _page: String
-  _properties: String
-  _self: String
 }
 
 type PromotionRunPaginated {
@@ -5897,6 +5518,11 @@ type Query {
   ): [Project!]!
   "License"
   licenseInfo: LicenseResponse!
+  "Getting a list of texts generated for a mock workflow"
+  mockWorkflowTexts(
+    "ID of the workflow instance"
+    instanceId: String!
+  ): [String!]!
   "List of all notification channels"
   notificationChannels: [NotificationChannel!]!
   "Getting a notification record using its ID"
@@ -6312,28 +5938,6 @@ type RevokeAllTokensPayload implements Payload {
 type RevokeTokenPayload implements Payload {
   "List of errors"
   errors: [UserError]
-}
-
-"Creating a project"
-type RootUserActionCreateProject {
-  "Description of the action"
-  description: String!
-  "Links attached to this action"
-  links: RootUserActionCreateProjectLinks
-  "Mutation associated with this action"
-  mutation: String
-}
-
-"Links attached to the createProject action on the RootUser type."
-type RootUserActionCreateProjectLinks {
-  "Creating a project"
-  form: UIActionLink
-}
-
-"Actions for a RootUser"
-type RootUserActions {
-  "Creating a project"
-  createProject: RootUserActionCreateProject
 }
 
 type RunInfo {
@@ -7762,24 +7366,6 @@ type TriggerData {
   id: String!
 }
 
-"""
-An `ActionLink` refers to a HTTP end point,
-                         having an uri, a HTTP method (like `PUT`
-                         or `POST`) and a type.
-                         The  type identifies the type of action,
-                         like "download", "form", "upload", etc.
-"""
-type UIActionLink {
-  "Link description"
-  description: String!
-  "Is this end point enabled, according to authorizations and state."
-  enabled: Boolean!
-  "HTTP method to use"
-  method: String!
-  "End point URI"
-  uri: String
-}
-
 "Output type for the unfavouriteBranch mutation."
 type UnfavouriteBranchPayload implements Payload {
   "Updated branch"
@@ -7794,14 +7380,6 @@ type UnfavouriteProjectPayload implements Payload {
   errors: [UserError]
   "Updated project"
   project: Project
-}
-
-"Output type for the unlockAccount mutation."
-type UnlockAccountPayload implements Payload {
-  "Updated account"
-  account: Account
-  "List of errors"
-  errors: [UserError]
 }
 
 "Output type for the unshareSCMFileChangeFilter mutation."
@@ -7888,8 +7466,6 @@ type UpdateValidationStampFilterPayload implements Payload {
 type User {
   "Account associated to the user"
   account: Account
-  "Actions for a RootUser"
-  actions: RootUserActions @deprecated(reason : "Will be removed in V5. User `userMenuActions` instead.")
   "List of groups the user is assigned to"
   assignedGroups: [AccountGroup!]!
   "idpGroups field"
@@ -8067,8 +7643,6 @@ type ValidationRun implements Authorizable & ProjectEntity {
   lastStatus: ValidationRunStatus!
   "List of links."
   linkProperty: Property
-  "Links"
-  links: ValidationRunLinks @deprecated(reason : "Use the `actions` field instead.")
   "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI."
   messageProperty: Property
   "List of meta information properties"
@@ -8106,19 +7680,6 @@ type ValidationRunData {
   descriptor: ValidationDataTypeDescriptor
 }
 
-"ValidationRun links"
-type ValidationRunLinks {
-  _decorations: String
-  _extra: String
-  _image: String
-  _page: String
-  _properties: String
-  _runInfo: String
-  _self: String
-  _validationRunStatusChange: String
-  _validationStampLink: String
-}
-
 type ValidationRunPaginated {
   "Information about the current page"
   pageInfo: PageInfo
@@ -8139,8 +7700,6 @@ type ValidationRunStatus implements Authorizable {
     "Filtering the issues on their status"
     status: String
   ): [Issue!]!
-  "Links"
-  links: ValidationRunStatusLinks @deprecated(reason : "Use the `actions` field instead.")
   "Status ID"
   statusID: ValidationRunStatusID
 }
@@ -8158,14 +7717,7 @@ type ValidationRunStatusID {
   root: Boolean
 }
 
-"ValidationRunStatus links"
-type ValidationRunStatusLinks {
-  _comment: String
-}
-
 type ValidationStamp implements Authorizable & ProjectEntity {
-  "Link to the image"
-  _image: String
   "Description with links."
   annotatedDescription: String
   "Authorizations for this context"
@@ -8192,8 +7744,6 @@ type ValidationStamp implements Authorizable & ProjectEntity {
   jenkinsJobProperty: Property
   "List of links."
   linkProperty: Property
-  "Links"
-  links: ValidationStampLinks @deprecated(reason : "Use the `actions` field instead.")
   "Associates an arbitrary message (and its type) to an entity. Will be displayed as a decorator in the UI."
   messageProperty: Property
   "List of meta information properties"
@@ -8232,39 +7782,12 @@ type ValidationStampFilter implements Authorizable {
   authorizations: [Authorization!]!
   "ID of the filter"
   id: Int
-  "Links"
-  links: ValidationStampFilterLinks @deprecated(reason : "Use the `actions` field instead.")
   "Name of the filter"
   name: String!
   "Scope of the filter"
   scope: ValidationStampFilterScope!
   "List of validation stamps"
   vsNames: [String!]!
-}
-
-"ValidationStampFilter links"
-type ValidationStampFilterLinks {
-  _delete: String
-  _shareAtGlobal: String
-  _shareAtProject: String
-  _update: String
-}
-
-"ValidationStamp links"
-type ValidationStampLinks {
-  _actions: String
-  _branch: String
-  _bulkUpdate: String
-  _decorations: String
-  _delete: String
-  _events: String
-  _image: String
-  _page: String
-  _project: String
-  _properties: String
-  _runs: String
-  _self: String
-  _update: String
 }
 
 "Version information"
@@ -9013,14 +8536,6 @@ input CreateBuildOrGetInput {
   runInfo: RunInfoInput
 }
 
-"Input type for the createBuiltInAccount mutation."
-input CreateBuiltInAccountInput {
-  "email field"
-  email: String!
-  "fullName field"
-  fullName: String!
-}
-
 "Input type for the createConfiguration mutation."
 input CreateConfigurationInput {
   "data field"
@@ -9165,6 +8680,16 @@ input CreateSlotsInput {
   projectId: Int!
   "qualifier field"
   qualifier: String
+}
+
+"Input type for the createTestAccount mutation."
+input CreateTestAccountInput {
+  "Email of the account"
+  email: String!
+  "Full name for the account. If null, the full name is not changed."
+  fullName: String!
+  "List of groups the account is a member of. If null, no group is assigned."
+  groups: [Int!]
 }
 
 "Input type for the createValidationRunById mutation."
@@ -9816,12 +9341,6 @@ input DeleteWebhookInput {
   name: String!
 }
 
-"Input type for the disableAccount mutation."
-input DisableAccountInput {
-  "ID of the account"
-  id: Int!
-}
-
 "Input type for the disableBranch mutation."
 input DisableBranchInput {
   "Branch ID"
@@ -9860,12 +9379,6 @@ input EditAccountInput {
   fullName: String
   "List of groups the account is a member of. If null, the groups are not changed."
   groups: [Int!]
-  "ID of the account"
-  id: Int!
-}
-
-"Input type for the enableAccount mutation."
-input EnableAccountInput {
   "ID of the account"
   id: Int!
 }
@@ -10245,12 +9758,6 @@ input LinksBuildInputItem {
   project: String!
   "Qualifier for the link"
   qualifier: String
-}
-
-"Input type for the lockAccount mutation."
-input LockAccountInput {
-  "ID of the account"
-  id: Int!
 }
 
 "Input type for the mapGroup mutation."
@@ -11841,12 +11348,6 @@ input UnfavouriteBranchInput {
 "Input type for the unfavouriteProject mutation."
 input UnfavouriteProjectInput {
   "Project ID"
-  id: Int!
-}
-
-"Input type for the unlockAccount mutation."
-input UnlockAccountInput {
-  "ID of the account"
   id: Int!
 }
 

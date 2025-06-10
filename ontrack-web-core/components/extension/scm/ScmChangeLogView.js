@@ -10,7 +10,7 @@ import {downToBranchBreadcrumbs, homeBreadcrumbs} from "@components/common/Bread
 import {CloseCommand} from "@components/common/Commands";
 import {branchUri, homeUri} from "@components/common/Links";
 import GridTable from "@components/grid/GridTable";
-import GridTableContextProvider, {GridTableContext} from "@components/grid/GridTableContext";
+import GridTableContextProvider from "@components/grid/GridTableContext";
 import GitChangeLogCommits from "@components/extension/git/GitChangeLogCommits";
 import ChangeLogIssues from "@components/extension/issues/ChangeLogIssues";
 import ChangeLogLinks from "@components/extension/scm/ChangeLogLinks";
@@ -51,7 +51,6 @@ export default function ScmChangeLogView({from, to}) {
                     name
                     description
                     image
-                    _image
                 }
             }
             releaseProperty {
@@ -129,7 +128,6 @@ export default function ScmChangeLogView({from, to}) {
                                             id
                                             name
                                             image
-                                            _image
                                         }
                                     }
                                     usingQualified {

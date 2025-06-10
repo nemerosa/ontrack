@@ -23,7 +23,6 @@ const gqlBuildMinInfo = gql`
                 description
                 name
                 image
-                _image
             }
         }
     }

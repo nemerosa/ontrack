@@ -44,7 +44,6 @@ function BranchLinksFlow({branch}) {
                     description
                     name
                     image
-                    _image
                 }
             }
         }

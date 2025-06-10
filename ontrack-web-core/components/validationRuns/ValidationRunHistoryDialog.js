@@ -85,7 +85,6 @@ export default function ValidationRunHistoryDialog({dialog, onChange}) {
                                         id
                                         name
                                         image
-                                        _image
                                         dataType {
                                             descriptor {
                                                 id

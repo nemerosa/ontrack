@@ -45,7 +45,6 @@ export const gqlBuilds = gql`
                             name
                             description
                             image
-                            _image
                         }
                     }
                     validations {

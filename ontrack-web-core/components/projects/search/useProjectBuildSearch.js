@@ -39,7 +39,6 @@ export const useProjectBuildSearch = ({project}) => {
                             name
                             description
                             image
-                            _image
                         }
                     }
                 }
