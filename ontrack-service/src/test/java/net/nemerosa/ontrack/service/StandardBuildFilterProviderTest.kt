@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.service
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.structure.PropertyService
 import net.nemerosa.ontrack.model.structure.StructureService
-import net.nemerosa.ontrack.model.structure.ValidationRunStatusService
 import net.nemerosa.ontrack.repository.CoreBuildFilterRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -19,21 +18,19 @@ class StandardBuildFilterProviderTest {
     @BeforeEach
     fun before() {
         val structureService = mock(StructureService::class.java)
-        val validationRunStatusService = mock(ValidationRunStatusService::class.java)
         val propertyService = mock(PropertyService::class.java)
         val coreBuildFilterRepository = mock(CoreBuildFilterRepository::class.java)
         provider = StandardBuildFilterProvider(
-            structureService,
-            validationRunStatusService,
-            propertyService,
-            coreBuildFilterRepository
+            structureService = structureService,
+            propertyService = propertyService,
+            coreBuildFilterRepository = coreBuildFilterRepository
         )
     }
 
     @Test
     fun `Parsing default`() {
         val data = provider.parse(
-                emptyMap<String,String>().asJson()
+            emptyMap<String, String>().asJson()
         )
         assertNotNull(data) {
             assertEquals(10, it.count)
@@ -43,15 +40,16 @@ class StandardBuildFilterProviderTest {
     @Test
     fun `Parsing without count`() {
         val data = provider.parse(
-                mapOf(
-                        "withPromotionLevel" to "IRON",
-                ).asJson()
+            mapOf(
+                "withPromotionLevel" to "IRON",
+            ).asJson()
         )
         assertNotNull(data) {
             assertEquals(10, it.count)
             assertEquals("IRON", it.withPromotionLevel)
         }
     }
+
     @Test
     fun parse_count_only() {
         val data = provider.parse(

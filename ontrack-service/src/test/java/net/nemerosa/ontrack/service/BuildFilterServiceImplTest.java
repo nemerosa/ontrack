@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.model.security.SecurityService;
 import net.nemerosa.ontrack.model.structure.PropertyService;
 import net.nemerosa.ontrack.model.structure.StandardBuildFilterData;
 import net.nemerosa.ontrack.model.structure.StructureService;
-import net.nemerosa.ontrack.model.structure.ValidationRunStatusService;
 import net.nemerosa.ontrack.repository.BuildFilterRepository;
 import net.nemerosa.ontrack.repository.CoreBuildFilterRepository;
 import org.junit.Before;
@@ -31,7 +30,6 @@ public class BuildFilterServiceImplTest {
                 Collections.singletonList(
                         new StandardBuildFilterProvider(
                                 structureService,
-                                mock(ValidationRunStatusService.class),
                                 mock(PropertyService.class),
                                 mock(CoreBuildFilterRepository.class)
                         )

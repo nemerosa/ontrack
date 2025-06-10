@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class StandardBuildFilterProvider(
     private val structureService: StructureService,
-    private val validationRunStatusService: ValidationRunStatusService,
     private val propertyService: PropertyService,
     private val coreBuildFilterRepository: CoreBuildFilterRepository,
 ) : AbstractBuildFilterProvider<StandardBuildFilterData>() {
@@ -28,14 +27,14 @@ class StandardBuildFilterProvider(
     override val isPredefined: Boolean = false
 
     override fun filterBranchBuilds(branch: Branch, data: StandardBuildFilterData?): List<Build> =
-            try {
-                coreBuildFilterRepository.standardFilter(
-                        branch,
-                        data ?: StandardBuildFilterData.of(10)
-                ) { type -> propertyService.getPropertyTypeByName<Any>(type) }
-            } catch (_: CoreBuildFilterInvalidException) {
-                emptyList()
-            }
+        try {
+            coreBuildFilterRepository.standardFilter(
+                branch,
+                data ?: StandardBuildFilterData.of(10)
+            ) { type -> propertyService.getPropertyTypeByName<Any>(type) }
+        } catch (_: CoreBuildFilterInvalidException) {
+            emptyList()
+        }
 
     override fun filterBranchBuildsWithPagination(
         branch: Branch,
@@ -44,10 +43,10 @@ class StandardBuildFilterProvider(
         size: Int,
     ): PaginatedList<Build> = try {
         coreBuildFilterRepository.standardFilterPagination(
-                branch,
-                data ?: StandardBuildFilterData.of(size),
-                offset,
-                size
+            branch,
+            data ?: StandardBuildFilterData.of(size),
+            offset,
+            size
         ) { type -> propertyService.getPropertyTypeByName<Any>(type) }
     } catch (_: CoreBuildFilterInvalidException) {
         PaginatedList.empty()
