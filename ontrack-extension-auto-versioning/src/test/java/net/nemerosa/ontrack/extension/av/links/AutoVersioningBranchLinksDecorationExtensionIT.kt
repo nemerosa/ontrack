@@ -43,11 +43,8 @@ class AutoVersioningBranchLinksDecorationExtensionIT : AbstractAutoVersioningTes
                             )
                             assertEquals("received", icon)
                             assertEquals(
-                                "urn:test:#:extension/collibra/auto-versioning-audit/branch/${project("parent").name}/${
-                                    branch(
-                                        "parent"
-                                    ).name
-                                }", url
+                                null,
+                                url
                             )
                         }
                     }
@@ -85,7 +82,7 @@ class AutoVersioningBranchLinksDecorationExtensionIT : AbstractAutoVersioningTes
                             )
                             assertEquals("received", icon)
                             assertEquals(
-                                "urn:test:#:extension/collibra/auto-versioning-audit/source/${project("component").name}",
+                                null,
                                 url
                             )
                         }

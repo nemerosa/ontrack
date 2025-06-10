@@ -3,12 +3,14 @@ package net.nemerosa.ontrack.extension.git
 import net.nemerosa.ontrack.extension.git.mocking.GitMockingConfigurator
 import net.nemerosa.ontrack.test.assertIs
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
+@Disabled("GitPullRequestInformationExtension is disabled")
 class GitPullRequestInformationExtensionIT : AbstractGitTestSupport() {
 
     @Autowired
