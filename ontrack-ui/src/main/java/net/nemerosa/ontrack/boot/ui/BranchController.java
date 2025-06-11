@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -165,8 +164,7 @@ public class BranchController {
                 new BranchBuildView(
                         builds.stream()
                                 .map(build -> structureService.getBuildView(build, true))
-                                .collect(Collectors.toList()),
-                        Collections.emptyList()
+                                .collect(Collectors.toList())
                 )
         );
     }

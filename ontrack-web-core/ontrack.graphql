@@ -344,6 +344,8 @@ type Branch implements Authorizable & ProjectEntity {
   ): BuildAutoVersioning
   "Auto versioning configuration"
   autoVersioningConfig: AutoVersioningConfig
+  "List of forms for the build filters (for the creation of new filters)"
+  buildFilterForms: [BuildFilterForm!]!
   "List of shared build filters for this branch"
   buildFilterResources: [BuildFilterResource!]!
   "Gets a list of builds for this branch. Use `buildsPaginated` to get a list of paginated builds."
@@ -729,6 +731,16 @@ type BuildAutoVersioning {
   lastEligibleBuild: Build
   "Last auto versioning entry for this dependency."
   status: AutoVersioningAuditEntry
+}
+
+"Form to create a new build filter."
+type BuildFilterForm {
+  "If the filter is predefined and cannot be configured."
+  isPredefined: Boolean
+  "FQCN for the build filter provider"
+  type: String!
+  "Display name for the filter"
+  typeName: String!
 }
 
 "Shared build filter for a branch."
