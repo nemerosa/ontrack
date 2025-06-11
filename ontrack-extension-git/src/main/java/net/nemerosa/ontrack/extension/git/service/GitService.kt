@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.git.service
 
-import net.nemerosa.ontrack.extension.api.model.BuildDiffRequest
 import net.nemerosa.ontrack.extension.git.model.*
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.issues.export.ExportFormat
@@ -94,38 +93,6 @@ interface GitService : SCMService {
     fun launchBuildSync(branchId: ID, synchronous: Boolean): Future<*>?
 
     /**
-     * Change log
-     */
-    @Deprecated("Will be removed in V5. Use the SCMChangeLogService instead.")
-    fun changeLog(request: BuildDiffRequest): GitChangeLog
-
-    /**
-     * Change log commits
-     */
-    @Deprecated("Will be removed in V5. Use the SCMChangeLogService instead.")
-    fun getChangeLogCommits(
-        changeLog: GitChangeLog,
-    ): GitChangeLogCommits
-
-    /**
-     * Change log issues IDs
-     */
-    @Deprecated("Will be removed in V5. Use the SCMChangeLogService instead.")
-    fun getChangeLogIssuesIds(changeLog: GitChangeLog): List<String>
-
-    /**
-     * Change log issues
-     */
-    @Deprecated("Will be removed in V5. Use the SCMChangeLogService instead.")
-    fun getChangeLogIssues(changeLog: GitChangeLog): GitChangeLogIssues
-
-    /**
-     * Change log files
-     */
-    @Deprecated("Will be removed in V5. Use the SCMChangeLogService instead.")
-    fun getChangeLogFiles(changeLog: GitChangeLog): GitChangeLogFiles
-
-    /**
      * Loops over each correctly configured project.
      */
     fun forEachConfiguredProject(consumer: BiConsumer<Project, GitConfiguration>)
@@ -167,11 +134,6 @@ interface GitService : SCMService {
      * Gets the list of remote branches, as defined under `ref/heads`.
      */
     fun getRemoteBranches(gitConfiguration: GitConfiguration): List<String>
-
-    /**
-     * Gets a diff on a list of file changes, filtering the changes using ANT-like patterns
-     */
-    fun diff(changeLog: GitChangeLog, patterns: List<String>): String
 
     /**
      * Synchronises the Git repository attached to this project.
@@ -284,8 +246,4 @@ interface GitService : SCMService {
     @Deprecated("Export formats are no longer issue service specific - will be removed in V5")
     fun getIssueExportFormats(project: Project): List<ExportFormat>
 
-    /**
-     * Gets a link to view a diff.
-     */
-    fun getDiffLink(gitChangeLog: GitChangeLog): String?
 }

@@ -133,16 +133,6 @@ class StructureServiceIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    fun `Project status view`() {
-        // Creating branches
-        val project = doCreateProject()
-        (1..5).forEach { doCreateBranch(project, nd("1.0.${it}", "")) }
-        // Gets the branch status views
-        val views = asUserWithView(project).call { structureService.getBranchStatusViews(project.id) }
-        assertEquals(5, views.size)
-    }
-
-    @Test
     fun `Previous build`() {
         val branch = doCreateBranch()
         val build1 = doCreateBuild(branch, nd("1", ""))

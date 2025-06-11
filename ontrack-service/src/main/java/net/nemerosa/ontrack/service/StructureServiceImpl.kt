@@ -49,7 +49,6 @@ class StructureServiceImpl(
     private val propertyService: PropertyService,
     private val predefinedPromotionLevelService: PredefinedPromotionLevelService,
     private val predefinedValidationStampService: PredefinedValidationStampService,
-    private val decorationService: DecorationService,
     private val promotionRunCheckService: PromotionRunCheckService,
     private val statsRepository: StatsRepository,
     private val buildLinkListenerService: BuildLinkListenerService,
@@ -62,16 +61,6 @@ class StructureServiceImpl(
     private val buildSearchExtensions: Map<String, BuildSearchExtension> by lazy {
         extensionManager.getExtensions(BuildSearchExtension::class.java).associateBy { it.id }
     }
-
-    override val projectStatusViews: List<ProjectStatusView>
-        get() = projectList
-            .map { project ->
-                ProjectStatusView(
-                    project,
-                    decorationService.getDecorations(project),
-                    getBranchStatusViews(project.id)
-                )
-            }
 
     override val projectList: List<Project>
         get() {
@@ -182,20 +171,6 @@ class StructureServiceImpl(
         return newBranch
     }
 
-    override fun getBranchStatusViews(projectId: ID): List<BranchStatusView> {
-        return getBranchesForProject(projectId)
-            .map { this.getBranchStatusView(it) }
-    }
-
-    override fun getBranchStatusView(branch: Branch): BranchStatusView {
-        return BranchStatusView(
-            branch,
-            decorationService.getDecorations(branch),
-            getLastBuildForBranch(branch),
-            getPromotionLevelListForBranch(branch.id).map { this.toPromotionView(it) }
-        )
-    }
-
     override fun saveBranch(branch: Branch) {
         isEntityDefined(branch, "Branch must be defined")
         isEntityDefined(branch.project, "Project must be defined")
@@ -228,27 +203,9 @@ class StructureServiceImpl(
         return structureRepository.deleteBranch(branchId)
     }
 
-    protected fun toPromotionView(promotionLevel: PromotionLevel): PromotionView {
-        // Gets the last build having this promotion level
-        val promotionRun = getLastPromotionRunForPromotionLevel(promotionLevel)
-        // OK
-        return PromotionView(
-            promotionLevel,
-            promotionRun
-        )
-    }
-
     override fun getLastPromotionRunForPromotionLevel(promotionLevel: PromotionLevel): PromotionRun? {
         securityService.checkProjectFunction(promotionLevel.projectId(), ProjectView::class.java)
         return structureRepository.getLastPromotionRunForPromotionLevel(promotionLevel)
-    }
-
-    override fun getPromotionRunView(promotionLevel: PromotionLevel): PromotionRunView {
-        securityService.checkProjectFunction(promotionLevel.projectId(), ProjectView::class.java)
-        return PromotionRunView(
-            promotionLevel,
-            structureRepository.getPromotionRunsForPromotionLevel(promotionLevel)
-        )
     }
 
     override fun deletePromotionRun(promotionRunId: ID): Ack {
@@ -610,26 +567,6 @@ class StructureServiceImpl(
     override fun forEachBuildLink(code: (from: Build, to: Build, qualifier: String) -> Unit) {
         securityService.checkGlobalFunction(ApplicationManagement::class.java)
         buildLinkRepository.forEachBuildLink(code)
-    }
-
-    override fun getValidationStampRunViewsForBuild(
-        build: Build,
-        offset: Int,
-        size: Int
-    ): List<ValidationStampRunView> {
-        // Gets all validation stamps
-        val stamps = getValidationStampListForBranch(build.branch.id)
-        // Gets all runs for this build
-        val runs = getValidationRunsForBuild(build.id, offset, size)
-        // Gets the validation stamp run views
-        return stamps.map { stamp -> getValidationStampRunView(runs, stamp) }
-    }
-
-    protected fun getValidationStampRunView(runs: List<ValidationRun>, stamp: ValidationStamp): ValidationStampRunView {
-        return ValidationStampRunView(
-            stamp,
-            runs.filter { run -> run.validationStamp.id() == stamp.id() }
-        )
     }
 
     override fun getPromotionLevelListForBranch(branchId: ID): List<PromotionLevel> {
@@ -994,37 +931,12 @@ class StructureServiceImpl(
             .filter { b -> securityService.isProjectFunctionGranted(b, ProjectView::class.java) }
     }
 
-    override fun getEarliestPromotionsAfterBuild(build: Build): BranchStatusView {
-        return BranchStatusView(
-            build.branch,
-            decorationService.getDecorations(build.branch),
-            getLastBuild(build.branch.id).orElse(null),
-            getPromotionLevelListForBranch(build.branch.id)
-                .map { promotionLevel ->
-                    PromotionView(
-                        promotionLevel,
-                        getEarliestPromotionRunAfterBuild(promotionLevel, build).orElse(null)
-                    )
-                }
-        )
-    }
-
     override fun findBuildAfterUsingNumericForm(id: ID, buildName: String): Optional<Build> {
         return if (StringUtils.isNumeric(buildName)) {
             structureRepository.findBuildAfterUsingNumericForm(id, buildName)
         } else {
             throw IllegalArgumentException("Build name is expected to be numeric: $buildName")
         }
-    }
-
-    override fun getBuildView(build: Build, withDecorations: Boolean): BuildView {
-        var view = BuildView.of(build)
-            .withPromotionRuns(getLastPromotionRunsForBuild(build.id))
-            .withValidationStampRunViews(getValidationStampRunViewsForBuild(build))
-        if (withDecorations) {
-            view = view.withDecorations(decorationService.getDecorations(build))
-        }
-        return view
     }
 
     override fun getValidationStampImage(validationStampId: ID): Document {

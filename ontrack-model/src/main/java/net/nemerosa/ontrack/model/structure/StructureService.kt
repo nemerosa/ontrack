@@ -10,8 +10,6 @@ import java.util.function.BiFunction
 
 interface StructureService {
 
-    val projectStatusViews: List<ProjectStatusView>
-
     val projectList: List<Project>
 
     // Projects
@@ -60,10 +58,6 @@ interface StructureService {
 
     fun newBranch(branch: Branch): Branch
 
-    fun getBranchStatusViews(projectId: ID): List<BranchStatusView>
-
-    fun getBranchStatusView(branch: Branch): BranchStatusView
-
     fun saveBranch(branch: Branch)
 
     fun disableBranch(branch: Branch): Branch
@@ -90,19 +84,12 @@ interface StructureService {
     // TODO Replace by Build?
     fun findBuildByName(project: String, branch: String, build: String): Optional<Build>
 
-    fun getEarliestPromotionsAfterBuild(build: Build): BranchStatusView
-
     /**
      * Finds a build on a branch whose name is the closest. It assumes that build names
      * are in a numeric format.
      */
     // TODO Replace by Build?
     fun findBuildAfterUsingNumericForm(id: ID, buildName: String): Optional<Build>
-
-    /**
-     * Gets an aggregated view of a build, with its promotion runs, validation stamps and decorations.
-     */
-    fun getBuildView(build: Build, withDecorations: Boolean): BuildView
 
     fun getLastBuildForBranch(branch: Branch): Build?
 
@@ -243,8 +230,6 @@ interface StructureService {
 
     fun buildSearch(projectId: ID, form: BuildSearchForm): List<Build>
 
-    fun getValidationStampRunViewsForBuild(build: Build, offset: Int = 0, size: Int = 10): List<ValidationStampRunView>
-
     // Promotion levels
 
     fun getPromotionLevelListForBranch(branchId: ID): List<PromotionLevel>
@@ -306,8 +291,6 @@ interface StructureService {
     fun getPromotionRunsForBuildAndPromotionLevel(build: Build, promotionLevel: PromotionLevel): List<PromotionRun>
 
     fun getLastPromotionRunForPromotionLevel(promotionLevel: PromotionLevel): PromotionRun?
-
-    fun getPromotionRunView(promotionLevel: PromotionLevel): PromotionRunView
 
     fun deletePromotionRun(promotionRunId: ID): Ack
 

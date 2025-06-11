@@ -109,11 +109,6 @@ public class PromotionLevelController {
         ));
     }
 
-    @RequestMapping(value = "promotionLevels/{promotionLevelId}/runs", method = RequestMethod.GET)
-    public PromotionRunView getPromotionRunView(@PathVariable ID promotionLevelId) {
-        return structureService.getPromotionRunView(structureService.getPromotionLevel(promotionLevelId));
-    }
-
     /**
      * Bulk update of all promotion levels in other projects/branches and in predefined promotion levels,
      * following the model designed by the promotion level ID.

@@ -1,15 +1,12 @@
 package net.nemerosa.ontrack.extension.scm.service
 
-import io.mockk.mockk
-import net.nemerosa.ontrack.model.structure.StructureService
 import org.junit.jupiter.api.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class SCMServiceImplTest {
 
-    private val structureService = mockk<StructureService>()
-    private val service = SCMUtilsServiceImpl(structureService)
+    private val service = SCMUtilsServiceImpl()
 
     @Test
     fun `One pattern`() {

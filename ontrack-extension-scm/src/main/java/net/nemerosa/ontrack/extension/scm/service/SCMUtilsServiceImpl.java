@@ -3,8 +3,6 @@ package net.nemerosa.ontrack.extension.scm.service;
 import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFile;
 import net.nemerosa.ontrack.extension.scm.model.SCMIssueCommitBranchInfo;
 import net.nemerosa.ontrack.model.structure.Build;
-import net.nemerosa.ontrack.model.structure.BuildView;
-import net.nemerosa.ontrack.model.structure.StructureService;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,11 +16,8 @@ import java.util.stream.Collectors;
 @Service
 public class SCMUtilsServiceImpl implements SCMUtilsService {
 
-    private final StructureService structureService;
-
     @Autowired
-    public SCMUtilsServiceImpl(StructureService structureService) {
-        this.structureService = structureService;
+    public SCMUtilsServiceImpl() {
     }
 
     @Override
@@ -64,19 +59,7 @@ public class SCMUtilsServiceImpl implements SCMUtilsService {
 
     @Override
     public SCMIssueCommitBranchInfo getBranchInfo(@Nullable Build buildAfterCommit, SCMIssueCommitBranchInfo branchInfo) {
-        SCMIssueCommitBranchInfo info = branchInfo;
-        if (buildAfterCommit != null) {
-            // Gets the build view
-            BuildView buildView = structureService.getBuildView(buildAfterCommit, true);
-            // Adds it to the list
-            info = info.withBuildView(buildView);
-            // Collects the promotions for the branch
-            info = info.withBranchStatusView(
-                    structureService.getEarliestPromotionsAfterBuild(buildAfterCommit)
-            );
-        }
-        // OK
-        return info;
+        return branchInfo;
     }
 
 }

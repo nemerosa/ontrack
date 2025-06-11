@@ -18,21 +18,6 @@ class BuildController(
     private val securityService: SecurityService,
 ) {
 
-    /**
-     * Build search
-     */
-    @GetMapping("project/{projectId}/builds/search")
-    fun buildSearch(@PathVariable projectId: ID, form: @Valid BuildSearchForm?): ResponseEntity<List<BuildView>> {
-        return ResponseEntity.ok(
-            structureService.buildSearch(projectId, form ?: BuildSearchForm())
-                .map { build: Build? ->
-                    structureService.getBuildView(
-                        build!!, true
-                    )
-                },
-        )
-    }
-
     @PostMapping("branches/{branchId}/builds/create")
     fun newBuild(@PathVariable branchId: ID, @RequestBody request: @Valid BuildRequest?): ResponseEntity<Build> {
         // Gets the holding branch

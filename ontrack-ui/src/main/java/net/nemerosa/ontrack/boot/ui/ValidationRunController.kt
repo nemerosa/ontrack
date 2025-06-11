@@ -20,16 +20,6 @@ constructor(
     private val securityService: SecurityService
 ) {
 
-    @GetMapping("builds/{buildId}/validationRuns/view")
-    fun getValidationStampRunViews(@PathVariable buildId: ID): List<ValidationStampRunView> {
-        // Build
-        val build = structureService.getBuild(buildId)
-        // Gets the views
-        val views = structureService.getValidationStampRunViewsForBuild(build)
-        // Converts into a view
-        return views
-    }
-
     @GetMapping("builds/{buildId}/validationRuns")
     fun getValidationRuns(@PathVariable buildId: ID): List<ValidationRun> {
         return structureService.getValidationRunsForBuild(buildId, 0, 100)

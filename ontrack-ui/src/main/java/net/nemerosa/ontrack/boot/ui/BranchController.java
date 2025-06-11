@@ -1,21 +1,13 @@
 package net.nemerosa.ontrack.boot.ui;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.validation.Valid;
-import net.nemerosa.ontrack.extension.api.ExtensionManager;
 import net.nemerosa.ontrack.model.Ack;
-import net.nemerosa.ontrack.model.buildfilter.BuildFilterProviderData;
-import net.nemerosa.ontrack.model.buildfilter.BuildFilterService;
 import net.nemerosa.ontrack.model.structure.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.WebRequest;
 
 import java.util.List;
-import java.util.stream.Collectors;
-
-import static net.nemerosa.ontrack.ui.support.UIUtils.requestParametersToJson;
 
 @RestController
 @RequestMapping("/rest/structure")
@@ -23,21 +15,15 @@ public class BranchController {
 
     private final StructureService structureService;
     private final CopyService copyService;
-    private final BuildFilterService buildFilterService;
-    private final ExtensionManager extensionManager;
     private final BranchFavouriteService branchFavouriteService;
 
     @Autowired
     public BranchController(
             StructureService structureService,
             CopyService copyService,
-            BuildFilterService buildFilterService,
-            ExtensionManager extensionManager,
             BranchFavouriteService branchFavouriteService) {
         this.structureService = structureService;
         this.copyService = copyService;
-        this.buildFilterService = buildFilterService;
-        this.extensionManager = extensionManager;
         this.branchFavouriteService = branchFavouriteService;
     }
 
@@ -94,32 +80,6 @@ public class BranchController {
         return ResponseEntity.ok(structureService.disableBranch(branch));
     }
 
-    @RequestMapping(value = "branches/{branchId}/status", method = RequestMethod.GET)
-    public ResponseEntity<BranchStatusView> getBranchStatusView(@PathVariable ID branchId) {
-        return ResponseEntity.ok(structureService.getBranchStatusView(structureService.getBranch(branchId)));
-    }
-
-    @RequestMapping(value = "branches/{branchId}/view", method = RequestMethod.GET)
-    public ResponseEntity<BranchBuildView> buildView(@PathVariable ID branchId) {
-        return buildViewWithFilter(
-                branchId,
-                buildFilterService.defaultFilterProviderData()
-        );
-
-    }
-
-    @RequestMapping(value = "branches/{branchId}/view/{filterType:.*}", method = RequestMethod.GET)
-    public <T> ResponseEntity<BranchBuildView> buildViewWithFilter(@PathVariable ID branchId, @PathVariable String filterType, WebRequest request) {
-        JsonNode jsonParameters = requestParametersToJson(request);
-        // Gets the filter provider
-        BuildFilterProviderData<T> buildFilterProvider = buildFilterService.getBuildFilterProviderData(filterType, jsonParameters);
-        // Gets the build view
-        return buildViewWithFilter(
-                branchId,
-                buildFilterProvider
-        );
-    }
-
     /**
      * Copies the configuration from a branch into this one.
      */
@@ -151,22 +111,6 @@ public class BranchController {
         Branch branch = structureService.getBranch(branchId);
         // Performs the clone
         return ResponseEntity.ok(copyService.cloneBranch(branch, request));
-    }
-
-    private <T> ResponseEntity<BranchBuildView> buildViewWithFilter(ID branchId,
-                                                                    BuildFilterProviderData<T> buildFilterProviderData) {
-        // Gets the branch
-        Branch branch = structureService.getBranch(branchId);
-        // Gets the list of builds
-        List<Build> builds = buildFilterProviderData.filterBranchBuilds(branch);
-        // Gets the views for each build
-        return ResponseEntity.ok(
-                new BranchBuildView(
-                        builds.stream()
-                                .map(build -> structureService.getBuildView(build, true))
-                                .collect(Collectors.toList())
-                )
-        );
     }
 
     @RequestMapping(value = "branches/{branchId}/favourite", method = RequestMethod.PUT)

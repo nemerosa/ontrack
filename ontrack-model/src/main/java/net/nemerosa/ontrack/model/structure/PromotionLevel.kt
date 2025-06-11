@@ -9,7 +9,7 @@ data class PromotionLevel(
         override val id: ID,
         val name: String,
         override val description: String?,
-        @JsonView(value = [PromotionLevel::class, PromotionView::class, PromotionRunView::class])
+        @JsonView(PromotionLevel::class)
         val branch: Branch,
         @JsonProperty("image")
         val isImage: Boolean,

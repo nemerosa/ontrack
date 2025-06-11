@@ -33,11 +33,6 @@ public class ProjectController {
         return structureService.getProjectList();
     }
 
-    @RequestMapping(value = "view", method = RequestMethod.GET)
-    public List<ProjectStatusView> getProjectStatusViews() {
-        return structureService.getProjectStatusViews();
-    }
-
     @RequestMapping(value = "create", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Project> newProject(@RequestBody @Valid NameDescriptionState nameDescription) {
@@ -47,11 +42,6 @@ public class ProjectController {
         project = structureService.newProject(project);
         // OK
         return ResponseEntity.ok(project);
-    }
-
-    @RequestMapping(value = "{projectId}/view", method = RequestMethod.GET)
-    public List<BranchStatusView> getBranchStatusViews(@PathVariable ID projectId) {
-        return structureService.getBranchStatusViews(projectId);
     }
 
     @RequestMapping(value = "{projectId}", method = RequestMethod.GET)

@@ -9,7 +9,6 @@ import net.nemerosa.ontrack.model.structure.ValidationStamp.Companion.of
 import net.nemerosa.ontrack.ui.support.UIUtils.setupDefaultImageCache
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.util.*
@@ -18,7 +17,6 @@ import java.util.*
 @RequestMapping("/rest/structure")
 class ValidationStampController(
     private val structureService: StructureService,
-    private val decorationService: DecorationService,
     private val validationDataTypeService: ValidationDataTypeService
 ) {
 
@@ -27,18 +25,6 @@ class ValidationStampController(
     fun getValidationStampListForBranch(@PathVariable branchId: ID): List<ValidationStamp> {
         val (_, _, _, _, project) = structureService.getBranch(branchId)
         return structureService.getValidationStampListForBranch(branchId)
-    }
-
-    @GetMapping("branches/{branchId}/validationStamps/view")
-    @Transactional
-    fun getValidationStampViewListForBranch(@PathVariable branchId: ID): List<ValidationStampView> {
-        return getValidationStampListForBranch(branchId)
-            .map { validationStamp: ValidationStamp? ->
-                ValidationStampView.of(
-                    validationStamp,
-                    decorationService.getDecorations(validationStamp)
-                )
-            }
     }
 
     @PutMapping("branches/{branchId}/validationStamps/reorder")
