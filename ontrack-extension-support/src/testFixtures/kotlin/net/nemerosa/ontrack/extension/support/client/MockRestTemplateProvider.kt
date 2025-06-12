@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.support.client
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnNotWebApplication
+import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Component
 import org.springframework.test.web.client.ExpectedCount
@@ -18,9 +19,9 @@ class MockRestTemplateProvider : DefaultRestTemplateProvider() {
 
     override fun createRestTemplate(
         rootUri: String,
-        basicAuthentication: RestTemplateBasicAuthentication
+        configuration: RestTemplateBuilder.() -> RestTemplateBuilder
     ): RestTemplate {
-        val template = super.createRestTemplate(rootUri, basicAuthentication)
+        val template = super.createRestTemplate(rootUri, configuration)
         context?.start(template)
         return template
     }

@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.tx
 
-interface TransactionResource : AutoCloseable {
+interface TransactionResource : java.lang.AutoCloseable {
 
     override fun close()
 

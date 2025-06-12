@@ -66,8 +66,7 @@ export default function JiraConfigurationsPage() {
             key="user"
             name="user"
             label="Username"
-            extra="Username used to connect to Jira."
-            rules={[{required: true, message: 'Username is required.',},]}
+            extra="Username used to connect to Jira. If blank, the password will be used as a personal access token (PAT)."
         >
             <Input/>
         </Form.Item>,
@@ -75,7 +74,7 @@ export default function JiraConfigurationsPage() {
             key="password"
             name="password"
             label="Password"
-            extra="Password or token used to connect to Jira."
+            extra="Password or token used to connect to Jira. It's considered a personal access token (PAT) if the username is blank."
         >
             <Input.Password/>
         </Form.Item>,
