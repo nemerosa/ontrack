@@ -20,13 +20,4 @@ open class DefaultRestTemplateProvider : RestTemplateProvider {
             }
             .build()
 
-    @Deprecated("Will be removed in V5. Use the method with the configuration block.")
-    final override fun createRestTemplate(
-        rootUri: String,
-        basicAuthentication: RestTemplateBasicAuthentication
-    ): RestTemplate =
-        createRestTemplate(rootUri) {
-            basicAuthentication(basicAuthentication.username, basicAuthentication.password)
-        }
-
 }
