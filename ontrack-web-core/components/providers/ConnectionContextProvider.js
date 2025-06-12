@@ -7,25 +7,6 @@ import {callGraphQL} from "@components/services/GraphQL";
 export const useConnection = () => useContext(ConnectionContext)
 
 /**
- * @deprecated Remove for V5
- */
-export const useFullRestUri = (uri) => {
-
-    const connection = useConnection()
-    const [fullUri, setFullUri] = useState('')
-
-    useEffect(() => {
-        if (connection.config) {
-            setFullUri(`${connection.config.url}${uri}`)
-        }
-    }, [uri, connection])
-
-    return {
-        fullUri,
-    }
-}
-
-/**
  * @deprecated Use useQuery / useMutation from GraphQL.js
  */
 export const useGraphQLClient = () => {
