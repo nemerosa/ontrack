@@ -18,6 +18,7 @@ interface MockRestTemplateContext {
         uri: String,
         parameters: Map<String, String>,
         outcome: MockRestTemplateOutcome,
+        expectedHeaders: Map<String, String> = emptyMap(),
     )
 
     /**
