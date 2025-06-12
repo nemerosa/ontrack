@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.extension.jira.client.JIRAClient.Companion.PROPERTY_
 import net.nemerosa.ontrack.extension.jira.client.JIRAClientImpl
 import net.nemerosa.ontrack.extension.support.client.RestTemplateProvider
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Component
 
 @Component
@@ -31,7 +32,7 @@ class JIRASessionFactoryImpl(
                 } else {
                     // Password as a token
                     this.defaultHeader(
-                        "Authentication",
+                        HttpHeaders.AUTHORIZATION,
                         "Bearer ${configuration.password}"
                     )
                 }
