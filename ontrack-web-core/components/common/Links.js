@@ -89,7 +89,7 @@ export function restPredefinedPromotionLevelImageUri(predefinedPromotionLevel) {
 }
 
 export function restPredefinedValidationStampImageUri(predefinedValidationStamp) {
-    return `/rest/admin/predefinedValidationStamps/${predefinedValidationStamp.id}/image`
+    return `/api/protected/images/predefinedValidationStamps/${predefinedValidationStamp.id}`
 }
 
 export function restValidationStampImageUri(validationStamp) {

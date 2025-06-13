@@ -7,7 +7,7 @@ export const usePredefinedPromotionLevelChangeImageDialog = ({onChange}) => {
 
     return useChangeImageDialog({
         query: gql`
-            query PromotionLevel($id: Int!) {
+            query PredefinedPromotionLevel($id: Int!) {
                 predefinedPromotionLevelById(id: $id) {
                     id
                     name
@@ -15,7 +15,7 @@ export const usePredefinedPromotionLevelChangeImageDialog = ({onChange}) => {
                 }
             }
         `,
-        queryUserNode: 'predefinedPromotionLevelByName',
+        queryUserNode: 'predefinedPromotionLevelById',
         imageCallback: (data, id) => {
             fetch(`/api/protected/images/predefinedPromotionLevels/${id}`, {
                 method: 'PUT',
