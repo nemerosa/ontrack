@@ -1,7 +1,29 @@
 import {backend, getAccessToken} from "@/app/api/protected/backend";
 import {NextResponse} from "next/server";
 
-export const fetchImageDataURL = async (uri) => {
+export const getImage = ({uri}) => async (request, {params}) => {
+    if (params.id) {
+        try {
+            const dataURL = await fetchImageDataURL(uri(params))
+            return NextResponse.json({dataURL})
+        } catch (error) {
+            return NextResponse.json({error}, {status: 500})
+        }
+    } else {
+        return NextResponse.json({error: "Missing image ID"}, {status: 400})
+    }
+}
+
+export const putImage = ({uri}) => async (request, {params}) => {
+    if (params.id) {
+        const data = await request.text()
+        return putImageData(uri(params), data)
+    } else {
+        return NextResponse.json({error: "Missing image ID"}, {status: 400})
+    }
+}
+
+const fetchImageDataURL = async (uri) => {
     const accessToken = await getAccessToken()
     if (!accessToken) {
         return {
@@ -29,7 +51,7 @@ export const fetchImageDataURL = async (uri) => {
     }
 }
 
-export const putImageData = async (uri, data) => {
+const putImageData = async (uri, data) => {
     const accessToken = await getAccessToken()
     if (!accessToken) {
         return {
