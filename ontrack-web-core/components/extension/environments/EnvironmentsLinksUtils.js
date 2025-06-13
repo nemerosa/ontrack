@@ -17,7 +17,7 @@ export const environmentsUri = `/extension/environments/environments`
 
 export const projectEnvironmentsUri = ({id}) => `/extension/environments/projects/${id}`
 
-export const restEnvironmentImageUri = ({id}) => `/rest/extension/environments/environments/${id}/image`
+export const restEnvironmentImageUri = ({id}) => `/api/protected/images/environments/${id}`
 
 export const environmentsBreadcrumbs = () => [
     ...homeBreadcrumbs(),
