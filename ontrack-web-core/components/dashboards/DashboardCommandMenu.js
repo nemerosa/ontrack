@@ -1,4 +1,3 @@
-import {useConnection} from "@components/providers/ConnectionContextProvider";
 import {useContext, useEffect, useState} from "react";
 import {UserContext} from "@components/providers/UserProvider";
 import {
@@ -25,7 +24,6 @@ export default function DashboardCommandMenu() {
     const user = useContext(UserContext)
 
     const router = useRouter()
-    const {environment} = useConnection()
     const context = useContext(DashboardContext)
 
     const saveDashboardDialog = useSaveDashboardDialog({
@@ -40,7 +38,7 @@ export default function DashboardCommandMenu() {
     const copyDashboard = () => {
         const selectedDashboard = context?.dashboard
         if (selectedDashboard) {
-            const link = `${environment.ontrack.ui.url}${router.pathname}?dashboard=${selectedDashboard.uuid}`
+            const link = `${window.location.origin}${router.pathname}?dashboard=${selectedDashboard.uuid}`
             if (copy(link)) {
                 message.success(
                     <Space direction="vertical">

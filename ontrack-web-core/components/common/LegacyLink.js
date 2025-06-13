@@ -1,13 +1,12 @@
 import Link from "next/link";
 import LegacyIndicator from "@components/common/LegacyIndicator";
-import {useConnection} from "@components/providers/ConnectionContextProvider";
 
+/**
+ * @deprecated Will be removed in V5
+ */
 export default function LegacyLink({href, children}) {
-
-    const {environment} = useConnection()
-
     return (
-        <Link href={`${environment?.ontrack?.url}${href}`}>
+        <Link href={`/`}>
             <LegacyIndicator>
                 {children}
             </LegacyIndicator>

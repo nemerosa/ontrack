@@ -10,7 +10,6 @@ import ValidationRunCell from "@components/branches/ValidationRunCell";
 import {useContext} from "react";
 import ValidationGroups from "@components/validationRuns/ValidationGroups";
 import {ValidationStampFilterContext} from "@components/branches/filters/validationStamps/ValidationStampFilterContext";
-import {useConnection, useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import {gql} from "graphql-request";
 import {buildUri, scmChangeLogUri} from "@components/common/Links";
 import EntityNotificationsBadge from "@components/extension/notifications/EntityNotificationsBadge";
@@ -45,9 +44,7 @@ export default function BranchBuilds({
                                          onPermalinkBuildFilter,
                                      }) {
 
-    const client = useGraphQLClient()
     const router = useRouter()
-    const connection = useConnection()
     const vsfContext = useContext(ValidationStampFilterContext)
 
     const {data: scmChangeLogEnabled} = useQuery(
