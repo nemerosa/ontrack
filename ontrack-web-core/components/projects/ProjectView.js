@@ -4,8 +4,8 @@ import {gql} from "graphql-request";
 import Head from "next/head";
 import {projectTitle} from "@components/common/Titles";
 import {projectBreadcrumbs} from "@components/common/Breadcrumbs";
-import {CloseCommand, LegacyLinkCommand} from "@components/common/Commands";
-import {homeUri, legacyProjectUri} from "@components/common/Links";
+import {CloseCommand} from "@components/common/Commands";
+import {homeUri} from "@components/common/Links";
 import {
     gqlDecorationFragment,
     gqlInformationFragment,
@@ -138,12 +138,6 @@ export default function ProjectView({id}) {
                     <ProjectBuildSearchCommand key="search" id={project.id}/>,
                     <UserMenuActions key="userMenuActions" actions={project.userMenuActions}/>,
                     <JumpToBranch key="branch" projectName={project.name}/>,
-                    <LegacyLinkCommand
-                        key="legacy"
-                        href={legacyProjectUri(project)}
-                        text="Legacy project"
-                        title="Goes to the legacy project page"
-                    />,
                     <CloseCommand key="close" href={homeUri()}/>,
                 )
                 // Setting the commands

@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
-import {CloseCommand, Command, LegacyLinkCommand} from "@components/common/Commands";
-import {branchLegacyUri, branchLinksUri, branchPromotionLevelsUri, projectUri} from "@components/common/Links";
+import {CloseCommand, Command} from "@components/common/Commands";
+import {branchLinksUri, branchPromotionLevelsUri, projectUri} from "@components/common/Links";
 import Head from "next/head";
 import {branchTitle} from "@components/common/Titles";
 import MainPage from "@components/layouts/MainPage";
@@ -119,12 +119,6 @@ export default function BranchPageView({id}) {
                         href={branchLinksUri(branch)}
                         text="Links"
                         title="Displays downstream and upstream dependencies"
-                    />,
-                    <LegacyLinkCommand
-                        key="legacy"
-                        href={branchLegacyUri(branch)}
-                        text="Legacy branch"
-                        title="Goes to the legacy branch page"
                     />,
                     <CloseCommand key="close" href={projectUri(branch.project)}/>,
                 )

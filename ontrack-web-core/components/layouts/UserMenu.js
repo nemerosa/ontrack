@@ -7,7 +7,6 @@ import {
     FaCode,
     FaCog,
     FaCogs,
-    FaDoorOpen,
     FaExpandArrowsAlt,
     FaGithub,
     FaInfo,
@@ -28,7 +27,6 @@ import {
     FaWrench
 } from "react-icons/fa";
 import {MainLayoutContext} from "@components/layouts/MainLayout";
-import LegacyLink from "@components/common/LegacyLink";
 import UserMenuItemLink from "@components/layouts/UserMenuItemLink";
 import {useRefData} from "@components/providers/RefDataProvider";
 import {signOut} from "next-auth/react";
@@ -112,12 +110,6 @@ export default function UserMenu({userMenu}) {
         // Separator
         menu.push({
             type: 'divider',
-        })
-        // Adding predefined "Legacy UI"
-        menu.push({
-            key: 'legacy',
-            label: <LegacyLink href="/">Legacy UI</LegacyLink>,
-            icon: <FaDoorOpen/>,
         })
         // Full view toggle
         menu.push({

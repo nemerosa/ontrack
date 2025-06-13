@@ -1,18 +1,16 @@
-import {FaDoorOpen, FaTimes} from "react-icons/fa";
+import {FaTimes} from "react-icons/fa";
 import {Button, Space, Typography} from "antd";
 import Link from "next/link";
 import {homeUri} from "@components/common/Links";
-import LegacyLink from "@components/common/LegacyLink";
 
-export function Command({icon, text, href, target, action, title, legacy = false, disabled = false}) {
+export function Command({icon, text, href, target, action, title, disabled = false}) {
     return <Button
         type="text"
         onClick={action}
         title={title}
         disabled={disabled}
     >
-        {href && !legacy && <Link href={href} target={target}>{icon} {text}</Link>}
-        {href && legacy && <LegacyLink href={href}>{icon} {text}</LegacyLink>}
+        {href && <Link href={href} target={target}>{icon} {text}</Link>}
         {!href && <>
             <Space size={8}>
                 {icon}
@@ -28,13 +26,4 @@ export function CloseCommand({href}) {
 
 export function CloseToHomeCommand() {
     return <CloseCommand href={homeUri()}/>
-}
-
-export function LegacyLinkCommand({href, text, title}) {
-    return <Command icon={<FaDoorOpen/>}
-                    href={href}
-                    text={text}
-                    title={title}
-                    legacy={true}
-    />
 }

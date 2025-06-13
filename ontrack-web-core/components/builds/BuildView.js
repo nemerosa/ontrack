@@ -5,8 +5,8 @@ import {buildBreadcrumbs} from "@components/common/Breadcrumbs";
 import LoadingContainer from "@components/common/LoadingContainer";
 import {useEffect, useState} from "react";
 import {gql} from "graphql-request";
-import {CloseCommand, Command, LegacyLinkCommand} from "@components/common/Commands";
-import {branchUri, buildLegacyUri, buildLinksUri} from "@components/common/Links";
+import {CloseCommand, Command} from "@components/common/Commands";
+import {branchUri, buildLinksUri} from "@components/common/Links";
 import {
     gqlDecorationFragment,
     gqlInformationFragment,
@@ -107,12 +107,6 @@ export default function BuildView({id}) {
                         build={data.build}
                         onSuccess={refresh}
                         key="edit"
-                    />,
-                    <LegacyLinkCommand
-                        key="legacy"
-                        href={buildLegacyUri(data.build)}
-                        text="Legacy build"
-                        title="Goes to the legacy build page"
                     />,
                     <StoredGridLayoutResetCommand key="reset"/>,
                     <CloseCommand key="close" href={branchUri(data.build.branch)}/>,

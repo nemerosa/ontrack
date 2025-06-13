@@ -11,11 +11,6 @@ export function projectUri(project) {
 export function projectBuildSearchUri(project) {
     return `/project/search/${project.id}`
 }
-
-export function legacyProjectUri(project) {
-    return `#/project/${project.id}`
-}
-
 export function branchUri(branch) {
     return `/branch/${branch.id}`
 }
@@ -32,20 +27,12 @@ export function branchAutoVersioningUri(branch) {
     return `/extension/auto-versioning/config/${branch.id}`
 }
 
-export function branchLegacyUri(branch) {
-    return `#/branch/${branch.id}`
-}
-
 export function buildUri(build) {
     return `/build/${build.id}`
 }
 
 export function buildLinksUri(build) {
     return `/build/${build.id}/links`
-}
-
-export function buildLegacyUri(build) {
-    return `#/build/${build.id}`
 }
 
 export function scmChangeLogUri(from, to) {
