@@ -53,7 +53,8 @@ services:
     ports:
       - "8008:8080"
     command:
-      - start-dev
+      - start
+      - --http-enabled true
       - --import-realm
     volumes:
       - ./keycloak/import/ldap:/opt/keycloak/data/import
