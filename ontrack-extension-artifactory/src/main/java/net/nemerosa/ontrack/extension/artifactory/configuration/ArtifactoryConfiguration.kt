@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.artifactory.configuration
 
-import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
 
 open class ArtifactoryConfiguration(
@@ -27,8 +26,5 @@ open class ArtifactoryConfiguration(
             password
         )
     }
-
-    override val descriptor: ConfigurationDescriptor
-        get() = ConfigurationDescriptor(name, name)
 
 }

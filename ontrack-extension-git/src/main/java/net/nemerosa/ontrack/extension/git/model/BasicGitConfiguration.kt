@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.git.model
 import com.fasterxml.jackson.annotation.JsonIgnore
 import net.nemerosa.ontrack.git.GitRepository
 import net.nemerosa.ontrack.git.UsernamePasswordGitRepositoryAuthenticator
-import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
 
 /**
@@ -104,12 +103,6 @@ open class BasicGitConfiguration(
     override fun obfuscate(): BasicGitConfiguration {
         return withPassword("")
     }
-
-    override val descriptor: ConfigurationDescriptor
-        get() = ConfigurationDescriptor(
-            name,
-            "$name ($remote)"
-        )
 
     companion object {
 

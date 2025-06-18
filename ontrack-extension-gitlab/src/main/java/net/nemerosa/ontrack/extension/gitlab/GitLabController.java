@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.extension.gitlab.service.GitLabConfigurationService;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
-import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import net.nemerosa.ontrack.model.support.ConnectionResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -46,14 +45,6 @@ public class GitLabController extends AbstractExtensionController<GitLabExtensio
     @RequestMapping(value = "configurations/test", method = RequestMethod.POST)
     public ConnectionResult testConfiguration(@RequestBody GitLabConfiguration configuration) {
         return configurationService.test(configuration);
-    }
-
-    /**
-     * Gets the configuration descriptors
-     */
-    @RequestMapping(value = "configurations/descriptors", method = RequestMethod.GET)
-    public List<ConfigurationDescriptor> getConfigurationsDescriptors() {
-        return configurationService.getConfigurationDescriptors();
     }
 
     /**

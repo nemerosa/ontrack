@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.sonarqube.configuration
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.CredentialsConfiguration
 
 /**
@@ -18,9 +17,6 @@ open class SonarQubeConfiguration(
     val url: String,
     val password: String?
 ) : CredentialsConfiguration<SonarQubeConfiguration> {
-
-    override val descriptor: ConfigurationDescriptor
-        get() = ConfigurationDescriptor(name, "$name ($url)")
 
     override fun obfuscate() = SonarQubeConfiguration(
         name,

@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.gitlab.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
 
 /**
@@ -15,11 +14,6 @@ open class GitLabConfiguration(
     @get:JsonProperty("ignoreSslCertificate")
     val isIgnoreSslCertificate: Boolean
 ) : UserPasswordConfiguration<GitLabConfiguration>(name, user, password) {
-
-    override val descriptor = ConfigurationDescriptor(
-        name,
-        "$name ($url)"
-    )
 
     override fun obfuscate(): GitLabConfiguration {
         return this.withPassword("")

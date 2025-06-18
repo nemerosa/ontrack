@@ -14,7 +14,6 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.PropertyService
 import net.nemerosa.ontrack.model.structure.StructureService
-import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.ConnectionResult
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -71,16 +70,6 @@ class SonarQubeController(
     @PostMapping("configurations/test")
     fun testConfiguration(@RequestBody configuration: SonarQubeConfiguration?): ConnectionResult {
         return configurationService.test(configuration ?: error("Expecting a non null body"))
-    }
-
-    /**
-     * Gets the configuration descriptors
-     */
-    @GetMapping("configurations/descriptors")
-    fun getConfigurationsDescriptors(): ResponseEntity<List<ConfigurationDescriptor>> {
-        return ResponseEntity.ok(
-            configurationService.configurationDescriptors,
-        )
     }
 
     /**

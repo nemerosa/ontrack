@@ -33,11 +33,6 @@ abstract class AbstractConfigurationService<T : Configuration<T>>(
         get() = configurationRepository.list(configurationClass)
             .map { config: T -> decrypt(config) }
 
-    override val configurationDescriptors: List<ConfigurationDescriptor>
-        get() = securityService.asAdmin {
-            configurations.map { it.descriptor }
-        }
-
     override fun newConfiguration(configuration: T): T {
         checkAccess()
 

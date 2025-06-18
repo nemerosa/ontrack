@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.bitbucket.cloud.configuration
 
 import net.nemerosa.ontrack.model.Ack
-import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.ConnectionResult
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -25,12 +24,6 @@ class BitbucketCloudConfigurationController(
     fun testConfiguration(@RequestBody configuration: BitbucketCloudConfiguration?): ConnectionResult {
         return configurationService.test(configuration!!)
     }
-
-    /**
-     * Gets the configuration descriptors
-     */
-    @GetMapping("descriptors")
-    fun getConfigurationsDescriptors(): List<ConfigurationDescriptor> = configurationService.configurationDescriptors
 
     /**
      * Creating a configuration

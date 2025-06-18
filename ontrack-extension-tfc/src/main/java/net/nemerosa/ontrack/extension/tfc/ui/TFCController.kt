@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.extension.tfc.config.TFCConfiguration
 import net.nemerosa.ontrack.extension.tfc.config.TFCConfigurationService
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription
-import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.ConnectionResult
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -41,16 +40,6 @@ class TFCController(
     @PostMapping("configurations/test")
     fun testConfiguration(@RequestBody configuration: TFCConfiguration?): ConnectionResult {
         return configurationService.test(configuration ?: error("Expecting a non null body"))
-    }
-
-    /**
-     * Gets the configuration descriptors
-     */
-    @GetMapping("configurations/descriptors")
-    fun getConfigurationsDescriptors(): ResponseEntity<List<ConfigurationDescriptor>> {
-        return ResponseEntity.ok(
-            configurationService.configurationDescriptors,
-        )
     }
 
     /**

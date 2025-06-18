@@ -6,7 +6,6 @@ import net.nemerosa.ontrack.extension.github.app.GitHubApp
 import net.nemerosa.ontrack.model.annotations.APIIgnore
 import net.nemerosa.ontrack.model.docs.DocumentationIgnore
 import net.nemerosa.ontrack.model.docs.SelfDocumented
-import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.CredentialsConfiguration
 
 /**
@@ -63,14 +62,6 @@ open class GitHubEngineConfiguration(
      */
     @DocumentationIgnore
     val url: String = if (url.isNullOrBlank()) GITHUB_COM else url
-
-    @DocumentationIgnore
-    @APIIgnore
-    override val descriptor: ConfigurationDescriptor
-        get() = ConfigurationDescriptor(
-            name,
-            "$name ($url)"
-        )
 
     override fun obfuscate(): GitHubEngineConfiguration =
         GitHubEngineConfiguration(

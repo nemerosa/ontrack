@@ -9,7 +9,6 @@ import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.StructureService
-import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.ConnectionResult
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -30,14 +29,6 @@ class GitController(
     val configurations: List<BasicGitConfiguration>
         @GetMapping("configurations")
         get() = configurationService.configurations
-
-    /**
-     * Gets the configuration descriptors
-     */
-    @Suppress("unused")
-    val configurationsDescriptors: List<ConfigurationDescriptor>
-        @GetMapping("configurations/descriptors")
-        get() = configurationService.configurationDescriptors
 
     @GetMapping("")
     override fun getDescription(): ExtensionFeatureDescription {

@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.jenkins
 
-import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
 
 open class JenkinsConfiguration(
@@ -34,7 +33,5 @@ open class JenkinsConfiguration(
             password
         )
     }
-
-    override val descriptor = ConfigurationDescriptor(name, name)
 
 }

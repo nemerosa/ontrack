@@ -3,10 +3,8 @@ package net.nemerosa.ontrack.extension.stash.model
 import com.fasterxml.jackson.annotation.JsonIgnore
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APILabel
-import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
 import org.apache.commons.lang3.StringUtils
-import java.lang.String.format
 
 /**
  * @property name Name of this configuration
@@ -36,12 +34,6 @@ open class StashConfiguration(
     val isCloud: Boolean
         @JsonIgnore
         get() = StringUtils.contains(url, "bitbucket.org")
-
-    override val descriptor: ConfigurationDescriptor
-        get() = ConfigurationDescriptor(
-            name,
-            format("%s (%s)", name, url)
-        )
 
     override fun obfuscate() = StashConfiguration(
         name = name,

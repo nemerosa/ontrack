@@ -23,11 +23,6 @@ interface ConfigurationService<T : Configuration<T>> {
     val configurations: List<T>
 
     /**
-     * List of descriptors for all these configurations
-     */
-    val configurationDescriptors: List<ConfigurationDescriptor>
-
-    /**
      * Saves a _new_ configuration.
      *
      * @param configuration Configuration to save

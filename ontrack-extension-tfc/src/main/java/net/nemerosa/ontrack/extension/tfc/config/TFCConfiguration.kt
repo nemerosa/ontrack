@@ -1,9 +1,7 @@
 package net.nemerosa.ontrack.extension.tfc.config
 
 import net.nemerosa.ontrack.model.annotations.APIDescription
-import net.nemerosa.ontrack.model.annotations.APIIgnore
 import net.nemerosa.ontrack.model.annotations.APILabel
-import net.nemerosa.ontrack.model.support.ConfigurationDescriptor
 import net.nemerosa.ontrack.model.support.CredentialsConfiguration
 
 // TODO #532 Using `open` as a workaround
@@ -18,12 +16,6 @@ open class TFCConfiguration(
     @APILabel("Token")
     val token: String,
 ) : CredentialsConfiguration<TFCConfiguration> {
-
-    @APIIgnore
-    override val descriptor = ConfigurationDescriptor(
-        name,
-        "$name ($url)"
-    )
 
     override fun obfuscate() = TFCConfiguration(
         name = name,

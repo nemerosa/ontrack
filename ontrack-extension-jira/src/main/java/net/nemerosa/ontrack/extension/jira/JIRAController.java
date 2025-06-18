@@ -3,7 +3,6 @@ package net.nemerosa.ontrack.extension.jira;
 import net.nemerosa.ontrack.extension.support.AbstractExtensionController;
 import net.nemerosa.ontrack.model.Ack;
 import net.nemerosa.ontrack.model.extension.ExtensionFeatureDescription;
-import net.nemerosa.ontrack.model.support.ConfigurationDescriptor;
 import net.nemerosa.ontrack.model.support.ConnectionResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,14 +34,6 @@ public class JIRAController extends AbstractExtensionController<JIRAExtensionFea
     @RequestMapping(value = "configurations", method = RequestMethod.GET)
     public List<JIRAConfiguration> getConfigurations() {
         return jiraConfigurationService.getConfigurations();
-    }
-
-    /**
-     * Gets the configuration descriptors
-     */
-    @RequestMapping(value = "configurations/descriptors", method = RequestMethod.GET)
-    public List<ConfigurationDescriptor> getConfigurationsDescriptors() {
-        return jiraConfigurationService.getConfigurationDescriptors();
     }
 
     /**
