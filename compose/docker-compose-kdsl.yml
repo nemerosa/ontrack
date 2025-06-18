@@ -31,19 +31,18 @@ services:
       - "8086:8086"
 
   keycloak:
-    image: quay.io/keycloak/keycloak:26.1.4
+    image: quay.io/keycloak/keycloak:26.2.5
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
       KC_HOSTNAME: http://localhost:8008
       KC_HOSTNAME_BACKCHANNEL_DYNAMIC: true
       KC_HOSTNAME_STRICT: false
+      KC_HTTP_ENABLED: true
     ports:
       - "8008:8080"
     command:
       - start
-      - --http-enabled
-      - "true"
       - --import-realm
     volumes:
       - ./keycloak/import/dev:/opt/keycloak/data/import
