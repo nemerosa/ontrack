@@ -4,8 +4,7 @@ import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.annotations.APILabel
 import net.nemerosa.ontrack.model.support.CredentialsConfiguration
 
-// TODO #532 Using `open` as a workaround
-open class TFCConfiguration(
+class TFCConfiguration(
     @APIDescription("Unique name for the configuration")
     @APILabel("Name")
     override val name: String,

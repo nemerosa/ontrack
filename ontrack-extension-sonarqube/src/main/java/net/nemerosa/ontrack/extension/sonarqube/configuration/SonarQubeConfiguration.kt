@@ -10,9 +10,8 @@ import net.nemerosa.ontrack.model.support.CredentialsConfiguration
  * @property url URL of the SonarQube server
  * @property password Connection token (called `password` for legacy reasons)
  */
-// TODO #532 Using `open` as a workaround
 @JsonIgnoreProperties(ignoreUnknown = true)
-open class SonarQubeConfiguration(
+class SonarQubeConfiguration(
     override val name: String,
     val url: String,
     val password: String?

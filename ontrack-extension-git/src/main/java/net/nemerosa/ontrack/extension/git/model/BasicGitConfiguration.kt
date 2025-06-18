@@ -20,8 +20,7 @@ import net.nemerosa.ontrack.model.support.UserPasswordConfiguration
  *  [net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration] associated
  *  with this repository.
  */
-// TODO #532 Workaround
-open class BasicGitConfiguration(
+class BasicGitConfiguration(
     name: String,
     val remote: String,
     user: String?,

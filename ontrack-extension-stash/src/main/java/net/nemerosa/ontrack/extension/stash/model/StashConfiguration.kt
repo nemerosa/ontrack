@@ -13,8 +13,7 @@ import org.apache.commons.lang3.StringUtils
  * @property password User password
  * @property autoMergeToken Token used for approving pull requests for the auto merge operations
  */
-// TODO #532 Workaround
-open class StashConfiguration(
+class StashConfiguration(
     name: String,
     val url: String,
     user: String?,
