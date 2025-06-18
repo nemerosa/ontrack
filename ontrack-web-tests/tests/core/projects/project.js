@@ -1,4 +1,5 @@
 import {expect} from "@playwright/test";
+import {expectOnPage} from "../../support/page-utils";
 
 export class ProjectPage {
 
@@ -8,9 +9,14 @@ export class ProjectPage {
         this.ontrack = ontrack
     }
 
+    async expectOnPage() {
+        await expectOnPage(this.page, "project")
+        await expect(this.page.getByText(this.project.name)).toBeVisible()
+    }
+
     async goTo() {
         await this.page.goto(`${this.ontrack.connection.ui}/project/${this.project.id}`)
-        await expect(this.page.getByText(this.project.name)).toBeVisible()
+        await this.expectOnPage()
     }
 
     async checkNoDisabledBanner() {

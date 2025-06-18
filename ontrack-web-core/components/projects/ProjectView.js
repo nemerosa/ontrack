@@ -155,6 +155,7 @@ export default function ProjectView({id}) {
                 {projectTitle(project)}
             </Head>
             <MainPage
+                pageId="project"
                 title={
                     <Space>
                         {project.name}

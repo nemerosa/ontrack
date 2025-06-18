@@ -6,7 +6,7 @@ import {homeUri} from "@components/common/Links";
 import {CloseCommand} from "@components/common/Commands";
 import {homeBreadcrumbs} from "@components/common/Breadcrumbs";
 import MainPage from "@components/layouts/MainPage";
-import {Button, Input, Popover, Skeleton, Space, Typography} from "antd";
+import {Button, Popover, Skeleton, Space, Typography} from "antd";
 import {useContext, useEffect, useState} from "react";
 import {gql} from "graphql-request";
 import SearchResultList from "@components/search/SearchResultList";
@@ -16,7 +16,6 @@ import {useRouter} from "next/router";
 import {conditionalPlural} from "@components/common/TextUtils";
 import LoadMoreButton from "@components/common/LoadMoreButton";
 import {SearchContext} from "@components/search/SearchContext";
-import {useSearch} from "@/pages/search";
 import SearchInput from "@components/search/SearchInput";
 
 export default function SearchView() {
@@ -117,6 +116,7 @@ export default function SearchView() {
                 {pageTitle("Search")}
             </Head>
             <MainPage
+                pageId="search"
                 title="Search"
                 breadcrumbs={homeBreadcrumbs()}
                 commands={[

@@ -6,7 +6,7 @@ import MainGlobalMessages from "@components/layouts/MainGlobalMessages";
 
 const {Content} = Layout;
 
-export default function MainPage({title, breadcrumbs, commands, description, warning, children}) {
+export default function MainPage({pageId = '', title, breadcrumbs, commands, description, warning, children}) {
 
     const {
         token: {colorBgContainer},
@@ -16,7 +16,7 @@ export default function MainPage({title, breadcrumbs, commands, description, war
 
     return (
         <>
-            <Layout>
+            <Layout data-page-id={`page-${pageId}`}>
                 <Content
                     style={{
                         padding: 12,

@@ -1,5 +1,6 @@
 import {expect} from "@playwright/test";
 import {EnvironmentsPage} from "../../extensions/environments/Environments";
+import {SearchPage} from "../search/SearchPage";
 
 export class HomePage {
 
@@ -20,6 +21,18 @@ export class HomePage {
     async selectEnvironments() {
         await this.page.getByRole('button', {name: 'Environments'}).click()
         return new EnvironmentsPage(this.page, this.ontrack)
+    }
+
+    async search(token) {
+        const searchBox = this.page.getByRole('searchbox')
+        await searchBox.click()
+        await searchBox.fill(token)
+        await searchBox.press('Enter')
+
+        const searchPage = new SearchPage(this.page, this.ontrack)
+        await searchPage.expectOnPage()
+
+        return searchPage
     }
 
 }
