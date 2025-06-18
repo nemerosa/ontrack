@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 @Profile(GitMockConfig.PROFILE_GIT_MOCK)
 public class GitMockConfig {
 
-    public static final String PROFILE_GIT_MOCK = "git.mock";
+    public static final String PROFILE_GIT_MOCK = "git_mock";
 
     @Bean
     public GitRepositoryClient testGitRepositoryClient() {
