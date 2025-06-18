@@ -3,7 +3,7 @@ import com.avast.gradle.dockercompose.ComposeExtension
 plugins {
     kotlin("jvm") version "2.1.20"
     kotlin("plugin.spring") version "2.1.20"
-    id("org.springframework.boot") version "3.4.5" apply false
+    id("org.springframework.boot") version "3.5.0" apply false
     id("io.spring.dependency-management") version "1.1.7"
     id("net.nemerosa.versioning") version "3.1.0"
     id("com.avast.gradle.docker-compose") version "0.17.12"
@@ -184,6 +184,9 @@ configure(javaProjects) {
         testImplementation("io.mockk:mockk-jvm")
         testImplementation("io.mockk:mockk-dsl")
         testImplementation("io.mockk:mockk-dsl-jvm")
+
+        // See https://github.com/junit-team/junit5/issues/4374
+        testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
         // Lombok
         compileOnly("org.projectlombok:lombok:1.18.26") // TODO V5 Remove dependency on Lombok
