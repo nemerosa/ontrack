@@ -9,8 +9,8 @@ export default function LoadingLogo() {
             height: '100vh',
         }}>
             <Image
-                src={`/yontrack-logo.svg`}
-                alt={"Yontrack logo"}
+                src="/yontrack-logo.svg"
+                alt="Yontrack logo"
                 width={480}
                 height={64}
                 className="logo-spin"

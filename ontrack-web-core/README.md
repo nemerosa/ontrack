@@ -5,12 +5,17 @@ Ontrack Web Core (Next UI)
 
 ### Environment variables
 
-| Variable                   | Default value           | Description                                                                                                                                             |
-|----------------------------|-------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| NEXT_PUBLIC_LOCAL          | `false`                 | By passing the default authentication process, to directly using `admin` / `admin` as credentials when connecting to the backend. Used for development. |
-| NEXT_PUBLIC_ONTRACK_URL    | `http://localhost:8080` | URL of the backend (from a user point of view)                                                                                                          |
-| NEXT_PUBLIC_ONTRACK_UI_URL | `http://localhost:3000` | URL of the frontend (from a user point of view)                                                                                                         |
-
+| Variable                       | Default value                                      | Description                                                                       |
+|--------------------------------|----------------------------------------------------|-----------------------------------------------------------------------------------|
+| ONTRACK_URL                    | `http://localhost:8080`                            | URL of the backend                                                                |
+| YONTRACK_UI_MANAGE_ACCOUNT_URL | _None_                                             | URL used to redirect the user to the management of their profile in the IdP       |
+| YONTRACK_UI_AUTH_SIGNIN_CUSTOM | `false`                                            | If set, activates a custom signin page                                            |
+| NEXTAUTH_PROVIDER              | _None_                                             | If `oidc`, activates direct OIDC authentication. Otherwise, uses the Keycloak IdP |
+| NEXTAUTH_PROVIDER_NAME         | `OIDC` if using OIDC, `Yontrack` if using Keycloak | Display name of the IdP to show on the signin page                                |
+| NEXTAUTH_ISSUER                | _Required_                                         | OIDC issuer URL                                                                   |
+| NEXTAUTH_CLIENT_ID             | _Required_                                         | OIDC client ID                                                                    |
+| NEXTAUTH_CLIENT_SECRET         | _Required_                                         | OIDC client secret                                                                |
+| NEXTAUTH_AUDIENCE              | _None_                                             | Audience URI used for OIDC (optional)                                             |
 
 ## Architecture Decisions Records
 

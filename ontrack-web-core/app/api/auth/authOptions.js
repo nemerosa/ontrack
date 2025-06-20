@@ -42,7 +42,7 @@ if (providerId === "oidc") {
     )
 }
 
-export const authOptions = {
+const baseAuthOptions = {
     providers: providers,
     // pages: {
     //     signIn: '/auth/signin'
@@ -60,3 +60,12 @@ export const authOptions = {
         }
     },
 }
+
+if (process.env.YONTRACK_UI_AUTH_SIGNIN_CUSTOM === 'true') {
+    console.log("Using custom signin page")
+    baseAuthOptions.pages = {
+        signIn: '/auth/signin'
+    }
+}
+
+export const authOptions = baseAuthOptions
