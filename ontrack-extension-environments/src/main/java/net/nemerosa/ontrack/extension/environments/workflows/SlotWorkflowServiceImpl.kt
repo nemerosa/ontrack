@@ -56,7 +56,13 @@ class SlotWorkflowServiceImpl(
     override fun getSlotWorkflowsBySlot(slot: Slot): List<SlotWorkflow> {
         securityService.checkSlotAccess<SlotView>(slot)
         return slotWorkflowRepository.getSlotWorkflowsBySlot(slot)
-            .sortedBy { it.workflow.name }
+            .sortedWith(
+                // First by type, then by name
+                compareBy(
+                    { it.trigger },
+                    { it.workflow.name },
+                )
+            )
     }
 
     override fun startWorkflow(
