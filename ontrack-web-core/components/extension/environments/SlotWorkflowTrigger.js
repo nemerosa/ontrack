@@ -1,5 +1,6 @@
 import {Tag} from "antd";
 
+// Based on SlotPipelineStatus
 export const slotWorkflowTriggers = {
     CANDIDATE: "On candidate",
     RUNNING: "On running",
