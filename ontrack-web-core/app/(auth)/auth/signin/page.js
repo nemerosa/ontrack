@@ -1,10 +1,7 @@
-import {getProviders} from "next-auth/react";
 import SignInButtons from "./SignInButtons";
 import Image from "next/image";
 
 export default async function SignInPage() {
-    const providers = await getProviders();
-
     return (
         <div style={{
             display: "flex",
@@ -23,7 +20,7 @@ export default async function SignInPage() {
                     height={64}
                 />
             </div>
-            <SignInButtons providers={providers}/>
+            <SignInButtons/>
         </div>
     );
 }
