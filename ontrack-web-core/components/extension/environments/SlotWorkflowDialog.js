@@ -22,7 +22,7 @@ export const useSlotWorkflowDialog = ({onSuccess}) => {
             mutation SaveSlotWorkflow(
                 $slotWorkflowId: String,
                 $slotId: String!,
-                $trigger: SlotWorkflowTrigger!,
+                $trigger: SlotPipelineStatus!,
                 $workflow: JSON!,
             ) {
                 saveSlotWorkflow(input: {
