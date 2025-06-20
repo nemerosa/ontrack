@@ -1,19 +1,5 @@
 # Application properties
 
-#logging:
-#  level:
-#    org.springframework.security: DEBUG
-
-# For Okta
-#ontrack:
-#  config:
-#    authorization:
-#      jwt:
-#        debug: true
-#        typ: application/okta-internal-at+jwt
-#        claims:
-#          email: sub
-
 # Spring configuration
 spring:
   security:
