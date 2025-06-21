@@ -1,22 +1,13 @@
 package net.nemerosa.ontrack.service.events
 
-import net.nemerosa.ontrack.extension.api.EventParameterExtension
-import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.model.events.Event
 import net.nemerosa.ontrack.model.events.EventVariableService
-import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.nameValues
 import net.nemerosa.ontrack.model.structure.varName
 import org.springframework.stereotype.Service
 
 @Service
-class EventVariableServiceImpl(
-    private val extensionManager: ExtensionManager,
-) : EventVariableService {
-
-    private val eventParameterExtensions: Collection<EventParameterExtension> by lazy {
-        extensionManager.getExtensions(EventParameterExtension::class.java)
-    }
+class EventVariableServiceImpl : EventVariableService {
 
     override fun getTemplateContext(event: Event, context: Map<String, Any>): Map<String, Any> {
         val result = context.toMutableMap()
@@ -53,16 +44,12 @@ class EventVariableServiceImpl(
             entity.nameValues.forEach { (name, value) ->
                 putTemplateParameter(result, name, value, caseVariants)
             }
-            // Derivative values for this entity
-            putDerivateValues(entity, result, caseVariants)
         }
         // Extra entities
         event.extraEntities.forEach { (_, entity) ->
             entity.nameValues.forEach { (name, value) ->
                 putTemplateParameter(result, "extra_$name", value, caseVariants)
             }
-            // Derivative values for this entity
-            putDerivateValues(entity, result, caseVariants)
         }
         // Values
         event.values.forEach { (_, item) ->
@@ -70,19 +57,6 @@ class EventVariableServiceImpl(
         }
         // OK
         return result.toMap()
-    }
-
-    private fun putDerivateValues(
-        entity: ProjectEntity,
-        result: MutableMap<String, String>,
-        caseVariants: Boolean
-    ) {
-        eventParameterExtensions.forEach { eventParameterExtension ->
-            val additionalParameters = eventParameterExtension.additionalTemplateParameters(entity)
-            additionalParameters.forEach { (name, value) ->
-                putTemplateParameter(result, name, value, caseVariants)
-            }
-        }
     }
 
     private fun putTemplateParameter(

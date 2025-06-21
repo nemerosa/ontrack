@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.service.events
 
-import io.mockk.mockk
 import net.nemerosa.ontrack.model.events.*
 import net.nemerosa.ontrack.model.structure.BranchFixtures
 import net.nemerosa.ontrack.model.structure.ValidationRunFixtures
@@ -10,7 +9,6 @@ import kotlin.test.assertEquals
 class EventVariableServiceImplTest {
 
     private val eventVariableService: EventVariableService = EventVariableServiceImpl(
-        extensionManager = mockk(),
     )
 
     @Test
