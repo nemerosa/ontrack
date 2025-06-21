@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import graphql.ErrorClassification
 import net.nemerosa.ontrack.graphql.schema.UserError
-import net.nemerosa.ontrack.it.links.AbstractBranchLinksTestSupport
+import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.isNullOrNullNode
 import net.nemerosa.ontrack.json.parse
@@ -19,7 +19,7 @@ import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.fail
 
-abstract class AbstractQLKTITSupport : AbstractBranchLinksTestSupport() {
+abstract class AbstractQLKTITSupport : AbstractDSLTestSupport() {
 
     @Autowired
     private lateinit var executionGraphQlService: ExecutionGraphQlService

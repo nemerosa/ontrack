@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.service.links
 
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.extension.api.BranchLinksDecorationExtension
 import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.model.buildfilter.BuildFilterService
 import net.nemerosa.ontrack.model.links.*
@@ -117,10 +116,6 @@ class BranchLinksServiceImpl(
         }
     }
 
-    private val providers: Collection<BranchLinksDecorationExtension> by lazy {
-        extensionManager.getExtensions(BranchLinksDecorationExtension::class.java)
-    }
-
     override fun getBranchLinks(branch: Branch, direction: BranchLinksDirection): BranchLinksNode {
         // Settings
         val settings: BranchLinksSettings = cachedSettingsService.getCachedSettings(BranchLinksSettings::class.java)
@@ -220,13 +215,9 @@ class BranchLinksServiceImpl(
             edge
         } else {
             val newLinkedNode = populate(edge.linkedTo, target, direction)
-            val decorations = providers.mapNotNull { provider ->
-                provider.getDecoration(source, newLinkedNode, direction)
-            }
             BranchLinksEdge(
                 direction = direction,
                 linkedTo = newLinkedNode,
-                decorations = decorations
             )
         }
     }
@@ -304,13 +295,9 @@ class BranchLinksServiceImpl(
             build = null,
             edges = node.branches.map { child ->
                 graphToNode(child, direction).run {
-                    val decorations = providers.mapNotNull { provider ->
-                        provider.getDecoration(BranchLinksNode(node.branch, null, emptyList()), this, direction)
-                    }
                     BranchLinksEdge(
                         direction = direction,
                         linkedTo = this,
-                        decorations = decorations
                     )
                 }
             }
