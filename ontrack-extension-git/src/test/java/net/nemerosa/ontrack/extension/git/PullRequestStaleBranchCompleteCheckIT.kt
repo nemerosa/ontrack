@@ -21,6 +21,7 @@ import kotlin.test.assertTrue
 /**
  * Integration tests between the PR check and the normal branch check.
  */
+@WithGitPullRequestEnabled
 class PullRequestStaleBranchCompleteCheckIT : AbstractGitTestSupport() {
 
     @Autowired

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.git.graphql
 
 import net.nemerosa.ontrack.extension.git.AbstractGitTestSupport
+import net.nemerosa.ontrack.extension.git.WithGitPullRequestEnabled
 import net.nemerosa.ontrack.extension.git.mocking.GitMockingConfigurator
 import net.nemerosa.ontrack.json.isNullOrNullNode
 import org.junit.jupiter.api.BeforeEach
@@ -10,6 +11,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
+@WithGitPullRequestEnabled
 class GitPullRequestGraphQLIT: AbstractGitTestSupport() {
 
     @Autowired
