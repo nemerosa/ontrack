@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueTyp
 import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueTypeConfig
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.StructureService
+import net.nemerosa.ontrack.model.templating.TemplatingService
 import org.springframework.stereotype.Component
 
 @Component
@@ -16,7 +17,8 @@ class OntrackPropertiesIndicatorComputer(
     private val structureService: StructureService,
     booleanIndicatorValueType: BooleanIndicatorValueType,
     configurableIndicatorService: ConfigurableIndicatorService,
-) : AbstractConfigurableIndicatorComputer(extensionFeature, configurableIndicatorService) {
+    templatingService: TemplatingService,
+) : AbstractConfigurableIndicatorComputer(extensionFeature, configurableIndicatorService, templatingService) {
 
     override val name: String = "Ontrack properties"
 

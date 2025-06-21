@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueTyp
 import net.nemerosa.ontrack.extension.jenkins.JenkinsExtensionFeature
 import net.nemerosa.ontrack.extension.scm.service.SCMServiceDetector
 import net.nemerosa.ontrack.model.structure.Project
+import net.nemerosa.ontrack.model.templating.TemplatingService
 import org.springframework.stereotype.Component
 
 /**
@@ -20,7 +21,8 @@ class JenkinsPipelineFileIndicatorComputer(
     private val scmServiceDetector: SCMServiceDetector,
     booleanIndicatorValueType: BooleanIndicatorValueType,
     configurableIndicatorService: ConfigurableIndicatorService,
-) : AbstractConfigurableIndicatorComputer(extensionFeature, configurableIndicatorService) {
+    templatingService: TemplatingService,
+) : AbstractConfigurableIndicatorComputer(extensionFeature, configurableIndicatorService, templatingService) {
 
     companion object {
         const val TYPE = "jenkins-pipeline-file"

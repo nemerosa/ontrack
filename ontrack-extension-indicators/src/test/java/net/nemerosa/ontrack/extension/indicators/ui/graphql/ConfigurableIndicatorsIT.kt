@@ -9,6 +9,7 @@ import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueTyp
 import net.nemerosa.ontrack.extension.indicators.values.BooleanIndicatorValueTypeConfig
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.structure.Project
+import net.nemerosa.ontrack.model.templating.TemplatingService
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -106,7 +107,8 @@ class ConfigurableIndicatorsIT : AbstractIndicatorsTestSupport() {
         extensionFeature: TestExtensionFeature,
         configurableIndicatorService: ConfigurableIndicatorService,
         booleanIndicatorValueType: BooleanIndicatorValueType,
-    ) : AbstractConfigurableIndicatorComputer(extensionFeature, configurableIndicatorService) {
+        templatingService: TemplatingService,
+    ) : AbstractConfigurableIndicatorComputer(extensionFeature, configurableIndicatorService, templatingService) {
         override val name: String = "TestConfigurableIndicatorComputer"
         override val perProject: Boolean = true
         override val source = IndicatorSource(

@@ -1,8 +1,10 @@
 package net.nemerosa.ontrack.extension.indicators.computing
 
 import net.nemerosa.ontrack.extension.support.AbstractExtension
+import net.nemerosa.ontrack.model.events.PlainEventRenderer
 import net.nemerosa.ontrack.model.extension.ExtensionFeature
 import net.nemerosa.ontrack.model.structure.Project
+import net.nemerosa.ontrack.model.templating.TemplatingService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -12,6 +14,7 @@ import org.slf4j.LoggerFactory
 abstract class AbstractConfigurableIndicatorComputer(
     extensionFeature: ExtensionFeature,
     private val configurableIndicatorService: ConfigurableIndicatorService,
+    private val templatingService: TemplatingService,
 ) : AbstractExtension(extensionFeature), IndicatorComputer {
 
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
@@ -37,7 +40,7 @@ abstract class AbstractConfigurableIndicatorComputer(
         val type = IndicatorComputedType(
             category = configurableIndicatorType.category,
             id = configurableIndicatorType.id,
-            name = configurableIndicatorType.expandName(state),
+            name = expandName(configurableIndicatorType, state),
             link = state.link,
             valueType = configurableIndicatorType.valueType,
             valueConfig = configurableIndicatorType.valueConfig(project, state),
@@ -51,6 +54,20 @@ abstract class AbstractConfigurableIndicatorComputer(
             type = type,
             value = value,
             comment = null,
+        )
+    }
+
+    private fun <C, T> expandName(
+        configurableIndicatorType: ConfigurableIndicatorType<T, C>,
+        state: ConfigurableIndicatorState
+    ): String {
+        val valueMap = state.values.associate {
+            it.attribute.key to it.attribute.type.map(it.value)
+        }
+        return templatingService.render(
+            template = configurableIndicatorType.name,
+            context = valueMap,
+            renderer = PlainEventRenderer.INSTANCE,
         )
     }
 }

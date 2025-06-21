@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.service.templating
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.common.SimpleExpand
 import net.nemerosa.ontrack.model.events.EventRenderer
 import net.nemerosa.ontrack.model.structure.EntityDisplayNameService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
@@ -44,8 +43,7 @@ class TemplatingServiceImpl(
 
     @Deprecated("Legacy templates will be removed in V5.")
     override fun isLegacyTemplate(template: String): Boolean =
-        SimpleExpand.regex.containsMatchIn(template) &&
-                !regexExpressions.containsMatchIn(template)
+        !regexExpressions.containsMatchIn(template)
 
     override fun render(
         template: String,
