@@ -4,7 +4,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import net.nemerosa.ontrack.common.FutureUtils
 import net.nemerosa.ontrack.common.asOptional
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.git.GitConfigProperties
 import net.nemerosa.ontrack.extension.git.branching.BranchingModelService
 import net.nemerosa.ontrack.extension.git.model.*
@@ -12,15 +11,15 @@ import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropert
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.repository.GitRepositoryHelper
 import net.nemerosa.ontrack.extension.git.support.NoGitCommitPropertyException
-import net.nemerosa.ontrack.extension.issues.export.ExportFormat
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
 import net.nemerosa.ontrack.extension.issues.model.Issue
-import net.nemerosa.ontrack.extension.scm.model.SCMChangeLogFileChangeType
 import net.nemerosa.ontrack.extension.scm.model.SCMPathInfo
 import net.nemerosa.ontrack.git.GitRepositoryClient
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory
 import net.nemerosa.ontrack.git.exceptions.GitRepositoryNoRemoteException
-import net.nemerosa.ontrack.git.model.*
+import net.nemerosa.ontrack.git.model.GitBranchInfo
+import net.nemerosa.ontrack.git.model.GitCommit
+import net.nemerosa.ontrack.git.model.GitSynchronisationStatus
 import net.nemerosa.ontrack.job.*
 import net.nemerosa.ontrack.job.orchestrator.JobOrchestratorSupplier
 import net.nemerosa.ontrack.model.Ack
@@ -41,6 +40,7 @@ import java.lang.String.format
 import java.util.*
 import java.util.concurrent.Future
 import java.util.function.BiConsumer
+import kotlin.jvm.optionals.getOrNull
 
 @Service
 @Transactional
@@ -156,19 +156,6 @@ class GitServiceImpl(
         return getProjectConfiguration(project) ?: throw GitProjectNotConfiguredException(project.id)
     }
 
-    protected fun getGitRepositoryClient(project: Project): GitRepositoryClient {
-        return getProjectConfiguration(project)?.gitRepository
-            ?.let { gitRepositoryClientFactory.getClient(it) }
-            ?: throw GitProjectNotConfiguredException(project.id)
-    }
-
-    private fun getCommitFromBuild(build: Build): String {
-        return getBranchConfiguration(build.branch)
-            ?.buildCommitLink
-            ?.getCommitFromBuild(build)
-            ?: throw GitBranchNotConfiguredException(build.branch.id)
-    }
-
     override fun isPatternFound(gitConfiguration: GitConfiguration, token: String): Boolean {
         // Gets the client
         val client = gitRepositoryClientFactory.getClient(gitConfiguration.gitRepository)
@@ -184,7 +171,7 @@ class GitServiceImpl(
     }
 
     override fun forEachCommit(gitConfiguration: GitConfiguration, code: (GitCommit) -> Unit) {
-        // Gets the client client for this configuration
+        // Gets the client for this configuration
         val gitClient = gitRepositoryClientFactory.getClient(gitConfiguration.gitRepository)
         // Looping
         gitClient.forEachCommit(code)
@@ -195,19 +182,6 @@ class GitServiceImpl(
         val gitClient = gitRepositoryClientFactory.getClient(gitConfiguration.gitRepository)
         // Test
         return gitClient.isReady
-    }
-
-    @Deprecated("Export formats are no longer issue service specific - will be removed in V5")
-    override fun getIssueExportFormats(project: Project): List<ExportFormat> {
-        val projectConfiguration = getProjectConfiguration(project)
-        return projectConfiguration?.let {
-            val configuredIssueService = it.configuredIssueService
-            configuredIssueService?.let { cis ->
-                cis.issueServiceExtension.exportFormats(
-                    cis.issueServiceConfiguration
-                )
-            }
-        } ?: emptyList()
     }
 
     override fun getCommitProjectInfo(projectId: ID, commit: String): OntrackGitCommitInfo {
@@ -373,11 +347,9 @@ class GitServiceImpl(
         // For every indexation group of branches
         val branchInfos = indexedBranches.mapValues { (_, branches) ->
             branches.map { branch ->
-                // Gets its Git configuration
-                val branchConfiguration = getRequiredBranchConfiguration(branch)
                 // Gets the earliest build on this branch that contains this commit
                 val firstBuildOnThisBranch = logTime("earliest-build", listOf("branch" to branch.name)) {
-                    getEarliestBuildAfterCommit(commitObject, branch, branchConfiguration, repositoryClient)
+                    getEarliestBuildAfterCommit(commitObject, branch)
                 }
                 // Promotions
                 val promotions: List<PromotionRun> = logTime("earliest-promotion", listOf("branch" to branch.name)) {
@@ -409,40 +381,12 @@ class GitServiceImpl(
 
     internal fun getEarliestBuildAfterCommit(
         commit: GitCommit,
-        branch: Branch,
-        branchConfiguration: GitBranchConfiguration,
-        client: GitRepositoryClient
+        branch: Branch
     ): Build? {
         return gitRepositoryHelper.getEarliestBuildAfterCommit(
             branch,
             IndexableGitCommit(commit)
         )?.let { structureService.getBuild(ID.of(it)) }
-    }
-
-    private fun getDiffUrl(diff: GitDiff, entry: GitDiffEntry, fileChangeLinkFormat: String): String {
-        return if (StringUtils.isNotBlank(fileChangeLinkFormat)) {
-            fileChangeLinkFormat
-                .replace("{commit}", entry.getReferenceId(diff.from, diff.to))
-                .replace("{path}", entry.referencePath)
-        } else {
-            ""
-        }
-    }
-
-    private fun toChangeLogFile(entry: GitDiffEntry): GitChangeLogFile {
-        return when (entry.changeType) {
-            GitChangeType.ADD -> GitChangeLogFile.of(SCMChangeLogFileChangeType.ADDED, entry.newPath)
-            GitChangeType.COPY -> GitChangeLogFile.of(SCMChangeLogFileChangeType.COPIED, entry.oldPath, entry.newPath)
-            GitChangeType.DELETE -> GitChangeLogFile.of(SCMChangeLogFileChangeType.DELETED, entry.oldPath)
-            GitChangeType.MODIFY -> GitChangeLogFile.of(SCMChangeLogFileChangeType.MODIFIED, entry.oldPath)
-            GitChangeType.RENAME -> GitChangeLogFile.of(
-                SCMChangeLogFileChangeType.RENAMED,
-                entry.oldPath,
-                entry.newPath
-            )
-
-            else -> GitChangeLogFile.of(SCMChangeLogFileChangeType.UNDEFINED, entry.oldPath, entry.newPath)
-        }
     }
 
     override fun toUICommit(gitConfiguration: GitConfiguration, commit: GitCommit): GitUICommit {
@@ -510,7 +454,7 @@ class GitServiceImpl(
             .firstOrNull()
     }
 
-    protected fun getRequiredBranchConfiguration(branch: Branch): GitBranchConfiguration {
+    private fun getRequiredBranchConfiguration(branch: Branch): GitBranchConfiguration {
         return getBranchConfiguration(branch)
             ?: throw GitBranchNotConfiguredException(branch.id)
     }
@@ -641,7 +585,7 @@ class GitServiceImpl(
         }
     }
 
-    protected fun getGitBranchSyncJobKey(branch: Branch): JobKey {
+    private fun getGitBranchSyncJobKey(branch: Branch): JobKey {
         return GIT_BUILD_SYNC_JOB.getKey(branch.id.toString())
     }
 
@@ -676,7 +620,7 @@ class GitServiceImpl(
         }
     }
 
-    protected fun <T> buildSync(branch: Branch, branchConfiguration: GitBranchConfiguration, listener: JobRunListener) {
+    private fun <T> buildSync(branch: Branch, branchConfiguration: GitBranchConfiguration, listener: JobRunListener) {
         listener.message("Git build/tag sync for %s/%s", branch.project.name, branch.name)
         val configuration = branchConfiguration.configuration
         // Gets the branch Git client

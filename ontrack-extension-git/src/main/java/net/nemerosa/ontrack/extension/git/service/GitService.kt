@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.git.service
 
 import net.nemerosa.ontrack.extension.git.model.*
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
-import net.nemerosa.ontrack.extension.issues.export.ExportFormat
 import net.nemerosa.ontrack.extension.scm.service.SCMService
 import net.nemerosa.ontrack.git.GitRepositoryClient
 import net.nemerosa.ontrack.git.model.GitCommit
@@ -68,7 +67,10 @@ interface GitService : SCMService {
      * @param gitBranchConfigurationProperty Gt branch configuration
      * @return Pull request or null is none
      */
-    fun getBranchAsPullRequest(branch: Branch, gitBranchConfigurationProperty: GitBranchConfigurationProperty?): GitPullRequest?
+    fun getBranchAsPullRequest(
+        branch: Branch,
+        gitBranchConfigurationProperty: GitBranchConfigurationProperty?
+    ): GitPullRequest?
 
     /**
      * Gets the configuration for a branch
@@ -165,7 +167,11 @@ interface GitService : SCMService {
      * @param project Associated project
      * @param listener Logger
      */
-    fun syncProjectRepository(config: GitConfiguration, project: Project, listener: (message: String) -> Unit = { println(it) })
+    fun syncProjectRepository(
+        config: GitConfiguration,
+        project: Project,
+        listener: (message: String) -> Unit = { println(it) }
+    )
 
     /**
      * Gets the Git synchronisation information.
@@ -214,11 +220,13 @@ interface GitService : SCMService {
      *
      * This is the optimized version for jobs running in the background.
      */
-    fun collectIndexableGitCommitForBranch(branch: Branch,
-                                           client: GitRepositoryClient,
-                                           config: GitBranchConfiguration,
-                                           overrides: Boolean,
-                                           listener: JobRunListener)
+    fun collectIndexableGitCommitForBranch(
+        branch: Branch,
+        client: GitRepositoryClient,
+        config: GitBranchConfiguration,
+        overrides: Boolean,
+        listener: JobRunListener
+    )
 
     /**
      * Collects and stores the [IndexableGitCommit]s one build.
@@ -239,11 +247,5 @@ interface GitService : SCMService {
      * Checks if the repository is ready to be used.
      */
     fun isRepositorySynched(gitConfiguration: GitConfiguration): Boolean
-
-    /**
-     * Gets the list of available issue export formats for this project
-     */
-    @Deprecated("Export formats are no longer issue service specific - will be removed in V5")
-    fun getIssueExportFormats(project: Project): List<ExportFormat>
 
 }
