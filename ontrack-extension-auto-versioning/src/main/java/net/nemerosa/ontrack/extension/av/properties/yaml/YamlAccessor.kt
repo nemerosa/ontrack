@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.av.properties.yaml
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import net.nemerosa.ontrack.extension.av.properties.support.JsonPropertyAccessor
+import net.nemerosa.ontrack.yaml.Yaml
 import org.springframework.expression.EvaluationContext
 import org.springframework.expression.ExpressionException
 import org.springframework.expression.spel.standard.SpelExpressionParser
@@ -12,19 +13,13 @@ class YamlAccessor(
 ) {
 
     private val yaml = Yaml()
-    private val root: List<ObjectNode>
-    private val context: EvaluationContext
-    private val parser: SpelExpressionParser
+    private val root: List<ObjectNode> = yaml.read(content)
 
-    init {
-        // Parsing of the string
-        root = yaml.read(content)
-        // Spring EL setup
-        parser = SpelExpressionParser()
-        context = StandardEvaluationContext().apply {
-            addPropertyAccessor(JsonPropertyAccessor())
-        }
+    private val context: EvaluationContext = StandardEvaluationContext().apply {
+        addPropertyAccessor(JsonPropertyAccessor())
     }
+
+    private val parser: SpelExpressionParser = SpelExpressionParser()
 
     fun getValue(spel: String): Any? =
         if (content.isBlank()) {
