@@ -54,7 +54,7 @@ class JenkinsPipelineFileIndicatorComputer(
         ConfigurableIndicatorType(
             category = indicatorCategory,
             id = TYPE,
-            name = "The repository {required} have a Jenkinsfile",
+            name = "The repository \${required} have a Jenkinsfile",
             valueType = booleanIndicatorValueType,
             valueConfig = { _, state -> BooleanIndicatorValueTypeConfig(required = state.getRequiredAttribute()) },
             attributes = listOf(
