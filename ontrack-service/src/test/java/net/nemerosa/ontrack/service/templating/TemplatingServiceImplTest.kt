@@ -11,8 +11,6 @@ import net.nemerosa.ontrack.model.templating.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
 class TemplatingServiceImplTest {
 
@@ -105,21 +103,6 @@ class TemplatingServiceImplTest {
             templatingContextHandlers = templatingContextHandlers,
             ontrackConfigProperties = ontrackConfigProperties,
             entityDisplayNameService = entityDisplayNameService,
-        )
-    }
-
-    @Test
-    fun `Checking the legacy templates`() {
-        assertFalse(templatingService.isLegacyTemplate("No expression at all."), "Plain text")
-        assertTrue(templatingService.isLegacyTemplate("Getting a {branch} name the old way."), "Legacy")
-        assertTrue(
-            templatingService.isLegacyTemplate("Getting a {branch|uppercase} name the old way."),
-            "Legacy with filter"
-        )
-        assertFalse(templatingService.isLegacyTemplate("Getting a ${'$'}{branch} name the new way."), "New templating")
-        assertFalse(
-            templatingService.isLegacyTemplate("Getting a ${'$'}{branch} name the new way and left over {branch}."),
-            "New templating mixed"
         )
     }
 

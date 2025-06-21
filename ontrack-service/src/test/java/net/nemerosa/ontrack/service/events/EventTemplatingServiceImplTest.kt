@@ -54,18 +54,6 @@ class EventTemplatingServiceImplTest {
     }
 
     @Test
-    fun `Render event for legacy`() {
-        val event = mockk<Event>()
-        val text = eventTemplatingService.renderEvent(
-            event = event,
-            context = emptyMap(),
-            template = "Legacy {branch} branch",
-            renderer = PlainEventRenderer.INSTANCE,
-        )
-        assertEquals("Legacy release/1.27 branch", text)
-    }
-
-    @Test
     fun `Render event for new syntax`() {
         val event = mockk<Event>()
         val text = eventTemplatingService.renderEvent(

@@ -57,45 +57,4 @@ class EventTemplatingServiceIT : AbstractDSLTestSupport() {
         }
     }
 
-    @Test
-    fun `Simple rendering of entity names for a promotion run using the legacy template`() {
-
-        asAdmin {
-            project {
-                branch {
-                    val pl = promotionLevel()
-                    build {
-                        val build = this
-                        val run = promote(pl)
-
-                        // Creates an event for this run
-                        val event = eventFactory.newPromotionRun(run)
-
-                        // Rendering for this event
-                        val text = eventTemplatingService.render(
-                            template = """
-                                Build {Build} on branch {Branch}
-                                of project {Project} has been promoted to
-                                {Promotion|uppercase}.
-                            """.trimIndent(),
-                            event = event,
-                            context = emptyMap(),
-                            renderer = PlainEventRenderer()
-                        )
-
-                        // Checking
-                        assertEquals(
-                            """
-                                Build ${build.name} on branch ${branch.name}
-                                of project ${project.name} has been promoted to
-                                ${pl.name.uppercase()}.
-                            """.trimIndent(),
-                            text
-                        )
-                    }
-                }
-            }
-        }
-    }
-
 }
