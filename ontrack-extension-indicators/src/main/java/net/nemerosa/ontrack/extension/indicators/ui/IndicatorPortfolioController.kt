@@ -3,9 +3,7 @@ package net.nemerosa.ontrack.extension.indicators.ui
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Pattern
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorConstants
-import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolioOfPortfolios
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolioService
-import net.nemerosa.ontrack.extension.indicators.portfolio.PortfolioGlobalIndicators
 import net.nemerosa.ontrack.extension.indicators.portfolio.PortfolioUpdateForm
 import net.nemerosa.ontrack.model.Ack
 import org.springframework.http.ResponseEntity
@@ -41,15 +39,6 @@ class IndicatorPortfolioController(
             )
         }
     }
-
-    /**
-     * Updating the global indicators
-     */
-    @PutMapping("global-indicators/update")
-    fun updatePortfolioGlobalIndicators(@RequestBody input: PortfolioGlobalIndicators): ResponseEntity<IndicatorPortfolioOfPortfolios> =
-            ResponseEntity.ok(
-                    indicatorPortfolioService.savePortfolioOfPortfolios(input)
-            )
 
     /**
      * Deleting a portfolio

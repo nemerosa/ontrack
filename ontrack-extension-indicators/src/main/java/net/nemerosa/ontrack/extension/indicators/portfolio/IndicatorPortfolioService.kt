@@ -44,18 +44,6 @@ interface IndicatorPortfolioService {
     fun deletePortfolio(id: String)
 
     /**
-     * Gets the portfolio of portfolios
-     */
-    @Deprecated("Use IndicatorView(s) instead")
-    fun getPortfolioOfPortfolios(): IndicatorPortfolioOfPortfolios
-
-    /**
-     * Saves the portfolio of portfolios
-     */
-    @Deprecated("Use IndicatorView(s) instead")
-    fun savePortfolioOfPortfolios(input: PortfolioGlobalIndicators): IndicatorPortfolioOfPortfolios
-
-    /**
      * List of indicator portfolios associated with this project, through its labels.
      */
     fun findPortfolioByProject(project: Project): List<IndicatorPortfolio>

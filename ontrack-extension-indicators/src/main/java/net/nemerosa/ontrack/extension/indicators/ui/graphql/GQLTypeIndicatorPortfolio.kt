@@ -78,20 +78,6 @@ class GQLTypeIndicatorPortfolio(
                                     indicatorStatsService.getStatsPortfolio(portfolio, duration)
                                 }
                     }
-                    // TODO V5 Removal
-                    // Stats
-                    .field {
-                        it.name("globalStats")
-                                .description("Global indicator stats")
-                                .deprecate("Use indicator views. This field will be removed in V5.")
-                                .type(listType(indicatorCategoryStats.typeRef))
-                                .durationArgument()
-                                .dataFetcher { env ->
-                                    val duration = env.getDurationArgument()
-                                    val portfolio: IndicatorPortfolio = env.getSource()!!
-                                    indicatorStatsService.getGlobalStats(portfolio, duration)
-                                }
-                    }
                     // Stats for a view
                     .field {
                         it.name("viewStats")
