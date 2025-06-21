@@ -17,13 +17,6 @@ class IndicatorPortfolioAccessIT : AbstractDSLTestSupport() {
     }
 
     @Test
-    fun `Portfolio managers have access to the portfolios`() {
-        asAccountWithGlobalRole(IndicatorRoleContributor.GLOBAL_INDICATOR_PORTFOLIO_MANAGER) {
-            assertTrue(securityService.isGlobalFunctionGranted(IndicatorPortfolioAccess::class.java))
-        }
-    }
-
-    @Test
     fun `Indicator managers have access to the portfolios`() {
         asAccountWithGlobalRole(IndicatorRoleContributor.GLOBAL_INDICATOR_MANAGER) {
             assertTrue(securityService.isGlobalFunctionGranted(IndicatorPortfolioAccess::class.java))
