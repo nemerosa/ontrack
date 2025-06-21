@@ -8,15 +8,14 @@ import net.nemerosa.ontrack.extension.gitlab.model.GitLabIssue
 import net.nemerosa.ontrack.extension.gitlab.model.GitLabIssueServiceConfiguration
 import net.nemerosa.ontrack.extension.gitlab.model.GitLabIssueWrapper
 import net.nemerosa.ontrack.extension.gitlab.service.GitLabConfigurationService
-import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
 import net.nemerosa.ontrack.extension.stale.StaleExtensionFeature
 import org.gitlab4j.api.Constants
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
 import java.util.*
 import kotlin.test.*
 
@@ -33,12 +32,10 @@ class GitLabIssueServiceExtensionTest {
     fun init() {
         configurationService = mock(GitLabConfigurationService::class.java)
         gitHubClientFactory = mock(OntrackGitLabClientFactory::class.java)
-        val issueExportServiceFactory = mock(IssueExportServiceFactory::class.java)
         extension = GitLabIssueServiceExtension(
-            GitLabExtensionFeature(GitExtensionFeature(SCMExtensionFeature(), StaleExtensionFeature())),
-            issueExportServiceFactory,
-            configurationService,
-            gitHubClientFactory
+            extensionFeature = GitLabExtensionFeature(GitExtensionFeature(SCMExtensionFeature(), StaleExtensionFeature())),
+            configurationService = configurationService,
+            gitLabClientFactory = gitHubClientFactory
         )
         engineConfiguration = GitLabConfiguration(
             "test",

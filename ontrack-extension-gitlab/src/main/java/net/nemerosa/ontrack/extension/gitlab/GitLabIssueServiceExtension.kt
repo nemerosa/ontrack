@@ -5,13 +5,12 @@ import net.nemerosa.ontrack.extension.gitlab.model.GitLabIssueServiceConfigurati
 import net.nemerosa.ontrack.extension.gitlab.model.GitLabIssueWrapper
 import net.nemerosa.ontrack.extension.gitlab.property.GitLabGitConfiguration
 import net.nemerosa.ontrack.extension.gitlab.service.GitLabConfigurationService
-import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
 import net.nemerosa.ontrack.extension.issues.support.AbstractIssueServiceExtension
+import net.nemerosa.ontrack.model.support.LegacyRegexMessageAnnotator
 import net.nemerosa.ontrack.model.support.MessageAnnotation.Companion.of
 import net.nemerosa.ontrack.model.support.MessageAnnotator
-import net.nemerosa.ontrack.model.support.LegacyRegexMessageAnnotator
 import org.apache.commons.lang3.StringUtils
 import org.springframework.stereotype.Component
 import java.util.regex.Pattern
@@ -19,14 +18,12 @@ import java.util.regex.Pattern
 @Component
 class GitLabIssueServiceExtension(
     extensionFeature: GitLabExtensionFeature,
-    issueExportServiceFactory: IssueExportServiceFactory,
     private val configurationService: GitLabConfigurationService,
     private val gitLabClientFactory: OntrackGitLabClientFactory,
 ) : AbstractIssueServiceExtension(
     extensionFeature,
     GITLAB_SERVICE_ID,
     "GitLab",
-    issueExportServiceFactory,
 ) {
     /**
      * The GitLab configurations are not selectable outside GitLab configurations and this method returns an empty list.

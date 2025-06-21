@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.jira
 
-import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
 import net.nemerosa.ontrack.extension.issues.support.AbstractIssueServiceExtension
@@ -23,9 +22,8 @@ class JIRAServiceExtension(
     private val jiraConfigurationService: JIRAConfigurationService,
     private val jiraSessionFactory: JIRASessionFactory,
     private val transactionService: TransactionService,
-    issueExportServiceFactory: IssueExportServiceFactory,
     private val propertyService: PropertyService
-) : AbstractIssueServiceExtension(extensionFeature, SERVICE, "JIRA", issueExportServiceFactory) {
+) : AbstractIssueServiceExtension(extensionFeature, SERVICE, "JIRA") {
 
     override fun getConfigurationList(): List<IssueServiceConfiguration> {
         return jiraConfigurationService.configurations

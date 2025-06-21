@@ -6,15 +6,13 @@ import net.nemerosa.ontrack.extension.github.model.GitHubLabel
 import net.nemerosa.ontrack.extension.github.property.GitHubGitConfiguration
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
 import net.nemerosa.ontrack.extension.github.service.GitHubIssueServiceConfiguration
-import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
 import net.nemerosa.ontrack.extension.issues.support.AbstractIssueServiceExtension
+import net.nemerosa.ontrack.model.support.LegacyRegexMessageAnnotator
 import net.nemerosa.ontrack.model.support.MessageAnnotation.Companion.of
 import net.nemerosa.ontrack.model.support.MessageAnnotator
-import net.nemerosa.ontrack.model.support.LegacyRegexMessageAnnotator
 import org.springframework.stereotype.Component
-import java.util.*
 import java.util.regex.Pattern
 import java.util.stream.Collectors
 
@@ -23,12 +21,10 @@ class GitHubIssueServiceExtension(
     extensionFeature: GitHubExtensionFeature,
     private val configurationService: GitHubConfigurationService,
     private val gitHubClientFactory: OntrackGitHubClientFactory,
-    issueExportServiceFactory: IssueExportServiceFactory,
 ) : AbstractIssueServiceExtension(
     extensionFeature,
     GITHUB_SERVICE_ID,
     "GitHub",
-    issueExportServiceFactory,
 ) {
 
     /**

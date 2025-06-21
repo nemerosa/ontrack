@@ -5,7 +5,6 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
 import net.nemerosa.ontrack.extension.jira.JIRAFixtures.jiraConfiguration
 import net.nemerosa.ontrack.extension.jira.client.JIRAClient
 import net.nemerosa.ontrack.extension.jira.model.JIRAIssue
@@ -39,8 +38,6 @@ class JIRAServiceExtensionTest {
         every { session.close() } just Runs
         every { session.client } returns client
 
-        val issueExportServiceFactory = mockk<IssueExportServiceFactory>()
-
         val propertyService = mockk<PropertyService>()
 
         service = JIRAServiceExtension(
@@ -48,7 +45,6 @@ class JIRAServiceExtensionTest {
             jiraConfigurationService = jiraConfigurationService,
             jiraSessionFactory = jiraSessionFactory,
             transactionService = transactionService,
-            issueExportServiceFactory = issueExportServiceFactory,
             propertyService = propertyService
         )
     }

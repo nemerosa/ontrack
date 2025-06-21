@@ -11,7 +11,6 @@ import net.nemerosa.ontrack.extension.github.model.GitHubState
 import net.nemerosa.ontrack.extension.github.model.GitHubUser
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
 import net.nemerosa.ontrack.extension.github.service.GitHubIssueServiceConfiguration
-import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
 import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
 import net.nemerosa.ontrack.extension.stale.StaleExtensionFeature
@@ -29,12 +28,12 @@ class GitHubIssueServiceExtensionTest {
     fun init() {
         configurationService = mockk<GitHubConfigurationService>()
         val gitHubClientFactory = mockk<OntrackGitHubClientFactory>()
-        val issueExportServiceFactory = mockk<IssueExportServiceFactory>()
         extension = GitHubIssueServiceExtension(
-            GitHubExtensionFeature(GitExtensionFeature(SCMExtensionFeature(), StaleExtensionFeature())),
-            configurationService,
-            gitHubClientFactory,
-            issueExportServiceFactory
+            extensionFeature = GitHubExtensionFeature(
+                GitExtensionFeature(SCMExtensionFeature(), StaleExtensionFeature())
+            ),
+            configurationService = configurationService,
+            gitHubClientFactory = gitHubClientFactory,
         )
         val engineConfiguration = GitHubEngineConfiguration(
             "test",

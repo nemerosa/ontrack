@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.issues.mock
 
-import net.nemerosa.ontrack.extension.issues.export.IssueExportServiceFactory
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
 import net.nemerosa.ontrack.extension.issues.support.AbstractIssueServiceExtension
@@ -12,12 +11,10 @@ import org.springframework.stereotype.Component
 @Component
 class TestIssueServiceExtension(
     extensionFeature: TestIssueServiceFeature,
-    issueExportServiceFactory: IssueExportServiceFactory,
 ) : AbstractIssueServiceExtension(
     extensionFeature,
     "test",
     "Test issues",
-    issueExportServiceFactory
 ) {
 
     /**

@@ -1,11 +1,8 @@
 package net.nemerosa.ontrack.extension.scm.mock
 
 import net.nemerosa.ontrack.common.RunProfile
-import net.nemerosa.ontrack.extension.api.model.IssueChangeLogExportRequest
 import net.nemerosa.ontrack.extension.issues.IssueServiceExtension
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
-import net.nemerosa.ontrack.extension.issues.export.ExportFormat
-import net.nemerosa.ontrack.extension.issues.export.ExportedIssues
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
@@ -417,19 +414,6 @@ class MockSCMExtension(
 
         override fun getIssue(issueServiceConfiguration: IssueServiceConfiguration, issueKey: String): Issue? =
             repository(repositoryName).findIssue(issueKey)
-
-        @Deprecated("Will be removed in V5. Deprecated in Java")
-        override fun exportFormats(issueServiceConfiguration: IssueServiceConfiguration?): MutableList<ExportFormat> {
-            TODO("Not yet implemented")
-        }
-
-        override fun exportIssues(
-            issueServiceConfiguration: IssueServiceConfiguration?,
-            issues: MutableList<out Issue>?,
-            request: IssueChangeLogExportRequest?
-        ): ExportedIssues {
-            TODO("Not yet implemented")
-        }
 
         override fun getIssueId(
             issueServiceConfiguration: IssueServiceConfiguration?,
