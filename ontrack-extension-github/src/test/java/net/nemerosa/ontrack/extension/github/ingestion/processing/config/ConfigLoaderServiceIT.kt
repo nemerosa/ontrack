@@ -1,5 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.config
 
+import net.nemerosa.ontrack.extension.git.WithGitPullRequestEnabled
 import net.nemerosa.ontrack.extension.github.TestOnGitHub
 import net.nemerosa.ontrack.extension.github.githubTestEnv
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
@@ -13,6 +14,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 @TestOnGitHub
+@WithGitPullRequestEnabled
 class ConfigLoaderServiceIT : AbstractIngestionTestSupport() {
 
     @Autowired
