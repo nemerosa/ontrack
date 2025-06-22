@@ -154,8 +154,4 @@ class JiraCreationNotificationChannel(
 
     override val enabled: Boolean = true
 
-    @Deprecated("Will be removed in V5. Only Next UI is used.")
-    override fun toText(config: JiraCreationNotificationChannelConfig): String =
-        config.titleTemplate
-
 }

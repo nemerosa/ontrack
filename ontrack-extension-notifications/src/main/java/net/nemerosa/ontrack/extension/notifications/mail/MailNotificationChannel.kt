@@ -58,8 +58,6 @@ class MailNotificationChannel(
             MailNotificationChannelConfig::subject.name to text
         ).asJson()
 
-    override fun toText(config: MailNotificationChannelConfig): String = config.subject
-
     override fun publish(
         recordId: String,
         config: MailNotificationChannelConfig,

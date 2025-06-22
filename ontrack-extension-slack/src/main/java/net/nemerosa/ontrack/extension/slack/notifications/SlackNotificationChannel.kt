@@ -71,9 +71,6 @@ class SlackNotificationChannel(
     override fun toSearchCriteria(text: String): JsonNode =
         mapOf(SlackNotificationChannelConfig::channel.name to text).asJson()
 
-    @Deprecated("Will be removed in V5. Only Next UI is used.")
-    override fun toText(config: SlackNotificationChannelConfig): String = config.channel
-
     override val type: String = "slack"
 
     override val displayName: String = "Slack"

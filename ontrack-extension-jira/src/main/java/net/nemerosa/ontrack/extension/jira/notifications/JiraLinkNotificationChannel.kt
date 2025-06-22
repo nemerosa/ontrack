@@ -129,6 +129,4 @@ class JiraLinkNotificationChannel(
     override val displayName: String = "Jira link creation"
     override val enabled: Boolean = true
 
-    @Deprecated("Will be removed in V5. Only Next UI is used.")
-    override fun toText(config: JiraLinkNotificationChannelConfig): String = config.linkName
 }

@@ -148,6 +148,4 @@ class WorkflowNotificationChannel(
     override val displayName: String = "Workflow"
     override val enabled: Boolean = true
 
-    @Deprecated("Will be removed in V5. Only Next UI is used.")
-    override fun toText(config: WorkflowNotificationChannelConfig): String = config.workflow.name
 }

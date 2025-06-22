@@ -160,16 +160,6 @@ abstract class AbstractJenkinsNotificationChannel(
 
     override val enabled: Boolean = true
 
-    @Deprecated("Will be removed in V5. Only Next UI is used.")
-    override fun toText(config: JenkinsNotificationChannelConfig): String {
-        val jenkinsConfig = jenkinsConfigurationService.findConfiguration(config.config)
-        return if (jenkinsConfig != null) {
-            "${jenkinsConfig.url}/${config.job}"
-        } else {
-            "n/a"
-        }
-    }
-
     data class JobLaunchResult(
         val error: String?,
         val buildUrl: String?,

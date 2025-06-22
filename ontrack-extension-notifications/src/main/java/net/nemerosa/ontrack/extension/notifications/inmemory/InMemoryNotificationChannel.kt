@@ -59,8 +59,6 @@ class InMemoryNotificationChannel(
 
     override fun toSearchCriteria(text: String): JsonNode = InMemoryNotificationChannelConfig(text).asJson()
 
-    override fun toText(config: InMemoryNotificationChannelConfig): String = config.group
-
     fun clear(): Ack {
         messages.clear()
         return Ack.OK

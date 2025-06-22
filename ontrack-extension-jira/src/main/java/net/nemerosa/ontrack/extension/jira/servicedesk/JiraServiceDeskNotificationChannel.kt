@@ -135,6 +135,4 @@ class JiraServiceDeskNotificationChannel(
 
     override fun toSearchCriteria(text: String): JsonNode = NullNode.instance
 
-    @Deprecated("Will be removed in V5. Only Next UI is used.")
-    override fun toText(config: JiraServiceDeskNotificationChannelConfig): String = ""
 }

@@ -143,9 +143,6 @@ class OntrackValidationNotificationChannel(
             OntrackValidationNotificationChannelConfig::validation.name to text
         ).asJson()
 
-    @Deprecated("Will be removed in V5. Only Next UI is used.")
-    override fun toText(config: OntrackValidationNotificationChannelConfig): String = config.validation
-
     override val type: String = "ontrack-validation"
     override val displayName: String = "Ontrack validation"
     override val enabled: Boolean = true

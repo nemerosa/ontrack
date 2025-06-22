@@ -53,12 +53,6 @@ interface NotificationChannel<C, R> {
     fun toSearchCriteria(text: String): JsonNode
 
     /**
-     * Given a configuration, returns a display text for it
-     */
-    @Deprecated("Will be removed in V5. Only Next UI is used.")
-    fun toText(config: C): String
-
-    /**
      * Type of the channel, used as an identifier for the serialization of the subscriptions.
      */
     val type: String
