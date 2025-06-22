@@ -111,26 +111,12 @@ interface GitService : SCMService {
     fun forEachConfiguredBranchInProject(project: Project, consumer: (Branch, GitBranchConfiguration) -> Unit)
 
     /**
-     * Gets information about an issue in a Git-configured project
-     *
-     * @param projectId ID of the project
-     * @param key Display key of the issue
-     * @return Issue & commit information about the issue in the project if available
-     */
-    fun getIssueProjectInfo(projectId: ID, key: String): OntrackGitIssueInfo?
-
-    /**
      * Looks up a commit in the given `configuration`.
      *
      * @param id Commit long or short ID
      * @return The content of a commit if it exists, `null` otherwise.
      */
     fun lookupCommit(configuration: GitConfiguration, id: String): GitCommit?
-
-    /**
-     * Gets information about a commit in a Git-configured project.
-     */
-    fun getCommitProjectInfo(projectId: ID, commit: String): OntrackGitCommitInfo
 
     /**
      * Gets the list of remote branches, as defined under `ref/heads`.
@@ -232,11 +218,6 @@ interface GitService : SCMService {
      * Collects and stores the [IndexableGitCommit]s one build.
      */
     fun collectIndexableGitCommitForBuild(build: Build)
-
-    /**
-     * Converts a raw [GitCommit] into an annotated [GitUICommit]
-     */
-    fun toUICommit(gitConfiguration: GitConfiguration, commit: GitCommit): GitUICommit
 
     /**
      * Loops over the commits of a configuration

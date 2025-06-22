@@ -5,14 +5,11 @@ import kotlinx.coroutines.withTimeoutOrNull
 import net.nemerosa.ontrack.common.FutureUtils
 import net.nemerosa.ontrack.common.asOptional
 import net.nemerosa.ontrack.extension.git.GitConfigProperties
-import net.nemerosa.ontrack.extension.git.branching.BranchingModelService
 import net.nemerosa.ontrack.extension.git.model.*
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationProperty
 import net.nemerosa.ontrack.extension.git.property.GitBranchConfigurationPropertyType
 import net.nemerosa.ontrack.extension.git.repository.GitRepositoryHelper
 import net.nemerosa.ontrack.extension.git.support.NoGitCommitPropertyException
-import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
-import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.scm.model.SCMPathInfo
 import net.nemerosa.ontrack.git.GitRepositoryClient
 import net.nemerosa.ontrack.git.GitRepositoryClientFactory
@@ -27,10 +24,7 @@ import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import net.nemerosa.ontrack.model.support.AbstractBranchJob
-import net.nemerosa.ontrack.model.support.MessageAnnotationUtils
-import net.nemerosa.ontrack.model.support.MessageAnnotator
 import net.nemerosa.ontrack.tx.TransactionService
-import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.PlatformTransactionManager
@@ -54,7 +48,6 @@ class GitServiceImpl(
     private val buildGitCommitLinkService: BuildGitCommitLinkService,
     private val gitConfigurators: Collection<GitConfigurator>,
     private val gitRepositoryHelper: GitRepositoryHelper,
-    private val branchingModelService: BranchingModelService,
     private val entityDataService: EntityDataService,
     private val gitConfigProperties: GitConfigProperties,
     private val gitPullRequestCache: DefaultGitPullRequestCache,
@@ -184,10 +177,6 @@ class GitServiceImpl(
         return gitClient.isReady
     }
 
-    override fun getCommitProjectInfo(projectId: ID, commit: String): OntrackGitCommitInfo {
-        return getOntrackGitCommitInfo(structureService.getProject(projectId), commit)
-    }
-
     override fun getRemoteBranches(gitConfiguration: GitConfiguration): List<String> {
         val gitClient = gitRepositoryClientFactory.getClient(gitConfiguration.gitRepository)
         return gitClient.remoteBranches
@@ -262,175 +251,6 @@ class GitServiceImpl(
             status,
             branches
         )
-    }
-
-    override fun getIssueProjectInfo(projectId: ID, key: String): OntrackGitIssueInfo? {
-        // Gets the project
-        val project = structureService.getProject(projectId)
-        // Gets the project configuration
-        val projectConfiguration = getRequiredProjectConfiguration(project)
-        // Issue service
-        val configuredIssueService: ConfiguredIssueService? = projectConfiguration.configuredIssueService
-        // Gets the details about the issue
-        val issue: Issue? = logTime("issue-object") {
-            configuredIssueService?.getIssue(key)
-        }
-        // If no issue, no info
-        if (issue == null || configuredIssueService == null) {
-            return null
-        } else {
-            // Gets a client for this project
-            val repositoryClient: GitRepositoryClient =
-                gitRepositoryClientFactory.getClient(projectConfiguration.gitRepository)
-            // Regular expression for the issue
-            val regex = configuredIssueService.getMessageRegex(issue)
-            // Now, get the last commit for this issue
-            val commit = logTime("issue-commit") {
-                repositoryClient.getLastCommitForExpression(regex)
-            }
-            // If commit is found, we collect the commit info
-            return if (commit != null) {
-                val commitInfo = getOntrackGitCommitInfo(project, commit)
-                // We now return the commit info together with the issue
-                OntrackGitIssueInfo(
-                    configuredIssueService.issueServiceConfigurationRepresentation,
-                    issue,
-                    commitInfo
-                )
-            }
-            // If not found, no commit info
-            else {
-                OntrackGitIssueInfo(
-                    configuredIssueService.issueServiceConfigurationRepresentation,
-                    issue,
-                    null
-                )
-            }
-        }
-    }
-
-    private fun getOntrackGitCommitInfo(project: Project, commit: String): OntrackGitCommitInfo {
-        // Gets the project configuration
-        val projectConfiguration = getRequiredProjectConfiguration(project)
-        // Gets a client for this configuration
-        val repositoryClient = gitRepositoryClientFactory.getClient(projectConfiguration.gitRepository)
-
-        // Gets the commit
-        val commitObject = logTime("commit-object") {
-            repositoryClient.getCommitFor(commit) ?: throw GitCommitNotFoundException(commit)
-        }
-        // Gets the annotated commit
-        val messageAnnotators = getMessageAnnotators(projectConfiguration)
-        val uiCommit = toUICommit(
-            projectConfiguration.commitLink,
-            messageAnnotators,
-            commitObject
-        )
-
-        // Looks for all Git branches for this commit
-        val gitBranches = logTime("branches-for-commit") { repositoryClient.getBranchesForCommit(commit) }
-        // Sorts the branches according to the branching model
-        val indexedBranches = logTime("branch-index") {
-            branchingModelService.getBranchingModel(project)
-                .groupBranches(gitBranches)
-                .mapValues { (_, gitBranches) ->
-                    gitBranches.mapNotNull { findBranchWithGitBranch(project, it) }
-                }
-                .filterValues { !it.isEmpty() }
-        }
-
-        // Logging of the index
-        indexedBranches.forEach { type, branches: List<Branch> ->
-            logger.debug("git-search-branch-index,type=$type,branches=${branches.joinToString { it.name }}")
-        }
-
-        // For every indexation group of branches
-        val branchInfos = indexedBranches.mapValues { (_, branches) ->
-            branches.map { branch ->
-                // Gets the earliest build on this branch that contains this commit
-                val firstBuildOnThisBranch = logTime("earliest-build", listOf("branch" to branch.name)) {
-                    getEarliestBuildAfterCommit(commitObject, branch)
-                }
-                // Promotions
-                val promotions: List<PromotionRun> = logTime("earliest-promotion", listOf("branch" to branch.name)) {
-                    firstBuildOnThisBranch?.let { build ->
-                        structureService.getPromotionLevelListForBranch(branch.id)
-                            .mapNotNull { promotionLevel ->
-                                structureService.getEarliestPromotionRunAfterBuild(promotionLevel, build).orElse(null)
-                            }
-                    } ?: emptyList()
-                }
-                // Complete branch info
-                BranchInfo(
-                    branch,
-                    firstBuildOnThisBranch,
-                    promotions
-                )
-            }
-        }.mapValues { (_, infos) ->
-            infos.filter { !it.isEmpty }
-        }.filterValues {
-            !it.isEmpty()
-        }
-        // Result
-        return OntrackGitCommitInfo(
-            uiCommit,
-            branchInfos
-        )
-    }
-
-    internal fun getEarliestBuildAfterCommit(
-        commit: GitCommit,
-        branch: Branch
-    ): Build? {
-        return gitRepositoryHelper.getEarliestBuildAfterCommit(
-            branch,
-            IndexableGitCommit(commit)
-        )?.let { structureService.getBuild(ID.of(it)) }
-    }
-
-    override fun toUICommit(gitConfiguration: GitConfiguration, commit: GitCommit): GitUICommit {
-        return toUICommits(
-            gitConfiguration,
-            listOf(commit)
-        ).first()
-    }
-
-    private fun toUICommits(
-        gitConfiguration: GitConfiguration,
-        commits: List<GitCommit>,
-    ): List<GitUICommit> {
-        // Link?
-        val commitLink = gitConfiguration.commitLink
-        // Issue-based annotations
-        val messageAnnotators = getMessageAnnotators(gitConfiguration)
-        // OK
-        return commits.map { commit -> toUICommit(commitLink, messageAnnotators, commit) }
-    }
-
-    private fun toUICommit(
-        commitLink: String,
-        messageAnnotators: List<MessageAnnotator>,
-        commit: GitCommit,
-    ): GitUICommit {
-        return GitUICommit(
-            commit = commit,
-            annotatedMessage = MessageAnnotationUtils.annotate(commit.shortMessage, messageAnnotators),
-            fullAnnotatedMessage = MessageAnnotationUtils.annotate(commit.fullMessage, messageAnnotators),
-            link = StringUtils.replace(commitLink, "{commit}", commit.id),
-        )
-    }
-
-    private fun getMessageAnnotators(gitConfiguration: GitConfiguration): List<MessageAnnotator> {
-        val configuredIssueService = gitConfiguration.configuredIssueService
-        return if (configuredIssueService != null) {
-            // Gets the message annotator
-            val messageAnnotator = configuredIssueService.messageAnnotator
-            // If present annotate the messages
-            listOfNotNull(messageAnnotator)
-        } else {
-            emptyList()
-        }
     }
 
     override fun getGitConfiguratorAndConfiguration(project: Project): Pair<GitConfigurator, GitConfiguration>? =
@@ -863,18 +683,6 @@ class GitServiceImpl(
         // Going on
         false
     } ?: false
-
-    private fun <T> logTime(key: String, tags: List<Pair<String, *>> = emptyList(), code: () -> T): T {
-        val start = System.currentTimeMillis()
-        val result = code()
-        val end = System.currentTimeMillis()
-        val time = end - start
-        val tagsString = tags.joinToString("") {
-            ",${it.first}=${it.second.toString()}"
-        }
-        logger.debug("git-search-time,key=$key,time-ms=$time$tagsString")
-        return result
-    }
 
     companion object {
         private val GIT_INDEXATION_JOB = GIT_JOB_CATEGORY.getType("git-indexation").withName("Git indexation")

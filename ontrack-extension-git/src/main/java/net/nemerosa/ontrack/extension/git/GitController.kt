@@ -1,6 +1,9 @@
 package net.nemerosa.ontrack.extension.git
 
-import net.nemerosa.ontrack.extension.git.model.*
+import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
+import net.nemerosa.ontrack.extension.git.model.GitBranchNotConfiguredException
+import net.nemerosa.ontrack.extension.git.model.GitSynchronisationInfo
+import net.nemerosa.ontrack.extension.git.model.GitSynchronisationRequest
 import net.nemerosa.ontrack.extension.git.service.GitConfigurationService
 import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.extension.scm.model.SCMDocumentNotFoundException
@@ -87,22 +90,6 @@ class GitController(
     @PostMapping("sync/{branchId}")
     fun launchBuildSync(@PathVariable branchId: ID): Ack {
         return Ack.validate(gitService.launchBuildSync(branchId, false) != null)
-    }
-
-    /**
-     * Commit information in a project
-     */
-    @GetMapping("{projectId}/commit-info/{commit}")
-    fun commitProjectInfo(@PathVariable projectId: ID, @PathVariable commit: String): OntrackGitCommitInfo {
-        return gitService.getCommitProjectInfo(projectId, commit)
-    }
-
-    /**
-     * Issue information in a project
-     */
-    @GetMapping("{projectId}/issue-info/{issue}")
-    fun issueProjectInfo(@PathVariable projectId: ID, @PathVariable issue: String): OntrackGitIssueInfo? {
-        return gitService.getIssueProjectInfo(projectId, issue)
     }
 
     /**

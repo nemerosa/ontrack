@@ -5,7 +5,6 @@ import net.nemerosa.ontrack.extension.git.mocking.GitMockingConfigurationPropert
 import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
 import net.nemerosa.ontrack.extension.git.model.BranchInfo
 import net.nemerosa.ontrack.extension.git.model.ConfiguredBuildGitCommitLink
-import net.nemerosa.ontrack.extension.git.model.OntrackGitCommitInfo
 import net.nemerosa.ontrack.extension.git.property.*
 import net.nemerosa.ontrack.extension.git.service.GitConfigurationService
 import net.nemerosa.ontrack.extension.git.service.GitService
@@ -121,10 +120,12 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
         val gitConfigurationName = TestUtils.uid("C")
         val gitConfiguration = asUser().with(GlobalSettings::class.java).call {
             gitConfigurationService.newConfiguration(
-                    BasicGitConfiguration.empty()
-                            .withName(gitConfigurationName)
-                            .withIssueServiceConfigurationIdentifier(TestIssueServiceConfiguration.INSTANCE.toIdentifier().format())
-                            .withRemote("file://${repo.dir.absolutePath}")
+                BasicGitConfiguration.empty()
+                    .withName(gitConfigurationName)
+                    .withIssueServiceConfigurationIdentifier(
+                        TestIssueServiceConfiguration.INSTANCE.toIdentifier().format()
+                    )
+                    .withRemote("file://${repo.dir.absolutePath}")
             )
         }
         if (sync) {
@@ -141,9 +142,9 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
         val gitConfiguration = createGitConfiguration(repo, sync)
         // Configures the project
         setProperty(
-                this,
-                GitProjectConfigurationPropertyType::class.java,
-                GitProjectConfigurationProperty(gitConfiguration)
+            this,
+            GitProjectConfigurationPropertyType::class.java,
+            GitProjectConfigurationProperty(gitConfiguration)
         )
         // Makes sure to register the project
         if (sync) {
@@ -161,9 +162,9 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
         val gitConfiguration = createGitConfiguration(repo, sync)
         // Configures the project
         setProperty(
-                this,
-                GitMockingConfigurationPropertyType::class.java,
-                GitMockingConfigurationProperty(gitConfiguration, null)
+            this,
+            GitMockingConfigurationPropertyType::class.java,
+            GitMockingConfigurationProperty(gitConfiguration, null)
         )
         // Makes sure to register the project
         if (sync) {
@@ -181,18 +182,18 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
      * @param commitLinkConfiguration Returns the build commit link, defaults to [buildNameAsCommit]
      */
     protected fun Branch.gitBranch(
-            branchName: String = "main",
-            commitLinkConfiguration: () -> ConfiguredBuildGitCommitLink<*> = { buildNameAsCommit() }
+        branchName: String = "main",
+        commitLinkConfiguration: () -> ConfiguredBuildGitCommitLink<*> = { buildNameAsCommit() }
     ) {
         asAdmin().execute {
             propertyService.editProperty(
-                    this,
-                    GitBranchConfigurationPropertyType::class.java,
-                    GitBranchConfigurationProperty(
-                            branchName,
-                            commitLinkConfiguration().toServiceConfiguration(),
-                            false, 0
-                    )
+                this,
+                GitBranchConfigurationPropertyType::class.java,
+                GitBranchConfigurationProperty(
+                    branchName,
+                    commitLinkConfiguration().toServiceConfiguration(),
+                    false, 0
+                )
             )
         }
     }
@@ -202,8 +203,8 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
      */
     protected fun buildNameAsCommit(abbreviated: Boolean = true): ConfiguredBuildGitCommitLink<CommitLinkConfig> {
         return ConfiguredBuildGitCommitLink(
-                commitBuildNameGitCommitLink,
-                CommitLinkConfig(abbreviated)
+            commitBuildNameGitCommitLink,
+            CommitLinkConfig(abbreviated)
         )
     }
 
@@ -211,24 +212,24 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
      * Configuration of a build commit link based on a commit property.
      */
     protected fun commitAsProperty() = ConfiguredBuildGitCommitLink(
-            gitCommitPropertyCommitLink,
-            NoConfig.INSTANCE
+        gitCommitPropertyCommitLink,
+        NoConfig.INSTANCE
     )
 
     /**
      * Configuration of a build commit link based on tag as build name.
      */
     protected fun tagBuildName() = ConfiguredBuildGitCommitLink(
-            tagBuildNameGitCommitLink,
-            NoConfig.INSTANCE
+        tagBuildNameGitCommitLink,
+        NoConfig.INSTANCE
     )
 
     /**
      * Configuration of a build commit link based on tag pattern as build name.
      */
     protected fun tagPatternBuildName(pattern: String) = ConfiguredBuildGitCommitLink(
-            tagPatternBuildNameGitCommitLink,
-            TagPattern(pattern)
+        tagPatternBuildNameGitCommitLink,
+        TagPattern(pattern)
     )
 
     /**
@@ -236,9 +237,9 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
      */
     protected fun Build.gitCommitProperty(commit: String) {
         setProperty(
-                this,
-                GitCommitPropertyType::class.java,
-                GitCommitProperty(commit)
+            this,
+            GitCommitPropertyType::class.java,
+            GitCommitProperty(commit)
         )
     }
 
@@ -251,25 +252,25 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
      * @return A map where the key in the index, and the value is the commit hash.
      */
     protected fun GitRepo.commits(n: Int, pauses: Boolean = false, shortId: Boolean = false) =
-            (1..n).associate {
-                val message = "Commit $it"
-                commit(it, message)
-                val hash = commitLookup(message, shortId)
-                if (pauses) sleep(1010)
-                it to hash
-            }
+        (1..n).associate {
+            val message = "Commit $it"
+            commit(it, message)
+            val hash = commitLookup(message, shortId)
+            if (pauses) sleep(1010)
+            it to hash
+        }
 
     /**
      * Creates a sequence of commits on different branches.
      */
     protected fun GitRepo.sequence(vararg commands: Any): Map<Int, String> =
-            runSequence(commands.toList(), false)
+        runSequence(commands.toList(), false)
 
     /**
      * Creates a sequence of commits on different branches, pausing after each commit
      */
     protected fun GitRepo.sequenceWithPauses(vararg commands: Any): Map<Int, String> =
-            runSequence(commands.toList(), true)
+        runSequence(commands.toList(), true)
 
     /**
      * Creates a sequence of commits on different branches.
@@ -322,7 +323,7 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
     protected fun <T> createRepo(init: GitRepo.() -> T) = RepoTestActions(init)
 
     protected class RepoTestActions<T>(
-            private val init: GitRepo.() -> T
+        private val init: GitRepo.() -> T
     ) {
         infix fun and(code: (GitRepo, T) -> Unit) {
             var value: T? = null
@@ -338,42 +339,10 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
         }
     }
 
-    protected fun commitInfoTest(
-            project: Project,
-            commits: Map<Int, String>,
-            no: Int,
-            tests: OntrackGitCommitInfo.() -> Unit
-    ) {
-        val commit = commits.getValue(no)
-        val info = gitService.getCommitProjectInfo(project.id, commit)
-        // Commit message & hash
-        assertEquals(commit, info.uiCommit.id)
-        assertEquals("Commit $no", info.uiCommit.annotatedMessage)
-        // Tests
-        info.tests()
-    }
-
-    protected fun OntrackGitCommitInfo.assertBranchInfos(
-            vararg tests: Pair<String, List<BranchInfoTest>>
-    ) {
-        assertEquals(tests.size, branchInfos.size, "Number of tests must match the number of collected branch infos")
-        // Test per test
-        tests.forEach { (type, branchInfoTests) ->
-            val branchInfoList = branchInfos[type]
-            assertNotNull(branchInfoList) { it ->
-                assertEquals(branchInfoTests.size, it.size, "Number of tests for type $type must match the number of collect branch infos")
-                // Group by pair
-                it.zip(branchInfoTests).forEach { (branchInfo, branchInfoTest) ->
-                    branchInfoTest(branchInfo)
-                }
-            }
-        }
-    }
-
     protected class BranchInfoTest(
-            private val branch: String,
-            private val firstBuild: String?,
-            private val promotions: List<Pair<String, String>> = emptyList()
+        private val branch: String,
+        private val firstBuild: String?,
+        private val promotions: List<Pair<String, String>> = emptyList()
     ) {
         operator fun invoke(branchInfo: BranchInfo) {
             // Branch
@@ -398,10 +367,10 @@ abstract class AbstractGitTestSupport : AbstractQLKTITSupport() {
     }
 
     protected fun Branch.build(
-            no: Int,
-            commits: Map<Int, String>,
-            validations: List<ValidationStamp> = emptyList(),
-            promotions: List<PromotionLevel> = emptyList()
+        no: Int,
+        commits: Map<Int, String>,
+        validations: List<ValidationStamp> = emptyList(),
+        promotions: List<PromotionLevel> = emptyList()
     ) {
         build(no.toString()) {
             gitCommitProperty(commits.getValue(no))
