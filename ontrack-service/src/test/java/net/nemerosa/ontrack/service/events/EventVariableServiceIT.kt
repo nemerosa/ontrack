@@ -83,37 +83,4 @@ class EventVariableServiceIT : AbstractDSLTestSupport() {
         }
     }
 
-    @Test
-    fun `Variables associated with a promotion run`() {
-        asAdmin {
-            project {
-                branch {
-                    val pl = promotionLevel()
-                    build {
-                        val build = this
-                        val run = promote(pl)
-
-                        // Creates an event for this run
-                        val event = eventFactory.newPromotionRun(run)
-
-                        // Gets all the variables for this event (neglecting the case variants)
-                        val parameters = eventVariableService.getTemplateParameters(event, caseVariants = false)
-
-                        // Checks all parameters
-                        assertEquals(
-                            mapOf(
-                                "project" to project.name,
-                                "branch" to branch.name,
-                                "build" to build.name,
-                                "promotion" to pl.name,
-                            ),
-                            parameters
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-
 }

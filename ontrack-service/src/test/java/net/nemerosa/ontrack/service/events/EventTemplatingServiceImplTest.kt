@@ -29,9 +29,6 @@ class EventTemplatingServiceImplTest {
         every { eventVariableService.getTemplateContext(any(), any()) } returns mapOf(
             "branch" to "release/1.27"
         )
-        every { eventVariableService.getTemplateParameters(any(), caseVariants = true) } returns mapOf(
-            "branch" to "release/1.27"
-        )
 
         entityDisplayNameService = mockk()
         every { entityDisplayNameService.getEntityDisplayName(any()) } answers {
