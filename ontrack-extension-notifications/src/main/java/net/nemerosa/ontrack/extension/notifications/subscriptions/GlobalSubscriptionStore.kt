@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.extension.notifications.subscriptions
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
-import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.notifications.channels.NotificationChannelRegistry
 import net.nemerosa.ontrack.extension.notifications.channels.getChannel
 import net.nemerosa.ontrack.json.format
@@ -10,7 +8,6 @@ import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.json.getTextField
 import net.nemerosa.ontrack.model.support.StorageService
 import org.springframework.stereotype.Component
-import java.util.*
 
 @Component
 class GlobalSubscriptionStore(
@@ -65,16 +62,6 @@ class GlobalSubscriptionStore(
             contextList += "left join jsonb_array_elements_text(data::jsonb->'events') as events on true"
             jsonFilters += """events = :eventType"""
             jsonCriteria["eventType"] = filter.eventType
-        }
-        // Filter: created before
-        if (filter.createdBefore != null) {
-            jsonFilters += """data::jsonb->'signature'->>'time' <= :time"""
-            jsonCriteria["time"] = Time.store(filter.createdBefore)
-        }
-        // Filter: creator
-        if (filter.creator != null) {
-            jsonFilters += """data::jsonb->'signature'->'user'->>'name' = :creator"""
-            jsonCriteria["creator"] = filter.creator
         }
 
         // Final context & criteria
