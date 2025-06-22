@@ -18,7 +18,7 @@ class EventSubscriptionMutations(
     override val mutations: List<Mutation>
         get() =
             genericMutations +
-                    ProjectEntityType.values().map { type ->
+                    ProjectEntityType.entries.map { type ->
                         createEntitySubscriptionMutation(type)
                     }
 
@@ -139,7 +139,7 @@ class EventSubscriptionMutations(
                 val projectEntity = input.projectEntity?.run {
                     type.getEntityFn(structureService).apply(ID.of(id))
                 }
-                val name = input.name ?: input.id ?: error("`name` must be specified")
+                val name = input.name
                 eventSubscriptionService.findSubscriptionByName(
                     projectEntity = projectEntity,
                     name = name,
@@ -169,7 +169,7 @@ class EventSubscriptionMutations(
                 val projectEntity = input.projectEntity?.run {
                     type.getEntityFn(structureService).apply(ID.of(id))
                 }
-                val name = input.name ?: input.id ?: error("`name` must be specified")
+                val name = input.name
                 eventSubscriptionService.findSubscriptionByName(
                     projectEntity = projectEntity,
                     name = name,
@@ -274,11 +274,8 @@ data class DisableSubscriptionInput(
     @APIDescription("Target project entity (null for global events)")
     @TypeRef(embedded = true, suffix = "Input")
     val projectEntity: ProjectEntityID?,
-    @APIDescription("ID of the subscription to disable")
-    @Deprecated("Will be removed in V5. Use name instead")
-    val id: String?,
     @APIDescription("Name of the subscription to disable")
-    val name: String?,
+    val name: String,
 )
 
 @APIDescription("Subscription enabling")
@@ -286,11 +283,8 @@ data class EnableSubscriptionInput(
     @APIDescription("Target project entity (null for global events)")
     @TypeRef(embedded = true, suffix = "Input")
     val projectEntity: ProjectEntityID?,
-    @APIDescription("ID of the subscription to enable")
-    @Deprecated("Will be removed in V5. Use name instead")
-    val id: String?,
     @APIDescription("Name of the subscription to enable")
-    val name: String?,
+    val name: String,
 )
 
 @APIDescription("Renaming a subscription")

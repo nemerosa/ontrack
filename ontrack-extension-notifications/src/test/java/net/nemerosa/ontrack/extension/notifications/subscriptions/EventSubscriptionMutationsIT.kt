@@ -499,7 +499,7 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                 """
                     mutation {
                         disableSubscription(input: {
-                            id: "$name"
+                            name: "$name"
                         }) {
                             errors {
                                 message
@@ -525,7 +525,7 @@ class EventSubscriptionMutationsIT : AbstractNotificationTestSupport() {
                 """
                     mutation {
                         enableSubscription(input: {
-                            id: "$name"
+                            name: "$name"
                         }) {
                             errors {
                                 message
