@@ -57,7 +57,7 @@ class AutoVersioningTemplatingServiceImpl(
             val tmp = mutableMapOf(
                 "sourceProject" to sourceProject,
                 "targetBranch" to order.branch,
-                "PROMOTION" to order.sourcePromotion!!,
+                "PROMOTION" to (order.sourcePromotion ?: ""),
                 "PATH" to order.defaultPath.paths.first(),
                 "PATHS" to order.allPaths.flatMap { it.paths }.joinToString(","),
                 "PROPERTY" to (order.targetProperty ?: ""),
