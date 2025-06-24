@@ -66,8 +66,8 @@ class JenkinsPostProcessing(
 
         // Parameters to send to the job
         val parameters = mutableMapOf(
-            "DOCKER_IMAGE" to config.dockerImage,
-            "DOCKER_COMMAND" to config.dockerCommand,
+            "DOCKER_IMAGE" to avTemplateRenderer.render(config.dockerImage, PlainEventRenderer.INSTANCE),
+            "DOCKER_COMMAND" to avTemplateRenderer.render(config.dockerCommand, PlainEventRenderer.INSTANCE),
             "COMMIT_MESSAGE" to (config.commitMessage ?: autoVersioningOrder.defaultCommitMessage),
             "REPOSITORY_URI" to repositoryURI,
             "UPGRADE_BRANCH" to upgradeBranch,
