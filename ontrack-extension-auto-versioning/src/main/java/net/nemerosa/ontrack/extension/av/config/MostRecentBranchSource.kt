@@ -1,21 +1,30 @@
 package net.nemerosa.ontrack.extension.av.config
 
-import net.nemerosa.ontrack.common.getOrNull
-import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.ordering.BranchOrderingService
+import net.nemerosa.ontrack.model.structure.Branch
+import net.nemerosa.ontrack.model.structure.BranchDisplayNameService
+import net.nemerosa.ontrack.model.structure.Project
+import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
+import kotlin.jvm.optionals.getOrNull
 
 @Component
 class MostRecentBranchSource(
     private val structureService: StructureService,
     private val branchDisplayNameService: BranchDisplayNameService,
+    private val branchOrderingService: BranchOrderingService,
 ) : AbstractBranchSource("most-recent") {
 
-    private val ordering = OptionalVersionBranchOrdering(branchDisplayNameService)
-
-    override fun getLatestBranch(config: String?, project: Project, targetBranch: Branch, promotion: String, includeDisabled: Boolean): Branch? {
+    override fun getLatestBranch(
+        config: String?,
+        project: Project,
+        targetBranch: Branch,
+        promotion: String,
+        includeDisabled: Boolean
+    ): Branch? {
         val sourceRegex = config?.toRegex() ?: throw BranchSourceMissingConfigurationException(id)
         // Version-based ordering
-        val versionComparator = ordering.getComparator(config)
+        val versionComparator = branchOrderingService.getRegexVersionComparator(regex = sourceRegex)
         // Gets the list of branches for the source project matching the regex
         val branches = structureService.getBranchesForProject(project.id)
             .filter { sourceBranch ->
