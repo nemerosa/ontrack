@@ -35,11 +35,11 @@ union BuildPromotionInfoItemData = EnvironmentBuildCount | PromotionLevel | Prom
 
 type Account {
     "Source of authentication (builtin, ldap, etc.)"
-    authenticationSource: AuthenticationSource
+    authenticationSource: AuthenticationSource @deprecated(reason: "Will be removed in V5.")
     "List of authorized projects"
     authorizedProjects: [AuthorizedProject!]!
     "List of groups contributed to this account. Some groups are available only after the user has logged in."
-    contributedGroups: [AccountGroup!]!
+    contributedGroups: [AccountGroup!]! @deprecated(reason: "Will be removed in V5. Use the User type fields.")
     "Is this account disabled?"
     disabled: Boolean
     "Email of the account"
@@ -49,16 +49,16 @@ type Account {
     "Global role for the account"
     globalRole: GlobalRole
     "List of groups the account belongs to"
-    groups: [AccountGroup!]!
+    groups: [AccountGroup!]! @deprecated(reason: "Will be removed in V5. Use the User type fields.")
     id: ID!
     "Links"
     links: AccountLinks @deprecated(reason: "Use the `actions` field instead.")
     "Is this account locked (meaning that no change can be performed)?"
     locked: Boolean
     "Unique name for the account"
-    name: String
+    name: String!
     "List of groups provided to this account. Some groups are available only after the user has logged in."
-    providedGroups: [String!]!
+    providedGroups: [String!]! @deprecated(reason: "Will be removed in V5. Use the User type fields.")
     "Security role (admin or none)"
     role: String
     "Authentication token, if any, linked to this account."
@@ -79,7 +79,7 @@ type AccountGroup {
     "Links"
     links: AccountGroupLinks @deprecated(reason: "Use the `actions` field instead.")
     "Mappings for this group"
-    mappings: [AccountGroupMapping!]!
+    mappings: [AccountGroupMapping!]! @deprecated(reason: "Will be removed in V5. Replaced in V5 by the `groupMappings` root query.")
     name: String
 }
 
@@ -381,9 +381,9 @@ type Branch implements Authorizable & ProjectEntity {
     "Auto versioning configuration"
     autoVersioningConfig: AutoVersioningConfig
     "Actions to get a diff on builds of the branch"
-    buildDiffActions: [Action!]!
+    buildDiffActions: [Action!]! @deprecated(reason: "Will be removed in V5. Used by legacy UI only.")
     "List of forms for the build filters (for the creation of new filters)"
-    buildFilterForms: [BuildFilterForm!]!
+    buildFilterForms: [BuildFilterForm!]! @deprecated(reason: "Will be removed in V5. Used by legacy UI only.")
     "List of shared build filters for this branch"
     buildFilterResources: [BuildFilterResource!]!
     "Gets a list of builds for this branch. Use `buildsPaginated` to get a list of paginated builds."
@@ -432,7 +432,7 @@ type Branch implements Authorizable & ProjectEntity {
         from: String!,
         "Name of the build to end the change log with"
         to: String!
-    ): GitChangeLog
+    ): GitChangeLog @deprecated(reason: "Will be removed in V5. Use scmChangeLog root query.")
     "Registered GitHub ingestion configuration"
     gitHubIngestionConfig: GitHubIngestionConfig
     "Graph of dependencies for this branch"
@@ -3349,17 +3349,17 @@ type Mutation {
     bulkUpdatePromotionLevelById(
         "Input for the mutation"
         input: BulkUpdatePromotionLevelByIdInput
-    ): BulkUpdatePromotionLevelByIdPayload
+    ): BulkUpdatePromotionLevelByIdPayload @deprecated(reason: "Bulk update of a promotion level")
     "Bulk update of a validation stamp"
     bulkUpdateValidationStampById(
         "Input for the mutation"
         input: BulkUpdateValidationStampByIdInput
-    ): BulkUpdateValidationStampByIdPayload
+    ): BulkUpdateValidationStampByIdPayload @deprecated(reason: "Bulk update of a validation stamp")
     "Cancelling a pipeline"
     cancelSlotPipeline(
         "Input for the mutation"
         input: CancelSlotPipelineInput
-    ): CancelSlotPipelinePayload
+    ): CancelSlotPipelinePayload @deprecated(reason: "Cancelling a pipeline")
     "Changing the password of the current user"
     changePassword(input: ChangePasswordInput!): ChangePasswordPayload
     "Change the status of a validation run"
@@ -3376,7 +3376,7 @@ type Mutation {
     checkAutoVersioning(
         "Input for the mutation"
         input: CheckAutoVersioningInput
-    ): CheckAutoVersioningPayload
+    ): CheckAutoVersioningPayload @deprecated(reason: "Checks the status of the auto versioning compared to the latest versions and creates an appropriate validation")
     "Creates a new branch"
     createBranch(
         "Input for the mutation"
@@ -3401,12 +3401,12 @@ type Mutation {
     createBuiltInAccount(
         "Input for the mutation"
         input: CreateBuiltInAccountInput
-    ): CreateBuiltInAccountPayload
+    ): CreateBuiltInAccountPayload @deprecated(reason: "Creation of accounts is deprecated and will be removed in V5")
     "Creates a configuration"
     createConfiguration(
         "Input for the mutation"
         input: CreateConfigurationInput
-    ): CreateConfigurationPayload
+    ): CreateConfigurationPayload @deprecated(reason: "Creates a configuration")
     "Creates a new environment"
     createEnvironment(
         "Input for the mutation"
@@ -3421,7 +3421,7 @@ type Mutation {
     createJenkinsConfiguration(
         "Input for the mutation"
         input: CreateJenkinsConfigurationInput
-    ): CreateJenkinsConfigurationPayload
+    ): CreateJenkinsConfigurationPayload @deprecated(reason: "Creates a Jenkins configuration")
     "Creates a new predefined promotion level"
     createPredefinedPromotionLevel(
         "Input for the mutation"
@@ -3491,7 +3491,7 @@ type Mutation {
     deleteAutoVersioningConfig(
         "Input for the mutation"
         input: DeleteAutoVersioningConfigInput
-    ): DeleteAutoVersioningConfigPayload
+    ): DeleteAutoVersioningConfigPayload @deprecated(reason: "Deletes the auto-versioning configuration from a branch")
     "Deletes the git branch property on a branch identified by name."
     deleteBranchGitConfigProperty(
         "Input for the mutation"
@@ -3536,7 +3536,7 @@ type Mutation {
     deleteBuildFilter(
         "Input for the mutation"
         input: DeleteBuildFilterInput
-    ): DeleteBuildFilterPayload
+    ): DeleteBuildFilterPayload @deprecated(reason: "Deletes a build filter for current user and for all users if shared")
     "Deletes the git commit property on a build identified by name."
     deleteBuildGitCommitProperty(
         "Input for the mutation"
@@ -3581,51 +3581,51 @@ type Mutation {
     deleteConfiguration(
         "Input for the mutation"
         input: DeleteConfigurationInput
-    ): DeleteConfigurationPayload
+    ): DeleteConfigurationPayload @deprecated(reason: "Deletes a configuration")
     "Deletes a dashboard"
     deleteDashboard(input: DeleteDashboardInput!): DeletionPayload
     "Deletes a deployment"
     deleteDeployment(
         "Input for the mutation"
         input: DeleteDeploymentInput
-    ): DeleteDeploymentPayload
+    ): DeleteDeploymentPayload @deprecated(reason: "Deletes a deployment")
     "Deletes an existing environment"
     deleteEnvironment(
         "Input for the mutation"
         input: DeleteEnvironmentInput
-    ): DeleteEnvironmentPayload
+    ): DeleteEnvironmentPayload @deprecated(reason: "Deletes an existing environment")
     "Generic deletion for a property and an entity"
     deleteGenericProperty(
         "Input for the mutation"
         input: DeleteGenericPropertyInput
-    ): DeleteGenericPropertyPayload
+    ): DeleteGenericPropertyPayload @deprecated(reason: "Generic deletion for a property and an entity")
     "Deletes a Jenkins configuration"
     deleteJenkinsConfiguration(
         "Input for the mutation"
         input: DeleteJenkinsConfigurationInput
-    ): DeleteJenkinsConfigurationPayload
+    ): DeleteJenkinsConfigurationPayload @deprecated(reason: "Deletes a Jenkins configuration")
     "Deletes a job"
     deleteJob(id: Int!): JobActionResult!
     "Deleting notification records"
     deleteNotificationRecords(
         "Input for the mutation"
         input: DeleteNotificationRecordsInput
-    ): DeleteNotificationRecordsPayload
+    ): DeleteNotificationRecordsPayload @deprecated(reason: "Deleting notification records")
     "Deletes an existing predefined promotion level"
     deletePredefinedPromotionLevel(
         "Input for the mutation"
         input: DeletePredefinedPromotionLevelInput
-    ): DeletePredefinedPromotionLevelPayload
+    ): DeletePredefinedPromotionLevelPayload @deprecated(reason: "Deletes an existing predefined promotion level")
     "Deletes an existing predefined validation stamp"
     deletePredefinedValidationStamp(
         "Input for the mutation"
         input: DeletePredefinedValidationStampInput
-    ): DeletePredefinedValidationStampPayload
+    ): DeletePredefinedValidationStampPayload @deprecated(reason: "Deletes an existing predefined validation stamp")
     "Deletes an existing project"
     deleteProject(
         "Input for the mutation"
         input: DeleteProjectInput
-    ): DeleteProjectPayload
+    ): DeleteProjectPayload @deprecated(reason: "Deletes an existing project")
     "Deletes the auto promotion levels property on a project identified by name."
     deleteProjectAutoPromotionLevelProperty(
         "Input for the mutation"
@@ -3760,7 +3760,7 @@ type Mutation {
     deletePromotionLevelById(
         "Input for the mutation"
         input: DeletePromotionLevelByIdInput
-    ): DeletePromotionLevelByIdPayload
+    ): DeletePromotionLevelByIdPayload @deprecated(reason: "Deletes an existing promotion level")
     "Deletes the message property on a promotion level identified by name."
     deletePromotionLevelMessageProperty(
         "Input for the mutation"
@@ -3785,7 +3785,7 @@ type Mutation {
     deletePromotionRun(
         "Input for the mutation"
         input: DeletePromotionRunInput
-    ): DeletePromotionRunPayload
+    ): DeletePromotionRunPayload @deprecated(reason: "Deletes an existing promotion run")
     "Deletes the message property on a promotion run identified by name."
     deletePromotionRunMessageProperty(
         "Input for the mutation"
@@ -3810,22 +3810,22 @@ type Mutation {
     deleteSlot(
         "Input for the mutation"
         input: DeleteSlotInput
-    ): DeleteSlotPayload
+    ): DeleteSlotPayload @deprecated(reason: "Deletes a slot using its ID")
     "Deletes an admission rule for a slot"
     deleteSlotAdmissionRuleConfig(
         "Input for the mutation"
         input: DeleteSlotAdmissionRuleConfigInput
-    ): DeleteSlotAdmissionRuleConfigPayload
+    ): DeleteSlotAdmissionRuleConfigPayload @deprecated(reason: "Deletes an admission rule for a slot")
     "Deletes a workflow from a slot"
     deleteSlotWorkflow(
         "Input for the mutation"
         input: DeleteSlotWorkflowInput
-    ): DeleteSlotWorkflowPayload
+    ): DeleteSlotWorkflowPayload @deprecated(reason: "Deletes a workflow from a slot")
     "Deletes an existing subscription using its ID"
     deleteSubscription(
         "Input for the mutation"
         input: DeleteSubscriptionInput
-    ): DeleteSubscriptionPayload
+    ): DeleteSubscriptionPayload @deprecated(reason: "Deletes an existing subscription using its ID")
     "Deletes the message property on a validation run identified by name."
     deleteValidationRunMessageProperty(
         "Input for the mutation"
@@ -3850,7 +3850,7 @@ type Mutation {
     deleteValidationStampById(
         "Input for the mutation"
         input: DeleteValidationStampByIdInput
-    ): DeleteValidationStampByIdPayload
+    ): DeleteValidationStampByIdPayload @deprecated(reason: "Deletes an existing validation stamp")
     "Deletes the message property on a validation stamp identified by name."
     deleteValidationStampMessageProperty(
         "Input for the mutation"
@@ -3875,12 +3875,12 @@ type Mutation {
     deleteWebhook(
         "Input for the mutation"
         input: DeleteWebhookInput
-    ): DeleteWebhookPayload
+    ): DeleteWebhookPayload @deprecated(reason: "Deleting an existing webhook")
     "Disables an account"
     disableAccount(
         "Input for the mutation"
         input: DisableAccountInput
-    ): DisableAccountPayload
+    ): DisableAccountPayload @deprecated(reason: "Disabling of accounts is deprecated and will be removed in V5")
     "Disables an existing branch"
     disableBranch(
         "Input for the mutation"
@@ -3900,7 +3900,7 @@ type Mutation {
     enableAccount(
         "Input for the mutation"
         input: EnableAccountInput
-    ): EnableAccountPayload
+    ): EnableAccountPayload @deprecated(reason: "Enabling of accounts is deprecated and will be removed in V5")
     "Enables an existing branch"
     enableBranch(
         "Input for the mutation"
@@ -3985,7 +3985,7 @@ type Mutation {
     grantGlobalRoleToAccount(
         "Input for the mutation"
         input: GrantGlobalRoleToAccountInput
-    ): GrantGlobalRoleToAccountPayload
+    ): GrantGlobalRoleToAccountPayload @deprecated(reason: "Grants a global role to an account")
     "Launches a job"
     launchJob(id: Int!): JobActionResult!
     "Launches an existing workflow"
@@ -4012,17 +4012,17 @@ type Mutation {
     lockAccount(
         "Input for the mutation"
         input: LockAccountInput
-    ): LockAccountPayload
+    ): LockAccountPayload @deprecated(reason: "Locking of accounts is deprecated and will be removed in V5")
     "Overriding a rule into a pipeline"
     overridePipelineRule(
         "Input for the mutation"
         input: OverridePipelineRuleInput
-    ): OverridePipelineRulePayload
+    ): OverridePipelineRulePayload @deprecated(reason: "Overriding a rule into a pipeline")
     "Overrides the execution of a workflow for a pipeline"
     overridePipelineWorkflow(
         "Input for the mutation"
         input: OverridePipelineWorkflowInput
-    ): OverridePipelineWorkflowPayload
+    ): OverridePipelineWorkflowPayload @deprecated(reason: "Overrides the execution of a workflow for a pipeline")
     "Pausing the execution of all jobs"
     pauseAllJobs: JobActionResult!
     "Pauses a job"
@@ -4049,12 +4049,12 @@ type Mutation {
     reorderPredefinedPromotionLevelById(
         "Input for the mutation"
         input: ReorderPredefinedPromotionLevelByIdInput
-    ): ReorderPredefinedPromotionLevelByIdPayload
+    ): ReorderPredefinedPromotionLevelByIdPayload @deprecated(reason: "Reordering the predefining promotion levels")
     "Reordering the promotion levels in a branch"
     reorderPromotionLevelById(
         "Input for the mutation"
         input: ReorderPromotionLevelByIdInput
-    ): ReorderPromotionLevelByIdPayload
+    ): ReorderPromotionLevelByIdPayload @deprecated(reason: "Reordering the promotion levels in a branch")
     "Resuming the execution of all jobs"
     resumeAllJobs: JobActionResult!
     "Resumes a job"
@@ -4063,19 +4063,19 @@ type Mutation {
     revokeAccountTokens(
         "Input for the mutation"
         input: RevokeAccountTokensInput
-    ): RevokeAccountTokensPayload
+    ): RevokeAccountTokensPayload @deprecated(reason: "Revoke all tokens of the given account")
     "Revokes all tokens"
     revokeAllTokens: RevokeAllTokensPayload
     "Revoke the given token"
     revokeToken(
         "Input for the mutation"
         input: RevokeTokenInput
-    ): RevokeTokenPayload
+    ): RevokeTokenPayload @deprecated(reason: "Revoke the given token")
     "Saves a build filter in the user preferences"
     saveBuildFilter(
         "Input for the mutation"
         input: SaveBuildFilterInput
-    ): SaveBuildFilterPayload
+    ): SaveBuildFilterPayload @deprecated(reason: "Saves a build filter in the user preferences")
     "Saves a dashboard"
     saveDashboard(input: SaveDashboardInput!): SaveDashboardPayload
     "Saves a workflow which is defined as JSON"
@@ -4521,14 +4521,14 @@ type Mutation {
     shareBuildFilter(
         "Input for the mutation"
         input: ShareBuildFilterInput
-    ): ShareBuildFilterPayload
+    ): ShareBuildFilterPayload @deprecated(reason: "Shares a build filter for all users")
     "Shares a dashboard"
     shareDashboard(input: ShareDashboardInput!): ShareDashboardPayload
     "Shares or updates a filter at project level"
     shareSCMFileChangeFilter(
         "Input for the mutation"
         input: ShareSCMFileChangeFilterInput
-    ): ShareSCMFileChangeFilterPayload
+    ): ShareSCMFileChangeFilterPayload @deprecated(reason: "Shares or updates a filter at project level")
     "Starts a pipeline for a slot and a build"
     startSlotPipeline(
         "Input for the mutation"
@@ -4545,7 +4545,7 @@ type Mutation {
     stopWorkflow(
         "Input for the mutation"
         input: StopWorkflowInput
-    ): StopWorkflowPayload
+    ): StopWorkflowPayload @deprecated(reason: "Stopping a running workflow. Does not do anything if already stopped.")
     "Set a list of subscriptions on a branch identified by name."
     subscribeBranchToEvents(
         "Input for the mutation"
@@ -4610,12 +4610,12 @@ type Mutation {
     unlockAccount(
         "Input for the mutation"
         input: UnlockAccountInput
-    ): UnlockAccountPayload
+    ): UnlockAccountPayload @deprecated(reason: "Unlocking of accounts is deprecated and will be removed in V5")
     "Unshares a filter at project level"
     unshareSCMFileChangeFilter(
         "Input for the mutation"
         input: UnshareSCMFileChangeFilterInput
-    ): UnshareSCMFileChangeFilterPayload
+    ): UnshareSCMFileChangeFilterPayload @deprecated(reason: "Unshares a filter at project level")
     "Updates an existing build"
     updateBuild(
         "Input for the mutation"
@@ -4625,17 +4625,17 @@ type Mutation {
     updateConfiguration(
         "Input for the mutation"
         input: UpdateConfigurationInput
-    ): UpdateConfigurationPayload
+    ): UpdateConfigurationPayload @deprecated(reason: "Updates a configuration")
     "Updates a Jenkins configuration"
     updateJenkinsConfiguration(
         "Input for the mutation"
         input: UpdateJenkinsConfigurationInput
-    ): UpdateJenkinsConfigurationPayload
+    ): UpdateJenkinsConfigurationPayload @deprecated(reason: "Updates a Jenkins configuration")
     "Updating the pipeline admission data"
     updatePipelineData(
         "Input for the mutation"
         input: UpdatePipelineDataInput
-    ): UpdatePipelineDataPayload
+    ): UpdatePipelineDataPayload @deprecated(reason: "Updating the pipeline admission data")
     "Updates an existing predefined promotion level"
     updatePredefinedPromotionLevel(
         "Input for the mutation"
@@ -5332,7 +5332,7 @@ type ProjectRole {
 
 type PromotionLevel implements Authorizable & ProjectEntity {
     "Link to the image"
-    _image: String
+    _image: String @deprecated(reason: "Will be removed in V5. Used by legacy UI only.")
     "Description with links."
     annotatedDescription: String
     "Authorizations for this context"
@@ -5525,7 +5525,7 @@ type Query {
         provider: String,
         "Authentication source name"
         source: String
-    ): [AccountGroupMapping!]!
+    ): [AccountGroupMapping!]! @deprecated(reason: "Will be removed in V5. Replaced in V5 by the `groupMappings` root query.")
     accountGroups(
         "Searching by ID"
         id: Int,
@@ -5550,7 +5550,7 @@ type Query {
         enabled: Boolean,
         "Filters on authentication sources which support group mapping"
         groupMappingSupported: Boolean
-    ): [AuthenticationSource!]!
+    ): [AuthenticationSource!]! @deprecated(reason: "Will be removed in V5. No replacement.")
     "Getting a list of authorizations for the authenticated user"
     authorizations: [Authorization!]!
     "List of audit entries for auto versioning processing orders"
@@ -5660,6 +5660,8 @@ type Query {
         "Filter on the environments"
         filter: EnvironmentFilter
     ): [Environment!]!
+    "Returns the number of environments"
+    environmentsCount: Int!
     "List of event subscriptions"
     eventSubscriptions(
         "Filter for the subscriptions"
@@ -7662,9 +7664,9 @@ type Token {
     "Name of the token"
     name: String
     "scope field"
-    scope: TokenScope!
+    scope: TokenScope! @deprecated(reason: "Token scopes will be removed in V5")
     "Is this token managed?"
-    transient: Boolean!
+    transient: Boolean! @deprecated(reason: "Transient tokens will be removed in V5.")
     "Validity flag, computed in regard to current time."
     valid: Boolean
     "Date until the end of validity."
@@ -8087,7 +8089,7 @@ type ValidationRunStatusLinks {
 
 type ValidationStamp implements Authorizable & ProjectEntity {
     "Link to the image"
-    _image: String
+    _image: String @deprecated(reason: "Will be removed in V5. Used by legacy UI only.")
     "Description with links."
     annotatedDescription: String
     "Authorizations for this context"
