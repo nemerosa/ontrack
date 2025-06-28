@@ -94,7 +94,7 @@ abstract class AbstractAutoVersioningAuditService(
             uuid = order.uuid,
             queue = null,
             upgradeBranch = null,
-            state = AutoVersioningAuditState.POST_PROCESSING_START,
+            state = AutoVersioningAuditState.POST_PROCESSING_LAUNCHED,
             data = postProcessingInfo.data.toList().toTypedArray()
         )
     }
