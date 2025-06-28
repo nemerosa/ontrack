@@ -44,6 +44,13 @@ class MockPostProcessing(
         avTemplateRenderer: AutoVersioningTemplateRenderer,
         onPostProcessingInfo: (info: PostProcessingInfo) -> Unit,
     ) {
+        onPostProcessingInfo(
+            PostProcessingInfo(
+                data = mapOf(
+                    "url" to repositoryURI,
+                )
+            )
+        )
         if (config.durationMs > 0) {
             runBlocking {
                 delay(config.durationMs)
