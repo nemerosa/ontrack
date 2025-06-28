@@ -104,6 +104,7 @@ class AutoVersioningBranchLinksDecorationExtension(
             -> "processing"
 
             AutoVersioningAuditState.POST_PROCESSING_START -> "post_processing"
+            AutoVersioningAuditState.POST_PROCESSING_LAUNCHED -> "post_processing"
 
             AutoVersioningAuditState.PR_CREATING -> "pr_creating"
 

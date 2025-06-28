@@ -1,10 +1,13 @@
 import {Space, Tooltip, Typography} from "antd";
 import {
     FaCheck,
-    FaClock, FaCodeBranch,
-    FaCog, FaFile, FaPause,
+    FaCodeBranch,
+    FaCog,
+    FaFile,
+    FaPause,
     FaPlay,
     FaRegClock,
+    FaRocket,
     FaThumbsUp,
     FaTimes,
     FaTimesCircle,
@@ -158,6 +161,17 @@ export default function AutoVersioningAuditEntryState({status}) {
                         <Space>
                             <FaCog/>
                             Post processing starts
+                        </Space>
+                    </Tooltip>
+                </Typography.Text>
+            }
+            {
+                status.state === 'POST_PROCESSING_LAUNCHED' &&
+                <Typography.Text type="secondary">
+                    <Tooltip title="Post processing launched">
+                        <Space>
+                            <FaRocket/>
+                            Post processing launched
                         </Space>
                     </Tooltip>
                 </Typography.Text>
