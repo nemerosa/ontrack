@@ -135,7 +135,7 @@ export default function AutoVersioningAuditEntry({entry}) {
                 />
                 <Popover
                     content={
-                        <AutoVersioningAuditEntryStateData data={item.data}/>
+                        <AutoVersioningAuditEntryStateData order={entry.order} state={item.state} data={item.data}/>
                     }
                 >
                     <FaInfoCircle
