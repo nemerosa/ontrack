@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.av.audit
 
 import net.nemerosa.ontrack.common.reducedStackTrace
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
+import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessingInfo
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -81,6 +82,20 @@ abstract class AbstractAutoVersioningAuditService(
             null,
             AutoVersioningAuditState.POST_PROCESSING_START,
             "branch" to upgradeBranch
+        )
+    }
+
+    override fun onPostProcessingLaunched(
+        order: AutoVersioningOrder,
+        postProcessingInfo: PostProcessingInfo
+    ) {
+        store.addState(
+            targetBranch = order.branch,
+            uuid = order.uuid,
+            queue = null,
+            upgradeBranch = null,
+            state = AutoVersioningAuditState.POST_PROCESSING_START,
+            data = postProcessingInfo.data.toList().toTypedArray()
         )
     }
 

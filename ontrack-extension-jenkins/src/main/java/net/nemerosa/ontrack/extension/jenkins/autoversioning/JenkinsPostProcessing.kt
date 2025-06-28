@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.jenkins.autoversioning
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
 import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessing
+import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessingInfo
 import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessingMissingConfigException
 import net.nemerosa.ontrack.extension.av.processing.AutoVersioningTemplateRenderer
 import net.nemerosa.ontrack.extension.jenkins.JenkinsConfiguration
@@ -46,6 +47,7 @@ class JenkinsPostProcessing(
         upgradeBranch: String,
         scm: SCM,
         avTemplateRenderer: AutoVersioningTemplateRenderer,
+        onPostProcessingInfo: (info: PostProcessingInfo) -> Unit,
     ) {
         // Gets the global settings
         val settings: JenkinsPostProcessingSettings =
@@ -88,7 +90,15 @@ class JenkinsPostProcessing(
             parameters,
             settings.retries,
             settings.retriesDelaySeconds
-        ) {}
+        ) { build ->
+            onPostProcessingInfo(
+                PostProcessingInfo(
+                    data = mapOf(
+                        "url" to build.url,
+                    )
+                )
+            )
+        }
 
         // Check for success
         if (!jenkinsBuild.successful) {

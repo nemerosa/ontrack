@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.av.audit
 
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
+import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessingInfo
 
 /**
  * This service is responsible to log events throughout the whole life-cycle
@@ -84,7 +85,7 @@ interface AutoVersioningAuditService {
     fun onProcessingUpdatingFile(order: AutoVersioningOrder, upgradeBranch: String, targetPath: String)
 
     /**
-     * Post processing has started for the [order] for the [upgradeBranch] branch.
+     * Post-processing has started for the [order] for the [upgradeBranch] branch.
      *
      * @param order Auto versioning order being processed
      * @param upgradeBranch Actual name of the upgrade branch
@@ -92,7 +93,15 @@ interface AutoVersioningAuditService {
     fun onPostProcessingStart(order: AutoVersioningOrder, upgradeBranch: String)
 
     /**
-     * Post processing has finished for the [order] for the [upgradeBranch] branch.
+     * Post-processing has been launched and we have more information
+     *
+     * @param order Auto versioning order being processed
+     * @param postProcessingInfo Information linked to the post-processing
+     */
+    fun onPostProcessingLaunched(order: AutoVersioningOrder, postProcessingInfo: PostProcessingInfo)
+
+    /**
+     * Post-processing has finished for the [order] for the [upgradeBranch] branch.
      *
      * @param order Auto versioning order being processed
      * @param upgradeBranch Actual name of the upgrade branch

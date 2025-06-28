@@ -33,6 +33,7 @@ interface PostProcessing<T> : Extension {
      * @param upgradeBranch Remote branch already containing the upgraded version
      * @param scm The target SCM
      * @param avTemplateRenderer Template renderer used to render templates in the auto-versioning context
+     * @param onPostProcessingInfo Callback called when the post-processing running info becomes available
      */
     fun postProcessing(
         config: T,
@@ -42,6 +43,7 @@ interface PostProcessing<T> : Extension {
         upgradeBranch: String,
         scm: SCM,
         avTemplateRenderer: AutoVersioningTemplateRenderer,
+        onPostProcessingInfo: (info: PostProcessingInfo) -> Unit,
     )
 
     /**
