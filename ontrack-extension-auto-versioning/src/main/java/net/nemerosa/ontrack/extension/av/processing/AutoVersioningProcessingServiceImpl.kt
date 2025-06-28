@@ -12,6 +12,7 @@ import net.nemerosa.ontrack.extension.av.dispatcher.getBuildVersion
 import net.nemerosa.ontrack.extension.av.event.AutoVersioningEventService
 import net.nemerosa.ontrack.extension.av.metrics.AutoVersioningMetricsService
 import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessing
+import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessingInfo
 import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessingNotFoundException
 import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessingRegistry
 import net.nemerosa.ontrack.extension.av.properties.FilePropertyType
@@ -373,8 +374,21 @@ class AutoVersioningProcessingServiceImpl(
     ) {
         // Parsing and validation of the configuration
         val config: T = postProcessing.parseAndValidate(order.postProcessingConfig)
+        // Collecting the post-processing information
+        val onPostProcessingInfo = { info: PostProcessingInfo ->
+            autoVersioningAuditService.onPostProcessingLaunched(order, info)
+        }
         // Launching the post-processing
-        postProcessing.postProcessing(config, order, repositoryURI, repository, upgradeBranch, scm, avTemplateRenderer)
+        postProcessing.postProcessing(
+            config = config,
+            autoVersioningOrder = order,
+            repositoryURI = repositoryURI,
+            repository = repository,
+            upgradeBranch = upgradeBranch,
+            scm = scm,
+            avTemplateRenderer = avTemplateRenderer,
+            onPostProcessingInfo = onPostProcessingInfo,
+        )
     }
 
     private fun AutoVersioningSourceConfigPath.replaceVersion(
