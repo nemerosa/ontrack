@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.casc.graphql
 
 import net.nemerosa.ontrack.extension.casc.CascConfigurationProperties
+import net.nemerosa.ontrack.extension.casc.support.SampleSettings
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
-import net.nemerosa.ontrack.model.settings.HomePageSettings
 import net.nemerosa.ontrack.test.assertJsonNotNull
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,13 +17,15 @@ class CascGraphQLIT : AbstractQLKTITSupport() {
     @Test
     fun `Accessing the Casc schema`() {
         asAdmin {
-            run("""
+            run(
+                """
                 {
                     casc {
                         schema
                     }
                 }
-            """).let { data ->
+            """
+            ).let { data ->
                 val schema = data.path("casc").path("schema")
                 assertJsonNotNull(schema)
             }
@@ -39,13 +41,15 @@ class CascGraphQLIT : AbstractQLKTITSupport() {
             )
         }
         asAdmin {
-            run("""
+            run(
+                """
                 {
                     casc {
                         locations
                     }
                 }
-            """).let { data ->
+            """
+            ).let { data ->
                 val locations = data.path("casc").path("locations").map { it.asText() }
                 assertEquals(
                     listOf(
@@ -61,23 +65,25 @@ class CascGraphQLIT : AbstractQLKTITSupport() {
     @Test
     fun `YAML rendering`() {
         asAdmin {
-            withSettings<HomePageSettings> {
+            withSettings<SampleSettings> {
                 settingsManagerService.saveSettings(
-                    HomePageSettings(
-                        maxBranches = 2,
+                    SampleSettings(
                         maxProjects = 200,
+                        enabled = true,
                     )
                 )
-                run("""
+                run(
+                    """
                     {
                         casc {
                             yaml
                         }
                     }
-                """).let { data ->
+                """
+                ).let { data ->
                     val yaml = data.path("casc").path("yaml").asText()
-                    assertTrue("maxBranches: 2" in yaml)
                     assertTrue("maxProjects: 200" in yaml)
+                    assertTrue("enabled: true" in yaml)
                 }
             }
         }
@@ -86,25 +92,31 @@ class CascGraphQLIT : AbstractQLKTITSupport() {
     @Test
     fun `Rendering as JSON`() {
         asAdmin {
-            withSettings<HomePageSettings> {
+            withSettings<SampleSettings> {
                 settingsManagerService.saveSettings(
-                    HomePageSettings(
-                        maxBranches = 2,
+                    SampleSettings(
                         maxProjects = 200,
+                        enabled = true,
                     )
                 )
-                run("""
+                run(
+                    """
                     {
                         casc {
                             json
                         }
                     }
-                """).let { data ->
+                """
+                ).let { data ->
                     val json = data.path("casc").path("json")
-                    assertEquals(2,
-                        json.path("ontrack").path("config").path("settings").path("home-page").path("maxBranches").asInt())
-                    assertEquals(200,
-                        json.path("ontrack").path("config").path("settings").path("home-page").path("maxProjects").asInt())
+                    assertEquals(
+                        200,
+                        json.path("ontrack").path("config").path("settings").path("sample").path("maxProjects").asInt()
+                    )
+                    assertEquals(
+                        true,
+                        json.path("ontrack").path("config").path("settings").path("sample").path("enabled").asBoolean()
+                    )
                 }
             }
         }
@@ -113,34 +125,36 @@ class CascGraphQLIT : AbstractQLKTITSupport() {
     @Test
     fun `Reloading the configuration as code`() {
         asAdmin {
-            withSettings<HomePageSettings> {
+            withSettings<SampleSettings> {
                 // Configuration
                 cascConfigurationProperties.locations = listOf(
-                    "classpath:casc/settings-home-page.yaml",
+                    "classpath:casc/settings-sample.yaml",
                 )
                 // Initial values
                 settingsManagerService.saveSettings(
-                    HomePageSettings(
-                        maxBranches = 2,
-                        maxProjects = 200,
+                    SampleSettings(
+                        maxProjects = 0,
+                        enabled = false,
                     )
                 )
                 // Reloading
-                val data = run("""
-                    mutation {
-                        reloadCasc {
-                            errors {
-                                message
+                val data = run(
+                    """
+                        mutation {
+                            reloadCasc {
+                                errors {
+                                    message
+                                }
                             }
                         }
-                    }
-                """)
-                // Checks there are no error
+                    """
+                )
+                // Checks there are no errors
                 assertNoUserError(data, "reloadCasc")
                 // Checks the values have been updated
-                val settings = cachedSettingsService.getCachedSettings(HomePageSettings::class.java)
-                assertEquals(10, settings.maxBranches)
-                assertEquals(100, settings.maxProjects)
+                val settings = cachedSettingsService.getCachedSettings(SampleSettings::class.java)
+                assertEquals(200, settings.maxProjects)
+                assertEquals(true, settings.enabled)
             }
         }
     }
