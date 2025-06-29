@@ -4,6 +4,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.extension.av.AbstractAutoVersioningTestSupport
 import net.nemerosa.ontrack.extension.av.AutoVersioningTestFixtures.createOrder
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
+import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessingInfo
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Project
 import org.junit.jupiter.api.Test
@@ -104,6 +105,7 @@ class AutoVersioningAuditMetricsCollectionIT : AbstractAutoVersioningTestSupport
                         autoVersioningAuditService.onProcessingCreatingBranch(it, "branch")
                         autoVersioningAuditService.onProcessingUpdatingFile(it, "branch", "file")
                         autoVersioningAuditService.onPostProcessingStart(it, "branch")
+                        autoVersioningAuditService.onPostProcessingLaunched(it, PostProcessingInfo(mapOf("url" to "test")))
                         autoVersioningAuditService.onPostProcessingEnd(it, "branch")
                     }
                 }
@@ -188,6 +190,7 @@ class AutoVersioningAuditMetricsCollectionIT : AbstractAutoVersioningTestSupport
                         AutoVersioningAuditState.PROCESSING_CREATING_BRANCH to 6.0,
                         AutoVersioningAuditState.PROCESSING_UPDATING_FILE to 7.0,
                         AutoVersioningAuditState.POST_PROCESSING_START to 8.0,
+                        AutoVersioningAuditState.POST_PROCESSING_LAUNCHED to 0.0, // Still 0 since it's seldom a most recent state
                         AutoVersioningAuditState.POST_PROCESSING_END to 9.0,
                         AutoVersioningAuditState.PR_CREATING to 10.0,
                         AutoVersioningAuditState.PR_MERGED to 11.0,
