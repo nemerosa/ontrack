@@ -41,6 +41,10 @@ spec:
       env:
         - name: VAULT_DEV_ROOT_TOKEN_ID
           value: "test"
+      securityContext:
+        capabilities:
+          add:
+            - IPC_LOCK
   volumes:
     - name: workspace-volume
       emptyDir:
