@@ -39,7 +39,7 @@ spec:
           memory: "50Mi"
           cpu: "200m"
         limits:
-          memory: "50Mi"
+          memory: "200Mi"
           cpu: "200m"
     - name: elasticsearch
       image: docker.elastic.co/elasticsearch/elasticsearch:7.17.28
