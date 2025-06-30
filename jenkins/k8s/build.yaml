@@ -9,10 +9,7 @@ spec:
       tty: true
     - name: postgres
       image: postgres:17
-      command:
-        - postgres
-        - -c
-        - 'max_connections=300'
+      args: ["-c", "max_connections=300"]
       env:
         - name: POSTGRES_DB
           value: ontrack
