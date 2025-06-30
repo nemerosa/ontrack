@@ -7,7 +7,7 @@ spec:
       command:
         - cat
       tty: true
-    - name: db
+    - name: postgres
       image: postgres:17
       command:
         - postgres
@@ -29,7 +29,7 @@ spec:
           value: "true"
         - name: "ES_JAVA_OPTS"
           value: "-Xms512m -Xmx512m"
-    - name: rabbit
+    - name: rabbitmq
       image: rabbitmq:3.13.7-management
       env:
         - name: RABBITMQ_DEFAULT_USER

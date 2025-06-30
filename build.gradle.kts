@@ -112,6 +112,8 @@ val javaProjects = subprojects.filter {
     it.path != ":ontrack-web-core"
 }
 
+val isCI = System.getenv("CI") == "true"
+
 configure(javaProjects) {
 
     apply(plugin = "java")
@@ -153,8 +155,11 @@ configure(javaProjects) {
         shouldRunAfter("test")
         minHeapSize = "128m"
         maxHeapSize = "3072m"
-        dependsOn(":integrationTestComposeUp")
-        finalizedBy(":integrationTestComposeDown")
+
+        if (!isCI) {
+            dependsOn(":integrationTestComposeUp")
+            finalizedBy(":integrationTestComposeDown")
+        }
     }
 
     // Synchronization with shutting down the database

@@ -62,40 +62,40 @@ pipeline {
             steps {
                 scmSkip(deleteBuild: false)
                 ontrackCliSetup(
-                    autoValidationStamps: true,
-                    validations: [
-                        [
-                            name: 'KDSL.ACCEPTANCE',
-                            tests: [
-                                warningIfSkipped: false,
-                            ],
+                        autoValidationStamps: true,
+                        validations: [
+                                [
+                                        name : 'KDSL.ACCEPTANCE',
+                                        tests: [
+                                                warningIfSkipped: false,
+                                        ],
+                                ],
                         ],
-                    ],
-                    promotions: [
-                        BRONZE: [
-                            validations: [
-                                'BUILD',
-                                'UI_UNIT',
-                                'KDSL.ACCEPTANCE',
-                                'PLAYWRIGHT',
-                            ],
-                        ],
-                        RELEASE: [
-                            promotions: [
-                                'BRONZE',
-                            ],
-                            validations: [
-                                'GITHUB.RELEASE',
-                            ]
-                        ],
-                    ]
+                        promotions: [
+                                BRONZE : [
+                                        validations: [
+                                                'BUILD',
+                                                'UI_UNIT',
+                                                'KDSL.ACCEPTANCE',
+                                                'PLAYWRIGHT',
+                                        ],
+                                ],
+                                RELEASE: [
+                                        promotions : [
+                                                'BRONZE',
+                                        ],
+                                        validations: [
+                                                'GITHUB.RELEASE',
+                                        ]
+                                ],
+                        ]
                 )
                 ontrackCliSetupBranchNotifications(
                         name: 'On validation error',
                         channel: 'slack',
                         channelConfig: [
                                 channel: '#notifications',
-                                type: 'ERROR'
+                                type   : 'ERROR'
                         ],
                         events: [
                                 'new_validation_run',
@@ -111,7 +111,7 @@ pipeline {
                         channel: 'slack',
                         channelConfig: [
                                 channel: '#notifications',
-                                type: 'SUCCESS'
+                                type   : 'SUCCESS'
                         ],
                         events: [
                                 'new_promotion_run',
@@ -126,7 +126,7 @@ pipeline {
                         channel: 'slack',
                         channelConfig: [
                                 channel: env.BRANCH_NAME ==~ /^release\/\d+\.\d+$/ ? '#releases' : '#internal-releases',
-                                type: 'SUCCESS'
+                                type   : 'SUCCESS'
                         ],
                         events: [
                                 'new_promotion_run',
@@ -143,13 +143,13 @@ pipeline {
                         channel: 'workflow',
                         channelConfig: [
                                 workflow: [
-                                        name: "Deploy Demo Beta",
+                                        name : "Deploy Demo Beta",
                                         nodes: [
                                                 [
-                                                        id: "start",
+                                                        id         : "start",
                                                         description: "Start deployment",
-                                                        executorId: "slot-pipeline-creation",
-                                                        data: [
+                                                        executorId : "slot-pipeline-creation",
+                                                        data       : [
                                                                 environment: "demo-beta",
                                                         ]
                                                 ]
@@ -170,6 +170,10 @@ pipeline {
                 }
             }
             environment {
+                // Using the Pod containers
+                SPRING_DATASOURCE_URL = "jdbc:postgresql://postgres/ontrack"
+                SPRING_RABBITMQ_HOST = "rabbitmq"
+                SPRING_ELASTICSEARCH_URIS = "http://elasticsearch:9200"
                 // Bitbucket Cloud system tests
                 ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_WORKSPACE = credentials('ontrack-test-extension-bitbucket-cloud-workspace')
                 ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_USER = credentials('ontrack-test-extension-bitbucket-cloud-user')
@@ -251,8 +255,8 @@ pipeline {
                     recordIssues(tools: [kotlin(), javaDoc(), java()])
                     // Build validation stamps
                     ontrackCliValidateTests(
-                        stamp: 'BUILD',
-                        pattern: '**/build/test-results/**/*.xml',
+                            stamp: 'BUILD',
+                            pattern: '**/build/test-results/**/*.xml',
                     )
                     ontrackCliValidateTests(
                             stamp: 'UI_UNIT',
@@ -526,8 +530,8 @@ pipeline {
                                 }
                             ''',
                             variables: [
-                                project: env.ONTRACK_PROJECT_NAME as String,
-                                build  : env.ONTRACK_VERSION as String,
+                                    project: env.ONTRACK_PROJECT_NAME as String,
+                                    build  : env.ONTRACK_VERSION as String,
                             ],
                     )
                     env.ONTRACK_TARGET_BRANCH_NAME = result.data.builds.first().branch.name as String
