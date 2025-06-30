@@ -201,7 +201,6 @@ pipeline {
                 ONTRACK_TEST_EXTENSION_GITHUB_ISSUES_MILESTONE = 'v1'
             }
             steps {
-                sh '''git status'''
                 // TODO Remove the build number suffix when ready to tag and release
                 sh '''
                     ./gradlew versionDisplay versionFile -PversionSuffix=-${BUILD_NUMBER} --no-daemon
