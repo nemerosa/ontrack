@@ -205,48 +205,50 @@ pipeline {
                 ONTRACK_TEST_EXTENSION_GITHUB_ISSUES_MILESTONE = 'v1'
             }
             steps {
-                // TODO Remove the build number suffix when ready to tag and release
-                sh '''
-                    ./gradlew versionDisplay versionFile -PversionSuffix=-${BUILD_NUMBER} --no-daemon
-                '''
-                script {
-                    // Additional options
-                    env.ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_IGNORE = params.SKIP_BITBUCKET_CLOUD_IT
-                    // Reads version information
-                    def props = readProperties(file: 'build/version.properties')
-                    env.VERSION = props.VERSION_DISPLAY + "-${env.BUILD_NUMBER}"
-                    env.GIT_COMMIT = props.VERSION_COMMIT
-                    // Creates a build
-                    ontrackCliBuild(name: VERSION)
-                }
-                echo "Version = ${VERSION}"
-                script {
-                    if (params.JUST_BUILD_AND_PUSH) {
-                        sh '''
-                            ./gradlew \\
-                                dockerBuild \\
-                                -PversionSuffix=-${BUILD_NUMBER} \\
-                                -Dorg.gradle.jvmargs=-Xmx6144m \\
-                                --stacktrace \\
-                                --parallel \\
-                                --no-daemon \\
-                                --console plain
-                        '''
-                    } else {
-                        // TODO documentation
-                        sh '''
-                            ./gradlew \\
-                                check \\
-                                build \\
-                                dockerBuild \\
-                                jibDockerBuild \\
-                                -PversionSuffix=-${BUILD_NUMBER} \\
-                                -Dorg.gradle.jvmargs=-Xmx6144m \\
-                                --stacktrace \\
-                                --parallel \\
-                                --no-daemon \\
-                                --console plain
-                        '''
+                container("build") {
+                    // TODO Remove the build number suffix when ready to tag and release
+                    sh '''
+                        ./gradlew versionDisplay versionFile -PversionSuffix=-${BUILD_NUMBER} --no-daemon
+                    '''
+                    script {
+                        // Additional options
+                        env.ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_IGNORE = params.SKIP_BITBUCKET_CLOUD_IT
+                        // Reads version information
+                        def props = readProperties(file: 'build/version.properties')
+                        env.VERSION = props.VERSION_DISPLAY + "-${env.BUILD_NUMBER}"
+                        env.GIT_COMMIT = props.VERSION_COMMIT
+                        // Creates a build
+                        ontrackCliBuild(name: VERSION)
+                    }
+                    echo "Version = ${VERSION}"
+                    script {
+                        if (params.JUST_BUILD_AND_PUSH) {
+                            sh '''
+                                ./gradlew \\
+                                    dockerBuild \\
+                                    -PversionSuffix=-${BUILD_NUMBER} \\
+                                    -Dorg.gradle.jvmargs=-Xmx6144m \\
+                                    --stacktrace \\
+                                    --parallel \\
+                                    --no-daemon \\
+                                    --console plain
+                            '''
+                        } else {
+                            // TODO documentation
+                            sh '''
+                                ./gradlew \\
+                                    check \\
+                                    build \\
+                                    dockerBuild \\
+                                    jibDockerBuild \\
+                                    -PversionSuffix=-${BUILD_NUMBER} \\
+                                    -Dorg.gradle.jvmargs=-Xmx6144m \\
+                                    --stacktrace \\
+                                    --parallel \\
+                                    --no-daemon \\
+                                    --console plain
+                            '''
+                        }
                     }
                 }
             }
