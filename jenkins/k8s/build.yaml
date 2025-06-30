@@ -3,7 +3,7 @@ kind: Pod
 spec:
   resources:
     requests:
-      memory: "8Gi"
+      memory: "12Gi"
       cpu: "6000m"
     limits:
       memory: "8Gi"
@@ -14,6 +14,13 @@ spec:
       command:
         - cat
       tty: true
+      resources:
+        requests:
+          memory: "8Gi"
+          cpu: "4000m"
+        limits:
+          memory: "8Gi"
+          cpu: "4000m"
     - name: postgres
       image: postgres:17
       args: ["-c", "max_connections=300"]
@@ -27,6 +34,13 @@ spec:
       securityContext:
         runAsUser: 999
         runAsGroup: 999
+      resources:
+        requests:
+          memory: "500Mi"
+          cpu: "500m"
+        limits:
+          memory: "500Mi"
+          cpu: "500m"
     - name: elasticsearch
       image: docker.elastic.co/elasticsearch/elasticsearch:7.17.28
       env:
@@ -36,6 +50,13 @@ spec:
           value: "true"
         - name: "ES_JAVA_OPTS"
           value: "-Xms512m -Xmx512m"
+      resources:
+        requests:
+          memory: "1Gi"
+          cpu: "500m"
+        limits:
+          memory: "1Gi"
+          cpu: "500m"
     - name: rabbitmq
       image: rabbitmq:3.13.7-management
       env:
@@ -43,6 +64,13 @@ spec:
           value: ontrack
         - name: RABBITMQ_DEFAULT_PASS
           value: ontrack
+      resources:
+        requests:
+          memory: "500Mi"
+          cpu: "500m"
+        limits:
+          memory: "500Mi"
+          cpu: "500m"
     - name: vault
       image: "vault:1.3.2"
       env:
@@ -52,6 +80,13 @@ spec:
         capabilities:
           add:
             - IPC_LOCK
+      resources:
+        requests:
+          memory: "500Mi"
+          cpu: "500m"
+        limits:
+          memory: "500Mi"
+          cpu: "500m"
   volumes:
     - name: workspace-volume
       emptyDir:
