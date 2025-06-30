@@ -31,8 +31,8 @@ pipeline {
 
     agent {
         kubernetes {
-            inheritFrom "ontrack-build:5.0.1"
-            defaultContainer 'ontrack'
+            yamlFile 'jenkins/k8s/build.yaml'
+            defaultContainer 'build'
         }
     }
 
