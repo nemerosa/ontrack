@@ -171,9 +171,9 @@ pipeline {
             }
             environment {
                 // Using the Pod containers
-                SPRING_DATASOURCE_URL = "jdbc:postgresql://postgres/ontrack"
-                SPRING_RABBITMQ_HOST = "rabbitmq"
-                SPRING_ELASTICSEARCH_URIS = "http://elasticsearch:9200"
+                SPRING_DATASOURCE_URL = "jdbc:postgresql://localhost/ontrack"
+                SPRING_RABBITMQ_HOST = "localhost"
+                SPRING_ELASTICSEARCH_URIS = "http://localhost:9200"
                 // Bitbucket Cloud system tests
                 ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_WORKSPACE = credentials('ontrack-test-extension-bitbucket-cloud-workspace')
                 ONTRACK_TEST_EXTENSION_BITBUCKET_CLOUD_USER = credentials('ontrack-test-extension-bitbucket-cloud-user')
