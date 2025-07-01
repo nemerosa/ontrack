@@ -1,10 +1,7 @@
 package net.nemerosa.ontrack.extension.av.config
 
 import net.nemerosa.ontrack.model.ordering.BranchOrderingService
-import net.nemerosa.ontrack.model.structure.Branch
-import net.nemerosa.ontrack.model.structure.BranchDisplayNameService
-import net.nemerosa.ontrack.model.structure.Project
-import net.nemerosa.ontrack.model.structure.StructureService
+import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 import kotlin.jvm.optionals.getOrNull
 
@@ -33,7 +30,7 @@ class MostRecentBranchSource(
             // ... filters them by regex, using their path
             .filter { sourceBranch ->
                 // Path of the branch
-                val sourcePath = branchDisplayNameService.getBranchDisplayName(sourceBranch)
+                val sourcePath = branchDisplayNameService.getBranchDisplayName(sourceBranch, BranchNamePolicy.DISPLAY_NAME_OR_NAME)
                 // Match check
                 sourceRegex.matches(sourcePath) || sourceRegex.matches(sourceBranch.name)
             }

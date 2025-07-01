@@ -11,7 +11,7 @@ class EntityDisplayNameServiceImpl(
 
     override fun getEntityDisplayName(entity: ProjectEntity): String =
         when (entity) {
-            is Branch -> branchDisplayNameService.getBranchDisplayName(entity)
+            is Branch -> branchDisplayNameService.getBranchDisplayName(entity, BranchNamePolicy.DISPLAY_NAME_OR_NAME)
             is Build -> buildDisplayNameService.getBuildDisplayName(entity)
             else -> entity.defaultDisplayName
         }

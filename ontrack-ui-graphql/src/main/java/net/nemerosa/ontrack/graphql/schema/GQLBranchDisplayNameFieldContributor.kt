@@ -3,10 +3,7 @@ package net.nemerosa.ontrack.graphql.schema
 import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLNonNull
-import net.nemerosa.ontrack.model.structure.Branch
-import net.nemerosa.ontrack.model.structure.BranchDisplayNameService
-import net.nemerosa.ontrack.model.structure.ProjectEntity
-import net.nemerosa.ontrack.model.structure.ProjectEntityType
+import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 
 /**
@@ -28,7 +25,7 @@ class GQLBranchDisplayNameFieldContributor(
                     .type(GraphQLNonNull(GraphQLString))
                     .dataFetcher { env ->
                         val branch: Branch = env.getSource()!!
-                        branchDisplayNameService.getBranchDisplayName(branch)
+                        branchDisplayNameService.getBranchDisplayName(branch, BranchNamePolicy.DISPLAY_NAME_OR_NAME)
                     }
                     .build()
             )

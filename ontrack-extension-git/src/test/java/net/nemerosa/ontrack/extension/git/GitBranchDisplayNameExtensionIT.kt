@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.git
 
 import net.nemerosa.ontrack.model.structure.BranchDisplayNameService
+import net.nemerosa.ontrack.model.structure.BranchNamePolicy
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
@@ -21,7 +22,7 @@ class GitBranchDisplayNameExtensionIT : AbstractGitTestSupport() {
                     gitBranch("release/1.0")
                     assertEquals(
                             "release/1.0",
-                            branchDisplayNameService.getBranchDisplayName(this)
+                            branchDisplayNameService.getBranchDisplayName(this, BranchNamePolicy.DISPLAY_NAME_OR_NAME)
                     )
                 }
             }

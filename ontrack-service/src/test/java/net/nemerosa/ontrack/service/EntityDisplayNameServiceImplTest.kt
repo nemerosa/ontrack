@@ -34,14 +34,14 @@ class EntityDisplayNameServiceImplTest {
     @Test
     fun `Branch display name without custom display name`() {
         val branch = BranchFixtures.testBranch()
-        every { branchDisplayNameService.getBranchDisplayName(branch) } returns branch.name
+        every { branchDisplayNameService.getBranchDisplayName(branch, BranchNamePolicy.DISPLAY_NAME_OR_NAME) } returns branch.name
         assertEquals(branch.name, entityDisplayNameService.getEntityDisplayName(branch))
     }
 
     @Test
     fun `Branch display name with custom display name`() {
         val branch = BranchFixtures.testBranch()
-        every { branchDisplayNameService.getBranchDisplayName(branch) } returns "release/1.0"
+        every { branchDisplayNameService.getBranchDisplayName(branch, BranchNamePolicy.DISPLAY_NAME_OR_NAME) } returns "release/1.0"
         assertEquals("release/1.0", entityDisplayNameService.getEntityDisplayName(branch))
     }
 

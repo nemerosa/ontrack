@@ -18,18 +18,18 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional
 class SonarQubeMeasuresCollectionServiceImpl(
-        private val clientFactory: SonarQubeClientFactory,
-        private val entityDataService: EntityDataService,
-        private val buildDisplayNameService: BuildDisplayNameService,
-        private val branchDisplayNameService: BranchDisplayNameService,
-        private val metricsExportService: MetricsExportService,
-        private val meterRegistry: MeterRegistry,
-        private val structureService: StructureService,
-        private val propertyService: PropertyService,
-        private val branchModelMatcherService: BranchModelMatcherService,
-        private val buildFilterService: BuildFilterService,
-        private val cachedSettingsService: CachedSettingsService,
-        private val securityService: SecurityService
+    private val clientFactory: SonarQubeClientFactory,
+    private val entityDataService: EntityDataService,
+    private val buildDisplayNameService: BuildDisplayNameService,
+    private val branchDisplayNameService: BranchDisplayNameService,
+    private val metricsExportService: MetricsExportService,
+    private val meterRegistry: MeterRegistry,
+    private val structureService: StructureService,
+    private val propertyService: PropertyService,
+    private val branchModelMatcherService: BranchModelMatcherService,
+    private val buildFilterService: BuildFilterService,
+    private val cachedSettingsService: CachedSettingsService,
+    private val securityService: SecurityService
 ) : SonarQubeMeasuresCollectionService {
 
     private val logger = LoggerFactory.getLogger(SonarQubeMeasuresCollectionService::class.java)
@@ -43,10 +43,10 @@ class SonarQubeMeasuresCollectionServiceImpl(
             val metrics: List<String> = getListOfMetrics(property)
             // For all project branches
             structureService.getBranchesForProject(project.id)
-                    // ... filter branches according to the model matcher
-                    .filter { branch -> matches(branch, property) }
-                    // ... scans the branch
-                    .forEach { collect(it, property, metrics, logger) }
+                // ... filter branches according to the model matcher
+                .filter { branch -> matches(branch, property) }
+                // ... scans the branch
+                .forEach { collect(it, property, metrics, logger) }
         }
     }
 
@@ -55,7 +55,7 @@ class SonarQubeMeasuresCollectionServiceImpl(
         logger("Getting SonarQube measures for ${branch.entityDisplayName}")
         // Gets the validation stamp for this branch
         val vs = structureService.getValidationStampListForBranch(branch.id)
-                .find { it.name == property.validationStamp }
+            .find { it.name == property.validationStamp }
         if (vs != null) {
             // Loops over all builds and launch the collection
             structureService.forEachBuild(branch, BuildSortDirection.FROM_NEWEST) { build ->
@@ -75,15 +75,15 @@ class SonarQubeMeasuresCollectionServiceImpl(
         if (property != null) {
             // Gets the validation stamp for this branch
             val vs = structureService.getValidationStampListForBranch(branch.id)
-                    .find { it.name == property.validationStamp }
+                .find { it.name == property.validationStamp }
             if (vs != null) {
                 // Gets the latest build for this branch having a scan
                 val build = buildFilterService.standardFilterProviderData(1)
-                        .withWithValidationStamp(vs.name)
-                        .withWithValidationStampStatus(ValidationRunStatusID.PASSED)
-                        .build()
-                        .filterBranchBuilds(branch)
-                        .firstOrNull()
+                    .withWithValidationStamp(vs.name)
+                    .withWithValidationStampStatus(ValidationRunStatusID.PASSED)
+                    .build()
+                    .filterBranchBuilds(branch)
+                    .firstOrNull()
                 if (build != null) {
                     return getMeasures(build)
                 }
@@ -110,12 +110,15 @@ class SonarQubeMeasuresCollectionServiceImpl(
         return branchPattern.isNullOrBlank() || branchPattern.toRegex().matches(path)
     }
 
-    private fun getBranchPath(branch: Branch): String = branchDisplayNameService.getBranchDisplayName(branch)
+    private fun getBranchPath(branch: Branch): String = branchDisplayNameService.getBranchDisplayName(
+        branch,
+        BranchNamePolicy.DISPLAY_NAME_OR_NAME
+    )
 
     override fun collect(build: Build, property: SonarQubeProperty): SonarQubeMeasuresCollectionResult {
         // Gets the validation stamp for this branch
         val vs = structureService.getValidationStampListForBranch(build.branch.id)
-                .find { it.name == property.validationStamp }
+            .find { it.name == property.validationStamp }
         // Collection for this build, only if there is a validation stamp being defined
         return if (vs != null) {
             val result = doCollect(build, property, getListOfMetrics(property), vs)
@@ -128,16 +131,21 @@ class SonarQubeMeasuresCollectionServiceImpl(
         }
     }
 
-    private fun doCollect(build: Build, property: SonarQubeProperty, metrics: List<String>, validationStamp: ValidationStamp): SonarQubeMeasuresCollectionResult {
+    private fun doCollect(
+        build: Build,
+        property: SonarQubeProperty,
+        metrics: List<String>,
+        validationStamp: ValidationStamp
+    ): SonarQubeMeasuresCollectionResult {
         // Gets the last validation run for this build and the validation stamp
         val lastRun = structureService.getValidationRunsForBuildAndValidationStamp(
-                buildId = build.id,
-                validationStampId = validationStamp.id,
-                offset = 0,
-                count = 1
+            buildId = build.id,
+            validationStampId = validationStamp.id,
+            offset = 0,
+            count = 1
         ).firstOrNull()
         // If no run, we don't want to go further
-                ?: return SonarQubeMeasuresCollectionResult.error("No validation run for ${validationStamp.name} can be found for ${build.entityDisplayName}")
+            ?: return SonarQubeMeasuresCollectionResult.error("No validation run for ${validationStamp.name} can be found for ${build.entityDisplayName}")
         // Gets the status of the last run
         val status = lastRun.lastStatus.statusID.id
         // Client
@@ -146,16 +154,16 @@ class SonarQubeMeasuresCollectionServiceImpl(
         val version: String = buildDisplayNameService.getBuildDisplayName(build)
         // Getting the measures
         val metricTags = mapOf(
-                "project" to build.project.name,
-                "branch" to build.branch.name,
-                "uri" to property.configuration.url
+            "project" to build.project.name,
+            "branch" to build.branch.name,
+            "uri" to property.configuration.url
         )
         val measures: Map<String, Double?>? = meterRegistry.measure(
-                started = SonarQubeMetrics.METRIC_ONTRACK_SONARQUBE_COLLECTION_STARTED_COUNT,
-                success = SonarQubeMetrics.METRIC_ONTRACK_SONARQUBE_COLLECTION_SUCCESS_COUNT,
-                error = SonarQubeMetrics.METRIC_ONTRACK_SONARQUBE_COLLECTION_ERROR_COUNT,
-                time = SonarQubeMetrics.METRIC_ONTRACK_SONARQUBE_COLLECTION_TIME,
-                tags = metricTags
+            started = SonarQubeMetrics.METRIC_ONTRACK_SONARQUBE_COLLECTION_STARTED_COUNT,
+            success = SonarQubeMetrics.METRIC_ONTRACK_SONARQUBE_COLLECTION_SUCCESS_COUNT,
+            error = SonarQubeMetrics.METRIC_ONTRACK_SONARQUBE_COLLECTION_ERROR_COUNT,
+            time = SonarQubeMetrics.METRIC_ONTRACK_SONARQUBE_COLLECTION_TIME,
+            tags = metricTags
         ) {
             val scmBranch = getBranchPath(build.branch)
             client.getMeasuresForVersion(property.key, scmBranch, version, metrics)
@@ -169,33 +177,33 @@ class SonarQubeMeasuresCollectionServiceImpl(
                 } else {
                     // No metric collected
                     meterRegistry.increment(
-                            SonarQubeMetrics.METRIC_ONTRACK_SONARQUBE_COLLECTION_NONE_COUNT,
-                            *(metricTags + ("measure" to name)).toList().toTypedArray()
+                        SonarQubeMetrics.METRIC_ONTRACK_SONARQUBE_COLLECTION_NONE_COUNT,
+                        *(metricTags + ("measure" to name)).toList().toTypedArray()
                     )
                 }
             }
             // Metrics
             safeMeasures.forEach { (name, value) ->
                 metricsExportService.exportMetrics(
-                        SonarQubeMetrics.METRIC_ONTRACK_SONARQUBE_MEASURE,
-                        tags = mapOf(
-                                "project" to build.project.name,
-                                "branch" to build.branch.name,
-                                "status" to status,
-                                "measure" to name
-                        ),
-                        fields = mapOf(
-                                "value" to value
-                        ),
-                        timestamp = build.signature.time
+                    SonarQubeMetrics.METRIC_ONTRACK_SONARQUBE_MEASURE,
+                    tags = mapOf(
+                        "project" to build.project.name,
+                        "branch" to build.branch.name,
+                        "status" to status,
+                        "measure" to name
+                    ),
+                    fields = mapOf(
+                        "value" to value
+                    ),
+                    timestamp = build.signature.time
                 )
             }
             // Storage of metrics for build
             securityService.asAdmin {
                 entityDataService.store(
-                        build,
-                        SonarQubeMeasures::class.java.name,
-                        SonarQubeMeasures(safeMeasures)
+                    build,
+                    SonarQubeMeasures::class.java.name,
+                    SonarQubeMeasures(safeMeasures)
                 )
             }
             // OK
@@ -215,8 +223,8 @@ class SonarQubeMeasuresCollectionServiceImpl(
     }
 
     override fun getMeasures(build: Build): SonarQubeMeasures? = entityDataService.retrieve(
-            build,
-            SonarQubeMeasures::class.java.name,
-            SonarQubeMeasures::class.java
+        build,
+        SonarQubeMeasures::class.java.name,
+        SonarQubeMeasures::class.java
     )
 }
