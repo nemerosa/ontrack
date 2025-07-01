@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.model.security.ProjectEdit
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.structure.PredefinedPromotionLevel
 import net.nemerosa.ontrack.model.structure.PromotionRun
-import net.nemerosa.ontrack.model.structure.Reordering
 import net.nemerosa.ontrack.model.structure.Signature
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
@@ -139,15 +138,17 @@ class AutoPromotionLevelPropertyIT : AbstractDSLTestSupport() {
             )
             // Reordering
             predefinedPromotionLevelService.reorderPromotionLevels(
-                Reordering(
-                    listOf(
-                        gold.id.get(),
-                        silver.id.get(),
-                        bronze.id.get(),
-                        copper.id.get(),
-                    )
-                )
-            )
+                gold.id(),
+                copper.id(),
+            ) // gold, copper, bronze, silver
+            predefinedPromotionLevelService.reorderPromotionLevels(
+                silver.id(),
+                copper.id(),
+            ) // gold, silver, copper, bronze
+            predefinedPromotionLevelService.reorderPromotionLevels(
+                bronze.id(),
+                copper.id(),
+            ) // gold, silver, bronze, copper
             // Checking their order
             assertEquals(
                 listOf(

@@ -7,7 +7,6 @@ import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService;
 import net.nemerosa.ontrack.model.structure.ID;
 import net.nemerosa.ontrack.model.structure.NameDescription;
 import net.nemerosa.ontrack.model.structure.PredefinedPromotionLevel;
-import net.nemerosa.ontrack.model.structure.Reordering;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -39,14 +38,6 @@ public class PredefinedPromotionLevelController {
     @RequestMapping(value = "predefinedPromotionLevels", method = RequestMethod.GET)
     public List<PredefinedPromotionLevel> getPredefinedPromotionLevelList() {
         return predefinedPromotionLevelService.getPredefinedPromotionLevels();
-    }
-
-    @RequestMapping(value = "predefinedPromotionLevels/reorder", method = RequestMethod.PUT)
-    public List<PredefinedPromotionLevel> reorderPromotionLevelListForBranch(@RequestBody Reordering reordering) {
-        // Reordering
-        predefinedPromotionLevelService.reorderPromotionLevels(reordering);
-        // OK
-        return getPredefinedPromotionLevelList();
     }
 
     @RequestMapping(value = "predefinedPromotionLevels/create", method = RequestMethod.POST)

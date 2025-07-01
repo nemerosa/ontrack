@@ -4,7 +4,6 @@ import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.PredefinedPromotionLevel
-import net.nemerosa.ontrack.model.structure.Reordering
 
 /**
  * Management of predefined promotion levels.
@@ -54,12 +53,6 @@ interface PredefinedPromotionLevelService {
      * Sets the image for a predefined promotion level
      */
     fun setPredefinedPromotionLevelImage(predefinedPromotionLevelId: ID, document: Document)
-
-    /**
-     * Reorder the predefined promotion levels
-     */
-    @Deprecated("Will be removed in V5")
-    fun reorderPromotionLevels(reordering: Reordering)
 
     /**
      * Reorder the predefined validation stamps

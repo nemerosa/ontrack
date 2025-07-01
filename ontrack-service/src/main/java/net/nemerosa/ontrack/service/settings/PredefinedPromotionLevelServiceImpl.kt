@@ -79,12 +79,6 @@ class PredefinedPromotionLevelServiceImpl(
         predefinedPromotionLevelRepository.setPredefinedPromotionLevelImage(predefinedPromotionLevelId, document)
     }
 
-    @Deprecated("Will be removed in V5")
-    override fun reorderPromotionLevels(reordering: Reordering) {
-        securityService.checkGlobalFunction(GlobalSettings::class.java)
-        predefinedPromotionLevelRepository.reorderPredefinedPromotionLevels(reordering)
-    }
-
     override fun reorderPromotionLevels(activeId: Int, overId: Int) {
         // Checks access
         securityService.checkGlobalFunction(GlobalSettings::class.java)
