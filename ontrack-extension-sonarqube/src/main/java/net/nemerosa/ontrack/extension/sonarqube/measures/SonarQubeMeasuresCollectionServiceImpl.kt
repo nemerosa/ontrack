@@ -151,7 +151,7 @@ class SonarQubeMeasuresCollectionServiceImpl(
         // Client
         val client = clientFactory.getClient(property.configuration)
         // Name of the build
-        val version: String = buildDisplayNameService.getBuildDisplayName(build)
+        val version: String = buildDisplayNameService.getBuildDisplayNameOrName(build)
         // Getting the measures
         val metricTags = mapOf(
             "project" to build.project.name,

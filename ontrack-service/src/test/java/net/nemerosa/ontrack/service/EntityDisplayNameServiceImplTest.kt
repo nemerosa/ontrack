@@ -48,14 +48,14 @@ class EntityDisplayNameServiceImplTest {
     @Test
     fun `Build display name without custom display name`() {
         val build = BuildFixtures.testBuild()
-        every { buildDisplayNameService.getBuildDisplayName(build) } returns build.name
+        every { buildDisplayNameService.getFirstBuildDisplayName(build) } returns null
         assertEquals(build.name, entityDisplayNameService.getEntityDisplayName(build))
     }
 
     @Test
     fun `Build display name with custom display name`() {
         val build = BuildFixtures.testBuild()
-        every { buildDisplayNameService.getBuildDisplayName(build) } returns "1.0.0"
+        every { buildDisplayNameService.getFirstBuildDisplayName(build) } returns "1.0.0"
         assertEquals("1.0.0", entityDisplayNameService.getEntityDisplayName(build))
     }
 
