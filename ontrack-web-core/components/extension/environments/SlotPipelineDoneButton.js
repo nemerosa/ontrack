@@ -9,6 +9,8 @@ export default function SlotPipelineDoneButton({
                                                    reloadState,
                                                    onFinish,
                                                    size,
+                                                   variant,
+                                                   color,
                                                    showDisabledButtonIfNotOk = false,
                                                    showIcon = true,
                                                    showText = false,
@@ -58,6 +60,8 @@ export default function SlotPipelineDoneButton({
                 action={action}
                 actionRunning={finishing}
                 size={size}
+                variant={variant}
+                color={color}
                 showDisabledButtonIfNotOk={showDisabledButtonIfNotOk}
                 showIcon={showIcon}
                 showText={showText}

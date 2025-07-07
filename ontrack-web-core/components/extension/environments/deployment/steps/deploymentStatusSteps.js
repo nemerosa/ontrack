@@ -40,7 +40,7 @@ function DeploymentStatusMessage({deployment, status}) {
 export function DeploymentStep({id, avatar, title, description}) {
     return (
         <>
-            <List.Item className="ot-list-item" data-testid={id}>
+            <List.Item className="ot-list-item" data-testid={id} style={{paddingLeft: "3em"}}>
                 <List.Item.Meta
                     avatar={avatar}
                     title={title}
@@ -54,21 +54,23 @@ export function DeploymentStep({id, avatar, title, description}) {
 function DeploymentStatusStep({deployment, status}) {
     return (
         <>
-            <DeploymentStep
-                id={`${deployment.id}-status-${status}`}
-                avatar={
+            <List.Item
+                className="ot-list-item"
+                data-testid={`${deployment.id}-status-${status}`}
+                style={{
+                    background: "#DDD",
+                    paddingLeft: "1em",
+                }}
+            >
+                <Space>
                     <SlotPipelineStatusIcon status={status}/>
-                }
-                title={
-                    slotPipelineStatusLabels[status]
-                }
-                description={
+                    <Typography.Text strong>{slotPipelineStatusLabels[status]}</Typography.Text>
                     <Space>
                         <DeploymentStatusSignature deployment={deployment} status={status}/>
                         <DeploymentStatusMessage deployment={deployment} status={status}/>
                     </Space>
-                }
-            />
+                </Space>
+            </List.Item>
         </>
     )
 }
