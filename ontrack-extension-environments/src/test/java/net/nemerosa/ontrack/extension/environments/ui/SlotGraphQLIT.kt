@@ -387,4 +387,82 @@ class SlotGraphQLIT : AbstractQLKTITSupport() {
         }
     }
 
+    @Test
+    fun `List of deployments filtered by branch name`() {
+        slotTestSupport.withSlot { slot ->
+            val pipeline121 = slotTestSupport.createPipeline(
+                branchName = "release-12",
+                slot = slot,
+            )
+            val pipeline122 = slotTestSupport.createPipeline(
+                branchName = "release-12",
+                slot = slot,
+            )
+            /* val pipeline13_2 = */ slotTestSupport.createPipeline(
+            branchName = "release-13",
+            slot = slot,
+        )
+            run(
+                """
+                    {
+                        slotById(id: "${slot.id}") {
+                            pipelines(branchName: "release-12") {
+                                pageItems {
+                                    id
+                                }
+                            }
+                        }
+                    }
+                """.trimIndent()
+            ) { data ->
+                val deploymentIds = data.path("slotById").path("pipelines")
+                    .path("pageItems")
+                    .map { it.path("id").asText() }
+                assertEquals(
+                    listOf(pipeline122.id, pipeline121.id),
+                    deploymentIds
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `List of deployments filtered by status`() {
+        slotTestSupport.withSlot { slot ->
+            val firstPipelineFinished = slotTestSupport.createRunAndFinishDeployment(
+                slot = slot,
+            )
+            /* val pipelineStarted = */ slotTestSupport.createPipeline(
+                slot = slot,
+            )
+            /* val pipelineRunning = */ slotTestSupport.createPipeline(slot = slot).apply {
+                slotService.runDeployment(this.id, dryRun = false)
+            }
+            val pipelineFinished = slotTestSupport.createRunAndFinishDeployment(
+                slot = slot,
+            )
+            run(
+                """
+                    {
+                        slotById(id: "${slot.id}") {
+                            pipelines(done: true) {
+                                pageItems {
+                                    id
+                                }
+                            }
+                        }
+                    }
+                """.trimIndent()
+            ) { data ->
+                val deploymentIds = data.path("slotById").path("pipelines")
+                    .path("pageItems")
+                    .map { it.path("id").asText() }
+                assertEquals(
+                    listOf(pipelineFinished.id, firstPipelineFinished.id),
+                    deploymentIds
+                )
+            }
+        }
+    }
+
 }

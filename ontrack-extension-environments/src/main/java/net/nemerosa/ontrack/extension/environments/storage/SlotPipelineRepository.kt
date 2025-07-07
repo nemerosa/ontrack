@@ -113,37 +113,77 @@ class SlotPipelineRepository(
         }.firstOrNull()
     }
 
-    fun findPipelines(slot: Slot, offset: Int, size: Int, buildId: Int?): PaginatedList<SlotPipeline> {
+    fun findPipelines(
+        slot: Slot,
+        offset: Int,
+        size: Int,
+        buildId: Int?,
+        branchName: String? = null,
+        done: Boolean? = null,
+    ): PaginatedList<SlotPipeline> {
         return if (buildId != null) {
-            findPipelinesForBuild(slot, offset, size, buildId)
+            findPipelinesForBuild(slot, offset, size, buildId, done)
         } else {
-            findAllPipelines(slot, offset, size)
+            findAllPipelines(slot, offset, size, branchName, done)
         }
     }
 
-    private fun findAllPipelines(slot: Slot, offset: Int, size: Int): PaginatedList<SlotPipeline> {
+    private fun findAllPipelines(
+        slot: Slot,
+        offset: Int,
+        size: Int,
+        branchName: String?,
+        done: Boolean?,
+    ): PaginatedList<SlotPipeline> {
+        var query = "WHERE SLOT_ID = :slotId"
+        val params = mutableMapOf(
+            "slotId" to slot.id,
+        )
+
+        if (!branchName.isNullOrBlank()) {
+            params["branchName"] = branchName
+            query += """
+                AND EXISTS (
+                    SELECT 1
+                    FROM BUILDS b
+                    WHERE B.ID = P.BUILD_ID
+                      AND EXISTS (
+                          SELECT 1
+                          FROM BRANCHES BR
+                          WHERE BR.ID = B.BRANCHID
+                            AND BR.NAME = :branchName
+                      )
+                )
+            """
+        }
+
+        if (done != null) {
+            query += if (done) {
+                " AND STATUS = 'DONE' "
+            } else {
+                " AND STATUS <> 'DONE' "
+            }
+        }
+
         val count = namedParameterJdbcTemplate!!.queryForObject(
             """
                 SELECT COUNT(*)
-                FROM ENV_SLOT_PIPELINE
-                WHERE SLOT_ID = :slotId
+                FROM ENV_SLOT_PIPELINE P
+                $query
             """.trimIndent(),
-            mapOf(
-                "slotId" to slot.id,
-            ),
+            params,
             Int::class.java
         ) ?: 0
         val list = namedParameterJdbcTemplate!!.query(
             """
                 SELECT *
-                FROM ENV_SLOT_PIPELINE
-                WHERE SLOT_ID = :slotId
+                FROM ENV_SLOT_PIPELINE P
+                $query
                 ORDER BY NUMBER DESC
                 LIMIT :size
                 OFFSET :offset
             """.trimIndent(),
-            mapOf(
-                "slotId" to slot.id,
+            params + mapOf(
                 "offset" to offset,
                 "size" to size,
             )
@@ -153,35 +193,49 @@ class SlotPipelineRepository(
         return PaginatedList.create(items = list, offset = offset, pageSize = size, total = count)
     }
 
-    private fun findPipelinesForBuild(slot: Slot, offset: Int, size: Int, buildId: Int): PaginatedList<SlotPipeline> {
+    private fun findPipelinesForBuild(
+        slot: Slot,
+        offset: Int,
+        size: Int,
+        buildId: Int,
+        done: Boolean?
+    ): PaginatedList<SlotPipeline> {
+        val params = mutableMapOf(
+            "slotId" to slot.id,
+            "buildId" to buildId,
+        )
+        var query = """
+            WHERE SLOT_ID = :slotId
+            AND BUILD_ID = :buildId
+        """.trimIndent()
+        if (done != null) {
+            query += if (done) {
+                " AND STATUS = 'DONE' "
+            } else {
+                " AND STATUS <> 'DONE' "
+            }
+        }
         val count = namedParameterJdbcTemplate!!.queryForObject(
             """
                 SELECT COUNT(*)
                 FROM ENV_SLOT_PIPELINE
-                WHERE SLOT_ID = :slotId
-                AND BUILD_ID = :buildId
+               $query
             """.trimIndent(),
-            mapOf(
-                "slotId" to slot.id,
-                "buildId" to buildId,
-            ),
+            params,
             Int::class.java
         ) ?: 0
         val list = namedParameterJdbcTemplate!!.query(
             """
                 SELECT *
                 FROM ENV_SLOT_PIPELINE
-                WHERE SLOT_ID = :slotId
-                AND BUILD_ID = :buildId
+                $query
                 ORDER BY NUMBER DESC
                 LIMIT :size
                 OFFSET :offset
             """.trimIndent(),
-            mapOf(
-                "slotId" to slot.id,
+            params + mapOf(
                 "offset" to offset,
                 "size" to size,
-                "buildId" to buildId,
             )
         ) { rs, _ ->
             toPipeline(rs)

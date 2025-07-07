@@ -10,6 +10,7 @@ import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+import kotlin.jvm.optionals.getOrNull
 import kotlin.test.assertTrue
 
 @Component
@@ -69,11 +70,13 @@ class SlotTestSupport : AbstractDSLTestSupport() {
     fun createPipeline(
         branchName: String = uid("B"),
         slot: Slot
-    ): SlotPipeline =
-        slot.project.branch<SlotPipeline>(name = branchName) {
-            val build = build()
-            slotService.startPipeline(slot, build)
-        }
+    ): SlotPipeline {
+        val branch = structureService.findBranchByName(slot.project.name, branchName)
+            .getOrNull()
+            ?: slot.project.branch(branchName)
+        val build = branch.build()
+        return slotService.startPipeline(slot, build)
+    }
 
     fun createRunAndFinishDeployment(
         branchName: String = uid("B"),
