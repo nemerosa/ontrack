@@ -9,6 +9,7 @@ import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLObjectType.newObject
 import net.nemerosa.ontrack.extension.api.ExtensionManager
 import net.nemerosa.ontrack.graphql.schema.authorizations.GQLInterfaceAuthorizableService
+import net.nemerosa.ontrack.graphql.support.booleanArgument
 import net.nemerosa.ontrack.graphql.support.disabledField
 import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.graphql.support.pagination.GQLPaginatedListFactory
@@ -100,6 +101,7 @@ class GQLTypeProject(
                                         .description("If set to true, the branches will be ordered from the most recent build activity.")
                                         .type(GraphQLBoolean)
                                 }
+                                .argument(booleanArgument(ARG_BRANCHES_ENABLED, "If null, does not filter on the branch disabled status. If true, looks only for enabled branches. If false, looks only for disabled branches."))
                                 .dataFetcher(projectBranchesFetcher())
                                 .build()
                 )
@@ -172,10 +174,12 @@ class GQLTypeProject(
                 val useModel: Boolean? = environment.getArgument(GRAPHQL_PROJECT_BRANCHES_USE_MODEL_ARG)
                 val count: Int? = environment.getArgument(ARG_BRANCHES_COUNT)
                 val order: Boolean? = environment.getArgument(ARG_BRANCHES_ORDER)
+                val enabled: Boolean? = environment.getArgument(ARG_BRANCHES_ENABLED)
                 // Using a filter
                 val filter = BranchFilter(
                     name = name,
                     favorite = favorite,
+                    enabled = enabled,
                     count = count,
                     order = order ?: false,
                 )
@@ -215,6 +219,10 @@ class GQLTypeProject(
          * Ordering the branches by decreasing build activity
          */
         const val ARG_BRANCHES_ORDER = "order"
+        /**
+         * Filter on the disabled status of the branch
+         */
+        const val ARG_BRANCHES_ENABLED = "enabled"
     }
 
 }
