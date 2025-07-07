@@ -1,5 +1,5 @@
 import Link from "next/link";
-import {slotUri} from "@components/extension/environments/EnvironmentsLinksUtils";
+import {slotPipelineUri, slotUri} from "@components/extension/environments/EnvironmentsLinksUtils";
 import {Button, Space, Typography} from "antd";
 import {slotNameWithoutProject} from "@components/extension/environments/SlotName";
 import {FaChevronCircleDown, FaChevronCircleRight} from "react-icons/fa";
@@ -8,8 +8,11 @@ import EnvironmentBuild from "@components/builds/environments/EnvironmentBuild";
 import {isAuthorized} from "@components/common/authorizations";
 import SlotPipelineCreateButton from "@components/extension/environments/SlotPipelineCreateButton";
 import {buildKnownName} from "@components/common/Titles";
+import {useRouter} from "next/router";
 
 export default function BuildSlotInfo({slot, build, showDetails = false, setShowDetails, refresh}) {
+
+    const router = useRouter()
 
     const toggleShowDetailsOn = () => {
         if (setShowDetails) setShowDetails(true)
@@ -17,6 +20,10 @@ export default function BuildSlotInfo({slot, build, showDetails = false, setShow
 
     const toggleShowDetailsOff = () => {
         if (setShowDetails) setShowDetails(false)
+    }
+
+    const navigateToPipeline = async (pipelineId) => {
+        await router.push(slotPipelineUri(pipelineId))
     }
 
     return (
@@ -37,7 +44,7 @@ export default function BuildSlotInfo({slot, build, showDetails = false, setShow
                             <SlotPipelineCreateButton
                                 slot={slot}
                                 build={build}
-                                onStart={refresh}
+                                onStart={navigateToPipeline}
                                 text={buildKnownName(build)}
                                 title={`Start deploying ${buildKnownName(build)}`}
                             />
