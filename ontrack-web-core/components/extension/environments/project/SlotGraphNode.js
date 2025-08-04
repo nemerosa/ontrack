@@ -24,13 +24,15 @@ export default function SlotGraphNode({data}) {
 
             <Card
                 hoverable={true}
+                onClick={onSlotSelected}
                 style={{
-                    border: selectedSlot?.id === data.slot.id ? 'solid 4px black' : 'solid 2px gray',
-                    filter: selectedSlot?.id === data.slot.id ? undefined : 'opacity(33%)',
+                    border: selectedSlot?.id === data.slot.id ? 'solid 5px black' : 'solid 2px gray',
+                    backgroundColor: selectedSlot?.id === data.slot.id ? '#D0FFD0' : '#F0F0F0',
+                    // filter: selectedSlot?.id === data.slot.id ? undefined : 'opacity(33%)',
                 }}
             >
                 <Space direction="vertical">
-                    <div className="ot-action" onClick={onSlotSelected}>
+                    <div className="ot-action">
                         <EnvironmentTitle environment={data.slot.environment} tags={false} editable={false}/>
                     </div>
                     {
