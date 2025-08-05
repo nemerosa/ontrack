@@ -3,7 +3,10 @@ package net.nemerosa.ontrack.graphql.schema
 import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLNonNull
-import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.BuildDisplayNameService
+import net.nemerosa.ontrack.model.structure.ProjectEntity
+import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import org.springframework.stereotype.Component
 
 /**
@@ -24,7 +27,7 @@ class GQLBuildDisplayNameFieldContributor(
                     .description("Display name for this build or the build's name if not available")
                     .type(GraphQLNonNull(GraphQLString))
                     .dataFetcher { env ->
-                        val build: Build = env.getSource()
+                        val build: Build = env.getSource()!!
                         buildDisplayNameService.getFirstBuildDisplayName(build) ?: build.name
                     }
                     .build()
