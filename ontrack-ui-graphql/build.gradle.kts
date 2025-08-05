@@ -22,6 +22,7 @@ dependencies {
     testImplementation(project(":ontrack-test-utils"))
     testImplementation(project(":ontrack-it-utils"))
     testImplementation(testFixtures(project(":ontrack-extension-api")))
+    testImplementation(testFixtures(project(":ontrack-extension-general")))
 
     testFixturesImplementation(project(":ontrack-it-utils"))
     testFixturesImplementation("org.jetbrains.kotlin:kotlin-test")

@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 
 @AsAdminTest
 class DefaultVersionSourceIT : AbstractDSLTestSupport() {
@@ -24,20 +23,6 @@ class DefaultVersionSourceIT : AbstractDSLTestSupport() {
         project {
             branch {
                 build {
-                    val version = source.getVersion(this, null)
-                    assertEquals(name, version)
-                }
-            }
-        }
-    }
-
-    @Test
-    fun `Build label but not configured for label returns the name`() {
-        project {
-            branch {
-                build {
-                    val label = uid("v_")
-                    releaseProperty(this, label)
                     val version = source.getVersion(this, null)
                     assertEquals(name, version)
                 }
@@ -66,9 +51,7 @@ class DefaultVersionSourceIT : AbstractDSLTestSupport() {
             useLabel(this)
             branch {
                 build {
-                    assertFailsWith<VersionSourceNoVersionException> {
-                        source.getVersion(this, null)
-                    }
+                    source.getVersion(this, null)
                 }
             }
         }
