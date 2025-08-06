@@ -8,6 +8,7 @@ import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 @AsAdminTest
 class DefaultVersionSourceIT : AbstractDSLTestSupport() {
@@ -19,7 +20,90 @@ class DefaultVersionSourceIT : AbstractDSLTestSupport() {
     private lateinit var source: DefaultVersionSource
 
     @Test
-    fun `Build name`() {
+    fun `No project BuildLinkDisplayProperty, no build ReleaseProperty`() {
+        project {
+            branch {
+                build {
+                    val version = source.getVersion(this, null)
+                    assertEquals(name, version)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `No project BuildLinkDisplayProperty, build ReleaseProperty set`() {
+        project {
+            branch {
+                build {
+                    val label = uid("v_")
+                    releaseProperty(this, label)
+                    val version = source.getVersion(this, null)
+                    assertEquals(label, version)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Project BuildLinkDisplayProperty false, no build ReleaseProperty`() {
+        project {
+            useLabel(this, useLabel = false)
+            branch {
+                build {
+                    val version = source.getVersion(this, null)
+                    assertEquals(name, version)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Project BuildLinkDisplayProperty false, build ReleaseProperty set`() {
+        project {
+            useLabel(this, useLabel = false)
+            branch {
+                build {
+                    val label = uid("v_")
+                    releaseProperty(this, label)
+                    val version = source.getVersion(this, null)
+                    assertEquals(name, version)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Project BuildLinkDisplayProperty true, no build ReleaseProperty`() {
+        project {
+            useLabel(this)
+            branch {
+                build {
+                    assertFailsWith<VersionSourceNoVersionException> {
+                        source.getVersion(this, null)
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Project BuildLinkDisplayProperty true, build ReleaseProperty set`() {
+        project {
+            useLabel(this)
+            branch {
+                build {
+                    val label = uid("v_")
+                    releaseProperty(this, label)
+                    val version = source.getVersion(this, null)
+                    assertEquals(label, version)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Build name by default`() {
         project {
             branch {
                 build {
@@ -51,7 +135,9 @@ class DefaultVersionSourceIT : AbstractDSLTestSupport() {
             useLabel(this)
             branch {
                 build {
-                    source.getVersion(this, null)
+                    assertFailsWith<VersionSourceNoVersionException> {
+                        source.getVersion(this, null)
+                    }
                 }
             }
         }
