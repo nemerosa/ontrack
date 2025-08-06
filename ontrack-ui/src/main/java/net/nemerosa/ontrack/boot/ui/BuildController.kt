@@ -158,11 +158,11 @@ class BuildController(
         @RequestParam(defaultValue = "10") size: Int
     ): ResponseEntity<List<Build>> {
         return ResponseEntity.ok(
-            structureService.getBuildsUsing(
+            structureService.getQualifiedBuildsUsing(
                 structureService.getBuild(buildId),
                 offset,
                 size
-            ).pageItems,
+            ).pageItems.map { it.build },
         )
     }
 

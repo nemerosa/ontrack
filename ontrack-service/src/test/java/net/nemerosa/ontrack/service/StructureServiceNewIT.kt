@@ -154,8 +154,8 @@ class StructureServiceNewIT : AbstractDSLTestSupport() {
             }
         }
         asAdmin {
-            structureService.addBuildLink(source, target) // Once
-            structureService.addBuildLink(source, target) // Twice
+            structureService.createBuildLink(source, target) // Once
+            structureService.createBuildLink(source, target) // Twice
         }
     }
 

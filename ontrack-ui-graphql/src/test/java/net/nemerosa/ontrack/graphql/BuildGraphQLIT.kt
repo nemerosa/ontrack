@@ -1099,7 +1099,7 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         val targetBuild = doCreateBuild()
 
         asAdmin().execute {
-            structureService.addBuildLink(build, targetBuild)
+            structureService.createBuildLink(build, targetBuild)
         }
 
         val data = run("""{
@@ -1137,8 +1137,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         val c = doCreateBuild()
         // Links: a -> b -> c
         asAdmin().execute {
-            structureService.addBuildLink(a, b)
-            structureService.addBuildLink(b, c)
+            structureService.createBuildLink(a, b)
+            structureService.createBuildLink(b, c)
         }
         // Query build links of "b" TO
         val data = run("""{
@@ -1169,8 +1169,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         val c = doCreateBuild()
         // Links: a -> b -> c
         asAdmin().execute {
-            structureService.addBuildLink(a, b)
-            structureService.addBuildLink(b, c)
+            structureService.createBuildLink(a, b)
+            structureService.createBuildLink(b, c)
         }
         // Query build links of "b" FROM
         val data = withGrantViewToAll {

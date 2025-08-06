@@ -98,9 +98,10 @@ abstract class AbstractBuildFilterTestSupport : AbstractDSLTestSupport() {
                     .with(branch, ProjectView::class.java)
                     .with(otherBuild, BuildEdit::class.java)
                     .execute {
-                        structureService.addBuildLink(
-                                otherBuild,
-                                build
+                        structureService.createBuildLink(
+                            fromBuild = otherBuild,
+                            toBuild = otherBuild,
+                            qualifier = BuildLink.DEFAULT,
                         )
                     }
             return this
@@ -112,9 +113,9 @@ abstract class AbstractBuildFilterTestSupport : AbstractDSLTestSupport() {
                     .with(branch, BuildEdit::class.java)
                     .with(otherBuild, ProjectView::class.java)
                     .execute {
-                        structureService.addBuildLink(
-                                build,
-                                otherBuild
+                        structureService.createBuildLink(
+                            fromBuild = build,
+                            toBuild = otherBuild
                         )
                     }
             return this

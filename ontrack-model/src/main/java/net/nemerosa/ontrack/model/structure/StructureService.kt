@@ -113,35 +113,14 @@ interface StructureService {
     fun getNextBuild(buildId: ID): Build?
 
     /**
-     * Build links
-     */
-
-    @Deprecated("Use createBuildLink instead")
-    fun addBuildLink(fromBuild: Build, toBuild: Build)
-
-    /**
      * Creates a qualified build link
      */
-    fun createBuildLink(fromBuild: Build, toBuild: Build, qualifier: String)
+    fun createBuildLink(fromBuild: Build, toBuild: Build, qualifier: String = BuildLink.DEFAULT)
 
     /**
      * Deletes a qualified build link
      */
     fun deleteBuildLink(fromBuild: Build, toBuild: Build, qualifier: String)
-
-    /**
-     * Gets the builds used by the given one.
-     *
-     * This method is _deprecated_ and the [getQualifiedBuildsUsedBy] method should be used instead.
-     *
-     * @param build  Source build
-     * @param offset Offset for pagination
-     * @param size   Page size for pagination
-     * @param filter Optional filter on the builds
-     * @return List of builds which are used by the given one
-     */
-    @Deprecated("Only qualified build links should be used")
-    fun getBuildsUsedBy(build: Build, offset: Int = 0, size: Int = 10, filter: (Build) -> Boolean = { true }): PaginatedList<Build>
 
     /**
      * Gets the total number of downstream links
@@ -170,18 +149,6 @@ interface StructureService {
         depth: Int = 0,
         filter: (link: BuildLink) -> Boolean = { true },
     ): PaginatedList<BuildLink>
-
-    /**
-     * Gets the builds which use the given one.
-     *
-     * @param build  Source build
-     * @param offset Offset for pagination
-     * @param size   Page size for pagination
-     * @param filter Optional filter on the builds
-     * @return List of builds which use the given one
-     */
-    @Deprecated("Will be removed in V5. Only qualified build links should be used")
-    fun getBuildsUsing(build: Build, offset: Int = 0, size: Int = 10, filter: (Build) -> Boolean = { true }): PaginatedList<Build>
 
     /**
      * Gets the builds which use the given one.

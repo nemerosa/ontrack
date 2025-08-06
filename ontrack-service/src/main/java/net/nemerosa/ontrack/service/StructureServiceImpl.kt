@@ -392,11 +392,6 @@ class StructureServiceImpl(
         return coreBuildFilterRepository.projectSearch(project, form, helper)
     }
 
-    @Deprecated("Use createBuildLink instead")
-    override fun addBuildLink(fromBuild: Build, toBuild: Build) {
-        createBuildLink(fromBuild, toBuild, BuildLink.DEFAULT)
-    }
-
     override fun createBuildLink(fromBuild: Build, toBuild: Build, qualifier: String) {
         securityService.checkProjectFunction(fromBuild, BuildConfig::class.java)
         securityService.checkProjectFunction(toBuild, ProjectView::class.java)
@@ -409,21 +404,6 @@ class StructureServiceImpl(
         securityService.checkProjectFunction(toBuild, ProjectView::class.java)
         buildLinkRepository.deleteBuildLink(fromBuild, toBuild, qualifier)
         buildLinkListenerService.onBuildLinkDeleted(fromBuild, toBuild, qualifier)
-    }
-
-    @Deprecated("Only qualified build links should be used")
-    override fun getBuildsUsedBy(
-        build: Build,
-        offset: Int,
-        size: Int,
-        filter: (Build) -> Boolean
-    ): PaginatedList<Build> {
-        securityService.checkProjectFunction(build, ProjectView::class.java)
-        // Gets the complete list, filtered by ACL
-        val list = structureRepository.getBuildsUsedBy(build)
-            .filter { b -> securityService.isProjectFunctionGranted(b, ProjectView::class.java) }
-        // OK
-        return PaginatedList.create(list.filter(filter), offset, size)
     }
 
     override fun getCountQualifiedBuildsUsedBy(build: Build): Int {
@@ -473,21 +453,6 @@ class StructureServiceImpl(
             list
         }
 
-    }
-
-    @Deprecated("Only qualified build links should be used")
-    override fun getBuildsUsing(
-        build: Build,
-        offset: Int,
-        size: Int,
-        filter: (Build) -> Boolean
-    ): PaginatedList<Build> {
-        securityService.checkProjectFunction(build, ProjectView::class.java)
-        // Gets the complete list, filtered by ACL
-        val list = structureRepository.getBuildsUsing(build)
-            .filter { b -> securityService.isProjectFunctionGranted(b, ProjectView::class.java) }
-        // OK
-        return PaginatedList.create(list.filter(filter), offset, size)
     }
 
     override fun getQualifiedBuildsUsing(

@@ -147,14 +147,18 @@ class BranchLinksServiceImpl(
     private fun getEdgeBuild(build: Build, target: Branch, direction: BranchLinksDirection): Build? =
         when (direction) {
             BranchLinksDirection.USING ->
-                structureService.getBuildsUsedBy(build, 0, 1) {
-                    it.branch.id == target.id
-                }.pageItems.firstOrNull()
+                structureService.getQualifiedBuildsUsedBy(build, 0, 1) {
+                    it.build.branch.id == target.id
+                }.pageItems.firstOrNull()?.build
 
             BranchLinksDirection.USED_BY ->
-                structureService.getBuildsUsing(build, 0, 1) {
-                    it.branch.id == target.id
-                }.pageItems.firstOrNull()
+                structureService.getQualifiedBuildsUsing(
+                    build = build,
+                    offset = 0,
+                    size = 1,
+                ) {
+                    it.build.branch.id == target.id
+                }.pageItems.firstOrNull()?.build
         }
 
     private class Node(

@@ -227,38 +227,6 @@ class GQLTypeBuild(
             }
             // Build links - "using" direction, with pagination
             .field(
-                paginatedListFactory.createPaginatedField<Build, Build>(
-                    cache = cache,
-                    fieldName = "using",
-                    fieldDescription = "List of builds being used by this one.",
-                    deprecation = "usingQualified must be used instead",
-                    itemType = this.typeName,
-                    arguments = listOf(
-                        newArgument()
-                            .name("project")
-                            .description("Keeps only links targeted from this project")
-                            .type(GraphQLString)
-                            .build(),
-                        newArgument()
-                            .name("branch")
-                            .description("Keeps only links targeted from this branch. `project` argument is also required.")
-                            .type(GraphQLString)
-                            .build()
-                    ),
-                    itemPaginatedListProvider = { environment, build, offset, size ->
-                        val filter: (BuildLink) -> Boolean = getFilter(environment)
-                        structureService.getBuildsUsedBy(
-                            build,
-                            offset,
-                            size
-                        ) { candidate ->
-                            filter(BuildLink(candidate, ""))
-                        }
-                    }
-                )
-            )
-            // Build links - "using" direction, with pagination
-            .field(
                 paginatedListFactory.createPaginatedField<Build, BuildLink>(
                     cache = cache,
                     fieldName = "usingQualified",
@@ -312,38 +280,6 @@ class GQLTypeBuild(
                             depth = depth,
                             filter = filter,
                         )
-                    }
-                )
-            )
-            // Build links - "usedBy" direction, with pagination
-            .field(
-                paginatedListFactory.createPaginatedField<Build, Build>(
-                    cache = cache,
-                    fieldName = "usedBy",
-                    fieldDescription = "List of builds using this one.",
-                    deprecation = "usedByQualified must be used instead",
-                    itemType = this.typeName,
-                    arguments = listOf(
-                        newArgument()
-                            .name("project")
-                            .description("Keeps only links targeted from this project")
-                            .type(GraphQLString)
-                            .build(),
-                        newArgument()
-                            .name("branch")
-                            .description("Keeps only links targeted from this branch. `project` argument is also required.")
-                            .type(GraphQLString)
-                            .build()
-                    ),
-                    itemPaginatedListProvider = { environment, build, offset, size ->
-                        val filter = getFilter(environment)
-                        structureService.getBuildsUsing(
-                            build,
-                            offset,
-                            size
-                        ) { candidate ->
-                            filter(BuildLink(candidate, ""))
-                        }
                     }
                 )
             )
