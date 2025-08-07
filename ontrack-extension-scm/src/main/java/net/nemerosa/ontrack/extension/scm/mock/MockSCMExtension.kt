@@ -422,10 +422,6 @@ class MockSCMExtension(
             TODO("Not yet implemented")
         }
 
-        override fun getMessageRegex(issueServiceConfiguration: IssueServiceConfiguration?, issue: Issue?): String {
-            TODO("Not yet implemented")
-        }
-
         override val feature: ExtensionFeature
             get() = TODO("Not yet implemented")
 

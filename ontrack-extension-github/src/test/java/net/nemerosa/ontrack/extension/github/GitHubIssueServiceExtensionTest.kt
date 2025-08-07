@@ -2,13 +2,9 @@ package net.nemerosa.ontrack.extension.github
 
 import io.mockk.every
 import io.mockk.mockk
-import net.nemerosa.ontrack.common.Time
 import net.nemerosa.ontrack.extension.git.GitExtensionFeature
 import net.nemerosa.ontrack.extension.github.client.OntrackGitHubClientFactory
 import net.nemerosa.ontrack.extension.github.model.GitHubEngineConfiguration
-import net.nemerosa.ontrack.extension.github.model.GitHubIssue
-import net.nemerosa.ontrack.extension.github.model.GitHubState
-import net.nemerosa.ontrack.extension.github.model.GitHubUser
 import net.nemerosa.ontrack.extension.github.service.GitHubConfigurationService
 import net.nemerosa.ontrack.extension.github.service.GitHubIssueServiceConfiguration
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
@@ -16,7 +12,10 @@ import net.nemerosa.ontrack.extension.scm.SCMExtensionFeature
 import net.nemerosa.ontrack.extension.stale.StaleExtensionFeature
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import kotlin.test.*
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class GitHubIssueServiceExtensionTest {
 
@@ -116,33 +115,6 @@ class GitHubIssueServiceExtensionTest {
     @Test
     fun getIssueId_with_prefix() {
         assertEquals(14, extension.getIssueId("#14").toLong())
-    }
-
-
-    @Test
-    fun `Message regular expression`() {
-        val issue = GitHubIssue(
-            id = 625,
-            url = "...",
-            summary = "...",
-            body = "...",
-            bodyHtml = "...",
-            assignee = GitHubUser("login", "..."),
-            labels = emptyList(),
-            state = GitHubState.open,
-            milestone = null,
-            createdAt = Time.now(),
-            updateTime = Time.now(),
-            closedAt = null
-        )
-        val regex = extension.getMessageRegex(configuration, issue).toRegex()
-        assertTrue(regex.containsMatchIn("#625"))
-        assertTrue(regex.containsMatchIn("#625 at the beginning"))
-        assertTrue(regex.containsMatchIn("In the #625 middle"))
-        assertTrue(regex.containsMatchIn("In the end #625"))
-        assertTrue(regex.containsMatchIn("#625: with separator"))
-        assertFalse(regex.containsMatchIn("Too many #6250 digits"))
-        assertFalse(regex.containsMatchIn("Too many digits #6250"))
     }
 
 }

@@ -1,8 +1,6 @@
 package net.nemerosa.ontrack.extension.issues.support;
 
 import net.nemerosa.ontrack.extension.issues.IssueServiceExtension;
-import net.nemerosa.ontrack.extension.issues.model.Issue;
-import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration;
 import net.nemerosa.ontrack.extension.support.AbstractExtension;
 import net.nemerosa.ontrack.model.extension.ExtensionFeature;
 
@@ -34,12 +32,6 @@ public abstract class AbstractIssueServiceExtension extends AbstractExtension im
     @Override
     public String getName() {
         return name;
-    }
-
-    @Override
-    public String getMessageRegex(IssueServiceConfiguration issueServiceConfiguration, Issue issue) {
-        String displayKey = issue.getDisplayKey();
-        return "(?:\\s|^)(" + displayKey + ")(?:[^\\d]|$)";
     }
 
 }

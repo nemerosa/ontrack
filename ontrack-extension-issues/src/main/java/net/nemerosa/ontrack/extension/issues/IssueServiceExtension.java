@@ -80,18 +80,6 @@ public interface IssueServiceExtension extends Extension {
     String getIssueId(IssueServiceConfiguration issueServiceConfiguration, String token);
 
     /**
-     * Creates a regular expression to use when looking for this issue in a message.
-     *
-     * @param issueServiceConfiguration Configuration for the service
-     * @param issue                     Issue to look for
-     * @return Regular expression
-     * @deprecated Will be removed in V5. Convert to using the SCM API.
-     */
-    @Deprecated
-    String getMessageRegex(IssueServiceConfiguration issueServiceConfiguration, Issue issue);
-
-
-    /**
      * Given an issue key, returns its display form.
      * <p>
      * By default, returns the <code>key</code>.

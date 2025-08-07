@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.issues.model
 
 import net.nemerosa.ontrack.extension.issues.IssueServiceExtension
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfigurationRepresentation.Companion.of
-import net.nemerosa.ontrack.model.support.MessageAnnotationUtils
 import net.nemerosa.ontrack.model.support.MessageAnnotator
 
 /**
@@ -13,15 +12,6 @@ data class ConfiguredIssueService(
     val issueServiceExtension: IssueServiceExtension,
     val issueServiceConfiguration: IssueServiceConfiguration,
 ) {
-
-    fun formatIssuesInMessage(message: String?): String {
-        val messageAnnotator = issueServiceExtension.getMessageAnnotator(issueServiceConfiguration)
-        return if (messageAnnotator != null) {
-            MessageAnnotationUtils.annotate(message, listOf(messageAnnotator))
-        } else {
-            ""
-        }
-    }
 
     fun getIssue(issueKey: String): Issue? {
         return issueServiceExtension.getIssue(issueServiceConfiguration, issueKey)
@@ -40,10 +30,6 @@ data class ConfiguredIssueService(
         return issueServiceExtension.extractIssueKeysFromMessage(issueServiceConfiguration, message)
     }
 
-    fun getIssueId(token: String): String? {
-        return issueServiceExtension.getIssueId(issueServiceConfiguration, token)
-    }
-
     /**
      * Given an issue key, returns its display form.
      *
@@ -54,7 +40,4 @@ data class ConfiguredIssueService(
         return issueServiceExtension.getDisplayKey(issueServiceConfiguration, key)
     }
 
-    fun getMessageRegex(issue: Issue): String {
-        return issueServiceExtension.getMessageRegex(issueServiceConfiguration, issue)
-    }
 }
