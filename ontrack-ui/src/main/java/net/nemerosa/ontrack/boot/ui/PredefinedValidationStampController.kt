@@ -9,7 +9,6 @@ import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.structure.PredefinedValidationStamp.Companion.of
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.multipart.MultipartFile
 import java.util.*
 
 /**
@@ -90,15 +89,4 @@ class PredefinedValidationStampController(
         )
     }
 
-    @PostMapping("predefinedValidationStamps/{predefinedValidationStampId}/image")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    @Deprecated("Will be removed in V5")
-    fun setValidationStampImage(@PathVariable predefinedValidationStampId: ID, @RequestParam file: MultipartFile) {
-        predefinedValidationStampService.setPredefinedValidationStampImage(
-            predefinedValidationStampId, Document(
-                file.contentType!!,
-                file.bytes
-            )
-        )
-    }
 }

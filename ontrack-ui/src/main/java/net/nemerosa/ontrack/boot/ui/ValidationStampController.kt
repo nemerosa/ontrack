@@ -10,7 +10,6 @@ import net.nemerosa.ontrack.ui.support.UIUtils.setupDefaultImageCache
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.multipart.MultipartFile
 import java.util.*
 
 @RestController
@@ -92,18 +91,6 @@ class ValidationStampController(
         val image = structureService.getValidationStampImage(validationStampId)
         setupDefaultImageCache(response, image)
         return image
-    }
-
-    @PostMapping("validationStamps/{validationStampId}/image")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    @Deprecated("Will be removed in V5. Use the PUT method.")
-    fun setValidationStampImage(@PathVariable validationStampId: ID, @RequestParam file: MultipartFile) {
-        structureService.setValidationStampImage(
-            validationStampId, Document(
-                file.contentType!!,
-                file.bytes
-            )
-        )
     }
 
     @PutMapping("validationStamps/{validationStampId}/image")
