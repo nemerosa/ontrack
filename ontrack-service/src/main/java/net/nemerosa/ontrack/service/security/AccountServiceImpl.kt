@@ -343,16 +343,4 @@ class AccountServiceImpl(
         return accountGroupRepository.findAccountGroupByName(name)
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun setAccountDisabled(id: ID, disabled: Boolean) {
-        securityService.checkGlobalFunction(AccountManagement::class.java)
-        accountRepository.setAccountDisabled(id, disabled)
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun setAccountLocked(id: ID, locked: Boolean) {
-        securityService.checkGlobalFunction(AccountManagement::class.java)
-        accountRepository.setAccountLocked(id, locked)
-    }
-
 }

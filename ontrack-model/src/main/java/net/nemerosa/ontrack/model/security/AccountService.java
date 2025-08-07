@@ -220,19 +220,4 @@ public interface AccountService {
     @Nullable
     AccountGroup findAccountGroupByName(@NotNull String name);
 
-    /**
-     * Disabled / enables an account
-     *
-     * @deprecated Will be removed in V5
-     */
-    @Deprecated
-    void setAccountDisabled(@NotNull ID id, boolean disabled);
-
-    /**
-     * Locks / unlocks an account
-     *
-     * @deprecated Will be removed in V5
-     */
-    @Deprecated
-    void setAccountLocked(@NotNull ID id, boolean locked);
 }

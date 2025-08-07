@@ -28,12 +28,6 @@ interface AccountRepository {
     fun deleteAccount(accountId: ID): Ack
 
     /**
-     * Changes the password of an account
-     */
-    @Deprecated("Will be removed in V5")
-    fun setPassword(accountId: Int, encodedPassword: String)
-
-    /**
      * Loads an account by ID
      */
     fun getAccount(accountId: ID): Account
@@ -60,18 +54,6 @@ interface AccountRepository {
      * Checks if an account ID exists
      */
     fun doesAccountIdExist(id: ID): Boolean
-
-    /**
-     * Disabled / enables an account
-     */
-    @Deprecated("Will be removed in V5")
-    fun setAccountDisabled(id: ID, disabled: Boolean)
-
-    /**
-     * Locks / unlocks an account
-     */
-    @Deprecated("Will be removed in V5")
-    fun setAccountLocked(id: ID, locked: Boolean)
 
     /**
      * Finds or create the account

@@ -46,7 +46,7 @@ class AccountJdbcRepository(
                     .addValue("email", account.email)
             )
             account.withId(of(id))
-        } catch (ex: DuplicateKeyException) {
+        } catch (_: DuplicateKeyException) {
             throw AccountNameAlreadyDefinedException(account.email)
         }
     }
@@ -62,7 +62,7 @@ class AccountJdbcRepository(
                     .addValue("fullName", account.fullName)
                     .addValue("email", account.email)
             )
-        } catch (ex: DuplicateKeyException) {
+        } catch (_: DuplicateKeyException) {
             throw AccountNameAlreadyDefinedException(account.email)
         }
     }
@@ -74,11 +74,6 @@ class AccountJdbcRepository(
                 params("id", accountId.value)
             )
         )
-    }
-
-    @Deprecated("Will be removed in V5")
-    override fun setPassword(accountId: Int, encodedPassword: String) {
-        error("Account passwords not supported any longer")
     }
 
     override fun getAccount(accountId: ID): Account {
@@ -128,16 +123,6 @@ class AccountJdbcRepository(
         ) { rs, _ ->
             toAccount(rs)
         }
-    }
-
-    @Deprecated("Will be removed in V5")
-    override fun setAccountDisabled(id: ID, disabled: Boolean) {
-        error("Disabling accounts no longer supported")
-    }
-
-    @Deprecated("Will be removed in V5")
-    override fun setAccountLocked(id: ID, locked: Boolean) {
-        error("Locked accounts no longer supported")
     }
 
     override fun findOrCreateAccount(account: Account): Account {
