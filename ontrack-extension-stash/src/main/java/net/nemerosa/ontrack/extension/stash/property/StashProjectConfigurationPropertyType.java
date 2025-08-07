@@ -93,7 +93,7 @@ public class StashProjectConfigurationPropertyType extends AbstractGitProjectCon
     @Override
     public StashProjectConfigurationProperty replaceValue(@NotNull StashProjectConfigurationProperty value, Function<String, String> replacementFunction) {
         return new StashProjectConfigurationProperty(
-                configurationService.replaceConfiguration(value.getConfiguration(), replacementFunction),
+                value.getConfiguration(),
                 replacementFunction.apply(value.getProject()),
                 replacementFunction.apply(value.getRepository()),
                 value.getIndexationInterval(),

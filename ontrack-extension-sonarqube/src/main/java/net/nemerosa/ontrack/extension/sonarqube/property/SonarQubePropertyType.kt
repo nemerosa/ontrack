@@ -68,7 +68,7 @@ class SonarQubePropertyType(
 
     override fun replaceValue(value: SonarQubeProperty, replacementFunction: Function<String, String>) =
         SonarQubeProperty(
-            configurationService.replaceConfiguration(value.configuration, replacementFunction),
+            value.configuration,
             replacementFunction.apply(value.key),
             replacementFunction.apply(value.validationStamp),
             value.measures,

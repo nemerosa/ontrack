@@ -64,7 +64,7 @@ class GitProjectConfigurationPropertyType(
         replacementFunction: Function<String, String>
     ): GitProjectConfigurationProperty {
         return GitProjectConfigurationProperty(
-            configurationService.replaceConfiguration(value.configuration, replacementFunction)
+            value.configuration
         )
     }
 }

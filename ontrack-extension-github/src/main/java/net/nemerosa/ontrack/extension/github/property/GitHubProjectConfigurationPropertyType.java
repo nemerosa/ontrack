@@ -109,7 +109,7 @@ public class GitHubProjectConfigurationPropertyType
     @Override
     public GitHubProjectConfigurationProperty replaceValue(@NotNull GitHubProjectConfigurationProperty value, Function<String, String> replacementFunction) {
         return new GitHubProjectConfigurationProperty(
-                configurationService.replaceConfiguration(value.getConfiguration(), replacementFunction),
+                value.getConfiguration(),
                 replacementFunction.apply(value.getRepository()),
                 value.getIndexationInterval(),
                 value.getIssueServiceConfigurationIdentifier()

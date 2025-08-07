@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.model.security.GlobalSettings
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.support.*
 import java.util.*
-import java.util.function.Function
 
 abstract class AbstractConfigurationService<T : Configuration<T>>(
     private val configurationClass: Class<T>,
@@ -131,13 +130,6 @@ abstract class AbstractConfigurationService<T : Configuration<T>>(
      * Validates a configuration by connecting to its target
      */
     protected abstract fun validate(configuration: T): ConnectionResult
-
-    /**
-     * Returns itself, no replacement any longer.
-     */
-    override fun replaceConfiguration(configuration: T, replacementFunction: Function<String, String>): T {
-        return configuration
-    }
 
     override val configurationType: Class<T> = configurationClass
 

@@ -94,7 +94,7 @@ public class GitLabProjectConfigurationPropertyType
     @Override
     public GitLabProjectConfigurationProperty replaceValue(@NotNull GitLabProjectConfigurationProperty value, Function<String, String> replacementFunction) {
         return new GitLabProjectConfigurationProperty(
-                configurationService.replaceConfiguration(value.getConfiguration(), replacementFunction),
+                value.getConfiguration(),
                 value.getIssueServiceConfigurationIdentifier(),
                 replacementFunction.apply(value.getRepository()),
                 value.getIndexationInterval()

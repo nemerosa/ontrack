@@ -20,6 +20,6 @@ public abstract class AbstractJenkinsPropertyType<T extends AbstractJenkinsPrope
     }
 
     protected JenkinsConfiguration replaceConfiguration(JenkinsConfiguration configuration, Function<String, String> replacementFunction) {
-        return configurationService.replaceConfiguration(configuration, replacementFunction);
+        return configuration;
     }
 }

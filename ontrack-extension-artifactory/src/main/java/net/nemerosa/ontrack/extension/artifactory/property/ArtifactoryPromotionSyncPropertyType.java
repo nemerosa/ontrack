@@ -97,7 +97,7 @@ public class ArtifactoryPromotionSyncPropertyType extends AbstractPropertyType<A
     @Override
     public ArtifactoryPromotionSyncProperty replaceValue(@NotNull ArtifactoryPromotionSyncProperty value, Function<String, String> replacementFunction) {
         return new ArtifactoryPromotionSyncProperty(
-                configurationService.replaceConfiguration(value.getConfiguration(), replacementFunction),
+                value.getConfiguration(),
                 replacementFunction.apply(value.getBuildName()),
                 replacementFunction.apply(value.getBuildNameFilter()),
                 value.getInterval()
