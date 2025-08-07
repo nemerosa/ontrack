@@ -38,12 +38,8 @@ class TemplatingServiceImpl(
         "^([a-zA-Z_]+|#)(?:\\.([a-zA-Z_\\.-]+))?(?:\\?((?:[a-zA-Z]+=[a-zA-Z0-9\\s,_\\.:-]+)(?:&[a-zA-Z]+=[a-zA-Z0-9\\s,_\\.:-]+)*))?(?:\\|([a-zA-Z_-]+))?\$".toRegex()
 
     override fun isTemplate(templating: String): Boolean {
-        return regexExpressions.containsMatchIn(templating) || isLegacyTemplate(templating)
+        return regexExpressions.containsMatchIn(templating)
     }
-
-    @Deprecated("Legacy templates will be removed in V5.")
-    override fun isLegacyTemplate(template: String): Boolean =
-        !regexExpressions.containsMatchIn(template)
 
     override fun render(
         template: String,

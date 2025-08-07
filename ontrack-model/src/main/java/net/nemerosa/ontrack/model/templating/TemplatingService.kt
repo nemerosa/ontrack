@@ -14,13 +14,6 @@ interface TemplatingService {
     fun isTemplate(templating: String): Boolean
 
     /**
-     * Checks if a given template contains legacy templating
-     * and no new syntax.
-     */
-    @Deprecated("Legacy templates will be removed in V5.")
-    fun isLegacyTemplate(template: String): Boolean
-
-    /**
      * Renders a template.
      *
      * @param template Content of the template
