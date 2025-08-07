@@ -98,12 +98,12 @@ class IndicatorPortfolioServiceImpl(
         } ?: emptyList()
 
     override fun findPortfolioById(id: String): IndicatorPortfolio? {
-        return storageService.retrieve(STORE, id, IndicatorPortfolio::class.java).orElse(null)
+        return storageService.find(STORE, id, IndicatorPortfolio::class)
     }
 
     override fun findAll(): List<IndicatorPortfolio> {
         return storageService.getKeys(STORE).mapNotNull { key ->
-            storageService.retrieve(STORE, key, IndicatorPortfolio::class.java).orElse(null)
+            storageService.find(STORE, key, IndicatorPortfolio::class)
         }.sortedBy { it.name }
     }
 
