@@ -1,21 +1,21 @@
 package net.nemerosa.ontrack.extension.stash.property
 
+import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.git.model.GitConfiguration
 import net.nemerosa.ontrack.extension.git.model.GitConfigurator
 import net.nemerosa.ontrack.extension.git.model.GitPullRequest
 import net.nemerosa.ontrack.extension.issues.IssueServiceRegistry
 import net.nemerosa.ontrack.extension.issues.model.ConfiguredIssueService
-import net.nemerosa.ontrack.extension.support.client.ClientConnection
-import net.nemerosa.ontrack.extension.support.client.ClientFactory
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.PropertyService
+import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.stereotype.Component
+import org.springframework.web.client.getForObject
 
 @Component
 class StashConfigurator(
     private val propertyService: PropertyService,
     private val issueServiceRegistry: IssueServiceRegistry,
-    private val clientFactory: ClientFactory
 ) : GitConfigurator {
 
     override fun isProjectConfigured(project: Project): Boolean {
@@ -32,15 +32,15 @@ class StashConfigurator(
 
     override fun getPullRequest(configuration: GitConfiguration, id: Int): GitPullRequest? =
         if (configuration is StashGitConfiguration) {
-            val client = clientFactory.getJsonClient(
-                ClientConnection(
-                    configuration.configuration.url,
+            val restTemplate = RestTemplateBuilder()
+                .rootUri(configuration.configuration.url)
+                .basicAuthentication(
                     configuration.configuration.user,
-                    configuration.configuration.password
+                    configuration.configuration.password,
                 )
-            )
+                .build()
             val json =
-                client.get("rest/api/1.0/projects/${configuration.project}/repos/${configuration.repository}/pull-requests/$id")
+                restTemplate.getForObject<JsonNode>("rest/api/1.0/projects/${configuration.project}/repos/${configuration.repository}/pull-requests/$id")
             GitPullRequest(
                 id = id,
                 key = "PR-$id",

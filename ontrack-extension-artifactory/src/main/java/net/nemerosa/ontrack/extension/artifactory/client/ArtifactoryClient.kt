@@ -1,18 +1,16 @@
-package net.nemerosa.ontrack.extension.artifactory.client;
+package net.nemerosa.ontrack.extension.artifactory.client
 
-import com.fasterxml.jackson.databind.JsonNode;
-import net.nemerosa.ontrack.client.JsonClient;
-import net.nemerosa.ontrack.extension.artifactory.model.ArtifactoryStatus;
+import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.extension.artifactory.model.ArtifactoryStatus
+import org.springframework.web.client.RestTemplate
 
-import java.util.List;
+interface ArtifactoryClient {
 
-public interface ArtifactoryClient {
+    val buildNames: List<String>
 
-    List<String> getBuildNames();
+    fun getBuildNumbers(buildName: String): List<String>
 
-    List<String> getBuildNumbers(String buildName);
-
-    JsonNode getBuildInfo(String buildName, String buildNumber);
+    fun getBuildInfo(buildName: String, buildNumber: String): JsonNode
 
     /**
      * Gets the statuses (i.e. promotions) of a given build info in Artifactory.
@@ -20,15 +18,15 @@ public interface ArtifactoryClient {
      * @param buildInfo Build info as returned by Artifactory
      * @return List of statuses
      */
-    List<ArtifactoryStatus> getStatuses(JsonNode buildInfo);
+    fun getStatuses(buildInfo: JsonNode): List<ArtifactoryStatus>
 
     /**
-     * Access to the underlying JSON client
+     * Access to the underlying REST template
      */
-    JsonClient getJsonClient();
+    val restTemplate: RestTemplate
 
     /**
      * AQL query
      */
-    JsonNode aql(String query);
+    fun aql(query: String): JsonNode
 }

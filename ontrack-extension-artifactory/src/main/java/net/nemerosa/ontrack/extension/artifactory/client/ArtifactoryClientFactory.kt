@@ -1,9 +1,9 @@
-package net.nemerosa.ontrack.extension.artifactory.client;
+package net.nemerosa.ontrack.extension.artifactory.client
 
-import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfiguration;
+import net.nemerosa.ontrack.extension.artifactory.configuration.ArtifactoryConfiguration
 
-public interface ArtifactoryClientFactory {
+interface ArtifactoryClientFactory {
 
-    ArtifactoryClient getClient(ArtifactoryConfiguration configuration);
+    fun getClient(configuration: ArtifactoryConfiguration): ArtifactoryClient
 
 }

@@ -1,6 +1,5 @@
-package net.nemerosa.ontrack.extension.artifactory.configuration;
+package net.nemerosa.ontrack.extension.artifactory.configuration
 
-import net.nemerosa.ontrack.model.support.ConfigurationService;
+import net.nemerosa.ontrack.model.support.ConfigurationService
 
-public interface ArtifactoryConfigurationService extends ConfigurationService<ArtifactoryConfiguration> {
-}
+interface ArtifactoryConfigurationService : ConfigurationService<ArtifactoryConfiguration>

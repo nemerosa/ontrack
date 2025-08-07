@@ -1,93 +1,76 @@
-package net.nemerosa.ontrack.extension.artifactory.client;
+package net.nemerosa.ontrack.extension.artifactory.client
 
-import com.fasterxml.jackson.databind.JsonNode;
-import net.nemerosa.ontrack.client.ClientNotFoundException;
-import net.nemerosa.ontrack.client.JsonClient;
-import net.nemerosa.ontrack.extension.artifactory.model.ArtifactoryStatus;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.hc.core5.http.ContentType;
-import org.apache.hc.core5.http.io.entity.StringEntity;
+import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.extension.artifactory.model.ArtifactoryStatus
+import org.springframework.web.client.HttpClientErrorException
+import org.springframework.web.client.RestTemplate
+import org.springframework.web.client.getForObject
+import org.springframework.web.client.postForObject
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+class ArtifactoryClientImpl(
+    override val restTemplate: RestTemplate,
+) : ArtifactoryClient {
 
-public class ArtifactoryClientImpl implements ArtifactoryClient {
-
-    private final JsonClient jsonClient;
-
-    public ArtifactoryClientImpl(JsonClient jsonClient) {
-        this.jsonClient = jsonClient;
+    override fun aql(query: String): JsonNode {
+        return restTemplate.postForObject<JsonNode>(
+            "/api/search/aql",
+            query,
+        )
     }
 
-    @Override
-    public JsonClient getJsonClient() {
-        return jsonClient;
-    }
-
-    @Override
-    public JsonNode aql(String query) {
-        return jsonClient.post(
-                new StringEntity(
-                        query,
-                        ContentType.TEXT_PLAIN.withCharset("UTF-8")
-                ),
-                "/api/search/aql"
-        );
-    }
-
-    @Override
-    public List<String> getBuildNames() {
-        JsonNode node = jsonClient.get("/api/build");
-        List<String> names = new ArrayList<>();
-        node.path("builds").forEach((JsonNode numberNode) -> {
-            String name = StringUtils.stripStart(numberNode.path("uri").asText(), "/");
-            if (StringUtils.isNotBlank(name)) {
-                names.add(name);
-            }
-        });
-        return names;
-    }
-
-    @Override
-    public List<String> getBuildNumbers(String buildName) {
-        try {
-            JsonNode node = jsonClient.get("/api/build/%s", buildName);
-            List<String> numbers = new ArrayList<>();
-            node.path("buildsNumbers").forEach((JsonNode numberNode) -> {
-                String number = StringUtils.stripStart(numberNode.path("uri").asText(), "/");
-                if (StringUtils.isNotBlank(number)) {
-                    numbers.add(number);
+    override val buildNames: List<String>
+        get() {
+            val node = restTemplate.getForObject<JsonNode>("/api/build")
+            val names = mutableListOf<String>()
+            node.path("build")
+                .forEach { numberNode ->
+                    val name = numberNode.path("uri").asText().trimStart('/')
+                    if (name.isNotBlank()) {
+                        names.add(name)
+                    }
                 }
-            });
-            return numbers;
-        } catch (ClientNotFoundException ex) {
+            return names
+        }
+
+    override fun getBuildNumbers(buildName: String): List<String> {
+        try {
+            val node = restTemplate.getForObject<JsonNode>("/api/build/${buildName}")
+            val numbers = mutableListOf<String>()
+            node.path("buildsNumbers").forEach { numberNode ->
+                val number = numberNode.path("uri").asText().trimStart('/')
+                if (number.isNotBlank()) {
+                    numbers.add(number)
+                }
+            }
+            return numbers
+        } catch (_: HttpClientErrorException.NotFound) {
             // When the build is not defined, returns no build number
-            return Collections.emptyList();
+            return emptyList()
         }
     }
 
-    @Override
-    public JsonNode getBuildInfo(String buildName, String buildNumber) {
-        return jsonClient.get("/api/build/%s/%s", buildName, buildNumber).path("buildInfo");
+    override fun getBuildInfo(buildName: String, buildNumber: String): JsonNode {
+        return restTemplate.getForObject<JsonNode>("/api/build/${buildName}/${buildNumber}").path("buildInfo")
     }
 
-    @Override
-    public List<ArtifactoryStatus> getStatuses(JsonNode buildInfo) {
-        List<ArtifactoryStatus> statuses = new ArrayList<>();
-        buildInfo.path("statuses").forEach(statusNode -> statuses.add(new ArtifactoryStatus(
-                statusNode.path("status").asText(),
-                statusNode.path("user").asText(),
-                LocalDateTime.parse(
+    override fun getStatuses(buildInfo: JsonNode): List<ArtifactoryStatus> {
+        val statuses = mutableListOf<ArtifactoryStatus>()
+        buildInfo.path("statuses").forEach { statusNode ->
+            statuses.add(
+                ArtifactoryStatus(
+                    statusNode.path("status").asText(),
+                    statusNode.path("user").asText(),
+                    LocalDateTime.parse(
                         statusNode.path("timestamp").asText(),
                         DateTimeFormatter.ofPattern(
-                                "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+                            "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
                         )
+                    )
                 )
-        )));
-        return statuses;
+            )
+        }
+        return statuses
     }
-
 }

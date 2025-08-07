@@ -58,7 +58,11 @@ class ArtifactoryPromotionSyncServiceIT : AbstractDSLTestSupport() {
          */
         @Bean
         @Primary
-        fun artifactoryClientFactory(client: ArtifactoryClient) = ArtifactoryClientFactory { client }
+        fun artifactoryClientFactory(client: ArtifactoryClient) = object : ArtifactoryClientFactory {
+            override fun getClient(configuration: ArtifactoryConfiguration): ArtifactoryClient {
+                return client
+            }
+        }
 
     }
 
