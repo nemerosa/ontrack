@@ -62,9 +62,6 @@ abstract class AbstractConfigurationService<T : Configuration<T>>(
             .find(configurationClass, name)
             ?.run { decrypt(this) }
 
-    override fun getOptionalConfiguration(name: String): Optional<T> =
-        Optional.ofNullable(findConfiguration(name))
-
     override fun deleteConfiguration(name: String) {
         checkAccess()
         val configuration = getConfiguration(name)

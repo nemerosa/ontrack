@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.model.support
 
-import java.util.*
 import java.util.function.Function
 
 /**
@@ -49,15 +48,6 @@ interface ConfigurationService<T : Configuration<T>> {
      * @return The configuration or null if not found
      */
     fun findConfiguration(name: String): T?
-
-    /**
-     * Same than [getConfiguration] but returns empty if not found.
-     *
-     * @param name Name of the configuration to find
-     * @return The configuration or empty if not found
-     */
-    @Deprecated(message = "Will be removed in V5. Use findConfiguration instead", replaceWith = ReplaceWith("findConfiguration"))
-    fun getOptionalConfiguration(name: String): Optional<T>
 
     /**
      * Deletes a configuration
