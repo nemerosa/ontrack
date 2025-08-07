@@ -44,7 +44,7 @@ abstract class AbstractBuildFilterTestSupport : AbstractDSLTestSupport() {
     @JvmOverloads
     protected fun build(name: String, dateTime: LocalDateTime = LocalDateTime.of(2014, 7, 14, 13, 25, 0)): BuildCreator {
         try {
-            val build = asUser().with(branch, BuildCreate::class.java).call {
+            val build = asUser().withProjectFunction(branch, BuildCreate::class.java).call {
                 structureService.newBuild(
                         Build.of(
                                 branch,
@@ -65,7 +65,7 @@ abstract class AbstractBuildFilterTestSupport : AbstractDSLTestSupport() {
     ) {
 
         fun withPromotion(promotionLevel: PromotionLevel): BuildCreator {
-            asUser().with(branch, PromotionRunCreate::class.java).call {
+            asUser().withProjectFunction(branch, PromotionRunCreate::class.java).call {
                 structureService.newPromotionRun(
                         PromotionRun.of(
                                 build,
@@ -80,7 +80,7 @@ abstract class AbstractBuildFilterTestSupport : AbstractDSLTestSupport() {
 
         @Throws(Exception::class)
         fun withValidation(stamp: ValidationStamp, status: ValidationRunStatusID): BuildCreator {
-            asUser().withView(branch).with(branch, ValidationRunCreate::class.java).call {
+            asUser().withView(branch).withProjectFunction(branch, ValidationRunCreate::class.java).call {
                 structureService.newValidationRun(
                         build,
                         ValidationRunRequest(
@@ -95,12 +95,12 @@ abstract class AbstractBuildFilterTestSupport : AbstractDSLTestSupport() {
         @Throws(Exception::class)
         fun linkedFrom(otherBuild: Build): BuildCreator {
             asUser()
-                    .with(branch, ProjectView::class.java)
-                    .with(otherBuild, BuildEdit::class.java)
+                    .withProjectFunction(branch, ProjectView::class.java)
+                    .withProjectFunction(otherBuild, BuildEdit::class.java)
                     .execute {
                         structureService.createBuildLink(
                             fromBuild = otherBuild,
-                            toBuild = otherBuild,
+                            toBuild = build,
                             qualifier = BuildLink.DEFAULT,
                         )
                     }
@@ -110,8 +110,8 @@ abstract class AbstractBuildFilterTestSupport : AbstractDSLTestSupport() {
         @Throws(Exception::class)
         fun linkedTo(otherBuild: Build): BuildCreator {
             asUser()
-                    .with(branch, BuildEdit::class.java)
-                    .with(otherBuild, ProjectView::class.java)
+                    .withProjectFunction(branch, BuildEdit::class.java)
+                    .withProjectFunction(otherBuild, ProjectView::class.java)
                     .execute {
                         structureService.createBuildLink(
                             fromBuild = build,
@@ -123,7 +123,7 @@ abstract class AbstractBuildFilterTestSupport : AbstractDSLTestSupport() {
 
         @Throws(Exception::class)
         fun withProperty(value: String): BuildCreator {
-            asUser().with(build, ProjectEdit::class.java).call {
+            asUser().withProjectFunction(build, ProjectEdit::class.java).call {
                 propertyService.editProperty(
                         build,
                         TestSimplePropertyType::class.java,
@@ -144,12 +144,6 @@ abstract class AbstractBuildFilterTestSupport : AbstractDSLTestSupport() {
 
     protected fun checkListIsEmpty(builds: List<Build>) {
         assertTrue(builds.isEmpty(), "Build list is empty")
-    }
-
-    protected fun checkList(builds: List<Build>, vararg expectedNames: String) {
-        val actualNames = builds
-                .map { it.name }
-        assertEquals(expectedNames.toList(), actualNames)
     }
 
 }

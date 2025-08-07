@@ -883,15 +883,17 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                     // No filter
                     run("""{
                         builds(id: $id) {
-                            using {
+                            usingQualified {
                                 pageItems {
-                                    name
+                                    build {
+                                        name
+                                    }
                                 }
                             }
                         }
                     }"""
                     ).run {
-                        this["builds"][0]["using"]["pageItems"].map { it["name"].asText() }.toSet()
+                        this["builds"][0]["usingQualified"]["pageItems"].map { it["build"]["name"].asText() }.toSet()
                     }.run {
                         assertEquals(
                                 setOf("1.0", "2.0", "3.0"),
@@ -902,15 +904,17 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                     // Filter by project
                     run("""{
                         builds(id: $id) {
-                            using(project: "${ref1.name}") {
+                            usingQualified(project: "${ref1.name}") {
                                 pageItems {
-                                    name
+                                    build {
+                                        name
+                                    }
                                 }
                             }
                         }
                     }"""
                     ).run {
-                        this["builds"][0]["using"]["pageItems"].map { it["name"].asText() }.toSet()
+                        this["builds"][0]["usingQualified"]["pageItems"].map { it["build"]["name"].asText() }.toSet()
                     }.run {
                         assertEquals(
                                 setOf("1.0", "2.0"),
@@ -921,15 +925,17 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                     // Filter by branch
                     run("""{
                         builds(id: $id) {
-                            using(project: "${ref1.name}", branch: "master") {
+                            usingQualified(project: "${ref1.name}", branch: "master") {
                                 pageItems {
-                                    name
+                                    build {
+                                        name
+                                    }
                                 }
                             }
                         }
                     }"""
                     ).run {
-                        this["builds"][0]["using"]["pageItems"].map { it["name"].asText() }.toSet()
+                        this["builds"][0]["usingQualified"]["pageItems"].map { it["build"]["name"].asText() }.toSet()
                     }.run {
                         assertEquals(
                                 setOf("2.0"),
@@ -975,15 +981,17 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             // No filter, all of them
             run("""{
                         builds(id: $id) {
-                            usedBy {
+                            usedByQualified {
                                 pageItems {
-                                    name
+                                    build {
+                                        name
+                                    }
                                 }
                             }
                         }
                     }"""
             ).run {
-                this["builds"][0]["usedBy"]["pageItems"].map { it["name"].asText() }.toSet()
+                this["builds"][0]["usedByQualified"]["pageItems"].map { it["build"]["name"].asText() }.toSet()
             }.run {
                 assertEquals(
                         setOf("1.0", "2.0", "3.0"),
@@ -993,15 +1001,17 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             // No filter, first one only
             run("""{
                         builds(id: $id) {
-                            usedBy(size: 1) {
+                            usedByQualified(size: 1) {
                                 pageItems {
-                                    name
+                                    build {
+                                        name
+                                    }
                                 }
                             }
                         }
                     }"""
             ).run {
-                this["builds"][0]["usedBy"]["pageItems"].map { it["name"].asText() }.toSet()
+                this["builds"][0]["usedByQualified"]["pageItems"].map { it["build"]["name"].asText() }.toSet()
             }.run {
                 assertEquals(
                         setOf("3.0"),
@@ -1011,15 +1021,17 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             // Project restriction, all of them
             run("""{
                         builds(id: $id) {
-                            usedBy(project: "${ref1.name}") {
+                            usedByQualified(project: "${ref1.name}") {
                                 pageItems {
-                                    name
+                                    build {
+                                        name
+                                    }
                                 }
                             }
                         }
                     }"""
             ).run {
-                this["builds"][0]["usedBy"]["pageItems"].map { it["name"].asText() }.toSet()
+                this["builds"][0]["usedByQualified"]["pageItems"].map { it["build"]["name"].asText() }.toSet()
             }.run {
                 assertEquals(
                         setOf("1.0", "2.0"),
@@ -1029,15 +1041,17 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             // Project restriction, first one
             run("""{
                         builds(id: $id) {
-                            usedBy(project: "${ref1.name}", size: 1) {
+                            usedByQualified(project: "${ref1.name}", size: 1) {
                                 pageItems {
-                                    name
+                                    build {
+                                        name
+                                    }
                                 }
                             }
                         }
                     }"""
             ).run {
-                this["builds"][0]["usedBy"]["pageItems"].map { it["name"].asText() }.toSet()
+                this["builds"][0]["usedByQualified"]["pageItems"].map { it["build"]["name"].asText() }.toSet()
             }.run {
                 assertEquals(
                         setOf("2.0"),
@@ -1047,15 +1061,17 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             // Branch restriction
             run("""{
                         builds(id: $id) {
-                            usedBy(project: "${ref1.name}", branch: "master") {
+                            usedByQualified(project: "${ref1.name}", branch: "master") {
                                 pageItems {
-                                    name
+                                    build {
+                                        name
+                                    }
                                 }
                             }
                         }
                     }"""
             ).run {
-                this["builds"][0]["usedBy"]["pageItems"].map { it["name"].asText() }.toSet()
+                this["builds"][0]["usedByQualified"]["pageItems"].map { it["build"]["name"].asText() }.toSet()
             }.run {
                 assertEquals(
                         setOf("2.0"),
@@ -1071,24 +1087,28 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
 
         val data = run("""{
             builds(id: ${build.id}) {
-                using {
+                usingQualified {
                     pageItems {
-                        name
+                        build {
+                            name
+                        }
                     }
                 }
-                usedBy {
+                usedByQualified {
                     pageItems {
-                        name
+                        build {
+                            name
+                        }
                     }
                 }
             }
         }""")
 
         val b = data["builds"].first()
-        assertNotNull(b["using"]["pageItems"]) {
+        assertNotNull(b["usingQualified"]["pageItems"]) {
             assertTrue(it.size() == 0)
         }
-        assertNotNull(b["usedBy"]["pageItems"]) {
+        assertNotNull(b["usedByQualified"]["pageItems"]) {
             assertTrue(it.size() == 0)
         }
     }
@@ -1104,13 +1124,15 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
 
         val data = run("""{
             builds(id: ${build.id}) {
-                using {
+                usingQualified {
                     pageItems {
-                        name
-                        branch {
+                        build {
                             name
-                            project {
+                            branch {
                                 name
+                                project {
+                                    name
+                                }
                             }
                         }
                     }
@@ -1118,13 +1140,13 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             }
         }""")
 
-        val links = data["builds"].first()["using"]["pageItems"]
+        val links = data["builds"].first()["usingQualified"]["pageItems"]
         assertNotNull(links) {
             assertEquals(1, it.size())
             val link = it.first()
-            assertEquals(targetBuild.name, link["name"].asText())
-            assertEquals(targetBuild.branch.name, link["branch"]["name"].asText())
-            assertEquals(targetBuild.branch.project.name, link["branch"]["project"]["name"].asText())
+            assertEquals(targetBuild.name, link["build"]["name"].asText())
+            assertEquals(targetBuild.branch.name, link["build"]["branch"]["name"].asText())
+            assertEquals(targetBuild.branch.project.name, link["build"]["branch"]["project"]["name"].asText())
         }
 
     }
@@ -1143,21 +1165,23 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         // Query build links of "b" TO
         val data = run("""{
             builds(id: ${b.id}) {
-                using {
+                usingQualified {
                     pageItems {
-                        id
-                        name
+                        build {
+                            id
+                            name
+                        }
                     }
                 }
             }
         }""")
         // Checks the result
-        val links = data["builds"].first()["using"]["pageItems"]
+        val links = data["builds"].first()["usingQualified"]["pageItems"]
         assertNotNull(links) {
             assertEquals(1, it.size())
             val link = it.first()
-            assertEquals(c.name, link["name"].asText())
-            assertEquals(c.id(), link["id"].asInt())
+            assertEquals(c.name, link["build"]["name"].asText())
+            assertEquals(c.id(), link["build"]["id"].asInt())
         }
     }
 
@@ -1176,22 +1200,24 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         val data = withGrantViewToAll {
             run("""{
                 builds(id: ${b.id}) {
-                    usedBy {
+                    usedByQualified {
                         pageItems {
-                            id
-                            name
+                            build {
+                                id
+                                name
+                            }
                         }
                     }
                 }
             }""")
         }
         // Checks the result
-        val links = data["builds"].first()["usedBy"]["pageItems"]
+        val links = data["builds"].first()["usedByQualified"]["pageItems"]
         assertNotNull(links) {
             assertEquals(1, it.size())
             val link = it.first()
-            assertEquals(a.name, link["name"].asText())
-            assertEquals(a.id(), link["id"].asInt())
+            assertEquals(a.name, link["build"]["name"].asText())
+            assertEquals(a.id(), link["build"]["id"].asInt())
         }
     }
 
@@ -1223,9 +1249,11 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                             {
                                 builds(id: $id) {
                                     name
-                                    using {
+                                    usingQualified {
                                         pageItems {
-                                            id
+                                            build {
+                                                id
+                                            }
                                         }
                                     }
                                 }
@@ -1233,7 +1261,7 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                         """.trimIndent())
                     }
                     // Dependencies Ids
-                    val dependencies = data["builds"][0]["using"]["pageItems"].map { it["id"].asInt() }
+                    val dependencies = data["builds"][0]["usingQualified"]["pageItems"].map { it["build"]["id"].asInt() }
                     assertEquals(
                             setOf(dep1.id(), dep2.id()),
                             dependencies.toSet()

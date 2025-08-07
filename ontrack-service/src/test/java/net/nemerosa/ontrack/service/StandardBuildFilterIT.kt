@@ -508,7 +508,7 @@ class StandardBuildFilterIT : AbstractBuildFilterTestSupport() {
         val otherPL = doCreatePromotionLevel(otherBranch, nd("PRODUCTION", ""))
         val otherBuild1 = doCreateBuild(otherBranch, nd("1.0", ""))
         val otherBuild2 = doCreateBuild(otherBranch, nd("2.0", ""))
-        asUser().with(otherBranch, PromotionRunCreate::class.java).execute {
+        asUser().withProjectFunction(otherBranch, PromotionRunCreate::class.java).execute {
             structureService.newPromotionRun(
                     of(
                             otherBuild2,
@@ -616,7 +616,7 @@ class StandardBuildFilterIT : AbstractBuildFilterTestSupport() {
         val otherPL = doCreatePromotionLevel(otherBranch, nd("PRODUCTION", ""))
         val otherBuild1 = doCreateBuild(otherBranch, nd("1.0", ""))
         val otherBuild2 = doCreateBuild(otherBranch, nd("2.0", ""))
-        asUser().with(otherBranch, PromotionRunCreate::class.java).execute {
+        asUser().withProjectFunction(otherBranch, PromotionRunCreate::class.java).execute {
             structureService.newPromotionRun(
                     of(
                             otherBuild2,
