@@ -2,8 +2,6 @@ package net.nemerosa.ontrack.extension.general.validation
 
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.graphql.AbstractQLKTITSupport
-import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.json.toJsonMap
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.RunInfoInput
 import net.nemerosa.ontrack.model.structure.ValidationDataTypeConfig
@@ -75,7 +73,8 @@ abstract class AbstractValidationDataTypeRunGraphQLMutationTestSupport<C> : Abst
                         validationDataTypeConfig = dataConfig
                     )
                     build {
-                        run("""
+                        run(
+                            """
                             mutation Mutation(${'$'}runInfo: RunInfoInput) {
                                 $mutationName(input: {
                                     ${buildInput(this)},
@@ -111,8 +110,9 @@ abstract class AbstractValidationDataTypeRunGraphQLMutationTestSupport<C> : Abst
                                 }
                             }
                         """, mapOf(
-                            "runInfo" to runInfo?.asJson()?.toJsonMap()
-                        )).let { data ->
+                                "runInfo" to runInfo?.asMap()
+                            )
+                        ).let { data ->
                             val node = assertNoUserError(data, mutationName)
                             val run = node.path("validationRun")
 

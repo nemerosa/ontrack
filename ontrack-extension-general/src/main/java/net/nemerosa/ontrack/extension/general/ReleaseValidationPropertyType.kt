@@ -16,11 +16,11 @@ class ReleaseValidationPropertyType(
     extensionFeature: GeneralExtensionFeature,
 ) : AbstractPropertyType<ReleaseValidationProperty>(extensionFeature) {
 
-    override fun getName(): String = "Validation on release/label"
+    override val name: String = "Validation on release/label"
 
-    override fun getDescription(): String = "When set, adding a release/label on a build will also validate this build."
+    override val description: String = "When set, adding a release/label on a build will also validate this build."
 
-    override fun getSupportedEntityTypes(): Set<ProjectEntityType> = setOf(ProjectEntityType.BRANCH)
+    override val supportedEntityTypes: Set<ProjectEntityType> = setOf(ProjectEntityType.BRANCH)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean =
         securityService.isProjectFunctionGranted(entity, ProjectConfig::class.java)
@@ -31,6 +31,7 @@ class ReleaseValidationPropertyType(
 
     override fun fromStorage(node: JsonNode): ReleaseValidationProperty = node.parse()
 
+    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: ReleaseValidationProperty,
         replacementFunction: Function<String, String>,

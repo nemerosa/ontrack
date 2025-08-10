@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.git.model.GitBranchConfiguration
 import net.nemerosa.ontrack.extension.git.model.IndexableBuildGitCommitLink
 import net.nemerosa.ontrack.git.GitRepositoryClient
-import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.StructureService
@@ -14,7 +14,7 @@ import java.util.*
 
 @Component
 class TagBuildNameGitCommitLink(
-        private val structureService: StructureService
+    private val structureService: StructureService
 ) : IndexableBuildGitCommitLink<NoConfig> {
 
     override val id: String = "tag"
@@ -32,26 +32,25 @@ class TagBuildNameGitCommitLink(
         return NoConfig.INSTANCE
     }
 
-    override fun toJson(data: NoConfig): JsonNode {
-        return JsonUtils.`object`().end()
-    }
+    override fun toJson(data: NoConfig): JsonNode =
+        emptyMap<String, String>().asJson()
 
     override fun getEarliestBuildAfterCommit(
-            branch: Branch,
-            gitClient: GitRepositoryClient,
-            branchConfiguration: GitBranchConfiguration,
-            data: NoConfig,
-            commit: String
+        branch: Branch,
+        gitClient: GitRepositoryClient,
+        branchConfiguration: GitBranchConfiguration,
+        data: NoConfig,
+        commit: String
     ): Int? {
         return gitClient.getTagsWhichContainCommit(commit)
-                // ... gets the builds
-                .mapNotNull { buildName -> structureService.findBuildByName(branch.project.name, branch.name, buildName).orElse(null) }
-                // ... sort by ID (from the oldest build to the newest)
-                .sortedBy { it.id() }
-                // ... takes the first build
-                .firstOrNull()
-                // ... and its ID
-                ?.id()
+            // ... gets the builds
+            .mapNotNull { buildName ->
+                structureService.findBuildByName(branch.project.name, branch.name, buildName).orElse(null)
+            }
+            // Get the minimum
+            .minByOrNull { it.id() }
+            // ... and its ID
+            ?.id()
     }
 
     override fun getBuildNameFromTagName(tagName: String, data: NoConfig): Optional<String> {

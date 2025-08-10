@@ -18,20 +18,21 @@ class MockSCMProjectPropertyType(
     extensionFeature: SCMExtensionFeature,
 ): AbstractPropertyType<MockSCMProjectProperty>(extensionFeature) {
 
-    override fun getName(): String = "Mock SCM"
+    override val name: String = "Mock SCM"
 
-    override fun getDescription(): String = "Mock SCM used for testing only"
+    override val description: String = "Mock SCM used for testing only"
 
-    override fun getSupportedEntityTypes(): Set<ProjectEntityType> = setOf(ProjectEntityType.PROJECT)
+    override val supportedEntityTypes: Set<ProjectEntityType> = setOf(ProjectEntityType.PROJECT)
 
-    override fun canEdit(entity: ProjectEntity?, securityService: SecurityService?): Boolean = true
+    override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean = true
 
-    override fun canView(entity: ProjectEntity?, securityService: SecurityService?): Boolean = true
+    override fun canView(entity: ProjectEntity, securityService: SecurityService): Boolean = true
 
     override fun fromClient(node: JsonNode): MockSCMProjectProperty = node.parse()
 
     override fun fromStorage(node: JsonNode): MockSCMProjectProperty = node.parse()
 
+    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: MockSCMProjectProperty,
         replacementFunction: Function<String, String>,

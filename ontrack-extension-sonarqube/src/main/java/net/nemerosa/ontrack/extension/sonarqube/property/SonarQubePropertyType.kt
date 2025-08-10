@@ -5,9 +5,9 @@ import net.nemerosa.ontrack.extension.sonarqube.SonarQubeExtensionFeature
 import net.nemerosa.ontrack.extension.sonarqube.configuration.SonarQubeConfiguration
 import net.nemerosa.ontrack.extension.sonarqube.configuration.SonarQubeConfigurationService
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
-import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.getBooleanField
+import net.nemerosa.ontrack.json.getTextField
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
@@ -23,11 +23,11 @@ class SonarQubePropertyType(
 ) : AbstractPropertyType<SonarQubeProperty>(extensionFeature),
     ConfigurationPropertyType<SonarQubeConfiguration, SonarQubeProperty> {
 
-    override fun getName(): String = "SonarQube"
+    override val name: String = "SonarQube"
 
-    override fun getDescription(): String = "Association with a SonarQube project."
+    override val description: String = "Association with a SonarQube project."
 
-    override fun getSupportedEntityTypes(): Set<ProjectEntityType> =
+    override val supportedEntityTypes: Set<ProjectEntityType> =
         setOf(ProjectEntityType.PROJECT)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean =
@@ -49,7 +49,7 @@ class SonarQubePropertyType(
             measures = node.path("measures").map { it.asText() },
             override = node.path("override").asBoolean(),
             branchModel = node.path("branchModel").asBoolean(),
-            branchPattern = JsonUtils.get(node, "branchPattern", null),
+            branchPattern = node.getTextField("branchPattern"),
             validationMetrics = node.getBooleanField(SonarQubeProperty::validationMetrics.name) ?: true,
         )
     }
@@ -66,6 +66,7 @@ class SonarQubePropertyType(
             SonarQubeProperty::validationMetrics.name to value.validationMetrics,
         ).asJson()
 
+    @Deprecated("Will be removed in V5")
     override fun replaceValue(value: SonarQubeProperty, replacementFunction: Function<String, String>) =
         SonarQubeProperty(
             value.configuration,

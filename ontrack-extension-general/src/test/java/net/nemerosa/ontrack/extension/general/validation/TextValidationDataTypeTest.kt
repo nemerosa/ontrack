@@ -2,7 +2,6 @@ package net.nemerosa.ontrack.extension.general.validation
 
 import com.fasterxml.jackson.databind.node.TextNode
 import net.nemerosa.ontrack.extension.general.GeneralExtensionFeature
-import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.test.assertIs
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -21,7 +20,7 @@ class TextValidationDataTypeTest {
 
     @Test
     fun fromJson() {
-        val data = dataType.fromJson(JsonUtils.parseAsNode("\"Some text\""))
+        val data = dataType.fromJson(TextNode("Some text"))
         assertEquals("Some text", data)
     }
 

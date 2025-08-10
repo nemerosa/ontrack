@@ -16,11 +16,11 @@ class TestSimplePropertyType(
     extensionFeature: TestExtensionFeature
 ) : AbstractPropertyType<TestSimpleProperty>(extensionFeature) {
 
-    override fun getName(): String = "Simple value"
+    override val name: String = "Simple value"
 
-    override fun getDescription(): String = "Value."
+    override val description: String = "Value."
 
-    override fun getSupportedEntityTypes(): Set<ProjectEntityType> = EnumSet.allOf(ProjectEntityType::class.java)
+    override val supportedEntityTypes: Set<ProjectEntityType> = EnumSet.allOf(ProjectEntityType::class.java)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean =
         securityService.isProjectFunctionGranted(entity, ProjectEdit::class.java)
@@ -29,8 +29,9 @@ class TestSimplePropertyType(
 
     override fun fromClient(node: JsonNode): TestSimpleProperty = fromStorage(node)
 
-    override fun fromStorage(node: JsonNode): TestSimpleProperty = parse(node, TestSimpleProperty::class.java)
+    override fun fromStorage(node: JsonNode): TestSimpleProperty = parse(node, TestSimpleProperty::class)
 
+    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: TestSimpleProperty,
         replacementFunction: Function<String, String>

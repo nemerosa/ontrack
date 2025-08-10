@@ -13,13 +13,13 @@ import java.util.function.Function
 @Component
 class TestDecoratorPropertyType(
     extensionFeature: TestExtensionFeature
-) : AbstractPropertyType<TestDecorationData?>(extensionFeature) {
+) : AbstractPropertyType<TestDecorationData>(extensionFeature) {
 
-    override fun getName(): String = "Decorator value"
+    override val name: String = "Decorator value"
 
-    override fun getDescription(): String = "Value."
+    override val description: String = "Value."
 
-    override fun getSupportedEntityTypes(): Set<ProjectEntityType> = EnumSet.allOf(ProjectEntityType::class.java)
+    override val supportedEntityTypes: Set<ProjectEntityType> = EnumSet.allOf(ProjectEntityType::class.java)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean =
         securityService.isProjectFunctionGranted(entity, ProjectEdit::class.java)
@@ -31,9 +31,10 @@ class TestDecoratorPropertyType(
     }
 
     override fun fromStorage(node: JsonNode): TestDecorationData {
-        return parse(node, TestDecorationData::class.java)
+        return parse(node, TestDecorationData::class)
     }
 
+    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: TestDecorationData,
         replacementFunction: Function<String, String>

@@ -17,11 +17,11 @@ class AutoVersioningProjectPropertyType(
 ) : AbstractPropertyType<AutoVersioningProjectProperty>(
     extensionFeature
 ) {
-    override fun getName(): String = "Auto-versioning"
+    override val name: String = "Auto-versioning"
 
-    override fun getDescription(): String = "Auto-versioning rules at project level"
+    override val description: String = "Auto-versioning rules at project level"
 
-    override fun getSupportedEntityTypes(): Set<ProjectEntityType> = setOf(ProjectEntityType.PROJECT)
+    override val supportedEntityTypes: Set<ProjectEntityType> = setOf(ProjectEntityType.PROJECT)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean =
         securityService.isProjectFunctionGranted(entity, ProjectConfig::class.java)
@@ -32,6 +32,7 @@ class AutoVersioningProjectPropertyType(
 
     override fun fromStorage(node: JsonNode) = node.parse<AutoVersioningProjectProperty>()
 
+    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: AutoVersioningProjectProperty,
         replacementFunction: Function<String, String>

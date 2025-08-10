@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.extension.git.branching
 import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.git.GitExtensionFeature
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
-import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
@@ -15,12 +15,12 @@ import java.util.function.Function
 class BranchingModelPropertyType(
         extensionFeature: GitExtensionFeature
 ) : AbstractPropertyType<BranchingModelProperty>(extensionFeature) {
-    override fun getName(): String = "Branching Model"
+    override val name: String = "Branching Model"
 
-    override fun getDescription(): String =
+    override val description: String =
             "Defines the branching model used by a project"
 
-    override fun getSupportedEntityTypes() =
+    override val supportedEntityTypes =
             setOf(ProjectEntityType.PROJECT)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean =
@@ -34,8 +34,9 @@ class BranchingModelPropertyType(
     }
 
     override fun fromStorage(node: JsonNode): BranchingModelProperty {
-        return JsonUtils.parse(node, BranchingModelProperty::class.java)
+        return node.parse()
     }
 
+    @Deprecated("Will be removed in V5")
     override fun replaceValue(value: BranchingModelProperty, replacementFunction: Function<String, String>) = value
 }

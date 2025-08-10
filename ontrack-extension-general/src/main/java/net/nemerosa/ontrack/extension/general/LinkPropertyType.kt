@@ -18,11 +18,11 @@ class LinkPropertyType(
         extensionFeature: GeneralExtensionFeature
 ) : AbstractPropertyType<LinkProperty>(extensionFeature) {
 
-    override fun getName(): String = "Links"
+    override val name: String = "Links"
 
-    override fun getDescription(): String = "List of links."
+    override val description: String = "List of links."
 
-    override fun getSupportedEntityTypes(): Set<ProjectEntityType> =
+    override val supportedEntityTypes: Set<ProjectEntityType> =
             EnumSet.allOf(ProjectEntityType::class.java)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean =
@@ -35,9 +35,10 @@ class LinkPropertyType(
     }
 
     override fun fromStorage(node: JsonNode): LinkProperty {
-        return parse(node, LinkProperty::class.java)
+        return parse(node, LinkProperty::class)
     }
 
+    @Deprecated("Will be removed in V5")
     override fun replaceValue(value: LinkProperty, replacementFunction: Function<String, String>): LinkProperty {
         return LinkProperty(
                 value.links.map { nv ->

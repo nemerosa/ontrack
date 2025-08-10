@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.it.AsAdminTest
-import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.security.BranchEdit
 import net.nemerosa.ontrack.model.security.BranchFilterMgt
 import net.nemerosa.ontrack.model.security.ProjectView
@@ -34,7 +34,7 @@ class BuildFilterServiceIT : AbstractDSLTestSupport() {
                 false,
                 "MyFilter",
                 PromotionLevelBuildFilterProvider::class.java.name,
-                JsonUtils.`object`().end()
+                emptyMap<String, String>().asJson()
             )
         }
         assertFalse(filterCreated.success, "A predefined filter cannot be saved")
@@ -204,7 +204,7 @@ class BuildFilterServiceIT : AbstractDSLTestSupport() {
                 false,
                 "MyFilter",
                 StandardBuildFilterProvider::class.java.name,
-                JsonUtils.`object`().with("count", 1).end()
+                mapOf("count" to 1).asJson()
             )
         }
         assertTrue(filterCreated.success)

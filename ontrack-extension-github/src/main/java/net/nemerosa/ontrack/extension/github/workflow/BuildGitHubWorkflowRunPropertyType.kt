@@ -19,11 +19,11 @@ class BuildGitHubWorkflowRunPropertyType(
     extensionFeature
 ) {
 
-    override fun getName(): String = "GitHub Workflow Run"
+    override val name: String = "GitHub Workflow Run"
 
-    override fun getDescription(): String = "Link to the GitHub Workflow Run which created this build."
+    override val description: String = "Link to the GitHub Workflow Run which created this build."
 
-    override fun getSupportedEntityTypes() = setOf(ProjectEntityType.BUILD)
+    override val supportedEntityTypes = setOf(ProjectEntityType.BUILD)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean =
         securityService.isProjectFunctionGranted(entity, BuildConfig::class.java)
@@ -41,13 +41,14 @@ class BuildGitHubWorkflowRunPropertyType(
             BuildGitHubWorkflowRunProperty(workflows = listOf(workflow))
         }
 
+    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: BuildGitHubWorkflowRunProperty,
         replacementFunction: Function<String, String>,
     ): BuildGitHubWorkflowRunProperty = value
 
-    override fun getSearchArguments(token: String?): PropertySearchArguments? =
-        if (!token.isNullOrBlank()) {
+    override fun getSearchArguments(token: String): PropertySearchArguments? =
+        if (token.isNotBlank()) {
             try {
                 val value = token.toLong()
                 PropertySearchArguments(

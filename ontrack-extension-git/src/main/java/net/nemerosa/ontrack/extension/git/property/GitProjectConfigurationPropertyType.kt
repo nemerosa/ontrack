@@ -1,10 +1,10 @@
 package net.nemerosa.ontrack.extension.git.property
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.common.MapBuilder
 import net.nemerosa.ontrack.extension.git.GitExtensionFeature
 import net.nemerosa.ontrack.extension.git.model.BasicGitConfiguration
 import net.nemerosa.ontrack.extension.git.service.GitConfigurationService
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
@@ -23,11 +23,11 @@ class GitProjectConfigurationPropertyType(
 ) : AbstractGitProjectConfigurationPropertyType<GitProjectConfigurationProperty>(extensionFeature),
     ConfigurationPropertyType<BasicGitConfiguration, GitProjectConfigurationProperty> {
 
-    override fun getName(): String = "Git configuration"
+    override val name: String = "Git configuration"
 
-    override fun getDescription(): String = "Associates the project with a Git repository"
+    override val description: String = "Associates the project with a Git repository"
 
-    override fun getSupportedEntityTypes(): Set<ProjectEntityType> = EnumSet.of(ProjectEntityType.PROJECT)
+    override val supportedEntityTypes: Set<ProjectEntityType> = EnumSet.of(ProjectEntityType.PROJECT)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean {
         return securityService.isProjectFunctionGranted(entity.projectId(), ProjectConfig::class.java)
@@ -51,14 +51,11 @@ class GitProjectConfigurationPropertyType(
         )
     }
 
-    override fun forStorage(value: GitProjectConfigurationProperty): JsonNode {
-        return format(
-            MapBuilder.params()
-                .with("configuration", value.configuration.name)
-                .get()
-        )
-    }
+    override fun forStorage(value: GitProjectConfigurationProperty): JsonNode =
+        mapOf("configuration" to value.configuration.name)
+            .asJson()
 
+    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: GitProjectConfigurationProperty,
         replacementFunction: Function<String, String>

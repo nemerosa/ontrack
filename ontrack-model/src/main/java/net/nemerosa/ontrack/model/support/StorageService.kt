@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.model.support
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.json.parseInto
 import net.nemerosa.ontrack.model.pagination.PaginatedList
@@ -178,10 +177,10 @@ interface StorageService {
      * @param store Store (typically an extension class name)
      * @param type  Class of the data to retrieve
      */
-    fun <T> getData(store: String, type: Class<T>): Map<String, T> {
+    fun <T: Any> getData(store: String, type: Class<T>): Map<String, T> {
         return getData(store)
             .mapValues { (_, value) ->
-                JsonUtils.parse(value, type)
+                value.parseInto(type.kotlin)
             }
     }
 }

@@ -14,14 +14,14 @@ class MainBuildLinksProjectPropertyType(
         extensionFeature: GeneralExtensionFeature
 ) : AbstractPropertyType<MainBuildLinksProjectProperty>(extensionFeature) {
 
-    override fun getName(): String = "Main build links"
+    override val name: String = "Main build links"
 
-    override fun getDescription(): String = """
+    override val description: String = """
          List of project labels which describes the list of build links
          to display in a build links decoration.
     """.trimIndent()
 
-    override fun getSupportedEntityTypes(): Set<ProjectEntityType> =
+    override val supportedEntityTypes: Set<ProjectEntityType> =
             setOf(ProjectEntityType.PROJECT)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean =
@@ -34,9 +34,10 @@ class MainBuildLinksProjectPropertyType(
     }
 
     override fun fromStorage(node: JsonNode): MainBuildLinksProjectProperty {
-        return parse(node, MainBuildLinksProjectProperty::class.java)
+        return parse(node, MainBuildLinksProjectProperty::class)
     }
 
+    @Deprecated("Will be removed in V5")
     override fun replaceValue(value: MainBuildLinksProjectProperty, replacementFunction: Function<String, String>): MainBuildLinksProjectProperty {
         return value
     }

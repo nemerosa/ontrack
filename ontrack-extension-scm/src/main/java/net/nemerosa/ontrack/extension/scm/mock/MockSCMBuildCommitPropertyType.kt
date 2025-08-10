@@ -18,20 +18,21 @@ class MockSCMBuildCommitPropertyType(
     extensionFeature: SCMExtensionFeature,
 ) : AbstractPropertyType<MockSCMBuildCommitProperty>(extensionFeature) {
 
-    override fun getName(): String = "Mock SCM commit"
+    override val name: String = "Mock SCM commit"
 
-    override fun getDescription(): String = "Mock SCM used for testing only"
+    override val description: String = "Mock SCM used for testing only"
 
-    override fun getSupportedEntityTypes(): Set<ProjectEntityType> = setOf(ProjectEntityType.BUILD)
+    override val supportedEntityTypes: Set<ProjectEntityType> = setOf(ProjectEntityType.BUILD)
 
-    override fun canEdit(entity: ProjectEntity?, securityService: SecurityService?): Boolean = true
+    override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean = true
 
-    override fun canView(entity: ProjectEntity?, securityService: SecurityService?): Boolean = true
+    override fun canView(entity: ProjectEntity, securityService: SecurityService): Boolean = true
 
     override fun fromClient(node: JsonNode): MockSCMBuildCommitProperty = node.parse()
 
     override fun fromStorage(node: JsonNode): MockSCMBuildCommitProperty = node.parse()
 
+    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: MockSCMBuildCommitProperty,
         replacementFunction: Function<String, String>,

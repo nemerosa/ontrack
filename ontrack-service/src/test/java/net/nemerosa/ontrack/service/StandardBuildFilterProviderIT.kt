@@ -2,7 +2,7 @@ package net.nemerosa.ontrack.service
 
 import net.nemerosa.ontrack.it.AbstractDSLTestSupport
 import net.nemerosa.ontrack.it.AsAdminTest
-import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.StandardBuildFilterData
 import org.junit.jupiter.api.Test
@@ -79,17 +79,17 @@ class StandardBuildFilterProviderIT : AbstractDSLTestSupport() {
                 // Pagination through the results, 4 by 4, with the promotion
                 // Note: the filter count is NOT used
                 val filter = buildFilterService
-                        .standardFilterProviderData(10)
-                        .withWithPromotionLevel(pl.name)
-                        .build()
+                    .standardFilterProviderData(10)
+                    .withWithPromotionLevel(pl.name)
+                    .build()
                 // First page
                 filter.filterBranchBuildsWithPagination(this, 0, 4).let { page ->
                     assertEquals(7, page.pageInfo.totalSize)
                     assertEquals(0, page.pageInfo.currentOffset)
                     assertEquals(4, page.pageInfo.currentSize)
                     assertEquals(
-                            listOf(18, 15, 12, 9).map { it.toString() },
-                            page.pageItems.map { it.name }
+                        listOf(18, 15, 12, 9).map { it.toString() },
+                        page.pageItems.map { it.name }
                     )
                     assertNull(page.pageInfo.previousPage, "No previous page")
                     assertNotNull(page.pageInfo.nextPage) {
@@ -103,8 +103,8 @@ class StandardBuildFilterProviderIT : AbstractDSLTestSupport() {
                     assertEquals(4, page.pageInfo.currentOffset)
                     assertEquals(3, page.pageInfo.currentSize)
                     assertEquals(
-                            listOf(6, 3, 0).map { it.toString() },
-                            page.pageItems.map { it.name }
+                        listOf(6, 3, 0).map { it.toString() },
+                        page.pageItems.map { it.name }
                     )
                     assertNotNull(page.pageInfo.previousPage) {
                         assertEquals(0, it.offset)
@@ -147,8 +147,8 @@ class StandardBuildFilterProviderIT : AbstractDSLTestSupport() {
                 val pl = promotionLevel()
                 val filter = StandardBuildFilterData.of(1).withSincePromotionLevel(pl.name)
                 validationError(
-                        filter,
-                        """Promotion level ${pl.name} does not exist for filter "Since promotion"."""
+                    filter,
+                    """Promotion level ${pl.name} does not exist for filter "Since promotion"."""
                 ) {
                     structureService.deletePromotionLevel(pl.id)
                 }
@@ -163,8 +163,8 @@ class StandardBuildFilterProviderIT : AbstractDSLTestSupport() {
                 val pl = promotionLevel()
                 val filter = StandardBuildFilterData.of(1).withWithPromotionLevel(pl.name)
                 validationError(
-                        filter,
-                        """Promotion level ${pl.name} does not exist for filter "With promotion"."""
+                    filter,
+                    """Promotion level ${pl.name} does not exist for filter "With promotion"."""
                 ) {
                     structureService.deletePromotionLevel(pl.id)
                 }
@@ -179,8 +179,8 @@ class StandardBuildFilterProviderIT : AbstractDSLTestSupport() {
                 val vs = validationStamp()
                 val filter = StandardBuildFilterData.of(1).withSinceValidationStamp(vs.name)
                 validationError(
-                        filter,
-                        """Validation stamp ${vs.name} does not exist for filter "Since validation"."""
+                    filter,
+                    """Validation stamp ${vs.name} does not exist for filter "Since validation"."""
                 ) {
                     structureService.deleteValidationStamp(vs.id)
                 }
@@ -195,8 +195,8 @@ class StandardBuildFilterProviderIT : AbstractDSLTestSupport() {
                 val vs = validationStamp()
                 val filter = StandardBuildFilterData.of(1).withWithValidationStamp(vs.name)
                 validationError(
-                        filter,
-                        """Validation stamp ${vs.name} does not exist for filter "With validation"."""
+                    filter,
+                    """Validation stamp ${vs.name} does not exist for filter "With validation"."""
                 ) {
                     structureService.deleteValidationStamp(vs.id)
                 }
@@ -205,29 +205,29 @@ class StandardBuildFilterProviderIT : AbstractDSLTestSupport() {
     }
 
     private fun Branch.validationError(
-            filter: StandardBuildFilterData,
-            expectedMessage: String,
-            invalidationCode: () -> Unit
+        filter: StandardBuildFilterData,
+        expectedMessage: String,
+        invalidationCode: () -> Unit
     ) {
         // Validation before code
         assertNull(
-                buildFilterService.validateBuildFilterProviderData(
-                        this,
-                        StandardBuildFilterProvider::class.java.name,
-                        JsonUtils.format(filter)
-                ),
-                "No validation error"
+            buildFilterService.validateBuildFilterProviderData(
+                this,
+                StandardBuildFilterProvider::class.java.name,
+                filter.asJson()
+            ),
+            "No validation error"
         )
         // Runs some code to invalid the filter
         asAdmin().execute { invalidationCode() }
         // Validation
         assertEquals(
-                expectedMessage,
-                buildFilterService.validateBuildFilterProviderData(
-                        this,
-                        StandardBuildFilterProvider::class.java.name,
-                        JsonUtils.format(filter)
-                )
+            expectedMessage,
+            buildFilterService.validateBuildFilterProviderData(
+                this,
+                StandardBuildFilterProvider::class.java.name,
+                filter.asJson()
+            )
         )
     }
 

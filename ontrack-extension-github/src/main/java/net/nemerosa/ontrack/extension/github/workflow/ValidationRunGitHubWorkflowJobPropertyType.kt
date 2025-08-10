@@ -18,11 +18,11 @@ class ValidationRunGitHubWorkflowJobPropertyType(
     extensionFeature
 ) {
 
-    override fun getName(): String = "GitHub Workflow Job"
+    override val name: String = "GitHub Workflow Job"
 
-    override fun getDescription(): String = "Link to the GitHub Workflow Job which created this validation run."
+    override val description: String = "Link to the GitHub Workflow Job which created this validation run."
 
-    override fun getSupportedEntityTypes() = setOf(ProjectEntityType.VALIDATION_RUN)
+    override val supportedEntityTypes = setOf(ProjectEntityType.VALIDATION_RUN)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean =
         securityService.isProjectFunctionGranted(entity, ValidationRunCreate::class.java)
@@ -33,6 +33,7 @@ class ValidationRunGitHubWorkflowJobPropertyType(
 
     override fun fromStorage(node: JsonNode): ValidationRunGitHubWorkflowJobProperty = node.parse()
 
+    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: ValidationRunGitHubWorkflowJobProperty,
         replacementFunction: Function<String, String>

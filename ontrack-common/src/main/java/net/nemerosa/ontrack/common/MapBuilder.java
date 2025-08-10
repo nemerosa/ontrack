@@ -4,6 +4,10 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * @deprecated Will be removed in V5
+ */
+@Deprecated
 public class MapBuilder<K, V> {
 
     public static <K, V> MapBuilder<K, V> create() {

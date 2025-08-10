@@ -1,42 +1,37 @@
-package net.nemerosa.ontrack.model.structure;
+package net.nemerosa.ontrack.model.structure
 
-import com.fasterxml.jackson.databind.JsonNode;
-import net.nemerosa.ontrack.model.extension.Extension;
-import net.nemerosa.ontrack.model.security.SecurityService;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
+import com.fasterxml.jackson.databind.JsonNode
+import net.nemerosa.ontrack.model.extension.Extension
+import net.nemerosa.ontrack.model.security.SecurityService
+import org.apache.commons.lang3.StringUtils
+import java.util.function.Function
 
 /**
  * Defines the type for a property.
  *
  * @param <T> Type of object supported by this type
  */
-public interface PropertyType<T> extends Extension {
+interface PropertyType<T> : Extension {
 
     /**
      * Display name for this property
      */
-    String getName();
+    val name: String
 
     /**
      * Description for this property
      */
-    String getDescription();
+    val description: String
 
     /**
      * List of entity types this property applies to.
      */
-    Set<ProjectEntityType> getSupportedEntityTypes();
+    val supportedEntityTypes: Set<ProjectEntityType>
 
     /**
      * Edition policy.
-     * <p>
+     *
+     *
      * Can this property be directly edited by a used on the given
      * associated entity.
      *
@@ -44,7 +39,7 @@ public interface PropertyType<T> extends Extension {
      * @param securityService The access to the security layer
      * @return Authorization policy for this entity
      */
-    boolean canEdit(ProjectEntity entity, SecurityService securityService);
+    fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean
 
     /**
      * Defines the authorization policy for viewing this property.
@@ -53,37 +48,37 @@ public interface PropertyType<T> extends Extension {
      * @param securityService The access to the security layer
      * @return Authorization policy for this entity
      */
-    boolean canView(ProjectEntity entity, SecurityService securityService);
+    fun canView(entity: ProjectEntity, securityService: SecurityService): Boolean
 
     /**
      * Creation of a property value from a value. Should perform validation.
      */
-    Property<T> of(T value);
+    fun of(value: T): Property<T>
 
     /**
      * Gets the JSON representation of a property value
      */
-    JsonNode forStorage(T value);
+    fun forStorage(value: T): JsonNode
 
     /**
      * Parses the client JSON representation for a property value. This method
-     * <i>MUST</i> perform validation before accepting the value.
+     * *MUST* perform validation before accepting the value.
      */
-    T fromClient(JsonNode node);
+    fun fromClient(node: JsonNode): T
 
     /**
      * Parses the storage JSON representation for a property value.
      */
-    T fromStorage(JsonNode node);
+    fun fromStorage(node: JsonNode): T
 
     /**
      * Parses the JSON representation for a property value and creates the property value directly.
      *
-     * @see #fromStorage(JsonNode)
-     * @see #of(Object)
+     * @see .fromStorage
+     * @see .of
      */
-    default Property<T> of(JsonNode node) {
-        return of(fromStorage(node));
+    fun of(node: JsonNode): Property<T> {
+        return of(fromStorage(node))
     }
 
     /**
@@ -93,40 +88,46 @@ public interface PropertyType<T> extends Extension {
      * @param replacementFunction Replacement function to used to transform each string into a new one
      * @return Transformed value
      */
-    T replaceValue(@NotNull T value, Function<String, String> replacementFunction);
+    @Deprecated("Will be removed in V5")
+    fun replaceValue(value: T, replacementFunction: Function<String, String>): T
 
     /**
-     * Checks if the property <code>value</code> contains the given search token.
+     * Checks if the property `value` contains the given search token.
      *
      * @param value         Value to search into
      * @param propertyValue Search token
-     * @return <code>true</code> is found
+     * @return `true` is found
      */
-    default boolean containsValue(T value, String propertyValue) {
-        return StringUtils.containsIgnoreCase(value.toString(), propertyValue);
+    fun containsValue(value: T, propertyValue: String): Boolean {
+        return StringUtils.containsIgnoreCase(value.toString(), propertyValue)
     }
 
-    /**
-     * Type name for this property type.
-     */
-    default String getTypeName() {
-        return getClass().getName();
-    }
+    val typeName: String
+        /**
+         * Type name for this property type.
+         */
+        get() = javaClass.getName()
 
     /**
-     * Copy/clones the {@code value} defined for the {@code sourceEntity} for being suitable
-     * in the {@code targetEntity} after applying the replacement function.
-     * <p>
+     * Copy/clones the `value` defined for the `sourceEntity` for being suitable
+     * in the `targetEntity` after applying the replacement function.
+     *
+     *
      * By default, just applies the textual replacements.
      *
      * @param sourceEntity  Owner of the property to copy
      * @param value         Property value to copy
      * @param targetEntity  Entity to associate the new property with
      * @param replacementFn Replacement function for textual values
-     * @see #replaceValue(Object, Function)
+     * @see .replaceValue
      */
-    default T copy(ProjectEntity sourceEntity, T value, ProjectEntity targetEntity, Function<String, String> replacementFn) {
-        return replaceValue(value, replacementFn);
+    fun copy(
+        sourceEntity: ProjectEntity,
+        value: T,
+        targetEntity: ProjectEntity,
+        replacementFn: Function<String, String>
+    ): T {
+        return replaceValue(value, replacementFn)
     }
 
     /**
@@ -135,7 +136,7 @@ public interface PropertyType<T> extends Extension {
      * @param entity Entity for which the property is changed
      * @param value  New value
      */
-    default void onPropertyChanged(ProjectEntity entity, T value) {
+    fun onPropertyChanged(entity: ProjectEntity, value: T) {
     }
 
     /**
@@ -144,19 +145,18 @@ public interface PropertyType<T> extends Extension {
      * @param entity   Entity for which the property is deleted
      * @param oldValue Old value
      */
-    default void onPropertyDeleted(ProjectEntity entity, T oldValue) {
+    fun onPropertyDeleted(entity: ProjectEntity, oldValue: T) {
     }
 
     /**
      * Gets the additional SQL criteria to add to a search.
      *
      * @param token Token to look for this property type
-     * @return Search arguments (or <code>null</code> if no search is possible)
+     * @return Search arguments (or `null` if no search is possible)
      * @see PropertySearchArguments
      */
-    @Nullable
-    default PropertySearchArguments getSearchArguments(String token) {
-        return null;
+    fun getSearchArguments(token: String): PropertySearchArguments? {
+        return null
     }
 
     /**
@@ -165,7 +165,7 @@ public interface PropertyType<T> extends Extension {
      * @param value Property value
      * @return Additional decorations if any.
      */
-    default @NotNull Map<String,?> getPropertyDecorations(@SuppressWarnings("unused") @NotNull T value) {
-        return Collections.emptyMap();
+    fun getPropertyDecorations(@Suppress("unused") value: T): Map<String, *> {
+        return emptyMap<String, Any>()
     }
 }

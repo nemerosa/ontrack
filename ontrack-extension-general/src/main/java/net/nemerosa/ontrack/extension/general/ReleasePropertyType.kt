@@ -17,11 +17,11 @@ class ReleasePropertyType(
     private val releasePropertyListeners: List<ReleasePropertyListener> = emptyList(),
 ) : AbstractPropertyType<ReleaseProperty>(extensionFeature) {
 
-    override fun getName(): String = "Release"
+    override val name: String = "Release"
 
-    override fun getDescription(): String = "Release indicator on the build."
+    override val description: String = "Release indicator on the build."
 
-    override fun getSupportedEntityTypes(): Set<ProjectEntityType> = EnumSet.of(ProjectEntityType.BUILD)
+    override val supportedEntityTypes: Set<ProjectEntityType> = EnumSet.of(ProjectEntityType.BUILD)
 
     /**
      * If one can promote a build, he can also attach a release label to a build.
@@ -53,6 +53,7 @@ class ReleasePropertyType(
         )
     }
 
+    @Deprecated("Will be removed in V5")
     override fun replaceValue(value: ReleaseProperty, replacementFunction: Function<String, String>): ReleaseProperty {
         return value
     }

@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.repository
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.Signature
 import net.nemerosa.ontrack.repository.support.AbstractJdbcRepository
@@ -13,7 +13,6 @@ import java.sql.ResultSet
 import java.sql.SQLException
 import java.time.LocalDateTime
 import java.util.*
-import java.util.function.Consumer
 import java.util.stream.Collectors
 import javax.sql.DataSource
 
@@ -263,12 +262,12 @@ class EntityDataStoreJdbcRepository(
         data: Any,
     ): EntityDataStoreRecord {
         return add(
-            entity,
-            category,
-            name,
-            signature,
-            groupName,
-            JsonUtils.format(data)
+            entity = entity,
+            category = category,
+            name = name,
+            signature = signature,
+            groupName = groupName,
+            data = data.asJson()
         )
     }
 
@@ -286,7 +285,7 @@ class EntityDataStoreJdbcRepository(
             name,
             signature,
             groupName,
-            JsonUtils.format(data)
+            data.asJson()
         )
     }
 

@@ -1,7 +1,8 @@
 package net.nemerosa.ontrack.graphql
 
 import net.nemerosa.ontrack.it.AsAdminTest
-import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.asJsonString
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.StandardBuildFilterData
 import org.junit.jupiter.api.Test
@@ -95,7 +96,7 @@ class BuildFilterValidationGraphQLIT : AbstractQLKTITSupport() {
     }
 
     private fun Branch.buildFilterValidation(filter: StandardBuildFilterData): String? {
-        val dataJSON: String = JsonUtils.toJSONString(filter)
+        val dataJSON: String = filter.asJson().asJsonString()
         val data = run("""
             query BuildFilterValidationQuery(
                 ${'$'}branchId: Int!,,

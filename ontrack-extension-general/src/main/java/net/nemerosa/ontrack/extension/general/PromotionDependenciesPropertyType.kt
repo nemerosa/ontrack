@@ -7,7 +7,6 @@ import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
-import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
 import java.util.function.Function
 
@@ -16,19 +15,18 @@ import java.util.function.Function
  */
 @Component
 class PromotionDependenciesPropertyType(
-        extensionFeature: GeneralExtensionFeature,
-        private val structureService: StructureService
+        extensionFeature: GeneralExtensionFeature
 ) : AbstractPropertyType<PromotionDependenciesProperty>(extensionFeature) {
 
-    override fun getName(): String = "Promotion dependencies"
+    override val name: String = "Promotion dependencies"
 
-    override fun getDescription(): String =
+    override val description: String =
             "List of promotions a promotion depends on before being applied."
 
     /**
      * Only for promotions
      */
-    override fun getSupportedEntityTypes(): Set<ProjectEntityType> =
+    override val supportedEntityTypes: Set<ProjectEntityType> =
             setOf(ProjectEntityType.PROMOTION_LEVEL)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean =
@@ -41,6 +39,7 @@ class PromotionDependenciesPropertyType(
 
     override fun fromStorage(node: JsonNode): PromotionDependenciesProperty = node.parse()
 
+    @Deprecated("Will be removed in V5")
     override fun replaceValue(value: PromotionDependenciesProperty, replacementFunction: Function<String, String>): PromotionDependenciesProperty =
             value
 }

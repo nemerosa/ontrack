@@ -2,7 +2,9 @@ package net.nemerosa.ontrack.extension.api.support
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.NullNode
-import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parse
+import net.nemerosa.ontrack.json.parseOrNull
 import net.nemerosa.ontrack.model.structure.AbstractValidationDataType
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.springframework.stereotype.Component
@@ -16,9 +18,9 @@ import org.springframework.stereotype.Component
  * Data
  */
 data class TestValidationData(
-        val critical: Int = 0,
-        val high: Int = 0,
-        val medium: Int = 0
+    val critical: Int = 0,
+    val high: Int = 0,
+    val medium: Int = 0
 )
 
 /**
@@ -26,17 +28,17 @@ data class TestValidationData(
  */
 @Component
 class TestValidationDataType(
-        extensionFeature: TestExtensionFeature
+    extensionFeature: TestExtensionFeature
 ) : AbstractValidationDataType<Any, TestValidationData>(
-        extensionFeature
+    extensionFeature
 ) {
 
     override fun validateData(config: Any?, data: TestValidationData?) =
-            validateNotNull(data) {
-                validate(critical >= 0, "Number of critical issues must be >= 0")
-                validate(high >= 0, "Number of high issues must be >= 0")
-                validate(medium >= 0, "Number of medium issues must be >= 0")
-            }
+        validateNotNull(data) {
+            validate(critical >= 0, "Number of critical issues must be >= 0")
+            validate(high >= 0, "Number of high issues must be >= 0")
+            validate(medium >= 0, "Number of medium issues must be >= 0")
+        }
 
     override fun configToJson(config: Any): JsonNode = NullNode.instance
 
@@ -46,29 +48,29 @@ class TestValidationDataType(
 
     override fun fromConfigForm(node: JsonNode?) {}
 
-    override fun toJson(data: TestValidationData): JsonNode = JsonUtils.format(data)
+    override fun toJson(data: TestValidationData): JsonNode = data.asJson()
 
-    override fun fromJson(node: JsonNode): TestValidationData? = JsonUtils.parse(node, TestValidationData::class.java)
+    override fun fromJson(node: JsonNode): TestValidationData? = node.parseOrNull()
 
     override fun fromForm(node: JsonNode?): TestValidationData? =
-            node?.run {
-                JsonUtils.parse(this, TestValidationData::class.java)
-            }
+        node?.run {
+            parse()
+        }
 
     override fun computeStatus(config: Any?, data: TestValidationData): ValidationRunStatusID? =
-            when {
-                data.critical > 0 -> ValidationRunStatusID.STATUS_FAILED
-                data.high > 0 -> ValidationRunStatusID.STATUS_WARNING
-                else -> ValidationRunStatusID.STATUS_PASSED
-            }
+        when {
+            data.critical > 0 -> ValidationRunStatusID.STATUS_FAILED
+            data.high > 0 -> ValidationRunStatusID.STATUS_WARNING
+            else -> ValidationRunStatusID.STATUS_PASSED
+        }
 
     override val displayName = "Test validation data"
 
     override fun getMetrics(data: TestValidationData): Map<String, *>? {
         return mapOf(
-                "critical" to data.critical,
-                "high" to data.high,
-                "medium" to data.medium
+            "critical" to data.critical,
+            "high" to data.high,
+            "medium" to data.medium
         )
     }
 }

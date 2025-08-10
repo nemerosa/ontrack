@@ -1,14 +1,14 @@
 package net.nemerosa.ontrack.extension.bitbucket.cloud.property
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.common.MapBuilder
 import net.nemerosa.ontrack.extension.bitbucket.cloud.BitbucketCloudExtensionFeature
 import net.nemerosa.ontrack.extension.bitbucket.cloud.client.BitbucketCloudClientFactory
 import net.nemerosa.ontrack.extension.bitbucket.cloud.configuration.BitbucketCloudConfiguration
 import net.nemerosa.ontrack.extension.bitbucket.cloud.configuration.BitbucketCloudConfigurationService
 import net.nemerosa.ontrack.extension.bitbucket.cloud.model.BitbucketCloudProject
 import net.nemerosa.ontrack.extension.git.property.AbstractGitProjectConfigurationPropertyType
-import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.getTextField
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
@@ -26,11 +26,11 @@ class BitbucketCloudProjectConfigurationPropertyType(
 ) : AbstractGitProjectConfigurationPropertyType<BitbucketCloudProjectConfigurationProperty>(extensionFeature),
     ConfigurationPropertyType<BitbucketCloudConfiguration, BitbucketCloudProjectConfigurationProperty> {
 
-    override fun getName(): String = "Bitbucket Cloud configuration"
+    override val name: String = "Bitbucket Cloud configuration"
 
-    override fun getDescription(): String = "Associates the project with a Bitbucket Cloud repository"
+    override val description: String = "Associates the project with a Bitbucket Cloud repository"
 
-    override fun getSupportedEntityTypes(): Set<ProjectEntityType> = EnumSet.of(ProjectEntityType.PROJECT)
+    override val supportedEntityTypes: Set<ProjectEntityType> = EnumSet.of(ProjectEntityType.PROJECT)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean =
         securityService.isProjectFunctionGranted(entity.projectId(), ProjectConfig::class.java)
@@ -48,21 +48,20 @@ class BitbucketCloudProjectConfigurationPropertyType(
             configuration = configuration,
             repository = node.path("repository").asText(),
             indexationInterval = node.path("indexationInterval").asInt(),
-            issueServiceConfigurationIdentifier = JsonUtils.get(node, "issueServiceConfigurationIdentifier", null)
+            issueServiceConfigurationIdentifier = node.getTextField("issueServiceConfigurationIdentifier"),
         )
     }
 
     override fun forStorage(value: BitbucketCloudProjectConfigurationProperty): JsonNode {
-        return format(
-            MapBuilder.params()
-                .with("configuration", value.configuration.name)
-                .with("repository", value.repository)
-                .with("indexationInterval", value.indexationInterval)
-                .with("issueServiceConfigurationIdentifier", value.issueServiceConfigurationIdentifier)
-                .get()
-        )
+        return mapOf(
+            "configuration" to value.configuration.name,
+            "repository" to value.repository,
+            "indexationInterval" to value.indexationInterval,
+            "issueServiceConfigurationIdentifier" to value.issueServiceConfigurationIdentifier,
+        ).asJson()
     }
 
+    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: BitbucketCloudProjectConfigurationProperty,
         replacementFunction: Function<String, String>

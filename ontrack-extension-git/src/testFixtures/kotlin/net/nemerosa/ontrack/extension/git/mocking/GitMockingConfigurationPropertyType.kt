@@ -16,11 +16,11 @@ class GitMockingConfigurationPropertyType(
         testExtensionFeature: TestExtensionFeature
 ) : AbstractPropertyType<GitMockingConfigurationProperty>(testExtensionFeature) {
 
-    override fun getName(): String = "Mock Git configuration"
+    override val name: String = "Mock Git configuration"
 
-    override fun getDescription(): String = "Git configuration used for testing"
+    override val description: String = "Git configuration used for testing"
 
-    override fun getSupportedEntityTypes(): Set<ProjectEntityType> = setOf(ProjectEntityType.PROJECT)
+    override val supportedEntityTypes: Set<ProjectEntityType> = setOf(ProjectEntityType.PROJECT)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean =
             securityService.isProjectFunctionGranted(entity, ProjectConfig::class.java)
@@ -31,5 +31,6 @@ class GitMockingConfigurationPropertyType(
 
     override fun fromStorage(node: JsonNode): GitMockingConfigurationProperty = node.parse()
 
+    @Deprecated("Will be removed in V5")
     override fun replaceValue(value: GitMockingConfigurationProperty, replacementFunction: Function<String, String>): GitMockingConfigurationProperty = error("Will not be used")
 }

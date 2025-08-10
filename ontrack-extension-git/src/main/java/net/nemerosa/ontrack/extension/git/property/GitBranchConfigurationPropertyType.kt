@@ -10,7 +10,9 @@ import net.nemerosa.ontrack.extension.git.model.IndexableBuildGitCommitLink
 import net.nemerosa.ontrack.extension.git.service.BuildGitCommitLinkService
 import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
-import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.json.getBooleanField
+import net.nemerosa.ontrack.json.getIntField
+import net.nemerosa.ontrack.json.getTextField
 import net.nemerosa.ontrack.model.security.ProjectConfig
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
@@ -20,18 +22,18 @@ import java.util.function.Function
 
 @Component
 class GitBranchConfigurationPropertyType(
-        extensionFeature: GitExtensionFeature,
-        private val buildGitCommitLinkService: BuildGitCommitLinkService,
-        private val gitService: GitService,
-        private val searchIndexService: SearchIndexService,
-        private val gitBranchSearchIndexer: GitBranchSearchIndexer
+    extensionFeature: GitExtensionFeature,
+    private val buildGitCommitLinkService: BuildGitCommitLinkService,
+    private val gitService: GitService,
+    private val searchIndexService: SearchIndexService,
+    private val gitBranchSearchIndexer: GitBranchSearchIndexer
 ) : AbstractPropertyType<GitBranchConfigurationProperty>(extensionFeature) {
 
-    override fun getName(): String = "Git branch"
+    override val name: String = "Git branch"
 
-    override fun getDescription(): String = "Git branch"
+    override val description: String = "Git branch"
 
-    override fun getSupportedEntityTypes(): Set<ProjectEntityType> = EnumSet.of(ProjectEntityType.BRANCH)
+    override val supportedEntityTypes: Set<ProjectEntityType> = EnumSet.of(ProjectEntityType.BRANCH)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean {
         return securityService.isProjectFunctionGranted(entity.projectId(), ProjectConfig::class.java)
@@ -44,19 +46,20 @@ class GitBranchConfigurationPropertyType(
     }
 
     override fun fromStorage(node: JsonNode): GitBranchConfigurationProperty {
-        val configuredBuildGitCommitLink: ConfiguredBuildGitCommitLink<*>?
-        configuredBuildGitCommitLink = if (node.has("buildCommitLink")) {
-            val linkNode = node["buildCommitLink"]
-            parseBuildCommitLink<Any>(linkNode)
-        } else {
-            null
-        }
-        val indexationAvailable = configuredBuildGitCommitLink != null && configuredBuildGitCommitLink.link is IndexableBuildGitCommitLink<*>
+        val configuredBuildGitCommitLink =
+            if (node.has("buildCommitLink")) {
+                val linkNode = node["buildCommitLink"]
+                parseBuildCommitLink<Any>(linkNode)
+            } else {
+                null
+            }
+        val indexationAvailable =
+            configuredBuildGitCommitLink != null && configuredBuildGitCommitLink.link is IndexableBuildGitCommitLink<*>
         return GitBranchConfigurationProperty(
-                JsonUtils.get(node, "branch", "main"),
-                configuredBuildGitCommitLink?.toServiceConfiguration(),
-                indexationAvailable && JsonUtils.getBoolean(node, "override", false),
-                if (indexationAvailable) JsonUtils.getInt(node, "buildTagInterval", 0) else 0
+            branch = node.getTextField("branch") ?: "main",
+            buildCommitLink = configuredBuildGitCommitLink?.toServiceConfiguration(),
+            isOverride = indexationAvailable && (node.getBooleanField("override") ?: false),
+            buildTagInterval = if (indexationAvailable) (node.getIntField("buildTagInterval") ?: 0) else 0
         )
     }
 
@@ -64,7 +67,7 @@ class GitBranchConfigurationPropertyType(
         if (linkNode.isNull) {
             return null
         }
-        val linkId = JsonUtils.get(linkNode, "id")
+        val linkId = linkNode.getTextField("id") ?: return null
         // Gets the link data
         val linkDataNode = linkNode["data"]
         // Gets the link
@@ -74,30 +77,41 @@ class GitBranchConfigurationPropertyType(
         val linkData = link.parseData(linkDataNode)
         // OK
         return ConfiguredBuildGitCommitLink(
-                link,
-                linkData
+            link,
+            linkData
         )
     }
 
-    override fun replaceValue(value: GitBranchConfigurationProperty, replacementFunction: Function<String, String>): GitBranchConfigurationProperty {
+    @Deprecated("Will be removed in V5")
+    override fun replaceValue(
+        value: GitBranchConfigurationProperty,
+        replacementFunction: Function<String, String>
+    ): GitBranchConfigurationProperty {
         return GitBranchConfigurationProperty(
-                replacementFunction.apply(value.branch),
-                if (value.buildCommitLink != null) replaceBuildCommitLink<Any>(value.buildCommitLink, replacementFunction) else null,
-                value.isOverride,
-                value.buildTagInterval
+            replacementFunction.apply(value.branch),
+            if (value.buildCommitLink != null) replaceBuildCommitLink<Any>(
+                value.buildCommitLink,
+                replacementFunction
+            ) else null,
+            value.isOverride,
+            value.buildTagInterval
         )
     }
 
-    private fun <T> replaceBuildCommitLink(configuration: ServiceConfiguration, replacementFunction: Function<String, String>): ServiceConfiguration {
+    private fun <T> replaceBuildCommitLink(
+        configuration: ServiceConfiguration,
+        replacementFunction: Function<String, String>
+    ): ServiceConfiguration {
         val linkId = configuration.id
+
         @Suppress("UNCHECKED_CAST")
         val link = buildGitCommitLinkService.getLink(linkId) as BuildGitCommitLink<T>
         val linkData = link.parseData(configuration.data)
         val clonedData = link.clone(linkData) { replacementFunction.apply(it) }
         val node = link.toJson(clonedData)
         return ServiceConfiguration(
-                linkId,
-                node
+            linkId,
+            node
         )
     }
 

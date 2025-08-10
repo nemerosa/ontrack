@@ -5,7 +5,7 @@ import net.nemerosa.ontrack.extension.git.model.BuildGitCommitLink
 import net.nemerosa.ontrack.extension.git.model.GitBranchConfiguration
 import net.nemerosa.ontrack.extension.git.property.GitCommitPropertyType
 import net.nemerosa.ontrack.git.GitRepositoryClient
-import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.structure.Branch
 import net.nemerosa.ontrack.model.structure.Build
 import net.nemerosa.ontrack.model.structure.ID
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component
  */
 @Component
 class GitCommitPropertyCommitLink(
-        private val propertyService: PropertyService
+    private val propertyService: PropertyService
 ) : BuildGitCommitLink<NoConfig> {
 
     override val id: String = "git-commit-property"
@@ -31,27 +31,32 @@ class GitCommitPropertyCommitLink(
 
     override fun getCommitFromBuild(build: Build, data: NoConfig): String {
         return propertyService.getProperty(build, GitCommitPropertyType::class.java)
-                .option()
-                .map { it.commit }
-                .orElseThrow { NoGitCommitPropertyException(build.entityDisplayName) }
+            .option()
+            .map { it.commit }
+            .orElseThrow { NoGitCommitPropertyException(build.entityDisplayName) }
     }
 
     override fun parseData(node: JsonNode?): NoConfig {
         return NoConfig.INSTANCE
     }
 
-    override fun toJson(data: NoConfig): JsonNode {
-        return JsonUtils.`object`().end()
-    }
+    override fun toJson(data: NoConfig): JsonNode =
+        emptyMap<String, String>().asJson()
 
-    override fun getEarliestBuildAfterCommit(branch: Branch, gitClient: GitRepositoryClient, branchConfiguration: GitBranchConfiguration, data: NoConfig, commit: String): Int? {
+    override fun getEarliestBuildAfterCommit(
+        branch: Branch,
+        gitClient: GitRepositoryClient,
+        branchConfiguration: GitBranchConfiguration,
+        data: NoConfig,
+        commit: String
+    ): Int? {
         // Loops over the commits on this branch, starting from this commit
         val buildId: ID? = gitClient.forEachCommitFrom(branchConfiguration.branch, commit) { revCommit ->
             // Gets the build for this commit
             propertyService.findBuildByBranchAndSearchkey(
-                    branch.id,
-                    GitCommitPropertyType::class.java,
-                    gitClient.getId(revCommit)
+                branch.id,
+                GitCommitPropertyType::class.java,
+                gitClient.getId(revCommit)
             )
         }
         return buildId?.value

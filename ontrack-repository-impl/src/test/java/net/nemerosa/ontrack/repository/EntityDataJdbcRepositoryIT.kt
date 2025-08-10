@@ -1,10 +1,11 @@
 package net.nemerosa.ontrack.repository
 
-import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.parse
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.annotation.Transactional
 import kotlin.test.assertEquals
@@ -13,13 +14,13 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 @Transactional
-class EntityDataJdbcRepositoryIT : AbstractRepositoryJUnit4TestSupport() {
+class EntityDataJdbcRepositoryIT : AbstractRepositoryTestSupport() {
 
     @Autowired
     private lateinit var repository: EntityDataRepository
     private lateinit var project: Project
 
-    @Before
+    @BeforeEach
     fun create_project() {
         project = do_create_project()
     }
@@ -48,10 +49,10 @@ class EntityDataJdbcRepositoryIT : AbstractRepositoryJUnit4TestSupport() {
     fun save_update_json_data() {
         val key = "Test 3"
         assertNull(repository.retrieveJson(project, key))
-        repository.storeJson(project, key, JsonUtils.format(TestObject("Value 1")))
-        assertEquals(TestObject("Value 1"), JsonUtils.parse(repository.retrieveJson(project, key), TestObject::class.java))
-        repository.storeJson(project, key, JsonUtils.format(TestObject("Value 2")))
-        assertEquals(TestObject("Value 2"), JsonUtils.parse(repository.retrieveJson(project, key), TestObject::class.java))
+        repository.storeJson(project, key, TestObject("Value 1").asJson())
+        assertEquals(TestObject("Value 1"), repository.retrieveJson(project, key)?.parse<TestObject>())
+        repository.storeJson(project, key, TestObject("Value 2").asJson())
+        assertEquals(TestObject("Value 2"), repository.retrieveJson(project, key)?.parse<TestObject>())
     }
 
     @Test

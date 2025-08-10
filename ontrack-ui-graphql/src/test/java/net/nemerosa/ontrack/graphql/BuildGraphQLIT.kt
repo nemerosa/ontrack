@@ -33,14 +33,14 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         val branch = doCreateBranch()
         val build = asUser().withProjectFunction(branch, BuildCreate::class.java).call {
             structureService.newBuild(
-                    Build.of(
-                            branch,
-                            nd("1", ""),
-                            Signature.of(
-                                    LocalDateTime.of(2016, 11, 25, 14, 43),
-                                    "test"
-                            )
+                Build.of(
+                    branch,
+                    nd("1", ""),
+                    Signature.of(
+                        LocalDateTime.of(2016, 11, 25, 14, 43),
+                        "test"
                     )
+                )
             )
         }
 
@@ -55,7 +55,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
     fun `Build property by name`() {
         val build = doCreateBuild()
         setProperty(build, TestSimplePropertyType::class.java, TestSimpleProperty("value 1"))
-        run("""{
+        run(
+            """{
             builds(id: ${build.id}) {
                 testSimpleProperty { 
                     type { 
@@ -67,9 +68,13 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                     editable
                 }
             }
-        }""") { data ->
+        }"""
+        ) { data ->
             val p = data.path("builds").first().path("testSimpleProperty")
-            assertEquals("net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType", p.path("type").path("typeName").asText())
+            assertEquals(
+                "net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType",
+                p.path("type").path("typeName").asText()
+            )
             assertEquals("Simple value", p.path("type").path("name").asText())
             assertEquals("Value.", p.path("type").path("description").asText())
             assertEquals("value 1", p.path("value").path("value").asText())
@@ -81,7 +86,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
     fun `Build property by list`() {
         val build = doCreateBuild()
         setProperty(build, TestSimplePropertyType::class.java, TestSimpleProperty("value 2"))
-        run("""{
+        run(
+            """{
             builds(id: ${build.id}) {
                 properties { 
                     type { 
@@ -93,11 +99,15 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                     editable
                 }
             }
-        }""") { data ->
+        }"""
+        ) { data ->
             var p = data.path("builds").first().path("properties").find {
                 it.path("type").path("name").asText() == "Simple value"
             } ?: fail("Cannot find property")
-            assertEquals("net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType", p.path("type").path("typeName").asText())
+            assertEquals(
+                "net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType",
+                p.path("type").path("typeName").asText()
+            )
             assertEquals("Simple value", p.path("type").path("name").asText())
             assertEquals("Value.", p.path("type").path("description").asText())
             assertEquals("value 2", p.path("value").path("value").asText())
@@ -106,7 +116,10 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             p = data.path("builds").first().path("properties").find {
                 it.path("type").path("name").asText() == "Configuration value"
             } ?: fail("Cannot find property")
-            assertEquals("net.nemerosa.ontrack.extension.api.support.TestPropertyType", p.path("type").path("typeName").asText())
+            assertEquals(
+                "net.nemerosa.ontrack.extension.api.support.TestPropertyType",
+                p.path("type").path("typeName").asText()
+            )
             assertEquals("Configuration value", p.path("type").path("name").asText())
             assertEquals("Value.", p.path("type").path("description").asText())
             assertJsonNull(p.path("type").path("value"))
@@ -118,7 +131,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
     fun `Build property filtered by type`() {
         val build = doCreateBuild()
         setProperty(build, TestSimplePropertyType::class.java, TestSimpleProperty("value 2"))
-        run("""{
+        run(
+            """{
             builds(id: ${build.id}) {
                 properties(type: "net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType") { 
                     type { 
@@ -130,11 +144,15 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                     editable
                 }
             }
-        }""") { data ->
+        }"""
+        ) { data ->
             val properties = data.path("builds").first().path("properties")
             assertEquals(1, properties.size())
             val p = properties.first()
-            assertEquals("net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType", p.path("type").path("typeName").asText())
+            assertEquals(
+                "net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType",
+                p.path("type").path("typeName").asText()
+            )
             assertEquals("Simple value", p.path("type").path("name").asText())
             assertEquals("Value.", p.path("type").path("description").asText())
             assertEquals("value 2", p.path("value").path("value").asText())
@@ -146,7 +164,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
     fun `Build property filtered by value`() {
         val build = doCreateBuild()
         setProperty(build, TestSimplePropertyType::class.java, TestSimpleProperty("value 2"))
-        run("""{
+        run(
+            """{
             builds(id: ${build.id}) {
                 properties(hasValue: true) { 
                     type { 
@@ -158,11 +177,15 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                     editable
                 }
             }
-        }""") { data ->
+        }"""
+        ) { data ->
             val properties = data.path("builds").first().path("properties")
             assertEquals(1, properties.size())
             val p = properties.first()
-            assertEquals("net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType", p.path("type").path("typeName").asText())
+            assertEquals(
+                "net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType",
+                p.path("type").path("typeName").asText()
+            )
             assertEquals("Simple value", p.path("type").path("name").asText())
             assertEquals("Value.", p.path("type").path("description").asText())
             assertEquals("value 2", p.path("value").path("value").asText())
@@ -175,15 +198,15 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         project {
             val name = uid("B")
             run(
-                    """{
+                """{
                     builds(project: "${project.name}", branch: "$name") {
                         name
                     }
                 }"""
             ) { data ->
                 assertTrue(
-                        data["builds"].isEmpty,
-                        "No build is returned"
+                    data["builds"].isEmpty,
+                    "No build is returned"
                 )
             }
         }
@@ -193,11 +216,13 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
     fun `By branch`() {
         val build = doCreateBuild()
 
-        run("""{
+        run(
+            """{
             builds(project: "${build.project.name}", branch: "${build.branch.name}") {
                 id
             }
-        }""") { data ->
+        }"""
+        ) { data ->
             assertEquals(build.id(), data.path("builds").first().getIntField("id"))
         }
     }
@@ -206,7 +231,7 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
     fun `By project not found`() {
         val name = uid("P")
         run(
-                """{
+            """{
                     builds(project: "$name") {
                         name
                     }
@@ -220,11 +245,13 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
     fun `By project`() {
         val build = doCreateBuild()
 
-        run("""{
+        run(
+            """{
             builds(project: "${build.project.name}") {
                 id
             }
-        }""") { data ->
+        }"""
+        ) { data ->
             assertEquals(build.id(), data.path("builds").first().getIntField("id"))
         }
     }
@@ -232,11 +259,13 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
     @Test
     fun `No argument means no result`() {
         doCreateBuild()
-        run("""{
+        run(
+            """{
             builds {
                 id
             }
-        }""") { data ->
+        }"""
+        ) { data ->
             assertTrue(data.path("builds").isEmpty)
         }
     }
@@ -250,14 +279,16 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         val pl = doCreatePromotionLevel(branch, nd("PL", ""))
         doPromote(build1, pl, "")
         // Query
-        run("""{
+        run(
+            """{
             builds(
                     project: "${branch.project.name}", 
                     branch: "${branch.name}", 
                     buildBranchFilter: {withPromotionLevel: "PL"}) {
                 id
             }
-        }""") { data ->
+        }"""
+        ) { data ->
             val builds = data.path("builds")
             assertEquals(1, builds.size())
             assertEquals(build1.id(), builds.first().getIntField("id"))
@@ -273,11 +304,13 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             doCreateBuild(branch, nd(it.toString(), ""))
         }
         // Query
-        run(""" {
+        run(
+            """ {
           builds(project: "${branch.project.name}", branch: "${branch.name}", buildBranchFilter: {count: 100, withPromotionLevel: "BRONZE", sincePromotionLevel: "SILVER"}) {
             id
           }
-        }""") { data ->
+        }"""
+        ) { data ->
             // We should not have any build
             assertEquals(0, data.path("builds").size())
         }
@@ -293,12 +326,12 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         doPromote(build1, pl, "")
         // Query
         runWithError(
-                """{
+            """{
                     builds(buildBranchFilter: {withPromotionLevel: "PL"}) {
                         id
                     }
                 }""",
-                errorClassification = ErrorType.BAD_REQUEST
+            errorClassification = ErrorType.BAD_REQUEST
         )
     }
 
@@ -308,13 +341,13 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         doCreateBuild()
         // Query
         runWithError(
-                """{
+            """{
                 builds( 
                         buildProjectFilter: {promotionName: "PL"}) {
                     id
                 }
             }""",
-                errorClassification = ErrorType.BAD_REQUEST
+            errorClassification = ErrorType.BAD_REQUEST
         )
     }
 
@@ -328,13 +361,15 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         doCreateBuild(branch2, nd("2.0.0", ""))
         doCreateBuild(branch2, nd("2.0.1", ""))
         // Query
-        run("""{
+        run(
+            """{
             builds( 
                     project: "${project.name}",
                     buildProjectFilter: {branchName: "2.0"}) {
                 name
             }
-        }""") { data ->
+        }"""
+        ) { data ->
             assertEquals(2, data.path("builds").size())
             assertEquals("2.0.1", data.path("builds").get(0).getTextField("name"))
             assertEquals("2.0.0", data.path("builds").get(1).getTextField("name"))
@@ -346,7 +381,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         asAdmin {
             project project@{
                 branch branch@{
-                    val data = run("""
+                    val data = run(
+                        """
                         mutation {
                             createBuild(input: {branchId: ${this@branch.id}, name: "1"}) {
                                 build {
@@ -359,11 +395,13 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                                 }
                             }
                         }
-                    """)
+                    """
+                    )
                     // Checks the build has been created
                     assertNotNull(
-                            structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
-                            "Build has been created")
+                        structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
+                        "Build has been created"
+                    )
                     // Checks the data
                     val build = data["createBuild"]["build"]
                     assertTrue(build["id"].asInt() > 0, "ID is set")
@@ -380,7 +418,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             project project@{
                 branch branch@{
                     val runInfo = RunInfoInput(runTime = 27)
-                    val data = run("""
+                    val data = run(
+                        """
                         mutation CreateBuild(${"$"}runInfo: RunInfoInput) {
                             createBuild(input: {branchId: ${this@branch.id}, name: "1", runInfo: ${"$"}runInfo}) {
                                 build {
@@ -397,12 +436,14 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                             }
                         }
                     """, mapOf(
-                            "runInfo" to runInfo.asJson().toJsonMap()
-                    ))
+                            "runInfo" to runInfo.asJson()
+                        )
+                    )
                     // Checks the build has been created
                     assertNotNull(
-                            structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
-                            "Build has been created")
+                        structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
+                        "Build has been created"
+                    )
                     // Checks the data
                     val node = assertNoUserError(data, "createBuild")
                     val build = node["build"]
@@ -420,7 +461,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         asAdmin {
             project project@{
                 branch branch@{
-                    val data = run("""
+                    val data = run(
+                        """
                         mutation {
                             createBuild(input: {branchId: ${this@branch.id}, name: "1 0"}) {
                                 build {
@@ -433,11 +475,18 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                                 }
                             }
                         }
-                    """)
+                    """
+                    )
                     // Checks the errors
                     val error = data["createBuild"]["errors"][0]
-                    assertEquals("The name can only have letters, digits, dots (.), dashes (-) or underscores (_).", error["message"].asText())
-                    assertEquals("net.nemerosa.ontrack.graphql.support.MutationInputValidationException", error["exception"].asText())
+                    assertEquals(
+                        "The name can only have letters, digits, dots (.), dashes (-) or underscores (_).",
+                        error["message"].asText()
+                    )
+                    assertEquals(
+                        "net.nemerosa.ontrack.graphql.support.MutationInputValidationException",
+                        error["exception"].asText()
+                    )
                     assertTrue(data["createBuild"]["build"].isNullOrNullNode(), "Build not returned")
                 }
             }
@@ -450,7 +499,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             project project@{
                 branch branch@{
                     build(name = "1")
-                    val data = run("""
+                    val data = run(
+                        """
                         mutation {
                             createBuild(input: {branchId: ${this@branch.id}, name: "1"}) {
                                 build {
@@ -463,11 +513,15 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                                 }
                             }
                         }
-                    """)
+                    """
+                    )
                     // Checks the errors
                     val error = data["createBuild"]["errors"][0]
                     assertEquals("Build name already exists: 1", error["message"].asText())
-                    assertEquals("net.nemerosa.ontrack.model.exceptions.BuildNameAlreadyDefinedException", error["exception"].asText())
+                    assertEquals(
+                        "net.nemerosa.ontrack.model.exceptions.BuildNameAlreadyDefinedException",
+                        error["exception"].asText()
+                    )
                     assertTrue(data["createBuild"]["build"].isNullOrNullNode(), "Build not returned")
                 }
             }
@@ -479,7 +533,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         asAdmin {
             project project@{
                 branch branch@{
-                    val data = run("""
+                    val data = run(
+                        """
                         mutation {
                             createBuild(input: {projectId: ${this@project.id}, branchName: "${this@branch.name}", name: "1"}) {
                                 build {
@@ -492,11 +547,13 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                                 }
                             }
                         }
-                    """)
+                    """
+                    )
                     // Checks the build has been created
                     assertNotNull(
-                            structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
-                            "Build has been created")
+                        structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
+                        "Build has been created"
+                    )
                     // Checks the data
                     val build = data["createBuild"]["build"]
                     assertTrue(build["id"].asInt() > 0, "ID is set")
@@ -512,7 +569,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         asAdmin {
             project project@{
                 branch branch@{
-                    val data = run("""
+                    val data = run(
+                        """
                         mutation {
                             createBuild(input: {projectName: "${this@project.name}", branchName: "${this@branch.name}", name: "1"}) {
                                 build {
@@ -525,11 +583,13 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                                 }
                             }
                         }
-                    """)
+                    """
+                    )
                     // Checks the build has been created
                     assertNotNull(
-                            structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
-                            "Build has been created")
+                        structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
+                        "Build has been created"
+                    )
                     // Checks the data
                     val build = data["createBuild"]["build"]
                     assertTrue(build["id"].asInt() > 0, "ID is set")
@@ -546,7 +606,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             project project@{
                 branch branch@{
                     build(name = "1")
-                    val data = run("""
+                    val data = run(
+                        """
                         mutation {
                             createBuild(input: {projectId: ${this@project.id}, name: "1"}) {
                                 build {
@@ -559,11 +620,15 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                                 }
                             }
                         }
-                    """)
+                    """
+                    )
                     // Checks the errors
                     val error = data["createBuild"]["errors"][0]
                     assertEquals("branchName is required if branchId is not provided", error["message"].asText())
-                    assertEquals("net.nemerosa.ontrack.graphql.schema.BuildInputMismatchException", error["exception"].asText())
+                    assertEquals(
+                        "net.nemerosa.ontrack.graphql.schema.BuildInputMismatchException",
+                        error["exception"].asText()
+                    )
                     assertTrue(data["createBuild"]["build"].isNullOrNullNode(), "Build not returned")
                 }
             }
@@ -576,7 +641,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             project project@{
                 branch branch@{
                     build(name = "1")
-                    val data = run("""
+                    val data = run(
+                        """
                         mutation {
                             createBuild(input: {branchName: "${this@branch.name}", name: "1"}) {
                                 build {
@@ -589,11 +655,18 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                                 }
                             }
                         }
-                    """)
+                    """
+                    )
                     // Checks the errors
                     val error = data["createBuild"]["errors"][0]
-                    assertEquals("When using branchName, projectName is required if projectId is not provided", error["message"].asText())
-                    assertEquals("net.nemerosa.ontrack.graphql.schema.BuildInputMismatchException", error["exception"].asText())
+                    assertEquals(
+                        "When using branchName, projectName is required if projectId is not provided",
+                        error["message"].asText()
+                    )
+                    assertEquals(
+                        "net.nemerosa.ontrack.graphql.schema.BuildInputMismatchException",
+                        error["exception"].asText()
+                    )
                     assertTrue(data["createBuild"]["build"].isNullOrNullNode(), "Build not returned")
                 }
             }
@@ -606,7 +679,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             project project@{
                 branch branch@{
                     build(name = "1")
-                    val data = run("""
+                    val data = run(
+                        """
                         mutation {
                             createBuild(input: {branchId: ${this@branch.id}, branchName: "${this@branch.name}", name: "1"}) {
                                 build {
@@ -619,11 +693,15 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                                 }
                             }
                         }
-                    """)
+                    """
+                    )
                     // Checks the errors
                     val error = data["createBuild"]["errors"][0]
                     assertEquals("Since branchId is provided, branchName is not required.", error["message"].asText())
-                    assertEquals("net.nemerosa.ontrack.graphql.schema.BuildInputMismatchException", error["exception"].asText())
+                    assertEquals(
+                        "net.nemerosa.ontrack.graphql.schema.BuildInputMismatchException",
+                        error["exception"].asText()
+                    )
                     assertTrue(data["createBuild"]["build"].isNullOrNullNode(), "Build not returned")
                 }
             }
@@ -636,7 +714,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             project project@{
                 branch branch@{
                     build(name = "1")
-                    val data = run("""
+                    val data = run(
+                        """
                         mutation {
                             createBuild(input: {branchId: ${this@branch.id}, projectName: "${this@project.name}", name: "1"}) {
                                 build {
@@ -649,11 +728,15 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                                 }
                             }
                         }
-                    """)
+                    """
+                    )
                     // Checks the errors
                     val error = data["createBuild"]["errors"][0]
                     assertEquals("Since branchId is provided, projectName is not required.", error["message"].asText())
-                    assertEquals("net.nemerosa.ontrack.graphql.schema.BuildInputMismatchException", error["exception"].asText())
+                    assertEquals(
+                        "net.nemerosa.ontrack.graphql.schema.BuildInputMismatchException",
+                        error["exception"].asText()
+                    )
                     assertTrue(data["createBuild"]["build"].isNullOrNullNode(), "Build not returned")
                 }
             }
@@ -666,7 +749,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             project project@{
                 branch branch@{
                     build(name = "1")
-                    val data = run("""
+                    val data = run(
+                        """
                         mutation {
                             createBuild(input: {branchId: ${this@branch.id}, projectId: ${this@project.id}, name: "1"}) {
                                 build {
@@ -679,11 +763,15 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                                 }
                             }
                         }
-                    """)
+                    """
+                    )
                     // Checks the errors
                     val error = data["createBuild"]["errors"][0]
                     assertEquals("Since branchId is provided, projectId is not required.", error["message"].asText())
-                    assertEquals("net.nemerosa.ontrack.graphql.schema.BuildInputMismatchException", error["exception"].asText())
+                    assertEquals(
+                        "net.nemerosa.ontrack.graphql.schema.BuildInputMismatchException",
+                        error["exception"].asText()
+                    )
                     assertTrue(data["createBuild"]["build"].isNullOrNullNode(), "Build not returned")
                 }
             }
@@ -696,7 +784,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             project project@{
                 branch branch@{
                     build(name = "1")
-                    val data = run("""
+                    val data = run(
+                        """
                         mutation {
                             createBuild(input: {branchName: "${this@branch.name}", projectId: ${this@project.id}, projectName: "${this@project.name}", name: "1"}) {
                                 build {
@@ -709,11 +798,15 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                                 }
                             }
                         }
-                    """)
+                    """
+                    )
                     // Checks the errors
                     val error = data["createBuild"]["errors"][0]
                     assertEquals("Since projectId is provided, projectName is not required.", error["message"].asText())
-                    assertEquals("net.nemerosa.ontrack.graphql.schema.BuildInputMismatchException", error["exception"].asText())
+                    assertEquals(
+                        "net.nemerosa.ontrack.graphql.schema.BuildInputMismatchException",
+                        error["exception"].asText()
+                    )
                     assertTrue(data["createBuild"]["build"].isNullOrNullNode(), "Build not returned")
                 }
             }
@@ -725,7 +818,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         asAdmin {
             project project@{
                 branch branch@{
-                    val data = run("""
+                    val data = run(
+                        """
                         mutation {
                             createBuildOrGet(input: {branchId: ${this@branch.id}, name: "1"}) {
                                 build {
@@ -738,11 +832,13 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                                 }
                             }
                         }
-                    """)
+                    """
+                    )
                     // Checks the build has been created
                     assertNotNull(
-                            structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
-                            "Build has been created")
+                        structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
+                        "Build has been created"
+                    )
                     // Checks the data
                     val build = data["createBuildOrGet"]["build"]
                     assertTrue(build["id"].asInt() > 0, "ID is set")
@@ -758,7 +854,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         asAdmin {
             project project@{
                 branch branch@{
-                    val data = run("""
+                    val data = run(
+                        """
                         mutation {
                             createBuildOrGet(input: {projectName: "${this@project.name}", branchName: "${this@branch.name}", name: "1"}) {
                                 build {
@@ -771,11 +868,13 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                                 }
                             }
                         }
-                    """)
+                    """
+                    )
                     // Checks the build has been created
                     assertNotNull(
-                            structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
-                            "Build has been created")
+                        structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
+                        "Build has been created"
+                    )
                     // Checks the data
                     val build = data["createBuildOrGet"]["build"]
                     assertTrue(build["id"].asInt() > 0, "ID is set")
@@ -792,7 +891,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             project project@{
                 branch branch@{
                     val existing = build(name = "1")
-                    val data = run("""
+                    val data = run(
+                        """
                         mutation {
                             createBuildOrGet(input: {branchId: ${this@branch.id}, name: "1"}) {
                                 build {
@@ -805,11 +905,13 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                                 }
                             }
                         }
-                    """)
+                    """
+                    )
                     // Checks the build has been created
                     assertNotNull(
-                            structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
-                            "Build has been created")
+                        structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
+                        "Build has been created"
+                    )
                     // Checks the data
                     val build = data["createBuildOrGet"]["build"]
                     assertEquals(existing.id(), build["id"].asInt(), "ID is the same")
@@ -826,7 +928,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             project project@{
                 branch branch@{
                     val existing = build(name = "1")
-                    val data = run("""
+                    val data = run(
+                        """
                         mutation {
                             createBuildOrGet(input: {projectName: "${this@project.name}", branchName: "${this@branch.name}", name: "1"}) {
                                 build {
@@ -839,11 +942,13 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                                 }
                             }
                         }
-                    """)
+                    """
+                    )
                     // Checks the build has been created
                     assertNotNull(
-                            structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
-                            "Build has been created")
+                        structureService.findBuildByName(this@project.name, this@branch.name, "1").getOrNull(),
+                        "Build has been created"
+                    )
                     // Checks the data
                     val build = data["createBuildOrGet"]["build"]
                     assertEquals(existing.id(), build["id"].asInt(), "ID is the same")
@@ -881,7 +986,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                     linkTo(ref2, "3.0")
 
                     // No filter
-                    run("""{
+                    run(
+                        """{
                         builds(id: $id) {
                             usingQualified {
                                 pageItems {
@@ -896,13 +1002,14 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                         this["builds"][0]["usingQualified"]["pageItems"].map { it["build"]["name"].asText() }.toSet()
                     }.run {
                         assertEquals(
-                                setOf("1.0", "2.0", "3.0"),
-                                this
+                            setOf("1.0", "2.0", "3.0"),
+                            this
                         )
                     }
 
                     // Filter by project
-                    run("""{
+                    run(
+                        """{
                         builds(id: $id) {
                             usingQualified(project: "${ref1.name}") {
                                 pageItems {
@@ -917,13 +1024,14 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                         this["builds"][0]["usingQualified"]["pageItems"].map { it["build"]["name"].asText() }.toSet()
                     }.run {
                         assertEquals(
-                                setOf("1.0", "2.0"),
-                                this
+                            setOf("1.0", "2.0"),
+                            this
                         )
                     }
 
                     // Filter by branch
-                    run("""{
+                    run(
+                        """{
                         builds(id: $id) {
                             usingQualified(project: "${ref1.name}", branch: "master") {
                                 pageItems {
@@ -938,8 +1046,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                         this["builds"][0]["usingQualified"]["pageItems"].map { it["build"]["name"].asText() }.toSet()
                     }.run {
                         assertEquals(
-                                setOf("2.0"),
-                                this
+                            setOf("2.0"),
+                            this
                         )
                     }
                 }
@@ -979,7 +1087,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
 
         build.apply {
             // No filter, all of them
-            run("""{
+            run(
+                """{
                         builds(id: $id) {
                             usedByQualified {
                                 pageItems {
@@ -994,12 +1103,13 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                 this["builds"][0]["usedByQualified"]["pageItems"].map { it["build"]["name"].asText() }.toSet()
             }.run {
                 assertEquals(
-                        setOf("1.0", "2.0", "3.0"),
-                        this
+                    setOf("1.0", "2.0", "3.0"),
+                    this
                 )
             }
             // No filter, first one only
-            run("""{
+            run(
+                """{
                         builds(id: $id) {
                             usedByQualified(size: 1) {
                                 pageItems {
@@ -1014,12 +1124,13 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                 this["builds"][0]["usedByQualified"]["pageItems"].map { it["build"]["name"].asText() }.toSet()
             }.run {
                 assertEquals(
-                        setOf("3.0"),
-                        this
+                    setOf("3.0"),
+                    this
                 )
             }
             // Project restriction, all of them
-            run("""{
+            run(
+                """{
                         builds(id: $id) {
                             usedByQualified(project: "${ref1.name}") {
                                 pageItems {
@@ -1034,12 +1145,13 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                 this["builds"][0]["usedByQualified"]["pageItems"].map { it["build"]["name"].asText() }.toSet()
             }.run {
                 assertEquals(
-                        setOf("1.0", "2.0"),
-                        this
+                    setOf("1.0", "2.0"),
+                    this
                 )
             }
             // Project restriction, first one
-            run("""{
+            run(
+                """{
                         builds(id: $id) {
                             usedByQualified(project: "${ref1.name}", size: 1) {
                                 pageItems {
@@ -1054,12 +1166,13 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                 this["builds"][0]["usedByQualified"]["pageItems"].map { it["build"]["name"].asText() }.toSet()
             }.run {
                 assertEquals(
-                        setOf("2.0"),
-                        this
+                    setOf("2.0"),
+                    this
                 )
             }
             // Branch restriction
-            run("""{
+            run(
+                """{
                         builds(id: $id) {
                             usedByQualified(project: "${ref1.name}", branch: "master") {
                                 pageItems {
@@ -1074,8 +1187,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                 this["builds"][0]["usedByQualified"]["pageItems"].map { it["build"]["name"].asText() }.toSet()
             }.run {
                 assertEquals(
-                        setOf("2.0"),
-                        this
+                    setOf("2.0"),
+                    this
                 )
             }
         }
@@ -1085,7 +1198,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
     fun `Build links are empty by default`() {
         val build = doCreateBuild()
 
-        val data = run("""{
+        val data = run(
+            """{
             builds(id: ${build.id}) {
                 usingQualified {
                     pageItems {
@@ -1102,7 +1216,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                     }
                 }
             }
-        }""")
+        }"""
+        )
 
         val b = data["builds"].first()
         assertNotNull(b["usingQualified"]["pageItems"]) {
@@ -1122,7 +1237,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             structureService.createBuildLink(build, targetBuild)
         }
 
-        val data = run("""{
+        val data = run(
+            """{
             builds(id: ${build.id}) {
                 usingQualified {
                     pageItems {
@@ -1138,7 +1254,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                     }
                 }
             }
-        }""")
+        }"""
+        )
 
         val links = data["builds"].first()["usingQualified"]["pageItems"]
         assertNotNull(links) {
@@ -1163,7 +1280,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
             structureService.createBuildLink(b, c)
         }
         // Query build links of "b" TO
-        val data = run("""{
+        val data = run(
+            """{
             builds(id: ${b.id}) {
                 usingQualified {
                     pageItems {
@@ -1174,7 +1292,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                     }
                 }
             }
-        }""")
+        }"""
+        )
         // Checks the result
         val links = data["builds"].first()["usingQualified"]["pageItems"]
         assertNotNull(links) {
@@ -1198,7 +1317,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         }
         // Query build links of "b" FROM
         val data = withGrantViewToAll {
-            run("""{
+            run(
+                """{
                 builds(id: ${b.id}) {
                     usedByQualified {
                         pageItems {
@@ -1209,7 +1329,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                         }
                     }
                 }
-            }""")
+            }"""
+            )
         }
         // Checks the result
         val links = data["builds"].first()["usedByQualified"]["pageItems"]
@@ -1245,7 +1366,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                     linkTo(dep2)
                     // Looks for dependencies
                     val data = asUser().withView(this).call {
-                        run("""
+                        run(
+                            """
                             {
                                 builds(id: $id) {
                                     name
@@ -1258,13 +1380,15 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                                     }
                                 }
                             }
-                        """.trimIndent())
+                        """.trimIndent()
+                        )
                     }
                     // Dependencies Ids
-                    val dependencies = data["builds"][0]["usingQualified"]["pageItems"].map { it["build"]["id"].asInt() }
+                    val dependencies =
+                        data["builds"][0]["usingQualified"]["pageItems"].map { it["build"]["id"].asInt() }
                     assertEquals(
-                            setOf(dep1.id(), dep2.id()),
-                            dependencies.toSet()
+                        setOf(dep1.id(), dep2.id()),
+                        dependencies.toSet()
                     )
                 }
             }
@@ -1277,7 +1401,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         val build = doCreateBuild()
         // Looks for promotion runs
         val data = asUser().withView(build).call {
-            run("""
+            run(
+                """
                 {
                     builds(id: ${build.id}) {
                         name
@@ -1288,7 +1413,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                         }
                     }
                 }
-            """.trimIndent())
+            """.trimIndent()
+            )
         }
         // Checks the build
         val b = data["builds"][0]
@@ -1303,7 +1429,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
         val build = doCreateBuild()
         // Looks for validations
         val data = asUser().withView(build).call {
-            run("""
+            run(
+                """
                 {
                     builds(id: ${build.id}) {
                         name
@@ -1316,7 +1443,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                         }
                     }
                 }
-            """.trimIndent())
+            """.trimIndent()
+            )
         }
         // Checks the build
         val b = data["builds"][0]
@@ -1338,13 +1466,15 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                     }
                     // Validation runs for this build, filtered on first validation stamp
                     val data = asUserWithView {
-                        run("""{
+                        run(
+                            """{
                             builds(id: $id) {
                                 validationRuns(validationStamp: "VS1") {
                                     id
                                 }
                             }
-                        }""")
+                        }"""
+                        )
                     }
                     // Checks the validation runs
                     val runs = data["builds"][0]["validationRuns"]
@@ -1367,13 +1497,15 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                     }
                     // Validation runs for this build, filtered on first validation stamp
                     val data = asUserWithView {
-                        run("""{
+                        run(
+                            """{
                             builds(id: $id) {
                                 validationRuns(validationStamp: "VS(1|2)") {
                                     id
                                 }
                             }
-                        }""")
+                        }"""
+                        )
                     }
                     // Checks the validation runs
                     val runs = data["builds"][0]["validationRuns"]
@@ -1397,7 +1529,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                     }
                     // Validation runs for this build, ordered by decreasing run time
                     asUserWithView {
-                        run("""{
+                        run(
+                            """{
                             builds(id: $id) {
                                 validationRunsPaginated(sortingMode: RUN_TIME) {
                                     pageItems {
@@ -1408,7 +1541,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                                     }
                                 }
                             }
-                        }""") { data ->
+                        }"""
+                        ) { data ->
                             val build = data.path("builds").path(0)
                             val actualRunIds = build.path("validationRunsPaginated").path("pageItems").map {
                                 it.getRequiredIntField("id")
@@ -1418,13 +1552,13 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                             }
                             val expectedRunIds = runs.map { it.id() }
                             assertEquals(
-                                    expectedRunIds, actualRunIds,
-                                    "Runs are sorted"
+                                expectedRunIds, actualRunIds,
+                                "Runs are sorted"
                             )
                             assertEquals(
-                                    listOf(100, 90, 80),
-                                    runTimes,
-                                    "Correctly sorted run times"
+                                listOf(100, 90, 80),
+                                runTimes,
+                                "Correctly sorted run times"
                             )
                         }
                     }
@@ -1441,22 +1575,26 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                 // Gets all builds by name, one by one
                 builds.forEach { build ->
                     val data = asUserWithView {
-                        run("""{
+                        run(
+                            """{
                             builds(project: "${build.branch.project.name}", branch: "${build.branch.name}", name: "${build.name}") {
                                 id
                             }
-                        }""")
+                        }"""
+                        )
                     }
                     val id = data["builds"][0]["id"].asInt()
                     assertEquals(build.id(), id)
                 }
                 // Looks for a non existing build
                 val data = asUserWithView {
-                    run("""{
+                    run(
+                        """{
                         builds(project: "${project.name}", branch: "$name", name: "11") {
                             id
                         }
-                    }""")
+                    }"""
+                    )
                 }
                 val list = data["builds"]
                 assertEquals(0, list.size())
@@ -1468,7 +1606,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
     fun `Previous and next builds`() {
 
         fun doTest(branch: Branch, buildName: String, previousName: String?, nextName: String?) {
-            run("""
+            run(
+                """
                 {
                     builds(project: "${branch.project.name}", branch: "${branch.name}", name: "$buildName") {
                         name
@@ -1476,7 +1615,8 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                         nextBuild { name }
                     }
                 }
-            """) { data ->
+            """
+            ) { data ->
                 val build = data.path("builds").path(0)
                 assertEquals(buildName, build.path("name").asText(), "Build found")
                 if (previousName != null) {

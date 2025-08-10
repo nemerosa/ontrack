@@ -3,7 +3,8 @@ package net.nemerosa.ontrack.extension.general.validation
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.NullNode
 import net.nemerosa.ontrack.extension.general.GeneralExtensionFeature
-import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.getTextField
 import net.nemerosa.ontrack.model.structure.AbstractValidationDataType
 import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.springframework.stereotype.Component
@@ -22,12 +23,11 @@ class TextValidationDataType(
 
     override fun fromConfigForm(node: JsonNode?) {}
 
-    override fun toJson(data: String): JsonNode = JsonUtils.format(data)
+    override fun toJson(data: String): JsonNode = data.asJson()
 
     override fun fromJson(node: JsonNode): String? = node.textValue()
 
-    override fun fromForm(node: JsonNode?): String? =
-            JsonUtils.get(node, "value")
+    override fun fromForm(node: JsonNode?): String? = node?.getTextField("value")
 
     override fun computeStatus(config: Any?, data: String): ValidationRunStatusID? = null
 

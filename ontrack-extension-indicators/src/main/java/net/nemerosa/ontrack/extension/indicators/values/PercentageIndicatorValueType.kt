@@ -8,8 +8,8 @@ import net.nemerosa.ontrack.extension.indicators.support.Percentage
 import net.nemerosa.ontrack.extension.indicators.support.PercentageThreshold
 import net.nemerosa.ontrack.extension.indicators.support.percent
 import net.nemerosa.ontrack.extension.support.AbstractExtension
-import net.nemerosa.ontrack.json.JsonUtils
 import net.nemerosa.ontrack.json.asJson
+import net.nemerosa.ontrack.json.getIntField
 import net.nemerosa.ontrack.json.parseOrNull
 import org.springframework.stereotype.Component
 
@@ -27,7 +27,7 @@ class PercentageIndicatorValueType(
             mapOf("value" to value.value).asJson()
 
     override fun fromClientJson(config: PercentageThreshold, value: JsonNode): Percentage? {
-        val i = JsonUtils.getInt(value, "value", -1)
+        val i = value.getIntField("value") ?: -1
         return if (i < 0) {
             null
         } else {

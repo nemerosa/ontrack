@@ -100,12 +100,13 @@ class CoreBuildFilterJdbcRepository(
             """
             criteria += "PP.TYPE = :property"
             params["property"] = property
-            if (!form.propertyValue.isNullOrBlank()) {
+            val formPropertyValue = form.propertyValue
+            if (!formPropertyValue.isNullOrBlank()) {
                 // Gets the property type
                 val propertyType = helper.propertyTypeAccessor(property)
                 // Gets the search arguments
-                val searchArguments = propertyType.getSearchArguments(form.propertyValue)
-                // If defined use them
+                val searchArguments = propertyType.getSearchArguments(formPropertyValue)
+                // If defined, use them
                 if (searchArguments != null && searchArguments.isDefined) {
                     PropertyJdbcRepository.prepareQueryForPropertyValue(
                         searchArguments,
@@ -384,7 +385,7 @@ class CoreBuildFilterJdbcRepository(
             params["withProperty"] = withProperty
             // withPropertyValue
             val withPropertyValue = data.withPropertyValue
-            if (isNotBlank(withPropertyValue)) {
+            if (!withPropertyValue.isNullOrBlank()) {
                 // Gets the property type
                 val propertyType = propertyTypeAccessor(withProperty)
                 // Gets the search arguments
@@ -635,7 +636,7 @@ class CoreBuildFilterJdbcRepository(
                     .id()
             }
 
-        } catch (ex: BuildNotFoundException) {
+        } catch (_: BuildNotFoundException) {
             // If one of the boundaries is not found, returns an empty list
             return emptyList()
         }
@@ -682,7 +683,7 @@ class CoreBuildFilterJdbcRepository(
         params["branchId"] = branch.id()
         params["propertyType"] = propertyTypeName
 
-        if (isNotBlank(propertyValue)) {
+        if (!propertyValue.isNullOrBlank()) {
             // Gets the property type
             val propertyType = propertyTypeAccessor(propertyTypeName)
             // Gets the search arguments for a property value

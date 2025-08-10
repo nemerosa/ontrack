@@ -11,7 +11,7 @@ import io.micrometer.core.instrument.binder.MeterBinder
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import net.nemerosa.ontrack.json.asJson
-import net.nemerosa.ontrack.json.toJsonMap
+import net.nemerosa.ontrack.json.toObject
 import net.nemerosa.ontrack.model.metrics.increment
 import net.nemerosa.ontrack.model.structure.SearchNodeResults
 import net.nemerosa.ontrack.model.structure.SearchResultNode
@@ -94,7 +94,7 @@ class DefaultElasticMetricsClient(
                 // Direct registration
                 val indexName = elasticMetricsConfigProperties.index.name
                 entries.forEach { entry ->
-                    val source = entry.asJson().toJsonMap()
+                    val source = entry.asJson().toObject()
                     client.index {
                         it.index(indexName)
                                 .id(entry.computeId())
@@ -204,7 +204,7 @@ class DefaultElasticMetricsClient(
                     val indexName = elasticMetricsConfigProperties.index.name
                     val br = BulkRequest.Builder()
                     entries.forEach {
-                        val source = it.asJson().toJsonMap()
+                        val source = it.asJson().toObject()
                         br.operations { op ->
                             op.index { idx ->
                                 idx.index(indexName)
@@ -279,11 +279,12 @@ class DefaultElasticMetricsClient(
         // Hits as JSON nodes
         val hits = responseHits.hits().mapNotNull { hit ->
             hit.id()?.let {
+                @Suppress("UNCHECKED_CAST")
                 SearchResultNode(
                     hit.index(),
                     it,
                     hit.score() ?: 0.0,
-                    hit.source()?.toJsonMap() ?: emptyMap(),
+                    hit.source()?.toObject() as? Map<String,Any>? ?: emptyMap(),
                 )
             }
         }

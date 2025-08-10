@@ -18,12 +18,12 @@ class AutoPromotionPropertyType(
     private val structureService: StructureService
 ) : AbstractPropertyType<AutoPromotionProperty>(extensionFeature) {
 
-    override fun getName(): String = "Auto promotion"
+    override val name: String = "Auto promotion"
 
-    override fun getDescription(): String =
+    override val description: String =
         "Allows a promotion level to be granted on a build as soon as a list of validation stamps and/or other promotions has been passed"
 
-    override fun getSupportedEntityTypes(): Set<ProjectEntityType> = EnumSet.of(ProjectEntityType.PROMOTION_LEVEL)
+    override val supportedEntityTypes: Set<ProjectEntityType> = EnumSet.of(ProjectEntityType.PROMOTION_LEVEL)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean =
         securityService.isProjectFunctionGranted(entity, ProjectConfig::class.java)
@@ -122,6 +122,7 @@ class AutoPromotionPropertyType(
         return loadAutoPromotionProperty(node)
     }
 
+    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: AutoPromotionProperty,
         replacementFunction: Function<String, String>

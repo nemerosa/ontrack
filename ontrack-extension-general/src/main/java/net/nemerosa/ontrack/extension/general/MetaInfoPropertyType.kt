@@ -20,11 +20,11 @@ class MetaInfoPropertyType(
     private val metaInfoSearchExtension: MetaInfoSearchExtension
 ) : AbstractPropertyType<MetaInfoProperty>(extensionFeature) {
 
-    override fun getName(): String = "Meta information"
+    override val name: String = "Meta information"
 
-    override fun getDescription(): String = "List of meta information properties"
+    override val description: String = "List of meta information properties"
 
-    override fun getSupportedEntityTypes(): Set<ProjectEntityType> = EnumSet.allOf(ProjectEntityType::class.java)
+    override val supportedEntityTypes: Set<ProjectEntityType> = EnumSet.allOf(ProjectEntityType::class.java)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean {
         return securityService.isProjectFunctionGranted(entity, ProjectConfig::class.java)
@@ -45,20 +45,21 @@ class MetaInfoPropertyType(
     }
 
     override fun fromStorage(node: JsonNode): MetaInfoProperty {
-        return parse(node, MetaInfoProperty::class.java)
+        return parse(node, MetaInfoProperty::class)
     }
 
-    override fun containsValue(property: MetaInfoProperty, propertyValue: String): Boolean {
+    override fun containsValue(value: MetaInfoProperty, propertyValue: String): Boolean {
         val pos = StringUtils.indexOf(propertyValue, ":")
         return if (pos > 0) {
-            val value = StringUtils.substringAfter(propertyValue, ":")
+            val entryValue = StringUtils.substringAfter(propertyValue, ":")
             val name = StringUtils.substringBefore(propertyValue, ":")
-            property.matchNameValue(name, value)
+            value.matchNameValue(name, entryValue)
         } else {
             false
         }
     }
 
+    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: MetaInfoProperty,
         replacementFunction: Function<String, String>

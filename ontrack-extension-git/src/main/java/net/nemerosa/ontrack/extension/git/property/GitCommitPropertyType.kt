@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.extension.git.GitExtensionFeature
 import net.nemerosa.ontrack.extension.git.service.GitService
 import net.nemerosa.ontrack.extension.support.AbstractPropertyType
-import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.json.getRequiredTextField
 import net.nemerosa.ontrack.model.security.BuildCreate
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Build
@@ -21,17 +21,11 @@ class GitCommitPropertyType(
     private val gitService: GitService
 ) : AbstractPropertyType<GitCommitProperty>(extensionFeature) {
 
-    override fun getName(): String {
-        return "Git commit"
-    }
+    override val name: String = "Git commit"
 
-    override fun getDescription(): String {
-        return "Git commit"
-    }
+    override val description: String = "Git commit"
 
-    override fun getSupportedEntityTypes(): Set<ProjectEntityType> {
-        return EnumSet.of(ProjectEntityType.BUILD)
-    }
+    override val supportedEntityTypes: Set<ProjectEntityType> = EnumSet.of(ProjectEntityType.BUILD)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean {
         return securityService.isProjectFunctionGranted(entity, BuildCreate::class.java)
@@ -47,10 +41,11 @@ class GitCommitPropertyType(
 
     override fun fromStorage(node: JsonNode): GitCommitProperty {
         return GitCommitProperty(
-            JsonUtils.get(node, "commit")
+            commit = node.getRequiredTextField("commit"),
         )
     }
 
+    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: GitCommitProperty,
         replacementFunction: Function<String, String>

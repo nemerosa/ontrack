@@ -15,15 +15,15 @@ class PreviousPromotionConditionPropertyType(
         extensionFeature: GeneralExtensionFeature
 ) : AbstractPropertyType<PreviousPromotionConditionProperty>(extensionFeature) {
 
-    override fun getName(): String = "Previous promotion condition"
+    override val name: String = "Previous promotion condition"
 
-    override fun getDescription(): String =
+    override val description: String =
             "Makes a promotion conditional based on the fact that a previous promotion has been granted."
 
     /**
      * Project, branch and promotion levels are supported.
      */
-    override fun getSupportedEntityTypes(): Set<ProjectEntityType> =
+    override val supportedEntityTypes: Set<ProjectEntityType> =
             setOf(
                     ProjectEntityType.PROJECT,
                     ProjectEntityType.BRANCH,
@@ -40,6 +40,7 @@ class PreviousPromotionConditionPropertyType(
 
     override fun fromStorage(node: JsonNode): PreviousPromotionConditionProperty = node.parse()
 
+    @Deprecated("Will be removed in V5")
     override fun replaceValue(value: PreviousPromotionConditionProperty, replacementFunction: Function<String, String>): PreviousPromotionConditionProperty =
             value
 }

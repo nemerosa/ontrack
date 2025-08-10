@@ -3,7 +3,7 @@ package net.nemerosa.ontrack.boot.ui
 //import net.nemerosa.ontrack.extension.general.AutoPromotionProperty
 //import net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType
 import net.nemerosa.ontrack.extension.api.support.TestNumberValidationDataType
-import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.exceptions.ValidationStampNotFoundException
 import net.nemerosa.ontrack.model.security.Roles
 import net.nemerosa.ontrack.model.security.ValidationStampCreate
@@ -116,7 +116,7 @@ class ValidationStampControllerIT : AbstractWebTestSupport() {
         // Branch
         val branch = doCreateBranch()
         // Creates a validation stamp with an associated percentage data type
-        val vs = asUser().with(branch, ValidationStampCreate::class.java).call {
+        val vs = asUser().withProjectFunction(branch, ValidationStampCreate::class.java).call {
             validationStampController.newValidationStamp(
                 branch.id,
                 ValidationStampInput(
@@ -124,7 +124,7 @@ class ValidationStampControllerIT : AbstractWebTestSupport() {
                     "",
                     ServiceConfiguration(
                         TestNumberValidationDataType::class.java.name,
-                        JsonUtils.format(mapOf("threshold" to 60))
+                        mapOf("threshold" to 60).asJson()
                     )
                 )
             )

@@ -4,7 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import net.nemerosa.ontrack.it.MockSecurityService
-import net.nemerosa.ontrack.json.JsonUtils
+import net.nemerosa.ontrack.json.asJson
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ID
 import net.nemerosa.ontrack.model.structure.NameDescription
@@ -85,10 +85,16 @@ class EntityDataServiceImplTest {
                 project,
                 "Test"
             )
-        } returns JsonUtils.parseAsNode("""{"name":"Name","value":"Value"}""")
-        val json = JsonUtils.toMap(service.retrieveJson(project, "Test"))
-        assertEquals("Name", json["name"])
-        assertEquals("Value", json["value"])
+        } returns mapOf("name" to "Name", "value" to "Value").asJson()
+        val json = service.retrieveJson(project, "Test")
+        assertEquals(
+            "Name",
+            json?.path("name")?.asText()
+        )
+        assertEquals(
+            "Value",
+            json?.path("value")?.asText()
+        )
     }
 
     @Test
@@ -104,7 +110,7 @@ class EntityDataServiceImplTest {
                 project,
                 "Test"
             )
-        } returns JsonUtils.parseAsNode("""{"name":"Name","value":"Value"}""")
+        } returns mapOf("name" to "Name", "value" to "Value").asJson()
         val o = service.retrieve(project, "Test", NameValue::class.java)
         assertNotNull(o) {
             assertEquals("Name", it.name)
@@ -146,7 +152,7 @@ class EntityDataServiceImplTest {
     fun `Store an object`() {
         service.store(project, "Test", NameValue("Name", "Value"))
         verify {
-            repository.storeJson(project, "Test", JsonUtils.parseAsNode("""{"name":"Name","value":"Value"}"""))
+            repository.storeJson(project, "Test", mapOf("name" to "Name", "value" to "Value").asJson())
         }
     }
 

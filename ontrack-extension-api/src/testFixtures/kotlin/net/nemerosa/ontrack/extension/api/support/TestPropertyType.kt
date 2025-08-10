@@ -19,17 +19,11 @@ class TestPropertyType(
 ) : AbstractPropertyType<TestProperty>(extensionFeature),
     ConfigurationPropertyType<TestConfiguration, TestProperty> {
 
-    override fun getName(): String {
-        return "Configuration value"
-    }
+    override val name: String = "Configuration value"
 
-    override fun getDescription(): String {
-        return "Value."
-    }
+    override val description: String = "Value."
 
-    override fun getSupportedEntityTypes(): Set<ProjectEntityType> {
-        return EnumSet.allOf(ProjectEntityType::class.java)
-    }
+    override val supportedEntityTypes: Set<ProjectEntityType> = EnumSet.allOf(ProjectEntityType::class.java)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean {
         return securityService.isProjectFunctionGranted(entity, ProjectEdit::class.java)
@@ -56,6 +50,7 @@ class TestPropertyType(
         )
     }
 
+    @Deprecated("Will be removed in V5")
     override fun replaceValue(value: TestProperty, replacementFunction: Function<String, String>): TestProperty {
         return TestProperty(
             value.configuration,
