@@ -46,7 +46,7 @@ class GQLTypeBuildAutoVersioningIT : AbstractAutoVersioningTestSupport() {
                 sourceProject = dependencyBuild.project.name,
                 targetVersion = "1.1.1",
             ).apply {
-                autoVersioningAuditService.onQueuing(this, "routing", cancelling = false)
+                autoVersioningAuditService.onQueuing(this, "routing")
                 autoVersioningAuditService.onReceived(this, "queue")
             }
 

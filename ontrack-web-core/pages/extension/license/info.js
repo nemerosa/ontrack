@@ -3,11 +3,12 @@ import StandardPage from "@components/layouts/StandardPage";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
 import LoadingContainer from "@components/common/LoadingContainer";
 import {gql} from "graphql-request";
-import {Alert, Card, Col, Descriptions, Row, Space, Table, Tag, Typography} from "antd";
+import {Alert, Card, Col, Descriptions, Row, Space, Tag, Typography} from "antd";
 import PageSection from "@components/common/PageSection";
 import LicenseActive from "@components/extension/license/LicenseActive";
 import LicenseValidUntil from "@components/extension/license/LicenseValidUntil";
 import LicenseMaxProjects from "@components/extension/license/LicenseMaxProjects";
+import LicenseFeatureData from "@components/extension/license/LicenseFeatureData";
 
 export default function LicenseInfoPage() {
 
@@ -103,6 +104,7 @@ export default function LicenseInfoPage() {
             <LoadingContainer loading={loading}>
                 <Space direction="vertical">
                     {
+                        licenseInfo?.license &&
                         licenseInfo?.licenseControl && (
                             licenseInfo.licenseControl.active ?
                                 <Alert
@@ -139,25 +141,10 @@ export default function LicenseInfoPage() {
                                                             <Tag color="success">Enabled</Tag> :
                                                             <Tag color="error">Disabled</Tag>
                                                     }
-                                                    {
-                                                        feature.data.length > 0 &&
-                                                        <Table
-                                                            dataSource={feature.data}
-                                                            size="small"
-                                                            pagination={false}
-                                                        >
-                                                            <Table.Column
-                                                                key="name"
-                                                                title="Name"
-                                                                dataIndex="name"
-                                                            />
-                                                            <Table.Column
-                                                                key="value"
-                                                                title="Value"
-                                                                dataIndex="value"
-                                                            />
-                                                        </Table>
-                                                    }
+                                                    <LicenseFeatureData
+                                                        featureId={feature.id}
+                                                        featureData={feature.data}
+                                                    />
                                                 </Space>
                                             </Card>
                                         </Col>

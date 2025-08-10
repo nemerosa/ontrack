@@ -3,6 +3,7 @@ package net.nemerosa.ontrack.extension.notifications.listener
 import io.micrometer.core.instrument.MeterRegistry
 import net.nemerosa.ontrack.extension.notifications.metrics.NotificationsMetrics
 import net.nemerosa.ontrack.extension.notifications.metrics.incrementForEvent
+import net.nemerosa.ontrack.extension.queue.QueueMetadata
 import net.nemerosa.ontrack.extension.queue.QueueProcessor
 import net.nemerosa.ontrack.model.events.SerializableEventService
 import net.nemerosa.ontrack.model.metrics.increment
@@ -25,7 +26,7 @@ class NotificationListenerQueueProcessor(
 
     override fun isCancelled(payload: NotificationListenerQueuePayload): String? = null
 
-    override fun process(payload: NotificationListenerQueuePayload) {
+    override fun process(payload: NotificationListenerQueuePayload, queueMetadata: QueueMetadata?) {
         try {
             val event = serializableEventService.hydrate(payload.serializedEvent)
             meterRegistry.incrementForEvent(

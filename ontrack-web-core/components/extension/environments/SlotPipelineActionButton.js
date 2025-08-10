@@ -15,6 +15,8 @@ export default function SlotPipelineActionButton({
                                                      action,
                                                      actionRunning,
                                                      size,
+                                                     variant,
+                                                     color,
                                                      showDisabledButtonIfNotOk = false,
                                                      showIcon = true,
                                                      showText = false,
@@ -58,6 +60,8 @@ export default function SlotPipelineActionButton({
                                     data-testid={id}
                                     size={size}
                                     disabled={disabled}
+                                    variant={variant}
+                                    color={color}
                                 >
                                     <Space>
                                         {

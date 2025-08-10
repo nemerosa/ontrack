@@ -12,15 +12,25 @@ export default function AnnotatedDescription({
         text: entity.description ? entity.description : entity.annotatedDescription,
         onChange: onChange,
     } : undefined
+
+    const actualType = type ? type : (disabled ? "secondary" : undefined)
+
     return entity.annotatedDescription ?
-        <Typography.Text type={type} disabled={disabled} editable={editableConfig}>
+        <Typography.Text
+            type={actualType}
+            editable={editableConfig}
+        >
             <SafeHTMLComponent
                 htmlContent={entity.annotatedDescription}/>
         </Typography.Text> :
         (
-            entity.description ?
-                <Typography.Text type={type} disabled={disabled} editable={editableConfig}>{entity.description}</Typography.Text> :
-                <Typography.Text type={type} disabled={disabled} editable={editableConfig}></Typography.Text>
+            entity.description &&
+            <Typography.Text
+                type={actualType}
+                editable={editableConfig}
+            >
+                {entity.description}
+            </Typography.Text>
         )
 
 }

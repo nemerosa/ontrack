@@ -1,16 +1,17 @@
 plugins {
     `java-library`
-    id("com.apollographql.apollo").version("2.5.13")
+    id("com.apollographql.apollo").version("2.5.14")
 }
 
 dependencies {
     api(project(":ontrack-json"))
 
-    api("com.apollographql.apollo:apollo-runtime:2.5.13")
-    api("com.apollographql.apollo:apollo-coroutines-support:2.5.13")
+    api("com.apollographql.apollo:apollo-runtime:2.5.14")
+    api("com.apollographql.apollo:apollo-coroutines-support:2.5.14")
     api("org.springframework.boot:spring-boot-starter-web")
 
-    implementation("org.apache.httpcomponents:httpclient:4.5.13")
+    implementation("org.apache.httpcomponents.client5:httpclient5:5.4.3")
+    implementation("org.apache.httpcomponents.core5:httpcore5:5.3.4")
 }
 
 apollo {

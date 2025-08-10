@@ -60,7 +60,7 @@ services:
 
   # ElasticSearch
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.15.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.28
     restart: always
     environment:
       - "discovery.type=single-node"
@@ -73,7 +73,7 @@ services:
 
   # Rabbit MQ
   rabbit:
-    image: rabbitmq:3.8.25-management
+    image: rabbitmq:3.13.7-management
     restart: always
     hostname: rabbit
     environment:

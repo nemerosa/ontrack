@@ -1,14 +1,20 @@
 package net.nemerosa.ontrack.extension.av.dispatcher
 
+import net.nemerosa.ontrack.extension.av.AutoVersioningConfigProperties
+import net.nemerosa.ontrack.extension.av.audit.AutoVersioningAuditService
 import net.nemerosa.ontrack.extension.av.config.AutoVersioningSourceConfig
-import net.nemerosa.ontrack.extension.av.queue.AutoVersioningQueue
+import net.nemerosa.ontrack.extension.av.metrics.AutoVersioningMetricsService
+import net.nemerosa.ontrack.extension.av.queue.AutoVersioningQueuePayload
+import net.nemerosa.ontrack.extension.av.queue.AutoVersioningQueueProcessor
+import net.nemerosa.ontrack.extension.av.queue.AutoVersioningQueueSourceData
+import net.nemerosa.ontrack.extension.av.queue.AutoVersioningQueueSourceExtension
 import net.nemerosa.ontrack.extension.av.tracking.AutoVersioningTracking
+import net.nemerosa.ontrack.extension.queue.dispatching.QueueDispatcher
+import net.nemerosa.ontrack.extension.queue.source.createQueueSource
 import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.Branch
-import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.PromotionRun
-import net.nemerosa.ontrack.model.support.ApplicationLogEntry
-import net.nemerosa.ontrack.model.support.ApplicationLogService
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.util.*
@@ -16,12 +22,16 @@ import java.util.*
 @Component
 class AutoVersioningDispatcherImpl(
     private val securityService: SecurityService,
-    private val queue: AutoVersioningQueue,
+    private val queueDispatcher: QueueDispatcher,
+    private val queueProcessor: AutoVersioningQueueProcessor,
+    private val queueSourceExtension: AutoVersioningQueueSourceExtension,
     private val versionSourceFactory: VersionSourceFactory,
-    private val applicationLogService: ApplicationLogService,
+    private val autoVersioningAuditService: AutoVersioningAuditService,
+    private val autoVersioningConfigProperties: AutoVersioningConfigProperties,
+    private val metrics: AutoVersioningMetricsService,
 ) : AutoVersioningDispatcher {
 
-    private val logger = LoggerFactory.getLogger(AutoVersioningDispatcherImpl::class.java)
+    private val logger: Logger = LoggerFactory.getLogger(AutoVersioningDispatcherImpl::class.java)
 
     override fun dispatch(
         promotionRun: PromotionRun,
@@ -42,7 +52,32 @@ class AutoVersioningDispatcherImpl(
                             tracking.withTrail {
                                 it.withOrder(branchTrail, order)
                             }
-                            queue.queue(order)
+
+                            // Cancelling any previous order
+                            if (autoVersioningConfigProperties.queue.cancelling) {
+                                autoVersioningAuditService.cancelQueuedOrders(order)
+                            }
+
+                            // Sending the request on the queue
+                            val result = queueDispatcher.dispatch(
+                                queueProcessor = queueProcessor,
+                                payload = AutoVersioningQueuePayload(
+                                    order = order,
+                                ),
+                                source = queueSourceExtension.createQueueSource(
+                                    AutoVersioningQueueSourceData(
+                                        orderUuid = order.uuid,
+                                    )
+                                ),
+                            )
+
+                            // Audit & metrics
+                            val routingKey = result.routingKey ?: "n/a"
+                            autoVersioningAuditService.onQueuing(
+                                order,
+                                routingKey,
+                            )
+                            metrics.onQueuing(order, routingKey)
                         }
                     }
                 }
@@ -88,17 +123,13 @@ class AutoVersioningDispatcherImpl(
             )
         } catch (ex: Exception) {
             // Logging the event
-            applicationLogService.log(
-                ApplicationLogEntry.error(
-                    ex,
-                    NameDescription.nd("auto-versioning-version-error", "Auto versioning version error"),
-                    "Build ${promotionRun.build.id} (${promotionRun.build.entityDisplayName}) was promoted, " +
-                            "but is not eligible to auto versioning because no version was returned or there " +
-                            "was an error. "
-                )
-                    .withDetail("auto-versioning-source-build", promotionRun.build.entityDisplayName)
-                    .withDetail("auto-versioning-source-promotion", promotionRun.promotionLevel.name)
-                    .withDetail("auto-versioning-target-branch", branch.entityDisplayName)
+            logger.error(
+                """
+                    Build ${promotionRun.build.id} (${promotionRun.build.entityDisplayName}) was promoted to 
+                    ${promotionRun.promotionLevel.name}, but is not eligible to auto-versioning because no 
+                    version was returned or there was an error.
+                """.trimIndent(),
+                ex
             )
             // Not going further with the auto versioning request
             return null

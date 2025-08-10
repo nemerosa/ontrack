@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.graphql.schema
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.exceptions.InputException
@@ -9,6 +8,7 @@ import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
+import kotlin.jvm.optionals.getOrNull
 
 @Component
 class BranchMutations(
@@ -21,8 +21,12 @@ class BranchMutations(
          * Creating a branch
          */
         simpleMutation(
-            CREATE_BRANCH, "Creates a new branch", CreateBranchInput::class,
-            "branch", "Created branch", Branch::class
+            name = CREATE_BRANCH,
+            description = "Creates a new branch",
+            input = CreateBranchInput::class,
+            outputName = "branch",
+            outputDescription = "Created branch",
+            outputType = Branch::class
         ) { input ->
             val project = getProject(input)
             structureService.newBranch(
@@ -36,8 +40,12 @@ class BranchMutations(
          * Creating a project or getting it if it already exists
          */
         simpleMutation(
-            CREATE_BRANCH_OR_GET, "Creates a new branch or gets it if it already exists", CreateBranchOrGetInput::class,
-            "branch", "Created or existing branch", Branch::class
+            name = CREATE_BRANCH_OR_GET,
+            description = "Creates a new branch or gets it if it already exists",
+            input = CreateBranchOrGetInput::class,
+            outputName = "branch",
+            outputDescription = "Created or existing branch",
+            outputType = Branch::class
         ) { input ->
             createBranchOrGet(input)
         },
@@ -45,8 +53,12 @@ class BranchMutations(
          * Mark a branch as favourite
          */
         simpleMutation(
-            "favouriteBranch", "Marks a branch as favourite", FavouriteBranchInput::class,
-            "branch", "Updated branch", Branch::class
+            name = "favouriteBranch",
+            description = "Marks a branch as favourite",
+            input = FavouriteBranchInput::class,
+            outputName = "branch",
+            outputDescription = "Updated branch",
+            outputType = Branch::class
         ) { input ->
             val branch = structureService.getBranch(ID.of(input.id))
             branchFavouriteService.setBranchFavourite(branch, true)
@@ -56,8 +68,12 @@ class BranchMutations(
          * Unmark a project as favourite
          */
         simpleMutation(
-            "unfavouriteBranch", "Unmarks a branch as favourite", UnfavouriteBranchInput::class,
-            "branch", "Updated branch", Branch::class
+            name = "unfavouriteBranch",
+            description = "Unmarks a branch as favourite",
+            input = UnfavouriteBranchInput::class,
+            outputName = "branch",
+            outputDescription = "Updated branch",
+            outputType = Branch::class
         ) { input ->
             val branch = structureService.getBranch(ID.of(input.id))
             branchFavouriteService.setBranchFavourite(branch, false)
@@ -67,8 +83,12 @@ class BranchMutations(
          * Disables a branch
          */
         simpleMutation(
-            "disableBranch", "Disables an existing branch", DisableBranchInput::class,
-            "branch", "Updated branch", Branch::class
+            name = "disableBranch",
+            description = "Disables an existing branch",
+            input = DisableBranchInput::class,
+            outputName = "branch",
+            outputDescription = "Updated branch",
+            outputType = Branch::class
         ) { input ->
             val branch = structureService.getBranch(ID(input.id))
             structureService.disableBranch(branch)
@@ -77,8 +97,12 @@ class BranchMutations(
          * Enables a branch
          */
         simpleMutation(
-            "enableBranch", "Enables an existing branch", EnableBranchInput::class,
-            "branch", "Updated branch", Branch::class
+            name = "enableBranch",
+            description = "Enables an existing branch",
+            input = EnableBranchInput::class,
+            outputName = "branch",
+            outputDescription = "Updated branch",
+            outputType = Branch::class
         ) { input ->
             val branch = structureService.getBranch(ID(input.id))
             structureService.enableBranch(branch)

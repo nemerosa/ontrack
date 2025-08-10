@@ -29,7 +29,11 @@ export default function MainLayout({children}) {
             <MainLayoutContext.Provider value={{expanded, toggleExpansion}}>
                 {
                     !expanded && <Layout>
-                        <Header>
+                        <Header
+                            style={{
+                                backgroundColor: "#3F3053",
+                            }}
+                        >
                             <NavBar/>
                         </Header>
                         <LayoutContent>

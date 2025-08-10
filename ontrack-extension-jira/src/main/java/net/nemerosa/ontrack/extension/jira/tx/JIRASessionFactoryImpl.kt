@@ -4,9 +4,9 @@ import net.nemerosa.ontrack.extension.jira.JIRAConfiguration
 import net.nemerosa.ontrack.extension.jira.JIRAConfigurationProperties
 import net.nemerosa.ontrack.extension.jira.client.JIRAClient
 import net.nemerosa.ontrack.extension.jira.client.JIRAClientImpl
-import net.nemerosa.ontrack.extension.support.client.RestTemplateBasicAuthentication
 import net.nemerosa.ontrack.extension.support.client.RestTemplateProvider
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Component
 
 @Component
@@ -24,12 +24,22 @@ class JIRASessionFactoryImpl(
 
         // Creates an HTTP client
         val template = restTemplateProvider.createRestTemplate(
-            rootUri = configuration.url,
-            basicAuthentication = RestTemplateBasicAuthentication(
-                username = configuration.user ?: "",
-                password = configuration.password ?: "",
-            )
-        )
+            rootUri = configuration.url
+        ) {
+            if (configuration.user.isNullOrBlank()) {
+                if (configuration.password.isNullOrBlank()) {
+                    this // No authentication
+                } else {
+                    // Password as a token
+                    this.defaultHeader(
+                        HttpHeaders.AUTHORIZATION,
+                        "Bearer ${configuration.password}"
+                    )
+                }
+            } else {
+                this.basicAuthentication(configuration.user, configuration.password)
+            }
+        }
 
         // Creates the client
         val client: JIRAClient = JIRAClientImpl(template)

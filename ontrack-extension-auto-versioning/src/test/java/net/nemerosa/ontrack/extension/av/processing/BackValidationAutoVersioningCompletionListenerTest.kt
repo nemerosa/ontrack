@@ -61,8 +61,8 @@ class BackValidationAutoVersioningCompletionListenerTest {
         every { structureService.findBuildByID(ID.of(unknownBuildId)) } returns null
 
         listener.onAutoVersioningCompletion(order, AutoVersioningProcessingOutcome.CREATED)
-        verify {
-            structureService.newValidationRun(source, any()) wasNot Called
+        verify(exactly = 0) {
+            structureService.newValidationRun(source, any())
         }
     }
 

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.av.audit
 
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
+import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessingInfo
 
 /**
  * This service is responsible to log events throughout the whole life-cycle
@@ -21,13 +22,18 @@ import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
 interface AutoVersioningAuditService {
 
     /**
+     * Cancelling all current orders whose processing has not started yet. Only requests
+     * targeting the exact same [branch][AutoVersioningOrder.branch] are cancelled.
+     */
+    fun cancelQueuedOrders(order: AutoVersioningOrder)
+
+    /**
      * The [order] was just queued. It's the first event in the story of this auto versioning order.
      *
      * @param order Auto versioning order
      * @param routing Queue routing key being used
-     * @param cancelling If the previous orders from the same source to the same target must be cancelled
      */
-    fun onQueuing(order: AutoVersioningOrder, routing: String, cancelling: Boolean)
+    fun onQueuing(order: AutoVersioningOrder, routing: String)
 
     /**
      * The [order] was received on the queue and is ready for processing
@@ -79,7 +85,7 @@ interface AutoVersioningAuditService {
     fun onProcessingUpdatingFile(order: AutoVersioningOrder, upgradeBranch: String, targetPath: String)
 
     /**
-     * Post processing has started for the [order] for the [upgradeBranch] branch.
+     * Post-processing has started for the [order] for the [upgradeBranch] branch.
      *
      * @param order Auto versioning order being processed
      * @param upgradeBranch Actual name of the upgrade branch
@@ -87,7 +93,15 @@ interface AutoVersioningAuditService {
     fun onPostProcessingStart(order: AutoVersioningOrder, upgradeBranch: String)
 
     /**
-     * Post processing has finished for the [order] for the [upgradeBranch] branch.
+     * Post-processing has been launched and we have more information
+     *
+     * @param order Auto versioning order being processed
+     * @param postProcessingInfo Information linked to the post-processing
+     */
+    fun onPostProcessingLaunched(order: AutoVersioningOrder, postProcessingInfo: PostProcessingInfo)
+
+    /**
+     * Post-processing has finished for the [order] for the [upgradeBranch] branch.
      *
      * @param order Auto versioning order being processed
      * @param upgradeBranch Actual name of the upgrade branch

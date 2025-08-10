@@ -8,7 +8,7 @@ apply<OntrackExtensionPlugin>()
 
 dependencies {
     api(project(":ontrack-extension-git"))
-    api("org.gitlab4j:gitlab4j-api:4.15.7")
+    api("org.gitlab4j:gitlab4j-api")
 
     implementation("org.apache.commons:commons-lang3")
     implementation(project(":ontrack-ui-graphql"))

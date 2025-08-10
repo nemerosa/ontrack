@@ -1,9 +1,6 @@
 import com.avast.gradle.dockercompose.ComposeExtension
 import com.avast.gradle.dockercompose.tasks.ComposeUp
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
-import com.netflix.gradle.plugins.deb.Deb
-import com.netflix.gradle.plugins.packaging.SystemPackagingTask
-import com.netflix.gradle.plugins.rpm.Rpm
 import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
 import net.nemerosa.ontrack.gradle.OntrackChangeLog
 import net.nemerosa.ontrack.gradle.OntrackLastReleases
@@ -13,7 +10,6 @@ import net.nemerosa.versioning.VersioningPlugin
 import org.ajoberstar.gradle.git.publish.GitPublishExtension
 import org.jetbrains.kotlin.allopen.gradle.AllOpenExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.redline_rpm.header.Os
 import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 buildscript {
@@ -38,8 +34,6 @@ val ossrhPassword: String by project
 plugins {
     java
     id("net.nemerosa.versioning") version "3.0.0" apply false
-    id("nebula.deb") version "8.1.0"
-    id("nebula.rpm") version "8.1.0"
     id("org.sonarqube") version "2.5"
     id("com.avast.gradle.docker-compose") version "0.16.12"
     id("com.bmuschko.docker-remote-api") version "9.3.1"
@@ -246,6 +240,8 @@ configure(exportedProjects) p@ {
 
 }
 
+val greenMailVersion: String by project
+
 configure(coreProjects) p@{
 
     /**
@@ -261,6 +257,8 @@ configure(coreProjects) p@{
         annotation("net.nemerosa.ontrack.model.structure.OpenEntity")
     }
 
+    ext["spring-security.version"] = "5.8.16"
+
     configure<DependencyManagementExtension> {
         imports {
             mavenBom(SpringBootPlugin.BOM_COORDINATES) {
@@ -270,15 +268,15 @@ configure(coreProjects) p@{
             }
         }
         dependencies {
-            dependency("commons-io:commons-io:2.6")
-            dependency("org.apache.commons:commons-text:1.8")
-            dependency("net.jodah:failsafe:1.1.1")
-            dependency("commons-logging:commons-logging:1.2")
+            dependency("commons-io:commons-io:2.18.0")
+            dependency("org.apache.commons:commons-text:1.9") // Compatible with org.apache.commons:commons-lang3:3.12.0 provided by Spring Boot
+            // TODO Check dependency("net.jodah:failsafe:1.1.1")
+            // TODO Check dependency("commons-logging:commons-logging:1.2")
             dependency("org.apache.commons:commons-math3:3.6.1")
-            dependency("args4j:args4j:2.33")
-            dependency("org.jgrapht:jgrapht-core:1.3.0")
-            dependency("com.opencsv:opencsv:5.2")
-            dependency("org.testcontainers:testcontainers:1.16.2")
+            dependency("args4j:args4j:2.37")
+            dependency("org.jgrapht:jgrapht-core:1.5.2")
+            dependency("com.opencsv:opencsv:5.10")
+            dependency("org.testcontainers:testcontainers:1.20.6")
             dependency("org.jetbrains.kotlin:kotlin-test:${Versions.kotlinVersion}")
             dependency("com.networknt:json-schema-validator:1.5.5")
             // JWT
@@ -288,6 +286,25 @@ configure(coreProjects) p@{
             // Spring Boot brings jakarta-json-api version 1.1.6
             // and Elastic Search 7.17.15. But this one relies on jakarta-json-api version 2.1.2
             dependency("jakarta.json:jakarta.json-api:2.1.2")
+            // Used for safe HTML
+            dependency("org.jsoup:jsoup:1.19.1")
+            // For TOML (see also #1156)
+            dependency("cc.ekblad:4koma:1.2.0")
+            // JSON schema suppport
+            dependency("com.networknt:json-schema-validator:1.5.5")
+            // SCM support
+            dependency("org.gitlab4j:gitlab4j-api:5.8.0")
+            // LDAP support
+            dependency("com.unboundid:unboundid-ldapsdk:7.0.2")
+            // Testing mail
+            dependency("com.icegreen:greenmail:$greenMailVersion")
+            dependency("com.icegreen:greenmail-spring:$greenMailVersion")
+            // Vault support
+            dependency("org.springframework.vault:spring-vault-core:2.3.4")
+            // Git repository support TODO Will be removed in V5
+            dependency("org.eclipse.jgit:org.eclipse.jgit:6.6.1.202309021850-r")
+            // Log JSON
+            dependency("net.logstash.logback:logstash-logback-encoder:7.3")
         }
     }
 
@@ -295,19 +312,19 @@ configure(coreProjects) p@{
         "implementation"("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlinVersion}")
         "implementation"("org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlinVersion}")
         "implementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.kotlinCoroutinesVersion}")
-        "implementation"("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:${Versions.kotlinCoroutinesVersion}")
+        "implementation"("org.jetbrains.kotlinx:kotlinx-coroutines-jdk9:${Versions.kotlinCoroutinesVersion}")
         // Lombok
-        "compileOnly"("org.projectlombok:lombok:1.18.26")
-        "annotationProcessor"("org.projectlombok:lombok:1.18.26")
-        "testCompileOnly"("org.projectlombok:lombok:1.18.26")
-        "testAnnotationProcessor"("org.projectlombok:lombok:1.18.26")
+        "compileOnly"("org.projectlombok:lombok:1.18.26") // TODO V5 Remove dependency on Lombok
+        "annotationProcessor"("org.projectlombok:lombok:1.18.26") // TODO V5 Remove dependency on Lombok
+        "testCompileOnly"("org.projectlombok:lombok:1.18.26") // TODO V5 Remove dependency on Lombok
+        "testAnnotationProcessor"("org.projectlombok:lombok:1.18.26") // TODO V5 Remove dependency on Lombok
         // Testing
         "testImplementation"("org.springframework.boot:spring-boot-starter-test")
         "testImplementation"("org.junit.vintage:junit-vintage-engine") {
             exclude(group = "org.hamcrest", module = "hamcrest-core")
         }
-        "testImplementation"("org.mockito:mockito-core")
-        "testImplementation"("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
+        "testImplementation"("org.mockito:mockito-core") // TODO V5 Remove dependency on Mockito
+        "testImplementation"("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0") // TODO V5 Remove dependency on Mockito
         "testImplementation"("io.mockk:mockk:${Versions.mockkVersion}")
         "testImplementation"("io.mockk:mockk-dsl:${Versions.mockkVersion}")
         "testImplementation"("io.mockk:mockk-dsl-jvm:${Versions.mockkVersion}")
@@ -376,61 +393,6 @@ if (project.hasProperty("documentation")) {
             include("**")
         }
     }
-}
-
-/**
- * Packaging for OS
- *
- * The package version does not accept versions like the ones generated
- * from the Versioning plugin for the feature branches for example.
- */
-
-val packageVersion: String = if (version.toString().matches("\\d+\\.\\d+\\.\\d+".toRegex())) {
-    version.toString().replace("[^0-9\\.-_]".toRegex(), "")
-} else {
-    "0.0.0"
-}
-println("Using package version = $packageVersion")
-
-val debPackage by tasks.registering(Deb::class) {
-    dependsOn(":ontrack-ui:bootJar")
-
-    link("/etc/init.d/ontrack", "/opt/ontrack/bin/ontrack.sh")
-}
-
-val rpmPackage by tasks.registering(Rpm::class) {
-    dependsOn(":ontrack-ui:bootJar")
-
-    user = "ontrack"
-    link("/etc/init.d/ontrack", "/opt/ontrack/bin/ontrack.sh")
-}
-
-tasks.withType(SystemPackagingTask::class) {
-
-    packageName = "ontrack"
-    release = "1"
-    version = packageVersion
-    os = Os.LINUX // only applied to RPM
-
-    preInstall(file("gradle/os-package/preInstall.sh"))
-    postInstall(file("gradle/os-package/postInstall.sh"))
-
-    from(project(":ontrack-ui").file("build/libs"), closureOf<CopySpec> {
-        include("ontrack-ui-${project.version}-app.jar")
-        into("/opt/ontrack/lib")
-        rename(".*", "ontrack.jar")
-    })
-
-    from("gradle/os-package", closureOf<CopySpec> {
-        include("ontrack.sh")
-        into("/opt/ontrack/bin")
-        fileMode = 0x168 // 0550
-    })
-}
-
-val osPackages by tasks.registering {
-    dependsOn(rpmPackage)
-    dependsOn(debPackage)
 }
 
 /**
@@ -615,14 +577,6 @@ val prepareGitHubRelease by tasks.registering(Copy::class) {
         include("ontrack-dsl-shell-${version}-executable.jar")
         rename { "ontrack-dsl-shell.jar" }
     }
-    from("build/distributions") {
-        include("ontrack*.deb")
-        rename { "ontrack.deb" }
-    }
-    from("build/distributions") {
-        include("ontrack*.rpm")
-        rename { "ontrack.rpm" }
-    }
     from("ontrack-ui/build") {
         include("graphql.json")
     }
@@ -651,8 +605,6 @@ githubRelease {
             "build/release/ontrack-dsl-shell.jar",
             "build/release/ontrack-postgresql-migration.jar",
             "build/release/ontrack.pdf",
-            "build/release/ontrack.deb",
-            "build/release/ontrack.rpm",
             "build/release/graphql.json"
     )
     body {

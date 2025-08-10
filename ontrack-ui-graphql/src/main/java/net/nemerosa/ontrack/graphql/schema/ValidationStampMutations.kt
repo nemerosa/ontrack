@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.graphql.support.TypedMutationProvider
 import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.exceptions.BranchNotFoundException
@@ -10,6 +9,7 @@ import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
+import kotlin.jvm.optionals.getOrNull
 
 @Component
 class ValidationStampMutations(
@@ -36,12 +36,12 @@ class ValidationStampMutations(
              * Creating a validation stamp from a branch ID
              */
             simpleMutation(
-                "createValidationStampById",
-                "Creates a new validation stamp from a branch ID",
-                CreateValidationStampByIdInput::class,
-                "validationStamp",
-                "Created validation stamp",
-                ValidationStamp::class
+                name = "createValidationStampById",
+                description = "Creates a new validation stamp from a branch ID",
+                input = CreateValidationStampByIdInput::class,
+                outputName = "validationStamp",
+                outputDescription = "Created validation stamp",
+                outputType = ValidationStamp::class
             ) { input ->
                 val branch = structureService.getBranch(ID.of(input.branchId))
                 createValidationStamp(
@@ -56,12 +56,12 @@ class ValidationStampMutations(
              * Updating an existing validation stamp
              */
             simpleMutation(
-                "updateValidationStampById",
-                "Updates an existing validation stamp",
-                UpdateValidationStampByIdInput::class,
-                "validationStamp",
-                "Updated validation stamp",
-                ValidationStamp::class
+                name = "updateValidationStampById",
+                description = "Updates an existing validation stamp",
+                input = UpdateValidationStampByIdInput::class,
+                outputName = "validationStamp",
+                outputDescription = "Updated validation stamp",
+                outputType = ValidationStamp::class
             ) { input ->
                 updateValidationStamp(input)
             },

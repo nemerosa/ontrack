@@ -26,6 +26,7 @@ class GQLTypeSlot(
     private val paginatedListFactory: GQLPaginatedListFactory,
     private val slotWorkflowService: SlotWorkflowService,
 ) : GQLType {
+
     override fun getTypeName(): String = Slot::class.java.simpleName
 
     override fun createType(cache: GQLTypeCache): GraphQLObjectType =
@@ -98,15 +99,21 @@ class GQLTypeSlot(
                     fieldDescription = "Paginated list of pipelines",
                     arguments = listOf(
                         intArgument("buildId", "Filtering on a build"),
+                        stringArgument(ARG_BRANCH_NAME, "Name of the branch to get the pipelines for"),
+                        booleanArgument(ARG_DONE, "Filtering on finished pipelines"),
                     ),
                     itemType = gqlTypeSlotPipeline.typeName,
                     itemPaginatedListProvider = { env, slot, offset, size ->
                         val buildId: Int? = env.getArgument("buildId")
+                        val branchName: String? = env.getArgument(ARG_BRANCH_NAME)
+                        val done: Boolean? = env.getArgument(ARG_DONE)
                         slotService.findPipelines(
                             slot = slot,
                             offset = offset,
                             size = size,
                             buildId = buildId,
+                            branchName = branchName,
+                            done = done,
                         )
                     }
                 )
@@ -138,4 +145,9 @@ class GQLTypeSlot(
             }
             // OK
             .build()
+
+    companion object {
+        const val ARG_BRANCH_NAME = "branchName"
+        const val ARG_DONE = "done"
+    }
 }

@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.queue.mock
 
 import net.nemerosa.ontrack.common.RunProfile
+import net.nemerosa.ontrack.extension.queue.QueueMetadata
 import net.nemerosa.ontrack.extension.queue.QueueProcessor
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
@@ -19,7 +20,7 @@ class MockQueueProcessor : QueueProcessor<MockQueuePayload> {
                 it.contains("cancelled", ignoreCase = true)
             }
 
-    override fun process(payload: MockQueuePayload) {
+    override fun process(payload: MockQueuePayload, queueMetadata: QueueMetadata?) {
         // Not doing anything (yet)
     }
 

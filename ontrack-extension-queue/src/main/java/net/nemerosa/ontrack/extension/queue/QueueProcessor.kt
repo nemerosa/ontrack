@@ -24,6 +24,16 @@ interface QueueProcessor<T : Any> {
     val defaultScale: Int? get() = null
 
     /**
+     * Minimal number of concurrent listeners on a queue
+     */
+    val minConcurrency: Int get() = 1
+
+    /**
+     * Maximum number of concurrent listeners on a queue
+     */
+    val maxConcurrency: Int get() = 1
+
+    /**
      * Gets a specific routing key for the payload.
      *
      * Returns null by default, to rely on the global settings
@@ -42,8 +52,11 @@ interface QueueProcessor<T : Any> {
 
     /**
      * Processes the payload.
+     *
+     * @param payload Message payload
+     * @param queueMetadata Metadata for the queue. Null if not available.
      */
-    fun process(payload: T)
+    fun process(payload: T, queueMetadata: QueueMetadata?)
 
     /**
      * Performs some specific configuration for the queues.

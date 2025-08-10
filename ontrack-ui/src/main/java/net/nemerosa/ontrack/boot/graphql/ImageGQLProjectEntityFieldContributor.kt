@@ -3,8 +3,6 @@ package net.nemerosa.ontrack.boot.graphql
 import graphql.Scalars
 import graphql.schema.DataFetchingEnvironment
 import graphql.schema.GraphQLFieldDefinition
-import net.nemerosa.ontrack.boot.ui.PromotionLevelController
-import net.nemerosa.ontrack.boot.ui.ValidationStampController
 import net.nemerosa.ontrack.graphql.schema.GQLProjectEntityFieldContributor
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
@@ -12,7 +10,6 @@ import net.nemerosa.ontrack.model.structure.PromotionLevel
 import net.nemerosa.ontrack.model.structure.ValidationStamp
 import net.nemerosa.ontrack.ui.controller.EntityURIBuilder
 import org.springframework.stereotype.Component
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on
 import java.net.URI
 
 @Component
@@ -47,6 +44,7 @@ class ImageGQLProjectEntityFieldContributor(
     ): GraphQLFieldDefinition = GraphQLFieldDefinition.newFieldDefinition()
         .name("_image")
         .description("Link to the image")
+        .deprecate("Will be removed in V5. Used by legacy UI only.")
         .type(Scalars.GraphQLString)
         .dataFetcher(dataFetcher)
         .build()

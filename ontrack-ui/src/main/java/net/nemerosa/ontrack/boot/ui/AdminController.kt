@@ -52,6 +52,7 @@ constructor(
      * Gets the list of application log entries
      */
     @GetMapping("logs")
+    @Deprecated("Will be removed in V5. Logs are no longer managed by Ontrack.")
     fun getLogEntries(filter: ApplicationLogEntryFilter, page: Page): Resources<ApplicationLogEntry> {
         // Gets the entries
         val entries = applicationLogService.getLogEntries(
@@ -101,6 +102,7 @@ constructor(
      * Deletes all application log entries
      */
     @DeleteMapping("logs")
+    @Deprecated("Will be removed in V5. Logs are no longer managed by Ontrack.")
     fun deleteLogEntries(): Ack {
         applicationLogService.deleteLogEntries()
         return Ack.OK

@@ -28,6 +28,7 @@ constructor(
                 GraphQLFieldDefinition.newFieldDefinition()
                     .name("buildDiffActions")
                     .description("Actions to get a diff on builds of the branch")
+                    .deprecate("Will be removed in V5. Used by legacy UI only.")
                     .type(listType(gqlTypeAction.typeRef))
                     .dataFetcher { env ->
                         val branch: Branch = env.getSource()

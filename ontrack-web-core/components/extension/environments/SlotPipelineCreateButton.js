@@ -26,6 +26,9 @@ export default function SlotPipelineCreateButton({slot, build, size, onStart, ti
                             slotId: $slotId,
                             buildId: $buildId,
                         }) {
+                            pipeline {
+                                id
+                            }
                             errors {
                                 message
                             }
@@ -38,7 +41,10 @@ export default function SlotPipelineCreateButton({slot, build, size, onStart, ti
                 }
             )
             if (processGraphQLErrors(data, 'startSlotPipeline', messageApi)) {
-                if (onStart) onStart()
+                const pipelineId = data.startSlotPipeline?.pipeline?.id
+                if (onStart && pipelineId) {
+                    onStart(pipelineId)
+                }
             }
         } finally {
             setLoading(false)

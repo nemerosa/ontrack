@@ -7,7 +7,6 @@ import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 import kotlin.test.fail
 
 class MailChannelIT : AbstractMailTestSupport() {

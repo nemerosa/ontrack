@@ -7,6 +7,7 @@ import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.av.AutoVersioningExtensionFeature
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
 import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessing
+import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessingInfo
 import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessingMissingConfigException
 import net.nemerosa.ontrack.extension.av.processing.AutoVersioningTemplateRenderer
 import net.nemerosa.ontrack.extension.scm.service.SCM
@@ -41,7 +42,15 @@ class MockPostProcessing(
         upgradeBranch: String,
         scm: SCM,
         avTemplateRenderer: AutoVersioningTemplateRenderer,
+        onPostProcessingInfo: (info: PostProcessingInfo) -> Unit,
     ) {
+        onPostProcessingInfo(
+            PostProcessingInfo(
+                data = mapOf(
+                    "url" to repositoryURI,
+                )
+            )
+        )
         if (config.durationMs > 0) {
             runBlocking {
                 delay(config.durationMs)

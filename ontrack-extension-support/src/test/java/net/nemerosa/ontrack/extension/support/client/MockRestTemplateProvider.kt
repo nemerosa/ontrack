@@ -1,6 +1,7 @@
 package net.nemerosa.ontrack.extension.support.client
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Component
 import org.springframework.test.web.client.ExpectedCount
@@ -23,9 +24,9 @@ class MockRestTemplateProvider : DefaultRestTemplateProvider() {
 
     override fun createRestTemplate(
         rootUri: String,
-        basicAuthentication: RestTemplateBasicAuthentication
+        configuration: RestTemplateBuilder.() -> RestTemplateBuilder
     ): RestTemplate {
-        val template = super.createRestTemplate(rootUri, basicAuthentication)
+        val template = super.createRestTemplate(rootUri, configuration)
         context?.start(template)
         return template
     }
@@ -49,11 +50,17 @@ class MockRestTemplateProvider : DefaultRestTemplateProvider() {
             )
         }
 
-        override fun onGetJson(uri: String, parameters: Map<String, String>, outcome: MockRestTemplateOutcome) {
+        override fun onGetJson(
+            uri: String,
+            parameters: Map<String, String>,
+            outcome: MockRestTemplateOutcome,
+            expectedHeaders: Map<String, String>,
+        ) {
             actions += MockRestTemplateGetJsonAction(
                 path = uri,
                 parameters = parameters,
-                outcome = outcome
+                outcome = outcome,
+                expectedHeaders = expectedHeaders,
             )
         }
 
@@ -99,7 +106,8 @@ class MockRestTemplateProvider : DefaultRestTemplateProvider() {
     private class MockRestTemplateGetJsonAction(
         private val path: String,
         private val parameters: Map<String, String>,
-        private val outcome: MockRestTemplateOutcome
+        private val outcome: MockRestTemplateOutcome,
+        private val expectedHeaders: Map<String, String> = emptyMap(),
     ) : MockRestTemplateAction {
 
         override fun register(mockServer: MockRestServiceServer) {
@@ -118,6 +126,14 @@ class MockRestTemplateProvider : DefaultRestTemplateProvider() {
             mockServer
                 .expect(ExpectedCount.once(), requestTo(completePath))
                 .andExpect(method(HttpMethod.GET))
+                .andExpect { request ->
+                    expectedHeaders.forEach { (name, expectedValue) ->
+                        val actualValue = request.headers.getFirst(name)
+                        require(actualValue == expectedValue) {
+                            "Expected header '$name' to be '$expectedValue', but was '$actualValue'"
+                        }
+                    }
+                }
                 .andRespond(outcome.responseCreator)
         }
 

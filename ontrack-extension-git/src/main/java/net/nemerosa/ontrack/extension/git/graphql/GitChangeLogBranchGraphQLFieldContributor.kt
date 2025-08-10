@@ -32,6 +32,7 @@ class GitChangeLogBranchGraphQLFieldContributor(
             listOf(
                 GraphQLFieldDefinition.newFieldDefinition()
                     .name("gitChangeLog")
+                    .deprecate("Will be removed in V5. Use scmChangeLog root query.")
                     .argument {
                         it.name("from")
                             .description("Name of the build to start the change log with")

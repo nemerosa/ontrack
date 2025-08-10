@@ -20,6 +20,7 @@ class GQLBranchBuildFilterFieldsContributor(
                         GraphQLFieldDefinition.newFieldDefinition()
                                 .name("buildFilterForms")
                                 .description("List of forms for the build filters (for the creation of new filters)")
+                                .deprecate("Will be removed in V5. Used by legacy UI only.")
                                 .type(listType(gqlTypeBuildFilterForm.typeRef))
                                 .dataFetcher { env ->
                                     val branch: Branch = env.getSource()

@@ -70,6 +70,84 @@ class ProjectGraphQLIT : AbstractQLKTITSupport() {
     }
 
     @Test
+    fun `Project branches not filtered by disabled status by default`() {
+        project {
+            branch("B1") {
+                structureService.disableBranch(this)
+            }
+            branch("B2")
+            run(
+                """
+                    {
+                        project(id: ${id}) {
+                            branches(enabled: null) {
+                                name
+                            }
+                        }
+                    }
+                """
+            ) { data ->
+                assertEquals(
+                    listOf("B2", "B1"),
+                    data.path("project").path("branches").map { it.path("name").asText() }
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Filtering project branches being disabled`() {
+        project {
+            branch("B1") {
+                structureService.disableBranch(this)
+            }
+            branch("B2")
+            run(
+                """
+                    {
+                        project(id: ${id}) {
+                            branches(enabled: false) {
+                                name
+                            }
+                        }
+                    }
+                """
+            ) { data ->
+                assertEquals(
+                    listOf("B1"),
+                    data.path("project").path("branches").map { it.path("name").asText() }
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `Filtering project branches being enabled`() {
+        project {
+            branch("B1") {
+                structureService.disableBranch(this)
+            }
+            branch("B2")
+            run(
+                """
+                    {
+                        project(id: ${id}) {
+                            branches(enabled: true) {
+                                name
+                            }
+                        }
+                    }
+                """
+            ) { data ->
+                assertEquals(
+                    listOf("B2"),
+                    data.path("project").path("branches").map { it.path("name").asText() }
+                )
+            }
+        }
+    }
+
+    @Test
     fun `Branch by name`() {
         project {
             branch("B1")

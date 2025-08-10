@@ -14,6 +14,8 @@ dependencies {
     implementation(project(":ontrack-extension-general"))
     implementation(project(":ontrack-extension-casc"))
     implementation(project(":ontrack-repository-support"))
+    implementation(project(":ontrack-extension-queue"))
+    implementation(project(":ontrack-extension-recordings"))
     implementation(project(":ontrack-rabbitmq"))
     implementation("io.micrometer:micrometer-core")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml") // TODO Remove when removing the Yaml class
@@ -23,7 +25,7 @@ dependencies {
     implementation(project(":ontrack-extension-notifications"))
     implementation(project(":ontrack-extension-workflows"))
 
-    implementation("cc.ekblad:4koma:1.2.0")
+    implementation("cc.ekblad:4koma")
 
     testImplementation(project(":ontrack-extension-general"))
     testImplementation(project(path = ":ontrack-extension-api", configuration = "tests"))
@@ -31,9 +33,11 @@ dependencies {
     testImplementation(project(path = ":ontrack-extension-scm", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-general", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-casc", configuration = "tests"))
-    testImplementation("com.networknt:json-schema-validator:1.5.5")
+    testImplementation("com.networknt:json-schema-validator")
     testImplementation(project(path = ":ontrack-extension-notifications", configuration = "tests"))
     testImplementation(project(path = ":ontrack-extension-workflows", configuration = "tests"))
+    testImplementation(project(path = ":ontrack-extension-queue", configuration = "tests"))
+    testImplementation(project(path = ":ontrack-extension-recordings", configuration = "tests"))
     testImplementation(project(path = ":ontrack-model", configuration = "tests"))
     testImplementation(project(":ontrack-it-utils"))
 

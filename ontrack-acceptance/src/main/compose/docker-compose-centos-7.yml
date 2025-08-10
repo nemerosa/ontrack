@@ -8,7 +8,7 @@ services:
       POSTGRES_USER    : ontrack
       POSTGRES_PASSWORD: ontrack
    elasticsearch:
-      image: docker.elastic.co/elasticsearch/elasticsearch:7.15.2
+      image: docker.elastic.co/elasticsearch/elasticsearch:7.17.28
       ports:
          - "9200:9200"
          - "9300:9300"
@@ -23,7 +23,7 @@ services:
 
    # Rabbit MQ
    rabbitmq:
-      image: rabbitmq:3.8.25-management
+      image: rabbitmq:3.13.7-management
       hostname: rabbit
       environment:
          RABBITMQ_DEFAULT_USER: ontrack

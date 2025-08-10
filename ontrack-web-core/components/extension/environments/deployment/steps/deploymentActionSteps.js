@@ -75,6 +75,8 @@ export function DeploymentFinishButtonStep({deployment, reloadState, onChange}) 
                 showDisabledButtonIfNotOk={true}
                 showIcon={false}
                 showText={true}
+                color="primary"
+                variant="solid"
             />
         }
         icon={
@@ -86,7 +88,15 @@ export function DeploymentFinishButtonStep({deployment, reloadState, onChange}) 
 export function DeploymentCancelButtonStep({deployment, reloadState, onChange}) {
     return <DeploymentActionButtonStep
         actionButton={
-            <SlotPipelineCancelButton deployment={deployment} reloadState={reloadState} onCancel={onChange} showText={true} showIcon={false}/>
+            <SlotPipelineCancelButton
+                deployment={deployment}
+                reloadState={reloadState}
+                onCancel={onChange}
+                showText={true}
+                showIcon={false}
+                color="danger"
+                variant="solid"
+            />
         }
         icon={
             <SlotPipelineStatusIcon status="CANCELLED"/>

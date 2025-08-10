@@ -1,18 +1,25 @@
 package net.nemerosa.ontrack.model.security
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import net.nemerosa.ontrack.model.annotations.APIDescription
 import net.nemerosa.ontrack.model.structure.Entity
 import net.nemerosa.ontrack.model.structure.ID
 import java.io.Serializable
 
 data class Account(
         override val id: ID,
+        @APIDescription("Unique name for the account")
+        @Deprecated("Will be removed in V6. Replaced in V5 by the `email` field")
         val name: String,
         val fullName: String,
         val email: String,
         val authenticationSource: AuthenticationSource,
         val role: SecurityRole,
+        @APIDescription("Is this account disabled?")
+        @Deprecated("Will be removed in V5. Not replaced.")
         val disabled: Boolean,
+        @APIDescription("Is this account locked (meaning that no change can be performed)?")
+        @Deprecated("Will be removed in V5. Not replaced.")
         val locked: Boolean,
 ) : Entity, Serializable {
 

@@ -65,6 +65,7 @@ class GQLTypeAccountGroup(private val accountService: AccountService,
                 .field { field: GraphQLFieldDefinition.Builder ->
                     field.name("mappings")
                             .description("Mappings for this group")
+                            .deprecate("Will be removed in V5. Replaced in V5 by the `groupMappings` root query.")
                             .type(listType(accountGroupMapping.typeRef))
                             .dataFetcher { env ->
                                 val accountGroup: AccountGroup = env.getSource()

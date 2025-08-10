@@ -58,5 +58,5 @@ data class AutoVersioningOrder(
      * Gets all paths
      */
     @get:JsonIgnore
-    val allPaths: List<AutoVersioningSourceConfigPath> = listOf(defaultPath) + (additionalPaths ?: emptyList())
+    val allPaths: List<AutoVersioningSourceConfigPath> = listOf(defaultPath) + additionalPaths
 }

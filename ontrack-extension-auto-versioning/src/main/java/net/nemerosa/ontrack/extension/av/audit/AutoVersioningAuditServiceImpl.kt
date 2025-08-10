@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.extension.av.audit
 
 import net.nemerosa.ontrack.common.RunProfile
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
+import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessingInfo
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
@@ -20,8 +21,12 @@ class AutoVersioningAuditServiceImpl(
         logger.info("[auto-versioning] Using production auto versioning audit service")
     }
 
-    override fun onQueuing(order: AutoVersioningOrder, routing: String, cancelling: Boolean) {
-        super.onQueuing(order, routing, cancelling)
+    override fun cancelQueuedOrders(order: AutoVersioningOrder) {
+        super.cancelQueuedOrders(order)
+    }
+
+    override fun onQueuing(order: AutoVersioningOrder, routing: String) {
+        super.onQueuing(order, routing)
     }
 
     override fun onReceived(order: AutoVersioningOrder, queue: String) {
@@ -50,6 +55,10 @@ class AutoVersioningAuditServiceImpl(
 
     override fun onPostProcessingStart(order: AutoVersioningOrder, upgradeBranch: String) {
         super.onPostProcessingStart(order, upgradeBranch)
+    }
+
+    override fun onPostProcessingLaunched(order: AutoVersioningOrder, postProcessingInfo: PostProcessingInfo) {
+        super.onPostProcessingLaunched(order, postProcessingInfo)
     }
 
     override fun onPostProcessingEnd(order: AutoVersioningOrder, upgradeBranch: String) {

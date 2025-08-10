@@ -7,6 +7,7 @@ import kotlinx.coroutines.runBlocking
 import net.nemerosa.ontrack.common.untilTimeout
 import net.nemerosa.ontrack.extension.av.dispatcher.AutoVersioningOrder
 import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessing
+import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessingInfo
 import net.nemerosa.ontrack.extension.av.postprocessing.PostProcessingMissingConfigException
 import net.nemerosa.ontrack.extension.av.processing.AutoVersioningTemplateRenderer
 import net.nemerosa.ontrack.extension.github.GitHubExtensionFeature
@@ -52,6 +53,7 @@ class GitHubPostProcessing(
         upgradeBranch: String,
         scm: SCM,
         avTemplateRenderer: AutoVersioningTemplateRenderer,
+        onPostProcessingInfo: (info: PostProcessingInfo) -> Unit,
     ) {
         // Gets the settings
         val settings = cachedSettingsService.getCachedSettings(GitHubPostProcessingSettings::class.java)
@@ -68,12 +70,13 @@ class GitHubPostProcessing(
         // Local repository
         if (!config.workflow.isNullOrBlank()) {
             runPostProcessing(
-                ghConfig,
-                repository,
-                config.workflow,
-                upgradeBranch,
-                emptyMap(),
-                settings,
+                ghConfig = ghConfig,
+                repository = repository,
+                workflow = config.workflow,
+                branch = upgradeBranch,
+                inputs = emptyMap(),
+                settings = settings,
+                onPostProcessingInfo = onPostProcessingInfo,
             )
         }
         // Common repository
@@ -85,11 +88,11 @@ class GitHubPostProcessing(
                 throw GitHubPostProcessingConfigException("Default GitHub workflow for auto versioning post processing is not defined.")
             }
             runPostProcessing(
-                ghConfig,
-                settings.repository,
-                settings.workflow,
-                settings.branch,
-                mapOf(
+                ghConfig = ghConfig,
+                repository = settings.repository,
+                workflow = settings.workflow,
+                branch = settings.branch,
+                inputs = mapOf(
                     "repository" to repository,
                     "upgrade_branch" to upgradeBranch,
                     "docker_image" to config.dockerImage,
@@ -97,7 +100,8 @@ class GitHubPostProcessing(
                     "commit_message" to config.commitMessage,
                     "version" to autoVersioningOrder.targetVersion,
                 ),
-                settings,
+                settings = settings,
+                onPostProcessingInfo = onPostProcessingInfo,
             )
         }
     }
@@ -109,6 +113,7 @@ class GitHubPostProcessing(
         branch: String,
         inputs: Map<String, String>,
         settings: GitHubPostProcessingSettings,
+        onPostProcessingInfo: (info: PostProcessingInfo) -> Unit,
     ) {
         // Getting the GH client
         val client = ontrackGitHubClientFactory.create(ghConfig).createGitHubRestTemplate()
@@ -116,8 +121,22 @@ class GitHubPostProcessing(
         val id = launchWorkflowRun(client, repository, workflow, branch, inputs)
         // Getting the workflow run
         val runId = findWorkflowRun(client, repository, workflow, branch, id, settings)
+        // Sending back the URL of the workflow run
+        val url = "${ghConfig.url}/${repository}/actions/runs/${runId}"
+        onPostProcessingInfo(
+            PostProcessingInfo(
+                data = mapOf(
+                    "url" to url
+                )
+            )
+        )
         // Waiting until the workflow run completes
-        waitUntilWorkflowRun(client, repository, runId, settings)
+        waitUntilWorkflowRun(
+            client = client,
+            repository = repository,
+            runId = runId,
+            settings = settings,
+        )
     }
 
     private fun waitUntilWorkflowRun(

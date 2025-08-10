@@ -41,7 +41,8 @@ class QueueDispatcherImpl(
             if (queueConfigProperties.general.warnIfAsync) {
                 logger.warn("Processing queuing in synchronous mode.")
             }
-            queueProcessor.process(payload)
+            // No metadata in sync mode
+            queueProcessor.process(payload, queueMetadata = null)
             QueueDispatchResult(type = QueueDispatchResultType.PROCESSED, id = null)
         } else {
             val accountName = securityService.currentAccount?.account?.name
@@ -69,6 +70,7 @@ class QueueDispatcherImpl(
             QueueDispatchResult(
                 type = QueueDispatchResultType.PROCESSING,
                 id = queuePayload.id,
+                routingKey = routingKey,
             )
         }
 

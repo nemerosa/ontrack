@@ -18,6 +18,7 @@ enum class AutoVersioningAuditState(
     PROCESSING_CREATING_BRANCH(isProcessing = true),
     PROCESSING_UPDATING_FILE(isProcessing = true),
     POST_PROCESSING_START(isProcessing = true),
+    POST_PROCESSING_LAUNCHED(isProcessing = true),
     POST_PROCESSING_END(isProcessing = true),
     PR_CREATING(isProcessing = true),
     PR_TIMEOUT(isRunning = false),
