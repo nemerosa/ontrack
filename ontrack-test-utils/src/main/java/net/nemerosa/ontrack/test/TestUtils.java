@@ -85,7 +85,7 @@ public final class TestUtils {
         return "2014-05-13T20:11:00Z";
     }
 
-    public static @NotNull
+    public static
     byte[] resourceBytes(@NotNull String path) throws IOException {
         return IOUtils.toByteArray(TestUtils.class.getResource(path));
     }

@@ -4,13 +4,13 @@ import net.nemerosa.ontrack.it.NOPValidationDataType
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.ValidationStamp
 import net.nemerosa.ontrack.model.structure.config
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-class ValidationStampStructureRepositoryIT : AbstractRepositoryJUnit4TestSupport() {
+class ValidationStampStructureRepositoryIT : AbstractRepositoryTestSupport() {
 
     @Autowired
     private lateinit var nopValidationDataType: NOPValidationDataType

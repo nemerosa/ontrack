@@ -2,13 +2,14 @@ package net.nemerosa.ontrack.repository
 
 import net.nemerosa.ontrack.common.Document
 import net.nemerosa.ontrack.model.support.DocumentsRepository
+import net.nemerosa.ontrack.test.TestUtils
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.util.unit.DataSize
 import kotlin.test.*
 
-class DocumentsJdbcRepositoryIT : AbstractRepositoryJUnit4TestSupport() {
+class DocumentsJdbcRepositoryIT : AbstractRepositoryTestSupport() {
 
     @Autowired
     private lateinit var repository: DocumentsRepository
@@ -17,9 +18,7 @@ class DocumentsJdbcRepositoryIT : AbstractRepositoryJUnit4TestSupport() {
     private val key = "path/image"
     private val type = "image/png"
 
-    private val bytes = DocumentsJdbcRepositoryIT::class.java
-            .getResourceAsStream("/image.png")
-            .readAllBytes()
+    private val bytes: ByteArray = TestUtils.resourceBytes("/image.png")
 
     private val size = bytes.size.toLong()
 

@@ -3,11 +3,11 @@ package net.nemerosa.ontrack.repository
 import net.nemerosa.ontrack.model.structure.NameDescription
 import net.nemerosa.ontrack.model.structure.PredefinedValidationStamp
 import net.nemerosa.ontrack.test.TestUtils.uid
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.assertEquals
 
-class PredefinedValidationStampRepositoryIT : AbstractRepositoryJUnit4TestSupport() {
+class PredefinedValidationStampRepositoryIT : AbstractRepositoryTestSupport() {
 
     @Autowired
     private lateinit var repository: PredefinedValidationStampRepository
