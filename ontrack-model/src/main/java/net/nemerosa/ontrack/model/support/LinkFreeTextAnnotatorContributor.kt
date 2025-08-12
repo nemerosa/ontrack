@@ -15,8 +15,8 @@ class LinkFreeTextAnnotatorContributor : FreeTextAnnotatorContributor {
 
     override fun getMessageAnnotators(entity: ProjectEntity): List<MessageAnnotator> =
             listOf(
-                LegacyRegexMessageAnnotator(
-                    pattern
+                RegexMessageAnnotator(
+                    pattern.toRegex()
                 ) { link ->
                     MessageAnnotation.of("a")
                         .attr("href", link)

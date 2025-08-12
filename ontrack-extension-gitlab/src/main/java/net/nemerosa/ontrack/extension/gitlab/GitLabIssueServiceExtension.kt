@@ -8,9 +8,9 @@ import net.nemerosa.ontrack.extension.gitlab.service.GitLabConfigurationService
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
 import net.nemerosa.ontrack.extension.issues.support.AbstractIssueServiceExtension
-import net.nemerosa.ontrack.model.support.LegacyRegexMessageAnnotator
 import net.nemerosa.ontrack.model.support.MessageAnnotation.Companion.of
 import net.nemerosa.ontrack.model.support.MessageAnnotator
+import net.nemerosa.ontrack.model.support.RegexMessageAnnotator
 import org.apache.commons.lang3.StringUtils
 import org.springframework.stereotype.Component
 import java.util.regex.Pattern
@@ -77,8 +77,8 @@ class GitLabIssueServiceExtension(
 
     override fun getMessageAnnotator(issueServiceConfiguration: IssueServiceConfiguration): MessageAnnotator {
         val configuration = issueServiceConfiguration as GitLabIssueServiceConfiguration
-        return LegacyRegexMessageAnnotator(
-            GITLAB_ISSUE_PATTERN
+        return RegexMessageAnnotator(
+            GITLAB_ISSUE_PATTERN.toRegex()
         ) { key: String ->
             of("a")
                 .attr(

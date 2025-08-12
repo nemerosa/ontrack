@@ -9,9 +9,9 @@ import net.nemerosa.ontrack.extension.github.service.GitHubIssueServiceConfigura
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
 import net.nemerosa.ontrack.extension.issues.support.AbstractIssueServiceExtension
-import net.nemerosa.ontrack.model.support.LegacyRegexMessageAnnotator
 import net.nemerosa.ontrack.model.support.MessageAnnotation.Companion.of
 import net.nemerosa.ontrack.model.support.MessageAnnotator
+import net.nemerosa.ontrack.model.support.RegexMessageAnnotator
 import org.springframework.stereotype.Component
 import java.util.regex.Pattern
 import java.util.stream.Collectors
@@ -77,18 +77,13 @@ class GitHubIssueServiceExtension(
 
     override fun getMessageAnnotator(issueServiceConfiguration: IssueServiceConfiguration): MessageAnnotator {
         val configuration = issueServiceConfiguration as GitHubIssueServiceConfiguration
-        return LegacyRegexMessageAnnotator(
-            GITHUB_ISSUE_PATTERN
+        return RegexMessageAnnotator(
+            GITHUB_ISSUE_PATTERN.toRegex(),
         ) { key: String ->
             of("a")
                 .attr(
                     "href",
-                    String.format(
-                        "%s/%s/issues/%s",
-                        configuration.configuration.url,
-                        configuration.repository,
-                        key.substring(1)
-                    )
+                    "${configuration.configuration.url}/${configuration.repository}/issues/${key.substring(1)}"
                 )
                 .text(key)
         }

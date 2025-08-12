@@ -3,9 +3,9 @@ package net.nemerosa.ontrack.extension.issues.mock
 import net.nemerosa.ontrack.extension.issues.model.Issue
 import net.nemerosa.ontrack.extension.issues.model.IssueServiceConfiguration
 import net.nemerosa.ontrack.extension.issues.support.AbstractIssueServiceExtension
-import net.nemerosa.ontrack.model.support.LegacyRegexMessageAnnotator
 import net.nemerosa.ontrack.model.support.MessageAnnotation
 import net.nemerosa.ontrack.model.support.MessageAnnotator
+import net.nemerosa.ontrack.model.support.RegexMessageAnnotator
 import org.springframework.stereotype.Component
 
 @Component
@@ -73,7 +73,7 @@ class TestIssueServiceExtension(
     }
 
     override fun getMessageAnnotator(issueServiceConfiguration: IssueServiceConfiguration): MessageAnnotator? {
-        return LegacyRegexMessageAnnotator("#(\\d+)") { token ->
+        return RegexMessageAnnotator("#(\\d+)".toRegex()) { token ->
             MessageAnnotation.of("a")
                 .attr("href", "http://issue/${token.substring(1)}")
                 .text(token)

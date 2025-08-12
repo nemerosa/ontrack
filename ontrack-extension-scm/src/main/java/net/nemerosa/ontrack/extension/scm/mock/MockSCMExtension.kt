@@ -16,9 +16,9 @@ import net.nemerosa.ontrack.extension.scm.service.SCMPullRequest
 import net.nemerosa.ontrack.extension.support.AbstractExtension
 import net.nemerosa.ontrack.model.extension.ExtensionFeature
 import net.nemerosa.ontrack.model.structure.*
-import net.nemerosa.ontrack.model.support.LegacyRegexMessageAnnotator
 import net.nemerosa.ontrack.model.support.MessageAnnotation.Companion.of
 import net.nemerosa.ontrack.model.support.MessageAnnotator
+import net.nemerosa.ontrack.model.support.RegexMessageAnnotator
 import org.apache.commons.codec.digest.DigestUtils
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
@@ -396,7 +396,7 @@ class MockSCMExtension(
             }.toSet()
 
         override fun getMessageAnnotator(issueServiceConfiguration: IssueServiceConfiguration): MessageAnnotator {
-            return LegacyRegexMessageAnnotator(issuePattern) { key: String? ->
+            return RegexMessageAnnotator(issuePattern.toRegex()) { key: String? ->
                 of("a")
                     .attr("href", "mock://$name/issue/$key")
                     .text(key)
