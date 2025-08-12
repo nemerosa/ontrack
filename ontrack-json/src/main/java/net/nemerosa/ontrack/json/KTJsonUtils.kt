@@ -183,10 +183,15 @@ fun JsonNode.getRequiredJsonField(field: String): JsonNode =
 fun JsonNode.getIntField(field: String): Int? =
     if (has(field)) {
         val value = get(field)
-        if (value.isNull || !value.isNumber) {
+        if (value.isNull) {
             null
+        } else if (value.isNumber) {
+            value.asInt()
+        } else if (value.isTextual) {
+            val text = value.asText()
+            text.toIntOrNull()
         } else {
-            get(field).asInt()
+            null
         }
     } else {
         null

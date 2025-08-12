@@ -436,7 +436,7 @@ class BuildGraphQLIT : AbstractQLKTITSupport() {
                             }
                         }
                     """, mapOf(
-                            "runInfo" to runInfo.asJson()
+                            "runInfo" to runInfo.asMap()
                         )
                     )
                     // Checks the build has been created
