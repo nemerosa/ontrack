@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.graphql
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.api.support.TestSimpleProperty
 import net.nemerosa.ontrack.extension.api.support.TestSimplePropertyType
 import net.nemerosa.ontrack.it.AsAdminTest
@@ -17,6 +16,7 @@ import net.nemerosa.ontrack.test.assertJsonNull
 import org.junit.jupiter.api.Test
 import org.springframework.graphql.execution.ErrorType
 import java.time.LocalDateTime
+import kotlin.jvm.optionals.getOrNull
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue

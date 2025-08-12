@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.casc.context.core.admin
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.casc.context.AbstractCascContext
 import net.nemerosa.ontrack.json.JsonParseException
 import net.nemerosa.ontrack.json.asJson
@@ -17,6 +16,7 @@ import net.nemerosa.ontrack.model.structure.StructureService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import kotlin.jvm.optionals.getOrNull
 
 /**
  * Project permissions as code.

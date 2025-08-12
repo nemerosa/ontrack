@@ -1,8 +1,8 @@
 package net.nemerosa.ontrack.extension.general
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
+import kotlin.jvm.optionals.getOrNull
 import kotlin.test.assertNotNull
 
 class ReleaseValidationPropertyLabelListenerIT : AbstractGeneralExtensionTestSupport() {

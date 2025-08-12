@@ -1,6 +1,6 @@
 package net.nemerosa.ontrack.model.structure
 
-import net.nemerosa.ontrack.common.getOrNull
+import kotlin.jvm.optionals.getOrNull
 
 /**
  * If the validation stamp designed by its name does not exist, creates it.

@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.jenkins.indicator
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.indicators.computing.*
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorSource
 import net.nemerosa.ontrack.extension.indicators.model.IndicatorSourceProviderDescription
@@ -11,6 +10,7 @@ import net.nemerosa.ontrack.extension.scm.service.SCMServiceDetector
 import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.templating.TemplatingService
 import org.springframework.stereotype.Component
+import kotlin.jvm.optionals.getOrNull
 
 /**
  * Indicator which checks if a project default branch has a `Jenkinsfile` at its root.

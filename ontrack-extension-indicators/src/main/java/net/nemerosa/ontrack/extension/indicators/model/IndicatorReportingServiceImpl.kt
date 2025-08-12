@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.indicators.model
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.indicators.portfolio.IndicatorPortfolioService
 import net.nemerosa.ontrack.model.labels.LabelManagementService
 import net.nemerosa.ontrack.model.labels.ProjectLabelManagementService
@@ -10,6 +9,7 @@ import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import kotlin.jvm.optionals.getOrNull
 
 @Service
 @Transactional

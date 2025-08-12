@@ -1,9 +1,9 @@
 package net.nemerosa.ontrack.extension.scm.catalog.sync
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.it.AsAdminTest
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import kotlin.jvm.optionals.getOrNull
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue

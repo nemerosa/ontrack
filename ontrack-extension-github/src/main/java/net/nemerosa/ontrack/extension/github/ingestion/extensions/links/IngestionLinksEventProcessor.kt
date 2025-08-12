@@ -1,13 +1,16 @@
 package net.nemerosa.ontrack.extension.github.ingestion.extensions.links
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.general.ReleasePropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.extensions.support.AbstractIngestionBuildEventProcessor
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventPreprocessingCheck
 import net.nemerosa.ontrack.extension.github.ingestion.processing.IngestionEventProcessingResultDetails
 import net.nemerosa.ontrack.extension.github.ingestion.support.IngestionModelAccessService
-import net.nemerosa.ontrack.model.structure.*
+import net.nemerosa.ontrack.model.structure.Build
+import net.nemerosa.ontrack.model.structure.BuildLink
+import net.nemerosa.ontrack.model.structure.BuildSearchForm
+import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
+import kotlin.jvm.optionals.getOrNull
 import kotlin.reflect.KClass
 
 @Component

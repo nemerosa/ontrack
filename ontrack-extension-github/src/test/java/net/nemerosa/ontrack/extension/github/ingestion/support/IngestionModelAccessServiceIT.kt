@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.github.ingestion.support
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
 import net.nemerosa.ontrack.extension.github.ingestion.processing.*
@@ -12,6 +11,7 @@ import net.nemerosa.ontrack.extension.github.property.GitHubProjectConfiguration
 import net.nemerosa.ontrack.test.TestUtils.uid
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import kotlin.jvm.optionals.getOrNull
 import kotlin.random.Random
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith

@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ingestion.support
 
 import com.fasterxml.jackson.databind.JsonNode
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.general.ReleasePropertyType
 import net.nemerosa.ontrack.extension.general.validation.CHMLValidationDataType
 import net.nemerosa.ontrack.extension.general.validation.MetricsValidationDataType
@@ -30,6 +29,7 @@ import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
 import net.nemerosa.ontrack.model.support.NoConfig
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import kotlin.jvm.optionals.getOrNull
 
 @Service
 @Transactional

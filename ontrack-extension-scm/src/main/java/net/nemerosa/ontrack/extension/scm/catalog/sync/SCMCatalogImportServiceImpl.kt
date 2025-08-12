@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.scm.catalog.sync
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.scm.catalog.*
 import net.nemerosa.ontrack.model.settings.CachedSettingsService
 import net.nemerosa.ontrack.model.structure.NameDescription.Companion.nd
@@ -8,6 +7,7 @@ import net.nemerosa.ontrack.model.structure.Project
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import kotlin.jvm.optionals.getOrNull
 
 @Service
 @Transactional

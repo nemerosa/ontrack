@@ -4,7 +4,6 @@ import graphql.Scalars.GraphQLString
 import graphql.schema.GraphQLInputObjectField
 import graphql.schema.GraphQLList
 import graphql.schema.GraphQLNonNull
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.graphql.schema.MutationInput
 import net.nemerosa.ontrack.graphql.schema.PropertyMutationProvider
 import net.nemerosa.ontrack.graphql.schema.optionalStringInputField
@@ -13,6 +12,7 @@ import net.nemerosa.ontrack.model.structure.PromotionLevel
 import net.nemerosa.ontrack.model.structure.PropertyType
 import net.nemerosa.ontrack.model.structure.StructureService
 import org.springframework.stereotype.Component
+import kotlin.jvm.optionals.getOrNull
 import kotlin.reflect.KClass
 
 @Component

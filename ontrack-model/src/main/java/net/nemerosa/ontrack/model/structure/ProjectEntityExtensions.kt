@@ -1,7 +1,7 @@
 package net.nemerosa.ontrack.model.structure
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.model.exceptions.InputException
+import kotlin.jvm.optionals.getOrNull
 
 /**
  * Map of fields/values for the names of this entity

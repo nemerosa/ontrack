@@ -28,12 +28,6 @@ infix fun <T> ((T) -> Boolean).and(other: (T) -> Boolean): (T) -> Boolean = { t 
 fun <T> T?.asOptional(): Optional<T & Any> = Optional.ofNullable(this)
 
 /**
- * Optional to nullable
- */
-@Deprecated("Use the Kotlin built-in extension")
-fun <T> Optional<T>.getOrNull(): T? = orElse(null)
-
-/**
  * Converts a POJO as a map, using properties as index.
  */
 fun <T : Any> T.asMap(vararg properties: KCallable<Any?>): Map<String, Any?> =

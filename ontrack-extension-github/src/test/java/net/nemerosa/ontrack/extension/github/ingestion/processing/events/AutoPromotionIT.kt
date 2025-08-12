@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.github.ingestion.processing.events
 
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.general.AutoPromotionPropertyType
 import net.nemerosa.ontrack.extension.github.ingestion.AbstractIngestionTestSupport
 import net.nemerosa.ontrack.extension.github.ingestion.IngestionHookFixtures
@@ -10,7 +9,10 @@ import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionCon
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfigSetup
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.IngestionConfigSteps
 import net.nemerosa.ontrack.extension.github.ingestion.config.model.support.FilterConfig
-import net.nemerosa.ontrack.extension.github.ingestion.processing.config.*
+import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigLoaderService
+import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigLoaderServiceITMockConfig
+import net.nemerosa.ontrack.extension.github.ingestion.processing.config.ConfigService
+import net.nemerosa.ontrack.extension.github.ingestion.processing.config.INGESTION_CONFIG_FILE_PATH
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepConclusion
 import net.nemerosa.ontrack.extension.github.ingestion.processing.model.WorkflowJobStepStatus
 import net.nemerosa.ontrack.model.structure.Branch
@@ -18,6 +20,7 @@ import net.nemerosa.ontrack.model.structure.ValidationRunStatusID
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.ContextConfiguration
+import kotlin.jvm.optionals.getOrNull
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue

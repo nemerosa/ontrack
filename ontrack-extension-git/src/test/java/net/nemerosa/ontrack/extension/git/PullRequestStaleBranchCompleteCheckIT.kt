@@ -1,7 +1,6 @@
 package net.nemerosa.ontrack.extension.git
 
 import net.nemerosa.ontrack.common.Time
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.git.mocking.GitMockingConfigurator
 import net.nemerosa.ontrack.extension.stale.StaleJobService
 import net.nemerosa.ontrack.extension.stale.StaleProperty
@@ -13,6 +12,7 @@ import net.nemerosa.ontrack.model.structure.Project
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import kotlin.jvm.optionals.getOrNull
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull

@@ -1,6 +1,5 @@
 package net.nemerosa.ontrack.extension.av.validation
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.extension.av.AbstractAutoVersioningTestSupport
 import net.nemerosa.ontrack.extension.general.autoValidationStampProperty
 import net.nemerosa.ontrack.extension.general.metaInfoItem
@@ -10,6 +9,7 @@ import net.nemerosa.ontrack.model.structure.Build
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import org.springframework.beans.factory.annotation.Autowired
+import kotlin.jvm.optionals.getOrNull
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue

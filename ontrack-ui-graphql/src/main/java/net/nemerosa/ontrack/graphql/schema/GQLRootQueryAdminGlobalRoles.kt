@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.graphql.schema
 
 import graphql.schema.GraphQLFieldDefinition
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.graphql.support.listType
 import net.nemerosa.ontrack.graphql.support.stringArgument
 import net.nemerosa.ontrack.model.security.RolesService
 import org.springframework.stereotype.Component
+import kotlin.jvm.optionals.getOrNull
 
 @Component
 class GQLRootQueryAdminGlobalRoles(

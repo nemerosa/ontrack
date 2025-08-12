@@ -1,11 +1,11 @@
 package net.nemerosa.ontrack.service
 
-import net.nemerosa.ontrack.common.getOrNull
 import net.nemerosa.ontrack.it.AbstractServiceTestSupport
 import net.nemerosa.ontrack.job.*
 import net.nemerosa.ontrack.model.support.SettingsRepository
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import kotlin.jvm.optionals.getOrNull
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
