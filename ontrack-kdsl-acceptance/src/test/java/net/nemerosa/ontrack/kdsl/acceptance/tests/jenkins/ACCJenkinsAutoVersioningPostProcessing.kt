@@ -176,4 +176,76 @@ class ACCJenkinsAutoVersioningPostProcessing : AbstractACCAutoVersioningTestSupp
         }
     }
 
+    @Test
+    fun `Some expressions in the Docker command can be escaped`() {
+        withMockScmRepository(ontrack) {
+            withAutoVersioning {
+                repositoryFile("gradle.properties") {
+                    "some-version = 1.0.0"
+                }
+                // Jenkins config
+                val jenkinsConfigName = uid("j-")
+                ontrack.configurations.jenkins.create(
+                    JenkinsConfiguration(
+                        name = jenkinsConfigName,
+                        url = "http://jenkins",
+                    )
+                )
+                // Jenkins AV config
+                ontrack.settings.jenkinsPostProcessing.set(
+                    JenkinsPostProcessingSettings(
+                        config = jenkinsConfigName,
+                        job = "/default/pipeline",
+                    )
+                )
+                // Dependency
+                val depBranch = branchWithPromotion(promotion = "RELEASE")
+                // Sample project to automatically upgrade & post-process using a custom Jenkins job
+                project {
+                    branch {
+                        configuredForMockRepository()
+                        setAutoVersioningConfig(
+                            listOf(
+                                AutoVersioningSourceConfig(
+                                    sourceProject = depBranch.project.name,
+                                    sourceBranch = depBranch.name,
+                                    sourcePromotion = "RELEASE",
+                                    targetPath = "gradle.properties",
+                                    targetProperty = "some-version",
+                                    postProcessing = "jenkins",
+                                    postProcessingConfig = mapOf(
+                                        "dockerImage" to "sample/docker",
+                                        "dockerCommand" to "sample command with escaped ${'$'}${'$'}{PARAMETER}",
+                                        "job" to "/custom/pipeline"
+                                    ).asJson(),
+                                )
+                            )
+                        )
+
+                        // Creates a new promoted version of the dependency
+                        depBranch.apply {
+                            build(name = "2.0.0") {
+                                promote("RELEASE")
+                            }
+                        }
+
+                        waitForAutoVersioningCompletion()
+
+                        assertThatMockScmRepository {
+                            fileContains("gradle.properties") {
+                                "some-version = 2.0.0"
+                            }
+                            // Checks the Jenkins execution
+                            val jenkinsJob = ontrack.jenkins.mock.job(jenkinsConfigName, "/custom/pipeline").jenkinsJob
+                            assertNotNull(jenkinsJob, "Custom pipeline found") { job ->
+                                assertTrue(job.wasCalled, "Custom pipeline was called")
+                                assertEquals("sample command with escaped ${'$'}{PARAMETER}", job.lastBuild.parameters["DOCKER_COMMAND"])
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }

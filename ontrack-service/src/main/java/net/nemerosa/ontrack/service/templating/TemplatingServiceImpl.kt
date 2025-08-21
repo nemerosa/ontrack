@@ -32,7 +32,7 @@ class TemplatingServiceImpl(
     private val contextHandlers = templatingContextHandlers.associateBy { it.id }
 
     private val regexExpressions =
-        "\\$\\{([^\\}]+)\\}".toRegex()
+        "(?<!\\\$)\\$\\{([^\\}]+)\\}".toRegex()
 
     @Suppress("RegExpUnnecessaryNonCapturingGroup")
     private val regexToken =
@@ -59,7 +59,7 @@ class TemplatingServiceImpl(
                 context = context,
                 renderer = renderer,
             )
-        }
+        }.replace("$$", "$")
 
     private fun renderExpression(
         expression: String,
