@@ -73,7 +73,7 @@ class TestIssueServiceExtension(
     }
 
     override fun getMessageAnnotator(issueServiceConfiguration: IssueServiceConfiguration): MessageAnnotator? {
-        return RegexMessageAnnotator("#(\\d+)".toRegex()) { token ->
+        return RegexMessageAnnotator("(#\\d+)".toRegex()) { token ->
             MessageAnnotation.of("a")
                 .attr("href", "http://issue/${token.substring(1)}")
                 .text(token)
