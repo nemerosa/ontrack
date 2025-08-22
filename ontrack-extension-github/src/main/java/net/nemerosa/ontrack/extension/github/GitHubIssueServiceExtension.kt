@@ -66,7 +66,7 @@ class GitHubIssueServiceExtension(
             val matcher = Pattern.compile(GITHUB_ISSUE_PATTERN).matcher(message)
             while (matcher.find()) {
                 // Gets the issue
-                val issueKey = matcher.group(1)
+                val issueKey = matcher.group(2)
                 // Adds to the result
                 result.add(issueKey)
             }
@@ -127,6 +127,6 @@ class GitHubIssueServiceExtension(
 
     companion object {
         const val GITHUB_SERVICE_ID: String = "github"
-        const val GITHUB_ISSUE_PATTERN: String = "#(\\d+)"
+        const val GITHUB_ISSUE_PATTERN: String = "(#(\\d+))"
     }
 }
