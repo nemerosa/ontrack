@@ -16,6 +16,7 @@ import javax.validation.constraints.Pattern
  * @property clientSecret OIDC client secret
  * @property groupFilter Regular expression used to filter groups associated with the OIDC user
  * @property forceHttps Check to force the protocol to HTTPS for the Redirect URI
+ * @property groupClaim Name of the access token claim that contains the list of groups. It defaults to `groups`.
  */
 data class OntrackOIDCProvider(
     @get:NotNull(message = "The account name is required.")
@@ -44,6 +45,9 @@ data class OntrackOIDCProvider(
     @APIDescription("If true, this provider is disabled and won't be active")
     @APIOptional
     val disabled: Boolean,
+    @APIDescription("Name of the access token claim that contains the list of groups. It defaults to `groups`.")
+    @APIOptional
+    val groupClaim: String? = null,
 ) {
 
     /**
