@@ -11,7 +11,6 @@ import net.nemerosa.ontrack.model.support.NameValue
 import org.apache.commons.lang3.StringUtils
 import org.springframework.stereotype.Component
 import java.util.*
-import java.util.function.Function
 
 @Component
 class LinkPropertyType(
@@ -38,11 +37,10 @@ class LinkPropertyType(
         return parse(node, LinkProperty::class)
     }
 
-    @Deprecated("Will be removed in V5")
-    override fun replaceValue(value: LinkProperty, replacementFunction: Function<String, String>): LinkProperty {
+    override fun replaceValue(value: LinkProperty, replacementFunction: (String) -> String): LinkProperty {
         return LinkProperty(
                 value.links.map { nv ->
-                    NameValue(nv.name, replacementFunction.apply(nv.value))
+                    NameValue(nv.name, replacementFunction(nv.value))
                 }
         )
     }

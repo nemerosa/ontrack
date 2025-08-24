@@ -15,7 +15,6 @@ import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.function.BiFunction
-import java.util.function.Function
 import java.util.function.Predicate
 import kotlin.reflect.KClass
 
@@ -258,7 +257,7 @@ class PropertyServiceImpl(
         )
     }
 
-    override fun <T> copyProperty(sourceEntity: ProjectEntity, property: Property<T>, targetEntity: ProjectEntity, replacementFn: Function<String, String>) {
+    override fun <T> copyProperty(sourceEntity: ProjectEntity, property: Property<T>, targetEntity: ProjectEntity, replacementFn: (String) -> String) {
         // Property copy
         val data = property.type.copy(sourceEntity, property.value, targetEntity, replacementFn)
         // Direct edition

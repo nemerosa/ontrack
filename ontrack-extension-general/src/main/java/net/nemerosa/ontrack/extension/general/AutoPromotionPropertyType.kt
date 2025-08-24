@@ -9,7 +9,6 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 import java.util.*
-import java.util.function.Function
 import kotlin.jvm.optionals.getOrNull
 
 @Component
@@ -81,7 +80,7 @@ class AutoPromotionPropertyType(
         sourceEntity: ProjectEntity,
         value: AutoPromotionProperty,
         targetEntity: ProjectEntity,
-        replacementFn: Function<String, String>
+        replacementFn: (String) -> String
     ): AutoPromotionProperty {
         val targetPromotionLevel = targetEntity as PromotionLevel
         return AutoPromotionProperty(
@@ -122,10 +121,9 @@ class AutoPromotionPropertyType(
         return loadAutoPromotionProperty(node)
     }
 
-    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: AutoPromotionProperty,
-        replacementFunction: Function<String, String>
+        replacementFunction: (String) -> String
     ): AutoPromotionProperty {
         return value
     }

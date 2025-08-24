@@ -11,7 +11,6 @@ import net.nemerosa.ontrack.model.structure.SearchIndexService
 import org.apache.commons.lang3.StringUtils
 import org.springframework.stereotype.Component
 import java.util.*
-import java.util.function.Function
 
 @Component
 class MetaInfoPropertyType(
@@ -62,16 +61,16 @@ class MetaInfoPropertyType(
     @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: MetaInfoProperty,
-        replacementFunction: Function<String, String>
+        replacementFunction: (String) -> String
     ): MetaInfoProperty {
         return MetaInfoProperty(
             value.items
                 .map { item ->
                     MetaInfoPropertyItem(
                         item.name,
-                        item.value?.apply { replacementFunction.apply(this) },
-                        item.link?.apply { replacementFunction.apply(this) },
-                        item.category?.apply { replacementFunction.apply(this) }
+                        item.value?.run { replacementFunction(this) },
+                        item.link?.run { replacementFunction(this) },
+                        item.category?.run { replacementFunction(this) }
                     )
                 }
         )

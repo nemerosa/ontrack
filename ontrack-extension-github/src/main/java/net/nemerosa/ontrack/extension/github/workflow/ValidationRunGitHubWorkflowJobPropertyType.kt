@@ -9,7 +9,6 @@ import net.nemerosa.ontrack.model.security.ValidationRunCreate
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import org.springframework.stereotype.Component
-import java.util.function.Function
 
 @Component
 class ValidationRunGitHubWorkflowJobPropertyType(
@@ -33,10 +32,9 @@ class ValidationRunGitHubWorkflowJobPropertyType(
 
     override fun fromStorage(node: JsonNode): ValidationRunGitHubWorkflowJobProperty = node.parse()
 
-    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: ValidationRunGitHubWorkflowJobProperty,
-        replacementFunction: Function<String, String>
+        replacementFunction: (String) -> String
     ): ValidationRunGitHubWorkflowJobProperty = value
 
 }

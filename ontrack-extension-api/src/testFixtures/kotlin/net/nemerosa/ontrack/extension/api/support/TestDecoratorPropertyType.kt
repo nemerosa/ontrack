@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import org.springframework.stereotype.Component
 import java.util.*
-import java.util.function.Function
 
 @Component
 class TestDecoratorPropertyType(
@@ -34,13 +33,12 @@ class TestDecoratorPropertyType(
         return parse(node, TestDecorationData::class)
     }
 
-    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: TestDecorationData,
-        replacementFunction: Function<String, String>
+        replacementFunction: (String) -> String
     ): TestDecorationData {
         return TestDecorationData(
-            replacementFunction.apply(value.value),
+            replacementFunction(value.value),
             value.isValid
         )
     }

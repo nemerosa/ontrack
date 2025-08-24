@@ -9,7 +9,6 @@ import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.structure.PropertySearchArguments
 import org.springframework.stereotype.Component
 import java.util.*
-import java.util.function.Function
 
 @Component
 class TestSimplePropertyType(
@@ -31,13 +30,12 @@ class TestSimplePropertyType(
 
     override fun fromStorage(node: JsonNode): TestSimpleProperty = parse(node, TestSimpleProperty::class)
 
-    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: TestSimpleProperty,
-        replacementFunction: Function<String, String>
+        replacementFunction: (String) -> String
     ): TestSimpleProperty {
         return TestSimpleProperty(
-            replacementFunction.apply(value.value)
+            replacementFunction(value.value)
         )
     }
 

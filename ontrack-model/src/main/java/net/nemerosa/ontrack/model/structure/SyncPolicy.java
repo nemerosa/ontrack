@@ -12,8 +12,11 @@ import java.util.stream.Collectors;
 
 /**
  * Behaviour to adopt when synchronising two lists.
+ *
+ * @deprecated Will be removed in V6. Use syncForward instead
  */
 @Data
+@Deprecated
 public class SyncPolicy {
 
     /**

@@ -9,7 +9,6 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import org.springframework.stereotype.Component
-import java.util.function.Function
 
 @Component
 class AutoVersioningProjectPropertyType(
@@ -32,10 +31,9 @@ class AutoVersioningProjectPropertyType(
 
     override fun fromStorage(node: JsonNode) = node.parse<AutoVersioningProjectProperty>()
 
-    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: AutoVersioningProjectProperty,
-        replacementFunction: Function<String, String>
+        replacementFunction: (String) -> String,
     ): AutoVersioningProjectProperty = value
 
 }

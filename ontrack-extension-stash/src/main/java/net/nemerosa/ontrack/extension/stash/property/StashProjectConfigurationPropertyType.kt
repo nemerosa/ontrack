@@ -14,7 +14,6 @@ import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.support.ConfigurationPropertyType
 import org.springframework.stereotype.Component
 import java.util.*
-import java.util.function.Function
 
 @Component
 class StashProjectConfigurationPropertyType(
@@ -26,7 +25,7 @@ class StashProjectConfigurationPropertyType(
 
     override val description: String = "Associates the project with a Bitbucket Server repository"
 
-    override val supportedEntityTypes: Set<ProjectEntityType> = EnumSet.of<ProjectEntityType>(ProjectEntityType.PROJECT)
+    override val supportedEntityTypes: Set<ProjectEntityType> = EnumSet.of(ProjectEntityType.PROJECT)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean {
         return securityService.isProjectFunctionGranted(entity.projectId(), ProjectConfig::class.java)
@@ -64,15 +63,14 @@ class StashProjectConfigurationPropertyType(
         ).asJson()
     }
 
-    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: StashProjectConfigurationProperty,
-        replacementFunction: Function<String, String>
+        replacementFunction: (String) -> String
     ): StashProjectConfigurationProperty {
         return StashProjectConfigurationProperty(
             value.configuration,
-            replacementFunction.apply(value.project),
-            replacementFunction.apply(value.repository),
+            replacementFunction(value.project),
+            replacementFunction(value.repository),
             value.indexationInterval,
             value.issueServiceConfigurationIdentifier
         )

@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import org.springframework.stereotype.Component
 import java.util.*
-import java.util.function.Function
 
 @Component
 class StalePropertyType(
@@ -36,8 +35,7 @@ class StalePropertyType(
         return parse(node, StaleProperty::class)
     }
 
-    @Deprecated("Will be removed in V5")
-    override fun replaceValue(value: StaleProperty, replacementFunction: Function<String, String>): StaleProperty {
+    override fun replaceValue(value: StaleProperty, replacementFunction: (String) -> String): StaleProperty {
         return value
     }
 }

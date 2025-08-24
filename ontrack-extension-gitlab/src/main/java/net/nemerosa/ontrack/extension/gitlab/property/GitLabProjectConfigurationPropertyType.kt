@@ -14,7 +14,6 @@ import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.support.ConfigurationPropertyType
 import org.springframework.stereotype.Component
 import java.util.*
-import java.util.function.Function
 
 @Component
 class GitLabProjectConfigurationPropertyType(
@@ -29,7 +28,7 @@ class GitLabProjectConfigurationPropertyType(
         get() = "Associates the project with a GitLab repository"
 
     override val supportedEntityTypes: Set<ProjectEntityType>
-        get() = EnumSet.of<ProjectEntityType>(ProjectEntityType.PROJECT)
+        get() = EnumSet.of(ProjectEntityType.PROJECT)
 
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean {
         return securityService.isProjectFunctionGranted(entity.projectId(), ProjectConfig::class.java)
@@ -64,15 +63,14 @@ class GitLabProjectConfigurationPropertyType(
             "issueServiceConfigurationIdentifier" to value.issueServiceConfigurationIdentifier,
         ).asJson()
 
-    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: GitLabProjectConfigurationProperty,
-        replacementFunction: Function<String, String>
+        replacementFunction: (String) -> String
     ): GitLabProjectConfigurationProperty {
         return GitLabProjectConfigurationProperty(
             value.configuration,
             value.issueServiceConfigurationIdentifier,
-            replacementFunction.apply(value.repository),
+            replacementFunction(value.repository),
             value.indexationInterval
         )
     }

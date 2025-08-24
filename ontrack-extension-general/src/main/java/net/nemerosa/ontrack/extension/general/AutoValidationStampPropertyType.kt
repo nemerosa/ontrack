@@ -10,7 +10,6 @@ import net.nemerosa.ontrack.model.settings.PredefinedValidationStampService
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 import java.util.*
-import java.util.function.Function
 
 @Component
 class AutoValidationStampPropertyType(
@@ -44,12 +43,12 @@ class AutoValidationStampPropertyType(
                 return Optional.of<ValidationStamp>(
                     securityService.asAdmin {
                         structureService.newValidationStamp(
-                            net.nemerosa.ontrack.model.structure.ValidationStamp.of(
+                            ValidationStamp.of(
                                 branch,
                                 NameDescription.nd(validationStampName, "Validation automatically created on demand.")
                             )
                         )
-                    }!!
+                    }
                 )
             }
         }
@@ -78,10 +77,9 @@ class AutoValidationStampPropertyType(
     override fun fromStorage(node: JsonNode): AutoValidationStampProperty =
         node.parse()
 
-    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: AutoValidationStampProperty,
-        replacementFunction: Function<String, String>
+        replacementFunction: (String) -> String
     ): AutoValidationStampProperty {
         return value
     }

@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import org.springframework.stereotype.Component
-import java.util.function.Function
 
 /**
  * Definition of the "Promotion dependencies" property type.
@@ -39,7 +38,6 @@ class PromotionDependenciesPropertyType(
 
     override fun fromStorage(node: JsonNode): PromotionDependenciesProperty = node.parse()
 
-    @Deprecated("Will be removed in V5")
-    override fun replaceValue(value: PromotionDependenciesProperty, replacementFunction: Function<String, String>): PromotionDependenciesProperty =
+    override fun replaceValue(value: PromotionDependenciesProperty, replacementFunction: (String) -> String): PromotionDependenciesProperty =
             value
 }

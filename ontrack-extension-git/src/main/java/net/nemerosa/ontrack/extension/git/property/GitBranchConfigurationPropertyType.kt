@@ -82,13 +82,12 @@ class GitBranchConfigurationPropertyType(
         )
     }
 
-    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: GitBranchConfigurationProperty,
-        replacementFunction: Function<String, String>
+        replacementFunction: (String) -> String
     ): GitBranchConfigurationProperty {
         return GitBranchConfigurationProperty(
-            replacementFunction.apply(value.branch),
+            replacementFunction(value.branch),
             if (value.buildCommitLink != null) replaceBuildCommitLink<Any>(
                 value.buildCommitLink,
                 replacementFunction

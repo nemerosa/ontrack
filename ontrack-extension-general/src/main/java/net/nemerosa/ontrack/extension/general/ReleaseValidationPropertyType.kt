@@ -9,7 +9,6 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.structure.PropertySearchArguments
 import org.springframework.stereotype.Component
-import java.util.function.Function
 
 @Component
 class ReleaseValidationPropertyType(
@@ -34,9 +33,9 @@ class ReleaseValidationPropertyType(
     @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: ReleaseValidationProperty,
-        replacementFunction: Function<String, String>,
+        replacementFunction: (String) -> String,
     ) = ReleaseValidationProperty(
-        validation = replacementFunction.apply(value.validation)
+        validation = replacementFunction(value.validation)
     )
 
     override fun containsValue(value: ReleaseValidationProperty, propertyValue: String): Boolean =

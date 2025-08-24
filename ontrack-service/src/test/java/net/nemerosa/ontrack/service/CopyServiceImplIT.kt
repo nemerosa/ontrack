@@ -11,7 +11,6 @@ import net.nemerosa.ontrack.test.TestUtils
 import net.nemerosa.ontrack.test.assertPresent
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
@@ -26,16 +25,16 @@ class CopyServiceImplIT : AbstractServiceTestSupport() {
         val sourceProject = doCreateProject()
         val sourceBranch = doCreateBranch(sourceProject, nd("B1", "Branch B1"))
 
-        asUser().with(sourceProject, ProjectEdit::class.java).execute(Runnable {
+        asUser().withProjectFunction(sourceProject, ProjectEdit::class.java).execute(Runnable {
             propertyService.editProperty(
                 sourceProject,
                 TestSimplePropertyType::class.java,
-                TestSimpleProperty("http://wiki/P1")
+                TestSimpleProperty("https://wiki/P1")
             )
             propertyService.editProperty(
                 sourceBranch,
                 TestSimplePropertyType::class.java,
-                TestSimpleProperty("http://wiki/B1")
+                TestSimpleProperty("https://wiki/B1")
             )
         })
 
@@ -71,7 +70,7 @@ class CopyServiceImplIT : AbstractServiceTestSupport() {
             ).value
         }
         assertNotNull(property)
-        assertEquals("http://wiki/P2", property.value)
+        assertEquals("https://wiki/P2", property.value)
 
         // Checks the copy of properties for the branch
         property = asUserWithView(clonedProject).call {
@@ -81,7 +80,7 @@ class CopyServiceImplIT : AbstractServiceTestSupport() {
             ).value
         }
         assertNotNull(property)
-        assertEquals("http://wiki/B2", property.value)
+        assertEquals("https://wiki/B2", property.value)
     }
 
     @Test
@@ -97,11 +96,11 @@ class CopyServiceImplIT : AbstractServiceTestSupport() {
         )
 
         // Branch properties
-        setProperty(sourceBranch, TestSimplePropertyType::class.java, TestSimpleProperty("http://wiki/B1"))
+        setProperty(sourceBranch, TestSimplePropertyType::class.java, TestSimpleProperty("https://wiki/B1"))
 
         // Cloning
         val clonedBranch = asUser()
-            .with(sourceBranch, ProjectEdit::class.java)
+            .withProjectFunction(sourceBranch, ProjectEdit::class.java)
             .call { service.cloneBranch(sourceBranch, request) }
 
         // Checks the branch is created
@@ -110,7 +109,7 @@ class CopyServiceImplIT : AbstractServiceTestSupport() {
         // Checks the copy of properties for the branch
         val p = getProperty(clonedBranch, TestSimplePropertyType::class.java)
         assertNotNull(p)
-        assertEquals("http://wiki/B2", p.value)
+        assertEquals("https://wiki/B2", p.value)
     }
 
     @Test
@@ -128,11 +127,11 @@ class CopyServiceImplIT : AbstractServiceTestSupport() {
         setProperty(
             branch,
             TestSimplePropertyType::class.java,
-            TestSimpleProperty("http://wiki/B1")
+            TestSimpleProperty("https://wiki/B1")
         )
 
         // Updating
-        val updatedBranch = asUser().with(
+        val updatedBranch = asUser().withProjectFunction(
             branch,
             ProjectEdit::class.java
         ).call { service.update(branch, request) }
@@ -140,7 +139,7 @@ class CopyServiceImplIT : AbstractServiceTestSupport() {
         // Checks the copy of properties for the branch
         val p = getProperty(updatedBranch, TestSimplePropertyType::class.java)
         assertNotNull(p)
-        assertEquals("http://wiki/B2", p.value)
+        assertEquals("https://wiki/B2", p.value)
     }
 
     @Test
@@ -156,19 +155,19 @@ class CopyServiceImplIT : AbstractServiceTestSupport() {
         )
 
         // Properties for the branch
-        setProperty(sourceBranch, TestSimplePropertyType::class.java, TestSimpleProperty("http://wiki/B1"))
+        setProperty(sourceBranch, TestSimplePropertyType::class.java, TestSimpleProperty("https://wiki/B1"))
 
         // Copy
         asUser()
             .withView(sourceBranch)
-            .with(targetBranch, ProjectEdit::class.java)
-            .execute(Runnable { service.copy(targetBranch, sourceBranch, replacementFn, SyncPolicy.COPY) }
+            .withProjectFunction(targetBranch, ProjectEdit::class.java)
+            .execute(Runnable { service.copy(targetBranch, sourceBranch, replacementFn) }
             )
 
         // Checks the copy of properties for the branch
         val p = getProperty(targetBranch, TestSimplePropertyType::class.java)
         assertNotNull(p)
-        assertEquals("http://wiki/B2", p.value)
+        assertEquals("https://wiki/B2", p.value)
     }
 
     @Test
@@ -186,17 +185,17 @@ class CopyServiceImplIT : AbstractServiceTestSupport() {
         val sourcePromotionLevel = doCreatePromotionLevel(sourceBranch, nd("copper", "Copper level for P1"))
 
         // Properties for the promotion level
-        setProperty(sourcePromotionLevel, TestSimplePropertyType::class.java, TestSimpleProperty("http://wiki/P1"))
+        setProperty(sourcePromotionLevel, TestSimplePropertyType::class.java, TestSimpleProperty("https://wiki/P1"))
 
         // Copy
         asUser()
             .withView(sourceBranch)
-            .with(targetBranch, ProjectEdit::class.java)
-            .execute(Runnable { service.copy(targetBranch, sourceBranch, replacementFn, SyncPolicy.COPY) }
+            .withProjectFunction(targetBranch, ProjectEdit::class.java)
+            .execute(Runnable { service.copy(targetBranch, sourceBranch, replacementFn) }
             )
 
         // Checks the promotion level was created
-        val oPL = asUserWithView(targetBranch).call<Optional<PromotionLevel>> {
+        val oPL = asUserWithView(targetBranch).call {
             structureService.findPromotionLevelByName(
                 targetBranch.project.name,
                 targetBranch.name,
@@ -207,7 +206,7 @@ class CopyServiceImplIT : AbstractServiceTestSupport() {
             // Checks the copy of properties for the promotion levels
             val p = getProperty(it, TestSimplePropertyType::class.java)
             assertNotNull(p)
-            assertEquals("http://wiki/P2", p.value)
+            assertEquals("https://wiki/P2", p.value)
         }
     }
 
@@ -228,18 +227,18 @@ class CopyServiceImplIT : AbstractServiceTestSupport() {
         setProperty(
             sourceValidationStamp,
             TestSimplePropertyType::class.java,
-            TestSimpleProperty("http://wiki/P1")
+            TestSimpleProperty("https://wiki/P1")
         )
 
         // Copy
         asUser()
             .withView(sourceBranch)
             .withProjectFunction(targetBranch, ProjectEdit::class.java)
-            .execute(Runnable { service.copy(targetBranch, sourceBranch, replacementFn, SyncPolicy.COPY) }
+            .execute(Runnable { service.copy(targetBranch, sourceBranch, replacementFn) }
             )
 
         // Checks the validation stamp was created
-        val oVS = asUserWithView(targetBranch).call<Optional<ValidationStamp>> {
+        val oVS = asUserWithView(targetBranch).call {
             structureService.findValidationStampByName(
                 targetBranch.project.name,
                 targetBranch.name,
@@ -250,7 +249,7 @@ class CopyServiceImplIT : AbstractServiceTestSupport() {
             // Checks the copy of properties for the validation stamps
             val p = getProperty(it, TestSimplePropertyType::class.java)
             assertNotNull(p)
-            assertEquals("http://wiki/P2", p.value)
+            assertEquals("https://wiki/P2", p.value)
         }
     }
 }

@@ -11,7 +11,6 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import org.springframework.stereotype.Component
 import java.util.*
-import java.util.function.Function
 
 @Component
 class JenkinsBuildPropertyType(
@@ -32,14 +31,14 @@ class JenkinsBuildPropertyType(
      * Depends on the nature of the entity. Allowed to the ones who can create the associated entity.
      */
     override fun canEdit(entity: ProjectEntity, securityService: SecurityService): Boolean {
-        when (entity.projectEntityType) {
-            ProjectEntityType.BUILD -> return securityService.isProjectFunctionGranted(entity, BuildCreate::class.java)
-            ProjectEntityType.PROMOTION_RUN -> return securityService.isProjectFunctionGranted(
+        return when (entity.projectEntityType) {
+            ProjectEntityType.BUILD -> securityService.isProjectFunctionGranted(entity, BuildCreate::class.java)
+            ProjectEntityType.PROMOTION_RUN -> securityService.isProjectFunctionGranted(
                 entity,
                 PromotionRunCreate::class.java
             )
 
-            ProjectEntityType.VALIDATION_RUN -> return securityService.isProjectFunctionGranted(
+            ProjectEntityType.VALIDATION_RUN -> securityService.isProjectFunctionGranted(
                 entity,
                 ValidationRunCreate::class.java
             )
@@ -55,7 +54,7 @@ class JenkinsBuildPropertyType(
         return true
     }
 
-    public override fun forStorage(value: JenkinsBuildProperty): JsonNode {
+    override fun forStorage(value: JenkinsBuildProperty): JsonNode {
         return mapOf(
             "configuration" to value.configuration.name,
             "job" to value.job,
@@ -83,14 +82,13 @@ class JenkinsBuildPropertyType(
         )
     }
 
-    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: JenkinsBuildProperty,
-        replacementFunction: Function<String, String>
+        replacementFunction: (String) -> String,
     ): JenkinsBuildProperty {
         return JenkinsBuildProperty(
             replaceConfiguration(value.configuration, replacementFunction),
-            replacementFunction.apply(value.job),
+            replacementFunction(value.job),
             value.build
         )
     }

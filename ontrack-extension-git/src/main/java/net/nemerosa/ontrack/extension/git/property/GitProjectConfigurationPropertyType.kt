@@ -12,7 +12,6 @@ import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.support.ConfigurationPropertyType
 import org.springframework.stereotype.Component
 import java.util.*
-import java.util.function.Function
 
 
 @Component
@@ -55,10 +54,9 @@ class GitProjectConfigurationPropertyType(
         mapOf("configuration" to value.configuration.name)
             .asJson()
 
-    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: GitProjectConfigurationProperty,
-        replacementFunction: Function<String, String>
+        replacementFunction: (String) -> String
     ): GitProjectConfigurationProperty {
         return GitProjectConfigurationProperty(
             value.configuration

@@ -10,7 +10,6 @@ import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.structure.PropertySearchArguments
 import org.springframework.stereotype.Component
 import java.util.*
-import java.util.function.Function
 
 @Component
 class MessagePropertyType(extensionFeature: GeneralExtensionFeature) :
@@ -41,11 +40,11 @@ class MessagePropertyType(extensionFeature: GeneralExtensionFeature) :
     @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: MessageProperty,
-        replacementFunction: Function<String, String>
+        replacementFunction: (String) -> String
     ): MessageProperty {
         return MessageProperty(
             value.type,
-            replacementFunction.apply(value.text)
+            replacementFunction(value.text)
         )
     }
 

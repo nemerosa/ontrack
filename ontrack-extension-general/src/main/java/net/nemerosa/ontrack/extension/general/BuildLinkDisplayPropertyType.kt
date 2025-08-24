@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import org.springframework.stereotype.Component
 import java.util.*
-import java.util.function.Function
 
 @Component
 class BuildLinkDisplayPropertyType(
@@ -37,8 +36,7 @@ class BuildLinkDisplayPropertyType(
         return parse(node, BuildLinkDisplayProperty::class)
     }
 
-    @Deprecated("Will be removed in V5")
-    override fun replaceValue(value: BuildLinkDisplayProperty, replacementFunction: Function<String, String>): BuildLinkDisplayProperty {
+    override fun replaceValue(value: BuildLinkDisplayProperty, replacementFunction: (String) -> String): BuildLinkDisplayProperty {
         return value
     }
 }

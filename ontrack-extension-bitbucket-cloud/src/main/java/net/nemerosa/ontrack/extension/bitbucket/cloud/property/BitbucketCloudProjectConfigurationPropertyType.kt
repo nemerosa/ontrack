@@ -16,7 +16,6 @@ import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.support.ConfigurationPropertyType
 import org.springframework.stereotype.Component
 import java.util.*
-import java.util.function.Function
 
 @Component
 class BitbucketCloudProjectConfigurationPropertyType(
@@ -61,13 +60,12 @@ class BitbucketCloudProjectConfigurationPropertyType(
         ).asJson()
     }
 
-    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: BitbucketCloudProjectConfigurationProperty,
-        replacementFunction: Function<String, String>
+        replacementFunction: (String) -> String
     ): BitbucketCloudProjectConfigurationProperty = BitbucketCloudProjectConfigurationProperty(
         value.configuration,
-        replacementFunction.apply(value.repository),
+        replacementFunction(value.repository),
         value.indexationInterval,
         value.issueServiceConfigurationIdentifier
     )

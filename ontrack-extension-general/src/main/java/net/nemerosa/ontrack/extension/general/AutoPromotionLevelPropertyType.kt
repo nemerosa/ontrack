@@ -10,7 +10,6 @@ import net.nemerosa.ontrack.model.settings.PredefinedPromotionLevelService
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 import java.util.*
-import java.util.function.Function
 
 @Component
 class AutoPromotionLevelPropertyType(
@@ -67,10 +66,9 @@ class AutoPromotionLevelPropertyType(
         return node.parse()
     }
 
-    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: AutoPromotionLevelProperty,
-        replacementFunction: Function<String, String>
+        replacementFunction: (String) -> String
     ): AutoPromotionLevelProperty {
         return value
     }

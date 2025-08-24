@@ -10,7 +10,6 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
-import java.util.function.Function
 
 @Component
 @Profile(RunProfile.DEV)
@@ -32,10 +31,9 @@ class MockSCMBuildCommitPropertyType(
 
     override fun fromStorage(node: JsonNode): MockSCMBuildCommitProperty = node.parse()
 
-    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: MockSCMBuildCommitProperty,
-        replacementFunction: Function<String, String>,
+        replacementFunction: (String) -> String,
     ): MockSCMBuildCommitProperty = value
 
 }

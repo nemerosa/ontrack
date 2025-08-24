@@ -14,7 +14,6 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.support.ConfigurationPropertyType
 import org.springframework.stereotype.Component
-import java.util.function.Function
 
 @Component
 class SonarQubePropertyType(
@@ -66,12 +65,11 @@ class SonarQubePropertyType(
             SonarQubeProperty::validationMetrics.name to value.validationMetrics,
         ).asJson()
 
-    @Deprecated("Will be removed in V5")
-    override fun replaceValue(value: SonarQubeProperty, replacementFunction: Function<String, String>) =
+    override fun replaceValue(value: SonarQubeProperty, replacementFunction: (String) -> String) =
         SonarQubeProperty(
             value.configuration,
-            replacementFunction.apply(value.key),
-            replacementFunction.apply(value.validationStamp),
+            replacementFunction(value.key),
+            replacementFunction(value.validationStamp),
             value.measures,
             value.override,
             value.branchModel,

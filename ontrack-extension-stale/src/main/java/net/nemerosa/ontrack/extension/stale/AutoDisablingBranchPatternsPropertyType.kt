@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import org.springframework.stereotype.Component
-import java.util.function.Function
 
 @Component
 class AutoDisablingBranchPatternsPropertyType(
@@ -35,9 +34,8 @@ class AutoDisablingBranchPatternsPropertyType(
     override fun fromStorage(node: JsonNode): AutoDisablingBranchPatternsProperty =
         node.parse<AutoDisablingBranchPatternsProperty>()
 
-    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: AutoDisablingBranchPatternsProperty,
-        replacementFunction: Function<String, String>,
+        replacementFunction: (String) -> String,
     ): AutoDisablingBranchPatternsProperty = value
 }

@@ -12,7 +12,6 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.support.ConfigurationPropertyType
 import org.springframework.stereotype.Component
-import java.util.function.Function
 
 @Component
 class ArtifactoryPromotionSyncPropertyType(
@@ -67,15 +66,14 @@ class ArtifactoryPromotionSyncPropertyType(
         )
     }
 
-    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: ArtifactoryPromotionSyncProperty,
-        replacementFunction: Function<String, String>
+        replacementFunction: (String) -> String,
     ): ArtifactoryPromotionSyncProperty {
         return ArtifactoryPromotionSyncProperty(
             value.configuration,
-            replacementFunction.apply(value.buildName),
-            replacementFunction.apply(value.buildNameFilter),
+            replacementFunction(value.buildName),
+            replacementFunction(value.buildNameFilter),
             value.interval
         )
     }

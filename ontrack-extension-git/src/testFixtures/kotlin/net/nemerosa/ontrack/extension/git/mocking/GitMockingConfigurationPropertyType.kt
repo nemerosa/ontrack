@@ -9,7 +9,6 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import org.springframework.stereotype.Component
-import java.util.function.Function
 
 @Component
 class GitMockingConfigurationPropertyType(
@@ -31,6 +30,5 @@ class GitMockingConfigurationPropertyType(
 
     override fun fromStorage(node: JsonNode): GitMockingConfigurationProperty = node.parse()
 
-    @Deprecated("Will be removed in V5")
-    override fun replaceValue(value: GitMockingConfigurationProperty, replacementFunction: Function<String, String>): GitMockingConfigurationProperty = error("Will not be used")
+    override fun replaceValue(value: GitMockingConfigurationProperty, replacementFunction: (String) -> String): GitMockingConfigurationProperty = error("Will not be used")
 }

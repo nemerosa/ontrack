@@ -10,7 +10,6 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.structure.PropertySearchArguments
 import org.springframework.stereotype.Component
-import java.util.function.Function
 
 @Component
 class BuildGitHubWorkflowRunPropertyType(
@@ -41,10 +40,9 @@ class BuildGitHubWorkflowRunPropertyType(
             BuildGitHubWorkflowRunProperty(workflows = listOf(workflow))
         }
 
-    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: BuildGitHubWorkflowRunProperty,
-        replacementFunction: Function<String, String>,
+        replacementFunction: (String) -> String,
     ): BuildGitHubWorkflowRunProperty = value
 
     override fun getSearchArguments(token: String): PropertySearchArguments? =

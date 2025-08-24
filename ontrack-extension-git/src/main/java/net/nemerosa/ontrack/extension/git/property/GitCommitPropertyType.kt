@@ -13,7 +13,6 @@ import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.structure.PropertySearchArguments
 import org.springframework.stereotype.Component
 import java.util.*
-import java.util.function.Function
 
 @Component
 class GitCommitPropertyType(
@@ -45,10 +44,9 @@ class GitCommitPropertyType(
         )
     }
 
-    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: GitCommitProperty,
-        replacementFunction: Function<String, String>
+        replacementFunction: (String) -> String
     ): GitCommitProperty {
         // A commit is immutable...
         return value

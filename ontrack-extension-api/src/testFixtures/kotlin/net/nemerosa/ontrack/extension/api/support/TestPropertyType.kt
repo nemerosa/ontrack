@@ -11,7 +11,6 @@ import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.support.ConfigurationPropertyType
 import org.springframework.stereotype.Component
 import java.util.*
-import java.util.function.Function
 
 @Component
 class TestPropertyType(
@@ -50,11 +49,10 @@ class TestPropertyType(
         )
     }
 
-    @Deprecated("Will be removed in V5")
-    override fun replaceValue(value: TestProperty, replacementFunction: Function<String, String>): TestProperty {
+    override fun replaceValue(value: TestProperty, replacementFunction: (String) -> String): TestProperty {
         return TestProperty(
             value.configuration,
-            replacementFunction.apply(value.value)
+            replacementFunction(value.value)
         )
     }
 }

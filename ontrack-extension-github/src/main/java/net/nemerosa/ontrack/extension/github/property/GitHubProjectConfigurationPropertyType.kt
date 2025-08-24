@@ -17,7 +17,6 @@ import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import net.nemerosa.ontrack.model.support.ConfigurationPropertyType
 import org.springframework.stereotype.Component
 import java.util.*
-import java.util.function.Function
 
 @Component
 class GitHubProjectConfigurationPropertyType(
@@ -79,14 +78,13 @@ class GitHubProjectConfigurationPropertyType(
         ).asJson()
     }
 
-    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: GitHubProjectConfigurationProperty,
-        replacementFunction: Function<String, String>
+        replacementFunction: (String) -> String
     ): GitHubProjectConfigurationProperty {
         return GitHubProjectConfigurationProperty(
             configuration = value.configuration,
-            repository = replacementFunction.apply(value.repository),
+            repository = replacementFunction(value.repository),
             indexationInterval = value.indexationInterval,
             issueServiceConfigurationIdentifier = value.issueServiceConfigurationIdentifier
         )

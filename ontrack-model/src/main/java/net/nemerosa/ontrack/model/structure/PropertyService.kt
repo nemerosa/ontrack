@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.model.Ack
 import net.nemerosa.ontrack.model.exceptions.PropertyTypeNotFoundException
 import java.util.function.BiFunction
-import java.util.function.Function
 import java.util.function.Predicate
 import kotlin.reflect.KClass
 
@@ -142,7 +141,7 @@ interface PropertyService {
      * @param replacementFn Replacement function for textual values
      * @param <T>           Type of the property
     </T> */
-    fun <T> copyProperty(sourceEntity: ProjectEntity, property: Property<T>, targetEntity: ProjectEntity, replacementFn: Function<String, String>)
+    fun <T> copyProperty(sourceEntity: ProjectEntity, property: Property<T>, targetEntity: ProjectEntity, replacementFn: (String) -> String)
 
     /**
      * Loops over all the properties of a given type.

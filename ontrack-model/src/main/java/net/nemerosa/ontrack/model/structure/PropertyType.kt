@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import net.nemerosa.ontrack.model.extension.Extension
 import net.nemerosa.ontrack.model.security.SecurityService
 import org.apache.commons.lang3.StringUtils
-import java.util.function.Function
 
 /**
  * Defines the type for a property.
@@ -88,8 +87,7 @@ interface PropertyType<T> : Extension {
      * @param replacementFunction Replacement function to used to transform each string into a new one
      * @return Transformed value
      */
-    @Deprecated("Will be removed in V5")
-    fun replaceValue(value: T, replacementFunction: Function<String, String>): T
+    fun replaceValue(value: T, replacementFunction: (String) -> String): T
 
     /**
      * Checks if the property `value` contains the given search token.
@@ -125,7 +123,7 @@ interface PropertyType<T> : Extension {
         sourceEntity: ProjectEntity,
         value: T,
         targetEntity: ProjectEntity,
-        replacementFn: Function<String, String>
+        replacementFn: (String) -> String
     ): T {
         return replaceValue(value, replacementFn)
     }

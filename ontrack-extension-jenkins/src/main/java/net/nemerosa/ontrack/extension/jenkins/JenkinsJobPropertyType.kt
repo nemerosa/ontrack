@@ -8,7 +8,6 @@ import net.nemerosa.ontrack.model.structure.ProjectEntity
 import net.nemerosa.ontrack.model.structure.ProjectEntityType
 import org.springframework.stereotype.Component
 import java.util.*
-import java.util.function.Function
 
 @Component
 class JenkinsJobPropertyType(
@@ -40,7 +39,7 @@ class JenkinsJobPropertyType(
         return true
     }
 
-    public override fun forStorage(value: JenkinsJobProperty): JsonNode {
+    override fun forStorage(value: JenkinsJobProperty): JsonNode {
         return mapOf(
             "configuration" to value.configuration.name,
             "job" to value.job,
@@ -65,14 +64,13 @@ class JenkinsJobPropertyType(
         )
     }
 
-    @Deprecated("Will be removed in V5")
     override fun replaceValue(
         value: JenkinsJobProperty,
-        replacementFunction: Function<String, String>
+        replacementFunction: (String) -> String
     ): JenkinsJobProperty {
         return JenkinsJobProperty(
             replaceConfiguration(value.configuration, replacementFunction),
-            replacementFunction.apply(value.job)
+            replacementFunction(value.job)
         )
     }
 }

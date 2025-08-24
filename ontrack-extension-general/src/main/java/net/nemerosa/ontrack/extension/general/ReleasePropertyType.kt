@@ -7,7 +7,6 @@ import net.nemerosa.ontrack.model.security.SecurityService
 import net.nemerosa.ontrack.model.structure.*
 import org.springframework.stereotype.Component
 import java.util.*
-import java.util.function.Function
 
 @Component
 class ReleasePropertyType(
@@ -53,8 +52,7 @@ class ReleasePropertyType(
         )
     }
 
-    @Deprecated("Will be removed in V5")
-    override fun replaceValue(value: ReleaseProperty, replacementFunction: Function<String, String>): ReleaseProperty {
+    override fun replaceValue(value: ReleaseProperty, replacementFunction: (String) -> String): ReleaseProperty {
         return value
     }
 
