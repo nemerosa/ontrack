@@ -136,6 +136,10 @@ class OntrackConfigProperties {
          * Custom claim for the email
          */
         var email: String = ""
+        /**
+         * Custom claim for the list of groups
+         */
+        val groups: String = ""
     }
 
     class AdminConfigProperties {

@@ -80,7 +80,10 @@ class WebSecurityFilter(
             }
             if (debug) log.debug("JWT full name {}", fullName)
 
-            val groups = jwtAuthenticationToken.token.getClaim<List<String>>("groups")
+            val groupsClaim = ontrackConfigProperties.security.authorization.jwt.claims.groups
+                .takeIf { it.isNotBlank() }
+                ?: "groups"
+            val groups = jwtAuthenticationToken.token.getClaim<List<String>>(groupsClaim)
                 ?: emptyList()
 
             return accountLoginService.login(email, fullName, groups)
