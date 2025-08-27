@@ -43,7 +43,7 @@ You can easily use the <<feeding-cli,Ontrack CLI>> from your GitHub workflows by
 [source,yaml]
 ----
 - name: Setup the CLI
-  uses: nemerosa/ontrack-github-actions-cli-setup@v1
+  uses: nemerosa/ontrack-github-actions-cli-setup@v2
   with:
     github-token: ${{ github.token }}
     only-for: nemerosa
@@ -66,7 +66,7 @@ You can easily use the <<feeding-cli,Ontrack CLI>> from your GitHub workflows by
     token: ${{ github.token }}
 ----
 
-Note that when https://github.com/nemerosa/ontrack-github-actions-cli-setup[`nemerosa/ontrack-github-actions-cli-setup`] has been called into your workflow job, the <<feedback-cli,Ontrack CLI>> becomes available in all subsequent steps and be used directly:
+Note that when https://github.com/nemerosa/ontrack-github-actions-cli-setup[`nemerosa/ontrack-github-actions-cli-setup`] has been called into your workflow job, the https://github.com/nemerosa/ontrack-cli[Ontrack CLI] becomes available in all subsequent steps and be used directly:
 
 [source,yaml]
 ----
@@ -77,3 +77,131 @@ Note that when https://github.com/nemerosa/ontrack-github-actions-cli-setup[`nem
 - name: Using the CLI
   run: ontrack-cli ...
 ----
+
+[[feeding-github-actions-example]]
+===== Example of GitHub pipeline with actions
+
+In your repository or organization, start by declaring the following
+elements:
+
+* a `ONTRACK_URL` _variable_, having the URL of your Ontrack installation
+* a `ONTRACK_TOKEN` _secret_, having an API token defined in Ontrack; the account linked to this token must have the necessary rights (typically administrator or automation)
+
+In Ontrack itself, make sure to define at least one <<integration-github-config,GitHub configuration>>.
+
+In each job, start by setting up the https://github.com/nemerosa/ontrack-cli[Ontrack CLI]:
+
+[source,yaml]
+----
+- name: Setup the CLI
+  uses: nemerosa/ontrack-github-actions-cli-setup@v2
+  with:
+    github-token: ${{ github.token }}
+    url: ${{ vars.ONTRACK_URL }}
+    token: ${{ secrets.ONTRACK_TOKEN }}
+    config: github.com
+    indexation: 60
+----
+
+NOTE: More options are available at https://github.com/nemerosa/ontrack-github-actions-cli-setup
+
+Once this step has been run, the https://github.com/nemerosa/ontrack-cli[Ontrack CLI] is available in the
+rest of the workflow.
+
+Typically, you'll create a build in Ontrack:
+
+[source,yaml]
+----
+  -  name: Ontrack build
+     run: |
+        ontrack-cli build setup \
+          --project ${{ steps.ontrack.outputs.project }} \
+          --branch ${{ steps.ontrack.outputs.branch }} \
+          --build ${{ github.run_number }}
+        ontrack-cli build set-property \
+          --project ${{ steps.ontrack.outputs.project }} \
+          --branch ${{ steps.ontrack.outputs.branch }} \
+          --build ${{ github.run_number }} \
+          git-commit \
+          --commit ${{ github.sha }}
+----
+
+After the build is created, you can create some validations,
+either using the https://github.com/nemerosa/ontrack-cli[Ontrack CLI]
+or using the dedicated https://github.com/nemerosa/ontrack-github-actions-cli-validation[`ontrack-github-actions-cli-validation`] action.
+
+For example:
+
+[source,yaml]
+----
+  - uses: nemerosa/ontrack-github-actions-cli-validation@v2
+    if: ${{ always() }}
+----
+
+NOTE: the `if: ${{ always() }}` is there to run this step even if the previous step is failed.
+
+Using the CLI, it can look like:
+
+[source,yaml]
+----
+  - name: Validation
+    run: |
+        ontrack-cli validate \
+          --project ${{ steps.ontrack.outputs.project }} \
+          --branch ${{ steps.ontrack.outputs.branch }} \
+          --build ${{ github.run_number }} \
+          --validation my-validation \
+          --status PASSED
+----
+
+If you want to record some JUnit XML test results:
+
+[source,yaml]
+----
+  - name: Validation
+    if: ${{ always() }}
+    run: |
+        ontrack-cli validate \
+          --project ${{ steps.ontrack.outputs.project }} \
+          --branch ${{ steps.ontrack.outputs.branch }} \
+          --build ${{ github.run_number }} \
+          --validation my-validation \
+          junit \
+          --pattern "**/results/*.xml"
+----
+
+[[feeding-github-actions-promotions]]
+===== Setting up validations and promotions
+
+The https://github.com/nemerosa/ontrack-github-actions-cli-setup[`ontrack-github-actions-cli-setup`] action allows the setup of validations and promotions:
+
+[source,yaml]
+----
+- name: Setup the CLI
+  uses: nemerosa/ontrack-github-actions-cli-setup@v2
+  with:
+    # ...
+    promotions: .github/ontrack/promotions.yaml
+----
+
+where `.github/ontrack/promotions.yaml` looks like:
+
+[source,yaml]
+----
+BRONZE:
+  validations:
+    - BUILD
+SILVER:
+  validations:
+    - ACCEPTANCE
+  promotions:
+    - BRONZE
+----
+
+This setup action does not allow much customization yet, and one
+needs to rely on the https://github.com/nemerosa/ontrack-cli[Ontrack CLI] for more options (typing of the validations, auto-promotion, etc).
+
+[[feeding-github-actions-auto-versioning]]
+===== Setting up auto-versioning
+
+TODO
