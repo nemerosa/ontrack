@@ -252,10 +252,47 @@ class OntrackOidcUserServiceIT : AbstractDSLTestJUnit4Support() {
         }
     }
 
+    @Test
+    fun `Groups using a custom claim`() {
+        val email = "${uid("n")}@nemerosa.net"
+        val fullName = uid("N")
+        whenever(oidcUserInfo.email).thenReturn(email)
+        whenever(oidcUser.fullName).thenReturn(fullName)
+
+        whenever(oidcUser.getClaimAsStringList("roles")).thenReturn(
+            listOf(
+                "ontrack-admins",
+                "ontrack-users",
+                "other-group"
+            )
+        )
+
+        registerProvider(groupClaim = "roles")
+
+        val user = userService.linkOidcUser(clientRegistration, oidcUser)
+
+        assertIs<OntrackOidcUser>(user) { ontrackUser ->
+            val accountId = ontrackUser.id()
+            asAdmin {
+                val authSource = OidcAuthenticationSourceProvider.asSource(clientRegistration)
+                val groups = providedGroupsService.getProvidedGroups(accountId, authSource)
+                assertEquals(
+                    setOf(
+                        "ontrack-admins",
+                        "ontrack-users",
+                        "other-group",
+                    ),
+                    groups
+                )
+            }
+        }
+    }
+
     private fun registerProvider(
             id: String = "test",
             name: String = "Test",
-            groupFilter: String? = null
+            groupFilter: String? = null,
+            groupClaim: String? = null,
     ) {
         asAdmin {
             val provider = oidcSettingsService.getProviderById(id)
@@ -271,6 +308,7 @@ class OntrackOidcUserServiceIT : AbstractDSLTestJUnit4Support() {
                                 groupFilter = groupFilter,
                                 forceHttps = false,
                                 disabled = false,
+                                groupClaim = groupClaim,
                         )
                 )
             } else {

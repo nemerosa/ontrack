@@ -287,4 +287,22 @@ class TemplatingServiceImplTest {
         )
     }
 
+    @Test
+    fun `Escaping expressions`() {
+        val project = ProjectFixtures.testProject(name = "ontrack")
+        val text = templatingService.render(
+            template = """
+                Parameter ${'$'}${'$'}{PARAM} is not expanded but ${'$'}{project} is.
+            """.trimIndent(),
+            context = mapOf(
+                "project" to project,
+            ),
+            renderer = PlainEventRenderer.INSTANCE,
+        )
+        assertEquals(
+            "Parameter ${'$'}{PARAM} is not expanded but ontrack is.",
+            text
+        )
+    }
+
 }

@@ -76,16 +76,18 @@ class OntrackOidcUserService(
         }
         // Wrapping the account
         val ontrackUser = AccountOntrackUser(account)
-        // Filter on the groups
-        val groupFilter = securityService.asAdmin {
+        // Configuration
+        val provider = securityService.asAdmin {
             oidcSettingsService
                 .getProviderById(clientRegistration.registrationId)
-                ?.groupFilter
-                ?: ".*"
         }
+        // Filter on the groups
+        val groupFilter = provider?.groupFilter ?: ".*"
         val groupFilterRegex = groupFilter.toRegex(RegexOption.IGNORE_CASE)
+        // Name of the groups claim
+        val groupClaim = provider?.groupClaim ?: "groups"
         // Gets the groups provided by OIDC
-        val groups = oidcUser.getClaimAsStringList("groups")
+        val groups = oidcUser.getClaimAsStringList(groupClaim)
             ?.filter { groupFilterRegex.matches(it) }
             ?.toSet()
             ?: emptySet()

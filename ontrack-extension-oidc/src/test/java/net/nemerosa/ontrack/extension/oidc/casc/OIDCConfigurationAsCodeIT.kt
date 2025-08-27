@@ -52,6 +52,10 @@ class OIDCConfigurationAsCodeIT : AbstractCascTestSupport() {
                         "description": "Check to force the protocol to HTTPS for the Redirect URI",
                         "type": "boolean"
                       },
+                      "groupClaim": {
+                        "description":"Name of the access token claim that contains the list of groups. It defaults to `groups`.",
+                        "type":"string"
+                      },
                       "groupFilter": {
                         "description": "Regular expression used to filter groups associated with the OIDC user",
                         "type": "string"
