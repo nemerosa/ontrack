@@ -24,7 +24,6 @@ export default function BuildContent({build}) {
             {i: "usedBy", x: 6, y: 24, w: 6, h: 9},
             {i: "notifications", x: 0, y: 33, w: 12, h: 9},
         ]
-        layoutName = "page-build-layout-v5-env"
     } else {
         defaultLayout = [
             {i: "promotions", x: 0, y: 0, w: 4, h: 9},
@@ -33,19 +32,12 @@ export default function BuildContent({build}) {
             {i: "usedBy", x: 6, y: 9, w: 6, h: 9},
             {i: "notifications", x: 0, y: 18, w: 12, h: 9},
         ]
-        layoutName = "page-build-layout-v5-noenv"
     }
 
     const items = [
         {
             id: "promotions",
             content: <BuildContentPromotions
-                build={build}
-            />,
-        },
-        {
-            id: "environments",
-            content: <BuildContentEnvironments
                 build={build}
             />,
         },
@@ -74,6 +66,15 @@ export default function BuildContent({build}) {
             />,
         },
     ]
+
+    if (user.authorizations.environment?.view) {
+        items.push({
+            id: "environments",
+            content: <BuildContentEnvironments
+                build={build}
+            />,
+        })
+    }
 
     return (
         <>
