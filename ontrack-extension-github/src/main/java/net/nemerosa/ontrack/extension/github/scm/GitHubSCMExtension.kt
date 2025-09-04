@@ -161,13 +161,15 @@ class GitHubSCMExtension(
             var merged = false
             // Auto approval
             if (autoApproval) {
-                // Approving using the auto merge account
-                client.approvePR(
-                    repository = repository,
-                    pr = pr.number,
-                    body = "Automated review for auto versioning on promotion",
-                    token = configuration.autoMergeToken,
-                )
+                // Approving using the auto merge account if provided
+                if (!configuration.autoMergeToken.isNullOrBlank()) {
+                    client.approvePR(
+                        repository = repository,
+                        pr = pr.number,
+                        body = "Automated review for auto versioning on promotion",
+                        token = configuration.autoMergeToken,
+                    )
+                }
                 // Auto merge
                 if (remoteAutoMerge) {
                     client.enableAutoMerge(repository, pr.number, message)
