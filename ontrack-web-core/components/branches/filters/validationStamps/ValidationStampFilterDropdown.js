@@ -1,5 +1,5 @@
 import {Button, Dropdown, Space, Typography} from "antd";
-import {FaCaretDown, FaCheckDouble, FaEdit, FaEraser, FaEyeSlash, FaFilter, FaPlus} from "react-icons/fa";
+import {FaCaretDown, FaCheckDouble, FaEdit, FaEraser, FaEyeSlash, FaFilter, FaPlus, FaTrashAlt} from "react-icons/fa";
 import {useContext, useEffect, useState} from "react";
 import CheckableMenuItem from "@components/common/CheckableMenuItem";
 import {gql} from "graphql-request";
@@ -16,6 +16,7 @@ import {
     gqlValidationStampFilterFragment
 } from "@components/branches/filters/validationStamps/ValidationStampFilterGraphQLFragments";
 import {ValidationStampFilterContext} from "@components/branches/filters/validationStamps/ValidationStampFilterContext";
+import InlineConfirmCommand from "@components/common/InlineConfirmCommand";
 
 /**
  * @param branch Target branch for the filters
@@ -67,12 +68,18 @@ export default function ValidationStampFilterDropdown({branch}) {
                             {/*}*/}
                             {
                                 isAuthorized(filter, "validation_stamp_filter", "edit") &&
-                                !vsfContext.inlineEdition &&
-                                <FaEdit
-                                    className="ot-command"
-                                    title="Edits this filter"
-                                    onClick={() => vsfContext.editFilter(filter)}
-                                />
+                                !vsfContext.inlineEdition && <>
+                                    <FaEdit
+                                        className="ot-command"
+                                        title="Edits this filter"
+                                        onClick={() => vsfContext.editFilter(filter)}
+                                    />
+                                    <InlineConfirmCommand
+                                        title="Filter deletion"
+                                        confirm={`Are you sure you want to delete the "${filter.name}" filter?`}
+                                        onConfirm={() => vsfContext.deleteFilter(filter)}
+                                    />
+                                </>
                             }
                         </>
                     }
