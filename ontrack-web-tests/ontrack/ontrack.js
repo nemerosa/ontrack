@@ -5,6 +5,7 @@ import {admin} from "@ontrack/admin";
 import {OntrackConfigurations} from "@ontrack/configurations";
 import {getBranchById} from "@ontrack/branch";
 import {EnvironmentsExtension} from "@ontrack/extensions/environments/environments";
+import {OntrackSettings} from "@ontrack/settings";
 
 /**
  * Ontrack root
@@ -30,6 +31,7 @@ export const ontrack = (customCredentials) => {
 
     self.admin = () => admin(self)
     self.configurations = new OntrackConfigurations(self)
+    self.settings = new OntrackSettings(self)
 
     // Extensions
     self.environments = new EnvironmentsExtension(self)
