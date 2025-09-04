@@ -4,6 +4,7 @@ import {admin} from "@ontrack/admin";
 import {OntrackConfigurations} from "@ontrack/configurations";
 import {getBranchById} from "@ontrack/branch";
 import {EnvironmentsExtension} from "@ontrack/extensions/environments/environments";
+import {OntrackSettings} from "@ontrack/settings";
 
 /**
  * Ontrack service
@@ -15,6 +16,7 @@ export class Ontrack {
 
     admin = () => admin(this)
     configurations = new OntrackConfigurations(this)
+    settings = new OntrackSettings(self)
 
     createProject = async (name) => createProject(this, name)
     getProjectById = async (id) => getProjectById(this, id)

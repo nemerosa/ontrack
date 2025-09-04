@@ -17,7 +17,7 @@ import net.nemerosa.ontrack.model.annotations.APILabel
  */
 class GitHubIngestionSettings(
     @APIDescription("Secret token sent by the GitHub hook and signing the payload. This MUST be a valid Ontrack API token.")
-    val token: String,
+    val token: String? = null,
     @APIDescription("Number of days to keep the received payloads (0 = forever)")
     val retentionDays: Int = DEFAULT_RETENTION_DAYS,
     @APIDescription("Must the organization name be used as a project name prefix?")

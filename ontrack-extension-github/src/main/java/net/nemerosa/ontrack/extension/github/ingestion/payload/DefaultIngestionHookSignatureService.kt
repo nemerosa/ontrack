@@ -24,7 +24,7 @@ class DefaultIngestionHookSignatureService(
             return IngestionHookSignatureCheckResult.OK
         }
         val token = cachedSettingsService.getCachedSettings(GitHubIngestionSettings::class.java).token
-        if (token.isBlank()) {
+        if (token.isNullOrBlank()) {
             return IngestionHookSignatureCheckResult.MISSING_TOKEN
         }
         return IngestionHookSignature.checkPayloadSignature(body, signature, token)
