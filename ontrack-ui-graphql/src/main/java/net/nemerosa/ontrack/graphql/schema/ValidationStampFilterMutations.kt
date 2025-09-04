@@ -46,6 +46,14 @@ class ValidationStampFilterMutations(
             // OK
             vsf
         },
+        unitMutation(
+            name = "deleteValidationStampFilterById",
+            description = "Deletes a validation stamp filter",
+            input = DeleteValidationStampFilterByIdInput::class,
+        ) { input ->
+            val vsf = filterService.getValidationStampFilter(ID(input.id))
+            filterService.deleteValidationStampFilter(vsf)
+        },
     )
 
 }
@@ -64,4 +72,10 @@ data class UpdateValidationStampFilterInput(
     @APIDescription("Validation stamp names")
     @ListRef
     val vsNames: List<String>,
+)
+
+@APIDescription("Deleting a validation stamp filter")
+data class DeleteValidationStampFilterByIdInput(
+    @APIDescription("ID of the validation stamp filter")
+    val id: Int,
 )

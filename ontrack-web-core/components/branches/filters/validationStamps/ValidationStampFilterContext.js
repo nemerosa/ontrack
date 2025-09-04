@@ -12,6 +12,7 @@ import EditValidationStampFilterDialog, {
 } from "@components/branches/filters/validationStamps/EditValidationStampFilterDialog";
 import {usePreferences} from "@components/providers/PreferencesProvider";
 import {useGraphQLClient} from "@components/providers/ConnectionContextProvider";
+import {useRefresh} from "@components/common/RefreshUtils";
 
 // noinspection JSUnusedLocalSymbols
 export const ValidationStampFilterContext = createContext({
@@ -40,6 +41,8 @@ export const ValidationStampFilterContext = createContext({
     },
     editFilter: (filter) => {
     },
+    deleteFilter: (filter) => {
+    },
     // Grouping options
     grouping: false,
     setGrouping: (value) => {
@@ -50,6 +53,7 @@ export default function ValidationStampFilterContextProvider({branch, children})
 
     const client = useGraphQLClient()
 
+    const [refreshCount, refresh] = useRefresh()
     const [validationStampNames, setValidationStampNames] = useState([])
     const [filters, setFilters] = useState([])
     useEffect(() => {
@@ -85,7 +89,7 @@ export default function ValidationStampFilterContextProvider({branch, children})
                 }
             })
         }
-    }, [client, branch])
+    }, [client, branch, refreshCount])
 
     const [selectedFilter, setSelectedFilter] = useState()
 
@@ -237,6 +241,25 @@ export default function ValidationStampFilterContextProvider({branch, children})
         editValidationStampFilterDialog.start({filter})
     }
 
+    const deleteFilter = async (filter) => {
+        client.request(
+            gql`
+                mutation DeleteValidationStampFilter($id: Int!) {
+                    deleteValidationStampFilterById(input: {
+                        id: $id,
+                    }) {
+                        errors {
+                            message
+                        }
+                    }
+                }
+            `,
+            {
+                id: Number(filter.id)
+            }
+        ).then(refresh)
+    }
+
     // Preferences
     const {branchViewVsGroups, setPreferences} = usePreferences()
 
@@ -259,6 +282,7 @@ export default function ValidationStampFilterContextProvider({branch, children})
         stopInlineEdition,
         newFilter,
         editFilter,
+        deleteFilter,
         grouping,
         setGrouping: onGrouping,
     }
