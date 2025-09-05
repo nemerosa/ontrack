@@ -58,9 +58,7 @@ class GitHubIngestionSettingsCascIT : AbstractCascTestSupport() {
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "token"
-                  ],
+                  "required": [],
                   "additionalProperties": false,
                   "type": "object"
                 }
