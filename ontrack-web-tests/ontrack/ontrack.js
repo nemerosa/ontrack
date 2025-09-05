@@ -16,7 +16,7 @@ export class Ontrack {
 
     admin = () => admin(this)
     configurations = new OntrackConfigurations(this)
-    settings = new OntrackSettings(self)
+    settings = new OntrackSettings(this)
 
     createProject = async (name) => createProject(this, name)
     getProjectById = async (id) => getProjectById(this, id)

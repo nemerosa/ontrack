@@ -55,6 +55,10 @@ class IngestionHookController(
         if (!settings.enabled) {
             throw GitHubIngestionHookDisabledException()
         }
+        // Checks the ingestion token is filled in
+        if (settings.token.isNullOrBlank()) {
+            throw GitHubIngestionSettingsMissingTokenException()
+        }
         // Gets the event processor if any
         val eventProcessor =
             eventProcessors[gitHubEvent] ?: throw GitHubIngestionHookEventNotSupportedException(gitHubEvent)
