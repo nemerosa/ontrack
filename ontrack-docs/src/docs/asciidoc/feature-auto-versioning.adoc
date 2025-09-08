@@ -727,8 +727,8 @@ jobs:
 [IMPORTANT]
 ====
 * all mentioned `inputs` are required by Ontrack
-* the `id` input and its output into a local file artifact is required by Ontrack to follow up on the workflow process
-* commit & pushing the changed files is required for the post processing to be considered complete
+* the `id` input and its output into a local file artifact is required by Ontrack to follow up on the workflow process (the GitHub API does not allow to explicitly retrieve a workflow run when it's launched) - see the generation & archiving of the `inputs.properties` file in the example above.
+* commit & pushing the changed files is required for the post-processing to be considered complete
 
 The rest of the workflow can be adapted at will.
 ====
