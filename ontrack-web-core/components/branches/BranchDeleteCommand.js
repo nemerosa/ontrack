@@ -39,7 +39,7 @@ export default function BranchDeleteCommand({id}) {
                         }
                     `
                 }
-                gqlVariables={{id}}
+                gqlVariables={{id: Number(id)}}
                 gqlUserNode="deleteBranchById"
                 onSuccess={onSuccess}
             />
