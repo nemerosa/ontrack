@@ -2,6 +2,7 @@ package net.nemerosa.ontrack.service.security
 
 import io.mockk.every
 import io.mockk.mockk
+import net.nemerosa.ontrack.model.security.BuildDelete
 import net.nemerosa.ontrack.model.security.BuildEdit
 import net.nemerosa.ontrack.model.security.PromotionRunCreate
 import net.nemerosa.ontrack.model.security.SecurityService
@@ -44,6 +45,12 @@ class BuildAuthorizationContributorTest {
             securityService.isProjectFunctionGranted(
                 any<ProjectEntity>(),
                 BuildEdit::class.java
+            )
+        } returns true
+        every {
+            securityService.isProjectFunctionGranted(
+                any<ProjectEntity>(),
+                BuildDelete::class.java
             )
         } returns true
         val branch = BranchFixtures.testBranch()
