@@ -106,7 +106,7 @@ export const useBuild = (id) => {
             }
         `,
         {
-            variables: {id},
+            variables: {id: Number(id)},
             dataFn: data => data.build,
         }
     )
@@ -135,7 +135,7 @@ export const useBranch = (id) => {
             }
         `,
         {
-            variables: {id},
+            variables: {id: Number(id)},
             dataFn: data => data.branch,
         }
     )
@@ -159,7 +159,7 @@ export const useProject = (id) => {
             }
         `,
         {
-            variables: {id},
+            variables: {id: Number(id)},
             dataFn: data => data.project,
         }
     )
